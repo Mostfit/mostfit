@@ -1,0 +1,24 @@
+
+%table.form
+  %tr
+    %td
+      Real name:
+    %td
+      = text_field :name
+  %tr
+    %td
+      Login name:
+    %td
+      = text_field :login
+      %br/
+      %span.greytext (only letters and numbers are allowed)
+  %tr
+    %td
+      Password:
+    %td
+      = password_field :password
+  %tr
+    %td
+      Password confirmation:
+    %td
+      = password_field :password_confirmation

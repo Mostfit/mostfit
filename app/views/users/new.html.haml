@@ -1,0 +1,15 @@
+
+.prefix-2.span-20.suffix-2.last
+  %h1 Create a new user
+
+  = error_messages_for @user
+
+  = form_for(@user, :action => url(:users)) do
+    = partial 'fields'
+    %p
+      = submit "create"
+
+  = link_to 'Back', url(:users)
+
+  %p
+    %br/

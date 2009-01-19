@@ -1,0 +1,53 @@
+%h1== Loans for center '#{@center.name}'
+
+%p
+  == Manage existing loans or #{link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new)}.
+
+%table.narrow.form{ :width => '100%' }
+  %thead
+    %tr
+      %th
+      %th id
+      %th amount
+      %th interest
+      %th installments
+      %th disbursement
+      %th repaid
+      %th
+      %th
+  %tbody
+  - for loan in @loans
+    %tr{ :class => cycle('odd','') }
+      %td &nbsp;
+      %td
+        = loan.id
+      %td
+        %b= loan.amount
+      %td
+        %b= loan.interest_rate
+      %td
+        = loan.number_of_installments
+        = plurial_nouns loan.installment_frequency
+      %td
+        - if loan.disbursal_date
+          = loan.disbursal_date
+          %br/
+          %span.greytext
+            = loan.scheduled_disbursal_date
+            = difference_in_days(loan.disbursal_date, loan.scheduled_disbursal_date)
+        - else
+          %i= loan.scheduled_disbursal_date
+      %td
+        = "#{(loan.repaid_principal / loan.amount * 100).round}%"
+      %td
+        = link_to 'edit', resource(@branch, @center, @client, loan, :edit)
+      %td
+        = link_to 'record payment', resource(@branch, @center, @client, loan, :payments, :new)
+
+  %tfoot
+    %tr
+      %td{ :colspan => 7 }
+
+
+
+= link_to 'New', resource(@branch, @center, @client, :loans, :new)

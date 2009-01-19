@@ -1,0 +1,16 @@
+
+.prefix-2.span-20.suffix-2.last
+
+  %h1= "Delete '#{@user.login}'"
+
+  %p
+    = "Are you sure you want to delete the user <b>#{@user.login}</b>?"
+
+  = form_for @user, { :action => resource(@user), :method => 'DELETE' } do
+    %p
+      = submit "Yes, delete user '#{@user.login}'..."
+
+  = link_to 'Back', url(:users)
+
+  %p
+    %br/

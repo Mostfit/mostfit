@@ -1,0 +1,9 @@
+%h1== Edit the '#{@loan.id}' loan details
+
+= error_messages_for @loan
+
+= form_for(@loan, :action => resource(@branch, @center, @client, @loan)) do
+  = partial :fields
+  = submit "Save changes"
+
+= link_to 'Back', resource(@branch, @center, @client, :loans)

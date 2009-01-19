@@ -1,0 +1,34 @@
+%h1 Centers
+
+%p
+  == Manage existing centers or #{link_to 'create a new center', resource(@branch, :centers, :new)}.
+
+%table.narrow.form{ :width => '100%' }
+  %thead
+    %tr
+      %th
+      %th id
+      %th name
+      %th meeting
+  %tbody
+  - for center in @centers
+    %tr{ :class => cycle('odd','') }
+      %td &nbsp;
+      %td
+        = center.id
+      %td
+        = link_to center.name, resource(@branch, center)
+      %td
+        %b== #{center.meeting_day}, #{center.meeting_time}
+      %td
+        = link_to 'edit', resource(@branch, center, :edit)
+      %td
+        = link_to 'new client', resource(@branch, center, :clients, :new)
+
+  %tfoot
+    %tr
+      %td{ :colspan => 7 }
+
+
+
+= link_to 'New', resource(@branch, :centers, :new)

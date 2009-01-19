@@ -1,0 +1,9 @@
+%h1== Edit the '#{@center.name}' center details
+
+= error_messages_for @center
+
+= form_for(@center, :action => resource(@branch, @center)) do
+  = partial :fields
+  = submit "Save changes"
+
+= link_to 'Back', resource(@branch, :centers)

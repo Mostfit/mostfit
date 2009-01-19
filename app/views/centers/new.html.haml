@@ -1,0 +1,10 @@
+%h1 Create new center
+
+= error_messages_for @center
+
+= form_for(@center, :action => resource(@branch, :centers)) do
+  = partial :fields
+
+  = submit "Create center"
+
+= link_to 'Back', resource(@branch, :centers)

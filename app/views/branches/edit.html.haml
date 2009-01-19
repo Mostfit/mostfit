@@ -1,0 +1,9 @@
+%h1== Edit the '#{@branch.name}' branch details
+
+= error_messages_for @branch
+
+= form_for(@branch, :action => url(:branch, @branch)) do
+  = partial :fields
+  = submit "Save changes"
+
+= link_to 'Back', url(:branches)

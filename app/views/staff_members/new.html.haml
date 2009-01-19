@@ -1,0 +1,13 @@
+%h1 StaffMembers controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/staff_members/new.html.erb
+
+= error_messages_for @staff_member
+
+= form_for(@staff_member, :action => url(:staff_members) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:staff_members)

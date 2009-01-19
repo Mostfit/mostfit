@@ -1,0 +1,16 @@
+%h1
+  StaffMembers controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/staff_members/index.html.erb
+%table
+  %tr
+  - for staff_member in @staff_members
+    %tr
+      %td
+        = link_to 'Show', url(:staff_member, staff_member)
+      %td
+        = link_to 'Edit', url(:edit_staff_member,  staff_member)
+
+= link_to 'New', url(:new_staff_member)

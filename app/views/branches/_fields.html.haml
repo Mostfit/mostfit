@@ -1,0 +1,18 @@
+%table.form
+  %tr
+    %td
+      Branch name:
+    %td
+      = text_field :name, :size => 40
+  %tr
+    %td
+      Address:
+    %td
+      ~ text_area :address, :rows => 10, :cols => 38
+  %tr
+    %td
+      Manager:
+    %td
+      = text_field :staff_member_id, :size => 40
+      %br/
+      %span.greytext (just a staffmember id)

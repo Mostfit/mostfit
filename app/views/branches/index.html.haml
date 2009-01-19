@@ -1,0 +1,35 @@
+%h1 Branches
+
+%p
+  == Manage existing branches or #{link_to 'create a new branch', resource(:branches, :new)}.
+
+%table.narrow.form{ :width => '100%' }
+  %thead
+    %tr
+      %th
+      %th id
+      %th name
+      %th centers
+  %tbody
+  - for branch in @branches
+    %tr{ :class => cycle('odd','') }
+      %td &nbsp;
+      %td
+        = branch.id
+      %td
+        = link_to branch.name, resource(branch)
+      %td
+        %b= branch.centers.size
+        == (#{link_to 'view', resource(branch, :centers)})
+      %td
+        = link_to 'edit', resource(branch, :edit)
+      %td
+        = link_to 'new center', resource(branch, :centers, :new)
+
+  %tfoot
+    %tr
+      %td{ :colspan => 7 }
+
+
+
+= link_to 'New', url(:new_branch)

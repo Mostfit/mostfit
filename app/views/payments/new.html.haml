@@ -1,0 +1,13 @@
+%h1 Payments controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/payments/new.html.erb
+
+= error_messages_for @payment
+
+= form_for(@payment, :action => url(:payments) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:payments)

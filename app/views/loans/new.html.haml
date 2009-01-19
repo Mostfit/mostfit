@@ -1,0 +1,10 @@
+%h1 Add a new loan
+
+= error_messages_for @loan
+
+= form_for(@loan, :action => resource(@branch, @center, @client, :loans)) do
+  = partial :fields
+
+  = submit "Add loan"
+
+= link_to 'Back', resource(@branch, @center, @client, :loans)

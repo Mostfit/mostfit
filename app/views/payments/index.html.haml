@@ -1,0 +1,16 @@
+%h1
+  Payments controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/payments/index.html.erb
+%table
+  %tr
+  - for payment in @payments
+    %tr
+      %td
+        = link_to 'Show', url(:payment, payment)
+      %td
+        = link_to 'Edit', url(:edit_payment,  payment)
+
+= link_to 'New', url(:new_payment)

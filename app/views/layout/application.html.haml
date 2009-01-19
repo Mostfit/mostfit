@@ -1,0 +1,78 @@
+!!! Strict
+%html{ "xml:lang" => "en", :lang => "en", :xmlns => "http://www.w3.org/1999/xhtml" }
+  %head
+    %meta{ :content => "text/html; charset=utf-8", "http-equiv" => "content-type" }/
+    %title
+      = 'mostfit' + (catch_content(:title) ? '' : ": #{catch_content(:title)}")
+    %link{ :rel => "icon", :type => "image/ico", :href => "/favicon.ico" }/
+    = css_include_tag :screen, :media => "screen, projection"
+    = css_include_tag :print, :media => "print"
+    ~ "<!--[if IE]>\n  <link rel='Stylesheet' href='/stylesheets/ie.css' type='text/css' media='screen, projection'>\n<![endif]-->"
+    = css_include_tag :style, :media => "screen, projection"
+  %body
+    .spacer/
+    .container
+      #header
+      #subheader
+        #title
+          mostfit
+        #right-nav
+          - if session.authenticated?
+            == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})
+      - if session.authenticated?
+        #navigation
+          - if session.user.id == 1
+            %b= link_to 'manage users', url(:users)
+            (admin only)&nbsp;|&nbsp;         
+          = link_to 'branches', url(:branches)
+          /&nbsp;|&nbsp;
+          /= link_to 'centers', url(:centers)
+          /&nbsp;|&nbsp;
+          /= link_to 'loans', url(:loans)
+          /&nbsp;|&nbsp;
+          /= link_to 'clients', url(:clients)
+
+      - if message
+        #flash-messages.span-14.prefix-5.suffix-5.last
+          - message.each do |key, value|
+            .flash{ :class => key.to_s }
+              %p= value
+
+
+      #content
+        = catch_content :for_layout
+
+      %p
+        %br/
+        %br/
+
+    #footer
+      == &copy; 2009 Intellecap &mdash; This software is released under the #{link_to 'GNU Affero General Public License', 'http://www.gnu.org/licenses/agpl.html'}.
+
+
+      - if Merb::Config[:environment] == 'development'
+        %p
+          %a{ :name => "debug" }/
+          %a{:onclick => "document.getElementsByClassName('debug-info')[0].style.display = '';", :href => '#debug'}
+            debug info
+          .debug-info{:style => 'display: none'}
+            %code
+              - debug_info.each do |i|
+                %p
+                  %a{:onclick => "document.getElementsByClassName('debug_#{i[:name]}')[0].style.display = '';", :href => "#debug_#{i[:name]}"}
+                    = i[:code] + ' =>'
+                  %br/
+                  %span{:class => "debug_#{i[:name]}", :style => 'display: none'}
+                    - if i[:obj].class == Hash
+                      - i[:obj].each do |key, value|
+                        = "#{key.inspect.to_s} => #{value.inspect.to_s}"
+                        %br/
+                    - elsif i[:obj].class == Array
+                      - i[:obj].each do |n|
+                        = n.inspect.to_s
+                        %br/
+                    - else
+                      = i[:obj].inspect.to_s
+                      %br/
+                  %a{ :name => "debug_#{i[:name]}" }/
+

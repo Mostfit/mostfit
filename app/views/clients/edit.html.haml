@@ -1,0 +1,9 @@
+%h1== Edit the '#{@client.name}' client details
+
+= error_messages_for @client
+
+= form_for(@client, :action => resource(@branch, @center, @client)) do
+  = partial :fields
+  = submit "Save changes"
+
+= link_to 'Back', resource(@branch, @center, :clients)

@@ -1,0 +1,15 @@
+
+.prefix-2.span-20.suffix-2.last
+  %h1= "Edit user '#{@user.login}'"
+
+  = error_messages_for :user
+
+  = form_for(@user, :action => url(:user, @user)) do
+    = partial 'fields'
+    %p
+      = submit "Save changes"
+
+  = link_to 'Back', url(:users)
+
+  %p
+    %br/

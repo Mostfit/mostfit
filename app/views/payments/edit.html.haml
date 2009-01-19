@@ -1,0 +1,15 @@
+%h1
+  Payments controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/payments/edit.html.erb
+= error_messages_for @payment
+
+= form_for(@payment, :action => url(:payment, @payment)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:payment, @payment)
+|
+= link_to 'Back', url(:payments)
