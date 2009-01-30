@@ -1,4 +1,30 @@
-%h1== Clients of center <i>#{@center.name}</i>
+%h1== Center: <i>#{@center.name}</i>
+
+%table.narrow.form
+  %tr
+    %td name
+    %td
+      %b= @center.name
+      == (id: #{@center.id})
+  %tr
+    %td manager
+    %td= link_to @center.manager.name, resource(@center.manager)
+  %tr
+    %td in branch
+    %td
+      = link_to @branch.name, resource(@center.branch)
+      %br/
+      %span.greytext
+        managed by:
+        = link_to @center.branch.manager.name, resource(@center.manager)
+  %tr
+    %td meeting
+    %td== #{@center.meeting_day}, #{@center.meeting_time}
+
+
+%p= link_to 'edit this center\'s details', resource(@branch, @center, :edit)
+
+%h2== Clients of the <i>#{@center.name}</i> center
 
 %p
   == Manage existing clients or #{link_to 'add a new client', resource(@branch, @center, :clients, :new)}.
@@ -17,13 +43,13 @@
       %td
         = client.id
       %td
-        = link_to client.name, resource(@branch, @center, client)
+        %b= link_to client.name, resource(@branch, @center, client)
       %td
         %b= client.loans.size
         == (#{link_to 'view', resource(@branch, @center, client, :loans)})
       %td
         = link_to 'edit', resource(@branch, @center, client, :edit)
-      %td
+        &nbsp;|&nbsp;
         = link_to 'new loan', resource(@branch, @center, client, :loans, :new)
 
   %tfoot

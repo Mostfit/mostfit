@@ -1,0 +1,35 @@
+
+madhuri:
+  :id: 1
+  :name: madhuri
+  :active: true
+
+manju:
+  :id: 2
+  :name: manju
+  :active: true
+
+pooja:
+  :id: 3
+  :name: pooja
+  :active: true
+
+samil:
+  :id: 4
+  :name: samil
+  :active: false
+
+usha:
+  :id: 5
+  :name: usha
+  :active: true
+
+priya:
+  :id: 6
+  :name: priya
+  :active: true
+
+jamil:
+  :id: 7
+  :name: jamil
+  :active: true

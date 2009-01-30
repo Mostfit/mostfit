@@ -1,0 +1,34 @@
+%table.form
+  %tr
+    %td
+    %td Either provide both the principal and interest:
+  %tr
+    %td Principal:
+    %td
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      = text_field :principal, :size => 40
+  %tr
+    %td Interest:
+    %td
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      = text_field :interest, :size => 40
+  %tr
+    %td
+    %td Or supply the total amount paid and we split it according to the loan type:
+  %tr
+    %td Total:
+    %td
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      = text_field :total, :size => 40
+  %tr
+    %td
+    %td
+  %tr
+    %td Received on:
+    %td
+      = text_field :received_on, :size => 40
+  %tr
+    %td Received by:
+    %td
+      = select :received_by, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
+

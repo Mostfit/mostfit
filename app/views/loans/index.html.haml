@@ -1,4 +1,27 @@
-%h1== Loans for client <i>#{@client.name}</i>
+%h1== Client: <i>#{@client.name}</i>
+
+
+%table.narrow.form
+  %tr
+    %td name
+    %td
+      %b= @client.name
+      == (id: #{@client.id})
+  %tr
+    %td manager
+    %td= link_to @branch.manager.name, resource(@branch.manager)
+  %tr
+    %td at center
+    %td
+      = link_to @center.name, resource(@branch, @center)
+      %br/
+      %span.greytext
+        managed by:
+        = link_to @center.branch.manager.name, resource(@center.manager)
+
+
+
+%h2== Loans for client <i>#{@client.name}</i>
 
 %p
   == Manage existing loans or #{link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new)}.
@@ -13,6 +36,7 @@
       %th installments
       %th disbursement
       %th repaid
+      %th status
   %tbody
   - for loan in @loans
     %tr{ :class => cycle('odd','') }
@@ -20,7 +44,7 @@
       %td
         = loan.id
       %td
-        %b= loan.amount
+        %b= format_currency(loan.amount)
       %td
         %b= format("%.2f%", loan.interest_rate * 100)
       %td
@@ -45,15 +69,17 @@
       %td
         = format("%.2f%", loan.repaid_principal.to_f / loan.amount * 100)
       %td
+        = loan.status.to_s.gsub('_', ' ')
+      %td
         = link_to 'edit', resource(@branch, @center, @client, loan, :edit)
-      %td
+        &nbsp;|&nbsp;
         = link_to 'view payments', resource(@branch, @center, @client, loan, :payments)
-      %td
+        &nbsp;|&nbsp;
         = link_to 'record payment', resource(@branch, @center, @client, loan, :payments, :new)
 
   %tfoot
     %tr
-      %td{ :colspan => 7 }
+      %td{ :colspan => 8 }
 
 
 

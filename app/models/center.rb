@@ -11,6 +11,8 @@ class Center
 
   has n, :clients
 
+  validates_present :manager
+
 #   def loan_stats
 #     Loan.loan_stats_for clients.loans
 #   end

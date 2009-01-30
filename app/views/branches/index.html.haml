@@ -9,6 +9,7 @@
       %th
       %th id
       %th name
+      %th manager
       %th centers
   %tbody
   - for branch in @branches
@@ -17,18 +18,20 @@
       %td
         = branch.id
       %td
-        = link_to branch.name, resource(branch)
+        %b= link_to branch.name, resource(branch)
+      %td
+        = link_to branch.manager.name, resource(branch.manager)
       %td
         %b= branch.centers.size
         == (#{link_to 'view', resource(branch, :centers)})
       %td
         = link_to 'edit', resource(branch, :edit)
-      %td
+        &nbsp;|&nbsp
         = link_to 'new center', resource(branch, :centers, :new)
 
   %tfoot
     %tr
-      %td{ :colspan => 7 }
+      %td{ :colspan => 5 }
 
 
 

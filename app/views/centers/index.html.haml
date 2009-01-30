@@ -1,7 +1,23 @@
-%h1== Centers of branch <i>#{@branch.name}</i>
+%h1== Branch: <i>#{@branch.name}</i>
 
-%p
-  == Manage existing centers or #{link_to 'create a new center', resource(@branch, :centers, :new)}.
+%table.narrow.form
+  %tr
+    %td name
+    %td
+      %b= @branch.name
+      == (id: #{@branch.id})
+  %tr
+    %td manager
+    %td= link_to @branch.manager.name, resource(@branch.manager)
+  %tr
+    %td centers
+    %td
+      %b= @branch.centers.size
+
+%p= link_to 'edit this branch\' details', resource(@branch, :edit)
+
+%h2== Centers of the <i>#{@branch.name}</i> branch
+%p== Manage existing centers or #{link_to 'create a new center', resource(@branch, :centers, :new)}.
 
 %table.narrow.form{ :width => '100%' }
   %thead
@@ -9,6 +25,7 @@
       %th
       %th id
       %th name
+      %th manager
       %th meeting
   %tbody
   - for center in @centers
@@ -17,12 +34,14 @@
       %td
         = center.id
       %td
-        = link_to center.name, resource(@branch, center)
+        %b= link_to center.name, resource(@branch, center)
       %td
-        %b== #{center.meeting_day}, #{center.meeting_time}
+        = link_to center.manager.name, resource(center.manager)
+      %td
+        == #{center.meeting_day}, #{center.meeting_time}
       %td
         = link_to 'edit', resource(@branch, center, :edit)
-      %td
+        &nbsp;|&nbsp;
         = link_to 'new client', resource(@branch, center, :clients, :new)
 
   %tfoot

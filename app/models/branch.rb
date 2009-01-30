@@ -5,9 +5,10 @@ class Branch
   property :name,    String, :length => 100, :nullable => false
   property :address, Text
   
-
   belongs_to :manager, :class_name => 'StaffMember'
   has n, :centers
+
+  validates_present :staff_member_id
 
   def loan_stats
     Loan.loan_stats_for self.centers.clients.loans

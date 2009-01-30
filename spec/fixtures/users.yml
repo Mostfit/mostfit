@@ -1,0 +1,42 @@
+
+admin:
+  :id: 1
+  :login: admin
+  :active: true
+  :password: password
+  :password_confirmation: password
+
+prashanth:
+  :id: 2
+  :login: prashanth
+  :active: true
+  :password: password
+  :password_confirmation: password
+
+priya:
+  :id: 3
+  :login: priya
+  :active: true
+  :password: password
+  :password_confirmation: password
+
+sid:
+  :id: 4
+  :login: sid
+  :active: true
+  :password: password
+  :password_confirmation: password
+
+cies:
+  :id: 5
+  :login: cies
+  :active: true
+  :password: password
+  :password_confirmation: password
+
+hemanth:
+  :id: 6
+  :login: hemanth
+  :active: false
+  :password: password
+  :password_confirmation: password
