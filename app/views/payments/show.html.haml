@@ -1,10 +1,10 @@
 %h1
-  Payments controller, show action
+  == Payment '#{@payment.id}'
 %p
   Edit this file in
   %tt
-    app/views/payments/show.html.erb
+    app/views/payment/show.html.erb
 
-= link_to 'Edit',  url(:edit_payment,  @payment)
+= link_to 'Edit',  resource(@branch, @center, @client, @loan, @payment, :edit)
 |
-= link_to 'Back', url(:payments)
+= link_to 'Back', resource(@branch, @center, @client, @loan, :payments)

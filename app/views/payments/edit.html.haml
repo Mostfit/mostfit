@@ -1,15 +1,9 @@
-%h1
-  Payments controller, edit action
-%p
-  Edit this file in
-  %tt
-    app/views/payments/edit.html.erb
+%h1== Edit the '#{@payment.id}' payment details
+
 = error_messages_for @payment
 
-= form_for(@payment, :action => url(:payment, @payment)) do
-  %p
-    = submit "Update"
+= form_for(@payment, :action => resource(@branch, @center, @client, @loan, @payment)) do
+  = partial :fields
+  = submit "Save changes"
 
-= link_to 'Show', url(:payment, @payment)
-|
-= link_to 'Back', url(:payments)
+= link_to 'Back', resource(@branch, @center, @client, @loan, :payments)

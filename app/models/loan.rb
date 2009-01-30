@@ -14,24 +14,35 @@ class Loan
   property :updated_at,                     DateTime
 
   belongs_to :client
+  belongs_to :written_off_by, :class_name => 'StaffMember'
   has n, :payments
 
   # TODO: validations!!!
 
-  def repay(amount, user, received_on)  # TODO: some kind of validation
+  def repay(input, user, received_on, received_by)  # TODO: some kind of validation
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
 
-    # interest is paid first, the rest goes in as principal
-    interest  = [interest_due_on(received_on), amount].min  # in case the payment is not sufficient for the interest alone
-    principal = amount - interest
-    payment   = Payment.new(
-      :loan_id     => self.id,
-      :principal   => principal,
-      :interest    => interest,
-      :user_id     => user.id,
-      :received_on => received_on)
-    payment.save
+    unless input.is_a? Array or input.is_a? Fixnum
+      raise "the input argument of Loan#repay should be of class Fixnum or Array"
+    end
+
+    interest, principal, total = 0, 0, 0
+    if input.is_a? Fixnum  # in case only one amount is specified
+      # interest is paid first, the rest goes in as principal
+      total = input.to_i
+      interest  = [interest_due_on(received_on), total].min  # just input when not sufficient for interest due 
+      principal = total - interest
+    elsif input.is_a? Array  # in case principal and interest are specified separately
+      principal, interest = input[0].to_i, input[1].to_i
+      total = principal + interest
+    end
+
+    payment = Payment.new(:loan_id => self.id, :user_id => user.id,
+      :received_on => received_on, :staff_member_id => received_by,
+      :principal => principal, :interest => interest, :total => total)
+
+    [payment.save, payment]  # return the success boolean and the payment object itself for further processing
   end
 
 
@@ -107,6 +118,41 @@ class Loan
       shift_date_by_installments(scheduled_first_payment_date, number-1)
     end
   end
+
+  def repayment_style
+    # how is this loan repayed? principal/interest separate, aggregated or allow either way
+    # at some point this should have effect on the view (1 or 2 fields)
+    :allow_both   # one of [:separate, :aggregated, :allow_both]
+  end
+
+  def written_off?
+    not self.written_off_by.blank?
+  end
+
+  def status  # returns on of [:open, :closed, :insolvable]
+    return :written_off if self.written_off?
+    self.repaid_principal >= amount ? :repaid : :outstanding  # works only if interest gets paid first...
+  end
+
+  def self.loan_stats_for(loans)  # the stats for a collection of loans
+    stats = { :outstanding => {:number => 0, :total_amount => 0, :total_repaid => 0, :total_due => 0},
+              :repaid =>      {:number => 0, :total_amount => 0},
+              :written_off => {:number => 0, :total_amount => 0, :total_repaid => 0} }
+    loans.each do |loan|
+      s = loan.status
+      stats[s][:number]       += 1
+      stats[s][:total_amount] += loan.amount
+      stats[s][:total_repaid] += loan.repaid_principal if [:outstanding, :written_off].include? s
+      stats[s][:total_due]    += loan.total_due_on(Date.today) if s == :outstanding
+    end
+    # calculate percentages
+    [:outstanding, :written_off].each do |s|
+      p_repaid = stats[s][:total_amount].to_f / stats[s][:total_repaid]
+      stats[s][:percentage_repaid] = format("%.2f", p_repaid * 100).to_f
+    end
+    return stats
+  end
+
 
   # private
   def number_of_installments_before(date)

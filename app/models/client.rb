@@ -23,6 +23,9 @@ class Client
 
   belongs_to :center
 
+  def loan_stats
+    Loan.loan_stats_for self.loans  # a good object to cache or keep history of
+  end
 end
 
 

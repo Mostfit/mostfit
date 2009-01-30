@@ -9,6 +9,9 @@ class Branch
   belongs_to :manager, :class_name => 'StaffMember'
   has n, :centers
 
+  def loan_stats
+    Loan.loan_stats_for self.centers.clients.loans
+  end
 end
 
 

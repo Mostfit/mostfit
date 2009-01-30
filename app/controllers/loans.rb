@@ -1,16 +1,17 @@
 class Loans < Application
-  before :get_parent
-  # provides :xml, :yaml, :js
+  before :get_context
+  provides :xml, :yaml, :js
 
   def index
-    @loans = Loan.all
+    @loans = @client.loans
     display @loans
   end
 
   def show(id)
     @loan = Loan.get(id)
     raise NotFound unless @loan
-    display @loan
+    @payments = @loan.payments
+    display [@loan, @payments], 'payments/index'
   end
 
   def new
@@ -21,6 +22,7 @@ class Loans < Application
 
   def create(loan)
     @loan = Loan.new(loan)
+    @loan.client = @client  # set direct context
     if @loan.save
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
     else
@@ -61,9 +63,10 @@ class Loans < Application
   end
 
   private
-  def get_parent
+  def get_context
     @branch = Branch.get(params[:branch_id])
     @center = Center.get(params[:center_id])
     @client = Client.get(params[:client_id])
+    raise NotFound unless @branch and @center and @client
   end
 end # Loans

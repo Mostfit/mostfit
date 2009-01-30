@@ -1,13 +1,10 @@
-%h1 Payments controller, new action
-
-%p 
-  Edit this file in 
-  %tt app/views/payments/new.html.erb
+%h1 Register a payment
 
 = error_messages_for @payment
 
-= form_for(@payment, :action => url(:payments) ) do
-  %p
-    = submit "Create"
+= form_for(@payment, :action => resource(@branch, @center, @client, @loan, :payments)) do
+  = partial :fields
 
-= link_to 'Back', url(:payments)
+  = submit "Register payment"
+
+= link_to 'Back', resource(@branch, @center, @client, @loan, :payments)

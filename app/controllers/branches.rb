@@ -1,5 +1,5 @@
 class Branches < Application
-  # provides :xml, :yaml, :js
+  provides :xml, :yaml, :js
 
   def index
     @branches = Branch.all
@@ -9,7 +9,8 @@ class Branches < Application
   def show(id)
     @branch = Branch.get(id)
     raise NotFound unless @branch
-    display @branch
+    @centers = @branch.centers
+    display [@branch, @centers], 'centers/index'
   end
 
   def new

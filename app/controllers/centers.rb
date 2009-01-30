@@ -1,16 +1,17 @@
 class Centers < Application
-  before :get_parent
-  # provides :xml, :yaml, :js
+  before :get_context
+  provides :xml, :yaml, :js
 
   def index
-    @centers = Center.all
+    @centers = @branch.centers
     display @centers
   end
 
   def show(id)
     @center = Center.get(id)
     raise NotFound unless @center
-    display @center
+    @clients = @center.clients
+    display [@center, @clients], 'clients/index'
   end
 
   def new
@@ -21,6 +22,7 @@ class Centers < Application
 
   def create(center)
     @center = Center.new(center)
+    @center.branch = @branch  # set direct context
     if @center.save
       redirect resource(@branch, :centers), :message => {:notice => "Center '#{@center.name}' was successfully created"}
     else
@@ -61,7 +63,8 @@ class Centers < Application
   end
 
   private
-  def get_parent
+  def get_context
     @branch = Branch.get(params[:branch_id])
+    raise NotFound unless @branch
   end
 end # Centers

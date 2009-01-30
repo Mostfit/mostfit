@@ -1,5 +1,6 @@
 module Merb
   module GlobalHelpers
+
     def plurial_nouns(freq)
       case freq.to_sym
         when :daily
@@ -13,11 +14,10 @@ module Merb
       end
     end
 
-    def difference_in_days(n, m)
+    def difference_in_days(n, m, words = ['days early', 'days late'])
       d = n - m
       return '' if d == 0
-      suffix = (d > 0 ? 'late' : 'early')
-      "(#{d.abs} days #{suffix})"
+      "#{d.abs} #{d < 0 ? words[0] : words[1]}"
     end
 
     def debug_info

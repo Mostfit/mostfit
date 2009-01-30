@@ -1,16 +1,67 @@
 %h1
-  Payments controller, index action
-%p
-  Edit this file in
-  %tt
-    app/views/payments/index.html.erb
-%table
-  %tr
-  - for payment in @payments
-    %tr
-      %td
-        = link_to 'Show', url(:payment, payment)
-      %td
-        = link_to 'Edit', url(:edit_payment,  payment)
+  Loan
+  = link_to "##{@loan.id}", resource(@branch, @center, @client, @loan)
+  by client
+  = link_to "<i>#{@client.name}</i>", resource(@branch, @center, @client)
 
-= link_to 'New', url(:new_payment)
+%table.narrow.form{ :width => '100%' }
+  %tr
+    %td amount
+    %td
+      == <b>#{@loan.amount}</b> @
+      %b= format("%.2f%", @loan.interest_rate)
+  %tr
+    %td type
+    %td= @loan.discriminator
+  %tr
+    %td installments
+    %td
+      = @loan.number_of_installments
+      = @loan.installment_frequency
+      == (#{@loan.number_of_installments_before(Date.today)} past installments)
+  %tr
+    %td disbursal
+    %td
+      - if @loan.disbursal_date
+        disbursed on
+        = @loan.disbursal_date
+      - else
+        to be disbursed on
+        = @loan.scheduled_disbursal_date
+
+
+
+%h2== Payments &mdash; (#{link_to 'new', resource(@branch, @center, @client, @loan, :payments, :new)})
+
+%table.narrow.form{ :width => '100%' }
+  %thead
+    %tr
+      %th
+      %th id
+      %th received
+      %th principal
+      %th interest
+      %th total
+      %th registered
+  %tbody
+  - for payment in @payments
+    %tr{ :class => cycle('odd','') }
+      %td &nbsp;
+      %td
+        = payment.id
+      %td
+        = payment.received_on
+      %td
+        %b= payment.principal
+      %td
+        %b= payment.interest
+      %td
+        %b= payment.total
+      %td
+        = link_to 'delete', resource(@branch, @center, @client, @loan, payment, :delete)
+
+  %tfoot
+    %tr
+      %td{ :colspan => 7 }
+
+%p= link_to 'new payment', resource(@branch, @center, @client, @loan, :payments, :new)

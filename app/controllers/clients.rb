@@ -1,16 +1,17 @@
 class Clients < Application
-  before :get_parent
-  # provides :xml, :yaml, :js
+  before :get_context
+  provides :xml, :yaml, :js
 
   def index
-    @clients = Client.all
+    @clients = @center.clients
     display @clients
   end
 
   def show(id)
     @client = Client.get(id)
     raise NotFound unless @client
-    display @client
+    @loans = @client.loans
+    display [@client, @loans], 'loans/index'
   end
 
   def new
@@ -21,6 +22,7 @@ class Clients < Application
 
   def create(client)
     @client = Client.new(client)
+    @client.center = @center  # set direct context
     if @client.save
       redirect resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' was successfully created"}
     else
@@ -61,8 +63,9 @@ class Clients < Application
   end
 
   private
-  def get_parent
+  def get_context
     @branch = Branch.get(params[:branch_id])
     @center = Center.get(params[:center_id])
+    raise NotFound unless @branch and @center
   end
 end # Clients
