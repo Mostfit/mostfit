@@ -4,16 +4,16 @@
   by client
   = link_to "<i>#{@client.name}</i>", resource(@branch, @center, @client)
 
-%table.narrow.form{ :width => '100%' }
-  %tr
-    %td amount
+%table.narrow.form{ :width => '50%' }
+  %tr.odd
+    %td{ :width => '30%' } amount
     %td
       == <b>#{@loan.amount}</b> @
-      %b= format("%.2f%", @loan.interest_rate)
+      %b= format("%.2f%", @loan.interest_rate*100)
   %tr
     %td type
     %td= @loan.discriminator
-  %tr
+  %tr.odd
     %td installments
     %td
       = @loan.number_of_installments
@@ -28,7 +28,23 @@
       - else
         to be disbursed on
         = @loan.scheduled_disbursal_date
-
+  %tr.odd
+    %td first payment
+    %td
+      - if @loan.payments.empty?
+        = @loan.scheduled_first_payment_date
+        %br/
+        %span.greytext (scheduled, no payments yet)
+      - else
+        = actual_first_payment = @loan.payments.first(:order => [:received_on.desc]).received_on
+        %br/
+        %span.greytext
+          - if actual_first_payment == @loan.scheduled_first_payment_date
+            as scheduled
+          - else
+            = difference_in_days(@loan.scheduled_first_payment_date, actual_first_payment, ['days earlier', 'days later'])
+            then scheduled
+            == (#{@loan.scheduled_disbursal_date})
 
 
 %h2== Payments &mdash; (#{link_to 'new', resource(@branch, @center, @client, @loan, :payments, :new)})
@@ -65,3 +81,57 @@
       %td{ :colspan => 7 }
 
 %p= link_to 'new payment', resource(@branch, @center, @client, @loan, :payments, :new)
+
+
+%h2== Payment schedule
+%table.narrow.form{ :width => '100%' }
+  %thead
+    %tr
+      %th
+      %th date due
+      %th scheduled payment
+      %th total scheduled payments
+      %th total paid within date due
+      %th total difference on date due
+  %tbody
+  - first, passed = true, false  # these are for printing the "today" row
+  - last_payment = @loan.payments.last( :order => [:received_on.desc])
+  - last_payment_date = last_payment.received_on if last_payment
+  - @loan.payment_schedule.each do |i|
+    - if i[:date] > Date.today and not passed
+      - passed = true
+      - if not first
+        %tr{ :class => cycle('odd','') }
+          %td{ :colspan => 6, :style => "text-align: center;" }
+            %span.greytext== today (#{Date.today})
+    - first = false
+    %tr{ :class => cycle('odd','') }
+      %td &nbsp;
+      %td
+        = i[:date]
+      %td
+        %b= format_currency i[:principal] + i[:interest]
+        %br/
+        %span.greytext== (#{i[:principal].round} principal + #{i[:interest].round} interest)
+      %td
+        - tsp, tsi = @loan.total_scheduled_principal_on(i[:date]), @loan.total_scheduled_interest_on(i[:date])
+        %b= format_currency tsp + tsi
+        %br/
+        %span.greytext== (#{tsp.round} principal + #{tsi.round} interest)
+      %td
+        - if last_payment_date and (i[:date] <= last_payment_date) and (i[:date] <= Date.today)
+          - trp, tri = @loan.total_received_principal_on(i[:date]), @loan.total_received_interest_on(i[:date])
+          %b= format_currency trp + tri
+          %br/
+          %span.greytext== (#{trp} principal + #{tri} interest)
+      %td
+        - if i[:date] <= Date.today
+          - diff = @loan.principle_difference_on(i[:date]) + @loan.interest_difference_on(i[:date])
+          %b
+            %span{ :class => (diff > 0 ? 'red' : 'green') }
+              = format_currency diff.abs
+          %br/
+          %span.greytext
+            %span{ :class => (diff > 0 ? 'red' : 'green') }
+              = format("%.0f%", (diff.abs.to_f / @loan.total_to_be_received) * 100)
+            = diff > 0 ? 'is lacking' : 'is payed in advance'

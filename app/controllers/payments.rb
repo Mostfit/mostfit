@@ -27,7 +27,7 @@ class Payments < Application
     # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
     succes, @payment = @loan.repay(amounts, session.user, Date.strptime(payment[:received_on]), payment[:received_by])
     if succes  # true if saved
-      redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Payment ##{@payment.id} has been registered"}
+      redirect resource(@branch, @center, @client, @loan), :message => {:notice => "Payment ##{@payment.id} has been registered"}
     else
       message[:error] = "Payment failed to be created"
       render :new

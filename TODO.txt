@@ -1,0 +1,8 @@
+
+* write specs (datamodel is nearly complete, no reason not to have tests already)
+* runner creating the loan history
+* extend user system with simple goup based permissions
+* finish the views for users and staff members
+* write a payment generating factory (yaml fixtures are fine for the other resources) for testing, development and demos
+* StaffMember to Staff ??
+* some sort of an action logger like audit trail, preferably user centered (presenting nice overview of all action), easily accomplished with hooks

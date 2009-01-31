@@ -2,20 +2,23 @@ class Loan
   include DataMapper::Resource
   
   property :id,                             Serial
-  property :discriminator,                  Discriminator
-  property :amount,                         Integer  # amounts go in as cents:  13.37 => 1337
-  property :interest_rate,                  Float
-  property :installment_frequency,          Enum[:daily, :weekly, :monthly]
-  property :number_of_installments,         Integer
+  property :discriminator,                  Discriminator, :nullable => false
+  property :amount,                         Integer, :nullable => false  # see helper for formatting
+  property :interest_rate,                  Float, :nullable => false
+  property :installment_frequency,          Enum[:daily, :weekly, :monthly], :nullable => false
+  property :number_of_installments,         Integer, :nullable => false
   property :scheduled_first_payment_date,   Date, :nullable => false  # arbitrary date for installment number 0
   property :scheduled_disbursal_date,       Date, :nullable => false
   property :disbursal_date,                 Date  # not disbursed when nil
   property :created_at,                     DateTime
   property :updated_at,                     DateTime
+  property :written_off_on,                 Date
 
   belongs_to :client
-  belongs_to :written_off_by, :class_name => 'StaffMember'
+  belongs_to :written_off_by, :child_key => [:written_off_by_staff_id], :class_name => 'StaffMember'
   has n, :payments
+  has n, :history, :class_name => 'LoanHistory'
+
 
   # TODO: validations!!!
 
@@ -39,7 +42,7 @@ class Loan
     end
 
     payment = Payment.new(:loan_id => self.id, :user_id => user.id,
-      :received_on => received_on, :staff_member_id => received_by,
+      :received_on => received_on, :received_by_staff_id => received_by,
       :principal => principal, :interest => interest, :total => total)
 
     [payment.save, payment]  # return the success boolean and the payment object itself for further processing
@@ -70,26 +73,37 @@ class Loan
   end
 
 
-  def repaid_principal
-    payments.sum(:principal) or 0
+  def total_received_principal_on(date)
+    payments.sum(:principal, :conditions => ['received_on <= ?', date]) or 0
   end
 
-  def paid_interest
-    payments.sum(:interest) or 0
+  def total_received_interest_on(date)
+    payments.sum(:interest, :conditions => ['received_on <= ?', date]) or 0
+  end
+
+  def principle_difference_on(date)
+    total_scheduled_principal_on(date) - total_received_principal_on(date)
+  end
+
+  def interest_difference_on(date)
+    total_scheduled_interest_on(date) - total_received_interest_on(date)
   end
 
   def principal_due_on(date)
-    [total_scheduled_principal_on(date) - repaid_principal, 0].max
+    [principle_difference_on(date), 0].max
   end
 
   def interest_due_on(date)
-    [total_scheduled_interest_on(date) - paid_interest, 0].max
+    [total_scheduled_interest_on(date), 0].max
   end
 
   def total_due_on(date)
     principal_due_on(date) + interest_due_on(date)
   end
 
+  def total_to_be_received
+    (self.amount.to_f * (1 + self.interest_rate)).round
+  end
 
   def payment_schedule
     schedule = []
@@ -131,7 +145,7 @@ class Loan
 
   def status  # returns on of [:open, :closed, :insolvable]
     return :written_off if self.written_off?
-    self.repaid_principal >= amount ? :repaid : :outstanding  # works only if interest gets paid first...
+    self.total_due_on(Date.today) >= self.total_to_be_received ? :repaid : :outstanding
   end
 
   def self.loan_stats_for(loans)  # the stats for a collection of loans
@@ -142,7 +156,7 @@ class Loan
       s = loan.status
       stats[s][:number]       += 1
       stats[s][:total_amount] += loan.amount
-      stats[s][:total_repaid] += loan.repaid_principal if [:outstanding, :written_off].include? s
+      stats[s][:total_repaid] += loan.total_received_principal_on(Date.today) if [:outstanding, :written_off].include? s
       stats[s][:total_due]    += loan.total_due_on(Date.today) if s == :outstanding
     end
     # calculate percentages
@@ -160,17 +174,16 @@ class Loan
     return 0 if date < scheduled_first_payment_date
     result = case installment_frequency
       when :daily
-        (date - scheduled_first_payment_date).to_f.floor + 1
+      then (date - scheduled_first_payment_date).to_f.floor + 1
       when :weekly
-        ((date - scheduled_first_payment_date).to_f / 7).floor + 1
+      then ((date - scheduled_first_payment_date).to_f / 7).floor + 1
       when :monthly
-        start_day, start_month = scheduled_first_payment_date.day, scheduled_first_payment_date.month
-        end_day, end_month = date.day, date.month
-        end_month - start_month + (start_day >= end_day ? 0 : 1)
-      else
-        raise "Strange period you got.."
+      then start_day, start_month = scheduled_first_payment_date.day, scheduled_first_payment_date.month
+           end_day, end_month = date.day, date.month
+           end_month - start_month + (start_day >= end_day ? 0 : 1)
+      else raise "Strange period you got.."
     end
-    [result, number_of_installments].max  # never return more than the number_of_installments
+    [result, number_of_installments].min  # never return more than the number_of_installments
   end
 
   def shift_date_by_installments(date, number)

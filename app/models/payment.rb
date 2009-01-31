@@ -11,8 +11,8 @@ class Payment
 
   belongs_to :loan
   belongs_to :created_by,  :class_name => 'User'
-  belongs_to :received_by, :class_name => 'StaffMember'
-  belongs_to :deleted_by,  :class_name => 'User'
+  belongs_to :received_by, :child_key => [:received_by_staff_id], :class_name => 'StaffMember'
+  belongs_to :deleted_by,  :child_key => [:deleted_by_user_id],  :class_name => 'User'
 
   validates_present :loan_id, :created_by, :received_by
 

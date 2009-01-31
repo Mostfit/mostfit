@@ -62,7 +62,8 @@ l006:
   :scheduled_first_payment_date: 2008-12-19
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-19
-  :written_off: true
+  :written_off_by_staff_id: 1
+  :written_off_on: 2009-01-19
   :client_id: 6
 
 l007:

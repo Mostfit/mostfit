@@ -6,8 +6,8 @@ class Center
   property :meeting_day,   Weekday
   property :meeting_time,  HoursAndMinutes
 
-  belongs_to :manager, :class_name => 'StaffMember'
   belongs_to :branch
+  belongs_to :manager, :child_key => [:manager_staff_id], :class_name => 'StaffMember'
 
   has n, :clients
 

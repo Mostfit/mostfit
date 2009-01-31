@@ -9,8 +9,6 @@ class Client
   property :date_of_birth,  Date
   property :address,        Text
 
-  has n, :loans
-
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},
       :url => "/uploads/:class/:id/:attachment/:style/:basename.:extension",
@@ -21,6 +19,7 @@ class Client
       :url => "/uploads/:class/:id/:attachment/:style/:basename.:extension",
       :path => "#{Merb.root}/public/uploads/:class/:id/:attachment/:style/:basename.:extension"
 
+  has n, :loans
   belongs_to :center
 
   def loan_stats

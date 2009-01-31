@@ -2,24 +2,25 @@ module Merb
   module GlobalHelpers
 
     def breadcrums
-      crums, strs, url = [], [], ''
+      # breadcrums use the request.uri and the instance vars of the parent
+      # resources (@branch, @center) that are available -- so no db queries
+      crums, url = [], ''
       request.uri[1..-1].split('/').each_with_index do |part, index|
         url  << '/' + part
-        if part.to_i.to_s.length == part.length  # true when a number
-          o = instance_variable_get('@'+strs.last.singular)
+        if part.to_i.to_s.length == part.length  # true when a number (id)
+          o = instance_variable_get('@'+url.split('/')[-2].singular)  # get the object (@branch)
           s = (o.respond_to?(:name) ? link_to(o.name, url) : link_to('#'+o.id.to_s, url))
           crums[-1] += ": <b><i>#{s}</i></b>"  # merge the instance names (or numbers)
-        else
-          crums << link_to(part.gsub('_', ' '), url)  # add the resource names
+        else  # when not a number (id)
+          crums << link_to(part.gsub('_', ' '), url)  # add the resource name
         end
-        strs << part
       end
       crums.join('&nbsp;<b>&gt;&gt;</b>&nbsp;')  # fancy separator
     end
 
     def format_currency(i)
       # in case of our rupees we do not count with cents, if you want to have cents do that here
-      i.to_s + " INR"
+      i.to_i.to_s + " INR"
     end
 
     def plurial_nouns(freq)

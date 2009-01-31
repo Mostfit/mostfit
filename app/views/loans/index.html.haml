@@ -6,7 +6,11 @@
     %td name
     %td
       %b= @client.name
-      == (id: #{@client.id})
+      == (id: #{@client.id}, ref: #{@client.reference})
+  %tr
+    %td spouse name
+    %td
+      = @client.spouse_name
   %tr
     %td manager
     %td= link_to @branch.manager.name, resource(@branch.manager)
@@ -14,9 +18,10 @@
     %td at center
     %td
       = link_to @center.name, resource(@branch, @center)
+      == (of branch #{link_to @branch.name, resource(@branch)})
       %br/
       %span.greytext
-        managed by:
+        center managed by:
         = link_to @center.branch.manager.name, resource(@center.manager)
 
 
@@ -48,8 +53,7 @@
       %td
         %b= format("%.2f%", loan.interest_rate * 100)
       %td
-        = loan.number_of_installments
-        = plurial_nouns loan.installment_frequency
+        == #{loan.number_of_installments}, #{loan.installment_frequency.to_s}
       %td
         - if loan.disbursal_date
           = loan.disbursal_date
@@ -69,11 +73,28 @@
       %td
         = format("%.2f%", loan.repaid_principal.to_f / loan.amount * 100)
       %td
-        = loan.status.to_s.gsub('_', ' ')
+        - if loan.status == :written_off
+          written off
+          %br/
+          %span.greytext
+            by
+            = link_to loan.written_off_by.name, resource(loan.written_off_by)
+            on
+            = loan.written_off_on
+        - else
+          = loan.status.to_s
+          %br/
+          %span.greytext
+            - if loan.payments.empty?
+              nothing repaid yet
+            - else
+              last payment on
+              = loan.payments.last(:order => [:received_on]).received_on
+            
       %td
-        = link_to 'edit', resource(@branch, @center, @client, loan, :edit)
+        = link_to 'view details', resource(@branch, @center, @client, loan, :payments)
         &nbsp;|&nbsp;
-        = link_to 'view payments', resource(@branch, @center, @client, loan, :payments)
+        = link_to 'edit', resource(@branch, @center, @client, loan, :edit)
         &nbsp;|&nbsp;
         = link_to 'record payment', resource(@branch, @center, @client, loan, :payments, :new)
 
