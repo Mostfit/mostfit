@@ -20,7 +20,7 @@ class Loan
   has n, :history, :class_name => 'LoanHistory'
 
 
-  # TODO: validations!!!
+  # TODO: validations!!! (validate written_off_* come/go in pairs)
 
   def repay(input, user, received_on, received_by)  # TODO: some kind of validation
     # this is the way to repay loans, _not_ directly on the Payment model
@@ -64,46 +64,57 @@ class Loan
     interest_rate * amount / number_of_installments
   end
 
+
+  def total_to_be_received
+    (self.amount.to_f * (1 + self.interest_rate)).round
+  end
+
   def total_scheduled_principal_on(date)  # typically reimplemented in subclasses
-    amount / number_of_installments * number_of_installments_before(date)
+    (amount.to_i / number_of_installments * number_of_installments_before(date)).round
   end
-
   def total_scheduled_interest_on(date)  # typically reimplemented in subclasses
-    interest_rate * amount / number_of_installments * number_of_installments_before(date)
+    (interest_rate * amount / number_of_installments * number_of_installments_before(date)).round
+  end
+  def total_scheduled_on(date)
+    total_scheduled_principal_on(date) + total_scheduled_interest_on(date)
   end
 
-
+  # next two methods use simple caching
+  # it works because objects live short (usualy only within the scope of one request)
   def total_received_principal_on(date)
-    payments.sum(:principal, :conditions => ['received_on <= ?', date]) or 0
+    return @trp_cache[date] if @trp_cache and @trp_cache[date]
+    @trp_cache ||= {}
+    @trp_cache[date] = (Payment.sum(:principal, :conditions => ['received_on <= ? AND loan_id = ?', date, self.id]) or 0)
   end
-
   def total_received_interest_on(date)
-    payments.sum(:interest, :conditions => ['received_on <= ?', date]) or 0
+    return @tri_cache[date] if @tri_cache and @tri_cache[date]
+    @tri_cache ||= {}
+    @tri_cache[date] = (Payment.sum(:interest, :conditions => ['received_on <= ? AND loan_id = ?', date, self.id]) or 0)
   end
+  def total_received_on(date)
+    total_received_principal_on(date) + total_received_interest_on(date)
+  end  
 
   def principle_difference_on(date)
     total_scheduled_principal_on(date) - total_received_principal_on(date)
   end
-
   def interest_difference_on(date)
     total_scheduled_interest_on(date) - total_received_interest_on(date)
+  end
+  def total_difference_on(date)
+    principle_difference_on(date) + interest_difference_on(date)
   end
 
   def principal_due_on(date)
     [principle_difference_on(date), 0].max
   end
-
   def interest_due_on(date)
-    [total_scheduled_interest_on(date), 0].max
+    [interest_difference_on(date), 0].max
   end
-
   def total_due_on(date)
     principal_due_on(date) + interest_due_on(date)
   end
 
-  def total_to_be_received
-    (self.amount.to_f * (1 + self.interest_rate)).round
-  end
 
   def payment_schedule
     schedule = []
@@ -143,9 +154,9 @@ class Loan
     not self.written_off_by.blank?
   end
 
-  def status  # returns on of [:open, :closed, :insolvable]
-    return :written_off if self.written_off?
-    self.total_due_on(Date.today) >= self.total_to_be_received ? :repaid : :outstanding
+  def status(date = Date.today)
+    return :written_off if self.written_off_on and self.written_off_on <= date
+    self.total_due_on(date) >= self.total_to_be_received ? :repaid : :outstanding
   end
 
   def self.loan_stats_for(loans)  # the stats for a collection of loans
