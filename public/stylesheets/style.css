@@ -162,6 +162,10 @@ ul.menu li {
   padding: 0px 18px 0px 18px;
 }
 
+.graph{
+  float: right;
+  margin-top: 20px;
+}
 
 /*.box
 {

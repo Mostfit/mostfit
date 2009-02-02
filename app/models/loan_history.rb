@@ -60,4 +60,7 @@ class LoanHistory
       :total_difference =>          loan.total_difference_on(date)
       )
   end
+
+  def get_overview(interval = :weekly, from, to = Date.today)
+  end
 end

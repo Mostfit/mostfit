@@ -17,7 +17,7 @@ Merb::Router.prepare do
   slice(:merb_auth_slice_password, :name_prefix => nil, :path_prefix => "")
 
   match('/data_entry/:action').to(:controller => 'data_entry').name(:data_entry)
-  match('/graph_data').to(:controller => 'graph_data').name(:graph_data)
+  match('/graph_data/:action/:id').to(:controller => 'graph_data').name(:graph_data)
 
   # This is the default route for /:controller/:action/:id
 #   default_routes
