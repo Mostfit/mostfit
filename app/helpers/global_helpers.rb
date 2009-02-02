@@ -27,7 +27,7 @@ module Merb
           crums << link_to(part.gsub('_', ' '), url)  # add the resource name
         end
       end
-      crums.join('&nbsp;<b>&gt;&gt;</b>&nbsp;')  # fancy separator
+      ['', crums].join('&nbsp;<b>&gt;&gt;</b>&nbsp;')  # fancy separator
     end
 
     def format_currency(i)

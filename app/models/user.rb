@@ -13,7 +13,8 @@ class User
   #   - :crypted_password and :salt db columns        
   # from the mixin.
 
-  validates_format :login, :with => /^[A-Za-z0-9_]$/
+  validates_format :login, :with => /^[A-Za-z0-9_]+$/
+  validates_length :login, :min => 3
   validates_is_unique :login
 
   private

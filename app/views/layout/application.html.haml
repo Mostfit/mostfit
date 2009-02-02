@@ -25,9 +25,11 @@
           - if session.user.id == 1
             %b= link_to 'manage users', url(:users)
             (admin only)&nbsp;|&nbsp;
-          = link_to 'browse', url(:branches)
+          %b= link_to 'browse data', url(:branches)
           &nbsp;|&nbsp;
-          = link_to 'mutations', url(:data_entry)
+          %b= link_to 'staff members', url(:staff_members)
+          &nbsp;|&nbsp;
+          %b= link_to 'data entry', url(:data_entry)
 
       - if message
         #flash-messages.span-14.prefix-5.suffix-5.last
