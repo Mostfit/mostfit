@@ -1,6 +1,6 @@
 
 %div{ :style => 'float: right; margin-top: 20px;' }
-  = ofc2(430, 200, request.env['HTTP_HOST'] )
+  = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data) )
 
 
 %h1{ :width => '50%' }== Client: <i>#{@client.name}</i>
