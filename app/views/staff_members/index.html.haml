@@ -9,6 +9,8 @@
   - for staff_member in @staff_members
     %tr
       %td
+        = staff_member.name.capitalize
+      %td
         = link_to 'Show', url(:staff_member, staff_member)
       %td
         = link_to 'Edit', url(:edit_staff_member,  staff_member)
