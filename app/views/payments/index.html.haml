@@ -66,7 +66,10 @@
       %td
         = payment.id
       %td
-        = payment.received_on
+        on
+        %i= payment.received_on
+        by
+        %b= link_to payment.received_by.name, resource(payment.received_by)
       %td
         %b= payment.principal
       %td
@@ -135,3 +138,6 @@
             %span{ :class => (diff > 0 ? 'red' : 'green') }
               = format("%.0f%", (diff.abs.to_f / @loan.total_to_be_received) * 100)
             = diff > 0 ? 'is lacking' : 'is payed in advance'
+  %tfoot
+    %tr
+      %td{ :colspan => 7 }
