@@ -1,9 +1,12 @@
-%h1
-  StaffMembers controller, show action
-%p
-  Edit this file in
-  %tt
-    app/views/staff_members/show.html.erb
+%h1 
+  = @staff_member.name
+%table
+  %tr
+    %th
+      Centers
+    %td
+      @staff_member.centers.count
+    %th
 
 = link_to 'Edit',  url(:edit_staff_member,  @staff_member)
 |
