@@ -5,8 +5,20 @@
     %th
       Centers
     %td
-      @staff_member.centers.count
+      = @staff_member.centers.count
+    %td
+      = link_to 'Show', url(:show_staff_member_centers, @staff_member.id)
+  %tr
     %th
+      Clients
+    %td
+      = @staff_member.centers.clients.count
+  %tr
+    %th
+      Disbursed
+    %td
+      = @staff_member.disbursed_loans.sum(:amount)
+    
 
 = link_to 'Edit',  url(:edit_staff_member,  @staff_member)
 |

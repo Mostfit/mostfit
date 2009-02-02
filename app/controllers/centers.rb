@@ -3,6 +3,9 @@ class Centers < Application
   provides :xml, :yaml, :js
 
   def index
+    if @staff_member
+      @centers = @staff_member.centers
+    els
     @centers = @branch.centers
     display @centers
   end
@@ -65,6 +68,7 @@ class Centers < Application
   private
   def get_context
     @branch = Branch.get(params[:branch_id])
+    @staff_member = StaffMember.get(params[:staff_member_id]])
     raise NotFound unless @branch
   end
 end # Centers
