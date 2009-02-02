@@ -1,6 +1,18 @@
 module Merb
   module GlobalHelpers
 
+    def ofc2(width, height, url, id = Time.now.usec, swf_base = '/')
+      <<-HTML
+        <div id='flashcontent_#{id}'></div>
+        <script type="text/javascript">
+          swfobject.embedSWF(
+          "#{swf_base}open-flash-chart.swf","flashcontent_#{id}",
+          "#{width}", "#{height}", "9.0.0", "expressInstall.swf",
+          {"data-file":"#{url}"} );
+        </script>
+      HTML
+    end
+
     def breadcrums
       # breadcrums use the request.uri and the instance vars of the parent
       # resources (@branch, @center) that are available -- so no db queries

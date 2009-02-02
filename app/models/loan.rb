@@ -15,12 +15,17 @@ class Loan
   property :written_off_on,                 Date
 
   belongs_to :client
+  belongs_to :approved_by,    :child_key => [:approved_by_staff_id],    :class_name => 'StaffMember'
+  belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],   :class_name => 'StaffMember'
   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id], :class_name => 'StaffMember'
   has n, :payments
   has n, :history, :class_name => 'LoanHistory'
 
-
-  # TODO: validations!!! (validate written_off_* come/go in pairs)
+  validates_with_method  :properly_written_off?
+  validates_with_method  :properly_disbursed?
+  validates_present      :approved_by_staff_id
+  validates_is_primitive :disbursal_date, :scheduled_disbursal_date, :scheduled_first_payment_date
+  
 
   def repay(input, user, received_on, received_by)  # TODO: some kind of validation
     # this is the way to repay loans, _not_ directly on the Payment model
@@ -159,24 +164,25 @@ class Loan
     self.total_due_on(date) >= self.total_to_be_received ? :repaid : :outstanding
   end
 
-  def self.loan_stats_for(loans)  # the stats for a collection of loans
-    stats = { :outstanding => {:number => 0, :total_amount => 0, :total_repaid => 0, :total_due => 0},
-              :repaid =>      {:number => 0, :total_amount => 0},
-              :written_off => {:number => 0, :total_amount => 0, :total_repaid => 0} }
-    loans.each do |loan|
-      s = loan.status
-      stats[s][:number]       += 1
-      stats[s][:total_amount] += loan.amount
-      stats[s][:total_repaid] += loan.total_received_principal_on(Date.today) if [:outstanding, :written_off].include? s
-      stats[s][:total_due]    += loan.total_due_on(Date.today) if s == :outstanding
-    end
-    # calculate percentages
-    [:outstanding, :written_off].each do |s|
-      p_repaid = stats[s][:total_amount].to_f / stats[s][:total_repaid]
-      stats[s][:percentage_repaid] = format("%.2f", p_repaid * 100).to_f
-    end
-    return stats
-  end
+# to be removed, obsoleted by the loan_history table
+#   def self.loan_stats_for(loans)  # the stats for a collection of loans
+#     stats = { :outstanding => {:number => 0, :total_amount => 0, :total_repaid => 0, :total_due => 0},
+#               :repaid =>      {:number => 0, :total_amount => 0},
+#               :written_off => {:number => 0, :total_amount => 0, :total_repaid => 0} }
+#     loans.each do |loan|
+#       s = loan.status
+#       stats[s][:number]       += 1
+#       stats[s][:total_amount] += loan.amount
+#       stats[s][:total_repaid] += loan.total_received_principal_on(Date.today) if [:outstanding, :written_off].include? s
+#       stats[s][:total_due]    += loan.total_due_on(Date.today) if s == :outstanding
+#     end
+#     # calculate percentages
+#     [:outstanding, :written_off].each do |s|
+#       p_repaid = stats[s][:total_amount].to_f / stats[s][:total_repaid]
+#       stats[s][:percentage_repaid] = format("%.2f", p_repaid * 100).to_f
+#     end
+#     return stats
+#   end
 
 
   # private
@@ -218,6 +224,21 @@ class Loan
       else
         raise "Strange period you got.."
     end
+  end
+
+
+
+  private
+  def properly_written_off?
+    return true if (self.written_off_on and self.written_off_by_staff_id) or
+      (!self.written_off_on and !self.written_off_by_staff_id)
+    [false, "written_off_on and written_off_by properties have to be (un)set together"]
+  end
+
+  def properly_disbursed?
+    return true if (self.disbursal_date and self.disbursed_by_staff_id) or
+      (!self.disbursal_date and !self.disbursed_by_staff_id)
+    [false, "disbursal_date and disbursed_by properties have to be (un)set together"]
   end
 end
 

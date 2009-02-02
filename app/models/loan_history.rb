@@ -19,8 +19,6 @@ class LoanHistory
 #   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id], :class_name => 'StaffMember'
 #   has n, :payments
 
-
-
 #### properties for methods (derived/calculates values) of a loan
 # (most of them end on: _on(date))
 # propably we dont need so much, but alas..

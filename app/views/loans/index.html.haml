@@ -1,7 +1,12 @@
-%h1== Client: <i>#{@client.name}</i>
+
+%div{ :style => 'float: right; margin-top: 20px;' }
+  = ofc2(430, 200, request.env['HTTP_HOST'] )
 
 
-%table.narrow.form
+%h1{ :width => '50%' }== Client: <i>#{@client.name}</i>
+
+
+%table.narrow.form{ :width => '50%' }
   %tr
     %td name
     %td
@@ -23,7 +28,6 @@
       %span.greytext
         center managed by:
         = link_to @center.branch.manager.name, resource(@center.manager)
-
 
 
 %h2== Loans for client <i>#{@client.name}</i>

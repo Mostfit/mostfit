@@ -9,7 +9,6 @@
     %tr
       %th
       %th id
-      %th real name
       %th login
       %th uploads
       %th created at
@@ -21,11 +20,7 @@
       %td
         = user.id
       %td
-        %i= user.name
-      %td
         %b= user.login
-      %td
-        %b= user.upload_count
       %td
         = relative_date user.created_at
       %td

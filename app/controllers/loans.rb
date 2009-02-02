@@ -2,6 +2,9 @@ class Loans < Application
   before :get_context
   provides :xml, :yaml, :js
 
+  def graph
+  end
+
   def index
     @loans = @client.loans
     display @loans

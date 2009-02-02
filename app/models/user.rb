@@ -13,6 +13,9 @@ class User
   #   - :crypted_password and :salt db columns        
   # from the mixin.
 
+  validates_format :login, :with => /^[A-Za-z0-9_]$/
+  validates_is_unique :login
+
   private
   def prevent_destroying_admin
     if id == 1

@@ -7,6 +7,8 @@ l001:
   :scheduled_first_payment_date: 2009-03-09
   :scheduled_disbursal_date: 2008-11-19
   :disbursal_date: 2008-12-01
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 1
 
 l002:
@@ -18,6 +20,8 @@ l002:
   :scheduled_first_payment_date: 2008-03-09
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-01
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 2
 
 l003:
@@ -29,6 +33,8 @@ l003:
   :scheduled_first_payment_date: 2009-05-19
   :scheduled_disbursal_date: 2008-11-09
   :disbursal_date: 2008-11-10
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 3
 
 l004:
@@ -40,6 +46,8 @@ l004:
   :scheduled_first_payment_date: 2008-12-19
   :scheduled_disbursal_date: 2008-05-19
   :disbursal_date: 2008-06-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 4
 
 l005:
@@ -51,6 +59,8 @@ l005:
   :scheduled_first_payment_date: 2008-12-19
   :scheduled_disbursal_date: 2008-02-19
   :disbursal_date: 2008-01-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 5
 
 l006:
@@ -64,6 +74,8 @@ l006:
   :disbursal_date: 2008-12-19
   :written_off_by_staff_id: 1
   :written_off_on: 2009-01-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 6
 
 l007:
@@ -75,6 +87,8 @@ l007:
   :scheduled_first_payment_date: 2008-12-19
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 7
 
 l008:
@@ -86,6 +100,8 @@ l008:
   :scheduled_first_payment_date: 2009-02-19
   :scheduled_disbursal_date: 2008-07-19
   :disbursal_date: 2008-08-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 8
 
 l009:
@@ -97,6 +113,8 @@ l009:
   :scheduled_first_payment_date: 2009-04-19
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 9
 
 l010:
@@ -108,6 +126,8 @@ l010:
   :scheduled_first_payment_date: 2008-12-19
   :scheduled_disbursal_date: 2008-09-19
   :disbursal_date: 2008-07-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 10
 
 l011:
@@ -119,6 +139,8 @@ l011:
   :scheduled_first_payment_date: 2009-01-05
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-11-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 11
 
 l012:
@@ -130,6 +152,8 @@ l012:
   :scheduled_first_payment_date: 2009-01-05
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 12
 
 l013:
@@ -141,6 +165,8 @@ l013:
   :scheduled_first_payment_date: 2009-01-05
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 13
 
 l014:
@@ -152,6 +178,8 @@ l014:
   :scheduled_first_payment_date: 2009-03-19
   :scheduled_disbursal_date: 2009-01-05
   :disbursal_date: 2008-12-09
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 14
 
 
@@ -164,6 +192,8 @@ l015:
   :scheduled_first_payment_date: 2009-04-05
   :scheduled_disbursal_date: 2008-12-29
   :disbursal_date: 2008-12-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 15
 
 l016:
@@ -175,6 +205,8 @@ l016:
   :scheduled_first_payment_date: 2009-02-05 
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-26
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 16
 
 l017:
@@ -186,4 +218,6 @@ l017:
   :scheduled_first_payment_date: 2009-06-05
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
   :client_id: 17

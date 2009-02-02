@@ -13,24 +13,6 @@ class Center
 
   validates_present :manager
 
-#   def loan_stats
-#     Loan.loan_stats_for clients.loans
-#   end
-# 
-#   def client_stats
-#     stats = { :active   => {:number => 0, :total_loans => 0, :total_amount => 0, :total_repaid => 0, :total_due => 0 },
-#               :inactive => {:number => 0, :total_loans => 0, :total_amount => 0} }
-#     self.clients.each do |client|
-#       loan_stats = client.loan_stats
-#       if loan_stats[:open][:number] > 0
-#         stats[:active][:number]       += 1
-# #         stats[:active][:total_loans]  += loan_stats
-# #         stats[:active][:total_amount] += 1
-#       else
-#         stats[:inactive][:number] += 1
-#       end
-#     end
-#   end
 end
 
 
