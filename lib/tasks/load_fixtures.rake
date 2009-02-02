@@ -12,8 +12,6 @@ require "merb-core"
 # here again, Merb will do it for you
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
-DataMapper.auto_migrate! if Merb.orm == :datamapper
-
 
 def load_fixtures(*files)
   files.each do |name|
@@ -32,7 +30,7 @@ end
 namespace :db do
   desc "Load fixtures from /spec/fixtures"
   task :load_fixtures do
-    DataMapper.repository #.auto_migrate!
+    DataMapper.auto_migrate! if Merb.orm == :datamapper
 
     # loading is ordered, important for our references to work
     load_fixtures :users, :staff_members, :branches, :centers, :clients, :loans  #, :payments

@@ -6,9 +6,9 @@ module Merb
         <div id='flashcontent_#{id}'></div>
         <script type="text/javascript">
           swfobject.embedSWF(
-          "#{swf_base}open-flash-chart.swf","flashcontent_#{id}",
-          "#{width}", "#{height}", "9.0.0", "expressInstall.swf",
-          {"data-file":"#{url}"} );
+            "#{swf_base}open-flash-chart.swf", "flashcontent_#{id}",
+            "#{width}", "#{height}", "9.0.0", "expressInstall.swf",
+            {"data-file":"#{url}"} );
         </script>
       HTML
     end
