@@ -31,14 +31,15 @@
           &nbsp;|&nbsp;
           %b= link_to 'data entry', url(:data_entry)
 
-      - if message
-        #flash-messages.span-14.prefix-5.suffix-5.last
-          - message.each do |key, value|
-            .flash{ :class => key.to_s }
-              %p= value
-
       #content
         #breadcrums= breadcrums
+
+        - if message
+          #flash-messages.span-14.prefix-5.suffix-5.last
+            - message.each do |key, value|
+              .flash{ :class => key.to_s }
+                %p= value
+
         = catch_content :for_layout
 
       %p
