@@ -30,12 +30,11 @@ class Loan
   def repay(input, user, received_on, received_by)  # TODO: some kind of validation
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
-
     unless input.is_a? Array or input.is_a? Fixnum
       raise "the input argument of Loan#repay should be of class Fixnum or Array"
     end
 
-    interest, principal, total = 0, 0, 0
+    interest, principal = 0, 0
     if input.is_a? Fixnum  # in case only one amount is specified
       # interest is paid first, the rest goes in as principal
       total = input.to_i
@@ -43,13 +42,11 @@ class Loan
       principal = total - interest
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0].to_i, input[1].to_i
-      total = principal + interest
     end
 
     payment = Payment.new(:loan_id => self.id, :user_id => user.id,
       :received_on => received_on, :received_by_staff_id => received_by,
-      :principal => principal, :interest => interest, :total => total)
-
+      :principal => principal, :interest => interest)
     [payment.save, payment]  # return the success boolean and the payment object itself for further processing
   end
 
@@ -164,26 +161,6 @@ class Loan
     self.total_due_on(date) >= self.total_to_be_received ? :repaid : :outstanding
   end
 
-# to be removed, obsoleted by the loan_history table
-#   def self.loan_stats_for(loans)  # the stats for a collection of loans
-#     stats = { :outstanding => {:number => 0, :total_amount => 0, :total_repaid => 0, :total_due => 0},
-#               :repaid =>      {:number => 0, :total_amount => 0},
-#               :written_off => {:number => 0, :total_amount => 0, :total_repaid => 0} }
-#     loans.each do |loan|
-#       s = loan.status
-#       stats[s][:number]       += 1
-#       stats[s][:total_amount] += loan.amount
-#       stats[s][:total_repaid] += loan.total_received_principal_on(Date.today) if [:outstanding, :written_off].include? s
-#       stats[s][:total_due]    += loan.total_due_on(Date.today) if s == :outstanding
-#     end
-#     # calculate percentages
-#     [:outstanding, :written_off].each do |s|
-#       p_repaid = stats[s][:total_amount].to_f / stats[s][:total_repaid]
-#       stats[s][:percentage_repaid] = format("%.2f", p_repaid * 100).to_f
-#     end
-#     return stats
-#   end
-
 
   # private
   def number_of_installments_before(date)
@@ -245,6 +222,30 @@ end
 class A50Loan < Loan
   
 end
+
+
+
+
+# to be removed, obsoleted by the loan_history table
+#   def self.loan_stats_for(loans)  # the stats for a collection of loans
+#     stats = { :outstanding => {:number => 0, :total_amount => 0, :total_repaid => 0, :total_due => 0},
+#               :repaid =>      {:number => 0, :total_amount => 0},
+#               :written_off => {:number => 0, :total_amount => 0, :total_repaid => 0} }
+#     loans.each do |loan|
+#       s = loan.status
+#       stats[s][:number]       += 1
+#       stats[s][:total_amount] += loan.amount
+#       stats[s][:total_repaid] += loan.total_received_principal_on(Date.today) if [:outstanding, :written_off].include? s
+#       stats[s][:total_due]    += loan.total_due_on(Date.today) if s == :outstanding
+#     end
+#     # calculate percentages
+#     [:outstanding, :written_off].each do |s|
+#       p_repaid = stats[s][:total_amount].to_f / stats[s][:total_repaid]
+#       stats[s][:percentage_repaid] = format("%.2f", p_repaid * 100).to_f
+#     end
+#     return stats
+#   end
+
 
 
 # # class Loan (models.Model):

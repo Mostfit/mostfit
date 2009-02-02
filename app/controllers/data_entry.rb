@@ -1,4 +1,4 @@
-class Mutations < Application
+class DataEntry < Application
 
   def index
     render

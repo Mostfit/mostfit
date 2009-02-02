@@ -4,7 +4,6 @@ class Payment
   property :id,             Serial
   property :principal,      Integer, :nullable => false
   property :interest,       Integer, :nullable => false
-  property :total,          Integer, :nullable => false  # do we need the this field (for clever sql queries)?
   property :received_on,    Date,    :nullable => false
   property :created_at,     DateTime
   property :deleted_at,     ParanoidDateTime

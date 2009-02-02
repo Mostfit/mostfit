@@ -5,20 +5,6 @@ class LoanHistory
   property :run_number,                Integer, :nullable => false
   property :created_at,                DateTime
 
-#### properties from the loan  --  we should get them from the join
-#### especially the immutable ones
-#   property :discriminator,                  Discriminator, :nullable => false
-#   property :amount,                         Integer, :nullable => false  # see helper for formatting
-#   property :interest_rate,                  Float, :nullable => false
-#   property :installment_frequency,          Enum[:daily, :weekly, :monthly], :nullable => false
-#   property :number_of_installments,         Integer, :nullable => false
-#   property :scheduled_first_payment_date,   Date, :nullable => false
-#   property :scheduled_disbursal_date,       Date, :nullable => false
-#   property :disbursal_date,                 Date  # not disbursed when nil
-#
-#   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id], :class_name => 'StaffMember'
-#   has n, :payments
-
 #### properties for methods (derived/calculates values) of a loan
 # (most of them end on: _on(date))
 # propably we dont need so much, but alas..
@@ -37,6 +23,7 @@ class LoanHistory
   property :total_difference,          Integer, :nullable => false
 
   property :status,                    Enum[:outstanding, :repaid, :written_off]
+#### end
 
   belongs_to :loan
 
