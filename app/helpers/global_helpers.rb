@@ -8,7 +8,7 @@ module Merb
           swfobject.embedSWF(
             "#{swf_base}open-flash-chart.swf", "flashcontent_#{id}",
             "#{width}", "#{height}", "9.0.0", "expressInstall.swf",
-            {"data-file":"#{url}"} );
+            {"data-file":"#{url}", "loading":"Waiting for data... (reload page when it takes too long)"} );
         </script>
       HTML
     end
@@ -48,10 +48,10 @@ module Merb
       end
     end
 
-    def difference_in_days(n, m, words = ['days early', 'days late'])
-      d = n - m
+    def difference_in_days(start_date, end_date, words = ['days early', 'days late'])
+      d = end_date - start_date
       return '' if d == 0
-      "#{d.abs} #{d < 0 ? words[0] : words[1]}"
+      "#{d.abs} #{d > 0 ? words[1] : words[0]}"
     end
 
     def debug_info

@@ -91,9 +91,9 @@ l007:
   :installment_frequency: weekly
   :number_of_installments: 10
   :scheduled_first_payment_date: 2008-12-19
-  :scheduled_disbursal_date: 2008-12-19
-  :disbursal_date: 2008-12-19
-  :approved_on: 2008-12-19
+  :scheduled_disbursal_date: 2008-11-19
+  :disbursal_date: 2008-11-22
+  :approved_on: 2008-08-08
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
   :client_id: 7

@@ -1,6 +1,6 @@
 
 .graph
-  = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
+  = ofc2(430, 250, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
 
 
 %h1
@@ -25,14 +25,17 @@
       = @loan.installment_frequency
       == (#{@loan.number_of_installments_before(Date.today)} past installments)
   %tr
-    %td approved by
+    %td approved
     %td
+      on
+      = @loan.approved_on
+      by
       %b= link_to @loan.approved_by.name, resource(@loan.disbursed_by)
   %tr.odd
-    %td disbursal
+    %td disbursed
     %td
       - if @loan.disbursal_date
-        disbursed on
+        on
         = @loan.disbursal_date
         by
         %b= link_to @loan.disbursed_by.name, resource(@loan.disbursed_by)
@@ -60,6 +63,9 @@
     %td status
     %td
       %b= @loan.status.to_s.gsub('_', ' ')
+      - if @loan.status == :written_off
+        by
+        %b= link_to @loan.written_off_by.name, resource(@loan.written_off_by)
 
 
 %h2== Payments &mdash; (#{link_to 'new', resource(@branch, @center, @client, @loan, :payments, :new)})
@@ -113,7 +119,7 @@
       %th total difference on date due
   %tbody
   - first, passed = true, false  # these are for printing the "today" row
-  - last_payment = @loan.payments.last( :order => [:received_on.desc])
+  - last_payment = @loan.payments.first(:order => [:received_on.desc])
   - last_payment_date = last_payment.received_on if last_payment
   - @loan.payment_schedule.each do |i|
     - if i[:date] > Date.today and not passed
@@ -130,18 +136,18 @@
       %td
         %b= format_currency i[:principal] + i[:interest]
         %br/
-        %span.greytext== (#{i[:principal].round} principal + #{i[:interest].round} interest)
+        %span.greytext== #{i[:principal].round} principal + #{i[:interest].round} interest
       %td
         - tsp, tsi = @loan.total_scheduled_principal_on(i[:date]), @loan.total_scheduled_interest_on(i[:date])
         %b= format_currency tsp + tsi
         %br/
-        %span.greytext== (#{tsp.round} principal + #{tsi.round} interest)
+        %span.greytext== #{tsp.round} principal + #{tsi.round} interest
       %td
-        - if last_payment_date and (i[:date] <= last_payment_date) and (i[:date] <= Date.today)
+        - if last_payment_date and (i[:date] <= last_payment_date or i[:date] <= Date.today)
           - trp, tri = @loan.total_received_principal_on(i[:date]), @loan.total_received_interest_on(i[:date])
           %b= format_currency trp + tri
           %br/
-          %span.greytext== (#{trp} principal + #{tri} interest)
+          %span.greytext== #{trp} principal + #{tri} interest
       %td
         - if i[:date] <= Date.today
           - diff = @loan.principle_difference_on(i[:date]) + @loan.interest_difference_on(i[:date])

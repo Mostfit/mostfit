@@ -94,12 +94,12 @@ class Loan
   def total_received_principal_on(date)
     return @trp_cache[date] if @trp_cache and @trp_cache[date]
     @trp_cache ||= {}
-    @trp_cache[date] = (Payment.sum(:principal, :conditions => ['received_on <= ? AND loan_id = ?', date, self.id]) or 0)
+    @trp_cache[date] = (self.payments.sum(:principal, :conditions => ['received_on <= ?', date]) or 0)
   end
   def total_received_interest_on(date)
     return @tri_cache[date] if @tri_cache and @tri_cache[date]
     @tri_cache ||= {}
-    @tri_cache[date] = (Payment.sum(:interest, :conditions => ['received_on <= ? AND loan_id = ?', date, self.id]) or 0)
+    @tri_cache[date] = (self.payments.sum(:interest, :conditions => ['received_on <= ?', date]) or 0)
   end
   def total_received_on(date)
     total_received_principal_on(date) + total_received_interest_on(date)
@@ -212,30 +212,6 @@ class Loan
     end
   end
 
-
-
-#   private
-  def approved_before_disbursed_before_written_off?
-    if disbursal_date and approved_on > disbursal_date
-      [false, "Cannot be disbursed before it is approved"]
-    elsif disbursal_date and written_off_on and disbursal_date > written_off_on
-      [false, "Cannot be written off before it is disbursed"]
-    end
-    true
-  end
-
-  def properly_written_off?
-    return true if (written_off_on and written_off_by_staff_id) or
-      (!written_off_on and !written_off_by_staff_id)
-    [false, "written_off_on and written_off_by properties have to be (un)set together"]
-  end
-
-  def properly_disbursed?
-    return true if (disbursal_date and disbursed_by_staff_id) or
-      (!disbursal_date and !disbursed_by_staff_id)
-    [false, "disbursal_date and disbursed_by properties have to be (un)set together"]
-  end
-
   def last_loan_history_date
     # this method return the last date the loan history makes sense
     # this can be a date in the future! (huh?!!)
@@ -253,6 +229,28 @@ class Loan
     elsif s == :written_off
       return [scheduled_repaid_on, written_off_on].max
     end
+  end
+
+  private
+  def approved_before_disbursed_before_written_off?
+    if disbursal_date and approved_on < disbursal_date
+      [false, "Cannot be disbursed before it is approved"]
+    elsif disbursal_date and written_off_on and disbursal_date < written_off_on
+      [false, "Cannot be written off before it is disbursed"]
+    end
+    true
+  end
+
+  def properly_written_off?
+    return true if (written_off_on and written_off_by_staff_id) or
+      (!written_off_on and !written_off_by_staff_id)
+    [false, "written_off_on and written_off_by properties have to be (un)set together"]
+  end
+
+  def properly_disbursed?
+    return true if (disbursal_date and disbursed_by_staff_id) or
+      (!disbursal_date and !disbursed_by_staff_id)
+    [false, "disbursal_date and disbursed_by properties have to be (un)set together"]
   end
 
   def update_history

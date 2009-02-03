@@ -25,7 +25,7 @@ class Payment
   # received_by has to point an active staff member
 
   def total
-    principal + interest
+    (principal and interest) ? principal + interest : nil
   end
 
   private

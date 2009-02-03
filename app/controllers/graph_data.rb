@@ -6,24 +6,40 @@ class GraphData < Application
 
       
     # end time is the last of: "fully repaid", "scheduled to be repaid", "written off"
-    #fully_repaid_on = @loan.history(:order => [:for_date], :conditions => ['status = ?', :repaid]).for_date
+    #fully_repaid_on = @loan.history(:order => [:date], :conditions => ['status = ?', :repaid]).date
     # for now just today :-)
 
-    @principal_scheduled_outstanding, @principal_actual_outstanding, @total_scheduled_outstanding, @total_actual_outstanding = [], [], [], []
-    h = @loan.history(:order => [:for_date], :conditions => ['date > ? AND date < ?', @loan.approved_on, Date.today])
-    h.each do |r|
-      @principal_scheduled_outstanding << t - r.total_scheduled_principal
-      @principal_actual_outstanding    << t - r.total_received_principal
+    @principal_scheduled_outstanding, @principal_actual_outstanding, @total_scheduled_outstanding, @total_actual_outstanding, @labels = [], [], [], [], []
+    h = @loan.history(:order => [:date], :conditions => ['date > ? AND date < ?', @loan.approved_on, @loan.last_loan_history_date])
+    h.each_with_index do |r, index|
+#       @principal_scheduled_outstanding << t - r.total_scheduled_principal
+#       @principal_actual_outstanding    << t - r.total_received_principal
       @total_scheduled_outstanding     << t - r.total_scheduled
-      @total_actual_outstanding        << t - r.total_received
+      @total_actual_outstanding        << {
+        'value'     => t - r.total_received,
+        'colour'    => (r.total_received < r.total_scheduled ? '#ff0000' : '#00ff00') }.to_json
+      @labels                          << ((index % 14 == 0) ? r.date.strftime("%d%b'%y") : '')
     end
     step_size = t/5
     <<-JSON
 {
-
   "elements":[
-    {
-      "type":      "line_dot",
+    { /*
+      "type":      "scatter",
+      "colour":    "#FFB900",
+      "text":      "Avg",
+      "font-size": 10,
+      "dot-size":  10,
+      "values" :   [
+                     {"x":2,  "y":100, "tip":"HELLO" },
+                     {"x":6,  "y":500,  "colour":"#FF0000" },
+                     {"x":5,  "y":100,  "dot-size":20},
+                     {"x":4,  "y":150, "dot-size":5},
+                     {"x":3,  "y":200,  "dot-size":5},
+                     {"x":2,  "y":300,  "dot-size":15}
+                   ]
+    }, { */
+/*      "type":      "line_dot",
       "colour":    "#736AFF",
       "text":      "principal_scheduled_outstanding",
       "font-size": 10,
@@ -40,31 +56,32 @@ class GraphData < Application
       "dot-size":  1,
       "halo-size": 0,
       "values" :   [#{@principal_actual_outstanding.join(',')}]
-    }, {
+    }, { */
       "type":      "line_dot",
       "colour":    "#aa0000",
       "text":      "total_scheduled_outstanding",
       "font-size": 10,
-      "width":     1,
+      "width":     3,
       "dot-size":  1,
       "halo-size": 0,
       "values" :   [#{@total_scheduled_outstanding.join(',')}]
     }, {
       "type":      "line_dot",
-      "colour":    "#00bb00",
+      "colour":    "#555555",
       "text":      "total_actual_outstanding",
       "font-size": 10,
-      "width":     1,
-      "dot-size":  1,
-      "halo-size": 0,
+      "width":     2,
+      "dot-size":  2,
+      "halo-size": 1,
       "values" :   [#{@total_actual_outstanding.join(',')}]
     }
   ],
 
   "x_axis":{
-    "steps": #{10},
+    "steps":        #{7},
     "colour":       "#003d4a",
-    "grid-colour":  "#bc6624"
+    "grid-colour":  "#bc6624",
+    "labels":       {"labels":#{@labels.to_json}}
   },
 
   "y_axis":{
@@ -82,44 +99,22 @@ class GraphData < Application
 
   def client
     <<-JSON
-{
-  "title":{
-    "text":"Area Chart",
-    "style":"{font-size: 30px;}"
-  },
-
-  "y_legend":{
-    "text":"OFC",
-    "style":"{font-size: 12px; color:#736AFF;}"
-  },
-
-  "elements":[
-    {
-      "type":      "area_hollow",
-      "colour":    "#CC3399",
-      "fill":      "#343399",
-      "fill-alpha": 0.8,
-      "text":      "Page views",
-      "width":     3,
-      "font-size": 10,
-      "dot-size":  7,
-      "values" :   [2.1,2.2]
-    }
-  ],
-
-  "y_axis":{
-    "stroke":       4,
-    "tick-length":  10,
-    "colour":       "#00ff00",
-    "grid-colour":  "#d0d0d0",
-    "offset":       true,
-    "min":          2,
-    "max":          3,
-    "visible":      true,
-    "steps":        0.1
-  }
-
-}
+{ "elements": [ { 
+"type": "bar_stack", 
+"colours": [ "#C4D318", "#50284A", "#7D7B6A" ], 
+"values": [ [ 2.5, 5, 2.5 ], [ 2.5, 5, 1.25, 1.25 ], [ 5, { "val": 5, "colour": "#ff0000" } ], [ 2, 2, 2, 2, { "val": 2, "colour": "#ff00ff" } ] ], 
+"keys": [ 
+{ "colour": "#C4D318", "text": "Kiting", "font-size": 13 }, 
+{ "colour": "#50284A", "text": "Work", "font-size": 13 }, 
+{ "colour": "#7D7B6A", "text": "Drinking", "font-size": 13 }, 
+{ "colour": "#ff0000", "text": "XXX", "font-size": 13 }, 
+{ "colour": "#ff00ff", "text": "What rhymes with purple? Nurple?", "font-size": 13 } ], 
+"tip": "X label [#x_label#], Value [#val#]
+Total [#total#]" } ], 
+"title": { "text": "Stuff I'm thinking about, Tue Feb 03 2009", "style": "{font-size: 20px; color: #F24062; text-align: center;}" }, 
+"x_axis": { "labels": { "labels": [ "Winter", "Spring", "Summer", "Autmn" ] } }, 
+"y_axis": { "min": 0, "max": 14, "steps": 2 }, 
+"tooltip": { "mouse": 2 } }
 
     JSON
 end

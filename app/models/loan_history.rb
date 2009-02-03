@@ -64,7 +64,15 @@ class LoanHistory
 #       :total_difference =>          loan.total_difference_on(date)
       }
     unless (loan = LoanHistory.first(:loan_id => loan.id, :date => date)).blank?  # if exists update, otherwise create
-      loan.update_attributes(properties)
+      begin  # trying a few times incase the sqlite3 db is locked...
+        loan.update_attributes(properties)
+      rescue Sqlite3Error
+        sleep(1)
+        loan.update_attributes(properties)
+      rescue Sqlite3Error
+        sleep(1)
+        loan.update_attributes(properties)
+      end
     else
       LoanHistory::create(properties)
     end
