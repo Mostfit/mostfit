@@ -65,6 +65,7 @@ class Centers < Application
   private
   def get_context
     @branch = Branch.get(params[:branch_id])
+    @staff_member = StaffMember.get(params[:staff_member_id])
     raise NotFound unless @branch
   end
 end # Centers

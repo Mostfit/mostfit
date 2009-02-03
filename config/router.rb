@@ -18,6 +18,7 @@ Merb::Router.prepare do
 
   match('/data_entry/:action').to(:controller => 'data_entry').name(:data_entry)
   match('/graph_data/:action/:id').to(:controller => 'graph_data').name(:graph_data)
+  match('/staff_member/:id/centers').to(:controller => 'staff_members', :action => 'show_centers').name(:show_staff_member_centers)
 
   # This is the default route for /:controller/:action/:id
 #   default_routes

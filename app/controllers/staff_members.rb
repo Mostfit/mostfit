@@ -6,6 +6,13 @@ class StaffMembers < Application
     display @staff_members
   end
 
+  def show_centers(id)
+    @staff_member = StaffMember.get(id)
+    raise NotFound unless @staff_member
+    @centers = @staff_member.centers
+    display @centers
+  end
+
   def show(id)
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
