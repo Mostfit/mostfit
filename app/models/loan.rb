@@ -8,6 +8,7 @@ class Loan
   property :installment_frequency,          Enum[:daily, :weekly, :monthly], :nullable => false
   property :number_of_installments,         Integer, :nullable => false
   property :scheduled_first_payment_date,   Date, :nullable => false  # arbitrary date for installment number 0
+  property :approved_on,                    Date, :nullable => false
   property :scheduled_disbursal_date,       Date, :nullable => false
   property :disbursal_date,                 Date  # not disbursed when nil
   property :created_at,                     DateTime
@@ -21,10 +22,11 @@ class Loan
   has n, :payments
   has n, :history, :class_name => 'LoanHistory'
 
+  validates_with_method  :approved_before_disbursed_before_written_off?
   validates_with_method  :properly_written_off?
   validates_with_method  :properly_disbursed?
   validates_present      :approved_by_staff_id
-  validates_is_primitive :disbursal_date, :scheduled_disbursal_date, :scheduled_first_payment_date
+  validates_is_primitive :disbursal_date, :scheduled_disbursal_date, :scheduled_first_payment_date, :approved_on
   
 
   def repay(input, user, received_on, received_by)  # TODO: some kind of validation
@@ -152,13 +154,15 @@ class Loan
     :allow_both   # one of [:separate, :aggregated, :allow_both]
   end
 
-  def written_off?
-    not self.written_off_by.blank?
-  end
+#   def approved?(date = Date.today);    not self.disbursal_date.blank?; end  # nice but not yet needed it seems
+#   def disbursed?(date = Date.today);   not self.disbursal_date.blank?; end
+#   def written_off?(date = Date.today); not self.written_off_on.blank?; end
 
   def status(date = Date.today)
-    return :written_off if self.written_off_on and self.written_off_on <= date
-    self.total_due_on(date) >= self.total_to_be_received ? :repaid : :outstanding
+    return nil          if approved_on >  date  # non existant
+    return :approved    if approved_on <= date and not (disbursal_date and disbursal_date <= date)
+    return :written_off if (written_off_on and written_off_on <= date)
+    total_due_on(date) >= total_to_be_received ? :repaid : :disbursed
   end
 
 
@@ -206,15 +210,24 @@ class Loan
 
 
   private
+  def approved_before_disbursed_before_written_off?
+    if disbursal_date and approved_on > disbursal_date
+      [false, "Cannot be disbursed before it is approved"]
+    elsif disbursal_date and written_off_on and disbursal_date > written_off_on
+      [false, "Cannot be written off before it is disbursed"]
+    end
+    true
+  end
+
   def properly_written_off?
-    return true if (self.written_off_on and self.written_off_by_staff_id) or
-      (!self.written_off_on and !self.written_off_by_staff_id)
+    return true if (written_off_on and written_off_by_staff_id) or
+      (!written_off_on and !written_off_by_staff_id)
     [false, "written_off_on and written_off_by properties have to be (un)set together"]
   end
 
   def properly_disbursed?
-    return true if (self.disbursal_date and self.disbursed_by_staff_id) or
-      (!self.disbursal_date and !self.disbursed_by_staff_id)
+    return true if (disbursal_date and disbursed_by_staff_id) or
+      (!disbursal_date and !disbursed_by_staff_id)
     [false, "disbursal_date and disbursed_by properties have to be (un)set together"]
   end
 end

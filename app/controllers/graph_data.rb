@@ -1,55 +1,131 @@
 class GraphData < Application
 
-  def loan
-    
+  def loan(id)
+    @loan = Loan.get(id)
+    t = @loan.total_to_be_received
+
+      
+    # end time is the last of: "fully repaid", "scheduled to be repaid", "written off"
+    #fully_repaid_on = @loan.history(:order => [:for_date], :conditions => ['status = ?', :repaid]).for_date
+    # for now just today :-)
+
+    @principal_scheduled_outstanding, @principal_actual_outstanding, @total_scheduled_outstanding, @total_actual_outstanding = [], [], [], []
+    h = @loan.history(:order => [:for_date], :conditions => ['for_date > ? AND for_date < ?', @loan.approved_on, Date.today])
+    h.each do |r|
+      @principal_scheduled_outstanding << t - r.total_scheduled_principal
+      @principal_actual_outstanding << t - r.total_received_principal
+      @total_scheduled_outstanding << t - r.total_scheduled
+      @total_actual_outstanding << t - r.total_received
+    end
+    step_size = t/5
     <<-JSON
 {
-  "y_legend":{
-    "text":   "Time of day",
-    "style": "{color: #736AFF;}"
-  },
 
   "elements":[
     {
       "type":      "line_dot",
       "colour":    "#736AFF",
-      "text":      "Avg. wave height (cm)",
+      "text":      "principal_scheduled_outstanding",
       "font-size": 10,
       "width":     1,
       "dot-size":  1,
       "halo-size": 0,
-      "values" :   [1.5,1.69,1.88,2.06,2.21,2.34,2.43,2.48,2.49,2.47,2.40,2.30,2.17,2.01,1.83,1.64,1.44,1.24,1.05,0.88,0.74,0.62,0.54,0.50,0.50,0.54,0.61,0.72,0.86,1.03,1.22,1.41,1.61,1.81,1.99,2.15,2.29,2.39,2.46,2.49,2.48,2.44,2.35,2.23,2.08]
+      "values" :   [#{@principal_scheduled_outstanding.join(',')}]
+    }, {
+      "type":      "line_dot",
+      "colour":    "#736A00",
+      "text":      "principal_actual_outstanding",
+      "font-size": 10,
+      "width":     1,
+      "dot-size":  1,
+      "halo-size": 0,
+      "values" :   [#{@principal_actual_outstanding.join(',')}]
+    }, {
+      "type":      "line_dot",
+      "colour":    "#aa0000",
+      "text":      "total_scheduled_outstanding",
+      "font-size": 10,
+      "width":     1,
+      "dot-size":  1,
+      "halo-size": 0,
+      "values" :   [#{@total_scheduled_outstanding.join(',')}]
+    }, {
+      "type":      "line_dot",
+      "colour":    "#00bb00",
+      "text":      "total_actual_outstanding",
+      "font-size": 10,
+      "width":     1,
+      "dot-size":  1,
+      "halo-size": 0,
+      "values" :   [#{@total_actual_outstanding.join(',')}]
     }
   ],
 
   "x_axis":{
-    "labels":["2:00am","2:10","2:20","2:30","2:40","2:50",
-              "3:00am","3:10","3:20","3:30","3:40","3:50",
-              "4:00am","4:10","4:20","4:30","4:40","4:50",
-              "5:00am","5:10","5:20","5:30","5:40","5:50",
-              "6:00am","6:10","6:20","6:30","6:40","6:50",
-              "7:00am","7:10","7:20","7:30","7:40","7:50",
-              "8:00am","8:10","8:20","8:30","8:40","8:50",
-              "9:00am","9:10","9:20"]
+    "steps": #{10},
+    "colour":       "#003d4a",
+    "grid-colour":  "#bc6624"
   },
 
-/*
-
-x_label_style = 13,0x9933CC,0,6
-y_label_style = none
-bg_colour = 0xDFFFDF
-
-*/
-
   "y_axis":{
-    "max":   3
-  }
+    "colour":       "#003d4a",
+    "grid-colour":  "#bc6624",
+    "steps": #{step_size},
+    "min": 0,
+    "max": #{t}
+  },
+  "bg_colour":"#ffffff"
 
 }
     JSON
   end
 
   def client
+    <<-JSON
+{
+  "title":{
+    "text":"Area Chart",
+    "style":"{font-size: 30px;}"
+  },
+
+  "y_legend":{
+    "text":"OFC",
+    "style":"{font-size: 12px; color:#736AFF;}"
+  },
+
+  "elements":[
+    {
+      "type":      "area_hollow",
+      "colour":    "#CC3399",
+      "fill":      "#343399",
+      "fill-alpha": 0.8,
+      "text":      "Page views",
+      "width":     3,
+      "font-size": 10,
+      "dot-size":  7,
+      "values" :   [2.1,2.2]
+    }
+  ],
+
+  "y_axis":{
+    "stroke":       4,
+    "tick-length":  10,
+    "colour":       "#00ff00",
+    "grid-colour":  "#d0d0d0",
+    "offset":       true,
+    "min":          2,
+    "max":          3,
+    "visible":      true,
+    "steps":        0.1
+  }
+
+}
+
+    JSON
+end
+
+
+  def center
     <<-JSON
 {
   "series":

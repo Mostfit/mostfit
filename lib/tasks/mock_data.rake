@@ -16,7 +16,9 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 def load_fixtures(*files)
   files.each do |name|
     klass = Kernel::const_get(name.to_s.singularize.camel_case)
-    entries = YAML::load_file(Merb.root / "spec/fixtures/#{name}.yml")
+    yml_file =  "spec/fixtures/#{name}.yml"
+    puts "\nLoading: #{yml_file}"
+    entries = YAML::load_file(Merb.root / yml_file)
     entries.each do |name, entry|
       k = klass::new(entry)
       unless k.save
@@ -27,9 +29,31 @@ def load_fixtures(*files)
   end
 end
 
-namespace :db do
-  desc "Load fixtures from /spec/fixtures"
-  task :load_fixtures do
+
+
+namespace :mock do
+  desc "Generate some 'clever-random' payments"
+  task :payments do
+    puts "Not implemented yet..."
+  end
+
+
+  desc "Make history (from first approved loan till today)"
+  task :history do
+    date = Loan.first(:order => [:approved_on]).approved_on
+    t0, days = Time.now, (Date.today - date)
+    Merb.logger.info! "Start mock:history rake task from #{date}, for #{days} days, at #{t0}"
+    while date <= Date.today
+      LoanHistory.run(date)
+      date += 1
+    end
+    t1 = Time.now
+    secs = (t1 - t0).round
+    Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{days} days (#{format("%.3f", secs.to_f/days)} secs/day), at #{t1}"
+  end
+
+  desc "Drop current db and load fixtures from /spec/fixtures"
+  task :fixtures do
     DataMapper.auto_migrate! if Merb.orm == :datamapper
 
     # loading is ordered, important for our references to work
@@ -43,7 +67,7 @@ end
 
 
 
-
+# some fixture loader if found online, more features, none we need so far it seems...
 # # $map = Hash.new
 # # 
 # # path = Merb.root / "spec" / "fixtures"

@@ -25,15 +25,21 @@
       = @loan.installment_frequency
       == (#{@loan.number_of_installments_before(Date.today)} past installments)
   %tr
+    %td approved by
+    %td
+      %b= link_to @loan.approved_by.name, resource(@loan.disbursed_by)
+  %tr.odd
     %td disbursal
     %td
       - if @loan.disbursal_date
         disbursed on
         = @loan.disbursal_date
+        by
+        %b= link_to @loan.disbursed_by.name, resource(@loan.disbursed_by)
       - else
         to be disbursed on
         = @loan.scheduled_disbursal_date
-  %tr.odd
+  %tr
     %td first payment
     %td
       - if @loan.payments.empty?
@@ -50,6 +56,10 @@
             = difference_in_days(@loan.scheduled_first_payment_date, actual_first_payment, ['days earlier', 'days later'])
             then scheduled
             == (#{@loan.scheduled_disbursal_date})
+  %tr.odd
+    %td status
+    %td
+      %b= @loan.status.to_s.gsub('_', ' ')
 
 
 %h2== Payments &mdash; (#{link_to 'new', resource(@branch, @center, @client, @loan, :payments, :new)})
