@@ -1,3 +1,6 @@
+# dont call save or update or anything on this method directly!!
+# this class is managed by the loan, and should be completely managed by it.
+
 class Payment
   include DataMapper::Resource
 

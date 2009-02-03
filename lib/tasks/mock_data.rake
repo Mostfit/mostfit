@@ -40,26 +40,40 @@ namespace :mock do
 
   desc "Make history (from first approved loan till today)"
   task :history do
-    date = Loan.first(:order => [:approved_on]).approved_on
-    t0, days = Time.now, (Date.today - date)
-    Merb.logger.info! "Start mock:history rake task from #{date}, for #{days} days, at #{t0}"
-    while date <= Date.today
-      LoanHistory.run(date)
-      date += 1
-    end
-    t1 = Time.now
-    secs = (t1 - t0).round
-    Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{days} days (#{format("%.3f", secs.to_f/days)} secs/day), at #{t1}"
+    puts "Obsoleted by giving Loan the responsibility to do it by itself, just mock:fixtures will do..."
+#     date = Loan.first(:order => [:approved_on]).approved_on
+#     t0, days = Time.now, (Date.today - date)
+#     Merb.logger.info! "Start mock:history rake task from #{date}, for #{days} days, at #{t0}"
+#     while date <= Date.today
+#       LoanHistory.run(date)
+#       date += 1
+#     end
+#     t1 = Time.now
+#     secs = (t1 - t0).round
+#     Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{days} days (#{format("%.3f", secs.to_f/days)} secs/day), at #{t1}"
   end
 
-  desc "Drop current db and load fixtures from /spec/fixtures"
+  desc "Drop current db and load fixtures from /spec/fixtures (and work the update_history jobs down)"
   task :fixtures do
     DataMapper.auto_migrate! if Merb.orm == :datamapper
 
     # loading is ordered, important for our references to work
     load_fixtures :users, :staff_members, :branches, :centers, :clients, :loans  #, :payments
 
-    puts "Fixtures have been loaded..."
+    t0 = Time.now
+    puts "Starting workers on the queue of history_update jobs at #{t0}"
+    5.times { Merb::Worker.new }  # put a few workers on the queue
+    while (queue_size = Merb::Dispatcher.work_queue.size) > 0
+      puts "Still #{queue_size} jobs in the work queue..."
+      sleep(5)
+    end
+    t1 = Time.now
+    sleep(4)  # allow some last, dangling task to finish
+    Merb.logger.flush
+    puts
+    puts "Finished the queue of history_update jobs in #{(t1 - t0).round} secs, at #{t1}"
+    puts
+    puts "Fixtures have been loaded."
   end
 end
 

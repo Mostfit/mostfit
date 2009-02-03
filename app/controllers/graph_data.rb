@@ -10,12 +10,12 @@ class GraphData < Application
     # for now just today :-)
 
     @principal_scheduled_outstanding, @principal_actual_outstanding, @total_scheduled_outstanding, @total_actual_outstanding = [], [], [], []
-    h = @loan.history(:order => [:for_date], :conditions => ['for_date > ? AND for_date < ?', @loan.approved_on, Date.today])
+    h = @loan.history(:order => [:for_date], :conditions => ['date > ? AND date < ?', @loan.approved_on, Date.today])
     h.each do |r|
       @principal_scheduled_outstanding << t - r.total_scheduled_principal
-      @principal_actual_outstanding << t - r.total_received_principal
-      @total_scheduled_outstanding << t - r.total_scheduled
-      @total_actual_outstanding << t - r.total_received
+      @principal_actual_outstanding    << t - r.total_received_principal
+      @total_scheduled_outstanding     << t - r.total_scheduled
+      @total_actual_outstanding        << t - r.total_received
     end
     step_size = t/5
     <<-JSON

@@ -3,7 +3,7 @@ class LoanHistory
   
 #   property :id,                        Serial  # composite key transperantly enables history-rewriting
   property :loan_id,                   Integer, :key => true
-  property :for_date,                  Date,    :key => true  # the day that this record applies to
+  property :date,                      Date,    :key => true  # the day that this record applies to
   property :created_at,                DateTime  # automatic, nice for benchmarking runs
   property :run_number,                Integer, :nullable => false
 
@@ -46,9 +46,9 @@ class LoanHistory
   end
 
   def self.write_for(loan, run_number, date = Date.today)
-    LoanHistory::create(
+    properties = {
       :loan_id =>                   loan.id,
-      :for_date =>                  date,
+      :date =>                      date,
       :run_number =>                run_number,
 #       :total_to_be_received =>      loan.total_to_be_received,  # some commented out as we dont need 'm (yet)
       :status =>                    loan.status(date),
@@ -62,7 +62,12 @@ class LoanHistory
 #       :principle_difference =>      loan.principle_difference_on(date),
 #       :interest_difference =>       loan.interest_difference_on(date),
 #       :total_difference =>          loan.total_difference_on(date)
-      )
+      }
+    unless (loan = LoanHistory.first(:loan_id => loan.id, :date => date)).blank?  # if exists update, otherwise create
+      loan.update_attributes(properties)
+    else
+      LoanHistory::create(properties)
+    end
   end
 
   def get_overview(interval = :weekly , to = Date.today)
