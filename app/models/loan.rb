@@ -171,6 +171,14 @@ class Loan
     total_received_on(date) >= total_to_be_received ? :repaid : :disbursed
   end
 
+  def installment_dates
+    dates = []
+    number_of_installments.times do |x|
+      dates << shift_date_by_installments(scheduled_first_payment_date, x)
+    end
+    dates
+  end
+
   # private
   def number_of_installments_before(date)
     # the number of payment dates before 'date' (if date is a payment 'date' it is counted in)
