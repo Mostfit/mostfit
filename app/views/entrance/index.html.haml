@@ -1,0 +1,65 @@
+
+%div{ :style => 'float: right; text-align: center;' }
+  %a{ :href => '/images/mostfit-screenie.png', :title => 'click to see full size' }
+    %img{ :src => '/images/intellecap-logo.png', :style => 'float: right;' }
+    %br/
+    %br/
+    %br/
+    %img{ :src => '/images/mostfit-screenie-thumb.png', :alt => 'screenshot!' }
+
+%h1 Mostfit &mdash; an MIF for MFI's
+
+%p== Welcome visitor. This is the homepage of <i>mostfit</i> an #{link_to 'MIS', 'http://en.wikipedia.org/wiki/Management_Information_System'} for #{link_to 'MFIs', 'http://en.wikipedia.org/wiki/Microfinance_institution'} developed by #{link_to 'Intellecap', 'http://intellecap.net'}. This software is release under the #{link_to 'GNU Affero Public License (v3)', 'http://www.fsf.org/licensing/licenses/agpl-3.0.html'}, in simple terms: it is open source. Hurray!
+
+%h2 Development process
+
+%p Mostfit, albeit very fit, is not yet fit enough for production use. The developers of this software, Intellecap, are working together with a pilot MFI to get it production ready as soon as possible. If you are interested in early-adopting Mostfit, please let us know!
+
+
+%h2 A Kick-ass MIS for MFIs, for free?!
+
+%p Yes Mostfit kicks-ass, mainly because it is designed with simplicity. And yes it is completely free! Because there are so many solutions (mainly proprietary, some open-source) out there we at Intellecap decided that it is time to join hands and collaborate with all interested MFIs to make our defacto-standard MIS. To show the world how serious we are, we sponsor its initial development.
+
+%h2 The tools we love...
+
+%p
+  As Misfit in currently in the development we do not have all the marketing/PR/etc text ready. That leave some space on this page to show our (the developers of Mostfit) love for some of the 'tools' we use. We heavily believe in
+  = link_to 'open source', 'http://en.wikipedia.org/wiki/Open_Source'
+  therefor we prefer to use Linux over Microsoft's Windows (or Apple's OSX). Yet the following tools are worth mentioning because the helped making Mostfit possible.
+
+
+%table.form
+  %tr
+    %td
+      %img{ :src => '/images/ruby.gif' }
+    %td
+      We love the Ruby programming language. It has revolutionized the way programmers can do their work, and, maybe more important: it helps us to write better software, using less lines-of-code, in less time!
+      %br/
+      %br/
+      = link_to 'The Ruby programming language', 'http://ruby-lang.org'
+  %tr
+    %td
+      %img{ :src => '/images/merb.jpg' }
+    %td
+      Merb is a fantastic web development environment that "just makes sense". It borrows a lot of concepts form Ruby On Rails, and it has been announced that it will be merged into Rails as of version 3. Together with Merb we use several other tools that are worth mentioning:
+      %ul
+        %li DataMapper &ndash; a god-sent ORM,
+        %li HAML &ndash; to ease the pain that is HTML and CSS,
+        %li Open Flash Chart 2 &ndash; for all our graphing,
+        %li mod_passenger for apache &ndash; as otherwise we'd still be in the stone age.
+      = link_to 'The Merb webframework', 'http://merbivore.com'
+      %br/
+      = link_to 'Ruby On Rails', ''
+      %br/
+      = link_to 'DataMapper', ''
+      %br/
+      = link_to 'HAML', ''
+      %br/
+      = link_to 'Open Flash Chart 2', ''
+      %br/
+      = link_to 'mod_passenger', ''
+      %br/
+
+
+
+      

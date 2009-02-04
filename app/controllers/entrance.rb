@@ -1,12 +1,14 @@
-class Entrance < Application
-  # the only unprotected action. not really needed (could do it straight from the router)
-  # but in the future we probably need somthing more sophisticated here
+class Entrance < Merb::Controller  # not inherit from Application as that thing is authenticated
+
+  def index
+    render
+  end
 
   def root
     if session.authenticated?
-      redirect url(:branches)
+      redirect url(:branches)  # this should be the cockpit page in later versions
     else
-      raise Unauthenticated
+      redirect url(:entrance)
     end
   end
 end

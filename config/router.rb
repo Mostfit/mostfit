@@ -23,6 +23,6 @@ Merb::Router.prepare do
   # This is the default route for /:controller/:action/:id
 #   default_routes
   
-  # Change this for your home page to be available at /
+  match('/entrance').to(:controller => 'entrance').name(:entrance)
   match('/').to(:controller => 'entrance', :action =>'root')
 end
