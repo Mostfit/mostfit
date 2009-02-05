@@ -1,13 +1,27 @@
 
-%div{ :style => 'float: right; text-align: center;' }
-  %a{ :href => '/images/mostfit-screenie.png', :title => 'click to see full size' }
-    %img{ :src => '/images/intellecap-logo.png', :style => 'float: right;' }
-    %br/
-    %br/
-    %br/
-    %img{ :src => '/images/mostfit-screenie-thumb.png', :alt => 'screenshot!' }
+- download_uri = '/mostfit-20090204.tar.gz'
+- demo_uri = url(:branches)
 
-%h1 Mostfit &mdash; an MIF for MFI's
+%div{ :style => 'float: right; text-align: center;' }
+  %a{ :href => 'http://intellecap.net', :title => 'respect to the sole patron of mostfit' }
+    %img{ :src => '/images/intellecap-logo.png', :style => 'float: right;' }
+  %br/
+  &nbsp;
+  %br/
+  &nbsp;
+  %br/
+  %a{ :href => '/images/mostfit-screenie.png', :title => 'click to see full size' }
+    %img{ :src => '/images/mostfit-screenie-thumb.png', :alt => 'screenshot!' }
+  %br/
+  &nbsp;
+  %br/
+  %h1== #{link_to 'Download Mostfit now!', download_uri}
+  %h1 or
+  %h1== #{link_to 'try our demo', demo_uri}
+
+
+
+%h1 Mostfit &mdash; an MIS for MFI's
 
 %p== Welcome visitor. This is the homepage of <i>mostfit</i> an #{link_to 'MIS', 'http://en.wikipedia.org/wiki/Management_Information_System'} for #{link_to 'MFIs', 'http://en.wikipedia.org/wiki/Microfinance_institution'} developed by #{link_to 'Intellecap', 'http://intellecap.net'}. This software is release under the #{link_to 'GNU Affero Public License (v3)', 'http://www.fsf.org/licensing/licenses/agpl-3.0.html'}, in simple terms: it is open source. Hurray!
 
@@ -30,7 +44,7 @@
 
 %table.form
   %tr
-    %td
+    %td{ :style => 'text-align: right;' }
       %img{ :src => '/images/ruby.gif' }
     %td
       We love the Ruby programming language. It has revolutionized the way programmers can do their work, and, maybe more important: it helps us to write better software, using less lines-of-code, in less time!
@@ -38,28 +52,21 @@
       %br/
       = link_to 'The Ruby programming language', 'http://ruby-lang.org'
   %tr
-    %td
+    %td{ :style => 'text-align: right;' }
       %img{ :src => '/images/merb.jpg' }
     %td
-      Merb is a fantastic web development environment that "just makes sense". It borrows a lot of concepts form Ruby On Rails, and it has been announced that it will be merged into Rails as of version 3. Together with Merb we use several other tools that are worth mentioning:
+      == #{link_to 'Merb', 'http://merbivore.org'} is a fantastic web development environment that "just makes sense". It borrows a lot of concepts form #{link_to 'Ruby On Rails', 'http://rubyonrails.org'}, and it has been announced that it will be merged into Rails as of version 3. Together with Merb we use several other tools that are worth mentioning:
       %ul
-        %li DataMapper &ndash; a god-sent ORM,
-        %li HAML &ndash; to ease the pain that is HTML and CSS,
-        %li Open Flash Chart 2 &ndash; for all our graphing,
-        %li mod_passenger for apache &ndash; as otherwise we'd still be in the stone age.
-      = link_to 'The Merb webframework', 'http://merbivore.com'
-      %br/
-      = link_to 'Ruby On Rails', ''
-      %br/
-      = link_to 'DataMapper', ''
-      %br/
-      = link_to 'HAML', ''
-      %br/
-      = link_to 'Open Flash Chart 2', ''
-      %br/
-      = link_to 'mod_passenger', ''
-      %br/
+        %li== #{link_to 'DataMapper', 'http://datamapper.org'} &ndash; a god-sent ORM,
+        %li== #{link_to 'haml', 'http://haml.hamptoncatlin.com'} &ndash; to ease the pain that is HTML and CSS,
+        %li== #{link_to 'Open Flash Chart 2', 'http://teethgrinder.co.uk/open-flash-chart-2'} &ndash; for all our graphing,
+        %li== #{link_to 'mod_passenger', 'http://www.modrails.com'} mod_passenger for apache &ndash; as otherwise we'd still be in the stone age.
 
+%h2 Download, use, test-drive, feedback, etc.
 
+%p As mentioned we currently do not recommend Mostfit to be used in a production environment. Yet in anticipation of Mostfit becoming "the best for free" you might want to check it out non the less. It is recommended to have some experience with Linux servers (do Apache, MySQL, bash and ssh ring a bell?). If you cannot get it to work that is no problem, as we are gearing up to deliver Mostfit as a "managed service". This way we take care of installing and maintaining your Mostfit installation for you.
+%p== Stay tuned for more updated and in the mean time #{link_to 'enjoy the source code', download_uri}.
+%p If you just want to test Mostfit you do not have to download it: the site that you are looking at right now is a live demo of Mostfit!
+%p== #{link_to 'Proceed to the login page', demo_uri}, and use login 'admin', and password 'password' to start testing Mostfit. In case the demo is not working properly, please let us know.
 
       
