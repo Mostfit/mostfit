@@ -32,9 +32,20 @@ end
 
 
 namespace :mock do
-  desc "Generate some 'clever-random' payments"
+  desc "Generate some payments"
   task :payments do
-    puts "Not implemented yet..."
+    # loan_id[0], total OR [principal, interest] [1], user_id[2], date as string[3], staff_member_id[4]
+    [ [1, 3000, 1, "2009-01-01", 3],
+      [1, 4000, 1, "2009-02-01", 3],
+      [1, 2000, 1, "2009-04-01", 3]
+    ].each do |r|
+      result = Loan.get(r[0]).repay(r[1], User.get(r[2]), Date.parse(r[3]), r[4])
+      unless result[0]  # the save status
+        puts "Validation errors repaying #{r[1]} for Loan ##{r[0]}:\n#{result[1].errors.inspect}"
+      end
+      # history update jobs are put on the queue.. we just call the loans individually.
+      Loan.get(1).update_history_now  # TODO make this generic for all loans that have payments made
+    end
   end
 
 
@@ -62,18 +73,26 @@ namespace :mock do
 
     t0 = Time.now
     puts "Starting workers on the queue of history_update jobs at #{t0}"
-    5.times { Merb::Worker.new }  # put a few workers on the queue
-    while (queue_size = Merb::Dispatcher.work_queue.size) > 0
-      puts "Still #{queue_size} jobs in the work queue...\n"
-      sleep(5)
-    end
-    t1 = Time.now
-    sleep(6)  # allow some last, dangling task to finish
-    Merb.logger.flush
+
     puts
-    puts "Finished the queue of history_update jobs in #{(t1 - t0).round} secs, at #{t1}"
-    puts
-    puts "Fixtures have been loaded."
+    puts "You have to kill this task youself when it is finished.. Sorry!\n\n"
+    sleep(2)
+
+    Merb::Worker.new
+
+    sleep(60*60*6)  # six hours, then we kill it ourselves..
+#     5.times { Merb::Worker.new }  # put a few workers on the queue
+#     while (queue_size = Merb::Dispatcher.work_queue.size) > 0
+#       puts "Still #{queue_size} jobs in the work queue...\n"
+#       sleep(5)
+#     end
+#     t1 = Time.now
+#     sleep(60)  # allow some last, dangling task to finish
+#     Merb.logger.flush
+#     puts
+#     puts "Finished the queue of history_update jobs in #{(t1 - t0).round} secs, at #{t1}"
+#     puts
+#     puts "Fixtures have been loaded."
   end
 end
 

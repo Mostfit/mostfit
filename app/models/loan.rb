@@ -111,7 +111,7 @@ class Loan
        FROM "payments"
       WHERE ("deleted_at" IS NULL)
         AND ("loan_id" = #{self.id})
-        AND received_on <= "#{date}"})[0].to_a.map { |x| x.nil? ? 0 : x }  # nil -> 0
+        AND ("received_on" <= "#{date}")})[0].to_a.map { |x| x.nil? ? 0 : x }  # nil -> 0
   end
 
 
@@ -123,19 +123,19 @@ class Loan
     interest_rate * amount / number_of_installments * number_of_installments_before(date)
   end
   def scheduled_received_total_up_to(date)
-    total_scheduled_principal_on(date) + total_scheduled_interest_on(date)
+    scheduled_received_principal_up_to(date) + scheduled_received_interest_up_to(date)
   end
 
   # these 3 methods return scheduled amounts from a LOAN-OUTSTANDING perspective
   # they are purely calculated -- no calls to its payments or loan_history)
   def scheduled_outstanding_principal_on(date)  # typically reimplemented in subclasses
-    amount - scheduled_received_principal_on(date)
+    amount - scheduled_received_principal_up_to(date)
   end
   def scheduled_outstanding_interest_on(date)  # typically reimplemented in subclasses
-    (interest_rate * amount) - scheduled_received_interest_on(date)
+    (interest_rate * amount) - scheduled_received_interest_up_to(date)
   end
   def scheduled_outstanding_total_on(date)
-    total_to_be_received - scheduled_received_total_on(date)
+    total_to_be_received - scheduled_received_total_up_to(date)
   end
 
   # these 3 methods return overpayment amounts (PAYMENT-RECEIVED perspective)
@@ -152,14 +152,13 @@ class Loan
 
   # these 3 methods return actual outstanding amounts (LOAN-OUTSTANDING perspective)
   def actual_outstanding_principal_on(date)
-    principal_received_up_to(date)
     scheduled_outstanding_principal_on(date) - principal_overpaid_on(date)
   end
   def actual_outstanding_interest_on(date)
     scheduled_outstanding_interest_on(date) - interest_overpaid_on(date)
   end
   def actual_outstanding_total_on(date)
-    scheduled_outstanding_total_on(date) + total_overpaid_on(date)
+    scheduled_outstanding_total_on(date) - total_overpaid_on(date)
   end
 
 
@@ -276,15 +275,14 @@ class Loan
     Merb.run_later { update_history_now }  # i just love procrastination
   end
   def update_history_now
-    start_date = approved_on  # start date
+    start_date = disbursal_date  # start date -- a payment can never come before the disbursal_date
     end_date   = last_loan_history_date  # end date
     date       = start_date
     run_number = (LoanHistory.max(:run_number) or 0) + 1
     t0         = Time.now
     Merb.logger.info! "Start Loan#history_update for loan ##{self.id} (#{start_date} - #{end_date}), at #{t0}"
     while date <= end_date
-      puts ">>>>>>>>> write_for(#{[run_number, date].inspect})"
-      LoanHistory::write_for(self, run_number, date)
+      LoanHistory.write_for(self, run_number, date)
       date += 1
     end
     t1 = Time.now
