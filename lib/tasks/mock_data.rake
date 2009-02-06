@@ -64,11 +64,11 @@ namespace :mock do
     puts "Starting workers on the queue of history_update jobs at #{t0}"
     5.times { Merb::Worker.new }  # put a few workers on the queue
     while (queue_size = Merb::Dispatcher.work_queue.size) > 0
-      puts "Still #{queue_size} jobs in the work queue..."
+      puts "Still #{queue_size} jobs in the work queue...\n"
       sleep(5)
     end
     t1 = Time.now
-    sleep(4)  # allow some last, dangling task to finish
+    sleep(6)  # allow some last, dangling task to finish
     Merb.logger.flush
     puts
     puts "Finished the queue of history_update jobs in #{(t1 - t0).round} secs, at #{t1}"

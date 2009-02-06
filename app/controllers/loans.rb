@@ -26,6 +26,10 @@ class Loans < Application
   def create(loan)
     @loan = Loan.new(loan)
     @loan.client = @client  # set direct context
+#     @loan.approved_by = (StaffMember.get(loan[:approved_by]) or raise NotFound)  # put in validation
+#     if loan[:disbursed_by].blank?
+#       @loan.disbursed_by = (StaffMember.get(loan[:disbursed_by]) or raise NotFound)
+#     end
     if @loan.save
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
     else

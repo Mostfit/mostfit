@@ -115,7 +115,7 @@
       %th date due
       %th scheduled payment
       %th total scheduled payments
-      %th total paid within date due
+      %th total received up to date due
       %th total difference on date due
   %tbody
   - first, passed = true, false  # these are for printing the "today" row
@@ -138,27 +138,27 @@
         %br/
         %span.greytext== #{i[:principal].round} principal + #{i[:interest].round} interest
       %td
-        - tsp, tsi = @loan.total_scheduled_principal_on(i[:date]), @loan.total_scheduled_interest_on(i[:date])
-        %b= format_currency tsp + tsi
+        - sop, soi = @loan.scheduled_outstanding_principal_on(i[:date]), @loan.scheduled_outstanding_interest_on(i[:date])
+        %b= format_currency sop + soi
         %br/
-        %span.greytext== #{tsp.round} principal + #{tsi.round} interest
+        %span.greytext== #{sop.round} principal + #{soi.round} interest
       %td
         - if last_payment_date and (i[:date] <= last_payment_date or i[:date] <= Date.today)
-          - trp, tri = @loan.total_received_principal_on(i[:date]), @loan.total_received_interest_on(i[:date])
-          %b= format_currency trp + tri
+          %b= format_currency @loan.total_received_up_to(i[:date])
           %br/
-          %span.greytext== #{trp} principal + #{tri} interest
+          %span.greytext
+            == #{@loan.principal_received_up_to(i[:date])} principal + #{@loan.interest_received_up_to(i[:date])} interest
       %td
         - if i[:date] <= Date.today
-          - diff = @loan.principle_difference_on(i[:date]) + @loan.interest_difference_on(i[:date])
+          - diff = @loan.total_overpaid_on(i[:date])
           %b
-            %span{ :class => (diff > 0 ? 'red' : 'green') }
+            %span{ :class => (diff > 0 ? 'green' : 'red') }
               = format_currency diff.abs
           %br/
           %span.greytext
-            %span{ :class => (diff > 0 ? 'red' : 'green') }
+            %span{ :class => (diff > 0 ? 'green' : 'red') }
               = format("%.0f%", (diff.abs.to_f / @loan.total_to_be_received) * 100)
-            = diff > 0 ? 'shortfall' : 'overpaid'
+            = diff > 0 ? 'overpaid' : 'shortfall'
   %tfoot
     %tr
       %td{ :colspan => 7 }

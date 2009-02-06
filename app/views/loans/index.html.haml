@@ -75,7 +75,7 @@
             scheduled for
             = loan.scheduled_disbursal_date
       %td
-        = format("%.2f%", loan.total_received_principal_on(Date.today).to_f / loan.amount * 100)
+        = format("%.2f%", loan.principal_received_up_to(Date.today).to_f / loan.amount * 100)
       %td
         - if loan.status == :written_off
           written off

@@ -7,77 +7,68 @@ class LoanHistory
   property :created_at,                DateTime  # automatic, nice for benchmarking runs
   property :run_number,                Integer, :nullable => false
 
-#### properties for methods (derived/calculates values) of a loan
-# (most of them end on: _on(date))
-# propably we dont need so much, but alas..
-#   property :total_to_be_received,      Integer, :nullable => false  # some commented out as we dont need 'm (yet)
-
-  property :total_scheduled_principal, Integer, :nullable => false
-#   property :total_scheduled_interest,  Integer, :nullable => false
-  property :total_scheduled,           Integer, :nullable => false
-
-  property :total_received_principal,  Integer, :nullable => false
-#   property :total_received_interest,   Integer, :nullable => false
-  property :total_received,            Integer, :nullable => false
-
-#   property :principle_difference,      Integer, :nullable => false
-#   property :interest_difference,       Integer, :nullable => false
-#   property :total_difference,          Integer, :nullable => false
-
-  property :status,                    Enum[nil, :approved, :disbursed, :repaid, :written_off]
-#### end
+  # some properties for similarly named methods of a loan:
+  property :scheduled_outstanding_principal, Integer, :nullable => false
+  property :scheduled_outstanding_total,     Integer, :nullable => false
+  property :actual_outstanding_principal,    Integer, :nullable => false
+  property :actual_outstanding_total,        Integer, :nullable => false
+  property :status,                          Enum[nil, :approved, :disbursed, :repaid, :written_off]
 
   belongs_to :loan
+  
 
-
-
-  def self.run(date = Date.today)
-    run_number = (LoanHistory.max(:run_number) or 0) + 1
-    loans = Loan.all(:order => [:created_at])
-    t0 = Time.now
-    Merb.logger.info! "Start LoanHistory run ##{run_number}, for #{loans.size} loans, at #{t0}"
-    loans.each do |loan|
-      LoanHistory.write_for(loan, run_number, date)
-      puts  # make reading the console output a little easier
-    end
-    t1 = Time.now
-    secs = (t1 - t0).round
-    Merb.logger.info! "Finished LoanHistory run ##{run_number}, in #{secs} secs (#{format("%.3f", secs.to_f/loans.size)} secs/loan), at #{t1}"
+  def self.raw_structs_for_loan(loan_id, dates)
+    raw = repository.adapter.query(%Q{
+      SELECT "loan_id", "date", "created_at", "run_number", "scheduled_outstanding_principal", "scheduled_outstanding_total", "actual_outstanding_principal", "actual_outstanding_total", "status"
+      FROM "loan_history"
+      WHERE "loan_id" = #{loan_id}
+        AND "date" IN (#{(dates.map { |x| x.to_s.inspect }).join(', ')})
+      ORDER BY "date"})
   end
 
+  def self.raw_structs_for_loans(loan_ids, dates)
+    raw = repository.adapter.query(%Q{
+      SELECT
+        "date",
+        SUM("scheduled_outstanding_principal") AS "scheduled_outstanding_principal",
+        SUM("scheduled_outstanding_total")     AS "scheduled_outstanding_total",
+        SUM("actual_outstanding_principal")    AS "actual_outstanding_principal",
+        SUM("actual_outstanding_total")        AS "actual_outstanding_total"
+       FROM "loan_history"
+      WHERE "loan_id" IN (#{(loan_ids.map { |x| x.to_s.inspect }).join(', ')})
+        AND "date" IN (#{(dates.map { |x| x.to_s.inspect }).join(', ')})
+      GROUP BY "date"
+      ORDER BY "date"})
+  end
+
+  # the prefered way to make history and future.
   def self.write_for(loan, run_number, date = Date.today)
-    properties = {
-      :loan_id =>                   loan.id,
-      :date =>                      date,
-      :run_number =>                run_number,
-#       :total_to_be_received =>      loan.total_to_be_received,  # some commented out as we dont need 'm (yet)
-      :status =>                    loan.status(date),
-      :total_scheduled_principal => loan.total_scheduled_principal_on(date),
-#       :total_scheduled_interest =>  loan.total_scheduled_interest_on(date),
-      :total_scheduled =>           loan.total_scheduled_on(date),
-      :total_received_principal =>  loan.total_received_principal_on(date),
-#       :total_received_interest =>   loan.total_received_interest_on(date),
-      :total_received =>            loan.total_received_on(date)
-#,
-#       :principle_difference =>      loan.principle_difference_on(date),
-#       :interest_difference =>       loan.interest_difference_on(date),
-#       :total_difference =>          loan.total_difference_on(date)
-      }
-    unless (loan = LoanHistory.first(:loan_id => loan.id, :date => date)).blank?  # if exists update, otherwise create
-      begin  # trying a few times incase the sqlite3 db is locked...
-        loan.update_attributes(properties)
-      rescue Sqlite3Error
-        sleep(1)
-        loan.update_attributes(properties)
-      rescue Sqlite3Error
-        sleep(1)
-        loan.update_attributes(properties)
-      end
+    keys = {
+      :loan_id =>                           loan.id,
+      :date =>                              date }
+    other_attributes = {
+      :run_number =>                        run_number,
+      :status =>                            loan.status(date),
+      :scheduled_outstanding_principal =>   loan.scheduled_outstanding_principal_on(date),
+      :scheduled_outstanding_total =>       loan.scheduled_outstanding_total_on(date),
+      :actual_outstanding_principal =>      loan.actual_outstanding_principal_on(date),
+      :actual_outstanding_total =>          loan.actual_outstanding_total_on(date) }
+    history_record = LoanHistory.first(keys.merge(:fields => [:loan_id]))  # dont pull to much
+    unless history_record.blank?
+      history_record.update_attributes(other_attributes)  # dont pass the keys
+      "DONE!"
+#       begin  # trying a few times incase the sqlite3 db is locked, mysql will not have this problem...
+#         history_record.update_attributes(properties)
+#       rescue Sqlite3Error
+#         sleep(1)
+#         history_record.update_attributes(properties)
+#       rescue Sqlite3Error
+#         sleep(1)
+#         history_record.update_attributes(properties)
+#       end
     else
-      LoanHistory::create(properties)
+      LoanHistory::create(keys.merge(other_attributes))
     end
   end
 
-  def get_overview(interval = :weekly , to = Date.today)
-  end
 end

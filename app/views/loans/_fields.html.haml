@@ -31,6 +31,19 @@
       = text_field :scheduled_disbursal_date, :size => 40
   %tr
     %td
-      Disbursal date:
+      Approved:
     %td
-      = text_field :disbursal_date, :size => 40
+      on
+      = text_field :approved_on, :size => 12
+      by
+      = select :approved_by_staff_id, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
+  %tr
+    %td
+      Disbursed:
+    %td
+      on
+      = text_field :disbursal_date, :size => 12
+      by
+      = select :disbursed_by_staff_id, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
+      %br/
+      %span.greytext (optional, may be specified later)
