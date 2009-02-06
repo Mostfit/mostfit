@@ -86,9 +86,8 @@ class Loan
     (self.amount.to_f * (1 + self.interest_rate)).round
   end
 
-  # the following methods basically count the payments
-  # next two methods use simple caching
-  # it works because objects live short (usualy only within the scope of one request)
+  # the following methods basically count the payments (PAYMENT-RECEIVED perspective)
+  # the last method makes the actual (optimized) db call and is cached
   def principal_received_up_to(date)
     payments_received_up_to(date)[0]
   end
@@ -100,42 +99,60 @@ class Loan
   end  
   # private??
   # returns an array with as contents sums of the principal[0], interest[1] and total[2]
-  # proper optimization, and good example of falling back to SQL
-  # keeps the cache for principal_received_up_to/interest_received_up_to/total_received_up_to
+  # proper optimization, and good example of falling back to SQL and query-caching
   def payments_received_up_to(date)
     return @summed_payments_cache[date] if @summed_payments_cache and @summed_payments_cache[date]
     @summed_payments_cache ||= {}
     @summed_payments_cache[date] = repository.adapter.query(%Q{
-      SELECT SUM("principal"), SUM("interest"), SUM("principal" + "interest") AS "total"
-      FROM "payments"
+      SELECT
+        SUM ("principal")              AS "principal_received",
+        SUM ("interest")               AS "interest_received",
+        SUM ("principal" + "interest") AS "total_received"
+       FROM "payments"
       WHERE ("deleted_at" IS NULL)
         AND ("loan_id" = #{self.id})
         AND received_on <= "#{date}"})[0].to_a.map { |x| x.nil? ? 0 : x }  # nil -> 0
   end
 
-  # these three methods return the scheduled outstanding amount for any date
-  # these 3 are so purely calculated -- no calls to its payments or loan_history)
-  def scheduled_outstanding_principal_on(date)  # typically reimplemented in subclasses
-    (amount.to_i / number_of_installments * number_of_installments_before(date)).round
+
+  # these 3 methods return scheduled amounts from a PAYMENT-RECEIVED perspective
+  def scheduled_received_principal_up_to(date)  # typically reimplemented in subclasses
+    amount.to_f / number_of_installments * number_of_installments_before(date)
   end
-  def scheduled_outstanding_interest_on(date)  # typically reimplemented in subclasses
-    (interest_rate * amount / number_of_installments * number_of_installments_before(date)).round
+  def scheduled_received_interest_up_to(date)  # typically reimplemented in subclasses
+    interest_rate * amount / number_of_installments * number_of_installments_before(date)
   end
-  def scheduled_outstanding_total_on(date)
-    scheduled_outstanding_principal_on(date) + scheduled_outstanding_interest_on(date)
+  def scheduled_received_total_up_to(date)
+    total_scheduled_principal_on(date) + total_scheduled_interest_on(date)
   end
 
-  # 2 sets of convenience methods
-  def principal_overpaid_on(date)  # negative values mean shortfall
-    principal_received_up_to(date) - scheduled_outstanding_principal_on(date)
+  # these 3 methods return scheduled amounts from a LOAN-OUTSTANDING perspective
+  # they are purely calculated -- no calls to its payments or loan_history)
+  def scheduled_outstanding_principal_on(date)  # typically reimplemented in subclasses
+    amount - scheduled_received_principal_on(date)
+  end
+  def scheduled_outstanding_interest_on(date)  # typically reimplemented in subclasses
+    (interest_rate * amount) - scheduled_received_interest_on(date)
+  end
+  def scheduled_outstanding_total_on(date)
+    total_to_be_received - scheduled_received_total_on(date)
+  end
+
+  # these 3 methods return overpayment amounts (PAYMENT-RECEIVED perspective)
+  # negative values mean shortfall (we're positive-minded at intellecap)
+  def principal_overpaid_on(date)
+    principal_received_up_to(date) - scheduled_received_principal_up_to(date)
   end
   def interest_overpaid_on(date)
-    interest_received_up_to(date) - scheduled_outstanding_interest_on(date)
+    interest_received_up_to(date) - scheduled_received_interest_up_to(date)
   end
   def total_overpaid_on(date)
-    total_received_up_to(date) - scheduled_outstanding_total_on(date)
+    total_received_up_to(date) - scheduled_received_total_up_to(date)
   end
+
+  # these 3 methods return actual outstanding amounts (LOAN-OUTSTANDING perspective)
   def actual_outstanding_principal_on(date)
+    principal_received_up_to(date)
     scheduled_outstanding_principal_on(date) - principal_overpaid_on(date)
   end
   def actual_outstanding_interest_on(date)
@@ -147,15 +164,24 @@ class Loan
 
 
   # used by the views to quickly get an overview of the "calculated schedule"
-  # this schedule does not need any further queries for payments or the loan_history
-  # TODO: MAYBE IT SHOULD? (i think it should --  cies)
+  # to compose this schedule one query for each installment is made
   def payment_schedule
     schedule = []
+    principal_so_far, interest_so_far = 0, 0
     number_of_installments.times do |number|
+      date      = shift_date_by_installments(scheduled_first_payment_date, number)
+      principal = scheduled_principal_for_installment(number)
+      interest  = scheduled_interest_for_installment(number)
       schedule << {
-        :date      => shift_date_by_installments(scheduled_first_payment_date, number),
-        :principal => scheduled_principal_for_installment(number),
-        :interest  => scheduled_interest_for_installment(number) }
+        :date                       => date,
+        :principal                  => principal,
+        :interest                   => interest,
+        :principal_so_far           => (principal_so_far += principal),
+        :interest_so_far            => (interest_so_far  += interest),
+        :principal_received_so_far  => principal_received_up_to(date),
+        :interest_received_so_far   => interest_received_up_to(date),
+        :principal_overpaid         => principal_overpaid_on(date),
+        :interest_overpaid          => interest_overpaid_on(date) }
     end
     schedule
   end
@@ -195,9 +221,30 @@ class Loan
   end
 
 
+  # this method returns the last date the loan history makes sense
+  # used by +update_history+ for knowing when to stop.
+  # (note: this is often a date in the future -- huh?!)   MAYBE: move this to the LoanHistory
+  def last_loan_history_date
+    s = status  # TODO: replace with case-when constuct
+    scheduled_repaid_on = shift_date_by_installments(scheduled_first_payment_date, number_of_installments)
+    if s.nil?
+      return nil
+    elsif s == :approved
+      return scheduled_repaid_on
+    elsif s == :disbursed
+      return [scheduled_repaid_on, Date.today].max
+    elsif s == :repaid
+      last_payment_received_on = self.payments.first(:order => [:received_on.desc]).received_on
+      return [scheduled_repaid_on, last_payment_received_on].max
+    elsif s == :written_off
+      return [scheduled_repaid_on, written_off_on].max
+    end
+  end
+
+
 
   # the number of payment dates before 'date' (if date is a payment 'date' it is counted in)
-  # used to calculate the outstanding value
+  # used to calculate the outstanding value, and in the views
   def number_of_installments_before(date)
     return 0 if date < scheduled_first_payment_date
     result = case installment_frequency
@@ -213,6 +260,65 @@ class Loan
     end
     [result, number_of_installments].min  # never return more than the number_of_installments
   end
+
+
+  # neat trick.. returns an Array with all subclasses of this model
+  # used in loan type selection.
+  def self.subclasses; @subclasses ||= Array.new; end
+  def self.inherited(subclass); subclasses << subclass; end
+  
+
+  # THE RUNNER.. this methods refreshes the history(/future) of this lone when
+  # changes have been made to it, or its payments. gets called by hooks
+  # the task of updating the history may take some time and it therefor put
+  # the the Merb::Dispatcher.work_queue (using Merb.run_later)
+  def update_history
+    Merb.run_later { update_history_now }  # i just love procrastination
+  end
+  def update_history_now
+    start_date = approved_on  # start date
+    end_date   = last_loan_history_date  # end date
+    date       = start_date
+    run_number = (LoanHistory.max(:run_number) or 0) + 1
+    t0         = Time.now
+    Merb.logger.info! "Start Loan#history_update for loan ##{self.id} (#{start_date} - #{end_date}), at #{t0}"
+    while date <= end_date
+      puts ">>>>>>>>> write_for(#{[run_number, date].inspect})"
+      LoanHistory::write_for(self, run_number, date)
+      date += 1
+    end
+    t1 = Time.now
+    secs = (t1 - t0).round
+    Merb.logger.info! "Finished Loan#history_update for loan ##{self.id} (#{start_date} - #{end_date}), in #{secs} secs (#{format("%.3f", secs.to_f/(end_date-start_date))} secs/record), at #{t1}"
+  end
+
+
+  private
+
+  ## validations: read their method name and error to see what they do.
+  def approved_before_disbursed_before_written_off?
+    parse_dates
+    if disbursal_date and approved_on < disbursal_date
+      [false, "Cannot be disbursed before it is approved"]
+    elsif disbursal_date and written_off_on and disbursal_date < written_off_on
+      [false, "Cannot be written off before it is disbursed"]
+    end
+    true
+  end
+  def properly_written_off?
+    parse_dates
+    return true if (written_off_on and written_off_by_staff_id) or
+      (!written_off_on and !written_off_by_staff_id)
+    [false, "written_off_on and written_off_by properties have to be (un)set together"]
+  end
+  def properly_disbursed?
+    parse_dates
+    return true if (disbursal_date and disbursed_by_staff_id) or
+      (!disbursal_date and !disbursed_by_staff_id)
+    [false, "disbursal_date and disbursed_by properties have to be (un)set together"]
+  end
+
+
 
   # the arithmic of shifting by the installment_frequency (especially months is tricky)
   # used by many other methods
@@ -239,55 +345,6 @@ class Loan
     end
   end
 
-  # this method returns the last date the loan history makes sense
-  # used by +update_history+ for knowing when to stop.
-  # (note: this is often a date in the future -- huh?!)
-  def last_loan_history_date
-    s = status  # TODO: replace with case-when constuct
-    scheduled_repaid_on = shift_date_by_installments(scheduled_first_payment_date, number_of_installments)
-    if s.nil?
-      return nil
-    elsif s == :approved
-      return scheduled_repaid_on
-    elsif s == :disbursed
-      return [scheduled_repaid_on, Date.today].max
-    elsif s == :repaid
-      last_payment_received_on = self.payments.first(:order => [:received_on.desc]).received_on
-      return [scheduled_repaid_on, last_payment_received_on].max
-    elsif s == :written_off
-      return [scheduled_repaid_on, written_off_on].max
-    end
-  end
-
-  # neat trick.. returns an Array with all subclasses of this model
-  # used in loan type selection.
-  def self.subclasses; @subclasses ||= Array.new; end
-  def self.inherited(subclass); subclasses << subclass; end
-  
-#   private
-
-  ## validations: read their method name and error to see what they do.
-  def approved_before_disbursed_before_written_off?
-    parse_dates
-    if disbursal_date and approved_on < disbursal_date
-      [false, "Cannot be disbursed before it is approved"]
-    elsif disbursal_date and written_off_on and disbursal_date < written_off_on
-      [false, "Cannot be written off before it is disbursed"]
-    end
-    true
-  end
-  def properly_written_off?
-    parse_dates
-    return true if (written_off_on and written_off_by_staff_id) or
-      (!written_off_on and !written_off_by_staff_id)
-    [false, "written_off_on and written_off_by properties have to be (un)set together"]
-  end
-  def properly_disbursed?
-    parse_dates
-    return true if (disbursal_date and disbursed_by_staff_id) or
-      (!disbursal_date and !disbursed_by_staff_id)
-    [false, "disbursal_date and disbursed_by properties have to be (un)set together"]
-  end
 
 
   ## FIXME
@@ -303,30 +360,6 @@ class Loan
     return Date.parse(date) if date.is_a? String
   rescue
     nil
-  end
-
-  # THE RUNNER.. this methods refreshes the history(/future) of this lone when
-  # changes have been made to it, or its payments. gets called by hooks
-  # the task of updating the history may take some time and it therefor put
-  # the the Merb::Dispatcher.work_queue (using Merb.run_later)
-  def update_history
-    Merb.run_later { update_history_now }  # i just love procrastination
-  end
-  def update_history_now
-    start_date = approved_on  # start date
-    end_date   = last_loan_history_date  # end date
-    date       = start_date
-    run_number = (LoanHistory.max(:run_number) or 0) + 1
-    t0         = Time.now
-    Merb.logger.info! "Start Loan#history_update for loan ##{self.id} (#{start_date} - #{end_date}), at #{t0}"
-    while date <= end_date
-      puts ">>>>>>>>> write_for(#{[run_number, date].inspect})"
-      LoanHistory::write_for(self, run_number, date)
-      date += 1
-    end
-    t1 = Time.now
-    secs = (t1 - t0).round
-    Merb.logger.info! "Finished Loan#history_update for loan ##{self.id} (#{start_date} - #{end_date}), in #{secs} secs (#{format("%.3f", secs.to_f/(end_date-start_date))} secs/record), at #{t1}"
   end
 end
 

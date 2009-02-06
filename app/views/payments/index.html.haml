@@ -138,27 +138,26 @@
         %br/
         %span.greytext== #{i[:principal].round} principal + #{i[:interest].round} interest
       %td
-        - sop, soi = @loan.scheduled_outstanding_principal_on(i[:date]), @loan.scheduled_outstanding_interest_on(i[:date])
-        %b= format_currency sop + soi
+        %b= format_currency i[:principal_so_far] + i[:interest_so_far]
         %br/
-        %span.greytext== #{sop.round} principal + #{soi.round} interest
+        %span.greytext== #{i[:principal_so_far].round} principal + #{i[:interest_so_far].round} interest
       %td
         - if last_payment_date and (i[:date] <= last_payment_date or i[:date] <= Date.today)
-          %b= format_currency @loan.total_received_up_to(i[:date])
+          %b= format_currency i[:principal_received_so_far] + i[:interest_received_so_far]
           %br/
           %span.greytext
-            == #{@loan.principal_received_up_to(i[:date])} principal + #{@loan.interest_received_up_to(i[:date])} interest
+            == #{i[:principal_received_so_far]} principal + #{i[:interest_received_so_far]} interest
       %td
         - if i[:date] <= Date.today
-          - diff = @loan.total_overpaid_on(i[:date])
+          - total_overpaid = i[:principal_overpaid] + i[:interest_overpaid]
           %b
-            %span{ :class => (diff > 0 ? 'green' : 'red') }
-              = format_currency diff.abs
+            %span{ :class => (total_overpaid >= 0 ? 'green' : 'red') }
+              = format_currency total_overpaid.abs
           %br/
           %span.greytext
-            %span{ :class => (diff > 0 ? 'green' : 'red') }
-              = format("%.0f%", (diff.abs.to_f / @loan.total_to_be_received) * 100)
-            = diff > 0 ? 'overpaid' : 'shortfall'
+            %span{ :class => (total_overpaid >= 0 ? 'green' : 'red') }
+              = format("%.0f%", (total_overpaid.abs.to_f / @loan.total_to_be_received) * 100)
+            = total_overpaid >= 0 ? 'overpaid' : 'shortfall'
   %tfoot
     %tr
       %td{ :colspan => 7 }
