@@ -14,6 +14,14 @@ class Centers < Application
     display [@center, @clients], 'clients/index'
   end
 
+  def today(id)
+    @center = Center.get(id)
+    raise NotFound unless @center
+    @clients = @center.clients
+    @loans = @clients.loans
+    display [@center, @clients, @loans], 'clients/today'
+  end
+
   def new
     only_provides :html
     @center = Center.new
@@ -60,6 +68,17 @@ class Centers < Application
     else
       raise InternalServerError
     end
+  end
+
+  def pay_loans(id)
+    @center = Center.get(id)
+    params.each do |param|
+      if param =~ /^pay/ # todo - make the payment
+        p param
+      end
+    end
+    # make dem payments
+    redirect url(:show_center, @branch.id, @center.id, :today), :message => {:notice => ' Payments made successfully'}
   end
 
   private

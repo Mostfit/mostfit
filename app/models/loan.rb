@@ -260,12 +260,12 @@ class Loan
     [result, number_of_installments].min  # never return more than the number_of_installments
   end
 
+  def missed_installments_before(date)
+    # the number of payments missed before a given data
+    return 0 if date < scheduled_first_payment_date
+    self.number_of_installments_before(date) - self.payments.size
+  end
 
-  # neat trick.. returns an Array with all subclasses of this model
-  # used in loan type selection.
-  def self.subclasses; @subclasses ||= Array.new; end
-  def self.inherited(subclass); subclasses << subclass; end
-  
 
   # THE RUNNER.. this methods refreshes the history(/future) of this lone when
   # changes have been made to it, or its payments. gets called by hooks
@@ -320,6 +320,14 @@ class Loan
 
   # the arithmic of shifting by the installment_frequency (especially months is tricky)
   # used by many other methods
+
+  def missed_installments_before(date)
+    # the number of payments missed before a given data
+    return 0 if date < scheduled_first_payment_date
+    self.number_of_installments_before(date) - self.payments.size
+  end
+
+
   def shift_date_by_installments(date, number)
     raise "number should be 0 or larger, got #{number}" if number < 0
     return date if number == 0
@@ -371,4 +379,5 @@ class A50Loan < Loan
 
   # so we have to implement some thing different here to show that it is possible :-P
 end
+
 

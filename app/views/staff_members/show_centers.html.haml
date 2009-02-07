@@ -1,0 +1,28 @@
+%h1
+  Centers for
+  = @staff_member.name.capitalize
+
+%table
+  %thead
+    %th
+      Name
+    %th
+      Clients
+    %th
+      Loans
+    %th
+      Disbursed
+    %th
+      Repaid
+  - for center in @centers
+    %tr
+      %td
+        = link_to center.name, url(:branch_center, center.branch.id, center.id)
+      %td
+        = center.clients.count
+      %td
+        = center.clients.loans.count
+      %td
+        = center.clients.loans.sum(:amount)
+      %td
+        = center.clients.loans.history.sum(:total_received_principal)

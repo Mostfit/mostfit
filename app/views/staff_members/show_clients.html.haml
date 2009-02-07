@@ -1,0 +1,36 @@
+%h1== Staff Member: <i>#{@staff_member.name}</i>
+
+%table.narrow.form
+  %tr
+    %td name
+    %td
+      %b= @staff_member.name
+      == (id: #{@center.id})
+
+
+
+
+%table.narrow.form{ :width => '100%' }
+  %thead
+    %tr
+      %th
+      %th id
+      %th name
+      %th loans
+  %tbody
+  - for client in @clients
+    %tr{ :class => cycle('odd','') }
+      %td &nbsp;
+      %td
+        = client.id
+      %td
+        %b= client.name
+      %td
+        %b= client.loans.size
+
+  %tfoot
+    %tr
+      %td{ :colspan => 7 }
+
+
+

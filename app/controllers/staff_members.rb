@@ -13,6 +13,20 @@ class StaffMembers < Application
     display @centers
   end
 
+  def show_clients(id)
+    @staff_member = StaffMember.get(id)
+    raise NotFound unless @staff_member
+    @clients = @staff_member.centers.clients
+    display @clients
+  end
+
+  def show_disbursed(id)
+    @staff_member = StaffMember.get(id)
+    raise NotFound unless @staff_member
+    @loans = @staff_member.disbursed_loans
+    display @loans
+  end
+
   def show(id)
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member

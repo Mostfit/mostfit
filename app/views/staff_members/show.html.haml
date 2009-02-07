@@ -7,17 +7,21 @@
     %td
       = @staff_member.centers.count
     %td
-      = link_to 'Show', url(:show_staff_member_centers, @staff_member.id)
+      = link_to 'Show', url(:show_staff_member, @staff_member.id, :show_centers)
   %tr
     %th
       Clients
     %td
       = @staff_member.centers.clients.count
+    %td
+      = link_to 'Show', url(:show_staff_member, @staff_member.id, :show_clients)
   %tr
     %th
       Disbursed
     %td
       = @staff_member.disbursed_loans.sum(:amount)
+    %td
+      = link_to 'Show', url(:show_staff_member, @staff_member.id, :show_disbursed)
     
 
 = link_to 'Edit',  url(:edit_staff_member,  @staff_member)

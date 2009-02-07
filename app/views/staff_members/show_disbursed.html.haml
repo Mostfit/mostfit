@@ -1,0 +1,67 @@
+%table.narrow.form{ :width => '100%' }
+  %thead
+    %tr
+      %th
+      %th id
+      %th amount
+      %th interest
+      %th installments
+      %th disbursement
+      %th repaid
+      %th status
+  %tbody
+  - for loan in @loans
+    %tr{ :class => cycle('odd','') }
+      %td &nbsp;
+      %td
+        = loan.id
+      %td
+        %b= format_currency(loan.amount)
+      %td
+        %b= format("%.2f%", loan.interest_rate * 100)
+      %td
+        == #{loan.number_of_installments}, #{loan.installment_frequency.to_s}
+      %td
+        - if loan.disbursal_date
+          = loan.disbursal_date
+          %br/
+          %span.greytext
+            - if loan.scheduled_disbursal_date == loan.disbursal_date
+              as scheduled
+            - else
+              = difference_in_days(loan.scheduled_disbursal_date, loan.disbursal_date, ['days earlier', 'days later'])
+              == (#{loan.scheduled_disbursal_date})
+        - else
+          %i not disbursed yet
+          %br/
+          %span.greytext
+            scheduled for
+            = loan.scheduled_disbursal_date
+      %td
+        = format("%.2f%", loan.total_received_principal_on(Date.today).to_f / loan.amount * 100)
+      %td
+        - if loan.status == :written_off
+          written off
+          %br/
+          %span.greytext
+            by
+            = link_to loan.written_off_by.name, resource(loan.written_off_by)
+            on
+            = loan.written_off_on
+        - else
+          = loan.status.to_s
+          %br/
+          %span.greytext
+            - if loan.payments.empty?
+              nothing repaid yet
+            - else
+              last payment on
+              = loan.payments.last(:order => [:received_on]).received_on
+            
+      %td
+
+  %tfoot
+    %tr
+      %td{ :colspan => 8 }
+
+
