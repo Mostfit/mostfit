@@ -50,7 +50,7 @@
         %br/
         %span.greytext (scheduled, no payments yet)
       - else
-        = actual_first_payment = @loan.payments.first(:order => [:received_on.desc]).received_on
+        = actual_first_payment = @loan.payments.first(:order => [:received_on]).received_on
         %br/
         %span.greytext
           - if actual_first_payment == @loan.scheduled_first_payment_date
@@ -75,11 +75,11 @@
     %tr
       %th
       %th id
-      %th received
+      %th received on
+      %th received by
       %th principal
       %th interest
       %th total
-      %th registered
   %tbody
   - for payment in @payments
     %tr{ :class => cycle('odd','') }
@@ -87,9 +87,8 @@
       %td
         = payment.id
       %td
-        on
         %i= payment.received_on
-        by
+      %td
         %b= link_to payment.received_by.name, resource(payment.received_by)
       %td
         %b= payment.principal

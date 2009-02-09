@@ -10,9 +10,8 @@
       %th
       %th id
       %th login
-      %th uploads
-      %th created at
-      %th updated at
+      %th payments created
+      %th payments deleter
   %tbody
   - for user in @users
     %tr{ :class => cycle('odd','') }
@@ -22,14 +21,13 @@
       %td
         %b= user.login
       %td
-        = relative_date user.created_at
+        %b= user.payments_created.count
       %td
-        = (user.updated_at == user.created_at) ? '&mdash;' : relative_date(user.updated_at)
-      %td
-        = link_to 'edit', resource(user, :edit)
-      - if session.user.id == 1
+        %b= user.payments_deleted.count
+      - if session.user.id == 1  # only show to admin
         %td
-          = link_to 'delete', resource(user, :delete) unless user.id == 1
+          = link_to 'edit', resource(user, :edit)
+          = link_to 'delete', resource(user, :delete) unless user.id == 1  # do not show for admin
   %tfoot
     %tr
       %td{ :colspan => 7 }

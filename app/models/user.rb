@@ -17,6 +17,9 @@ class User
   validates_length :login, :min => 3
   validates_is_unique :login
 
+  has n, :payments_created, :child_key => [:created_by],         :class_name => 'Payment'
+  has n, :payments_deleted, :child_key => [:deleted_by_user_id], :class_name => 'Payment'
+
   private
   def prevent_destroying_admin
     if id == 1

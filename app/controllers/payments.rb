@@ -61,10 +61,10 @@ class Payments < Application
   def destroy(id)
     @payment = Payment.get(id)
     raise NotFound unless @payment
-    if @payment.destroy
+    if @loan.delete_payment(@payment, session.user)
       redirect resource(@branch, @center, @client, @loan, :payments), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
     else
-      raise InternalServerError
+      redirect resource(@branch, @center, @client, @loan, :payments), :message => {:error => "Could not delete payment '#{@payment.id}'"}
     end
   end
 

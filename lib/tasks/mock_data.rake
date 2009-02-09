@@ -21,6 +21,7 @@ def load_fixtures(*files)
     entries = YAML::load_file(Merb.root / yml_file)
     entries.each do |name, entry|
       k = klass::new(entry)
+      k.history_disabled = true if k.class == Loan  # do not update the hisotry for loans
       unless k.save
         puts "Validation errors saving a #{klass}:"
         p k.errors
@@ -32,67 +33,53 @@ end
 
 
 namespace :mock do
-  desc "Generate some payments"
-  task :payments do
-    # loan_id[0], total OR [principal, interest] [1], user_id[2], date as string[3], staff_member_id[4]
-    [ [1, 3000, 1, "2009-01-01", 3],
-      [1, 4000, 1, "2009-02-01", 3],
-      [1, 2000, 1, "2009-04-01", 3]
-    ].each do |r|
-      result = Loan.get(r[0]).repay(r[1], User.get(r[2]), Date.parse(r[3]), r[4])
-      unless result[0]  # the save status
-        puts "Validation errors repaying #{r[1]} for Loan ##{r[0]}:\n#{result[1].errors.inspect}"
-      end
-      # history update jobs are put on the queue.. we just call the loans individually.
-      Loan.get(1).update_history_now  # TODO make this generic for all loans that have payments made
-    end
-  end
-
-
-  desc "Make history (from first approved loan till today)"
-  task :history do
-    puts "Obsoleted by giving Loan the responsibility to do it by itself, just mock:fixtures will do..."
-#     date = Loan.first(:order => [:approved_on]).approved_on
-#     t0, days = Time.now, (Date.today - date)
-#     Merb.logger.info! "Start mock:history rake task from #{date}, for #{days} days, at #{t0}"
-#     while date <= Date.today
-#       LoanHistory.run(date)
-#       date += 1
-#     end
-#     t1 = Time.now
-#     secs = (t1 - t0).round
-#     Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{days} days (#{format("%.3f", secs.to_f/days)} secs/day), at #{t1}"
+  desc "All in one -- load fixtures, generate payments and update the history"
+  task :load_demo do
+    Rake::Task['mock:fixtures'].invoke
+    Rake::Task['mock:payments'].invoke
+    Rake::Task['mock:update_history'].invoke
+    puts
+    puts "If all went well your demo environment has been loaded/generated... Enjoy the sandbox!"
   end
 
   desc "Drop current db and load fixtures from /spec/fixtures (and work the update_history jobs down)"
   task :fixtures do
     DataMapper.auto_migrate! if Merb.orm == :datamapper
-
     # loading is ordered, important for our references to work
     load_fixtures :users, :staff_members, :branches, :centers, :clients, :loans  #, :payments
-
-    t0 = Time.now
-    puts "Starting workers on the queue of history_update jobs at #{t0}"
-
     puts
-    puts "You have to kill this task youself when it is finished.. Sorry!\n\n"
-    sleep(2)
+    puts "Fixtures loaded. Have a look at the mock:payments and mock:update_history tasks."
+  end
 
-    Merb::Worker.new
+  desc "Generate some payments (does not write any history)"
+  task :payments do
+    busy_user = User.get(3)
+    Loan.all.each do |loan|
+      next if loan.payments.count > 0 or not loan.status == :disbursed
+      loan.history_disabled = true  # do not update the hisotry for every payment
+      start_date = loan.disbursal_date
+      end_date   = [Date.today, loan.scheduled_repaid_on + 30].min
+      amount     = loan.total_to_be_received / loan.number_of_installments
+      number     = loan.number_of_installments_before(end_date)
+      number     = number - (rand * number / 4).to_i  # at most 25% random missed payments
+      step_size  = (end_date - start_date).to_i / number
+      number.times do |i|
+        result   = loan.repay(amount, busy_user, start_date + (i*step_size), 1)
+        unless result[0]  # the save status
+          puts "Validation errors repaying #{amount} for Loan ##{loan.id}:\n#{result[1].errors.inspect}"
+        end
+      end
+    end
+  end
 
-    sleep(60*60*6)  # six hours, then we kill it ourselves..
-#     5.times { Merb::Worker.new }  # put a few workers on the queue
-#     while (queue_size = Merb::Dispatcher.work_queue.size) > 0
-#       puts "Still #{queue_size} jobs in the work queue...\n"
-#       sleep(5)
-#     end
-#     t1 = Time.now
-#     sleep(60)  # allow some last, dangling task to finish
-#     Merb.logger.flush
-#     puts
-#     puts "Finished the queue of history_update jobs in #{(t1 - t0).round} secs, at #{t1}"
-#     puts
-#     puts "Fixtures have been loaded."
+  desc "Recreate the whole history"
+  task :update_history do
+    t0 = Time.now
+    Merb.logger.info! "Start mock:history rake task at #{t0}"
+    Loan.all.each { |l| l.update_history }
+    t1 = Time.now
+    secs = (t1 - t0).round
+    Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{Loan.all.size} loans with #{Payment.all.size} payments, at #{t1}"
   end
 end
 

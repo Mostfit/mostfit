@@ -3,6 +3,8 @@ class Loan
   after :save,    :update_history  # also seems to do :update
 #   after :create,  :update_history
   after :destroy, :update_history
+
+  attr_accessor :history_disabled  # set to true to disable history writing by this object
   
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false
@@ -35,8 +37,6 @@ class Loan
   # this is the method used for creating payments, not directly on the Payment class
   # for +input+ it allows either a "total" amount as Fixnum or an array with
   # principal[0] and interest[1].
-  # TODO: destroying payments by the Loan class, and update_history accordingly
-  # TODO: some kind of validation
   def repay(input, user, received_on, received_by)
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
@@ -44,7 +44,7 @@ class Loan
       raise "the input argument of Loan#repay should be of class Fixnum or Array"
     end
 
-    interest, principal = 0, 0
+    principal, interest, total = 0, 0, nil
     if input.is_a? Fixnum  # in case only one amount is specified
       # interest is paid first, the rest goes in as principal
       total        = input.to_i
@@ -55,13 +55,24 @@ class Loan
       principal, interest = input[0].to_i, input[1].to_i
     end
 
-    raise ValidationError unless StaffMember.first(:id => received_by, :active => true)
     payment = Payment.new(:loan_id => self.id, :user_id => user.id,
       :received_on => received_on, :received_by_staff_id => received_by,
       :principal => principal, :interest => interest)
     save_status = payment.save
     update_history if save_status  # update the history is we saved a payment
+    payment.principal, payment.interest = nil, nil unless total.nil?  # remove calculated pr./int. values from the form
     [save_status, payment]  # return the success boolean and the payment object itself for further processing
+  end
+
+  # the way to delete payments from the db
+  def delete_payment(payment, user)
+    return false unless payment.loan.id == self.id
+    if payment.update_attributes(:deleted_at => Time.now, :deleted_by_user_id => user.id)
+      update_history
+      return true
+    end
+    p payment.errors
+    false
   end
 
 
@@ -89,30 +100,51 @@ class Loan
   # the following methods basically count the payments (PAYMENT-RECEIVED perspective)
   # the last method makes the actual (optimized) db call and is cached
   def principal_received_up_to(date)
-    payments_received_up_to(date)[0]
+    payments_received_up_to(date)[:principal_received_so_far]
   end
   def interest_received_up_to(date)
-    payments_received_up_to(date)[1]
+    payments_received_up_to(date)[:interest_received_so_far]
   end
   def total_received_up_to(date)
-    payments_received_up_to(date)[2]
+    payments_received_up_to(date)[:total_received_so_far]
   end  
   # private??
   # returns an array with as contents sums of the principal[0], interest[1] and total[2]
   # proper optimization, and good example of falling back to SQL and query-caching
   def payments_received_up_to(date)
-    return @summed_payments_cache[date] if @summed_payments_cache and @summed_payments_cache[date]
-    @summed_payments_cache ||= {}
-    @summed_payments_cache[date] = repository.adapter.query(%Q{
-      SELECT
-        SUM ("principal")              AS "principal_received",
-        SUM ("interest")               AS "interest_received",
-        SUM ("principal" + "interest") AS "total_received"
-       FROM "payments"
-      WHERE ("deleted_at" IS NULL)
-        AND ("loan_id" = #{self.id})
-        AND ("received_on" <= "#{date}")})[0].to_a.map { |x| x.nil? ? 0 : x }  # nil -> 0
+    date = Date.parse(date) if date.is_a? String
+
+    # pick the latestest key<Date> of the payments_hash that is not greater than +date+
+    d = Date.new(0)
+    payments_hash.keys.each { |n| (d = n if (n > d and n <= date)) if n }
+    return payments_hash[d] if (not d == Date.new(0)) and payments_hash[d]
+    {:principal_received_so_far => 0, :interest_received_so_far => 0, :total_received_so_far => 0}
   end
+
+
+  # probably this is the best caching trick ever..
+  # payments will rarely be over a hundred, and even that is (one read query) blazing fast.
+  # so best is not to recalculate everytime, or query all along -- but to cache.
+  def payments_hash
+    return @payments_hash_cache if @payments_hash_cache
+    structs = repository.adapter.query(%Q{
+      SELECT "principal", "interest", "received_on"  -- fill the payments_hash_cache
+        FROM "payments"
+       WHERE ("deleted_at" IS NULL) AND ("loan_id" = #{self.id})
+    ORDER BY "received_on"})
+    @payments_hash_cache = {}
+    principal, interest, total = 0, 0, 0
+    structs.each do |s|
+      # we know the received_on dates are in ascending order as we
+      # walk through (so we can do th += thingy)
+      @payments_hash_cache[ Date.parse(s[:received_on]) ] = {
+        :principal_received_so_far => (principal += s[:principal]),
+        :interest_received_so_far =>  (interest  += s[:interest]),
+        :total_received_so_far =>     (total     += s[:principal] + s[:interest]) }
+    end
+    @payments_hash_cache
+  end
+
 
 
   # these 3 methods return scheduled amounts from a PAYMENT-RECEIVED perspective
@@ -207,9 +239,6 @@ class Loan
     :allow_both   # one of [:separate, :aggregated, :allow_both]
   end
 
-#   def approved?(date = Date.today);    not self.disbursal_date.blank?; end  # nice but not yet needed it seems
-#   def disbursed?(date = Date.today);   not self.disbursal_date.blank?; end
-#   def written_off?(date = Date.today); not self.written_off_on.blank?; end
 
   # this method returns one of [nil, :approved, :disbursed, :repaid, :written_off]
   def status(date = Date.today)
@@ -220,12 +249,15 @@ class Loan
   end
 
 
+  def scheduled_repaid_on
+    shift_date_by_installments(scheduled_first_payment_date, number_of_installments)
+  end
+
   # this method returns the last date the loan history makes sense
   # used by +update_history+ for knowing when to stop.
   # (note: this is often a date in the future -- huh?!)   MAYBE: move this to the LoanHistory
   def last_loan_history_date
     s = status  # TODO: replace with case-when constuct
-    scheduled_repaid_on = shift_date_by_installments(scheduled_first_payment_date, number_of_installments)
     if s.nil?
       return nil
     elsif s == :approved
@@ -260,36 +292,61 @@ class Loan
     [result, number_of_installments].min  # never return more than the number_of_installments
   end
 
-  def missed_installments_before(date)
-    # the number of payments missed before a given data
-    return 0 if date < scheduled_first_payment_date
-    self.number_of_installments_before(date) - self.payments.size
-  end
 
+  # neat trick.. returns an Array with all subclasses of this model
+  # used in loan type selection.
+  def self.subclasses; @subclasses ||= Array.new; end
+  def self.inherited(subclass); subclasses << subclass; end
+  
 
   # THE RUNNER.. this methods refreshes the history(/future) of this lone when
   # changes have been made to it, or its payments. gets called by hooks
   # the task of updating the history may take some time and it therefor put
   # the the Merb::Dispatcher.work_queue (using Merb.run_later)
   def update_history
-    Merb.run_later { update_history_now }  # i just love procrastination
+    return if history_disabled  # easy when doing mass db modifications (like with fixutes)
+    update_history_now
+#     Merb.run_later { update_history_now }  # i just love procrastination
   end
-  def update_history_now
-    start_date = disbursal_date  # start date -- a payment can never come before the disbursal_date
-    end_date   = last_loan_history_date  # end date
-    date       = start_date
-    run_number = (LoanHistory.max(:run_number) or 0) + 1
-    t0         = Time.now
-    Merb.logger.info! "Start Loan#history_update for loan ##{self.id} (#{start_date} - #{end_date}), at #{t0}"
-    while date <= end_date
-      LoanHistory.write_for(self, run_number, date)
-      date += 1
+  def update_history_now  # TODO: not update every thing all the time (like in case of a new payment)
+    Merb.logger.error! "could not destroy the history" unless self.history.destroy!
+    dates = payment_dates + installment_dates
+    dates << scheduled_disbursal_date if scheduled_disbursal_date
+    dates << disbursal_date if disbursal_date
+    dates << written_off_on if written_off_on
+    dates.uniq.sort.each do |date|
+      LoanHistory.write_for(self, date)
     end
-    t1 = Time.now
-    secs = (t1 - t0).round
-    Merb.logger.info! "Finished Loan#history_update for loan ##{self.id} (#{start_date} - #{end_date}), in #{secs} secs (#{format("%.3f", secs.to_f/(end_date-start_date))} secs/record), at #{t1}"
   end
 
+
+  # the arithmic of shifting by the installment_frequency (especially months is tricky)
+  # used by many other methods, it accepts a negative +number+
+  def shift_date_by_installments(date, number)
+    return date if number == 0
+    case installment_frequency
+      when :daily
+        return date + number
+      when :weekly
+        return date + number * 7
+      when :monthly
+        new_month = date.month + number
+        new_year  = date.year
+        while new_month > 12
+          new_year  += 1
+          new_month -= 12
+        end
+        while new_month < 1
+          new_year  -= 1
+          new_month += 12
+        end
+        month_lengths = [nil, 31, (Time.gm(new_year, new_month).to_date.leap? ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        new_day = (date.day > month_lengths[new_month]) ? month_lengths[new_month] : date.day
+        return Time.gm(new_year, new_month, new_day).to_date
+      else
+        raise "Strange period you got.."
+    end
+  end
 
   private
 
@@ -318,40 +375,13 @@ class Loan
 
 
 
-  # the arithmic of shifting by the installment_frequency (especially months is tricky)
-  # used by many other methods
 
-  def missed_installments_before(date)
-    # the number of payments missed before a given data
-    return 0 if date < scheduled_first_payment_date
-    self.number_of_installments_before(date) - self.payments.size
+
+  def payment_dates
+    repository.adapter.query(%Q{
+      SELECT "received_on" FROM "payments"    -- the payment dates
+       WHERE ("deleted_at" IS NULL) AND ("loan_id" = #{self.id})}).map { |x| Date.parse(x) }
   end
-
-
-  def shift_date_by_installments(date, number)
-    raise "number should be 0 or larger, got #{number}" if number < 0
-    return date if number == 0
-    case installment_frequency
-      when :daily
-        return date + number
-      when :weekly
-        return date + number * 7
-      when :monthly
-        new_month = date.month + number
-        new_year  = date.year
-        while new_month > 12
-          new_year  += 1
-          new_month -= 12
-        end
-        month_lengths = [nil, 31, (Time.gm(new_year, new_month).to_date.leap? ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-        new_day = date.day > month_lengths[new_month] ? month_lengths[new_month] : date.day
-        return Time.gm(new_year, new_month, new_day).to_date
-      else
-        raise "Strange period you got.."
-    end
-  end
-
-
 
   ## FIXME
   ## trying to solve a problem with the (auto) validations on empty dates
@@ -379,5 +409,4 @@ class A50Loan < Loan
 
   # so we have to implement some thing different here to show that it is possible :-P
 end
-
 
