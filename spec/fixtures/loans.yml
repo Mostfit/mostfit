@@ -183,49 +183,49 @@ l007:
 #   :approved_by_staff_id: 1
 #   :client_id: 11
 # 
-# l012:
-#   :id: 12
-#   :amount: 2000
-#   :interest_rate: 0.20
-#   :installment_frequency: weekly
-#   :number_of_installments: 4
-#   :scheduled_first_payment_date: 2009-01-05
-#   :scheduled_disbursal_date: 2008-12-19
-#   :disbursal_date: 2008-12-19
-#   :approved_on: 2008-12-17
-#   :disbursed_by_staff_id: 1 
-#   :approved_by_staff_id: 1
-#   :client_id: 12
-# 
-# l013:
-#   :id: 13
-#   :amount: 30000
-#   :interest_rate: 0.20
-#   :installment_frequency: weekly
-#   :number_of_installments: 15
-#   :scheduled_first_payment_date: 2009-01-05
-#   :scheduled_disbursal_date: 2008-12-19
-#   :disbursal_date: 2008-12-19
-#   :approved_on: 2008-12-09
-#   :disbursed_by_staff_id: 1 
-#   :approved_by_staff_id: 1
-#   :client_id: 13
-# 
-# l014:
-#   :id: 14
-#   :amount: 9000
-#   :interest_rate: 0.20
-#   :installment_frequency: weekly
-#   :number_of_installments: 9
-#   :scheduled_first_payment_date: 2009-03-19
-#   :scheduled_disbursal_date: 2009-01-05
-#   :disbursal_date: 2008-12-09
-#   :approved_on: 2008-11-09
-#   :disbursed_by_staff_id: 1 
-#   :approved_by_staff_id: 1
-#   :client_id: 14
-# 
-# 
+l012:
+  :id: 12
+  :amount: 2000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 4
+  :scheduled_first_payment_date: 2009-01-05
+  :scheduled_disbursal_date: 2008-12-19
+  :disbursal_date: 2008-12-19
+  :approved_on: 2008-12-17
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 12
+
+l013:
+  :id: 13
+  :amount: 30000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 15
+  :scheduled_first_payment_date: 2009-01-05
+  :scheduled_disbursal_date: 2008-12-19
+  :disbursal_date: 2008-12-19
+  :approved_on: 2008-12-09
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 13
+
+l014:
+  :id: 14
+  :amount: 9000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 9
+  :scheduled_first_payment_date: 2009-03-19
+  :scheduled_disbursal_date: 2009-01-05
+  :disbursal_date: 2008-12-09
+  :approved_on: 2008-11-09
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 14
+
+
 l015:
   :id: 15
   :amount: 10000

@@ -46,20 +46,25 @@ class Weekday < DataMapper::Type
   primitive Integer
   length 1
 
-  DAYS_OF_THE_WEEK = [nil, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+  DAYS_OF_THE_WEEK       = [nil, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+  DAYS_OF_THE_WEEK_SHORT = [nil, :mon, :tue, :wed, :thu, :fri, :sat, :sun]
   
   def self.load(value, property)
     return nil if value.nil?
+    return ''  if value.blank?
+    raise ArgumentError.new("+value+ cannot be of type #{value.class}") unless [Fixnum, String, Float, Bignum].include? value.class
     raise ArgumentError.new("+value+ must be within (1..7)") unless (1..7).include? value.to_i
-    DAYS_OF_THE_WEEK[value]
+    DAYS_OF_THE_WEEK[value.to_i]
   end
 
   def self.dump(value, property)
     return nil if value.nil?
     # plurialized weekday names are allowed ("Mondays", "thursday", "SUNDAY", :sunday)
     if value.class == String
+      return '' if value.blank?
+      DAYS_OF_THE_WEEK_SHORT.index value.downcase.to_sym if value.length == 3
       DAYS_OF_THE_WEEK.index value.downcase.singularize.to_sym
-    elsif value.class ==  Symbol
+    elsif value.class == Symbol
       DAYS_OF_THE_WEEK.index value
     else
       raise ArgumentError.new("+value+ must be of type String or Symbol, or nil")

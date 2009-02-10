@@ -12,5 +12,5 @@ class Center
   has n, :clients
 
   validates_present :manager
-
+  validates_present :branch
 end

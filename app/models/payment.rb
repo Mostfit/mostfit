@@ -20,6 +20,7 @@ class Payment
 
   validates_present :loan_id, :user_id, :received_by_staff_id  # it seems better to validate on the column name
   validates_with_method :properly_deleted?
+  validates_with_method :only_take_payments_on_disbursed_loans?
   validates_with_method :principal, :not_paying_too_much_principal?
   validates_with_method :total, :not_paying_too_much_in_total?
   validates_with_method :received_on, :not_received_in_the_future?
@@ -53,12 +54,16 @@ class Payment
     end
     true
   end
+  def only_take_payments_on_disbursed_loans?
+    return true if self.loan.status == :disbursed
+    [false, "payments cannot be made on loans that are written off, repaid or not (yet) disbursed"]
+  end
   def not_received_in_the_future?
     return true if self.received_on <= Date.today
     [false, "payments cannot be received in the future"]
   end
   def not_received_before_loan_is_disbursed?
-    return true if not self.loan.disbursal_date.blank? and self.received_on >= self.loan.disbursal_date
+    return true if self.loan.disbursal_date.blank? ? false :  self.loan.disbursal_date <= self.received_on
     [false, "payments cannot be received before the loan is disbursed"]
   end
   def received_by_active_staff_member?

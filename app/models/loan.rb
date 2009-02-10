@@ -161,12 +161,15 @@ class Loan
   # these 3 methods return scheduled amounts from a LOAN-OUTSTANDING perspective
   # they are purely calculated -- no calls to its payments or loan_history)
   def scheduled_outstanding_principal_on(date)  # typically reimplemented in subclasses
+    return 0 if not disbursal_date or date < disbursal_date
     amount - scheduled_received_principal_up_to(date)
   end
   def scheduled_outstanding_interest_on(date)  # typically reimplemented in subclasses
+    return 0 if not disbursal_date or date < disbursal_date
     (interest_rate * amount) - scheduled_received_interest_up_to(date)
   end
   def scheduled_outstanding_total_on(date)
+    return 0 if not disbursal_date or date < disbursal_date
     total_to_be_received - scheduled_received_total_up_to(date)
   end
 
@@ -311,7 +314,7 @@ class Loan
   def update_history_now  # TODO: not update every thing all the time (like in case of a new payment)
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
     dates = payment_dates + installment_dates
-    dates << scheduled_disbursal_date if scheduled_disbursal_date
+#     dates << scheduled_disbursal_date if scheduled_disbursal_date
     dates << disbursal_date if disbursal_date
     dates << written_off_on if written_off_on
     dates.uniq.sort.each do |date|
@@ -351,23 +354,30 @@ class Loan
   private
 
   ## validations: read their method name and error to see what they do.
-  def approved_before_disbursed_before_written_off?
-    parse_dates
-    if disbursal_date and approved_on < disbursal_date
+  def approved_before_disbursed?
+    if disbursal_date and disbursal_date < approved_on
       [false, "Cannot be disbursed before it is approved"]
-    elsif disbursal_date and written_off_on and disbursal_date < written_off_on
+    end
+    true
+  end
+  def disbursed_before_written_off?
+    if disbursal_date and written_off_on and disbursal_date > written_off_on
       [false, "Cannot be written off before it is disbursed"]
     end
     true
   end
+  def approved_before_scheduled_to_be_disbursed?
+    if scheduled_disbursal_date < approved_on
+      [false, "Cannot be scheduled for disbusal before it is approved"]
+    end
+    true
+  end
   def properly_written_off?
-    parse_dates
     return true if (written_off_on and written_off_by_staff_id) or
       (!written_off_on and !written_off_by_staff_id)
     [false, "written_off_on and written_off_by properties have to be (un)set together"]
   end
   def properly_disbursed?
-    parse_dates
     return true if (disbursal_date and disbursed_by_staff_id) or
       (!disbursal_date and !disbursed_by_staff_id)
     [false, "disbursal_date and disbursed_by properties have to be (un)set together"]
@@ -402,6 +412,12 @@ end
 class DefaultLoan < Loan
   # This is the "Default" loan type. It is nothing better of worse than its parent.
   # That explains the emptyness
+  def edit_partial
+    ''  # this method is are used plug HTML into the new and edit pages (using the _fields.html.haml partial)
+  end
+  def show_partial
+    ''  # this method is are used plug HTML into the show page of the loan and its payments (app/views/payments/index.html.haml)
+  end
 end
 
 class A50Loan < Loan

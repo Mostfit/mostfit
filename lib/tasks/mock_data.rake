@@ -51,25 +51,29 @@ namespace :mock do
     puts "Fixtures loaded. Have a look at the mock:payments and mock:update_history tasks."
   end
 
-  desc "Generate some payments (does not write any history)"
-  task :payments do
+  desc "Generate all payments for all loans without payments as if everyone paid dilligently (does not write any history)"
+  task :all_payments do
+    t0 = Time.now
+    Merb.logger.info! "Start mock:all_payments rake task at #{t0}"
     busy_user = User.get(3)
+    count = 0
     Loan.all.each do |loan|
-      next if loan.payments.count > 0 or not loan.status == :disbursed
+      next if loan.payments.size > 0 or loan.status != :disbursed
       loan.history_disabled = true  # do not update the hisotry for every payment
-      start_date = loan.disbursal_date
-      end_date   = [Date.today, loan.scheduled_repaid_on + 30].min
       amount     = loan.total_to_be_received / loan.number_of_installments
-      number     = loan.number_of_installments_before(end_date)
-      number     = number - (rand * number / 4).to_i  # at most 25% random missed payments
-      step_size  = (end_date - start_date).to_i / number
-      number.times do |i|
-        result   = loan.repay(amount, busy_user, start_date + (i*step_size), 1)
-        unless result[0]  # the save status
+      dates      = loan.installment_dates.reject { |x| x > Date.today }
+      dates.each do |date|
+        result   = loan.repay(amount, busy_user, date, loan.client.center.manager.id)
+        if result[0]  # the save status
+          count += 1
+        else          
           puts "Validation errors repaying #{amount} for Loan ##{loan.id}:\n#{result[1].errors.inspect}"
         end
       end
     end
+    t1 = Time.now
+    secs = (t1 - t0).round
+    Merb.logger.info! "Finished mock:all_payments rake task in #{secs} secs for #{Loan.all.size} loans creating #{count} payments, at #{t1}"
   end
 
   desc "Recreate the whole history"

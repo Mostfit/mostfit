@@ -8,9 +8,6 @@ class Branch
   belongs_to :manager, :child_key => [:manager_staff_id], :class_name => 'StaffMember'
   has n, :centers
 
-  validates_present :manager_staff_id
-
-  def loan_stats
-    Loan.loan_stats_for self.centers.clients.loans
-  end
+  validates_length  :name, :min => 3
+  validates_present :manager
 end
