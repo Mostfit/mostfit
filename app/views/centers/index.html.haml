@@ -1,6 +1,7 @@
 
-.graph
-  = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'branch', :id => @branch.id, :scope_unit => 'months', :scope_size => 3) )
+- if @branch.centers.clients.loans.size > 0
+  .graph
+    = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'branch', :id => @branch.id, :scope_unit => 'months', :scope_size => 3) )
 
 %h1== Branch: <i>#{@branch.name}</i>
 

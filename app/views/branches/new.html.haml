@@ -1,10 +1,6 @@
-%h1 Create new branch
+%h1 Create a new branch
 
 = error_messages_for @branch
 
 = form_for(@branch, :action => url(:branches)) do
-  = partial :fields
-
-  = submit "Create branch"
-
-= link_to 'Back', url(:branches)
+  = partial :fields, :submit_text => "Create branch"

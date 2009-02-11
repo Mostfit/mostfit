@@ -6,7 +6,11 @@ class HoursAndMinutes < DataMapper::Type
 
   def self.load(value, property)
     return nil if value.nil?
+    return ''  if value.is_a? String and value.blank?
     raise ArgumentError.new("+value+ must be within (0..2359)") unless (0..2359).include? value
+    h = value / 100
+    m = value - (h*100)
+    raise ArgumentError.new("invalid time, '#{value}', units out of range") unless (0..23).include? h and (0..59).include? m
     colonize(value)
   end
 
@@ -15,10 +19,13 @@ class HoursAndMinutes < DataMapper::Type
     h, m = 0, 0
     o = (o * 100).to_i if o.class == Float  # now float can be treated like ints
     if o.class == String
+      return '' if o.blank?
+      raise ArgumentError.new("+o+ must be within (0..2359)") unless (0..2359).include? o.to_i
       o = colonize(o) if o.length == o.to_i.to_s.length  # when the string is representing an int
       raise ArgumentError.new("Cannot parse string '#{o}'") unless o =~ /(\d{1,2})[:.',]{0,1}(\d{1,2})/
       h, m = $1.to_i, $2.to_i
     elsif o.class == Fixnum
+      raise ArgumentError.new("+o+ must be within (0..2359)") unless (0..2359).include? o
       h = o / 100
       m = o - (h*100)
     else
@@ -62,16 +69,23 @@ class Weekday < DataMapper::Type
     # plurialized weekday names are allowed ("Mondays", "thursday", "SUNDAY", :sunday)
     if value.class == String
       return '' if value.blank?
-      DAYS_OF_THE_WEEK_SHORT.index value.downcase.to_sym if value.length == 3
-      DAYS_OF_THE_WEEK.index value.downcase.singularize.to_sym
+      result = string_to_fixnum(value)
     elsif value.class == Symbol
-      DAYS_OF_THE_WEEK.index value
+      result = DAYS_OF_THE_WEEK.index value
     else
       raise ArgumentError.new("+value+ must be of type String or Symbol, or nil")
     end
+    raise ArgumentError.new("Coud not parse +value+, #{value}, into a weekday") unless result
+    result
   end
 
   def self.typecast(value, property)
     value.kind_of?(Weekday) ? value : load(value, property)
+  end
+
+  private
+  def self.string_to_fixnum(str)
+    return DAYS_OF_THE_WEEK_SHORT.index str.downcase.to_sym if str.length == 3
+    DAYS_OF_THE_WEEK.index str.downcase.singularize.to_sym
   end
 end

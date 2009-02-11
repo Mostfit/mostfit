@@ -22,4 +22,7 @@ class Client
   has n, :loans
   belongs_to :center
 
+  validates_length    :name, :min => 3
+  validates_present   :center
+  validates_is_unique :reference
 end

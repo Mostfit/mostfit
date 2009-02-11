@@ -12,7 +12,7 @@ class LoanHistory
   property :scheduled_outstanding_total,     Integer, :nullable => false
   property :actual_outstanding_principal,    Integer, :nullable => false
   property :actual_outstanding_total,        Integer, :nullable => false
-  property :status,                          Enum[nil, :approved, :disbursed, :repaid, :written_off]
+  property :status,                          Enum[nil, :approved, :outstanding, :repaid, :written_off]
 
   belongs_to :loan
 

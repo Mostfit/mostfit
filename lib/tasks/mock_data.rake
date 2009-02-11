@@ -23,7 +23,7 @@ def load_fixtures(*files)
       k = klass::new(entry)
       k.history_disabled = true if k.class == Loan  # do not update the hisotry for loans
       unless k.save
-        puts "Validation errors saving a #{klass}:"
+        puts "Validation errors saving a #{klass} (##{k.id}):"
         p k.errors
       end
     end
@@ -36,7 +36,7 @@ namespace :mock do
   desc "All in one -- load fixtures, generate payments and update the history"
   task :load_demo do
     Rake::Task['mock:fixtures'].invoke
-    Rake::Task['mock:payments'].invoke
+    Rake::Task['mock:all_payments'].invoke
     Rake::Task['mock:update_history'].invoke
     puts
     puts "If all went well your demo environment has been loaded/generated... Enjoy the sandbox!"
@@ -58,12 +58,12 @@ namespace :mock do
     busy_user = User.get(3)
     count = 0
     Loan.all.each do |loan|
-      next if loan.payments.size > 0 or loan.status != :disbursed
+      next if loan.payments.size > 0 or loan.status != :outstanding
       loan.history_disabled = true  # do not update the hisotry for every payment
       amount     = loan.total_to_be_received / loan.number_of_installments
-      dates      = loan.installment_dates.reject { |x| x > Date.today }
+      dates      = loan.installment_dates.reject { |x| x > Date.today or x < loan.disbursal_date }
       dates.each do |date|
-        result   = loan.repay(amount, busy_user, date, loan.client.center.manager.id)
+        result   = loan.repay(amount, busy_user, date, loan.client.center.manager)
         if result[0]  # the save status
           count += 1
         else          

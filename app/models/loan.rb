@@ -27,10 +27,20 @@ class Loan
   has n, :payments
   has n, :history, :class_name => 'LoanHistory'
 
-  validates_with_method  :approved_before_disbursed_before_written_off?
-  validates_with_method  :properly_written_off?
-  validates_with_method  :properly_disbursed?
-  validates_present      :approved_by_staff_id
+
+  validates_with_method  :amount,                       :method => :amount_greater_than_zero?
+  validates_with_method  :interest_rate,                :method => :interest_rate_greater_than_zero?
+  validates_with_method  :number_of_installments,       :method => :number_of_installments_greater_than_zero?
+  validates_with_method  :approved_on,                  :method => :approved_before_disbursed?
+  validates_with_method  :written_off_on,               :method => :disbursed_before_written_off?
+  validates_with_method  :approved_on,                  :method => :approved_before_scheduled_to_be_disbursed?
+  validates_with_method  :written_off_by,               :method => :properly_written_off?
+  validates_with_method  :written_off_on,               :method => :properly_written_off?
+  validates_with_method  :disbursed_by,                 :method => :properly_disbursed?
+  validates_with_method  :disbursal_date,               :method => :properly_disbursed?
+  validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
+  validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
+  validates_present      :approved_by, :client
   validates_is_primitive :scheduled_disbursal_date, :scheduled_first_payment_date, :approved_on  # :disbursal_date (opt.)
   
 
@@ -43,23 +53,29 @@ class Loan
     unless input.is_a? Array or input.is_a? Fixnum
       raise "the input argument of Loan#repay should be of class Fixnum or Array"
     end
+    raise "cannot repay a loan that has not been saved" if new_record?
 
     principal, interest, total = 0, 0, nil
     if input.is_a? Fixnum  # in case only one amount is specified
       # interest is paid first, the rest goes in as principal
-      total        = input.to_i
-      interest_due = (interest_overpaid_on(received_on) > 0) ? 0 : interest_overpaid_on(received_on).abs 
+      # the payment is filed on received_on without knowing about the future
+      # it could happen that payment have been made after this payment
+      # here the validations on the Payment should 
+      total        = input
+      interest_due = [(-interest_overpaid_on(received_on)).round, 0].max
       interest     = [interest_due, total].min  # never more than total
       principal    = total - interest
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0].to_i, input[1].to_i
     end
-
-    payment = Payment.new(:loan_id => self.id, :user_id => user.id,
-      :received_on => received_on, :received_by_staff_id => received_by,
-      :principal => principal, :interest => interest)
+    payment = Payment.new(:loan => self, :created_by => user,
+      :received_on => received_on, :received_by => received_by,
+      :principal => principal.round, :interest => interest.round)
     save_status = payment.save
-    update_history if save_status  # update the history is we saved a payment
+    if save_status == true
+      update_history  # update the history is we saved a payment
+      clear_payments_hash_cache
+    end
     payment.principal, payment.interest = nil, nil unless total.nil?  # remove calculated pr./int. values from the form
     [save_status, payment]  # return the success boolean and the payment object itself for further processing
   end
@@ -69,6 +85,7 @@ class Loan
     return false unless payment.loan.id == self.id
     if payment.update_attributes(:deleted_at => Time.now, :deleted_by_user_id => user.id)
       update_history
+      clear_payments_hash_cache
       return true
     end
     p payment.errors
@@ -88,13 +105,16 @@ class Loan
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
     raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
-    interest_rate * amount / number_of_installments
+    total_interest_to_be_received / number_of_installments
   end
 
   # the 'grande totale' of what the client has to pay back for this loan
   # used in many places
   def total_to_be_received
     (self.amount.to_f * (1 + self.interest_rate)).round
+  end
+  def total_interest_to_be_received
+    amount * interest_rate
   end
 
   # the following methods basically count the payments (PAYMENT-RECEIVED perspective)
@@ -136,7 +156,7 @@ class Loan
     principal, interest, total = 0, 0, 0
     structs.each do |s|
       # we know the received_on dates are in ascending order as we
-      # walk through (so we can do th += thingy)
+      # walk through (so we can do the += thingy)
       @payments_hash_cache[ Date.parse(s[:received_on]) ] = {
         :principal_received_so_far => (principal += s[:principal]),
         :interest_received_so_far =>  (interest  += s[:interest]),
@@ -145,14 +165,16 @@ class Loan
     @payments_hash_cache
   end
 
-
+  def clear_payments_hash_cache
+    @payments_hash_cache = nil
+  end
 
   # these 3 methods return scheduled amounts from a PAYMENT-RECEIVED perspective
   def scheduled_received_principal_up_to(date)  # typically reimplemented in subclasses
     amount.to_f / number_of_installments * number_of_installments_before(date)
   end
   def scheduled_received_interest_up_to(date)  # typically reimplemented in subclasses
-    interest_rate * amount / number_of_installments * number_of_installments_before(date)
+    total_interest_to_be_received / number_of_installments * number_of_installments_before(date)
   end
   def scheduled_received_total_up_to(date)
     scheduled_received_principal_up_to(date) + scheduled_received_interest_up_to(date)
@@ -166,7 +188,7 @@ class Loan
   end
   def scheduled_outstanding_interest_on(date)  # typically reimplemented in subclasses
     return 0 if not disbursal_date or date < disbursal_date
-    (interest_rate * amount) - scheduled_received_interest_up_to(date)
+    total_interest_to_be_received - scheduled_received_interest_up_to(date)
   end
   def scheduled_outstanding_total_on(date)
     return 0 if not disbursal_date or date < disbursal_date
@@ -243,17 +265,19 @@ class Loan
   end
 
 
-  # this method returns one of [nil, :approved, :disbursed, :repaid, :written_off]
+  # this method returns one of [nil, :approved, :outstanding, :repaid, :written_off]
   def status(date = Date.today)
     return nil          if approved_on >  date  # non existant
     return :approved    if approved_on <= date and not (disbursal_date and disbursal_date <= date)
     return :written_off if (written_off_on and written_off_on <= date)
-    total_received_up_to(date) >= total_to_be_received ? :repaid : :disbursed
+    total_received_up_to(date) >= total_to_be_received ? :repaid : :outstanding
   end
 
 
   def scheduled_repaid_on
-    shift_date_by_installments(scheduled_first_payment_date, number_of_installments)
+    # first payment is on "scheduled_first_payment_date", so number_of_installments-1 periods later
+    # we find the scheduled_repaid_on date.
+    shift_date_by_installments(scheduled_first_payment_date, number_of_installments - 1)
   end
 
   # this method returns the last date the loan history makes sense
@@ -265,7 +289,7 @@ class Loan
       return nil
     elsif s == :approved
       return scheduled_repaid_on
-    elsif s == :disbursed
+    elsif s == :outstanding
       return [scheduled_repaid_on, Date.today].max
     elsif s == :repaid
       last_payment_received_on = self.payments.first(:order => [:received_on.desc]).received_on
@@ -282,15 +306,23 @@ class Loan
   def number_of_installments_before(date)
     return 0 if date < scheduled_first_payment_date
     result = case installment_frequency
-      when :daily
-      then (date - scheduled_first_payment_date).to_f.floor + 1
-      when :weekly
-      then ((date - scheduled_first_payment_date).to_f / 7).floor + 1
-      when :monthly
-      then start_day, start_month = scheduled_first_payment_date.day, scheduled_first_payment_date.month
-           end_day, end_month = date.day, date.month
-           end_month - start_month + (start_day >= end_day ? 0 : 1)
-      else raise "Strange period you got.."
+      when  :daily
+      then  (date - scheduled_first_payment_date).to_f.floor + 1
+      when  :weekly
+      then  ((date - scheduled_first_payment_date).to_f / 7).floor + 1
+      when  :biweekly
+      then  ((date - scheduled_first_payment_date).to_f / 14).floor + 1
+      when  :monthly
+      then  count = 1
+            count += 1 while shift_date_by_installments(date, -count) >= scheduled_first_payment_date
+            count
+            
+
+# #            start_day, start_month = scheduled_first_payment_date.day, scheduled_first_payment_date.month
+# #            end_day, end_month = date.day, date.month
+# #            end_month - start_month + (start_day >= end_day ? 0 : 1)
+      else
+        raise ArgumentError.new("Strange period you got..")
     end
     [result, number_of_installments].min  # never return more than the number_of_installments
   end
@@ -332,6 +364,8 @@ class Loan
         return date + number
       when :weekly
         return date + number * 7
+      when :biweekly
+        return date + number * 14
       when :monthly
         new_month = date.month + number
         new_year  = date.year
@@ -347,45 +381,51 @@ class Loan
         new_day = (date.day > month_lengths[new_month]) ? month_lengths[new_month] : date.day
         return Time.gm(new_year, new_month, new_day).to_date
       else
-        raise "Strange period you got.."
+        raise ArgumentError.new("Strange period you got..")
     end
   end
 
   private
 
   ## validations: read their method name and error to see what they do.
+  def amount_greater_than_zero?
+    return true if not amount.blank? and amount > 0
+    [false, "Loan amount should be greater than zero"]
+  end
+  def interest_rate_greater_than_zero?
+    return true if interest_rate and interest_rate > 0
+    [false, "Interest rate should be greater than zero"]
+  end
+  def number_of_installments_greater_than_zero?
+    return true if number_of_installments and number_of_installments > 0
+    [false, "Number of installments should be greater than zero"]
+  end
   def approved_before_disbursed?
-    if disbursal_date and disbursal_date < approved_on
-      [false, "Cannot be disbursed before it is approved"]
-    end
-    true
+    return true if disbursal_date.blank? or (disbursal_date and approved_on and disbursal_date >= approved_on)
+    [false, "Cannot be disbursed before it is approved"]
   end
   def disbursed_before_written_off?
-    if disbursal_date and written_off_on and disbursal_date > written_off_on
-      [false, "Cannot be written off before it is disbursed"]
-    end
-    true
+    return true if written_off_on.blank? or (disbursal_date and written_off_on and disbursal_date <= written_off_on)
+    [false, "Cannot be written off before it is disbursed"]
   end
   def approved_before_scheduled_to_be_disbursed?
-    if scheduled_disbursal_date < approved_on
-      [false, "Cannot be scheduled for disbusal before it is approved"]
-    end
-    true
+    return true if scheduled_disbursal_date and approved_on and scheduled_disbursal_date >= approved_on
+    [false, "Cannot be scheduled for disbusal before it is approved"]
   end
   def properly_written_off?
-    return true if (written_off_on and written_off_by_staff_id) or
-      (!written_off_on and !written_off_by_staff_id)
+    return true if (written_off_on and written_off_by) or (!written_off_on and !written_off_by)
     [false, "written_off_on and written_off_by properties have to be (un)set together"]
   end
   def properly_disbursed?
-    return true if (disbursal_date and disbursed_by_staff_id) or
-      (!disbursal_date and !disbursed_by_staff_id)
+    return true if (disbursal_date and disbursed_by) or (!disbursal_date and !disbursed_by)
     [false, "disbursal_date and disbursed_by properties have to be (un)set together"]
   end
+  def scheduled_disbursal_before_scheduled_first_payment?
+    return true if scheduled_disbursal_date and scheduled_first_payment_date and scheduled_disbursal_date <= scheduled_first_payment_date
+    [false, "scheduled first payment cannot come before scheduled disbursal"]
+  end
 
-
-
-
+  
 
   def payment_dates
     repository.adapter.query(%Q{
@@ -412,6 +452,9 @@ end
 class DefaultLoan < Loan
   # This is the "Default" loan type. It is nothing better of worse than its parent.
   # That explains the emptyness
+  def self.description
+    "This is the default loan in Mostfit. In this loan type interest is is paid flat over the installments, so all the installments are the same size. It allows both repayment in totals and repayment in principal-interest pairs. In case of paying in totals the interest due is payed before the principal due."
+  end
   def edit_partial
     ''  # this method is are used plug HTML into the new and edit pages (using the _fields.html.haml partial)
   end

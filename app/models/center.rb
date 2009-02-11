@@ -11,6 +11,7 @@ class Center
 
   has n, :clients
 
+  validates_length  :name, :min => 3
   validates_present :manager
   validates_present :branch
 end

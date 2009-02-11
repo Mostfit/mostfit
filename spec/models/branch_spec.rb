@@ -4,6 +4,8 @@ describe Branch do
 
   before(:each) do
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
+    @manager.should be_valid
+
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
     @branch.should be_valid
@@ -19,7 +21,7 @@ describe Branch do
     @branch.should_not be_valid
   end
  
-  it "should not be valid without an author's name shorter than 3 characters" do
+  it "should not be valid with a name shorter than 3 characters" do
     @branch.name = "ok"
     @branch.should_not be_valid
   end
@@ -30,7 +32,6 @@ describe Branch do
     @center.branch  = @branch
     @center.manager = @manager
     @center.should be_valid
-#     @branch.save.should_not be_true
 
     @branch.centers << @center
     @branch.should be_valid
@@ -45,6 +46,5 @@ describe Branch do
     @branch.should be_valid
     @branch.centers.size.should eql(2)
   end
-
 
 end

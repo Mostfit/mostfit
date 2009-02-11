@@ -9,5 +9,11 @@ class Branch
   has n, :centers
 
   validates_length  :name, :min => 3
-  validates_present :manager
+  validates_with_method :manager, :method => :manager_is_an_active_staff_member?
+
+  private
+  def manager_is_an_active_staff_member?
+    return true if manager and manager.active
+    [false, "receiving staff member is currently not active"]
+  end
 end

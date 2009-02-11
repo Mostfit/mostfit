@@ -4,15 +4,23 @@
       Branch name:
     %td
       = text_field :name, :size => 40
+      %br/
+      %span.greytext the name by which the branch is known
   %tr
     %td
       Address:
     %td
-      ~ text_area :address, :rows => 10, :cols => 38
+      ~ text_area :address, :rows => 6, :cols => 38
   %tr
     %td
-      Manager:
+      Managed by:
     %td
-      = text_field :staff_member_id, :size => 40
+      = select :manager, :collection => StaffMember.all(:active => true), :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
       %br/
-      %span.greytext (just a staffmember id)
+      %span.greytext pick the staff member that manages this branch
+  %tr
+    %td
+    %td
+      = submit submit_text
+      &nbsp;&nbsp;
+      = link_to 'cancel', url(:branches)

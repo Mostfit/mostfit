@@ -1,13 +1,6 @@
-%h1 StaffMembers controller, new action
-
-%p 
-  Edit this file in 
-  %tt app/views/staff_members/new.html.erb
+%h1 Create a new staff member
 
 = error_messages_for @staff_member
 
-= form_for(@staff_member, :action => url(:staff_members) ) do
-  %p
-    = submit "Create"
-
-= link_to 'Back', url(:staff_members)
+= form_for(@staff_member, :action => url(:staff_members)) do
+  = partial :fields, :submit_text => "Create staff member"

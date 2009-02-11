@@ -1,4 +1,4 @@
-l001a:
+l001:
   :id: 1
   :amount: 10000
   :interest_rate: 0.20
@@ -12,7 +12,7 @@ l001a:
   :approved_by_staff_id: 1
   :client_id: 1
 
-l001b:
+l101:
   :id: 101
   :amount: 5000
   :interest_rate: 0.20
@@ -26,7 +26,7 @@ l001b:
   :approved_by_staff_id: 1
   :client_id: 1
 
-l001c:
+l102:
   :id: 102
   :amount: 8000
   :interest_rate: 0.20
@@ -48,9 +48,9 @@ l002:
   :installment_frequency: weekly
   :number_of_installments: 10
   :scheduled_first_payment_date: 2008-03-09
-  :scheduled_disbursal_date: 2008-12-19
-  :disbursal_date: 2008-12-01
-  :approved_on: 2008-11-17
+  :scheduled_disbursal_date: 2007-01-19
+  :disbursal_date: 2007-02-01
+  :approved_on: 2007-01-17
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
   :client_id: 2
@@ -76,7 +76,7 @@ l004:
   :installment_frequency: weekly
   :number_of_installments: 4
   :scheduled_first_payment_date: 2008-12-19
-  :scheduled_disbursal_date: 2008-05-19
+  :scheduled_disbursal_date: 2008-06-10
   :disbursal_date: 2008-06-19
   :approved_on: 2008-06-07
   :disbursed_by_staff_id: 1 

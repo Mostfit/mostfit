@@ -29,5 +29,5 @@
       on
       = text_field :received_on, :size => 12
       by
-      = select :received_by, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
+      = select :received_by, :collection => StaffMember.all(:active => true), :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
 

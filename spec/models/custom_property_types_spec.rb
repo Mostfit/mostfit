@@ -3,10 +3,6 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe HoursAndMinutes do
 
   describe ".new" do
-    it "should create a Class" do
-      HoursAndMinutes.new.should be_instance_of(Class)
-    end
- 
     it "should create unique a Class each call" do
       HoursAndMinutes.new.should_not == HoursAndMinutes.new
     end
@@ -30,7 +26,7 @@ describe HoursAndMinutes do
       HoursAndMinutes.dump('1.0', :property).should == 100
       HoursAndMinutes.dump(10.0, :property).should == 1000
       HoursAndMinutes.dump(23.50, :property).should == 2350
-      HoursAndMinutes.dump(21.00, :property).should == 1200
+      HoursAndMinutes.dump(21.00, :property).should == 2100
       HoursAndMinutes.dump(2.0, :property).should == 200
       HoursAndMinutes.dump(1200, :property).should == 1200
       HoursAndMinutes.dump(300, :property).should == 300
@@ -38,15 +34,16 @@ describe HoursAndMinutes do
     end
 
     it "should raise an ArgumentError when trying to feed it rubbish/typos/etc as input" do
-      HoursAndMinutes.dump(2400, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.dump('2::0', :property).should raise_error(ArgumentError)
-      HoursAndMinutes.dump('-2', :property).should raise_error(ArgumentError) 
-      HoursAndMinutes.dump('12122', :property).should raise_error(ArgumentError)
-      HoursAndMinutes.dump(:hhmm, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.dump(1060, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.dump(1099, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.dump('1060', :property).should raise_error(ArgumentError)
-      HoursAndMinutes.dump('10:60', :property).should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.dump(2400, :property)    }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.dump('2::0', :property)  }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.dump(-2, :property)      }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.dump('-2', :property)    }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.dump('12122', :property) }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.dump(:hhmm, :property)   }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.dump(1060, :property)    }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.dump(1099, :property)    }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.dump('1060', :property)  }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.dump('10:60', :property) }.should raise_error(ArgumentError)
     end
 
     it "should return nil if given nil" do
@@ -54,7 +51,7 @@ describe HoursAndMinutes do
     end
  
     it "should return an empty string if the value is an empty string" do
-      HoursAndMinutes.dump("", :property).should == ""
+      HoursAndMinutes.dump('', :property).should == ''
     end
   end
  
@@ -64,16 +61,16 @@ describe HoursAndMinutes do
     end
 
     it "should raise an ArgumentError when feeding it rubbish" do
-      HoursAndMinutes.load(-1, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.load(2400, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.load(60, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.load(99, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.load(160, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.load(199, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.load(3000, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.load((1..7), :property).should raise_error(ArgumentError)
-      HoursAndMinutes.load(Date.new, :property).should raise_error(ArgumentError)
-      HoursAndMinutes.load(Object.new, :property).should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.load(-1, :property) }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.load(2400, :property) }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.load(60, :property) }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.load(99, :property) }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.load(160, :property) }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.load(199, :property) }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.load(3000, :property) }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.load((1..7), :property) }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.load(Date.new, :property) }.should raise_error(ArgumentError)
+      lambda { HoursAndMinutes.load(Object.new, :property) }.should raise_error(ArgumentError)
     end
  
     it "should return nil if given nil" do
@@ -81,14 +78,14 @@ describe HoursAndMinutes do
     end
  
     it "should return an empty string if the value is an empty string" do
-      HoursAndMinutes.load("", :property).should == ""
+      HoursAndMinutes.load('', :property).should == ''
     end
   end
  
   describe '.typecast' do
     it 'should do nothing if a HoursAndMinutes is provided' do
       hhmm = HoursAndMinutes.new
-      HoursAndMinutes.typecast(hhmm, :property).should == @w
+      HoursAndMinutes.typecast(hhmm, :property).should == hhmm
     end
  
     it 'should defer to .load if a Fixnum (primitive type) is provided' do
@@ -110,10 +107,6 @@ end
 describe Weekday do
 
   describe ".new" do
-    it "should create a Class" do
-      Weekday.new.should be_instance_of(Class)
-    end
- 
     it "should create unique a Class each call" do
       Weekday.new.should_not == Weekday.new
     end
@@ -149,12 +142,12 @@ describe Weekday do
     end
 
     it "should raise an ArgumentError when trying to feed it rubbish/typos/etc as input" do
-      Weekday.dump('mondayz', :property).should raise_error(ArgumentError)
-      Weekday.dump('mo', :property).should raise_error(ArgumentError)
-      Weekday.dump(:mon, :property).should raise_error(ArgumentError)      # promote symbol consistency
-      Weekday.dump(:mondays, :property).should raise_error(ArgumentError)  # promote symbol consistency
-      Weekday.dump('sathurday', :property).should raise_error(ArgumentError)
-      Weekday.dump('tursday', :property).should raise_error(ArgumentError)
+      lambda { Weekday.dump('mondayz', :property)   }.should raise_error(ArgumentError)
+      lambda { Weekday.dump('mo', :property)        }.should raise_error(ArgumentError)
+      lambda { Weekday.dump(:mon, :property)        }.should raise_error(ArgumentError)  # promote symbol consistency
+      lambda { Weekday.dump(:mondays, :property)    }.should raise_error(ArgumentError)  # promote symbol consistency
+      lambda { Weekday.dump('sathurday', :property) }.should raise_error(ArgumentError)
+      lambda { Weekday.dump('tursday', :property)   }.should raise_error(ArgumentError)
     end
 
     it "should return nil if given nil" do
@@ -162,7 +155,7 @@ describe Weekday do
     end
  
     it "should return an empty string if the value is an empty string" do
-      Weekday.dump("", :property).should == ""
+      Weekday.dump('', :property).should == ''
     end
   end
  
@@ -180,15 +173,15 @@ describe Weekday do
     end
 
     it "should raise an ArgumentError when feeding it rubbish" do
-      Weekday.load(0, :property).should raise_error(ArgumentError)
-      Weekday.load(8, :property).should raise_error(ArgumentError)
-      Weekday.load(-1, :property).should raise_error(ArgumentError)
-      Weekday.load(100, :property).should raise_error(ArgumentError)
-      Weekday.load(100, :property).should raise_error(ArgumentError)
+      lambda { Weekday.load(0, :property)   }.should raise_error(ArgumentError)
+      lambda { Weekday.load(8, :property)   }.should raise_error(ArgumentError)
+      lambda { Weekday.load(-1, :property)  }.should raise_error(ArgumentError)
+      lambda { Weekday.load(100, :property) }.should raise_error(ArgumentError)
+      lambda { Weekday.load(100, :property) }.should raise_error(ArgumentError)
 
-      Weekday.load((1..7), :property).should raise_error(ArgumentError)
-      Weekday.load(Date.new, :property).should raise_error(ArgumentError)
-      Weekday.load(Object.new, :property).should raise_error(ArgumentError)
+      lambda { Weekday.load((1..7), :property)     }.should raise_error(ArgumentError)
+      lambda { Weekday.load(Date.new, :property)   }.should raise_error(ArgumentError)
+      lambda { Weekday.load(Object.new, :property) }.should raise_error(ArgumentError)
     end
  
     it "should return nil if given nil" do
@@ -196,14 +189,14 @@ describe Weekday do
     end
  
     it "should return an empty string if the value is an empty string" do
-      Weekday.load("", :property).should == ""
+      Weekday.load('', :property).should == ''
     end
   end
  
   describe '.typecast' do
     it 'should do nothing if a Weekday is provided' do
       w = Weekday.new
-      Weekday.typecast(w, :property).should == @w
+      Weekday.typecast(w, :property).should == w
     end
  
     it 'should defer to .load if a Fixnum (primitive type) is provided' do

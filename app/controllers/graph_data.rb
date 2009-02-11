@@ -36,11 +36,13 @@ class GraphData < Application
       percentage            = scheduled_outstanding == 0 ? '0' : (overpaid.abs.to_f/scheduled_outstanding*100).round.to_s + '%'
       @stacks << [
         { :val => [scheduled_outstanding, actual_outstanding].min, :colour => (future ? '#55aaff' : '#003d4a'),
-          :tip => tip_base },
+          :tip => tip_base + (future ?
+            "#{scheduled_outstanding.round} scheduled outstanding" :
+            "#{actual_outstanding.round} outstanding (#{percentage} #{overpaid > 0 ? 'overpaid' : 'shortfall'})") },
         { :val => [overpaid,  0].max, :colour => (future ? '#55ff55' : '#00aa00'),
-          :tip => "#{tip_base}#{ overpaid} (#{percentage}) overpaid" },
+          :tip => "#{tip_base} overpaid #{ overpaid} (#{percentage})" },
         { :val => [-overpaid, 0].max, :colour => (future ? '#ff5588' : '#aa0000'),
-          :tip => "#{tip_base}#{-overpaid} (#{percentage}) shortfall" } ]
+          :tip => "#{tip_base} shortfall of #{-overpaid} (#{percentage})" } ]
       @labels << ((index % step_size == 0 and index >= offset) ? (index-offset+1).to_s : '')
     end
     render_loan_graph('installments', @stacks, @labels, step_size, max_amount)
@@ -82,7 +84,7 @@ class GraphData < Application
   def common_aggregate_loan_graph(loan_ids, start_date, end_date)
     days = (end_date - start_date).to_i
     step_size = 1; i = 0   # make a nice round step size, not more than 20 steps
-    while days/step_size > 40
+    while days/step_size > 50
       step_size = [1, 7, 14, 30, 60, 365/4, 365/2, 365][i += 1]
     end
     steps = days/step_size + 1
@@ -102,11 +104,13 @@ class GraphData < Application
       percentage            = scheduled_outstanding == 0 ? '0' : (overpaid.abs.to_f/scheduled_outstanding*100).round.to_s + '%'
       @stacks << [
         { :val => [scheduled_outstanding, actual_outstanding].min, :colour => (future ? '#55aaff' : '#003d4a'),
-          :tip => tip_base },
+          :tip => tip_base + (future ?
+            "#{scheduled_outstanding.round} scheduled outstanding" :
+            "#{actual_outstanding.round} outstanding (#{percentage} #{overpaid > 0 ? 'overpaid' : 'shortfall'})") },
         { :val => [overpaid,  0].max, :colour => (future ? '#55ff55' : '#00aa00'),
-          :tip => "#{tip_base}\n#{ overpaid} overpaid (#{percentage})" },
+          :tip => "#{tip_base} overpaid #{ overpaid} (#{percentage})" },
         { :val => [-overpaid, 0].max, :colour => (future ? '#ff5588' : '#aa0000'),
-          :tip => "#{tip_base}\n#{-overpaid} shortfall (#{percentage})" } ]
+          :tip => "#{tip_base} shortfall of #{-overpaid} (#{percentage})" } ]
       @labels << ((index % step_size == 0) ? date.strftime("%b%d'%y") : '')
     end
     render_loan_graph('aggregate loan graph', @stacks, @labels, step_size, max_amount)
@@ -120,11 +124,11 @@ class GraphData < Application
         "type": "bar_stack", 
         "colours": [ "#666666", "#00aa00", "#aa0000" ], 
         "values": #{stacks.to_json}, 
-        "keys": [ 
+        "keys": [
+          { "colour": "#003d4a", "text": "outstanding", "font-size": 10 },
+          { "colour": "#55aaff", "text": "outstanding (future)", "font-size": 10 },
           { "colour": "#aa0000", "text": "shortfall", "font-size": 10 },
-          { "colour": "#ff5588", "text": "shortfall (future)", "font-size": 10 },
-          { "colour": "#00aa00", "text": "overpaid", "font-size": 10 },
-          { "colour": "#55ff55", "text": "overpaid (future)", "font-size": 10 } ] } ],
+          { "colour": "#00aa00", "text": "overpaid", "font-size": 10 } ] } ],
       "x_axis": {
         "steps":        #{step_size},
         "colour":       "#333333",

@@ -1,6 +1,6 @@
-
-.graph
-  = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'total', :scope_unit => 'months', :scope_size => 3) )
+- if Branch.all.centers.clients.loans.size > 0
+  .graph
+    = ofc2(430, 300, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'total', :scope_unit => 'months', :scope_size => 3) )
 
 
 %h1 Overview of all branches
@@ -8,36 +8,38 @@
 %p
   == Manage existing branches or #{link_to 'create a new branch', resource(:branches, :new)}.
 
-%table.narrow.form{ :width => '100%' }
-  %thead
-    %tr
-      %th
-      %th id
-      %th name
-      %th manager
-      %th centers
-  %tbody
-  - for branch in @branches
-    %tr{ :class => cycle('odd','') }
-      %td &nbsp;
-      %td
-        = branch.id
-      %td
-        %b= link_to branch.name, resource(branch)
-      %td
-        = link_to branch.manager.name, resource(branch.manager)
-      %td
-        %b= branch.centers.size
-        == (#{link_to 'view', resource(branch, :centers)})
-      %td
-        = link_to 'edit', resource(branch, :edit)
-        &nbsp;|&nbsp
-        = link_to 'new center', resource(branch, :centers, :new)
+- if @branches.blank?
+  %p
+    %i No branches have been created yet.
+- else
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th id
+        %th name
+        %th manager
+        %th centers
+    %tbody
+    - for branch in @branches
+      %tr{ :class => cycle('odd','') }
+        %td &nbsp;
+        %td
+          = branch.id
+        %td
+          %b= link_to branch.name, resource(branch)
+        %td
+          = link_to branch.manager.name, resource(branch.manager)
+        %td
+          %b= branch.centers.size
+          == (#{link_to 'view', resource(branch, :centers)})
+        %td
+          = link_to 'edit', resource(branch, :edit)
+          &nbsp;|&nbsp
+          = link_to 'new center', resource(branch, :centers, :new)
 
-  %tfoot
-    %tr
-      %td{ :colspan => 5 }
+    %tfoot
+      %tr
+        %td{ :colspan => 5 }
 
-
-
-= link_to 'New', url(:new_branch)
+  = link_to 'Create a new branch', url(:new_branch)
