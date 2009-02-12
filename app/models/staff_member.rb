@@ -16,5 +16,4 @@ class StaffMember
   validates_is_unique :name
   validates_length :name, :min => 3
 
-
 end

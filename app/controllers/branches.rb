@@ -21,7 +21,6 @@ class Branches < Application
 
   def create(branch)
     @branch = Branch.new(branch)
-    @branch.manager = StaffMember.first
     if @branch.save
       redirect resource(:branches), :message => {:notice => "Branch '#{@branch.name}' successfully created"}
     else

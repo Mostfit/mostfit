@@ -15,7 +15,7 @@
     %td
       Managed by:
     %td
-      = select :manager, :collection => StaffMember.all(:active => true), :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
+      = select :manager_staff_id, :collection => StaffMember.all(:active => true), :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
       %br/
       %span.greytext pick the staff member that manages this branch
   %tr
@@ -23,4 +23,4 @@
     %td
       = submit submit_text
       &nbsp;&nbsp;
-      = link_to 'cancel', url(:branches)
+      = link_to 'cancel', resource(:branches)

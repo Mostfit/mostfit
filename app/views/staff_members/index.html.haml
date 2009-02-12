@@ -1,29 +1,44 @@
-%table
-  %thead
-    %tr
-      %th
-        Staff Name
-      %th
-        Approved Loans
-      %th
-        Disbursed Loans
-      %th
-        Written Off Loans
-      %th
-      %th
-  - for staff_member in @staff_members
-    %tr{ :class => cycle('odd','') }
-      %td
-        = staff_member.name.capitalize
-      %td
-        = staff_member.approved_loans.sum(:amount)
-      %td
-        = staff_member.disbursed_loans.sum(:amount)
-      %td
-        = staff_member.written_off_loans.sum(:amount)
-      %td
-        = link_to 'Show', url(:staff_member, staff_member)
-      %td
-        = link_to 'Edit', url(:edit_staff_member,  staff_member)
+%h1 Overview of all staff members
 
-= link_to 'New', url(:new_staff_member)
+%p
+  == Manage existing staff members or #{link_to 'create a new staff member', resource(:staff_members, :new)}.
+
+- if @staff_members.blank?
+  %p
+    %i No staff members been created yet.
+- else
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th
+          name
+        %th
+          status
+        %th
+          approved loans
+        %th
+          disbursed loans
+        %th
+          written off loans
+    - for staff_member in @staff_members
+      %tr{ :class => cycle('odd','') }
+        %td
+        %td
+          %b= link_to staff_member.name, resource(staff_member)
+        %td
+          %b= staff_member.active? ? 'active' : 'disabled'
+        %td
+          not yet
+        %td
+          not yet
+        %td
+          not yet
+        %td
+          = link_to 'edit', resource(staff_member, :edit)
+
+    %tfoot
+      %tr
+        %td{ :colspan => 6 }
+
+  = link_to 'Create a new staff member', url(:new_staff_member)

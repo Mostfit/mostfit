@@ -3,8 +3,4 @@
 = error_messages_for @center
 
 = form_for(@center, :action => resource(@branch, :centers)) do
-  = partial :fields
-
-  = submit "Create center"
-
-= link_to 'Back', resource(@branch, :centers)
+  = partial :fields, :submit_text => 'Create new center'

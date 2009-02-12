@@ -8,7 +8,8 @@ class Branch
   belongs_to :manager, :child_key => [:manager_staff_id], :class_name => 'StaffMember'
   has n, :centers
 
-  validates_length  :name, :min => 3
+  validates_length      :name, :min => 3
+  validates_present     :manager
   validates_with_method :manager, :method => :manager_is_an_active_staff_member?
 
   private

@@ -49,7 +49,7 @@ class StaffMembers < Application
   def create(staff_member)
     @staff_member = StaffMember.new(staff_member)
     if @staff_member.save
-      redirect resource(@staff_member), :message => {:notice => "StaffMember was successfully created"}
+      redirect resource(:staff_members), :message => {:notice => "StaffMember was successfully created"}
     else
       message[:error] = "StaffMember failed to be created"
       render :new
@@ -60,7 +60,7 @@ class StaffMembers < Application
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
     if @staff_member.update_attributes(staff_member)
-       redirect resource(@staff_member)
+       redirect resource(:staff_members)
     else
       display @staff_member, :edit
     end

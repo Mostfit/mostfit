@@ -6,18 +6,25 @@
       = text_field :name, :size => 40
   %tr
     %td
-      Meeting day:
+      Meeting every:
     %td
-      = text_field :meeting_day, :size => 40
+      - options = [['none', '<none>']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
+      = select :meeting_day, :collection => options
+      &nbsp;&nbsp;on&nbsp;&nbsp;
+      = text_field :meeting_time_hours,   :size => 2
+      %b :
+      = text_field :meeting_time_minutes, :size => 2
+      %span.greytext time is in a 24 hour format
   %tr
     %td
-      Meeting time:
+      Managed by:
     %td
-      = text_field :meeting_time, :size => 40
-  %tr
-    %td
-      Manager:
-    %td
-      = text_field :staff_member_id, :size => 40
+      = select :manager_staff_id, :collection => StaffMember.all(:active => true), :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
       %br/
-      %span.greytext (just a staffmember id)
+      %span.greytext pick the staff member that manages this center
+  %tr
+    %td
+    %td
+      = submit submit_text
+      &nbsp;&nbsp;
+      = link_to 'cancel', resource(@branch, :centers)

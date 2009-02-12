@@ -6,7 +6,10 @@ class HoursAndMinutes < DataMapper::Type
 
   def self.load(value, property)
     return nil if value.nil?
-    return ''  if value.is_a? String and value.blank?
+    if value.is_a? String
+      return '' if value.blank?
+      value = value.to_i
+    end
     raise ArgumentError.new("+value+ must be within (0..2359)") unless (0..2359).include? value
     h = value / 100
     m = value - (h*100)
@@ -55,12 +58,23 @@ class Weekday < DataMapper::Type
 
   DAYS_OF_THE_WEEK       = [nil, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   DAYS_OF_THE_WEEK_SHORT = [nil, :mon, :tue, :wed, :thu, :fri, :sat, :sun]
+
+  def self.days
+    DAYS_OF_THE_WEEK
+  end
+
+  def self.days_for_select
+    i = 0
+    DAYS_OF_THE_WEEK[1..-1].map { |x| i += 1; [i, x.to_s.capitalize] }
+  end
   
   def self.load(value, property)
     return nil if value.nil?
     return ''  if value.blank?
-    raise ArgumentError.new("+value+ cannot be of type #{value.class}") unless [Fixnum, String, Float, Bignum].include? value.class
-    raise ArgumentError.new("+value+ must be within (1..7)") unless (1..7).include? value.to_i
+    unless [Fixnum, String, Float, Bignum].include? value.class
+      raise ArgumentError.new("+value+ cannot be of type #{value.class}")
+    end
+    raise ArgumentError.new("+value+ must be within (1..7), got #{value}") unless (1..7).include? value.to_i
     DAYS_OF_THE_WEEK[value.to_i]
   end
 

@@ -1,29 +1,6 @@
-%h1 
-  = @staff_member.name
-%table
-  %tr
-    %th
-      Centers
-    %td
-      = @staff_member.centers.count
-    %td
-      = link_to 'Show', url(:show_staff_member, @staff_member.id, :show_centers)
-  %tr
-    %th
-      Clients
-    %td
-      = @staff_member.centers.clients.count
-    %td
-      = link_to 'Show', url(:show_staff_member, @staff_member.id, :show_clients)
-  %tr
-    %th
-      Disbursed
-    %td
-      = @staff_member.disbursed_loans.sum(:amount)
-    %td
-      = link_to 'Show', url(:show_staff_member, @staff_member.id, :show_disbursed)
-    
+%h1 Nothing here yet
 
-= link_to 'Edit',  url(:edit_staff_member,  @staff_member)
-|
-= link_to 'Back', url(:staff_members)
+%p This page will contain an overview of a staff member with some graphs and such
+
+%p
+  = link_to 'back', resource(:staff_members)
