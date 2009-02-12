@@ -7,7 +7,7 @@
 
 
 %table.narrow.form{ :width => '50%' }
-  %tr
+  %tr.odd
     %td name
     %td
       %b= @client.name
@@ -16,7 +16,7 @@
     %td spouse name
     %td
       = @client.spouse_name
-  %tr
+  %tr.odd
     %td manager
     %td= link_to @branch.manager.name, resource(@branch.manager)
   %tr
@@ -35,77 +35,81 @@
 %p
   == Manage existing loans or #{link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new)}.
 
-%table.narrow.form{ :width => '100%' }
-  %thead
-    %tr
-      %th
-      %th id
-      %th amount
-      %th interest
-      %th installments
-      %th disbursement
-      %th repaid
-      %th status
-  %tbody
-  - for loan in @loans
-    %tr{ :class => cycle('odd','') }
-      %td &nbsp;
-      %td
-        = loan.id
-      %td
-        %b= format_currency(loan.amount)
-      %td
-        %b= format("%.2f%", loan.interest_rate * 100)
-      %td
-        == #{loan.number_of_installments}, #{loan.installment_frequency.to_s}
-      %td
-        - if loan.disbursal_date
-          = loan.disbursal_date
-          %br/
-          %span.greytext
-            - if loan.scheduled_disbursal_date == loan.disbursal_date
-              as scheduled
-            - else
-              = difference_in_days(loan.scheduled_disbursal_date, loan.disbursal_date, ['days earlier', 'days later'])
-              == (#{loan.scheduled_disbursal_date})
-        - else
-          %i not disbursed yet
-          %br/
-          %span.greytext
-            scheduled for
-            = loan.scheduled_disbursal_date
-      %td
-        = format("%.2f%", loan.principal_received_up_to(Date.today).to_f / loan.amount * 100)
-      %td
-        - if loan.status == :written_off
-          written off
-          %br/
-          %span.greytext
-            by
-            = link_to loan.written_off_by.name, resource(loan.written_off_by)
-            on
-            = loan.written_off_on
-        - else
-          = loan.status.to_s
-          %br/
-          %span.greytext
-            - if loan.payments.empty?
-              nothing repaid yet
-            - else
-              last payment on
-              = loan.payments.last(:order => [:received_on]).received_on
-            
-      %td
-        = link_to 'view details', resource(@branch, @center, @client, loan, :payments)
-        &nbsp;|&nbsp;
-        = link_to 'edit', resource(@branch, @center, @client, loan, :edit)
-        &nbsp;|&nbsp;
-        = link_to 'record payment', resource(@branch, @center, @client, loan, :payments, :new)
+- if @loans.blank?
+  %p
+    %i== #{@client.name} has no loans yet.
+- else
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th id
+        %th amount
+        %th interest
+        %th installments
+        %th disbursement
+        %th repaid
+        %th status
+    %tbody
+    - for loan in @loans
+      %tr{ :class => cycle('odd','') }
+        %td &nbsp;
+        %td
+          = loan.id
+        %td
+          %b= format_currency(loan.amount)
+        %td
+          %b= format("%.2f%", loan.interest_rate * 100)
+        %td
+          == #{loan.number_of_installments}, #{loan.installment_frequency.to_s}
+        %td
+          - if loan.disbursal_date
+            = loan.disbursal_date
+            %br/
+            %span.greytext
+              - if loan.scheduled_disbursal_date == loan.disbursal_date
+                as scheduled
+              - else
+                = difference_in_days(loan.scheduled_disbursal_date, loan.disbursal_date, ['days earlier', 'days later'])
+                == (#{loan.scheduled_disbursal_date})
+          - else
+            %i not disbursed yet
+            %br/
+            %span.greytext
+              scheduled for
+              = loan.scheduled_disbursal_date
+        %td
+          = format("%.2f%", loan.principal_received_up_to(Date.today).to_f / loan.amount * 100)
+        %td
+          - if loan.status == :written_off
+            written off
+            %br/
+            %span.greytext
+              by
+              = link_to loan.written_off_by.name, resource(loan.written_off_by)
+              on
+              = loan.written_off_on
+          - else
+            = loan.status.to_s
+            %br/
+            %span.greytext
+              - if loan.payments.empty?
+                nothing repaid yet
+              - else
+                last payment on
+                = loan.payments.last(:order => [:received_on]).received_on
+              
+        %td
+          = link_to 'view details', resource(@branch, @center, @client, loan, :payments)
+          &nbsp;|&nbsp;
+          = link_to 'edit', resource(@branch, @center, @client, loan, :edit)
+          &nbsp;|&nbsp;
+          = link_to 'record payment', resource(@branch, @center, @client, loan, :payments, :new)
 
-  %tfoot
-    %tr
-      %td{ :colspan => 8 }
+    %tfoot
+      %tr
+        %td{ :colspan => 8 }
 
 
 
-= link_to 'New', resource(@branch, @center, @client, :loans, :new)
+  = link_to 'New', resource(@branch, @center, @client, :loans, :new)

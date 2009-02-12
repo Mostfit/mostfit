@@ -4,13 +4,16 @@ class Loan
 #   after :create,  :update_history
   after :destroy, :update_history
 
+  INSTALLMENT_FREQUENCIES = [:daily, :biweekly, :weekly, :monthly]
+
   attr_accessor :history_disabled  # set to true to disable history writing by this object
+  attr_accessor :interest_percentage  # set to true to disable history writing by this object
   
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false
   property :amount,                         Integer, :nullable => false  # see helper for formatting
   property :interest_rate,                  Float, :nullable => false
-  property :installment_frequency,          Enum[:daily, :weekly, :monthly], :nullable => false
+  property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false
   property :number_of_installments,         Integer, :nullable => false
   property :scheduled_first_payment_date,   Date, :nullable => false  # arbitrary date for installment number 0
   property :approved_on,                    Date, :nullable => false
@@ -40,7 +43,8 @@ class Loan
   validates_with_method  :disbursal_date,               :method => :properly_disbursed?
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
-  validates_present      :approved_by, :client
+  validates_present      :approved_by
+  validates_present      :client
   validates_is_primitive :scheduled_disbursal_date, :scheduled_first_payment_date, :approved_on  # :disbursal_date (opt.)
   
 
@@ -264,6 +268,13 @@ class Loan
     :allow_both   # one of [:separate, :aggregated, :allow_both]
   end
 
+  def interest_percentage
+    return nil if interest_rate.blank?
+    format("%f.2", interest_rate * 100)
+  end
+  def interest_percentage= (percentage)
+    interest_rate = percentage.to_f/100
+  end
 
   # this method returns one of [nil, :approved, :outstanding, :repaid, :written_off]
   def status(date = Date.today)
@@ -316,22 +327,11 @@ class Loan
       then  count = 1
             count += 1 while shift_date_by_installments(date, -count) >= scheduled_first_payment_date
             count
-            
-
-# #            start_day, start_month = scheduled_first_payment_date.day, scheduled_first_payment_date.month
-# #            end_day, end_month = date.day, date.month
-# #            end_month - start_month + (start_day >= end_day ? 0 : 1)
       else
         raise ArgumentError.new("Strange period you got..")
     end
     [result, number_of_installments].min  # never return more than the number_of_installments
   end
-
-
-  # neat trick.. returns an Array with all subclasses of this model
-  # used in loan type selection.
-  def self.subclasses; @subclasses ||= Array.new; end
-  def self.inherited(subclass); subclasses << subclass; end
   
 
   # THE RUNNER.. this methods refreshes the history(/future) of this lone when
@@ -383,6 +383,17 @@ class Loan
       else
         raise ArgumentError.new("Strange period you got..")
     end
+  end
+
+  def self.description
+    "This is the description of the build-in master loan type. Typically you only deal with loan that are derived of this loan type."
+  end
+  def fields_partial; ''; end  # without reimplementation in the descendants these will render the default shizzle
+  def show_partial;   ''; end
+
+  def self.installment_frequencies
+    # Loan.properties[:installment_frequency].type.flag_map.values would give us a garbled order, so:
+    INSTALLMENT_FREQUENCIES
   end
 
   private
@@ -455,8 +466,8 @@ class DefaultLoan < Loan
   def self.description
     "This is the default loan in Mostfit. In this loan type interest is is paid flat over the installments, so all the installments are the same size. It allows both repayment in totals and repayment in principal-interest pairs. In case of paying in totals the interest due is payed before the principal due."
   end
-  def edit_partial
-    ''  # this method is are used plug HTML into the new and edit pages (using the _fields.html.haml partial)
+  def fields_partial
+    ''  # this method is are used plug HTML into the show page of the loan and its payments (app/views/payments/index.html.haml)
   end
   def show_partial
     ''  # this method is are used plug HTML into the show page of the loan and its payments (app/views/payments/index.html.haml)

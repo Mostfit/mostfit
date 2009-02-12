@@ -15,6 +15,6 @@ class Branch
   private
   def manager_is_an_active_staff_member?
     return true if manager and manager.active
-    [false, "receiving staff member is currently not active"]
+    [false, "managing staff member is currently not active"]
   end
 end

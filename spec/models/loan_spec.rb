@@ -251,7 +251,7 @@ describe Loan do
     loan.number_of_installments_before(Date.parse('2000-02-29')).should == 1
     loan.number_of_installments_before(Date.parse('2000-03-01')).should == 2
     loan.number_of_installments_before(Date.parse('2000-03-30')).should == 3
-    loan.scheduled_first_payment_date = Date.parse('2001-01-30')  # febs last days
+    loan.scheduled_first_payment_date = Date.parse('2001-01-30')  # febs last days (non leap year)
     loan.number_of_installments_before(Date.parse('2001-02-28')).should == 1
     loan.number_of_installments_before(Date.parse('2001-03-01')).should == 2
     loan.number_of_installments_before(Date.parse('2001-03-30')).should == 3

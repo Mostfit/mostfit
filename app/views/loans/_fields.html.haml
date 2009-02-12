@@ -3,47 +3,60 @@
     %td
       Amount:
     %td
-      = text_field :amount, :size => 40
+      = text_field :amount, :size => 15
+      %br/
+      %span.greytext in Rupees
   %tr
     %td
       Interest rate:
     %td
-      = text_field :interest_rate, :size => 40
+      = text_field :interest_rate, :value => @loan.interest_percentage, :name => "#{@loan.class.to_s.snake_case}[interest_percentage]", :size => 4
+      \%
+      %br/
+      %span.greytext the interest rate as a percentage
   %tr
     %td
       Installment frequency:
     %td
-      = text_field :installment_frequency, :size => 40
+      = select :installment_frequency, :collection => Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
   %tr
     %td
       Number of installments:
     %td
-      = text_field :number_of_installments, :size => 40
+      = text_field :number_of_installments, :size => 4
   %tr
     %td
       Scheduled first payment:
     %td
-      = text_field :scheduled_first_payment_date, :size => 40
+      on&nbsp;&nbsp;
+      = text_field :scheduled_first_payment_date, :size => 10
+      &nbsp;&nbsp;
+      %span.greytext yyyy-mm-dd
   %tr
     %td
       Scheduled disbursal date:
     %td
-      = text_field :scheduled_disbursal_date, :size => 40
+      on&nbsp;&nbsp;
+      = text_field :scheduled_disbursal_date, :size => 10
+      &nbsp;&nbsp;
+      %span.greytext yyyy-mm-dd
   %tr
     %td
       Approved:
     %td
-      on
-      = text_field :approved_on, :size => 12
-      by
+      on&nbsp;&nbsp;
+      = text_field :approved_on, :size => 10
+      &nbsp;&nbsp;by&nbsp;&nbsp;
       = select :approved_by_staff_id, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
+      %br/
+      %span.greytext yyyy-mm-dd
   %tr
     %td
       Disbursed:
     %td
-      on
-      = text_field :disbursal_date, :size => 12
-      by
+      on&nbsp;&nbsp;
+      = text_field :disbursal_date, :size => 10
+      &nbsp;&nbsp;by&nbsp;&nbsp;
       = select :disbursed_by_staff_id, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
       %br/
-      %span.greytext (optional, may be specified later)
+      %span.greytext these fields are optional so may be specified later

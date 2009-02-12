@@ -1,14 +1,27 @@
 %table.form
   %tr
     %td
-      Reference:
-    %td
-      = text_field :reference, :size => 40
-  %tr
-    %td
       Name:
     %td
       = text_field :name, :size => 40
+  %tr
+    %td
+      Reference:
+    %td
+      = text_field :reference, :size => 40
+      %br/
+      %span.greytext
+        references are unique, a way to check that this is the only record of a client
+        %br/
+        for this reason it is advisable to use a government ID as reference
+  %tr
+    %td
+      Date of birth:
+    %td
+      = text_field :spouse_name, :size => 40
+      %br/
+      %span.greytext
+        yyyy-mm-dd
   %tr
     %td
       Spouse name:
@@ -18,4 +31,10 @@
     %td
       Address:
     %td
-      ~ text_area :address, :rows => 10, :cols => 38
+      ~ text_area :address, :rows => 6, :cols => 38
+  %tr
+    %td
+    %td
+      = submit submit_text
+      &nbsp;&nbsp;
+      = link_to 'cancel', resource(@branch, @center, :clients)

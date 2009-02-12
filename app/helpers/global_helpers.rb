@@ -1,6 +1,45 @@
 module Merb
   module GlobalHelpers
 
+    def date_selector(col, attrs = {})
+
+      attrs.merge!(:name => attrs[:name])
+      attrs.merge!(:id   => attrs[:id])
+
+      date = @_obj.send(col) || Time.new
+      
+      # TODO: Handle :selected option
+      #attrs.merge!(:selected => attrs[:selected] || control_value(col))
+      
+      errorify_field(attrs, col)
+
+      month_attrs = attrs.merge(
+        :selected   => date.month.to_s, 
+        :name       => attrs[:name] + '[month]',
+        :id         => attrs[:id] + '_month',
+        :collection => [1,2,3,4,5,6,7,8,9,10,11,12]
+      )
+      
+      day_attrs = attrs.merge(
+        :selected   => date.day.to_s, 
+        :name       => attrs[:name] + '[day]',
+        :id         => attrs[:id] + '_day',
+        :collection => (1..31).to_a,
+        :label      => nil
+      )
+      
+      year_attrs = attrs.merge(
+        :selected   => date.year.to_s,
+        :name       => attrs[:name] + '[year]',
+        :id         => attrs[:id] + '_year',
+        :collection => (1970..2020).to_a,
+        :label      => nil
+      )
+      
+      select_field(day_attrs) + select_field(month_attrs) + select_field(year_attrs)
+    end
+
+
     def ofc2(width, height, url, id = Time.now.usec, swf_base = '/')
       <<-HTML
         <div id='flashcontent_#{id}'></div>

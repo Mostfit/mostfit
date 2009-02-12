@@ -5,8 +5,8 @@
 
 %h1== Branch: <i>#{@branch.name}</i>
 
-%table.narrow.form
-  %tr
+%table.narrow.form{ :style => "width: 40%;" }
+  %tr.odd
     %td name
     %td
       %b= @branch.name
@@ -14,7 +14,7 @@
   %tr
     %td manager
     %td= link_to @branch.manager.name, resource(@branch.manager)
-  %tr
+  %tr.odd
     %td centers
     %td
       %b= @branch.centers.size

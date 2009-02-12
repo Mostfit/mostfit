@@ -2,9 +2,6 @@ class Loans < Application
   before :get_context
   provides :xml, :yaml, :js
 
-  def graph
-  end
-
   def index
     @loans = @client.loans
     display @loans
@@ -19,21 +16,24 @@ class Loans < Application
 
   def new
     only_provides :html
-    @loan = Loan.new
-    display @loan
+    if Loan.descendants.map{|x| x.to_s}.include? params[:loan_type]
+      begin
+        klass = Kernel::const_get(params[:loan_type])
+        @loan = klass.new
+#       rescue
+#         @loan = nil
+      end
+    end
+    @loan_types = Loan.descendants if @loan.nil?
+    display [@loan_types, @loan]
   end
 
   def create(loan)
     @loan = Loan.new(loan)
     @loan.client = @client  # set direct context
-#     @loan.approved_by = (StaffMember.get(loan[:approved_by]) or raise NotFound)  # put in validation
-#     if loan[:disbursed_by].blank?
-#       @loan.disbursed_by = (StaffMember.get(loan[:disbursed_by]) or raise NotFound)
-#     end
     if @loan.save
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
     else
-#       message[:error] = "Loan failed to be created"
       render :new  # error messages will be shown
     end
   end
