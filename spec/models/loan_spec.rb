@@ -22,10 +22,14 @@ describe Loan do
     @client.center = @center
     # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
 
-    @loan = Loan.new(:id => 123456, :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 30, :scheduled_first_payment_date => "2000-12-06", :approved_on => "2000-02-03", :scheduled_disbursal_date => "2000-06-13")
+    @loan = Loan.new(:id => 123456, :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 30, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
     @loan.history_disabled = true
-    @loan.approved_by = @manager
+    @loan.applied_by = @manager
     @loan.client = @client
+    @loan.should be_valid
+
+    @loan.approved_on = "2000-02-03"
+    @loan.approved_by = @manager
     @loan.should be_valid
   end
 
@@ -210,9 +214,9 @@ describe Loan do
     loan.shift_date_by_installments(Date.parse('2001-03-28'), -1).should == Date.parse('2001-02-28')
   end
 
-  it ".subclasses should keep track of the direct subclasses (also uses Loan.inherited)" do
+  it ".descendants should keep track of the subclasses (just testing dm-core functionality)" do
     class TestLoan < Loan; end
-    Loan.subclasses.include?(TestLoan).should be_true
+    Loan.descendants.include?(TestLoan).should be_true
   end
 
   it ".number_of_installments_before should do what it promises" do
@@ -263,8 +267,7 @@ describe Loan do
     @loan.scheduled_repaid_on.should eql(Date.parse('2001-06-27'))
   end
 
-  it ".status should give status accoring to changing properties" do
-    @loan.status(@loan.approved_on - 1).should be_nil
+  it ".status should give status accoring to changing properties up to it written off" do
     @loan.status.should == :approved
     @loan.disbursal_date = Date.today
     @loan.disbursed_by   = @manager
@@ -275,7 +278,7 @@ describe Loan do
     @loan.status.should == :written_off
     @loan.status(Date.today - 1).should == :approved
   end
-  it ".status should give status accoring to changing properties (the sequel)" do
+  it ".status should give status accoring to changing properties up to it is repaid" do
     @loan.disbursal_date = Date.today
     @loan.disbursed_by   = @manager
     @loan.status.should == :outstanding
@@ -287,6 +290,12 @@ describe Loan do
     r[0].should == true
     @loan.status.should == :repaid
     @loan.status(Date.today - 1).should == :approved
+  end
+  it ".status should give status accoring to changing properties before being approved" do
+    @loan.status(@loan.applied_on - 1).should be_nil
+    @loan.status(@loan.applied_on).should == :pending
+    @loan.status(@loan.approved_on - 1).should == :pending
+    @loan.status.should == :approved
   end
 
 

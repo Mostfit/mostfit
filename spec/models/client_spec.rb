@@ -41,9 +41,13 @@ describe Client do
   end
  
   it "should be able to 'have' loans" do
-    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 30, :scheduled_first_payment_date => "2000-12-06", :approved_on => "2000-02-03", :scheduled_disbursal_date => "2000-06-13")
-    @loan.approved_by = @manager
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 30, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-03", :scheduled_disbursal_date => "2000-06-13")
+    @loan.should_not be_valid
+    @loan.applied_by  = @manager
     @loan.client      = @client
+    @loan.should be_valid
+    @loan.approved_on = "2000-02-03"
+    @loan.approved_by = @manager
     @loan.should be_valid
 
     @client.loans << @loan
@@ -52,7 +56,8 @@ describe Client do
     @client.loans.first.installment_frequency.should eql(:weekly)
 
 
-    loan2 = Loan.new(:amount => 10000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 30, :scheduled_first_payment_date => "2000-12-07", :approved_on => "2000-02-04", :scheduled_disbursal_date => "2000-06-14")
+    loan2 = Loan.new(:amount => 10000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 30, :scheduled_first_payment_date => "2000-12-07", :applied_on => "2000-02-04", :approved_on => "2000-02-04", :scheduled_disbursal_date => "2000-06-14")
+    loan2.applied_by  = @manager
     loan2.approved_by = @manager
     loan2.client      = @client
     loan2.should be_valid

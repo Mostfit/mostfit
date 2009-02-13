@@ -28,8 +28,12 @@ class Loans < Application
     display [@loan_types, @loan]
   end
 
-  def create(loan)
-    @loan = Loan.new(loan)
+  def create
+    loan_key = params.keys.find { |x| x =~  /_loan$/ }  # loan params have the key like 'a50_loan'
+    attrs = params[loan_key]
+    raise NotFound if not params[:loan_type]
+    klass = Kernel::const_get(params[:loan_type])
+    @loan = klass.new(attrs)
     @loan.client = @client  # set direct context
     if @loan.save
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}

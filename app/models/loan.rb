@@ -15,15 +15,17 @@ class Loan
   property :interest_rate,                  Float, :nullable => false
   property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false
   property :number_of_installments,         Integer, :nullable => false
-  property :scheduled_first_payment_date,   Date, :nullable => false  # arbitrary date for installment number 0
-  property :approved_on,                    Date, :nullable => false
   property :scheduled_disbursal_date,       Date, :nullable => false
+  property :scheduled_first_payment_date,   Date, :nullable => false  # arbitrary date for installment number 0
+  property :applied_on,                     Date, :nullable => false
+  property :approved_on,                    Date
   property :disbursal_date,                 Date  # not disbursed when nil
+  property :written_off_on,                 Date
   property :created_at,                     DateTime
   property :updated_at,                     DateTime
-  property :written_off_on,                 Date
 
   belongs_to :client
+  belongs_to :applied_by,     :child_key => [:applied_by_staff_id],     :class_name => 'StaffMember'
   belongs_to :approved_by,    :child_key => [:approved_by_staff_id],    :class_name => 'StaffMember'
   belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],   :class_name => 'StaffMember'
   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id], :class_name => 'StaffMember'
@@ -34,18 +36,21 @@ class Loan
   validates_with_method  :amount,                       :method => :amount_greater_than_zero?
   validates_with_method  :interest_rate,                :method => :interest_rate_greater_than_zero?
   validates_with_method  :number_of_installments,       :method => :number_of_installments_greater_than_zero?
+  validates_with_method  :applied_on,                   :method => :applied_before_appoved?
   validates_with_method  :approved_on,                  :method => :approved_before_disbursed?
   validates_with_method  :written_off_on,               :method => :disbursed_before_written_off?
-  validates_with_method  :approved_on,                  :method => :approved_before_scheduled_to_be_disbursed?
-  validates_with_method  :written_off_by,               :method => :properly_written_off?
+  validates_with_method  :approved_on,                  :method => :applied_before_scheduled_to_be_disbursed?
+  validates_with_method  :approved_on,                  :method => :properly_approved?
+  validates_with_method  :approved_by,                  :method => :properly_approved?
   validates_with_method  :written_off_on,               :method => :properly_written_off?
-  validates_with_method  :disbursed_by,                 :method => :properly_disbursed?
+  validates_with_method  :written_off_by,               :method => :properly_written_off?
   validates_with_method  :disbursal_date,               :method => :properly_disbursed?
+  validates_with_method  :disbursed_by,                 :method => :properly_disbursed?
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
-  validates_present      :approved_by
+  validates_present      :applied_by
   validates_present      :client
-  validates_is_primitive :scheduled_disbursal_date, :scheduled_first_payment_date, :approved_on  # :disbursal_date (opt.)
+  validates_is_primitive :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_on  # :disbursal_date (opt.)
   
 
   # this is the method used for creating payments, not directly on the Payment class
@@ -278,7 +283,8 @@ class Loan
 
   # this method returns one of [nil, :approved, :outstanding, :repaid, :written_off]
   def status(date = Date.today)
-    return nil          if approved_on >  date  # non existant
+    return nil          if applied_on > date  # non existant
+    return :pending     if applied_on <= date and not (approved_on and approved_on <= date)
     return :approved    if approved_on <= date and not (disbursal_date and disbursal_date <= date)
     return :written_off if (written_off_on and written_off_on <= date)
     total_received_up_to(date) >= total_to_be_received ? :repaid : :outstanding
@@ -411,6 +417,10 @@ class Loan
     return true if number_of_installments and number_of_installments > 0
     [false, "Number of installments should be greater than zero"]
   end
+  def applied_before_appoved?
+    return true if approved_on.blank? or (approved_on and applied_on and approved_on >= applied_on)
+    [false, "Cannot be approved before it is applied for"]
+  end
   def approved_before_disbursed?
     return true if disbursal_date.blank? or (disbursal_date and approved_on and disbursal_date >= approved_on)
     [false, "Cannot be disbursed before it is approved"]
@@ -419,9 +429,13 @@ class Loan
     return true if written_off_on.blank? or (disbursal_date and written_off_on and disbursal_date <= written_off_on)
     [false, "Cannot be written off before it is disbursed"]
   end
-  def approved_before_scheduled_to_be_disbursed?
-    return true if scheduled_disbursal_date and approved_on and scheduled_disbursal_date >= approved_on
-    [false, "Cannot be scheduled for disbusal before it is approved"]
+  def applied_before_scheduled_to_be_disbursed?
+    return true if scheduled_disbursal_date and applied_on and scheduled_disbursal_date >= applied_on
+    [false, "Cannot be scheduled for disbusal before it is applied"]
+  end
+  def properly_approved?
+    return true if (approved_on and approved_by) or (!approved_on and !approved_by)
+    [false, "applied_on and applied_by properties have to be (un)set together"]
   end
   def properly_written_off?
     return true if (written_off_on and written_off_by) or (!written_off_on and !written_off_by)
