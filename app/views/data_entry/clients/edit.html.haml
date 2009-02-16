@@ -6,30 +6,21 @@
 = error_messages_for @client
 
 - if @center
-    %table.form
-      - @center.clients.each |client|
-        %tr
-          %td &nbsp;
-          %td
-            %b= client.name
-          %td
-            = text_field :client_id, :size => 8
-          %td
-            = form_for(@client, :action => url(:enter_clients, :action => 'create')) do
-            = submit "Proceed..."
-        %tr
-          %td &nbsp;
-        %tr
-          %td &nbsp;
-          %td
-            Center:
-          %td
-            = select_center_for @client, :center
-          %td
+  %table.form
+    - @center.clients.each do |client|
+      %tr
+        %td &nbsp;
+        %td
+          %b= client.name
+        %td
+          more info to some here...
+        %td
+          = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
+            = hidden_field :id, :value => client.id 
             = submit "Proceed..."
 - else
-  = form_for(@client, :action => url(:enter_clients, :action => 'create')) do
-    %table.form
+  %table.form
+    = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
       %tr
         %td &nbsp;
       %tr
@@ -37,11 +28,12 @@
         %td
           Client ID:
         %td
-          = text_field :client_id, :size => 8
+          = text_field :id, :size => 8
         %td
           = submit "Proceed..."
       %tr
         %td &nbsp;
+    = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
       %tr
         %td &nbsp;
         %td
