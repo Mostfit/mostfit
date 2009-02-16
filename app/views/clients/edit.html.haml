@@ -3,4 +3,4 @@
 = error_messages_for @client
 
 = form_for(@client, :action => resource(@branch, @center, @client)) do
-  = partial :fields, :submit_text => "Save changes"
+  = partial :fields, :submit_text => "Save changes", :cancel_link => resource(@branch, @center, :clients)

@@ -16,20 +16,21 @@ class Clients < DataEntry::Controller
   end
 
   def edit
-    @client = Client.new
-    params[:client][:center_id]
-    @center = Center.get(params[:client][:center_id])
-    @center = nil if not @center
+    @client = (params[:client] and params[:client][:id]) ? Client.get(params[:client][:id]) : Client.new
+    if params[:client] and params[:client][:center_id]
+      @center = Center.get(params[:client][:center_id])
+    end
     render
   end
 
-  def update
-  end
-
-  def delete
-  end
-
-  def destroy
+  def update(id, client)
+    @client = Client.get(id)
+    raise NotFound unless @client
+    if @client.update_attributes(client)
+       redirect url(:enter_clients, :action => 'edit'), :message => {:notice => "Client '#{@client.name}' has been edited"}
+    else
+      render :edit  # error messages will be shown
+    end
   end
 end
 

@@ -1,44 +1,50 @@
 %h1 Edit client
 
-%p
-  Please select a client that you want to edit, either by its client ID, or through the center it belongs to.
-
 = error_messages_for @client
 
-- if @center
-  %table.form
-    - @center.clients.each do |client|
-      %tr
-        %td &nbsp;
-        %td
-          %b= client.name
-        %td
-          more info to some here...
-        %td
-          = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
-            = hidden_field :id, :value => client.id 
+- if @client.new_record?
+  %p
+    Please select a client that you want to edit, either by its client ID, or through the center it belongs to.
+
+
+  - if @center
+    %table.form
+      - @center.clients.each do |client|
+        %tr
+          %td &nbsp;
+          %td
+            %b= client.name
+          %td
+            more info to some here...
+          %td
+            = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
+              = hidden_field :id, :value => client.id 
+              = submit "Proceed..."
+  - else
+    %table.form
+      = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
+        %tr
+          %td &nbsp;
+        %tr
+          %td &nbsp;
+          %td
+            Client ID:
+          %td
+            = text_field :id, :size => 8
+          %td
             = submit "Proceed..."
+        %tr
+          %td &nbsp;
+      = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
+        %tr
+          %td &nbsp;
+          %td
+            Center:
+          %td
+            = select_center_for @client, :center
+          %td
+            = submit "Proceed..."
+
 - else
-  %table.form
-    = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
-      %tr
-        %td &nbsp;
-      %tr
-        %td &nbsp;
-        %td
-          Client ID:
-        %td
-          = text_field :id, :size => 8
-        %td
-          = submit "Proceed..."
-      %tr
-        %td &nbsp;
-    = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
-      %tr
-        %td &nbsp;
-        %td
-          Center:
-        %td
-          = select_center_for @client, :center
-        %td
-          = submit "Proceed..."
+  = form_for(@client, :action => url(:enter_clients, :action => 'update', :id => @client.id)) do
+    = partial 'clients/fields', :submit_text => "Save changes", :cancel_link => url(:data_entry)
