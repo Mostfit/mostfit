@@ -29,11 +29,11 @@
         %td
           %b= staff_member.active? ? 'active' : 'disabled'
         %td
-          not yet
+          = Loan.all(:approved_by_staff_id => staff_member.id).size
         %td
-          not yet
+          = Loan.all(:disbursed_by_staff_id => staff_member.id).size
         %td
-          not yet
+          = Loan.all(:written_off_by_staff_id => staff_member.id).size
         %td
           = link_to 'edit', resource(staff_member, :edit)
 
