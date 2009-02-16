@@ -1,6 +1,7 @@
 class Client
   include DataMapper::Resource
   include Paperclip::Resource
+  before :valid?, :parse_dates
   
   property :id,             Serial
   property :reference,      String, :length => 100, :nullable => false
@@ -25,4 +26,8 @@ class Client
   validates_length    :name, :min => 3
   validates_present   :center
   validates_is_unique :reference
+
+
+  private
+  include DateParser  # mixin for the hook "before :valid?, :parse_dates"
 end

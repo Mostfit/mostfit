@@ -1,0 +1,21 @@
+%table.form
+  %tr
+    %td
+      Name:
+    %td
+      = text_field :name, :size => 40
+      %br/
+      %span.greytext the screen name of the staff member
+  %tr
+    %td
+      Active:
+    %td
+      = check_box :active
+      &nbsp;&nbsp;
+      %span.greytext only active staff members can be marked as managers, approve loans, or receive payments
+  %tr
+    %td
+    %td
+      = submit submit_text
+      &nbsp;&nbsp;
+      = link_to 'cancel', url(:staff_members)

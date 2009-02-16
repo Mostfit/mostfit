@@ -28,14 +28,14 @@ class Center
   private
   def hours_valid?
     return true if meeting_time_hours.blank? or (0..23).include? meeting_time_hours.to_i
-    [false, "hours of the meeting time should be within 0-23 or blank"]
+    [false, "Hours of the meeting time should be within 0-23 or blank"]
   end
   def minutes_valid?
     return true if meeting_time_minutes.blank? or (0..59).include? meeting_time_minutes.to_i
-    [false, "hours of the meeting time should be within 0-59 or blank"]
+    [false, "Minutes of the meeting time should be within 0-59 or blank"]
   end
   def manager_is_an_active_staff_member?
     return true if manager and manager.active
-    [false, "receiving staff member is currently not active"]
+    [false, "Receiving staff member is currently not active"]
   end
 end

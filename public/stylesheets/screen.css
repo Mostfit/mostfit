@@ -271,7 +271,7 @@ hr.space {background:#fff;color:#fff;}
 .container .thin {font-weight: lighter;}
 .container div.error, .container div.notice, .container div.success {padding:.8em;margin-bottom:1.6em;border:2px solid #ddd;}
 .container div.error {background:#FBE3E4;color:#8a1f11;border-color:#FBC2C4;}
-input.error, textarea.error {background:#FBE3E4;}
+input.error, textarea.error, select.error {background:#FBE3E4;}
 .container div.notice {background:#FFF6BF;color:#514721;border-color:#FFD324;}
 .container div.success {background:#E6EFC2;color:#264409;border-color:#C6D880;}
 .container .error a {color:#8a1f11; background:none; padding:0; margin:0; }

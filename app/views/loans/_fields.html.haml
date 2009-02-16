@@ -1,3 +1,4 @@
+= hidden_field :name => "loan_type", :value => @loan.class.to_s
 %table.form
   %tr
     %td
@@ -10,7 +11,7 @@
     %td
       Interest rate:
     %td
-      = text_field :interest_rate, :value => @loan.interest_percentage, :name => "#{@loan.class.to_s.snake_case}[interest_percentage]", :size => 4
+      = text_field :interest_rate, :name => "#{@loan.class.to_s.snake_case}[interest_percentage]", :value => @loan.interest_percentage, :size => 4
       \%
       %br/
       %span.greytext the interest rate as a percentage
@@ -26,37 +27,43 @@
       = text_field :number_of_installments, :size => 4
   %tr
     %td
-      Scheduled first payment:
+      Application:
     %td
       on&nbsp;&nbsp;
-      = text_field :scheduled_first_payment_date, :size => 10
-      &nbsp;&nbsp;
-      %span.greytext yyyy-mm-dd
+      = date_select_for @loan, :applied_on
+      &nbsp;&nbsp;by&nbsp;&nbsp;
+      = select_staff_member_for @loan, :applied_by
   %tr
     %td
       Scheduled disbursal date:
     %td
       on&nbsp;&nbsp;
-      = text_field :scheduled_disbursal_date, :size => 10
-      &nbsp;&nbsp;
-      %span.greytext yyyy-mm-dd
+      = date_select_for @loan, :scheduled_disbursal_date
+  %tr
+    %td
+      Scheduled first payment:
+    %td
+      on&nbsp;&nbsp;
+      = date_select_for @loan, :scheduled_first_payment_date
+  %tr
+    %td &nbsp;
   %tr
     %td
       Approved:
     %td
       on&nbsp;&nbsp;
-      = text_field :approved_on, :size => 10
+      = date_select_for @loan, :approved_on, :nullable => true
       &nbsp;&nbsp;by&nbsp;&nbsp;
-      = select :approved_by_staff_id, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
+      = select_staff_member_for @loan, :approved_by
       %br/
-      %span.greytext yyyy-mm-dd
+      %span.greytext these fields are optional so may be specified later
   %tr
     %td
       Disbursed:
     %td
       on&nbsp;&nbsp;
-      = text_field :disbursal_date, :size => 10
+      = date_select_for @loan, :disbursal_date, :nullable => true
       &nbsp;&nbsp;by&nbsp;&nbsp;
-      = select :disbursed_by_staff_id, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
+      = select_staff_member_for @loan, :disbursed_by
       %br/
       %span.greytext these fields are optional so may be specified later

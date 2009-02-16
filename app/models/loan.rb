@@ -1,10 +1,11 @@
 class Loan
   include DataMapper::Resource
-  after :save,    :update_history  # also seems to do :update
-#   after :create,  :update_history
-  after :destroy, :update_history
+  before :valid?,  :parse_dates
+  after  :save,    :update_history  # also seems to do updates
+  after  :destroy, :update_history
 
-  INSTALLMENT_FREQUENCIES = [:daily, :biweekly, :weekly, :monthly]
+  INSTALLMENT_FREQUENCIES = [:daily, :weekly, :biweekly, :monthly]
+#   DATE_FORMAT = /(^\s*$|\d{4}[-.\/]{1}\d{1,2}[-.\/]{1}\d{1,2})/  # matches "1982-06-12" or empty strings
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
   attr_accessor :interest_percentage  # set to true to disable history writing by this object
@@ -15,18 +16,28 @@ class Loan
   property :interest_rate,                  Float, :nullable => false
   property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false
   property :number_of_installments,         Integer, :nullable => false
-  property :scheduled_first_payment_date,   Date, :nullable => false  # arbitrary date for installment number 0
-  property :approved_on,                    Date, :nullable => false
-  property :scheduled_disbursal_date,       Date, :nullable => false
-  property :disbursal_date,                 Date  # not disbursed when nil
+  property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false
+  property :scheduled_first_payment_date,   Date, :nullable => false, :auto_validation => false
+  property :applied_on,                     Date, :nullable => false, :auto_validation => false
+  property :approved_on,                    Date, :auto_validation => false
+  property :rejected_on,                    Date, :auto_validation => false
+  property :disbursal_date,                 Date, :auto_validation => false
+  property :written_off_on,                 Date, :auto_validation => false
+  property :fees,                           Yaml  # like: "first fee: 1000, second fee: 200" (yaml) -- fully reimplementable
+  property :fees_total,                     Integer, :default => 0  # gets included in first payment
+  property :fees_paid,                      Boolean, :default => false
+  property :validated_on,                   Date, :auto_validation => false
+  property :validation_comment,             Text
   property :created_at,                     DateTime
   property :updated_at,                     DateTime
-  property :written_off_on,                 Date
 
   belongs_to :client
+  belongs_to :applied_by,     :child_key => [:applied_by_staff_id],     :class_name => 'StaffMember'
   belongs_to :approved_by,    :child_key => [:approved_by_staff_id],    :class_name => 'StaffMember'
+  belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],    :class_name => 'StaffMember'
   belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],   :class_name => 'StaffMember'
   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id], :class_name => 'StaffMember'
+  belongs_to :validated_by,   :child_key => [:validated_by_staff_id],   :class_name => 'StaffMember'
   has n, :payments
   has n, :history, :class_name => 'LoanHistory'
 
@@ -34,18 +45,37 @@ class Loan
   validates_with_method  :amount,                       :method => :amount_greater_than_zero?
   validates_with_method  :interest_rate,                :method => :interest_rate_greater_than_zero?
   validates_with_method  :number_of_installments,       :method => :number_of_installments_greater_than_zero?
+  validates_with_method  :applied_on,                   :method => :applied_before_appoved?
+  validates_with_method  :approved_on,                  :method => :applied_before_appoved?
+  validates_with_method  :applied_on,                   :method => :applied_before_rejected?
+  validates_with_method  :rejected_on,                  :method => :applied_before_rejected?
   validates_with_method  :approved_on,                  :method => :approved_before_disbursed?
+  validates_with_method  :disbursal_date,               :method => :approved_before_disbursed?
+  validates_with_method  :disbursal_date,               :method => :disbursed_before_written_off?
   validates_with_method  :written_off_on,               :method => :disbursed_before_written_off?
-  validates_with_method  :approved_on,                  :method => :approved_before_scheduled_to_be_disbursed?
-  validates_with_method  :written_off_by,               :method => :properly_written_off?
+  validates_with_method  :approved_on,                  :method => :applied_before_scheduled_to_be_disbursed?
+  validates_with_method  :scheduled_disbursal_date,     :method => :applied_before_scheduled_to_be_disbursed?
+  validates_with_method  :approved_on,                  :method => :properly_approved?
+  validates_with_method  :approved_by,                  :method => :properly_approved?
+  validates_with_method  :rejected_on,                  :method => :properly_rejected?
+  validates_with_method  :rejected_by,                  :method => :properly_rejected?
   validates_with_method  :written_off_on,               :method => :properly_written_off?
-  validates_with_method  :disbursed_by,                 :method => :properly_disbursed?
+  validates_with_method  :written_off_by,               :method => :properly_written_off?
   validates_with_method  :disbursal_date,               :method => :properly_disbursed?
+  validates_with_method  :disbursed_by,                 :method => :properly_disbursed?
+  validates_with_method  :validated_on,                 :method => :properly_validated?
+  validates_with_method  :validated_by,                 :method => :properly_validated?
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
-  validates_present      :approved_by
-  validates_present      :client
-  validates_is_primitive :scheduled_disbursal_date, :scheduled_first_payment_date, :approved_on  # :disbursal_date (opt.)
+  validates_present      :applied_by, :client, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_on
+
+  # validates_primitive doesn't work well for date -- we need our dates checked to be parsable strings though
+  # therefor we switch off the auto validation on date type and do it with a regexp
+#   validates_format       :applied_on,                   :with => DATE_FORMAT, :message => "Application date not valid"
+#   validates_format       :approved_on,                  :with => DATE_FORMAT, :message => "Approval date not valid"
+#   validates_format       :disbursal_date,               :with => DATE_FORMAT, :message => "Disbursal date not valid"
+#   validates_format       :scheduled_disbursal_date,     :with => DATE_FORMAT, :message => "Scheduled disbursal date not valid"
+#   validates_format       :scheduled_first_payment_date, :with => DATE_FORMAT, :message => "Scheduled first payment date not valid"
   
 
   # this is the method used for creating payments, not directly on the Payment class
@@ -265,7 +295,7 @@ class Loan
   # how is this loan repayed? principal/interest separate, aggregated or allow either way
   # at some point this should have effect on the view (1 or 2 fields)
   def repayment_style
-    :allow_both   # one of [:separate, :aggregated, :allow_both]
+    :allow_both   # one of [:separated, :aggregated, :allow_both]
   end
 
   def interest_percentage
@@ -278,8 +308,12 @@ class Loan
 
   # this method returns one of [nil, :approved, :outstanding, :repaid, :written_off]
   def status(date = Date.today)
-    return nil          if approved_on >  date  # non existant
-    return :approved    if approved_on <= date and not (disbursal_date and disbursal_date <= date)
+    return nil          if applied_on > date  # non existant
+    return :pending     if applied_on <= date and
+                          not (approved_on and approved_on <= date) and
+                          not (rejected_on and rejected_on <= date)
+    return :approved    if (approved_on and approved_on <= date) and not (disbursal_date and disbursal_date <= date)
+    return :rejected    if (rejected_on and rejected_on <= date)
     return :written_off if (written_off_on and written_off_on <= date)
     total_received_up_to(date) >= total_to_be_received ? :repaid : :outstanding
   end
@@ -296,9 +330,8 @@ class Loan
   # (note: this is often a date in the future -- huh?!)   MAYBE: move this to the LoanHistory
   def last_loan_history_date
     s = status  # TODO: replace with case-when constuct
-    if s.nil?
-      return nil
-    elsif s == :approved
+    return nil if s.nil?
+    if s == :approved
       return scheduled_repaid_on
     elsif s == :outstanding
       return [scheduled_repaid_on, Date.today].max
@@ -308,6 +341,7 @@ class Loan
     elsif s == :written_off
       return [scheduled_repaid_on, written_off_on].max
     end
+    return nil  # i.e. when status is :applied or :rejected
   end
 
 
@@ -396,7 +430,22 @@ class Loan
     INSTALLMENT_FREQUENCIES
   end
 
+  def interest_percentage
+    return nil if interest_rate.blank?
+    format("%.2f", interest_rate * 100)
+  end
+  def interest_percentage=(percentage)
+    self.interest_rate = percentage.blank? ? nil : percentage.to_f / 100
+  end
+
+  alias :set_fees_without_updating_total :fees=
+  def fees=(fees)
+    set_fees_without_updating_total fees
+    update_fees_total
+  end
+
   private
+  include DateParser  # mixin for the hook "before :valid?, :parse_dates"
 
   ## validations: read their method name and error to see what they do.
   def amount_greater_than_zero?
@@ -411,6 +460,14 @@ class Loan
     return true if number_of_installments and number_of_installments > 0
     [false, "Number of installments should be greater than zero"]
   end
+  def applied_before_appoved?
+    return true if approved_on.blank? or (approved_on and applied_on and approved_on >= applied_on)
+    [false, "Cannot be approved before it is applied for"]
+  end
+  def applied_before_rejected?
+    return true if rejected_on.blank? or (rejected_on and applied_on and rejected_on >= applied_on)
+    [false, "Cannot be rejected before it is applied for"]
+  end
   def approved_before_disbursed?
     return true if disbursal_date.blank? or (disbursal_date and approved_on and disbursal_date >= approved_on)
     [false, "Cannot be disbursed before it is approved"]
@@ -419,44 +476,52 @@ class Loan
     return true if written_off_on.blank? or (disbursal_date and written_off_on and disbursal_date <= written_off_on)
     [false, "Cannot be written off before it is disbursed"]
   end
-  def approved_before_scheduled_to_be_disbursed?
-    return true if scheduled_disbursal_date and approved_on and scheduled_disbursal_date >= approved_on
-    [false, "Cannot be scheduled for disbusal before it is approved"]
-  end
-  def properly_written_off?
-    return true if (written_off_on and written_off_by) or (!written_off_on and !written_off_by)
-    [false, "written_off_on and written_off_by properties have to be (un)set together"]
-  end
-  def properly_disbursed?
-    return true if (disbursal_date and disbursed_by) or (!disbursal_date and !disbursed_by)
-    [false, "disbursal_date and disbursed_by properties have to be (un)set together"]
+  def applied_before_scheduled_to_be_disbursed?
+    return true if scheduled_disbursal_date and applied_on and scheduled_disbursal_date >= applied_on
+    [false, "Cannot be scheduled for disbusal before it is applied"]
   end
   def scheduled_disbursal_before_scheduled_first_payment?
     return true if scheduled_disbursal_date and scheduled_first_payment_date and scheduled_disbursal_date <= scheduled_first_payment_date
-    [false, "scheduled first payment cannot come before scheduled disbursal"]
+    [false, "The scheduled first payment date cannot precede the scheduled disbursal date"]
+  end
+  def properly_approved?
+    return true if (approved_on and approved_by) or (approved_on.blank? and approved_by.blank?)
+    [false, "The approval date and the staff member that approved the loan should both be given"]
+  end
+  def properly_rejected?
+    return true if (rejected_on and rejected_by) or (rejected_on.blank? and rejected_by.blank?)
+    [false, "The rejection date and the staff member that rejected the loan should both be given"]
+  end
+  def properly_written_off?
+    return true if (written_off_on and written_off_by) or (written_off_on.blank? and written_off_by.blank?)
+    [false, "The date of writing off the loan and the staff member that wrote off the loan should both be given"]
+  end
+  def properly_disbursed?
+    return true if (disbursal_date and disbursed_by) or (disbursal_date.blank? and disbursed_by.blank?)
+    [false, "The disbursal date and the staff member that disbursed the loan should both be given"]
+  end
+  def properly_validated?
+    # if the validation_comment is not blank we also invalidate the model
+    return true if (validated_on and validated_by) or (validated_on.blank? and validated_by.blank? and validation_comment.blank?)
+    [false, "The validation date, the validating staff member the loan should both be given"]
   end
 
-  
+
+  # this method only works if fees are in a format of:
+  #   "fee1: 100\nfee2: 200":String (yaml)
+  # and gets called from the free= method, yet all this is fully reimplementable
+  def update_fees_total
+    return if fees.blank?
+    total = 0
+    fees = YAML.load(self.fees) if self.fees.is_a? String
+    fees.each_value { |v| total += v.to_i }
+    self.fees_total = total
+  end
 
   def payment_dates
     repository.adapter.query(%Q{
       SELECT "received_on" FROM "payments"    -- the payment dates
        WHERE ("deleted_at" IS NULL) AND ("loan_id" = #{self.id})}).map { |x| Date.parse(x) }
-  end
-
-  ## FIXME
-  ## trying to solve a problem with the (auto) validations on empty dates
-  def parse_dates
-    self.approved_on    = Loan::parse_date(approved_on)
-    self.disbursal_date = Loan::parse_date(disbursal_date)
-    self.written_off_on = Loan::parse_date(written_off_on)
-  end
-  def self.parse_date(date)
-    return date if date.is_a? Date
-    return date.to_time.to_date if date.is_a? DateTime
-    return Date.parse(date) if date.is_a? String
-  rescue
-    nil
   end
 end
 

@@ -2,9 +2,9 @@
 
 = error_messages_for @payment
 
-= form_for(@payment, :action => resource(@branch, @center, @client, @loan, :payments)) do
+= form_for(@payment, :action => url_for_loan(@loan, 'payments')) do
   = partial :fields
 
   = submit "Register payment"
 
-= link_to 'Back', resource(@branch, @center, @client, @loan, :payments)
+= link_to 'Back', url_for_loan(@loan, 'payments')

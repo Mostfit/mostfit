@@ -29,8 +29,9 @@ class Loans < Application
     display [@loan_types, @loan]
   end
 
-  def create(loan)
-    @loan = Loan.new(loan)
+  def create
+    klass, attrs = get_loan_and_attrs
+    @loan = klass.new(attrs)
     @loan.client = @client  # set direct context
     if @loan.save
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
@@ -46,10 +47,11 @@ class Loans < Application
     display @loan
   end
 
-  def update(id, loan)
-    @loan = Loan.get(id)
+  def update(id)
+    klass, attrs = get_loan_and_attrs
+    @loan = klass.get(id)
     raise NotFound unless @loan
-    if @loan.update_attributes(loan)
+    if @loan.update_attributes(attrs)
        redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
     else
       display @loan, :edit  # error messages will be shown
@@ -76,5 +78,16 @@ class Loans < Application
     @center = Center.get(params[:center_id])
     @client = Client.get(params[:client_id])
     raise NotFound unless @branch and @center and @client
+  end
+
+
+  # the loan is not of type Loan of a derived type, therefor we cannot just assume its name..
+  # this method gets the loans type from a hidden field value and uses that to get the attrs
+  def get_loan_and_attrs
+    loan_key = params.keys.find { |x| x =~  /_loan$/ }  # loan params have the key like 'a50_loan'
+    attrs = params[loan_key]
+    raise NotFound if not params[:loan_type]
+    klass = Kernel::const_get(params[:loan_type])
+    [klass, attrs]
   end
 end # Loans

@@ -3,4 +3,4 @@
 = form_for(@payment, :action => resource(@branch, @center, @client, @loan, @payment), :method => :delete) do
   = submit "Delete it!"
 
-= link_to 'Back', resource(@branch, @center, @client, @loan, :payments)
+= link_to 'Back', url_for_loan(@loan, 'payments')
