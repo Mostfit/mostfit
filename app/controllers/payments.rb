@@ -7,11 +7,11 @@ class Payments < Application
     display @payments
   end
 
-  def show(id)
-    @payment = Payment.get(id)
-    raise NotFound unless @payment
-    display @payment
-  end
+#   def show(id)
+#     @payment = Payment.get(id)
+#     raise NotFound unless @payment
+#     display @payment
+#   end
 
   def new
     only_provides :html
@@ -24,10 +24,11 @@ class Payments < Application
     unless amounts > 0  # if no total is given we use the principal/interest duo
       amounts = [payment[:principal].to_i, payment[:interest].to_i]
     end
+    receiving_staff = StaffMember.get(payment[:received_by])
     # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
-    succes, @payment = @loan.repay(amounts, session.user, Date.strptime(payment[:received_on]), payment[:received_by])
+    succes, @payment = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff)
     if succes  # true if saved
-      redirect resource(@branch, @center, @client, @loan), :message => {:notice => "Payment ##{@payment.id} has been registered"}
+      redirect url_for_loan(@loan), :message => {:notice => "Payment ##{@payment.id} has been registered"}
     else
       message[:error] = "Payment failed to be created"
       render :new
@@ -62,14 +63,16 @@ class Payments < Application
     @payment = Payment.get(id)
     raise NotFound unless @payment
     if @loan.delete_payment(@payment, session.user)
-      redirect resource(@branch, @center, @client, @loan, :payments), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
+      redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
     else
-      redirect resource(@branch, @center, @client, @loan, :payments), :message => {:error => "Could not delete payment '#{@payment.id}'"}
+      redirect url_for_loan(@loan, 'payments'), :message => {:error => "Could not delete payment '#{@payment.id}'"}
     end
   end
 
 
   private
+  include DateParser
+
   def get_context
     @branch = Branch.get(params[:branch_id])
     @center = Center.get(params[:center_id])

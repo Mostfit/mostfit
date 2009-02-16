@@ -18,10 +18,7 @@
     %td
       Date of birth:
     %td
-      = text_field :spouse_name, :size => 40
-      %br/
-      %span.greytext
-        yyyy-mm-dd
+      = date_select_for @client, :date_of_birth
   %tr
     %td
       Spouse name:

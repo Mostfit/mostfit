@@ -14,12 +14,13 @@
       = text_field :meeting_time_hours,   :size => 2
       %b :
       = text_field :meeting_time_minutes, :size => 2
+      &nbsp;&nbsp;
       %span.greytext time is in a 24 hour format
   %tr
     %td
       Managed by:
     %td
-      = select :manager_staff_id, :collection => StaffMember.all(:active => true), :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
+      = select_staff_member_for @center, :manager
       %br/
       %span.greytext pick the staff member that manages this center
   %tr

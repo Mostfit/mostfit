@@ -100,11 +100,11 @@
                 = loan.payments.last(:order => [:received_on]).received_on
               
         %td
-          = link_to 'view details', resource(@branch, @center, @client, loan, :payments)
+          = link_to 'view details', url_for_loan(loan, 'payments')
           &nbsp;|&nbsp;
-          = link_to 'edit', resource(@branch, @center, @client, loan, :edit)
+          = link_to 'edit', url_for_loan(loan, 'edit')
           &nbsp;|&nbsp;
-          = link_to 'record payment', resource(@branch, @center, @client, loan, :payments, :new)
+          = link_to 'record payment', url_for_loan(loan, "payments/new")
 
     %tfoot
       %tr

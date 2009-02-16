@@ -4,7 +4,7 @@
 
 %h1
   Loan
-  = link_to "##{@loan.id}", resource(@branch, @center, @client, @loan)
+  = link_to "##{@loan.id}", url_for_loan(@loan)
   by client
   = link_to "<i>#{@client.name}</i>", resource(@branch, @center, @client)
 
@@ -24,13 +24,23 @@
       = @loan.installment_frequency
       == (#{@loan.number_of_installments_before(Date.today)} past installments)
   %tr
-    %td approved
+    %td application
     %td
       on
-      = @loan.approved_on
+      = @loan.applied_on
       by
-      %b= link_to @loan.approved_by.name, resource(@loan.disbursed_by)
+      %b= link_to @loan.applied_by.name, resource(@loan.applied_by)
   %tr.odd
+    %td approval
+    %td
+      - if @loan.approved_on
+        on
+        = @loan.approved_on
+        by
+        %b= link_to @loan.approved_by.name, resource(@loan.approved_by)
+      - else
+        %i approval is pending
+  %tr
     %td disbursed
     %td
       - if @loan.disbursal_date
@@ -41,7 +51,7 @@
       - else
         to be disbursed on
         = @loan.scheduled_disbursal_date
-  %tr
+  %tr.odd
     %td first payment
     %td
       - if @loan.payments.empty?
@@ -58,7 +68,7 @@
             = difference_in_days(@loan.scheduled_first_payment_date, actual_first_payment, ['days earlier', 'days later'])
             then scheduled
             == (#{@loan.scheduled_disbursal_date})
-  %tr.odd
+  %tr
     %td status
     %td
       %b= @loan.status.to_s.gsub('_', ' ')
@@ -66,43 +76,49 @@
         by
         %b= link_to @loan.written_off_by.name, resource(@loan.written_off_by)
 
+= link_to 'edit this loan', url_for_loan(@loan, 'edit')
 
-%h2== Payments &mdash; (#{link_to 'new', resource(@branch, @center, @client, @loan, :payments, :new)})
 
-%table.narrow.form{ :width => '100%' }
-  %thead
-    %tr
-      %th
-      %th id
-      %th received on
-      %th received by
-      %th principal
-      %th interest
-      %th total
-  %tbody
-  - for payment in @payments
-    %tr{ :class => cycle('odd','') }
-      %td &nbsp;
-      %td
-        = payment.id
-      %td
-        %i= payment.received_on
-      %td
-        %b= link_to payment.received_by.name, resource(payment.received_by)
-      %td
-        %b= payment.principal
-      %td
-        %b= payment.interest
-      %td
-        %b= payment.total
-      %td
-        = link_to 'delete', resource(@branch, @center, @client, @loan, payment, :delete)
+%h2== Payments &mdash; (#{link_to 'new', url_for_loan(@loan, 'payments/new')})
 
-  %tfoot
-    %tr
-      %td{ :colspan => 7 }
+- if @loan.payments.blank?
+  %p
+    %i No payments have been made so far.
+- else
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th id
+        %th received on
+        %th received by
+        %th principal
+        %th interest
+        %th total
+    %tbody
+    - for payment in @payments
+      %tr{ :class => cycle('odd','') }
+        %td &nbsp;
+        %td
+          = payment.id
+        %td
+          %i= payment.received_on
+        %td
+          %b= link_to payment.received_by.name, resource(payment.received_by)
+        %td
+          %b= payment.principal
+        %td
+          %b= payment.interest
+        %td
+          %b= payment.total
+        %td
+          = link_to 'delete', url_for_loan(@loan, 'payment/delete')
 
-%p= link_to 'new payment', resource(@branch, @center, @client, @loan, :payments, :new)
+    %tfoot
+      %tr
+        %td{ :colspan => 7 }
+
+%p= link_to 'new payment', url_for_loan(@loan, 'payments/new')
 
 
 %h2== Payment schedule

@@ -41,16 +41,30 @@ describe Loan do
     @loan.client = nil
     @loan.should_not be_valid
   end
-  it "should not be valid without being approved" do
-    @loan.approved_by = nil
+  it "should not be valid without being approved properly" do
+    @loan.applied_by = nil
+    @loan.should_not be_valid
+    @loan.applied_by = @manager
+    @loan.applied_on = nil
     @loan.should_not be_valid
   end
-  it "should not be valid without being approved" do
+  it "should not be valid without being approved properly" do
     @loan.approved_by = nil
     @loan.should_not be_valid
+    @loan.approved_by = @manager
+    @loan.approved_on = nil
+    @loan.should_not be_valid
   end
-  it "should not be valid without being approved" do
+  it "should not be valid without being rejected properly" do
+    date = @loan.approved_on
     @loan.approved_by = nil
+    @loan.approved_on = nil
+    @loan.should be_valid
+    @loan.rejected_on = date
+    @loan.rejected_by = nil
+    @loan.should_not be_valid
+    @loan.rejected_by = @manager
+    @loan.rejected_on = nil
     @loan.should_not be_valid
   end
   it "should not be valid without belonging to a client" do
@@ -296,6 +310,17 @@ describe Loan do
     @loan.status(@loan.applied_on).should == :pending
     @loan.status(@loan.approved_on - 1).should == :pending
     @loan.status.should == :approved
+  end
+  it ".status should give status accoring to changing properties when being rejected" do
+    date = @loan.approved_on
+    @loan.approved_on = nil
+    @loan.approved_by = nil
+    @loan.rejected_on = date
+    @loan.rejected_by = @manager
+    @loan.should be_valid
+    @loan.status(@loan.rejected_on - 1).should == :pending
+    @loan.status(@loan.rejected_on).should == :rejected
+    @loan.status.should == :rejected
   end
 
 

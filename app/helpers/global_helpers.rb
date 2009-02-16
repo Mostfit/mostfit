@@ -1,42 +1,62 @@
 module Merb
   module GlobalHelpers
+    def url_for_loan(loan, action = '')
+      # this is to generate links to loans, as the resouce method doesn't work for descendant classes of Loan
+      # it expects the whole context (@branch, @center, @client) to exist
+      base = url(:branch_center_client, @branch.id, @center.id, @client.id)
+      base + "/loans/#{loan.id}/" + action
+    end
 
-    def date_selector(col, attrs = {})
+    def select_staff_member_for(obj, col, attrs = {})
+      id_col = "#{col.to_s}_staff_id".to_sym
+      select col,
+        :collection   => StaffMember.all(:active => true),
+        :value_method => :id,
+        :text_method  => :name,
+        :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
+        :id           => "#{obj.class.to_s.snake_case}_#{id_col}",
+        :selected     => (obj.send(id_col) ? obj.send(id_col).to_s : nil),
+        :prompt       => (attrs[:prompt] or "&lt;select a staff member&gt;")
+    end
 
-      attrs.merge!(:name => attrs[:name])
-      attrs.merge!(:id   => attrs[:id])
 
-      date = @_obj.send(col) || Time.new
-      
-      # TODO: Handle :selected option
-      #attrs.merge!(:selected => attrs[:selected] || control_value(col))
-      
-      errorify_field(attrs, col)
+    MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    def date_select_for(obj, col, attrs = {})
+      attrs.merge!(:name => "#{obj.class.to_s.snake_case}[#{col.to_s}]")
+      attrs.merge!(:id   => "#{obj.class.to_s.snake_case}_#{col.to_s}")
 
-      month_attrs = attrs.merge(
-        :selected   => date.month.to_s, 
-        :name       => attrs[:name] + '[month]',
-        :id         => attrs[:id] + '_month',
-        :collection => [1,2,3,4,5,6,7,8,9,10,11,12]
-      )
-      
+      nullable = attrs[:nullable] ? true : false
+      date = obj.send(col)
+      date = Date.today if date.blank? and not nullable
+      date = nil        if date.blank? and nullable
+#       errorify_field(attrs, col)
+
       day_attrs = attrs.merge(
-        :selected   => date.day.to_s, 
         :name       => attrs[:name] + '[day]',
         :id         => attrs[:id] + '_day',
-        :collection => (1..31).to_a,
-        :label      => nil
+        :selected   => (date ? date.day.to_s : ''),
+        :class      => (obj.errors[col] ? 'error' : ''),
+        :collection => (nullable ? [['', '-']] : []) + (1..31).to_a.map{ |x| x = [x.to_s, x.to_s] }
+      )
+      
+      count = 0
+      month_attrs = attrs.merge(
+        :name       => attrs[:name] + '[month]',
+        :id         => attrs[:id] + '_month',
+        :selected   => (date ? date.month.to_s : ''),
+        :class      => (obj.errors[col] ? 'error' : ''),
+        :collection => (nullable ? [['', '-']] : []) + MONTHS.map { |x| count += 1; x = [count, x] }
       )
       
       year_attrs = attrs.merge(
-        :selected   => date.year.to_s,
         :name       => attrs[:name] + '[year]',
         :id         => attrs[:id] + '_year',
-        :collection => (1970..2020).to_a,
-        :label      => nil
+        :selected   => (date ? date.year.to_s : ''),
+        :class      => (obj.errors[col] ? 'error' : ''),
+        :collection => (nullable ? [['', '-']] : []) + (1900..Time.now.year).to_a.reverse.map{|x| x = [x.to_s, x.to_s]}
       )
       
-      select_field(day_attrs) + select_field(month_attrs) + select_field(year_attrs)
+      select(month_attrs) + '&nbsp;' + select(day_attrs) + '&nbsp;' + select(year_attrs)
     end
 
 
