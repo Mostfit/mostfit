@@ -1,5 +1,5 @@
 class Clients < Application
-  before :get_context
+  before :get_context  # TODO: not do this for every action
   provides :xml, :yaml, :js
 
   def index

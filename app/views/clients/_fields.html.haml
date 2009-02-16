@@ -1,4 +1,10 @@
 %table.form
+  - if @branch.blank?
+    %tr
+      %td
+        For center:
+      %td
+        = select_center_for @client, :center
   %tr
     %td
       Name:
@@ -29,9 +35,17 @@
       Address:
     %td
       ~ text_area :address, :rows => 6, :cols => 38
+  - if not @client.new_record?
+    %tr
+      %td
+        Active:
+      %td
+        = check_box :active
+        &nbsp;&nbsp;
+        %span.greytext inactive member are not counted for attendancy
   %tr
     %td
     %td
       = submit submit_text
       &nbsp;&nbsp;
-      = link_to 'cancel', resource(@branch, @center, :clients)
+      = link_to 'cancel', cancel_link

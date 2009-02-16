@@ -1,0 +1,52 @@
+%h1 Edit client
+
+%p
+  Please select a client that you want to edit, either by its client ID, or through the center it belongs to.
+
+= error_messages_for @client
+
+- if @center
+    %table.form
+      - @center.clients.each |client|
+        %tr
+          %td &nbsp;
+          %td
+            %b= client.name
+          %td
+            = text_field :client_id, :size => 8
+          %td
+            = form_for(@client, :action => url(:enter_clients, :action => 'create')) do
+            = submit "Proceed..."
+        %tr
+          %td &nbsp;
+        %tr
+          %td &nbsp;
+          %td
+            Center:
+          %td
+            = select_center_for @client, :center
+          %td
+            = submit "Proceed..."
+- else
+  = form_for(@client, :action => url(:enter_clients, :action => 'create')) do
+    %table.form
+      %tr
+        %td &nbsp;
+      %tr
+        %td &nbsp;
+        %td
+          Client ID:
+        %td
+          = text_field :client_id, :size => 8
+        %td
+          = submit "Proceed..."
+      %tr
+        %td &nbsp;
+      %tr
+        %td &nbsp;
+        %td
+          Center:
+        %td
+          = select_center_for @client, :center
+        %td
+          = submit "Proceed..."

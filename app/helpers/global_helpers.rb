@@ -19,6 +19,22 @@ module Merb
         :prompt       => (attrs[:prompt] or "&lt;select a staff member&gt;")
     end
 
+    def select_center_for(obj, col, attrs = {})
+      id_col = "#{col.to_s}_id".to_sym
+      collection = []
+      catalog = Center.catalog
+      catalog.keys.sort.each do |branch_name|
+        collection << ['', branch_name]
+        catalog[branch_name].each_pair { |k,v| collection << [k.to_s, "!!!!!!!!!#{v}"] }
+      end
+      html = select col,
+        :collection   => collection,
+        :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
+        :id           => "#{obj.class.to_s.snake_case}_#{id_col}",
+        :selected     => (obj.send(id_col) ? obj.send(id_col).to_s : nil),
+        :prompt       => (attrs[:prompt] or "&lt;select a center&gt;")
+      html.gsub('!!!', '&nbsp;')  # otherwise the &nbsp; entities get escaped
+    end
 
     MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     def date_select_for(obj, col, attrs = {})
