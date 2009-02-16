@@ -1,5 +1,6 @@
 class Centers < Application
   before :get_context
+  before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
   provides :xml, :yaml, :js
 
   def index
@@ -11,7 +12,8 @@ class Centers < Application
     @center = Center.get(id)
     raise NotFound unless @center
     @clients = @center.clients
-    display [@center, @clients], 'clients/index'
+    @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    display [@center, @clients, @date], 'clients/index'
   end
 
   def today(id)
@@ -70,16 +72,7 @@ class Centers < Application
     end
   end
 
-  def pay_loans(id)
-    @center = Center.get(id)
-    params.each do |param|
-      if param =~ /^pay/ # todo - make the payment
-        p param
-      end
-    end
-    # make dem payments
-    redirect url(:show_center, @branch.id, @center.id, :today), :message => {:notice => ' Payments made successfully'}
-  end
+
 
   private
   def get_context
@@ -87,4 +80,6 @@ class Centers < Application
     @staff_member = StaffMember.get(params[:staff_member_id])
     raise NotFound unless @branch
   end
+
+
 end # Centers

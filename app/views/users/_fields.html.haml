@@ -17,3 +17,23 @@
       Password confirmation:
     %td
       = password_field :password_confirmation
+  %tr
+    %td
+      Is Data Entry Operator?
+    %td
+      = check_box :data_entry_operator
+  %tr
+    %td
+      Is MIS Manager?
+    %td
+      = check_box :mis_manager
+  %tr
+    %td
+      Is Admin?
+    %td
+      = check_box :admin
+  %tr
+    %td
+      Is Read-only?
+    %td
+      = check_box :read_only_user

@@ -1,5 +1,6 @@
 class StaffMembers < Application
   # provides :xml, :yaml, :js
+  before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
 
   def index
     @staff_members = StaffMember.all

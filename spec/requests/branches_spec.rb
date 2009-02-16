@@ -10,6 +10,9 @@ describe "resource(:branches)" do
   describe "GET" do
     
     before(:each) do
+      u = User.new(:login => 'abcde', :password => 'abcde', :password_confirmation => 'abcde')
+      p u.save
+      request("/login", :method => 'PUT', :params => {:login => 'abcde', :password => 'abcde'})
       @response = request(resource(:branches))
     end
     
