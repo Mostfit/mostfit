@@ -15,12 +15,12 @@
         %td
           more info to some here...
         %td
-          = form_for(@client, :action => url(:enter_clients, :action => 'create')) do
-            = hidden_field :client_id, :value => client.id 
+          = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
+            = hidden_field :id, :value => client.id 
             = submit "Proceed..."
 - else
-  = form_for(@client, :action => url(:enter_clients, :action => 'create')) do
-    %table.form
+  %table.form
+    = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
       %tr
         %td &nbsp;
       %tr
@@ -28,11 +28,12 @@
         %td
           Client ID:
         %td
-          = text_field :client_id, :size => 8
+          = text_field :id, :size => 8
         %td
           = submit "Proceed..."
       %tr
         %td &nbsp;
+    = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
       %tr
         %td &nbsp;
         %td

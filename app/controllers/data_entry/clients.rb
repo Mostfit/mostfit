@@ -17,7 +17,8 @@ class Clients < DataEntry::Controller
 
   def edit
     @client = Client.new
-    @center = Center.get(params[:center_id])
+    params[:client][:center_id]
+    @center = Center.get(params[:client][:center_id])
     @center = nil if not @center
     render
   end
