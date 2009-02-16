@@ -30,7 +30,6 @@ class Payments < Application
     if succes  # true if saved
       redirect url_for_loan(@loan), :message => {:notice => "Payment ##{@payment.id} has been registered"}
     else
-      message[:error] = "Payment failed to be created"
       render :new
     end
   end

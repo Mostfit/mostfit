@@ -112,7 +112,7 @@
         %td
           %b= payment.total
         %td
-          = link_to 'delete', url_for_loan(@loan, 'payment/delete')
+          = link_to 'delete', url_for_loan(@loan, "payment/#{payment.id}/delete")
 
     %tfoot
       %tr

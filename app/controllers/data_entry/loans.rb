@@ -1,7 +1,9 @@
 module DataEntry
 
 class Loans < DataEntry::Controller
-  def add
+  def new
+    @loan = Loan.new
+    render
   end
 
   def create
