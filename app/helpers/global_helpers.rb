@@ -37,12 +37,11 @@ module Merb
     end
 
     MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-    def date_select_for(obj, col, attrs = {})
+    def date_select_for(obj, col = nil, attrs = {})
       attrs.merge!(:name => "#{obj.class.to_s.snake_case}[#{col.to_s}]")
       attrs.merge!(:id   => "#{obj.class.to_s.snake_case}_#{col.to_s}")
-
       nullable = attrs[:nullable] ? true : false
-      date = obj.send(col)
+      date = col == nil ? Date.today : obj.send(col) 
       date = Date.today if date.blank? and not nullable
       date = nil        if date.blank? and nullable
 #       errorify_field(attrs, col)

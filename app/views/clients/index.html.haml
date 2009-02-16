@@ -72,6 +72,13 @@
   %h2 
     Activity for 
     = @date
+  %h3
+    or choose:
+    = link_to 'previous meeting date', resource(@branch, @center, :date => @center.previous_meeting_date_from(@date))
+    |
+    = link_to 'next meeting date', resource(@branch, @center, :date => @center.next_meeting_date_from(@date))
+    | custom date
+    = date_select_for @center
   %table.narrow.form{ :width => '100%' }
     %thead
       %tr
