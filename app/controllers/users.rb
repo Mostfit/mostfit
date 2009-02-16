@@ -1,6 +1,6 @@
 class Users < Application
   before :ensure_authenticated
-  before :ensure_is_admin
+  before :ensure_has_admin_privileges
   # provides :xml, :yaml, :js
 
   def index

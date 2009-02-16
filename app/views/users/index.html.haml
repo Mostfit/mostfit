@@ -10,6 +10,10 @@
       %th
       %th id
       %th login
+      %th data entry
+      %th mis manager
+      %th admin
+      %th read only
       %th payments created
       %th payments deleter
   %tbody
@@ -20,6 +24,14 @@
         = user.id
       %td
         %b= user.login
+      %td
+        %b= user.data_entry_operator.nil? || !user.data_entry_operator ? "" : user.data_entry_operator
+      %td
+        %b= user.mis_manager.nil?|| !user.mis_manager ? "" : user.mis_manager
+      %td
+        %b= user.admin.nil? || !user.admin ? "" : user.admin
+      %td
+        %b= user.read_only_user.nil? || !user.read_only_user ? "" : user.read_only_user
       %td
         %b= user.payments_created.count
       %td
