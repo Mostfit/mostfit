@@ -4,6 +4,8 @@ l001:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 20
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2008-12-22
   :scheduled_disbursal_date: 2008-11-19
   :disbursal_date: 2008-12-01
@@ -18,6 +20,8 @@ l101:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 20
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2008-07-22
   :scheduled_disbursal_date: 2008-6-19
   :disbursal_date: 2008-07-01
@@ -32,6 +36,8 @@ l102:
   :interest_rate: 0.20
   :installment_frequency: monthly
   :number_of_installments: 12
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2008-1-22
   :scheduled_disbursal_date: 2008-1-19
   :disbursal_date: 2008-2-01
@@ -47,6 +53,8 @@ l002:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 10
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2008-03-09
   :scheduled_disbursal_date: 2007-01-19
   :disbursal_date: 2007-02-01
@@ -61,6 +69,8 @@ l003:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 40
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2009-05-19
   :scheduled_disbursal_date: 2008-11-09
   :disbursal_date: 2008-11-10
@@ -75,6 +85,8 @@ l004:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 4
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2008-12-19
   :scheduled_disbursal_date: 2008-06-10
   :disbursal_date: 2008-06-19
@@ -89,6 +101,8 @@ l005:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 10
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2008-12-19
   :scheduled_disbursal_date: 2008-02-19
   :disbursal_date: 2008-01-19
@@ -103,6 +117,8 @@ l006:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 8
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2008-12-19
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-19
@@ -119,6 +135,8 @@ l007:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 10
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2008-12-19
   :scheduled_disbursal_date: 2008-11-19
   :disbursal_date: 2008-11-22
@@ -189,6 +207,8 @@ l012:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 4
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2009-01-05
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-19
@@ -203,6 +223,8 @@ l013:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 15
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2009-01-05
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-19
@@ -217,6 +239,8 @@ l014:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 9
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2009-03-19
   :scheduled_disbursal_date: 2009-01-05
   :disbursal_date: 2008-12-09
@@ -232,6 +256,8 @@ l015:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 15
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2009-04-05
   :scheduled_disbursal_date: 2008-12-29
   :disbursal_date: 2008-12-19
@@ -246,6 +272,8 @@ l016:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 16
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2009-02-05 
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-26
@@ -260,6 +288,8 @@ l017:
   :interest_rate: 0.20
   :installment_frequency: weekly
   :number_of_installments: 20
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
   :scheduled_first_payment_date: 2009-06-05
   :scheduled_disbursal_date: 2008-12-19
   :disbursal_date: 2008-12-19
