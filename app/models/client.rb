@@ -9,6 +9,7 @@ class Client
   property :spouse_name,    String, :length => 100
   property :date_of_birth,  Date
   property :address,        Text
+  property :active,         Boolean, :default => true, :nullable => false
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},

@@ -25,6 +25,20 @@ class Center
     DAYS
   end
 
+  # a simple catalog (Hash) of center names and ids grouped by branches
+  # returns some like: {"One branch" => {1 => 'center1', 2 => 'center2'}, "b2" => {3 => 'c3', 4 => 'c4'}} 
+  def self.catalog
+    result = {}
+    branch_names = {}
+    Branch.all(:fields => [:id, :name]).each { |b| branch_names[b.id] = b.name }
+    Center.all(:fields => [:id, :name, :branch_id]).each do |center|
+      branch = branch_names[center.branch_id]
+      result[branch] ||= {}
+      result[branch][center.id] = center.name
+    end
+    result
+  end
+
   private
   def hours_valid?
     return true if meeting_time_hours.blank? or (0..23).include? meeting_time_hours.to_i

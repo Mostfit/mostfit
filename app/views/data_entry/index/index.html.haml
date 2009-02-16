@@ -1,0 +1,31 @@
+
+
+%h1 Data Entry
+
+%p
+  Follow the links below to perform common actions quickly. Most forms are made especially for mass data entry.
+/%p At the bottom you find an overview of all modifications that you have made.
+
+%h2 Clients
+= link_to 'add new clients', url(:enter_clients, :action => 'new')
+%br/
+= link_to 'edit a client', url(:enter_clients, :action => 'edit')
+
+%h2 Payments
+= link_to 'record payments', url(:enter_payments, :action => 'record')
+%br/
+= link_to 'delete a payment', url(:enter_payments, :action => 'delete')
+
+%h2 Loans
+= link_to 'create new loans', url(:enter_loans, :action => 'new')
+%br/
+= link_to 'edit a loan', url(:enter_loans, :action => 'edit')
+%br/
+= link_to 'record loan verification', url(:enter_loans, :action => 'verification')
+%br/
+= link_to 'delete a loan', url(:enter_loans, :action => 'delete')
+
+%h2 Attendancy
+= link_to 'record attendancy', url(:enter_attendancy, :action => 'record')
+%br/
+= link_to 'edit attendancy lists', url(:enter_attendancy, :action => 'edit')
