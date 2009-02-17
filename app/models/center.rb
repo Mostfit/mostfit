@@ -39,6 +39,18 @@ class Center
     result
   end
 
+  def next_meeting_date_from(date)
+    nmd = date + 1
+    nmd += 1 while nmd.cwday != Center.meeting_days.index(meeting_day)
+    nmd
+  end
+
+  def previous_meeting_date_from(date)
+    nmd = date - 1
+    nmd -= 1 while nmd.cwday != Center.meeting_days.index(meeting_day)
+    nmd
+  end
+
   private
   def hours_valid?
     return true if meeting_time_hours.blank? or (0..23).include? meeting_time_hours.to_i
