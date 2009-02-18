@@ -4,8 +4,9 @@ class Clients < Application
   provides :xml, :yaml, :js
 
   def index
-    @clients = @center.clients
-    display @clients
+#    @clients = @center.clients
+#    display @clients
+    redirect resource(@branch, @center)
   end
 
   def show(id)

@@ -49,27 +49,27 @@ module Merb
     end
 
     def date_select_for(obj, col = nil, attrs = {})
+      debugger
       attrs.merge!(:name => "#{obj.class.to_s.snake_case}[#{col.to_s}]")
       attrs.merge!(:id   => "#{obj.class.to_s.snake_case}_#{col.to_s}")
       nullable = attrs[:nullable] ? true : false
-      debugger
       date = obj.send(col) 
       date = Date.today if date.blank? and not nullable
       date = nil        if date.blank? and nullable
-      attrs.merge(:date => date)
-      date_select(attrs, obj)
+      attrs.merge!(:date => date)
+      date_select_html(attrs, obj, col)
 #       errorify_field(attrs, col)
     end
 
-    def date_select_html (attrs, obj = nil)
+    def date_select_html (attrs, obj = nil, col = nil)
+      debugger
       date = attrs[:date]
       nullable = attrs[:nullable]
-      x = 1
       day_attrs = attrs.merge(
         :name       => attrs[:name] + '[day]',
         :id         => attrs[:id] + '_day',
         :selected   => (date ? date.day.to_s : ''),
-        :class      => obj ? (obj.errors[col] ? 'error' : '') : nil,
+        :class      => (obj and col) ? (obj.errors[col] ? 'error' : '') : nil,
         :collection =>  (nullable ? [['', '-']] : []) + (1..31).to_a.map{ |x| x = [x.to_s, x.to_s] }
       )
       

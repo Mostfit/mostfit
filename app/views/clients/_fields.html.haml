@@ -24,7 +24,7 @@
     %td
       Date of birth:
     %td
-      = date_select_for @client, :date_of_birth
+      = date_select_for @client, :date_of_birth, :nullable => true
   %tr
     %td
       Spouse name:
