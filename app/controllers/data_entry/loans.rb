@@ -22,15 +22,20 @@ class Loans < DataEntry::Controller
   end
 
   def edit
+    @loan = (params[:loan] and params[:loan][:id]) ? Loan.get(params[:loan][:id]) : Loan.new
+    render
   end
 
   def update
-  end
-
-  def delete
-  end
-
-  def destroy
+    raise NotFound unless params[:loan] and params[:loan][:id]
+    klass, attrs = get_loan_and_attrs
+    @loan = klass.get(params[:loan][:id])
+    raise NotFound unless @loan
+    if @loan.update_attributes(attrs)
+       redirect url(:enter_loans, :action => 'edit'), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
+    else
+      render :edit
+    end
   end
 
   private
