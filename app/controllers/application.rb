@@ -14,3 +14,12 @@ class Application < Merb::Controller
   end
 
 end
+
+
+class Date
+  
+  def inspect
+    "<Date>:" + self.to_s
+  end
+
+end

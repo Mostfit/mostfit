@@ -37,21 +37,40 @@ module Merb
     end
 
     MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    def date_select(name, date=Date.today)
+      # defaults to Date.today
+      # should refactor
+      attrs = {}
+      attrs.merge!(:name => name)
+      attrs.merge!(:date => date)
+      attrs.merge!(:id => name)
+      attrs.merge(:date => date)
+      date_select_html(attrs) 
+    end
+
     def date_select_for(obj, col = nil, attrs = {})
       attrs.merge!(:name => "#{obj.class.to_s.snake_case}[#{col.to_s}]")
       attrs.merge!(:id   => "#{obj.class.to_s.snake_case}_#{col.to_s}")
       nullable = attrs[:nullable] ? true : false
-      date = col == nil ? Date.today : obj.send(col) 
+      debugger
+      date = obj.send(col) 
       date = Date.today if date.blank? and not nullable
       date = nil        if date.blank? and nullable
+      attrs.merge(:date => date)
+      date_select(attrs, obj)
 #       errorify_field(attrs, col)
+    end
 
+    def date_select_html (attrs, obj = nil)
+      date = attrs[:date]
+      nullable = attrs[:nullable]
+      x = 1
       day_attrs = attrs.merge(
         :name       => attrs[:name] + '[day]',
         :id         => attrs[:id] + '_day',
         :selected   => (date ? date.day.to_s : ''),
-        :class      => (obj.errors[col] ? 'error' : ''),
-        :collection => (nullable ? [['', '-']] : []) + (1..31).to_a.map{ |x| x = [x.to_s, x.to_s] }
+        :class      => obj ? (obj.errors[col] ? 'error' : '') : nil,
+        :collection =>  (nullable ? [['', '-']] : []) + (1..31).to_a.map{ |x| x = [x.to_s, x.to_s] }
       )
       
       count = 0
@@ -59,7 +78,7 @@ module Merb
         :name       => attrs[:name] + '[month]',
         :id         => attrs[:id] + '_month',
         :selected   => (date ? date.month.to_s : ''),
-        :class      => (obj.errors[col] ? 'error' : ''),
+        :class      => obj ? (obj.errors[col] ? 'error' : '') : nil,
         :collection => (nullable ? [['', '-']] : []) + MONTHS.map { |x| count += 1; x = [count, x] }
       )
       
@@ -67,10 +86,9 @@ module Merb
         :name       => attrs[:name] + '[year]',
         :id         => attrs[:id] + '_year',
         :selected   => (date ? date.year.to_s : ''),
-        :class      => (obj.errors[col] ? 'error' : ''),
+        :class      => obj ? (obj.errors[col] ? 'error' : '') : nil,
         :collection => (nullable ? [['', '-']] : []) + (1900..Time.now.year).to_a.reverse.map{|x| x = [x.to_s, x.to_s]}
       )
-      
       select(month_attrs) + '&nbsp;' + select(day_attrs) + '&nbsp;' + select(year_attrs)
     end
 

@@ -73,38 +73,48 @@
     Activity for 
     = @date
   %h3
-    or choose:
-    = link_to 'previous meeting date', resource(@branch, @center, :date => @center.previous_meeting_date_from(@date))
-    |
-    = link_to 'next meeting date', resource(@branch, @center, :date => @center.next_meeting_date_from(@date))
-    | custom date
-    = date_select_for @center
-  %table.narrow.form{ :width => '100%' }
-    %thead
-      %tr
-        %th
+    Change the date: 
+  choose:
+  = link_to 'today', resource(@branch, @center, :date => Date.today)
+  |
+  = link_to 'previous meeting date', resource(@branch, @center, :date => @center.previous_meeting_date_from(@date))
+  |
+  = link_to 'next meeting date', resource(@branch, @center, :date => @center.next_meeting_date_from(@date))
+  %h3
+    or
+  | custom date
+  %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'float:left;'}
+    = date_select 'date', @date
+    = submit 'Go!'
+  - if @center.meeting_day? @date
+    %table.narrow.form{ :width => '100%' }
+      %thead
+        %tr
+          %th
           %th loan id
           %th name
           %th loan details
           %th principal due
           %th interest due
           %th total due
-    %tbody
-      - @clients.loans.all(:order => ['client_id']).each do |loan|
-        %tr{ :class => cycle('odd','') }
-          %td &nbsp;
-          %td
-            = loan.id
-          %td
-            %b= link_to loan.client.name, resource(@branch, @center, loan.client)
-          %td 
-            == Rs.#{loan.amount} disbursed #{loan.disbursal_date}
-          %td
-            = loan.scheduled_received_principal_up_to(@date) - loan.principal_received_up_to(@date)
-          %td
-            = loan.scheduled_received_interest_up_to(@date) - loan.interest_received_up_to(@date)
-          %td
-            = loan.scheduled_received_principal_up_to(@date) - loan.principal_received_up_to(@date) + loan.scheduled_received_interest_up_to(@date) - loan.interest_received_up_to(@date)
-    %tfoot
-      %tr
-        %td{ :colspan => 7 }
+      %tbody
+        - @clients.loans.all(:order => ['client_id']).each do |loan|
+          %tr{ :class => cycle('odd','') }
+            %td &nbsp;
+            %td
+              = loan.id
+              %td
+                %b= link_to loan.client.name, resource(@branch, @center, loan.client)
+              %td 
+                == Rs.#{loan.amount} disbursed #{loan.disbursal_date}
+              %td
+                = loan.scheduled_received_principal_up_to(@date) - loan.principal_received_up_to(@date)
+              %td
+                = loan.scheduled_received_interest_up_to(@date) - loan.interest_received_up_to(@date)
+              %td
+                = loan.scheduled_received_principal_up_to(@date) - loan.principal_received_up_to(@date) + loan.scheduled_received_interest_up_to(@date) - loan.interest_received_up_to(@date)
+      %tfoot
+        %tr
+          %td{ :colspan => 7 }
+  - else
+    %i This day is not a meeting day

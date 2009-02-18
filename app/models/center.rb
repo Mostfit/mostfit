@@ -45,6 +45,10 @@ class Center
     nmd
   end
 
+  def meeting_day?(date)
+    date.cwday == Center.meeting_days.index(meeting_day)
+  end
+
   def previous_meeting_date_from(date)
     nmd = date - 1
     nmd -= 1 while nmd.cwday != Center.meeting_days.index(meeting_day)

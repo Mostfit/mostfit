@@ -1,4 +1,5 @@
 class Centers < Application
+  include DateParser
   before :get_context
   before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
   provides :xml, :yaml, :js
@@ -12,7 +13,15 @@ class Centers < Application
     @center = Center.get(id)
     raise NotFound unless @center
     @clients = @center.clients
-    @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    if params[:date]
+      if params[:date].is_a? String
+        @date = Date.parse(params[:date])
+      elsif params[:date].is_a? Mash
+        @date = parse_date(params[:date])
+      end
+    else
+      @date = Date.today
+    end
     display [@center, @clients, @date], 'clients/index'
   end
 
