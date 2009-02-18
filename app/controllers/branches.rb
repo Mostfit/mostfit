@@ -13,6 +13,14 @@ class Branches < Application
     @centers = @branch.centers
     display [@branch, @centers], 'centers/index'
   end
+  
+  def today(id)
+    @date = params[:date] == nil ? Date.today : params[:date]
+    @branch = Branch.get(id)
+    raise NotFound unless @branch
+    @centers = @branch.centers
+    display [@branch, @centers]
+  end
 
   def new
     only_provides :html

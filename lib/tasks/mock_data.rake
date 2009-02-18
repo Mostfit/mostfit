@@ -55,19 +55,21 @@ namespace :mock do
   task :all_payments do
     t0 = Time.now
     Merb.logger.info! "Start mock:all_payments rake task at #{t0}"
-    busy_user = User.get(3)
+    busy_user = User.get(1)
     count = 0
     Loan.all.each do |loan|
       next if loan.payments.size > 0 or loan.status != :outstanding
       loan.history_disabled = true  # do not update the hisotry for every payment
-      amount     = loan.total_to_be_received / loan.number_of_installments
+#      amount     = loan.total_to_be_received / loan.number_of_installments
       dates      = loan.installment_dates.reject { |x| x > Date.today or x < loan.disbursal_date }
       dates.each do |date|
-        result   = loan.repay(amount, busy_user, date, loan.client.center.manager)
+        prin = loan.scheduled_received_principal_up_to(date) - loan.principal_received_up_to(date)
+        int = loan.scheduled_received_interest_up_to(date) - loan.interest_received_up_to(date)
+        result   = loan.repay([prin,int], busy_user, date, loan.client.center.manager)
         if result[0]  # the save status
           count += 1
         else          
-          puts "Validation errors repaying #{amount} for Loan ##{loan.id}:\n#{result[1].errors.inspect}"
+          puts "Validation errors repaying #{amount} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
         end
       end
     end

@@ -128,6 +128,7 @@ class Loan
 
 
   # these 2 methods define the pay back scheme
+  # These are ZERO BASED
   # typically reimplemented in subclasses
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
@@ -204,11 +205,21 @@ class Loan
   end
 
   # these 3 methods return scheduled amounts from a PAYMENT-RECEIVED perspective
-  def scheduled_received_principal_up_to(date)  # typically reimplemented in subclasses
-    amount.to_f / number_of_installments * number_of_installments_before(date)
+  # they work by looping over scheduled_principal_for_installment and scheduled_interest_for_installment
+  # you should not have to re-implement them in the subclasses
+  def scheduled_received_principal_up_to(date) 
+    amount = 0
+    (0..number_of_installments_before(date)-1).each do |i|
+      amount += scheduled_principal_for_installment(i)
+    end
+    amount
   end
-  def scheduled_received_interest_up_to(date)  # typically reimplemented in subclasses
-    total_interest_to_be_received / number_of_installments * number_of_installments_before(date)
+  def scheduled_received_interest_up_to(date)
+    amount = 0
+    (0..number_of_installments_before(date)-1).each do |i|
+      amount += scheduled_interest_for_installment(i)
+    end
+    amount
   end
   def scheduled_received_total_up_to(date)
     scheduled_received_principal_up_to(date) + scheduled_received_interest_up_to(date)
@@ -541,7 +552,19 @@ end
 
 class A50Loan < Loan
   # a fine example of a subclassing (if it was finished)
-
-  # so we have to implement some thing different here to show that it is possible :-P
+  # these 2 methods define the pay back scheme
+  # typically reimplemented in subclasses
+  def scheduled_principal_for_installment(number)
+    # number unused in this implentation, subclasses may decide differently
+    # therefor always supply number, so it works for all implementations
+    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
+    amount.to_f / number_of_installments
+  end
+  def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
+    # number unused in this implentation, subclasses may decide differently
+    # therefor always supply number, so it works for all implementations
+    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
+    number < 45 ? total_interest_to_be_received / 45 : 0
+  end
 end
 
