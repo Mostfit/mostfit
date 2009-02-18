@@ -1,0 +1,66 @@
+%h1 Delete a payment
+
+= error_messages_for @client
+
+- if @payment and not @payment.new_record?
+
+  %p== Are you sure you want to delete payment '#{@payment.id}'?
+  = form_for(@payment, :action => url(:enter_payments, :action => 'destroy')) do
+    = hidden_field :id, :value => @payment.id
+    = submit "Delete it!"
+    &nbsp;&nbsp;
+    = link_to 'Back', url(:enter_payments)
+
+
+- elsif @loan
+  %p Please select the payment you want to delete...
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th id
+        %th received on
+        %th received by
+        %th principal
+        %th interest
+        %th total
+    %tbody
+    - for payment in @loan.payments
+      %tr{ :class => cycle('odd','') }
+        %td &nbsp;
+        %td
+          = payment.id
+        %td
+          %i= payment.received_on
+        %td
+          %b= link_to payment.received_by.name, resource(payment.received_by)
+        %td
+          %b= payment.principal
+        %td
+          %b= payment.interest
+        %td
+          %b= payment.total
+        %td
+          = form_for(@payment, :action => url(:enter_payments, :action => 'delete')) do
+            = hidden_field :id, :value => payment.id 
+            = submit "Proceed..."
+    %tfoot
+      %tr
+        %td{ :colspan => 7 }
+
+- else
+  %p
+    Please select a loan that you want to delete a payment for by entering its loan ID.
+
+  %table.form
+    = form_for(@payment, :action => url(:enter_payments, :action => 'delete')) do
+      %tr
+        %td &nbsp;
+      %tr
+        %td &nbsp;
+        %td
+          Loan ID:
+        %td
+          = text_field :loan_id, :size => 8
+        %td
+          = submit "Proceed..."

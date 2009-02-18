@@ -1,0 +1,25 @@
+%h1 Record a new payment
+
+= error_messages_for @loan
+
+- if @loan
+  = form_for(@payment, :action => url(:enter_payments, :action => 'create')) do
+    = hidden_field :loan_id, :value => @loan.id
+    = partial 'payments/fields', :submit_text => "Record payment", :cancel_link => url(:data_entry)
+
+- else
+  %p
+    Please select a loan that you want to record a payment for by entering its loan ID.
+
+  %table.form
+    = form_for(@payment, :action => url(:enter_payments, :action => 'record')) do
+      %tr
+        %td &nbsp;
+      %tr
+        %td &nbsp;
+        %td
+          Loan ID:
+        %td
+          = text_field :loan_id, :size => 8
+        %td
+          = submit "Proceed..."

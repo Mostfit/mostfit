@@ -48,7 +48,7 @@ namespace :mock do
     # loading is ordered, important for our references to work
     load_fixtures :users, :staff_members, :branches, :centers, :clients, :loans  #, :payments
     puts
-    puts "Fixtures loaded. Have a look at the mock:payments and mock:update_history tasks."
+    puts "Fixtures loaded. Have a look at the mock:all_payments and mock:update_history tasks."
   end
 
   desc "Generate all payments for all loans without payments as if everyone paid dilligently (does not write any history)"

@@ -1,0 +1,27 @@
+%h1
+  New loan
+  = @client ? "for #{@client.name} (##{@client.id})" : ''
+
+= error_messages_for @loan
+
+- if @client
+  = form_for(@loan, :action => url(:enter_loans, :action => 'create')) do
+    = hidden_field :client_id, :value => @client.id
+    = partial 'loans/fields', :submit_text => "Create loan for #{@client.name}", :cancel_link => url(:data_entry)
+
+- else
+  %p
+    Please select the client that you want to create a loan for by entering its client ID.
+
+  %table.form
+    = form_for(@payment, :action => url(:enter_loans, :action => 'new')) do
+      %tr
+        %td &nbsp;
+      %tr
+        %td &nbsp;
+        %td
+          Client ID:
+        %td
+          = text_field :client_id, :size => 8
+        %td
+          = submit "Proceed..."

@@ -53,7 +53,7 @@ class GraphData < Application
     @client    = Client.get(id)
 #     return loan(@client.loans.first.id) if @client.loans.size == 1  # nicely prints on the installment dates
     start_date = @client.loans.min(:scheduled_disbursal_date)
-    end_date   = (@client.loans.map { |l| l.last_loan_history_date }).max
+    end_date   = (@client.loans.map{|l| l.last_loan_history_date}.reject{|x| x.blank?}).max
     loan_ids   = Loan.all(:client_id => @client.id, :fields => [:id]).map { |x| x.id }
     common_aggregate_loan_graph(loan_ids, start_date, end_date)
   end

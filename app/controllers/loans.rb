@@ -83,8 +83,8 @@ class Loans < Application
 
   # the loan is not of type Loan of a derived type, therefor we cannot just assume its name..
   # this method gets the loans type from a hidden field value and uses that to get the attrs
-  def get_loan_and_attrs
-    loan_key = params.keys.find { |x| x =~  /_loan$/ }  # loan params have the key like 'a50_loan'
+  def get_loan_and_attrs   # FIXME: this is a code dup with data_entry/loans
+    loan_key = params.keys.find { |x| x =~  /loan$/ }  # loan params have the key like 'a50_loan' or 'loan'
     attrs = params[loan_key]
     raise NotFound if not params[:loan_type]
     klass = Kernel::const_get(params[:loan_type])

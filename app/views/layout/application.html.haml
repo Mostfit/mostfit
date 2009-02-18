@@ -20,6 +20,10 @@
         #right-nav
           - if session.authenticated?
             == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})
+          - else
+            existing users can
+            %b= link_to 'login', url(:login)
+            to proceed
       - if session.authenticated?
         #navigation
           - if session.user.id == 1
