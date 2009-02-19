@@ -1,6 +1,6 @@
 class Centers < Application
   include DateParser
-  before :get_context
+  before :get_context, :exclude => ['redirect_to_show']
   before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
   provides :xml, :yaml, :js
 
@@ -81,14 +81,17 @@ class Centers < Application
     end
   end
 
-
+  # this redirects to the proper url, used from the router
+  def redirect_to_show(id)
+    raise NotFound unless @center = Center.get(id)
+    redirect resource(@center.branch, @center)
+  end
 
   private
+  # this works from proper urls
   def get_context
     @branch = Branch.get(params[:branch_id])
     @staff_member = StaffMember.get(params[:staff_member_id])
     raise NotFound unless @branch
   end
-
-
 end # Centers

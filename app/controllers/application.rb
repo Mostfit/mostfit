@@ -12,14 +12,13 @@ class Application < Merb::Controller
   def ensure_has_admin_privileges
     raise NotPrivileged unless session.user.admin?
   end
-
 end
 
 
-class Date
-  
-  def inspect
-    "<Date>:" + self.to_s
-  end
 
+# small monkey patch, real patch is submitted to extlib/merb/dm, hoping for inclusion soon
+class Date
+  def inspect
+    "<Date: #{self.to_s}>"
+  end
 end

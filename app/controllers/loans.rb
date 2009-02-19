@@ -1,5 +1,5 @@
 class Loans < Application
-  before :get_context
+  before :get_context, :exclude => ['redirect_to_show']
   provides :xml, :yaml, :js
   before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
 
@@ -72,6 +72,14 @@ class Loans < Application
     end
   end
 
+  # this redirects to the proper url, used from the router
+  def redirect_to_show(id)
+    raise NotFound unless @loan = Loan.get(id)
+    @branch, @center, @client = @loan.client.center.branch, @loan.client.center, @loan.client
+    redirect url_for_loan(@loan)
+  end
+
+
   private
   def get_context
     @branch = Branch.get(params[:branch_id])
@@ -79,7 +87,6 @@ class Loans < Application
     @client = Client.get(params[:client_id])
     raise NotFound unless @branch and @center and @client
   end
-
 
   # the loan is not of type Loan of a derived type, therefor we cannot just assume its name..
   # this method gets the loans type from a hidden field value and uses that to get the attrs

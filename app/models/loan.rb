@@ -53,6 +53,8 @@ class Loan
   validates_with_method  :disbursal_date,               :method => :approved_before_disbursed?
   validates_with_method  :disbursal_date,               :method => :disbursed_before_written_off?
   validates_with_method  :written_off_on,               :method => :disbursed_before_written_off?
+  validates_with_method  :disbursal_date,               :method => :disbursed_before_validated?
+  validates_with_method  :validated_on,                 :method => :disbursed_before_validated?
   validates_with_method  :approved_on,                  :method => :applied_before_scheduled_to_be_disbursed?
   validates_with_method  :scheduled_disbursal_date,     :method => :applied_before_scheduled_to_be_disbursed?
   validates_with_method  :approved_on,                  :method => :properly_approved?
@@ -68,15 +70,7 @@ class Loan
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_present      :applied_by, :client, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_on
-
-  # validates_primitive doesn't work well for date -- we need our dates checked to be parsable strings though
-  # therefor we switch off the auto validation on date type and do it with a regexp
-#   validates_format       :applied_on,                   :with => DATE_FORMAT, :message => "Application date not valid"
-#   validates_format       :approved_on,                  :with => DATE_FORMAT, :message => "Approval date not valid"
-#   validates_format       :disbursal_date,               :with => DATE_FORMAT, :message => "Disbursal date not valid"
-#   validates_format       :scheduled_disbursal_date,     :with => DATE_FORMAT, :message => "Scheduled disbursal date not valid"
-#   validates_format       :scheduled_first_payment_date, :with => DATE_FORMAT, :message => "Scheduled first payment date not valid"
-  
+  # validates_primitive doesn't work well for date -- we use "before :valid?, :parse_dates" to achieve similar effects 
 
   # this is the method used for creating payments, not directly on the Payment class
   # for +input+ it allows either a "total" amount as Fixnum or an array with
@@ -482,6 +476,10 @@ class Loan
   def approved_before_disbursed?
     return true if disbursal_date.blank? or (disbursal_date and approved_on and disbursal_date >= approved_on)
     [false, "Cannot be disbursed before it is approved"]
+  end
+  def disbursed_before_validated?
+    return true if validated_on.blank? or (disbursal_date and validated_on and disbursal_date <= validated_on)
+    [false, "Cannot be validated before it is disbursed"]
   end
   def disbursed_before_written_off?
     return true if written_off_on.blank? or (disbursal_date and written_off_on and disbursal_date <= written_off_on)
