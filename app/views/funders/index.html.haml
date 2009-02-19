@@ -1,16 +1,41 @@
-%h1
-  Funders controller, index action
-%p
-  Edit this file in
-  %tt
-    app/views/funders/index.html.erb
-%table
-  %tr
-  - for funder in @funders
-    %tr
-      %td
-        = link_to 'Show', url(:funder, funder)
-      %td
-        = link_to 'Edit', url(:edit_funder,  funder)
+- if @funders.size > 0
+  .graph
+    = ofc2(430, 200, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'funding') )
 
-= link_to 'New', url(:new_funder)
+
+%h1 Overview of all funders
+
+%p
+  == Manage existing funders or #{link_to 'create a new funder', resource(:funders, :new)}.
+
+- if @funders.blank?
+  %p
+    %i No funders have been created yet.
+- else
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th id
+        %th name
+        %th lines
+    %tbody
+    - for funder in @funders
+      %tr{ :class => cycle('odd','') }
+        %td &nbsp;
+        %td
+          = funder.id
+        %td
+          %b= link_to funder.name, resource(funder)
+        %td
+          %b= funder.funding_lines.size
+        %td
+          = link_to 'edit', resource(funder, :edit)
+          &nbsp;|&nbsp
+          = link_to 'new funding line', resource(funder, :funding_lines, :new)
+
+    %tfoot
+      %tr
+        %td{ :colspan => 4 }
+
+  = link_to 'Create a new funder', url(:new_funder)

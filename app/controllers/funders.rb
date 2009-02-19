@@ -1,5 +1,6 @@
 class Funders < Application
-  # provides :xml, :yaml, :js
+  provides :xml, :yaml, :js
+  before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update']
 
   def index
     @funders = Funder.all
@@ -9,13 +10,23 @@ class Funders < Application
   def show(id)
     @funder = Funder.get(id)
     raise NotFound unless @funder
-    display @funder
+    @funding_lines = @funder.funding_lines
+    display [@funder, @funding_lines], 'funding_lines/index'
   end
 
   def new
     only_provides :html
     @funder = Funder.new
     display @funder
+  end
+
+  def create(funder)
+    @funder = Funder.new(funder)
+    if @funder.save
+      redirect resource(:funders), :message => {:notice => "Funder #{@funder.name} was successfully created"}
+    else
+      render :new
+    end
   end
 
   def edit(id)
@@ -25,34 +36,24 @@ class Funders < Application
     display @funder
   end
 
-  def create(funder)
-    @funder = Funder.new(funder)
-    if @funder.save
-      redirect resource(@funder), :message => {:notice => "Funder was successfully created"}
-    else
-      message[:error] = "Funder failed to be created"
-      render :new
-    end
-  end
-
   def update(id, funder)
     @funder = Funder.get(id)
     raise NotFound unless @funder
     if @funder.update_attributes(funder)
-       redirect resource(@funder)
+       redirect resource(:funders)
     else
       display @funder, :edit
     end
   end
 
-  def destroy(id)
-    @funder = Funder.get(id)
-    raise NotFound unless @funder
-    if @funder.destroy
-      redirect resource(:funders)
-    else
-      raise InternalServerError
-    end
-  end
+#   def destroy(id)
+#     @funder = Funder.get(id)
+#     raise NotFound unless @funder
+#     if @funder.destroy
+#       redirect resource(:funders)
+#     else
+#       raise InternalServerError
+#     end
+#   end
 
 end # Funders

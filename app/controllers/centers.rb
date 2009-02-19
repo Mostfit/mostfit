@@ -1,5 +1,4 @@
 class Centers < Application
-  include DateParser
   before :get_context, :exclude => ['redirect_to_show']
   before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
   provides :xml, :yaml, :js
@@ -87,7 +86,10 @@ class Centers < Application
     redirect resource(@center.branch, @center)
   end
 
+
   private
+  include DateParser  # for the parse_date method used somewhere here..
+
   # this works from proper urls
   def get_context
     @branch = Branch.get(params[:branch_id])

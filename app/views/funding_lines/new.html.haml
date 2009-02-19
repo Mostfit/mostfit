@@ -1,13 +1,6 @@
-%h1 FundingLines controller, new action
-
-%p 
-  Edit this file in 
-  %tt app/views/funding_lines/new.html.erb
+%h1 Create a new funding line
 
 = error_messages_for @funding_line
 
-= form_for(@funding_line, :action => url(:funding_lines) ) do
-  %p
-    = submit "Create"
-
-= link_to 'Back', url(:funding_lines)
+= form_for(@funding_line, :action => resource(@funder, :funding_lines)) do
+  = partial :fields, :submit_text => "Create funding line", :cancel_link => resource(@funder, :funding_lines)

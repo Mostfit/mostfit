@@ -304,12 +304,12 @@ class Loan
     :allow_both   # one of [:separated, :aggregated, :allow_both]
   end
 
-  def interest_percentage
+  def interest_percentage  # code dup with the FundingLine
     return nil if interest_rate.blank?
-    format("%f.2", interest_rate * 100)
+    format("%.2f", interest_rate * 100)
   end
   def interest_percentage= (percentage)
-    interest_rate = percentage.to_f/100
+    self.interest_rate = percentage.to_f/100
   end
 
   # this method returns one of [nil, :approved, :outstanding, :repaid, :written_off]

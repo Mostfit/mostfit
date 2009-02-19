@@ -6,7 +6,7 @@ class Clients < Application
   def index
 #    @clients = @center.clients
 #    display @clients
-    redirect resource(@branch, @center)
+    redirect resource(@branch, @center)  # redirecting to the centers show where the @date shizzle works
   end
 
   def show(id)
@@ -28,7 +28,6 @@ class Clients < Application
     if @client.save
       redirect resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' was successfully created"}
     else
-#       message[:error] = "Client failed to be created"
       render :new  # error messages will be shown
     end
   end

@@ -1,15 +1,6 @@
-%h1
-  FundingLines controller, edit action
-%p
-  Edit this file in
-  %tt
-    app/views/funding_lines/edit.html.erb
+%h1== Edit funding line ##{@funding_line.id} by '#{@funder.name}'
+
 = error_messages_for @funding_line
 
-= form_for(@funding_line, :action => url(:funding_line, @funding_line)) do
-  %p
-    = submit "Update"
-
-= link_to 'Show', url(:funding_line, @funding_line)
-|
-= link_to 'Back', url(:funding_lines)
+= form_for(@funding_line, :action => resource(@funder, @funding_line)) do
+  = partial :fields, :submit_text => "Save changes", :cancel_link => resource(@funder, :funding_lines)
