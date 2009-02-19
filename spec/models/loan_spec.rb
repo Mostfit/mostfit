@@ -48,12 +48,19 @@ describe Loan do
     @loan.applied_on = nil
     @loan.should_not be_valid
   end
-  it "should not be valid without being approved properly" do
-    @loan.approved_by = nil
+  it "should not be valid without being validated properly" do
+    @loan.disbursal_date = @loan.scheduled_disbursal_date
+    @loan.disbursed_by = @manager
+    @loan.should be_valid
+    @loan.validated_on = disbursal_date
+    @loan.disbursed_by = nil
     @loan.should_not be_valid
-    @loan.approved_by = @manager
-    @loan.approved_on = nil
+    @loan.validated_on = nil
+    @loan.validated_by = @manager
     @loan.should_not be_valid
+    @loan.validated_on = disbursal_date
+    @loan.validated_by = @manager
+    @loan.should be_valid
   end
   it "should not be valid without being rejected properly" do
     date = @loan.approved_on
@@ -140,6 +147,17 @@ describe Loan do
     @loan.should be_valid
     @loan.disbursal_date = @loan.approved_on + 10
     @loan.should be_valid
+  end
+  it "should not be valid when validated_on is earlier than the disbursal_date" do
+    @loan.written_off_by = @manager
+    @loan.disbursed_by   = @manager
+    @loan.disbursal_date = @loan.scheduled_disbursal_date
+    @loan.validated_on   = @loan.disbursal_date
+    @loan.should be_valid
+    @loan.validated_on   = @loan.disbursal_date + 1
+    @loan.should be_valid
+    @loan.validated_on   = @loan.disbursal_date - 1
+    @loan.should_not be_valid
   end
   it "should not be valid when written_off_on is earlier than the disbursal_date" do
     @loan.written_off_by = @manager

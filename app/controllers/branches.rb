@@ -69,4 +69,9 @@ class Branches < Application
     end
   end
 
+  # this redirects to the proper url, used from the router
+  def redirect_to_show(id)
+    raise NotFound unless @branch = Branch.get(id)
+    redirect resource(@branch)
+  end
 end # Branches

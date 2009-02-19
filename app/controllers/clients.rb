@@ -1,5 +1,5 @@
 class Clients < Application
-  before :get_context
+  before :get_context, :exclude => ['redirect_to_show']
   before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
   provides :xml, :yaml, :js
 
@@ -62,6 +62,12 @@ class Clients < Application
     else
       raise InternalServerError
     end
+  end
+
+  # this redirects to the proper url, used from the router
+  def redirect_to_show(id)
+    raise NotFound unless @client = Client.get(id)
+    redirect resource(@client.center.branch, @client.center, @client)
   end
 
   private

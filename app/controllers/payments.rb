@@ -1,5 +1,5 @@
 class Payments < Application
-  before :get_context
+  before :get_context, :exclude => ['redirect_to_show']
   provides :xml, :yaml, :js
 
   def index
