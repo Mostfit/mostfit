@@ -5,6 +5,7 @@ admin:
   :active: true
   :password: password
   :password_confirmation: password
+  :admin: true
 
 prashanth:
   :id: 2

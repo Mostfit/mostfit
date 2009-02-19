@@ -1,5 +1,5 @@
 .graph
-  = ofc2(430, 250, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
+  = ofc2(430, 250, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
 
 
 %h1

@@ -113,7 +113,7 @@ module Merb
         url  << '/' + part
         if part.to_i.to_s.length == part.length  # true when a number (id)
           o = instance_variable_get('@'+url.split('/')[-2].singular)  # get the object (@branch)
-          s = (o.respond_to?(:name) ? link_to(o.name, url) : link_to('#'+o.id.to_s, url))
+          s = (o.respond_to?(:name) ? link_to(o.name, url) : link_to('#'+o.object_id.to_s, url))
           crums[-1] += ": <b><i>#{s}</i></b>"  # merge the instance names (or numbers)
         else  # when not a number (id)
           crums << link_to(part.gsub('_', ' '), url)  # add the resource name
