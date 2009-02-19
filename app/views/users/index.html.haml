@@ -10,12 +10,12 @@
       %th
       %th id
       %th login
-      %th data entry
-      %th mis manager
-      %th admin
-      %th read only
+      %th{ :width => '50px' } data entry
+      %th{ :width => '50px' } mis manager
+      %th{ :width => '50px' } admin
+      %th{ :width => '50px' } read only
       %th payments created
-      %th payments deleter
+      %th payments deleted
   %tbody
   - for user in @users
     %tr{ :class => cycle('odd','') }
@@ -25,13 +25,13 @@
       %td
         %b= user.login
       %td
-        %b= user.data_entry_operator.nil? || !user.data_entry_operator ? "" : user.data_entry_operator
+        %b= user.data_entry_operator ? 'X' : ''
       %td
-        %b= user.mis_manager.nil?|| !user.mis_manager ? "" : user.mis_manager
+        %b= user.mis_manager ? 'X' : ''
       %td
-        %b= user.admin.nil? || !user.admin ? "" : user.admin
+        %b= user.admin ? 'X' : ''
       %td
-        %b= user.read_only_user.nil? || !user.read_only_user ? "" : user.read_only_user
+        %b= user.read_only_user ? 'X' : ''
       %td
         %b= user.payments_created.count
       %td
@@ -39,7 +39,7 @@
       - if session.user.id == 1  # only show to admin
         %td
           = link_to 'edit', resource(user, :edit)
-          = link_to 'delete', resource(user, :delete) unless user.id == 1  # do not show for admin
+          = '&nbsp;|&nbsp;&nbsp;' + link_to('delete', resource(user, :delete)) unless user.id == 1  # do not show for admin
   %tfoot
     %tr
-      %td{ :colspan => 7 }
+      %td{ :colspan => 9 }

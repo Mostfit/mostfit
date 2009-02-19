@@ -10,13 +10,10 @@ class User
   property :active,       Boolean, :default => true, :nullable => false
 
   # permissions
-  
-  property :data_entry_operator, Boolean, :default => false, :nullable => false # can do some things
-  property :admin, Boolean, :default => false, :nullable => false               # can do everything
-  property :mis_manager, Boolean, :default => false, :nullable => false         # can do most things
-  property :read_only_user, Boolean, :default => false, :nullable => false      # read_only (duh!)
-
-  
+  property :read_only_user,      Boolean, :default => false, :nullable => false  # read_only (duh!)
+  property :data_entry_operator, Boolean, :default => false, :nullable => false  # can do some things
+  property :mis_manager,         Boolean, :default => false, :nullable => false  # can do most things
+  property :admin,               Boolean, :default => false, :nullable => false  # can do everything
 
   # it gets                                   
   #   - :password and :password_confirmation accessors
@@ -31,9 +28,6 @@ class User
   has n, :payments_deleted, :child_key => [:deleted_by_user_id], :class_name => 'Payment'
   has n, :audit_trail, :class_name => 'AuditTrail'
 
-  def can_write(object)
-    self.admin || self.mis_manager || ((object.class.to_s == 'Loan' || object.class.to_s == 'Payment') && self.data_entry_operator)
-  end
 
   def admin?
     self.admin || self.id == 1
