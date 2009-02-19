@@ -256,6 +256,9 @@ tr.odd {
 td {
   vertical-align: top;
 }
+td.numeric {
+  text-align: right;
+}
 table.narrow td, table.narrow th{
   padding: 2px;
 }

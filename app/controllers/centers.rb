@@ -11,7 +11,7 @@ class Centers < Application
   def show(id)
     @center = Center.get(id)
     raise NotFound unless @center
-    @clients = @center.clients
+    @clients = @center.clients(:active => true, :order => [:name])
     if params[:date]
       if params[:date].is_a? String
         @date = Date.parse(params[:date])

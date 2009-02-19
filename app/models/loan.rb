@@ -384,7 +384,6 @@ class Loan
 #     Merb.run_later { update_history_now }  # i just love procrastination
   end
   def update_history_now  # TODO: not update every thing all the time (like in case of a new payment)
-    debugger
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
     dates = payment_dates + installment_dates
 #     dates << scheduled_disbursal_date if scheduled_disbursal_date
@@ -393,9 +392,12 @@ class Loan
     dates.uniq.sort.each do |date|
       LoanHistory.write_for(self, date)
     end
-    debugger
   end
 
+  # returns the name of the funder
+  def funder_name
+    self.funding_line.funder.name
+  end
 
   # the arithmic of shifting by the installment_frequency (especially months is tricky)
   # used by many other methods, it accepts a negative +number+

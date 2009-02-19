@@ -20,6 +20,13 @@ Merb::BootLoader.before_app_loads do
   Extlib::Inflection.word('loan_history')  # i dont like a table named 'loan_histories'
   Extlib::Inflection.word('audit_trail')   # i dont like a table named 'audit_trails'
   Extlib::Inflection.word('attendancy')    # i dont like a table named 'attendancies'
+  Numeric::Transformer.add_format(
+    :mostfit_default => { :number =>   { :precision => 3, :delimiter => ' ',  :separator => '.'},
+                          :currency => { :unit => '',     :format => '%n',    :precision => 0 } },
+    :in              => { :number =>   { :precision => 3, :delimiter => ',',  :separator => '.'},
+                          :currency => { :unit => 'Rs.',  :format => '%u %n', :precision => 0 } })
+  Numeric::Transformer.change_default_format(:mostfit_default)
+
 end
  
 Merb::BootLoader.after_app_loads do
