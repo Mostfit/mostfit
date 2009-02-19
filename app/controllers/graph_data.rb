@@ -2,6 +2,7 @@ class GraphData < Application
 
   def loan(id)
     @loan      = Loan.get(id)
+    raise NotFound unless @loan.disbursal_date
     max_amount = @loan.total_to_be_received
     dates      = @loan.installment_dates
     offset     = 0

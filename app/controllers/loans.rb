@@ -48,6 +48,7 @@ class Loans < Application
   end
 
   def update(id)
+    debugger
     klass, attrs = get_loan_and_attrs
     @loan = klass.get(id)
     raise NotFound unless @loan

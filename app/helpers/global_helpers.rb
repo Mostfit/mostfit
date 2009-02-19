@@ -49,7 +49,6 @@ module Merb
     end
 
     def date_select_for(obj, col = nil, attrs = {})
-      debugger
       attrs.merge!(:name => "#{obj.class.to_s.snake_case}[#{col.to_s}]")
       attrs.merge!(:id   => "#{obj.class.to_s.snake_case}_#{col.to_s}")
       nullable = attrs[:nullable] ? true : false
@@ -62,7 +61,6 @@ module Merb
     end
 
     def date_select_html (attrs, obj = nil, col = nil)
-      debugger
       date = attrs[:date]
       nullable = attrs[:nullable]
       day_attrs = attrs.merge(
