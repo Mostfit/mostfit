@@ -46,7 +46,7 @@ namespace :mock do
   task :fixtures do
     DataMapper.auto_migrate! if Merb.orm == :datamapper
     # loading is ordered, important for our references to work
-    load_fixtures :users, :staff_members, :branches, :centers, :clients, :loans  #, :payments
+    load_fixtures :users, :staff_members, :funders, :funding_lines, :branches, :centers, :clients, :loans  #, :payments
     puts
     puts "Fixtures loaded. Have a look at the mock:all_payments and mock:update_history tasks."
   end

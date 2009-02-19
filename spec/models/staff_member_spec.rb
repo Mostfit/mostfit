@@ -21,7 +21,6 @@ describe StaffMember do
     @new_staff_member = StaffMember.new
     @new_staff_member.name = "Test Staff"
     if @staff_member.save
-      p "staff member saved"
       @new_staff_member.save
       @new_staff_member.should_not be_valid
     else
