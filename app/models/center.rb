@@ -5,6 +5,7 @@ class Center
   
   property :id,                   Serial
   property :name,                 String, :length => 100, :nullable => false
+  property :center_leader_name,   String, :length => 100
   property :meeting_day,          Enum.send('[]', *DAYS), :nullable => false, :default => :none
   property :meeting_time_hours,   Integer, :length => 2
   property :meeting_time_minutes, Integer, :length => 2

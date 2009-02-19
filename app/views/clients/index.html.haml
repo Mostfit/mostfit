@@ -66,29 +66,41 @@
         %td{ :colspan => 7 }
 
 
+  = link_to 'Create new client', resource(@branch, @center, :clients, :new)
 
-  = link_to 'New', resource(@branch, @center, :clients, :new)
 
-  %h2 
-    Activity for 
-    = @date
-  %h3
-    Change the date: 
-  choose:
-  = link_to 'today', resource(@branch, @center, :date => Date.today)
-  |
-  = link_to 'previous meeting date', resource(@branch, @center, :date => @center.previous_meeting_date_from(@date))
-  |
-  = link_to 'next meeting date', resource(@branch, @center, :date => @center.next_meeting_date_from(@date))
-  %h3
-    or
-  | custom date
-  %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'float:left;'}
-    = date_select 'date', @date
-    = submit 'Go!'
+
+  %h2
+    %a{ :name => 'weeksheet' }/
+    == Week #{@date.cweek} meeting sheet for center #{@center.name}
+
+  %table.narrow.form{ :style => "width: 40%;" }
+    %tr.odd
+      %td meeting at
+      %td
+        - if @center.meeting_day?(@date)
+          %b== #{@date} #{@center.meeting_time}
+        - else
+          %i no meeting today
+    %tr
+      %td center manager
+      %td= link_to @center.manager.name, resource(@center.manager)
+
   - if @center.meeting_day? @date
     %table.narrow.form{ :width => '100%' }
       %thead
+        %tr
+          %th{ :colspan => 5 }
+            %p{:align => 'center' }
+              = link_to 'today', resource(@branch, @center, :date => Date.today) + '#weeksheet'
+              &nbsp;|&nbsp;
+              = link_to 'previous meeting', resource(@branch, @center, :date => @center.previous_meeting_date_from(@date)) + '#weeksheet'
+              &nbsp;|&nbsp;
+              = link_to 'next meeting', resource(@branch, @center, :date => @center.next_meeting_date_from(@date)) + '#weeksheet'
+          %th{ :colspan => 2 }
+            %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
+              = date_select 'date', @date
+              = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
         %tr
           %th
           %th loan id
@@ -115,6 +127,16 @@
                 = loan.scheduled_received_principal_up_to(@date) - loan.principal_received_up_to(@date) + loan.scheduled_received_interest_up_to(@date) - loan.interest_received_up_to(@date)
       %tfoot
         %tr
-          %td{ :colspan => 7 }
+          %td{ :colspan => 5 }
+            %p{:align => 'center' }
+              = link_to 'today', resource(@branch, @center, :date => Date.today) + '#weeksheet'
+              &nbsp;|&nbsp;
+              = link_to 'previous meeting', resource(@branch, @center, :date => @center.previous_meeting_date_from(@date)) + '#weeksheet'
+              &nbsp;|&nbsp;
+              = link_to 'next meeting', resource(@branch, @center, :date => @center.next_meeting_date_from(@date)) + '#weeksheet'
+          %td{ :colspan => 2 }
+            %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
+              = date_select 'date', @date
+              = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
   - else
     %i This day is not a meeting day
