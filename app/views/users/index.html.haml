@@ -39,7 +39,7 @@
       - if session.user.id == 1  # only show to admin
         %td
           = link_to 'edit', resource(user, :edit)
-          = '&nbsp;|&nbsp;&nbsp;' + link_to('delete', resource(user, :delete)) unless user.id == 1  # do not show for admin
+          = '&nbsp;|&nbsp;' + link_to('delete', resource(user, :delete)) unless user.id == 1  # do not show for admin
   %tfoot
     %tr
       %td{ :colspan => 9 }

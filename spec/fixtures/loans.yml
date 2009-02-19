@@ -13,6 +13,7 @@ l001:
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
   :client_id: 1
+  :funding_line_id: 1
 
 l101:
   :id: 101
@@ -29,6 +30,7 @@ l101:
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
   :client_id: 1
+  :funding_line_id: 1
 
 l102:
   :id: 102
@@ -45,6 +47,7 @@ l102:
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
   :client_id: 1
+  :funding_line_id: 1
 
 
 l002:
@@ -54,7 +57,7 @@ l002:
   :installment_frequency: weekly
   :number_of_installments: 10
   :applied_by_staff_id: 1
-  :applied_on: 2008-01-01
+  :applied_on: 2006-01-01
   :scheduled_first_payment_date: 2008-03-09
   :scheduled_disbursal_date: 2007-01-19
   :disbursal_date: 2007-02-01
@@ -62,6 +65,7 @@ l002:
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
   :client_id: 2
+  :funding_line_id: 1
 
 l003:
   :id: 3
@@ -78,6 +82,7 @@ l003:
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
   :client_id: 3
+  :funding_line_id: 1
 
 l004:
   :id: 4
@@ -94,6 +99,7 @@ l004:
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
   :client_id: 4
+  :funding_line_id: 1
 
 l005:
   :id: 5
@@ -110,6 +116,7 @@ l005:
   :disbursed_by_staff_id: 1
   :approved_by_staff_id: 1
   :client_id: 5
+  :funding_line_id: 1
 
 l006:
   :id: 6
@@ -128,6 +135,7 @@ l006:
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
   :client_id: 6
+  :funding_line_id: 1
 
 l007:
   :id: 7
@@ -144,6 +152,7 @@ l007:
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
   :client_id: 7
+  :funding_line_id: 1
 
 # l008:
 #   :id: 8
@@ -215,7 +224,8 @@ l012:
   :approved_on: 2008-12-17
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
-  :client_id: 12
+  :client_id: 1
+  :funding_line_id: 1
 
 l013:
   :id: 13
@@ -231,7 +241,8 @@ l013:
   :approved_on: 2008-12-09
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
-  :client_id: 13
+  :client_id: 1
+  :funding_line_id: 1
 
 l014:
   :id: 14
@@ -247,7 +258,8 @@ l014:
   :approved_on: 2008-11-09
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
-  :client_id: 14
+  :client_id: 1
+  :funding_line_id: 1
 
 
 l015:
@@ -264,7 +276,8 @@ l015:
   :approved_on: 2008-12-10
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
-  :client_id: 15
+  :client_id: 1
+  :funding_line_id: 1
 
 l016:
   :id: 16
@@ -280,7 +293,8 @@ l016:
   :approved_on: 2008-12-20
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
-  :client_id: 16
+  :client_id: 1
+  :funding_line_id: 1
 
 l017:
   :id: 17
@@ -296,4 +310,5 @@ l017:
   :approved_on: 2008-12-19
   :disbursed_by_staff_id: 1 
   :approved_by_staff_id: 1
-  :client_id: 17
+  :client_id: 1
+  :funding_line_id: 1

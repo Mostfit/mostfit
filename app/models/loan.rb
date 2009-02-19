@@ -70,7 +70,7 @@ class Loan
   validates_with_method  :validated_by,                 :method => :properly_validated?
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
-  validates_present      :applied_by, :client, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_on
+  validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
   # validates_primitive doesn't work well for date -- we use "before :valid?, :parse_dates" to achieve similar effects 
 
   # this is the method used for creating payments, not directly on the Payment class

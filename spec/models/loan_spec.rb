@@ -9,23 +9,31 @@ describe Loan do
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
     # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
 
+    @funder = Funder.new(:name => "FWWB")
+    @funder.should be_valid
+
+    @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
+    @funding_line.funder = @funder
+    @funding_line.should be_valid
+
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
     @branch.should be_valid
 
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
-    @center.branch = @branch
+    @center.branch  = @branch
     @center.should be_valid
 
     @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05')
-    @client.center = @center
+    @client.center  = @center
     # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
 
     @loan = Loan.new(:id => 123456, :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 30, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
     @loan.history_disabled = true
-    @loan.applied_by = @manager
-    @loan.client = @client
+    @loan.applied_by       = @manager
+    @loan.funding_line     = @funding_line
+    @loan.client           = @client
     @loan.should be_valid
 
     @loan.approved_on = "2000-02-03"
@@ -52,15 +60,14 @@ describe Loan do
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @manager
     @loan.should be_valid
-    @loan.validated_on = disbursal_date
-    @loan.disbursed_by = nil
-    @loan.should_not be_valid
-    @loan.validated_on = nil
-    @loan.validated_by = @manager
-    @loan.should_not be_valid
-    @loan.validated_on = disbursal_date
+    @loan.validated_on = @loan.disbursal_date
     @loan.validated_by = @manager
     @loan.should be_valid
+    @loan.validated_on = nil
+    @loan.should_not be_valid
+    @loan.validated_on = @loan.disbursal_date
+    @loan.validated_by = nil
+    @loan.should_not be_valid
   end
   it "should not be valid without being rejected properly" do
     date = @loan.approved_on
@@ -149,10 +156,10 @@ describe Loan do
     @loan.should be_valid
   end
   it "should not be valid when validated_on is earlier than the disbursal_date" do
-    @loan.written_off_by = @manager
     @loan.disbursed_by   = @manager
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.validated_on   = @loan.disbursal_date
+    @loan.validated_by   = @manager
     @loan.should be_valid
     @loan.validated_on   = @loan.disbursal_date + 1
     @loan.should be_valid

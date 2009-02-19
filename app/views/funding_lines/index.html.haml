@@ -15,6 +15,14 @@
     %td funding lines
     %td
       %b= @funder.funding_lines.size
+  %tr.odd
+    %td first disbursement
+    %td
+      = @funder.funding_lines.min(:disbursal_date)
+  %tr
+    %td last disbursement
+    %td
+      = @funder.funding_lines.max(:disbursal_date)
 
 %p= link_to 'edit this funders details', resource(@funder, :edit)
 

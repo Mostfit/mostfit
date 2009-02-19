@@ -45,6 +45,14 @@ describe Client do
     @loan.should_not be_valid
     @loan.applied_by  = @manager
     @loan.client      = @client
+
+    @funder = Funder.new(:name => "FWWB")
+    @funder.should be_valid
+    @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
+    @funding_line.funder = @funder
+    @funding_line.should be_valid
+
+    @loan.funding_line = @funding_line
     @loan.should be_valid
     @loan.approved_on = "2000-02-03"
     @loan.approved_by = @manager
@@ -57,9 +65,10 @@ describe Client do
 
 
     loan2 = Loan.new(:amount => 10000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 30, :scheduled_first_payment_date => "2000-12-07", :applied_on => "2000-02-04", :approved_on => "2000-02-04", :scheduled_disbursal_date => "2000-06-14")
-    loan2.applied_by  = @manager
-    loan2.approved_by = @manager
-    loan2.client      = @client
+    loan2.applied_by   = @manager
+    loan2.approved_by  = @manager
+    loan2.client       = @client
+    loan2.funding_line = @funding_line
     loan2.should be_valid
 
     @client.loans << loan2
