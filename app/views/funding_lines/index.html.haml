@@ -1,0 +1,16 @@
+%h1
+  FundingLines controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/funding_lines/index.html.erb
+%table
+  %tr
+  - for funding_line in @funding_lines
+    %tr
+      %td
+        = link_to 'Show', url(:funding_line, funding_line)
+      %td
+        = link_to 'Edit', url(:edit_funding_line,  funding_line)
+
+= link_to 'New', url(:new_funding_line)

@@ -32,6 +32,7 @@ class Loan
   property :updated_at,                     DateTime
 
   belongs_to :client
+  belongs_to :funding_line
   belongs_to :applied_by,     :child_key => [:applied_by_staff_id],     :class_name => 'StaffMember'
   belongs_to :approved_by,    :child_key => [:approved_by_staff_id],    :class_name => 'StaffMember'
   belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],    :class_name => 'StaffMember'

@@ -18,6 +18,8 @@ end
 Merb::BootLoader.before_app_loads do
   # This will get executed after dependencies have been loaded but before your app's classes have loaded.
   Extlib::Inflection.word('loan_history')  # i dont like a table named 'loan_histories'
+  Extlib::Inflection.word('audit_trail')   # i dont like a table named 'audit_trails'
+  Extlib::Inflection.word('attendancy')    # i dont like a table named 'attendancies'
 end
  
 Merb::BootLoader.after_app_loads do

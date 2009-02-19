@@ -1,0 +1,16 @@
+%h1
+  Funders controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/funders/index.html.erb
+%table
+  %tr
+  - for funder in @funders
+    %tr
+      %td
+        = link_to 'Show', url(:funder, funder)
+      %td
+        = link_to 'Edit', url(:edit_funder,  funder)
+
+= link_to 'New', url(:new_funder)

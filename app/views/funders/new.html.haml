@@ -1,0 +1,13 @@
+%h1 Funders controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/funders/new.html.erb
+
+= error_messages_for @funder
+
+= form_for(@funder, :action => url(:funders) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:funders)

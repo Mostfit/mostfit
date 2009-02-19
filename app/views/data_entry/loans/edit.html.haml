@@ -1,0 +1,28 @@
+%h1
+  Edit loan
+  = @loan.new_record? ? '' : "##{@loan.id} for #{@loan.client.name}"
+
+= error_messages_for @loan
+
+- if @loan.new_record?
+  %p
+    Please enter the loan ID of the loan you want to edit.
+
+  %table.form
+    = form_for(@loan, :action => url(:enter_loans, :action => 'edit')) do
+      %tr
+        %td &nbsp;
+      %tr
+        %td &nbsp;
+        %td
+          Loan ID:
+        %td
+          = text_field :id, :size => 8
+        %td
+          = submit "Proceed..."
+
+- else
+  = form_for(@loan, :action => url(:enter_loans, :action => 'update')) do
+    = hidden_field :id, :value => @loan.id
+    = partial 'loans/fields', :submit_text => "Save changes on loan ##{@loan.id}", :cancel_link => url(:data_entry)
+

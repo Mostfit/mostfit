@@ -1,0 +1,15 @@
+%h1
+  Funders controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/funders/edit.html.erb
+= error_messages_for @funder
+
+= form_for(@funder, :action => url(:funder, @funder)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:funder, @funder)
+|
+= link_to 'Back', url(:funders)

@@ -29,6 +29,7 @@ class User
 
   has n, :payments_created, :child_key => [:created_by_user_id], :class_name => 'Payment'
   has n, :payments_deleted, :child_key => [:deleted_by_user_id], :class_name => 'Payment'
+  has n, :audit_trail, :class_name => 'AuditTrail'
 
   def can_write(object)
     self.admin || self.mis_manager || ((object.class.to_s == 'Loan' || object.class.to_s == 'Payment') && self.data_entry_operator)

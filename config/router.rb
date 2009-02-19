@@ -2,7 +2,6 @@ Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
   resources :users
   resources :staff_members
-  # RESTful routes
   resources :branches  do
     resources :centers  do
       resources :clients do
@@ -12,12 +11,15 @@ Merb::Router.prepare do
       end
     end
   end
+  resources :funders do
+    resources :funding_lines
+  end
   
   # Adds the required routes for merb-auth using the password slice
   slice(:merb_auth_slice_password, :name_prefix => nil, :path_prefix => "")
 
   match('/data_entry').to(:namespace => 'data_entry', :controller => 'index').name(:data_entry)
-  namespace :data_entry, :name_prefix => 'enter' do
+  namespace :data_entry, :name_prefix => 'enter' do  # for url(:enter_payment) and the likes
     match('/clients(/:action)').to(:controller => 'clients').name(:clients)
     match('/loans(/:action)').to(:controller => 'loans').name(:loans)
     match('/payments(/:action)').to(:controller => 'payments').name(:payments)
