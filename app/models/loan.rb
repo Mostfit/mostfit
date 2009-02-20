@@ -383,6 +383,7 @@ class Loan
     update_history_now
 #     Merb.run_later { update_history_now }  # i just love procrastination
   end
+
   def update_history_now  # TODO: not update every thing all the time (like in case of a new payment)
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
     dates = payment_dates + installment_dates

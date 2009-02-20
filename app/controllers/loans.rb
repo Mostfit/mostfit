@@ -48,12 +48,11 @@ class Loans < Application
   end
 
   def update(id)
-    debugger
     klass, attrs = get_loan_and_attrs
     @loan = klass.get(id)
     raise NotFound unless @loan
     if @loan.update_attributes(attrs)
-       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
+      redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
     else
       display @loan, :edit  # error messages will be shown
     end

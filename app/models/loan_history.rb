@@ -16,7 +16,7 @@ class LoanHistory
 
   belongs_to :loan
 
-  validates_present :loan  # the rest does with autovalidations
+#  validates_present :loan  # the rest does with autovalidations
 
 
   # the prefered way to make history and future.

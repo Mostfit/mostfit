@@ -36,6 +36,24 @@ module Merb
       html.gsub('!!!', '&nbsp;')  # otherwise the &nbsp; entities get escaped
     end
 
+    def select_funding_line_for(obj, col, attrs = {}) # Fix me: Refactor this with all select_*_for
+      id_col = "#{col.to_s}_id".to_sym
+      catalog = Funder.catalog
+      collection = []
+      catalog.keys.sort.each do |funder_name|
+        collection << ['', funder_name]
+        catalog[funder_name].each_pair { |k,v| collection << [k.to_s, "!!!!!!#{v}"]}
+      end
+      html = select col,
+        :collection   => collection,
+        :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
+        :id           => "#{obj.class.to_s.snake_case}_#{id_col}",
+        :selected     => (obj.send(id_col) ? obj.send(id_col).to_s : nil),
+        :prompt       => (attrs[:prompt] or "&lt;select a funding line&gt;")
+      html.gsub('!!!', '&nbsp;')  # otherwise the &nbsp; entities get escaped
+    end
+
+
     MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     def date_select(name, date=Date.today)
       # defaults to Date.today

@@ -3,7 +3,7 @@ class FundingLine
   before :valid?, :parse_dates
 
   attr_accessor :interest_percentage  # set to true to disable history writing by this object
-  
+
   property :id,                  Serial
   property :amount,              Integer
   property :interest_rate,       Float
@@ -11,6 +11,8 @@ class FundingLine
   property :disbursal_date,      Date  # with these 3 dates and the amount we can draw rough graphs
   property :first_payment_date,  Date
   property :last_payment_date,   Date
+  property :closed_on,           Date
+  property :closing_comment,     Text
 
   belongs_to :funder
   has n, :loans
@@ -21,6 +23,14 @@ class FundingLine
   validates_with_method  :last_payment_date,    :method => :first_payment_before_last_payment?
   validates_present :amount, :interest_rate, :disbursal_date, :first_payment_date, :last_payment_date, :funder
 
+  def status
+    if :closed_on
+      status = :closed
+    else
+      status = :open
+    end
+    status
+  end
 
 
   def outstanding_principal_on(date)

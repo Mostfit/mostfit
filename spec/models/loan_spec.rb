@@ -35,13 +35,12 @@ describe Loan do
     @loan.funding_line     = @funding_line
     @loan.client           = @client
     @loan.should be_valid
-
+    
     @loan.approved_on = "2000-02-03"
     @loan.approved_by = @manager
     @loan.should be_valid
   end
-
-
+  
   it "should have a discrimintator" do
     @loan.discriminator.should_not be_blank
   end
@@ -360,6 +359,7 @@ describe Loan do
     dates.sort[-1].should eql(@loan.scheduled_repaid_on)
     dates.sort[-2].should eql(@loan.shift_date_by_installments(@loan.scheduled_repaid_on, -1))
   end
+
 
   it ".payment_schedule should also have some specs -- albeit more on the view side"
 

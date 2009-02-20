@@ -19,12 +19,17 @@
     %td
       Installment frequency:
     %td
-      = select :installment_frequency, :collection => Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
+      = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
   %tr
     %td
       Number of installments:
     %td
       = text_field :number_of_installments, :size => 4
+  %tr
+    %td
+      Funding Line
+    %td
+      = select_funding_line_for @loan, :funding_line
   %tr
     %td
       Application:
