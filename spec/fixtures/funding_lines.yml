@@ -1,0 +1,10 @@
+funding_line_1:
+  :id: 1
+  :amount: 10000000
+  :interest_rate: 0.18
+  :purpose: "To fund"
+  :disbursal_date: 2008-01-01
+  :first_payment_date: 2008-02-01
+  :last_payment_date: 2012-01-01
+  :funder_id: 1
+
