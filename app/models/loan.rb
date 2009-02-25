@@ -184,10 +184,12 @@ class Loan
     ORDER BY "received_on"})
     @payments_hash_cache = {}
     principal, interest, total = 0, 0, 0
+    debugger
     structs.each do |s|
       # we know the received_on dates are in ascending order as we
       # walk through (so we can do the += thingy)
-      @payments_hash_cache[ Date.parse(s[:received_on]) ] = {
+      date = (s[:received_on].is_a? String) ? Date.parse(s[:received_on]) : s[:received_on]
+      @payments_hash_cache[ date ] = {
         :principal_received_so_far => (principal += s[:principal]),
         :interest_received_so_far =>  (interest  += s[:interest]),
         :total_received_so_far =>     (total     += s[:principal] + s[:interest]) }
