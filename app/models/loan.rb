@@ -536,9 +536,10 @@ class Loan
   end
 
   def payment_dates
-    repository.adapter.query(%Q{
-      SELECT "received_on" FROM "payments"    -- the payment dates
-       WHERE ("deleted_at" IS NULL) AND ("loan_id" = #{self.id})}).map { |x| Date.parse(x) }
+#    repository.adapter.query(%Q{
+#      SELECT "received_on" FROM "payments"    -- the payment dates
+#       WHERE ("deleted_at" IS NULL) AND ("loan_id" = #{self.id})}).map { |x| Date.parse(x) }
+    payments.map { |p| p.received_on }
   end
 end
 
