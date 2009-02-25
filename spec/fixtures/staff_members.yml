@@ -1,35 +1,19 @@
-
-madhuri:
+a:
   :id: 1
-  :name: madhuri
+  :name: Fatima
   :active: true
 
-manju:
+b:
   :id: 2
-  :name: manju
+  :name: Feroza
   :active: true
 
-pooja:
+c: 
   :id: 3
-  :name: pooja
+  :name: Madhuri
   :active: true
 
-samil:
+d: 
   :id: 4
-  :name: samil
-  :active: false
-
-usha:
-  :id: 5
-  :name: usha
-  :active: true
-
-priya:
-  :id: 6
-  :name: priya
-  :active: true
-
-jamil:
-  :id: 7
-  :name: jamil
+  :name: Usha
   :active: true

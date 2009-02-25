@@ -15,6 +15,16 @@ class Loans < Application
     display [@loan, @payments], 'payments/index'
   end
 
+  def test
+
+    @loans = Loan.all()
+    @loans.each do |loan|
+      loan.history_disabled = true
+      loan.save
+    end
+    display @loans
+  end
+
   def new
     only_provides :html
     if Loan.descendants.map{|x| x.to_s}.include? params[:loan_type]

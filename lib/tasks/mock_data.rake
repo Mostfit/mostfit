@@ -16,7 +16,8 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 def load_fixtures(*files)
   files.each do |name|
     klass = Kernel::const_get(name.to_s.singularize.camel_case)
-    yml_file =  "spec/fixtures/#{name}.yml"
+#    yml_file =  "spec/fixtures/#{name}.yml"
+    yml_file =  "misfit_fixtures/#{name}.yml"
     puts "\nLoading: #{yml_file}"
     entries = YAML::load_file(Merb.root / yml_file)
     entries.each do |name, entry|
@@ -25,6 +26,7 @@ def load_fixtures(*files)
       unless k.save
         puts "Validation errors saving a #{klass} (##{k.id}):"
         p k.errors
+        raise
       end
     end
   end
@@ -83,6 +85,18 @@ namespace :mock do
     t0 = Time.now
     Merb.logger.info! "Start mock:history rake task at #{t0}"
     Loan.all.each { |l| l.update_history }
+    t1 = Time.now
+    secs = (t1 - t0).round
+    Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{Loan.all.size} loans with #{Payment.all.size} payments, at #{t1}"
+  end
+
+  desc "Historify unhistorified loans"
+  task :historify_unhistorified do
+    t0 = Time.now
+    Merb.logger.info! "Start mock:history rake task at #{t0}"
+    Loan.all.each do |l| 
+      l.update_history if l.history.blank?
+    end
     t1 = Time.now
     secs = (t1 - t0).round
     Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{Loan.all.size} loans with #{Payment.all.size} payments, at #{t1}"

@@ -30,6 +30,7 @@ Merb::Router.prepare do
   match('/staff_member/:id/centers').to(:controller => 'staff_members', :action => 'show_centers').name(:show_staff_member_centers)
   match('/branches/:id/today').to(:controller => 'branches', :action => 'today').name(:branch_today)
   match('/entrance').to(:controller => 'entrance').name(:entrance)
+  match('/branches/:branch_id/centers/:center_id/clients/:client_id/test').to( :controller => 'loans', :action => 'test')
 
 
   # This is the default route for /:controller/:action/:id

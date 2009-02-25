@@ -380,6 +380,7 @@ class Loan
   # the the Merb::Dispatcher.work_queue (using Merb.run_later)
   def update_history
     return if history_disabled  # easy when doing mass db modifications (like with fixutes)
+    debugger
     update_history_now
 #     Merb.run_later { update_history_now }  # i just love procrastination
   end
@@ -449,11 +450,11 @@ class Loan
     self.interest_rate = percentage.blank? ? nil : percentage.to_f / 100
   end
 
-  alias :set_fees_without_updating_total :fees=
-  def fees=(fees)
-    set_fees_without_updating_total fees
-    update_fees_total
-  end
+#  alias :set_fees_without_updating_total :fees=
+#  def fees=(fees)
+#    set_fees_without_updating_total fees
+#    update_fees_total
+#  end
 
   private
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
@@ -558,6 +559,7 @@ class A50Loan < Loan
   # a fine example of a subclassing (if it was finished)
   # these 2 methods define the pay back scheme
   # typically reimplemented in subclasses
+  property :purpose,  String
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations

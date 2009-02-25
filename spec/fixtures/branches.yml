@@ -1,17 +1,11 @@
-maladwest:
+1:
   :id: 1
-  :name: Mumbai Headquaters
-  :address: "Link Rd, Opp Offix, Parija Building, no. 203\nMumbai, Maharashtra\nIndia\n+91.9780503352"
-  :manager_staff_id: 2
-
-hyydeeraa:
-  :id: 2
-  :name: Hyderabad Outpost
-  :address: "Road Nr. 2, Banjara Hills, next to Ories\nHyderabad, AP\nIndia\n04040300200"
-  :manager_staff_id: 2
-
-munnar:
-  :id: 3
-  :name: Kerela Hills
-  :address: "Munnar Shanti Station, Hill Rd, Opp. Happy Dhaba\nMunnar, Kerela\nIndia"
+  :name: Mumbai
+  :address: 
   :manager_staff_id: 1
+
+2: 
+  :id: 2
+  :name: Dilli
+  :address: 
+  :manager_staff_id: 2
