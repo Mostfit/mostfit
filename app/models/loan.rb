@@ -177,22 +177,21 @@ class Loan
   # so best is not to recalculate everytime, or query all along -- but to cache.
   def payments_hash
     return @payments_hash_cache if @payments_hash_cache
-    structs = repository.adapter.query(%Q{
-      SELECT "principal", "interest", "received_on"  -- fill the payments_hash_cache
-        FROM "payments"
-       WHERE ("deleted_at" IS NULL) AND ("loan_id" = #{self.id})
-    ORDER BY "received_on"})
+    payments = Payment.all(:loan_id => self.id, :order => [:received_on.asc])
+#    structs = repository.adapter.query(%Q{                                             # This causes problems with mysql/sqlite3 changes
+#      SELECT "principal", "interest", "received_on"  -- fill the payments_hash_cache
+#        FROM "payments"
+#       WHERE ("deleted_at" IS NULL) AND ("loan_id" = #{self.id})
+#    ORDER BY "received_on"})
     @payments_hash_cache = {}
     principal, interest, total = 0, 0, 0
-    debugger
-    structs.each do |s|
+    payments.each do |payment|
       # we know the received_on dates are in ascending order as we
       # walk through (so we can do the += thingy)
-      date = (s[:received_on].is_a? String) ? Date.parse(s[:received_on]) : s[:received_on]
-      @payments_hash_cache[ date ] = {
-        :principal_received_so_far => (principal += s[:principal]),
-        :interest_received_so_far =>  (interest  += s[:interest]),
-        :total_received_so_far =>     (total     += s[:principal] + s[:interest]) }
+      @payments_hash_cache[payment.received_on] = {
+        :principal_received_so_far => (principal += payment.principal),
+        :interest_received_so_far =>  (interest  += payment.interest),
+        :total_received_so_far =>     (total     +=payment.principal + payment.interest) }
     end
     @payments_hash_cache
   end
