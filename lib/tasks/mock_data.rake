@@ -16,8 +16,7 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 def load_fixtures(*files)
   files.each do |name|
     klass = Kernel::const_get(name.to_s.singularize.camel_case)
-#    yml_file =  "spec/fixtures/#{name}.yml"
-    yml_file =  "misfit_fixtures/#{name}.yml"
+    yml_file =  "spec/fixtures/#{name}.yml"
     puts "\nLoading: #{yml_file}"
     entries = YAML::load_file(Merb.root / yml_file)
     entries.each do |name, entry|
