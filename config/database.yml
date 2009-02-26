@@ -2,8 +2,11 @@
 # This is a sample database file for the DataMapper ORM
 development: &defaults
   # These are the settings for repository :default
-  adapter:  sqlite3
-  database: db/development.db
+  adapter:  mysql
+  database: mostfit_test
+  username: root
+  password: hatstars
+  host: localhost
  
 test:
   <<:       *defaults
