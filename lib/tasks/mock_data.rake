@@ -73,7 +73,6 @@ namespace :mock do
           puts "Validation errors repaying #{amount} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
         end
       end
-      puts "Finished doing payments for Loan ##{loan.id}"
     end
     t1 = Time.now
     secs = (t1 - t0).round
@@ -84,10 +83,7 @@ namespace :mock do
   task :update_history do
     t0 = Time.now
     Merb.logger.info! "Start mock:history rake task at #{t0}"
-    Loan.all.each do |l|
-      l.update_history
-      puts "Finished updating history for laon ##{l.id}"
-    end
+    Loan.all.each { |l| l.update_history }
     t1 = Time.now
     secs = (t1 - t0).round
     Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{Loan.all.size} loans with #{Payment.all.size} payments, at #{t1}"
