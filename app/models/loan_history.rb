@@ -49,7 +49,7 @@ class LoanHistory
         SUM(actual_outstanding_total)        AS actual_outstanding_total
        FROM( SELECT scheduled_outstanding_principal, scheduled_outstanding_total,
                      actual_outstanding_principal, actual_outstanding_total, MAX(date) FROM loan_history
-               WHERE (loan_id IN (#{loan_ids.join(', ')})) AND (date <= #{date.to_s.inspect})
+               WHERE (loan_id IN (#{loan_ids.join(', ')})) AND (date <= '#{date.to_s}')
             GROUP BY loan_id ) AS derived_table" )[0]  # in case of nil errors add: .map { |x| x.nil? ? 0 : x }  # nil -> 0
   end
 
