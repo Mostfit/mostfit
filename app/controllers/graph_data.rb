@@ -56,7 +56,7 @@ class GraphData < Application
     start_date = @client.loans.min(:scheduled_disbursal_date)
     end_date   = (@client.loans.map{|l| l.last_loan_history_date}.reject{|x| x.blank?}).max
     loan_ids   = Loan.all(:client_id => @client.id, :fields => [:id]).map { |x| x.id }
-    common_aggregate_loan_graph(loan_ids, start_date, end_date)
+    aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
   def center(id)
@@ -64,7 +64,7 @@ class GraphData < Application
     start_date = @center.clients.loans.min(:scheduled_disbursal_date)
     end_date   = Date.today  # (@client.loans.map { |l| l.last_loan_history_date }).max
     loan_ids   = @center.clients.loans.all(:fields => [:id]).map { |x| x.id }
-    common_aggregate_loan_graph(loan_ids, start_date, end_date)
+    aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
   def branch(id)
@@ -72,17 +72,57 @@ class GraphData < Application
     start_date = @branch.centers.clients.loans.min(:scheduled_disbursal_date)
     end_date   = Date.today  # (@client.loans.map { |l| l.last_loan_history_date }).max
     loan_ids   = @branch.centers.clients.loans.all(:fields => [:id]).map { |x| x.id }
-    common_aggregate_loan_graph(loan_ids, start_date, end_date)
+    aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
   def total
     start_date = Loan.all.min(:scheduled_disbursal_date)
     end_date   = Date.today  # (@client.loans.map { |l| l.last_loan_history_date }).max
     loan_ids   = Loan.all(:fields => [:id]).map { |x| x.id }
-    common_aggregate_loan_graph(loan_ids, start_date, end_date)
+    aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
-  def common_aggregate_loan_graph(loan_ids, start_date, end_date)
+  def aggregate_loan_graph(loan_ids, start_date, end_date)
+    days = (end_date - start_date).to_i
+    step_size = 1; i = 0   # make a nice round step size, not more than 20 steps
+    while days/step_size > 50
+      step_size = [1, 7, 14, 30, 60, 365/4, 365/2, 365][i += 1]
+    end
+    steps = days/step_size + 1
+    @labels, @stacks, max_amount = [], [], 0
+    table = repository.adapter.query(%Q{
+      SELECT MIN(date) AS date, 
+      CONCAT(WEEK(date),'_',YEAR(date)) AS weeknum, 
+      SUM(scheduled_outstanding_principal),
+      SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
+      SUM(actual_outstanding_principal)    AS actual_outstanding_principal,
+      SUM(actual_outstanding_total)        AS actual_outstanding_total
+      FROM  loan_history WHERE loan_id IN (#{loan_ids.join(', ')}) GROUP BY weeknum ORDER BY date;})
+    table.each_with_index do |row,index|
+      future                = row.date > Date.today
+      s                     = row
+      date                  = s['date']
+      scheduled_outstanding = (s['scheduled_outstanding_total'].to_i or 0)  # or *_principal
+      actual_outstanding    = future ? scheduled_outstanding : (s['actual_outstanding_total'].to_i or 0)     # or *_principal
+      max_amount            = [max_amount, scheduled_outstanding, actual_outstanding].max
+      overpaid              = scheduled_outstanding - actual_outstanding  # negative means shortfall
+      tip_base              = "##{index+1}, #{date.strftime("%a %b %d %Y")}#{(future ? ' (future)' : '')}<br>"
+      percentage            = scheduled_outstanding == 0 ? '0' : (overpaid.abs.to_f/scheduled_outstanding*100).round.to_s + '%'
+      @stacks << [
+        { :val => [scheduled_outstanding, actual_outstanding].min, :colour => (future ? '#55aaff' : '#003d4a'),
+          :tip => tip_base + (future ?
+            "#{scheduled_outstanding.round} scheduled outstanding" :
+            "#{actual_outstanding.round} outstanding (#{percentage} #{overpaid > 0 ? 'overpaid' : 'shortfall'})") },
+        { :val => [overpaid,  0].max, :colour => (future ? '#55ff55' : '#00aa00'),
+          :tip => "#{tip_base} overpaid #{ overpaid} (#{percentage})" },
+        { :val => [-overpaid, 0].max, :colour => (future ? '#ff5588' : '#aa0000'),
+          :tip => "#{tip_base} shortfall of #{-overpaid} (#{percentage})" } ]
+      @labels << ((index % step_size == 0) ? date.strftime("%b%d'%y") : '')
+    end
+    render_loan_graph('aggregate loan graph', @stacks, @labels, step_size, max_amount)
+  end
+
+  def common_aggregate_loan_graph(loan_ids, start_date, end_date) # __DEPRECATED__
     days = (end_date - start_date).to_i
     step_size = 1; i = 0   # make a nice round step size, not more than 20 steps
     while days/step_size > 50
@@ -97,8 +137,8 @@ class GraphData < Application
     dates.each_with_index do |date, index|
       future                = date > Date.today
       s                     = LoanHistory.sum_outstanding_for(date, loan_ids)
-      scheduled_outstanding = (s['scheduled_outstanding_total'] or 0)  # or *_principal
-      actual_outstanding    = future ? scheduled_outstanding : (s['actual_outstanding_total'] or 0)     # or *_principal
+      scheduled_outstanding = (s['scheduled_outstanding_total'].to_i or 0)  # or *_principal
+      actual_outstanding    = future ? scheduled_outstanding : (s['actual_outstanding_total'].to_i or 0)     # or *_principal
       max_amount            = [max_amount, scheduled_outstanding, actual_outstanding].max
       overpaid              = scheduled_outstanding - actual_outstanding  # negative means shortfall
       tip_base              = "##{index+1}, #{date.strftime("%a %b %d %Y")}#{(future ? ' (future)' : '')}<br>"

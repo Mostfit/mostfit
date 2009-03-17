@@ -37,20 +37,5 @@ class LoanHistory
     end
   end
 
-  # this method gets call for history aggregation.
-  # i.e. making a graph, for every 'measurment' in the graph (a bunch of date on the x axis)
-  # this method is called once.
-  def self.sum_outstanding_for(date, loan_ids)
-    repository.adapter.query("
-      SELECT  
-        SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
-        SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
-        SUM(actual_outstanding_principal)    AS actual_outstanding_principal,
-        SUM(actual_outstanding_total)        AS actual_outstanding_total
-       FROM( SELECT scheduled_outstanding_principal, scheduled_outstanding_total,
-                     actual_outstanding_principal, actual_outstanding_total, MAX(date) FROM loan_history
-               WHERE (loan_id IN (#{loan_ids.join(', ')})) AND (date <= '#{date.to_s}')
-            GROUP BY loan_id ) AS derived_table" )[0]  # in case of nil errors add: .map { |x| x.nil? ? 0 : x }  # nil -> 0
-  end
 
 end
