@@ -37,5 +37,33 @@ class LoanHistory
     end
   end
 
+  def self.sum_outstanding_for(date, loan_ids)
+    repository.adapter.query(%Q{
+      SELECT
+        SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
+        SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
+        SUM(actual_outstanding_principal)    AS actual_outstanding_principal,
+        SUM(actual_outstanding_total)        AS actual_outstanding_total
+      FROM
+      (select scheduled_outstanding_principal,scheduled_outstanding_total, actual_outstanding_principal, actual_outstanding_total from
+        (select loan_id, max(date) as date from loan_history where date <= '#{date.to_s}' and loan_id in (#{loan_ids.join(', ')}) group by loan_id) as dt, 
+        loan_history lh 
+      where lh.loan_id = dt.loan_id and lh.date = dt.date) as dt1;})
+
+#     WHERE loan_id in (#{loan_ids.join(', ')}) 
+#       AND date IN
+#                (SELECT MAX(date) FROM loan_history WHERE date <= '#{date.to_s}' AND loan_id IN (#{loan_ids.join(', ')}) 
+#                 GROUP BY loan_id
+#                 ORDER BY date DESC);})
+
+#     SELECT 
+#        SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
+#        SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
+#        SUM(actual_outstanding_principal)    AS actual_outstanding_principal,
+#        SUM(actual_outstanding_total)        AS actual_outstanding_total
+#       FROM (( SELECT scheduled_outstanding_principal, scheduled_outstanding_total,
+#                     actual_outstanding_principal, actual_outstanding_total, MAX(date) FROM loan_history
+#               WHERE (loan_id IN (#{loan_ids.join(', ')})) AND (date <= '#{date.to_s}') GROUP BY loan_id) AS dt)} )
+  end
 
 end

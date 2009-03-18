@@ -56,7 +56,7 @@ class GraphData < Application
     start_date = @client.loans.min(:scheduled_disbursal_date)
     end_date   = (@client.loans.map{|l| l.last_loan_history_date}.reject{|x| x.blank?}).max
     loan_ids   = Loan.all(:client_id => @client.id, :fields => [:id]).map { |x| x.id }
-    aggregate_loan_graph(loan_ids, start_date, end_date)
+    common_aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
   def center(id)
@@ -64,7 +64,7 @@ class GraphData < Application
     start_date = @center.clients.loans.min(:scheduled_disbursal_date)
     end_date   = Date.today  # (@client.loans.map { |l| l.last_loan_history_date }).max
     loan_ids   = @center.clients.loans.all(:fields => [:id]).map { |x| x.id }
-    aggregate_loan_graph(loan_ids, start_date, end_date)
+    common_aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
   def branch(id)
@@ -72,14 +72,14 @@ class GraphData < Application
     start_date = @branch.centers.clients.loans.min(:scheduled_disbursal_date)
     end_date   = Date.today  # (@client.loans.map { |l| l.last_loan_history_date }).max
     loan_ids   = @branch.centers.clients.loans.all(:fields => [:id]).map { |x| x.id }
-    aggregate_loan_graph(loan_ids, start_date, end_date)
+    common_aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
   def total
     start_date = Loan.all.min(:scheduled_disbursal_date)
     end_date   = Date.today  # (@client.loans.map { |l| l.last_loan_history_date }).max
     loan_ids   = Loan.all(:fields => [:id]).map { |x| x.id }
-    aggregate_loan_graph(loan_ids, start_date, end_date)
+    common_aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
   def aggregate_loan_graph(loan_ids, start_date, end_date)
@@ -89,9 +89,11 @@ class GraphData < Application
       step_size = [1, 7, 14, 30, 60, 365/4, 365/2, 365][i += 1]
     end
     steps = days/step_size + 1
+    dates = []
+    steps.times { |i| dates << start_date + step_size * i }
     @labels, @stacks, max_amount = [], [], 0
     table = repository.adapter.query(%Q{
-      SELECT MIN(date) AS date, 
+      SELECT MAX(date) AS date, 
       CONCAT(WEEK(date),'_',YEAR(date)) AS weeknum, 
       SUM(scheduled_outstanding_principal),
       SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
@@ -136,7 +138,7 @@ class GraphData < Application
     p dates
     dates.each_with_index do |date, index|
       future                = date > Date.today
-      s                     = LoanHistory.sum_outstanding_for(date, loan_ids)
+      s                     = LoanHistory.sum_outstanding_for(date, loan_ids)[0]
       scheduled_outstanding = (s['scheduled_outstanding_total'].to_i or 0)  # or *_principal
       actual_outstanding    = future ? scheduled_outstanding : (s['actual_outstanding_total'].to_i or 0)     # or *_principal
       max_amount            = [max_amount, scheduled_outstanding, actual_outstanding].max

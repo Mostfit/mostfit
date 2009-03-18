@@ -178,14 +178,14 @@ class Loan
   def payments_hash
     return @payments_hash_cache if @payments_hash_cache
     payments = Payment.all(:loan_id => self.id, :order => [:received_on.asc])
-#    structs = repository.adapter.query(%Q{                                             # This causes problems with mysql/sqlite3 changes
-#      SELECT "principal", "interest", "received_on"  -- fill the payments_hash_cache
-#        FROM "payments"
-#       WHERE ("deleted_at" IS NULL) AND ("loan_id" = #{self.id})
-#    ORDER BY "received_on"})
+    structs = repository.adapter.query(%Q{                                             # This causes problems with mysql/sqlite3 changes
+      SELECT principal, interest, received_on
+        FROM payments
+       WHERE (deleted_at IS NULL) AND (loan_id = #{self.id})
+    ORDER BY received_on})
     @payments_hash_cache = {}
     principal, interest, total = 0, 0, 0
-    payments.each do |payment|
+    structs.each do |payment|
       # we know the received_on dates are in ascending order as we
       # walk through (so we can do the += thingy)
       @payments_hash_cache[payment.received_on] = {
@@ -399,7 +399,7 @@ class Loan
 
   # returns the name of the funder
   def funder_name
-    self.funding_line.funder.name
+    self.funding_line and self.funding_line.funder.name or nil
   end
 
   # the arithmic of shifting by the installment_frequency (especially months is tricky)
