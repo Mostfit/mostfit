@@ -32,6 +32,9 @@ class FundingLine
     status
   end
 
+  def name
+    "#{funder.name} #{amount}@#{interest_rate}"
+  end
 
   def outstanding_principal_on(date)
     if date < disbursal_date
