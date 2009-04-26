@@ -1,0 +1,314 @@
+l001:
+  :id: 1
+  :amount: 10000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 20
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2008-12-22
+  :scheduled_disbursal_date: 2008-11-19
+  :disbursal_date: 2008-12-01
+  :approved_on: 2008-11-01
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 1
+  :funding_line_id: 1
+
+l101:
+  :id: 101
+  :amount: 5000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 20
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2008-07-22
+  :scheduled_disbursal_date: 2008-6-19
+  :disbursal_date: 2008-07-01
+  :approved_on: 2008-06-01
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 1
+  :funding_line_id: 1
+
+l102:
+  :id: 102
+  :amount: 8000
+  :interest_rate: 0.20
+  :installment_frequency: monthly
+  :number_of_installments: 12
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2008-1-22
+  :scheduled_disbursal_date: 2008-1-19
+  :disbursal_date: 2008-2-01
+  :approved_on: 2008-1-01
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 1
+  :funding_line_id: 1
+
+
+l002:
+  :id: 2
+  :amount: 5000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 10
+  :applied_by_staff_id: 1
+  :applied_on: 2006-01-01
+  :scheduled_first_payment_date: 2008-03-09
+  :scheduled_disbursal_date: 2007-01-19
+  :disbursal_date: 2007-02-01
+  :approved_on: 2007-01-17
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 2
+  :funding_line_id: 1
+
+l003:
+  :id: 3
+  :amount: 10000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 40
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2009-05-19
+  :scheduled_disbursal_date: 2008-11-09
+  :disbursal_date: 2008-11-10
+  :approved_on: 2008-11-03
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 3
+  :funding_line_id: 1
+
+l004:
+  :id: 4
+  :amount: 4000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 4
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2008-12-19
+  :scheduled_disbursal_date: 2008-06-10
+  :disbursal_date: 2008-06-19
+  :approved_on: 2008-06-07
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 4
+  :funding_line_id: 1
+
+l005:
+  :id: 5
+  :amount: 10000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 10
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2008-12-19
+  :scheduled_disbursal_date: 2008-02-19
+  :disbursal_date: 2008-01-19
+  :approved_on: 2008-01-02
+  :disbursed_by_staff_id: 1
+  :approved_by_staff_id: 1
+  :client_id: 5
+  :funding_line_id: 1
+
+l006:
+  :id: 6
+  :amount: 8000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 8
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2008-12-19
+  :scheduled_disbursal_date: 2008-12-19
+  :disbursal_date: 2008-12-19
+  :approved_on: 2008-12-18
+  :written_off_by_staff_id: 1
+  :written_off_on: 2009-01-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 6
+  :funding_line_id: 1
+
+l007:
+  :id: 7
+  :amount: 2000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 10
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2008-12-19
+  :scheduled_disbursal_date: 2008-11-19
+  :disbursal_date: 2008-11-22
+  :approved_on: 2008-08-08
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 7
+  :funding_line_id: 1
+
+# l008:
+#   :id: 8
+#   :amount: 10000
+#   :interest_rate: 0.20
+#   :installment_frequency: weekly
+#   :number_of_installments: 20
+#   :scheduled_first_payment_date: 2009-02-19
+#   :scheduled_disbursal_date: 2008-07-19
+#   :disbursal_date: 2008-08-19
+#   :approved_on: 2008-08-19
+#   :disbursed_by_staff_id: 1 
+#   :approved_by_staff_id: 1
+#   :client_id: 8
+# 
+# l009:
+#   :id: 9
+#   :amount: 9000
+#   :interest_rate: 0.20
+#   :installment_frequency: weekly
+#   :number_of_installments: 9
+#   :scheduled_first_payment_date: 2009-04-19
+#   :scheduled_disbursal_date: 2008-12-19
+#   :disbursal_date: 2008-12-19
+#   :approved_on: 2008-12-17
+#   :disbursed_by_staff_id: 1 
+#   :approved_by_staff_id: 1
+#   :client_id: 9
+# 
+# l010:
+#   :id: 10
+#   :amount: 3000
+#   :interest_rate: 0.20
+#   :installment_frequency: weekly
+#   :number_of_installments: 6
+#   :scheduled_first_payment_date: 2008-12-19
+#   :scheduled_disbursal_date: 2008-09-19
+#   :disbursal_date: 2008-07-19
+#   :approved_on: 2008-07-13
+#   :disbursed_by_staff_id: 1 
+#   :approved_by_staff_id: 1
+#   :client_id: 10
+# 
+# l011:
+#   :id: 11
+#   :amount: 12000
+#   :interest_rate: 0.20
+#   :installment_frequency: weekly
+#   :number_of_installments: 6
+#   :scheduled_first_payment_date: 2009-01-05
+#   :scheduled_disbursal_date: 2008-12-19
+#   :disbursal_date: 2008-11-19
+#   :approved_on: 2008-11-12
+#   :disbursed_by_staff_id: 1 
+#   :approved_by_staff_id: 1
+#   :client_id: 11
+# 
+l012:
+  :id: 12
+  :amount: 2000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 4
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2009-01-05
+  :scheduled_disbursal_date: 2008-12-19
+  :disbursal_date: 2008-12-19
+  :approved_on: 2008-12-17
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 1
+  :funding_line_id: 1
+
+l013:
+  :id: 13
+  :amount: 30000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 15
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2009-01-05
+  :scheduled_disbursal_date: 2008-12-19
+  :disbursal_date: 2008-12-19
+  :approved_on: 2008-12-09
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 1
+  :funding_line_id: 1
+
+l014:
+  :id: 14
+  :amount: 9000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 9
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2009-03-19
+  :scheduled_disbursal_date: 2009-01-05
+  :disbursal_date: 2008-12-09
+  :approved_on: 2008-11-09
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 1
+  :funding_line_id: 1
+
+
+l015:
+  :id: 15
+  :amount: 10000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 15
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2009-04-05
+  :scheduled_disbursal_date: 2008-12-29
+  :disbursal_date: 2008-12-19
+  :approved_on: 2008-12-10
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 1
+  :funding_line_id: 1
+
+l016:
+  :id: 16
+  :amount: 8000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 16
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2009-02-05 
+  :scheduled_disbursal_date: 2008-12-19
+  :disbursal_date: 2008-12-26
+  :approved_on: 2008-12-20
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 1
+  :funding_line_id: 1
+
+l017:
+  :id: 17
+  :amount: 20000
+  :interest_rate: 0.20
+  :installment_frequency: weekly
+  :number_of_installments: 20
+  :applied_by_staff_id: 1
+  :applied_on: 2008-01-01
+  :scheduled_first_payment_date: 2009-06-05
+  :scheduled_disbursal_date: 2008-12-19
+  :disbursal_date: 2008-12-19
+  :approved_on: 2008-12-19
+  :disbursed_by_staff_id: 1 
+  :approved_by_staff_id: 1
+  :client_id: 1
+  :funding_line_id: 1

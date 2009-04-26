@@ -1,0 +1,71 @@
+mum_center_1:
+  :id: 1
+  :name: Oshiwari
+  :meeting_day: monday
+  :meeting_time_hours: 16
+  :meeting_time_minutes: 0
+  :manager_staff_id: 2
+  :branch_id: 1
+
+mum_center_2:
+  :id: 2
+  :name: Daravi
+  :meeting_day: tuesday
+  :meeting_time_hours: 12
+  :meeting_time_minutes: 0
+  :manager_staff_id: 2
+  :branch_id: 1
+
+mum_center_3:
+  :id: 3
+  :name: Goregoan
+  :meeting_day: thursday
+  :meeting_time_hours: 22
+  :meeting_time_minutes: 0
+  :manager_staff_id: 3
+  :branch_id: 1
+
+hyd_center_1:
+  :id: 4
+  :name: Secudairabad
+  :meeting_day: saturday
+  :meeting_time_hours: 12
+  :meeting_time_minutes: 0
+  :manager_staff_id: 1
+  :branch_id: 2
+
+hyd_center_2:
+  :id: 5
+  :name: Koti
+  :meeting_day: saturday
+  :meeting_time_hours: 10
+  :meeting_time_minutes: 0
+  :manager_staff_id: 1
+  :branch_id: 2
+
+hyd_center_3:
+  :id: 6
+  :name: Somajiguta
+  :meeting_day: monday
+  :meeting_time_hours: 17
+  :meeting_time_minutes: 0
+  :manager_staff_id: 1
+  :branch_id: 2
+
+kerela_center_1:
+  :id: 7
+  :name: Munnar
+  :meeting_day: monday
+  :meeting_time_hours: 17
+  :meeting_time_minutes: 0
+  :manager_staff_id: 4
+  :branch_id: 3
+
+kerela_center_1:
+  :id: 8
+  :name: Kochin
+  :meeting_day: sunday
+  :meeting_time_hours: 13
+  :meeting_time_minutes: 0
+  :manager_staff_id: 4
+  :branch_id: 3

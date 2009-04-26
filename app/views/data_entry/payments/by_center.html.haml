@@ -1,0 +1,60 @@
+%h1
+  = @date
+  - if @center and @date
+    - if not @errors.blank?
+      .error
+        %p
+          - @errors.each do |payment|
+            Error paying loan
+            = payment.loan.id
+            - payment.errors.each do |k|
+              = k
+              %br
+    %p
+      %br/
+    %h2
+      == Week #{@date.cweek} meeting sheet for center #{@center.name}
+    %a{ :name => 'weeksheet' }/
+    
+    %table.narrow.form{ :style => "width: 100%;" }
+      %tr.odd
+        %td meeting at
+        %td
+          - if @center.meeting_day?(@date)
+            %b== #{@date} #{@center.meeting_time}
+          - else
+            %i no meeting today
+        %td
+          = link_to 'today', url(:enter_payments, :action => 'by_center', :for_date => Date.today, :center_id => @center.id) + '#weeksheet'
+          &nbsp;|&nbsp;
+          = link_to 'previous meeting', url(:enter_payments, :action => 'by_center', :for_date => @center.previous_meeting_date_from(@date), :center_id => @center.id) + '#weeksheet'
+          &nbsp;|&nbsp;
+          = link_to 'next meeting', url(:enter_payments, :action => 'by_center', :for_date => @center.next_meeting_date_from(@date), :center_id => @center.id) + '#weeksheet'
+      %tr
+        %td center manager
+        %td= link_to @center.manager.name, resource(@center.manager)
+        %td
+          %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
+            = date_select 'date', @date
+            = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
+      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
+        = hidden_field :name => 'for_date', :value => @date
+        = hidden_field :name => 'center_id', :value => @center.id
+        = partial 'centers/cds'
+        = submit 'Make Payments'
+
+  - else
+    Choose a center to record a payment for
+    = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
+      %table.form
+        %tr
+          %th
+            Center Id
+          %td
+            = text_field :name => 'center_id'
+        %tr
+          %th
+            For Date
+          %td
+            = text_field :name => 'for_date', :value => Date.today
+      = submit 'Submit'
