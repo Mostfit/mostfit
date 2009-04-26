@@ -9,6 +9,30 @@ class Payments < DataEntry::Controller
     render
   end
 
+  def by_center
+    @center = Center.get(params[:center_id]) 
+    @branch = @center.branch unless @center.nil?
+    @clients = @center.clients unless @center.nil?
+    @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
+    @errors = []
+    if params[:submit] == 'Make Payments'
+      params.collect {|k,v| k.to_i == 0 ? nil : k }.compact.each do |k|
+        @loan = Loan.get(k.to_i)
+        @staff = StaffMember.get(params[:received_by])
+        amounts = params[k.to_sym].to_i
+        debugger
+        succes, @payment = @loan.repay(amounts, session.user, @date, @staff, true)
+        if not succes
+          @errors << @payment
+        end
+      end
+      if @errors.blank?
+        redirect url(:data_entry), :message => {:notice => 'All payments made succesfully'}
+      end
+    end
+    render
+  end
+
   def create(payment)
     raise NotFound unless @loan = Loan.get(payment[:loan_id])
 

@@ -76,7 +76,7 @@ class Loan
   # this is the method used for creating payments, not directly on the Payment class
   # for +input+ it allows either a "total" amount as Fixnum or an array with
   # principal[0] and interest[1].
-  def repay(input, user, received_on, received_by)
+  def repay(input, user, received_on, received_by, defer_update = false)
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
     unless input.is_a? Array or input.is_a? Fixnum
@@ -102,7 +102,13 @@ class Loan
       :principal => principal.round, :interest => interest.round)
     save_status = payment.save
     if save_status == true
-      update_history  # update the history is we saved a payment
+      if defer_update
+        Merb.run_later do
+          update_history
+        end
+      else
+        update_history  # update the history is we saved a payment
+      end
       clear_payments_hash_cache
     end
     payment.principal, payment.interest = nil, nil unless total.nil?  # remove calculated pr./int. values from the form
@@ -381,7 +387,6 @@ class Loan
   # the the Merb::Dispatcher.work_queue (using Merb.run_later)
   def update_history
     return if history_disabled  # easy when doing mass db modifications (like with fixutes)
-    debugger
     update_history_now
 #     Merb.run_later { update_history_now }  # i just love procrastination
   end
