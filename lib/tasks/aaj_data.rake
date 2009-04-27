@@ -23,7 +23,7 @@ namespace :aaj do
     branch_yaml_file = File.open("misfit_fixtures/aaj_branches.yml","w")
     center_yaml_file = File.open("misfit_fixtures/aaj_centers.yml","w")
     client_yaml_file = File.open("misfit_fixtures/aaj_clients.yml","w")
-    staffs = ['madhuri']
+    staffs = ['nirmala']
     funder = Funder.new(:name => 'icicici')
     funder.save
     funding_line = FundingLine.new(:funder => funder, :amount => 1000000, :interest_rate => 0.12, :disbursal_date => Date.parse("2008-01-01"))
@@ -50,7 +50,7 @@ namespace :aaj do
           c = Center.new
           c.manager = @s
           c.name = l[1].to_s
-          c.meeting_day= l[7].downcase.to_s
+          c.meeting_day= l[9].downcase.to_s
 #	  mt = l[4].split(":")
           c.meeting_time_hours= 9 #mt[0].to_i
           c.meeting_time_minutes= 30 #mt[1].to_i
@@ -76,7 +76,7 @@ namespace :aaj do
 	  loan.interest_rate = 0.18
 	  loan.installment_frequency = :weekly
 	  loan.number_of_installments = 50
-	  ad = l[5].split('.')
+	  ad = l[4].gsub(".","/").split('/')
           p ad
 	  d = Date.new(ad[2].to_i < 2000 ? ad[2].to_i + 2000 : ad[2].to_i ,ad[1].to_i,ad[0].to_i)
 	  p d.to_s
@@ -90,7 +90,7 @@ namespace :aaj do
 	  loan.discriminator = "A50Loan"
 	  loan.history_disabled = true
           loan.funding_line = funding_line
-	  ad = l[7].split('.')
+	  ad = l[9].gsub(".","/").split('/')
 	  d = Date.new(ad[2].to_i < 2000 ? ad[2].to_i + 2000 : ad[2].to_i,ad[1].to_i,ad[0].to_i)	  
 	  p d.to_s
 	  loan.scheduled_first_payment_date = d

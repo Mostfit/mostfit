@@ -9,6 +9,6 @@
 - else
   = form_for(@loan, :action => resource(@branch, @center, @client, :loans)) do
     - if @loan.fields_partial.blank?
-      = partial :fields, :sumbit_text => "Create loan for #{@client.name}", :cancel_link => resource(@branch, @center, @client, :loans)
+      = partial :fields, :submit_text => "Create loan for #{@client.name}", :cancel_link => resource(@branch, @center, @client, :loans)
     - else
       = @loan.fields_partial
