@@ -23,7 +23,7 @@ namespace :aaj do
     branch_yaml_file = File.open("misfit_fixtures/aaj_branches.yml","w")
     center_yaml_file = File.open("misfit_fixtures/aaj_centers.yml","w")
     client_yaml_file = File.open("misfit_fixtures/aaj_clients.yml","w")
-    staffs = ['nirmala']
+    staffs = ['mithilesh','madhuri','manju','nirmala','rashida','usha']
     funder = Funder.new(:name => 'icicici')
     funder.save
     funding_line = FundingLine.new(:funder => funder, :amount => 1000000, :interest_rate => 0.12, :disbursal_date => Date.parse("2008-01-01"))
@@ -31,11 +31,14 @@ namespace :aaj do
     branch_manager = StaffMember.new(:name => 'Rashida Bano')
     branch_manager.save
     staff_yaml_file.write(branch_manager.to_yaml)
-    branch = Branch.new(:name => 'Holambi', :manager => branch_manager)
-    branch_yaml_file.write(branch.to_yaml)
-    branch.save
     @s = nil
+    bawana = Branch.new(:name => 'Bawana', :manager => branch_manager)
+    holambi = Branch.new(:name => 'Holambi', :manager => branch_manager)
+    branches = {'mithilesh' => bawana, 'rashida' => bawana, 'nirmala' => bawana,
+                'manju' => holambi, 'madhuri' => holambi, 'usha' => holambi}
     staffs.each do |staff|
+      branch = Branch.new(:name => 'Holambi', :manager => branch_manager)
+      branch_yaml_file.write(branch.to_yaml)
       csv = CSV::read("misfit_fixtures/#{staff}.csv")
       while l = csv.shift
         p l
@@ -54,7 +57,7 @@ namespace :aaj do
 #	  mt = l[4].split(":")
           c.meeting_time_hours= 9 #mt[0].to_i
           c.meeting_time_minutes= 30 #mt[1].to_i
-	  c.branch = branch
+	  c.branch = branches[staff]
           if c.save
 	  else
 	   p c.errors
