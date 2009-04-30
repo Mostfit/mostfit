@@ -59,6 +59,7 @@ namespace :mock do
     busy_user = User.get(1)
     count = 0
     Loan.all.each do |loan|
+      puts "Doing loan No. #{loan.id}...."
       next if loan.payments.size > 0 or loan.status != :outstanding
       loan.history_disabled = true  # do not update the hisotry for every payment
 #      amount     = loan.total_to_be_received / loan.number_of_installments
@@ -73,6 +74,7 @@ namespace :mock do
           puts "Validation errors repaying #{amount} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
         end
       end
+      puts "done"
     end
     t1 = Time.now
     secs = (t1 - t0).round
