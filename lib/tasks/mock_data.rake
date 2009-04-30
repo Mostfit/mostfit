@@ -59,8 +59,8 @@ namespace :mock do
     busy_user = User.get(1)
     count = 0
     Loan.all.each do |loan|
-      puts "Doing loan No. #{loan.id}...."
       next if loan.payments.size > 0 or loan.status != :outstanding
+      puts "Doing loan No. #{loan.id}...."
       loan.history_disabled = true  # do not update the hisotry for every payment
 #      amount     = loan.total_to_be_received / loan.number_of_installments
       dates      = loan.installment_dates.reject { |x| x > Date.today or x < loan.disbursal_date }

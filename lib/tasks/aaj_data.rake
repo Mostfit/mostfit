@@ -61,6 +61,7 @@ namespace :aaj do
           if c.save
 	  else
 	   p c.errors
+           raise
 	  end
           center_yaml_file.write(c.to_yaml)
         elsif l[0] =~ /\d.\d+/
@@ -99,11 +100,10 @@ namespace :aaj do
 	  loan.scheduled_first_payment_date = d
 	  loan.client = cl
 	  if loan.save
-	#    p "Loan saved succesfully"
+	    p "Loan saved succesfully"
 	  else
 	    p loan.errors
 	      	  raise
-
 	  end
           loan_yaml_file.write(loan.to_yaml)
         end
