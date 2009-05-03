@@ -18,6 +18,7 @@ Merb::Router.prepare do
   # Adds the required routes for merb-auth using the password slice
   slice(:merb_auth_slice_password, :name_prefix => nil, :path_prefix => "")
 
+  match('/reports').to(:namespace => 'reports', :controller => 'reports').name(:reports)
   match('/data_entry').to(:namespace => 'data_entry', :controller => 'index').name(:data_entry)
   namespace :data_entry, :name_prefix => 'enter' do  # for url(:enter_payment) and the likes
     match('/clients(/:action)').to(:controller => 'clients').name(:clients)

@@ -10,6 +10,7 @@ class Client
   property :date_of_birth,  Date
   property :address,        Text
   property :active,         Boolean, :default => true, :nullable => false
+  property :date_joined,    Date
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},

@@ -195,4 +195,63 @@ class GraphData < Application
     JSON
   end
 
+  def dashboard
+    case params[:id]
+      when "client_growth"
+        val = repository.adapter.query(%Q{
+        SELECT CONCAT(YEAR(date_joined), '_', MONTH(date_joined)) as j, COUNT(id) FROM clients GROUP BY j
+        })
+        values = (val.map {|k| k['coun_t(id)']})[1..-1]
+        type = "bar"
+      when "client_cumulative"
+        min_date = Client.all.min(:date_joined)
+        max_date = Date.today >> 1
+        date = min_date
+        values = []
+        type ="bar"
+        while date <= max_date 
+          values << Client.all(:date_joined.lte => date).count
+          date = date >> 1
+        end
+      when "branch_pie"
+        values = Branch.all.map {|b| b.centers.clients.loans.sum(:amount) }
+        type = "pie"
+    end
+    render_graph(values, type)
+
+  end
+
+  def render_graph(vals, type = "bar")
+    x = { :elements => {:type => "bar", :values => vals}}
+    case type
+      when "bar"
+      <<-JSON
+      { "elements":[
+          {
+            "type": "bar",
+            "values": #{vals.to_json}
+          }
+        ],
+        "y_axis": {
+         "max": #{vals.max * 1.1},
+          "steps": #{vals.max * 1.1 / 10}
+
+        },
+       "x_axis": {
+       }
+      }
+      JSON
+      when "pie"
+      <<-JSON
+      { "elements":[
+          {
+            "type": "pie",
+            "values": #{vals.to_json}
+          }
+        ]}
+      JSON
+    end
+ end    
+
+
 end

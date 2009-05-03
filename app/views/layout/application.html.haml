@@ -29,6 +29,8 @@
           - if session.user.id == 1
             %b= link_to 'manage users', url(:users)
             (admin only)&nbsp;|&nbsp;
+          %b= link_to 'reports', url(:reports)
+          &nbsp;|&nbsp;
           %b= link_to 'browse loans', url(:branches)
           &nbsp;|&nbsp;
           %b= link_to 'browse funds', url(:funders)
