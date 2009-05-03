@@ -106,7 +106,9 @@ namespace :mock do
   task :add_date_joined do
     cs = Client.all(:date_joined => nil)
     cs.each do |c|
+      print "Doing client id #{c.id}..."
       c.date_joined = c.loans[0].applied_on - 1
+      print ".done \n"
     end
   end
 end
