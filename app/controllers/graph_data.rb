@@ -201,7 +201,18 @@ class GraphData < Application
         val = repository.adapter.query(%Q{
         SELECT CONCAT(YEAR(date_joined), '_', MONTH(date_joined)) as j, COUNT(id) FROM clients GROUP BY j
         })
-        values = (val.map {|k| k['coun_t(id)']})[1..-1]
+        vals = val.map {|v| [v[0],v[1]]}.to_hash 
+        min_date = Client.all.min(:date_joined)
+        max_date = Date.today >> 1
+        date = min_date
+        values = []
+        type ="bar"
+        while date <= max_date 
+          values << (vals[date.year.to_s + "_" + date.month.to_s] or 0)
+          date = date >> 1
+        end
+      debugger
+
         type = "bar"
       when "client_cumulative"
         min_date = Client.all.min(:date_joined)
