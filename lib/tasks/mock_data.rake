@@ -102,6 +102,13 @@ namespace :mock do
     secs = (t1 - t0).round
     Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{Loan.all.size} loans with #{Payment.all.size} payments, at #{t1}"
   end
+
+  task :add_date_joined do
+    cs = Client.all(:date_joined => nil)
+    cs.each do |c|
+      c.date_joined = c.loans[0].applied_on - 1
+    end
+  end
 end
 
 
