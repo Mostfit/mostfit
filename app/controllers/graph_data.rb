@@ -196,6 +196,7 @@ class GraphData < Application
   end
 
   def dashboard
+    labels = []
     case params[:id]
       when "client_growth"
         val = repository.adapter.query(%Q{
@@ -209,10 +210,9 @@ class GraphData < Application
         type ="bar"
         while date <= max_date 
           values << (vals[date.year.to_s + "_" + date.month.to_s] or 0)
+          labels << (date.month % 3 == 0 ? date.month.to_s + "/" + date.year.to_s : "")
           date = date >> 1
         end
-      debugger
-
         type = "bar"
       when "client_cumulative"
         min_date = Client.all.min(:date_joined)
@@ -222,17 +222,18 @@ class GraphData < Application
         type ="bar"
         while date <= max_date 
           values << Client.all(:date_joined.lte => date).count
+          labels << (date.month % 3 == 0 ? date.month.to_s + "/" + date.year.to_s : "")
           date = date >> 1
         end
       when "branch_pie"
         values = Branch.all.map {|b| b.centers.clients.loans.sum(:amount) }
         type = "pie"
     end
-    render_graph(values, type)
+    render_graph(values, type, labels)
 
   end
 
-  def render_graph(vals, type = "bar")
+  def render_graph(vals, type = "bar", labels = [])
     x = { :elements => {:type => "bar", :values => vals}}
     case type
       when "bar"
@@ -249,6 +250,7 @@ class GraphData < Application
 
         },
        "x_axis": {
+          "labels": { "labels": #{labels.to_json}}
        }
       }
       JSON
