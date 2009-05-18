@@ -1,0 +1,62 @@
+have_header: checking for sqlite3.h... -------------------- yes
+
+"gcc -E -I. -I/usr/lib/ruby/1.8/i686-linux -I.  -D_FILE_OFFSET_BITS=64  -march=i686 -mtune=generic -O2 -pipe  -fPIC   -Wall   conftest.c -o conftest.i"
+checked program was:
+/* begin */
+1: #include <sqlite3.h>
+/* end */
+
+--------------------
+
+have_library: checking for sqlite3_open() in -lsqlite3... -------------------- yes
+
+"gcc -o conftest -I. -I/usr/lib/ruby/1.8/i686-linux -I.  -D_FILE_OFFSET_BITS=64  -march=i686 -mtune=generic -O2 -pipe  -fPIC   -Wall  conftest.c  -L. -L/usr/lib -Wl,-R/usr/lib -L.  -rdynamic -Wl,-export-dynamic     -lruby-static -lsqlite3  -lpthread -ldl -lcrypt -lm   -lc"
+conftest.c: In function ‘t’:
+conftest.c:3: error: ‘sqlite3_open’ undeclared (first use in this function)
+conftest.c:3: error: (Each undeclared identifier is reported only once
+conftest.c:3: error: for each function it appears in.)
+checked program was:
+/* begin */
+1: /*top*/
+2: int main() { return 0; }
+3: int t() { void ((*volatile p)()); p = (void ((*)()))sqlite3_open; return 0; }
+/* end */
+
+"gcc -o conftest -I. -I/usr/lib/ruby/1.8/i686-linux -I.  -D_FILE_OFFSET_BITS=64  -march=i686 -mtune=generic -O2 -pipe  -fPIC   -Wall  conftest.c  -L. -L/usr/lib -Wl,-R/usr/lib -L.  -rdynamic -Wl,-export-dynamic     -lruby-static -lsqlite3  -lpthread -ldl -lcrypt -lm   -lc"
+conftest.c: In function ‘t’:
+conftest.c:3: warning: implicit declaration of function ‘sqlite3_open’
+checked program was:
+/* begin */
+1: /*top*/
+2: int main() { return 0; }
+3: int t() { sqlite3_open(); return 0; }
+/* end */
+
+--------------------
+
+have_func: checking for sqlite3_prepare_v2()... -------------------- yes
+
+"gcc -o conftest -I. -I/usr/lib/ruby/1.8/i686-linux -I.  -D_FILE_OFFSET_BITS=64  -march=i686 -mtune=generic -O2 -pipe  -fPIC   -Wall  conftest.c  -L. -L/usr/lib -Wl,-R/usr/lib -L.  -rdynamic -Wl,-export-dynamic    -lsqlite3  -lruby-static -lsqlite3  -lpthread -ldl -lcrypt -lm   -lc"
+conftest.c: In function ‘t’:
+conftest.c:3: error: ‘sqlite3_prepare_v2’ undeclared (first use in this function)
+conftest.c:3: error: (Each undeclared identifier is reported only once
+conftest.c:3: error: for each function it appears in.)
+checked program was:
+/* begin */
+1: /*top*/
+2: int main() { return 0; }
+3: int t() { void ((*volatile p)()); p = (void ((*)()))sqlite3_prepare_v2; return 0; }
+/* end */
+
+"gcc -o conftest -I. -I/usr/lib/ruby/1.8/i686-linux -I.  -D_FILE_OFFSET_BITS=64  -march=i686 -mtune=generic -O2 -pipe  -fPIC   -Wall  conftest.c  -L. -L/usr/lib -Wl,-R/usr/lib -L.  -rdynamic -Wl,-export-dynamic    -lsqlite3  -lruby-static -lsqlite3  -lpthread -ldl -lcrypt -lm   -lc"
+conftest.c: In function ‘t’:
+conftest.c:3: warning: implicit declaration of function ‘sqlite3_prepare_v2’
+checked program was:
+/* begin */
+1: /*top*/
+2: int main() { return 0; }
+3: int t() { sqlite3_prepare_v2(); return 0; }
+/* end */
+
+--------------------
+

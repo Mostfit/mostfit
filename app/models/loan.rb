@@ -11,25 +11,25 @@ class Loan
   attr_accessor :interest_percentage  # set to true to disable history writing by this object
   
   property :id,                             Serial
-  property :discriminator,                  Discriminator, :nullable => false
-  property :amount,                         Integer, :nullable => false  # see helper for formatting
-  property :interest_rate,                  Float, :nullable => false
-  property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false
-  property :number_of_installments,         Integer, :nullable => false
-  property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false
-  property :scheduled_first_payment_date,   Date, :nullable => false, :auto_validation => false
-  property :applied_on,                     Date, :nullable => false, :auto_validation => false
-  property :approved_on,                    Date, :auto_validation => false
-  property :rejected_on,                    Date, :auto_validation => false
-  property :disbursal_date,                 Date, :auto_validation => false
-  property :written_off_on,                 Date, :auto_validation => false
+  property :discriminator,                  Discriminator, :nullable => false, :index => true
+  property :amount,                         Integer, :nullable => false, :index => true  # see helper for formatting
+  property :interest_rate,                  Float, :nullable => false, :index => true
+  property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
+  property :number_of_installments,         Integer, :nullable => false, :index => true
+  property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false, :index => true
+  property :scheduled_first_payment_date,   Date, :nullable => false, :auto_validation => false, :index => true
+  property :applied_on,                     Date, :nullable => false, :auto_validation => false, :index => true
+  property :approved_on,                    Date, :auto_validation => false, :index => true
+  property :rejected_on,                    Date, :auto_validation => false, :index => true
+  property :disbursal_date,                 Date, :auto_validation => false, :index => true
+  property :written_off_on,                 Date, :auto_validation => false, :index => true
   property :fees,                           Yaml  # like: "first fee: 1000, second fee: 200" (yaml) -- fully reimplementable
-  property :fees_total,                     Integer, :default => 0  # gets included in first payment
-  property :fees_paid,                      Boolean, :default => false
-  property :validated_on,                   Date, :auto_validation => false
-  property :validation_comment,             Text
-  property :created_at,                     DateTime
-  property :updated_at,                     DateTime
+  property :fees_total,                     Integer, :default => 0, :index => true  # gets included in first payment
+  property :fees_paid,                      Boolean, :default => false, :index => true
+  property :validated_on,                   Date, :auto_validation => false, :index => true
+  property :validation_comment,             Text, :index => true
+  property :created_at,                     DateTime, :index => true
+  property :updated_at,                     DateTime, :index => true
 
   belongs_to :client
   belongs_to :funding_line
@@ -157,6 +157,7 @@ class Loan
   # the last method makes the actual (optimized) db call and is cached
   def principal_received_up_to(date)
     payments_received_up_to(date)[:principal_received_so_far]
+#    payments(:received_on.lte => date).sum(:principal)
   end
   def interest_received_up_to(date)
     payments_received_up_to(date)[:interest_received_so_far]
@@ -183,7 +184,7 @@ class Loan
   # so best is not to recalculate everytime, or query all along -- but to cache.
   def payments_hash
     return @payments_hash_cache if @payments_hash_cache
-    payments = Payment.all(:loan_id => self.id, :order => [:received_on.asc])
+#    payments = Payment.all(:loan_id => self.id, :order => [:received_on.asc])
     structs = repository.adapter.query(%Q{                                             # This causes problems with mysql/sqlite3 changes
       SELECT principal, interest, received_on
         FROM payments
@@ -241,6 +242,9 @@ class Loan
     return 0 if not disbursal_date or date < disbursal_date
     total_to_be_received - scheduled_received_total_up_to(date)
   end
+
+    
+
 
   # these 3 methods return overpayment amounts (PAYMENT-RECEIVED perspective)
   # negative values mean shortfall (we're positive-minded at intellecap)
@@ -385,9 +389,39 @@ class Loan
   # changes have been made to it, or its payments. gets called by hooks
   # the task of updating the history may take some time and it therefor put
   # the the Merb::Dispatcher.work_queue (using Merb.run_later)
+  def history_for(date)
+    scheduled_os_principal = amount
+    scheduled_os_total = total_to_be_received
+    t0 = Time.now
+    i_number = number_of_installments_before(date)-1
+    if @history_array.nil?
+      0.upto(i_number) do |i|
+        prin = scheduled_principal_for_installment(i)
+        int = scheduled_interest_for_installment(i)
+        scheduled_os_principal -= prin
+        scheduled_os_total -= (int + prin)
+      end
+      prin = principal_received_up_to(date)
+      int = interest_received_up_to(date)
+      actual_os_principal = amount - prin
+      actual_os_total = total_to_be_received - int -prin
+      #    puts "#{Time.now - t0}"
+      @history_array = {:loan_id => id, :date => date, :status => status(date), :scheduled_outstanding_principal => scheduled_os_principal, :scheduled_outstanding_total => scheduled_os_total, :actual_outstanding_principal => actual_os_principal, :actual_outstanding_total => actual_os_total}
+    else
+      prin = scheduled_principal_for_installment(i_number)
+      act_prin = principal_received_up_to(date)
+      int = scheduled_interest_for_installment(i_number)
+      act_int = interest_received_up_to(date)
+      @history_array[:scheduled_outstanding_principal] -= prin 
+      @history_array[:scheduled_outstanding_total] -= (int + prin)
+      @history_array[:actual_outstanding_principal] -= act_prin
+      @history_array[:actual_outstanding_total] -= (act_prin + act_int)
+    end
+  end
+
   def update_history
     return if history_disabled  # easy when doing mass db modifications (like with fixutes)
-    update_history_now
+    update_history_bulk_insert
 #     Merb.run_later { update_history_now }  # i just love procrastination
   end
 
@@ -401,6 +435,32 @@ class Loan
       LoanHistory.write_for(self, date)
     end
   end
+
+  def update_history_bulk_insert
+    Merb.logger.error! "could not destroy the history" unless self.history.destroy!
+    dates = payment_dates + installment_dates
+#     dates << scheduled_disbursal_date if scheduled_disbursal_date
+    dates << disbursal_date if disbursal_date
+    dates << written_off_on if written_off_on
+    sql = %Q{ INSERT INTO loan_history(loan_id, date, status, 
+              scheduled_outstanding_principal, scheduled_outstanding_total,
+              actual_outstanding_principal, actual_outstanding_total)
+              VALUES }
+    values = []
+    t = Time.now
+    dates.uniq.sort.each do |date|
+      history = history_for(date)
+      st = [nil, :approved, :outstanding, :repaid, :written_off].index(status(date)) + 1
+      value = %Q{(#{id}, '#{date}', #{st}, #{history[:scheduled_outstanding_principal]}, #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},#{history[:actual_outstanding_total]})}
+     values << value
+    end
+    puts "#{Time.now - t}"
+    sql += values.join(",") + ";"
+    repository.adapter.execute(sql)
+    puts "#{Time.now - t}"
+    
+  end
+    
 
   # returns the name of the funder
   def funder_name
@@ -546,6 +606,22 @@ class Loan
     #   WHERE ("deleted_at" IS NULL) AND ("loan_id" = #{self.id})}).map { |x| Date.parse(x) }
     payments.map { |p| p.received_on }
   end
+
+  def self.defaulted_loans (days = 7, date = Date.today)
+    debugger
+    defaulted_loan_ids = repository.adapter.query(%Q{
+            SELECT loan_id, DATEDIFF(MIN(date), NOW()) FROM 
+                (SELECT loan_id,
+                        date, 
+                        scheduled_outstanding_principal, 
+                        actual_outstanding_principal 
+                   FROM loan_history 
+                  WHERE scheduled_outstanding_principal != actual_outstanding_principal) 
+                     AS dt;
+             })
+    defaulted_loans = Loan.all(:id.in => defaulted_loan_ids)
+  end
+
 end
 
 class DefaultLoan < Loan
@@ -573,6 +649,7 @@ class A50Loan < Loan
     raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
     amount.to_f / number_of_installments
   end
+
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations

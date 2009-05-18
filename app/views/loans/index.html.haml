@@ -35,6 +35,7 @@
 %p
   == Manage existing loans or #{link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new)}.
 
+
 - if @loans.blank?
   %p
     %i== #{@client.name} has no loans yet.

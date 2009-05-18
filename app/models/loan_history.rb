@@ -37,6 +37,11 @@ class LoanHistory
     end
   end
 
+  def self.make_insert_for(loan, date)
+    history = history_for(date)
+    %Q{(#{history.id}, '#{date}', #{status}, #{history.scheduled_outstanding_principal_on(date)}, #{history.scheduled_outstanding_total_on(date)}, #{history.actual_outstanding_principal_on(date)},#{history.actual_outstanding_total_on(date)})}
+  end
+
   def self.sum_outstanding_for(date, loan_ids)
     repository.adapter.query(%Q{
       SELECT

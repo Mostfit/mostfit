@@ -1,0 +1,21 @@
+1.0.0  Feb 27 2007
+ - Initial release.
+ 
+2.0.0  Mar 07 2007
+ - Removed BCrypt::Password#exactly_equals -- use BCrypt::Password#eql? instead.
+ - Added BCrypt::Password#is_password?.
+ - Refactored out BCrypt::Internals into more useful BCrypt::Engine.
+ - Added validation of secrets -- nil is not healthy.
+
+2.0.1  Mar 09 2007
+ - Fixed load path issues
+ - Fixed crashes when hashing weird values (e.g., false, etc.)
+
+2.0.2  Jun 06 2007
+ - Fixed example code in the README [Winson]
+ - Fixed Solaris compatibility [Jeremy LaTrasse, Twitter crew]
+
+2.0.3  May 07 2008
+ - Made exception classes descend from StandardError, not Exception [Dan42]
+ - Changed BCrypt::Engine.hash to BCrypt::Engine.hash_secret to avoid Merb
+   sorting issues. [Lee Pope]

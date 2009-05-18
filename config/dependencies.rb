@@ -1,6 +1,6 @@
 # dependencies are generated using a strict version, don't forget to edit the dependency versions when upgrading.
-merb_gems_version = "1.0.9"
-dm_gems_version   = "0.9.10"
+merb_gems_version = "1.0.11"
+dm_gems_version   = "0.9.11"
 do_gems_version   = "0.9.11"
 
 # For more information about each component, please read http://wiki.merbivore.com/faqs/merb_components
@@ -23,7 +23,7 @@ dependency "merb-exceptions", merb_gems_version
 dependency "merb_datamapper", merb_gems_version
 
 dependency "data_objects", do_gems_version
-dependency "do_sqlite3", do_gems_version  # most development
+#dependency "do_sqlite3", do_gems_version  # most development
 dependency "do_mysql", do_gems_version    # most production
 
 dependency "dm-core", dm_gems_version
@@ -35,3 +35,4 @@ dependency "dm-validations", dm_gems_version
 dependency "dm-serializer", dm_gems_version
 
 dependency "dm-paperclip"
+dependency "merb-gen", merb_gems_version
