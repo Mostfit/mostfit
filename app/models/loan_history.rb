@@ -6,6 +6,10 @@ class LoanHistory
   property :date,                      Date,    :key => true  # the day that this record applies to
   property :created_at,                DateTime  # automatic, nice for benchmarking runs
   property :run_number,                Integer, :nullable => false, :default => 0
+  property :current,                   Boolean  # tracks the row refering to the loans current status. we can query for these
+                                                # during reporting. I put it here to save an extra write to the db during 
+                                                # update_history_now
+  property :amount_in_default,          Integer # less normalisation = faster queries
 
   # some properties for similarly named methods of a loan:
   property :scheduled_outstanding_principal, Integer, :nullable => false

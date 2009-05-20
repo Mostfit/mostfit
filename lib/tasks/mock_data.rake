@@ -21,7 +21,11 @@ def load_fixtures(*files)
     entries = YAML::load_file(Merb.root / yml_file)
     entries.each do |name, entry|
       k = klass::new(entry)
-      k.history_disabled = true if k.class == Loan  # do not update the hisotry for loans
+      puts "#{k} :#{name}"
+
+      if k.class == Loan  # do not update the hisotry for loans
+        k.history_disabled 
+      end
       unless k.save
         puts "Validation errors saving a #{klass} (##{k.id}):"
         p k.errors
@@ -63,7 +67,7 @@ namespace :mock do
       _t0 = Time.now
       loan = Loan.get(loan_id)
       Thread.new {
-        next if loan.payments.size > 0 or loan.status != :outstanding
+        next if loan.payments.size > 0 or loan.get_status != :outstanding
         p "Doing loan No. #{loan.id}...."
         loan.history_disabled = true  # do not update the hisotry for every payment
         #      amount     = loan.total_to_be_received / loan.number_of_installments
@@ -75,7 +79,7 @@ namespace :mock do
           if result[0]  # the save status
             count += 1
           else          
-            puts "Validation errors repaying #{amount} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
+            puts "Validation errors repaying #{prin} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
           end
         end
         p "done in #{Time.now - _t0} secs\n"
@@ -114,10 +118,12 @@ namespace :mock do
   end
 
   task :add_date_joined do
-    cs = Client.all(:date_joined => nil)
-    cs.each do |c|
+    cs = Client.all(:date_joined => nil).map{|c| c.id}
+    cs.each do |id|
+      c = Client.get(id)
       print "Doing client id #{c.id}..."
       c.date_joined = c.loans[0].applied_on - 1
+      c.save
       print ".done \n"
     end
   end

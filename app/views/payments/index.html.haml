@@ -2,7 +2,7 @@
   .graph
     = ofc2(430, 250, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
 
-
+= error_messages_for @payment
 %h1
   Loan
   = link_to "##{@loan.id}", url_for_loan(@loan)
@@ -113,7 +113,7 @@
         %td
           %b= payment.total
         %td
-          = link_to 'delete', url_for_loan(@loan, "payment/#{payment.id}/delete")
+          = link_to 'delete', url_for_loan(@loan, "payments/#{payment.id}/delete")
 
     %tfoot
       %tr

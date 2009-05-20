@@ -27,10 +27,17 @@ class Loan
   property :fees_total,                     Integer, :default => 0, :index => true  # gets included in first payment
   property :fees_paid,                      Boolean, :default => false, :index => true
   property :validated_on,                   Date, :auto_validation => false, :index => true
-  property :validation_comment,             Text, :index => true
+  property :validation_comment,             Text
   property :created_at,                     DateTime, :index => true
   property :updated_at,                     DateTime, :index => true
 
+  # loan status
+  # we sacrifice some database normalisation for easier querying and faster reports
+  property :status,                         Enum[nil, :approved, :outstanding, :repaid, :written_off]
+  property :last_payment_received_on,       Date
+  property :amount_in_default,              Integer
+
+  # associations
   belongs_to :client
   belongs_to :funding_line
   belongs_to :applied_by,     :child_key => [:applied_by_staff_id],     :class_name => 'StaffMember'
@@ -324,7 +331,7 @@ class Loan
   end
 
   # this method returns one of [nil, :approved, :outstanding, :repaid, :written_off]
-  def status(date = Date.today)
+  def get_status(date = Date.today)
     return nil          if applied_on > date  # non existant
     return :pending     if applied_on <= date and
                           not (approved_on and approved_on <= date) and
@@ -334,7 +341,18 @@ class Loan
     return :written_off if (written_off_on and written_off_on <= date)
     total_received_up_to(date) >= total_to_be_received ? :repaid : :outstanding
   end
-
+  
+  def update_status
+    debugger
+    self.status = history[:status]
+    if not payments.empty?
+      self.last_payment_received_on = payments.all(:order => [:received_on.desc]).first.received_on
+    end
+    self.amount_in_default = history[:actual_outstanding_principal] - history[:scheduled_outstanding_principal]
+    self.history_disabled = true
+    Merb.logger.notice! "Saving loan #{id}"
+    self.save
+  end
 
   def scheduled_repaid_on
     # first payment is on "scheduled_first_payment_date", so number_of_installments-1 periods later
@@ -346,7 +364,7 @@ class Loan
   # used by +update_history+ for knowing when to stop.
   # (note: this is often a date in the future -- huh?!)   MAYBE: move this to the LoanHistory
   def last_loan_history_date
-    s = status  # TODO: replace with case-when constuct
+    s = get_status  # TODO: replace with case-when constuct
     return nil if s.nil?
     if s == :approved
       return scheduled_repaid_on
@@ -385,10 +403,9 @@ class Loan
   end
   
 
-  # THE RUNNER.. this methods refreshes the history(/future) of this lone when
-  # changes have been made to it, or its payments. gets called by hooks
-  # the task of updating the history may take some time and it therefor put
-  # the the Merb::Dispatcher.work_queue (using Merb.run_later)
+  # Moved this method here from instead of the LoanHistory model for purposes of speed. We sacrifice a bit of readability
+  # for brute force iterations and caching => speed
+
   def history_for(date)
     scheduled_os_principal = amount
     scheduled_os_total = total_to_be_received
@@ -405,8 +422,7 @@ class Loan
       int = interest_received_up_to(date)
       actual_os_principal = amount - prin
       actual_os_total = total_to_be_received - int -prin
-      #    puts "#{Time.now - t0}"
-      @history_array = {:loan_id => id, :date => date, :status => status(date), :scheduled_outstanding_principal => scheduled_os_principal, :scheduled_outstanding_total => scheduled_os_total, :actual_outstanding_principal => actual_os_principal, :actual_outstanding_total => actual_os_total}
+      @history_array = {:loan_id => id, :date => date, :status => get_status(date), :scheduled_outstanding_principal => scheduled_os_principal, :scheduled_outstanding_total => scheduled_os_total, :actual_outstanding_principal => actual_os_principal, :actual_outstanding_total => actual_os_total}
     else
       prin = scheduled_principal_for_installment(i_number)
       act_prin = principal_received_up_to(date)
@@ -414,8 +430,10 @@ class Loan
       act_int = interest_received_up_to(date)
       @history_array[:scheduled_outstanding_principal] -= prin 
       @history_array[:scheduled_outstanding_total] -= (int + prin)
-      @history_array[:actual_outstanding_principal] -= act_prin
-      @history_array[:actual_outstanding_total] -= (act_prin + act_int)
+      @history_array[:actual_outstanding_principal] = amount - act_prin
+      @history_array[:actual_outstanding_total] = total_to_be_received - (act_prin + act_int)
+      @history_array[:status] = get_status(date)
+      @history_array
     end
   end
 
@@ -425,7 +443,7 @@ class Loan
 #     Merb.run_later { update_history_now }  # i just love procrastination
   end
 
-  def update_history_now  # TODO: not update every thing all the time (like in case of a new payment)
+  def update_history_now  # DEPRECATED - use update_history_bulk_insert instead
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
     dates = payment_dates + installment_dates
 #     dates << scheduled_disbursal_date if scheduled_disbursal_date
@@ -439,19 +457,29 @@ class Loan
   def update_history_bulk_insert
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
     dates = payment_dates + installment_dates
-#     dates << scheduled_disbursal_date if scheduled_disbursal_date
     dates << disbursal_date if disbursal_date
     dates << written_off_on if written_off_on
     sql = %Q{ INSERT INTO loan_history(loan_id, date, status, 
               scheduled_outstanding_principal, scheduled_outstanding_total,
-              actual_outstanding_principal, actual_outstanding_total)
+              actual_outstanding_principal, actual_outstanding_total, current, amount_in_default)
               VALUES }
     values = []
     t = Time.now
+    status_updated = false
     dates.uniq.sort.each do |date|
       history = history_for(date)
-      st = [nil, :approved, :outstanding, :repaid, :written_off].index(status(date)) + 1
-      value = %Q{(#{id}, '#{date}', #{st}, #{history[:scheduled_outstanding_principal]}, #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},#{history[:actual_outstanding_total]})}
+      if date > Date.today and not status_updated
+        current = 1
+        status_updated = true
+      else
+        current = 0
+      end
+      st = [nil, :approved, :outstanding, :repaid, :written_off].index(get_status(date)) + 1
+      value = %Q{(#{id}, '#{date}', #{st}, #{history[:scheduled_outstanding_principal]}, 
+                          #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
+                          #{history[:actual_outstanding_total]},#{current},
+                          #{history[:actual_outstanding_total] - history[:scheduled_outstanding_total]})}
+
      values << value
     end
     puts "#{Time.now - t}"
@@ -460,8 +488,23 @@ class Loan
     puts "#{Time.now - t}"
     
   end
-    
 
+  def self.defaulted_loans (days = 7, date = Date.today, query ={})
+    if not query.empty?
+      loans = Loan.all(query)
+      loan_ids = loans.map {|l| l.id}
+    end
+    defaulted_loan_ids = repository.adapter.query(%Q{
+      SELECT loan_id
+             FROM  loan_history 
+             WHERE actual_outstanding_principal != scheduled_outstanding_principal 
+             AND date < now()
+             GROUP BY loan_id;})
+    
+    defaulted_loans = Loan.all(:id.in => loan_ids.nil? ? defaulted_loan_ids : defaulted_loan_ids & loan_ids)
+  end
+
+  
   # returns the name of the funder
   def funder_name
     self.funding_line and self.funding_line.funder.name or nil
@@ -607,20 +650,8 @@ class Loan
     payments.map { |p| p.received_on }
   end
 
-  def self.defaulted_loans (days = 7, date = Date.today)
-    debugger
-    defaulted_loan_ids = repository.adapter.query(%Q{
-            SELECT loan_id, DATEDIFF(MIN(date), NOW()) FROM 
-                (SELECT loan_id,
-                        date, 
-                        scheduled_outstanding_principal, 
-                        actual_outstanding_principal 
-                   FROM loan_history 
-                  WHERE scheduled_outstanding_principal != actual_outstanding_principal) 
-                     AS dt;
-             })
-    defaulted_loans = Loan.all(:id.in => defaulted_loan_ids)
-  end
+  
+
 
 end
 

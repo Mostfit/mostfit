@@ -86,3 +86,19 @@
     - Branch.all.each do |branch|
       %td
         = @branch_loans[branch.id].all(:scheduled_disbursal_date.not => nil, :disbursal_date => nil, 'client.center.branch_id' => branch.id).sum(:amount)
+  %tr
+    %th
+      Defaulted Loans (Count)
+    %td
+      = LoanHistory.all(:current => true, :amount_in_default.not => 0).count
+    - Branch.all.each do |branch|
+      %td
+        = LoanHistory.all(:current => true, :amount_in_default.not => 0, 'loan.client.center.branch_id' => branch.id).count
+  %tr
+    %th
+      Defaulted Loans (Amount)
+    %td
+      = LoanHistory.all(:current => true, :amount_in_default.not => 0).sum(:amount_in_default)
+    - Branch.all.each do |branch|
+      %td
+        = LoanHistory.all(:current => true, :amount_in_default.not => 0, 'loan.client.center.branch_id' => branch.id).sum(:amount_in_default)
