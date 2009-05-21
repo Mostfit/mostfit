@@ -28,6 +28,14 @@ class StaffMembers < Application
     display @loans
   end
 
+  def day_sheet(id)
+    @staff_member = StaffMember.get(id)
+    raise NotFound unless @staff_member
+    date = params[:date] || Date.today
+    @centers = Center.all(:manager_staff_id => @staff_member.id, :meeting_day => Center.meeting_days[date.wday])
+    display @centers
+  end
+
   def show(id)
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member

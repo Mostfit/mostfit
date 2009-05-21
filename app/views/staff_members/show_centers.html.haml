@@ -14,6 +14,8 @@
       Disbursed
     %th
       Repaid
+    %th
+      Amount In Default
   - for center in @centers
     %tr
       %td
@@ -25,4 +27,6 @@
       %td
         = center.clients.loans.sum(:amount)
       %td
-        = center.clients.loans.history.sum(:total_received_principal)
+        = center.clients.loans.payments.sum(:principal)
+      %td
+        = LoanHistory.all(:current => true, 'loan.client.center_id' => center.id).sum(:amount_in_default) || 0

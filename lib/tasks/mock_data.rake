@@ -64,26 +64,35 @@ namespace :mock do
     count = 0
     loan_ids = Loan.all.map{|l| l.id}
     loan_ids.each do |loan_id|
+      sql = " INSERT INTO `payments` (`received_by_staff_id`, `principal`, `interest`, `created_by_user_id`, `loan_id`, `received_on`, `created_at`) VALUES ";
       _t0 = Time.now
       loan = Loan.get(loan_id)
-      Thread.new {
-        next if loan.payments.size > 0 or loan.get_status != :outstanding
-        p "Doing loan No. #{loan.id}...."
-        loan.history_disabled = true  # do not update the hisotry for every payment
-        #      amount     = loan.total_to_be_received / loan.number_of_installments
-        dates      = loan.installment_dates.reject { |x| x > Date.today or x < loan.disbursal_date }
-        dates.each do |date|
-          prin = loan.scheduled_received_principal_up_to(date) - loan.principal_received_up_to(date)
-          int = loan.scheduled_received_interest_up_to(date) - loan.interest_received_up_to(date)
-          result   = loan.repay([prin,int], busy_user, date, loan.client.center.manager)
-          if result[0]  # the save status
-            count += 1
-          else          
-            puts "Validation errors repaying #{prin} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
-          end
-        end
-        p "done in #{Time.now - _t0} secs\n"
-      }.join
+      staff_member = loan.client.center.manager
+      next if loan.payments.size > 0 or loan.get_status != :outstanding
+      p "Doing loan No. #{loan.id}...."
+      loan.history_disabled = true  # do not update the hisotry for every payment
+      #      amount     = loan.total_to_be_received / loan.number_of_installments
+      dates      = loan.installment_dates.reject { |x| x > Date.today or x < loan.disbursal_date }
+      prin = loan.scheduled_principal_for_installment(1)
+      int = loan.scheduled_interest_for_installment(1)
+      values = []
+      dates.each do |date|
+        #prin = loan.scheduled_received_principal_up_to(date) - loan.principal_received_up_to(date)
+        #int = loan.scheduled_received_interest_up_to(date) - loan.interest_received_up_to(date)
+        values << "(#{staff_member.id}, #{prin}, #{int}, 1, #{loan.id}, '#{date}', now())"
+        #result   = loan.repay([prin,int], busy_user, date, staff_member)
+        #if result[0]  # the save status
+        #  count += 1
+        #else          
+        #  puts "Validation errors repaying #{prin} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
+        #end
+      end
+      if not values.empty?
+        sql += values.join(",")
+#        debugger
+        repository.adapter.execute(sql)
+      end
+      p "done in #{Time.now - _t0} secs\n"
     end
     t1 = Time.now
     secs = (t1 - t0).round

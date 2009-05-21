@@ -148,7 +148,7 @@ class Loan
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
     raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
-    total_interest_to_be_received / number_of_installments
+    (total_interest_to_be_received / number_of_installments).round
   end
 
   # the 'grande totale' of what the client has to pay back for this loan
@@ -282,20 +282,33 @@ class Loan
   def payment_schedule
     schedule = []
     principal_so_far, interest_so_far = 0, 0
+    scheduled_balance, actual_balance = amount, amount
+    schedule << {
+      :date => disbursal_date, :principal => 0, :interest => 0, :principal_so_far => 0, :interest_so_far => 0,
+      :principal_received_so_far => 0, :interest_received_so_far => 0, :principal_overpaid => 0, 
+      :interest_overpaid => 0, :scheduled_balance => scheduled_balance, :actual_balance => actual_balance
+    }
     number_of_installments.times do |number|
       date      = shift_date_by_installments(scheduled_first_payment_date, number)
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
+      principal_so_far += principal
+      interest_so_far  += interest
+      scheduled_balance -= principal
+      actual_balance = amount - principal_so_far
       schedule << {
         :date                       => date,
         :principal                  => principal,
         :interest                   => interest,
-        :principal_so_far           => (principal_so_far += principal),
-        :interest_so_far            => (interest_so_far  += interest),
+        :principal_so_far           => (principal_so_far),
+        :interest_so_far            => (interest_so_far),
         :principal_received_so_far  => principal_received_up_to(date),
         :interest_received_so_far   => interest_received_up_to(date),
         :principal_overpaid         => principal_overpaid_on(date),
-        :interest_overpaid          => interest_overpaid_on(date) }
+        :interest_overpaid          => interest_overpaid_on(date),
+        :scheduled_balance          => scheduled_balance, 
+        :actual_balance             => actual_balance
+      }
     end
     schedule
   end
@@ -466,19 +479,21 @@ class Loan
     values = []
     t = Time.now
     status_updated = false
-    dates.uniq.sort.each do |date|
+    dates = dates.uniq.sort
+    dates.each_with_index do |date,index|
       history = history_for(date)
-      if date > Date.today and not status_updated
+      if dates[[index + 1,dates.size - 1].min] > Date.today and not status_updated
         current = 1
         status_updated = true
       else
         current = 0
       end
       st = [nil, :approved, :outstanding, :repaid, :written_off].index(get_status(date)) + 1
+      amount_in_default = date <= Date.today ? history[:actual_outstanding_total] - history[:scheduled_outstanding_total] : 0
       value = %Q{(#{id}, '#{date}', #{st}, #{history[:scheduled_outstanding_principal]}, 
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
                           #{history[:actual_outstanding_total]},#{current},
-                          #{history[:actual_outstanding_total] - history[:scheduled_outstanding_total]})}
+                          #{amount_in_default})}
 
      values << value
     end
