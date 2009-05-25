@@ -27,6 +27,7 @@ Merb::BootLoader.before_app_loads do
                           :currency => { :unit => 'Rs.',  :format => '%u %n', :precision => 0 } })
   Numeric::Transformer.change_default_format(:mostfit_default)
 
+
 end
  
 Merb::BootLoader.after_app_loads do
@@ -45,3 +46,4 @@ Merb::BootLoader.after_app_loads do
   end
 
 end
+

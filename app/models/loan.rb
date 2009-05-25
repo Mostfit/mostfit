@@ -31,12 +31,6 @@ class Loan
   property :created_at,                     DateTime, :index => true
   property :updated_at,                     DateTime, :index => true
 
-  # loan status
-  # we sacrifice some database normalisation for easier querying and faster reports
-  property :status,                         Enum[nil, :approved, :outstanding, :repaid, :written_off]
-  property :last_payment_received_on,       Date
-  property :amount_in_default,              Integer
-
   # associations
   belongs_to :client
   belongs_to :funding_line
@@ -154,10 +148,10 @@ class Loan
   # the 'grande totale' of what the client has to pay back for this loan
   # used in many places
   def total_to_be_received
-    (self.amount.to_f * (1 + self.interest_rate)).round
+    self.amount + total_interest_to_be_received
   end
   def total_interest_to_be_received
-    amount * interest_rate
+    ((self.amount * self.interest_rate) / number_of_installments).round * number_of_installments
   end
 
   # the following methods basically count the payments (PAYMENT-RECEIVED perspective)
@@ -344,6 +338,10 @@ class Loan
   end
 
   # this method returns one of [nil, :approved, :outstanding, :repaid, :written_off]
+  def status
+    get_status
+  end
+
   def get_status(date = Date.today)
     return nil          if applied_on > date  # non existant
     return :pending     if applied_on <= date and
