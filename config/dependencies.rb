@@ -36,3 +36,4 @@ dependency "dm-serializer", dm_gems_version
 
 dependency "dm-paperclip"
 dependency "merb-gen", merb_gems_version
+dependency "dm-pagination"
