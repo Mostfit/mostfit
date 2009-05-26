@@ -35,12 +35,11 @@ Merb::Router.prepare do
   
   match('/staff_members/:id/day_sheet').to(:controller => 'staff_members', :action => 'day_sheet').name(:day_sheet)
 
-
-  # This is the default route for /:controller/:action/:id
-#   default_routes
-
   # this uses the redirect_to_show methods on the controllers to redirect some models to their appropriate urls
   match('/:controller/:id').to(:action => 'redirect_to_show').name(:quick_link)
 
   match('/').to(:controller => 'entrance', :action =>'root')
+  # This is the default route for /:controller/:action/:id
+  default_routes
+
 end
