@@ -3,14 +3,14 @@ class Branches < Application
   before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
 
   def index
-    @branches = Branch.all
+    @branches = Branch.paginate(:page => params[:page], :per_page => 15)
     display @branches
   end
 
   def show(id)
     @branch = Branch.get(id)
     raise NotFound unless @branch
-    @centers = @branch.centers
+    @centers = @branch.centers_with_paginate(params)
     display [@branch, @centers], 'centers/index'
   end
   
