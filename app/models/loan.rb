@@ -278,7 +278,7 @@ class Loan
     principal_so_far, interest_so_far = 0, 0
     scheduled_balance, actual_balance = amount, amount
     schedule << {
-      :date => disbursal_date, :principal => 0, :interest => 0, :principal_so_far => 0, :interest_so_far => 0,
+      :date => disbursal_date || scheduled_disbursal_date, :principal => 0, :interest => 0, :principal_so_far => 0, :interest_so_far => 0,
       :principal_received_so_far => 0, :interest_received_so_far => 0, :principal_overpaid => 0, 
       :interest_overpaid => 0, :scheduled_balance => scheduled_balance, :actual_balance => actual_balance
     }
@@ -342,7 +342,8 @@ class Loan
     get_status
   end
 
-  def get_status(date = Date.today)
+  def get_status(date = Date.today, total_received = nil) # we have this last parameter so we can speed up get_status
+                                                          # considerably by passing total_received, i.e. from history_for
     return nil          if applied_on > date  # non existant
     return :pending     if applied_on <= date and
                           not (approved_on and approved_on <= date) and
@@ -350,10 +351,13 @@ class Loan
     return :approved    if (approved_on and approved_on <= date) and not (disbursal_date and disbursal_date <= date)
     return :rejected    if (rejected_on and rejected_on <= date)
     return :written_off if (written_off_on and written_off_on <= date)
-    total_received_up_to(date) >= total_to_be_received ? :repaid : :outstanding
+    return :outstanding if (date == disbursal_date)
+    total_received = total_received.nil? ? total_received_up_to(date) : total_received
+    total_received  >= total_to_be_received ? :repaid : :outstanding
   end
   
-  def update_status
+  def update_status # DEPRECATED? check if this is actually being called. I think we moved this to loan_history with
+                    # a 'current' flag.
     debugger
     self.status = history[:status]
     if not payments.empty?
@@ -418,6 +422,7 @@ class Loan
   # for brute force iterations and caching => speed
 
   def history_for(date)
+    t0 = Time.now
     scheduled_os_principal = amount
     scheduled_os_total = total_to_be_received
     t0 = Time.now
@@ -429,23 +434,33 @@ class Loan
         scheduled_os_principal -= prin
         scheduled_os_total -= (int + prin)
       end
-      prin = principal_received_up_to(date)
-      int = interest_received_up_to(date)
+#      puts "    Made first history in #{Time.now - t0}"
+#      puts "#{date} == #{disbursal_date}?"
+      prin = date == disbursal_date ? 0 : principal_received_up_to(date)
+      int = date == disbursal_date ? 0 : interest_received_up_to(date)
       actual_os_principal = amount - prin
       actual_os_total = total_to_be_received - int -prin
-      @history_array = {:loan_id => id, :date => date, :status => get_status(date), :scheduled_outstanding_principal => scheduled_os_principal, :scheduled_outstanding_total => scheduled_os_total, :actual_outstanding_principal => actual_os_principal, :actual_outstanding_total => actual_os_total}
+      st = get_status(date, total_to_be_received - actual_os_total)
+#      puts "    Made first history in #{Time.now - t0}"
+      @history_array = {:loan_id => id, :date => date, :status => st, :scheduled_outstanding_principal => scheduled_os_principal, :scheduled_outstanding_total => scheduled_os_total, :actual_outstanding_principal => actual_os_principal, :actual_outstanding_total => actual_os_total}
+#      puts "    but something took #{Time.now - t0}"
+
     else
+#      puts "    in else I took #{Time.now - t0}"
       prin = scheduled_principal_for_installment(i_number)
       act_prin = principal_received_up_to(date)
+#      puts "    calculating prin took #{Time.now - t0}"
       int = scheduled_interest_for_installment(i_number)
       act_int = interest_received_up_to(date)
+#      puts "    calculating int took  #{Time.now - t0}"
       @history_array[:scheduled_outstanding_principal] -= prin 
       @history_array[:scheduled_outstanding_total] -= (int + prin)
       @history_array[:actual_outstanding_principal] = amount - act_prin
       @history_array[:actual_outstanding_total] = total_to_be_received - (act_prin + act_int)
-      @history_array[:status] = get_status(date)
-      @history_array
+      @history_array[:status] = get_status(date, total_to_be_received - @history_array[:actual_outstanding_total])
+#      puts "    Made subsequent history in #{Time.now - t0}"
     end
+    @history_array
   end
 
   def update_history
@@ -466,7 +481,9 @@ class Loan
   end
 
   def update_history_bulk_insert
+    t = Time.now
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
+    @history_array = nil
     dates = payment_dates + installment_dates
     dates << disbursal_date if disbursal_date
     dates << written_off_on if written_off_on
@@ -475,18 +492,20 @@ class Loan
               actual_outstanding_principal, actual_outstanding_total, current, amount_in_default)
               VALUES }
     values = []
-    t = Time.now
     status_updated = false
     dates = dates.uniq.sort
+#    puts "  1: got dates #{Time.now - t}"
     dates.each_with_index do |date,index|
       history = history_for(date)
+#      puts "  1.1: got history for in #{Time.now - t}"
       if dates[[index + 1,dates.size - 1].min] > Date.today and not status_updated
         current = 1
         status_updated = true
       else
         current = 0
       end
-      st = [nil, :approved, :outstanding, :repaid, :written_off].index(get_status(date)) + 1
+      loan_status = get_status(date)
+      st = loan_status == :pending ? "NULL" : [nil, :approved, :outstanding, :repaid, :written_off].index(loan_status) + 1
       amount_in_default = date <= Date.today ? history[:actual_outstanding_total] - history[:scheduled_outstanding_total] : 0
       value = %Q{(#{id}, '#{date}', #{st}, #{history[:scheduled_outstanding_principal]}, 
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
@@ -495,10 +514,10 @@ class Loan
 
      values << value
     end
-    puts "#{Time.now - t}"
+#    puts "  2: made sql #{Time.now - t}"
     sql += values.join(",") + ";"
     repository.adapter.execute(sql)
-    puts "#{Time.now - t}"
+    puts "  3: executed sql #{Time.now - t}"
     
   end
 

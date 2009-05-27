@@ -173,46 +173,50 @@ namespace :mock do
     Merb.logger.info! "Start mock:all_payments rake task at #{t0}"
     busy_user = User.get(1)
     count = 0
-#    cs = Branch.all.map{|c| c.id}
-#    cs.each do |c|
-    debugger
-    loan_ids = repository.adapter.query("SELECT id from loans")
-    puts Time.now - t0
-    sql = " INSERT INTO `payments` (`received_by_staff_id`, `principal`, `interest`, `created_by_user_id`, `loan_id`, `received_on`) VALUES ";
+    loan_ids = repository.adapter.query("SELECT id from loans WHERE id > (select max(loan_id) from payments)")
+    puts "1: #{Time.now - t0}"
     loan_ids.each do |loan_id|
+      sql = " INSERT INTO `payments` (`received_by_staff_id`, `principal`, `interest`, `created_by_user_id`, `loan_id`, `received_on`) VALUES ";
       _t0 = Time.now
-        loan = Loan.get(loan_id)
-        puts loan_id
-        next unless loan.payments.empty?
-        puts Time.now - t0
-        staff_member = loan.client.center.manager
-        next if loan.payments.size > 0 or loan.get_status != :outstanding
-        p "Doing loan No. #{loan.id}...."
-        loan.history_disabled = true  # do not update the hisotry for every payment
-        #      amount     = loan.total_to_be_received / loan.number_of_installments
-        dates      = loan.installment_dates.reject { |x| x > Date.today or x < loan.disbursal_date }
-        prin = loan.scheduled_principal_for_installment(1)
-        int = loan.scheduled_interest_for_installment(1)
-        values = []
-        dates.each do |date|
-          #prin = loan.scheduled_received_principal_up_to(date) - loan.principal_received_up_to(date)
-          #int = loan.scheduled_received_interest_up_to(date) - loan.interest_received_up_to(date)
+      loan = Loan.get(loan_id)
+      #puts loan_id
+      #puts "__________________"
+      #puts "2: #{Time.now - _t0}"
+      staff_member = loan.client.center.manager
+      #puts "3: #{Time.now - _t0}"
+      #next if loan.payments.size > 0 or loan.get_status != :outstanding
+      #puts "4: #{Time.now - _t0}"
+      p "Doing loan No. #{loan.id}...."
+      loan.history_disabled = true  # do not update the hisotry for every payment
+      #      amount     = loan.total_to_be_received / loan.number_of_installments
+      dates      = loan.installment_dates.reject { |x| x > Date.today or x < loan.disbursal_date }
+      prin = loan.scheduled_principal_for_installment(1)
+      #puts "  4.1: #{Time.now - _t0}"
+      int = loan.scheduled_interest_for_installment(1)
+      values = []
+      #puts "5: #{Time.now - _t0}"
+      dates.each do |date|
+        #prin = loan.scheduled_received_principal_up_to(date) - loan.principal_received_up_to(date)
+        #int = loan.scheduled_received_interest_up_to(date) - loan.interest_received_up_to(date)
         values << "(#{staff_member.id}, #{prin}, #{int}, 1, #{loan.id}, '#{date}')"
-          #result   = loan.repay([prin,int], busy_user, date, staff_member)
-          #if result[0]  # the save status
-          #  count += 1
-          #else          
-          #  puts "Validation errors repaying #{prin} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
-          #end
-        end
-        if not values.empty?
-          sql += values.join(",")
-          #        debugger
-          repository.adapter.execute(sql)
-        end
-        p "done in #{Time.now - _t0} secs. Total time: #{Time.now - t0} secs"
+        #result   = loan.repay([prin,int], busy_user, date, staff_member)
+        #if result[0]  # the save status
+        #  count += 1
+        #else          
+        #  puts "Validation errors repaying #{prin} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
+        #end
       end
-#    end
+      puts "done constructing sql in #{Time.now - _t0}"
+      if not values.empty?
+        sql += values.join(",")
+        #        debugger
+        repository.adapter.execute(sql)
+        puts "done executing sql in #{Time.now - _t0}"
+        puts "---------------------"
+      end
+      p "done in #{Time.now - _t0} secs. Total time: #{Time.now - t0} secs"
+    end
+    #    end
     t1 = Time.now
     secs = (t1 - t0).round
     Merb.logger.info! "Finished mock:all_payments rake task in #{secs} secs for #{Loan.all.size} loans creating #{count} payments, at #{t1}"
@@ -222,10 +226,19 @@ namespace :mock do
   task :update_history do
     t0 = Time.now
     Merb.logger.info! "Start mock:history rake task at #{t0}"
-    loan_ids = Loan.all.map{|l| l.id}
+    puts "finding unhistorified loans"
+    loan_ids = repository.adapter.query("SELECT id from loans WHERE id > (select max(loan_id) from loan_history)")
+    puts "got loan ids"
+    if loan_ids.empty?
+      puts "loan_ids empty. getting all"
+      loan_ids = repository.adapter.query("SELECT id from loans")
+    end
+    t0 = Time.now
     loan_ids.each do |loan_id|
       loan = Loan.get(loan_id)   
+      puts "1: #{Time.now - t0}"
       loan.update_history_bulk_insert
+      puts "2: #{Time.now - t0}"
       print "Did loan #{loan.id}  (total = #{Time.now - t0} secs)\n"
     end
     t1 = Time.now

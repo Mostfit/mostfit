@@ -8,16 +8,16 @@ class Payment
   attr_writer :total  # just to be used in the form
   
   property :id,             Serial
-  property :principal,      Integer, :nullable => false
-  property :interest,       Integer, :nullable => false
-  property :received_on,    Date,    :nullable => false
-  property :created_at,     DateTime
-  property :deleted_at,     ParanoidDateTime
+  property :principal,      Integer, :nullable => false, :index => true
+  property :interest,       Integer, :nullable => false, :index => true
+  property :received_on,    Date,    :nullable => false, :index => true
+  property :created_at,     DateTime, :index => true
+  property :deleted_at,     ParanoidDateTime, :index => true
 
-  belongs_to :loan
-  belongs_to :created_by,  :child_key => [:created_by_user_id],   :class_name => 'User'
-  belongs_to :received_by, :child_key => [:received_by_staff_id], :class_name => 'StaffMember'
-  belongs_to :deleted_by,  :child_key => [:deleted_by_user_id],   :class_name => 'User'
+  belongs_to :loan, :index => true
+  belongs_to :created_by,  :child_key => [:created_by_user_id],   :class_name => 'User', :index => true
+  belongs_to :received_by, :child_key => [:received_by_staff_id], :class_name => 'StaffMember', :index => true
+  belongs_to :deleted_by,  :child_key => [:deleted_by_user_id],   :class_name => 'User', :index => true
 
   validates_present     :loan, :created_by, :received_by
   validates_with_method :only_take_payments_on_disbursed_loans?
