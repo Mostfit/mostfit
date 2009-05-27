@@ -1,6 +1,7 @@
 module DataEntry
 
 class Loans < DataEntry::Controller
+  provides :html, :xml
   def new
     debugger
     if params[:client_id]
@@ -27,9 +28,13 @@ class Loans < DataEntry::Controller
     raise NotFound if not @loan.client  # should be known though hidden field
     @client = @loan.client
     if @loan.save
-      redirect url(:enter_loans, :action => 'new'), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
+      if params[:format]=='xml'
+        display @loan, ""
+      else
+        redirect url(:enter_loans, :action => 'new'), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
+      end
     else
-      render :new  # error messages will be shown
+      params[:format]=='xml'? display(@loan) : render(:new)
     end
   end
 
@@ -39,14 +44,17 @@ class Loans < DataEntry::Controller
   end
 
   def update
-    raise NotFound unless params[:loan] and params[:loan][:id]
     klass, attrs = get_loan_and_attrs
-    @loan = klass.get(params[:loan][:id])
+    @loan = klass.get(params[klass.to_s.snake_case.to_sym][:id])
     raise NotFound unless @loan
     if @loan.update_attributes(attrs)
-       redirect url(:enter_loans, :action => 'edit'), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
+      if params[:format]=='xml'
+            display @loan, ""
+      else
+        redirect url(:enter_loans, :action => 'new'), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
+      end
     else
-      render :edit
+      params[:format]=='xml'? display(@loan): render(:edit)
     end
   end
 

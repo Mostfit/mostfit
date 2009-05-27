@@ -6,6 +6,10 @@ class LoanHistory
   property :date,                      Date,    :key => true  # the day that this record applies to
   property :created_at,                DateTime  # automatic, nice for benchmarking runs
   property :run_number,                Integer, :nullable => false, :default => 0
+  property :current,                   Boolean  # tracks the row refering to the loans current status. we can query for these
+                                                # during reporting. I put it here to save an extra write to the db during 
+                                                # update_history_now
+  property :amount_in_default,          Integer # less normalisation = faster queries
 
   # some properties for similarly named methods of a loan:
   property :scheduled_outstanding_principal, Integer, :nullable => false
@@ -35,6 +39,11 @@ class LoanHistory
       Merb.logger.error! "errors object: #{result.errors.inspect}"
       return result
     end
+  end
+
+  def self.make_insert_for(loan, date)
+    history = history_for(date)
+    %Q{(#{history.id}, '#{date}', #{status}, #{history.scheduled_outstanding_principal_on(date)}, #{history.scheduled_outstanding_total_on(date)}, #{history.actual_outstanding_principal_on(date)},#{history.actual_outstanding_total_on(date)})}
   end
 
   def self.sum_outstanding_for(date, loan_ids)

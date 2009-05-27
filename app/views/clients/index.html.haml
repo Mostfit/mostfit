@@ -1,6 +1,6 @@
-- if @center.clients.loans.size > 0
-  .graph
-    = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'center', :id => @center.id, :scope_unit => 'months', :scope_size => 3) )
+/- if @center.clients.loans.size > 0
+/  .graph
+/    = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'center', :id => @center.id, :scope_unit => 'months', :scope_size => 3) )
 
 
 %h1== Center: <i>#{@center.name}</i>
@@ -54,7 +54,7 @@
         %td
           %b= link_to client.name, resource(@branch, @center, client)
         %td
-          %b= Loan.all(:client_id => client.id).count
+          %b= client.loans.size
           == (#{link_to 'view', resource(@branch, @center, client, :loans)})
         %td
           = link_to 'edit', resource(@branch, @center, client, :edit)
@@ -135,7 +135,7 @@
               %b= i.to_currency
               - tot_outstanding += i
             %td.center
-              = loan.status(@date).to_s
+              = loan.get_status(@date).to_s
             %td
               = loan.disbursal_date.to_s
             %td

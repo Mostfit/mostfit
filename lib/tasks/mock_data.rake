@@ -21,7 +21,11 @@ def load_fixtures(*files)
     entries = YAML::load_file(Merb.root / yml_file)
     entries.each do |name, entry|
       k = klass::new(entry)
-      k.history_disabled = true if k.class == Loan  # do not update the hisotry for loans
+      puts "#{k} :#{name}"
+
+      if k.class == Loan  # do not update the hisotry for loans
+        k.history_disabled 
+      end
       unless k.save
         puts "Validation errors saving a #{klass} (##{k.id}):"
         p k.errors
@@ -52,30 +56,167 @@ namespace :mock do
     puts "Fixtures loaded. Have a look at the mock:all_payments and mock:update_history tasks."
   end
 
+  desc "will make 200K loans in 10K Centers and 200 Branches"
+  task :massive_db do
+    DataMapper.auto_migrate! if Merb.orm == :datamapper
+
+    f = Funder.new(:name => 'icicicici')
+    f.save
+    fl = FundingLine.new(:funder => f, :amount =>10000000, :interest_rate => 0.12,
+                         :disbursal_date => Date.parse('2008-01-01'),
+                         :first_payment_date => Date.parse('2008-07-01'),
+                         :last_payment_date => Date.parse('2010-01-01'))
+    if not fl.save
+      fl.errors.each do |e|
+        puts e
+      end
+      raise
+    end                         
+    #first make the branches
+    25.times do |i|
+      sm = StaffMember.new(:name => "Branch Manager #{i}" )
+      sm.save
+      puts "staff_member => #{i}"
+      b = Branch.new(:name => "Branch #{i}")
+      b.manager = sm
+      b.save
+      puts "branch => #{i}"
+      # make 20 random center managers
+      cms = []
+      20.times do |j|
+        cm = StaffMember.new(:name => "br #{i} cm #{j}")
+        cm.save
+        cms << cm
+        puts "center_manager => #{cm.name}"
+      end
+      # make 400 centers per branch
+      400.times do |j|
+        md = Center.meeting_days[[1,rand(7)].min]
+        
+        center = Center.new(:branch => b, :name => "br #{i} cen #{j}", 
+                            :manager => cms[rand(20)], 
+                            :meeting_day => Center.meeting_days[rand(7)])
+        center.save
+        puts "center #{center.name} : manager => #{center.manager.name}"
+      end
+    end
+  end
+  desc "makes clients and loans for massive_db"
+  task :massive_clients do
+    #make 20 clients per center and their loans
+    d1 = Date.parse('2008-08-01')
+    d2 = Date.parse('2009-06-01')
+    fl = FundingLine.get 1
+    cids = Center.all.map { |c| c.id}
+    cids.each do |cid|
+      center = Center.get(cid)
+      next if center.clients.size == 20
+      i = center.branch.id
+      b = center.branch
+      j = center.id
+      date_joined = nil
+      client_sql = %Q{INSERT INTO clients (name, date_joined, reference, center_id) VALUES }
+      loan_sql = %Q{ INSERT INTO loans (client_id, amount, interest_rate, installment_frequency, number_of_installments,
+                                   applied_on, applied_by_staff_id, approved_on, approved_by_staff_id,
+                                   scheduled_disbursal_date, scheduled_first_payment_date, 
+                                   disbursed_by_staff_id, disbursal_date,
+                                   funding_line_id, discriminator) VALUES }
+      values = []
+      (20 - center.clients.size).times do |k|
+        date_joined = (d1..d2).sort_by{rand}[0]
+        value = "('br #{i} cen #{j} cl #{k}', '#{date_joined}', '#{i}-#{j}-#{k}', #{j})"
+#        cl = Client.new(:name => "br #{i} cen #{j} cl #{k}", :date_joined => date_joined, :reference => "#{i}-#{j}-#{k}",
+#                        :center => center)
+#        unless cl.save
+#          cl.errors.each {|e| puts e}
+#        end
+        values << value
+      end
+      sql = client_sql + values.join(",")
+      repository.adapter.execute(sql)
+      puts "Added 20 clients to center no #{j} in branch #{i}"
+      values = []
+      Client.all(:center_id => j).each do |cl|
+        applied_on = center.next_meeting_date_from(date_joined)
+        approved_on = applied_on + 2
+        scheduled_disbursal_date = center.next_meeting_date_from(applied_on)
+        scheduled_first_payment_date = center.next_meeting_date_from(scheduled_disbursal_date)
+        disbursal_date = scheduled_disbursal_date
+        value = %Q{(#{cl.id}, 8000, 0.18, 2, 50, '#{applied_on}', #{center.manager.id}, '#{approved_on}', #{b.manager.id},
+                   '#{scheduled_disbursal_date}', '#{scheduled_first_payment_date}',  #{center.manager.id}, '#{disbursal_date}', #{fl.id}, 'Loan')}
+        values << value
+#        l = Loan.new(:client => cl, :amount => 8000,
+#                     :interest_rate => 0.18, :installment_frequency => :weekly, :number_of_installments => 50,
+#                     :applied_on => applied_on, :applied_by => center.manager,
+#                     :approved_on => approved_on, :approved_by => b.manager,
+#                     :scheduled_disbursal_date => scheduled_disbursal_date,
+#                     :scheduled_first_payment_date => scheduled_first_payment_date,
+#                     :disbursed_by => center.manager, :disbursal_date => disbursal_date,
+#                     :funding_line => fl)
+#        l.history_disabled = true
+#        if not l.save
+#          l.errors.each do |e|
+#            puts e
+#          end
+#          raise
+#        end                              
+      end
+      sql = loan_sql + values.join(",")
+      repository.adapter.execute(sql)
+    end
+  end
+
   desc "Generate all payments for all loans without payments as if everyone paid dilligently (does not write any history)"
   task :all_payments do
+    puts "starting"
     t0 = Time.now
     Merb.logger.info! "Start mock:all_payments rake task at #{t0}"
     busy_user = User.get(1)
     count = 0
-    Loan.all.each do |loan|
-      next if loan.payments.size > 0 or loan.status != :outstanding
-      puts "Doing loan No. #{loan.id}...."
+    loan_ids = repository.adapter.query("SELECT id from loans WHERE id > (select max(loan_id) from payments)")
+    puts "1: #{Time.now - t0}"
+    loan_ids.each do |loan_id|
+      sql = " INSERT INTO `payments` (`received_by_staff_id`, `principal`, `interest`, `created_by_user_id`, `loan_id`, `received_on`) VALUES ";
+      _t0 = Time.now
+      loan = Loan.get(loan_id)
+      #puts loan_id
+      #puts "__________________"
+      #puts "2: #{Time.now - _t0}"
+      staff_member = loan.client.center.manager
+      #puts "3: #{Time.now - _t0}"
+      #next if loan.payments.size > 0 or loan.get_status != :outstanding
+      #puts "4: #{Time.now - _t0}"
+      p "Doing loan No. #{loan.id}...."
       loan.history_disabled = true  # do not update the hisotry for every payment
-#      amount     = loan.total_to_be_received / loan.number_of_installments
+      #      amount     = loan.total_to_be_received / loan.number_of_installments
       dates      = loan.installment_dates.reject { |x| x > Date.today or x < loan.disbursal_date }
+      prin = loan.scheduled_principal_for_installment(1)
+      #puts "  4.1: #{Time.now - _t0}"
+      int = loan.scheduled_interest_for_installment(1)
+      values = []
+      #puts "5: #{Time.now - _t0}"
       dates.each do |date|
-        prin = loan.scheduled_received_principal_up_to(date) - loan.principal_received_up_to(date)
-        int = loan.scheduled_received_interest_up_to(date) - loan.interest_received_up_to(date)
-        result   = loan.repay([prin,int], busy_user, date, loan.client.center.manager)
-        if result[0]  # the save status
-          count += 1
-        else          
-          puts "Validation errors repaying #{amount} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
-        end
+        #prin = loan.scheduled_received_principal_up_to(date) - loan.principal_received_up_to(date)
+        #int = loan.scheduled_received_interest_up_to(date) - loan.interest_received_up_to(date)
+        values << "(#{staff_member.id}, #{prin}, #{int}, 1, #{loan.id}, '#{date}')"
+        #result   = loan.repay([prin,int], busy_user, date, staff_member)
+        #if result[0]  # the save status
+        #  count += 1
+        #else          
+        #  puts "Validation errors repaying #{prin} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
+        #end
       end
-      puts "done"
+      puts "done constructing sql in #{Time.now - _t0}"
+      if not values.empty?
+        sql += values.join(",")
+        #        debugger
+        repository.adapter.execute(sql)
+        puts "done executing sql in #{Time.now - _t0}"
+        puts "---------------------"
+      end
+      p "done in #{Time.now - _t0} secs. Total time: #{Time.now - t0} secs"
     end
+    #    end
     t1 = Time.now
     secs = (t1 - t0).round
     Merb.logger.info! "Finished mock:all_payments rake task in #{secs} secs for #{Loan.all.size} loans creating #{count} payments, at #{t1}"
@@ -85,7 +226,21 @@ namespace :mock do
   task :update_history do
     t0 = Time.now
     Merb.logger.info! "Start mock:history rake task at #{t0}"
-    Loan.all.each { |l| l.update_history }
+    puts "finding unhistorified loans"
+    loan_ids = repository.adapter.query("SELECT id from loans WHERE id > (select max(loan_id) from loan_history)")
+    puts "got loan ids"
+    if loan_ids.empty?
+      puts "loan_ids empty. getting all"
+      loan_ids = repository.adapter.query("SELECT id from loans")
+    end
+    t0 = Time.now
+    loan_ids.each do |loan_id|
+      loan = Loan.get(loan_id)   
+      puts "1: #{Time.now - t0}"
+      loan.update_history_bulk_insert
+      puts "2: #{Time.now - t0}"
+      print "Did loan #{loan.id}  (total = #{Time.now - t0} secs)\n"
+    end
     t1 = Time.now
     secs = (t1 - t0).round
     Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{Loan.all.size} loans with #{Payment.all.size} payments, at #{t1}"
@@ -104,10 +259,12 @@ namespace :mock do
   end
 
   task :add_date_joined do
-    cs = Client.all(:date_joined => nil)
-    cs.each do |c|
+    cs = Client.all(:date_joined => nil).map{|c| c.id}
+    cs.each do |id|
+      c = Client.get(id)
       print "Doing client id #{c.id}..."
       c.date_joined = c.loans[0].applied_on - 1
+      c.save
       print ".done \n"
     end
   end

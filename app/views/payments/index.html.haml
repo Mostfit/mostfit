@@ -2,7 +2,7 @@
   .graph
     = ofc2(430, 250, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
 
-
+= error_messages_for @payment
 %h1
   Loan
   = link_to "##{@loan.id}", url_for_loan(@loan)
@@ -113,7 +113,7 @@
         %td
           %b= payment.total
         %td
-          = link_to 'delete', url_for_loan(@loan, "payment/#{payment.id}/delete")
+          = link_to 'delete', url_for_loan(@loan, "payments/#{payment.id}/delete")
 
     %tfoot
       %tr
@@ -128,10 +128,11 @@
     %tr
       %th
       %th date due
+      %th scheduled balance
       %th scheduled payment
-      %th total scheduled payments
-      %th total received up to date due
-      %th total difference on date due
+      %th actual balance
+      %th actual payments
+      %th difference
   %tbody
   - first, passed = true, false  # these are for printing the "today" row
   - last_payment = @loan.payments.first(:order => [:received_on.desc])
@@ -149,13 +150,14 @@
       %td
         = i[:date]
       %td
-        %b= format_currency i[:principal] + i[:interest]
-        %br/
-        %span.greytext== #{i[:principal].round} principal + #{i[:interest].round} interest
+        %b= format_currency i[:scheduled_balance]
       %td
         %b= format_currency i[:principal_so_far] + i[:interest_so_far]
         %br/
         %span.greytext== #{i[:principal_so_far].round} principal + #{i[:interest_so_far].round} interest
+      %td
+        - if last_payment_date and (i[:date] <= last_payment_date or i[:date] <= Date.today)
+          %b= format_currency i[:actual_balance]
       %td
         - if last_payment_date and (i[:date] <= last_payment_date or i[:date] <= Date.today)
           %b= format_currency i[:principal_received_so_far] + i[:interest_received_so_far]

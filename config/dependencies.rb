@@ -23,7 +23,7 @@ dependency "merb-exceptions", merb_gems_version
 dependency "merb_datamapper", merb_gems_version
 
 dependency "data_objects", do_gems_version
-dependency "do_sqlite3", do_gems_version  # most development
+#dependency "do_sqlite3", do_gems_version  # most development
 dependency "do_mysql", do_gems_version    # most production
 
 dependency "dm-core", dm_gems_version
@@ -35,3 +35,5 @@ dependency "dm-validations", dm_gems_version
 dependency "dm-serializer", dm_gems_version
 
 dependency "dm-paperclip"
+dependency "merb-gen", merb_gems_version
+dependency "dm-pagination"

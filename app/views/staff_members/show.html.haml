@@ -1,6 +1,8 @@
-%h1 Nothing here yet
+%h1 
+  = @staff_member.name
 
-%p This page will contain an overview of a staff member with some graphs and such
-
+= link_to 'Day Sheet', url(:day_sheet, @staff_member.id)
+%br
+= link_to 'Centers Managed', url(:show_staff_member_centers, @staff_member.id)
 %p
   = link_to 'back', resource(:staff_members)

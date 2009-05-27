@@ -35,6 +35,7 @@
 %p
   == Manage existing loans or #{link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new)}.
 
+
 - if @loans.blank?
   %p
     %i== #{@client.name} has no loans yet.
@@ -81,7 +82,7 @@
         %td
           = format("%.2f%", loan.principal_received_up_to(Date.today).to_f / loan.amount * 100)
         %td
-          - if loan.status == :written_off
+          - if loan.get_status == :written_off
             %b written off
             %br/
             %span.greytext

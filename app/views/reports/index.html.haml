@@ -1,0 +1,15 @@
+%h1
+  Reports
+
+%table
+  %tr
+  - @reports.each do |report|
+    %tr
+      %td
+        = report.name
+      %td
+        = link_to 'Show', url(:report, report)
+      %td
+        = link_to 'Edit', url(:edit_report,  report)
+
+= link_to 'New', url(:new_report)

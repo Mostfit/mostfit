@@ -1,0 +1,15 @@
+%h1 New Report
+
+= error_messages_for @report
+
+= form_for(@report, :action => url(:reports) ) do
+  %table
+    %tr
+      %th
+        Report Name
+      %td
+        = text_field :name
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:reports)

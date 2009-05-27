@@ -11,27 +11,29 @@ class Loan
   attr_accessor :interest_percentage  # set to true to disable history writing by this object
   
   property :id,                             Serial
-  property :discriminator,                  Discriminator, :nullable => false
-  property :amount,                         Integer, :nullable => false  # see helper for formatting
-  property :interest_rate,                  Float, :nullable => false
-  property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false
-  property :number_of_installments,         Integer, :nullable => false
-  property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false
-  property :scheduled_first_payment_date,   Date, :nullable => false, :auto_validation => false
-  property :applied_on,                     Date, :nullable => false, :auto_validation => false
-  property :approved_on,                    Date, :auto_validation => false
-  property :rejected_on,                    Date, :auto_validation => false
-  property :disbursal_date,                 Date, :auto_validation => false
-  property :written_off_on,                 Date, :auto_validation => false
+  property :discriminator,                  Discriminator, :nullable => false, :index => true
+  property :amount,                         Integer, :nullable => false, :index => true  # see helper for formatting
+  property :interest_rate,                  Float, :nullable => false, :index => true
+  property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
+  property :number_of_installments,         Integer, :nullable => false, :index => true
+  property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false, :index => true
+  property :scheduled_first_payment_date,   Date, :nullable => false, :auto_validation => false, :index => true
+  property :applied_on,                     Date, :nullable => false, :auto_validation => false, :index => true
+  property :approved_on,                    Date, :auto_validation => false, :index => true
+  property :rejected_on,                    Date, :auto_validation => false, :index => true
+  property :disbursal_date,                 Date, :auto_validation => false, :index => true
+  property :written_off_on,                 Date, :auto_validation => false, :index => true
   property :fees,                           Yaml  # like: "first fee: 1000, second fee: 200" (yaml) -- fully reimplementable
-  property :fees_total,                     Integer, :default => 0  # gets included in first payment
-  property :fees_paid,                      Boolean, :default => false
-  property :validated_on,                   Date, :auto_validation => false
+
+  property :fees_total,                     Integer, :default => 0, :index => true  # gets included in first payment
+  property :fees_paid,                      Boolean, :default => false, :index => true
+  property :validated_on,                   Date, :auto_validation => false, :index => true
 
   property :validation_comment,             Text
-  property :created_at,                     DateTime
-  property :updated_at,                     DateTime
+  property :created_at,                     DateTime, :index => true
+  property :updated_at,                     DateTime, :index => true
 
+  # associations
   belongs_to :client
   belongs_to :funding_line
   belongs_to :applied_by,     :child_key => [:applied_by_staff_id],     :class_name => 'StaffMember'
@@ -142,22 +144,23 @@ class Loan
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
     raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
-    total_interest_to_be_received / number_of_installments
+    (total_interest_to_be_received / number_of_installments).round
   end
 
   # the 'grande totale' of what the client has to pay back for this loan
   # used in many places
   def total_to_be_received
-    (self.amount.to_f * (1 + self.interest_rate)).round
+    self.amount + total_interest_to_be_received
   end
   def total_interest_to_be_received
-    amount * interest_rate
+    ((self.amount * self.interest_rate) / number_of_installments).round * number_of_installments
   end
 
   # the following methods basically count the payments (PAYMENT-RECEIVED perspective)
   # the last method makes the actual (optimized) db call and is cached
   def principal_received_up_to(date)
     payments_received_up_to(date)[:principal_received_so_far]
+#    payments(:received_on.lte => date).sum(:principal)
   end
   def interest_received_up_to(date)
     payments_received_up_to(date)[:interest_received_so_far]
@@ -183,8 +186,10 @@ class Loan
   # payments will rarely be over a hundred, and even that is (one read query) blazing fast.
   # so best is not to recalculate everytime, or query all along -- but to cache.
   def payments_hash
-    return @payments_hash_cache if @payments_hash_cache 
-    payments = Payment.all(:loan_id => self.id, :order => [:received_on.asc])
+
+    return @payments_hash_cache if @payments_hash_cache
+#    payments = Payment.all(:loan_id => self.id, :order => [:received_on.asc])
+
     structs = repository.adapter.query(%Q{                                             # This causes problems with mysql/sqlite3 changes
       SELECT principal, interest, received_on
         FROM payments
@@ -243,6 +248,9 @@ class Loan
     total_to_be_received - scheduled_received_total_up_to(date)
   end
 
+    
+
+
   # these 3 methods return overpayment amounts (PAYMENT-RECEIVED perspective)
   # negative values mean shortfall (we're positive-minded at intellecap)
   def principal_overpaid_on(date)
@@ -272,20 +280,33 @@ class Loan
   def payment_schedule
     schedule = []
     principal_so_far, interest_so_far = 0, 0
+    scheduled_balance, actual_balance = amount, amount
+    schedule << {
+      :date => disbursal_date || scheduled_disbursal_date, :principal => 0, :interest => 0, :principal_so_far => 0, :interest_so_far => 0,
+      :principal_received_so_far => 0, :interest_received_so_far => 0, :principal_overpaid => 0, 
+      :interest_overpaid => 0, :scheduled_balance => scheduled_balance, :actual_balance => actual_balance
+    }
     number_of_installments.times do |number|
       date      = shift_date_by_installments(scheduled_first_payment_date, number)
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
+      principal_so_far += principal
+      interest_so_far  += interest
+      scheduled_balance -= principal
+      actual_balance = amount - principal_so_far
       schedule << {
         :date                       => date,
         :principal                  => principal,
         :interest                   => interest,
-        :principal_so_far           => (principal_so_far += principal),
-        :interest_so_far            => (interest_so_far  += interest),
+        :principal_so_far           => (principal_so_far),
+        :interest_so_far            => (interest_so_far),
         :principal_received_so_far  => principal_received_up_to(date),
         :interest_received_so_far   => interest_received_up_to(date),
         :principal_overpaid         => principal_overpaid_on(date),
-        :interest_overpaid          => interest_overpaid_on(date) }
+        :interest_overpaid          => interest_overpaid_on(date),
+        :scheduled_balance          => scheduled_balance, 
+        :actual_balance             => actual_balance
+      }
     end
     schedule
   end
@@ -321,7 +342,12 @@ class Loan
   end
 
   # this method returns one of [nil, :approved, :outstanding, :repaid, :written_off]
-  def status(date = Date.today)
+  def status
+    get_status
+  end
+
+  def get_status(date = Date.today, total_received = nil) # we have this last parameter so we can speed up get_status
+                                                          # considerably by passing total_received, i.e. from history_for
     return nil          if applied_on > date  # non existant
     return :pending     if applied_on <= date and
                           not (approved_on and approved_on <= date) and
@@ -329,9 +355,23 @@ class Loan
     return :approved    if (approved_on and approved_on <= date) and not (disbursal_date and disbursal_date <= date)
     return :rejected    if (rejected_on and rejected_on <= date)
     return :written_off if (written_off_on and written_off_on <= date)
-    total_received_up_to(date) >= total_to_be_received ? :repaid : :outstanding
+    return :outstanding if (date == disbursal_date)
+    total_received = total_received.nil? ? total_received_up_to(date) : total_received
+    total_received  >= total_to_be_received ? :repaid : :outstanding
   end
-
+  
+  def update_status # DEPRECATED? check if this is actually being called. I think we moved this to loan_history with
+                    # a 'current' flag.
+    debugger
+    self.status = history[:status]
+    if not payments.empty?
+      self.last_payment_received_on = payments.all(:order => [:received_on.desc]).first.received_on
+    end
+    self.amount_in_default = history[:actual_outstanding_principal] - history[:scheduled_outstanding_principal]
+    self.history_disabled = true
+    Merb.logger.notice! "Saving loan #{id}"
+    self.save
+  end
 
   def scheduled_repaid_on
     # first payment is on "scheduled_first_payment_date", so number_of_installments-1 periods later
@@ -343,7 +383,7 @@ class Loan
   # used by +update_history+ for knowing when to stop.
   # (note: this is often a date in the future -- huh?!)   MAYBE: move this to the LoanHistory
   def last_loan_history_date
-    s = status  # TODO: replace with case-when constuct
+    s = get_status  # TODO: replace with case-when constuct
     return nil if s.nil?
     if s == :approved
       return scheduled_repaid_on
@@ -382,17 +422,58 @@ class Loan
   end
   
 
-  # THE RUNNER.. this methods refreshes the history(/future) of this lone when
-  # changes have been made to it, or its payments. gets called by hooks
-  # the task of updating the history may take some time and it therefor put
-  # the the Merb::Dispatcher.work_queue (using Merb.run_later)
+  # Moved this method here from instead of the LoanHistory model for purposes of speed. We sacrifice a bit of readability
+  # for brute force iterations and caching => speed
+
+  def history_for(date)
+    t0 = Time.now
+    scheduled_os_principal = amount
+    scheduled_os_total = total_to_be_received
+    t0 = Time.now
+    i_number = number_of_installments_before(date)-1
+    if @history_array.nil?
+      0.upto(i_number) do |i|
+        prin = scheduled_principal_for_installment(i)
+        int = scheduled_interest_for_installment(i)
+        scheduled_os_principal -= prin
+        scheduled_os_total -= (int + prin)
+      end
+#      puts "    Made first history in #{Time.now - t0}"
+#      puts "#{date} == #{disbursal_date}?"
+      prin = date == disbursal_date ? 0 : principal_received_up_to(date)
+      int = date == disbursal_date ? 0 : interest_received_up_to(date)
+      actual_os_principal = amount - prin
+      actual_os_total = total_to_be_received - int -prin
+      st = get_status(date, total_to_be_received - actual_os_total)
+#      puts "    Made first history in #{Time.now - t0}"
+      @history_array = {:loan_id => id, :date => date, :status => st, :scheduled_outstanding_principal => scheduled_os_principal, :scheduled_outstanding_total => scheduled_os_total, :actual_outstanding_principal => actual_os_principal, :actual_outstanding_total => actual_os_total}
+#      puts "    but something took #{Time.now - t0}"
+
+    else
+#      puts "    in else I took #{Time.now - t0}"
+      prin = scheduled_principal_for_installment(i_number)
+      act_prin = principal_received_up_to(date)
+#      puts "    calculating prin took #{Time.now - t0}"
+      int = scheduled_interest_for_installment(i_number)
+      act_int = interest_received_up_to(date)
+#      puts "    calculating int took  #{Time.now - t0}"
+      @history_array[:scheduled_outstanding_principal] -= prin 
+      @history_array[:scheduled_outstanding_total] -= (int + prin)
+      @history_array[:actual_outstanding_principal] = amount - act_prin
+      @history_array[:actual_outstanding_total] = total_to_be_received - (act_prin + act_int)
+      @history_array[:status] = get_status(date, total_to_be_received - @history_array[:actual_outstanding_total])
+#      puts "    Made subsequent history in #{Time.now - t0}"
+    end
+    @history_array
+  end
+
   def update_history
     return if history_disabled  # easy when doing mass db modifications (like with fixutes)
-    update_history_now
+    update_history_bulk_insert
 #     Merb.run_later { update_history_now }  # i just love procrastination
   end
 
-  def update_history_now  # TODO: not update every thing all the time (like in case of a new payment)
+  def update_history_now  # DEPRECATED - use update_history_bulk_insert instead
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
     dates = payment_dates + installment_dates
 #     dates << scheduled_disbursal_date if scheduled_disbursal_date
@@ -403,6 +484,63 @@ class Loan
     end
   end
 
+  def update_history_bulk_insert
+    t = Time.now
+    Merb.logger.error! "could not destroy the history" unless self.history.destroy!
+    @history_array = nil
+    dates = payment_dates + installment_dates
+    dates << disbursal_date if disbursal_date
+    dates << written_off_on if written_off_on
+    sql = %Q{ INSERT INTO loan_history(loan_id, date, status, 
+              scheduled_outstanding_principal, scheduled_outstanding_total,
+              actual_outstanding_principal, actual_outstanding_total, current, amount_in_default)
+              VALUES }
+    values = []
+    status_updated = false
+    dates = dates.uniq.sort
+#    puts "  1: got dates #{Time.now - t}"
+    dates.each_with_index do |date,index|
+      history = history_for(date)
+#      puts "  1.1: got history for in #{Time.now - t}"
+      if dates[[index + 1,dates.size - 1].min] > Date.today and not status_updated
+        current = 1
+        status_updated = true
+      else
+        current = 0
+      end
+      loan_status = get_status(date)
+      st = loan_status == :pending ? "NULL" : [nil, :approved, :outstanding, :repaid, :written_off].index(loan_status) + 1
+      amount_in_default = date <= Date.today ? history[:actual_outstanding_total] - history[:scheduled_outstanding_total] : 0
+      value = %Q{(#{id}, '#{date}', #{st}, #{history[:scheduled_outstanding_principal]}, 
+                          #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
+                          #{history[:actual_outstanding_total]},#{current},
+                          #{amount_in_default})}
+
+     values << value
+    end
+#    puts "  2: made sql #{Time.now - t}"
+    sql += values.join(",") + ";"
+    repository.adapter.execute(sql)
+    puts "  3: executed sql #{Time.now - t}"
+    
+  end
+
+  def self.defaulted_loans (days = 7, date = Date.today, query ={})
+    if not query.empty?
+      loans = Loan.all(query)
+      loan_ids = loans.map {|l| l.id}
+    end
+    defaulted_loan_ids = repository.adapter.query(%Q{
+      SELECT loan_id
+             FROM  loan_history 
+             WHERE actual_outstanding_principal != scheduled_outstanding_principal 
+             AND date < now()
+             GROUP BY loan_id;})
+    
+    defaulted_loans = Loan.all(:id.in => loan_ids.nil? ? defaulted_loan_ids : defaulted_loan_ids & loan_ids)
+  end
+
+  
   # returns the name of the funder
   def funder_name
     self.funding_line and self.funding_line.funder.name or nil
@@ -547,6 +685,10 @@ class Loan
     #   WHERE ("deleted_at" IS NULL) AND ("loan_id" = #{self.id})}).map { |x| Date.parse(x) }
     payments.map { |p| p.received_on }
   end
+
+  
+
+
 end
 
 class DefaultLoan < Loan
@@ -574,6 +716,7 @@ class A50Loan < Loan
     raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
     amount.to_f / number_of_installments
   end
+
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations

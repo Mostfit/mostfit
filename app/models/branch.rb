@@ -12,6 +12,11 @@ class Branch
   validates_present     :manager
   validates_with_method :manager, :method => :manager_is_an_active_staff_member?
 
+  
+  def centers_with_paginate(params)
+    Center.paginate(:page => params[:page], :per_page => 15)
+  end
+
   private
   def manager_is_an_active_staff_member?
     return true if manager and manager.active

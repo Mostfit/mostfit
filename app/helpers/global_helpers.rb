@@ -124,6 +124,7 @@ module Merb
     def breadcrums
       # breadcrums use the request.uri and the instance vars of the parent
       # resources (@branch, @center) that are available -- so no db queries
+      debugger
       crums, url = [], ''
       request.uri[1..-1].split('/').each_with_index do |part, index|
         url  << '/' + part

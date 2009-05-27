@@ -78,7 +78,7 @@ end
 
 class ::Gem::SpecFetcher
   alias old_fetch fetch
-  def fetch(dependency, all = false, matching_platform = true)
+  def fetch(dependency, all = false, matching_platform = true, prerelease = false)
     idx = Gem::SourceIndex.from_installed_gems
     
     reqs = dependency.version_requirements.requirements
@@ -94,7 +94,7 @@ class ::Gem::SpecFetcher
       spec = ::Gem::Format.from_file_by_path(file).spec
       [[spec, file]]
     else
-      old_fetch(dependency, all, matching_platform)
+      old_fetch(dependency, all, matching_platform, prerelease)
     end
   end
 end
