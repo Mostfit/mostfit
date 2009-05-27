@@ -16,7 +16,7 @@ class LoanHistory
 
   belongs_to :loan
 
-#  validates_present :loan  # the rest does with autovalidations
+       validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
 
   # the prefered way to make history and future.

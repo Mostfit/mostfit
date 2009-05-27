@@ -27,6 +27,7 @@ class Loan
   property :fees_total,                     Integer, :default => 0  # gets included in first payment
   property :fees_paid,                      Boolean, :default => false
   property :validated_on,                   Date, :auto_validation => false
+
   property :validation_comment,             Text
   property :created_at,                     DateTime
   property :updated_at,                     DateTime
@@ -182,7 +183,7 @@ class Loan
   # payments will rarely be over a hundred, and even that is (one read query) blazing fast.
   # so best is not to recalculate everytime, or query all along -- but to cache.
   def payments_hash
-    return @payments_hash_cache if @payments_hash_cache
+    return @payments_hash_cache if @payments_hash_cache 
     payments = Payment.all(:loan_id => self.id, :order => [:received_on.asc])
     structs = repository.adapter.query(%Q{                                             # This causes problems with mysql/sqlite3 changes
       SELECT principal, interest, received_on

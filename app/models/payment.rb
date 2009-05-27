@@ -19,20 +19,19 @@ class Payment
   belongs_to :received_by, :child_key => [:received_by_staff_id], :class_name => 'StaffMember'
   belongs_to :deleted_by,  :child_key => [:deleted_by_user_id],   :class_name => 'User'
 
-  validates_present     :loan, :created_by, :received_by
-  validates_with_method :only_take_payments_on_disbursed_loans?
-  validates_with_method :created_by,  :method => :created_by_active_user?
-  validates_with_method :received_by, :method => :received_by_active_staff_member?
-  validates_with_method :deleted_by,  :method => :properly_deleted?
-  validates_with_method :deleted_at,  :method => :properly_deleted?
-  validates_with_method :principal,   :method => :not_paying_too_much_principal?
-  validates_with_method :total,       :method => :not_paying_too_much_in_total?
-  validates_with_method :received_on, :method => :not_received_in_the_future?
-  validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?
-  validates_with_method :principal,   :method => :principal_is_positive?
-  validates_with_method :interest,    :method => :interest_is_positive?
-  validates_with_method :total,       :method => :total_is_positive?
-
+  validates_present     :loan 
+  validates_with_method :only_take_payments_on_disbursed_loans?  
+  validates_with_method :created_by,  :method => :created_by_active_user? 
+  validates_with_method :received_by, :method => :received_by_active_staff_member? 
+  validates_with_method :deleted_by,  :method => :properly_deleted? 
+  validates_with_method :deleted_at,  :method => :properly_deleted? 
+  validates_with_method :principal,   :method => :not_paying_too_much_principal? 
+  validates_with_method :total,       :method => :not_paying_too_much_in_total? 
+  validates_with_method :received_on, :method => :not_received_in_the_future? 
+  validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed? 
+  validates_with_method :principal,   :method => :principal_is_positive? 
+  validates_with_method :interest,    :method => :interest_is_positive? 
+  validates_with_method :total,       :method => :total_is_positive? 
   def total
     return nil if principal.blank? or interest.blank?
     principal + interest
@@ -64,7 +63,7 @@ class Payment
     true
   end
   def not_paying_too_much_in_total?
-    if new_record?  # do not do this check on updates, it will count itself double
+    if new_record?   # do not do this check on updates, it will count itself double
       a = loan.payments_hash[loan.payments_hash.keys.max]
       new_total = ((a and a[:total_received_so_far]) ? a[:total_received_so_far] : 0) + total
       if new_total > loan.total_to_be_received
@@ -74,7 +73,7 @@ class Payment
     true
   end
   def only_take_payments_on_disbursed_loans?
-    return true if loan.status == :outstanding
+    return true if loan and loan.status == :outstanding
     [false, "Payments cannot be made on loans that are written off, repaid or not (yet) disbursed"]
   end
   def not_received_in_the_future?

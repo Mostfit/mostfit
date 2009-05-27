@@ -11,7 +11,14 @@ class Attendancy
   belongs_to :client
   belongs_to :center
 
+validates_present  :client,:date
+validates_with_method :date, :method=>:not_in_future? 
+
   def attendancy_states
     ATTENDANCY_STATES
+  end
+  def not_in_future?
+  return true if date and (date<=Date.today)
+  [false, "Date should not be in future"]
   end
 end
