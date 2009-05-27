@@ -6,9 +6,9 @@ development: &defaults
   # WARNING: Do not use sqlite3. This is a FINANCIAL application, it needs a real database.
 
   adapter:  mysql 
-  database: mostfit_dev
+  database: mostfit_aaj__test
   username: root
-  password: hatstars
+  password: priyam08
   host:     localhost
 
 test:

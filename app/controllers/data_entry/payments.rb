@@ -1,6 +1,7 @@
 module DataEntry
 
 class Payments < DataEntry::Controller
+  provides :html, :xml
   def record
     @payment = (params[:payment] and params[:payment][:id]) ? Payment.get(params[:payment][:id]) : Payment.new
     if params[:payment] and params[:payment][:loan_id]
@@ -44,9 +45,13 @@ class Payments < DataEntry::Controller
     # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
     succes, @payment = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff)
     if succes  # true if saved
-      redirect url(:enter_payments, :action => 'record'), :message => {:notice => "Payment ##{@payment.id} has been registered"}
+      if params[:format]=='xml'
+        display @payment
+      else
+        redirect url(:enter_payments, :action => 'record'), :message => {:notice => "Payment ##{@payment.id} has been registered"}
+      end
     else
-      render :record
+      params[:format]=='xml' ? display(@payment, :status => 400) : render(:record)
     end
   end
 

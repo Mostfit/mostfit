@@ -1,6 +1,7 @@
 module DataEntry
 
 class Clients < DataEntry::Controller
+  provides :html, :xml
   def new
     @client = Client.new
     render
@@ -9,9 +10,13 @@ class Clients < DataEntry::Controller
   def create(client)
     @client = Client.new(client)
     if @client.save
-      redirect url(:enter_clients, :action => 'new'), :message => {:notice => "Client '#{@client.name}' was successfully created"}
+     if params[:format]=='xml'#for xml thing return xml response
+       display @client
+     else
+       redirect url(:enter_clients, :action => 'new'), :message => {:notice => "Client '#{@client.name}' was successfully created"}
+     end
     else
-      render :new  # error messages will be shown
+      params[:format]=='xml' ? display(@client): render(:new)
     end
   end
 
