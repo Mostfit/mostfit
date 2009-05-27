@@ -11,7 +11,7 @@ class Clients < DataEntry::Controller
     @client = Client.new(client)
     if @client.save
      if params[:format]=='xml'#for xml thing return xml response
-       display @client
+       display @client, ""
      else
        redirect url(:enter_clients, :action => 'new'), :message => {:notice => "Client '#{@client.name}' was successfully created"}
      end

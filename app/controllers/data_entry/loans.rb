@@ -29,7 +29,7 @@ class Loans < DataEntry::Controller
     @client = @loan.client
     if @loan.save
       if params[:format]=='xml'
-        display @loan
+        display @loan, ""
       else
         redirect url(:enter_loans, :action => 'new'), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
       end
@@ -49,7 +49,7 @@ class Loans < DataEntry::Controller
     raise NotFound unless @loan
     if @loan.update_attributes(attrs)
       if params[:format]=='xml'
-            display @loan
+            display @loan, ""
       else
         redirect url(:enter_loans, :action => 'new'), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
       end

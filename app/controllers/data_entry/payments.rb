@@ -46,7 +46,7 @@ class Payments < DataEntry::Controller
     succes, @payment = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff)
     if succes  # true if saved
       if params[:format]=='xml'
-        display @payment
+        display @payment, ""
       else
         redirect url(:enter_payments, :action => 'record'), :message => {:notice => "Payment ##{@payment.id} has been registered"}
       end

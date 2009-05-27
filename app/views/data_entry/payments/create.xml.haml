@@ -1,4 +1,5 @@
 -error=@payment.errors.instance_variable_get("@errors")
-%error
-  - error.each_key do |k|
-    =error[k]
+-if error
+  %error
+    - error.each_key do |k|
+      =error[k]
