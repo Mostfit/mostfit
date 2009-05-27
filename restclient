@@ -1,0 +1,63 @@
+#! /usr/bin/ruby
+require 'net/http'
+require 'uri'
+require 'rubygems'
+require 'hpricot'
+
+task=ARGV[0]
+if task=='create_loan'  #create a default loan
+    url = URI.parse('http://localhost:4000/data_entry/loans/create.xml')
+    req = Net::HTTP::Post.new(url.path)
+    req.basic_auth ARGV[1], ARGV[2]
+    req.set_form_data({'loan_type'=>'DefaultLoan','default_loan[client_id]'=>640,'default_loan[amount]'=>5000,
+                        'default_loan[interest_percentage]'=>5,'default_loan[installment_frequency]'=>'weekly',
+                        'default_loan[number_of_installments]'=>10,'default_loan[funding_line_id]'=>1,
+                        'default_loan[applied_on][month]'=>5,'default_loan[applied_on][day]'=>15,
+                        'default_loan[applied_on][year]'=>2009,'default_loan[applied_by_staff_id]'=>1,
+                        'default_loan[scheduled_disbursal_date][month]'=>5,
+                        'default_loan[scheduled_disbursal_date][day]'=>16,
+                        'default_loan[scheduled_disbursal_date][year]'=>2009,
+                        'default_loan[scheduled_first_payment_date][month]'=>5,
+                        'default_loan[scheduled_first_payment_date][day]'=>18,
+                        'default_loan[scheduled_first_payment_date][year]'=>2009})
+
+elsif task=='create_client' #create a client
+    url = URI.parse('http://localhost:4000/data_entry/clients/create.xml')
+    req = Net::HTTP::Post.new(url.path)
+    req.basic_auth ARGV[1], ARGV[2]
+    req.set_form_data({'client[center_id]'=>1,'client[name]'=>'Name','client[reference]'=>'abcd1234',
+                        'client[date_of_birth][month]'=>12,'client[date_of_birth][month]'=>8,
+                        'client[date_of_birth][year]'=>1991,'client[spouse_name]'=>'Spouse Name',
+                        'client[address]'=>'512, Palm Spring'})
+
+elsif task=='disburse_loan' #disburse a loan
+    url = URI.parse('http://localhost:4000/data_entry/loans/update.xml')
+    req = Net::HTTP::Post.new(url.path)
+    req.basic_auth ARGV[1], ARGV[2]
+    req.set_form_data({'loan[id]'=>ARGV[3],'default_loan[id]'=>ARGV[3],'loan_type'=>'DefaultLoan',
+                        'default_loan[approved_on][month]'=>5,'default_loan[approved_on][day]'=>16,
+                        'default_loan[approved_on][year]'=>2009,'default_loan[approved_by_staff_id]'=>5,
+                        'default_loan[disbursal_date][month]'=>5,'default_loan[disbursal_date][day]'=>16,
+                        'default_loan[disbursal_date][year]'=>2009,'default_loan[disbursed_by_staff_id]'=>5})
+
+elsif task=='accept_payment' #accept a payment
+    url = URI.parse('http://localhost:4000/data_entry/payments/create.xml')
+    req = Net::HTTP::Post.new(url.path)
+    req.basic_auth ARGV[1], ARGV[2]
+    req.set_form_data({'loan_id'=>ARGV[3],'payment[loan_id]'=>ARGV[3],'payment[principal]'=>5000,'payment[interest]'=>5,
+                        'payment[received_on][month]'=>5,'payment[received_on][day]'=>18,
+                        'payment[received_on][year]'=>2009,'payment[received_by]'=>5})
+end
+
+res = Net::HTTP.new(url.host, url.port).start {|http| http.request(req) }
+case res
+when Net::HTTPSuccess, Net::HTTPRedirection
+  puts "Status code is #{res.code}"
+  puts res.body
+  doc = Hpricot(res.body)
+  puts "ID is #{doc.search('id')}"
+else
+  puts "Did not happen! #{res.code}"
+  puts "Error xml is #{res.body}"
+end
+
