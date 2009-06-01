@@ -72,7 +72,7 @@ class GraphData < Application
     start_date = @branch.centers.clients.loans.min(:scheduled_disbursal_date)
     end_date   = Date.today  # (@client.loans.map { |l| l.last_loan_history_date }).max
     loan_ids   = @branch.centers.clients.loans.all(:fields => [:id]).map { |x| x.id }
-    common_aggregate_loan_graph(loan_ids, start_date, end_date)
+    weekly_aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
   def total
@@ -125,6 +125,7 @@ class GraphData < Application
   end
 
   def common_aggregate_loan_graph(loan_ids, start_date, end_date) # __DEPRECATED__
+    debugger
     days = (end_date - start_date).to_i
     step_size = 1; i = 0   # make a nice round step size, not more than 20 steps
     while days/step_size > 50
@@ -135,8 +136,8 @@ class GraphData < Application
     steps.times { |i| dates << start_date + step_size * i }
 
     @labels, @stacks, max_amount = [], [], 0
-    p dates
     dates.each_with_index do |date, index|
+      t0 =Time.now
       future                = date > Date.today
       s                     = LoanHistory.sum_outstanding_for(date, loan_ids)[0]
       scheduled_outstanding = (s['scheduled_outstanding_total'].to_i or 0)  # or *_principal
@@ -155,11 +156,79 @@ class GraphData < Application
         { :val => [-overpaid, 0].max, :colour => (future ? '#ff5588' : '#aa0000'),
           :tip => "#{tip_base} shortfall of #{-overpaid} (#{percentage})" } ]
       @labels << ((index % step_size == 0) ? date.strftime("%b%d'%y") : '')
+      puts "Did t#{index} in total #{Time.now - t0} secs"
+    end
+    render_loan_graph('aggregate loan graph', @stacks, @labels, step_size, max_amount)
+  end
+
+  def weekly_aggregate_loan_graph(loan_ids, start_date, end_date)
+    t0 =Time.now
+    step_size = 12
+    structs = repository.adapter.query(%Q{
+      SELECT da_te as date, weeknum,
+        SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal, 
+        SUM(scheduled_outstanding_total) AS scheduled_outstanding_total, 
+        SUM(actual_outstanding_principal) AS actual_outstanding_principal, 
+        SUM(actual_outstanding_total) AS actual_outstanding_total 
+        FROM (SELECT da_te, weeknum,
+                     scheduled_outstanding_principal,
+                     scheduled_outstanding_total, 
+                     actual_outstanding_principal, 
+                     actual_outstanding_total 
+                     FROM (SELECT loan_id, 
+                           max(date) as da_te,
+                           concat(year(date),'_',week(date)) AS weeknum
+                           FROM loan_history 
+                           WHERE loan_id IN (#{loan_ids.join(",")})
+                           GROUP BY loan_id, weeknum) AS dt, 
+                           loan_history lh 
+                     WHERE lh.loan_id = dt.loan_id 
+                     AND lh.date = dt.da_te) AS dt1 GROUP BY weeknum ORDER BY date;})
+
+    puts "Finished query in #{Time.now - t0}"
+    @labels, @stacks, max_amount = [], [], 0
+    @t = nil
+    structs.each_with_index do |s, index|
+      # there is a problem with the week that spans two years as it gets spilt into 2008_52 and 2009_0 or similar
+      puts index
+      if @t
+        s['scheduled_outstanding_total'] += @t['scheduled_outstanding_total']
+        s['actual_outstanding_total'] += @t['actual_outstanding_total']
+        @t = nil
+      end
+      if index < structs.size - 1  and structs[index + 1]['weeknum'].index("_0")
+        @t = s
+        next
+      end
+      date = s['date']          
+      future                = date > Date.today
+#      s                     = LoanHistory.sum_outstanding_for(date, loan_ids)[0]
+      scheduled_outstanding = (s['scheduled_outstanding_total'].to_i or 0)  # or *_principal
+      actual_outstanding    = future ? scheduled_outstanding : (s['actual_outstanding_total'].to_i or 0)     # or *_principal
+      max_amount            = [max_amount, scheduled_outstanding, actual_outstanding].max
+      overpaid              = scheduled_outstanding - actual_outstanding  # negative means shortfall
+      tip_base              = "##{index+1}, #{date.strftime("%a %b %d %Y")}#{(future ? ' (future)' : '')}<br>"
+      percentage            = scheduled_outstanding == 0 ? '0' : (overpaid.abs.to_f/scheduled_outstanding*100).round.to_s + '%'
+      @stacks << [
+        { :val => [scheduled_outstanding, actual_outstanding].min, :colour => (future ? '#55aaff' : '#003d4a'),
+          :tip => tip_base + (future ?
+            "#{scheduled_outstanding.round} scheduled outstanding" :
+            "#{actual_outstanding.round} outstanding (#{percentage} #{overpaid > 0 ? 'overpaid' : 'shortfall'})") },
+        { :val => [overpaid,  0].max, :colour => (future ? '#55ff55' : '#00aa00'),
+          :tip => "#{tip_base} overpaid #{ overpaid} (#{percentage})" },
+        { :val => [-overpaid, 0].max, :colour => (future ? '#ff5588' : '#aa0000'),
+          :tip => "#{tip_base} shortfall of #{-overpaid} (#{percentage})" } ]
+      @labels << ((index % step_size == 0) ? date.strftime("%b%d'%y") : '')
+      puts "Did t#{index} in total #{Time.now - t0} secs"
     end
     render_loan_graph('aggregate loan graph', @stacks, @labels, step_size, max_amount)
   end
 
 
+
+
+ 
+  
 
   def render_loan_graph(description, stacks, labels, step_size, max_amount)
     <<-JSON

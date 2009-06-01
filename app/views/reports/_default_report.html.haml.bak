@@ -1,0 +1,104 @@
+%h2
+  = @report.name
+
+- @branch_loans = {}
+- Branch.all.each do |branch|
+  - @branch_loans[branch.id] = Loan.all('client.center.branch_id' => branch.id)
+
+%table
+  %tr
+    %th
+      Parameter
+    %th
+      All Branches
+    - Branch.all.each do |branch|
+      %th
+        = branch.name
+  %tr
+    %th
+      No. of CM
+    %td
+      = Center.all.manager.uniq.count
+    - Branch.all.each do |branch|
+      %td
+        = Center.all(:branch_id => branch.id).manager.uniq.count
+  %tr
+    %th
+      No. of Centers
+    %td
+      = Center.all.count
+    - Branch.all.each do |branch|
+      %td
+        = Center.all(:branch_id => branch.id).count
+  %tr
+    %th
+      No. of Clients
+    %td
+      = Client.all.count
+    - Branch.all.each do |branch|
+      %td
+        = Client.all('center.branch_id' => branch.id).count
+  %tr
+    %th
+      No. of Clients
+    %td
+      = Client.all.count
+    - Branch.all.each do |branch|
+      %td
+        = Client.all('center.branch_id' => branch.id).count
+  %tr
+    %th
+      No. of Borowers
+    %td
+      = repository(:default).adapter.query("SELECT COUNT(DISTINCT(client_id)) FROM loans")[0]
+    - Branch.all.each do |branch|
+      %td
+        = repository.adapter.query("SELECT COUNT(DISTINCT(client_id)) FROM loans,clients,centers,branches WHERE loans.client_id = clients.id AND clients.center_id = centers.id AND centers.branch_id = branches.id AND branches.id = #{branch.id}")[0]
+  %tr
+    %th
+      Loans for next week (number)
+    %td
+      = Loan.all(:scheduled_disbursal_date.gt => Date.today, :scheduled_disbursal_date.lt => Date.today + 7).count
+    - Branch.all.each do |branch|
+      %td
+        = @branch_loans[branch.id].all(:scheduled_disbursal_date.gt => Date.today, :scheduled_disbursal_date.lt => (Date.today + 7)).count
+  %tr
+    %th
+      Loans for next week (amount)
+    %td
+      = Loan.all(:scheduled_disbursal_date.gt => Date.today, :scheduled_disbursal_date.lt => Date.today + 7).sum(:amount) || 0
+    - Branch.all.each do |branch|
+      %td
+        = @branch_loans[branch.id].all(:scheduled_disbursal_date.gt => Date.today, :scheduled_disbursal_date.lt => (Date.today + 7)).sum(:amount) || 0
+  %tr
+    %th
+      Waiting Clients (number)
+    %td
+      = Loan.all(:scheduled_disbursal_date.not => nil, :disbursal_date => nil).count
+    - Branch.all.each do |branch|
+      %td
+        = @branch_loans[branch.id].all(:scheduled_disbursal_date.not => nil, :disbursal_date => nil, 'client.center.branch_id' => branch.id).count
+  %tr
+    %th
+      Waiting Clients (amount)
+    %td
+      = Loan.all(:scheduled_disbursal_date.not => nil, :disbursal_date => nil).sum(:amount)
+    - Branch.all.each do |branch|
+      %td
+        = @branch_loans[branch.id].all(:scheduled_disbursal_date.not => nil, :disbursal_date => nil, 'client.center.branch_id' => branch.id).sum(:amount)
+  %tr
+    %th
+      Defaulted Loans (Count)
+    %td
+      = LoanHistory.all(:current => true, :amount_in_default.not => 0).count
+    - Branch.all.each do |branch|
+      %td
+        = LoanHistory.all(:current => true, :amount_in_default.not => 0, 'loan.client.center.branch_id' => branch.id).count
+  %tr
+    %th
+      Defaulted Loans (Amount)
+    %td
+      = LoanHistory.all(:current => true, :amount_in_default.not => 0).sum(:amount_in_default)
+    - Branch.all.each do |branch|
+      %td
+        = LoanHistory.all(:current => true, :amount_in_default.not => 0, 'loan.client.center.branch_id' => branch.id).sum(:amount_in_default)
