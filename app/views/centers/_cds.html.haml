@@ -43,7 +43,7 @@
               %b= i.to_currency
               - tot_outstanding += i
             %td.center
-              = loan.status(@date).to_s
+              = loan.get_status(@date).to_s
             %td
               = loan.disbursal_date.to_s
             %td

@@ -3,7 +3,7 @@ class StaffMembers < Application
   before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
 
   def index
-    @staff_members = StaffMember.all
+    @staff_members = StaffMember.paginate(:page => params[:page], :per_page => 15)
     display @staff_members
   end
 

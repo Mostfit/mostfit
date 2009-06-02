@@ -79,7 +79,7 @@ class GraphData < Application
     start_date = Loan.all.min(:scheduled_disbursal_date)
     end_date   = Date.today  # (@client.loans.map { |l| l.last_loan_history_date }).max
     loan_ids   = Loan.all(:fields => [:id]).map { |x| x.id }
-    common_aggregate_loan_graph(loan_ids, start_date, end_date)
+    weekly_aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
   def aggregate_loan_graph(loan_ids, start_date, end_date)
@@ -162,6 +162,7 @@ class GraphData < Application
   end
 
   def weekly_aggregate_loan_graph(loan_ids, start_date, end_date)
+    debugger
     t0 =Time.now
     step_size = 12
     structs = repository.adapter.query(%Q{
@@ -295,7 +296,7 @@ class GraphData < Application
           date = date >> 1
         end
       when "branch_pie"
-        values = Branch.all.map {|b| b.centers.clients.loans.sum(:amount) }
+        values = Branch.all.map {|b| b.centers.clients.loans.sum(:amount) || 0 }
         type = "pie"
     end
     render_graph(values, type, labels)
