@@ -71,7 +71,10 @@ namespace :aaj do
           cl.address = l[3].to_s
 	  cl.center = c
 	  cl.reference = c.name + l[0]
-	  cl.save
+	  if not cl.save
+            cl.errors.each {|k| puts k}
+            raise "Client #{cl.reference} could not be saved" 
+          end
           p [cl.errors, cl] if not cl.valid?
           client_yaml_file.write(cl.to_yaml)
 
