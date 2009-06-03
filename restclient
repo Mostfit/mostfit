@@ -9,7 +9,7 @@ if task=='create_loan'  #create a default loan
     url = URI.parse('http://localhost:4000/data_entry/loans/create.xml')
     req = Net::HTTP::Post.new(url.path)
     req.basic_auth ARGV[1], ARGV[2]
-    req.set_form_data({'loan_type'=>'DefaultLoan','default_loan[client_id]'=>640,'default_loan[amount]'=>5000,
+    req.set_form_data({'loan_type'=>'DefaultLoan','default_loan[client_id]'=>1,'default_loan[amount]'=>5000,
                         'default_loan[interest_percentage]'=>5,'default_loan[installment_frequency]'=>'weekly',
                         'default_loan[number_of_installments]'=>10,'default_loan[funding_line_id]'=>1,
                         'default_loan[applied_on][month]'=>5,'default_loan[applied_on][day]'=>15,

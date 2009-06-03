@@ -39,20 +39,21 @@
         %td
           %b= staff_member.active? ? 'active' : 'disabled'
         %td
-          = staff_member.branches.size
+          = Branch.all(:manager_staff_id => staff_member.id).count
         %td
-          = staff_member.centers.size
-
+          = Center.all(:manager_staff_id => staff_member.id).count
         %td
-          = staff_member.applied_loans.size
+          = Payment.all(:received_by_staff_id => staff_member.id).count
         %td
-          = staff_member.approved_loans.size
+          = Loan.all(:applied_by_staff_id => staff_member.id).count
         %td
-          = staff_member.rejected_loans.size
+          = Loan.all(:approved_by_staff_id => staff_member.id).count
         %td
-          = staff_member.disbursed_loans.size
+          = Loan.all(:rejected_by_staff_id => staff_member.id).count
         %td
-          = staff_member.written_off_loans.size
+          = Loan.all(:disbursed_by_staff_id => staff_member.id).count
+        %td
+          = Loan.all(:written_off_by_staff_id => staff_member.id).count
         %td
           = link_to 'edit', resource(staff_member, :edit)
 
