@@ -173,7 +173,9 @@ namespace :mock do
     Merb.logger.info! "Start mock:all_payments rake task at #{t0}"
     busy_user = User.get(1)
     count = 0
-    loan_ids = repository.adapter.query("SELECT id from loans WHERE id > (select max(loan_id) from payments)")
+
+    loan_ids = repository.adapter.query("SELECT id from loans") #WHERE id > (select max(loan_id) from payments)")
+
     puts "1: #{Time.now - t0}"
     loan_ids.each do |loan_id|
       sql = " INSERT INTO `payments` (`received_by_staff_id`, `principal`, `interest`, `created_by_user_id`, `loan_id`, `received_on`) VALUES ";

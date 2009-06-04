@@ -20,3 +20,5 @@ gems/gems/*
 gems/specifications/*
 merb_profile_results
 misfit_fixtures/*
+config/database.yml
+result_file.txt

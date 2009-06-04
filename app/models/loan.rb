@@ -36,12 +36,12 @@ class Loan
   # associations
   belongs_to :client
   belongs_to :funding_line
-  belongs_to :applied_by,     :child_key => [:applied_by_staff_id],     :class_name => 'StaffMember'
-  belongs_to :approved_by,    :child_key => [:approved_by_staff_id],    :class_name => 'StaffMember'
-  belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],    :class_name => 'StaffMember'
-  belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],   :class_name => 'StaffMember'
-  belongs_to :written_off_by, :child_key => [:written_off_by_staff_id], :class_name => 'StaffMember'
-  belongs_to :validated_by,   :child_key => [:validated_by_staff_id],   :class_name => 'StaffMember'
+  belongs_to :applied_by,     :child_key => [:applied_by_staff_id],     :class_name => 'StaffMember', :index => true
+  belongs_to :approved_by,    :child_key => [:approved_by_staff_id],    :class_name => 'StaffMember', :index => true
+  belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],    :class_name => 'StaffMember', :index => true
+  belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],   :class_name => 'StaffMember', :index => true
+  belongs_to :written_off_by, :child_key => [:written_off_by_staff_id], :class_name => 'StaffMember', :index => true
+  belongs_to :validated_by,   :child_key => [:validated_by_staff_id],   :class_name => 'StaffMember', :index => true
   has n, :payments
   has n, :history, :class_name => 'LoanHistory'
 
@@ -189,7 +189,10 @@ class Loan
 
     return @payments_hash_cache if @payments_hash_cache
 #    payments = Payment.all(:loan_id => self.id, :order => [:received_on.asc])
+<<<<<<< HEAD:app/models/loan.rb
 
+=======
+>>>>>>> ffac9685bfe0e2e44ce24b7d048ce63782375a74:app/models/loan.rb
     structs = repository.adapter.query(%Q{                                             # This causes problems with mysql/sqlite3 changes
       SELECT principal, interest, received_on
         FROM payments
