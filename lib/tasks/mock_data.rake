@@ -125,11 +125,6 @@ namespace :mock do
       (20 - center.clients.size).times do |k|
         date_joined = (d1..d2).sort_by{rand}[0]
         value = "('br #{i} cen #{j} cl #{k}', '#{date_joined}', '#{i}-#{j}-#{k}', #{j})"
-#        cl = Client.new(:name => "br #{i} cen #{j} cl #{k}", :date_joined => date_joined, :reference => "#{i}-#{j}-#{k}",
-#                        :center => center)
-#        unless cl.save
-#          cl.errors.each {|e| puts e}
-#        end
         values << value
       end
       sql = client_sql + values.join(",")
@@ -145,21 +140,6 @@ namespace :mock do
         value = %Q{(#{cl.id}, 8000, 0.18, 2, 50, '#{applied_on}', #{center.manager.id}, '#{approved_on}', #{b.manager.id},
                    '#{scheduled_disbursal_date}', '#{scheduled_first_payment_date}',  #{center.manager.id}, '#{disbursal_date}', #{fl.id}, 'Loan')}
         values << value
-#        l = Loan.new(:client => cl, :amount => 8000,
-#                     :interest_rate => 0.18, :installment_frequency => :weekly, :number_of_installments => 50,
-#                     :applied_on => applied_on, :applied_by => center.manager,
-#                     :approved_on => approved_on, :approved_by => b.manager,
-#                     :scheduled_disbursal_date => scheduled_disbursal_date,
-#                     :scheduled_first_payment_date => scheduled_first_payment_date,
-#                     :disbursed_by => center.manager, :disbursal_date => disbursal_date,
-#                     :funding_line => fl)
-#        l.history_disabled = true
-#        if not l.save
-#          l.errors.each do |e|
-#            puts e
-#          end
-#          raise
-#        end                              
       end
       sql = loan_sql + values.join(",")
       repository.adapter.execute(sql)
@@ -173,43 +153,29 @@ namespace :mock do
     Merb.logger.info! "Start mock:all_payments rake task at #{t0}"
     busy_user = User.get(1)
     count = 0
-    loan_ids = repository.adapter.query("SELECT id from loans") #WHERE id > (select max(loan_id) from payments)")
+    if Payment.all.empty?
+      loan_ids = repository.adapter.query("SELECT id from loans")
+    else
+      loan_ids = repository.adapter.query("SELECT id from loans WHERE id > (select max(loan_id) from payments)")
+    end
     puts "1: #{Time.now - t0}"
     loan_ids.each do |loan_id|
       sql = " INSERT INTO `payments` (`received_by_staff_id`, `principal`, `interest`, `created_by_user_id`, `loan_id`, `received_on`) VALUES ";
       _t0 = Time.now
       loan = Loan.get(loan_id)
-      #puts loan_id
-      #puts "__________________"
-      #puts "2: #{Time.now - _t0}"
       staff_member = loan.client.center.manager
-      #puts "3: #{Time.now - _t0}"
-      #next if loan.payments.size > 0 or loan.get_status != :outstanding
-      #puts "4: #{Time.now - _t0}"
       p "Doing loan No. #{loan.id}...."
       loan.history_disabled = true  # do not update the hisotry for every payment
-      #      amount     = loan.total_to_be_received / loan.number_of_installments
       dates      = loan.installment_dates.reject { |x| x > Date.today or x < loan.disbursal_date }
       prin = loan.scheduled_principal_for_installment(1)
-      #puts "  4.1: #{Time.now - _t0}"
       int = loan.scheduled_interest_for_installment(1)
       values = []
-      #puts "5: #{Time.now - _t0}"
       dates.each do |date|
-        #prin = loan.scheduled_received_principal_up_to(date) - loan.principal_received_up_to(date)
-        #int = loan.scheduled_received_interest_up_to(date) - loan.interest_received_up_to(date)
         values << "(#{staff_member.id}, #{prin}, #{int}, 1, #{loan.id}, '#{date}')"
-        #result   = loan.repay([prin,int], busy_user, date, staff_member)
-        #if result[0]  # the save status
-        #  count += 1
-        #else          
-        #  puts "Validation errors repaying #{prin} for Loan ##{loan.id} after #{count} writes:\n#{result[1].errors.inspect}"
-        #end
       end
       puts "done constructing sql in #{Time.now - _t0}"
       if not values.empty?
         sql += values.join(",")
-        #        debugger
         repository.adapter.execute(sql)
         puts "done executing sql in #{Time.now - _t0}"
         puts "---------------------"
@@ -227,7 +193,11 @@ namespace :mock do
     t0 = Time.now
     Merb.logger.info! "Start mock:history rake task at #{t0}"
     puts "finding unhistorified loans"
-    loan_ids = repository.adapter.query("SELECT id from loans WHERE id > (select max(loan_id) from loan_history)")
+    if LoanHistory.all.count == 0
+      loan_ids = repository.adapter.query("SELECT id from loans")
+    else
+      loan_ids = repository.adapter.query("SELECT id from loans WHERE id > (select max(loan_id) from loan_history)")
+    end
     puts "got loan ids"
     if loan_ids.empty?
       puts "loan_ids empty. getting all"

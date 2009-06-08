@@ -1,0 +1,42 @@
+%table
+  %tr
+    %th
+      Particulars
+    - Branch.all.each do |branch|
+      %th
+        = branch.name
+    %th
+      Total
+  %tr
+    %th
+      Number of Members
+    - Branch.all.each do |b|
+      %td
+        = Client.all('center.branch_id' => b.id).count
+  %tr
+    %th
+      Number of Borrowers
+    - Branch.all(:order => [:id]).each do |b|
+      %td
+        == #{Client.active('center.branch_id' => b.id).count}
+  %tr
+    %th
+      First cycle
+    - Branch.all(:order => [:id]).each do |b|
+      %td
+        = Client.find_by_loan_cycle(1, 'center.branch_id' => b.id).count
+
+  %tr
+    %th
+      Second Cycle
+    - Branch.all(:order => [:id]).each do |b|
+      %td
+        = Client.find_by_loan_cycle(2, 'center.branch_id' => b.id).count
+
+  %tr
+    %th
+      Second Cycle
+    - Branch.all(:order => [:id]).each do |b|
+      %td
+        = Client.dormant('center.branch_id' => b.id).count
+

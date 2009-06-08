@@ -1,9 +1,6 @@
 %h1
   Reports controller, show action
-%p
-  Edit this file in
-  %tt
-    app/views/reports/show.html.erb
+
 
 = partial "#{@report.name.snake_case.gsub(" ","_")}"
 = link_to 'Edit',  url(:edit_report,  @report)

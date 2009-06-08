@@ -7,9 +7,28 @@ class Reports < Application
   end
 
   def show(id)
+    provides :pdf
     @report = Report.get(id)
     raise NotFound unless @report
-    display @report
+    if params[:format] == "pdf"
+      pdf = PDF::HTMLDoc.new
+      pdf.set_option :bodycolor, :white
+      pdf.set_option :toc, false
+      pdf.set_option :portrait, true
+      pdf.set_option :links, true
+      pdf.set_option :webpage, true
+      pdf.set_option :left, '2cm'
+      pdf.set_option :right, '2cm'
+      pdf.set_option :header, "Header here!"
+      debugger
+      f = File.read("app/views/reports/_#{@report.name.snake_case.gsub(" ","_")}.html.haml")
+      report = Haml::Engine.new(f).render
+      pdf << report
+      pdf.footer ".t."
+      send_data pdf.generate, :filename => 'report.pdf'
+    else
+      display @report
+    end
   end
 
   def new

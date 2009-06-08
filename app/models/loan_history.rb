@@ -19,11 +19,15 @@ class LoanHistory
   property :status,                          Enum[nil, :approved, :outstanding, :repaid, :written_off]
 
   belongs_to :loan
+  belongs_to :client         # speed up reports
+  belongs_to :center         # by avoiding lots of joins!
+  belongs_to :branch         # muahahahahahaha!
 
 #  validates_present :loan  # the rest does with autovalidations
 
 
-  # the prefered way to make history and future.
+  # __DEPRECATED__ the prefered way to make history and future.
+  # HISTORY IS NOW WRITTEN BY THE LOAN MODEL USING update_history_bulk_insert
   def self.write_for(loan, date)
     if result = LoanHistory::create(
       :loan_id =>                           loan.id,

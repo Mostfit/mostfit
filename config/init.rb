@@ -32,6 +32,7 @@ end
  
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
+  Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
   begin
     if User.all.empty?
       u = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password')
@@ -44,6 +45,5 @@ Merb::BootLoader.after_app_loads do
   rescue
     Merb.logger.info("Couldn't create the 'admin' user, possibly unable to access the database.")
   end
-
 end
 

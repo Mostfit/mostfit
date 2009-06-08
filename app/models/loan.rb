@@ -72,6 +72,7 @@ class Loan
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
+
   # validates_primitive doesn't work well for date -- we use "before :valid?, :parse_dates" to achieve similar effects 
 
   # this is the method used for creating payments, not directly on the Payment class
@@ -434,31 +435,22 @@ class Loan
         scheduled_os_principal -= prin
         scheduled_os_total -= (int + prin)
       end
-#      puts "    Made first history in #{Time.now - t0}"
-#      puts "#{date} == #{disbursal_date}?"
       prin = date == disbursal_date ? 0 : principal_received_up_to(date)
       int = date == disbursal_date ? 0 : interest_received_up_to(date)
       actual_os_principal = amount - prin
       actual_os_total = total_to_be_received - int -prin
       st = get_status(date, total_to_be_received - actual_os_total)
-#      puts "    Made first history in #{Time.now - t0}"
       @history_array = {:loan_id => id, :date => date, :status => st, :scheduled_outstanding_principal => scheduled_os_principal, :scheduled_outstanding_total => scheduled_os_total, :actual_outstanding_principal => actual_os_principal, :actual_outstanding_total => actual_os_total}
-#      puts "    but something took #{Time.now - t0}"
-
     else
-#      puts "    in else I took #{Time.now - t0}"
       prin = scheduled_principal_for_installment(i_number)
       act_prin = principal_received_up_to(date)
-#      puts "    calculating prin took #{Time.now - t0}"
       int = scheduled_interest_for_installment(i_number)
       act_int = interest_received_up_to(date)
-#      puts "    calculating int took  #{Time.now - t0}"
       @history_array[:scheduled_outstanding_principal] -= prin 
       @history_array[:scheduled_outstanding_total] -= (int + prin)
       @history_array[:actual_outstanding_principal] = amount - act_prin
       @history_array[:actual_outstanding_total] = total_to_be_received - (act_prin + act_int)
       @history_array[:status] = get_status(date, total_to_be_received - @history_array[:actual_outstanding_total])
-#      puts "    Made subsequent history in #{Time.now - t0}"
     end
     @history_array
   end
@@ -472,7 +464,6 @@ class Loan
   def update_history_now  # DEPRECATED - use update_history_bulk_insert instead
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
     dates = payment_dates + installment_dates
-#     dates << scheduled_disbursal_date if scheduled_disbursal_date
     dates << disbursal_date if disbursal_date
     dates << written_off_on if written_off_on
     dates.uniq.sort.each do |date|
@@ -489,16 +480,15 @@ class Loan
     dates << written_off_on if written_off_on
     sql = %Q{ INSERT INTO loan_history(loan_id, date, status, 
               scheduled_outstanding_principal, scheduled_outstanding_total,
-              actual_outstanding_principal, actual_outstanding_total, current, amount_in_default)
+              actual_outstanding_principal, actual_outstanding_total, current, amount_in_default,
+              center_id, client_id, branch_id)
               VALUES }
     values = []
     status_updated = false
     dates = dates.uniq.sort
-#    puts "  1: got dates #{Time.now - t}"
     dates.each_with_index do |date,index|
       history = history_for(date)
-#      puts "  1.1: got history for in #{Time.now - t}"
-      if dates[[index + 1,dates.size - 1].min] > Date.today and not status_updated
+      if (dates[[index + 1,dates.size - 1].min] > Date.today or index == dates.size - 1) and not status_updated
         current = 1
         status_updated = true
       else
@@ -510,17 +500,17 @@ class Loan
       value = %Q{(#{id}, '#{date}', #{st}, #{history[:scheduled_outstanding_principal]}, 
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
                           #{history[:actual_outstanding_total]},#{current},
-                          #{amount_in_default})}
+                          #{amount_in_default}, #{client.center.id},#{client.id},#{client.center.branch.id})}
 
      values << value
     end
-#    puts "  2: made sql #{Time.now - t}"
     sql += values.join(",") + ";"
     repository.adapter.execute(sql)
-    puts "  3: executed sql #{Time.now - t}"
+    puts "update_history_bulk_insert done in #{Time.now - t}"
     
   end
 
+  # FINDERS
   def self.defaulted_loans (days = 7, date = Date.today, query ={})
     if not query.empty?
       loans = Loan.all(query)
