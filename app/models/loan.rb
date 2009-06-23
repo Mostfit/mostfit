@@ -24,9 +24,11 @@ class Loan
   property :disbursal_date,                 Date, :auto_validation => false, :index => true
   property :written_off_on,                 Date, :auto_validation => false, :index => true
   property :fees,                           Yaml  # like: "first fee: 1000, second fee: 200" (yaml) -- fully reimplementable
+
   property :fees_total,                     Integer, :default => 0, :index => true  # gets included in first payment
   property :fees_paid,                      Boolean, :default => false, :index => true
   property :validated_on,                   Date, :auto_validation => false, :index => true
+
   property :validation_comment,             Text
   property :created_at,                     DateTime, :index => true
   property :updated_at,                     DateTime, :index => true
@@ -185,6 +187,7 @@ class Loan
   # payments will rarely be over a hundred, and even that is (one read query) blazing fast.
   # so best is not to recalculate everytime, or query all along -- but to cache.
   def payments_hash
+
     return @payments_hash_cache if @payments_hash_cache
 #    payments = Payment.all(:loan_id => self.id, :order => [:received_on.asc])
     structs = repository.adapter.query(%Q{

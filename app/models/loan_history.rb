@@ -25,7 +25,7 @@ class LoanHistory
   belongs_to :center         # by avoiding lots of joins!
   belongs_to :branch         # muahahahahahaha!
 
-#  validates_present :loan  # the rest does with autovalidations
+       validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
 
   # __DEPRECATED__ the prefered way to make history and future.

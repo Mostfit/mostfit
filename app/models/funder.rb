@@ -6,6 +6,8 @@ class Funder
 
   has n, :funding_lines
 
+  
+
   def self.catalog
     result = {}
     funder_names = {}

@@ -16,7 +16,6 @@ class FundingLine
 
   belongs_to :funder
   has n, :loans
-
   validates_with_method  :disbursal_date,       :method => :disbursed_before_first_payment?
   validates_with_method  :first_payment_date,   :method => :disbursed_before_first_payment?
   validates_with_method  :first_payment_date,   :method => :first_payment_before_last_payment?

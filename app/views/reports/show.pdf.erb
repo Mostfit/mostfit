@@ -1,0 +1,9 @@
+<%=
+
+pdf = Prawn::Document.generate("fancy_table.pdf") do
+   text "Hello Prawn" * 20
+end
+
+pdf
+
+%>

@@ -1,0 +1,16 @@
+%table
+  %tr
+    %th
+      Particulars
+    - Branch.all.each do |branch|
+      %th
+        = branch.name
+    %th
+      Total
+    - report.report.each do |r|
+      %tr
+        %th
+          = r.keys[0]
+        - r[r.keys[0]].each do |v|
+          %td
+            = v

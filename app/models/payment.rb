@@ -19,6 +19,7 @@ class Payment
   belongs_to :received_by, :child_key => [:received_by_staff_id], :class_name => 'StaffMember', :index => true
   belongs_to :deleted_by,  :child_key => [:deleted_by_user_id],   :class_name => 'User', :index => true
 
+
   validates_present     :loan, :created_by, :received_by
   validates_with_method :only_take_payments_on_disbursed_loans?
   validates_with_method :created_by,  :method => :created_by_active_user?
@@ -64,7 +65,7 @@ class Payment
     true
   end
   def not_paying_too_much_in_total?
-    if new_record?  # do not do this check on updates, it will count itself double
+    if new_record?   # do not do this check on updates, it will count itself double
       a = loan.payments_hash[loan.payments_hash.keys.max]
       new_total = ((a and a[:total_received_so_far]) ? a[:total_received_so_far] : 0) + total
       if new_total > loan.total_to_be_received
@@ -74,7 +75,13 @@ class Payment
     true
   end
   def only_take_payments_on_disbursed_loans?
+<<<<<<< HEAD:app/models/payment.rb
+
     return true if loan.get_status == :outstanding
+
+=======
+    return true if loan.get_status == :outstanding
+>>>>>>> ffac9685bfe0e2e44ce24b7d048ce63782375a74:app/models/payment.rb
     [false, "Payments cannot be made on loans that are written off, repaid or not (yet) disbursed"]
   end
   def not_received_in_the_future?

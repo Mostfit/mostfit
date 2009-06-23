@@ -2,6 +2,10 @@
   .graph
     = ofc2(430, 200, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'total', :scope_unit => 'months', :scope_size => 3) )
 
+%form#loan_search{:action => "javascript:document.location='/loans/' + document.forms[0].loan_id.value;"}
+  Search for loan by id: 
+  %input{:name => "loan_id"}
+  %input{:type => "submit"}
 
 %h1 Overview of all branches
 
