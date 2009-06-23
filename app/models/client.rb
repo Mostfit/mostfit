@@ -39,7 +39,7 @@ class Client
          FROM loan_history lh
          WHERE current = true AND lh.status <= 3
          GROUP BY client_id HAVING COUNT(loan_id) #{operator} #{num_loans}) as dt1;})
-    query[:id.in] = client_ids
+    query[:id.in] = client_ids unless client_ids.empty?
     Client.all(query)
   end
 
@@ -51,7 +51,7 @@ class Client
               FROM loan_history 
               WHERE current = true AND status <= 3 
               GROUP BY client_id) AS dt)})
-    query[:id.in] = client_ids
+    query[:id.in] = client_ids unless client_ids.empty?
     Client.all(query)
   end
 
