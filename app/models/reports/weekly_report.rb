@@ -27,7 +27,7 @@ class WeeklyReport
     Branch.all.each do |b|
       @branch_ids[b.id] = LoanHistory.all(:current => true, :date.gt => @start_date, :date.lt => @end_date,  :fields => ['loan_id'], :branch_id => b.id).map{|h| h.loan_id}
       @repaid_ids[b.id] = LoanHistory.all(:current => true, :status => :repaid, :date.gt => @start_date, :date.lt => @end_date,  :fields => ['loan_id'], :branch_id => b.id).map{|h| h.loan_id}
-      @staff_members[b.id] = b.centers.manager.uniq.count + 1
+      @staff_members[b.id] = b.centers.manager.uniq.size + 1
       @start_sum[b.id] = LoanHistory.sum_outstanding_for(@start_date, @branch_ids[b.id])
       @end_sum[b.id] = LoanHistory.sum_outstanding_for(@end_date, @branch_ids[b.id])
     end
