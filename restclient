@@ -1,4 +1,7 @@
 #! /usr/bin/ruby
+
+# this is a small ruby script to demonstrate the ability to control MISFIT using http requests.
+
 require 'net/http'
 require 'uri'
 require 'rubygems'
