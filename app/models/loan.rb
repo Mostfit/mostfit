@@ -104,12 +104,12 @@ class Loan
       :principal => principal.round, :interest => interest.round)
     save_status = payment.save
     if save_status == true
-      if defer_update
+      if defer_update #i.e. bulk updating loans
         Merb.run_later do
           update_history
         end
       else
-        update_history  # update the history is we saved a payment
+        update_history  # update the history if we saved a payment
       end
       clear_payments_hash_cache
     end
@@ -187,7 +187,7 @@ class Loan
   def payments_hash
     return @payments_hash_cache if @payments_hash_cache
 #    payments = Payment.all(:loan_id => self.id, :order => [:received_on.asc])
-    structs = repository.adapter.query(%Q{                                             # This causes problems with mysql/sqlite3 changes
+    structs = repository.adapter.query(%Q{
       SELECT principal, interest, received_on
         FROM payments
        WHERE (deleted_at IS NULL) AND (loan_id = #{self.id})
@@ -339,6 +339,7 @@ class Loan
   end
 
   # this method returns one of [nil, :approved, :outstanding, :repaid, :written_off]
+
   def status
     get_status
   end
@@ -428,7 +429,12 @@ class Loan
     scheduled_os_total = total_to_be_received
     t0 = Time.now
     i_number = number_of_installments_before(date)-1
-    if @history_array.nil?
+    last_payment_date = nil
+    payments_hash.keys.sort.each do |k|
+      last_payment_date = k unless k > date
+    end
+    days_overdue = last_payment_date.nil? ? 0 : (date - last_payment_date)
+    if @history_array.nil? #like @payments_hash, we cache @history_array to avoid repeated calls to the database
       0.upto(i_number) do |i|
         prin = scheduled_principal_for_installment(i)
         int = scheduled_interest_for_installment(i)
@@ -440,7 +446,7 @@ class Loan
       actual_os_principal = amount - prin
       actual_os_total = total_to_be_received - int -prin
       st = get_status(date, total_to_be_received - actual_os_total)
-      @history_array = {:loan_id => id, :date => date, :status => st, :scheduled_outstanding_principal => scheduled_os_principal, :scheduled_outstanding_total => scheduled_os_total, :actual_outstanding_principal => actual_os_principal, :actual_outstanding_total => actual_os_total}
+      @history_array = {:loan_id => id, :date => date, :status => st, :scheduled_outstanding_principal => scheduled_os_principal, :scheduled_outstanding_total => scheduled_os_total, :actual_outstanding_principal => actual_os_principal, :actual_outstanding_total => actual_os_total, :days_overdue => days_overdue}
     else
       prin = scheduled_principal_for_installment(i_number)
       act_prin = principal_received_up_to(date)
@@ -451,6 +457,7 @@ class Loan
       @history_array[:actual_outstanding_principal] = amount - act_prin
       @history_array[:actual_outstanding_total] = total_to_be_received - (act_prin + act_int)
       @history_array[:status] = get_status(date, total_to_be_received - @history_array[:actual_outstanding_total])
+      @history_array[:days_overdue] = days_overdue
     end
     @history_array
   end
@@ -458,7 +465,6 @@ class Loan
   def update_history
     return if history_disabled  # easy when doing mass db modifications (like with fixutes)
     update_history_bulk_insert
-#     Merb.run_later { update_history_now }  # i just love procrastination
   end
 
   def update_history_now  # DEPRECATED - use update_history_bulk_insert instead
@@ -481,7 +487,7 @@ class Loan
     sql = %Q{ INSERT INTO loan_history(loan_id, date, status, 
               scheduled_outstanding_principal, scheduled_outstanding_total,
               actual_outstanding_principal, actual_outstanding_total, current, amount_in_default,
-              center_id, client_id, branch_id)
+              center_id, client_id, branch_id, days_overdue)
               VALUES }
     values = []
     status_updated = false
@@ -500,7 +506,8 @@ class Loan
       value = %Q{(#{id}, '#{date}', #{st}, #{history[:scheduled_outstanding_principal]}, 
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
                           #{history[:actual_outstanding_total]},#{current},
-                          #{amount_in_default}, #{client.center.id},#{client.id},#{client.center.branch.id})}
+                          #{amount_in_default}, #{client.center.id},#{client.id},#{client.center.branch.id},
+                          #{history[:days_overdue]})}
 
      values << value
     end
@@ -511,19 +518,13 @@ class Loan
   end
 
   # FINDERS
-  def self.defaulted_loans (days = 7, date = Date.today, query ={})
-    if not query.empty?
-      loans = Loan.all(query)
-      loan_ids = loans.map {|l| l.id}
-    end
+  def self.defaulted_loan_info (days = 7, date = Date.today, query ={})
+    # this does not work as expected if the loan is repaid and goes back into default within the days we are looking at it.
+    # the fix is to have a days_overdue column in loan_history
     defaulted_loan_ids = repository.adapter.query(%Q{
-      SELECT loan_id
-             FROM  loan_history 
-             WHERE actual_outstanding_principal != scheduled_outstanding_principal 
-             AND date < now()
-             GROUP BY loan_id;})
-    
-    defaulted_loans = Loan.all(:id.in => loan_ids.nil? ? defaulted_loan_ids : defaulted_loan_ids & loan_ids)
+      SELECT loan_id FROM
+        (select loan_id, max(ddiff) as diff from (select date, loan_id, datediff(now(),date) as ddiff,actual_outstanding_principal - scheduled_outstanding_principal as diff from loan_history where actual_outstanding_principal != scheduled_outstanding_principal and date < now()) as dt group by loan_id having diff < #{days}) as dt1;})
+
   end
 
   
@@ -534,6 +535,7 @@ class Loan
 
   # the arithmic of shifting by the installment_frequency (especially months is tricky)
   # used by many other methods, it accepts a negative +number+
+  # TODO: decide if we should make sure returned date is a payment date.
   def shift_date_by_installments(date, number)
     return date if number == 0
     case installment_frequency

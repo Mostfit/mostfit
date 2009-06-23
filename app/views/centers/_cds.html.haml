@@ -23,7 +23,7 @@
           
     %tbody
       - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_total = 0, 0, 0, 0, 0, 0
-      - @clients.each do |client|
+      - @center.clients.each do |client|
         - loan_row_count = 0
         - Loan.all(:client_id => client.id).each do |loan|
           - #next if [nil, :repaid, :pending].include? loan.status
@@ -53,9 +53,13 @@
               = i
               - tot_installments += i
             %td.numeric
-              - i = [-loan.principal_overpaid_on(@date), 0].max
-              = i.to_currency
-              - tot_principal += i
+              - p = Payment.all(:loan_id => loan.id, :received_on => @date)[0]
+              - if p
+                = p.principal
+              - else
+                - i = [-loan.principal_overpaid_on(@date), 0].max
+                = i.to_currency
+                - tot_principal += i
             %td.numeric
               - i = [-loan.interest_overpaid_on(@date), 0].max
               = i.to_currency

@@ -11,6 +11,7 @@ class Client
   property :address,        Text
   property :active,         Boolean, :default => true, :nullable => false
   property :date_joined,    Date
+  property :deleted_at,     ParanoidDateTime
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},
@@ -58,6 +59,9 @@ class Client
     # a person is deemed to be in a loan_cycle if the number of repaid / written off loans he has is 
     # 1) equal to loan_cycle - 1 if he has a loan outstanding or
     # but ONLY IF loan_cycle > 1
+    #
+    # TODO
+    # We can optimise this per model (i.e. branch) by returning one hash like {1 => 2436, 2 => 4367} etc
     if loan_cycle == 1
       client_ids = repository.adapter.query(" select client_id from (select count(client_id) as x, client_id, status from loan_history where current = true group by client_id having x = 1) as dt where dt.status <= 3")
     else
@@ -77,7 +81,7 @@ class Client
                 AS dt) 
              GROUP BY client_id HAVING COUNT(loan_id) > 0) as dt1;})
     end
-    query[:id.in] = client_ids
+    query[:id.in] = client_ids unless client_ids.empty?
     Client.all(query)
   end
 

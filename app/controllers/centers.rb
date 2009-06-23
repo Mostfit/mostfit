@@ -4,6 +4,7 @@ class Centers < Application
   provides :xml, :yaml, :js
 
   def index
+    debugger
     @centers = @branch.centers
     display @centers
   end

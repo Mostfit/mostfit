@@ -14,7 +14,7 @@ class Branch
 
   
   def centers_with_paginate(params)
-    Center.paginate(:page => params[:page], :per_page => 15)
+    centers.paginate(:page => params[:page], :per_page => 15)
   end
 
   private

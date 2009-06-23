@@ -13,7 +13,10 @@
 
 %h2 Payments
 = link_to 'record payments', url(:enter_payments, :action => 'record')
+|
 = link_to 'by center', url(:enter_payments, :action => 'by_center')
+|
+= link_to 'by staff member', url(:enter_payments, :action => 'by_staff_member')
 %br/
 = link_to 'delete a payment', url(:enter_payments, :action => 'delete')
 

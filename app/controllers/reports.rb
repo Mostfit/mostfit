@@ -21,12 +21,16 @@ class Reports < Application
       pdf.set_option :right, '2cm'
       pdf.set_option :header, "Header here!"
       debugger
-      f = File.read("app/views/reports/_#{@report.name.snake_case.gsub(" ","_")}.html.haml")
-      report = Haml::Engine.new(f).render
+      @report = Kernel.const_get("WeeklyReport").new(Date.parse('2009-01-01'),Date.today)
+      @report.calc
+      f = File.read("app/views/reports/_#{@report.name.snake_case.gsub(" ","_")}.pdf.haml")
+      report = Haml::Engine.new(f).render(Object.new, :report => @report)
       pdf << report
       pdf.footer ".t."
       send_data pdf.generate, :filename => 'report.pdf'
     else
+      @report = Kernel.const_get("WeeklyReport").new(Date.parse('2009-01-01'),Date.today)
+      @report.calc
       display @report
     end
   end

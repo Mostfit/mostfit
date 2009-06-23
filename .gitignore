@@ -22,3 +22,5 @@ merb_profile_results
 misfit_fixtures/*
 config/database.yml
 result_file.txt
+.emacs*
+config/database.yml

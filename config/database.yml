@@ -13,7 +13,7 @@ development: &defaults
 
 test:
   <<:       *defaults
-  database: db/test.db
+  database: mostfit_test
  
 production:
   adapter:  mysql

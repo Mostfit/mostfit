@@ -216,7 +216,8 @@ describe Loan do
     @loan.scheduled_first_payment_date = @loan.scheduled_disbursal_date - 1  # before disbursed
     @loan.should_not be_valid
   end
-
+  it "should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates" do
+  end
 
 
 

@@ -34,6 +34,16 @@ class Payments < DataEntry::Controller
     render
   end
 
+  def by_staff_member
+    debugger
+    @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
+    if params[:staff_member_id]
+      @staff_member = StaffMember.get(params[:staff_member_id])
+      raise NotFound unless @staff_member
+    end
+    render
+  end
+    
   def create(payment)
     raise NotFound unless @loan = Loan.get(payment[:loan_id])
 
