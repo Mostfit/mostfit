@@ -8,7 +8,7 @@ development: &defaults
   adapter:  mysql 
   database: mostfit_small
   username: root
-  password: god
+  password: hatstars
   host:     localhost
 
 test:

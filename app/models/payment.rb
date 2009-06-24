@@ -75,13 +75,7 @@ class Payment
     true
   end
   def only_take_payments_on_disbursed_loans?
-<<<<<<< HEAD:app/models/payment.rb
-
     return true if loan.get_status == :outstanding
-
-=======
-    return true if loan.get_status == :outstanding
->>>>>>> ffac9685bfe0e2e44ce24b7d048ce63782375a74:app/models/payment.rb
     [false, "Payments cannot be made on loans that are written off, repaid or not (yet) disbursed"]
   end
   def not_received_in_the_future?

@@ -10,6 +10,7 @@ class WeeklyReport
 
   def calc
     @report = []
+    puts "generating..."
     @report[0] = {'Number of Members' => Branch.all.map{ |b| Client.all('center.branch_id' => b.id).count}}
     @report[1] = {'Number of Borrowers' => Branch.all.map{ |b| Client.active('center.branch_id' => b.id).count}}
     (1..4).each do |i|
@@ -28,8 +29,8 @@ class WeeklyReport
       @branch_ids[b.id] = LoanHistory.all(:current => true, :date.gt => @start_date, :date.lt => @end_date,  :fields => ['loan_id'], :branch_id => b.id).map{|h| h.loan_id}
       @repaid_ids[b.id] = LoanHistory.all(:current => true, :status => :repaid, :date.gt => @start_date, :date.lt => @end_date,  :fields => ['loan_id'], :branch_id => b.id).map{|h| h.loan_id}
       @staff_members[b.id] = b.centers.manager.uniq.size + 1
-      @start_sum[b.id] = LoanHistory.sum_outstanding_for(@start_date, @branch_ids[b.id])
-      @end_sum[b.id] = LoanHistory.sum_outstanding_for(@end_date, @branch_ids[b.id])
+      @start_sum[b.id] = @branch_ids[b.id].empty? ? 0 : LoanHistory.sum_outstanding_for(@start_date, @branch_ids[b.id]) 
+      @end_sum[b.id] = @branch_ids[b.id].empty? ? 0 : LoanHistory.sum_outstanding_for(@end_date, @branch_ids[b.id])
     end
     @report[10] = { "Loans repaid in last week (count)" => Branch.all.map{ |b| Loan.all(:id.in => @repaid_ids[b.id]).count }}
     @report[11] = {"Loans repaid in last week (amount)" => Branch.all.map{ |b| Loan.all(:id.in => @repaid_ids[b.id]).sum(:amount) }}
@@ -42,7 +43,6 @@ class WeeklyReport
     @report[14] = {"total amount outstanding" => @os_bals}
     @orig_bals = Branch.all.map {|b| Loan.all('client.center.branch_id' => b.id).sum(:amount)}
     @report[15] = {"total original amount" => @orig_bals}
-    debugger
     @avg_balances = []
     @avg_balance_per_cm = []
     @avg_borrowers_per_cm = []
