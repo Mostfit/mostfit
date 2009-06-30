@@ -1,0 +1,31 @@
+%h2
+  Approve loans
+- if @center.nil?
+  The following centers have unapproved loans
+  %br
+  - @centers.each do |k,v|
+    - center = Center.get(k)
+    = link_to "Center #{center.name}", url(:enter_approval_by_center, :id => center.id)
+    == ( #{Loan.all(:approved_on => nil, 'client.center_id' => center.id).count} loans )
+    %br
+
+- if @center
+  The following loans have not been approved yet for 
+  = link_to "this center.", "/centers/#{@center.id}"
+  
+  = form_for(@loan, :action => url(:enter_loans, :action => 'approve')) do
+    %table
+      - Loan.all(:approved_on => nil, 'client.center_id' => @center.id).each do |l|
+        %tr
+          %td
+            %input{:type => :checkbox, :name => "approve[#{l.id}]"}
+          %td
+            = l.amount
+            @
+            = l.interest_rate
+            for client
+            = l.client.name
+          %td
+            = link_to "See", "/loans/#{l.id}"
+    = select :name => :approved_by, :collection => StaffMember.all.map {|sm| [sm.id, sm.name]}, :selected => @center.manager_staff_id.to_s
+    = submit "Approve these loans"

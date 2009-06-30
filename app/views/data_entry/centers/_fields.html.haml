@@ -1,0 +1,35 @@
+%table.form
+  %tr
+    %td
+      Center name:
+    %td
+      = text_field :name, :size => 40
+  %tr
+    %td
+      Branch 
+    %td
+      = select :name => 'center[branch_id]', :collection => Branch.all.map {|b| [b.id,b.name]}
+  %tr
+    %td
+      Meeting every:
+    %td
+      - options = [['none', '<none>']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
+      = select :meeting_day, :collection => options
+      &nbsp;&nbsp;on&nbsp;&nbsp;
+      = text_field :meeting_time_hours,   :size => 2
+      %b :
+      = text_field :meeting_time_minutes, :size => 2
+      &nbsp;&nbsp;
+      %span.greytext time is in a 24 hour format
+  %tr
+    %td
+      Managed by:
+    %td
+      = select_staff_member_for @center, :manager
+      %br/
+      %span.greytext pick the staff member that manages this center
+  %tr
+    %td
+    %td
+      = submit submit_text
+      &nbsp;&nbsp;

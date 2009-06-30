@@ -1,0 +1,6 @@
+%h1 Create a new center
+
+= error_messages_for @center
+
+= form_for(@center, :action => url(:enter_centers, :action => 'create')) do
+  = partial :fields, :submit_text => "Create center"

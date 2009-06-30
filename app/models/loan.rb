@@ -484,13 +484,14 @@ class Loan
     t = Time.now
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
     @history_array = nil
+    d0 = Date.parse('2000-01-03')
     dates = payment_dates + installment_dates
     dates << disbursal_date if disbursal_date
     dates << written_off_on if written_off_on
     sql = %Q{ INSERT INTO loan_history(loan_id, date, status, 
               scheduled_outstanding_principal, scheduled_outstanding_total,
               actual_outstanding_principal, actual_outstanding_total, current, amount_in_default,
-              center_id, client_id, branch_id, days_overdue)
+              center_id, client_id, branch_id, days_overdue, week_id)
               VALUES }
     values = []
     status_updated = false
@@ -510,7 +511,7 @@ class Loan
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
                           #{history[:actual_outstanding_total]},#{current},
                           #{amount_in_default}, #{client.center.id},#{client.id},#{client.center.branch.id},
-                          #{history[:days_overdue]})}
+                          #{history[:days_overdue]}, #{((date - d0) / 7).to_i + 1})}
 
      values << value
     end

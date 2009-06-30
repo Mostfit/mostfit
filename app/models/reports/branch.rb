@@ -1,6 +1,6 @@
 module Reporting
 
-  module Branch
+  module BranchReports
 
     def member_ids
       repository.adapter.query(%Q{
@@ -118,7 +118,7 @@ module Reporting
     end
 
     def current_principal_outstanding
-
+    end
 
   end
 end

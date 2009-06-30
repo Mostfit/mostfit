@@ -14,16 +14,16 @@ class LoanHistory
   property :days_overdue,               Integer
 
   # some properties for similarly named methods of a loan:
-  property :scheduled_outstanding_principal, Integer, :nullable => false
-  property :scheduled_outstanding_total,     Integer, :nullable => false
-  property :actual_outstanding_principal,    Integer, :nullable => false
-  property :actual_outstanding_total,        Integer, :nullable => false
+  property :scheduled_outstanding_principal, Integer, :nullable => false, :index => true
+  property :scheduled_outstanding_total,     Integer, :nullable => false, :index => true
+  property :actual_outstanding_principal,    Integer, :nullable => false, :index => true
+  property :actual_outstanding_total,        Integer, :nullable => false, :index => true
   property :status,                          Enum[nil, :approved, :outstanding, :repaid, :written_off]
 
-  belongs_to :loan
-  belongs_to :client         # speed up reports
-  belongs_to :center         # by avoiding lots of joins!
-  belongs_to :branch         # muahahahahahaha!
+  belongs_to :loan, :index => true
+  belongs_to :client, :index => true         # speed up reports
+  belongs_to :center, :index => true         # by avoiding lots of joins!
+  belongs_to :branch, :index => true         # muahahahahahaha!
 
        validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 

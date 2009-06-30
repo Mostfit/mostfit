@@ -58,6 +58,33 @@ class Loans < DataEntry::Controller
     end
   end
 
+  def approve
+    debugger
+    if params[:id]
+      @center = Center.get(params[:id])
+      raise NotFound unless @center
+      render
+    elsif params[:approve]
+      params[:approve].each do |k,v|
+        l = Loan.get(k)
+        l.approved_on = Date.today
+        approver = StaffMember.get(params[:approved_by])
+        raise NotFound if approver.nil?
+        l.approved_by = approver
+        l.history_disabled = true
+        l.save
+      end
+      redirect "/data_entry", :message => {:notice => 'loans approved'}
+    else
+      @loans = Loan.all(:approved_on => nil)
+      @centers = {}
+      @loans.each do |l|
+        @centers[l.client.center_id] = @centers[l.client.center_id].nil? ? 1 : @centers[l.client.center_id] + 1
+      end
+      render
+    end
+  end
+
   private
   # the loan is not of type Loan of a derived type, therefor we cannot just assume its name..
   # this method gets the loans type from a hidden field value and uses that to get the attrs

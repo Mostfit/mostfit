@@ -1,0 +1,37 @@
+%h1 
+  Activity for 
+  = @date
+- @centers.each do |center|
+  %h3
+    = center.name
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+          %th loan id
+          %th name
+          %th loan details
+          %th principal due
+          %th interest due
+          %th total due
+    %tbody
+      - center.clients.loans.all(:order => ['client_id']).each do |loan|
+        %tr{ :class => cycle('odd','') }
+          %td &nbsp;
+          %td
+            = loan.id
+          %td
+            %b= link_to loan.client.name, resource(@branch, center, loan.client)
+          %td 
+            == Rs.#{loan.amount} disbursed #{loan.disbursal_date}
+          %td
+            = loan.scheduled_received_principal_up_to(@date) - loan.principal_received_up_to(@date)
+          %td
+            = loan.scheduled_received_interest_up_to(@date) - loan.interest_received_up_to(@date)
+          %td
+            = loan.scheduled_received_principal_up_to(@date) - loan.principal_received_up_to(@date) + loan.scheduled_received_interest_up_to(@date) - loan.interest_received_up_to(@date)
+    %tfoot
+      %tr
+        %td{ :colspan => 7 }
+
+      
