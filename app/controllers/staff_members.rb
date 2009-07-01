@@ -1,6 +1,5 @@
-require("lib/pdfs/day_sheet.rb")
 class StaffMembers < Application
-  include Pdf::DaySheet
+  include Pdf::DaySheet if PDF_WRITER
   # provides :xml, :yaml, :js
   before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
 
