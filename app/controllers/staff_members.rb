@@ -1,4 +1,6 @@
+require("lib/pdfs/day_sheet.rb")
 class StaffMembers < Application
+  include Pdf::DaySheet
   # provides :xml, :yaml, :js
   before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
 
@@ -37,7 +39,13 @@ class StaffMembers < Application
     raise NotFound unless @staff_member
     @date = (params[:date] and Date.parse(params[:date])) ? Date.parse(params[:date]) : Date.today
     @centers = Center.all(:manager_staff_id => @staff_member.id, :meeting_day => Center.meeting_days[@date.wday])
-    display @centers
+    if params[:format] == "pdf"      
+      generate_pdf 
+      send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf"), 
+                :filename => "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf")
+    else
+      display @centers
+    end
   end
 
   def show(id)
