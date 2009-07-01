@@ -45,8 +45,15 @@ Merb::BootLoader.after_app_loads do
   rescue
     Merb.logger.info("Couldn't create the 'admin' user, possibly unable to access the database.")
   end
-  Mime::Type.register 'application/pdf', :pdf
-  require "pdf/writer"
-  require "pdf/simpletable"
+#  Mime::Type.register 'application/pdf', :pdf
+  begin
+    require "pdf/writer"
+    require "pdf/simpletable"
+    Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
+  rescue
+    puts "--------------------------------------------------------------------------------"
+    puts "--------Do a gem install pdf-writer otherwise pdf generation won't work---------"
+    puts "--------------------------------------------------------------------------------"
+  end
 end
 
