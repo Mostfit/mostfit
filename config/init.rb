@@ -26,8 +26,17 @@ Merb::BootLoader.before_app_loads do
     :in              => { :number =>   { :precision => 3, :delimiter => ',',  :separator => '.'},
                           :currency => { :unit => 'Rs.',  :format => '%u %n', :precision => 0 } })
   Numeric::Transformer.change_default_format(:mostfit_default)
-
-
+  begin
+    require "pdf/writer"
+    require "pdf/simpletable"
+    require("lib/pdfs/day_sheet.rb")
+    PDF_WRITER = true
+  rescue
+    PDF_WRITER = false
+    puts "--------------------------------------------------------------------------------"
+    puts "--------Do a gem install pdf-writer otherwise pdf generation won't work---------"
+    puts "--------------------------------------------------------------------------------"
+  end
 end
  
 Merb::BootLoader.after_app_loads do
@@ -46,14 +55,5 @@ Merb::BootLoader.after_app_loads do
     Merb.logger.info("Couldn't create the 'admin' user, possibly unable to access the database.")
   end
 #  Mime::Type.register 'application/pdf', :pdf
-  begin
-    require "pdf/writer"
-    require "pdf/simpletable"
-    Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
-  rescue
-    puts "--------------------------------------------------------------------------------"
-    puts "--------Do a gem install pdf-writer otherwise pdf generation won't work---------"
-    puts "--------------------------------------------------------------------------------"
-  end
 end
 
