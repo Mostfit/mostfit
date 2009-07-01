@@ -46,6 +46,7 @@ Merb::BootLoader.after_app_loads do
     Merb.logger.info("Couldn't create the 'admin' user, possibly unable to access the database.")
   end
   Mime::Type.register 'application/pdf', :pdf
-  require 'htmldoc'
+  require "pdf/writer"
+  require "pdf/simpletable"
 end
 
