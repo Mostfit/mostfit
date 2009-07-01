@@ -25,8 +25,8 @@ class LoanHistory
   belongs_to :client, :index => true         # speed up reports
   belongs_to :center, :index => true         # by avoiding lots of joins!
   belongs_to :branch, :index => true         # muahahahahahaha!
-
-       validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
+  
+  validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
 
   # __DEPRECATED__ the prefered way to make history and future.
