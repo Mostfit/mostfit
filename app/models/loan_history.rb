@@ -12,6 +12,7 @@ class LoanHistory
 
   property :amount_in_default,          Integer # less normalisation = faster queries
   property :days_overdue,               Integer
+  property :week_id,                    Integer # good for aggregating.
 
   # some properties for similarly named methods of a loan:
   property :scheduled_outstanding_principal, Integer, :nullable => false, :index => true
