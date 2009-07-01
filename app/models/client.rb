@@ -1,6 +1,8 @@
 class Client
-  include DataMapper::Resource
   include Paperclip::Resource
+  include DateParser  # mixin for the hook "before :valid?, :parse_dates"
+  include DataMapper::Resource
+
   before :valid?, :parse_dates
   
   property :id,             Serial
@@ -87,5 +89,4 @@ class Client
 
 
   private
-  include DateParser  # mixin for the hook "before :valid?, :parse_dates"
 end
