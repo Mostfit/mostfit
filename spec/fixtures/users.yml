@@ -13,13 +13,14 @@ prashanth:
   :active: true
   :password: password
   :password_confirmation: password
-
+  :mis_manager: true
 priya:
   :id: 3
   :login: priya
   :active: true
   :password: password
   :password_confirmation: password
+  :mis_manager: true
 
 sid:
   :id: 4
@@ -27,6 +28,7 @@ sid:
   :active: true
   :password: password
   :password_confirmation: password
+  :mis_manager: true
 
 cies:
   :id: 5
@@ -34,6 +36,7 @@ cies:
   :active: true
   :password: password
   :password_confirmation: password
+  :mis_manager: true
 
 hemanth:
   :id: 6
@@ -41,3 +44,4 @@ hemanth:
   :active: false
   :password: password
   :password_confirmation: password
+  :mis_manager: true
