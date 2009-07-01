@@ -35,8 +35,8 @@ class StaffMembers < Application
   def day_sheet(id)
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
-    date = params[:date] || Date.today
-    @centers = Center.all(:manager_staff_id => @staff_member.id, :meeting_day => Center.meeting_days[date.wday])
+    @date = (params[:date] and Date.parse(params[:date])) ? Date.parse(params[:date]) : Date.today
+    @centers = Center.all(:manager_staff_id => @staff_member.id, :meeting_day => Center.meeting_days[@date.wday])
     display @centers
   end
 
