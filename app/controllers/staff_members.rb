@@ -5,8 +5,8 @@ class StaffMembers < Application
 
   def index
     debugger
-#    @current_page = ( params[:page] && ( params[:page].to_i > 0 ) ) ? params[:page].to_i : 1 
-#    per_page = 15
+    # @current_page = ( params[:page] && ( params[:page].to_i > 0 ) ) ? params[:page].to_i : 1 
+    #per_page = 15
     # @staff_members = StaffMember.all(:order => [:id], :offset => (@current_page - 1 ) * per_page, :limit => per_page)
     @staff_members = StaffMember.paginate(:page => params[:page], :per_page => 15)
     display @staff_members

@@ -3,70 +3,58 @@ class WeeklyReport
   attr_accessor :start_date, :end_date, :report, :name
   
   def initialize(start_date, end_date)
-    @start_date = start_date
-    @end_date = end_date
+    @start_date = (start_date.is_a? Date) ? start_date : Date.parse(start_date)
+    @end_date = (end_date.is_a? Date) ? end_date : Date.parse(end_date)
     @name = "weekly report"
   end
 
   def calc
     @report = []
+    t0 = Time.now
+    t = Time.now
     puts "generating..."
-    @report[0] = {'Number of Members' => Branch.all.map{ |b| Client.all('center.branch_id' => b.id).count}}
-    @report[1] = {'Number of Borrowers' => Branch.all.map{ |b| Client.active('center.branch_id' => b.id).count}}
+    @report[0] = {'Number of Members' => Branch.client_count}
+    @report[1] = {'Number of Borrowers' => Branch.active_client_count}
     (1..4).each do |i|
-      @report[1+i] = { "Loan Cycle #{i}" => Branch.all.map{ |b| Client.find_by_loan_cycle(i,'center.branch_id' => b.id).count }}
+      @report[1+i] = { "Loan Cycle #{i}" => Branch.client_count_by_loan_cycle(i)}
     end
-    @report[6] = {"More than one loan"  => Branch.all.map{ |b| Client.active({'center.branch_id' => b.id}, ">", 1).count }}
-    @report[7] = {"Dormant clients" => Branch.all.map{ |b| Client.dormant('center.branch_id' => b.id).count }}
-    @report[8] = {"last_week_drop_outs" => Branch.all.map{ |b| Client.all('center.branch_id' => b.id, :deleted_at.gte => @start_date, :deleted_at.lte => @end_date).count }}
-    @report[9] = {"new_clients_last_week" => Branch.all.map{ |b| Client.all('center.branch_id' => b.id, :date_joined.gte => @start_date, :deleted_at.lte => @end_date).count }}
-    @branch_ids = []
-    @repaid_ids = []
-    @staff_members = []
-    @start_sum, @end_sum = [], []
-    @defaulted_loan_ids = {}
-    Branch.all.each do |b|
-      @branch_ids[b.id] = LoanHistory.all(:current => true, :date.gt => @start_date, :date.lt => @end_date,  :fields => ['loan_id'], :branch_id => b.id).map{|h| h.loan_id}
-      @repaid_ids[b.id] = LoanHistory.all(:current => true, :status => :repaid, :date.gt => @start_date, :date.lt => @end_date,  :fields => ['loan_id'], :branch_id => b.id).map{|h| h.loan_id}
-      @staff_members[b.id] = b.centers.manager.uniq.size + 1
-      @start_sum[b.id] = @branch_ids[b.id].empty? ? 0 : LoanHistory.sum_outstanding_for(@start_date, @branch_ids[b.id]) 
-      @end_sum[b.id] = @branch_ids[b.id].empty? ? 0 : LoanHistory.sum_outstanding_for(@end_date, @branch_ids[b.id])
-    end
-    @report[10] = { "Loans repaid in last week (count)" => Branch.all.map{ |b| Loan.all(:id.in => @repaid_ids[b.id]).count }}
-    @report[11] = {"Loans repaid in last week (amount)" => Branch.all.map{ |b| Loan.all(:id.in => @repaid_ids[b.id]).sum(:amount) }}
-    @payments = Branch.all.map{ |b| Payment.all(:received_on.gt => @start_date, :received_on.lt => @end_date, :loan_id.in => @branch_ids[b.id])}
-    @prin_received = @payments.map {|p| p.sum(:principal)}
-    @int_received = @payments.map {|p| p.sum(:interest)}
-    @report[12] = {"principal received last week" => @prin_received }
-    @report[13] = {"interest received last week" => @int_received }
-    @os_bals = Branch.all.map{ |b| LoanHistory.all(:branch_id => b.id, :current => true).sum(:actual_outstanding_principal)}
-    @report[14] = {"total amount outstanding" => @os_bals}
+    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did loan cycles. starting more than one loan"
+    t = Time.now
+#    @report[6] = {"More than one loan"  => Branch.all.map{ |b| Client.active({'center.branch_id' => b.id}, ">", 1).count }}
+#    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did more than one loan. starting dormant"
+    t = Time.now
+    @report[7] = {"Dormant clients" => Branch.dormant_client_count}
+    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did  dormant. starting last week dropouts"
+    t = Time.now
+    @report[8] = {"last_week_drop_outs" => Branch.clients_deleted_between_such_and_such_date_count(start_date, end_date)}
+    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did last week dropouts. starting last weeks additions"
+    t = Time.now
+    @report[9] = {"new_clients_last_week" => Branch.clients_added_between_such_and_such_date_count(start_date, end_date)}
+    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did last weeks additions. starting laons repaid (count)"
+    t = Time.now
+    @report[10] = { "Loans repaid in last week (count)" => Branch.loans_repaid_between_such_and_such_date(start_date, end_date, "count")}
+    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did last weeks additions. starting laons repaid (sum)"
+    t = Time.now
+    @report[11] = {"Loans repaid in last week (amount)" => Branch.loans_repaid_between_such_and_such_date(start_date, end_date, "sum")}
+    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did loans repaid (sum). starting principal_received last week"
+    t = Time.now
+    @report[12] = {"principal received last week" => Branch.principal_received_between_such_and_such_date(start_date, end_date) }
+    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did prin received. starting interest received last week"
+    t = Time.now
+      @report[13] = {"interest received last week" => Branch.interest_received_between_such_and_such_date(start_date, end_date)}
+    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did int received last week. starting os bals"
+    t = Time.now
+    @report[14] = {"total amount outstanding" => Branch.current_principal_outstanding(end_date)}
     @orig_bals = Branch.all.map {|b| Loan.all('client.center.branch_id' => b.id).sum(:amount)}
-    @report[15] = {"total original amount" => @orig_bals}
-    @avg_balances = []
-    @avg_balance_per_cm = []
-    @avg_borrowers_per_cm = []
-    @report[1][@report[1].keys[0]].each_with_index do |v,i|
-      @avg_balances[i] =  @os_bals[i].to_f / v
-      @avg_balance_per_cm[i] = @os_bals[i].to_f / (@staff_members[i+1]-1)
-      @avg_borrowers_per_cm[i] = v / (@staff_members[i+1]-1)
-    end
-    @report[15] = {"average os bal per loanee" => @avg_balances}
-    @report[16] = {"number of staff members" => @staff_members[1..-1]}
-    @report[17] = {"number of center managers" => @staff_members[1..-1].map{|x| x-1}}
-    @avg_staff_member_per_client = []
-    @avg_member_per_cm = []
-    @report[0][@report[0].keys[0]].each_with_index do |v,i|
-      @avg_staff_member_per_client[i] = v.to_f / @staff_members[i+1]
-      @avg_member_per_cm[i] = v.to_f / (@staff_members[i+1]-1)
-    end
-    @report[18] = {"average clients / staff" => @avg_staff_member_per_client}
-    @report[19] = {"average clients / CM" => @avg_member_per_cm}
-    @report[20] = {"average balance / CM" => @avg_balance_per_cm}
-    @report[21] = {"average borrowers / CM" => @avg_borrowers_per_cm}
-    @report[22] = {"loans disbursed this week" => Branch.all.map { |b| Loan.all(:id.in => @branch_ids[b.id], :disbursal_date.gt => @start_date, :disbursal_date.lt => @end_date).count}}
-    @report[23] = {"loans disbursed this week (amount)" => Branch.all.map { |b| Loan.all(:id.in => @branch_ids[b.id], :disbursal_date.gt => @start_date, :disbursal_date.lt => @end_date).sum(:amount)}}
-    @principal_due = Branch.all.map { |b| @end_sum[b.id][0][:scheduled_outstanding_principal].to_i - @start_sum[b.id][0][:actual_outstanding_principal].to_i}
+    @report[15] = {"average os bal per loanee" => Branch.avg_balances}
+    @report[16] = {"number of staff members" => Branch.staff_members}
+    @report[17] = {"number of center managers" => Branch.center_managers}
+    @report[18] = {"average clients / staff" => Branch.avg_client_count_per_center_manager}
+    @report[20] = {"average balance / CM" => Branch.avg_current_principal_outstanding_per_center_manager}
+    @report[21] = {"average borrowers / CM" => Branch.avg_active_client_count_per_center_manager}
+    @report[22] = {"loans disbursed this week" => Branch.loans_disbursed_between_such_and_such_date(start_date, end_date, "count")}
+    @report[23] = {"loans disbursed this week (amount)" => Branch.loans_disbursed_between_such_and_such_date(start_date, end_date, "sum")}
+    @principal_due = Branch.principal_due_between_such_and_such_date(start_date, end_date)
     @interest_due = Branch.all.map { |b| (@end_sum[b.id][0][:scheduled_outstanding_total].to_i - @end_sum[b.id][0][:scheduled_outstanding_principal].to_i) - (@start_sum[b.id][0][:actual_outstanding_total].to_i - @start_sum[b.id][0][:actual_outstanding_principal].to_i)}
     @report[23] = {"principal due this week" => @principal_due}
     @report[24] = {"interest due this week" => @interest_due}
