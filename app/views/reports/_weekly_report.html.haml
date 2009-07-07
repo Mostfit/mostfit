@@ -11,6 +11,6 @@
       %tr
         %th
           = r.keys[0]
-        - r[r.keys[0]].each do |v|
+        - Branch.all.each do |branch|
           %td
-            = v
+            = r[r.keys[0]][branch.id] || "-"

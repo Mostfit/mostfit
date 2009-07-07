@@ -151,6 +151,12 @@ module Reporting
       query_as_hash(%Q{ select sum(principal), b.id from payments p, loans l, clients cl, centers c, branches b where p.received_on between '#{start_date}' and '#{end_date}' and p.loan_id = l.id and l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id  group by b.id})
     end
 
+    def interest_due_between_such_and_such_date(start_date, end_date)
+      start_bal = current_total_outstanding(start_date) - current_principal_outstanding(start_date)
+      end_bal = scheduled_total_outstanding(end_date) - scheduled_principal_outstanding(end_date)
+      start_bal - end_bal
+    end
+
     def interest_received_between_such_and_such_date(start_date, end_date)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
@@ -209,9 +215,12 @@ module Reporting
       query_as_hash("select branch_id, avg(actual_outstanding_principal) from loan_history where current = true group by branch_id;")
     end
 
+    def overdue_by(min, max)
+      repository.adapter.query("SELECT branch_id, SUM(amount_in_default) FROM loan_history WHERE current = true AND days_overdue BETWEEN #{min} and #{max} GROUP BY branch_id").map {|x| [x[0],x[1].to_f]}.to_hash
+    end
 
     def method_missing(name, params = nil)
-      if /(\w+)_per_(\w+)/.match(name.to_s)
+      if /avg_(\w+)_per_(\w+)/.match(name.to_s)
         send($1) / send($2)
       else
         raise "No such method #{name}"

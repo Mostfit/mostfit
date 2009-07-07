@@ -20,7 +20,7 @@ class WeeklyReport
     end
     Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did loan cycles. starting more than one loan"
     t = Time.now
-#    @report[6] = {"More than one loan"  => Branch.all.map{ |b| Client.active({'center.branch_id' => b.id}, ">", 1).count }}
+    @report[6] = {"More than one loan"  => Branch.active_client_count}
 #    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did more than one loan. starting dormant"
     t = Time.now
     @report[7] = {"Dormant clients" => Branch.dormant_client_count}
@@ -46,24 +46,25 @@ class WeeklyReport
     t = Time.now
     @report[14] = {"total amount outstanding" => Branch.current_principal_outstanding(end_date)}
     @orig_bals = Branch.all.map {|b| Loan.all('client.center.branch_id' => b.id).sum(:amount)}
-    @report[15] = {"average os bal per loanee" => Branch.avg_balances}
-    @report[16] = {"number of staff members" => Branch.staff_members}
+    @report[15] = {"average os bal per loanee" => Branch.avg_outstanding_balance}
+    @report[16] = {"number of staff members" => Branch.center_managers}
     @report[17] = {"number of center managers" => Branch.center_managers}
-    @report[18] = {"average clients / staff" => Branch.avg_client_count_per_center_manager}
-    @report[20] = {"average balance / CM" => Branch.avg_current_principal_outstanding_per_center_manager}
-    @report[21] = {"average borrowers / CM" => Branch.avg_active_client_count_per_center_manager}
+    @report[18] = {"average clients / staff" => Branch.avg_client_count_per_center_managers}
+    @report[19] = {"average clients / staff" => Branch.avg_client_count_per_center_managers}
+    @report[20] = {"average balance / CM" => Branch.avg_current_principal_outstanding_per_center_managers}
+    @report[21] = {"average borrowers / CM" => Branch.avg_active_client_count_per_center_managers}
     @report[22] = {"loans disbursed this week" => Branch.loans_disbursed_between_such_and_such_date(start_date, end_date, "count")}
     @report[23] = {"loans disbursed this week (amount)" => Branch.loans_disbursed_between_such_and_such_date(start_date, end_date, "sum")}
     @principal_due = Branch.principal_due_between_such_and_such_date(start_date, end_date)
-    @interest_due = Branch.all.map { |b| (@end_sum[b.id][0][:scheduled_outstanding_total].to_i - @end_sum[b.id][0][:scheduled_outstanding_principal].to_i) - (@start_sum[b.id][0][:actual_outstanding_total].to_i - @start_sum[b.id][0][:actual_outstanding_principal].to_i)}
+    @interest_due = Branch.interest_due_between_such_and_such_date(start_date,end_date)
     @report[23] = {"principal due this week" => @principal_due}
     @report[24] = {"interest due this week" => @interest_due}
-    @report[25] = {"principal received" => @prin_received}
-    @report[25] = {"interest received" => @int_received}
-    @report[26] = {"7 days late" => Branch.all.map {|b| LoanHistory.all(:current => true, :branch_id => b.id, :days_overdue.lte => 7).sum(:amount_in_default)}}
-    @report[27] = {"14 days late" => Branch.all.map {|b| LoanHistory.all(:current => true, :branch_id => b.id, :days_overdue.gt => 7, :days_overdue.lte => 14).sum(:amount_in_default)}}
-    @report[28] = {"21 days late" => Branch.all.map {|b| LoanHistory.all(:current => true, :branch_id => b.id, :days_overdue.gt => 14, :days_overdue.lte => 21).sum(:amount_in_default)}}
-    @report[29] = {"28 days late" => Branch.all.map {|b| LoanHistory.all(:current => true, :branch_id => b.id, :days_overdue.gt => 21, :days_overdue.lte => 28).sum(:amount_in_default)}}
+    @report[25] = {"principal received" => Branch.principal_received_between_such_and_such_date(start_date, end_date)}
+    @report[25] = {"interest received" => Branch.interest_received_between_such_and_such_date(start_date, end_date)}
+    @report[26] = {"7 days late" => Branch.overdue_by(0,7)}
+    @report[27] = {"14 days late" => Branch.overdue_by(8,14)}
+    @report[28] = {"21 days late" => Branch.overdue_by(9,21)}
+    @report[29] = {"28 days late" => Branch.overdue_by(22,28)}
     return @report
 
   end
