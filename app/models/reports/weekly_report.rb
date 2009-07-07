@@ -1,11 +1,13 @@
-class WeeklyReport
-
-  attr_accessor :start_date, :end_date, :report, :name
+class WeeklyReport < Report
   
   def initialize(start_date, end_date)
-    @start_date = (start_date.is_a? Date) ? start_date : Date.parse(start_date)
-    @end_date = (end_date.is_a? Date) ? end_date : Date.parse(end_date)
+    self.start_date = (start_date.is_a? Date) ? start_date : Date.parse(start_date)
+    self.end_date = (end_date.is_a? Date) ? end_date : Date.parse(end_date)
     @name = "weekly report"
+  end
+
+  def to_str
+    "#{start_date} - #{end_date}"
   end
 
   def calc
@@ -65,7 +67,9 @@ class WeeklyReport
     @report[27] = {"14 days late" => Branch.overdue_by(8,14)}
     @report[28] = {"21 days late" => Branch.overdue_by(9,21)}
     @report[29] = {"28 days late" => Branch.overdue_by(22,28)}
-    return @report
-
+    self.raw = @report
+    self.report = Marshal.dump(@report)
+    self.generation_time = Time.now - t0
+    self.save
   end
 end

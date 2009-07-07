@@ -6,32 +6,32 @@ class Reports < Application
     display @reports
   end
 
-  def show(id)
+  def show(report_type, id)
     provides :pdf
-    @report = Report.get(id)
-    raise NotFound unless @report
-    if params[:format] == "pdf"
-      pdf = PDF::HTMLDoc.new
-      pdf.set_option :bodycolor, :white
-      pdf.set_option :toc, false
-      pdf.set_option :portrait, true
-      pdf.set_option :links, true
-      pdf.set_option :webpage, true
-      pdf.set_option :left, '2cm'
-      pdf.set_option :right, '2cm'
-      pdf.set_option :header, "Header here!"
-      debugger
-      @report = Kernel.const_get("WeeklyReport").new(Date.parse('2009-01-01'),Date.today)
-      @report.calc
-      f = File.read("app/views/reports/_#{@report.name.snake_case.gsub(" ","_")}.pdf.haml")
-      report = Haml::Engine.new(f).render(Object.new, :report => @report)
-      pdf << report
-      pdf.footer ".t."
-      send_data pdf.generate, :filename => 'report.pdf'
+    klass = Kernel.const_get(report_type)
+    if id.nil?
+      @reports = klass.all
+      display @reports
     else
-      @report = Kernel.const_get("WeeklyReport").new(Date.parse('2009-01-01'),Date.today)
-      @report.calc
-      display @report
+      @report = Report.get(id)
+      if params[:format] == "pdf"
+        pdf = PDF::HTMLDoc.new
+        pdf.set_option :bodycolor, :white
+        pdf.set_option :toc, false
+        pdf.set_option :portrait, true
+        pdf.set_option :links, true
+        pdf.set_option :webpage, true
+        pdf.set_option :left, '2cm'
+        pdf.set_option :right, '2cm'
+        pdf.set_option :header, "Header here!"
+        f = File.read("app/views/reports/_#{@report.name.snake_case.gsub(" ","_")}.pdf.haml")
+        report = Haml::Engine.new(f).render(Object.new, :report => @report)
+        pdf << report
+        pdf.footer ".t."
+        send_data pdf.generate, :filename => 'report.pdf'
+      else
+        display @report
+      end
     end
   end
 

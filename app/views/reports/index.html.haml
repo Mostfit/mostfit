@@ -3,13 +3,13 @@
 
 %table
   %tr
-  - @reports.each do |report|
+  - Report.descendants.each do |report|
     %tr
       %td
-        = report.name
+        = report
       %td
-        = link_to 'Show', url(:report, report)
+        = link_to 'Show', url(:show_report, :report_type => report)
       %td
-        = link_to 'Edit', url(:edit_report,  report)
+        = link_to 'Edit'
 
 = link_to 'New', url(:new_report)

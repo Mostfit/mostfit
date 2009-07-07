@@ -1,7 +1,13 @@
 class Report
   include DataMapper::Resource
-  
-  property :id, Serial
-  property :name, Text, :length => 255
 
+  attr_accessor :raw
+  property :id, Serial
+  property :start_date, Date
+  property :end_date, Date
+  property :report, Yaml
+  property :dirty, Boolean
+  property :report_type, Discriminator
+  property :created_at, DateTime
+  property :generation_time, Integer
 end
