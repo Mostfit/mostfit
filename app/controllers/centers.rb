@@ -4,7 +4,7 @@ class Centers < Application
   provides :xml, :yaml, :js
 
   def index
-    @centers = Center.paginate(:branch_id => @branch.id, :per_page => 15)
+    @centers = Center.all(:branch_id => @branch.id).paginate(:per_page => 15)
     display @centers
   end
 

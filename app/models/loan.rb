@@ -540,15 +540,15 @@ class Loan
   # the arithmic of shifting by the installment_frequency (especially months is tricky)
   # used by many other methods, it accepts a negative +number+
   # TODO: decide if we should make sure returned date is a payment date.
-  def shift_date_by_installments(date, number)
+  def shift_date_by_installments(date, number, ensure_meeting_day = true)
     return date if number == 0
     case installment_frequency
       when :daily
-        return date + number
+        new_date =  date + number
       when :weekly
-        return date + number * 7
+        new_date =  date + number * 7
       when :biweekly
-        return date + number * 14
+        new_date = date + number * 14
       when :monthly
         new_month = date.month + number
         new_year  = date.year
@@ -562,10 +562,11 @@ class Loan
         end
         month_lengths = [nil, 31, (Time.gm(new_year, new_month).to_date.leap? ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
         new_day = (date.day > month_lengths[new_month]) ? month_lengths[new_month] : date.day
-        return Time.gm(new_year, new_month, new_day).to_date
+        new_date = Time.gm(new_year, new_month, new_day).to_date
       else
         raise ArgumentError.new("Strange period you got..")
     end
+    new_date - new_date.cwday + Center.meeting_days.index(client.center.meeting_day)
   end
 
   def self.description

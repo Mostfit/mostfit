@@ -1,5 +1,6 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :loan_types
   resources :reports
   resources :users
   resources :staff_members
@@ -44,6 +45,6 @@ Merb::Router.prepare do
 
   match('/').to(:controller => 'entrance', :action =>'root')
   # This is the default route for /:controller/:action/:id
-  # default_routes
+  default_routes
 
 end

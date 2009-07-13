@@ -1,0 +1,21 @@
+%h1
+  LoanTypes
+
+- if @loan_types.count == 0
+  %h3
+    No Loan Types defined. 
+    = link_to 'Click here', url(:new_loan_type)
+    to add one
+
+%table
+  %tr
+  - for loan_type in @loan_types
+    %tr
+      %td
+        = loan_type.name
+      %td
+        = link_to 'Show', url(:loan_type, loan_type)
+      %td
+        = link_to 'Edit', url(:edit_loan_type,  loan_type)
+
+= link_to 'New', url(:new_loan_type)

@@ -34,10 +34,11 @@ class StaffMembers < Application
   end
 
   def day_sheet(id)
+    debugger
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
     @date = (params[:date] and Date.parse(params[:date])) ? Date.parse(params[:date]) : Date.today
-    @centers = Center.all(:manager_staff_id => @staff_member.id, :meeting_day => Center.meeting_days[@date.wday])
+    @centers = @staff_member.centers(:meeting_day => Center.meeting_days[@date.cwday])
     if params[:format] == "pdf"      
       generate_pdf 
       send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf"), 
