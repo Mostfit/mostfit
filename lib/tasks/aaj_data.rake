@@ -117,7 +117,7 @@ namespace :aaj do
 
   desc "Check for anomalous entries "
   task :check_for_anomaly do
-    date=Date.new(2009,4,1)#1st April,2009
+    date=Date.new(2009,03,31)
 
     result_file=File.open("result_file.txt",'w')
     result_file.write("\t\t Name \t\t Expected \t\t Actual \n")
