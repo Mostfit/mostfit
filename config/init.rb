@@ -44,11 +44,14 @@ Merb::BootLoader.after_app_loads do
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
   begin
     if User.all.empty?
-      u = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password')
+      u = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password', :admin => true)
       if u.save
         Merb.logger.info("The initial user 'admin' was created (password is set to 'password')...")
       else
         Merb.logger.info("Couldn't create the 'admin' user...")
+        u.errors.each do |e|
+          Merb.logger.info(e)
+        end
       end
     end
   rescue
