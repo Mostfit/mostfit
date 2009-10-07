@@ -2,7 +2,7 @@
   %h1
     = params[:report_type]
   - @reports.each do |report|
-    = link_to "#{report.id}: #{report.to_str}", url(:show_report, params[:report_type], report.id)
+    = link_to "#{report.name}", url(:show_report, params[:report_type], report.id)
     %br
 - else
   %h1

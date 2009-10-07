@@ -97,7 +97,7 @@
         %th interest
         %th total
     %tbody
-    - for payment in @payments
+    - for payment in @loan.payments
       %tr{ :class => cycle('odd','') }
         %td &nbsp;
         %td

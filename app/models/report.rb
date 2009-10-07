@@ -10,4 +10,8 @@ class Report
   property :report_type, Discriminator
   property :created_at, DateTime
   property :generation_time, Integer
+
+  def name
+    "#{report_type}: #{start_date} - #{end_date}"
+  end
 end
