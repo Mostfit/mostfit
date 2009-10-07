@@ -1,6 +1,6 @@
-- if @funders.size > 0
-  .graph
-    = ofc2(430, 200, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'funding') )
+/- if @funders.size > 0
+/  .graph
+/    = ofc2(430, 200, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'funding') )
 
 
 %h1 Overview of all funders

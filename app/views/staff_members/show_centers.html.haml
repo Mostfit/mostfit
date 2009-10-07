@@ -17,7 +17,7 @@
     %th
       Amount In Default
   - for center in @centers
-    %tr
+    %tr{ :class => cycle('odd','even')}
       %td
         = link_to center.name, url(:branch_center, center.branch.id, center.id)
       %td

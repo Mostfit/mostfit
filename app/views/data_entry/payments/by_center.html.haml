@@ -1,5 +1,9 @@
 %h1
-  = @date
+  = @date 
+  - if @center
+    (
+    = Center.meeting_days[@date.wday]
+    )
   - if @center and @date
     - if not @errors.blank?
       .error
@@ -13,7 +17,8 @@
     %p
       %br/
     %h2
-      == Week #{@date.cweek} meeting sheet for center #{@center.name}
+      == Week #{@date.cweek} : Center #{@center.name}
+      == : Meeting day #{@center.meeting_day}
     %a{ :name => 'weeksheet' }/
     
     %table.narrow.form{ :style => "width: 100%;" }

@@ -22,6 +22,7 @@ class FundingLines < Application
   end
 
   def create(funding_line)
+    funding_line[:interest] = funding_line[:interest] / 100
     @funding_line = FundingLine.new(funding_line)
     @funding_line.funder = @funder
     if @funding_line.save

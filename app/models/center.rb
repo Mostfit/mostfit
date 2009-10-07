@@ -41,17 +41,21 @@ class Center
   end
 
   def next_meeting_date_from(date)
-    date + 7 - date.cwday + Center.meeting_days.index(meeting_day)
+    meeting_wday = Center.meeting_days.index(meeting_day)
+    next_meeting_date = date - date.wday + meeting_wday
+    next_meeting_date += 7 if next_meeting_date <= date
+    next_meeting_date
   end
+
+  def previous_meeting_date_from(date)
+    meeting_wday = Center.meeting_days.index(meeting_day)
+    date.wday > meeting_wday ? date - date.wday + meeting_wday : date - date.wday - 7 + meeting_wday
+  end
+
 
   def meeting_day?(date)
     date.cwday == Center.meeting_days.index(meeting_day)
   end
-
-  def previous_meeting_date_from(date)
-    date - 7 + Center.meeting_days.index(meeting_day)
-  end
-
 
   def meeting_time
     meeting_time_hours.two_digits + ':' + meeting_time_minutes.two_digits

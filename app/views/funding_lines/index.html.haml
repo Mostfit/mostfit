@@ -1,7 +1,6 @@
-
-- if @funder.funding_lines.size > 0
-  .graph
-    = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'funding_lines', :id => @funder.id, :scope_unit => 'months', :scope_size => 3) )
+/- if @funder.funding_lines.size > 0
+/  .graph
+/    = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'funding_lines', :id => @funder.id, :scope_unit => 'months', :scope_size => 3) )
 
 %h1== Funder: <i>#{@funder.name}</i>
 
