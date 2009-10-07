@@ -6,9 +6,14 @@
   %table
     %tr
       %th
-        Report Name
+        Report Type
       %td
-        = text_field :name
+        = select :report_type, :collection => ["YearlyReport", "MonthlyReport", "WeeklyReport", "DailyReport"]
+    %tr
+      %th
+        Start Date
+      %td
+        = date_select_html(:name => "[start_date]", :id => "start_date", :date => Date.today)
   %p
     = submit "Create"
 

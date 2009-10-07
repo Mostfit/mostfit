@@ -25,36 +25,30 @@ class Hash
 end
 
 module Reporting
-
-
-
   module BranchReports
-
     # we must convert each SQL struct into a hash of {:branch_id =< :value}, so that we are always looking at 
     # the correct branch, and we have to refactor the divison, multiplication, etc. of these arrays
-
     def query_as_hash(sql)
       repository.adapter.query(sql).map {|x| [x[0],x[1]]}.to_hash
     end
 
-    def client_count
+    def client_count(start_date, end_date)
       query_as_hash(%Q{
           SELECT b.id, COUNT(cl.id) as count
           FROM clients cl, centers c, branches b
-          WHERE cl.center_id = c.id AND c.branch_id = b.id
+          WHERE cl.center_id = c.id AND c.branch_id = b.id and cl.date_joined < '#{end_date}'
           GROUP BY b.id})            
     end
 
-    def loan_count
+    def loan_count(start_date, end_date)
       query_as_hash(%Q{
           SELECT COUNT(*) 
           FROM loans l, clients cl, centers c, branches b
-          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id
+          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id and l.created_at <='#{end_date}'
           GROUP BY b.id})            
     end
 
-    def active_client_count
-      debugger
+    def active_client_count(start_date, end_date)
       query_as_hash(%Q{
          SELECT branch_id, COUNT(DISTINCT client_id)
          FROM loan_history lh
@@ -62,8 +56,8 @@ module Reporting
          GROUP BY branch_id})
     end
 
-    def dormant_client_count
-      client_count - active_client_count
+    def dormant_client_count(start_date, end_date)
+      client_count(start_date, end_date) - active_client_count(start_date, end_date)
     end
 
     def client_count_by_loan_cycle(loan_cycle)
@@ -139,7 +133,7 @@ module Reporting
     end
 
     def principal_due_between_such_and_such_date(start_date, end_date)
-      start_bal = current_principal_outstanding(start_date)
+      start_bal = current_principal_outstanding(start_date, end_date)
       end_bal = scheduled_principal_outstanding(end_date)
       debugger
       start_bal - end_bal
@@ -152,7 +146,7 @@ module Reporting
     end
 
     def interest_due_between_such_and_such_date(start_date, end_date)
-      start_bal = current_total_outstanding(start_date) - current_principal_outstanding(start_date)
+      start_bal = current_total_outstanding(start_date) - current_principal_outstanding(start_date, end_date)
       end_bal = scheduled_total_outstanding(end_date) - scheduled_principal_outstanding(end_date)
       start_bal - end_bal
     end
@@ -163,12 +157,12 @@ module Reporting
       query_as_hash(%Q{ select sum(interest), b.id from payments p, loans l, clients cl, centers c, branches b where p.received_on between '#{start_date}' and '#{end_date}' and p.loan_id = l.id and l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id  group by b.id})
     end
 
-    def current_principal_outstanding(date = Date.today)
+    def current_principal_outstanding(start_date, end_date)
       repository.adapter.query(%Q{
         SELECT branch_id, SUM(actual_outstanding_principal) 
         FROM loan_history 
         WHERE week_id = IF( 
-                         WEEKDAY(date) > WEEKDAY(now()), 
+                         WEEKDAY(#{end_date}) > WEEKDAY(now()),
                          CEILING(DATEDIFF(NOW(),'2000-01-03')/7) - 1, 
                          CEILING(DATEDIFF(NOW(),'2000-01-03')/7)) 
         GROUP BY branch_id;}).map {|x| [x[0],x[1].to_f]}.to_hash
@@ -207,7 +201,7 @@ module Reporting
         GROUP BY branch_id;}).map {|x| [x[0],x[1].to_f]}.to_hash
     end
 
-    def center_managers
+    def center_managers(start_date, end_date)
       query_as_hash("select branch_id, count(distinct(manager_staff_id)) from centers group by branch_id;")
     end
 
@@ -219,9 +213,26 @@ module Reporting
       repository.adapter.query("SELECT branch_id, SUM(amount_in_default) FROM loan_history WHERE current = true AND days_overdue BETWEEN #{min} and #{max} GROUP BY branch_id").map {|x| [x[0],x[1].to_f]}.to_hash
     end
 
-    def method_missing(name, params = nil)
+    def method_missing(name, *params)
       if /avg_(\w+)_per_(\w+)/.match(name.to_s)
-        send($1) / send($2)
+        if params
+          arg1 = method($1).arity
+          arg2 = method($2).arity
+          puts name
+          p arg1
+          p arg2
+          if arg1==0 and arg2==0
+            send($1) / send($2)
+          elsif arg1>0 and arg2==0
+            send($1, *params) / send($2)
+          elsif arg1==0 and arg2>0
+            send($1, *params) / send($2, *params)
+          elsif arg1>0 and arg2>0
+            send($1, *params) / send($2, *params)
+          end
+        else
+          send($1) / send($2)
+        end
       else
         raise "No such method #{name}"
       end
