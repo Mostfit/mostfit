@@ -3,7 +3,7 @@
   %head
     %meta{ :content => "text/html; charset=utf-8", "http-equiv" => "content-type" }/
     %title
-      = 'mostfit' + (catch_content(:title) ? '' : ": #{catch_content(:title)}")
+      = 'mis-fit' + (catch_content(:title) ? '' : ": #{catch_content(:title)}")
     %link{ :rel => "icon", :type => "image/ico", :href => "/favicon.ico" }/
     = css_include_tag :screen, :media => "screen, projection"
     = css_include_tag :print, :media => "print"
@@ -16,7 +16,7 @@
       #header
       #subheader
         #title
-          mostfit
+          demo mfi, mumbai
         #right-nav
           - if session.authenticated?
             == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})

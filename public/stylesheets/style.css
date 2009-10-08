@@ -31,7 +31,9 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: -15px;
 }
 .container a:link, .container a:visited, .container a:active{
-  color: #bc6624;
+  /*color: #bc6624;*/
+  color: #466124;
+  font-weight: bold;
   text-decoration: none;
 }
 .container a:hover {
@@ -52,7 +54,7 @@ ol { list-style-position: outside; list-style-type: decimal; }
 
 #subheader
 {
-  background: #003d4a;
+  background: #8DC73F;
   color: #fff;
   font-weight: bold;
   padding-left: 20px;
@@ -65,6 +67,8 @@ ol { list-style-position: outside; list-style-type: decimal; }
 {
   width: 40%;
   float: left;
+  font-size: 120%;
+  
 }
 
 #subheader #right-nav
@@ -72,7 +76,7 @@ ol { list-style-position: outside; list-style-type: decimal; }
   width: 40%;
   float: right;
   text-align: right;
-  font-size: 80%;
+  font-size: 120%;
   margin-top: 0px;
   font-weight: normal;
 }
@@ -88,16 +92,17 @@ ol { list-style-position: outside; list-style-type: decimal; }
 
 #navigation
 {
-  background: #bc6624;
-  color: #fff;
+  background: #ffea73;
+  color: black;
   padding-left: 20px;
   padding-right: 20px;
   text-align: right;
 }
 
 #navigation a {
-  color: #fff;
+  color: #black;
   text-decoration: underline;
+  font-weight: bold;
 }
 
 #navigation a:hover
@@ -164,7 +169,7 @@ ul.menu li {
 
 .graph{
   float: right;
-  margin-top: 20px;
+  margin-top: 0px;
 }
 
 #breadcrums {
@@ -241,7 +246,7 @@ table.form, table.form td, table.form th{
   border: 0px;
 }
 table thead th {
-  background: #333;
+  background: #5f7999;
   color: #fff;
   text-align: left;
 }
@@ -355,8 +360,8 @@ a.nopic { background:none; padding:0; margin:0; }
 
 #header
 {
-  background: url(/images/mostfit-logo.png) no-repeat #fff;
-  height: 37px;
+  background: url(/images/misfit_logo.png) no-repeat #fff;
+  height: 130px;
 }
 
 

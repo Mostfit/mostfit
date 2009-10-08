@@ -51,6 +51,7 @@
         %th disbursement
         %th repaid
         %th status
+        %th actions
     %tbody
     - for loan in @loans
       %tr{ :class => cycle('odd','') }
@@ -109,7 +110,7 @@
 
     %tfoot
       %tr
-        %td{ :colspan => 8 }
+        %td{ :colspan => 9 }
 
 
 

@@ -10,12 +10,11 @@
       %th
       %th id
       %th login
-      %th{ :width => '50px' } data entry
-      %th{ :width => '50px' } mis manager
-      %th{ :width => '50px' } admin
-      %th{ :width => '50px' } read only
-      %th payments created
-      %th payments deleted
+      %th data entry
+      %th mis manager
+      %th admin
+      %th read only
+      %th edit | delete
   %tbody
   - for user in @users
     %tr{ :class => cycle('odd','') }
@@ -32,10 +31,6 @@
         %b= user.admin ? 'X' : ''
       %td
         %b= user.read_only_user ? 'X' : ''
-      %td
-        %b= user.payments_created.count
-      %td
-        %b= user.payments_deleted.count
       - if session.user.id == 1  # only show to admin
         %td
           = link_to 'edit', resource(user, :edit)

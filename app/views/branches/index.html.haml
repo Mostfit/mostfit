@@ -24,6 +24,7 @@
         %th name
         %th manager
         %th centers
+        %th edit | delete
     %tbody
     - for branch in @branches
       %tr{ :class => cycle('odd','') }
@@ -44,6 +45,6 @@
 
     %tfoot
       %tr
-        %td{ :colspan => 5 }
+        %td{ :colspan => 7 }
   = paginate @branches
   = link_to 'Create a new branch', url(:new_branch)

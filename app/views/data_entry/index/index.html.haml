@@ -1,25 +1,23 @@
 
 
 %h1 Data Entry
-
-%p
-  Follow the links below to perform common actions quickly. Most forms are made especially for mass data entry.
+Follow the links below to perform common actions quickly. Most forms are made especially for mass data entry.
 /%p At the bottom you find an overview of all modifications that you have made.
 
 %h2 Branches
 = link_to 'add new branch', url(:enter_branches, :action => 'new')
-%br/
+|
 = link_to 'edit a branch', url(:enter_branches, :action => 'edit')
 
 %h2 Centers
 = link_to 'add new center', url(:enter_centers, :action => 'new')
-%br/
+|
 = link_to 'edit a center', url(:enter_centers, :action => 'edit')
 
 
 %h2 Clients
 = link_to 'add new clients', url(:enter_clients, :action => 'new')
-%br/
+|
 = link_to 'edit a client', url(:enter_clients, :action => 'edit')
 
 %h2 Payments
@@ -28,17 +26,17 @@
 = link_to 'by center', url(:enter_payments, :action => 'by_center')
 |
 = link_to 'by staff member', url(:enter_payments, :action => 'by_staff_member')
-%br/
+|
 = link_to 'delete a payment', url(:enter_payments, :action => 'delete')
 
 %h2 Loans
 = link_to 'create new loans', url(:enter_loans, :action => 'new')
-%br/
+|
 = link_to 'edit a loan', url(:enter_loans, :action => 'edit')
-%br
+|
 = link_to 'approve unapproved loans', url(:enter_loans, :action => 'approve')
 
 %h2 Attendancy (not yet)
 = link_to 'record attendancy', url(:enter_attendancy, :action => 'record')
-%br/
+|
 = link_to 'edit attendancy lists', url(:enter_attendancy, :action => 'edit')
