@@ -3,12 +3,6 @@
 
 .prefix-4.span-16.suffix-4.last
   %h1 Please login to continue...
-  %p
-    This website is only accessible to authorized users.
-    %br/
-    Please refer to the super si-fi cool MOSTIT website, that is so si-fi that it will be created in the future.
-  %p
-    Authorized user proceed by logging in:
 
   = error_messages_for session.authentication
   - @login_param = Merb::Authentication::Strategies::Basic::Base.login_param
