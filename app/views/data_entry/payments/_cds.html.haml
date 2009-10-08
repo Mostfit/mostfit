@@ -69,7 +69,10 @@
               = i.to_currency
               - tot_total += i
             %td.numeric
-              = text_field :name => loan.id, :value => i, :cols => "7"
+              - if i == 0
+                -
+              - else 
+                = text_field :name => loan.id, :value => i, :cols => "7" 
               - tot_total += i
 
         - if loan_row_count == 0

@@ -23,6 +23,7 @@ class Loans < DataEntry::Controller
   end
 
   def create
+    debugger
     klass, attrs = get_loan_and_attrs
     @loan = klass.new(attrs)
     raise NotFound if not @loan.client  # should be known though hidden field

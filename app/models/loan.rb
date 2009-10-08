@@ -75,6 +75,16 @@ class Loan
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
 
+
+  def defaults
+    # this method should be overwritten by derived classes to provide default values
+    {}
+  end
+
+
+  def required
+    # this method provides required values. i.e. 50 weeks only
+  end
   # validates_primitive doesn't work well for date -- we use "before :valid?, :parse_dates" to achieve similar effects 
 
   # this is the method used for creating payments, not directly on the Payment class
@@ -703,6 +713,17 @@ class A50Loan < Loan
   # these 2 methods define the pay back scheme
   # typically reimplemented in subclasses
   property :purpose,  String
+
+  attr_accessor :defaults
+
+  def defaults
+    {:interest_rate => 0.18, :installment_frequency => :weekly, :number_of_installments => 50}
+  end
+
+  def self.description
+    "50 Weeks, 18%, [6000-10000]"
+  end
+
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations

@@ -1,29 +1,28 @@
 %h1
   = @date
-  - if @staff_member and @date
-    - if not @errors.blank?
-      .error
-        %p
-          - @errors.each do |payment|
-            Error paying loan
-            = payment.loan.id
-            - payment.errors.each do |k|
-              = k
-              %br
-    %p
-      %br/
-      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
-        = submit 'Make Payments'
-        = hidden_field :name => 'for_date', :value => @date
-        = @staff_member.centers.all(:meeting_day => Center.meeting_days[@date.wday]).count
-        Centers
-        - @staff_member.centers.all(:meeting_day => Center.meeting_days[@date.wday]).each do |@center|
+- if @staff_member and @date
+  - if not @errors.blank?
+    .error
+      %p
+        - @errors.each do |payment|
+          Error paying loan
+          = payment.loan.id
+          - payment.errors.each do |k|
+            = k
+            %br
+  %p
+    = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
+      = submit 'Make Payments'
+      = hidden_field :name => 'for_date', :value => @date
+      = @staff_member.centers.all(:meeting_day => Center.meeting_days[@date.wday]).count
+      Centers
+      - @staff_member.centers.all(:meeting_day => Center.meeting_days[@date.wday]).each do |@center|
+        %a{:name => 'weeksheet' }
           %h2
-            == Week #{@date.cweek} meeting sheet for center #{@center.name}
-          %a{ :name => 'weeksheet' }/
-          = hidden_field :name => 'center_id', :value => @center.id
-          = partial :cds
-        = submit 'Make Payments'
+            = "Week #{@date.cweek} meeting sheet for center #{@center.name}"
+        = hidden_field :name => 'center_id', :value => @center.id
+        = partial :cds
+      = submit 'Make Payments'
 
   - else
     Choose a staff member to record a payment for

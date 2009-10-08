@@ -3,8 +3,19 @@
 = error_messages_for @loan
 
 - if @loan.nil?
-  = form_for(@loan, :action => resource(@branch, @center, @client, :loans, :new), :method => 'get') do
-    = partial :types
+  %p== Please select the type of loan you want to create for #{@client.name}.
+  .prefix-2.span-16.suffix-6.last
+  - @loan_types.each do |loan_type|
+    = form_for(@loan, :action => resource(@branch, @center, @client, :loans, :new), :method => 'get') do
+      %h3= loan_type.to_s[0..-5] + ' loan'
+      %p
+        /  = loan_type.description
+        %br/
+        %br/
+        = hidden_field :name => "loan_type", :value => loan_type.to_s
+        = submit "Proceed with the #{loan_type.to_s[0..-5]} loan"
+        %br/
+        %br/
     = link_to 'cancel', resource(@branch, @center, @client, :loans)
 - else
   = form_for(@loan, :action => resource(@branch, @center, @client, :loans)) do

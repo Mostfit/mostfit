@@ -11,7 +11,11 @@
     %td
       Interest rate:
     %td
-      = text_field :interest_rate, :name => "#{@loan.class.to_s.snake_case}[interest_percentage]", :value => @loan.interest_percentage, :size => 4
+      - if @loan.defaults[:interest_rate]
+        = hidden_field :interest_rate, :value => @loan.defaults[:interest_rate] * 100
+        = @loan.defaults[:interest_rate] * 100
+      - else
+        = text_field :interest_rate, :name => "#{@loan.class.to_s.snake_case}[interest_percentage]", :value => @loan.interest_percentage, :size => 4
       \%
       %br/
       %span.greytext the interest rate as a percentage
@@ -19,12 +23,20 @@
     %td
       Installment frequency:
     %td
-      = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
+      - if @loan.defaults[:installment_frequency]
+        = hidden_field :installment_frequency, :value => @loan.defaults[:installment_frequency].to_s
+        = @loan.defaults[:installment_frequency]
+      - else
+        = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
   %tr
     %td
       Number of installments:
     %td
-      = text_field :number_of_installments, :size => 4
+      - if @loan.defaults[:number_of_installments]
+        = @loan.defaults[:number_of_installments]
+        = hidden_field :number_of_installments, :value => @loan.defaults[:number_of_installments]
+      - else
+        = text_field :number_of_installments, :size => 4
   %tr
     %td
       Funding Line
