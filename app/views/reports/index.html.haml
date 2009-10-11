@@ -6,9 +6,7 @@
   - Report.descendants.each do |report|
     %tr
       %td
-        = report
-      %td
-        = link_to 'Show', url(:show_report, :report_type => report)
+        = link_to report, url(:show_report, :report_type => report)
       %td
         = link_to 'Edit'
 

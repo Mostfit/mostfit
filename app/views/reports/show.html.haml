@@ -6,5 +6,5 @@
     %br
 - else
   %h1
-    Reports controller, show action
+    =@report.name
   = partial "#{params[:report_type].snake_case.gsub(" ","_")}"

@@ -26,7 +26,7 @@ class WeeklyReport < Report
     end
     Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did loan cycles. starting more than one loan"
     t = Time.now
-    @report[6] = {"More than one loan"  => Branch.active_client_count(start_date, end_date)}
+    @report[6] = {"Active clients"  => Branch.active_client_count(start_date, end_date)}
 #    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did more than one loan. starting dormant"
     t = Time.now
     @report[7] = {"Dormant clients" => Branch.dormant_client_count(start_date, end_date)}
@@ -67,10 +67,10 @@ class WeeklyReport < Report
     @report[24] = {"interest due this week" => @interest_due}
     @report[25] = {"principal received" => Branch.principal_received_between_such_and_such_date(start_date, end_date)}
     @report[25] = {"interest received" => Branch.interest_received_between_such_and_such_date(start_date, end_date)}
-    @report[26] = {"7 days late" => Branch.overdue_by(0,7)}
-    @report[27] = {"14 days late" => Branch.overdue_by(8,14)}
-    @report[28] = {"21 days late" => Branch.overdue_by(9,21)}
-    @report[29] = {"28 days late" => Branch.overdue_by(22,28)}
+    @report[26] = {"7 days late amount" => Branch.overdue_by(0,7)}
+    @report[27] = {"14 days late amount" => Branch.overdue_by(8,14)}
+    @report[28] = {"21 days late amount" => Branch.overdue_by(9,21)}
+    @report[29] = {"28 days late amount" => Branch.overdue_by(22,28)}
     self.raw = @report
     self.report = Marshal.dump(@report)
     self.generation_time = Time.now - t0

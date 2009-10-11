@@ -52,7 +52,7 @@ module Reporting
       query_as_hash(%Q{
          SELECT branch_id, COUNT(DISTINCT client_id)
          FROM loan_history lh
-         WHERE current = true AND lh.status <= 3
+         WHERE lh.status <= 3 AND lh.created_at<'#{end_date}'
          GROUP BY branch_id})
     end
 
@@ -68,11 +68,11 @@ module Reporting
       # TODO
       # We can optimise this per model (i.e. branch) by returning one hash like {1 => 2436, 2 => 4367} etc
       if loan_cycle == 1
-        client_ids = query_as_hash(" select count(client_id),branch_id from (select count(client_id) as x, client_id, status, branch_id from loan_history where current = true group by client_id having x = 1) as dt where dt.status <= 3 group by branch_id")
+        client_ids = query_as_hash("select branch_id, count(client_id) from (select count(client_id) as x, client_id, status, branch_id from loan_history where current = true group by client_id having x = 1) as dt where dt.status <= 3 group by branch_id")
       else
         # first find the Clients with repaid/written_off loans numbering loan_cycle - 1 and with loan outstanding
         client_ids = query_as_hash(%Q{
-         SELECT COUNT(loan_id),client_id,branch_id
+         SELECT branch_id, COUNT(loan_id)
          FROM loan_history lh
          WHERE current = true AND lh.status <= 3 and client_id in (
              SELECT id FROM 
@@ -93,7 +93,7 @@ module Reporting
         SELECT b.id, COUNT(c.id) 
         FROM clients c, centers ce, branches b
         WHERE date_joined BETWEEN '#{start_date}' AND '#{end_date}'
-              AND c.center_id = ce.id AND ce.branch_id = b.id
+        AND c.center_id = ce.id AND ce.branch_id = b.id
         GROUP BY b.id})
     end
 
@@ -133,7 +133,7 @@ module Reporting
     end
 
     def principal_due_between_such_and_such_date(start_date, end_date)
-      start_bal = current_principal_outstanding(start_date, end_date)
+      start_bal = current_principal_outstanding(start_date, start_date)
       end_bal = scheduled_principal_outstanding(end_date)
       debugger
       start_bal - end_bal
@@ -142,19 +142,19 @@ module Reporting
     def principal_received_between_such_and_such_date(start_date, end_date)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
-      query_as_hash(%Q{ select sum(principal), b.id from payments p, loans l, clients cl, centers c, branches b where p.received_on between '#{start_date}' and '#{end_date}' and p.loan_id = l.id and l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id  group by b.id})
+      query_as_hash(%Q{ select b.id, sum(principal) from payments p, loans l, clients cl, centers c, branches b where p.received_on between '#{start_date}' and '#{end_date}' and p.loan_id = l.id and l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id  group by b.id})
     end
 
     def interest_due_between_such_and_such_date(start_date, end_date)
-      start_bal = current_total_outstanding(start_date) - current_principal_outstanding(start_date, end_date)
-      end_bal = scheduled_total_outstanding(end_date) - scheduled_principal_outstanding(end_date)
+      start_bal = current_total_outstanding(start_date) - current_principal_outstanding(start_date, start_date)
+      end_bal   = scheduled_total_outstanding(end_date) - scheduled_principal_outstanding(end_date)
       start_bal - end_bal
     end
 
     def interest_received_between_such_and_such_date(start_date, end_date)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
-      query_as_hash(%Q{ select sum(interest), b.id from payments p, loans l, clients cl, centers c, branches b where p.received_on between '#{start_date}' and '#{end_date}' and p.loan_id = l.id and l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id  group by b.id})
+      query_as_hash(%Q{ select b.id, sum(interest) from payments p, loans l, clients cl, centers c, branches b where p.received_on between '#{start_date}' and '#{end_date}' and p.loan_id = l.id and l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id  group by b.id})
     end
 
     def current_principal_outstanding(start_date, end_date)
@@ -218,9 +218,6 @@ module Reporting
         if params
           arg1 = method($1).arity
           arg2 = method($2).arity
-          puts name
-          p arg1
-          p arg2
           if arg1==0 and arg2==0
             send($1) / send($2)
           elsif arg1>0 and arg2==0

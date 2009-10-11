@@ -2,7 +2,8 @@
   %tr
     %th
       Particulars
-    - Branch.all.each do |branch|
+    - branches = Branch.all
+    - branches.each do |branch|
       %th
         = branch.name
     %th
@@ -11,6 +12,10 @@
       %tr
         %th
           = r.keys[0]
-        - Branch.all.each do |branch|
+        - branches.each do |branch|
           %td
-            = r[r.keys[0]][branch.id] || "-"
+            = r[r.keys[0]][branch.id].to_i || "-"
+        %td
+          = r[r.keys[0]].values.map{|x| x.to_i}.reduce{|x, sum| sum+=x.to_i} || "-"
+
+
