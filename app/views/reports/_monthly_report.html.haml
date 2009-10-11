@@ -1,0 +1,21 @@
+%table
+  %tr
+    %th
+      Particulars
+    - branches = Branch.all
+    - branches.each do |branch|
+      %th
+        = branch.name
+    %th
+      Total
+    - Marshal.load(@report.report).each do |r|
+      %tr
+        %th
+          = r.keys[0]
+        - branches.each do |branch|
+          %td
+            = r[r.keys[0]][branch.id].to_i || "-"
+        %td
+          = r[r.keys[0]].values.map{|x| x.to_i}.reduce{|x, sum| sum+=x.to_i} || "-"
+
+
