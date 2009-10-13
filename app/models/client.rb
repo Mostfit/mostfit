@@ -32,6 +32,14 @@ class Client
   validates_present   :center
   validates_is_unique :reference
 
+  def self.search(q)
+    if /^\d+$/.match(q)
+      all(:conditions => {:id => q})
+    else
+      all(:conditions => ["name like ?", q+'%'])
+    end
+  end
+
   def self.active(query = {},operator = "=", num_loans = 1)
     debugger
     client_ids = repository.adapter.query(%Q{

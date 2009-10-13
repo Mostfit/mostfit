@@ -76,6 +76,12 @@ class Loan
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
 
 
+  def self.search(q)
+    if /^\d+$/.match(q)
+      all(:conditions => {:id => q})
+    end
+  end
+
   def defaults
     # this method should be overwritten by derived classes to provide default values
     {}

@@ -14,6 +14,10 @@
     .spacer/
     .container
       #header
+        #header_search_div{:style => 'margin: 2px; float: right; background: lightyellow; padding: 4px;'}
+          %form{:action => '/search'}
+            %input{:name => 'query', :value => params[:query]}
+            %input{:type => 'submit', :value=>'search'}
       #subheader
         #title
           demo mfi, mumbai
@@ -53,10 +57,9 @@
                 %option{:value => by}
                   = by
             %input{:name => 'value'}
+            %input{:type => 'submit', :value=>'search'}
             %a{:href => '#', :onclick => "document.getElementById('search_div').style.display='none';"}
               Hide search
-            %br
-            %input{:type => 'submit', :value=>'search'}
       #content
         #breadcrums= breadcrums
 
