@@ -1,1 +1,33 @@
-You're in index of the Search controller.
+-{"branches" => ["name", {"manager" => true}], "clients" => ["name", {"center" => true}], "centers" => ["name", {"manager" => true}], "loans" => ["client", {"amount" => false}]}.each do |model, functions|
+  -objects = instance_variable_get("@#{model}")
+  -if objects and objects.length>0
+    %div{:style => "float: left; padding-right: 35px;"}
+      %h2
+        =model.capitalize
+      %table
+        %tr
+          %th
+            ID
+          -functions.each do |function|
+            %th
+              =function.class==Hash ? function.keys[0] : function
+        -objects.each do |obj|
+          %tr
+            %td
+              =obj.id
+            -functions.each do |hash|
+              %td
+                - if hash.class==Hash
+                  - fetch_assoc = hash.values[0]
+                  - function    = hash.keys[0]
+                -else
+                  - function    = hash
+                  - primary     = true
+
+                - field       = obj.send(function)
+                - if fetch_assoc
+                  =link_to(field.respond_to?(:name) ? field.name : field, "/#{function=='manager' ? 'staff_members' : function.pluralize}/#{field.id}")
+                -elsif primary
+                  =link_to(field.respond_to?(:name) ? field.name : field, "/#{model}/#{obj.id}")
+                -else
+                  =field

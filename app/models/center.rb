@@ -21,6 +21,14 @@ class Center
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
   validates_with_method :meeting_time_minutes, :method => :minutes_valid?
 
+  def self.search(q)
+    if /^\d+$/.match(q)
+      all(:conditions => {:id => q})
+    else
+      all(:conditions => ["name like ? or center_leader_name like ?", q+'%', q+'%'])
+    end
+  end
+
   def self.meeting_days
     # Center.properties[:meeting_day].type.flag_map.values would give us a garbled order, so:
     DAYS
