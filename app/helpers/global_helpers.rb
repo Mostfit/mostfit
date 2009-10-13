@@ -103,7 +103,7 @@ module Merb
         :id         => attrs[:id] + '_year',
         :selected   => (date ? date.year.to_s : ''),
         :class      => obj ? (obj.errors[col] ? 'error' : '') : nil,
-        :collection => (nullable ? [['', '-']] : []) + (1900..Time.now.year).to_a.reverse.map{|x| x = [x.to_s, x.to_s]}
+        :collection => (nullable ? [['', '-']] : []) + (1900..Time.now.year + 3).to_a.reverse.map{|x| x = [x.to_s, x.to_s]}
       )
       select(month_attrs) + '&nbsp;' + select(day_attrs) + '&nbsp;' + select(year_attrs)
     end
