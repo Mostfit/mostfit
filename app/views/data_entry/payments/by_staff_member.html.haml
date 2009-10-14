@@ -14,9 +14,11 @@
     = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
       = submit 'Make Payments'
       = hidden_field :name => 'for_date', :value => @date
-      = @staff_member.centers.all(:meeting_day => Center.meeting_days[@date.wday]).count
-      Centers
-      - @staff_member.centers.all(:meeting_day => Center.meeting_days[@date.wday]).each do |@center|
+      - @centers = @staff_member.centers.all(:meeting_day => Center.meeting_days[@date.wday])
+      %h3
+        = @centers.count
+        Centers
+      - @centers.each do |@center|
         %a{:name => 'weeksheet' }
           %h2
             = "Week #{@date.cweek} meeting sheet for center #{@center.name}"

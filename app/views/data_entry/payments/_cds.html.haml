@@ -3,11 +3,11 @@
   Payments collected by 
   = select :received_by, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :selected => @center.manager.id.to_s
 
-  %table.narrow.form{ :width => '100%' }
+  %table.narrow.form{ :width => '100%'}
     %thead
-      %tr
+      %tr{:style => "font-size: 0.85em;"}
         %th
-        %th on name
+        %th name
         %th id
         %th amount
         %th outstanding
@@ -21,7 +21,7 @@
         %th paid
         %th attended
           
-    %tbody
+    %tbody{:style => "text-align:left;" }
       - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_total = 0, 0, 0, 0, 0, 0
       - @center.clients.each do |client|
         - loan_row_count = 0
@@ -72,7 +72,7 @@
               - if i == 0
                 -
               - else 
-                = text_field :name => loan.id, :value => i, :cols => "7" 
+                = text_field :name => loan.id, :value => i, :cols => "5", :style => "width:50px;" 
               - tot_total += i
 
         - if loan_row_count == 0

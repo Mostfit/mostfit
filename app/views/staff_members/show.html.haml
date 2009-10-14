@@ -1,8 +1,10 @@
 %h1 
   = @staff_member.name
 
-= link_to 'Day Sheet', url(:day_sheet, @staff_member.id)
-%br
-= link_to 'Centers Managed', url(:show_staff_member_centers, @staff_member.id)
+%ul
+  %li
+    = link_to 'Day Sheet >>', url(:day_sheet, @staff_member.id), :class => "bold"
+  %li
+    = link_to 'Centers Managed >>', url(:show_staff_member_centers, @staff_member.id), :class => "bold"
 %p
-  = link_to 'back', resource(:staff_members)
+  = link_to '<< back', resource(:staff_members), :class => "button"

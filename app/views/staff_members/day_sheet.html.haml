@@ -4,7 +4,7 @@
   for 
   = @date 
 
-= link_to "Download pdf", url(:day_sheet_with_format, :format => "pdf", :date => @date), :style => "float: right;"
+= link_to "Download pdf >>", url(:day_sheet_with_format, :format => "pdf", :date => @date), :style => "float: right;", :class => "button"
 - @centers.each do |center|
   %h2
     = center.id

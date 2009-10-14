@@ -1,0 +1,28 @@
+%table
+  %tr
+    %th
+      Amount
+    %td
+      = text_field :amount
+  %tr
+    %th
+      Interest Rate
+    %td
+      = text_field :interest_rate
+      = "%"
+  %tr
+    %th
+      Disbursal Date
+    %td
+      = date_select_for @funding_line, :disbursal_date
+  %tr
+    %th
+      First Payment Date
+    %td
+      = date_select_for @funding_line, :first_payment_date
+  %tr
+    %th
+      Last Payment Date
+    %td
+      = date_select_for @funding_line, :last_payment_date
+

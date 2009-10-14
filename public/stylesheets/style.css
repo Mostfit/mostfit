@@ -267,7 +267,8 @@ td {
   vertical-align: top;
 }
 td.numeric {
-  text-align: right;
+  text-align: center;
+  border-right: 1px solid #999;
 }
 table.narrow td, table.narrow th{
   padding: 2px;
