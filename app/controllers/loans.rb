@@ -31,6 +31,8 @@ class Loans < Application
 
   def create
     klass, attrs = get_loan_and_attrs
+    debugger
+    attrs[:interest_rate] = attrs[:interest_rate] / 100 if attrs[:interest_rate] > 1
     @loan = klass.new(attrs)
     @loan.client = @client  # set direct context
     if @loan.save
