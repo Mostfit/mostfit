@@ -25,6 +25,7 @@ module DataEntry
     end
 
     def update(id, branch)
+      debugger
       @branch = Branch.get(id)
       raise NotFound unless @branch
       if @branch.update_attributes(branch)
