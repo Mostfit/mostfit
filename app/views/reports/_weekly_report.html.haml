@@ -16,6 +16,7 @@
           %td
             = r[r.keys[0]][branch.id].to_i || "-"
         %td
-          = r[r.keys[0]].values.map{|x| x.to_i}.reduce{|x, sum| sum+=x.to_i} || "-"
+          - sum = 0.0
+          = r[r.keys[0]].values.map{|x| x.to_i}.inject(0) {|sum, item| sum+item} || "-"
 
 
