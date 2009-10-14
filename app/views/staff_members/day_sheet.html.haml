@@ -11,6 +11,9 @@
   %table.narrow.form{ :width => '100%' }
     %thead
       %tr
+        %th{:colspan => 12}
+          Collections
+      %tr
         %th
         %th on name
         %th id
@@ -93,6 +96,9 @@
             %b= tot_interest.to_currency
           %td.numeric
             %b= tot_total.to_currency
+      %tr
+        %th{:colspan => "12"}
+          Disbursements
             
     %tfoot    
       %tr
