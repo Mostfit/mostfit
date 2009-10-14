@@ -1,7 +1,7 @@
 %h1 Overview of all staff members
 
 %p
-  == Manage existing staff members or #{link_to 'create a new staff member', resource(:staff_members, :new)}.
+  == Manage existing staff members or #{link_to 'create a new staff member', resource(:staff_members, :new), :class => "bold"}.
 
 - if @staff_members.blank?
   %p
@@ -61,4 +61,4 @@
       %tr
         %td{ :colspan => 11 }
   = paginate @staff_members
-  = link_to 'Create a new staff member', url(:new_staff_member)
+  = link_to 'Create a new staff member >>', url(:new_staff_member), :class => "button"

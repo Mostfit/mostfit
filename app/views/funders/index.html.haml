@@ -6,7 +6,7 @@
 %h1 Overview of all funders
 
 %p
-  == Manage existing funders or #{link_to 'create a new funder', resource(:funders, :new)}.
+  == Manage existing funders or #{link_to 'create a new funder', resource(:funders, :new), :class => "bold"}.
 
 - if @funders.blank?
   %p
@@ -38,4 +38,4 @@
       %tr
         %td{ :colspan => 4 }
 
-  = link_to 'Create a new funder', url(:new_funder)
+  = link_to 'Create a new funder >>', url(:new_funder), :class => "button"
