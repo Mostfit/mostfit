@@ -23,7 +23,11 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     color: #003d4a;
-    font-family: Helvetica,FreeSans,Arial,sans-serif;
+    font-family: Verdana, Helvetica,FreeSans,Arial,sans-serif;
+}
+
+h1 {
+  padding: 10px;
 }
 
 .container {
@@ -249,6 +253,7 @@ table thead th {
   background: #8DC73F;
   color: #fff;
   text-align: left;
+  font-size: 1.3em;
 }
 table tfoot td {
   background: #333;
@@ -350,13 +355,35 @@ font-size: 11px;
 
 
 
+
 a.nopic { background:none; padding:0; margin:0; }
 
-
-
-
-
-
+a.bold {
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #2b2214;
+  text-decoration: underline;
+}
+a.bold:visited {
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #2b2214;
+  text-decoration: underline;
+}
+a.button:link {
+  background-color: darkorange;
+  color: white;
+  padding: 4px;
+  border: orange solid 1px;
+  margin: 3px;
+}
+a.button:visited {
+  background-color: darkorange;
+  color: white;
+  padding: 4px;
+  border: orange solid 1px;
+  margin: 3px;
+}
 
 #header
 {

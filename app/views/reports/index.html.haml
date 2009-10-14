@@ -1,13 +1,16 @@
 %h1
   Reports
 
-%table
+%table{:width => "100%"}
+  %thead
+    %tr
+      %th
+        Please choose a Report Type
+        
   %tr
   - Report.descendants.each do |report|
     %tr
       %td
         = link_to report, url(:show_report, :report_type => report)
-      %td
-        = link_to 'Edit'
 
-= link_to 'New', url(:new_report)
+= link_to 'New Report','', :class => "button"

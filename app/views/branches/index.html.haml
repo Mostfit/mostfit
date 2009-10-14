@@ -10,7 +10,7 @@
 %h1 Overview of all branches
 
 %p
-  == Manage existing branches or #{link_to 'create a new branch', resource(:branches, :new)}.
+  == Manage existing branches or #{link_to 'create a new branch >>', resource(:branches, :new), :class => "bold"}
 
 - if @branches.blank?
   %p
@@ -47,4 +47,5 @@
       %tr
         %td{ :colspan => 7 }
   = paginate @branches
-  = link_to 'Create a new branch', url(:new_branch)
+  %br
+  = link_to 'Create a new branch >>', url(:new_branch), :class => "button"

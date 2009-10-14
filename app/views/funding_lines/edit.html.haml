@@ -3,4 +3,6 @@
 = error_messages_for @funding_line
 
 = form_for(@funding_line, :action => resource(@funder, @funding_line)) do
-  = partial :fields, :submit_text => "Save changes", :cancel_link => resource(@funder, :funding_lines)
+  = partial :fields
+  = submit "Save changes"
+  = link_to 'Cancel', resource(@funder, :funding_lines)

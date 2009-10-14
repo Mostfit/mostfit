@@ -33,7 +33,7 @@
 %h2== Loans for client <i>#{@client.name}</i>
 
 %p
-  == Manage existing loans or #{link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new)}.
+  == Manage existing loans or #{link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "bold"}.
 
 
 - if @loans.blank?
@@ -114,4 +114,4 @@
 
 
 
-  = link_to 'New', resource(@branch, @center, @client, :loans, :new)
+  = link_to 'New Loan >>', resource(@branch, @center, @client, :loans, :new), :class => "button"

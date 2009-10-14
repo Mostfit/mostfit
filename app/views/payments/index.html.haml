@@ -77,7 +77,7 @@
         by
         %b= link_to @loan.written_off_by.name, resource(@loan.written_off_by)
 
-= link_to 'edit this loan', url_for_loan(@loan, 'edit')
+= link_to 'edit this loan >>', url_for_loan(@loan, 'edit'), :class => "button"
 
 
 %h2== Payments &mdash; (#{link_to 'new', url_for_loan(@loan, 'payments/new')})
@@ -120,7 +120,7 @@
       %tr
         %td{ :colspan => 8 }
 
-%p= link_to 'new payment', url_for_loan(@loan, 'payments/new')
+%p= link_to 'new payment >>', url_for_loan(@loan, 'payments/new'), :class => "button"
 
 
 %h2== Payment schedule

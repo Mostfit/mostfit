@@ -42,6 +42,7 @@ class FundingLines < Application
   end
 
   def update(id, funding_line)
+    funding_line[:interest_rate] = funding_line[:interest_rate].to_f / 100
     @funding_line = FundingLine.get(id)
     raise NotFound unless @funding_line
     if @funding_line.update_attributes(funding_line)

@@ -19,10 +19,10 @@
     %td
       %b= @branch.centers.size
 
-%p= link_to 'edit this branch\' details', resource(@branch, :edit)
+%p= link_to 'edit this branch\'s details >>', resource(@branch, :edit), :class => "button"
 
 %h2== Centers of the <i>#{@branch.name}</i> branch
-%p== Manage existing centers or #{link_to 'create a new center', resource(@branch, :centers, :new)}.
+%p== Manage existing centers or #{link_to 'create a new center ->', resource(@branch, :centers, :new), :class => "bold"}.
 
 - if @centers.blank?
   %p
@@ -61,4 +61,4 @@
 
 
   = paginate @centers
-  = link_to 'Create new center', resource(@branch, :centers, :new)
+  = link_to 'Create new center >>', resource(@branch, :centers, :new), :class => "button"

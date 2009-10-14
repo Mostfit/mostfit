@@ -27,7 +27,7 @@
     %td== #{@center.meeting_day.to_s.capitalize}#{(@center.meeting_time_hours and @center.meeting_time_minutes) ? ", #{@center.meeting_time_hours}:#{@center.meeting_time_minutes}" : ''}
 
 
-%p= link_to 'edit this center\'s details', resource(@branch, @center, :edit)
+%p= link_to 'edit this center\'s details', resource(@branch, @center, :edit), :class => "button"
 
 %h2== Clients of the <i>#{@center.name}</i> center
 
