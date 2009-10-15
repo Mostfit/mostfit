@@ -1,4 +1,6 @@
-- if @reports
+- if params[:report_type]=="PerformanceReport"
+  = partial "#{params[:report_type].snake_case.gsub(" ","_")}"
+- elsif @reports
   %h1
     = params[:report_type]
   - @reports.each do |report|
