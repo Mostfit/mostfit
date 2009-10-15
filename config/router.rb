@@ -18,6 +18,8 @@ Merb::Router.prepare do
   
   # Adds the required routes for merb-auth using the password slice
   slice(:merb_auth_slice_password, :name_prefix => nil, :path_prefix => "")
+  match('/search').to(:controller => 'search', :action => 'index')
+  match('/reports/graphs').to(:controller => 'reports', :action => 'graphs')
   match('/reports/:report_type(/:id)').to(:controller => 'reports', :action => 'show').name(:show_report)
   resources :reports
 
