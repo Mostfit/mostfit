@@ -6,7 +6,7 @@
     -keys.each do |key|
       %th
         =key
-    -@reports.all.each do |report|
+    -@reports.all(:order => [:start_date.desc]).each do |report|
       %tr
         %td
           =report.start_date.strftime("%b-%Y")
