@@ -22,7 +22,7 @@
               = submit "Proceed..."
   - else
     %table.form
-      = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
+      = form_for(@client, :action => url(:enter_clients, :action => 'edit'), :multipart => true) do
         %tr
           %td &nbsp;
         %tr

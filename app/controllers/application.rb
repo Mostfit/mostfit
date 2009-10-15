@@ -1,5 +1,29 @@
 class Application < Merb::Controller
   before :ensure_authenticated
+  
+  # move the following two functions into lib/logger.rb somehow
+  def get_object_state
+    debugger
+    model = self.class.to_s.singular
+    object = eval"#{model}.get(params[:id])"
+    @ributes = object.attributes
+  end
+  
+  def _log
+    debugger
+    f = File.open("log/misfit.log","w+")
+    object = eval("@#{self.class.to_s.downcase.singular}")
+    if object
+      attributes = object.attributes
+      diff = @ributes.diff(attributes)
+      diff_string = diff.each {|k| "#{k} from #{@ributes[k]} to #{attributes[k]}"}
+      log = "#{Time.now}\t#{session.user.login}\t#{diff_string}\n"
+      f.write(log)
+      f.close
+      Merb.logger.info(log)
+    end
+  end
+
 
   def ensure_has_data_entry_privileges
     raise NotPrivileged unless session.user.data_entry_operator? || session.user.mis_manager? || session.user.admin?
@@ -33,5 +57,15 @@ end
 class Date
   def inspect
     "<Date: #{self.to_s}>"
+  end
+end
+
+
+#Hash diffs are easy
+
+class Hash
+  def diff(other)
+    keys = self.keys
+    keys.each.select{|k| self[k] != other[k]}
   end
 end
