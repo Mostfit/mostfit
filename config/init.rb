@@ -29,6 +29,7 @@ Merb::BootLoader.before_app_loads do
   begin
     require "pdf/writer"
     require "pdf/simpletable"
+    require "lib/logger"
     require("lib/pdfs/day_sheet.rb")
     PDF_WRITER = true
   rescue
@@ -37,10 +38,14 @@ Merb::BootLoader.before_app_loads do
     puts "--------Do a gem install pdf-writer otherwise pdf generation won't work---------"
     puts "--------------------------------------------------------------------------------"
   end
+  Paperclip.options[:image_magick_path] = "/usr/local/bin"
+  Paperclip.options[:command_path] = "/usr/local/bin"
 end
  
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
+  Misfit::Logger.start(['Loans', 'Clients'])
+
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
   begin
     if User.all.empty?

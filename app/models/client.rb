@@ -18,7 +18,8 @@ class Client
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},
       :url => "/uploads/:class/:id/:attachment/:style/:basename.:extension",
-      :path => "#{Merb.root}/public/uploads/:class/:id/:attachment/:style/:basename.:extension"
+      :path => "#{Merb.root}/public/uploads/:class/:id/:attachment/:style/:basename.:extension",
+      :default_url => "/images/no_photo.jpg"
 
   has_attached_file :application_form,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},
@@ -31,6 +32,7 @@ class Client
   validates_length    :name, :min => 3
   validates_present   :center
   validates_is_unique :reference
+  validates_attachment_thumbnails :picture
 
   def self.search(q)
     if /^\d+$/.match(q)

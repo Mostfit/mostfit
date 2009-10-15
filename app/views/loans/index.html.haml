@@ -8,6 +8,8 @@
 
 %table.narrow.form{ :width => '50%' }
   %tr.odd
+    %td{:rowspan => "5"}
+      = image_tag @client.picture.url(:thumb)
     %td name
     %td
       %b= @client.name

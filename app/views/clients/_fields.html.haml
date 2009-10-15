@@ -45,6 +45,12 @@
         %span.greytext inactive member are not counted for attendancy
   %tr
     %td
+      Photo
+    %td
+      = image_tag @client.picture.url(:medium)
+      = file_field :picture
+  %tr
+    %td
     %td
       = submit submit_text
       &nbsp;&nbsp;

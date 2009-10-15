@@ -2,6 +2,6 @@
 
 = error_messages_for @client
 
-= form_for(@client, :action => url(:enter_clients, :action => 'create')) do
+= form_for(@client, :action => url(:enter_clients, :action => 'create'), :multipart => true) do
   = partial 'clients/fields', :submit_text => "Add client", :cancel_link => url(:enter_clients)
 

@@ -46,6 +46,6 @@ Merb::Router.prepare do
 
   match('/').to(:controller => 'entrance', :action =>'root')
   # This is the default route for /:controller/:action/:id
-
+  default_routes
 
 end
