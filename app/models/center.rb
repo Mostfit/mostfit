@@ -9,7 +9,7 @@ class Center
   property :meeting_day,          Enum.send('[]', *DAYS), :nullable => false, :default => :none
   property :meeting_time_hours,   Integer, :length => 2
   property :meeting_time_minutes, Integer, :length => 2
-
+  property :created_at,           DateTime, :nullable => false, :default => Time.now
   belongs_to :branch
   belongs_to :manager, :child_key => [:manager_staff_id], :class_name => 'StaffMember'
 
