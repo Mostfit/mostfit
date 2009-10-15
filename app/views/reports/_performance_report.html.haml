@@ -1,0 +1,17 @@
+%table
+  %tr
+    -keys = Marshal.load(@reports[0].report).collect{|x| x.keys}.flatten
+    %th
+      Month/Year
+    -keys.each do |key|
+      %th
+        =key
+    -@reports.all.each do |report|
+      %tr
+        %td
+          =report.start_date.strftime("%b-%Y")
+        - Marshal.load(report.report).each do |hash|
+          %td
+            = hash.values[0].to_i
+
+
