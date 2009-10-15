@@ -37,7 +37,7 @@ Merb::Router.prepare do
   match('/branches/:id/today').to(:controller => 'branches', :action => 'today').name(:branch_today)
   match('/entrance').to(:controller => 'entrance').name(:entrance)
   match('/branches/:branch_id/centers/:center_id/clients/:client_id/test').to( :controller => 'loans', :action => 'test')
-
+  match('/loans/latest').to(:controller => 'loans', :action => 'latest')
   match('/staff_members/:id/day_sheet').to(:controller => 'staff_members', :action => 'day_sheet').name(:day_sheet)  
   match('/staff_members/:id/day_sheet.:format').to(:controller => 'staff_members', :action => 'day_sheet', :format => ":format").name(:day_sheet_with_format)
 
@@ -46,6 +46,6 @@ Merb::Router.prepare do
 
   match('/').to(:controller => 'entrance', :action =>'root')
   # This is the default route for /:controller/:action/:id
-  default_routes
+
 
 end

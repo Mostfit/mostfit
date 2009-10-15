@@ -1,10 +1,17 @@
 class Loans < Application
   before :get_context, :exclude => ['redirect_to_show']
   provides :xml, :yaml, :js
-  before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
+  before :ensure_has_mis_manager_privileges #, :only => ['new','create','edit','update','destroy','delete']
 
   def index
     @loans = @client.loans
+    display @loans
+  end
+
+  def latest
+    @offset = params[:page].to_i -1
+    @limit = 20
+    @loans = Loan.all(:order => [:created_at.desc], :offset => @offset, :limit => 10)
     display @loans
   end
 
