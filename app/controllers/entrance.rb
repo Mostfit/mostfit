@@ -4,6 +4,10 @@ class Entrance < Merb::Controller  # not inherit from Application as that thing 
     render
   end
 
+  def about
+    render
+  end
+
   def root
     redirect url(:entrance)  # no switch, nicer for the demo
 
@@ -13,4 +17,6 @@ class Entrance < Merb::Controller  # not inherit from Application as that thing 
 #       redirect url(:entrance)
 #     end
   end
+
+
 end

@@ -40,7 +40,7 @@ Merb::Router.prepare do
   match('/graph_data/:action(/:id)').to(:controller => 'graph_data').name(:graph_data)
   match('/staff_members/:id/centers').to(:controller => 'staff_members', :action => 'show_centers').name(:show_staff_member_centers)
   match('/branches/:id/today').to(:controller => 'branches', :action => 'today').name(:branch_today)
-  match('/entrance').to(:controller => 'entrance').name(:entrance)
+  match('/entrance(/:action)').to(:controller => 'entrance').name(:entrance)
   match('/branches/:branch_id/centers/:center_id/clients/:client_id/test').to( :controller => 'loans', :action => 'test')
   match('/loans/latest').to(:controller => 'loans', :action => 'latest')
   match('/staff_members/:id/day_sheet').to(:controller => 'staff_members', :action => 'day_sheet').name(:day_sheet)  
