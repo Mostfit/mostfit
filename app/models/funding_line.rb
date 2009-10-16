@@ -1,5 +1,7 @@
 class FundingLine
   include DataMapper::Resource
+  extend Reporting::FundingLineReports
+
   before :valid?, :parse_dates
 
   attr_accessor :interest_percentage  # set to true to disable history writing by this object
