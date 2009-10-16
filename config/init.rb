@@ -29,6 +29,7 @@ Merb::BootLoader.before_app_loads do
   begin
     require "pdf/writer"
     require "pdf/simpletable"
+    require "lib/logger.rb"
     require("lib/pdfs/day_sheet.rb")
     PDF_WRITER = true
   rescue
@@ -43,8 +44,6 @@ end
  
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
-  require "lib/logger.rb"
-  debugger
   Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments'])
 
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
