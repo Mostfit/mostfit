@@ -31,9 +31,11 @@
       - if session.authenticated?
         #navigation
           - if session.user.admin 
-            %b= link_to 'manage users', url(:users)
-            (admin only)&nbsp;|&nbsp;
+            %b= link_to 'admin', url(:admin)
+            &nbsp;|&nbsp;
           - if session.user.mis_manager || session.user.admin
+            %b= link_to 'dashboard', url(:dashboard)
+            &nbsp;|&nbsp;
             %b= link_to 'reports', url(:reports)
             &nbsp;|&nbsp;
             %b= link_to 'browse loans', url(:branches)

@@ -11,12 +11,12 @@ class Application < Merb::Controller
   
   def _log
     debugger
-    f = File.open("log/misfit.log","w+")
+    f = File.open("log/#{self.class}.log","a")
     object = eval("@#{self.class.to_s.downcase.singular}")
     if object
       attributes = object.attributes
       diff = @ributes.diff(attributes)
-      diff_string = diff.each {|k| "#{k} from #{@ributes[k]} to #{attributes[k]}"}
+      diff_string = diff.map{|k| "#{k} from #{@ributes[k]} to #{attributes[k]}" if k != :updated_at}.join("\t")
       log = "#{Time.now}\t#{session.user.login}\t#{diff_string}\n"
       f.write(log)
       f.close

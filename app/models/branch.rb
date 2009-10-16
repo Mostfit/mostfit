@@ -5,6 +5,7 @@ class Branch
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false
   property :address, Text
+  property :created_at, DateTime
   
   belongs_to :manager, :child_key => [:manager_staff_id], :class_name => 'StaffMember'
   has n, :centers

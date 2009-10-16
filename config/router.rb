@@ -34,6 +34,9 @@ Merb::Router.prepare do
     match('/centers(/:action)(.:format)').to(:controller => 'centers').name(:centers)
   end
 
+  match('/admin(/:action)').to(:controller => 'admin').name(:admin)
+  match('/dashboard(/:action)').to(:controller => 'dashboard').name(:dashboard)
+
   match('/graph_data/:action(/:id)').to(:controller => 'graph_data').name(:graph_data)
   match('/staff_members/:id/centers').to(:controller => 'staff_members', :action => 'show_centers').name(:show_staff_member_centers)
   match('/branches/:id/today').to(:controller => 'branches', :action => 'today').name(:branch_today)
@@ -45,9 +48,9 @@ Merb::Router.prepare do
 
   # this uses the redirect_to_show methods on the controllers to redirect some models to their appropriate urls
   match('/:controller/:id').to(:action => 'redirect_to_show').name(:quick_link)
-
-  match('/').to(:controller => 'entrance', :action =>'root')
-  # This is the default route for /:controller/:action/:id
   default_routes
+  match('/').to(:controller => 'entrance', :action =>'root')
+
+
 
 end

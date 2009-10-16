@@ -162,7 +162,6 @@ class GraphData < Application
   end
 
   def weekly_aggregate_loan_graph(loan_ids, start_date, end_date)
-    debugger
     t0 =Time.now
     step_size = 12
     structs = repository.adapter.query(%Q{
