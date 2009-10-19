@@ -31,6 +31,7 @@ Merb::BootLoader.before_app_loads do
     require "pdf/simpletable"
     require "lib/logger.rb"
     require("lib/pdfs/day_sheet.rb")
+    require("lib/functions.rb")
     PDF_WRITER = true
   rescue
     PDF_WRITER = false
@@ -46,7 +47,7 @@ Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
 
   # Starting the logger takes time, so turn it off during development
-  # Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments'])
+  Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments']) unless Merb.environment == "development" or Merb.environment == "test"
 
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
   begin

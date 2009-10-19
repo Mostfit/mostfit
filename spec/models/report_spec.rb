@@ -136,7 +136,6 @@ describe Report do
     Branch.client_count(@date).should == {1 => 4, 2 => 3}
     Branch.active_client_count(@date).should == {1 => 3, 2 => 3}
     Branch.dormant_client_count(@date).should == {1 => 1, 2 => 0}
-    c.destroy
     # add a few dummy loans, repay them and check
     (1..5).each do |h|
       c = Client.get(h)
@@ -173,8 +172,52 @@ describe Report do
       LoanHistory.all(:loan_id => loan.id).last.actual_outstanding_principal.should == 0
     end
     Branch.client_count_by_loan_cycle(2,@date).should == {1 => 3, 2=>2}
+    Branch.clients_added_between_such_and_such_date_count(Date.today - 1, Date.today).should == {1=>3,2=>3}
+    Branch.clients_added_between_such_and_such_date_count('2008-01-02',Date.today - 2).should == {}
+    Branch.clients_added_between_such_and_such_date_count('2008-01-01',Date.today - 2).should == {1 => 1}
+    Branch.clients_added_between_such_and_such_date_count(Date.today,'2012-01-01').should == {}
+    Client.get(7).destroy
+    Branch.clients_deleted_between_such_and_such_date_count(Date.today, Date.today + 1).should == {1=>1}
+    Branch.clients_deleted_between_such_and_such_date_count(Date.today + 1, Date.today + 2).should == {}
   end
 
+  it "should return correct repaid loan count" do
+    l = Loan.get(7)
+    date = l.scheduled_maturity_date
+    Branch.loans_repaid_between_such_and_such_date(date-3,date+3,"count").should == {1=>3, 2=>2}
+    Branch.loans_repaid_between_such_and_such_date(date+1,date+100,"count").should == {}
+    Branch.loans_repaid_between_such_and_such_date(date-100,date-1,"count").should == {}
+  end
+
+  it "should return correct repaid loan amount" do
+    l = Loan.get(7)
+    date = l.scheduled_maturity_date
+    Branch.loans_repaid_between_such_and_such_date(date-3,date+3,"sum").should == {1=>30000, 2=>20000}
+    Branch.loans_repaid_between_such_and_such_date(date+1,date+100,"sum").should == {}
+    Branch.loans_repaid_between_such_and_such_date(date-100,date-1,"sum").should == {}
+  end
+
+  it "should return correct disbursed loan count" do
+    l = Loan.get(1)
+    date = l.scheduled_disbursal_date
+    Branch.loans_disbursed_between_such_and_such_date(date-3,date+3,"count").should == {1=>3, 2=>3}
+    Branch.loans_disbursed_between_such_and_such_date(date+1,date+100,"count").should == {}
+    Branch.loans_disbursed_between_such_and_such_date(date-100,date-1,"count").should == {}
+  end
+
+  it "should return correct disbursed loan amount" do
+    l = Loan.get(1)
+    date = l.scheduled_disbursal_date
+    Branch.loans_disbursed_between_such_and_such_date(date,date+3,"sum").should == {1=>6000, 2=>6000}
+    Branch.loans_disbursed_between_such_and_such_date(date+1,date+100,"sum").should == {}
+    Branch.loans_disbursed_between_such_and_such_date(date-100,date-1,"sum").should == {}
+  end
+
+  it "should give correct pricipal due" do
+    l = Loan.get 1
+    date = l.scheduled_first_payment_date
+    Branch.principal_due_between_such_and_such_date(date, date + 6).should == (12000 - 20)
+  end
   
 
   

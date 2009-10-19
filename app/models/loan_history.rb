@@ -15,11 +15,13 @@ class LoanHistory
   property :week_id,                    Integer # good for aggregating.
 
   # some properties for similarly named methods of a loan:
-  property :scheduled_outstanding_principal, Integer, :nullable => false, :index => true
   property :scheduled_outstanding_total,     Integer, :nullable => false, :index => true
-  property :actual_outstanding_principal,    Integer, :nullable => false, :index => true
+  property :scheduled_outstanding_principal, Integer, :nullable => false, :index => true
   property :actual_outstanding_total,        Integer, :nullable => false, :index => true
-  property :status,                          Enum[nil, :approved, :outstanding, :repaid, :written_off]
+  property :actual_outstanding_principal,    Integer, :nullable => false, :index => true
+  property :principal_paid,                  Integer, :nullable => false, :index => true
+  property :interest_paid,                  Integer, :nullable => false, :index => true
+  property :status,                          Enum[:applied_in_future, :pending_approval, :rejected, :approved, :outstanding, :repaid, :written_off]
 
   belongs_to :loan, :index => true
   belongs_to :client, :index => true         # speed up reports

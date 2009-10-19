@@ -112,10 +112,10 @@ module Reporting
       end_date = Date.parse(end_date) unless end_date.is_a? Date
       return unless what.downcase == "sum" or "count"
         query_as_hash(%Q{
-         SELECT #{what}(l.amount), lh.branch_id 
+         SELECT lh.branch_id,#{what}(l.amount)
          FROM loans l, loan_history lh
          WHERE l.id = lh.loan_id 
-               AND  lh.status = 4 AND lh.date BETWEEN #{start_date} AND #{end_date}
+               AND  lh.status = 5 AND lh.date BETWEEN '#{start_date}' AND '#{end_date}'
          GROUP BY lh.branch_id})
     end
 
@@ -124,17 +124,16 @@ module Reporting
       end_date = Date.parse(end_date) unless end_date.is_a? Date
       return unless what.downcase == "sum" or "count"
         query_as_hash(%Q{
-         SELECT #{what}(l.amount), lh.branch_id 
+         SELECT lh.branch_id, #{what}(l.amount)
          FROM loans l, loan_history lh
          WHERE l.id = lh.loan_id 
-               AND  lh.status = 4 AND l.disbursal_date BETWEEN #{start_date} AND #{end_date}
+               AND  lh.status = 3 AND l.disbursal_date BETWEEN '#{start_date}' AND '#{end_date}'
          GROUP BY lh.branch_id})
     end
 
     def principal_due_between_such_and_such_date(start_date, end_date)
-      start_bal = current_principal_outstanding(start_date, start_date)
+      start_bal = principal_outstanding(start_date)
       end_bal = scheduled_principal_outstanding(end_date)
-      debugger
       start_bal - end_bal
     end
 
@@ -161,7 +160,7 @@ module Reporting
         SELECT branch_id, SUM(actual_outstanding_principal) 
         FROM loan_history 
         WHERE week_id = IF( 
-                         WEEKDAY(#{end_date}) > WEEKDAY(now()),
+                         WEEKDAY('#{date}') > WEEKDAY(now()),
                          CEILING(DATEDIFF(NOW(),'2000-01-03')/7) - 1, 
                          CEILING(DATEDIFF(NOW(),'2000-01-03')/7)) 
         GROUP BY branch_id;}).map {|x| [x[0],x[1].to_f]}.to_hash

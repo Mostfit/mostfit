@@ -305,6 +305,10 @@ describe Loan do
   it ".scheduled_repaid_on give the proper date" do
     @loan.scheduled_repaid_on.should eql(Date.parse('2001-06-27'))
   end
+  it "should have proper values for principal, interest and total to be received" do
+    @loan.total_interest_to_be_received.should == 210
+    @loan.total_to_be_received.should == 1210
+  end
 
   it ".status should give status accoring to changing properties up to it written off" do
     @loan.status.should == :approved
@@ -331,9 +335,9 @@ describe Loan do
     @loan.status(Date.today - 1).should == :approved
   end
   it ".status should give status accoring to changing properties before being approved" do
-    @loan.status(@loan.applied_on - 1).should be_nil
-    @loan.status(@loan.applied_on).should == :pending
-    @loan.status(@loan.approved_on - 1).should == :pending
+    @loan.status(@loan.applied_on - 1).should == :applied_in_future
+    @loan.status(@loan.applied_on).should == :pending_approval
+    @loan.status(@loan.approved_on - 1).should == :pending_approval
     @loan.status.should == :approved
   end
   it ".status should give status accoring to changing properties when being rejected" do
@@ -343,7 +347,7 @@ describe Loan do
     @loan.rejected_on = date
     @loan.rejected_by = @manager
     @loan.should be_valid
-    @loan.status(@loan.rejected_on - 1).should == :pending
+    @loan.status(@loan.rejected_on - 1).should == :pending_approval
     @loan.status(@loan.rejected_on).should == :rejected
     @loan.status.should == :rejected
   end

@@ -164,7 +164,7 @@ class Loan
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
     raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
-    (total_interest_to_be_received / number_of_installments).round
+    (total_interest_to_be_received / number_of_installments)
   end
   def date_for_installment(number)
     shift_date_by_installments(scheduled_first_payment_date, number)
@@ -367,8 +367,8 @@ class Loan
 
   # this method returns one of [nil, :approved, :outstanding, :repaid, :written_off]
 
-  def status
-    get_status
+  def status(date = Date.today)
+    get_status(date)
   end
 
   def get_status(date = Date.today, total_received = nil) # we have this last parameter so we can speed up get_status
@@ -382,8 +382,8 @@ class Loan
     return :approved             if (approved_on and approved_on <= date) and not (disbursal_date and disbursal_date <= date)
     return :rejected             if (rejected_on and rejected_on <= date)
     return :written_off          if (written_off_on and written_off_on <= date)
-    return :outstanding          if (date == disbursal_date)
     total_received = total_received.nil? ? total_received_up_to(date) : total_received
+    return :outstanding          if (date == disbursal_date) and total_received < total_to_be_received
     @status = total_received  >= total_to_be_received ? :repaid : :outstanding
   end
   
@@ -476,7 +476,7 @@ class Loan
       actual_os_principal = amount - prin
       actual_os_total = total_to_be_received - int -prin
       st = STATUSES.index(get_status(date, total_to_be_received - actual_os_total))
-      @history_array = {:loan_id => id, :date => date, :status => st, :scheduled_outstanding_principal => scheduled_os_principal, :scheduled_outstanding_total => scheduled_os_total, :actual_outstanding_principal => actual_os_principal, :actual_outstanding_total => actual_os_total, :days_overdue => days_overdue}
+      @history_array = {:loan_id => id, :date => date, :status => st, :scheduled_outstanding_principal => scheduled_os_principal, :scheduled_outstanding_total => scheduled_os_total, :actual_outstanding_principal => actual_os_principal, :actual_outstanding_total => actual_os_total, :days_overdue => days_overdue, :principal_paid => 0, :interest_paid => 0}
     else
       prin = i_number < 0 ? 0 : scheduled_principal_for_installment(i_number)
       act_prin = principal_received_up_to(date)
@@ -486,6 +486,8 @@ class Loan
       @history_array[:scheduled_outstanding_total] -= (int + prin)
       @history_array[:actual_outstanding_principal] = amount - act_prin
       @history_array[:actual_outstanding_total] = total_to_be_received - (act_prin + act_int)
+      @history_array[:principal_paid] = prin
+      @history_array[:interest_paid] = int
       @history_array[:status] = STATUSES.index(get_status(date, total_to_be_received - @history_array[:actual_outstanding_total]))
       @history_array[:days_overdue] = days_overdue
     end
@@ -519,7 +521,7 @@ class Loan
     sql = %Q{ INSERT INTO loan_history(loan_id, date, status, 
               scheduled_outstanding_principal, scheduled_outstanding_total,
               actual_outstanding_principal, actual_outstanding_total, current, amount_in_default,
-              center_id, client_id, branch_id, days_overdue, week_id)
+              center_id, client_id, branch_id, days_overdue, week_id, principal_paid, interest_paid)
               VALUES }
     values = []
     status_updated = false
@@ -537,7 +539,7 @@ class Loan
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
                           #{history[:actual_outstanding_total]},#{current},
                           #{amount_in_default}, #{client.center.id},#{client.id},#{client.center.branch.id},
-                          #{history[:days_overdue]}, #{((date - d0) / 7).to_i + 1})}
+                          #{history[:days_overdue]}, #{((date - d0) / 7).to_i + 1}, #{history[:principal_paid]},#{history[:interest_paid]})}
 
      values << value
     end
@@ -592,7 +594,14 @@ class Loan
       else
         raise ArgumentError.new("Strange period you got..")
     end
-    new_date - new_date.cwday + Center.meeting_days.index(client.center.meeting_day) if ensure_meeting_day
+    if self.client and self.client.center and self.client.center.meeting_day != :none and ensure_meeting_day
+      next_meeting_day = client.center.next_meeting_date_from(new_date)
+      new_date = next_meeting_day unless new_date.weekday == client.center.meeting_day
+      #new_date - new_date.cwday + Center.meeting_days.index(client.center.meeting_day)
+    else
+      new_date
+    end
+    new_date
   end
 
   def self.description
