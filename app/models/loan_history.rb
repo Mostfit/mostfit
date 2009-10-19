@@ -31,11 +31,12 @@ class LoanHistory
 
   # __DEPRECATED__ the prefered way to make history and future.
   # HISTORY IS NOW WRITTEN BY THE LOAN MODEL USING update_history_bulk_insert
+
   def self.write_for(loan, date)
     if result = LoanHistory::create(
       :loan_id =>                           loan.id,
       :date =>                              date,
-      :status =>                            loan.status(date),
+      :status =>                            loan.get_status(date),
       :scheduled_outstanding_principal =>   loan.scheduled_outstanding_principal_on(date),
       :scheduled_outstanding_total =>       loan.scheduled_outstanding_total_on(date),
       :actual_outstanding_principal =>      loan.actual_outstanding_principal_on(date),

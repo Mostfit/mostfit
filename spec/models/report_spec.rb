@@ -83,7 +83,7 @@ describe Report do
 
   it "should have status pending for today and approved in 2 days" do
     Loan.all.each do |l| 
-      l.get_status.should == :pending
+      l.get_status.should == :pending_approval
       l.get_status(Date.today + 2).should == :approved
     end
   end
@@ -146,7 +146,6 @@ describe Report do
       loan.disbursal_date = loan.scheduled_disbursal_date
       loan.disbursed_by = @manager
       loan.scheduled_first_payment_date = loan.scheduled_disbursal_date + 7
-      Merb.logger.info "fp date #{loan.scheduled_first_payment_date}"
       loan.interest_rate = 0.1
       loan.installment_frequency = :weekly
       loan.number_of_installments = 50
@@ -164,13 +163,16 @@ describe Report do
         date = loan.date_for_installment(i)
         _p = loan.scheduled_principal_for_installment(i)
         _i = loan.scheduled_interest_for_installment(i)
-        loan.history_disabled = false if i == 49
-        pmt = loan.repay([_p,_i],@user,date,@manager)[1] 
+        paid = loan.repay([_p,_i],@user,date,@manager)
+        paid[1].errors.inspect if not paid[0]
         total += _p
       end
+      loan.history_disabled = false
+      loan.update_history
       loan.get_status(loan.scheduled_maturity_date).should == :repaid
+      LoanHistory.all(:loan_id => loan.id).last.actual_outstanding_principal.should == 0
     end
-    Branch.client_count_by_loan_cycle(2,@date).should == {1 => 5, 2=>0}
+    Branch.client_count_by_loan_cycle(2,@date).should == {1 => 3, 2=>2}
   end
 
   
