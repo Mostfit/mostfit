@@ -44,7 +44,9 @@ end
  
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
-  Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments'])
+
+  # Starting the logger takes time, so turn it off during development
+  # Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments'])
 
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
   begin

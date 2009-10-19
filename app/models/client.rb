@@ -31,6 +31,7 @@ class Client
 
   validates_length    :name, :min => 3
   validates_present   :center
+  validates_present   :date_joined
   validates_is_unique :reference
   validates_attachment_thumbnails :picture
 

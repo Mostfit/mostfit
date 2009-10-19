@@ -90,6 +90,7 @@ class Loan
 
   def required
     # this method provides required values. i.e. 50 weeks only
+    {}
   end
   # validates_primitive doesn't work well for date -- we use "before :valid?, :parse_dates" to achieve similar effects 
 
@@ -132,6 +133,7 @@ class Loan
       clear_payments_hash_cache
     end
     payment.principal, payment.interest = nil, nil unless total.nil?  # remove calculated pr./int. values from the form
+    Merb.logger.info "loan #{id}: #{received_on} => paid #{principal} + #{interest} | prin_paid #{principal_received_up_to(received_on)} | os_bal:#{actual_outstanding_principal_on(received_on)}"
     [save_status, payment]  # return the success boolean and the payment object itself for further processing
   end
 
@@ -162,6 +164,12 @@ class Loan
     # therefor always supply number, so it works for all implementations
     raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
     (total_interest_to_be_received / number_of_installments).round
+  end
+  def date_for_installment(number)
+    shift_date_by_installments(scheduled_first_payment_date, number)
+  end
+  def scheduled_maturity_date
+    shift_date_by_installments(scheduled_first_payment_date, number_of_installments - 1)
   end
 
   # the 'grande totale' of what the client has to pay back for this loan
@@ -365,7 +373,9 @@ class Loan
 
   def get_status(date = Date.today, total_received = nil) # we have this last parameter so we can speed up get_status
                                                           # considerably by passing total_received, i.e. from history_for
-    return nil          if applied_on > date  # non existant
+    #return @status if @status
+    date = Date.parse(date) if date.is_a? String
+    return :applied_in_the_future if applied_on > date  # non existant
     return :pending     if applied_on <= date and
                           not (approved_on and approved_on <= date) and
                           not (rejected_on and rejected_on <= date)
@@ -374,7 +384,7 @@ class Loan
     return :written_off if (written_off_on and written_off_on <= date)
     return :outstanding if (date == disbursal_date)
     total_received = total_received.nil? ? total_received_up_to(date) : total_received
-    total_received  >= total_to_be_received ? :repaid : :outstanding
+    @status = total_received  >= total_to_be_received ? :repaid : :outstanding
   end
   
   def update_status # DEPRECATED? check if this is actually being called. I think we moved this to loan_history with
@@ -448,6 +458,8 @@ class Loan
     scheduled_os_total = total_to_be_received
     t0 = Time.now
     i_number = number_of_installments_before(date)-1
+    puts "history: #{date}:#{i_number}. history array = #{@history_array.inspect}"
+
     last_payment_date = nil
     payments_hash.keys.sort.each do |k|
       last_payment_date = k unless k > date
@@ -483,6 +495,7 @@ class Loan
 
   def update_history
     return if history_disabled  # easy when doing mass db modifications (like with fixutes)
+    @status = nil
     update_history_bulk_insert
   end
 
@@ -533,7 +546,7 @@ class Loan
     end
     sql += values.join(",") + ";"
     repository.adapter.execute(sql)
-    puts "update_history_bulk_insert done in #{Time.now - t}"
+    Merb.logger.info "update_history_bulk_insert done in #{Time.now - t}"
     
   end
 
@@ -582,7 +595,7 @@ class Loan
       else
         raise ArgumentError.new("Strange period you got..")
     end
-    new_date - new_date.cwday + Center.meeting_days.index(client.center.meeting_day)
+    new_date - new_date.cwday + Center.meeting_days.index(client.center.meeting_day) if ensure_meeting_day
   end
 
   def self.description
@@ -603,6 +616,10 @@ class Loan
   def interest_percentage=(percentage)
     self.interest_rate = percentage.blank? ? nil : percentage.to_f / 100
   end
+
+  #def interest_rate=(rate)
+  #  interest_rate  = rate.to_f > 1 ? int.to_f/100 : int.to_f
+  #end
 
 #  alias :set_fees_without_updating_total :fees=
 #  def fees=(fees)

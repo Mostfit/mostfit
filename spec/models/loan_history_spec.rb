@@ -39,5 +39,8 @@ describe LoanHistory do
   :scheduled_outstanding_total=>900,:actual_outstanding_principal=>820,:actual_outstanding_total=>920 ,:status=>:approved)
 	@loanhistory2.save	
 	@loanhistory2.should_not be_valid
-	end
+  end
+
+  it "should have correct values" do
+  end
 end
