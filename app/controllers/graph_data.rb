@@ -125,7 +125,6 @@ class GraphData < Application
   end
 
   def common_aggregate_loan_graph(loan_ids, start_date, end_date) # __DEPRECATED__
-    debugger
     days = (end_date - start_date).to_i
     step_size = 1; i = 0   # make a nice round step size, not more than 20 steps
     while days/step_size > 50

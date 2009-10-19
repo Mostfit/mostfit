@@ -32,35 +32,39 @@ module Reporting
       repository.adapter.query(sql).map {|x| [x[0],x[1]]}.to_hash
     end
 
-    def client_count(start_date, end_date)
+    def client_count(date = Date.today)
       query_as_hash(%Q{
           SELECT b.id, COUNT(cl.id) as count
           FROM clients cl, centers c, branches b
-          WHERE cl.center_id = c.id AND c.branch_id = b.id and cl.date_joined < '#{end_date}'
+          WHERE cl.center_id = c.id AND c.branch_id = b.id and cl.date_joined < '#{date}'
           GROUP BY b.id})            
     end
 
-    def loan_count(start_date, end_date)
+    def loan_count(date = Date.today)
       query_as_hash(%Q{
-          SELECT COUNT(*) 
+          SELECT b.id,COUNT(*) 
           FROM loans l, clients cl, centers c, branches b
-          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id and l.created_at <='#{end_date}'
+          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id and l.created_at <='#{date}'
           GROUP BY b.id})            
     end
 
-    def active_client_count(start_date, end_date)
+    def active_client_count(date = Date.today)
       query_as_hash(%Q{
-         SELECT branch_id, COUNT(DISTINCT client_id)
-         FROM loan_history lh
-         WHERE lh.status <= 3 AND lh.created_at<'#{end_date}'
-         GROUP BY branch_id})
+            SELECT branch_id, count(*) 
+            FROM (
+                  SELECT loan_id, max(date), status, branch_id 
+                  FROM loan_history 
+                  WHERE date < '#{date}'
+                  GROUP BY loan_id) AS dt 
+            WHERE status <= 3
+            GROUP BY branch_id})
     end
 
-    def dormant_client_count(start_date, end_date)
-      client_count(start_date, end_date) - active_client_count(start_date, end_date)
+    def dormant_client_count(date = Date.today)
+      client_count(date) - active_client_count(date)
     end
 
-    def client_count_by_loan_cycle(loan_cycle)
+    def client_count_by_loan_cycle(loan_cycle, date=Date.today)
       # a person is deemed to be in a loan_cycle if the number of repaid / written off loans he has is 
       # 1) equal to loan_cycle - 1 if he has a loan outstanding or
       # but ONLY IF loan_cycle > 1
@@ -157,7 +161,7 @@ module Reporting
       query_as_hash(%Q{ select b.id, sum(interest) from payments p, loans l, clients cl, centers c, branches b where p.received_on between '#{start_date}' and '#{end_date}' and p.loan_id = l.id and l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id  group by b.id})
     end
 
-    def current_principal_outstanding(start_date, end_date)
+    def current_principal_outstanding(date = Date.today)
       repository.adapter.query(%Q{
         SELECT branch_id, SUM(actual_outstanding_principal) 
         FROM loan_history 
@@ -215,21 +219,8 @@ module Reporting
 
     def method_missing(name, *params)
       if /avg_(\w+)_per_(\w+)/.match(name.to_s)
-        if params
-          arg1 = method($1).arity
-          arg2 = method($2).arity
-          if arg1==0 and arg2==0
-            send($1) / send($2)
-          elsif arg1>0 and arg2==0
-            send($1, *params) / send($2)
-          elsif arg1==0 and arg2>0
-            send($1, *params) / send($2, *params)
-          elsif arg1>0 and arg2>0
-            send($1, *params) / send($2, *params)
-          end
-        else
-          send($1) / send($2)
-        end
+        num = params ? send($1, *params[0]) : send($1)
+        den = (params and params[1]) ? send($2, *params[1]) : send($2)
       else
         raise "No such method #{name}"
       end
