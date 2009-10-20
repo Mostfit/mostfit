@@ -1,0 +1,36 @@
+%h1
+  LoanProducts
+
+- if @loan_products.length == 0
+  %h3
+    No Loan Products defined. 
+    = link_to 'Click here', url(:new_loan_product)
+    to add one
+
+%table{:width => "100%"}
+  %tr
+    %th
+      Product name
+    %th
+      Loan type
+    %th
+      Amount
+    %th
+      Interest (%)
+    %th
+      Validity
+
+  %tr
+  - for loan_product in @loan_products
+    %tr
+      %td
+        = link_to loan_product.name, url(:loan_product, loan_product) 
+      %td
+        = loan_product.loan_type
+      %td
+        = loan_product.min_amount!=loan_product.max_amount ? "#{loan_product.min_amount} - #{loan_product.max_amount}" : loan_product.min_amount
+      %td
+        = loan_product.min_interest_rate!=loan_product.max_interest_rate ? "#{loan_product.min_interest_rate} - #{loan_product.max_interest_rate}" : loan_product.min_interest_rate
+      %td
+        = loan_product.valid_from!=loan_product.valid_upto ? "#{loan_product.valid_from.strftime("%d-%b %Y")} to #{loan_product.valid_upto.strftime("%d-%b %Y")}" : loan_product.valid_upto.strftime("%d-%b %Y")
+= link_to 'New', url(:new_loan_product)

@@ -1,0 +1,8 @@
+%h1 Edit Loan Product
+
+= error_messages_for @loan_product
+= form_for(@loan_product, :action => url(:loan_product, @loan_product) ) do
+  = partial "fields"  
+  = submit "Edit"
+
+= link_to 'Back', url(:loan_products)

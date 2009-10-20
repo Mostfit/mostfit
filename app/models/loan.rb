@@ -4,7 +4,6 @@ class Loan
   after  :save,    :update_history  # also seems to do updates
   after  :destroy, :update_history
 
-  INSTALLMENT_FREQUENCIES = [:daily, :weekly, :biweekly, :monthly]
 #   DATE_FORMAT = /(^\s*$|\d{4}[-.\/]{1}\d{1,2}[-.\/]{1}\d{1,2})/  # matches "1982-06-12" or empty strings
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
@@ -32,7 +31,7 @@ class Loan
   property :validation_comment,             Text
   property :created_at,                     DateTime, :index => true
   property :updated_at,                     DateTime, :index => true
-
+  property :loan_product_id,                     Integer,  :nullable => false, :index => true
   # associations
   belongs_to :client
   belongs_to :funding_line
@@ -44,7 +43,7 @@ class Loan
   belongs_to :validated_by,   :child_key => [:validated_by_staff_id],   :class_name => 'StaffMember', :index => true
   has n, :payments
   has n, :history, :class_name => 'LoanHistory'
-
+  belongs_to :loan_product
 
   validates_with_method  :amount,                       :method => :amount_greater_than_zero?
   validates_with_method  :interest_rate,                :method => :interest_rate_greater_than_zero?
@@ -74,7 +73,29 @@ class Loan
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
+  
+  #product validations
+  validates_with_method  :amount,                       :method => :is_valid_loan_product_amount
+  validates_with_method  :interest_rate,                :method => :is_valid_loan_product_interest_rate
+  validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
 
+  def is_valid_loan_product_amount; is_valid_loan_product(:amount); end
+  def is_valid_loan_product_interest_rate; is_valid_loan_product(:interest_rate); end
+  def is_valid_loan_product_number_of_installments; is_valid_loan_product(:number_of_installments); end
+
+  def is_valid_loan_product(method)
+    product = self.loan_product
+    {:min => :minimum, :max => :maximum}.each{|k, v|
+      loan_attr    = self.send(method)
+      product_attr = product.send("#{k}_#{method}")
+      if k==:min and loan_attr and product_attr and  loan_attr < product_attr
+        return [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
+      elsif k==:max and loan_attr and product_attr and  loan_attr > product_attr
+        return  [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"] 
+      end
+    }
+    return true
+  end
 
   def self.search(q)
     if /^\d+$/.match(q)

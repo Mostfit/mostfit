@@ -1,0 +1,8 @@
+%h1 New Loan Product
+
+= error_messages_for @loan_product
+= form_for(@loan_product, :action => url(:loan_products) ) do
+  = partial "fields"    
+  = submit "Create"
+
+= link_to 'Back', url(:loan_products)

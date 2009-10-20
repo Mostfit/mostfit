@@ -24,27 +24,27 @@ class Loans < Application
 
   def new
     only_provides :html
-    if Loan.descendants.map{|x| x.to_s}.include? params[:loan_type]
-      begin
-        klass = Kernel::const_get(params[:loan_type])
+    if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])
+      if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type)
+        klass = Kernel::const_get(@loan_product.loan_type)
         @loan = klass.new
-#       rescue
-#         @loan = nil
       end
     end
-    @loan_types = Loan.descendants if @loan.nil?
+    @loan_products = LoanProduct.valid if @loan.nil?
     display [@loan_types, @loan]
   end
 
   def create
     klass, attrs = get_loan_and_attrs
-    debugger
     attrs[:interest_rate] = attrs[:interest_rate] / 100 if attrs[:interest_rate].to_f > 1
     @loan = klass.new(attrs)
+    @loan_product = LoanProduct.is_valid(params[:loan_product_id])
+    @loan.loan_product_id = @loan_product.id 
     @loan.client = @client  # set direct context
     if @loan.save
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
     else
+
       render :new  # error messages will be shown
     end
   end

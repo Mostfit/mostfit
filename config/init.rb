@@ -1,7 +1,7 @@
 # Go to http://wiki.merbivore.com/pages/init-rb
  
 require 'config/dependencies.rb'
- 
+
 use_orm :datamapper
 use_test :rspec
 use_template_engine :haml
@@ -26,10 +26,12 @@ Merb::BootLoader.before_app_loads do
     :in              => { :number =>   { :precision => 3, :delimiter => ',',  :separator => '.'},
                           :currency => { :unit => 'Rs.',  :format => '%u %n', :precision => 0 } })
   Numeric::Transformer.change_default_format(:mostfit_default)
+  require 'config/constants.rb'
   begin
     require "pdf/writer"
     require "pdf/simpletable"
     require "lib/logger.rb"
+    require 'lib/string.rb'
     require("lib/pdfs/day_sheet.rb")
     PDF_WRITER = true
   rescue
@@ -49,6 +51,7 @@ Merb::BootLoader.after_app_loads do
   # Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments'])
 
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
+  LoanProduct.property(:loan_type, LoanProduct::Enum.send('[]', *Loan.descendants.map{|x| x.to_s}), :nullable => false, :index => true)
   begin
     if User.all.empty?
       u = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password', :admin => true)

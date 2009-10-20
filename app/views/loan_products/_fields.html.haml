@@ -1,0 +1,27 @@
+%table
+  - [:name, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments].each do |attr|
+    %tr
+      %th
+        = attr.humanize
+        %td
+          = text_field attr
+  %tr
+    %th
+      Installment Frequency
+    %td
+      = select :installment_frequency, :collection => [[:any, "Any"]] + Loan.installment_frequencies.map {|f| [f,f.to_s]}
+  %tr
+    %th
+      Loan Type
+    %td
+      = select :loan_type, :collection => Loan.descendants.map{|f| [f, f.to_s]}
+  %tr
+    %th
+      Valid from
+    %td
+      = date_select_for @loan_product, :valid_from
+  %tr
+    %th
+      Valid upto
+    %td
+      = date_select_for @loan_product, :valid_upto
