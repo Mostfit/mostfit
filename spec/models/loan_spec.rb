@@ -29,11 +29,12 @@ describe Loan do
     @client.center  = @center
     # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
 
-    @loan = Loan.new(:id => 123456, :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 30, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
+    @loan = Loan.new(:id => 123456, :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
     @loan.history_disabled = true
     @loan.applied_by       = @manager
     @loan.funding_line     = @funding_line
     @loan.client           = @client
+    @loan.errors.each {|e| puts e}
     @loan.should be_valid
     
     @loan.approved_on = "2000-02-03"
@@ -303,11 +304,11 @@ describe Loan do
   it ".last_loan_history_date should have some tests -- albeit more a view thing"
 
   it ".scheduled_repaid_on give the proper date" do
-    @loan.scheduled_repaid_on.should eql(Date.parse('2001-06-27'))
+    @loan.scheduled_repaid_on.should eql(Date.parse('2001-05-23'))
   end
   it "should have proper values for principal, interest and total to be received" do
-    @loan.total_interest_to_be_received.should == 210
-    @loan.total_to_be_received.should == 1210
+    @loan.total_interest_to_be_received.should == 1000 * 0.2
+    @loan.total_to_be_received.should == 1000 * (1.2)
   end
 
   it ".status should give status accoring to changing properties up to it written off" do

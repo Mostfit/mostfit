@@ -1,0 +1,8 @@
+--colour
+--format progress
+--format specdoc:spec/spec_full_report.txt
+--format failing_examples:spec/spec_failing_examples.txt
+--format html:spec/spec_report.html
+--loadby mtime
+--reverse
+--debugger

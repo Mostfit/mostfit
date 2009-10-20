@@ -1,0 +1,16 @@
+
+LoanHistory
+- should not be valid without scheduled outstanding principal
+- should not be valid without scheduled outstanding total
+- should not be valid without actual outstanding principal
+- should not be valid without actual outstanding total
+- should not be valid without having a proper status
+- should not be valid if the combination if loan id and date is not unique
+- should have correct number of periods
+- should start with the application date, approval date, disbursal date and first payment date
+- should have the following dates afterwards
+- should have correct amounts
+
+Finished in 16.701425 seconds
+
+10 examples, 0 failures
