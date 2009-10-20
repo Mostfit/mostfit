@@ -15,11 +15,13 @@ class LoanHistory
   property :week_id,                    Integer # good for aggregating.
 
   # some properties for similarly named methods of a loan:
-  property :scheduled_outstanding_principal, Integer, :nullable => false, :index => true
   property :scheduled_outstanding_total,     Integer, :nullable => false, :index => true
-  property :actual_outstanding_principal,    Integer, :nullable => false, :index => true
+  property :scheduled_outstanding_principal, Integer, :nullable => false, :index => true
   property :actual_outstanding_total,        Integer, :nullable => false, :index => true
-  property :status,                          Enum[nil, :approved, :outstanding, :repaid, :written_off]
+  property :actual_outstanding_principal,    Integer, :nullable => false, :index => true
+  property :principal_paid,                  Integer, :nullable => false, :index => true
+  property :interest_paid,                  Integer, :nullable => false, :index => true
+  property :status,                          Enum[:applied_in_future, :pending_approval, :rejected, :approved, :outstanding, :repaid, :written_off]
 
   belongs_to :loan, :index => true
   belongs_to :client, :index => true         # speed up reports
@@ -31,11 +33,12 @@ class LoanHistory
 
   # __DEPRECATED__ the prefered way to make history and future.
   # HISTORY IS NOW WRITTEN BY THE LOAN MODEL USING update_history_bulk_insert
+
   def self.write_for(loan, date)
     if result = LoanHistory::create(
       :loan_id =>                           loan.id,
       :date =>                              date,
-      :status =>                            loan.status(date),
+      :status =>                            loan.get_status(date),
       :scheduled_outstanding_principal =>   loan.scheduled_outstanding_principal_on(date),
       :scheduled_outstanding_total =>       loan.scheduled_outstanding_total_on(date),
       :actual_outstanding_principal =>      loan.actual_outstanding_principal_on(date),

@@ -33,6 +33,7 @@ Merb::BootLoader.before_app_loads do
     require "lib/logger.rb"
     require 'lib/string.rb'
     require("lib/pdfs/day_sheet.rb")
+    require("lib/functions.rb")
     PDF_WRITER = true
   rescue
     PDF_WRITER = false
@@ -48,7 +49,7 @@ Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
 
   # Starting the logger takes time, so turn it off during development
-  # Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments'])
+  Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments']) unless Merb.environment == "development" or Merb.environment == "test"
 
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
   LoanProduct.property(:loan_type, LoanProduct::Enum.send('[]', *Loan.descendants.map{|x| x.to_s}), :nullable => false, :index => true)

@@ -18,7 +18,6 @@ class Center
   validates_length      :name, :min => 3
   validates_present     :manager
   validates_present     :branch
-  validates_present     :meeting_day
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
   validates_with_method :meeting_time_minutes, :method => :minutes_valid?
 
