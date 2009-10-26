@@ -181,31 +181,87 @@ a {
 <div class="results">
 <div class="example_group">
   <dl>
-  <dt id="example_group_1">LoanHistory</dt>
-    <script type="text/javascript">moveProgressBar('10.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without scheduled outstanding principal</span></dd>
-    <script type="text/javascript">moveProgressBar('20.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without scheduled outstanding total</span></dd>
-    <script type="text/javascript">moveProgressBar('30.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without actual outstanding principal</span></dd>
-    <script type="text/javascript">moveProgressBar('40.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without actual outstanding total</span></dd>
-    <script type="text/javascript">moveProgressBar('50.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without having a proper status</span></dd>
-    <script type="text/javascript">moveProgressBar('60.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if the combination if loan id and date is not unique</span></dd>
-    <script type="text/javascript">moveProgressBar('70.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct number of periods</span></dd>
-    <script type="text/javascript">moveProgressBar('80.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should start with the application date, approval date, disbursal date and first payment date</span></dd>
-    <script type="text/javascript">moveProgressBar('90.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have the following dates afterwards</span></dd>
+  <dt id="example_group_1">Loan</dt>
+    <script type="text/javascript">moveProgressBar('2.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have a discrimintator</span></dd>
+    <script type="text/javascript">moveProgressBar('5.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
+    <script type="text/javascript">moveProgressBar('8.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being approved properly</span></dd>
+    <script type="text/javascript">moveProgressBar('10.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being validated properly</span></dd>
+    <script type="text/javascript">moveProgressBar('13.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being rejected properly</span></dd>
+    <script type="text/javascript">moveProgressBar('16.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
+    <script type="text/javascript">moveProgressBar('18.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper amount</span></dd>
+    <script type="text/javascript">moveProgressBar('21.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper interest_rate</span></dd>
+    <script type="text/javascript">moveProgressBar('24.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be valid with a proper installment_frequency</span></dd>
+    <script type="text/javascript">moveProgressBar('27.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper installment_frequency</span></dd>
+    <script type="text/javascript">moveProgressBar('29.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper number_of_installments</span></dd>
+    <script type="text/javascript">moveProgressBar('32.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_first_payment_date</span></dd>
+    <script type="text/javascript">moveProgressBar('35.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('37.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid with a disbursal date earlier than the loan is approved</span></dd>
+    <script type="text/javascript">moveProgressBar('40.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid when validated_on is earlier than the disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('43.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid when written_off_on is earlier than the disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('45.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without approved_on earlier than scheduled_disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('48.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly written off</span></dd>
+    <script type="text/javascript">moveProgressBar('51.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly disbursed</span></dd>
+    <script type="text/javascript">moveProgressBar('54.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid when scheduled_first_payment_date if before scheduled_disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('56.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates</span></dd>
+    <script type="text/javascript">moveProgressBar('59.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.shift_date_by_installments should shift dates properly, even odd ones.. and backwards.</span></dd>
+    <script type="text/javascript">moveProgressBar('62.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.descendants should keep track of the subclasses (just testing dm-core functionality)</span></dd>
+    <script type="text/javascript">moveProgressBar('64.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.number_of_installments_before should do what it promises</span></dd>
+    <script type="text/javascript">makeYellow('rspec-header');</script>
+    <script type="text/javascript">makeYellow('example_group_1');</script>
+    <script type="text/javascript">moveProgressBar('67.5');</script>
+    <dd class="spec not_implemented"><span class="not_implemented_spec_name">.last_loan_history_date should have some tests -- albeit more a view thing (PENDING: Not Yet Implemented)</span></dd>
+    <script type="text/javascript">moveProgressBar('70.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.scheduled_repaid_on give the proper date</span></dd>
+    <script type="text/javascript">moveProgressBar('72.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have proper values for principal, interest and total to be received</span></dd>
+    <script type="text/javascript">moveProgressBar('75.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it written off</span></dd>
+    <script type="text/javascript">moveProgressBar('78.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it is repaid</span></dd>
+    <script type="text/javascript">moveProgressBar('81.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties before being approved</span></dd>
+    <script type="text/javascript">moveProgressBar('83.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties when being rejected</span></dd>
+    <script type="text/javascript">moveProgressBar('86.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">cannot repay an unsaved loan</span></dd>
+    <script type="text/javascript">moveProgressBar('89.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.installment_dates should give a list with some dates</span></dd>
+    <script type="text/javascript">moveProgressBar('91.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.payment_schedule should give correct results</span></dd>
+    <script type="text/javascript">moveProgressBar('94.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.payments_hash should give correct results</span></dd>
+    <script type="text/javascript">moveProgressBar('97.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">history should be correct</span></dd>
     <script type="text/javascript">moveProgressBar('100.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct amounts</span></dd>
+    <dd class="spec passed"><span class="passed_spec_name">should write the history correctly into the db</span></dd>
   </dl>
 </div>
-<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>16.701425 seconds</strong>";</script>
-<script type="text/javascript">document.getElementById('totals').innerHTML = "10 examples, 0 failures";</script>
+<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>7.493729 seconds</strong>";</script>
+<script type="text/javascript">document.getElementById('totals').innerHTML = "37 examples, 0 failures, 1 pending";</script>
 </div>
 </div>
 </body>

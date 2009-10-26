@@ -138,7 +138,7 @@
   - first, passed = true, false  # these are for printing the "today" row
   - last_payment = @loan.payments.first(:order => [:received_on.desc])
   - last_payment_date = last_payment.received_on if last_payment
-  - @loan.payment_schedule.each do |i|
+  - @loan.history.each do |i|
     - if i[:date] > Date.today and not passed
       - passed = true
       - if not first

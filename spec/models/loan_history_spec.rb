@@ -101,13 +101,14 @@ describe LoanHistory do
 
   it "should have correct amounts" do
     (1..@loan.number_of_installments - 1).each do |i|
-      @history[i+2].principal_paid.should == @loan.scheduled_principal_for_installment(i)
-      @history[i+2].interest_paid.should == @loan.scheduled_interest_for_installment(i)
+      @history[i+2].principal_paid.should == 0 # @loan.scheduled_principal_for_installment(i)
+      @history[i+2].interest_paid.should == 0 # @loan.scheduled_interest_for_installment(i)
       # @history[i+3].amount_in_default.should == 0
       @history[i+2].days_overdue.should == 0
       @history[i+2].scheduled_outstanding_principal.should == 1000 - (1000/25 * (i)).to_i
     end
     @history[27].scheduled_outstanding_principal.should == 0
+    @history[27].status.should == :repaid
   end
 
 

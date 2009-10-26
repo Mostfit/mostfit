@@ -3,6 +3,8 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe Loan do
 
   before(:each) do
+    Payment.all.destroy! if Payment.all.count > 0
+    Client.all.destroy! if Client.count > 0
     @user = User.new(:id => 234, :login => 'Joey User', :password => 'password', :password_confirmation => 'password')
     # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
 
@@ -18,15 +20,21 @@ describe Loan do
 
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
+    @branch.save
     @branch.should be_valid
 
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
     @center.branch  = @branch
+    @center.save
     @center.should be_valid
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05')
+    @client = Client.new(:name => 'Ms C.L. Ient', :reference => Time.now.to_s)
     @client.center  = @center
+    @client.date_joined = Date.parse('2006-01-01')
+    @client.save
+    @client.errors.each {|e| puts e}
+    @client.should be_valid
     # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
 
     @loan = Loan.new(:id => 123456, :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
@@ -313,17 +321,17 @@ describe Loan do
 
   it ".status should give status accoring to changing properties up to it written off" do
     @loan.status.should == :approved
-    @loan.disbursal_date = Date.today
+    @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by   = @manager
     @loan.status.should == :outstanding
-    @loan.status(Date.today - 1).should == :approved
-    @loan.written_off_on = Date.today
+    @loan.status(@loan.disbursal_date - 1).should == :approved
+    @loan.written_off_on = @loan.scheduled_first_payment_date
     @loan.written_off_by = @manager
     @loan.status.should == :written_off
-    @loan.status(Date.today - 1).should == :approved
+    @loan.status(@loan.scheduled_first_payment_date - 1).should == :outstanding
   end
   it ".status should give status accoring to changing properties up to it is repaid" do
-    @loan.disbursal_date = Date.today
+    @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by   = @manager
     @loan.status.should == :outstanding
     # no payments on unsaved (new_record? == true) loans:
@@ -333,7 +341,7 @@ describe Loan do
     p r[1].errors unless r[0]
     r[0].should == true
     @loan.status.should == :repaid
-    @loan.status(Date.today - 1).should == :approved
+    @loan.status(@loan.scheduled_disbursal_date - 1).should == :approved
   end
   it ".status should give status accoring to changing properties before being approved" do
     @loan.status(@loan.applied_on - 1).should == :applied_in_future
@@ -367,6 +375,106 @@ describe Loan do
   end
 
 
-  it ".payment_schedule should also have some specs -- albeit more on the view side"
+  it ".payment_schedule should give correct results" do
+    @loan.payment_schedule.keys.sort.each_with_index do |k,i|
+      case i
+        when 0
+          k.should == @loan.scheduled_disbursal_date
+        when 1
+          k.should == @loan.scheduled_first_payment_date 
+        else
+          k.should == @loan.scheduled_first_payment_date + (7*(i-1))
+      end
+      ps = @loan.payment_schedule[k]
+      ps[:total_principal].should == 40 * (i)
+      ps[:total_interest].should == (200/25) * i
+    end
+  end
 
+  it ".payments_hash should give correct results" do
+    @loan.payments_hash.should be_blank
+    @loan.id = nil
+    @loan.save
+    7.times do |i|
+      @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
+    end
+    @loan.payments_hash.keys.sort.each_with_index do |k,i|
+      case i
+        when 0 
+          k.should == @loan.scheduled_first_payment_date
+        else
+          k.should == @loan.scheduled_first_payment_date + (7*(i-1))
+      end
+      if i >= 3
+        ps = @loan.payments_hash[k]
+        ps[:total_principal].should == 40 * (i+1)
+        ps[:total_interest].should == (200/25) * (i+1)
+      end
+    end
+  end
+
+  it "history should be correct" do
+    @loan.payments_hash.should be_blank
+    @loan.id = nil
+    @loan.disbursal_date = @loan.scheduled_disbursal_date
+    @loan.disbursed_by = @manager
+    @loan.get_status(@loan.scheduled_disbursal_date).should == :outstanding
+    @loan.save
+    @loan.errors.each {|e| puts e}
+    @loan.history_disabled = true
+    7.times do |i|
+      p = @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
+      p[1].errors.each {|e| puts e}
+    end
+    hist = @loan.calculate_history
+    os_prin = 1000
+    os_tot = 1200
+    hist.each_with_index do |h,i|
+      if h[:date] <= @loan.scheduled_disbursal_date
+        prin,int = 0
+      else
+        prin = h[:principal]
+        int = h[:interest_paid]
+      end
+      # puts "#{i}:#{h[:date]}:#{h[:status]}:#{h[:scheduled_outstanding_principal]} : #{h[:principal_due]} : #{h[:interest_due]} : #{h[:actual_outstanding_principal]} : #{h[:principal_paid]} : #{h[:interest_paid]} : #{h[:days_overdue]}!!"
+      h[:scheduled_outstanding_principal].should == 1000 - (40*([0,i-2].max))
+      h[:scheduled_outstanding_total].should == 1200 -(48 * ([0,i-2].max))
+      if i > 2
+        h[:principal_due].should == 40 
+        h[:interest_due].should == 8
+        if i < 10
+          h[:principal_paid].should == 40
+          h[:interest_paid].should == 8
+          h[:actual_outstanding_principal].should == 1000 -(40 * ([0,i-2].max)) 
+        else
+          h[:principal_paid].should == 0
+          h[:interest_paid].should == 0
+          h[:actual_outstanding_principal].should == 1000 -(40 * 7) 
+          if i > 11
+            h[:days_overdue].should == 7 * (i-11)
+          end
+        end
+      end
+    end
+  end
+
+  it "should write the history correctly into the db" do
+    @loan.payments_hash.should be_blank
+    @loan.id = nil
+    @loan.disbursal_date = @loan.scheduled_disbursal_date
+    @loan.disbursed_by = @manager
+    @loan.get_status(@loan.scheduled_disbursal_date).should == :outstanding
+    @loan.save
+    @loan.errors.each {|e| puts e}
+    @loan.history_disabled = true
+    7.times do |i|
+      p = @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
+      p[1].errors.each {|e| puts e}
+    end
+    @loan.history_disabled = false
+    @loan.update_history_bulk_insert
+    lhs = LoanHistory.all(:loan_id => @loan.id, :order => [:date])
+    lhs.last.current.should == true
+  end
+      
 end
