@@ -3,7 +3,8 @@ class StaffMember
   
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false
-  property :active,  Boolean, :default => true, :nullable => false
+  property :mobile_number,  String, :length => 12,  :nullable => true
+  property :active,  Boolean, :default => true, :nullable => false  
   # no designations, they are derived from the relations it has
 
   has n, :branches, :child_key => [:manager_staff_id]
@@ -18,6 +19,9 @@ class StaffMember
 
   validates_is_unique :name
   validates_length :name, :min => 3
-
-
+  
+  def self.from_csv(row, headers)
+    obj = new(:name => row[headers[:name]], :mobile_number => row[headers[:mobile_number]])
+    obj.save
+  end
 end

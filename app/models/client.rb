@@ -35,6 +35,13 @@ class Client
   validates_is_unique :reference
   validates_attachment_thumbnails :picture
 
+  def self.from_csv(row, headers)
+    obj = new(:reference => row[headers[:reference]], :name => row[headers[:name]], :spouse_name => row[headers[:spouse_name]], 
+              :date_of_birth => Date.parse(row[:headers][:date_of_birth]), :address => row[headers[:address]], :date_joined => row[headers[:date_joined]],
+              :center_id => Center.first(:name => row[headers[:center]]))
+    obj.save
+  end
+
   def self.search(q)
     if /^\d+$/.match(q)
       all(:conditions => {:id => q})

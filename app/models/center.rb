@@ -21,6 +21,15 @@ class Center
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
   validates_with_method :meeting_time_minutes, :method => :minutes_valid?
 
+  def self.from_csv(row, headers)
+    hour, minute = row[headers[:center_meeting_time_in_24h_format]].split(":")
+    branch       = Branch.first(:name => row[headers[:branch_name]])
+    staff_member = StaffMember.first(:name => row[headers[:staff_name]])
+    obj = new(:name => row[headers[:center_name]], :meeting_day => DAYS.index(row[headers[:meeting]].downcase.to_s.to_sym), 
+              :meeting_time_hours => hour, :meeting_time_minutes => minute, :branch_id => branch.id, :staff_member_id => staff_member.id) 
+    obj.save
+  end
+
   def self.search(q)
     if /^\d+$/.match(q)
       all(:conditions => {:id => q})
