@@ -317,7 +317,7 @@ class Loan
     return 0 if date < keys.min and (column == :principal or column == :interest)
     return cache[keys.min][column] if date < keys.min
     return cache[keys.max][column] if date >= keys.max
-    return cache[date][column] if cache.has_key? (date)
+    return cache[date][column] if cache.has_key?(date)
     return 0 if (column == :principal or column == :interest)
     cache.keys.sort.each_with_index do |k,i| 
       return cache[k][column] if keys[i+1] > date
@@ -377,17 +377,17 @@ class Loan
   # they are purely calculated -- no calls to its payments or loan_history)
   def scheduled_outstanding_principal_on(date)  # typically reimplemented in subclasses
     return 0 if date < applied_on
-    return amount if not disbursal_date or date < disbursal_date
+    return amount if  date < (disbursal_date || scheduled_disbursal_date)
     amount - scheduled_principal_up_to(date)
   end
   def scheduled_outstanding_interest_on(date)  # typically reimplemented in subclasses
     return 0 if date < applied_on
-    return total_interest_to_be_received if not disbursal_date or date < disbursal_date
+    return total_interest_to_be_received if date < (disbursal_date || scheduled_disbursal_date)
     total_interest_to_be_received - scheduled_interest_up_to(date)
   end
   def scheduled_outstanding_total_on(date)
     return 0 if date < applied_on
-    return total_to_be_received if not disbursal_date or date < disbursal_date
+    return total_to_be_received if date < (disbursal_date || scheduled_disbursal_date)
     total_to_be_received - scheduled_total_up_to(date)
   end
   # the number of payment dates before 'date' (if date is a payment 'date' it is counted in)
@@ -514,24 +514,26 @@ class Loan
       actual_outstanding_principal = actual_outstanding_principal_on(date)
       actual_outstanding_total = actual_outstanding_total_on(date)
       total_due = actual_outstanding_total - scheduled_outstanding_total
-      principal_due = scheduled_principal_due_on(date)
-      interest_due = scheduled_interest_due_on(date)
+      principal_due = actual_outstanding_principal - scheduled_outstanding_principal #scheduled_principal_due_on(date)
+      interest_due = actual_outstanding_total - scheduled_outstanding_total - principal_due
       prin = principal_received_on(date)
       int = interest_received_on(date)
       default = (principal_due + interest_due > prin + int) and date >= scheduled_first_payment_date
       if default
-        last_paid_date ||= dates[[i+1,dates.size-1].min] 
+        last_paid_date ||= dates[[i,dates.size-1].min] 
+        days_overdue = [0,date - last_paid_date].max
       else
         last_paid_date = nil
+        days_overdue = 0
       end
       @history_array << {:loan_id => id, :date => date, 
-                           :status => STATUSES.index(get_status(date)), 
+                           :status => STATUSES.index(get_status(date)) + 1, 
                            :scheduled_outstanding_principal => scheduled_outstanding_principal,
                            :scheduled_outstanding_total => scheduled_outstanding_total,
                            :actual_outstanding_principal => actual_outstanding_principal,
                            :actual_outstanding_total => actual_outstanding_total,
                            :amount_in_default => [0,scheduled_outstanding_principal - actual_outstanding_principal].max,
-                           :days_overdue => [0,(last_paid_date ? date - last_paid_date : 0)].max, :current => current || 0,
+                           :days_overdue => days_overdue, :current => current || 0,
                            :principal_due => principal_due, :interest_due => interest_due,
                            :principal_paid => prin, :interest_paid => int}
     end

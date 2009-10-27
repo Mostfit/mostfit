@@ -34,7 +34,7 @@ describe Center do
   it "should be able to 'have' clients" do
     name = 'Ms C.L. Ient'
     ref  = 'XW000-2009.01.05'
-    @client = Client.new(:name => name, :reference => ref)
+    @client = Client.new(:name => name, :reference => ref, :date_joined => Date.today)
     @client.center  = @center
     @client.should be_valid
 
@@ -43,7 +43,7 @@ describe Center do
     @center.clients.first.name.should eql(name)
     @center.clients.first.reference.should eql(ref)
 
-    client2 = Client.new(:name => 'Mr. T.A. Kesmoney', :reference => 'AN000THER_REF')
+    client2 = Client.new(:name => 'Mr. T.A. Kesmoney', :reference => 'AN000THER_REF', :date_joined => Date.today)
     client2.center  = @center
     client2.should be_valid
 

@@ -41,7 +41,7 @@ module Reporting
 
     def disbursed(end_date, what)
       end_date = Date.parse(end_date) unless end_date.is_a? Date
-      return unless what.downcase == "sum" or "count"
+      return unless what.downcase == "sum" or what.downcase == "count"
         query_as_number(%Q{
          SELECT #{what}(l.amount)
          FROM loans l

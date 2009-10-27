@@ -15,8 +15,10 @@ describe Client do
     @center.branch = @branch
     @center.should be_valid
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05')
+    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => Date.today)
     @client.center  = @center
+    @client.valid?
+    @client.errors.each {|e| puts e}
     @client.should be_valid
   end
  
@@ -39,9 +41,14 @@ describe Client do
     @client.name = "ok"
     @client.should_not be_valid
   end
+
+  it "should have a joining date" do
+    @client.date_joined = nil
+    @client.should_not be_valid
+  end
  
   it "should be able to 'have' loans" do
-    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 30, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-03", :scheduled_disbursal_date => "2000-06-13")
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-03", :scheduled_disbursal_date => "2000-06-13")
     @loan.should_not be_valid
     @loan.applied_by  = @manager
     @loan.client      = @client
@@ -64,7 +71,7 @@ describe Client do
     @client.loans.first.installment_frequency.should eql(:weekly)
 
 
-    loan2 = Loan.new(:amount => 10000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 30, :scheduled_first_payment_date => "2000-12-07", :applied_on => "2000-02-04", :approved_on => "2000-02-04", :scheduled_disbursal_date => "2000-06-14")
+    loan2 = Loan.new(:amount => 10000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 40, :scheduled_first_payment_date => "2000-12-07", :applied_on => "2000-02-04", :approved_on => "2000-02-04", :scheduled_disbursal_date => "2000-06-14")
     loan2.applied_by   = @manager
     loan2.approved_by  = @manager
     loan2.client       = @client
@@ -75,5 +82,7 @@ describe Client do
     @client.should be_valid
     @client.loans.size.should eql(2)
   end
+
+  it "should not have more than one outstanding loan at a time if so specified"
 
 end

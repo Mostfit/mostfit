@@ -440,18 +440,20 @@ describe Loan do
       h[:scheduled_outstanding_principal].should == 1000 - (40*([0,i-2].max))
       h[:scheduled_outstanding_total].should == 1200 -(48 * ([0,i-2].max))
       if i > 2
-        h[:principal_due].should == 40 
-        h[:interest_due].should == 8
         if i < 10
+          h[:principal_due].should == 0
+          h[:interest_due].should == 0
           h[:principal_paid].should == 40
           h[:interest_paid].should == 8
           h[:actual_outstanding_principal].should == 1000 -(40 * ([0,i-2].max)) 
         else
+          h[:principal_due].should == ((h[:days_overdue] / 7) + 1) * 40
+          h[:interest_due].should == ((h[:days_overdue] / 7) + 1) * 8
           h[:principal_paid].should == 0
           h[:interest_paid].should == 0
           h[:actual_outstanding_principal].should == 1000 -(40 * 7) 
-          if i > 11
-            h[:days_overdue].should == 7 * (i-11)
+          if h[:date] > @loan.scheduled_first_payment_date + (7 * 6)
+            h[:days_overdue].should ==  h[:date] - @loan.scheduled_first_payment_date - 49
           end
         end
       end

@@ -110,7 +110,7 @@ module Reporting
     def loans_repaid_between_such_and_such_date(start_date, end_date, what)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
-      return unless what.downcase == "sum" or "count"
+      return unless what.downcase == "sum" or what.downcase == "count"
         query_as_hash(%Q{
          SELECT lh.branch_id,#{what}(l.amount)
          FROM loans l, loan_history lh
@@ -122,7 +122,7 @@ module Reporting
     def loans_disbursed_between_such_and_such_date(start_date, end_date, what)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
-      return unless what.downcase == "sum" or "count"
+      return unless what.downcase == "sum" or what.downcase == "count"
         query_as_hash(%Q{
          SELECT lh.branch_id, #{what}(l.amount)
          FROM loans l, loan_history lh

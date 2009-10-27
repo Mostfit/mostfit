@@ -24,7 +24,7 @@ class LoanHistory
   property :principal_paid,                  Integer, :nullable => false, :index => true
   property :interest_paid,                  Integer, :nullable => false, :index => true
 
-  property :status,                          Enum[:applied_in_future, :pending_approval, :rejected, :approved, :outstanding, :repaid, :written_off]
+  property :status,                          Enum.send('[]', *STATUSES)
 
   belongs_to :loan, :index => true
   belongs_to :client, :index => true         # speed up reports

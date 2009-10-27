@@ -81,25 +81,6 @@ describe Report do
 #    Client.all.count.should == 2 * 7 * 3
   end
 
-  it "should have status pending for today and approved in 2 days" do
-    Loan.all.each do |l| 
-      l.get_status.should == :pending_approval
-      l.get_status(Date.today + 2).should == :approved
-    end
-  end
-
-  it "should have proper disbursal day and be outstanding on that day" do
-    [:monday].each do |day|
-      Merb.logger.info "checking #{day.to_s} disbursals"
-      Center.all(:meeting_day => day)[0].clients.loans.each do |l| 
-        Merb.logger.info "\t disbursal on #{l.disbursal_date}. i.e. in #{l.disbursal_date - Date.today} days\n"
-        l.disbursal_date.cwday.should == Center.meeting_days.index(day)
-        l.disbursal_date.should be >= Date.today + 7
-        l.disbursal_date.should be <= Date.today + 14
-        l.get_status(l.disbursal_date).should == :outstanding
-      end
-    end
-  end
   
   it "should have proper statistics after first monday's payments" do
     Merb.logger.info "checking statistics after first payment"
@@ -107,10 +88,10 @@ describe Report do
     @repaying_loans = Loan.all(:scheduled_first_payment_date => @date)
     @repaying_loans.count.should be == 2 * 3
     @repaying_loans.each_with_index do |l,i|
-      # TODO: we know that the amount to be repaid is correct because of the tests on each individual loan type.
-      # TODO: we also know that the outstanding balance etc are all kosher for the same reason
+      # we know that the amount to be repaid is correct because of the tests on each individual loan type.
+      # we also know that the outstanding balance etc are all kosher for the same reason
       # no need to repeat them here.
-      amt = [l.scheduled_principal_for_installment(0),l.scheduled_interest_for_installment(0)]
+      amt = [l.scheduled_principal_for_installment(1),l.scheduled_interest_for_installment(1)]
       pmt = l.repay(amt, @user, @date, @manager)[1]
       pmt.errors.each {|e| puts e}
       pmt.should be_valid
@@ -158,7 +139,7 @@ describe Report do
       loan.errors.each {|e| puts e}
       loan.should be_valid
       total = 0
-      (0..loan.number_of_installments - 1).each do |i|
+      (1..loan.number_of_installments).each do |i|
         date = loan.date_for_installment(i)
         _p = loan.scheduled_principal_for_installment(i)
         _i = loan.scheduled_interest_for_installment(i)

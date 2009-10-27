@@ -59,7 +59,7 @@ class Payment
   def not_paying_too_much_principal?
     if new_record?  # do not do this check on updates, it will count itself double
       a = loan.payments_hash[loan.payments_hash.keys.max]
-      if ((a and a[:principal_received_so_far]) ? a[:principal_received_so_far] : 0) + principal > loan.amount
+      if (((not a.blank?) and a[:total_principal]) ? a[:total_principal] : 0) + principal > loan.amount
         return [false, "Principal is more than the loans outstanding principal"]
       end
     end
@@ -68,7 +68,7 @@ class Payment
   def not_paying_too_much_in_total?
     if new_record?   # do not do this check on updates, it will count itself double
       a = loan.payments_hash[loan.payments_hash.keys.max]
-      new_total = ((a and a[:total_received_so_far]) ? a[:total_received_so_far] : 0) + total
+      new_total = (((not a.blank?) and a[:total]) ? a[:total] : 0) + total
       if new_total > loan.total_to_be_received
         return [false, "Total is more than the loans outstanding total"]
       end

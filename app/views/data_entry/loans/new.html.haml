@@ -6,7 +6,7 @@
 - if @client
   - if @loan.nil?
     - @loan_types.each do |loan_type|
-      = form_for (@loan, :action => url(:enter_loans, :action => 'new')) do
+      = form_for(@loan, :action => url(:enter_loans, :action => 'new')) do
         = hidden_field :client_id, :value => @client.id
         %h3= loan_type.to_s[0..-5] + ' loan'
         %p
