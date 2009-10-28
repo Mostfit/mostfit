@@ -247,6 +247,14 @@ module Reporting
       end
     end
 
+    def get_latest_before(column, date = Date.today, group_by = nil)
+      date = Date.parse(date) unless date.is_a? Date
+      query_as_hash(%Q{
+          SELECT branch_id,center_id, client_id,loan_id, min(#{column.to_s})
+          FROM loan_history
+          WHERE date < '#{date}'
+          GROUP BY loan_id})
+    end
 
   end
 end

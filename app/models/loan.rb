@@ -258,30 +258,33 @@ class Loan
     return @schedule if @schedule
     @schedule = {}
     principal_so_far, interest_so_far, total = 0, 0
-    scheduled_balance, actual_balance = amount, amount
+    balance = amount
     @schedule[disbursal_date || scheduled_disbursal_date] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0,
-      :scheduled_balance => scheduled_balance}
+      :balance => balance, :total => 0}
     (1..number_of_installments).each do |number|
       date      = shift_date_by_installments(scheduled_first_payment_date, number - 1)
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
       principal_so_far += principal
       interest_so_far  += interest
-      scheduled_balance -= principal
-      actual_balance = amount - principal_so_far
+      balance -= principal
       @schedule[date] = {
         :principal                  => principal,
         :interest                   => interest,
         :total_principal            => (principal_so_far),
         :total_interest             => (interest_so_far),
         :total                      => principal_so_far + interest_so_far,
-        :balance                    => scheduled_balance, 
+        :balance                    => balance, 
       }
     end
+    # we have to do the following to avoid the circular reference from total_to_be_received.
+    total = @schedule[@schedule.keys.max][:total]
+    @schedule.each { |k,v| v[:total_balance] = total - v[:total]}
     @schedule
   end
 
   def payments_hash
+    debugger
     return @payments_cache if @payments_cache
     structs = repository.adapter.query(%Q{
       SELECT principal, interest, received_on
@@ -290,20 +293,26 @@ class Loan
     ORDER BY received_on})
     @payments_cache = {}
     return @payments_cache if structs.size == 0
-    @payments_cache[disbursal_date || scheduled_disbursal_date] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :total => 0}
+    total_balance = total_to_be_received
+    @payments_cache[disbursal_date || scheduled_disbursal_date] = {
+      :principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :total => 0, :balance => amount, :total_balance => total_balance
+    }
     principal, interest, total = 0, 0, 0
     structs.each do |payment|
       # we know the received_on dates are in ascending order as we
       # walk through (so we can do the += thingy)
+      
       @payments_cache[payment.received_on] = {
         :principal                 => payment.principal,
         :interest                  => payment.interest,
         :total_principal           => (principal += payment.principal),
         :total_interest            => (interest  += payment.interest),
-        :total                     => (total     +=payment.principal + payment.interest) }
+        :total                     => (total     +=payment.principal + payment.interest),
+        :balance                   => amount - principal,
+        :total_balance             => total_balance - total}
     end
-    installment_dates.reject{|d| d <= structs[-1].received_on}.each do |date|
-      @payments_cache[date] = {:principal => 0, :interest => 0, :total_principal => principal, :total_interest => interest, :total => total}
+    (installment_dates + payment_dates).uniq.sort.reject{|d| d <= structs[-1].received_on}.each do |date|
+      @payments_cache[date] = {:principal => 0, :interest => 0, :total_principal => principal, :total_interest => interest, :total => total, :balance => amount - principal, :total_balance => total_balance - total}
     end
     @payments_cache
   end
@@ -313,14 +322,23 @@ class Loan
   def get_from_cache(cache, column, date)
     date = Date.parse(date) if date.is_a? String
     return 0 if cache.blank?
-    keys = cache.keys
-    return 0 if date < keys.min and (column == :principal or column == :interest)
-    return cache[keys.min][column] if date < keys.min
-    return cache[keys.max][column] if date >= keys.max
-    return cache[date][column] if cache.has_key?(date)
-    return 0 if (column == :principal or column == :interest)
-    cache.keys.sort.each_with_index do |k,i| 
-      return cache[k][column] if keys[i+1] > date
+    if cache.has_key?(date)
+      return (column == :all ? cache[date] : cache[date][column])
+    else
+      return 0 if (column == :principal or column == :interest)
+      keys = cache.keys.sort
+      rv = (column == :all ? cache[keys.min] : cache[keys.min][column]) if date < keys.min
+      rv = (column == :all ? cache[keys.max] : cache[keys.max][column]) if date >= keys.max
+      keys.each_with_index do |k,i| 
+        rv = (column == :all ? cache[k] : cache[k][column]) if keys[[i+1,keys.size - 1].min] > date
+      end
+      if rv.is_a? Hash
+        rv[:principal] = 0; rv[:interest] = 0
+      end
+      if rv == nil
+        debugger
+      end
+      rv
     end
   end
 
@@ -437,7 +455,7 @@ class Loan
   end
   # these 3 methods return actual outstanding amounts (LOAN-OUTSTANDING perspective)
   def actual_outstanding_principal_on(date)
-    scheduled_outstanding_principal_on(date) - principal_overpaid_on(date)
+    get_actual(:balance, date)
   end
   def actual_outstanding_interest_on(date)
     scheduled_outstanding_interest_on(date) - interest_overpaid_on(date)
@@ -507,14 +525,16 @@ class Loan
     dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on,scheduled_first_payment_date] + payment_dates + installment_dates).compact.uniq.sort
     last_paid_date = nil
     dates.each_with_index do |date,i|
-#      debugger
       current = ((dates[[i-1,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or (i == dates.size - 1 and dates[i] < Date.today)) ? 1 : 0
-      scheduled_outstanding_principal = scheduled_outstanding_principal_on(date) 
-      scheduled_outstanding_total = scheduled_outstanding_total_on(date)
-      actual_outstanding_principal = actual_outstanding_principal_on(date)
-      actual_outstanding_total = actual_outstanding_total_on(date)
+      scheduled = get_scheduled(:all, date)
+      actual = get_actual(:all, date)
+      #puts "#{i} #{date} #{scheduled.inspect} #{actual.inspect}"
+      scheduled_outstanding_principal = scheduled[:balance]
+      scheduled_outstanding_total = scheduled[:total_balance]
+      actual_outstanding_principal = actual[:balance]
+      actual_outstanding_total = actual[:total_balance]
       total_due = actual_outstanding_total - scheduled_outstanding_total
-      principal_due = actual_outstanding_principal - scheduled_outstanding_principal #scheduled_principal_due_on(date)
+      principal_due = actual_outstanding_principal - scheduled_outstanding_principal
       interest_due = actual_outstanding_total - scheduled_outstanding_total - principal_due
       prin = principal_received_on(date)
       int = interest_received_on(date)

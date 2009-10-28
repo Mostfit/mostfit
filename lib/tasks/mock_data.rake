@@ -24,7 +24,7 @@ def load_fixtures(*files)
       puts "#{k} :#{name}"
 
       if k.class == Loan  # do not update the hisotry for loans
-        k.history_disabled 
+        k.history_disabled = true
       end
       unless k.save
         puts "Validation errors saving a #{klass} (##{k.id}):"
