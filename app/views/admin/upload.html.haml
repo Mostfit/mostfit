@@ -1,0 +1,27 @@
+%h1
+  Mostfit data upload
+%p
+  This is the place where your to-date MFI data in one go
+
+
+%form{:action => "/admin/upload", :enctype => "multipart/form-data",  :method => "post"}
+  %fieldset
+    %h4
+      Upload excal sheet containing worksheets for 
+      %ol
+        %li 
+          Staff members
+        %li
+          Branches
+        %li
+          Centers
+        %li
+          Clients
+        %li
+          Loans
+        %li
+          Payments
+        %li
+          Loan products 
+    %input{:name => "file", :size => "80",  :type => "file"}
+    %input{:type => "submit", :value => "Upload"}
