@@ -7,6 +7,7 @@ describe Report do
     StaffMember.all.destroy!
     Funder.all.destroy!
     FundingLine.all.destroy!
+    Loan.all.destroy!
     @user = User.new(:id => 234, :login => 'Joey User', :password => 'password', :password_confirmation => 'password')
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
     @manager.should be_valid
@@ -136,6 +137,7 @@ describe Report do
       loan.funding_line = @funding_line
       loan.history_disabled = true
       loan.save
+      loan.should be_valid
       loan.errors.each {|e| puts e}
       loan.should be_valid
       total = 0
@@ -144,7 +146,7 @@ describe Report do
         _p = loan.scheduled_principal_for_installment(i)
         _i = loan.scheduled_interest_for_installment(i)
         paid = loan.repay([_p,_i],@user,date,@manager)
-        paid[1].errors.inspect if not paid[0]
+        puts paid[1].errors.inspect if not paid[0]
         total += _p
       end
       loan.history_disabled = false
@@ -194,12 +196,75 @@ describe Report do
     Branch.loans_disbursed_between_such_and_such_date(date-100,date-1,"sum").should == {}
   end
 
-  it "should give correct pricipal due" do
+  it "should give correct principal due" do
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    Branch.principal_due_between_such_and_such_date(date, date + 6).should == (12000 - 20)
+    Branch.principal_due_between_such_and_such_date(date, date + 6).should == {1=>0, 2=>0}
+    Branch.principal_due_between_such_and_such_date(date + 7, date + 13).should == {1=>(20 + 40 + 60), 2=> (20 + 40 + 60)}
   end
-  
+
+  it "should give correct principal received" do
+    l = Loan.get 1
+    date = l.scheduled_first_payment_date
+    Branch.principal_received_between_such_and_such_date(date, date + 6).should == {1=>(20 + 40 + 60), 2=>(20 + 40 + 60)}
+    Branch.principal_received_between_such_and_such_date(date + 7, date + 13).should == {1=>0, 2=> 0}
+  end
+
+  it "should give correct interest due" do
+    l = Loan.get 1
+    date = l.scheduled_first_payment_date
+    Branch.interest_due_between_such_and_such_date(date, date + 6).should == {1=>0, 2=>0}
+    Branch.interest_due_between_such_and_such_date(date + 7, date + 13).should == {1=>(2 + 4 + 6), 2=> (2 + 4 + 6)}
+  end
+
+  it "should give correct interest received" do
+    l = Loan.get 1
+    date = l.scheduled_first_payment_date
+    Branch.interest_received_between_such_and_such_date(date, date + 6).should == {1=>(2 + 4 + 6), 2=>(2 + 4 + 6)}
+    Branch.interest_received_between_such_and_such_date(date + 7, date + 13).should == {1=>0, 2=> 0}
+  end
+
+  it "should give correct principal outstanding" do
+    #TODO check the "repaid" loans as well
+    l = Loan.get 1
+    date = l.scheduled_first_payment_date - 1
+    Branch.principal_outstanding(date).should == {1 => 6000, 2 => 6000}
+    date = date + 2
+    Branch.principal_outstanding(date).should == {1 => 5880, 2 => 5880}
+    date = date + 15
+    Branch.principal_outstanding(date).should == {1 => 5880, 2 => 5880}
+  end
+
+  it "should give correct scheduled principal outstanding" do
+    #TODO check the "repaid" loans as well
+    l = Loan.get 1
+    date = l.scheduled_first_payment_date
+    Branch.scheduled_principal_outstanding(date - 1).should == {1 => 6000, 2 => 6000}
+    Branch.scheduled_principal_outstanding(date + 1).should == {1 => 6000 - (20 + 40 + 60), 2 => 6000 - (20 + 40 + 60)}
+    puts date + 8
+    Branch.scheduled_principal_outstanding(date + 8).should == {1 => 6000 - (40 + 80 + 120), 2 => 6000 - (40 + 80 + 120)}
+  end
+
+
+  it "should give correct total outstanding" do
+    #TODO check the "repaid" loans as well
+    l = Loan.get 1
+    date = l.scheduled_first_payment_date
+    Branch.total_outstanding(date - 1).should == {1 => 6600, 2 => 6600}
+    Branch.total_outstanding(date + 1).should == {1 => 6600 - (22 + 44 + 66), 2 => 6600 - (22 + 44 + 66)}
+    puts date + 8
+    Branch.total_outstanding(date + 1).should == {1 => 6600 - (22 + 44 + 66), 2 => 6600 - (22 + 44 + 66)}
+  end
+
+
+  it "should give correct scheduled total outstanding" do
+    #TODO check the "repaid" loans as well
+    l = Loan.get 1
+    date = l.scheduled_first_payment_date
+    Branch.scheduled_total_outstanding(date - 1).should == {1 => 6600, 2 => 6600}
+    Branch.scheduled_total_outstanding(date + 1).should == {1 => 6600 - (22 + 44 + 66), 2 => 6600 - (22 + 44 + 66)}
+    Branch.scheduled_total_outstanding(date + 8).should == {1 => 6600 - (44 + 88 + 132), 2 => 6600 - (44 + 88 + 132)}
+  end
 
   
 end

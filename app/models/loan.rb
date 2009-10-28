@@ -483,14 +483,14 @@ class Loan
     return :rejected             if (rejected_on and rejected_on <= date)
     return :written_off          if (written_off_on and written_off_on <= date)
     total_received ||= total_received_up_to(date)
-    return :outstanding          if (date == disbursal_date) and total_received < total_to_be_received
+    return :disbursed          if (date == disbursal_date) and total_received < total_to_be_received
     @status = total_received  >= total_to_be_received ? :repaid : :outstanding
   end
 
 
   # LOAN INFO FUNCTIONS - DATES
   def date_for_installment(number)
-    shift_date_by_installments(scheduled_first_payment_date, number)
+    shift_date_by_installments(scheduled_first_payment_date, number-1)
   end
   def scheduled_maturity_date
     shift_date_by_installments(scheduled_first_payment_date, number_of_installments - 1)
@@ -525,7 +525,7 @@ class Loan
     last_paid_date = nil
     dates.each_with_index do |date,i|
 #      debugger
-      current = ((dates[[i-1,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or (i == dates.size - 1)) ? 1 : 0
+      current = ((dates[[i-1,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or (i == dates.size - 1 and dates[i] < Date.today)) ? 1 : 0
       scheduled_outstanding_principal = scheduled_outstanding_principal_on(date) 
       scheduled_outstanding_total = scheduled_outstanding_total_on(date)
       actual_outstanding_principal = actual_outstanding_principal_on(date)
