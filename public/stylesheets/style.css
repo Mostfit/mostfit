@@ -396,6 +396,14 @@ a.button:visited {
 #search_div {
 	display: none;
 }
+div.log_box{
+    border: 2px solid #8DC73F;
+    height: 400px;
+    width: 90%;
+    padding-left: 10px;
+    overflow-y: auto;
+}
+
 
 
 
