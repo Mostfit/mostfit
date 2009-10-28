@@ -35,6 +35,7 @@ Merb::Router.prepare do
   end
 
   match('/admin(/:action)').to(:controller => 'admin').name(:admin)
+  match('/admin(/:action/:id)').to(:controller => 'admin').name(:admin)
   match('/dashboard(/:action)').to(:controller => 'dashboard').name(:dashboard)
 
   match('/graph_data/:action(/:id)').to(:controller => 'graph_data').name(:graph_data)

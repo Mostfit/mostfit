@@ -23,6 +23,15 @@ class LoanProduct
   validates_is_number   :max_amount, :min_amount, :max_interest_rate, :min_interest_rate
   validates_with_method :check_loan_type_correctness
 
+  def self.from_csv(row, headers)
+    obj = new(:name => row[headers[:name]], :min_amount => row[headers[:min_amount]], :max_amount => row[headers[:max_amount]], 
+              :min_interest_rate => row[headers[:min_interest_rate]], :max_interest_rate => row[headers[:max_interest_rate]], 
+              :min_number_of_installments => row[headers[:min_number_of_installments]], :max_number_of_installments => row[headers[:max_number_of_installments]], 
+              :installment_frequency => row[headers[:installment_frequency]].downcase.to_sym,
+              :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]), :loan_type => row[headers[:loan_type]])
+    [obj.save, obj]
+  end
+
   def self.valid(date=Date.today)
     LoanProduct.all(:valid_from.lte => date, :valid_upto.gte => date) 
   end

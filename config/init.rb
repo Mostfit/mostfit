@@ -7,7 +7,7 @@ use_test :rspec
 use_template_engine :haml
  
 Merb::Config.use do |c|
-  c[:use_mutex] = false
+  c[:use_mutex] = true
   c[:session_store] = 'cookie'  # can also be 'memory', 'memcache', 'container', 'datamapper
   
   # cookie session store configuration
@@ -27,6 +27,10 @@ Merb::BootLoader.before_app_loads do
                           :currency => { :unit => 'Rs.',  :format => '%u %n', :precision => 0 } })
   Numeric::Transformer.change_default_format(:mostfit_default)
   require 'config/constants.rb'
+  require 'csv'
+  require 'uuid'
+  require 'ftools'
+  require 'logger'
   begin
     require "pdf/writer"
     require "pdf/simpletable"
@@ -47,7 +51,7 @@ end
  
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
-
+  
   # Starting the logger takes time, so turn it off during development
   Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments']) unless Merb.environment == "development" or Merb.environment == "test"
 

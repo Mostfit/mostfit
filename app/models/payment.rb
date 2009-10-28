@@ -34,6 +34,14 @@ class Payment
   validates_with_method :interest,    :method => :interest_is_positive?
   validates_with_method :total,       :method => :total_is_positive?
 
+  def self.from_csv(row, headers, loans)
+    obj = new(:received_by_staff_id => StaffMember.first(:name => row[headers[:received_by_staff]]).id, :loan_id => loans[row[headers[:loan_serial_number]]].id, 
+              :principal => row[headers[:principal]], :interest =>  row[headers[:interest]], :received_on => Date.parse(row[headers[:received_on]]), 
+              :created_by_user_id => User.first.id)
+    [obj.save, obj]
+  end
+
+
   def total
     return nil if principal.blank? or interest.blank?
     principal + interest

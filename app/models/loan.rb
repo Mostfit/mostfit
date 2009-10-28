@@ -78,6 +78,25 @@ class Loan
   validates_with_method  :interest_rate,                :method => :is_valid_loan_product_interest_rate
   validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
 
+  
+  def self.from_csv(row, headers, funding_lines)
+    obj = new(:loan_product_id => LoanProduct.first(:name => row[headers[:product]]).id, :amount => row[headers[:amount]], 
+              :interest_rate => row[headers[:interest_rate]], 
+              :installment_frequency => row[headers[:installment_frequency]], :number_of_installments => row[headers[:number_of_installments]], 
+              :scheduled_disbursal_date => Date.parse(row[headers[:scheduled_disbursal_date]]), 
+              :scheduled_first_payment_date => Date.parse(row[headers[:scheduled_first_payment_date]]), 
+              :applied_on => Date.parse(row[headers[:applied_on]]), :approved_on => Date.parse(row[headers[:approved_on]]), 
+              :disbursal_date => Date.parse(row[headers[:disbursal_date]]), :fees => row[headers[:fees]], :fees_total => row[headers[:fees_total]],
+              :disbursed_by_staff_id => StaffMember.first(:name => row[headers[:disbursed_by_staff]]).id, 
+              :funding_line_id => funding_lines[row[headers[:funding_line_serial_number]]].id,
+              :applied_by_staff_id => StaffMember.first(:name => row[headers[:applied_by_staff]]).id,
+              :approved_by_staff_id => StaffMember.first(:name => row[headers[:approved_by_staff]]).id,
+              :client_id => Client.first(:reference => row[headers[:client_reference]]).id)
+    obj.history_disabled=true
+    [obj.save, obj]
+  end
+
+
   def is_valid_loan_product_amount; is_valid_loan_product(:amount); end
   def is_valid_loan_product_interest_rate; is_valid_loan_product(:interest_rate); end
   def is_valid_loan_product_number_of_installments; is_valid_loan_product(:number_of_installments); end

@@ -24,6 +24,14 @@ class FundingLine
   validates_with_method  :last_payment_date,    :method => :first_payment_before_last_payment?
   validates_present :amount, :interest_rate, :disbursal_date, :first_payment_date, :last_payment_date, :funder
 
+  def self.from_csv(row, headers)
+    funder = Funder.create(:name => row[headers[:funder_name]])
+    obj = new(:funder_id => funder.id, :amount => row[headers[:amount]], :interest_rate => row[headers[:interest]],
+              :disbursal_date => Date.parse(row[headers[:disbursal_date]]), :first_payment_date => Date.parse(row[headers[:first_payment_date]]),
+              :last_payment_date => Date.parse(row[headers[:last_payment_date]]))
+    [obj.save, obj]
+  end
+
   def status
     if :closed_on
       status = :closed

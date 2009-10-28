@@ -5,7 +5,6 @@ class Funder
   property :name, String, :length => 50, :nullable => false
 
   has n, :funding_lines
-
   
 
   def self.catalog
