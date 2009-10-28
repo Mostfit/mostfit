@@ -23,11 +23,12 @@ class Center
 
   def self.from_csv(row, headers)
     hour, minute = row[headers[:center_meeting_time_in_24h_format]].split(":")
+    
     branch       = Branch.first(:name => row[headers[:branch_name]])
     staff_member = StaffMember.first(:name => row[headers[:staff_name]])
-    obj = new(:name => row[headers[:center_name]], :meeting_day => DAYS.index(row[headers[:meeting]].downcase.to_s.to_sym), 
-              :meeting_time_hours => hour, :meeting_time_minutes => minute, :branch_id => branch.id, :staff_member_id => staff_member.id) 
-    obj.save
+    obj = new(:name => row[headers[:center_name]], :meeting_day => row[headers[:meeting_day]].downcase.to_s.to_sym, 
+              :meeting_time_hours => hour, :meeting_time_minutes => minute, :branch_id => branch.id, :manager_staff_id => staff_member.id) 
+    [obj.save, obj]
   end
 
   def self.search(q)

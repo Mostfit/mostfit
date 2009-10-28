@@ -21,7 +21,9 @@ class StaffMember
   validates_length :name, :min => 3
   
   def self.from_csv(row, headers)
-    obj = new(:name => row[headers[:name]], :mobile_number => row[headers[:mobile_number]])
-    obj.save
+    obj = new(:name => row[headers[:name]], 
+              :mobile_number => row[headers[:mobile_number]], 
+              :active => true)
+    [obj.save, obj]
   end
 end

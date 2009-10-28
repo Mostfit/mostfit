@@ -1,17 +1,9 @@
 class Upload
-  def directory
-    @directory
-  end
-
-  def filename
-    @filename
-  end
+  attr_accessor :log, :directory, :filename
 
   def initialize(filename)
     @directory = UUID.generate
     @filename  = filename
-    @log       = Logger.new(File.join(Merb.root, "public", "logs", @directory))
-    @log.level = Logger::WARN
   end
 
   def move(tempfile)
@@ -26,39 +18,59 @@ class Upload
   end
 
   def process_excel_to_csv
-    excel = Excel.new(File.join(Merb.root, "uploads", directory, filename))
-    excel.sheets.each{|sheet|
-      excel.default_sheet=sheet
-      excel.to_csv(File.join(Merb.root, "uploads", directory, sheet))
-    }
-    return sheets
+    `rake 'excel:to_csv[#{directory}, #{filename}]'`
   end
 
-  def load_csv
-    models = [StaffMembers, Branch, Center, Client, FundingLine, LoanProduct, Loan, Payment]
+  def load_csv(log=nil)
+    models = [StaffMember, Branch, Center, Client, FundingLine, LoanProduct, Loan, Payment]
+    funding_lines, loans = {}, {}
     models.each{|model|
+      log.info("Creating #{model.to_s.plural}") if log
+      model.all.destroy!
       headers = {}
-      CSV.parse(File.join(file.directory, model.to_s.snake_case.pluralize)).each_with_index{|row, idx|
-        begin
-          if idx==0
-            row.to_enum(:each_with_index).collect{|name, index| 
-              headers[name.to_sym] = index
-            }
-          rescue
-            @log.fatal("#{model}: Problem in getting headers for #{model}. You will need to upload the excel sheet all over again")
-          end
+      CSV.open(File.join(Merb.root, "uploads", @directory, model.to_s.snake_case.pluralize), "r").each_with_index{|row, idx|
+        if idx==0
+          row.to_enum(:each_with_index).collect{|name, index| 
+            headers[name.downcase.gsub(' ', '_').to_sym] = index
+          }
         else
           begin
-            if record = model.from_csv(row, headers)
-              @log.info("#{model}: Inserted row #{row[headers[:serial_number]]}")
+            status, record = 
+              if model == Loan
+                model.from_csv(row, headers, funding_lines)
+              elsif model==Payment
+                model.from_csv(row, headers, loans)
+              else
+                model.from_csv(row, headers)
+              end
+
+            if status
+              #Storing funding lines and loans for serial number reference
+              funding_lines[row[headers[:serial_number]]] = record if model==FundingLine
+              loans[row[headers[:serial_number]]]         = record if model==Loan
+              log.info("Created #{idx-499} #{idx+1} entries. Some more left")    if idx%500==499
             else
-              @log.warn("#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors}")
+              log.error("<font color='red'>#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors.inspect}</font>") if log
             end
-          rescue
-            @log.warn("#{model}: Problem in inserting #{model} #{row[headers[:serial_number]]}. Insert it manually later")
+          rescue Exception => e
+            puts(e.message)            
+            puts e.backtrace
+            log.error("<font color='red'>#{model}: Problem in inserting #{model} #{row[headers[:serial_number]]}. Insert it manually later</font>") if log
           end
         end    
       }
+      log.info("<font color='#8DC73F'><b>Created #{model.count} #{model.to_s.plural}</b></strong>")
     }
   end
 end
+
+
+
+#   def process_excel_to_csv
+#     excel = Excel.new(File.join(Merb.root, "uploads", directory, filename))
+#     excel.sheets.each{|sheet|
+#       excel.default_sheet=sheet
+#       excel.to_csv(File.join(Merb.root, "uploads", directory, sheet))
+#     }
+#     return excel.sheets
+#   end

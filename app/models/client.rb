@@ -34,12 +34,13 @@ class Client
   validates_present   :date_joined
   validates_is_unique :reference
   validates_attachment_thumbnails :picture
-
+  
   def self.from_csv(row, headers)
+    center = Center.first(:name => row[headers[:center]])
     obj = new(:reference => row[headers[:reference]], :name => row[headers[:name]], :spouse_name => row[headers[:spouse_name]], 
-              :date_of_birth => Date.parse(row[:headers][:date_of_birth]), :address => row[headers[:address]], :date_joined => row[headers[:date_joined]],
-              :center_id => Center.first(:name => row[headers[:center]]))
-    obj.save
+              :date_of_birth => Date.parse(row[headers[:date_of_birth]]), :address => row[headers[:address]], :date_joined => row[headers[:date_joined]],
+              :center_id => center.id)
+    [obj.save, obj]
   end
 
   def self.search(q)
