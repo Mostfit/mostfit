@@ -418,7 +418,7 @@ describe Loan do
     @loan.id = nil
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @manager
-    @loan.get_status(@loan.scheduled_disbursal_date).should == :outstanding
+    @loan.get_status(@loan.scheduled_disbursal_date).should == :disbursed
     @loan.save
     @loan.errors.each {|e| puts e}
     @loan.history_disabled = true
@@ -439,6 +439,7 @@ describe Loan do
       # puts "#{i}:#{h[:date]}:#{h[:status]}:#{h[:scheduled_outstanding_principal]} : #{h[:principal_due]} : #{h[:interest_due]} : #{h[:actual_outstanding_principal]} : #{h[:principal_paid]} : #{h[:interest_paid]} : #{h[:days_overdue]}!!"
       h[:scheduled_outstanding_principal].should == 1000 - (40*([0,i-2].max))
       h[:scheduled_outstanding_total].should == 1200 -(48 * ([0,i-2].max))
+      h[:status].should == STATUSES.index(:disbursed) + 1 if i == 2
       if i > 2
         if i < 10
           h[:principal_due].should == 0
@@ -465,7 +466,7 @@ describe Loan do
     @loan.id = nil
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @manager
-    @loan.get_status(@loan.scheduled_disbursal_date).should == :outstanding
+    @loan.get_status(@loan.scheduled_disbursal_date).should == :disbursed
     @loan.save
     @loan.errors.each {|e| puts e}
     @loan.history_disabled = true

@@ -29,6 +29,7 @@ module Reporting
     # we must convert each SQL struct into a hash of {:branch_id =< :value}, so that we are always looking at 
     # the correct branch, and we have to refactor the divison, multiplication, etc. of these arrays
     def query_as_hash(sql)
+      #puts sql
       repository.adapter.query(sql).map {|x| [x[0],x[1]]}.to_hash
     end
 
@@ -115,7 +116,7 @@ module Reporting
          SELECT lh.branch_id,#{what}(l.amount)
          FROM loans l, loan_history lh
          WHERE l.id = lh.loan_id 
-               AND  lh.status = 5 AND lh.date BETWEEN '#{start_date}' AND '#{end_date}'
+               AND  lh.status = #{STATUSES.index(:repaid) + 1}  AND lh.date BETWEEN '#{start_date}' AND '#{end_date}'
          GROUP BY lh.branch_id})
     end
 
@@ -127,77 +128,103 @@ module Reporting
          SELECT lh.branch_id, #{what}(l.amount)
          FROM loans l, loan_history lh
          WHERE l.id = lh.loan_id 
-               AND  lh.status = 3 AND l.disbursal_date BETWEEN '#{start_date}' AND '#{end_date}'
+               AND  lh.status = #{STATUSES.index(:disbursed) + 1} AND  l.disbursal_date BETWEEN '#{start_date}' AND '#{end_date}'
          GROUP BY lh.branch_id})
     end
 
     def principal_due_between_such_and_such_date(start_date, end_date)
-      start_bal = principal_outstanding(start_date)
-      end_bal = scheduled_principal_outstanding(end_date)
-      start_bal - end_bal
+      start_date = Date.parse(start_date) unless start_date.is_a? Date
+      end_date = Date.parse(end_date) unless end_date.is_a? Date
+      query_as_hash(%Q{
+           SELECT branch_id, SUM(principal_due) 
+           FROM loan_history lh
+           WHERE date BETWEEN '#{start_date}' AND '#{end_date}'
+           GROUP BY branch_id })
     end
 
     def principal_received_between_such_and_such_date(start_date, end_date)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
-      query_as_hash(%Q{ select b.id, sum(principal) from payments p, loans l, clients cl, centers c, branches b where p.received_on between '#{start_date}' and '#{end_date}' and p.loan_id = l.id and l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id  group by b.id})
+      query_as_hash(%Q{
+           SELECT branch_id, SUM(principal_paid) 
+           FROM loan_history lh
+           WHERE date BETWEEN '#{start_date}' AND '#{end_date}'
+           GROUP BY branch_id })
     end
 
     def interest_due_between_such_and_such_date(start_date, end_date)
-      start_bal = current_total_outstanding(start_date) - current_principal_outstanding(start_date, start_date)
-      end_bal   = scheduled_total_outstanding(end_date) - scheduled_principal_outstanding(end_date)
-      start_bal - end_bal
+      start_date = Date.parse(start_date) unless start_date.is_a? Date
+      end_date = Date.parse(end_date) unless end_date.is_a? Date
+      query_as_hash(%Q{
+           SELECT branch_id, SUM(interest_due) 
+           FROM loan_history lh
+           WHERE date BETWEEN '#{start_date}' AND '#{end_date}'
+           GROUP BY branch_id })
     end
 
     def interest_received_between_such_and_such_date(start_date, end_date)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
-      query_as_hash(%Q{ select b.id, sum(interest) from payments p, loans l, clients cl, centers c, branches b where p.received_on between '#{start_date}' and '#{end_date}' and p.loan_id = l.id and l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id  group by b.id})
+      query_as_hash(%Q{
+           SELECT branch_id, SUM(interest_paid) 
+           FROM loan_history lh
+           WHERE date BETWEEN '#{start_date}' AND '#{end_date}'
+           GROUP BY branch_id })
     end
 
     def principal_outstanding(date = Date.today)
-      repository.adapter.query(%Q{
-        SELECT branch_id, SUM(actual_outstanding_principal) 
-        FROM loan_history 
-        WHERE week_id = IF( 
-                         WEEKDAY('#{date}') > WEEKDAY(now()),
-                         CEILING(DATEDIFF(NOW(),'2000-01-03')/7) - 1, 
-                         CEILING(DATEDIFF(NOW(),'2000-01-03')/7)) 
-        GROUP BY branch_id;}).map {|x| [x[0],x[1].to_f]}.to_hash
+      date = Date.parse(date) unless date.is_a? Date
+      query_as_hash(%Q{
+          SELECT branch_id, SUM(actual_outstanding_principal)
+          FROM loan_history 
+          WHERE concat(loan_id,'_',date) IN (
+             SELECT concat(loan_id,'_',max(date)) as _id
+             FROM loan_history
+             WHERE date < '#{date}'
+             GROUP BY loan_id)
+          GROUP by branch_id})
+
     end
 
     def scheduled_principal_outstanding(date = Date.today)
-      repository.adapter.query(%Q{
-        SELECT branch_id, SUM(scheduled_outstanding_principal) 
-        FROM loan_history 
-        WHERE week_id = IF( 
-                         WEEKDAY(date) > WEEKDAY(now()), 
-                         CEILING(DATEDIFF(NOW(),'2000-01-03')/7) - 1, 
-                         CEILING(DATEDIFF(NOW(),'2000-01-03')/7)) 
-        GROUP BY branch_id;}).map {|x| [x[0],x[1].to_f]}.to_hash
+      date = Date.parse(date) unless date.is_a? Date
+      query_as_hash(%Q{
+          SELECT branch_id, SUM(scheduled_outstanding_principal)
+          FROM loan_history 
+          WHERE concat(loan_id,'_',date) IN (
+             SELECT concat(loan_id,'_',max(date)) as _id
+             FROM loan_history
+             WHERE date < '#{date}'
+             GROUP BY loan_id)
+          GROUP by branch_id})
     end
 
-    def current_total_outstanding(date = Date.today)
-      repository.adapter.query(%Q{
-        SELECT branch_id, SUM(actual_outstanding_total) 
-        FROM loan_history 
-        WHERE week_id = IF( 
-                         WEEKDAY(date) > WEEKDAY(now()), 
-                         CEILING(DATEDIFF(NOW(),'2000-01-03')/7) - 1, 
-                         CEILING(DATEDIFF(NOW(),'2000-01-03')/7)) 
-        GROUP BY branch_id;}).map {|x| [x[0],x[1].to_f]}.to_hash
+    def total_outstanding(date = Date.today)
+      date = Date.parse(date) unless date.is_a? Date
+      query_as_hash(%Q{
+          SELECT branch_id, SUM(actual_outstanding_total)
+          FROM loan_history 
+          WHERE concat(loan_id,'_',date) IN (
+             SELECT concat(loan_id,'_',max(date)) as _id
+             FROM loan_history
+             WHERE date < '#{date}'
+             GROUP BY loan_id)
+          GROUP by branch_id})
     end
 
     def scheduled_total_outstanding(date = Date.today)
-      repository.adapter.query(%Q{
-        SELECT branch_id, SUM(scheduled_outstanding_total) 
-        FROM loan_history 
-        WHERE week_id = IF( 
-                         WEEKDAY(date) > WEEKDAY(now()), 
-                         CEILING(DATEDIFF(NOW(),'2000-01-03')/7) - 1, 
-                         CEILING(DATEDIFF(NOW(),'2000-01-03')/7)) 
-        GROUP BY branch_id;}).map {|x| [x[0],x[1].to_f]}.to_hash
+      date = Date.parse(date) unless date.is_a? Date
+      query_as_hash(%Q{
+          SELECT branch_id, SUM(scheduled_outstanding_total)
+          FROM loan_history 
+          WHERE concat(loan_id,'_',date) IN (
+             SELECT concat(loan_id,'_',max(date)) as _id
+             FROM loan_history
+             WHERE date < '#{date}'
+             GROUP BY loan_id)
+          GROUP by branch_id})
     end
+
 
     def center_managers(start_date, end_date)
       query_as_hash("select branch_id, count(distinct(manager_staff_id)) from centers group by branch_id;")
