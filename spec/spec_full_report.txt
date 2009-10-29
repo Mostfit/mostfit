@@ -1,4 +1,91 @@
 
+User
+- should not be valid with name shorter than 3 characters
+- should not have a nil login 
+- should be return for admin? if admin value set to true
+- should be created before it is updated
+- should have a login name beginning with numbers, aplphabets and underscores 
+- should not have false in all permission fields
+
+StaffMember
+- should not be valid without a name
+- should not  be valid without active boolean
+- should be unique
+- should have name length > 3
+
+Branch
+- should not be valid without a manager
+- should not be valid without a name
+- should not be valid with a name shorter than 3 characters
+- should be able to 'have' centers
+
+Funder
+- should not be valid without having a name
+- should be able to have funding lines
+- should give correct count of completed lines 
+- should give correct count of active lines
+- should give correct count of total lines 
+
+FundingLine
+- should not be valid without belonging to a funder
+- should not have a blank interest_rate
+- should not have a blank disbursal_date
+- should not have a blank amount
+- should not have blank last payment date
+- should have first payment done before last payment
+- should be disbursed before first payment
+
+Attendancy
+- should not be valid without belonging to a client
+- should not be valid without proper date
+- should not be valid when attendancy date is in future
+- should not be valid without proper status
+
+LoanType
+- should have specs (PENDING: Not Yet Implemented)
+
+Payment
+- should not be valid without belonging to a loan
+- should not be valid without being created by a staff member
+- should not be valid without being received by a staff member
+- should not be valid without being created by active user
+- should not be valid without beng received by an active staff member
+- should not be valid without being properly deleted
+- should not be valid if date of receival is in future
+- should not be valid if interest is negative
+- should not be valid if principal is negative
+- should not be valid if total is negative
+- should not be valid if payment is received before disbursal of loan
+- should not be valid if paying too much principal
+- should not be valid if paying too much in total
+
+Client
+- should not be valid without belonging to a center
+- should not be valid without a name
+- should not be valid without a reference
+- should not be valid with name shorter than 3 characters
+- should have a joining date
+- should be able to 'have' loans
+- should not have more than one outstanding loan at a time if so specified (PENDING: Not Yet Implemented)
+
+Center
+- should not be valid without a manager
+- should not be valid without a name
+- should not be valid with a name shorter than 3 characters
+- should be able to 'have' clients
+
+LoanHistory
+- should not be valid without scheduled outstanding principal
+- should not be valid without scheduled outstanding total
+- should not be valid without actual outstanding principal
+- should not be valid without actual outstanding total
+- should not be valid without having a proper status
+- should not be valid if the combination if loan id and date is not unique
+- should have correct number of periods
+- should start with the application date, approval date, disbursal date and first payment date
+- should have the following dates afterwards
+- should have correct amounts
+
 Report
 - should have 2 * 7 centers and centers * 3 clients
 - should have proper statistics after first monday's payments
@@ -17,6 +104,67 @@ Report
 - should give correct total outstanding
 - should give correct scheduled total outstanding
 
-Finished in 42.304531 seconds
+Upload
+- before(:all) (FAILED - 1)
 
-16 examples, 0 failures
+Loan
+- should have a discrimintator
+- should not be valid without belonging to a client
+- should not be valid without being approved properly
+- should not be valid without being validated properly
+- should not be valid without being rejected properly
+- should not be valid without belonging to a client
+- should not be valid without a proper amount
+- should not be valid without a proper interest_rate
+- should be valid with a proper installment_frequency
+- should not be valid without proper installment_frequency
+- should not be valid without a proper number_of_installments
+- should not be valid without a scheduled_first_payment_date
+- should not be valid without a scheduled_disbursal_date
+- should not be valid with a disbursal date earlier than the loan is approved
+- should not be valid when validated_on is earlier than the disbursal_date
+- should not be valid when written_off_on is earlier than the disbursal_date
+- should not be valid without approved_on earlier than scheduled_disbursal_date
+- should not be valid without being properly written off
+- should not be valid without being properly disbursed
+- should not be valid when scheduled_first_payment_date if before scheduled_disbursal_date
+- should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates
+- .shift_date_by_installments should shift dates properly, even odd ones.. and backwards.
+- .descendants should keep track of the subclasses (just testing dm-core functionality)
+- .number_of_installments_before should do what it promises
+- .last_loan_history_date should have some tests -- albeit more a view thing (PENDING: Not Yet Implemented)
+- .scheduled_repaid_on give the proper date
+- should have proper values for principal, interest and total to be received
+- .status should give status accoring to changing properties up to it written off
+- .status should give status accoring to changing properties up to it is repaid
+- .status should give status accoring to changing properties before being approved
+- .status should give status accoring to changing properties when being rejected
+- cannot repay an unsaved loan
+- .installment_dates should give a list with some dates
+- .payment_schedule should give correct results
+- .payments_hash should give correct results
+- history should be correct
+- should write the history correctly into the db
+
+Pending:
+
+LoanType should have specs (Not Yet Implemented)
+./spec/models/loan_type_spec.rb:5
+
+Client should not have more than one outstanding loan at a time if so specified (Not Yet Implemented)
+./spec/models/client_spec.rb:86
+
+Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
+./spec/models/loan_spec.rb:312
+
+1)
+Errno::ENOENT in 'Upload before(:all)'
+No such file or directory - /home/svs/src/mostfit/uploads/b6c1a2c0-a697-012c-24fb-002170a20aef/staff_members
+/home/svs/src/mostfit/app/models/upload.rb:31:in `load_csv'
+/home/svs/src/mostfit/app/models/upload.rb:27:in `each'
+/home/svs/src/mostfit/app/models/upload.rb:27:in `load_csv'
+./spec/models/upload_spec.rb:19:
+
+Finished in 76.535282 seconds
+
+118 examples, 1 failure, 3 pending

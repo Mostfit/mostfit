@@ -392,29 +392,32 @@ describe Loan do
   end
 
   it ".payments_hash should give correct results" do
-    @loan.payments_hash.should be_blank
+    @loan.payments_hash.should_not be_blank
+    @loan.disbursal_date = @loan.scheduled_disbursal_date
+    @loan.disbursed_by = @manager
     @loan.id = nil
     @loan.save
     7.times do |i|
-      @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
+      status = @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
+      status[1].errors.each {|e| puts e}
     end
     @loan.payments_hash.keys.sort.each_with_index do |k,i|
       case i
         when 0 
-          k.should == @loan.scheduled_first_payment_date
+          k.should == @loan.scheduled_disbursal_date
         else
           k.should == @loan.scheduled_first_payment_date + (7*(i-1))
       end
       if i >= 3
         ps = @loan.payments_hash[k]
-        ps[:total_principal].should == 40 * (i+1)
-        ps[:total_interest].should == (200/25) * (i+1)
+        ps[:total_principal].should == 40 * (i) unless i > 7
+        ps[:total_interest].should == (200/25) * (i) unless i > 7
       end
     end
   end
 
   it "history should be correct" do
-    @loan.payments_hash.should be_blank
+    @loan.payments_hash.should_not be_blank
     @loan.id = nil
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @manager
@@ -462,7 +465,7 @@ describe Loan do
   end
 
   it "should write the history correctly into the db" do
-    @loan.payments_hash.should be_blank
+    @loan.payments_hash.should_not be_blank
     @loan.id = nil
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @manager

@@ -29,8 +29,14 @@ module Reporting
     # we must convert each SQL struct into a hash of {:branch_id =< :value}, so that we are always looking at 
     # the correct branch, and we have to refactor the divison, multiplication, etc. of these arrays
     def query_as_hash(sql)
-      #puts sql
-      repository.adapter.query(sql).map {|x| [x[0],x[1]]}.to_hash
+      # we cache the values to avoid unneccessary calls to the database.
+      calling_method = caller[0].split("`")[1][0..-2]
+      Merb.logger.error! "Called by #{calling_method}"
+      o = Kernel.instance_variable_get("@_#{calling_method}")
+      return o if o
+      o = repository.adapter.query(sql).map {|x| [x[0],x[1]]}.to_hash
+      Kernel.instance_variable_set("@_#{calling_method}",o)
+      o
     end
 
     def client_count(date = Date.today)
@@ -75,10 +81,8 @@ module Reporting
                   SELECT loan_id, client_id, center_id, branch_id,date, status,concat(client_id,'_',status) 
                   FROM loan_history 
                   WHERE concat(loan_id,'_',date) IN (
-                      SELECT concat(loan_id,'_', max(date)) 
-                      FROM loan_history 
-                      WHERE date < '#{date}' 
-                      GROUP BY loan_id)  
+                      #{"'" + get_latest_loan_history_row_before(date).join("','") + "'"}
+                  )
                   GROUP BY CONCAT(client_id,'_',status)) AS dt1 
                GROUP BY client_id
                HAVING num_loans = #{loan_cycle}) 
@@ -174,60 +178,27 @@ module Reporting
 
     def principal_outstanding(date = Date.today)
       date = Date.parse(date) unless date.is_a? Date
-      query_as_hash(%Q{
-          SELECT branch_id, SUM(actual_outstanding_principal)
-          FROM loan_history 
-          WHERE concat(loan_id,'_',date) IN (
-             SELECT concat(loan_id,'_',max(date)) as _id
-             FROM loan_history
-             WHERE date < '#{date}'
-             GROUP BY loan_id)
-          GROUP by branch_id})
-
+      get_latest_before(:actual_outstanding_principal, date)
     end
 
     def scheduled_principal_outstanding(date = Date.today)
       date = Date.parse(date) unless date.is_a? Date
-      query_as_hash(%Q{
-          SELECT branch_id, SUM(scheduled_outstanding_principal)
-          FROM loan_history 
-          WHERE concat(loan_id,'_',date) IN (
-             SELECT concat(loan_id,'_',max(date)) as _id
-             FROM loan_history
-             WHERE date < '#{date}'
-             GROUP BY loan_id)
-          GROUP by branch_id})
+      get_latest_before(:scheduled_outstanding_principal, date)
     end
 
     def total_outstanding(date = Date.today)
       date = Date.parse(date) unless date.is_a? Date
-      query_as_hash(%Q{
-          SELECT branch_id, SUM(actual_outstanding_total)
-          FROM loan_history 
-          WHERE concat(loan_id,'_',date) IN (
-             SELECT concat(loan_id,'_',max(date)) as _id
-             FROM loan_history
-             WHERE date < '#{date}'
-             GROUP BY loan_id)
-          GROUP by branch_id})
+      get_latest_before(:actual_outstanding_total, date)
     end
 
     def scheduled_total_outstanding(date = Date.today)
       date = Date.parse(date) unless date.is_a? Date
-      query_as_hash(%Q{
-          SELECT branch_id, SUM(scheduled_outstanding_total)
-          FROM loan_history 
-          WHERE concat(loan_id,'_',date) IN (
-             SELECT concat(loan_id,'_',max(date)) as _id
-             FROM loan_history
-             WHERE date < '#{date}'
-             GROUP BY loan_id)
-          GROUP by branch_id})
+      get_latest_before(:scheduled_outstanding_total, date)
     end
 
 
-    def center_managers(start_date, end_date)
-      query_as_hash("select branch_id, count(distinct(manager_staff_id)) from centers group by branch_id;")
+    def center_managers(date)
+      query_as_hash("select branch_id, count(distinct(manager_staff_id)) from centers group by branch_id ;")
     end
 
     def avg_outstanding_balance
@@ -238,23 +209,29 @@ module Reporting
       repository.adapter.query("SELECT branch_id, SUM(amount_in_default) FROM loan_history WHERE current = true AND days_overdue BETWEEN #{min} and #{max} GROUP BY branch_id").map {|x| [x[0],x[1].to_f]}.to_hash
     end
 
-    def method_missing(name, *params)
-      if /avg_(\w+)_per_(\w+)/.match(name.to_s)
-        num = params ? send($1, *params[0]) : send($1)
-        den = (params and params[1]) ? send($2, *params[1]) : send($2)
-      else
-        raise "No such method #{name}"
-      end
+    def get_latest_loan_history_row_before(date = Date.today)
+      date = Date.parse(date) unless date.is_a? Date
+      repository.adapter.query("select concat(loan_id,'_',max(date)) from loan_history where date < '#{date}' group by loan_id")
     end
 
     def get_latest_before(column, date = Date.today, group_by = nil)
       date = Date.parse(date) unless date.is_a? Date
-      query_as_hash(%Q{
-          SELECT branch_id,center_id, client_id,loan_id, min(#{column.to_s})
-          FROM loan_history
-          WHERE date < '#{date}'
-          GROUP BY loan_id})
+      array = get_latest_loan_history_row_before(date)
+      array_sql = "'" + array.join("','") + "'"
+      sql = %Q{ SELECT branch_id, SUM(#{column.to_s}) as #{column} FROM loan_history WHERE CONCAT(loan_id,'_',date) IN (#{array_sql}) GROUP BY branch_id}
+      query_as_hash(sql)
     end
+
+    def method_missing(name, params)
+      if /avg_(\w+)_per_(\w+)/.match(name.to_s)
+        num = params ? send($1, *params[0]) : send($1)
+        den = params ? send($2, *params[1]) : send($2)
+        return num/den
+      else
+        raise NoMethodError
+      end
+    end
+
 
   end
 end

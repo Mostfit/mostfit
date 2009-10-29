@@ -303,7 +303,6 @@ class Loan
   end
 
   def payments_hash
-    debugger
     return @payments_cache if @payments_cache
     structs = repository.adapter.query(%Q{
       SELECT principal, interest, received_on
@@ -311,7 +310,6 @@ class Loan
        WHERE (deleted_at IS NULL) AND (loan_id = #{self.id})
     ORDER BY received_on})
     @payments_cache = {}
-    return @payments_cache if structs.size == 0
     total_balance = total_to_be_received
     @payments_cache[disbursal_date || scheduled_disbursal_date] = {
       :principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :total => 0, :balance => amount, :total_balance => total_balance
@@ -330,7 +328,9 @@ class Loan
         :balance                   => amount - principal,
         :total_balance             => total_balance - total}
     end
-    (installment_dates + payment_dates).uniq.sort.reject{|d| d <= structs[-1].received_on}.each do |date|
+    dates = (installment_dates + payment_dates)
+    dates = dates.uniq.sort.reject{|d| d <= structs[-1].received_on} unless structs.blank?
+    dates.each do |date| 
       @payments_cache[date] = {:principal => 0, :interest => 0, :total_principal => principal, :total_interest => interest, :total => total, :balance => amount - principal, :total_balance => total_balance - total}
     end
     @payments_cache
@@ -346,16 +346,17 @@ class Loan
     else
       return 0 if (column == :principal or column == :interest)
       keys = cache.keys.sort
-      rv = (column == :all ? cache[keys.min] : cache[keys.min][column]) if date < keys.min
-      rv = (column == :all ? cache[keys.max] : cache[keys.max][column]) if date >= keys.max
-      keys.each_with_index do |k,i| 
-        rv = (column == :all ? cache[k] : cache[k][column]) if keys[[i+1,keys.size - 1].min] > date
+      if date < keys.min
+        rv = (column == :all ? cache[keys.min] : cache[keys.min][column]) 
+      elsif date >= keys.max
+        rv = (column == :all ? cache[keys.max] : cache[keys.max][column])
+      else
+        keys.each_with_index do |k,i| 
+          rv = (column == :all ? cache[k] : cache[k][column]) if keys[[i+1,keys.size - 1].min] > date
+        end
       end
       if rv.is_a? Hash
         rv[:principal] = 0; rv[:interest] = 0
-      end
-      if rv == nil
-        debugger
       end
       rv
     end

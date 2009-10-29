@@ -23,11 +23,11 @@ class WeeklyReport < Report
     Merb.logger.info "#{report[0].inspect}"
     @report[1] = {'Number of Borrowers' => Branch.active_client_count(end_date)}
     Merb.logger.info "#{report[1].inspect}"
-#    (1..4).each do |i|
-#      @report[1+i] = { "Loan Cycle #{i}" => Branch.client_count_by_loan_cycle(i)}
-#      Merb.logger.info "#{report[i+1].inspect}"
-#    end
-#    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did loan cycles. starting more than one loan"
+    (1..4).each do |i|
+      @report[1+i] = { "Loan Cycle #{i}" => Branch.client_count_by_loan_cycle(i)}
+      Merb.logger.info "#{report[i+1].inspect}"
+    end
+    Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did loan cycles. starting more than one loan"
     t = Time.now
     @report[6] = {"Active clients"  => Branch.active_client_count(end_date)}
     Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did more than one loan. starting dormant"
@@ -57,12 +57,13 @@ class WeeklyReport < Report
     Merb.logger.info "#{Time.now - t0}:#{Time.now - t}:did aount outstanding. doing orig bals"
     @orig_bals = Branch.all.map {|b| Loan.all('client.center.branch_id' => b.id).sum(:amount)}
     @report[15] = {"average os bal per loanee" => Branch.avg_outstanding_balance}
-    @report[16] = {"number of staff members" => Branch.center_managers(start_date, end_date)}
-    @report[17] = {"number of center managers" => Branch.center_managers(start_date, end_date)}
-    @report[18] = {"average clients / staff" => Branch.avg_client_count_per_center_managers(start_date, end_date)}
-    @report[19] = {"average clients / staff" => Branch.avg_client_count_per_center_managers(start_date, end_date)}
-    @report[20] = {"average balance / CM" => Branch.avg_current_principal_outstanding_per_center_managers(start_date, end_date)}
-    @report[21] = {"average borrowers / CM" => Branch.avg_active_client_count_per_center_managers(start_date, end_date)}
+    @report[16] = {"number of staff members" => Branch.center_managers(end_date)}
+    @report[17] = {"number of center managers" => Branch.center_managers(end_date)}
+    debugger
+    @report[18] = {"average clients / staff" => Branch.avg_client_count_per_center_managers([[end_date], [end_date]])}
+    @report[19] = {"average clients / staff" => Branch.avg_client_count_per_center_managers([[end_date], [end_date]])}
+    @report[20] = {"average balance / CM" => Branch.avg_principal_outstanding_per_center_managers([[end_date],[end_date]])}
+    @report[21] = {"average borrowers / CM" => Branch.avg_active_client_count_per_center_managers([[end_date], [end_date]])}
     @report[22] = {"loans disbursed this week" => Branch.loans_disbursed_between_such_and_such_date(start_date, end_date, "count")}
     @report[23] = {"loans disbursed this week (amount)" => Branch.loans_disbursed_between_such_and_such_date(start_date, end_date, "sum")}
     @principal_due = Branch.principal_due_between_such_and_such_date(start_date, end_date)

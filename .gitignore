@@ -25,3 +25,6 @@ result_file.txt
 .emacs*
 config/database.yml
 *pdf
+public/logs
+uploads
+
