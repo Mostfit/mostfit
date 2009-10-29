@@ -107,6 +107,7 @@ class Loan
     {:min => :minimum, :max => :maximum}.each{|k, v|
       loan_attr    = self.send(method)
       product_attr = product.send("#{k}_#{method}")
+      product_attr = product_attr.to_f/100 if method==:interest_rate
       if k==:min and loan_attr and product_attr and  loan_attr < product_attr
         return [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
       elsif k==:max and loan_attr and product_attr and  loan_attr > product_attr
@@ -754,8 +755,55 @@ class A50Loan < Loan
     raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
     number < 45 ? total_interest_to_be_received / 45 : 0
   end
+end
 
+class EquatedWeekly < Loan
+  # these 2 methods define the pay back scheme
+  # typically reimplemented in subclasses
+  include ExcelFormula
+  property :purpose,  String
+  
+  attr_accessor :defaults
 
+  def defaults
+    {:interest_rate => 0.18, :installment_frequency => :weekly, :number_of_installments => 50}
+  end
+
+  def self.description
+    "50 Weeks, 18%, [6000-10000]"
+  end
+
+  def scheduled_principal_for_installment(number)
+    # number unused in this implentation, subclasses may decide differently
+    # therefor always supply number, so it works for all implementations
+    raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > number_of_installments
+    payment             = pmt(interest_rate/number_of_installments, number_of_installments, amount, 0, 0)
+    principal_payable   = 0
+    balance             = amount
+
+    1.upto(number){|installment|
+      interest_payable  = balance * interest_rate / number_of_installments
+      principal_payable = payment - interest_payable
+      balance           = balance - principal_payable
+    }
+    return number==number_of_installments ? balance.ceil : principal_payable.to_i
+  end
+
+  def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
+    # number unused in this implentation, subclasses may decide differently
+    # therefor always supply number, so it works for all implementations
+    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
+    payment             = pmt(interest_rate/number_of_installments, number_of_installments, amount, 0, 0)
+    interest_payable    = 0
+    balance             = amount
+    
+    1.upto(number){|installment|
+      interest_payable  = balance * interest_rate / number_of_installments
+      principal_payable = payment - interest_payable
+      balance           = balance - principal_payable
+    }
+    return interest_payable.to_i
+  end
 end
 
 
