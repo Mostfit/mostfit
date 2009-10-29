@@ -36,7 +36,8 @@ class Loans < Application
 
   def create
     klass, attrs = get_loan_and_attrs
-    attrs[:interest_rate] = attrs[:interest_rate] / 100 if attrs[:interest_rate].to_f > 1
+    attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 1
+
     @loan = klass.new(attrs)
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])
     @loan.loan_product_id = @loan_product.id 
@@ -44,7 +45,7 @@ class Loans < Application
     if @loan.save
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
     else
-
+      @loan.interest_rate *= 100
       render :new  # error messages will be shown
     end
   end
@@ -52,13 +53,14 @@ class Loans < Application
   def edit(id)
     only_provides :html
     @loan = Loan.get(id)
+    @loan_product =  @loan.loan_product
     raise NotFound unless @loan
     display @loan
   end
 
   def update(id)
-    debugger
     klass, attrs = get_loan_and_attrs
+    attrs[:interest_rate] = attrs[:interest_rate] / 100 if attrs[:interest_rate].to_f > 1
     @loan = klass.get(id)
     raise NotFound unless @loan
     if @loan.update_attributes(attrs)
@@ -101,8 +103,8 @@ class Loans < Application
   # the loan is not of type Loan of a derived type, therefor we cannot just assume its name..
   # this method gets the loans type from a hidden field value and uses that to get the attrs
   def get_loan_and_attrs   # FIXME: this is a code dup with data_entry/loans
-    loan_key = params.keys.find { |x| x =~  /loan$/ }  # loan params have the key like 'a50_loan' or 'loan'
-    attrs = params[loan_key]
+    loan_product = LoanProduct.get(params[:loan_product_id])
+    attrs = params[loan_product.loan_type.snake_case.to_sym]
     raise NotFound if not params[:loan_type]
     klass = Kernel::const_get(params[:loan_type])
     [klass, attrs]
