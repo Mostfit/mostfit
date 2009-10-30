@@ -3,16 +3,13 @@ class LoanType
   
   property :id, Serial
 
-  property :name, String
-  property :amount, Integer
-  property :max_amount, Integer
-  property :min_amount, Integer
-  property :interest_rate, Integer
-  property :max_interest_rate, Integer
-  property :min_interest_rate, Integer
-  property :installment_frequency, Enum.send('[]',*Loan.installment_frequencies)
-  property :number_of_installments, Integer
-  property :max_number_of_installments, Integer
-  property :min_number_of_installments, Integer
+  property :name, String, :index => true
+  property :max_amount, Integer, :index => true
+  property :min_amount, Integer, :index => true
+  property :max_interest_rate, Integer, :index => true
+  property :min_interest_rate, Integer, :index => true
+  property :installment_frequency, Enum.send('[]',*Loan.installment_frequencies), :index => true
+  property :max_number_of_installments, Integer, :index => true
+  property :min_number_of_installments, Integer, :index => true
 
 end

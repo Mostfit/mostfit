@@ -4,12 +4,12 @@ class Center
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   
   property :id,                   Serial
-  property :name,                 String, :length => 100, :nullable => false
+  property :name,                 String, :length => 100, :nullable => false, :index => true
   property :center_leader_name,   String, :length => 100
-  property :meeting_day,          Enum.send('[]', *DAYS), :nullable => false, :default => :none
-  property :meeting_time_hours,   Integer, :length => 2
-  property :meeting_time_minutes, Integer, :length => 2
-  property :created_at,           DateTime, :nullable => false, :default => Time.now
+  property :meeting_day,          Enum.send('[]', *DAYS), :nullable => false, :default => :none, :index => true
+  property :meeting_time_hours,   Integer, :length => 2, :index => true
+  property :meeting_time_minutes, Integer, :length => 2, :index => true
+  property :created_at,           DateTime, :nullable => false, :default => Time.now, :index => true
   belongs_to :branch
   belongs_to :manager, :child_key => [:manager_staff_id], :class_name => 'StaffMember'
 
