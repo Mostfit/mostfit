@@ -31,6 +31,7 @@ Merb::BootLoader.before_app_loads do
   require 'uuid'
   require 'ftools'
   require 'logger'
+
   begin
     require "pdf/writer"
     require "pdf/simpletable"

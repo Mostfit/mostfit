@@ -353,7 +353,10 @@ class Loan
         rv = (column == :all ? cache[keys.max] : cache[keys.max][column])
       else
         keys.each_with_index do |k,i| 
-          rv = (column == :all ? cache[k] : cache[k][column]) if keys[[i+1,keys.size - 1].min] > date
+          if keys[[i+1,keys.size - 1].min] > date
+            rv = (column == :all ? cache[k] : cache[k][column]) 
+            break
+          end
         end
       end
       if rv.is_a? Hash
@@ -549,7 +552,7 @@ class Loan
       current = ((dates[[i-1,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or (i == dates.size - 1 and dates[i] < Date.today)) ? 1 : 0
       scheduled = get_scheduled(:all, date)
       actual = get_actual(:all, date)
-      #puts "#{i} #{date} #{scheduled.inspect} #{actual.inspect}"
+      puts "#{i} #{date} #{scheduled[:balance]} #{actual[:balance]} :: #{scheduled[:principal]} #{actual[:principal]}"
       scheduled_outstanding_principal = scheduled[:balance]
       scheduled_outstanding_total = scheduled[:total_balance]
       actual_outstanding_principal = actual[:balance]

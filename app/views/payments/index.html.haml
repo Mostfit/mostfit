@@ -168,10 +168,10 @@
           %b= format_currency h.actual_outstanding_principal
       %td
         - if last_payment_date and (h.date <= last_payment_date or h.date <= Date.today)
-          %b= format_currency principal_received_so_far + interest_received_so_far
+          %b= format_currency h.principal_paid + h.interest_paid
           %br/
           %span.greytext
-            == #{principal_received_so_far} principal + #{interest_received_so_far} interest
+            == #{h.principal_paid} principal + #{h.interest_paid} interest
       %td
         - if h.date <= Date.today
           %b
