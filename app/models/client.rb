@@ -6,13 +6,13 @@ class Client
   before :valid?, :parse_dates
   
   property :id,             Serial
-  property :reference,      String, :length => 100, :nullable => false
-  property :name,           String, :length => 100, :nullable => false
+  property :reference,      String, :length => 100, :nullable => false, :index => true
+  property :name,           String, :length => 100, :nullable => false, :index => true
   property :spouse_name,    String, :length => 100
-  property :date_of_birth,  Date
+  property :date_of_birth,  Date, :index => true
   property :address,        Text
-  property :active,         Boolean, :default => true, :nullable => false
-  property :date_joined,    Date
+  property :active,         Boolean, :default => true, :nullable => false, :index => true
+  property :date_joined,    Date, :index => true
   property :deleted_at,     ParanoidDateTime
 
   has_attached_file :picture,

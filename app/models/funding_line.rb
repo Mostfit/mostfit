@@ -7,8 +7,8 @@ class FundingLine
   attr_accessor :interest_percentage  # set to true to disable history writing by this object
 
   property :id,                  Serial
-  property :amount,              Integer
-  property :interest_rate,       Float
+  property :amount,              Integer, :index => true
+  property :interest_rate,       Float, :index => true
   property :purpose,             Text
   property :disbursal_date,      Date  # with these 3 dates and the amount we can draw rough graphs
   property :first_payment_date,  Date

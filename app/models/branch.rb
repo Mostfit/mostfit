@@ -3,7 +3,7 @@ class Branch
   extend Reporting::BranchReports
 
   property :id,      Serial
-  property :name,    String, :length => 100, :nullable => false
+  property :name,    String, :length => 100, :nullable => false, :index => true
   property :address, Text
   property :created_at, DateTime
   
