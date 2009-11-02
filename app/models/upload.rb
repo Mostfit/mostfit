@@ -1,8 +1,8 @@
 class Upload
   attr_accessor :log, :directory, :filename
 
-  def initialize(filename)
-    @directory = UUID.generate
+  def initialize(filename, uid=nil)
+    @directory = uid||UUID.generate
     @filename  = filename
   end
 
