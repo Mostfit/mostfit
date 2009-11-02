@@ -391,7 +391,7 @@ class Loan
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
     raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-    amount * interest_rate / number_of_installments
+    (amount * interest_rate / number_of_installments).to_i
   end
 
   # These info functions need not be overridden in derived classes.

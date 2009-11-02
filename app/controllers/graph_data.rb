@@ -297,15 +297,13 @@ class GraphData < Application
         values = Branch.all.map {|b| b.centers.clients.loans.sum(:amount) || 0 }
         type = "pie"
       when "center_day"
+      debugger
       vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{params[:date]}' GROUP BY lh.center_id")
       values = vals.map do |v| 
-        if v[0] == 0
-          val = v[1]
-          color = "#00ff00"
-        else
-          val = v[0]
-          color = "#ff0000"
-        end
+        val = v[0] + v[1]
+        color_ratio = v[0]/val
+        color_value = 65280 + (color_ratio * (16711680 - 65280))
+        color = color_value.to_i.to_s(16)
         {:value => val.to_i, :label => "#{v[2]}\nReceived #{v[1].to_i} of #{(v[1]+v[0]).to_i}", :colour => color}
       end
       type="pie" 
