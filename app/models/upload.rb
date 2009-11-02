@@ -56,6 +56,7 @@ class Upload
             puts(e.message)            
             puts e.backtrace
             log.error("<font color='red'>#{model}: Problem in inserting #{model} #{row[headers[:serial_number]]}. Insert it manually later</font>") if log
+            log.error("<font color='red'>#{model}: #{e.backtrace}</font>") if log
           end
         end    
       }
