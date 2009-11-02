@@ -8,7 +8,7 @@ Merb::Config.use { |c|
   c[:log_auto_flush ] = true
   c[:log_level] = :debug
 
-  [:log_stream] = STDOUT
+  c[:log_stream] = STDOUT
   c[:log_file]   = nil
   # Or redirect logging into a file:
   # c[:log_file]  = Merb.root / "log" / "development.log"
