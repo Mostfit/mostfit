@@ -296,6 +296,12 @@ class GraphData < Application
       when "branch_pie"
         values = Branch.all.map {|b| b.centers.clients.loans.sum(:amount) || 0 }
         type = "pie"
+      when "center_day"
+        debugger
+      vals = repository.adapter.query("SELECT SUM(lh.scheduled_outstanding_principal), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{params[:date]}' GROUP BY lh.center_id")
+        values = vals.map{|v| v[0].to_i}
+        labels = vals.map{|v| v[1]}
+        type="pie" 
     end
     render_graph(values, type, labels)
 
@@ -327,7 +333,8 @@ class GraphData < Application
       { "elements":[
           {
             "type": "pie",
-            "values": #{vals.to_json}
+            "values": #{vals.to_json},
+            "labels": #{labels.to_json},
           }
         ]}
       JSON

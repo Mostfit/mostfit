@@ -1,0 +1,25 @@
+%h2
+  today
+
+
+- @centers = Center.all(:meeting_day => @date.weekday)
+- total_due = total_paid = 0
+%table
+  %tr
+    %th
+      Name
+    %th
+      Due
+    %th
+      Paid
+  - @centers.each do |center|
+    %tr
+      - lh = LoanHistory.aggregate(:principal_due.sum, :interest_due.sum, :principal_paid.sum, :interest_paid.sum, :center_id => center.id, :date => @date)
+      %td
+        = center.name
+      %td
+        = (lh[0] || 0) + (lh[1] || 0)
+      %td
+        = (lh[2] || 0) + (lh[3] || 0)
+
+= ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'center_day', :date => @date) )
