@@ -52,7 +52,8 @@ end
  
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
-  
+  # Load MFI account details to allow this app to sync phone numbers of staffmembers to mostfit box. If this file is not present then no such updates will happen
+  MFI_DETAILS = YAML.load(File.read(File.join(Merb.root, "config", "mfi.yml")))
   # Starting the logger takes time, so turn it off during development
   Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments']) unless Merb.environment == "development" or Merb.environment == "test"
 
