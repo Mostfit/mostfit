@@ -1,6 +1,6 @@
 class Branch
-  include DataMapper::Resource
   extend Reporting::BranchReports
+  include DataMapper::Resource
 
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false, :index => true

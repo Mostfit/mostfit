@@ -297,11 +297,18 @@ class GraphData < Application
         values = Branch.all.map {|b| b.centers.clients.loans.sum(:amount) || 0 }
         type = "pie"
       when "center_day"
-        debugger
-      vals = repository.adapter.query("SELECT SUM(lh.scheduled_outstanding_principal), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{params[:date]}' GROUP BY lh.center_id")
-        values = vals.map{|v| v[0].to_i}
-        labels = vals.map{|v| v[1]}
-        type="pie" 
+      vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{params[:date]}' GROUP BY lh.center_id")
+      values = vals.map do |v| 
+        if v[0] == 0
+          val = v[1]
+          color = "#00ff00"
+        else
+          val = v[0]
+          color = "#ff0000"
+        end
+        {:value => val.to_i, :label => "#{v[2]}\nReceived #{v[1].to_i} of #{(v[1]+v[0]).to_i}", :colour => color}
+      end
+      type="pie" 
     end
     render_graph(values, type, labels)
 
@@ -333,8 +340,7 @@ class GraphData < Application
       { "elements":[
           {
             "type": "pie",
-            "values": #{vals.to_json},
-            "labels": #{labels.to_json},
+            "values": #{vals.to_json}
           }
         ]}
       JSON

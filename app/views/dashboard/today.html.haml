@@ -4,7 +4,7 @@
 
 - @centers = Center.all(:meeting_day => @date.weekday)
 - total_due = total_paid = 0
-%table
+%table{:style => "float:left"}
   %tr
     %th
       Name
@@ -22,4 +22,4 @@
       %td
         = (lh[2] || 0) + (lh[3] || 0)
 
-= ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'center_day', :date => @date) )
+= ofc2(630, 350, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'center_day', :date => @date) )
