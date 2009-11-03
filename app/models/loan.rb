@@ -229,13 +229,14 @@ class Loan
     raise "cannot repay a loan that has not been saved" if new_record?
 
     principal, interest, total = 0, 0, nil
+    debugger
     if input.is_a? Fixnum  # in case only one amount is specified
       # interest is paid first, the rest goes in as principal
       # the payment is filed on received_on without knowing about the future
       # it could happen that payment have been made after this payment
       # here the validations on the Payment should 
       total        = input
-      interest_due = [(-interest_overpaid_on(received_on)).round, 0].max
+      interest_due = [(-interest_overpaid_on(received_on)), 0].max
       interest     = [interest_due, total].min  # never more than total
       principal    = total - interest
     elsif input.is_a? Array  # in case principal and interest are specified separately
@@ -306,9 +307,10 @@ class Loan
   def payments_hash
     return @payments_cache if @payments_cache
     structs = repository.adapter.query(%Q{
-      SELECT principal, interest, received_on
+      SELECT sum(principal) as principal, sum(interest) as interest, received_on
         FROM payments
        WHERE (deleted_at IS NULL) AND (loan_id = #{self.id})
+       GROUP BY received_on
     ORDER BY received_on})
     @payments_cache = {}
     total_balance = total_to_be_received
@@ -469,10 +471,10 @@ class Loan
   # these 3 methods return overpayment amounts (PAYMENT-RECEIVED perspective)
   # negative values mean shortfall (we're positive-minded at intellecap)
   def principal_overpaid_on(date)
-    principal_received_up_to(date) - scheduled_principal_up_to(date)
+    (principal_received_up_to(date) - scheduled_principal_up_to(date)).to_i
   end
   def interest_overpaid_on(date)
-    interest_received_up_to(date) - scheduled_interest_up_to(date)
+    (interest_received_up_to(date) - scheduled_interest_up_to(date)).to_i
   end
   def total_overpaid_on(date)
     total_received_up_to(date) - scheduled_total_up_to(date)

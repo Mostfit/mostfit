@@ -26,6 +26,7 @@
       - @center.clients.each do |client|
         - loan_row_count = 0
         - Loan.all(:client_id => client.id).each do |loan|
+          - lh = loan.history(:date => @date)[0] #TODO make this work even for non payment dates
           - #next if [nil, :repaid, :pending].include? loan.status
           - loan_row_count += 1
           %tr{ :class => cycle('odd','') }
@@ -35,45 +36,40 @@
             %td
               = loan.id
             %td.numeric
-              - i = loan.amount
-              %b= i.to_currency
-              - tot_amount += i
+              - amt = loan.amount
+              %b= amt.to_currency
+              - tot_amount += amt
             %td.numeric
-              - i = loan.actual_outstanding_principal_on(@date)
-              %b= i.to_currency
-              - tot_outstanding += i
+              - p = lh.nil? ? 0 : lh.actual_outstanding_principal
+              %b= p.to_currency
+              - tot_outstanding += p
             %td.center
-              = loan.get_status(@date).to_s
+              = lh.status.to_s unless lh.nil?
             %td
               = loan.disbursal_date.to_s
             %td
               = loan.funder_name
             %td.numeric
-              - i = loan.number_of_installments_before(@date)
-              = i
-              - tot_installments += i
+              - ins = loan.number_of_installments_before(@date)
+              = ins
+              - tot_installments += ins
             %td.numeric
-              - p = Payment.all(:loan_id => loan.id, :received_on => @date)[0]
-              - if p
-                = p.principal
-              - else
-                - i = [-loan.principal_overpaid_on(@date), 0].max
-                = i.to_currency
-                - tot_principal += i
+              - p = lh.nil? ? 0 : lh.principal_due.to_i
+              = p.to_currency
+              - tot_principal += p
             %td.numeric
-              - i = [-loan.interest_overpaid_on(@date), 0].max
+              - i = lh.nil? ? 0 : lh.interest_due.to_i
               = i.to_currency
               - tot_interest += i
             %td.numeric
-              - i = [-loan.total_overpaid_on(@date), 0].max
-              = i.to_currency
-              - tot_total += i
+              - a = p + i
+              = a.to_currency
+              - tot_total += a
             %td.numeric
               - if i == 0
                 -
               - else 
-                = text_field :name => loan.id, :value => i, :cols => "5", :style => "width:50px;" 
-              - tot_total += i
+                = text_field :name => loan.id, :value => a, :cols => "5", :style => "width:50px;" 
 
         - if loan_row_count == 0
           %tr{ :class => cycle('odd','') }

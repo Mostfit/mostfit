@@ -18,11 +18,11 @@ class Payments < DataEntry::Controller
     @errors = []
     if params[:submit] == 'Make Payments'
       params.collect {|k,v| k.to_i == 0 ? nil : k }.compact.each do |k|
+        debugger
         @loan = Loan.get(k.to_i)
         @staff = StaffMember.get(params[:received_by])
         amounts = params[k.to_sym].to_i
-        debugger
-        succes, @payment = @loan.repay(amounts, session.user, @date, @staff, true)
+        succes, @payment = @loan.repay(amounts, session.user, @date, @staff, false)
         if not succes
           @errors << @payment
         end

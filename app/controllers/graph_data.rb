@@ -304,6 +304,7 @@ class GraphData < Application
         color_ratio = v[0]/val
         color_value = 65280 + (color_ratio * (16711680 - 65280))
         color = color_value.to_i.to_s(16)
+        color = "00" + color if color.length == 4
         {:value => val.to_i, :label => "#{v[2]}\nReceived #{v[1].to_i} of #{(v[1]+v[0]).to_i}", :colour => color}
       end
       type="pie" 

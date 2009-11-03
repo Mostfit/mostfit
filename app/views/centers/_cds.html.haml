@@ -36,29 +36,29 @@
             %td
               = link_to loan.id, url_for_loan(loan)
             %td.numeric
-              - i = loan.amount
-              %b= i.to_currency
-              - tot_amount += i
+              - amt = loan.amount
+              %b= amt.to_currency
+              - tot_amount += amt
             %td.numeric
-              - i = lh.actual_outstanding_principal
-              %b= i.to_currency
-              - tot_outstanding += i
+              - os_prin = lh.nil? ? 0 : lh.actual_outstanding_principal
+              %b= os_prin.to_currency
+              - tot_outstanding += os_prin
             %td.center
-              = lh.status.to_s
+              = lh.status.to_s unless lh.nil?
             %td
               = loan.disbursal_date.to_s
             %td
               = loan.funder_name
             %td.numeric
-              - i = loan.number_of_installments_before(@date)
-              = i
-              - tot_installments += i
+              - ins = loan.number_of_installments_before(@date)
+              = ins
+              - tot_installments += ins
             %td.numeric
-              - p = lh.principal_due
+              - p = lh.nil? ? 0 : lh.principal_due
               = p.to_currency
               - tot_principal += p
             %td.numeric
-              - i = lh.interest_due
+              - i = lh.nil? ? 0 : lh.interest_due
               = i.to_currency
               - tot_interest += i
             %td.numeric
