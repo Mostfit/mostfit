@@ -75,8 +75,7 @@ class Payment
   def not_paying_too_much_in_total?
     if new_record?   # do not do this check on updates, it will count itself double
       a = loan.actual_outstanding_total_on(received_on)
-      new_total = (a or 0) + total
-      if new_total > loan.total_to_be_received
+      if total > a
         return [false, "Total is more than the loans outstanding total"]
       end
     end
