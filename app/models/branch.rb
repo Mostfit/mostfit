@@ -7,7 +7,7 @@ class Branch
   property :address, Text
   property :created_at, DateTime
   
-  belongs_to :manager, :child_key => [:manager_staff_id], :class_name => 'StaffMember'
+  belongs_to :manager, :child_key => [:manager_staff_id], :model => 'StaffMember'
   has n, :centers
 
   validates_length      :name, :min => 3

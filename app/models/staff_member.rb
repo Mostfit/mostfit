@@ -9,11 +9,11 @@ class StaffMember
 
   has n, :branches, :child_key => [:manager_staff_id]
   has n, :centers, :child_key => [:manager_staff_id]
-  has n, :approved_loans,    :child_key => [:approved_by_staff_id],    :class_name => 'Loan'
-  has n, :applied_loans,    :child_key => [:applied_by_staff_id],    :class_name => 'Loan'
-  has n, :rejected_loans,    :child_key => [:rejected_by_staff_id],    :class_name => 'Loan'
-  has n, :disbursed_loans,   :child_key => [:disbursed_by_staff_id],   :class_name => 'Loan'
-  has n, :written_off_loans, :child_key => [:written_off_by_staff_id], :class_name => 'Loan'
+  has n, :approved_loans,    :child_key => [:approved_by_staff_id],    :model => 'Loan'
+  has n, :applied_loans,    :child_key => [:applied_by_staff_id],    :model => 'Loan'
+  has n, :rejected_loans,    :child_key => [:rejected_by_staff_id],    :model => 'Loan'
+  has n, :disbursed_loans,   :child_key => [:disbursed_by_staff_id],   :model => 'Loan'
+  has n, :written_off_loans, :child_key => [:written_off_by_staff_id], :model => 'Loan'
 
   has n, :payments, :child_key  => [:received_by_staff_id]
 

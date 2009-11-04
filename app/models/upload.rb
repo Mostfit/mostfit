@@ -25,8 +25,9 @@ class Upload
     models = [StaffMember, Branch, Center, Client, FundingLine, LoanProduct, Loan, Payment]
     funding_lines, loans = {}, {}
     models.each{|model|
-      log.info("Creating #{model.to_s.plural}") if log
       model.all.destroy!
+      log.info("Destroying old records for #{model.to_s.plural} (if any)") if log
+      log.info("Creating #{model.to_s.plural}") if log
       headers = {}
       CSV.open(File.join(Merb.root, "uploads", @directory, model.to_s.snake_case.pluralize), "r").each_with_index{|row, idx|
         if idx==0
@@ -50,7 +51,7 @@ class Upload
               loans[row[headers[:serial_number]]]         = record if model==Loan
               log.info("Created #{idx-499} #{idx+1} entries. Some more left")    if idx%500==499
             else
-              log.error("<font color='red'>#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors.inspect}</font>") if log
+              log.error("<font color='red'>#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors.to_a.join(', ')}</font>") if log
             end
           rescue Exception => e
             puts(e.message)            

@@ -73,7 +73,7 @@ module DataMapper
     
   end # module Stamped
   
-  Resource::append_inclusions Stamped
+  Model::append_inclusions Stamped
   
 end # module DataMapper
 

@@ -25,9 +25,9 @@ class User
   validates_is_unique :login
   validates_with_method :is_any_permission_granted
 
-  has n, :payments_created, :child_key => [:created_by_user_id], :class_name => 'Payment'
-  has n, :payments_deleted, :child_key => [:deleted_by_user_id], :class_name => 'Payment'
-  has n, :audit_trail, :class_name => 'AuditTrail'
+  has n, :payments_created, :child_key => [:created_by_user_id], :model => 'Payment'
+  has n, :payments_deleted, :child_key => [:deleted_by_user_id], :model => 'Payment'
+  has n, :audit_trail, :model => 'AuditTrail'
 
 
   def admin?

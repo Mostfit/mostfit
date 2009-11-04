@@ -7,7 +7,7 @@ class AuditTrail
   property :user_name,       String,  :nullable => false  # the user name will not change often
 #  property :message,         String,  :nullable => false
   property :action,          String,  :nullable => false, :length => 50
-  property :changes,         Yaml
+  property :changes,         Yaml, :length => 20000
 #  property :version,         Integer, :nullable => false, :default => 0
   property :created_at,      DateTime
 

@@ -7,17 +7,18 @@ class Payment
 
   attr_writer :total  # just to be used in the form
   
-  property :id,             Serial
-  property :principal,      Integer, :nullable => false, :index => true
-  property :interest,       Integer, :nullable => false, :index => true
-  property :received_on,    Date,    :nullable => false, :index => true
-  property :created_at,     DateTime, :index => true
-  property :deleted_at,     ParanoidDateTime, :index => true
+  property :id,                 Serial
+  property :principal,          Integer, :nullable => false, :index => true
+  property :interest,           Integer, :nullable => false, :index => true
+  property :received_on,        Date,    :nullable => false, :index => true
+  property :deleted_by_user_id, Integer, :nullable => true, :index => true
+  property :created_at,         DateTime,:nullable => false, :default => Time.now, :index => true
+  property :deleted_at,         ParanoidDateTime, :nullable => true, :index => true
 
-  belongs_to :loan, :index => true
-  belongs_to :created_by,  :child_key => [:created_by_user_id],   :class_name => 'User', :index => true
-  belongs_to :received_by, :child_key => [:received_by_staff_id], :class_name => 'StaffMember', :index => true
-  belongs_to :deleted_by,  :child_key => [:deleted_by_user_id],   :class_name => 'User', :index => true
+  belongs_to :loan
+  belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
+  belongs_to :received_by, :child_key => [:received_by_staff_id], :model => 'StaffMember'
+  belongs_to :deleted_by,  :child_key => [:deleted_by_user_id],   :model => 'User'
 
 
   validates_present     :loan, :created_by, :received_by
@@ -64,7 +65,7 @@ class Payment
     [false, "deleted_by and deleted_at properties have to be (un)set together"]
   end
   def not_paying_too_much_principal?
-    if new_record?  # do not do this check on updates, it will count itself double
+    if new?  # do not do this check on updates, it will count itself double
       a = loan.payments_hash[loan.payments_hash.keys.max]
       if (((not a.blank?) and a[:total_principal]) ? a[:total_principal] : 0) + principal > loan.amount
         return [false, "Principal is more than the loans outstanding principal"]
@@ -73,7 +74,7 @@ class Payment
     true
   end
   def not_paying_too_much_in_total?
-    if new_record?   # do not do this check on updates, it will count itself double
+    if new?   # do not do this check on updates, it will count itself double
       a = loan.actual_outstanding_total_on(received_on)
       if total > a
         return [false, "Total is more than the loans outstanding total"]
