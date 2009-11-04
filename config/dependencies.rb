@@ -1,7 +1,7 @@
 # dependencies are generated using a strict version, don't forget to edit the dependency versions when upgrading.
-merb_gems_version = "1.0.12"
-dm_gems_version   = "0.9.11"
-do_gems_version   = "0.9.12"
+merb_gems_version = "1.0.13"
+dm_gems_version   = "0.10.1"
+do_gems_version   = "0.10.0"
 
 # For more information about each component, please read http://wiki.merbivore.com/faqs/merb_components
 dependency "merb-core", merb_gems_version
@@ -38,5 +38,6 @@ dependency "dm-paperclip"
 dependency "merb-gen", merb_gems_version
 dependency "dm-pagination"
 dependency "htmldoc"
+#dependency "dm-pagination/paginatable"
 #dependency "prawn"
 #dependency "dm-is-paginated"
