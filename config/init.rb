@@ -27,12 +27,15 @@ Merb::BootLoader.before_app_loads do
                           :currency => { :unit => 'Rs.',  :format => '%u %n', :precision => 0 } })
   Numeric::Transformer.change_default_format(:mostfit_default)
   require 'config/constants.rb'
-  require 'csv'
+#  require 'csv'
   require 'uuid'
   require 'ftools'
   require 'logger'
 
   begin
+    require 'dm-pagination'
+    require 'dm-pagination/paginatable'
+    require 'dm-pagination/pagination_builder'
     require "pdf/writer"
     require "pdf/simpletable"
     require "lib/logger.rb"
@@ -46,11 +49,13 @@ Merb::BootLoader.before_app_loads do
     puts "--------Do a gem install pdf-writer otherwise pdf generation won't work---------"
     puts "--------------------------------------------------------------------------------"
   end
+  DataMapper::Model.append_extensions DmPagination::Paginatable
   Paperclip.options[:image_magick_path] = "/usr/local/bin"
   Paperclip.options[:command_path] = "/usr/local/bin"
 end
  
 Merb::BootLoader.after_app_loads do
+
   # This will get executed after your app's classes have been loaded.
   # Load MFI account details to allow this app to sync phone numbers of staffmembers to mostfit box. If this file is not present then no such updates will happen
   MFI_DETAILS = YAML.load(File.read(File.join(Merb.root, "config", "mfi.yml"))) if File.exists?(File.join(Merb.root, "config", "mfi.yml"))
