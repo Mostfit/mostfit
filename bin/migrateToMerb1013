@@ -1,0 +1,26 @@
+sudo gem source --add http://gemcutter.org                                                                                       
+sudo gem install dm-aggregates dm-migrations dm-paginations dm-types               
+sudo gem install dm-validations                                                    
+sudo gem install data_objects                                                      
+sudo gem install dm-timestamps                                                     
+sudo gem install dm-serializer                                                     
+sudo gem install sqlite3-ruby
+sudo gem install merb -v 1.0.13                                                                                                  
+sudo gem install dm-core 
+sudo gem list merb-action-args -v 1.0.13                                                                                         
+sudo gem install merb-action-args -v 1.0.13                                                                                      
+sudo gem install merb-assets -v 1.0.13                                                                                           
+sudo gem install merb-helpers -v 1.0.13                                                                                          
+sudo gem install merb-haml -v 1.0.13                                                                                             
+sudo gem install merb-mailer -v 1.0.13                                                                                           
+sudo gem install merb-slices -v 1.0.13                                                                                           
+sudo gem install merb-auth-core -v 1.0.13                                                                                        
+sudo gem install merb-auth-more -v 1.0.13                                                                                        
+sudo gem uninstall merb-core -v 1.0.14                                                                                           
+sudo gem install merb-auth-slice-password -v 1.0.13                                                                              
+sudo gem uninstall merb-core -v 1.0.14                                                                                           
+sudo gem remove merb-param-protection -v 1.0.14                                                                                  
+sudo gem install merb-param-protection( -v 1.0.13                                                                                
+sudo gem install merb-param-protection -v 1.0.13                                                                                 
+sudo gem install merb-exceptions -v 1.0.13                                                                                       
+sudo gem install merb-gen -v 1.0.13
