@@ -176,5 +176,9 @@ module Merb
         {:name => 'resource_routes', :code => 'Merb::Router.resource_routes', :obj => Merb::Router.resource_routes},
       ]
     end
+
+    def paginate(pagination, *args, &block)
+      DmPagination::PaginationBuilder.new(self, pagination, *args, &block)
+    end
   end
 end
