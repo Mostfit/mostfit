@@ -179,6 +179,6 @@ NoMethodError in 'Center should be able to 'have' clients'
 undefined method `name' for nil:NilClass
 ./spec/models/center_spec.rb:50:
 
-Finished in 74.757929 seconds
+Finished in 89.362588 seconds
 
 119 examples, 3 failures, 3 pending
