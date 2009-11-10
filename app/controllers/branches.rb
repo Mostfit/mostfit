@@ -33,7 +33,7 @@ class Branches < Application
     if @branch.save
       redirect resource(:branches), :message => {:notice => "Branch '#{@branch.name}' successfully created"}
     else
-#       message[:error] = "Branch failed to be created"
+      message[:error] = "Branch failed to be created"
       render :new  # error messages will show
     end
   end

@@ -25,7 +25,7 @@ module Merb
       catalog = Center.catalog
       catalog.keys.sort.each do |branch_name|
         collection << ['', branch_name]
-        catalog[branch_name].each_pair { |k,v| collection << [k.to_s, "!!!!!!!!!#{v}"] }
+        catalog[branch_name].sort.each{ |k,v| collection << [k.to_s, "!!!!!!!!!#{v}"] }
       end
       html = select col,
         :collection   => collection,
