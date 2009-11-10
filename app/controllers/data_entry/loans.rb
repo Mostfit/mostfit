@@ -6,19 +6,16 @@ class Loans < DataEntry::Controller
     debugger
     if params[:client_id]
       @client = Client.get(params[:client_id])
-      if params[:loan_type]
-        if Loan.descendants.map{|x| x.to_s}.include? params[:loan_type]
-          begin
-            klass = Kernel::const_get(params[:loan_type])
-            @loan = klass.new
-          end
-#          @loan = (params[:loan] and params[:loan][:id]) ? Loan.get(params[:loan][:id]) : (@loan or Loan.new)
+      if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])
+        if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type)
+          klass = Kernel::const_get(@loan_product.loan_type)
+          @loan = klass.new
         end
-      else
-        @loan_types = Loan.descendants if @loan.nil?
-        display [@loan_types, @loan, @client]
       end
     end
+    @loan_types = Loan.descendants if @loan.nil?
+    @loan_products = LoanProduct.valid if @loan.nil?
+    display [@loan_types, @loan_products, @loan, @client]
     render
   end
 
