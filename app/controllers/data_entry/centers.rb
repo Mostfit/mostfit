@@ -11,7 +11,6 @@ module DataEntry
     end
 
     def create(center)
-      debugger
       @center = Center.new(center)
       if @center.save
         redirect url(:enter_centers, :action => 'new'), :message => {:notice => "Center #{@center.name} created succesfully"}
@@ -21,7 +20,11 @@ module DataEntry
     end
 
     def edit
-      @center = (params[:center] and params[:center][:id]) ? Center.get(params[:center][:id]) : Center.new
+      if params[:id] and center = Center.get(params[:id]) || Center.first(:name => params[:id]) 
+        @center = center
+      elsif params[:id]
+        message[:error]  = "No center by that id or name"
+      end
       render
     end
 

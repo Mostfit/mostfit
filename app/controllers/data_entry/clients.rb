@@ -21,7 +21,13 @@ class Clients < DataEntry::Controller
   end
 
   def edit
-    @client = (params[:client] and params[:client][:id]) ? Client.get(params[:client][:id]) : Client.new
+    if params[:id] and client = Client.get(params[:id]) || Client.first(:name => params[:id]) || Client.first(:reference => params[:id])
+      @client = client
+    elsif params[:id]
+      message[:error] = "No client by that id or name or reference number"
+    elsif params[:client] and params[:client][:center_id]
+      @center  = Center.get(params[:client][:center_id])
+    end
     render
   end
 

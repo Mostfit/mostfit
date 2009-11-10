@@ -1,6 +1,5 @@
 module DataEntry
-  class Branches < DataEntry::Controller
-  
+  class Branches < DataEntry::Controller  
     def index
       render
     end
@@ -20,20 +19,22 @@ module DataEntry
     end
 
     def edit
-      @branch = (params[:branch] and params[:branch][:id]) ? Branch.get(params[:branch][:id]) : Branch.new
+      if params[:id] and branch = (Branch.get(params[:id]) || Branch.first(:name => params[:id]))
+        @branch = branch
+      elsif params[:id]
+        message[:error]  = "No branch by that id or name"
+      end
       render
     end
-
+    
     def update(id, branch)
-      debugger
       @branch = Branch.get(id)
       raise NotFound unless @branch
       if @branch.update_attributes(branch)
-        redirect url(:enter_branches, :action => 'edit'), :message => {:notice => "branch '#{@branch.name}' has been edited"}
+        redirect url(:enter_branches, :action => 'edit'), :message => {:notice => "Branch '#{@branch.name}' has been edited"}
       else
         render :edit  # error messages will be shown
       end
-    end
-
+    end    
   end
 end # DataEntry
