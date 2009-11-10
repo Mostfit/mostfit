@@ -1,4 +1,4 @@
-%h1
+%h2
   = @date 
   - if @center
     (
@@ -19,7 +19,7 @@
     %h2
       == Week #{@date.cweek} : Center #{@center.name}
       == : Meeting day #{@center.meeting_day}
-    %a{ :name => 'weeksheet' }/
+    %a{ :name => 'weeksheet' }
     
     %table.narrow.form{ :style => "width: 100%;" }
       %tr.odd
@@ -37,7 +37,8 @@
           = link_to 'next meeting', url(:enter_payments, :action => 'by_center', :for_date => @center.next_meeting_date_from(@date), :center_id => @center.id) + '#weeksheet'
       %tr
         %td center manager
-        %td= link_to @center.manager.name, resource(@center.manager)
+        %td
+          = link_to @center.manager.name, resource(@center.manager)
         %td
           %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
             = date_select 'date', @date
@@ -54,7 +55,7 @@
       %table.form
         %tr
           %th
-            Center Id
+            Center Id or Name
           %td
             = text_field :name => 'center_id'
         %tr
