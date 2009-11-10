@@ -66,8 +66,8 @@
               = a.to_currency
               - tot_total += a
             %td.numeric
-              - if i == 0
-                -
+              - if a == 0
+                = lh.nil? ? 0 : (lh.principal_paid.to_i + lh.interest_paid.to_i)
               - else 
                 = text_field :name => loan.id, :value => a, :cols => "5", :style => "width:50px;" 
 

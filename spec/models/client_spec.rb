@@ -2,23 +2,28 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Client do
 
-  before(:each) do
+  before(:all) do
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
+    @manager.save
     @manager.should be_valid
 
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
+    @branch.save
     @branch.should be_valid
 
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
     @center.branch = @branch
+    @center.save
     @center.should be_valid
-
+  end
+  
+  before(:each) do
+    Client.all.destroy!
     @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => Date.today)
     @client.center  = @center
-    @client.valid?
-    @client.errors.each {|e| puts e}
+    @client.save
     @client.should be_valid
   end
  
@@ -55,17 +60,21 @@ describe Client do
 
     @funder = Funder.new(:name => "FWWB")
     @funder.should be_valid
+    @funder.save
     @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
     @funding_line.funder = @funder
+    @funding_line.save
     @funding_line.should be_valid
 
     @loan.funding_line = @funding_line
-    @loan.should be_valid
     @loan.approved_on = "2000-02-03"
     @loan.approved_by = @manager
+    @loan.save
     @loan.should be_valid
 
     @client.loans << @loan
+    @client.valid?
+    @client.errors.each {|e| puts e}
     @client.should be_valid
     @client.loans.first.amount.should eql(1000)
     @client.loans.first.installment_frequency.should eql(:weekly)
@@ -76,6 +85,8 @@ describe Client do
     loan2.approved_by  = @manager
     loan2.client       = @client
     loan2.funding_line = @funding_line
+    loan2.save
+    loan2.errors.each {|e| puts e}
     loan2.should be_valid
 
     @client.loans << loan2

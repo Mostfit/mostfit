@@ -233,10 +233,9 @@ class Loan
     unless input.is_a? Array or input.is_a? Fixnum
       raise "the input argument of Loan#repay should be of class Fixnum or Array"
     end
-    raise "cannot repay a loan that has not been saved" if new_record?
+    raise "cannot repay a loan that has not been saved" if new?
 
     principal, interest, total = 0, 0, nil
-    debugger
     if input.is_a? Fixnum  # in case only one amount is specified
       # interest is paid first, the rest goes in as principal
       # the payment is filed on received_on without knowing about the future
@@ -264,7 +263,7 @@ class Loan
       clear_cache
     end
     payment.principal, payment.interest = nil, nil unless total.nil?  # remove calculated pr./int. values from the form
-    Merb.logger.info "loan #{id}: #{received_on} => paid #{principal} + #{interest} | prin_paid #{principal_received_up_to(received_on)} | os_bal:#{actual_outstanding_principal_on(received_on)}"
+    # Merb.logger.info "loan #{id}: #{received_on} => paid #{principal} + #{interest} | prin_paid #{principal_received_up_to(received_on)} | os_bal:#{actual_outstanding_principal_on(received_on)}"
     [save_status, payment]  # return the success boolean and the payment object itself for further processing
   end
 
@@ -313,12 +312,13 @@ class Loan
 
   def payments_hash
     return @payments_cache if @payments_cache
-    structs = repository.adapter.query(%Q{
+    sql = %Q{
       SELECT sum(principal) as principal, sum(interest) as interest, received_on
         FROM payments
        WHERE (deleted_at IS NULL) AND (loan_id = #{self.id})
        GROUP BY received_on
-    ORDER BY received_on})
+    ORDER BY received_on}
+    structs = id ? repository.adapter.query(sql) : []
     @payments_cache = {}
     total_balance = total_to_be_received
     @payments_cache[disbursal_date || scheduled_disbursal_date] = {
@@ -561,7 +561,7 @@ class Loan
       current = ((dates[[i-1,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or (i == dates.size - 1 and dates[i] < Date.today)) ? 1 : 0
       scheduled = get_scheduled(:all, date)
       actual = get_actual(:all, date)
-      puts "#{i} #{date} #{scheduled[:balance]} #{actual[:balance]} :: #{scheduled[:principal]} #{actual[:principal]}"
+      # puts "#{i} #{date} #{scheduled[:balance]} #{actual[:balance]} :: #{scheduled[:principal]} #{actual[:principal]}"
       scheduled_outstanding_principal = scheduled[:balance]
       scheduled_outstanding_total = scheduled[:total_balance]
       actual_outstanding_principal = actual[:balance]

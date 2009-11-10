@@ -2,12 +2,16 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Branch do
 
-  before(:each) do
+  before(:all) do
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
+    @manager.save
     @manager.should be_valid
+  end
 
+  before(:each) do
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
+    @branch.save
     @branch.should be_valid
   end
  
@@ -31,9 +35,11 @@ describe Branch do
     @center = Center.new(:name => name)
     @center.branch  = @branch
     @center.manager = @manager
+    @center.save
+    @center.errors.each {|e| puts e}
     @center.should be_valid
 
-    @branch.centers << @center
+    # @branch.centers << @center
     @branch.should be_valid
     @branch.centers.first.name.should eql(name)
 

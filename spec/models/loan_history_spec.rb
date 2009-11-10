@@ -2,33 +2,41 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe LoanHistory do
 
-  before(:each) do
+  before(:all) do
     DataMapper.auto_migrate! if Merb.orm == :datamapper
-    @user = User.new(:id => 234, :login => 'Joey User', :password => 'password', :password_confirmation => 'password')
-    # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
+    @user = User.new(:id => 234, :login => 'Joey', :password => 'password', :password_confirmation => 'password', :admin => true)
+    @user.save
+    @user.should be_valid
 
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
-    # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
+    @manager.save
+    @manager.should be_valid
 
     @funder = Funder.new(:name => "FWWB", :id => 1)
+    @funder.save
     @funder.should be_valid
 
     @funding_line = FundingLine.new(:id => 1, :amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
     @funding_line.funder = @funder
+    @funding_line.save
     @funding_line.should be_valid
 
     @branch = Branch.new(:name => "Kerela branch", :id => 1)
     @branch.manager = @manager
+    @branch.save
     @branch.should be_valid
 
     @center = Center.new(:name => "Munnar hill center", :id => 1)
     @center.manager = @manager
     @center.branch  = @branch
+    @center.save
     @center.should be_valid
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :id => 1)
+    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => Date.parse('2000-01-01'))
     @client.center  = @center
-    # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
+    @client.save
+    @client.errors.each{|e| puts e}
+    @client.should be_valid
 
     @loan = Loan.new( :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
     @loan.applied_by       = @manager
@@ -48,36 +56,42 @@ describe LoanHistory do
     @loanhistory.should_not be_nil
   end
 
- it "should not be valid without scheduled outstanding principal" do
-	@loanhistory.scheduled_outstanding_principal=nil
-	@loanhistory.should_not be_valid
-	end
- it "should not be valid without scheduled outstanding total" do
-	@loanhistory.scheduled_outstanding_total=nil
-	@loanhistory.should_not be_valid
-	end
- it "should not be valid without actual outstanding principal" do
-	@loanhistory.actual_outstanding_principal=nil
-	@loanhistory.should_not be_valid
-	end
- it "should not be valid without actual outstanding total" do
-	@loanhistory.actual_outstanding_total=nil
-	@loanhistory.should_not be_valid
-	end
- it "should not be valid without having a proper status" do
-	@loanhistory.status="ready"
-	@loanhistory.should_not be_valid
-	@loanhistory.status=nil
-	@loanhistory.should_not be_valid
-	end
- it "should not be valid if the combination if loan id and date is not unique" do
-	@loanhistory1=LoanHistory.new(:loan_id=>12345,:date=>"2001-02-02",:scheduled_outstanding_principal=>800,
-  :scheduled_outstanding_total=>900,:actual_outstanding_principal=>820,:actual_outstanding_total=>920 ,:status=>:approved)
-	@loanhistory1.save
-	@loanhistory2=LoanHistory.new(:loan_id=>12345,:date=>"2001-02-02",:scheduled_outstanding_principal=>800,
-  :scheduled_outstanding_total=>900,:actual_outstanding_principal=>820,:actual_outstanding_total=>920 ,:status=>:approved)
-	@loanhistory2.save	
-	@loanhistory2.should_not be_valid
+  it "should not be valid without scheduled outstanding principal" do
+    # debugger
+    @loanhistory.scheduled_outstanding_principal=nil
+    @loanhistory.should_not be_valid
+  end
+
+  it "should not be valid without scheduled outstanding total" do
+    @loanhistory.scheduled_outstanding_total=nil
+    @loanhistory.should_not be_valid
+  end
+
+  it "should not be valid without actual outstanding principal" do
+    @loanhistory.actual_outstanding_principal=nil
+    @loanhistory.should_not be_valid
+  end
+
+  it "should not be valid without actual outstanding total" do
+    @loanhistory.actual_outstanding_total=nil
+    @loanhistory.should_not be_valid
+  end
+
+  it "should not be valid without having a proper status" do
+    @loanhistory.status="ready"
+    @loanhistory.should_not be_valid
+    @loanhistory.status=nil
+    @loanhistory.should_not be_valid
+  end
+
+  it "should not be valid if the combination if loan id and date is not unique" do
+    @loanhistory1=LoanHistory.new(:loan_id=>12345,:date=>"2001-02-02",:scheduled_outstanding_principal=>800,
+                                  :scheduled_outstanding_total=>900,:actual_outstanding_principal=>820,:actual_outstanding_total=>920 ,:status=>:approved)
+    @loanhistory1.save
+    @loanhistory2=LoanHistory.new(:loan_id=>12345,:date=>"2001-02-02",:scheduled_outstanding_principal=>800,
+                                  :scheduled_outstanding_total=>900,:actual_outstanding_principal=>820,:actual_outstanding_total=>920 ,:status=>:approved)
+    @loanhistory2.save	
+    @loanhistory2.should_not be_valid
   end
 
   it "should have correct number of periods" do

@@ -2,17 +2,23 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Center do
 
-  before(:each) do
+  before(:all) do
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
+    @manager.save
     @manager.should be_valid
 
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
+    @branch.save
     @branch.should be_valid
+  end
 
+  before(:each) do
+    Center.all.destroy!
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
     @center.branch = @branch
+    @center.save
     @center.should be_valid
   end
  
@@ -35,6 +41,7 @@ describe Center do
     name = 'Ms C.L. Ient'
     ref  = 'XW000-2009.01.05'
     @client = Client.new(:name => name, :reference => ref, :date_joined => Date.today)
+    @client.save
     @client.center  = @center
     @client.should be_valid
 
@@ -45,6 +52,7 @@ describe Center do
 
     client2 = Client.new(:name => 'Mr. T.A. Kesmoney', :reference => 'AN000THER_REF', :date_joined => Date.today)
     client2.center  = @center
+    client2.save
     client2.should be_valid
 
     @center.clients << client2

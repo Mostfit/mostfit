@@ -26,16 +26,17 @@ end
 
 module Reporting
   module BranchReports
-    # we must convert each SQL struct into a hash of {:branch_id =< :value}, so that we are always looking at 
+    # we must convert each SQL struct into a hash of {:branch_id => :value}, so that we are always looking at 
     # the correct branch, and we have to refactor the divison, multiplication, etc. of these arrays
     def query_as_hash(sql)
       # we cache the values to avoid unneccessary calls to the database.
-      calling_method = caller[0].split("`")[1][0..-2]
-      Merb.logger.error! "Called by #{calling_method}"
-      o = Kernel.instance_variable_get("@_#{calling_method}")
-      return o if o
+      #calling_method = caller[0].split("`")[1][0..-2]
+      #Merb.logger.error! "Called by #{calling_method}"
+      #o = Kernel.instance_variable_get("@_#{calling_method}")
+      #return o if o
+      #puts sql
       o = repository.adapter.query(sql).map {|x| [x[0],x[1]]}.to_hash
-      Kernel.instance_variable_set("@_#{calling_method}",o)
+      #Kernel.instance_variable_set("@_#{calling_method}",o)
       o
     end
 

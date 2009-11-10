@@ -7,24 +7,18 @@ User
 - should have a login name beginning with numbers, aplphabets and underscores 
 - should not have false in all permission fields
 
-StaffMember
-- should not be valid without a name
-- should not  be valid without active boolean
-- should be unique
-- should have name length > 3
-
-Branch
-- should not be valid without a manager
-- should not be valid without a name
-- should not be valid with a name shorter than 3 characters
-- should be able to 'have' centers
-
 Funder
 - should not be valid without having a name
 - should be able to have funding lines
 - should give correct count of completed lines 
 - should give correct count of active lines
 - should give correct count of total lines 
+
+StaffMember
+- should not be valid without a name
+- should not  be valid without active boolean
+- should be unique
+- should have name length > 3
 
 FundingLine
 - should not be valid without belonging to a funder
@@ -35,29 +29,14 @@ FundingLine
 - should have first payment done before last payment
 - should be disbursed before first payment
 
-Attendancy
-- should not be valid without belonging to a client
-- should not be valid without proper date
-- should not be valid when attendancy date is in future
-- should not be valid without proper status
-
 LoanType
 - should have specs (PENDING: Not Yet Implemented)
 
-Payment
-- should not be valid without belonging to a loan
-- should not be valid without being created by a staff member
-- should not be valid without being received by a staff member
-- should not be valid without being created by active user
-- should not be valid without beng received by an active staff member
-- should not be valid without being properly deleted
-- should not be valid if date of receival is in future
-- should not be valid if interest is negative
-- should not be valid if principal is negative
-- should not be valid if total is negative
-- should not be valid if payment is received before disbursal of loan
-- should not be valid if paying too much principal
-- should not be valid if paying too much in total
+Upload
+- before(:all) (FAILED - 1)
+
+Upload
+- before(:all) (FAILED - 2)
 
 Client
 - should not be valid without belonging to a center
@@ -67,12 +46,6 @@ Client
 - should have a joining date
 - should be able to 'have' loans
 - should not have more than one outstanding loan at a time if so specified (PENDING: Not Yet Implemented)
-
-Center
-- should not be valid without a manager
-- should not be valid without a name
-- should not be valid with a name shorter than 3 characters
-- should be able to 'have' clients
 
 LoanHistory
 - should not be valid without scheduled outstanding principal
@@ -91,6 +64,7 @@ Report
 - should have proper statistics after first monday's payments
 - should have correct loan count
 - should have correct number of clients
+- should have correct client count event after we add our new loans
 - should return correct repaid loan count
 - should return correct repaid loan amount
 - should return correct disbursed loan count
@@ -103,9 +77,6 @@ Report
 - should give correct scheduled principal outstanding
 - should give correct total outstanding
 - should give correct scheduled total outstanding
-
-Upload
-- before(:all) (FAILED - 1)
 
 Loan
 - should have a discrimintator
@@ -146,25 +117,68 @@ Loan
 - history should be correct
 - should write the history correctly into the db
 
+Payment
+- should not be valid without belonging to a loan
+- should not be valid without being created by a staff member
+- should not be valid without being received by a staff member
+- should not be valid without being created by active user
+- should not be valid without beng received by an active staff member
+- should not be valid without being properly deleted
+- should not be valid if date of receival is in future
+- should not be valid if interest is negative
+- should not be valid if principal is negative
+- should not be valid if total is negative
+- should not be valid if payment is received before disbursal of loan
+- should not be valid if paying too much principal
+- should not be valid if paying too much in total
+
+Branch
+- should not be valid without a manager
+- should not be valid without a name
+- should not be valid with a name shorter than 3 characters
+- should be able to 'have' centers
+
+Center
+- should not be valid without a manager
+- should not be valid without a name
+- should not be valid with a name shorter than 3 characters
+- should be able to 'have' clients (FAILED - 3)
+
+Attendancy
+- should not be valid without belonging to a client
+- should not be valid without proper date
+- should not be valid when attendancy date is in future
+- should not be valid without proper status
+
 Pending:
 
 LoanType should have specs (Not Yet Implemented)
 ./spec/models/loan_type_spec.rb:5
 
 Client should not have more than one outstanding loan at a time if so specified (Not Yet Implemented)
-./spec/models/client_spec.rb:86
+./spec/models/client_spec.rb:97
 
 Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
-./spec/models/loan_spec.rb:312
+./spec/models/loan_spec.rb:316
 
 1)
-Errno::ENOENT in 'Upload before(:all)'
-No such file or directory - /home/svs/src/mostfit/uploads/b6c1a2c0-a697-012c-24fb-002170a20aef/staff_members
-/home/svs/src/mostfit/app/models/upload.rb:31:in `load_csv'
+NameError in 'Upload before(:all)'
+uninitialized constant Upload::CSV
+/home/svs/src/mostfit/app/models/upload.rb:32:in `load_csv'
 /home/svs/src/mostfit/app/models/upload.rb:27:in `each'
 /home/svs/src/mostfit/app/models/upload.rb:27:in `load_csv'
 ./spec/models/upload_spec.rb:19:
 
-Finished in 76.535282 seconds
+2)
+NameError in 'Upload before(:all)'
+uninitialized constant CSV
+./spec/models/functions_spec.rb:10:
 
-118 examples, 1 failure, 3 pending
+3)
+NoMethodError in 'Center should be able to 'have' clients'
+undefined method `name' for nil:NilClass
+./spec/models/center_spec.rb:50:
+
+Finished in 74.757929 seconds
+
+119 examples, 3 failures, 3 pending

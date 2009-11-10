@@ -2,20 +2,24 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Loan do
 
-  before(:each) do
+  before(:all) do
     Payment.all.destroy! if Payment.all.count > 0
     Client.all.destroy! if Client.count > 0
-    @user = User.new(:id => 234, :login => 'Joey User', :password => 'password', :password_confirmation => 'password')
-    # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
+    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :admin => true)
+    @user.save
+    @user.should be_valid
 
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
-    # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
+    @manager.save
+    @manager.should be_valid
 
     @funder = Funder.new(:name => "FWWB")
+    @funder.save
     @funder.should be_valid
 
     @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
     @funding_line.funder = @funder
+    @funding_line.save
     @funding_line.should be_valid
 
     @branch = Branch.new(:name => "Kerela branch")
@@ -36,15 +40,15 @@ describe Loan do
     @client.errors.each {|e| puts e}
     @client.should be_valid
     # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
-
-    @loan = Loan.new(:id => 123456, :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
+  end
+  before(:each) do
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
     @loan.history_disabled = true
     @loan.applied_by       = @manager
     @loan.funding_line     = @funding_line
     @loan.client           = @client
     @loan.errors.each {|e| puts e}
     @loan.should be_valid
-    
     @loan.approved_on = "2000-02-03"
     @loan.approved_by = @manager
     @loan.should be_valid
@@ -323,6 +327,7 @@ describe Loan do
     @loan.status.should == :approved
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by   = @manager
+    @loan.save
     @loan.status.should == :outstanding
     @loan.status(@loan.disbursal_date - 1).should == :approved
     @loan.written_off_on = @loan.scheduled_first_payment_date
@@ -392,11 +397,11 @@ describe Loan do
   end
 
   it ".payments_hash should give correct results" do
+    @loan.save
     @loan.payments_hash.should_not be_blank
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @manager
-    @loan.id = nil
-    @loan.save
+    # @loan.id = nil
     7.times do |i|
       status = @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
       status[1].errors.each {|e| puts e}

@@ -26,7 +26,7 @@ class LoanHistory
 
   property :status,                          Enum.send('[]', *STATUSES)
 
-  belongs_to :loan, :index => true
+  belongs_to :loan#, :index => true
   belongs_to :client, :index => true         # speed up reports
   belongs_to :center, :index => true         # by avoiding lots of joins!
   belongs_to :branch, :index => true         # muahahahahahaha!
