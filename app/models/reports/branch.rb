@@ -224,7 +224,7 @@ module Reporting
     end
 
     def method_missing(name, params)
-      if /avg_(\w+)_per_(\w+)/.match(name.to_s)
+      if /avg_([a-zA-Z0-9_]+)_per_([a-zA-Z0-9_]+)/.match(name.to_s)
         num = params ? send($1, *params[0]) : send($1)
         den = params ? send($2, *params[1]) : send($2)
         return num/den
@@ -232,7 +232,5 @@ module Reporting
         raise NoMethodError
       end
     end
-
-
   end
 end

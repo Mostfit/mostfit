@@ -59,7 +59,6 @@ class WeeklyReport < Report
     @report[15] = {"average os bal per loanee" => Branch.avg_outstanding_balance}
     @report[16] = {"number of staff members" => Branch.center_managers(end_date)}
     @report[17] = {"number of center managers" => Branch.center_managers(end_date)}
-    debugger
     @report[18] = {"average clients / staff" => Branch.avg_client_count_per_center_managers([[end_date], [end_date]])}
     @report[19] = {"average clients / staff" => Branch.avg_client_count_per_center_managers([[end_date], [end_date]])}
     @report[20] = {"average balance / CM" => Branch.avg_principal_outstanding_per_center_managers([[end_date],[end_date]])}

@@ -52,7 +52,6 @@ class Client
   end
 
   def self.active(query = {},operator = "=", num_loans = 1)
-    debugger
     client_ids = repository.adapter.query(%Q{
       SELECT (id) 
       FROM (

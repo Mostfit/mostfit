@@ -22,7 +22,6 @@ class FundingLines < Application
   end
 
   def create(funding_line)
-    debugger
     funding_line[:interest_rate] = funding_line[:interest_rate].to_f / 100
     @funding_line = FundingLine.new(funding_line)
     @funding_line.funder = @funder

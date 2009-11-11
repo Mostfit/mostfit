@@ -26,7 +26,6 @@ module DataMapper
 
     
     def _log(action)
-      debugger
       puts "logging"
       log = {
         :action => action,

@@ -297,7 +297,6 @@ class GraphData < Application
         values = Branch.all.map {|b| b.centers.clients.loans.sum(:amount) || 0 }
         type = "pie"
       when "center_day"
-      debugger
       vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{params[:date]}' GROUP BY lh.center_id")
       values = vals.map do |v| 
         val = v[0] + v[1]

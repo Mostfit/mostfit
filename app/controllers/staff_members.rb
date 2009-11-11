@@ -4,7 +4,6 @@ class StaffMembers < Application
   before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
 
   def index
-    debugger
     # @current_page = ( params[:page] && ( params[:page].to_i > 0 ) ) ? params[:page].to_i : 1 
     #per_page = 15
     # @staff_members = StaffMember.all(:order => [:id], :offset => (@current_page - 1 ) * per_page, :limit => per_page)
@@ -34,7 +33,6 @@ class StaffMembers < Application
   end
 
   def day_sheet(id)
-    debugger
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
     @date = (params[:date] and Date.parse(params[:date])) ? Date.parse(params[:date]) : Date.today
