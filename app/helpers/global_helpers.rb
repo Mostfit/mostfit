@@ -9,14 +9,11 @@ module Merb
 
     def select_staff_member_for(obj, col, attrs = {})
       id_col = "#{col.to_s}_staff_id".to_sym
-      select col,
-        :collection   => StaffMember.all(:active => true),
-        :value_method => :id,
-        :text_method  => :name,
-        :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
-        :id           => "#{obj.class.to_s.snake_case}_#{id_col}",
-        :selected     => (obj.send(id_col) ? obj.send(id_col).to_s : nil),
-        :prompt       => (attrs[:prompt] or "&lt;select a staff member&gt;")
+      select(col,
+      :collection   => [["0", "<Select a staff member"]] + StaffMember.all(:active => true).map{|x| [x.id, x.name]},
+      :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
+      :id           => "#{obj.class.to_s.snake_case}_#{id_col}",
+      :selected     => ((obj.send(id_col) and obj.send(id_col)!="") ? obj.send(id_col).to_s : "0"))
     end
 
     def select_center_for(obj, col, attrs = {})

@@ -630,7 +630,7 @@ class Loan
     [false, "Loan amount should be greater than zero"]
   end
   def installments_are_integers?
-    return [false, "Number of installments not defined"] if number_of_installments.nil?
+    return [false, "Number of installments not defined"] if number_of_installments.nil? or number_of_installments.blank?
     (1..number_of_installments).each do |i|
       p = scheduled_principal_for_installment(i)
       return [false, "Amount must yield integer installments"] if p.to_i != p
@@ -638,11 +638,11 @@ class Loan
     return true
   end
   def interest_rate_greater_than_zero?
-    return true if interest_rate and interest_rate > 0
+    return true if interest_rate and interest_rate.to_f > 0
     [false, "Interest rate should be greater than zero"]
   end
   def number_of_installments_greater_than_zero?
-    return true if number_of_installments and number_of_installments > 0
+    return true if number_of_installments and number_of_installments.to_i > 0
     [false, "Number of installments should be greater than zero"]
   end
   def applied_before_appoved?
