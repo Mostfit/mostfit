@@ -3,9 +3,8 @@ module DataEntry
 class Loans < DataEntry::Controller
   provides :html, :xml
   def new
-    debugger
     if params[:client_id]
-      @client = Client.get(params[:client_id])
+      @client = Client.get(params[:client_id]) || Client.first(:name => params[:client_id]) || Client.first(:reference => params[:client_id])
       if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])
         if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type)
           klass = Kernel::const_get(@loan_product.loan_type)
@@ -13,14 +12,13 @@ class Loans < DataEntry::Controller
         end
       end
     end
-    @loan_types = Loan.descendants if @loan.nil?
+    @loan_types    = Loan.descendants if @loan.nil?
     @loan_products = LoanProduct.valid if @loan.nil?
-    display [@loan_types, @loan_products, @loan, @client]
+#    display [@loan_types, @loan_products, @loan, @client]
     render
   end
 
   def create
-    debugger
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 1
     @loan = klass.new(attrs)
@@ -33,6 +31,7 @@ class Loans < DataEntry::Controller
         redirect url(:enter_loans, :action => 'new'), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
       end
     else
+      @loan_product  = LoanProduct.get(params[:loan_product_id])
       params[:format]=='xml'? display(@loan) : render(:new)
     end
   end
@@ -58,7 +57,6 @@ class Loans < DataEntry::Controller
   end
 
   def approve
-    debugger
     if params[:id]
       @center = Center.get(params[:id])
       raise NotFound unless @center

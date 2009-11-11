@@ -5,16 +5,16 @@
 = error_messages_for @loan
 - if @client
   - if @loan.nil?
-    - @loan_products.each do |product|
-      = form_for(@loan, :action => url(:enter_loans, :action => 'new')) do
-        %tr
-          %td
-            %h3
-              = product.name
+    %table
+      - @loan_products.each do |product|
+        = form_for(@loan, :action => url(:enter_loans, :action => 'new'), :method => :get) do
+          %tr
+            %td
+              %h3= product.name
+            %td
               = hidden_field :name => "product_id", :value => product.id
               = hidden_field :name => "client_id", :value => @client.id
-          %td
-            = submit "Proceed"
+              = submit "Proceed"
   - else
     = form_for(@loan, :action => url(:enter_loans, :action => 'create')) do
       = hidden_field :client_id, :value => @client.id
@@ -35,7 +35,7 @@
       %tr
         %td &nbsp;
         %td
-          Client ID:
+          Client ID, Name or Ref.:
         %td
           = text_field :client_id, :size => 8
         %td
