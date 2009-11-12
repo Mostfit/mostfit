@@ -29,9 +29,10 @@ class GraphData < Application
 
     @labels, @stacks = [], []
     dates.sort.each_with_index do |date, index|
+      debugger
       future                = date > Date.today
-      scheduled_outstanding = @loan.scheduled_outstanding_total_on(date)  # or *_principal_on
-      actual_outstanding    = future ? scheduled_outstanding : @loan.actual_outstanding_total_on(date)  # or *_principal_on
+      scheduled_outstanding = @loan.scheduled_outstanding_total_on(date).to_i  # or *_principal_on
+      actual_outstanding    = future ? scheduled_outstanding : @loan.actual_outstanding_total_on(date).to_i  # or *_principal_on
       overpaid              = scheduled_outstanding - actual_outstanding  # negative means shortfall
       tip_base              = "##{index+1}, #{date.strftime("%a %b %d %Y")}#{(future ? ' (future)' : '')}<br>"
       percentage            = scheduled_outstanding == 0 ? '0' : (overpaid.abs.to_f/scheduled_outstanding*100).round.to_s + '%'
