@@ -1,0 +1,13 @@
+%h1 LedgerEntries controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/ledger_entries/new.html.erb
+
+= error_messages_for @ledger_entry
+
+= form_for(@ledger_entry, :action => url(:ledger_entries) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:ledger_entries)

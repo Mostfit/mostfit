@@ -1,0 +1,16 @@
+%h1
+  LedgerEntries controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/ledger_entries/index.html.erb
+%table
+  %tr
+  - for ledger_entry in @ledger_entries
+    %tr
+      %td
+        = link_to 'Show', url(:ledger_entry, ledger_entry)
+      %td
+        = link_to 'Edit', url(:edit_ledger_entry,  ledger_entry)
+
+= link_to 'New', url(:new_ledger_entry)

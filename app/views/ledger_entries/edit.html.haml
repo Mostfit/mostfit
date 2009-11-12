@@ -1,0 +1,15 @@
+%h1
+  LedgerEntries controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/ledger_entries/edit.html.erb
+= error_messages_for @ledger_entry
+
+= form_for(@ledger_entry, :action => url(:ledger_entry, @ledger_entry)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:ledger_entry, @ledger_entry)
+|
+= link_to 'Back', url(:ledger_entries)

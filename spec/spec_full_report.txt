@@ -1,11 +1,212 @@
 
-User
-- should not be valid with name shorter than 3 characters
-- should not have a nil login 
-- should be return for admin? if admin value set to true
-- should be created before it is updated
-- should have a login name beginning with numbers, aplphabets and underscores 
-- should not have false in all permission fields
+resource(@report) PUT
+- redirect to the report show action (FAILED - 1)
+
+resource(@report) GET
+- responds successfully (FAILED - 2)
+
+resource(@report, :edit)
+- responds successfully (FAILED - 3)
+
+resource(:reports, :new)
+- responds successfully (FAILED - 4)
+
+resource(@report) a successful DELETE
+- should redirect to the index action (FAILED - 5)
+
+resource(:reports) a successful POST
+- redirects to resource(:reports) (FAILED - 6)
+
+resource(:reports) GET
+- has a list of reports (PENDING: TODO)
+
+resource(:reports) GET
+- responds successfully (FAILED - 7)
+- contains a list of reports (PENDING: TODO)
+
+resource(@user) PUT
+- redirect to the article show action (FAILED - 8)
+
+resource(@user) GET
+- responds successfully (FAILED - 9)
+
+resource(@user, :edit)
+- responds successfully (FAILED - 10)
+
+resource(:users, :new)
+- responds successfully (FAILED - 11)
+
+resource(@user) a successful DELETE
+- should redirect to the index action (FAILED - 12)
+
+resource(:users) a successful POST
+- redirects to resource(:users) (FAILED - 13)
+
+resource(:users) GET
+- has a list of users (PENDING: TODO)
+
+resource(:users) GET
+- responds successfully (FAILED - 14)
+- contains a list of users (PENDING: TODO)
+
+resource(@permission) PUT
+- redirect to the article show action (FAILED - 15)
+
+resource(@permission) GET
+- responds successfully (FAILED - 16)
+
+resource(@permission, :edit)
+- responds successfully (FAILED - 17)
+
+resource(:permissions, :new)
+- responds successfully (FAILED - 18)
+
+resource(@permission) a successful DELETE
+- should redirect to the index action (FAILED - 19)
+
+resource(:permissions) a successful POST
+- redirects to resource(:permissions) (FAILED - 20)
+
+resource(:permissions) GET
+- has a list of permissions (FAILED - 21)
+
+resource(:permissions) GET
+- responds successfully (FAILED - 22)
+- contains a list of permissions (FAILED - 23)
+
+resource(@payment) PUT
+- redirect to the article show action (FAILED - 24)
+
+resource(@payment) GET
+- responds successfully (FAILED - 25)
+
+resource(@payment, :edit)
+- responds successfully (FAILED - 26)
+
+resource(:payments, :new)
+- responds successfully (FAILED - 27)
+
+resource(@payment) a successful DELETE
+- should redirect to the index action (FAILED - 28)
+
+resource(:payments) a successful POST
+- redirects to resource(:payments) (FAILED - 29)
+
+resource(:payments) GET
+- has a list of payments (FAILED - 30)
+
+resource(:payments) GET
+- responds successfully (FAILED - 31)
+- contains a list of payments (FAILED - 32)
+
+resource(@loan) PUT
+- redirect to the article show action (FAILED - 33)
+
+resource(@loan) GET
+- responds successfully (FAILED - 34)
+
+resource(@loan, :edit)
+- responds successfully (FAILED - 35)
+
+resource(:loans, :new)
+- responds successfully (FAILED - 36)
+
+resource(@loan) a successful DELETE
+- should redirect to the index action (FAILED - 37)
+
+resource(:loans) a successful POST
+- redirects to resource(:loans) (FAILED - 38)
+
+resource(:loans) GET
+- has a list of loans (FAILED - 39)
+
+resource(:loans) GET
+- responds successfully (FAILED - 40)
+- contains a list of loans (FAILED - 41)
+
+Controllers 
+- should fail with improper credentials
+- should deny access to the data
+- should login with correct credentials
+- should check read_only_user credentials (FAILED - 42)
+- should check data_entry_operator credentials (FAILED - 43)
+- should check mis_manager credentials (FAILED - 44)
+- should check admin credentials (FAILED - 45)
+
+resource(@staff_member) PUT
+- redirect to the article show action (FAILED - 46)
+
+resource(@staff_member) GET
+- responds successfully (FAILED - 47)
+
+resource(@staff_member, :edit)
+- responds successfully (FAILED - 48)
+
+resource(:staff_members, :new)
+- responds successfully (FAILED - 49)
+
+resource(@staff_member) a successful DELETE
+- should redirect to the index action (FAILED - 50)
+
+resource(:staff_members) a successful POST
+- redirects to resource(:staff_members) (FAILED - 51)
+
+resource(:staff_members) GET
+- has a list of staff_members (PENDING: TODO)
+
+resource(:staff_members) GET
+- responds successfully (FAILED - 52)
+- contains a list of staff_members (PENDING: TODO)
+
+resource(@funding_line) PUT
+- redirect to the funding_line show action (FAILED - 53)
+
+resource(@funding_line) GET
+- responds successfully (FAILED - 54)
+
+resource(@funding_line, :edit)
+- responds successfully (FAILED - 55)
+
+resource(:funding_lines, :new)
+- responds successfully (FAILED - 56)
+
+resource(@funding_line) a successful DELETE
+- should redirect to the index action (FAILED - 57)
+
+resource(:funding_lines) a successful POST
+- redirects to resource(:funding_lines) (FAILED - 58)
+
+resource(:funding_lines) GET
+- has a list of funding_lines (FAILED - 59)
+
+resource(:funding_lines) GET
+- responds successfully (FAILED - 60)
+- contains a list of funding_lines (FAILED - 61)
+
+resource(@funder) PUT
+- redirect to the funder show action (FAILED - 62)
+
+resource(@funder) GET
+- responds successfully (FAILED - 63)
+
+resource(@funder, :edit)
+- responds successfully (FAILED - 64)
+
+resource(:funders, :new)
+- responds successfully (FAILED - 65)
+
+resource(@funder) a successful DELETE
+- should redirect to the index action (FAILED - 66)
+
+resource(:funders) a successful POST
+- redirects to resource(:funders) (FAILED - 67)
+
+resource(:funders) GET
+- has a list of funders (PENDING: TODO)
+
+resource(:funders) GET
+- responds successfully (FAILED - 68)
+- contains a list of funders (PENDING: TODO)
 
 Funder
 - should not be valid without having a name
@@ -13,12 +214,6 @@ Funder
 - should give correct count of completed lines 
 - should give correct count of active lines
 - should give correct count of total lines 
-
-StaffMember
-- should not be valid without a name
-- should not  be valid without active boolean
-- should be unique
-- should have name length > 3
 
 FundingLine
 - should not be valid without belonging to a funder
@@ -29,14 +224,128 @@ FundingLine
 - should have first payment done before last payment
 - should be disbursed before first payment
 
+StaffMember
+- should not be valid without a name
+- should not  be valid without active boolean
+- should be unique
+- should have name length > 3
+
+resource(@client) PUT
+- redirect to the article show action (FAILED - 69)
+
+resource(@client) GET
+- responds successfully (FAILED - 70)
+
+resource(@client, :edit)
+- responds successfully (FAILED - 71)
+
+resource(:clients, :new)
+- responds successfully (FAILED - 72)
+
+resource(@client) a successful DELETE
+- should redirect to the index action (FAILED - 73)
+
+resource(:clients) a successful POST
+- redirects to resource(:clients) (FAILED - 74)
+
+resource(:clients) GET
+- has a list of clients (FAILED - 75)
+
+resource(:clients) GET
+- responds successfully (FAILED - 76)
+- contains a list of clients (FAILED - 77)
+
+resource(@center) PUT
+- redirect to the article show action (FAILED - 78)
+
+resource(@center) GET
+- responds successfully (FAILED - 79)
+
+resource(@center, :edit)
+- responds successfully (FAILED - 80)
+
+resource(:centers, :new)
+- responds successfully (FAILED - 81)
+
+resource(@center) a successful DELETE
+- should redirect to the index action (FAILED - 82)
+
+resource(:centers) a successful POST
+- redirects to resource(:centers) (FAILED - 83)
+
+resource(:centers) GET
+- has a list of centers (FAILED - 84)
+
+resource(:centers) GET
+- responds successfully (FAILED - 85)
+- contains a list of centers (FAILED - 86)
+
+User
+- should not be valid with name shorter than 3 characters
+- should not have a nil login 
+- should be return for admin? if admin value set to true
+- should be created before it is updated
+- should have a login name beginning with numbers, aplphabets and underscores 
+- should not have false in all permission fields
+
+resource(@branch) PUT
+- redirect to the article show action (FAILED - 87)
+
+resource(@branch) GET
+- responds successfully (FAILED - 88)
+
+resource(@branch, :edit)
+- responds successfully (FAILED - 89)
+
+resource(:branches, :new)
+- responds successfully (FAILED - 90)
+
+resource(@branch) a successful DELETE
+- should redirect to the index action (FAILED - 91)
+
+resource(:branches) a successful POST
+- redirects to resource(:branches) (FAILED - 92)
+
+resource(:branches) GET
+- has a list of branches (PENDING: TODO)
+
+resource(:branches) GET
+- responds successfully (FAILED - 93)
+- contains a list of branches (PENDING: TODO)
+
+resource(@loan_type) PUT
+- redirect to the loan_type show action (FAILED - 94)
+
+resource(@loan_type) GET
+- responds successfully (FAILED - 95)
+
+resource(@loan_type, :edit)
+- responds successfully (FAILED - 96)
+
+resource(:loan_types, :new)
+- responds successfully (FAILED - 97)
+
+resource(@loan_type) a successful DELETE
+- should redirect to the index action (FAILED - 98)
+
+resource(:loan_types) a successful POST
+- redirects to resource(:loan_types) (FAILED - 99)
+
+resource(:loan_types) GET
+- has a list of loan_types (FAILED - 100)
+
+resource(:loan_types) GET
+- responds successfully (FAILED - 101)
+- contains a list of loan_types (FAILED - 102)
+
 LoanType
 - should have specs (PENDING: Not Yet Implemented)
 
 Upload
-- before(:all) (FAILED - 1)
+- before(:all) (FAILED - 103)
 
 Upload
-- before(:all) (FAILED - 2)
+- before(:all) (FAILED - 104)
 
 Client
 - should not be valid without belonging to a center
@@ -142,7 +451,7 @@ Center
 - should not be valid without a manager
 - should not be valid without a name
 - should not be valid with a name shorter than 3 characters
-- should be able to 'have' clients (FAILED - 3)
+- should be able to 'have' clients (FAILED - 105)
 
 Attendancy
 - should not be valid without belonging to a client
@@ -150,7 +459,65 @@ Attendancy
 - should not be valid when attendancy date is in future
 - should not be valid without proper status
 
+resource(@ledger_entry) PUT
+- redirect to the ledger_entry show action (FAILED - 106)
+
+resource(@ledger_entry) GET
+- responds successfully (FAILED - 107)
+
+resource(@ledger_entry, :edit)
+- responds successfully (FAILED - 108)
+
+resource(:ledger_entries, :new)
+- responds successfully (FAILED - 109)
+
+resource(@ledger_entry) a successful DELETE
+- should redirect to the index action (FAILED - 110)
+
+resource(:ledger_entries) a successful POST
+- redirects to resource(:ledger_entries) (FAILED - 111)
+
+resource(:ledger_entries) GET
+- has a list of ledger_entries (PENDING: TODO)
+
+resource(:ledger_entries) GET
+- responds successfully (FAILED - 112)
+- contains a list of ledger_entries (PENDING: TODO)
+
+LedgerEntry
+- should have specs (PENDING: Not Yet Implemented)
+
 Pending:
+
+resource(:reports) GET has a list of reports (TODO)
+./spec/requests/reports_spec.rb:32
+
+resource(:reports) GET contains a list of reports (TODO)
+./spec/requests/reports_spec.rb:20
+
+resource(:users) GET has a list of users (TODO)
+./spec/requests/users_spec.rb:32
+
+resource(:users) GET contains a list of users (TODO)
+./spec/requests/users_spec.rb:20
+
+resource(:staff_members) GET has a list of staff_members (TODO)
+./spec/requests/staff_members_spec.rb:32
+
+resource(:staff_members) GET contains a list of staff_members (TODO)
+./spec/requests/staff_members_spec.rb:20
+
+resource(:funders) GET has a list of funders (TODO)
+./spec/requests/funders_spec.rb:32
+
+resource(:funders) GET contains a list of funders (TODO)
+./spec/requests/funders_spec.rb:20
+
+resource(:branches) GET has a list of branches (TODO)
+./spec/requests/branches_spec.rb:35
+
+resource(:branches) GET contains a list of branches (TODO)
+./spec/requests/branches_spec.rb:23
 
 LoanType should have specs (Not Yet Implemented)
 ./spec/models/loan_type_spec.rb:5
@@ -161,7 +528,526 @@ Client should not have more than one outstanding loan at a time if so specified 
 Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
 ./spec/models/loan_spec.rb:316
 
+resource(:ledger_entries) GET has a list of ledger_entries (TODO)
+./spec/requests/ledger_entries_spec.rb:32
+
+resource(:ledger_entries) GET contains a list of ledger_entries (TODO)
+./spec/requests/ledger_entries_spec.rb:20
+
+LedgerEntry should have specs (Not Yet Implemented)
+./spec/models/ledger_entry_spec.rb:5
+
 1)
+Merb::Router::GenerationError in 'resource(@report) PUT redirect to the report show action'
+Resource route not found: [nil]
+./spec/requests/reports_spec.rb:100:
+
+2)
+Merb::Router::GenerationError in 'resource(@report) GET responds successfully'
+Resource route not found: [nil]
+./spec/requests/reports_spec.rb:89:
+
+3)
+Merb::Router::GenerationError in 'resource(@report, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+./spec/requests/reports_spec.rb:77:
+
+4)
+'resource(:reports, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/reports/new' to be successful, but it returned a 401
+./spec/requests/reports_spec.rb:71:
+
+5)
+Merb::Router::GenerationError in 'resource(@report) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+./spec/requests/reports_spec.rb:55:
+
+6)
+Merb::Router::GenerationError in 'resource(:reports) a successful POST redirects to resource(:reports)'
+Resource route not found: [nil]
+./spec/requests/reports_spec.rb:46:
+
+7)
+'resource(:reports) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/reports' to be successful, but it returned a 401
+./spec/requests/reports_spec.rb:17:
+
+8)
+Merb::Router::GenerationError in 'resource(@user) PUT redirect to the article show action'
+Resource route not found: [nil]
+./spec/requests/users_spec.rb:100:
+
+9)
+Merb::Router::GenerationError in 'resource(@user) GET responds successfully'
+Resource route not found: [nil]
+./spec/requests/users_spec.rb:89:
+
+10)
+Merb::Router::GenerationError in 'resource(@user, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+./spec/requests/users_spec.rb:77:
+
+11)
+'resource(:users, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/users/new' to be successful, but it returned a 401
+./spec/requests/users_spec.rb:71:
+
+12)
+Merb::Router::GenerationError in 'resource(@user) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+./spec/requests/users_spec.rb:55:
+
+13)
+Merb::Router::GenerationError in 'resource(:users) a successful POST redirects to resource(:users)'
+Resource route not found: [nil]
+./spec/requests/users_spec.rb:46:
+
+14)
+'resource(:users) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/users' to be successful, but it returned a 401
+./spec/requests/users_spec.rb:17:
+
+15)
+NameError in 'resource(@permission) PUT redirect to the article show action'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:4:
+
+16)
+NameError in 'resource(@permission) GET responds successfully'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:4:
+
+17)
+NameError in 'resource(@permission, :edit) responds successfully'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:4:
+
+18)
+Merb::Router::GenerationError in 'resource(:permissions, :new) responds successfully'
+Resource route not found: [:permissions, :new]
+./spec/requests/permissions_spec.rb:67:
+
+19)
+NameError in 'resource(@permission) a successful DELETE should redirect to the index action'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:4:
+
+20)
+NameError in 'resource(:permissions) a successful POST redirects to resource(:permissions)'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:40:
+
+21)
+NameError in 'resource(:permissions) GET has a list of permissions'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:4:
+
+22)
+Merb::Router::GenerationError in 'resource(:permissions) GET responds successfully'
+Resource route not found: [:permissions]
+./spec/requests/permissions_spec.rb:13:
+
+23)
+Merb::Router::GenerationError in 'resource(:permissions) GET contains a list of permissions'
+Resource route not found: [:permissions]
+./spec/requests/permissions_spec.rb:13:
+
+24)
+Merb::Router::GenerationError in 'resource(@payment) PUT redirect to the article show action'
+Resource route not found: [:payments]
+./spec/requests/payments_spec.rb:5:
+
+25)
+Merb::Router::GenerationError in 'resource(@payment) GET responds successfully'
+Resource route not found: [:payments]
+./spec/requests/payments_spec.rb:5:
+
+26)
+Merb::Router::GenerationError in 'resource(@payment, :edit) responds successfully'
+Resource route not found: [:payments]
+./spec/requests/payments_spec.rb:5:
+
+27)
+Merb::Router::GenerationError in 'resource(:payments, :new) responds successfully'
+Resource route not found: [:payments, :new]
+./spec/requests/payments_spec.rb:67:
+
+28)
+Merb::Router::GenerationError in 'resource(@payment) a successful DELETE should redirect to the index action'
+Resource route not found: [:payments]
+./spec/requests/payments_spec.rb:5:
+
+29)
+Merb::Router::GenerationError in 'resource(:payments) a successful POST redirects to resource(:payments)'
+Resource route not found: [:payments]
+./spec/requests/payments_spec.rb:41:
+
+30)
+Merb::Router::GenerationError in 'resource(:payments) GET has a list of payments'
+Resource route not found: [:payments]
+./spec/requests/payments_spec.rb:5:
+
+31)
+Merb::Router::GenerationError in 'resource(:payments) GET responds successfully'
+Resource route not found: [:payments]
+./spec/requests/payments_spec.rb:13:
+
+32)
+Merb::Router::GenerationError in 'resource(:payments) GET contains a list of payments'
+Resource route not found: [:payments]
+./spec/requests/payments_spec.rb:13:
+
+33)
+Merb::Router::GenerationError in 'resource(@loan) PUT redirect to the article show action'
+Resource route not found: [:loans]
+./spec/requests/loans_spec.rb:5:
+
+34)
+Merb::Router::GenerationError in 'resource(@loan) GET responds successfully'
+Resource route not found: [:loans]
+./spec/requests/loans_spec.rb:5:
+
+35)
+Merb::Router::GenerationError in 'resource(@loan, :edit) responds successfully'
+Resource route not found: [:loans]
+./spec/requests/loans_spec.rb:5:
+
+36)
+Merb::Router::GenerationError in 'resource(:loans, :new) responds successfully'
+Resource route not found: [:loans, :new]
+./spec/requests/loans_spec.rb:67:
+
+37)
+Merb::Router::GenerationError in 'resource(@loan) a successful DELETE should redirect to the index action'
+Resource route not found: [:loans]
+./spec/requests/loans_spec.rb:5:
+
+38)
+Merb::Router::GenerationError in 'resource(:loans) a successful POST redirects to resource(:loans)'
+Resource route not found: [:loans]
+./spec/requests/loans_spec.rb:41:
+
+39)
+Merb::Router::GenerationError in 'resource(:loans) GET has a list of loans'
+Resource route not found: [:loans]
+./spec/requests/loans_spec.rb:5:
+
+40)
+Merb::Router::GenerationError in 'resource(:loans) GET responds successfully'
+Resource route not found: [:loans]
+./spec/requests/loans_spec.rb:13:
+
+41)
+Merb::Router::GenerationError in 'resource(:loans) GET contains a list of loans'
+Resource route not found: [:loans]
+./spec/requests/loans_spec.rb:13:
+
+42)
+'Controllers  should check read_only_user credentials' FAILED
+Expected a GET to 'http://example.org/branches' to be successful, but it returned a 401
+./spec/controllers/users_spec.rb:51:
+
+43)
+'Controllers  should check data_entry_operator credentials' FAILED
+Expected a GET to 'http://example.org/branches' to be successful, but it returned a 401
+./spec/controllers/users_spec.rb:103:
+
+44)
+'Controllers  should check mis_manager credentials' FAILED
+Expected a GET to 'http://example.org/branches/1/centers/1/clients/4/edit' to be successful, but it returned a 404
+./spec/controllers/users_spec.rb:181:
+
+45)
+'Controllers  should check admin credentials' FAILED
+Expected a GET to 'http://example.org/branches/1/centers/1/clients/4/edit' to be successful, but it returned a 404
+./spec/controllers/users_spec.rb:222:
+
+46)
+Merb::Router::GenerationError in 'resource(@staff_member) PUT redirect to the article show action'
+Resource route not found: [nil]
+./spec/requests/staff_members_spec.rb:100:
+
+47)
+Merb::Router::GenerationError in 'resource(@staff_member) GET responds successfully'
+Resource route not found: [nil]
+./spec/requests/staff_members_spec.rb:89:
+
+48)
+Merb::Router::GenerationError in 'resource(@staff_member, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+./spec/requests/staff_members_spec.rb:77:
+
+49)
+'resource(:staff_members, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/staff_members/new' to be successful, but it returned a 401
+./spec/requests/staff_members_spec.rb:71:
+
+50)
+Merb::Router::GenerationError in 'resource(@staff_member) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+./spec/requests/staff_members_spec.rb:55:
+
+51)
+Merb::Router::GenerationError in 'resource(:staff_members) a successful POST redirects to resource(:staff_members)'
+Resource route not found: [nil]
+./spec/requests/staff_members_spec.rb:46:
+
+52)
+'resource(:staff_members) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/staff_members' to be successful, but it returned a 401
+./spec/requests/staff_members_spec.rb:17:
+
+53)
+Merb::Router::GenerationError in 'resource(@funding_line) PUT redirect to the funding_line show action'
+Resource route not found: [:funding_lines]
+./spec/requests/funding_lines_spec.rb:5:
+
+54)
+Merb::Router::GenerationError in 'resource(@funding_line) GET responds successfully'
+Resource route not found: [:funding_lines]
+./spec/requests/funding_lines_spec.rb:5:
+
+55)
+Merb::Router::GenerationError in 'resource(@funding_line, :edit) responds successfully'
+Resource route not found: [:funding_lines]
+./spec/requests/funding_lines_spec.rb:5:
+
+56)
+Merb::Router::GenerationError in 'resource(:funding_lines, :new) responds successfully'
+Resource route not found: [:funding_lines, :new]
+./spec/requests/funding_lines_spec.rb:67:
+
+57)
+Merb::Router::GenerationError in 'resource(@funding_line) a successful DELETE should redirect to the index action'
+Resource route not found: [:funding_lines]
+./spec/requests/funding_lines_spec.rb:5:
+
+58)
+Merb::Router::GenerationError in 'resource(:funding_lines) a successful POST redirects to resource(:funding_lines)'
+Resource route not found: [:funding_lines]
+./spec/requests/funding_lines_spec.rb:41:
+
+59)
+Merb::Router::GenerationError in 'resource(:funding_lines) GET has a list of funding_lines'
+Resource route not found: [:funding_lines]
+./spec/requests/funding_lines_spec.rb:5:
+
+60)
+Merb::Router::GenerationError in 'resource(:funding_lines) GET responds successfully'
+Resource route not found: [:funding_lines]
+./spec/requests/funding_lines_spec.rb:13:
+
+61)
+Merb::Router::GenerationError in 'resource(:funding_lines) GET contains a list of funding_lines'
+Resource route not found: [:funding_lines]
+./spec/requests/funding_lines_spec.rb:13:
+
+62)
+Merb::Router::GenerationError in 'resource(@funder) PUT redirect to the funder show action'
+Resource route not found: [nil]
+./spec/requests/funders_spec.rb:100:
+
+63)
+Merb::Router::GenerationError in 'resource(@funder) GET responds successfully'
+Resource route not found: [nil]
+./spec/requests/funders_spec.rb:89:
+
+64)
+Merb::Router::GenerationError in 'resource(@funder, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+./spec/requests/funders_spec.rb:77:
+
+65)
+'resource(:funders, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/funders/new' to be successful, but it returned a 401
+./spec/requests/funders_spec.rb:71:
+
+66)
+Merb::Router::GenerationError in 'resource(@funder) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+./spec/requests/funders_spec.rb:55:
+
+67)
+Merb::Router::GenerationError in 'resource(:funders) a successful POST redirects to resource(:funders)'
+Resource route not found: [nil]
+./spec/requests/funders_spec.rb:46:
+
+68)
+'resource(:funders) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/funders' to be successful, but it returned a 401
+./spec/requests/funders_spec.rb:17:
+
+69)
+Merb::Router::GenerationError in 'resource(@client) PUT redirect to the article show action'
+Resource route not found: [:clients]
+./spec/requests/clients_spec.rb:5:
+
+70)
+Merb::Router::GenerationError in 'resource(@client) GET responds successfully'
+Resource route not found: [:clients]
+./spec/requests/clients_spec.rb:5:
+
+71)
+Merb::Router::GenerationError in 'resource(@client, :edit) responds successfully'
+Resource route not found: [:clients]
+./spec/requests/clients_spec.rb:5:
+
+72)
+Merb::Router::GenerationError in 'resource(:clients, :new) responds successfully'
+Resource route not found: [:clients, :new]
+./spec/requests/clients_spec.rb:67:
+
+73)
+Merb::Router::GenerationError in 'resource(@client) a successful DELETE should redirect to the index action'
+Resource route not found: [:clients]
+./spec/requests/clients_spec.rb:5:
+
+74)
+Merb::Router::GenerationError in 'resource(:clients) a successful POST redirects to resource(:clients)'
+Resource route not found: [:clients]
+./spec/requests/clients_spec.rb:41:
+
+75)
+Merb::Router::GenerationError in 'resource(:clients) GET has a list of clients'
+Resource route not found: [:clients]
+./spec/requests/clients_spec.rb:5:
+
+76)
+Merb::Router::GenerationError in 'resource(:clients) GET responds successfully'
+Resource route not found: [:clients]
+./spec/requests/clients_spec.rb:13:
+
+77)
+Merb::Router::GenerationError in 'resource(:clients) GET contains a list of clients'
+Resource route not found: [:clients]
+./spec/requests/clients_spec.rb:13:
+
+78)
+Merb::Router::GenerationError in 'resource(@center) PUT redirect to the article show action'
+Resource route not found: [:centers]
+./spec/requests/centers_spec.rb:5:
+
+79)
+Merb::Router::GenerationError in 'resource(@center) GET responds successfully'
+Resource route not found: [:centers]
+./spec/requests/centers_spec.rb:5:
+
+80)
+Merb::Router::GenerationError in 'resource(@center, :edit) responds successfully'
+Resource route not found: [:centers]
+./spec/requests/centers_spec.rb:5:
+
+81)
+Merb::Router::GenerationError in 'resource(:centers, :new) responds successfully'
+Resource route not found: [:centers, :new]
+./spec/requests/centers_spec.rb:67:
+
+82)
+Merb::Router::GenerationError in 'resource(@center) a successful DELETE should redirect to the index action'
+Resource route not found: [:centers]
+./spec/requests/centers_spec.rb:5:
+
+83)
+Merb::Router::GenerationError in 'resource(:centers) a successful POST redirects to resource(:centers)'
+Resource route not found: [:centers]
+./spec/requests/centers_spec.rb:41:
+
+84)
+Merb::Router::GenerationError in 'resource(:centers) GET has a list of centers'
+Resource route not found: [:centers]
+./spec/requests/centers_spec.rb:5:
+
+85)
+Merb::Router::GenerationError in 'resource(:centers) GET responds successfully'
+Resource route not found: [:centers]
+./spec/requests/centers_spec.rb:13:
+
+86)
+Merb::Router::GenerationError in 'resource(:centers) GET contains a list of centers'
+Resource route not found: [:centers]
+./spec/requests/centers_spec.rb:13:
+
+87)
+Merb::Router::GenerationError in 'resource(@branch) PUT redirect to the article show action'
+Resource route not found: [nil]
+./spec/requests/branches_spec.rb:103:
+
+88)
+Merb::Router::GenerationError in 'resource(@branch) GET responds successfully'
+Resource route not found: [nil]
+./spec/requests/branches_spec.rb:92:
+
+89)
+Merb::Router::GenerationError in 'resource(@branch, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+./spec/requests/branches_spec.rb:80:
+
+90)
+'resource(:branches, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/branches/new' to be successful, but it returned a 401
+./spec/requests/branches_spec.rb:74:
+
+91)
+Merb::Router::GenerationError in 'resource(@branch) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+./spec/requests/branches_spec.rb:58:
+
+92)
+Merb::Router::GenerationError in 'resource(:branches) a successful POST redirects to resource(:branches)'
+Resource route not found: [nil]
+./spec/requests/branches_spec.rb:49:
+
+93)
+'resource(:branches) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/branches' to be successful, but it returned a 401
+./spec/requests/branches_spec.rb:20:
+
+94)
+Merb::Router::GenerationError in 'resource(@loan_type) PUT redirect to the loan_type show action'
+Resource route not found: [:loan_types]
+./spec/requests/loan_types_spec.rb:5:
+
+95)
+Merb::Router::GenerationError in 'resource(@loan_type) GET responds successfully'
+Resource route not found: [:loan_types]
+./spec/requests/loan_types_spec.rb:5:
+
+96)
+Merb::Router::GenerationError in 'resource(@loan_type, :edit) responds successfully'
+Resource route not found: [:loan_types]
+./spec/requests/loan_types_spec.rb:5:
+
+97)
+Merb::Router::GenerationError in 'resource(:loan_types, :new) responds successfully'
+Resource route not found: [:loan_types, :new]
+./spec/requests/loan_types_spec.rb:67:
+
+98)
+Merb::Router::GenerationError in 'resource(@loan_type) a successful DELETE should redirect to the index action'
+Resource route not found: [:loan_types]
+./spec/requests/loan_types_spec.rb:5:
+
+99)
+Merb::Router::GenerationError in 'resource(:loan_types) a successful POST redirects to resource(:loan_types)'
+Resource route not found: [:loan_types]
+./spec/requests/loan_types_spec.rb:41:
+
+100)
+Merb::Router::GenerationError in 'resource(:loan_types) GET has a list of loan_types'
+Resource route not found: [:loan_types]
+./spec/requests/loan_types_spec.rb:5:
+
+101)
+Merb::Router::GenerationError in 'resource(:loan_types) GET responds successfully'
+Resource route not found: [:loan_types]
+./spec/requests/loan_types_spec.rb:13:
+
+102)
+Merb::Router::GenerationError in 'resource(:loan_types) GET contains a list of loan_types'
+Resource route not found: [:loan_types]
+./spec/requests/loan_types_spec.rb:13:
+
+103)
 NameError in 'Upload before(:all)'
 uninitialized constant Upload::CSV
 /home/svs/src/mostfit/app/models/upload.rb:32:in `load_csv'
@@ -169,16 +1055,51 @@ uninitialized constant Upload::CSV
 /home/svs/src/mostfit/app/models/upload.rb:27:in `load_csv'
 ./spec/models/upload_spec.rb:19:
 
-2)
+104)
 NameError in 'Upload before(:all)'
 uninitialized constant CSV
 ./spec/models/functions_spec.rb:10:
 
-3)
+105)
 NoMethodError in 'Center should be able to 'have' clients'
 undefined method `name' for nil:NilClass
 ./spec/models/center_spec.rb:50:
 
-Finished in 89.362588 seconds
+106)
+Merb::Router::GenerationError in 'resource(@ledger_entry) PUT redirect to the ledger_entry show action'
+Resource route not found: [nil]
+./spec/requests/ledger_entries_spec.rb:100:
 
-119 examples, 3 failures, 3 pending
+107)
+Merb::Router::GenerationError in 'resource(@ledger_entry) GET responds successfully'
+Resource route not found: [nil]
+./spec/requests/ledger_entries_spec.rb:89:
+
+108)
+Merb::Router::GenerationError in 'resource(@ledger_entry, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+./spec/requests/ledger_entries_spec.rb:77:
+
+109)
+'resource(:ledger_entries, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/ledger_entries/new' to be successful, but it returned a 401
+./spec/requests/ledger_entries_spec.rb:71:
+
+110)
+Merb::Router::GenerationError in 'resource(@ledger_entry) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+./spec/requests/ledger_entries_spec.rb:55:
+
+111)
+Merb::Router::GenerationError in 'resource(:ledger_entries) a successful POST redirects to resource(:ledger_entries)'
+Resource route not found: [nil]
+./spec/requests/ledger_entries_spec.rb:46:
+
+112)
+'resource(:ledger_entries) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/ledger_entries' to be successful, but it returned a 401
+./spec/requests/ledger_entries_spec.rb:17:
+
+Finished in 1241.241153 seconds
+
+244 examples, 112 failures, 16 pending

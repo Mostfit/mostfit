@@ -330,11 +330,11 @@ class Loan
       # walk through (so we can do the += thingy)
       
       @payments_cache[payment.received_on] = {
-        :principal                 => payment.principal,
-        :interest                  => payment.interest,
-        :total_principal           => (principal += payment.principal),
-        :total_interest            => (interest  += payment.interest),
-        :total                     => (total     +=payment.principal + payment.interest),
+        :principal                 => payment.principal.to_i,
+        :interest                  => payment.interest.to_i,
+        :total_principal           => (principal += payment.principal.to_i),
+        :total_interest            => (interest  += payment.interest.to_i),
+        :total                     => (total     +=payment.principal.to_i + payment.interest.to_i),
         :balance                   => amount - principal,
         :total_balance             => total_balance - total}
     end

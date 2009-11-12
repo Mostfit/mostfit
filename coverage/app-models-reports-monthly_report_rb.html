@@ -1,0 +1,531 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang='en' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <title>app/models/reports/monthly_report.rb</title>
+    <link href="screen.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="print.css" media="print" rel="stylesheet" type="text/css" />
+    
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+    <script type="text/javascript" src="rcov.js"></script>
+  </head>
+  <body>
+    <h1>Mostfit C0 Coverage Information - RCov</h1>
+    <h2>app/models/reports/monthly_report.rb</h2>
+
+    
+
+    <div class="report_table_wrapper">
+      <table class='report' id='report_table'>
+        <thead>
+          <tr>
+            <th class="left_align">Name</th>
+            <th class="right_align">Total Lines</th>
+            <th class="right_align">Lines of Code</th>
+            <th class="left_align">Total Coverage</th>
+            <th class="left_align">Code Coverage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="left_align"><a href="app-models-reports-monthly_report_rb.html">app/models/reports/monthly_report.rb</a></td>
+            <td class='right_align'><tt>78</tt></td>
+            <td class='right_align'><tt>74</tt></td>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>10.26%</tt></div>
+          <div class="percent_graph">
+            <div class="covered" style="width:10px"></div>
+            <div class="uncovered" style="width:90px"></div>
+          </div></td>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>6.76%</tt></div>
+          <div class="percent_graph">
+            <div class="covered" style="width:7px"></div>
+            <div class="uncovered" style="width:93px"></div>
+          </div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <h3>Key</h3>
+    
+    <div class="key"><pre><span class='marked'>Code reported as executed by Ruby looks like this...</span><span class='marked1'>and this: this line is also marked as covered.</span><span class='inferred'>Lines considered as run by rcov, but not reported by Ruby, look like this,</span><span class='inferred1'>and this: these lines were inferred by rcov (using simple heuristics).</span><span class='uncovered'>Finally, here's a line marked as not executed.</span></pre></div>
+
+    <h3>Coverage Details</h3>
+
+    <table class="details">
+      <tbody>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line1">1</a> class MonthlyReport &lt; Report</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line2">2</a>   def initialize(month, year)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line3">3</a>     self.start_date = Date.new(year, month, 1)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line4">4</a>     self.end_date   = self.start_date + (Date.new(start_date.year,12,31).to_date&lt;&lt;(12-start_date.month)).day</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line5">5</a>     @name = &quot;Monthly report for #{start_date.strftime(&quot;%B&quot;)}&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line6">6</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line7">7</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line8">8</a>   def name</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line9">9</a>     &quot;Month of #{start_date.strftime(&quot;%B&quot;)}&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line10">10</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line11">11</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line12">12</a>   def to_str</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line13">13</a>     &quot;#{start_date} - #{end_date}&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line14">14</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line15">15</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line16">16</a>   def calc</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line17">17</a>     @report = []</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line18">18</a>     t0 = Time.now</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line19">19</a>     t = Time.now</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line20">20</a>     puts &quot;generating...&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line21">21</a>     @report[0] = {'Number of Members' =&gt; Branch.client_count(end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line22">22</a>     @report[1] = {'Number of Borrowers' =&gt; Branch.active_client_count(end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line23">23</a>     (1..4).each do |i|</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line24">24</a>       @report[1+i] = { &quot;Loan Cycle #{i}&quot; =&gt; Branch.client_count_by_loan_cycle(i)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line25">25</a>     end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line26">26</a>     Merb.logger.info &quot;#{Time.now - t0}:#{Time.now - t}:did loan cycles. starting more than one loan&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line27">27</a>     t = Time.now</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line28">28</a>     @report[6] = {&quot;Active clients&quot;  =&gt; Branch.active_client_count(end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line29">29</a> #    Merb.logger.info &quot;#{Time.now - t0}:#{Time.now - t}:did more than one loan. starting dormant&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line30">30</a>     t = Time.now</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line31">31</a>     @report[7] = {&quot;Dormant clients&quot; =&gt; Branch.dormant_client_count(end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line32">32</a>     Merb.logger.info &quot;#{Time.now - t0}:#{Time.now - t}:did  dormant. starting last week dropouts&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line33">33</a>     t = Time.now</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line34">34</a>     @report[8] = {&quot;last_week_drop_outs&quot; =&gt; Branch.clients_deleted_between_such_and_such_date_count(start_date, end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line35">35</a>     Merb.logger.info &quot;#{Time.now - t0}:#{Time.now - t}:did last week dropouts. starting last weeks additions&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line36">36</a>     t = Time.now</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line37">37</a>     @report[9] = {&quot;new_clients_last_week&quot; =&gt; Branch.clients_added_between_such_and_such_date_count(start_date, end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line38">38</a>     Merb.logger.info &quot;#{Time.now - t0}:#{Time.now - t}:did last weeks additions. starting laons repaid (count)&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line39">39</a>     t = Time.now</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line40">40</a>     @report[10] = { &quot;Loans repaid in last week (count)&quot; =&gt; Branch.loans_repaid_between_such_and_such_date(start_date, end_date, &quot;count&quot;)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line41">41</a>     Merb.logger.info &quot;#{Time.now - t0}:#{Time.now - t}:did last weeks additions. starting laons repaid (sum)&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line42">42</a>     t = Time.now</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line43">43</a>     @report[11] = {&quot;Loans repaid in last week (amount)&quot; =&gt; Branch.loans_repaid_between_such_and_such_date(start_date, end_date, &quot;sum&quot;)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line44">44</a>     Merb.logger.info &quot;#{Time.now - t0}:#{Time.now - t}:did loans repaid (sum). starting principal_received last week&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line45">45</a>     t = Time.now</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line46">46</a>     @report[12] = {&quot;principal received last week&quot; =&gt; Branch.principal_received_between_such_and_such_date(start_date, end_date) }</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line47">47</a>     Merb.logger.info &quot;#{Time.now - t0}:#{Time.now - t}:did prin received. starting interest received last week&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line48">48</a>     t = Time.now</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line49">49</a>       @report[13] = {&quot;interest received last week&quot; =&gt; Branch.interest_received_between_such_and_such_date(start_date, end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line50">50</a>     Merb.logger.info &quot;#{Time.now - t0}:#{Time.now - t}:did int received last week. starting os bals&quot;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line51">51</a>     t = Time.now</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line52">52</a>     @report[14] = {&quot;total amount outstanding&quot; =&gt; Branch.principal_outstanding(end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line53">53</a>     @orig_bals = Branch.all.map {|b| Loan.all('client.center.branch_id' =&gt; b.id).sum(:amount)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line54">54</a>     @report[15] = {&quot;average os bal per loanee&quot; =&gt; Branch.avg_outstanding_balance}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line55">55</a>     @report[16] = {&quot;number of staff members&quot; =&gt; Branch.center_managers(end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line56">56</a>     @report[17] = {&quot;number of center managers&quot; =&gt; Branch.center_managers(end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line57">57</a>     @report[18] = {&quot;average clients / staff&quot; =&gt; Branch.avg_client_count_per_center_managers([[end_date], [end_date]])}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line58">58</a>     @report[19] = {&quot;average clients / staff&quot; =&gt; Branch.avg_client_count_per_center_managers([[end_date], [end_date]])}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line59">59</a>     @report[20] = {&quot;average balance / CM&quot; =&gt; Branch.avg_current_principal_outstanding_per_center_managers([[end_date], [end_date]])}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line60">60</a>     @report[21] = {&quot;average borrowers / CM&quot; =&gt; Branch.avg_active_client_count_per_center_managers([[end_date], [end_date]])}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line61">61</a>     @report[22] = {&quot;loans disbursed this week&quot; =&gt; Branch.loans_disbursed_between_such_and_such_date(start_date, end_date, &quot;count&quot;)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line62">62</a>     @report[23] = {&quot;loans disbursed this week (amount)&quot; =&gt; Branch.loans_disbursed_between_such_and_such_date(start_date, end_date, &quot;sum&quot;)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line63">63</a>     @principal_due = Branch.principal_due_between_such_and_such_date(start_date, end_date)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line64">64</a>     @interest_due = Branch.interest_due_between_such_and_such_date(start_date,end_date)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line65">65</a>     @report[23] = {&quot;principal due this week&quot; =&gt; @principal_due}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line66">66</a>     @report[24] = {&quot;interest due this week&quot; =&gt; @interest_due}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line67">67</a>     @report[25] = {&quot;principal received&quot; =&gt; Branch.principal_received_between_such_and_such_date(start_date, end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line68">68</a>     @report[25] = {&quot;interest received&quot; =&gt; Branch.interest_received_between_such_and_such_date(start_date, end_date)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line69">69</a>     @report[26] = {&quot;7 days late amount&quot; =&gt; Branch.overdue_by(0,7)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line70">70</a>     @report[27] = {&quot;14 days late amount&quot; =&gt; Branch.overdue_by(8,14)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line71">71</a>     @report[28] = {&quot;21 days late amount&quot; =&gt; Branch.overdue_by(9,21)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line72">72</a>     @report[29] = {&quot;28 days late amount&quot; =&gt; Branch.overdue_by(22,28)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line73">73</a>     self.raw = @report</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line74">74</a>     self.report = Marshal.dump(@report)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line75">75</a>     self.generation_time = Time.now - t0</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line76">76</a>     self.save</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line77">77</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line78">78</a> end</pre></td>
+          </tr>
+        
+      </tbody>
+    </table>
+
+    <p>Generated on Thu Nov 12 16:05:07 +0530 2009 with <a href="http://github.com/relevance/rcov">rcov 0.9.6</a></p>
+
+  </body>
+</html>
