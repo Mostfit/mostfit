@@ -1,9 +1,0 @@
-
-* write more specs (payments need specs, svs is working on controller specs)
-* make an example of the fees thing -- show that it works
-
-* some sort of an action logger like audit trail, preferably user centered (presenting nice overview of all action), easily accomplished with hooks
-* redo some parts of the design (better logo, favicon, more icons in the interface)
-* attendancy lists
-* polish data entry interface
-* 
