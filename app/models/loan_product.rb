@@ -4,8 +4,10 @@ class LoanProduct
   property :name, String, :nullable => false, :index => true, :min => 3
   property :max_amount, Integer, :nullable => false, :index => true
   property :min_amount, Integer, :nullable => false, :index => true
+  property :amount_multiple, Integer, :nullable => false, :index => true, :default => 1, :min => 1
   property :max_interest_rate, Integer, :nullable => false, :index => true, :max => 100
   property :min_interest_rate, Integer, :nullable => false, :index => true, :min => 0
+  property :interest_rate_multiple, Integer, :nullable => false, :index => true, :default => 1, :min => 0.1
   property :installment_frequency, Enum.send('[]', *([:any] + INSTALLMENT_FREQUENCIES)), :nullable => true, :index => true
 
   property :max_number_of_installments, Integer, :nullable => false, :index => true, :max => 1000
@@ -46,6 +48,7 @@ class LoanProduct
 
   def self.is_valid(id)
     return false unless product = LoanProduct.get(id)
+    p product
     if product.valid_from<=Date.today and product.valid_upto>=Date.today
       return product
     else
@@ -56,7 +59,7 @@ class LoanProduct
   def min_is_less_than_max
     if max_amount and min_amount and max_amount < min_amount
       [ false, "Minimum amount cannot be greater than maximum amount" ]
-    elsif max_interest_rate and min_interest_rate and max_interest_rate < min_interest_rate
+    elsif max_interest_rate and min_interest_rate and max_interest_rate.to_f < min_interest_rate.to_f
       [ false, "Minimum interest rate cannot be greater than maximum interest rate" ]
     elsif valid_from and valid_upto and valid_upto < valid_from
       [ false, "Valid from date cannot be greater than valid upto date" ]

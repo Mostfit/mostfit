@@ -10,7 +10,7 @@
       - if @loan_product.min_amount!=@loan_product.max_amount 
         = text_field :amount, :size => 15
         %span.greytext in Rupees
-        = " (#{@loan_product.min_amount} - #{@loan_product.max_amount})"
+        = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
       - else
         = @loan_product.min_amount
         %span.greytext Rupees

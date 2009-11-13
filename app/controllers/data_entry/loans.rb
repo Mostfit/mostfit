@@ -23,6 +23,8 @@ class Loans < DataEntry::Controller
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 1
     @loan = klass.new(attrs)
     raise NotFound if not @loan.client  # should be known though hidden field
+    @loan_product = LoanProduct.is_valid(params[:loan_product_id])
+    @loan.loan_product_id = @loan_product.id 
     @client = @loan.client
     if @loan.save
       if params[:format]=='xml'
@@ -31,7 +33,7 @@ class Loans < DataEntry::Controller
         redirect url(:enter_loans, :action => 'new'), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
       end
     else
-      @loan_product  = LoanProduct.get(params[:loan_product_id])
+      @loan.interest_rate *= 100
       params[:format]=='xml'? display(@loan) : render(:new)
     end
   end

@@ -1,5 +1,5 @@
 %table
-  - [:name, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments].each do |attr|
+  - [:name, :min_amount, :max_amount, :amount_multiple, :min_interest_rate, :max_interest_rate, :interest_rate_multiple, :min_number_of_installments, :max_number_of_installments].each do |attr|
     %tr
       %th
         = attr.humanize

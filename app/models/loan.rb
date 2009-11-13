@@ -109,18 +109,26 @@ class Loan
   def is_valid_loan_product_number_of_installments; is_valid_loan_product(:number_of_installments); end
 
   def is_valid_loan_product(method)
-    return true unless self.loan_product
+    return [false, "No loan product chosen"] unless self.loan_product
     product = self.loan_product
+    loan_attr    = self.send(method)
+    #Checking if the loan adheres to minimum and maximums of the loan product
     {:min => :minimum, :max => :maximum}.each{|k, v|
-      loan_attr    = self.send(method)
       product_attr = product.send("#{k}_#{method}")
       product_attr = product_attr.to_f/100 if method==:interest_rate
+      
       if k==:min and loan_attr and product_attr and  loan_attr < product_attr
         return [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
       elsif k==:max and loan_attr and product_attr and  loan_attr > product_attr
         return  [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"] 
-      end
+      end      
     }
+    #check if loan is follows the minimum discrete value for amount and interest
+    if product.respond_to?("#{method}_multiple")
+      product_attr = product.send("#{method}_multiple")
+      loan_attr = loan_attr*100 if method==:interest_rate
+      return  [false, "#{method.to_s.capitalize} should be in multiples of #{product_attr}"]  if not loan_attr.remainder(product_attr)==0
+    end
     return true
   end
 
