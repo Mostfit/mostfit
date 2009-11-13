@@ -10,7 +10,7 @@ module DataEntry
     end
 
     def by_center
-      @center = Center.get(params[:center_id]) 
+      @center = Center.get(params[:center_id]) || Center.first(:name => params[:center_id]) 
       @branch = @center.branch unless @center.nil?
       @clients = @center.clients unless @center.nil?
       @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
