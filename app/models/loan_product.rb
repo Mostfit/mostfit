@@ -17,7 +17,8 @@ class LoanProduct
 #  property :loan_type, Enum.send('[]'), :nullable => false, :index => true
   property :valid_from, Date, :nullable => false, :index => true
   property :valid_upto, Date, :nullable => false, :index => true
-  
+
+  has n, :fees
   has n, :loans
 
   validates_with_method :min_is_less_than_max

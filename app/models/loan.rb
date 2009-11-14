@@ -20,10 +20,6 @@ class Loan
   property :rejected_on,                    Date, :auto_validation => false, :index => true
   property :disbursal_date,                 Date, :auto_validation => false, :index => true
   property :written_off_on,                 Date, :auto_validation => false, :index => true
-  property :fees,                           Yaml, :length => 20000  # like: "first fee: 1000, second fee: 200" (yaml) -- fully reimplementable
-
-  property :fees_total,                     Integer, :default => 0, :index => true  # gets included in first payment
-  property :fees_paid,                      Boolean, :default => false, :index => true
   property :validated_on,                   Date, :auto_validation => false, :index => true
 
   property :validation_comment,             Text

@@ -1,0 +1,15 @@
+%h1
+  Fees controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/fees/edit.html.erb
+= error_messages_for @fee
+
+= form_for(@fee, :action => url(:fee, @fee)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:fee, @fee)
+|
+= link_to 'Back', url(:fees)

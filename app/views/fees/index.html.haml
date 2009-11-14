@@ -1,0 +1,16 @@
+%h1
+  Fees controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/fees/index.html.erb
+%table
+  %tr
+  - for fee in @fees
+    %tr
+      %td
+        = link_to 'Show', url(:fee, fee)
+      %td
+        = link_to 'Edit', url(:edit_fee,  fee)
+
+= link_to 'New', url(:new_fee)
