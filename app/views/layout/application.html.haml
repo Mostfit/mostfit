@@ -13,54 +13,31 @@
   %body
     .spacer/
     .container
+      - if session.authenticated?
+        #navigation
+          - if session.user.admin 
+            = link_to_with_class('admin', url(:admin))
+          - if session.user.mis_manager || session.user.admin
+            = link_to_with_class('dashboard', url(:dashboard))
+            = link_to_with_class('reports', url(:reports))
+            = link_to_with_class('browse loans', url(:branches))
+            = link_to_with_class('browse funds', url(:funders))
+            = link_to_with_class('staff members', url(:staff_members))
+          = link_to_with_class 'data entry', url(:data_entry)
       #header
-        #header_search_div{:style => 'margin: 2px; float: right; background: lightyellow; padding: 4px;'}
-          %form{:action => '/search'}
-            %input{:name => 'query', :value => params[:query]}
-            %input{:type => 'submit', :value=>'search'}
-      #subheader
-        #title
-          demo mfi, mumbai
-        #right-nav
+        #header_search_div{:style => 'margin: 2px; float: right; padding: 4px;'}
           - if session.authenticated?
             == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})
+            %form{:action => '/search'}
+              %input{:name => 'query', :value => params[:query]}
+              %input{:type => 'submit', :value=>'search'}
           - else
             existing users can
             %b= link_to 'login', url(:login)
             to proceed
-      - if session.authenticated?
-        #navigation
-          - if session.user.admin 
-            %b= link_to 'admin', url(:admin)
-            &nbsp;|&nbsp;
-          - if session.user.mis_manager || session.user.admin
-            %b= link_to 'dashboard', url(:dashboard)
-            &nbsp;|&nbsp;
-            %b= link_to 'reports', url(:reports)
-            &nbsp;|&nbsp;
-            %b= link_to 'browse loans', url(:branches)
-            &nbsp;|&nbsp;
-            %b= link_to 'browse funds', url(:funders)
-            &nbsp;|&nbsp;
-            %b= link_to 'staff members', url(:staff_members)
-            &nbsp;|&nbsp;
-          %b= link_to 'data entry', url(:data_entry)
-        #search_div{:style => 'margin: 2px; background:lightyellow;padding: 4px;'}
-          %form{:action => '/search'}
-            Search for 
-            %select{:name => 'model'}
-              - ['Branch','Client','Center','Loan'].each do |model|
-                %option{:value => model}
-                  = model
-            with
-            %select{:name => 'by'}
-              - ['Id','Name','Reference'].each do |by|
-                %option{:value => by}
-                  = by
-            %input{:name => 'value'}
-            %input{:type => 'submit', :value=>'search'}
-            %a{:href => '#', :onclick => "document.getElementById('search_div').style.display='none';"}
-              Hide search
+      #subheader
+        #title
+          demo mfi, mumbai
       #content
         #breadcrums= breadcrums
 

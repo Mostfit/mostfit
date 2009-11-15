@@ -1,5 +1,9 @@
 module Merb
   module GlobalHelpers
+    def link_to_with_class(name, url)
+      link_to(name, url, :class => ((request.uri==(url) or request.uri.index(url)==0) ? "selected" : ""))
+    end
+
     def url_for_loan(loan, action = '')
       # this is to generate links to loans, as the resouce method doesn't work for descendant classes of Loan
       # it expects the whole context (@branch, @center, @client) to exist

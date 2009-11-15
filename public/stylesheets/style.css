@@ -96,22 +96,33 @@ ol { list-style-position: outside; list-style-type: decimal; }
 
 #navigation
 {
-  background: #ffea73;
   color: black;
   padding-left: 20px;
+  margin-bottom: 20px;
   padding-right: 20px;
-  text-align: right;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  position: absolute;
+  top: 105px;
+  left: 45%;
 }
 
 #navigation a {
-  color: #black;
-  text-decoration: underline;
+  background: #ffea73;
+  padding: 5px;
+  padding-bottom: 3px;
+  color: black;
+  width: 50px;
+  text-decoration: none;
   font-weight: bold;
 }
 
-#navigation a:hover
-{
-  text-decoration: none;
+#navigation a:hover{
+  color: #8DC73F;
+}
+#navigation a.selected{
+  background: orange;
+  color: white;
 }
 
 /*
