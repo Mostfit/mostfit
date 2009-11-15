@@ -1,0 +1,15 @@
+1:
+  :id: 1
+  :name: Default
+  :max_amount: 100000
+  :min_amount: 1000
+  :amount_multiple: 1
+  :max_interest_rate: 100
+  :min_interest_rate: 0
+  :interest_rate_multiple: 1
+  :installment_frequency: :weekly
+  :max_number_of_installments: 50
+  :min_number_of_installments: 50
+  :valid_from: 2009-01-01
+  :valid_upto: 2012-01-01
+  :loan_type: DefaultLoan

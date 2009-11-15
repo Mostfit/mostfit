@@ -51,7 +51,7 @@ namespace :mock do
   task :fixtures do
     DataMapper.auto_migrate! if Merb.orm == :datamapper
     # loading is ordered, important for our references to work
-    load_fixtures :users, :staff_members, :funders, :funding_lines, :branches, :centers, :clients, :loans  #, :payments
+    load_fixtures :users, :staff_members, :funders, :funding_lines, :branches, :centers, :clients, :loan_products, :loans  #, :payments
     puts
     puts "Fixtures loaded. Have a look at the mock:all_payments and mock:update_history tasks."
   end
@@ -160,7 +160,7 @@ namespace :mock do
     end
     puts "1: #{Time.now - t0}"
     loan_ids.each do |loan_id|
-      sql = " INSERT INTO `payments` (`received_by_staff_id`, `principal`, `interest`, `created_by_user_id`, `loan_id`, `received_on`) VALUES ";
+      sql = " INSERT INTO `payments` (`received_by_staff_id`, `amount`, `type`, `created_by_user_id`, `loan_id`, `received_on`) VALUES ";
       _t0 = Time.now
       loan = Loan.get(loan_id)
       staff_member = loan.client.center.manager
@@ -171,7 +171,8 @@ namespace :mock do
       int = loan.scheduled_interest_for_installment(1)
       values = []
       dates.each do |date|
-        values << "(#{staff_member.id}, #{prin}, #{int}, 1, #{loan.id}, '#{date}')"
+        values << "(#{staff_member.id}, #{prin}, 1, 1, #{loan.id}, '#{date}')"
+        values << "(#{staff_member.id}, #{int}, 2, 1, #{loan.id}, '#{date}')"
       end
       puts "done constructing sql in #{Time.now - _t0}"
       if not values.empty?

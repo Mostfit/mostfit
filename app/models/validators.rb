@@ -1,14 +1,21 @@
 module Misfit
   # ALL payment validations go in here so that they are available to the loan product
   module PaymentValidators
-    def test_validation
-      puts "test_validation"
-      [false, "test validator failed"]
-    end
-
-    def other_validation
-      puts "other_validation"
-      [false, "other_val"]
+    def amount_must_be_paid_in_full_or_not_at_all
+      case type
+        when :principal
+          if amount < loan.principal_due_on(received_on) and amount != 0
+            return [false, "amount must be paid in full or not at all"]
+          else
+            return true
+          end
+        when :interest
+          if amount < loan.interest_due_on(received_on) and amount != 0
+            return [false, "amount must be paid in full or not at all"]
+          else
+            return true
+          end
+      end
     end
   end    
 
