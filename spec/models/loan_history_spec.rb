@@ -38,10 +38,28 @@ describe LoanHistory do
     @client.errors.each{|e| puts e}
     @client.should be_valid
 
+    @loan_product = LoanProduct.new
+    @loan_product.name = "LP1"
+    @loan_product.max_amount = 1000
+    @loan_product.min_amount = 1000
+    @loan_product.max_interest_rate = 100
+    @loan_product.min_interest_rate = 0.1
+    @loan_product.installment_frequency = :weekly
+    @loan_product.max_number_of_installments = 25
+    @loan_product.min_number_of_installments = 25
+    @loan_product.loan_type = "DefaultLoan"
+    @loan_product.valid_from = Date.parse('2000-01-01')
+    @loan_product.valid_upto = Date.parse('2012-01-01')
+    @loan_product.save
+    @loan_product.errors.each {|e| puts e}
+    @loan_product.should be_valid
+
+
     @loan = Loan.new( :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
     @loan.applied_by       = @manager
     @loan.funding_line     = @funding_line
     @loan.client           = @client
+    @loan.loan_product     = @loan_product
     @loan.should be_valid
     
     @loan.approved_on = "2000-02-03"

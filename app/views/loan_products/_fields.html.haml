@@ -25,3 +25,10 @@
       Valid upto
     %td
       = date_select_for @loan_product, :valid_upto
+  
+%h2 Payment Validations
+- Misfit::PaymentValidators.instance_methods.each do |v|
+  = check_box :name => "payment_validations", :value => v
+  = v.humanize
+
+%br

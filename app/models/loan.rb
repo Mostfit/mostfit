@@ -137,7 +137,7 @@ class Loan
   end
 
   def clear_cache
-    @payments_cache, @schedule, @history_array = nil
+    @payments_cache = @schedule = @history_array = @fee_schedule = nil
   end
 
   # this method returns the last date the loan history makes sense
@@ -252,10 +252,13 @@ class Loan
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0].to_i, input[1].to_i
     end
-    payment = Payment.new(:loan => self, :created_by => user,
+    prin_payment = Payment.new(:loan => self, :created_by => user,
       :received_on => received_on, :received_by => received_by,
-      :principal => principal.round, :interest => interest.round)
-    save_status = payment.save
+      :amount => principal.round, :type => :principal)
+    int_payment = Payment.new(:loan => self, :created_by => user,
+      :received_on => received_on, :received_by => received_by,
+      :amount => interest.round, :type => :interest)
+    save_status = (prin_payment.save and int_payment.save)
     if save_status == true
       if defer_update #i.e. bulk updating loans
         Merb.run_later do
@@ -266,9 +269,9 @@ class Loan
       end
       clear_cache
     end
-    payment.principal, payment.interest = nil, nil unless total.nil?  # remove calculated pr./int. values from the form
+    #payment.principal, payment.interest = nil, nil unless total.nil?  # remove calculated pr./int. values from the form
     # Merb.logger.info "loan #{id}: #{received_on} => paid #{principal} + #{interest} | prin_paid #{principal_received_up_to(received_on)} | os_bal:#{actual_outstanding_principal_on(received_on)}"
-    [save_status, payment]  # return the success boolean and the payment object itself for further processing
+    [save_status, prin_payment, int_payment]  # return the success boolean and the payment object itself for further processing
   end
 
   # the way to delete payments from the db
@@ -284,6 +287,35 @@ class Loan
   end
 
   # LOAN INFO FUNCTIONS - CALCULATIONS
+
+  def fees_due
+    fd = 0; loan_product.fees.each { |f| fd += f.fees_for(self)};
+    fd
+  end
+
+  def fees_paid
+    payments(:type => :fees).sum(:amount) || 0
+  end
+
+  def fees_paid?
+    fees_paid >= fees_due
+  end
+  
+  def fee_schedule
+    @fee_schedule = {}
+    loan_product.fees.each do |f|
+      date = eval(f.payable_on.to_s)
+      @fee_schedule[date] = f.fees_for(self)
+    end
+    @fee_schedule
+  end
+
+  def fee_payments
+    @fees_payments = {}
+    payments(:type => :fees, :order => :received_on).each do |p|
+      @fees_payments[p.received_on] = p.amount
+    end
+  end
 
   def payment_schedule
     return @schedule if @schedule
@@ -317,11 +349,12 @@ class Loan
   def payments_hash
     return @payments_cache if @payments_cache
     sql = %Q{
-      SELECT sum(principal) as principal, sum(interest) as interest, received_on
-        FROM payments
-       WHERE (deleted_at IS NULL) AND (loan_id = #{self.id})
-       GROUP BY received_on
-    ORDER BY received_on}
+        SELECT SUM(amount * IF(type=1,1,0)) AS principal, 
+               SUM(amount * IF(type=2,1,0)) AS interest,
+               received_on 
+        FROM payments 
+        WHERE (deleted_at IS NULL) AND (loan_id = #{self.id})
+        GROUP BY received_on}
     structs = id ? repository.adapter.query(sql) : []
     @payments_cache = {}
     total_balance = total_to_be_received
@@ -698,34 +731,6 @@ class Loan
     return true if (validated_on and validated_by) or (validated_on.blank? and validated_by.blank? and validation_comment.blank?)
     [false, "The validation date, the validating staff member the loan should both be given"]
   end
-
-
-  # this method only works if fees are in a format of:
-  #   "fee1: 100\nfee2: 200":String (yaml)
-  # and gets called from the free= method, yet all this is fully reimplementable
-  def update_fees_total
-    return if fees.blank?
-    total = 0
-    fees = YAML.load(self.fees) if self.fees.is_a? String
-    fees.each_value { |v| total += v.to_i }
-    self.fees_total = total
-  end
-
-
-  def update_status # DEPRECATED? check if this is actually being called. I think we moved this to loan_history with
-                    # a 'current' flag.
-    self.status = history[:status]
-    if not payments.empty?
-      self.last_payment_received_on = payments.all(:order => [:received_on.desc]).first.received_on
-    end
-    self.amount_in_default = history[:actual_outstanding_principal] - history[:scheduled_outstanding_principal]
-    self.history_disabled = true
-    Merb.logger.notice! "Saving loan #{id}"
-    self.save
-  end
-  
-
-
 end
 
 class DefaultLoan < Loan

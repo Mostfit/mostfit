@@ -4,12 +4,13 @@
 class Payment
   include DataMapper::Resource
   before :valid?, :parse_dates
-
+  before :valid?, :add_loan_product_validations
+  after :valid?, :after_valid
   attr_writer :total  # just to be used in the form
   
   property :id,                 Serial
-  property :principal,          Integer, :nullable => false, :index => true
-  property :interest,           Integer, :nullable => false, :index => true
+  property :amount,             Integer, :nullable => false, :index => true
+  property :type,               Enum[:principal, :interest, :fees], :index => true
   property :received_on,        Date,    :nullable => false, :index => true
   property :deleted_by_user_id, Integer, :nullable => true, :index => true
   property :created_at,         DateTime,:nullable => false, :default => Time.now, :index => true
@@ -27,13 +28,10 @@ class Payment
   validates_with_method :received_by, :method => :received_by_active_staff_member?
   validates_with_method :deleted_by,  :method => :properly_deleted?
   validates_with_method :deleted_at,  :method => :properly_deleted?
-  validates_with_method :principal,   :method => :not_paying_too_much_principal?
-  validates_with_method :total,       :method => :not_paying_too_much_in_total?
-  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
-  validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?
-  validates_with_method :principal,   :method => :principal_is_positive?
-  validates_with_method :interest,    :method => :interest_is_positive?
-  validates_with_method :total,       :method => :total_is_positive?
+#  validates_with_method :not_paying_too_much?
+#  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
+#  validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?
+#  validates_with_method :principal,   :method => :is_positive?
 
   def self.from_csv(row, headers, loans)
     obj = new(:received_by_staff_id => StaffMember.first(:name => row[headers[:received_by_staff]]).id, :loan_id => loans[row[headers[:loan_serial_number]]].id, 
@@ -44,13 +42,23 @@ class Payment
 
 
   def total
-    (principal or 0) + (interest or 0)
+    amount
   end
 
 
   private
   include DateParser  # mixin for the hook "before: valid?, :parse_dates"
+  include Misfit::PaymentValidators
+  def add_loan_product_validations
+    debugger
+    return unless loan
+    Payment.add_validator_to_context({:context => :default}, loan.loan_product.payment_validations, DataMapper::Validate::MethodValidator)
+  end
 
+  def after_valid
+    debugger
+    x = 1
+  end
 
   def created_by_active_user?
     return true if created_by and created_by.active
@@ -64,10 +72,24 @@ class Payment
     return true if (deleted_by and deleted_at) or (!deleted_by and !deleted_at)
     [false, "deleted_by and deleted_at properties have to be (un)set together"]
   end
+  def only_take_payments_on_disbursed_loans?
+#    debugger
+    return true if loan.get_status(received_on) == :outstanding
+    [false, "Payments cannot be made on loans that are written off, repaid or not (yet) disbursed. This loan is #{loan.get_status(received_on)}"]
+  end
+  def not_received_in_the_future?
+    return true if received_on <= Date.today
+    [false, "Payments cannot be received in the future"]
+  end
+  def not_received_before_loan_is_disbursed?
+    return true if loan.disbursal_date.blank? ? false : loan.disbursal_date <= received_on
+    [false, "Payments cannot be received before the loan is disbursed"]
+  end
   def not_paying_too_much_principal?
+    return true unless type == :principal
     if new?  # do not do this check on updates, it will count itself double
       a = loan.payments_hash[loan.payments_hash.keys.max]
-      if (((not a.blank?) and a[:total_principal]) ? a[:total_principal] : 0) + principal > loan.amount
+      if (((not a.blank?) and a[:total_principal]) ? a[:total_principal] : 0) + amount > loan.amount
         return [false, "Principal is more than the loans outstanding principal"]
       end
     end
@@ -81,19 +103,6 @@ class Payment
       end
     end
     true
-  end
-  def only_take_payments_on_disbursed_loans?
-#    debugger
-    return true if loan.get_status(received_on) == :outstanding
-    [false, "Payments cannot be made on loans that are written off, repaid or not (yet) disbursed. This loan is #{loan.get_status(received_on)}"]
-  end
-  def not_received_in_the_future?
-    return true if received_on <= Date.today
-    [false, "Payments cannot be received in the future"]
-  end
-  def not_received_before_loan_is_disbursed?
-    return true if loan.disbursal_date.blank? ? false : loan.disbursal_date <= received_on
-    [false, "Payments cannot be received before the loan is disbursed"]
   end
 
   def principal_is_positive?

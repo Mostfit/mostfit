@@ -181,2563 +181,391 @@ a {
 <div class="results">
 <div class="example_group">
   <dl>
-  <dt id="example_group_1">resource(@report) PUT</dt>
-    <script type="text/javascript">makeRed('rspec-header');</script>
-    <script type="text/javascript">makeRed('example_group_1');</script>
-    <script type="text/javascript">moveProgressBar('0.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the report show action</span>
-      <div class="failure" id="failure_1">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/reports_spec.rb:100:</pre></div>
-    <pre class="ruby"><code><span class="linenum">98</span>    before(:each) do
-<span class="linenum">99</span>      @report = Report.first
-<span class="offending"><span class="linenum">100</span>      @response = request(resource(@report), :method => "PUT", </span>
-<span class="linenum">101</span>        :params => { :report => {:id => @report.id} })
-<span class="linenum">102</span>    end
-<span class="linenum">103</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_2">resource(@report) GET</dt>
-    <script type="text/javascript">makeRed('example_group_2');</script>
+  <dt id="example_group_1">User</dt>
     <script type="text/javascript">moveProgressBar('0.7');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_2">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/reports_spec.rb:89:</pre></div>
-    <pre class="ruby"><code><span class="linenum">87</span>  describe "GET" do
-<span class="linenum">88</span>    before(:each) do
-<span class="offending"><span class="linenum">89</span>      @response = request(resource(Report.first))</span>
-<span class="linenum">90</span>    end
-<span class="linenum">91</span>  
-<span class="linenum">92</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_3">resource(@report, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_3');</script>
-    <script type="text/javascript">moveProgressBar('1.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_3">
-        <div class="message"><pre>Resource route not found: [nil, :edit]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/reports_spec.rb:77:</pre></div>
-    <pre class="ruby"><code><span class="linenum">75</span>describe "resource(@report, :edit)", :given => "a report exists" do
-<span class="linenum">76</span>  before(:each) do
-<span class="offending"><span class="linenum">77</span>    @response = request(resource(Report.first, :edit))</span>
-<span class="linenum">78</span>  end
-<span class="linenum">79</span>  
-<span class="linenum">80</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_4">resource(:reports, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_4');</script>
-    <script type="text/javascript">moveProgressBar('1.5');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_4">
-        <div class="message"><pre>Expected a GET to 'http://example.org/reports/new' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/reports_spec.rb:71:</pre></div>
-    <pre class="ruby"><code><span class="linenum">69</span>  
-<span class="linenum">70</span>  it "responds successfully" do
-<span class="offending"><span class="linenum">71</span>    @response.should be_successful</span>
-<span class="linenum">72</span>  end
-<span class="linenum">73</span>end
-<span class="linenum">74</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_5">resource(@report) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_5');</script>
-    <script type="text/javascript">moveProgressBar('1.9');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_5">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/reports_spec.rb:55:</pre></div>
-    <pre class="ruby"><code><span class="linenum">53</span>  describe "a successful DELETE", :given => "a report exists" do
-<span class="linenum">54</span>     before(:each) do
-<span class="offending"><span class="linenum">55</span>       @response = request(resource(Report.first), :method => "DELETE")</span>
-<span class="linenum">56</span>     end
-<span class="linenum">57</span>
-<span class="linenum">58</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_6">resource(:reports) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_6');</script>
-    <script type="text/javascript">moveProgressBar('2.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:reports)</span>
-      <div class="failure" id="failure_6">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/reports_spec.rb:46:</pre></div>
-    <pre class="ruby"><code><span class="linenum">44</span>    
-<span class="linenum">45</span>    it "redirects to resource(:reports)" do
-<span class="offending"><span class="linenum">46</span>      @response.should redirect_to(resource(Report.first), :message => {:notice => "report was successfully created"})</span>
-<span class="linenum">47</span>    end
-<span class="linenum">48</span>    
-<span class="linenum">49</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_7">resource(:reports) GET</dt>
-    <script type="text/javascript">makeYellow('example_group_7');</script>
-    <script type="text/javascript">moveProgressBar('2.7');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">has a list of reports (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_8">resource(:reports) GET</dt>
-    <script type="text/javascript">makeRed('example_group_8');</script>
-    <script type="text/javascript">moveProgressBar('3.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_7">
-        <div class="message"><pre>Expected a GET to 'http://example.org/reports' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/reports_spec.rb:17:</pre></div>
-    <pre class="ruby"><code><span class="linenum">15</span>    
-<span class="linenum">16</span>    it "responds successfully" do
-<span class="offending"><span class="linenum">17</span>      @response.should be_successful</span>
-<span class="linenum">18</span>    end
-<span class="linenum">19</span>
-<span class="linenum">20</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('3.5');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">contains a list of reports (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_9">resource(@user) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_9');</script>
-    <script type="text/javascript">moveProgressBar('3.9');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the article show action</span>
-      <div class="failure" id="failure_8">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/users_spec.rb:100:</pre></div>
-    <pre class="ruby"><code><span class="linenum">98</span>    before(:each) do
-<span class="linenum">99</span>      @user = User.first
-<span class="offending"><span class="linenum">100</span>      @response = request(resource(@user), :method => "PUT", </span>
-<span class="linenum">101</span>        :params => { :user => {:id => @user.id} })
-<span class="linenum">102</span>    end
-<span class="linenum">103</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_10">resource(@user) GET</dt>
-    <script type="text/javascript">makeRed('example_group_10');</script>
-    <script type="text/javascript">moveProgressBar('4.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_9">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/users_spec.rb:89:</pre></div>
-    <pre class="ruby"><code><span class="linenum">87</span>  describe "GET" do
-<span class="linenum">88</span>    before(:each) do
-<span class="offending"><span class="linenum">89</span>      @response = request(resource(User.first))</span>
-<span class="linenum">90</span>    end
-<span class="linenum">91</span>  
-<span class="linenum">92</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_11">resource(@user, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_11');</script>
-    <script type="text/javascript">moveProgressBar('4.7');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_10">
-        <div class="message"><pre>Resource route not found: [nil, :edit]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/users_spec.rb:77:</pre></div>
-    <pre class="ruby"><code><span class="linenum">75</span>describe "resource(@user, :edit)", :given => "a user exists" do
-<span class="linenum">76</span>  before(:each) do
-<span class="offending"><span class="linenum">77</span>    @response = request(resource(User.first, :edit))</span>
-<span class="linenum">78</span>  end
-<span class="linenum">79</span>  
-<span class="linenum">80</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_12">resource(:users, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_12');</script>
-    <script type="text/javascript">moveProgressBar('5.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_11">
-        <div class="message"><pre>Expected a GET to 'http://example.org/users/new' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/users_spec.rb:71:</pre></div>
-    <pre class="ruby"><code><span class="linenum">69</span>  
-<span class="linenum">70</span>  it "responds successfully" do
-<span class="offending"><span class="linenum">71</span>    @response.should be_successful</span>
-<span class="linenum">72</span>  end
-<span class="linenum">73</span>end
-<span class="linenum">74</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_13">resource(@user) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_13');</script>
-    <script type="text/javascript">moveProgressBar('5.5');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_12">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/users_spec.rb:55:</pre></div>
-    <pre class="ruby"><code><span class="linenum">53</span>  describe "a successful DELETE", :given => "a user exists" do
-<span class="linenum">54</span>     before(:each) do
-<span class="offending"><span class="linenum">55</span>       @response = request(resource(User.first), :method => "DELETE")</span>
-<span class="linenum">56</span>     end
-<span class="linenum">57</span>
-<span class="linenum">58</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_14">resource(:users) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_14');</script>
-    <script type="text/javascript">moveProgressBar('5.9');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:users)</span>
-      <div class="failure" id="failure_13">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/users_spec.rb:46:</pre></div>
-    <pre class="ruby"><code><span class="linenum">44</span>    
-<span class="linenum">45</span>    it "redirects to resource(:users)" do
-<span class="offending"><span class="linenum">46</span>      @response.should redirect_to(resource(User.first), :message => {:notice => "user was successfully created"})</span>
-<span class="linenum">47</span>    end
-<span class="linenum">48</span>    
-<span class="linenum">49</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_15">resource(:users) GET</dt>
-    <script type="text/javascript">makeYellow('example_group_15');</script>
-    <script type="text/javascript">moveProgressBar('6.3');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">has a list of users (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_16">resource(:users) GET</dt>
-    <script type="text/javascript">makeRed('example_group_16');</script>
-    <script type="text/javascript">moveProgressBar('6.7');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_14">
-        <div class="message"><pre>Expected a GET to 'http://example.org/users' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/users_spec.rb:17:</pre></div>
-    <pre class="ruby"><code><span class="linenum">15</span>    
-<span class="linenum">16</span>    it "responds successfully" do
-<span class="offending"><span class="linenum">17</span>      @response.should be_successful</span>
-<span class="linenum">18</span>    end
-<span class="linenum">19</span>
-<span class="linenum">20</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('7.1');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">contains a list of users (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_17">resource(@permission) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_17');</script>
-    <script type="text/javascript">moveProgressBar('7.5');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the article show action</span>
-      <div class="failure" id="failure_15">
-        <div class="message"><pre>uninitialized constant Permission</pre></div>
-        <div class="backtrace"><pre>./spec/requests/permissions_spec.rb:4:</pre></div>
-    <pre class="ruby"><code><span class="linenum">2</span>
-<span class="linenum">3</span>given "a permission exists" do
-<span class="offending"><span class="linenum">4</span>  Permission.all.destroy!</span>
-<span class="linenum">5</span>  request(resource(:permissions), :method => "POST", 
-<span class="linenum">6</span>    :params => { :permission => { :id => nil }})
-<span class="linenum">7</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_18">resource(@permission) GET</dt>
-    <script type="text/javascript">makeRed('example_group_18');</script>
-    <script type="text/javascript">moveProgressBar('7.9');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_16">
-        <div class="message"><pre>uninitialized constant Permission</pre></div>
-        <div class="backtrace"><pre>./spec/requests/permissions_spec.rb:4:</pre></div>
-    <pre class="ruby"><code><span class="linenum">2</span>
-<span class="linenum">3</span>given "a permission exists" do
-<span class="offending"><span class="linenum">4</span>  Permission.all.destroy!</span>
-<span class="linenum">5</span>  request(resource(:permissions), :method => "POST", 
-<span class="linenum">6</span>    :params => { :permission => { :id => nil }})
-<span class="linenum">7</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_19">resource(@permission, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_19');</script>
-    <script type="text/javascript">moveProgressBar('8.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_17">
-        <div class="message"><pre>uninitialized constant Permission</pre></div>
-        <div class="backtrace"><pre>./spec/requests/permissions_spec.rb:4:</pre></div>
-    <pre class="ruby"><code><span class="linenum">2</span>
-<span class="linenum">3</span>given "a permission exists" do
-<span class="offending"><span class="linenum">4</span>  Permission.all.destroy!</span>
-<span class="linenum">5</span>  request(resource(:permissions), :method => "POST", 
-<span class="linenum">6</span>    :params => { :permission => { :id => nil }})
-<span class="linenum">7</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_20">resource(:permissions, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_20');</script>
-    <script type="text/javascript">moveProgressBar('8.7');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_18">
-        <div class="message"><pre>Resource route not found: [:permissions, :new]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/permissions_spec.rb:67:</pre></div>
-    <pre class="ruby"><code><span class="linenum">65</span>describe "resource(:permissions, :new)" do
-<span class="linenum">66</span>  before(:each) do
-<span class="offending"><span class="linenum">67</span>    @response = request(resource(:permissions, :new))</span>
-<span class="linenum">68</span>  end
-<span class="linenum">69</span>  
-<span class="linenum">70</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_21">resource(@permission) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_21');</script>
-    <script type="text/javascript">moveProgressBar('9.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_19">
-        <div class="message"><pre>uninitialized constant Permission</pre></div>
-        <div class="backtrace"><pre>./spec/requests/permissions_spec.rb:4:</pre></div>
-    <pre class="ruby"><code><span class="linenum">2</span>
-<span class="linenum">3</span>given "a permission exists" do
-<span class="offending"><span class="linenum">4</span>  Permission.all.destroy!</span>
-<span class="linenum">5</span>  request(resource(:permissions), :method => "POST", 
-<span class="linenum">6</span>    :params => { :permission => { :id => nil }})
-<span class="linenum">7</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_22">resource(:permissions) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_22');</script>
-    <script type="text/javascript">moveProgressBar('9.5');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:permissions)</span>
-      <div class="failure" id="failure_20">
-        <div class="message"><pre>uninitialized constant Permission</pre></div>
-        <div class="backtrace"><pre>./spec/requests/permissions_spec.rb:40:</pre></div>
-    <pre class="ruby"><code><span class="linenum">38</span>  describe "a successful POST" do
-<span class="linenum">39</span>    before(:each) do
-<span class="offending"><span class="linenum">40</span>      Permission.all.destroy!</span>
-<span class="linenum">41</span>      @response = request(resource(:permissions), :method => "POST", 
-<span class="linenum">42</span>        :params => { :permission => { :id => nil }})
-<span class="linenum">43</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_23">resource(:permissions) GET</dt>
-    <script type="text/javascript">makeRed('example_group_23');</script>
-    <script type="text/javascript">moveProgressBar('9.9');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">has a list of permissions</span>
-      <div class="failure" id="failure_21">
-        <div class="message"><pre>uninitialized constant Permission</pre></div>
-        <div class="backtrace"><pre>./spec/requests/permissions_spec.rb:4:</pre></div>
-    <pre class="ruby"><code><span class="linenum">2</span>
-<span class="linenum">3</span>given "a permission exists" do
-<span class="offending"><span class="linenum">4</span>  Permission.all.destroy!</span>
-<span class="linenum">5</span>  request(resource(:permissions), :method => "POST", 
-<span class="linenum">6</span>    :params => { :permission => { :id => nil }})
-<span class="linenum">7</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_24">resource(:permissions) GET</dt>
-    <script type="text/javascript">makeRed('example_group_24');</script>
-    <script type="text/javascript">moveProgressBar('10.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_22">
-        <div class="message"><pre>Resource route not found: [:permissions]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/permissions_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:permissions))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('10.7');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">contains a list of permissions</span>
-      <div class="failure" id="failure_23">
-        <div class="message"><pre>Resource route not found: [:permissions]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/permissions_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:permissions))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_25">resource(@payment) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_25');</script>
-    <script type="text/javascript">moveProgressBar('11.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the article show action</span>
-      <div class="failure" id="failure_24">
-        <div class="message"><pre>Resource route not found: [:payments]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/payments_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a payment exists" do
-<span class="linenum">4</span>  Payment.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:payments), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :payment => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_26">resource(@payment) GET</dt>
-    <script type="text/javascript">makeRed('example_group_26');</script>
-    <script type="text/javascript">moveProgressBar('11.5');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_25">
-        <div class="message"><pre>Resource route not found: [:payments]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/payments_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a payment exists" do
-<span class="linenum">4</span>  Payment.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:payments), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :payment => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_27">resource(@payment, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_27');</script>
-    <script type="text/javascript">moveProgressBar('11.9');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_26">
-        <div class="message"><pre>Resource route not found: [:payments]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/payments_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a payment exists" do
-<span class="linenum">4</span>  Payment.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:payments), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :payment => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_28">resource(:payments, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_28');</script>
-    <script type="text/javascript">moveProgressBar('12.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_27">
-        <div class="message"><pre>Resource route not found: [:payments, :new]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/payments_spec.rb:67:</pre></div>
-    <pre class="ruby"><code><span class="linenum">65</span>describe "resource(:payments, :new)" do
-<span class="linenum">66</span>  before(:each) do
-<span class="offending"><span class="linenum">67</span>    @response = request(resource(:payments, :new))</span>
-<span class="linenum">68</span>  end
-<span class="linenum">69</span>  
-<span class="linenum">70</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_29">resource(@payment) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_29');</script>
-    <script type="text/javascript">moveProgressBar('12.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_28">
-        <div class="message"><pre>Resource route not found: [:payments]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/payments_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a payment exists" do
-<span class="linenum">4</span>  Payment.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:payments), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :payment => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_30">resource(:payments) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_30');</script>
-    <script type="text/javascript">moveProgressBar('13.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:payments)</span>
-      <div class="failure" id="failure_29">
-        <div class="message"><pre>Resource route not found: [:payments]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/payments_spec.rb:41:</pre></div>
-    <pre class="ruby"><code><span class="linenum">39</span>    before(:each) do
-<span class="linenum">40</span>      Payment.all.destroy!
-<span class="offending"><span class="linenum">41</span>      @response = request(resource(:payments), :method => "POST", </span>
-<span class="linenum">42</span>        :params => { :payment => { :id => nil }})
-<span class="linenum">43</span>    end
-<span class="linenum">44</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_31">resource(:payments) GET</dt>
-    <script type="text/javascript">makeRed('example_group_31');</script>
-    <script type="text/javascript">moveProgressBar('13.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">has a list of payments</span>
-      <div class="failure" id="failure_30">
-        <div class="message"><pre>Resource route not found: [:payments]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/payments_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a payment exists" do
-<span class="linenum">4</span>  Payment.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:payments), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :payment => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_32">resource(:payments) GET</dt>
-    <script type="text/javascript">makeRed('example_group_32');</script>
-    <script type="text/javascript">moveProgressBar('13.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_31">
-        <div class="message"><pre>Resource route not found: [:payments]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/payments_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:payments))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('14.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">contains a list of payments</span>
-      <div class="failure" id="failure_32">
-        <div class="message"><pre>Resource route not found: [:payments]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/payments_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:payments))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_33">resource(@loan) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_33');</script>
-    <script type="text/javascript">moveProgressBar('14.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the article show action</span>
-      <div class="failure" id="failure_33">
-        <div class="message"><pre>Resource route not found: [:loans]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loans_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a loan exists" do
-<span class="linenum">4</span>  Loan.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:loans), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :loan => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_34">resource(@loan) GET</dt>
-    <script type="text/javascript">makeRed('example_group_34');</script>
-    <script type="text/javascript">moveProgressBar('15.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_34">
-        <div class="message"><pre>Resource route not found: [:loans]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loans_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a loan exists" do
-<span class="linenum">4</span>  Loan.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:loans), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :loan => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_35">resource(@loan, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_35');</script>
-    <script type="text/javascript">moveProgressBar('15.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_35">
-        <div class="message"><pre>Resource route not found: [:loans]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loans_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a loan exists" do
-<span class="linenum">4</span>  Loan.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:loans), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :loan => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_36">resource(:loans, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_36');</script>
-    <script type="text/javascript">moveProgressBar('15.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_36">
-        <div class="message"><pre>Resource route not found: [:loans, :new]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loans_spec.rb:67:</pre></div>
-    <pre class="ruby"><code><span class="linenum">65</span>describe "resource(:loans, :new)" do
-<span class="linenum">66</span>  before(:each) do
-<span class="offending"><span class="linenum">67</span>    @response = request(resource(:loans, :new))</span>
-<span class="linenum">68</span>  end
-<span class="linenum">69</span>  
-<span class="linenum">70</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_37">resource(@loan) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_37');</script>
-    <script type="text/javascript">moveProgressBar('16.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_37">
-        <div class="message"><pre>Resource route not found: [:loans]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loans_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a loan exists" do
-<span class="linenum">4</span>  Loan.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:loans), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :loan => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_38">resource(:loans) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_38');</script>
-    <script type="text/javascript">moveProgressBar('16.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:loans)</span>
-      <div class="failure" id="failure_38">
-        <div class="message"><pre>Resource route not found: [:loans]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loans_spec.rb:41:</pre></div>
-    <pre class="ruby"><code><span class="linenum">39</span>    before(:each) do
-<span class="linenum">40</span>      Loan.all.destroy!
-<span class="offending"><span class="linenum">41</span>      @response = request(resource(:loans), :method => "POST", </span>
-<span class="linenum">42</span>        :params => { :loan => { :id => nil }})
-<span class="linenum">43</span>    end
-<span class="linenum">44</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_39">resource(:loans) GET</dt>
-    <script type="text/javascript">makeRed('example_group_39');</script>
-    <script type="text/javascript">moveProgressBar('17.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">has a list of loans</span>
-      <div class="failure" id="failure_39">
-        <div class="message"><pre>Resource route not found: [:loans]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loans_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a loan exists" do
-<span class="linenum">4</span>  Loan.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:loans), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :loan => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_40">resource(:loans) GET</dt>
-    <script type="text/javascript">makeRed('example_group_40');</script>
-    <script type="text/javascript">moveProgressBar('17.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_40">
-        <div class="message"><pre>Resource route not found: [:loans]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loans_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:loans))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('17.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">contains a list of loans</span>
-      <div class="failure" id="failure_41">
-        <div class="message"><pre>Resource route not found: [:loans]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loans_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:loans))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_41">Controllers </dt>
-    <script type="text/javascript">moveProgressBar('18.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should fail with improper credentials</span></dd>
-    <script type="text/javascript">moveProgressBar('18.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should deny access to the data</span></dd>
-    <script type="text/javascript">moveProgressBar('19.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should login with correct credentials</span></dd>
-    <script type="text/javascript">makeRed('example_group_41');</script>
-    <script type="text/javascript">moveProgressBar('19.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should check read_only_user credentials</span>
-      <div class="failure" id="failure_42">
-        <div class="message"><pre>Expected a GET to 'http://example.org/branches' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/controllers/users_spec.rb:51:</pre></div>
-    <pre class="ruby"><code><span class="linenum">49</span>    response = request url(:perform_login), :method => "PUT", :params => {:login => 'read', :password => 'only'}
-<span class="linenum">50</span>    response.should redirect
-<span class="offending"><span class="linenum">51</span>    request("/branches").should be_successful</span>
-<span class="linenum">52</span>    @user = User.get(1)
-<span class="linenum">53</span>    response = request(url(:new_user)).body.to_s.should =~ /Not Privileged/ 
-<span class="linenum">54</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('19.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should check data_entry_operator credentials</span>
-      <div class="failure" id="failure_43">
-        <div class="message"><pre>Expected a GET to 'http://example.org/branches' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/controllers/users_spec.rb:103:</pre></div>
-    <pre class="ruby"><code><span class="linenum">101</span>    response = request url(:perform_login), :method => "PUT", :params => {:login => 'data', :password => 'entry'}
-<span class="linenum">102</span>    response.should redirect
-<span class="offending"><span class="linenum">103</span>    request("/branches").should be_successful</span>
-<span class="linenum">104</span>    @user = User.get(1)
-<span class="linenum">105</span>    response = request(url(:new_user)).body.to_s.should =~ /Not Privileged/ 
-<span class="linenum">106</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('20.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should check mis_manager credentials</span>
-      <div class="failure" id="failure_44">
-        <div class="message"><pre>Expected a GET to 'http://example.org/branches/1/centers/1/clients/4/edit' to be successful, but it returned a 404</pre></div>
-        <div class="backtrace"><pre>./spec/controllers/users_spec.rb:181:</pre></div>
-    <pre class="ruby"><code><span class="linenum">179</span>    @client = Client.get(1)
-<span class="linenum">180</span>    request(url(:new_branch_center_client, @branch.id, @center.id)).should be_successful 
-<span class="offending"><span class="linenum">181</span>    request(url(:edit_branch_center_client, @branch.id, @center.id, @client.id)).should be_successful </span>
-<span class="linenum">182</span>#    request(url(:delete_branch_center_client, @branch.id, @center.id, @client.id)).should be_successful 
-<span class="linenum">183</span>
-<span class="linenum">184</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('20.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should check admin credentials</span>
-      <div class="failure" id="failure_45">
-        <div class="message"><pre>Expected a GET to 'http://example.org/branches/1/centers/1/clients/4/edit' to be successful, but it returned a 404</pre></div>
-        <div class="backtrace"><pre>./spec/controllers/users_spec.rb:222:</pre></div>
-    <pre class="ruby"><code><span class="linenum">220</span>    @client = Client.get(1)
-<span class="linenum">221</span>    request(url(:new_branch_center_client, @branch.id, @center.id)).should be_successful 
-<span class="offending"><span class="linenum">222</span>    request(url(:edit_branch_center_client, @branch.id, @center.id, @client.id)).should be_successful </span>
-<span class="linenum">223</span>#    request(url(:delete_branch_center_client, @branch.id, @center.id, @client.id)).should be_successful 
-<span class="linenum">224</span>
-<span class="linenum">225</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_42">resource(@staff_member) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_42');</script>
-    <script type="text/javascript">moveProgressBar('21.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the article show action</span>
-      <div class="failure" id="failure_46">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/staff_members_spec.rb:100:</pre></div>
-    <pre class="ruby"><code><span class="linenum">98</span>    before(:each) do
-<span class="linenum">99</span>      @staff_member = StaffMember.first
-<span class="offending"><span class="linenum">100</span>      @response = request(resource(@staff_member), :method => "PUT", </span>
-<span class="linenum">101</span>        :params => { :staff_member => {:id => @staff_member.id} })
-<span class="linenum">102</span>    end
-<span class="linenum">103</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_43">resource(@staff_member) GET</dt>
-    <script type="text/javascript">makeRed('example_group_43');</script>
-    <script type="text/javascript">moveProgressBar('21.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_47">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/staff_members_spec.rb:89:</pre></div>
-    <pre class="ruby"><code><span class="linenum">87</span>  describe "GET" do
-<span class="linenum">88</span>    before(:each) do
-<span class="offending"><span class="linenum">89</span>      @response = request(resource(StaffMember.first))</span>
-<span class="linenum">90</span>    end
-<span class="linenum">91</span>  
-<span class="linenum">92</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_44">resource(@staff_member, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_44');</script>
-    <script type="text/javascript">moveProgressBar('21.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_48">
-        <div class="message"><pre>Resource route not found: [nil, :edit]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/staff_members_spec.rb:77:</pre></div>
-    <pre class="ruby"><code><span class="linenum">75</span>describe "resource(@staff_member, :edit)", :given => "a staff_member exists" do
-<span class="linenum">76</span>  before(:each) do
-<span class="offending"><span class="linenum">77</span>    @response = request(resource(StaffMember.first, :edit))</span>
-<span class="linenum">78</span>  end
-<span class="linenum">79</span>  
-<span class="linenum">80</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_45">resource(:staff_members, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_45');</script>
-    <script type="text/javascript">moveProgressBar('22.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_49">
-        <div class="message"><pre>Expected a GET to 'http://example.org/staff_members/new' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/staff_members_spec.rb:71:</pre></div>
-    <pre class="ruby"><code><span class="linenum">69</span>  
-<span class="linenum">70</span>  it "responds successfully" do
-<span class="offending"><span class="linenum">71</span>    @response.should be_successful</span>
-<span class="linenum">72</span>  end
-<span class="linenum">73</span>end
-<span class="linenum">74</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_46">resource(@staff_member) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_46');</script>
-    <script type="text/javascript">moveProgressBar('22.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_50">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/staff_members_spec.rb:55:</pre></div>
-    <pre class="ruby"><code><span class="linenum">53</span>  describe "a successful DELETE", :given => "a staff_member exists" do
-<span class="linenum">54</span>     before(:each) do
-<span class="offending"><span class="linenum">55</span>       @response = request(resource(StaffMember.first), :method => "DELETE")</span>
-<span class="linenum">56</span>     end
-<span class="linenum">57</span>
-<span class="linenum">58</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_47">resource(:staff_members) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_47');</script>
-    <script type="text/javascript">moveProgressBar('23.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:staff_members)</span>
-      <div class="failure" id="failure_51">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/staff_members_spec.rb:46:</pre></div>
-    <pre class="ruby"><code><span class="linenum">44</span>    
-<span class="linenum">45</span>    it "redirects to resource(:staff_members)" do
-<span class="offending"><span class="linenum">46</span>      @response.should redirect_to(resource(StaffMember.first), :message => {:notice => "staff_member was successfully created"})</span>
-<span class="linenum">47</span>    end
-<span class="linenum">48</span>    
-<span class="linenum">49</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_48">resource(:staff_members) GET</dt>
-    <script type="text/javascript">makeYellow('example_group_48');</script>
-    <script type="text/javascript">moveProgressBar('23.4');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">has a list of staff_members (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_49">resource(:staff_members) GET</dt>
-    <script type="text/javascript">makeRed('example_group_49');</script>
-    <script type="text/javascript">moveProgressBar('23.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_52">
-        <div class="message"><pre>Expected a GET to 'http://example.org/staff_members' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/staff_members_spec.rb:17:</pre></div>
-    <pre class="ruby"><code><span class="linenum">15</span>    
-<span class="linenum">16</span>    it "responds successfully" do
-<span class="offending"><span class="linenum">17</span>      @response.should be_successful</span>
-<span class="linenum">18</span>    end
-<span class="linenum">19</span>
-<span class="linenum">20</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('24.2');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">contains a list of staff_members (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_50">resource(@funding_line) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_50');</script>
-    <script type="text/javascript">moveProgressBar('24.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the funding_line show action</span>
-      <div class="failure" id="failure_53">
-        <div class="message"><pre>Resource route not found: [:funding_lines]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funding_lines_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a funding_line exists" do
-<span class="linenum">4</span>  FundingLine.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:funding_lines), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :funding_line => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_51">resource(@funding_line) GET</dt>
-    <script type="text/javascript">makeRed('example_group_51');</script>
-    <script type="text/javascript">moveProgressBar('25.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_54">
-        <div class="message"><pre>Resource route not found: [:funding_lines]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funding_lines_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a funding_line exists" do
-<span class="linenum">4</span>  FundingLine.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:funding_lines), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :funding_line => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_52">resource(@funding_line, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_52');</script>
-    <script type="text/javascript">moveProgressBar('25.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_55">
-        <div class="message"><pre>Resource route not found: [:funding_lines]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funding_lines_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a funding_line exists" do
-<span class="linenum">4</span>  FundingLine.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:funding_lines), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :funding_line => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_53">resource(:funding_lines, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_53');</script>
-    <script type="text/javascript">moveProgressBar('25.7');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_56">
-        <div class="message"><pre>Resource route not found: [:funding_lines, :new]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funding_lines_spec.rb:67:</pre></div>
-    <pre class="ruby"><code><span class="linenum">65</span>describe "resource(:funding_lines, :new)" do
-<span class="linenum">66</span>  before(:each) do
-<span class="offending"><span class="linenum">67</span>    @response = request(resource(:funding_lines, :new))</span>
-<span class="linenum">68</span>  end
-<span class="linenum">69</span>  
-<span class="linenum">70</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_54">resource(@funding_line) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_54');</script>
-    <script type="text/javascript">moveProgressBar('26.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_57">
-        <div class="message"><pre>Resource route not found: [:funding_lines]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funding_lines_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a funding_line exists" do
-<span class="linenum">4</span>  FundingLine.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:funding_lines), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :funding_line => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_55">resource(:funding_lines) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_55');</script>
-    <script type="text/javascript">moveProgressBar('26.5');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:funding_lines)</span>
-      <div class="failure" id="failure_58">
-        <div class="message"><pre>Resource route not found: [:funding_lines]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funding_lines_spec.rb:41:</pre></div>
-    <pre class="ruby"><code><span class="linenum">39</span>    before(:each) do
-<span class="linenum">40</span>      FundingLine.all.destroy!
-<span class="offending"><span class="linenum">41</span>      @response = request(resource(:funding_lines), :method => "POST", </span>
-<span class="linenum">42</span>        :params => { :funding_line => { :id => nil }})
-<span class="linenum">43</span>    end
-<span class="linenum">44</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_56">resource(:funding_lines) GET</dt>
-    <script type="text/javascript">makeRed('example_group_56');</script>
-    <script type="text/javascript">moveProgressBar('26.9');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">has a list of funding_lines</span>
-      <div class="failure" id="failure_59">
-        <div class="message"><pre>Resource route not found: [:funding_lines]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funding_lines_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a funding_line exists" do
-<span class="linenum">4</span>  FundingLine.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:funding_lines), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :funding_line => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_57">resource(:funding_lines) GET</dt>
-    <script type="text/javascript">makeRed('example_group_57');</script>
-    <script type="text/javascript">moveProgressBar('27.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_60">
-        <div class="message"><pre>Resource route not found: [:funding_lines]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funding_lines_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:funding_lines))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('27.7');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">contains a list of funding_lines</span>
-      <div class="failure" id="failure_61">
-        <div class="message"><pre>Resource route not found: [:funding_lines]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funding_lines_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:funding_lines))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_58">resource(@funder) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_58');</script>
-    <script type="text/javascript">moveProgressBar('28.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the funder show action</span>
-      <div class="failure" id="failure_62">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funders_spec.rb:100:</pre></div>
-    <pre class="ruby"><code><span class="linenum">98</span>    before(:each) do
-<span class="linenum">99</span>      @funder = Funder.first
-<span class="offending"><span class="linenum">100</span>      @response = request(resource(@funder), :method => "PUT", </span>
-<span class="linenum">101</span>        :params => { :funder => {:id => @funder.id} })
-<span class="linenum">102</span>    end
-<span class="linenum">103</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_59">resource(@funder) GET</dt>
-    <script type="text/javascript">makeRed('example_group_59');</script>
-    <script type="text/javascript">moveProgressBar('28.5');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_63">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funders_spec.rb:89:</pre></div>
-    <pre class="ruby"><code><span class="linenum">87</span>  describe "GET" do
-<span class="linenum">88</span>    before(:each) do
-<span class="offending"><span class="linenum">89</span>      @response = request(resource(Funder.first))</span>
-<span class="linenum">90</span>    end
-<span class="linenum">91</span>  
-<span class="linenum">92</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_60">resource(@funder, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_60');</script>
-    <script type="text/javascript">moveProgressBar('28.9');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_64">
-        <div class="message"><pre>Resource route not found: [nil, :edit]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funders_spec.rb:77:</pre></div>
-    <pre class="ruby"><code><span class="linenum">75</span>describe "resource(@funder, :edit)", :given => "a funder exists" do
-<span class="linenum">76</span>  before(:each) do
-<span class="offending"><span class="linenum">77</span>    @response = request(resource(Funder.first, :edit))</span>
-<span class="linenum">78</span>  end
-<span class="linenum">79</span>  
-<span class="linenum">80</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_61">resource(:funders, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_61');</script>
-    <script type="text/javascript">moveProgressBar('29.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_65">
-        <div class="message"><pre>Expected a GET to 'http://example.org/funders/new' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funders_spec.rb:71:</pre></div>
-    <pre class="ruby"><code><span class="linenum">69</span>  
-<span class="linenum">70</span>  it "responds successfully" do
-<span class="offending"><span class="linenum">71</span>    @response.should be_successful</span>
-<span class="linenum">72</span>  end
-<span class="linenum">73</span>end
-<span class="linenum">74</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_62">resource(@funder) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_62');</script>
-    <script type="text/javascript">moveProgressBar('29.7');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_66">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funders_spec.rb:55:</pre></div>
-    <pre class="ruby"><code><span class="linenum">53</span>  describe "a successful DELETE", :given => "a funder exists" do
-<span class="linenum">54</span>     before(:each) do
-<span class="offending"><span class="linenum">55</span>       @response = request(resource(Funder.first), :method => "DELETE")</span>
-<span class="linenum">56</span>     end
-<span class="linenum">57</span>
-<span class="linenum">58</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_63">resource(:funders) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_63');</script>
-    <script type="text/javascript">moveProgressBar('30.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:funders)</span>
-      <div class="failure" id="failure_67">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funders_spec.rb:46:</pre></div>
-    <pre class="ruby"><code><span class="linenum">44</span>    
-<span class="linenum">45</span>    it "redirects to resource(:funders)" do
-<span class="offending"><span class="linenum">46</span>      @response.should redirect_to(resource(Funder.first), :message => {:notice => "funder was successfully created"})</span>
-<span class="linenum">47</span>    end
-<span class="linenum">48</span>    
-<span class="linenum">49</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_64">resource(:funders) GET</dt>
-    <script type="text/javascript">makeYellow('example_group_64');</script>
-    <script type="text/javascript">moveProgressBar('30.5');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">has a list of funders (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_65">resource(:funders) GET</dt>
-    <script type="text/javascript">makeRed('example_group_65');</script>
-    <script type="text/javascript">moveProgressBar('30.9');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_68">
-        <div class="message"><pre>Expected a GET to 'http://example.org/funders' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/funders_spec.rb:17:</pre></div>
-    <pre class="ruby"><code><span class="linenum">15</span>    
-<span class="linenum">16</span>    it "responds successfully" do
-<span class="offending"><span class="linenum">17</span>      @response.should be_successful</span>
-<span class="linenum">18</span>    end
-<span class="linenum">19</span>
-<span class="linenum">20</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('31.3');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">contains a list of funders (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_66">Funder</dt>
-    <script type="text/javascript">moveProgressBar('31.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without having a name</span></dd>
-    <script type="text/javascript">moveProgressBar('32.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should be able to have funding lines</span></dd>
-    <script type="text/javascript">moveProgressBar('32.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct count of completed lines </span></dd>
-    <script type="text/javascript">moveProgressBar('32.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct count of active lines</span></dd>
-    <script type="text/javascript">moveProgressBar('33.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct count of total lines </span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_67">FundingLine</dt>
-    <script type="text/javascript">moveProgressBar('33.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a funder</span></dd>
-    <script type="text/javascript">moveProgressBar('34.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not have a blank interest_rate</span></dd>
-    <script type="text/javascript">moveProgressBar('34.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not have a blank disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('34.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not have a blank amount</span></dd>
-    <script type="text/javascript">moveProgressBar('35.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not have blank last payment date</span></dd>
-    <script type="text/javascript">moveProgressBar('35.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have first payment done before last payment</span></dd>
-    <script type="text/javascript">moveProgressBar('36.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should be disbursed before first payment</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_68">StaffMember</dt>
-    <script type="text/javascript">moveProgressBar('36.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
-    <script type="text/javascript">moveProgressBar('36.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not  be valid without active boolean</span></dd>
-    <script type="text/javascript">moveProgressBar('37.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should be unique</span></dd>
-    <script type="text/javascript">moveProgressBar('37.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have name length &gt; 3</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_69">resource(@client) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_69');</script>
-    <script type="text/javascript">moveProgressBar('38.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the article show action</span>
-      <div class="failure" id="failure_69">
-        <div class="message"><pre>Resource route not found: [:clients]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/clients_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a client exists" do
-<span class="linenum">4</span>  Client.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:clients), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :client => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_70">resource(@client) GET</dt>
-    <script type="text/javascript">makeRed('example_group_70');</script>
-    <script type="text/javascript">moveProgressBar('38.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_70">
-        <div class="message"><pre>Resource route not found: [:clients]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/clients_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a client exists" do
-<span class="linenum">4</span>  Client.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:clients), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :client => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_71">resource(@client, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_71');</script>
-    <script type="text/javascript">moveProgressBar('38.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_71">
-        <div class="message"><pre>Resource route not found: [:clients]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/clients_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a client exists" do
-<span class="linenum">4</span>  Client.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:clients), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :client => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_72">resource(:clients, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_72');</script>
-    <script type="text/javascript">moveProgressBar('39.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_72">
-        <div class="message"><pre>Resource route not found: [:clients, :new]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/clients_spec.rb:67:</pre></div>
-    <pre class="ruby"><code><span class="linenum">65</span>describe "resource(:clients, :new)" do
-<span class="linenum">66</span>  before(:each) do
-<span class="offending"><span class="linenum">67</span>    @response = request(resource(:clients, :new))</span>
-<span class="linenum">68</span>  end
-<span class="linenum">69</span>  
-<span class="linenum">70</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_73">resource(@client) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_73');</script>
-    <script type="text/javascript">moveProgressBar('39.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_73">
-        <div class="message"><pre>Resource route not found: [:clients]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/clients_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a client exists" do
-<span class="linenum">4</span>  Client.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:clients), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :client => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_74">resource(:clients) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_74');</script>
-    <script type="text/javascript">moveProgressBar('40.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:clients)</span>
-      <div class="failure" id="failure_74">
-        <div class="message"><pre>Resource route not found: [:clients]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/clients_spec.rb:41:</pre></div>
-    <pre class="ruby"><code><span class="linenum">39</span>    before(:each) do
-<span class="linenum">40</span>      Client.all.destroy!
-<span class="offending"><span class="linenum">41</span>      @response = request(resource(:clients), :method => "POST", </span>
-<span class="linenum">42</span>        :params => { :client => { :id => nil }})
-<span class="linenum">43</span>    end
-<span class="linenum">44</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_75">resource(:clients) GET</dt>
-    <script type="text/javascript">makeRed('example_group_75');</script>
-    <script type="text/javascript">moveProgressBar('40.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">has a list of clients</span>
-      <div class="failure" id="failure_75">
-        <div class="message"><pre>Resource route not found: [:clients]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/clients_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a client exists" do
-<span class="linenum">4</span>  Client.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:clients), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :client => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_76">resource(:clients) GET</dt>
-    <script type="text/javascript">makeRed('example_group_76');</script>
-    <script type="text/javascript">moveProgressBar('40.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_76">
-        <div class="message"><pre>Resource route not found: [:clients]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/clients_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:clients))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('41.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">contains a list of clients</span>
-      <div class="failure" id="failure_77">
-        <div class="message"><pre>Resource route not found: [:clients]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/clients_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:clients))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_77">resource(@center) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_77');</script>
-    <script type="text/javascript">moveProgressBar('41.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the article show action</span>
-      <div class="failure" id="failure_78">
-        <div class="message"><pre>Resource route not found: [:centers]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a center exists" do
-<span class="linenum">4</span>  Center.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:centers), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :center => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_78">resource(@center) GET</dt>
-    <script type="text/javascript">makeRed('example_group_78');</script>
-    <script type="text/javascript">moveProgressBar('42.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_79">
-        <div class="message"><pre>Resource route not found: [:centers]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a center exists" do
-<span class="linenum">4</span>  Center.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:centers), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :center => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_79">resource(@center, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_79');</script>
-    <script type="text/javascript">moveProgressBar('42.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_80">
-        <div class="message"><pre>Resource route not found: [:centers]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a center exists" do
-<span class="linenum">4</span>  Center.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:centers), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :center => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_80">resource(:centers, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_80');</script>
-    <script type="text/javascript">moveProgressBar('42.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_81">
-        <div class="message"><pre>Resource route not found: [:centers, :new]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:67:</pre></div>
-    <pre class="ruby"><code><span class="linenum">65</span>describe "resource(:centers, :new)" do
-<span class="linenum">66</span>  before(:each) do
-<span class="offending"><span class="linenum">67</span>    @response = request(resource(:centers, :new))</span>
-<span class="linenum">68</span>  end
-<span class="linenum">69</span>  
-<span class="linenum">70</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_81">resource(@center) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_81');</script>
-    <script type="text/javascript">moveProgressBar('43.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_82">
-        <div class="message"><pre>Resource route not found: [:centers]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a center exists" do
-<span class="linenum">4</span>  Center.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:centers), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :center => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_82">resource(:centers) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_82');</script>
-    <script type="text/javascript">moveProgressBar('43.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:centers)</span>
-      <div class="failure" id="failure_83">
-        <div class="message"><pre>Resource route not found: [:centers]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:41:</pre></div>
-    <pre class="ruby"><code><span class="linenum">39</span>    before(:each) do
-<span class="linenum">40</span>      Center.all.destroy!
-<span class="offending"><span class="linenum">41</span>      @response = request(resource(:centers), :method => "POST", </span>
-<span class="linenum">42</span>        :params => { :center => { :id => nil }})
-<span class="linenum">43</span>    end
-<span class="linenum">44</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_83">resource(:centers) GET</dt>
-    <script type="text/javascript">makeRed('example_group_83');</script>
-    <script type="text/javascript">moveProgressBar('44.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">has a list of centers</span>
-      <div class="failure" id="failure_84">
-        <div class="message"><pre>Resource route not found: [:centers]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a center exists" do
-<span class="linenum">4</span>  Center.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:centers), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :center => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_84">resource(:centers) GET</dt>
-    <script type="text/javascript">makeRed('example_group_84');</script>
-    <script type="text/javascript">moveProgressBar('44.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_85">
-        <div class="message"><pre>Resource route not found: [:centers]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:centers))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('44.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">contains a list of centers</span>
-      <div class="failure" id="failure_86">
-        <div class="message"><pre>Resource route not found: [:centers]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:centers))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_85">User</dt>
-    <script type="text/javascript">moveProgressBar('45.2');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid with name shorter than 3 characters</span></dd>
-    <script type="text/javascript">moveProgressBar('45.6');</script>
+    <script type="text/javascript">moveProgressBar('1.5');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not have a nil login </span></dd>
-    <script type="text/javascript">moveProgressBar('46.0');</script>
+    <script type="text/javascript">moveProgressBar('2.3');</script>
     <dd class="spec passed"><span class="passed_spec_name">should be return for admin? if admin value set to true</span></dd>
-    <script type="text/javascript">moveProgressBar('46.4');</script>
+    <script type="text/javascript">moveProgressBar('3.1');</script>
     <dd class="spec passed"><span class="passed_spec_name">should be created before it is updated</span></dd>
-    <script type="text/javascript">moveProgressBar('46.8');</script>
+    <script type="text/javascript">moveProgressBar('3.8');</script>
     <dd class="spec passed"><span class="passed_spec_name">should have a login name beginning with numbers, aplphabets and underscores </span></dd>
-    <script type="text/javascript">moveProgressBar('47.2');</script>
+    <script type="text/javascript">moveProgressBar('4.6');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not have false in all permission fields</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_86">resource(@branch) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_86');</script>
-    <script type="text/javascript">moveProgressBar('47.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the article show action</span>
-      <div class="failure" id="failure_87">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/branches_spec.rb:103:</pre></div>
-    <pre class="ruby"><code><span class="linenum">101</span>    before(:each) do
-<span class="linenum">102</span>      @branch = Branch.first
-<span class="offending"><span class="linenum">103</span>      @response = request(resource(@branch), :method => "PUT", </span>
-<span class="linenum">104</span>        :params => { :branch => {:id => @branch.id} })
-<span class="linenum">105</span>    end
-<span class="linenum">106</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
+  <dt id="example_group_2">Funder</dt>
+    <script type="text/javascript">moveProgressBar('5.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without having a name</span></dd>
+    <script type="text/javascript">moveProgressBar('6.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be able to have funding lines</span></dd>
+    <script type="text/javascript">moveProgressBar('6.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct count of completed lines </span></dd>
+    <script type="text/javascript">moveProgressBar('7.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct count of active lines</span></dd>
+    <script type="text/javascript">moveProgressBar('8.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct count of total lines </span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_87">resource(@branch) GET</dt>
-    <script type="text/javascript">makeRed('example_group_87');</script>
-    <script type="text/javascript">moveProgressBar('48.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_88">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/branches_spec.rb:92:</pre></div>
-    <pre class="ruby"><code><span class="linenum">90</span>  describe "GET" do
-<span class="linenum">91</span>    before(:each) do
-<span class="offending"><span class="linenum">92</span>      @response = request(resource(Branch.first))</span>
-<span class="linenum">93</span>    end
-<span class="linenum">94</span>  
-<span class="linenum">95</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
+  <dt id="example_group_3">StaffMember</dt>
+    <script type="text/javascript">moveProgressBar('9.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
+    <script type="text/javascript">moveProgressBar('10.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not  be valid without active boolean</span></dd>
+    <script type="text/javascript">moveProgressBar('10.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be unique</span></dd>
+    <script type="text/javascript">moveProgressBar('11.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have name length &gt; 3</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_88">resource(@branch, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_88');</script>
-    <script type="text/javascript">moveProgressBar('48.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_89">
-        <div class="message"><pre>Resource route not found: [nil, :edit]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/branches_spec.rb:80:</pre></div>
-    <pre class="ruby"><code><span class="linenum">78</span>describe "resource(@branch, :edit)", :given => "a branch exists" do
-<span class="linenum">79</span>  before(:each) do
-<span class="offending"><span class="linenum">80</span>    @response = request(resource(Branch.first, :edit))</span>
-<span class="linenum">81</span>  end
-<span class="linenum">82</span>  
-<span class="linenum">83</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
+  <dt id="example_group_4">FundingLine</dt>
+    <script type="text/javascript">moveProgressBar('12.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a funder</span></dd>
+    <script type="text/javascript">moveProgressBar('13.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not have a blank interest_rate</span></dd>
+    <script type="text/javascript">moveProgressBar('13.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not have a blank disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('14.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not have a blank amount</span></dd>
+    <script type="text/javascript">moveProgressBar('15.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not have blank last payment date</span></dd>
+    <script type="text/javascript">moveProgressBar('16.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have first payment done before last payment</span></dd>
+    <script type="text/javascript">moveProgressBar('17.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be disbursed before first payment</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_89">resource(:branches, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_89');</script>
-    <script type="text/javascript">moveProgressBar('48.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_90">
-        <div class="message"><pre>Expected a GET to 'http://example.org/branches/new' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/branches_spec.rb:74:</pre></div>
-    <pre class="ruby"><code><span class="linenum">72</span>  
-<span class="linenum">73</span>  it "responds successfully" do
-<span class="offending"><span class="linenum">74</span>    @response.should be_successful</span>
-<span class="linenum">75</span>  end
-<span class="linenum">76</span>end
-<span class="linenum">77</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_90">resource(@branch) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_90');</script>
-    <script type="text/javascript">moveProgressBar('49.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_91">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/branches_spec.rb:58:</pre></div>
-    <pre class="ruby"><code><span class="linenum">56</span>  describe "a successful DELETE", :given => "a branch exists" do
-<span class="linenum">57</span>     before(:each) do
-<span class="offending"><span class="linenum">58</span>       @response = request(resource(Branch.first), :method => "DELETE")</span>
-<span class="linenum">59</span>     end
-<span class="linenum">60</span>
-<span class="linenum">61</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_91">resource(:branches) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_91');</script>
-    <script type="text/javascript">moveProgressBar('49.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:branches)</span>
-      <div class="failure" id="failure_92">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/branches_spec.rb:49:</pre></div>
-    <pre class="ruby"><code><span class="linenum">47</span>    
-<span class="linenum">48</span>    it "redirects to resource(:branches)" do
-<span class="offending"><span class="linenum">49</span>      @response.should redirect_to(resource(Branch.first), :message => {:notice => "branch was successfully created"})</span>
-<span class="linenum">50</span>    end
-<span class="linenum">51</span>    
-<span class="linenum">52</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_92">resource(:branches) GET</dt>
-    <script type="text/javascript">makeYellow('example_group_92');</script>
-    <script type="text/javascript">moveProgressBar('50.0');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">has a list of branches (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_93">resource(:branches) GET</dt>
-    <script type="text/javascript">makeRed('example_group_93');</script>
-    <script type="text/javascript">moveProgressBar('50.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_93">
-        <div class="message"><pre>Expected a GET to 'http://example.org/branches' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/branches_spec.rb:20:</pre></div>
-    <pre class="ruby"><code><span class="linenum">18</span>    
-<span class="linenum">19</span>    it "responds successfully" do
-<span class="offending"><span class="linenum">20</span>      @response.should be_successful</span>
-<span class="linenum">21</span>    end
-<span class="linenum">22</span>
-<span class="linenum">23</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('50.7');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">contains a list of branches (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_94">resource(@loan_type) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_94');</script>
-    <script type="text/javascript">moveProgressBar('51.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the loan_type show action</span>
-      <div class="failure" id="failure_94">
-        <div class="message"><pre>Resource route not found: [:loan_types]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loan_types_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a loan_type exists" do
-<span class="linenum">4</span>  LoanType.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:loan_types), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :loan_type => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_95">resource(@loan_type) GET</dt>
-    <script type="text/javascript">makeRed('example_group_95');</script>
-    <script type="text/javascript">moveProgressBar('51.5');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_95">
-        <div class="message"><pre>Resource route not found: [:loan_types]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loan_types_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a loan_type exists" do
-<span class="linenum">4</span>  LoanType.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:loan_types), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :loan_type => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_96">resource(@loan_type, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_96');</script>
-    <script type="text/javascript">moveProgressBar('51.9');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_96">
-        <div class="message"><pre>Resource route not found: [:loan_types]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loan_types_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a loan_type exists" do
-<span class="linenum">4</span>  LoanType.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:loan_types), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :loan_type => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_97">resource(:loan_types, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_97');</script>
-    <script type="text/javascript">moveProgressBar('52.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_97">
-        <div class="message"><pre>Resource route not found: [:loan_types, :new]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loan_types_spec.rb:67:</pre></div>
-    <pre class="ruby"><code><span class="linenum">65</span>describe "resource(:loan_types, :new)" do
-<span class="linenum">66</span>  before(:each) do
-<span class="offending"><span class="linenum">67</span>    @response = request(resource(:loan_types, :new))</span>
-<span class="linenum">68</span>  end
-<span class="linenum">69</span>  
-<span class="linenum">70</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_98">resource(@loan_type) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_98');</script>
-    <script type="text/javascript">moveProgressBar('52.7');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_98">
-        <div class="message"><pre>Resource route not found: [:loan_types]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loan_types_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a loan_type exists" do
-<span class="linenum">4</span>  LoanType.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:loan_types), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :loan_type => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_99">resource(:loan_types) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_99');</script>
-    <script type="text/javascript">moveProgressBar('53.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:loan_types)</span>
-      <div class="failure" id="failure_99">
-        <div class="message"><pre>Resource route not found: [:loan_types]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loan_types_spec.rb:41:</pre></div>
-    <pre class="ruby"><code><span class="linenum">39</span>    before(:each) do
-<span class="linenum">40</span>      LoanType.all.destroy!
-<span class="offending"><span class="linenum">41</span>      @response = request(resource(:loan_types), :method => "POST", </span>
-<span class="linenum">42</span>        :params => { :loan_type => { :id => nil }})
-<span class="linenum">43</span>    end
-<span class="linenum">44</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_100">resource(:loan_types) GET</dt>
-    <script type="text/javascript">makeRed('example_group_100');</script>
-    <script type="text/javascript">moveProgressBar('53.5');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">has a list of loan_types</span>
-      <div class="failure" id="failure_100">
-        <div class="message"><pre>Resource route not found: [:loan_types]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loan_types_spec.rb:5:</pre></div>
-    <pre class="ruby"><code><span class="linenum">3</span>given "a loan_type exists" do
-<span class="linenum">4</span>  LoanType.all.destroy!
-<span class="offending"><span class="linenum">5</span>  request(resource(:loan_types), :method => "POST", </span>
-<span class="linenum">6</span>    :params => { :loan_type => { :id => nil }})
-<span class="linenum">7</span>end
-<span class="linenum">8</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_101">resource(:loan_types) GET</dt>
-    <script type="text/javascript">makeRed('example_group_101');</script>
-    <script type="text/javascript">moveProgressBar('53.9');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_101">
-        <div class="message"><pre>Resource route not found: [:loan_types]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loan_types_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:loan_types))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('54.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">contains a list of loan_types</span>
-      <div class="failure" id="failure_102">
-        <div class="message"><pre>Resource route not found: [:loan_types]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/loan_types_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    
-<span class="linenum">12</span>    before(:each) do
-<span class="offending"><span class="linenum">13</span>      @response = request(resource(:loan_types))</span>
-<span class="linenum">14</span>    end
-<span class="linenum">15</span>    
-<span class="linenum">16</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_102">LoanType</dt>
-    <script type="text/javascript">makeYellow('example_group_102');</script>
-    <script type="text/javascript">moveProgressBar('54.7');</script>
+  <dt id="example_group_5">LoanType</dt>
+    <script type="text/javascript">makeYellow('rspec-header');</script>
+    <script type="text/javascript">makeYellow('example_group_5');</script>
+    <script type="text/javascript">moveProgressBar('17.8');</script>
     <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_103">Upload</dt>
-    <script type="text/javascript">makeRed('example_group_103');</script>
-    <script type="text/javascript">moveProgressBar('54.7');</script>
+  <dt id="example_group_6">Upload</dt>
+    <script type="text/javascript">makeRed('rspec-header');</script>
+    <script type="text/javascript">makeRed('example_group_6');</script>
+    <script type="text/javascript">moveProgressBar('17.8');</script>
     <dd class="spec failed">
       <span class="failed_spec_name">before(:all)</span>
-      <div class="failure" id="failure_103">
+      <div class="failure" id="failure_1">
         <div class="message"><pre>uninitialized constant Upload::CSV</pre></div>
         <div class="backtrace"><pre>/home/svs/src/mostfit/app/models/upload.rb:32:in `load_csv'
 /home/svs/src/mostfit/app/models/upload.rb:27:in `each'
 /home/svs/src/mostfit/app/models/upload.rb:27:in `load_csv'
 ./spec/models/upload_spec.rb:19:</pre></div>
-    <pre class="ruby"><code><span class="linenum">30</span>      log.info("Creating #{model.to_s.plural}") if log
-<span class="linenum">31</span>      headers = {}
-<span class="offending"><span class="linenum">32</span>      CSV.open(File.join(Merb.root, "uploads", @directory, model.to_s.snake_case.pluralize), "r").each_with_index{|row, idx|</span>
-<span class="linenum">33</span>        if idx==0
-<span class="linenum">34</span>          row.to_enum(:each_with_index).collect{|name, index| 
-<span class="linenum">35</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
+    <pre class="ruby"><code><span class="linenum">30</span>      <span class="ident">log</span><span class="punct">.</span><span class="ident">info</span><span class="punct">(&quot;</span><span class="string">Creating <span class="expr">#{model.to_s.plural}</span></span><span class="punct">&quot;)</span> <span class="keyword">if</span> <span class="ident">log</span>
+<span class="linenum">31</span>      <span class="ident">headers</span> <span class="punct">=</span> <span class="punct">{}</span>
+<span class="offending"><span class="linenum">32</span>      <span class="constant">CSV</span><span class="punct">.</span><span class="ident">open</span><span class="punct">(</span><span class="constant">File</span><span class="punct">.</span><span class="ident">join</span><span class="punct">(</span><span class="constant">Merb</span><span class="punct">.</span><span class="ident">root</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">uploads</span><span class="punct">&quot;,</span> <span class="attribute">@directory</span><span class="punct">,</span> <span class="ident">model</span><span class="punct">.</span><span class="ident">to_s</span><span class="punct">.</span><span class="ident">snake_case</span><span class="punct">.</span><span class="ident">pluralize</span><span class="punct">),</span> <span class="punct">&quot;</span><span class="string">r</span><span class="punct">&quot;).</span><span class="ident">each_with_index</span><span class="punct">{|</span><span class="ident">row</span><span class="punct">,</span> <span class="ident">idx</span><span class="punct">|</span></span>
+<span class="linenum">33</span>        <span class="keyword">if</span> <span class="ident">idx</span><span class="punct">==</span><span class="number">0</span>
+<span class="linenum">34</span>          <span class="ident">row</span><span class="punct">.</span><span class="ident">to_enum</span><span class="punct">(</span><span class="symbol">:each_with_index</span><span class="punct">).</span><span class="ident">collect</span><span class="punct">{|</span><span class="ident">name</span><span class="punct">,</span> <span class="ident">index</span><span class="punct">|</span> </code></pre>
       </div>
     </dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_104">Upload</dt>
-    <script type="text/javascript">makeRed('example_group_104');</script>
-    <script type="text/javascript">moveProgressBar('54.7');</script>
+  <dt id="example_group_7">Upload</dt>
+    <script type="text/javascript">makeRed('example_group_7');</script>
+    <script type="text/javascript">moveProgressBar('17.8');</script>
     <dd class="spec failed">
       <span class="failed_spec_name">before(:all)</span>
-      <div class="failure" id="failure_104">
+      <div class="failure" id="failure_2">
         <div class="message"><pre>uninitialized constant CSV</pre></div>
         <div class="backtrace"><pre>./spec/models/functions_spec.rb:10:</pre></div>
-    <pre class="ruby"><code><span class="linenum">8</span>    @installments = 50
-<span class="linenum">9</span>    @data         = []
-<span class="offending"><span class="linenum">10</span>    CSV.open(File.join(Merb.root, "spec", "fixtures", "pmt.csv"), "r").each{|row|</span>
-<span class="linenum">11</span>      @data << row
-<span class="linenum">12</span>    }
-<span class="linenum">13</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
+    <pre class="ruby"><code><span class="linenum">8</span>    <span class="attribute">@installments</span> <span class="punct">=</span> <span class="number">50</span>
+<span class="linenum">9</span>    <span class="attribute">@data</span>         <span class="punct">=</span> <span class="punct">[]</span>
+<span class="offending"><span class="linenum">10</span>    <span class="constant">CSV</span><span class="punct">.</span><span class="ident">open</span><span class="punct">(</span><span class="constant">File</span><span class="punct">.</span><span class="ident">join</span><span class="punct">(</span><span class="constant">Merb</span><span class="punct">.</span><span class="ident">root</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">spec</span><span class="punct">&quot;,</span> <span class="punct">&quot;</span><span class="string">fixtures</span><span class="punct">&quot;,</span> <span class="punct">&quot;</span><span class="string">pmt.csv</span><span class="punct">&quot;),</span> <span class="punct">&quot;</span><span class="string">r</span><span class="punct">&quot;).</span><span class="ident">each</span><span class="punct">{|</span><span class="ident">row</span><span class="punct">|</span></span>
+<span class="linenum">11</span>      <span class="attribute">@data</span> <span class="punct">&lt;&lt;</span> <span class="ident">row</span>
+<span class="linenum">12</span>    <span class="punct">}</span></code></pre>
       </div>
     </dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_105">Client</dt>
-    <script type="text/javascript">moveProgressBar('55.1');</script>
+  <dt id="example_group_8">Client</dt>
+    <script type="text/javascript">moveProgressBar('18.6');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a center</span></dd>
-    <script type="text/javascript">moveProgressBar('55.5');</script>
+    <script type="text/javascript">moveProgressBar('19.3');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
-    <script type="text/javascript">moveProgressBar('55.9');</script>
+    <script type="text/javascript">moveProgressBar('20.1');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without a reference</span></dd>
-    <script type="text/javascript">moveProgressBar('56.3');</script>
+    <script type="text/javascript">moveProgressBar('20.9');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid with name shorter than 3 characters</span></dd>
-    <script type="text/javascript">moveProgressBar('56.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have a joining date</span></dd>
-    <script type="text/javascript">moveProgressBar('57.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should be able to 'have' loans</span></dd>
-    <script type="text/javascript">makeYellow('example_group_105');</script>
-    <script type="text/javascript">moveProgressBar('57.5');</script>
+    <script type="text/javascript">makeRed('example_group_8');</script>
+    <script type="text/javascript">moveProgressBar('21.7');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should have a joining date</span>
+      <div class="failure" id="failure_3">
+        <div class="message"><pre>expected valid? to return false, got true</pre></div>
+        <div class="backtrace"><pre>./spec/models/client_spec.rb:52:</pre></div>
+    <pre class="ruby"><code><span class="linenum">50</span>  <span class="ident">it</span> <span class="punct">&quot;</span><span class="string">should have a joining date</span><span class="punct">&quot;</span> <span class="keyword">do</span>
+<span class="linenum">51</span>    <span class="attribute">@client</span><span class="punct">.</span><span class="ident">date_joined</span> <span class="punct">=</span> <span class="constant">nil</span>
+<span class="offending"><span class="linenum">52</span>    <span class="attribute">@client</span><span class="punct">.</span><span class="ident">should_not</span> <span class="ident">be_valid</span></span>
+<span class="linenum">53</span>  <span class="keyword">end</span>
+<span class="linenum">54</span> </code></pre>
+      </div>
+    </dd>
+    <script type="text/javascript">moveProgressBar('22.4');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should be able to 'have' loans</span>
+      <div class="failure" id="failure_4">
+        <div class="message"><pre>expected valid? to return true, got false</pre></div>
+        <div class="backtrace"><pre>./spec/models/client_spec.rb:73:</pre></div>
+    <pre class="ruby"><code><span class="linenum">71</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">approved_by</span> <span class="punct">=</span> <span class="attribute">@manager</span>
+<span class="linenum">72</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">73</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">74</span>
+<span class="linenum">75</span>    <span class="attribute">@client</span><span class="punct">.</span><span class="ident">loans</span> <span class="punct">&lt;&lt;</span> <span class="attribute">@loan</span></code></pre>
+      </div>
+    </dd>
+    <script type="text/javascript">moveProgressBar('23.2');</script>
     <dd class="spec not_implemented"><span class="not_implemented_spec_name">should not have more than one outstanding loan at a time if so specified (PENDING: Not Yet Implemented)</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_106">LoanHistory</dt>
-    <script type="text/javascript">moveProgressBar('57.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without scheduled outstanding principal</span></dd>
-    <script type="text/javascript">moveProgressBar('58.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without scheduled outstanding total</span></dd>
-    <script type="text/javascript">moveProgressBar('58.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without actual outstanding principal</span></dd>
-    <script type="text/javascript">moveProgressBar('59.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without actual outstanding total</span></dd>
-    <script type="text/javascript">moveProgressBar('59.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without having a proper status</span></dd>
-    <script type="text/javascript">moveProgressBar('59.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if the combination if loan id and date is not unique</span></dd>
-    <script type="text/javascript">moveProgressBar('60.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct number of periods</span></dd>
-    <script type="text/javascript">moveProgressBar('60.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should start with the application date, approval date, disbursal date and first payment date</span></dd>
-    <script type="text/javascript">moveProgressBar('61.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have the following dates afterwards</span></dd>
-    <script type="text/javascript">moveProgressBar('61.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct amounts</span></dd>
+  <dt id="example_group_9">Payment</dt>
+    <script type="text/javascript">makeRed('example_group_9');</script>
+    <script type="text/javascript">moveProgressBar('23.2');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">before(:all)</span>
+      <div class="failure" id="failure_5">
+        <div class="message"><pre>expected valid? to return true, got false</pre></div>
+        <div class="backtrace"><pre>./spec/models/payment_spec.rb:52:</pre></div>
+    <pre class="ruby"><code><span class="linenum">50</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">disbursed_by</span> <span class="punct">=</span> <span class="attribute">@manager</span>
+<span class="linenum">51</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">52</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">53</span>  <span class="keyword">end</span></code></pre>
+      </div>
+    </dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_107">Report</dt>
-    <script type="text/javascript">moveProgressBar('61.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have 2 * 7 centers and centers * 3 clients</span></dd>
-    <script type="text/javascript">moveProgressBar('62.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have proper statistics after first monday's payments</span></dd>
-    <script type="text/javascript">moveProgressBar('62.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct loan count</span></dd>
-    <script type="text/javascript">moveProgressBar('63.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct number of clients</span></dd>
-    <script type="text/javascript">moveProgressBar('63.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct client count event after we add our new loans</span></dd>
-    <script type="text/javascript">moveProgressBar('63.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should return correct repaid loan count</span></dd>
-    <script type="text/javascript">moveProgressBar('64.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should return correct repaid loan amount</span></dd>
-    <script type="text/javascript">moveProgressBar('64.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should return correct disbursed loan count</span></dd>
-    <script type="text/javascript">moveProgressBar('65.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should return correct disbursed loan amount</span></dd>
-    <script type="text/javascript">moveProgressBar('65.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct principal due</span></dd>
-    <script type="text/javascript">moveProgressBar('65.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct principal received</span></dd>
-    <script type="text/javascript">moveProgressBar('66.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct interest due</span></dd>
-    <script type="text/javascript">moveProgressBar('66.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct interest received</span></dd>
-    <script type="text/javascript">moveProgressBar('67.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct principal outstanding</span></dd>
-    <script type="text/javascript">moveProgressBar('67.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct scheduled principal outstanding</span></dd>
-    <script type="text/javascript">moveProgressBar('67.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct total outstanding</span></dd>
-    <script type="text/javascript">moveProgressBar('68.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct scheduled total outstanding</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_108">Loan</dt>
-    <script type="text/javascript">moveProgressBar('68.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have a discrimintator</span></dd>
-    <script type="text/javascript">moveProgressBar('69.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
-    <script type="text/javascript">moveProgressBar('69.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being approved properly</span></dd>
-    <script type="text/javascript">moveProgressBar('69.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being validated properly</span></dd>
-    <script type="text/javascript">moveProgressBar('70.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being rejected properly</span></dd>
-    <script type="text/javascript">moveProgressBar('70.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
-    <script type="text/javascript">moveProgressBar('71.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper amount</span></dd>
-    <script type="text/javascript">moveProgressBar('71.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper interest_rate</span></dd>
-    <script type="text/javascript">moveProgressBar('71.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should be valid with a proper installment_frequency</span></dd>
-    <script type="text/javascript">moveProgressBar('72.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper installment_frequency</span></dd>
-    <script type="text/javascript">moveProgressBar('72.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper number_of_installments</span></dd>
-    <script type="text/javascript">moveProgressBar('73.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_first_payment_date</span></dd>
-    <script type="text/javascript">moveProgressBar('73.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('73.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid with a disbursal date earlier than the loan is approved</span></dd>
-    <script type="text/javascript">moveProgressBar('74.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid when validated_on is earlier than the disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('74.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid when written_off_on is earlier than the disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('75.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without approved_on earlier than scheduled_disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('75.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly written off</span></dd>
-    <script type="text/javascript">moveProgressBar('75.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly disbursed</span></dd>
-    <script type="text/javascript">moveProgressBar('76.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid when scheduled_first_payment_date if before scheduled_disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('76.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates</span></dd>
-    <script type="text/javascript">moveProgressBar('76.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.shift_date_by_installments should shift dates properly, even odd ones.. and backwards.</span></dd>
-    <script type="text/javascript">moveProgressBar('77.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.descendants should keep track of the subclasses (just testing dm-core functionality)</span></dd>
-    <script type="text/javascript">moveProgressBar('77.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.number_of_installments_before should do what it promises</span></dd>
-    <script type="text/javascript">makeYellow('example_group_108');</script>
-    <script type="text/javascript">moveProgressBar('78.1');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">.last_loan_history_date should have some tests -- albeit more a view thing (PENDING: Not Yet Implemented)</span></dd>
-    <script type="text/javascript">moveProgressBar('78.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.scheduled_repaid_on give the proper date</span></dd>
-    <script type="text/javascript">moveProgressBar('78.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have proper values for principal, interest and total to be received</span></dd>
-    <script type="text/javascript">moveProgressBar('79.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it written off</span></dd>
-    <script type="text/javascript">moveProgressBar('79.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it is repaid</span></dd>
-    <script type="text/javascript">moveProgressBar('80.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties before being approved</span></dd>
-    <script type="text/javascript">moveProgressBar('80.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties when being rejected</span></dd>
-    <script type="text/javascript">moveProgressBar('80.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">cannot repay an unsaved loan</span></dd>
-    <script type="text/javascript">moveProgressBar('81.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.installment_dates should give a list with some dates</span></dd>
-    <script type="text/javascript">moveProgressBar('81.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.payment_schedule should give correct results</span></dd>
-    <script type="text/javascript">moveProgressBar('82.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.payments_hash should give correct results</span></dd>
-    <script type="text/javascript">moveProgressBar('82.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">history should be correct</span></dd>
-    <script type="text/javascript">moveProgressBar('82.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should write the history correctly into the db</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_109">Payment</dt>
-    <script type="text/javascript">moveProgressBar('83.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a loan</span></dd>
-    <script type="text/javascript">moveProgressBar('83.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being created by a staff member</span></dd>
-    <script type="text/javascript">moveProgressBar('84.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being received by a staff member</span></dd>
-    <script type="text/javascript">moveProgressBar('84.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being created by active user</span></dd>
-    <script type="text/javascript">moveProgressBar('84.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without beng received by an active staff member</span></dd>
-    <script type="text/javascript">moveProgressBar('85.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly deleted</span></dd>
-    <script type="text/javascript">moveProgressBar('85.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if date of receival is in future</span></dd>
-    <script type="text/javascript">moveProgressBar('86.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if interest is negative</span></dd>
-    <script type="text/javascript">moveProgressBar('86.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if principal is negative</span></dd>
-    <script type="text/javascript">moveProgressBar('86.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if total is negative</span></dd>
-    <script type="text/javascript">moveProgressBar('87.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if payment is received before disbursal of loan</span></dd>
-    <script type="text/javascript">moveProgressBar('87.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if paying too much principal</span></dd>
-    <script type="text/javascript">moveProgressBar('88.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if paying too much in total</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_110">Branch</dt>
-    <script type="text/javascript">moveProgressBar('88.4');</script>
+  <dt id="example_group_10">Branch</dt>
+    <script type="text/javascript">moveProgressBar('24.0');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without a manager</span></dd>
-    <script type="text/javascript">moveProgressBar('88.8');</script>
+    <script type="text/javascript">moveProgressBar('24.8');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
-    <script type="text/javascript">moveProgressBar('89.2');</script>
+    <script type="text/javascript">moveProgressBar('25.5');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid with a name shorter than 3 characters</span></dd>
-    <script type="text/javascript">moveProgressBar('89.6');</script>
+    <script type="text/javascript">moveProgressBar('26.3');</script>
     <dd class="spec passed"><span class="passed_spec_name">should be able to 'have' centers</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_111">Center</dt>
-    <script type="text/javascript">moveProgressBar('90.0');</script>
+  <dt id="example_group_11">Center</dt>
+    <script type="text/javascript">moveProgressBar('27.1');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without a manager</span></dd>
-    <script type="text/javascript">moveProgressBar('90.4');</script>
+    <script type="text/javascript">moveProgressBar('27.9');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
-    <script type="text/javascript">moveProgressBar('90.8');</script>
+    <script type="text/javascript">moveProgressBar('28.6');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid with a name shorter than 3 characters</span></dd>
-    <script type="text/javascript">makeRed('example_group_111');</script>
-    <script type="text/javascript">moveProgressBar('91.2');</script>
+    <script type="text/javascript">makeRed('example_group_11');</script>
+    <script type="text/javascript">moveProgressBar('29.4');</script>
     <dd class="spec failed">
       <span class="failed_spec_name">should be able to 'have' clients</span>
-      <div class="failure" id="failure_105">
+      <div class="failure" id="failure_6">
         <div class="message"><pre>undefined method `name' for nil:NilClass</pre></div>
         <div class="backtrace"><pre>./spec/models/center_spec.rb:50:</pre></div>
-    <pre class="ruby"><code><span class="linenum">48</span>    @center.clients << @client
-<span class="linenum">49</span>    @center.should be_valid
-<span class="offending"><span class="linenum">50</span>    @center.clients.first.name.should eql(name)</span>
-<span class="linenum">51</span>    @center.clients.first.reference.should eql(ref)
-<span class="linenum">52</span>
-<span class="linenum">53</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
+    <pre class="ruby"><code><span class="linenum">48</span>    <span class="attribute">@center</span><span class="punct">.</span><span class="ident">clients</span> <span class="punct">&lt;&lt;</span> <span class="attribute">@client</span>
+<span class="linenum">49</span>    <span class="attribute">@center</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span>
+<span class="offending"><span class="linenum">50</span>    <span class="attribute">@center</span><span class="punct">.</span><span class="ident">clients</span><span class="punct">.</span><span class="ident">first</span><span class="punct">.</span><span class="ident">name</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">eql</span><span class="punct">(</span><span class="ident">name</span><span class="punct">)</span></span>
+<span class="linenum">51</span>    <span class="attribute">@center</span><span class="punct">.</span><span class="ident">clients</span><span class="punct">.</span><span class="ident">first</span><span class="punct">.</span><span class="ident">reference</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">eql</span><span class="punct">(</span><span class="ident">ref</span><span class="punct">)</span></code></pre>
       </div>
     </dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_112">Attendancy</dt>
-    <script type="text/javascript">moveProgressBar('91.6');</script>
+  <dt id="example_group_12">Attendancy</dt>
+    <script type="text/javascript">moveProgressBar('30.2');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
-    <script type="text/javascript">moveProgressBar('92.0');</script>
+    <script type="text/javascript">moveProgressBar('31.0');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper date</span></dd>
-    <script type="text/javascript">moveProgressBar('92.4');</script>
+    <script type="text/javascript">moveProgressBar('31.7');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid when attendancy date is in future</span></dd>
-    <script type="text/javascript">moveProgressBar('92.8');</script>
+    <script type="text/javascript">moveProgressBar('32.5');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper status</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_113">resource(@ledger_entry) PUT</dt>
-    <script type="text/javascript">makeRed('example_group_113');</script>
-    <script type="text/javascript">moveProgressBar('93.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the ledger_entry show action</span>
-      <div class="failure" id="failure_106">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/ledger_entries_spec.rb:100:</pre></div>
-    <pre class="ruby"><code><span class="linenum">98</span>    before(:each) do
-<span class="linenum">99</span>      @ledger_entry = LedgerEntry.first
-<span class="offending"><span class="linenum">100</span>      @response = request(resource(@ledger_entry), :method => "PUT", </span>
-<span class="linenum">101</span>        :params => { :ledger_entry => {:id => @ledger_entry.id} })
-<span class="linenum">102</span>    end
-<span class="linenum">103</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_114">resource(@ledger_entry) GET</dt>
-    <script type="text/javascript">makeRed('example_group_114');</script>
-    <script type="text/javascript">moveProgressBar('93.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_107">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/ledger_entries_spec.rb:89:</pre></div>
-    <pre class="ruby"><code><span class="linenum">87</span>  describe "GET" do
-<span class="linenum">88</span>    before(:each) do
-<span class="offending"><span class="linenum">89</span>      @response = request(resource(LedgerEntry.first))</span>
-<span class="linenum">90</span>    end
-<span class="linenum">91</span>  
-<span class="linenum">92</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_115">resource(@ledger_entry, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_115');</script>
-    <script type="text/javascript">moveProgressBar('94.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_108">
-        <div class="message"><pre>Resource route not found: [nil, :edit]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/ledger_entries_spec.rb:77:</pre></div>
-    <pre class="ruby"><code><span class="linenum">75</span>describe "resource(@ledger_entry, :edit)", :given => "a ledger_entry exists" do
-<span class="linenum">76</span>  before(:each) do
-<span class="offending"><span class="linenum">77</span>    @response = request(resource(LedgerEntry.first, :edit))</span>
-<span class="linenum">78</span>  end
-<span class="linenum">79</span>  
-<span class="linenum">80</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_116">resource(:ledger_entries, :new)</dt>
-    <script type="text/javascript">makeRed('example_group_116');</script>
-    <script type="text/javascript">moveProgressBar('94.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_109">
-        <div class="message"><pre>Expected a GET to 'http://example.org/ledger_entries/new' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/ledger_entries_spec.rb:71:</pre></div>
-    <pre class="ruby"><code><span class="linenum">69</span>  
-<span class="linenum">70</span>  it "responds successfully" do
-<span class="offending"><span class="linenum">71</span>    @response.should be_successful</span>
-<span class="linenum">72</span>  end
-<span class="linenum">73</span>end
-<span class="linenum">74</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_117">resource(@ledger_entry) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_117');</script>
-    <script type="text/javascript">moveProgressBar('94.8');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_110">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/ledger_entries_spec.rb:55:</pre></div>
-    <pre class="ruby"><code><span class="linenum">53</span>  describe "a successful DELETE", :given => "a ledger_entry exists" do
-<span class="linenum">54</span>     before(:each) do
-<span class="offending"><span class="linenum">55</span>       @response = request(resource(LedgerEntry.first), :method => "DELETE")</span>
-<span class="linenum">56</span>     end
-<span class="linenum">57</span>
-<span class="linenum">58</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_118">resource(:ledger_entries) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_118');</script>
-    <script type="text/javascript">moveProgressBar('95.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:ledger_entries)</span>
-      <div class="failure" id="failure_111">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>./spec/requests/ledger_entries_spec.rb:46:</pre></div>
-    <pre class="ruby"><code><span class="linenum">44</span>    
-<span class="linenum">45</span>    it "redirects to resource(:ledger_entries)" do
-<span class="offending"><span class="linenum">46</span>      @response.should redirect_to(resource(LedgerEntry.first), :message => {:notice => "ledger_entry was successfully created"})</span>
-<span class="linenum">47</span>    end
-<span class="linenum">48</span>    
-<span class="linenum">49</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_119">resource(:ledger_entries) GET</dt>
-    <script type="text/javascript">makeYellow('example_group_119');</script>
-    <script type="text/javascript">moveProgressBar('95.6');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">has a list of ledger_entries (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_120">resource(:ledger_entries) GET</dt>
-    <script type="text/javascript">makeRed('example_group_120');</script>
-    <script type="text/javascript">moveProgressBar('96.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_112">
-        <div class="message"><pre>Expected a GET to 'http://example.org/ledger_entries' to be successful, but it returned a 401</pre></div>
-        <div class="backtrace"><pre>./spec/requests/ledger_entries_spec.rb:17:</pre></div>
-    <pre class="ruby"><code><span class="linenum">15</span>    
-<span class="linenum">16</span>    it "responds successfully" do
-<span class="offending"><span class="linenum">17</span>      @response.should be_successful</span>
-<span class="linenum">18</span>    end
-<span class="linenum">19</span>
-<span class="linenum">20</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('96.4');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">contains a list of ledger_entries (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_121">LedgerEntry</dt>
-    <script type="text/javascript">makeYellow('example_group_121');</script>
-    <script type="text/javascript">moveProgressBar('96.8');</script>
+  <dt id="example_group_13">LedgerEntry</dt>
+    <script type="text/javascript">makeYellow('example_group_13');</script>
+    <script type="text/javascript">moveProgressBar('33.3');</script>
     <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
   </dl>
 </div>
-<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>1241.241153 seconds</strong>";</script>
-<script type="text/javascript">document.getElementById('totals').innerHTML = "244 examples, 112 failures, 16 pending";</script>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_14">Fee</dt>
+    <script type="text/javascript">makeYellow('example_group_14');</script>
+    <script type="text/javascript">moveProgressBar('34.1');</script>
+    <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_15">Loan</dt>
+    <script type="text/javascript">moveProgressBar('34.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have a discrimintator</span></dd>
+    <script type="text/javascript">moveProgressBar('35.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
+    <script type="text/javascript">moveProgressBar('36.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being approved properly</span></dd>
+    <script type="text/javascript">moveProgressBar('37.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being validated properly</span></dd>
+    <script type="text/javascript">moveProgressBar('37.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being rejected properly</span></dd>
+    <script type="text/javascript">moveProgressBar('38.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
+    <script type="text/javascript">moveProgressBar('39.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper amount</span></dd>
+    <script type="text/javascript">moveProgressBar('40.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper interest_rate</span></dd>
+    <script type="text/javascript">moveProgressBar('41.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be valid with a proper installment_frequency</span></dd>
+    <script type="text/javascript">moveProgressBar('41.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper installment_frequency</span></dd>
+    <script type="text/javascript">moveProgressBar('42.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper number_of_installments</span></dd>
+    <script type="text/javascript">moveProgressBar('43.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_first_payment_date</span></dd>
+    <script type="text/javascript">moveProgressBar('44.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('44.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid with a disbursal date earlier than the loan is approved</span></dd>
+    <script type="text/javascript">moveProgressBar('45.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid when validated_on is earlier than the disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('46.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid when written_off_on is earlier than the disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('47.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without approved_on earlier than scheduled_disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('48.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly written off</span></dd>
+    <script type="text/javascript">moveProgressBar('48.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly disbursed</span></dd>
+    <script type="text/javascript">moveProgressBar('49.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid when scheduled_first_payment_date if before scheduled_disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('50.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates</span></dd>
+    <script type="text/javascript">moveProgressBar('51.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.shift_date_by_installments should shift dates properly, even odd ones.. and backwards.</span></dd>
+    <script type="text/javascript">moveProgressBar('51.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.descendants should keep track of the subclasses (just testing dm-core functionality)</span></dd>
+    <script type="text/javascript">moveProgressBar('52.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.number_of_installments_before should do what it promises</span></dd>
+    <script type="text/javascript">makeYellow('example_group_15');</script>
+    <script type="text/javascript">moveProgressBar('53.4');</script>
+    <dd class="spec not_implemented"><span class="not_implemented_spec_name">.last_loan_history_date should have some tests -- albeit more a view thing (PENDING: Not Yet Implemented)</span></dd>
+    <script type="text/javascript">moveProgressBar('54.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.scheduled_repaid_on give the proper date</span></dd>
+    <script type="text/javascript">moveProgressBar('55.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have proper values for principal, interest and total to be received</span></dd>
+    <script type="text/javascript">moveProgressBar('55.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it written off</span></dd>
+    <script type="text/javascript">moveProgressBar('56.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it is repaid</span></dd>
+    <script type="text/javascript">moveProgressBar('57.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties before being approved</span></dd>
+    <script type="text/javascript">moveProgressBar('58.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties when being rejected</span></dd>
+    <script type="text/javascript">moveProgressBar('58.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">cannot repay an unsaved loan</span></dd>
+    <script type="text/javascript">moveProgressBar('59.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.installment_dates should give a list with some dates</span></dd>
+    <script type="text/javascript">moveProgressBar('60.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.payment_schedule should give correct results</span></dd>
+    <script type="text/javascript">moveProgressBar('61.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.payments_hash should give correct results</span></dd>
+    <script type="text/javascript">moveProgressBar('62.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">history should be correct</span></dd>
+    <script type="text/javascript">moveProgressBar('62.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should write the history correctly into the db</span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_16">LoanHistory</dt>
+    <script type="text/javascript">moveProgressBar('63.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without scheduled outstanding principal</span></dd>
+    <script type="text/javascript">moveProgressBar('64.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without scheduled outstanding total</span></dd>
+    <script type="text/javascript">moveProgressBar('65.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without actual outstanding principal</span></dd>
+    <script type="text/javascript">moveProgressBar('65.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without actual outstanding total</span></dd>
+    <script type="text/javascript">moveProgressBar('66.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without having a proper status</span></dd>
+    <script type="text/javascript">moveProgressBar('67.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if the combination if loan id and date is not unique</span></dd>
+    <script type="text/javascript">moveProgressBar('68.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have correct number of periods</span></dd>
+    <script type="text/javascript">moveProgressBar('68.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should start with the application date, approval date, disbursal date and first payment date</span></dd>
+    <script type="text/javascript">moveProgressBar('69.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have the following dates afterwards</span></dd>
+    <script type="text/javascript">moveProgressBar('70.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have correct amounts</span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_17">Report</dt>
+    <script type="text/javascript">moveProgressBar('71.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have 2 * 7 centers and centers * 3 clients</span></dd>
+    <script type="text/javascript">moveProgressBar('72.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have proper statistics after first monday's payments</span></dd>
+    <script type="text/javascript">moveProgressBar('72.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have correct loan count</span></dd>
+    <script type="text/javascript">moveProgressBar('73.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have correct number of clients</span></dd>
+    <script type="text/javascript">moveProgressBar('74.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have correct client count event after we add our new loans</span></dd>
+    <script type="text/javascript">moveProgressBar('75.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct repaid loan count</span></dd>
+    <script type="text/javascript">moveProgressBar('75.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct repaid loan amount</span></dd>
+    <script type="text/javascript">moveProgressBar('76.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct disbursed loan count</span></dd>
+    <script type="text/javascript">moveProgressBar('77.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct disbursed loan amount</span></dd>
+    <script type="text/javascript">moveProgressBar('78.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct principal due</span></dd>
+    <script type="text/javascript">moveProgressBar('79.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct principal received</span></dd>
+    <script type="text/javascript">moveProgressBar('79.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct interest due</span></dd>
+    <script type="text/javascript">moveProgressBar('80.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct interest received</span></dd>
+    <script type="text/javascript">moveProgressBar('81.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct principal outstanding</span></dd>
+    <script type="text/javascript">moveProgressBar('82.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct scheduled principal outstanding</span></dd>
+    <script type="text/javascript">moveProgressBar('82.9');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct total outstanding</span></dd>
+    <script type="text/javascript">moveProgressBar('83.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct scheduled total outstanding</span></dd>
+  </dl>
+</div>
+<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>87.633235 seconds</strong>";</script>
+<script type="text/javascript">document.getElementById('totals').innerHTML = "108 examples, 6 failures, 5 pending";</script>
 </div>
 </div>
 </body>

@@ -36,6 +36,7 @@ class LoanProducts < Application
   end
 
   def update(id, loan_product)
+    debugger
     @loan_product = LoanProduct.get(id)
     raise NotFound unless @loan_product
     if @loan_product.update_attributes(loan_product)

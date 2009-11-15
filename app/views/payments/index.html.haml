@@ -80,49 +80,6 @@
 = link_to 'edit this loan >>', url_for_loan(@loan, 'edit'), :class => "button"
 
 
-%h2== Payments &mdash; (#{link_to 'new', url_for_loan(@loan, 'payments/new')})
-
-- if @loan.payments.blank?
-  %p
-    %i No payments have been made so far.
-- else
-  %table.narrow.form{ :width => '100%' }
-    %thead
-      %tr
-        %th
-        %th id
-        %th received on
-        %th received by
-        %th principal
-        %th interest
-        %th total
-        %th delete
-    %tbody
-    - for payment in @loan.payments
-      %tr{ :class => cycle('odd','') }
-        %td &nbsp;
-        %td
-          = payment.id
-        %td
-          %i= payment.received_on
-        %td
-          %b= link_to payment.received_by.name, resource(payment.received_by)
-        %td
-          %b= payment.principal
-        %td
-          %b= payment.interest
-        %td
-          %b= payment.total
-        %td
-          = link_to 'delete', url_for_loan(@loan, "payments/#{payment.id}/delete")
-
-    %tfoot
-      %tr
-        %td{ :colspan => 8 }
-
-%p= link_to 'new payment >>', url_for_loan(@loan, 'payments/new'), :class => "button"
-
-
 %h2== Payment schedule
 %table.narrow.form{ :width => '100%' }
   %thead
@@ -185,3 +142,44 @@
   %tfoot
     %tr
       %td{ :colspan => 7 }
+
+%h2== Payments &mdash; (#{link_to 'new', url_for_loan(@loan, 'payments/new')})
+
+- if @loan.payments.blank?
+  %p
+    %i No payments have been made so far.
+- else
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th id
+        %th received on
+        %th received by
+        %th amount
+        %th type
+        %th delete
+    %tbody
+    - for payment in @loan.payments
+      %tr{ :class => cycle('odd','') }
+        %td &nbsp;
+        %td
+          = payment.id
+        %td
+          %i= payment.received_on
+        %td
+          %b= link_to payment.received_by.name, resource(payment.received_by)
+        %td
+          %b= payment.amount
+        %td
+          %b= payment.type.to_s
+        %td
+          = link_to 'delete', url_for_loan(@loan, "payments/#{payment.id}/delete")
+
+    %tfoot
+      %tr
+        %td{ :colspan => 8 }
+
+%p= link_to 'new payment >>', url_for_loan(@loan, 'payments/new'), :class => "button"
+
+

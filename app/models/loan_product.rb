@@ -18,6 +18,9 @@ class LoanProduct
   property :valid_from, Date, :nullable => false, :index => true
   property :valid_upto, Date, :nullable => false, :index => true
 
+  property :payment_validations, Text
+
+
   has n, :fees
   has n, :loans
 
@@ -25,7 +28,7 @@ class LoanProduct
   validates_is_unique   :name
   validates_is_number   :max_amount, :min_amount, :max_interest_rate, :min_interest_rate
   validates_with_method :check_loan_type_correctness
-
+  
   def self.from_csv(row, headers)
     obj = new(:name => row[headers[:name]], :min_amount => row[headers[:min_amount]], :max_amount => row[headers[:max_amount]], 
               :min_interest_rate => row[headers[:min_interest_rate]], :max_interest_rate => row[headers[:max_interest_rate]], 

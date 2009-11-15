@@ -24,6 +24,21 @@ describe Report do
     @funding_line.should be_valid
     @num_clients = []
     @loans = []
+    @loan_product = LoanProduct.new
+    @loan_product.name = "LP1"
+    @loan_product.max_amount = 10000
+    @loan_product.min_amount = 1000
+    @loan_product.max_interest_rate = 100
+    @loan_product.min_interest_rate = 0.1
+    @loan_product.installment_frequency = :weekly
+    @loan_product.max_number_of_installments = 50
+    @loan_product.min_number_of_installments = 25
+    @loan_product.loan_type = "DefaultLoan"
+    @loan_product.valid_from = Date.parse('2000-01-01')
+    @loan_product.valid_upto = Date.parse('2012-01-01')
+    @loan_product.save
+    @loan_product.errors.each {|e| puts e}
+    @loan_product.should be_valid
     
       # generate a couple of branches
     if Loan.all.count == 0
@@ -72,6 +87,7 @@ describe Report do
             loan.approved_by = @manager
             loan.funding_line = @funding_line
             loan.client = client
+            loan.loan_product = @loan_product
             loan.save
             loan.errors.each  {|e| puts e}
             loan.should be_valid
@@ -145,6 +161,7 @@ describe Report do
       loan.approved_by = @manager
       loan.funding_line = @funding_line
       loan.history_disabled = true
+      loan.loan_product = @loan_product
       loan.save
       loan.should be_valid
       loan.errors.each {|e| puts e}
