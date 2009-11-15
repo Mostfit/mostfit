@@ -61,6 +61,11 @@ Merb::BootLoader.after_app_loads do
   MFI_DETAILS = YAML.load(File.read(File.join(Merb.root, "config", "mfi.yml"))) if File.exists?(File.join(Merb.root, "config", "mfi.yml"))
   # Starting the logger takes time, so turn it off during development
   Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments']) unless Merb.environment == "development" or Merb.environment == "test"
+  # Load the validation hooks
+  Misfit::PaymentValidators.instance_methods.map{|m| m.to_sym}.each do |s|
+    clause = eval("Proc.new{|t| t.loan and (t.loan.loan_product.payment_validations.index(:#{s}) != nil)}")
+    Payment.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
+  end
 
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
   LoanProduct.property(:loan_type, LoanProduct::Enum.send('[]', *Loan.descendants.map{|x| x.to_s}), :nullable => false, :index => true)

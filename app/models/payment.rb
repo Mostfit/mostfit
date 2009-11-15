@@ -4,8 +4,8 @@
 class Payment
   include DataMapper::Resource
   before :valid?, :parse_dates
-  before :valid?, :add_loan_product_validations
-  after :valid?, :after_valid
+  # before :valid?, :add_loan_product_validations
+  # after :valid?, :after_valid
   attr_writer :total  # just to be used in the form
   
   property :id,                 Serial
@@ -27,7 +27,7 @@ class Payment
   validates_with_method :created_by,  :method => :created_by_active_user?
   validates_with_method :received_by, :method => :received_by_active_staff_member?
   validates_with_method :deleted_by,  :method => :properly_deleted?
-  validates_with_method :deleted_at,  :method => :properly_deleted?
+  validates_with_method :deleted_at,  :method => :properly_deleted?, :if => Proc.new{|t| t.type != :fee}
 #  validates_with_method :not_paying_too_much?
 #  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
 #  validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?
@@ -50,14 +50,19 @@ class Payment
   include DateParser  # mixin for the hook "before: valid?, :parse_dates"
   include Misfit::PaymentValidators
   def add_loan_product_validations
-    debugger
-    return unless loan
-    Payment.add_validator_to_context({:context => :default}, loan.loan_product.payment_validations, DataMapper::Validate::MethodValidator)
+    return unless loan and loan.loan_product
+    # THIS WORKS
+#    clause = eval "Proc.new{|t| t.loan.loan_product.id == 1}"
+    #Payment.add_validator_to_context({:context => :default}, 
+    #                                 loan.loan_product.payment_validations, DataMapper::Validate::MethodValidator)
+    Payment.add_validator_to_context({:context => :default, :if => eval("Proc.new{|t| t.loan.loan_product.id == #{loan.loan_product.id}}")}, loan.loan_product.payment_validations,DataMapper::Validate::MethodValidator)
+  end
+
+  def is_same_product
+    true
   end
 
   def after_valid
-    debugger
-    x = 1
   end
 
   def created_by_active_user?

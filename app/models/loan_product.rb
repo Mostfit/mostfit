@@ -18,7 +18,7 @@ class LoanProduct
   property :valid_from, Date, :nullable => false, :index => true
   property :valid_upto, Date, :nullable => false, :index => true
 
-  property :payment_validations, Text
+  property :payment_validation_methods, Text
 
 
   has n, :fees
@@ -38,6 +38,9 @@ class LoanProduct
     [obj.save, obj]
   end
 
+  def payment_validations
+    payment_validation_methods.split(",").each.map{|m| m.to_sym}
+  end
   def self.valid(date=Date.today)
     LoanProduct.all(:valid_from.lte => date, :valid_upto.gte => date) 
   end
