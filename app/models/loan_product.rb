@@ -19,6 +19,7 @@ class LoanProduct
   property :valid_upto, Date, :nullable => false, :index => true
 
   property :payment_validation_methods, Text
+  property :loan_validation_methods, Text
 
 
   has n, :fees
@@ -41,6 +42,11 @@ class LoanProduct
   def payment_validations
     payment_validation_methods.split(",").each.map{|m| m.to_sym}
   end
+
+  def loan_validations
+    loan_validation_methods.split(",").each.map{|m| m.to_sym}
+  end
+
   def self.valid(date=Date.today)
     LoanProduct.all(:valid_from.lte => date, :valid_upto.gte => date) 
   end

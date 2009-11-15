@@ -62,9 +62,15 @@ Merb::BootLoader.after_app_loads do
   # Starting the logger takes time, so turn it off during development
   Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments']) unless Merb.environment == "development" or Merb.environment == "test"
   # Load the validation hooks
+  # ruby is too beautiful. 3 lines of code and all payments can get their appropriate validations which are decided by the
+  # loan product.
   Misfit::PaymentValidators.instance_methods.map{|m| m.to_sym}.each do |s|
     clause = eval("Proc.new{|t| t.loan and (t.loan.loan_product.payment_validations.index(:#{s}) != nil)}")
     Payment.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
+  end
+  Misfit::LoanValidators.instance_methods.map{|m| m.to_sym}.each do |s|
+    clause = eval("Proc.new{|t| t.loan and (t.loan.loan_product.loan_validations.index(:#{s}) != nil)}")
+    Loan.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
   end
 
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
