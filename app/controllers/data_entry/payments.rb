@@ -47,9 +47,9 @@ module DataEntry
     def create(payment)
       raise NotFound unless @loan = Loan.get(payment[:loan_id])
       
-      amounts = payment[:total].to_i
+      amounts = params[:total].to_i
       unless amounts > 0  # if no total is given we use the principal/interest duo
-        amounts = [payment[:principal].to_i, payment[:interest].to_i]
+        amounts = [params[:principal].to_i, params[:interest].to_i]
       end
       receiving_staff = StaffMember.get(payment[:received_by])
       # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)

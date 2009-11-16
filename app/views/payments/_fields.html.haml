@@ -8,12 +8,12 @@
       %td Principal:
       %td
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        = text_field :principal, :size => 40
+        = text_field :name => :principal, :size => 40
     %tr
       %td Interest:
       %td
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        = text_field :interest, :size => 40
+        = text_field :name => :interest, :size => 40
   - if @loan.repayment_style == :allow_both
     %tr
       %td
@@ -23,7 +23,7 @@
       %td Total:
       %td
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        = text_field :total, :size => 40
+        = text_field :name => :total, :size => 40
   %tr
     %td
     %td

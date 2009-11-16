@@ -622,7 +622,7 @@ class Loan
                            :scheduled_outstanding_total => scheduled_outstanding_total,
                            :actual_outstanding_principal => actual_outstanding_principal,
                            :actual_outstanding_total => actual_outstanding_total,
-                           :amount_in_default => [0,scheduled_outstanding_principal - actual_outstanding_principal].max,
+                           :amount_in_default => actual_outstanding_principal - scheduled_outstanding_principal,
                            :days_overdue => days_overdue, :current => current || 0,
                            :principal_due => principal_due, :interest_due => interest_due,
                            :principal_paid => prin, :interest_paid => int}
