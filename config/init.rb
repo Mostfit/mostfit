@@ -69,7 +69,7 @@ Merb::BootLoader.after_app_loads do
     Payment.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
   end
   Misfit::LoanValidators.instance_methods.map{|m| m.to_sym}.each do |s|
-    clause = Proc.new{|t| t.loan and (t.loan.loan_product.loan_validations.include?(s))}
+    clause = Proc.new{|t| t.loan_product.loan_validations.include?(s)}
     Loan.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
   end
 

@@ -660,7 +660,7 @@ class Loan
 
   private
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
-
+  include Misfit::LoanValidators
   ## validations: read their method name and error to see what they do.
   def amount_greater_than_zero?
     return true if not amount.blank? and amount > 0
