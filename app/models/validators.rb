@@ -17,6 +17,10 @@ module Misfit
           end
       end
     end
+
+    def other_validation
+      return true
+    end
   end    
 
   module LoanValidators

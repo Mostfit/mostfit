@@ -28,7 +28,7 @@
   
 %h2 Payment Validations
 - Misfit::PaymentValidators.instance_methods.each do |v|
-  = check_box :name => "payment_validations[#{v}]"
+  = check_box :name => "payment_validations[#{v}]", :checked => @loan_product.payment_validations.include?(v.to_sym)
   = v.humanize
 
 %br

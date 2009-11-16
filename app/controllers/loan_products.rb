@@ -39,6 +39,7 @@ class LoanProducts < Application
     debugger
     @loan_product = LoanProduct.get(id)
     raise NotFound unless @loan_product
+    loan_product[:payment_validation_methods] = params[:payment_validations].keys.join(",")
     if @loan_product.update_attributes(loan_product)
        redirect resource(@loan_product)
     else
