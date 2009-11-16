@@ -65,11 +65,11 @@ Merb::BootLoader.after_app_loads do
   # ruby is too beautiful. 3 lines of code and all payments can get their appropriate validations which are decided by the
   # loan product.
   Misfit::PaymentValidators.instance_methods.map{|m| m.to_sym}.each do |s|
-    clause = eval("Proc.new{|t| t.loan and (t.loan.loan_product.payment_validations.index(:#{s}) != nil)}")
+    clause = Proc.new{|t| t.loan and (t.loan.loan_product.payment_validations.include?(s))}
     Payment.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
   end
   Misfit::LoanValidators.instance_methods.map{|m| m.to_sym}.each do |s|
-    clause = eval("Proc.new{|t| t.loan and (t.loan.loan_product.loan_validations.index(:#{s}) != nil)}")
+    clause = Proc.new{|t| t.loan and (t.loan.loan_product.loan_validations.include?(s))}
     Loan.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
   end
 

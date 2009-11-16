@@ -27,4 +27,5 @@ config/database.yml
 *pdf
 public/logs
 uploads
-
+nbproject
+config.ru.bak
