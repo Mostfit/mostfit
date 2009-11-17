@@ -3,25 +3,25 @@
 %h1 Data Entry
 Follow the links below to perform common actions quickly. Most forms are made especially for mass data entry.
 /%p At the bottom you find an overview of all modifications that you have made.
-= if session.user.can_manage(:branches)
+- if session.user.can_manage?(:branch)
   %h2 Branches
   = link_to 'add new branch', url(:enter_branches, :action => 'new')
   |
   = link_to 'edit a branch', url(:enter_branches, :action => 'edit')
 
-= if session.user.can_manage(:centers)
+- if session.user.can_manage?(:center)
   %h2 Centers
   = link_to 'add new center', url(:enter_centers, :action => 'new')
   |
   = link_to 'edit a center', url(:enter_centers, :action => 'edit')
 
-= if session.user.can_manage(:clients)
+- if session.user.can_manage?(:client)
   %h2 Clients
   = link_to 'add new clients', url(:enter_clients, :action => 'new')
   |
   = link_to 'edit a client', url(:enter_clients, :action => 'edit')
 
-= if session.user.can_manage(:payments)
+- if session.user.can_manage?(:payment)
   %h2 Payments
   = link_to 'record payments', url(:enter_payments, :action => 'record')
   |
@@ -31,11 +31,11 @@ Follow the links below to perform common actions quickly. Most forms are made es
   |
   = link_to 'delete a payment', url(:enter_payments, :action => 'delete')
 
-= if session.user.can_manage(:loans)
+- if session.user.can_manage?(:loan)
   %h2 Loans
   = link_to 'create new loans', url(:enter_loans, :action => 'new')
   |
   = link_to 'edit a loan', url(:enter_loans, :action => 'edit')
   |
   = link_to 'approve unapproved loans', url(:enter_loans, :action => 'approve')
->>>>>>> Stashed changes:app/views/data_entry/index/index.html.haml
+
