@@ -15,6 +15,12 @@ Follow the links below to perform common actions quickly. Most forms are made es
   |
   = link_to 'edit a center', url(:enter_centers, :action => 'edit')
 
+- if session.user.can_manage?(:center)
+  %h2 Groups
+  = link_to 'add a group to a center', url(:enter_groups, :action => 'new')
+  |
+  = link_to 'edit a group', url(:enter_groups, :action => 'edit')
+
 - if session.user.can_manage?(:client)
   %h2 Clients
   = link_to 'add new clients', url(:enter_clients, :action => 'new')
