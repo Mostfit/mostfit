@@ -42,7 +42,7 @@ class User
   end
 
   def can_manage?(model)
-    crud_rights.values.reduce([]){|a,b| a + b}.uniq.include?(model)
+    crud_rights.values.inject([]){|a,b| a + b}.uniq.include?(model)
   end
   
 
