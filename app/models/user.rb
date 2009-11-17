@@ -36,6 +36,7 @@ class User
   end
 
   def can_access?(controller, action)
+    return true if role == :admin
     r = (access_rights[action.to_s.to_sym] or access_rights[:all])
     return false if r.nil?
     r.include?(controller.to_sym)
