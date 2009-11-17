@@ -1,6 +1,5 @@
 class Fees < Application
   # provides :xml, :yaml, :js
-
   def index
     @fees = Fee.all
     display @fees

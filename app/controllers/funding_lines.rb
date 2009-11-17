@@ -1,6 +1,5 @@
 class FundingLines < Application
   include DateParser
-  before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update']
   before :get_context, :exclude => ['redirect_to_show']
   provides :xml, :yaml, :js
 

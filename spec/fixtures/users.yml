@@ -5,43 +5,19 @@ admin:
   :active: true
   :password: password
   :password_confirmation: password
-  :admin: true
-
+  :role: :admin
 prashanth:
   :id: 2
   :login: prashanth
   :active: true
   :password: password
   :password_confirmation: password
-  :mis_manager: true
+  :role: :mis_manager
 priya:
   :id: 3
   :login: priya
   :active: true
   :password: password
   :password_confirmation: password
-  :mis_manager: true
+  :role: :data_entry
 
-sid:
-  :id: 4
-  :login: sid
-  :active: true
-  :password: password
-  :password_confirmation: password
-  :mis_manager: true
-
-cies:
-  :id: 5
-  :login: cies
-  :active: true
-  :password: password
-  :password_confirmation: password
-  :mis_manager: true
-
-hemanth:
-  :id: 6
-  :login: hemanth
-  :active: false
-  :password: password
-  :password_confirmation: password
-  :mis_manager: true

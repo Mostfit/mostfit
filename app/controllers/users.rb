@@ -1,7 +1,4 @@
 class Users < Application
-  before :ensure_authenticated
-  before :ensure_has_admin_privileges
-  # provides :xml, :yaml, :js
 
   def index
     @users = User.all

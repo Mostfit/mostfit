@@ -3,44 +3,39 @@
 %h1 Data Entry
 Follow the links below to perform common actions quickly. Most forms are made especially for mass data entry.
 /%p At the bottom you find an overview of all modifications that you have made.
+= if session.user.can_manage(:branches)
+  %h2 Branches
+  = link_to 'add new branch', url(:enter_branches, :action => 'new')
+  |
+  = link_to 'edit a branch', url(:enter_branches, :action => 'edit')
 
-%h2 Branches
-= link_to 'add new branch', url(:enter_branches, :action => 'new')
-|
-= link_to 'edit a branch', url(:enter_branches, :action => 'edit')
+= if session.user.can_manage(:centers)
+  %h2 Centers
+  = link_to 'add new center', url(:enter_centers, :action => 'new')
+  |
+  = link_to 'edit a center', url(:enter_centers, :action => 'edit')
 
-%h2 Centers
-= link_to 'add new center', url(:enter_centers, :action => 'new')
-|
-= link_to 'edit a center', url(:enter_centers, :action => 'edit')
+= if session.user.can_manage(:clients)
+  %h2 Clients
+  = link_to 'add new clients', url(:enter_clients, :action => 'new')
+  |
+  = link_to 'edit a client', url(:enter_clients, :action => 'edit')
 
-%h2 Groups
-= link_to 'add a group to a center', url(:enter_groups, :action => 'new')
-|
-= link_to 'edit a group', url(:enter_groups, :action => 'edit')
+= if session.user.can_manage(:payments)
+  %h2 Payments
+  = link_to 'record payments', url(:enter_payments, :action => 'record')
+  |
+  = link_to 'by center', url(:enter_payments, :action => 'by_center')
+  |
+  = link_to 'by staff member', url(:enter_payments, :action => 'by_staff_member')
+  |
+  = link_to 'delete a payment', url(:enter_payments, :action => 'delete')
 
-%h2 Clients
-= link_to 'add new clients', url(:enter_clients, :action => 'new')
-|
-= link_to 'edit a client', url(:enter_clients, :action => 'edit')
-
-%h2 Payments
-= link_to 'record payments', url(:enter_payments, :action => 'record')
-|
-= link_to 'by center', url(:enter_payments, :action => 'by_center')
-|
-= link_to 'by staff member', url(:enter_payments, :action => 'by_staff_member')
-|
-= link_to 'delete a payment', url(:enter_payments, :action => 'delete')
-
-%h2 Loans
-= link_to 'create new loans', url(:enter_loans, :action => 'new')
-|
-= link_to 'edit a loan', url(:enter_loans, :action => 'edit')
-|
-= link_to 'approve unapproved loans', url(:enter_loans, :action => 'approve')
-
-%h2 Attendancy (not yet)
-= link_to 'record attendancy', url(:enter_attendancy, :action => 'record')
-|
-= link_to 'edit attendancy lists', url(:enter_attendancy, :action => 'edit')
+= if session.user.can_manage(:loans)
+  %h2 Loans
+  = link_to 'create new loans', url(:enter_loans, :action => 'new')
+  |
+  = link_to 'edit a loan', url(:enter_loans, :action => 'edit')
+  |
+  = link_to 'approve unapproved loans', url(:enter_loans, :action => 'approve')
+>>>>>>> Stashed changes:app/views/data_entry/index/index.html.haml

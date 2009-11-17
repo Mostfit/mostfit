@@ -1,7 +1,5 @@
 class StaffMembers < Application
   include Pdf::DaySheet if PDF_WRITER
-  # provides :xml, :yaml, :js
-  before :ensure_has_mis_manager_privileges, :only => ['new','create','edit','update','destroy','delete']
 
   def index
     # @current_page = ( params[:page] && ( params[:page].to_i > 0 ) ) ? params[:page].to_i : 1 

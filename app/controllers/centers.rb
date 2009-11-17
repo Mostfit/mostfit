@@ -1,6 +1,5 @@
 class Centers < Application
   before :get_context, :exclude => ['redirect_to_show', 'groups']
-  before :ensure_has_mis_manager_privileges, :exclude => [:groups]#, :only => ['new','create','edit','update','destroy','delete']
   provides :xml, :yaml, :js
 
   def index

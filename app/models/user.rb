@@ -10,10 +10,8 @@ class User
   property :active,       Boolean, :default => true, :nullable => false
 
   # permissions
-  property :read_only_user,      Boolean, :default => false, :nullable => false  # read_only (duh!)
-  property :data_entry_operator, Boolean, :default => false, :nullable => false  # can do some things
-  property :mis_manager,         Boolean, :default => false, :nullable => false  # can do most things
-  property :admin,               Boolean, :default => false, :nullable => false  # can do everything
+  ROLES = [:data_entry, :mis_manager, :admin, :read_only]
+  property :role, Enum.send('[]', *ROLES), :nullable => false
 
   # it gets                                   
   #   - :password and :password_confirmation accessors
@@ -23,19 +21,41 @@ class User
   validates_format :login, :with => /^[A-Za-z0-9_]+$/
   validates_length :login, :min => 3
   validates_is_unique :login
-  validates_with_method :is_any_permission_granted
+
 
   has n, :payments_created, :child_key => [:created_by_user_id], :model => 'Payment'
   has n, :payments_deleted, :child_key => [:deleted_by_user_id], :model => 'Payment'
   has n, :audit_trail, :model => 'AuditTrail'
 
+  def crud_rights
+    Misfit::Config.crud_rights[role]
+  end
 
-  def admin?
-    self.admin || self.id == 1
+  def access_rights
+    Misfit::Config.access_rights[role]
   end
-  def is_any_permission_granted
-  read_only_user||data_entry_operator||mis_manager||admin
+
+  def can_access?(controller, action)
+    r = (access_rights[action.to_s.to_sym] or access_rights[:all])
+    return false if r.nil?
+    r.include?(controller.to_sym)
   end
+
+  def can_manage?(model)
+    crud_rights.values.reduce([]){|a,b| a + b}.uniq.include?(model)
+  end
+  
+
+  def method_missing(name, params)
+    if x = /can_\w+/.match(name.to_s)
+      model = params
+      function = x[0].split("_")[1].gsub("?","").to_sym # wtf happened to $1?!?!?
+      r = crud_rights[function] or crud_rights[:all]
+      return false if r.nil?
+      r.include?(model)
+    end
+  end
+
  private
   def prevent_destroying_admin
     if id == 1

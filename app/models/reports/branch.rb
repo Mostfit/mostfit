@@ -1,28 +1,3 @@
-class Hash
-  def / (other)
-    rhash = {}
-    keys.each do |k|
-      if has_key?(k) and other.has_key?(k)
-        rhash[k] = self[k]/other[k]
-      else
-        rhash[k] = nil
-      end
-    end
-    rhash
-  end
-
-  def - (other)
-    rhash = {}
-    keys.each do |k|
-      if has_key?(k) and other.has_key?(k)
-        rhash[k] = self[k] - other[k]
-      else
-        rhash[k] = nil
-      end
-    end
-    rhash
-  end
-end
 
 module Reporting
   module BranchReports

@@ -1,17 +1,11 @@
 class Application < Merb::Controller
   before :ensure_authenticated
-  
+  before :ensure_can_do
 
-  def ensure_has_data_entry_privileges
-    raise NotPrivileged unless session.user.data_entry_operator? || session.user.mis_manager? || session.user.admin?
-  end
-
-  def ensure_has_mis_manager_privileges
-    raise NotPrivileged unless session.user.mis_manager? || session.user.admin?
-  end
-
-  def ensure_has_admin_privileges
-    raise NotPrivileged unless session.user.admin?
+  def ensure_can_do
+    debugger
+    cont = request.params[:namespace] == "data_entry" ? :data_entry : request.params[:controller].singular.to_sym
+    raise NotPrivileged unless session.user.can_access?(cont, request.params[:action].to_sym)
   end
 
   def render_to_pdf(options = nil)
@@ -39,10 +33,33 @@ end
 
 
 #Hash diffs are easy
-
 class Hash
   def diff(other)
     keys = self.keys
     keys.each.select{|k| self[k] != other[k]}
+  end
+
+  def / (other)
+    rhash = {}
+    keys.each do |k|
+      if self.has_key?(k) and other.has_key?(k)
+        rhash[k] = self[k]/other[k]
+      else
+        rhash[k] = nil
+      end
+    end
+    rhash
+  end
+
+  def - (other)
+    rhash = {}
+    keys.each do |k|
+      if has_key?(k) and other.has_key?(k)
+        rhash[k] = self[k] - other[k]
+      else
+        rhash[k] = nil
+      end
+    end
+    rhash
   end
 end

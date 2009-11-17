@@ -19,6 +19,7 @@ Merb::Router.prepare do
   resources :funders do
     resources :funding_lines
   end
+
   
   # Adds the required routes for merb-auth using the password slice
   match('/centers/:id/groups.:format').to(:controller => 'centers', :action => 'groups')

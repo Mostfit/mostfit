@@ -72,12 +72,12 @@ Merb::BootLoader.after_app_loads do
     clause = Proc.new{|t| t.loan_product.loan_validations.include?(s)}
     Loan.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
   end
-
+  require 'config/misfit'
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
   LoanProduct.property(:loan_type, LoanProduct::Enum.send('[]', *Loan.descendants.map{|x| x.to_s}), :nullable => false, :index => true)
   begin
     if User.all.empty?
-      u = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password', :admin => true)
+      u = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password', :role => :admin)
       if u.save
         Merb.logger.info("The initial user 'admin' was created (password is set to 'password')...")
       else
