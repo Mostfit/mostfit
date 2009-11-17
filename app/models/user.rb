@@ -27,6 +27,14 @@ class User
   has n, :payments_deleted, :child_key => [:deleted_by_user_id], :model => 'Payment'
   has n, :audit_trail, :model => 'AuditTrail'
 
+  def self.roles
+    roles = []
+    ROLES.each_with_index{|v, idx|
+      roles << [v, v.to_s.gsub('_', ' ').capitalize]
+    }
+    roles
+  end
+  
   def crud_rights
     Misfit::Config.crud_rights[role]
   end
