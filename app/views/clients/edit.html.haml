@@ -2,5 +2,9 @@
 
 = error_messages_for @client
 
-= form_for(@client, :action => resource(@branch, @center, @client), :multipart => true) do
-  = partial :fields, :submit_text => "Save changes", :cancel_link => resource(@branch, @center, :clients)
+-if @center
+  = form_for(@client, :action => resource(@branch, @center, @client), :multipart => true) do
+    = partial :fields, :submit_text => "Save changes", :cancel_link => resource(@branch, @center, :clients)
+-else
+  = form_for(@client, :action => resource(@client), :multipart => true) do
+    = partial :fields, :submit_text => "Save changes", :cancel_link => url(:data_entry)

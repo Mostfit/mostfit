@@ -1,6 +1,6 @@
 class Centers < Application
-  before :get_context, :exclude => ['redirect_to_show']
-  before :ensure_has_mis_manager_privileges #, :only => ['new','create','edit','update','destroy','delete']
+  before :get_context, :exclude => ['redirect_to_show', 'groups']
+  before :ensure_has_mis_manager_privileges, :exclude => [:groups]#, :only => ['new','create','edit','update','destroy','delete']
   provides :xml, :yaml, :js
 
   def index
@@ -86,6 +86,11 @@ class Centers < Application
     redirect resource(@center.branch, @center)
   end
 
+  def groups
+    only_provides :json
+    @groups = Center.get(params[:id]).client_groups
+    display @groups
+  end
 
   private
   include DateParser  # for the parse_date method used somewhere here..

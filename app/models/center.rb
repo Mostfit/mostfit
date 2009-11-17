@@ -14,6 +14,7 @@ class Center
   belongs_to :manager, :child_key => [:manager_staff_id], :model => 'StaffMember'
 
   has n, :clients
+  has n, :client_groups
 
   validates_length      :name, :min => 3
   validates_present     :manager

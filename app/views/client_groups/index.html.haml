@@ -1,0 +1,16 @@
+%h1
+  ClientGroups controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/client_groups/index.html.erb
+%table
+  %tr
+  - for client_group in @client_groups
+    %tr
+      %td
+        = link_to 'Show', url(:client_group, client_group)
+      %td
+        = link_to 'Edit', url(:edit_client_group,  client_group)
+
+= link_to 'New', url(:new_client_group)

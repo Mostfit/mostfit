@@ -4,15 +4,19 @@ class Client
   include DataMapper::Resource
 
   before :valid?, :parse_dates
-  
+  before :valid?, :convert_blank_to_nil
+
   property :id,             Serial
   property :reference,      String, :length => 100, :nullable => false, :index => true
   property :name,           String, :length => 100, :nullable => false, :index => true
   property :spouse_name,    String, :length => 100
-  property :date_of_birth,  Date, :index => true
+  property :date_of_birth,  Date,   :index => true
   property :address,        Text
   property :active,         Boolean, :default => true, :nullable => false, :index => true
-  property :date_joined,    Date, :index => true
+  property :date_joined,    Date,    :index => true
+  property :grt_pass_date,  Date,    :index => true, :nullable => true
+  property :client_group_id,Integer, :index => true, :nullable => true
+  property :center_id,      Integer, :index => true, :nullable => true
   property :deleted_at,     ParanoidDateTime
 
   has_attached_file :picture,
@@ -28,9 +32,10 @@ class Client
 
   has n, :loans
   belongs_to :center
+  belongs_to :client_group
 
   validates_length    :name, :min => 3
-  validates_present   :center
+#  validates_present   :center
 #  validates_present   :date_joined
   validates_is_unique :reference
   validates_attachment_thumbnails :picture
@@ -107,4 +112,7 @@ class Client
 
 
   private
+  def convert_blank_to_nil
+    self.center_id=nil if self.center_id.blank?
+  end
 end

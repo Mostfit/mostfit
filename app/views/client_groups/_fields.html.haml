@@ -1,0 +1,19 @@
+%table.form
+  -if @client_group.center_id
+    =hidden_field :center_id, :value => @client_group.center_id
+  -else
+    %tr
+      %td
+        For center:
+      %td
+        = select_center_for @client_group, :center
+  %tr
+    %td
+      Group name:
+    %td
+      = text_field :name
+  %tr
+    %td
+      Maximum clients:
+    %td
+      = text_field :number_of_members, :size => 3

@@ -5,6 +5,8 @@ Merb::Router.prepare do
   resources :loan_products
   resources :users
   resources :staff_members
+  resources :clients
+  resources :client_groups
   resources :branches  do
     resources :centers  do
       resources :clients do
@@ -19,6 +21,7 @@ Merb::Router.prepare do
   end
   
   # Adds the required routes for merb-auth using the password slice
+  match('/centers/:id/groups.:format').to(:controller => 'centers', :action => 'groups')
   slice(:merb_auth_slice_password, :name_prefix => nil, :path_prefix => "")
   match('/search').to(:controller => 'search', :action => 'index')
   match('/reports/graphs').to(:controller => 'reports', :action => 'graphs')
@@ -34,6 +37,7 @@ Merb::Router.prepare do
     match('/attendancy(/:action)(.:format)').to(:controller => 'attendancy').name(:attendancy)
     match('/branches(/:action)(.:format)').to(:controller => 'branches').name(:branches)
     match('/centers(/:action)(.:format)').to(:controller => 'centers').name(:centers)
+    match('/groups(/:action)(.:format)').to(:controller => 'client_groups').name(:groups)
   end
 
   match('/admin(/:action)').to(:controller => 'admin').name(:admin)

@@ -117,7 +117,7 @@
       %td
         %b= format_currency h.scheduled_outstanding_principal
       %td
-        %b= format_currency (scheduled_principal + scheduled_interest)
+        %b= format_currency(scheduled_principal + scheduled_interest)
         %br/
         %span.greytext== #{scheduled_principal.round} principal + #{scheduled_interest.round} interest
       %td
@@ -181,5 +181,3 @@
         %td{ :colspan => 8 }
 
 %p= link_to 'new payment >>', url_for_loan(@loan, 'payments/new'), :class => "button"
-
-

@@ -12,8 +12,13 @@ class Clients < Application
   def show(id)
     @client = Client.get(id)
     raise NotFound unless @client
-    @loans = @client.loans
-    display [@client, @loans], 'loans/index'
+    
+    if @center
+      @loans = @client.loans
+      display [@client, @loans], 'loans/index'
+    else
+      redirect_to_show(params[:id])      
+    end
   end
 
   def new
@@ -43,7 +48,11 @@ class Clients < Application
     @client = Client.get(id)
     raise NotFound unless @client
     if @client.update_attributes(client)
-       redirect resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' has been edited"}
+      if @branch and @center
+        redirect(resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' has been edited"})
+      else
+        redirect(resource(@client, :edit), :message => {:notice => "Client '#{@client.name}' has been edited"})
+      end
     else
       display @client, :edit  # error messages will be shown
     end
@@ -66,13 +75,19 @@ class Clients < Application
   # this redirects to the proper url, used from the router
   def redirect_to_show(id)
     raise NotFound unless @client = Client.get(id)
-    redirect resource(@client.center.branch, @client.center, @client)
+    if @client.center
+      redirect resource(@client.center.branch, @client.center, @client)
+    else
+      redirect resource(@client, :edit)
+    end
   end
 
   private
   def get_context
-    @branch = Branch.get(params[:branch_id])
-    @center = Center.get(params[:center_id])
-    raise NotFound unless @branch and @center
+    if params[:branch_id] and params[:center_id] 
+      @branch = Branch.get(params[:branch_id]) 
+      @center = Center.get(params[:center_id]) 
+      raise NotFound unless @branch and @center
+    end
   end
 end # Clients

@@ -30,7 +30,15 @@
       %span.greytext
         center managed by:
         = link_to @center.branch.manager.name, resource(@center.manager)
-
+  %tr
+    %td group name
+    %td
+      -if @client.client_group
+        =@client.client_group.name
+      -else
+        Not associated with a group yet (
+        =link_to('Edit', resource(@branch, @center, @client, :edit))
+        to change)
 
 %h2== Loans for client <i>#{@client.name}</i>
 

@@ -1,0 +1,6 @@
+= form_for(@client_group, :id => "new_client_group_form", :action => url(:enter_groups, :create) ) do
+  = partial 'client_groups/fields'
+  %p
+    = submit "Create"
+    %a{:href => "#", :onclick => "$('#new_client_group_form').html('')"}
+      cancel
