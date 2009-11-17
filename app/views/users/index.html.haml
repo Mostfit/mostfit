@@ -23,14 +23,10 @@
         = user.id
       %td
         %b= user.login
-      %td
-        %b= user.data_entry_operator ? 'X' : ''
-      %td
-        %b= user.mis_manager ? 'X' : ''
-      %td
-        %b= user.admin ? 'X' : ''
-      %td
-        %b= user.read_only_user ? 'X' : ''
+      - User::ROLES.each do |role|
+        %td
+          -if user.role==role
+            %b Yes            
       - if session.user.id == 1  # only show to admin
         %td
           = link_to 'edit', resource(user, :edit)
