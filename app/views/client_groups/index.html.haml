@@ -1,16 +1,20 @@
 %h1
-  ClientGroups controller, index action
-%p
-  Edit this file in
-  %tt
-    app/views/client_groups/index.html.erb
-%table
+  Groups
+%table{:width => "60%"}
+  %tr
+    %th
+      Group
+    %th
+      Center
+    %th
+      
   %tr
   - for client_group in @client_groups
     %tr
       %td
-        = link_to 'Show', url(:client_group, client_group)
+        = client_group.name
       %td
-        = link_to 'Edit', url(:edit_client_group,  client_group)
+        = client_group.center.name
+      %td
+        = link_to('Edit', url(:controller => params[:controller], :action => :edit, :id => client_group))
 
-= link_to 'New', url(:new_client_group)

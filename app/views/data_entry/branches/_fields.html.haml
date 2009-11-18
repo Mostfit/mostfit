@@ -8,6 +8,13 @@
       %span.greytext the name by which the branch is known
   %tr
     %td
+      Branch code:
+    %td
+      = text_field :code, :size => 2
+      %br/
+      %span.greytext a two letter unique code for the branch
+  %tr
+    %td
       Address:
     %td
       ~ text_area :address, :rows => 6, :cols => 38

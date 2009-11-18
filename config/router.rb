@@ -38,7 +38,8 @@ Merb::Router.prepare do
     match('/attendancy(/:action)(.:format)').to(:controller => 'attendancy').name(:attendancy)
     match('/branches(/:action)(.:format)').to(:controller => 'branches').name(:branches)
     match('/centers(/:action)(.:format)').to(:controller => 'centers').name(:centers)
-    match('/groups(/:action)(.:format)').to(:controller => 'client_groups').name(:groups)
+    match('/groups(/:action)(/:id)(.:format)').to(:controller => 'client_groups').name(:groups)
+    match('/client_groups(/:action)(/:id)(.:format)').to(:controller => 'client_groups').name(:groups)
   end
 
   match('/admin(/:action)').to(:controller => 'admin').name(:admin)

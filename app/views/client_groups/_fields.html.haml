@@ -14,6 +14,13 @@
       = text_field :name
   %tr
     %td
+      Group Code:
+    %td
+      = text_field :code, :size => 3
+      %br/
+      %span.greytext a two letter unique code for the group
+  %tr
+    %td
       Maximum clients:
     %td
       = text_field :number_of_members, :size => 3

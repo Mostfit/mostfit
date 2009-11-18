@@ -23,12 +23,18 @@ function fillOptions(id, select){
 		for(i=0; i < data.length; i++){
 		    str += "<option value=\"" + data[i]["id"] + "\">" + data[i]["name"] + "</option>";
 		}
-		$("#client_group_select").html(str);
-		$("#client_group_select").val(select);
+		$("#client_group_id").find("form").remove();
+		$("#client_group_id").html(str).val(select);
 	    }
 	});
 }
+function fillCode(center_id, group_id){
+    
+}
 $(document).ready(function(){
+	$("#client_group_id").change(function(){
+		fillCode($("#client_center_id").val(), $("#client_group_id").val());
+	    });
 	if($("div.log_box").length>0){
 	    setInterval(function(){
 		    spitLogs();
@@ -43,16 +49,21 @@ $(document).ready(function(){
 			    $("#new_client_group_form").html(data);
 			    $("#new_client_group_form").submit(function(){
 				    $.ajax({
-					    type: "POST",  
+					    type: "POST",
+					    dataType: "json",
 					    url: "/data_entry/groups/create",
 					    data: "client_group[name]="+$("#client_group_name").val()
 						+ "&client_group[number_of_members]=" + $("#client_group_number_of_members").val()
-						+ "&client_group[center_id]=" + $("#client_group_center_id").val(),
+						+ "&client_group[center_id]=" + $("#client_group_center_id").val()
+						+ "&client_group[code]=" + $("#client_group_code").val(),
 					    success: function(){
 						$("#client_group_name").val();
 						fillOptions($("#client_group_center_id").val(), $("#client_group_name").val());
 						$("#new_client_group_form").html("");
-					    }
+					    }, 
+					    error: function(data){
+						alert(data.responseText);
+					    }					    
 					});
 				    return false;
 				});
@@ -68,7 +79,7 @@ $(document).ready(function(){
 				fillOptions(id);
 			    }else{
 				$("#new_client_group_link").css("display", "none");
-				$("#client_group_select").html("");
+				$("#client_group_id").find("form").remove();
 			    }
 			});
 		});
