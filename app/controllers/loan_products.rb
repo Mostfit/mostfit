@@ -36,7 +36,6 @@ class LoanProducts < Application
   end
 
   def update(id, loan_product)
-    debugger
     @loan_product = LoanProduct.get(id)
     raise NotFound unless @loan_product
     loan_product[:payment_validation_methods] = params[:payment_validations].keys.join(",")

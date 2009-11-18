@@ -6,6 +6,13 @@
       = text_field :name, :size => 40
   %tr
     %td
+      Center code:
+    %td
+      = text_field :code, :size => 2
+      %br/
+      %span.greytext a two letter unique code for the center
+  %tr
+    %td
       Meeting every:
     %td
       - options = [['none', '<none>']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]

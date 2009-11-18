@@ -26,12 +26,13 @@ class ClientGroups < Application
   end
 
   def create(client_group)
+    only_provides :html, :json
     @client_group = ClientGroup.new(client_group)
     if @client_group.save
-      redirect resource(@client_group), :message => {:notice => "ClientGroup was successfully created"}
+      request.xhr? ? display(@client_group) : redirect(url(:data_entry), :message => {:notice => "Group was successfully created"})
     else
-      message[:error] = "ClientGroup failed to be created"
-      render :new
+      message[:error] = "Group failed to be created"
+      request.xhr? ? display(@client_group.errors, :status => 406) : render(:new)
     end
   end
 

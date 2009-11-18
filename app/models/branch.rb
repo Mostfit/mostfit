@@ -4,11 +4,15 @@ class Branch
 
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false, :index => true
+  property :code,    String, :length => 5, :nullable => true, :index => true, :min => 1, :max => 5
   property :address, Text
   property :created_at, DateTime
   
   belongs_to :manager, :child_key => [:manager_staff_id], :model => 'StaffMember'
   has n, :centers
+
+  validates_is_unique   :code
+  validates_length      :code, :min => 1, :max => 4
 
   validates_length      :name, :min => 3
   validates_present     :manager
@@ -27,7 +31,7 @@ class Branch
     if /^\d+$/.match(q)
       Branch.all(:conditions => {:id => q})
     else
-      Branch.all(:conditions => ["name like ?", q+'%'])
+      Branch.all(:conditions => ["code=? or name like ?", q, q+'%'])
     end
   end
 

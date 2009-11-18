@@ -13,6 +13,7 @@ class Search < Application
       @clients  = Client.search(params[:query])
       @centers  = Center.search(params[:query])
       @loans    = Loan.search(params[:query])
+      @groups   = ClientGroup.search(params[:query])
       display [@branches, @clients, @centers, @loans]
     else
       display "No results"
