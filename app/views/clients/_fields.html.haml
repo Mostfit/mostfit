@@ -6,7 +6,12 @@
       %td
         = select_center_for @client, :center
   -else
-    %input{:id => "client_center_id", :value => "#{@center.id}", :type => "hidden"}
+    %tr
+      %td 
+        For center
+      %td
+        = @center.name
+        %input{:id => "client_center_id", :value => "#{@center.id}", :type => "hidden"}
   %tr
     %td
       Group name

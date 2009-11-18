@@ -54,11 +54,11 @@ $(document).ready(function(){
 					    url: "/data_entry/groups/create",
 					    data: "client_group[name]="+$("#client_group_name").val()
 						+ "&client_group[number_of_members]=" + $("#client_group_number_of_members").val()
-						+ "&client_group[center_id]=" + $("#client_group_center_id").val()
+						+ "&client_group[center_id]=" + $("#client_center_id").val()
 						+ "&client_group[code]=" + $("#client_group_code").val(),
 					    success: function(){
 						$("#client_group_name").val();
-						fillOptions($("#client_group_center_id").val(), $("#client_group_name").val());
+						fillOptions($("#client_center_id").val(), $("#client_group_name").val());
 						$("#new_client_group_form").html("");
 					    }, 
 					    error: function(data){
