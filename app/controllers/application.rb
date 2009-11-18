@@ -3,8 +3,7 @@ class Application < Merb::Controller
   before :ensure_can_do
 
   def ensure_can_do
-    debugger
-    cont = request.params[:namespace] == "data_entry" ? :data_entry : request.params[:controller].singular.to_sym
+    cont = ((request.params[:namespace] ? (request.params[:namespace] + "/") : "") + request.params[:controller]).to_sym
     raise NotPrivileged unless session.user.can_access?(cont, request.params[:action].to_sym)
   end
 

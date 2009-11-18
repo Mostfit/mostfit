@@ -43,5 +43,14 @@ Follow the links below to perform common actions quickly. Most forms are made es
   |
   = link_to 'edit a loan', url(:enter_loans, :action => 'edit')
   |
-  = link_to 'approve unapproved loans', url(:enter_loans, :action => 'approve')
+  = link_to_with_rights 'approve unapproved loans', url(:enter_loans, :action => 'approve')
 
+- if session.user.can_access?(:admin, :index)
+  %h1 Administration
+  %ul
+    %li
+      = link_to 'Manage Users', resource(:users)
+    %li
+      = link_to 'Manage loan products', resource(:loan_products)
+    %li
+      = link_to 'Upload data', url(:action => "upload")

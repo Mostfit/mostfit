@@ -44,6 +44,7 @@ class User
   end
 
   def can_access?(controller, action)
+    debugger
     return true if role == :admin
     r = (access_rights[action.to_s.to_sym] or access_rights[:all])
     return false if r.nil?
@@ -51,17 +52,24 @@ class User
   end
 
   def can_manage?(model)
+    return true if role == :admin
     crud_rights.values.inject([]){|a,b| a + b}.uniq.include?(model)
   end
   
 
   def method_missing(name, params)
-    if x = /can_\w+/.match(name.to_s)
-      model = params
+    if x = /can_\w+\?/.match(name.to_s)
+      debugger
+      return true if role == :admin
       function = x[0].split("_")[1].gsub("?","").to_sym # wtf happened to $1?!?!?
-      r = crud_rights[function] or crud_rights[:all]
+      puts function
+      raise NoMethodError if not ([:edit, :update, :create, :new, :delete, :destroy].include?(function))
+      model = params
+      r = (crud_rights[function] or crud_rights[:all])
       return false if r.nil?
       r.include?(model)
+    else
+      raise NoMethodError
     end
   end
 

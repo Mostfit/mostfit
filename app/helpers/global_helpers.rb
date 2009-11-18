@@ -4,6 +4,17 @@ module Merb
       link_to(name, url, :class => ((request.uri==(url) or request.uri.index(url)==0) ? "selected" : ""))
     end
 
+    def link_to_with_rights(text, path, method="GET",params = {})
+      uri = URI.parse(path)
+      method = method.to_s.upcase || "GET"
+      request = Merb::Request.new(
+                                  Merb::Const::REQUEST_PATH => uri.path,
+                                  Merb::Const::REQUEST_METHOD => method,
+                                  Merb::Const::QUERY_STRING => uri.query)
+      route = Merb::Router.match(request)[1] rescue nil
+      return link_to(text,path,params) if session.user.can_access?(route[:controller],route[:action])
+    end
+
     def url_for_loan(loan, action = '')
       # this is to generate links to loans, as the resouce method doesn't work for descendant classes of Loan
       # it expects the whole context (@branch, @center, @client) to exist
