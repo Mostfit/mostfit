@@ -19,7 +19,7 @@ Follow the links below to perform common actions quickly. Most forms are made es
   %h2 Groups
   = link_to 'add a group to a center', url(:enter_groups, :action => 'new')
   |
-  = link_to 'edit a group', url(:enter_groups, :action => 'edit')
+  = link_to 'edit a group', url(:enter_groups, :action => 'index')
 
 - if session.user.can_manage?(:client)
   %h2 Clients

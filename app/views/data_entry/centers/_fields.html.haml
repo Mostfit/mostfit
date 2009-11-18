@@ -6,6 +6,13 @@
       = text_field :name, :size => 40
   %tr
     %td
+      Center code:
+    %td
+      = text_field :code, :size => 2
+      %br/
+      %span.greytext a two letter unique code for the center
+  %tr
+    %td
       Branch 
     %td
       = select :name => 'center[branch_id]', :collection => Branch.all.map {|b| [b.id,b.name]}

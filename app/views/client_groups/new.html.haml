@@ -1,13 +1,13 @@
-%h1 ClientGroups controller, new action
-
-%p 
-  Edit this file in 
-  %tt app/views/client_groups/new.html.erb
+%h1 Groups
 
 = error_messages_for @client_group
 
-= form_for(@client_group, :action => url(:client_groups) ) do
+= form_for(@client_group, :action => url(:controller => params[:controller], :action => :create, :id => @client_group), :id => "new_client_group_form") do
+  = partial "client_groups/fields"
   %p
     = submit "Create"
-
-= link_to 'Back', url(:client_groups)
+-if request.xhr?
+  %a{:href => "#", :onclick => "$('#new_client_group_form').html('')"}
+    cancel
+-else
+  = link_to('Back', url(:controller => params[:controller], :action => :index))
