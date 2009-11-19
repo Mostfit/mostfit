@@ -69,7 +69,7 @@
               - if a == 0
                 = lh.nil? ? 0 : (lh.principal_paid.to_i + lh.interest_paid.to_i)
               - else 
-                = text_field :name => loan.id, :value => a, :cols => "5", :style => "width:50px;" 
+                = text_field :name => "paid[#{loan.id}", :value => a, :cols => "5", :style => "width:50px;" 
 
         - if loan_row_count == 0
           %tr{ :class => cycle('odd','') }
@@ -102,6 +102,39 @@
     %tfoot    
       %tr
         %td{ :colspan => 12 }
+
+  %h2 Disbursals
+  - loans_to_disburse = @center.clients.loans(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil)
+  - if loans_to_disburse.size > 0
+    %table.narrow.form{ :width => '100%'}
+      %thead
+        %tr{:style => "font-size: 0.85em;"}
+          %th
+            Name
+          %th
+            Scheduled Disbursal Date
+          %th
+            Status
+          %th
+            Disbursed?
+      - loans_to_disburse.each do |loan|
+        %tr
+          %td
+            = loan.client.name
+          %td
+            = loan.scheduled_disbursal_date
+          %td
+            - late =  @date - loan.scheduled_disbursal_date
+            - if late > 0
+              == "#{late} days late"
+            - else
+              on time
+          %td
+            = check_box :name => "disbursed[#{loan.id}]"
+  - else
+    No disbursals today
+      
+    
 
 - else
   %i This day is not a meeting day

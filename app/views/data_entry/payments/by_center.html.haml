@@ -8,12 +8,11 @@
     - if not @errors.blank?
       .error
         %p
-          - @errors.each do |payment|
-            Error paying loan
-            = payment.loan.id
-            - payment.errors.each do |k|
-              = k
-              %br
+          - @errors.each do |error|
+            - debugger
+            == "#{error.resource.class} #{error.resource.id}:"
+            = error
+            %br
     %p
       %br/
     %h2

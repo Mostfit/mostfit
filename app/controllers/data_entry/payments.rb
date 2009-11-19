@@ -10,36 +10,28 @@ module DataEntry
     end
 
     def by_center
-      @center = Center.get(params[:center_id]) || Center.first(:name => params[:center_id]) 
-      @branch = @center.branch unless @center.nil?
-      @clients = @center.clients unless @center.nil?
-      @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
-      @errors = []
-      if params[:submit] == 'Make Payments'
-        params.collect{|k,v| k.to_i == 0 ? nil : k }.compact.each do |k|
-          @loan = Loan.get(k.to_i)
-          @staff = StaffMember.get(params[:received_by])
-          amounts = params[k.to_sym].to_i
-          success, @payment = @loan.repay(amounts, session.user, @date, @staff, false)
-          @errors << @payment if not success
-        end
-        
+      if request.method == :post
+        bulk_payments_and_disbursals
         if @errors.blank?
           params[:format] and params[:format]=="xml" ? display(@payment) : redirect(url(:data_entry), :message => {:notice => 'All payments made succesfully'})
         else
-          params[:format] and params[:format]=="xml" ? display(@payment) : redirect(url(:data_entry), :message => {:notice => 'The payment could not be made'})
+          params[:format] and params[:format]=="xml" ? display("") : render      
         end
-      else      
-        params[:format] and params[:format]=="xml" ? display("") : render      
+      else
+        render
       end
-      render
     end
     
     def by_staff_member
       @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
-      if params[:staff_member_id]
-        @staff_member = StaffMember.get(params[:staff_member_id])
-        raise NotFound unless @staff_member
+      if request.method == :post
+        if params[:staff_member_id]
+          @staff_member = StaffMember.get(params[:staff_member_id])
+          raise NotFound unless @staff_member
+        end
+        if params[:paid] or params[:disbursed]
+          bulk_payments_and_disbursals
+        end
       end
       render
     end
@@ -91,5 +83,33 @@ module DataEntry
     
     private
     include DateParser
+    # this function is called by by_center and by_staff_member
+    def bulk_payments_and_disbursals
+      debugger
+      @center = Center.get(params[:center_id]) || Center.first(:name => params[:center_id]) 
+      @branch = @center.branch unless @center.nil?
+      @clients = @center.clients unless @center.nil?
+      @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
+      @errors = []
+      if params[:paid]
+        params[:paid].keys.each do |k|
+          @loan = Loan.get(k.to_i)
+          @staff = StaffMember.get(params[:received_by])
+          amounts = params[:paid][k.to_sym].to_i
+          success, @payment = @loan.repay(amounts, session.user, @date, @staff, false)
+          @errors << @payment.errors if not success
+        end
+      end
+      if params[:disbursed]
+        params[:disbursed].each do |k,v|
+          next if v != "on"
+          @loan = Loan.get(k.to_i)
+          @loan.disbursal_date = @date
+          @loan.disbursed_by = @staff
+          @errors << @loan.errors if not @loan.save
+        end
+      end
+    end
+
   end
 end

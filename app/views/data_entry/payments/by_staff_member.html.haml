@@ -11,7 +11,7 @@
             = k
             %br
   %p
-    = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
+    = form_for(@payment, :action => url(:enter_payments, :action => 'by_staff_member')) do
       = submit 'Make Payments'
       = hidden_field :name => 'for_date', :value => @date
       - @centers = @staff_member.centers.all(:meeting_day => Center.meeting_days[@date.wday])
