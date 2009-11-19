@@ -1,4 +1,3 @@
-= error_messages_for @client
 - if @center
   %h2 
     Center: 
@@ -12,15 +11,14 @@
         %td
           = client.reference
         %td
-          = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
-            = hidden_field :id, :value => client.id 
+          = form_for(client, :action => url(:enter_clients, :action => 'edit', :id => client.id), :method => :get) do
             = submit "Proceed..."
-- elsif not @client and not @center
+- else
   %h1 Edit client
   %p
     Please select a client that you want to edit, either by its client ID, or through the center it belongs to.
   %table.form
-    = form_for(@client, :action => url(:enter_clients, :action => 'edit'), :multipart => true) do
+    = form_for(@client, :action => url(:controller => params[:controller], :action => 'index'), :method => :get) do
       %tr
         %td &nbsp;
       %tr
@@ -28,12 +26,12 @@
         %td
           Client ID, Name or Ref.:
         %td
-          = text_field :id, :size => 8
+          = text_field :query, :size => 8
         %td
           = submit "Proceed..."
       %tr
         %td &nbsp;
-    = form_for(@client, :action => url(:enter_clients, :action => 'edit')) do
+    = form_for(@client, :action => url(:enter_clients, :action => 'index'), :method => :get) do
       %tr
         %td &nbsp;
         %td
@@ -43,7 +41,4 @@
         %td
           = submit "Proceed..."
 
-- else
-  %h1 Edit client
-  = form_for(@client, :action => url(:enter_clients, :action => 'update', :id => @client.id)) do
-    = partial 'clients/fields', :submit_text => "Save changes", :cancel_link => url(:data_entry)
+

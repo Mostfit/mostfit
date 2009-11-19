@@ -25,7 +25,7 @@ Follow the links below to perform common actions quickly. Most forms are made es
   %h2 Clients
   = link_to 'add new clients', url(:enter_clients, :action => 'new')
   |
-  = link_to 'edit a client', url(:enter_clients, :action => 'edit')
+  = link_to 'edit a client', url(:enter_clients, :action => 'index')
 
 - if session.user.can_manage?(:payment)
   %h2 Payments

@@ -31,7 +31,7 @@ Merb::Router.prepare do
 
   match('/data_entry').to(:namespace => 'data_entry', :controller => 'index').name(:data_entry)
   namespace :data_entry, :name_prefix => 'enter' do  # for url(:enter_payment) and the likes
-    match('/clients(/:action)(.:format)').to(:controller => 'clients').name(:clients)
+    match('/clients(/:action)(/:id)(.:format)').to(:controller => 'clients').name(:clients)
     match('/loans/approve_by_center/:id').to(:controller => 'loans', :action => 'approve').name(:approval_by_center)
     match('/loans(/:action)(.:format)').to(:controller => 'loans').name(:loans)
     match('/payments(/:action)(.:format)').to(:controller => 'payments').name(:payments)
