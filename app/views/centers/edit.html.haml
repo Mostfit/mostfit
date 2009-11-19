@@ -1,6 +1,8 @@
 %h1== Edit the '#{@center.name}' center details
 
 = error_messages_for @center
+- form_url   = (params[:controller]=="data_entry/centers" ? url(:enter_centers, :action => 'update', :id => @center) : resource(@branch, @center))
+- cancel_url = (params[:controller]=="data_entry/centers" ? url(:data_entry) : resource(@branch, @center))
 
-= form_for(@center, :action => resource(@branch, @center)) do
-  = partial :fields, :submit_text => "Save changes"
+= form_for(@center, :action => form_url) do
+  = partial("centers/fields", :submit_text => "Save changes", :cancel_url => cancel_url)

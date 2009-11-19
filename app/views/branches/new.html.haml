@@ -1,6 +1,8 @@
 %h1 Create a new branch
 
 = error_messages_for @branch
+- form_url   =  url(:controller => params[:controller], :action => 'create')
+- cancel_url = (params[:controller]=="data_entry/branches" ? url(:data_entry) : resource(:branches))
 
-= form_for(@branch, :action => url(:branches)) do
-  = partial :fields, :submit_text => "Create branch"
+= form_for(@branch, :action => form_url) do
+  = partial "branches/fields", :submit_text => "Create branch", :cancel_url => cancel_url

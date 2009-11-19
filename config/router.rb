@@ -36,8 +36,8 @@ Merb::Router.prepare do
     match('/loans(/:action)(.:format)').to(:controller => 'loans').name(:loans)
     match('/payments(/:action)(.:format)').to(:controller => 'payments').name(:payments)
     match('/attendancy(/:action)(.:format)').to(:controller => 'attendancy').name(:attendancy)
-    match('/branches(/:action)(.:format)').to(:controller => 'branches').name(:branches)
-    match('/centers(/:action)(.:format)').to(:controller => 'centers').name(:centers)
+    match('/branches(/:action)(/:id)(.:format)').to(:controller => 'branches').name(:branches)
+    match('/centers(/:action)(/:id)(.:format)').to(:controller => 'centers').name(:centers)
     match('/groups(/:action)(/:id)(.:format)').to(:controller => 'client_groups').name(:groups)
     match('/client_groups(/:action)(/:id)(.:format)').to(:controller => 'client_groups').name(:groups)
   end

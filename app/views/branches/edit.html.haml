@@ -1,6 +1,8 @@
 %h1== Edit the '#{@branch.name}' branch details
 
 = error_messages_for @branch
+- form_url   =  url(:controller => params[:controller], :action => 'update', :id => @branch)
+- cancel_url = (params[:controller]=="data_entry/branches" ? url(:data_entry) : resource(:branches))
 
-= form_for(@branch, :action => url(:branch, @branch)) do
-  = partial :fields, :submit_text => "Save changes"
+= form_for(@branch, :action => form_url) do
+  = partial "branches/fields", :submit_text => "Save changes", :cancel_url => cancel_url

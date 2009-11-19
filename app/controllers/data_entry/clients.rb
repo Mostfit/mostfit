@@ -1,5 +1,4 @@
 module DataEntry
-
   class Clients < DataEntry::Controller
     provides :html, :xml
     def index
