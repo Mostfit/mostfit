@@ -1,0 +1,23 @@
+%h1
+  - if @branch
+    == Edit the '#{@branch.name}' branch details
+  - else
+    Choose branch to edit
+= error_messages_for @branch
+
+- if not @branch
+  %p
+    Please select a branch that you want to edit
+  %table.form
+    = form_for(@branch, :action => url(:enter_branches, :action => 'edit'), :method => :get) do
+      %tr
+        %td &nbsp;
+      %tr
+        %td &nbsp;
+        %td
+          Branch ID, Code or Name:
+        %td
+          = text_field :query, :size => 8
+        %td
+          = submit "Proceed..."
+

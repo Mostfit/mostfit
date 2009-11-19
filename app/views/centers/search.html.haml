@@ -1,0 +1,23 @@
+%h1
+  -if @center
+    == Edit the '#{@center.name}' center details
+  -else
+    Choose center to edit
+
+= error_messages_for @center
+- if not @center
+  %p
+    Please select a center that you want to edit
+  %table.form
+    = form_for(@center, :action => url(:enter_centers, :action => 'edit'), :method => :get) do
+      %tr
+        %td &nbsp;
+      %tr
+        %td &nbsp;
+        %td
+          Center ID, Code or Name:
+        %td
+          = text_field :query, :size => 8
+        %td
+          = submit "Proceed..."
+
