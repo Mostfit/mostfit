@@ -61,7 +61,6 @@ class LoanProduct
 
   def self.is_valid(id)
     return false unless product = LoanProduct.get(id)
-    p product
     if product.valid_from<=Date.today and product.valid_upto>=Date.today
       return product
     else
@@ -79,5 +78,9 @@ class LoanProduct
     else
       return true
     end
+  end
+  
+  def to_s
+    "Loans of Rs. #{(max_amount==min_amount ? max_amount : min_amount.to_s+'-'+max_amount.to_s)} at #{(max_interest_rate==min_interest_rate ? max_interest_rate : min_interest_rate.to_s+'% - '+max_interest_rate.to_s+'%')}"
   end
 end

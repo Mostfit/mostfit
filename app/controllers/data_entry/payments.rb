@@ -85,7 +85,6 @@ module DataEntry
     include DateParser
     # this function is called by by_center and by_staff_member
     def bulk_payments_and_disbursals
-      debugger
       @center = Center.get(params[:center_id]) || Center.first(:name => params[:center_id]) 
       @branch = @center.branch unless @center.nil?
       @clients = @center.clients unless @center.nil?

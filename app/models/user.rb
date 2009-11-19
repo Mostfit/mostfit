@@ -44,7 +44,6 @@ class User
   end
 
   def can_access?(controller, action)
-    debugger
     return true if role == :admin
     r = (access_rights[action.to_s.to_sym] or access_rights[:all])
     return false if r.nil?
@@ -59,7 +58,6 @@ class User
 
   def method_missing(name, params)
     if x = /can_\w+\?/.match(name.to_s)
-      debugger
       return true if role == :admin
       function = x[0].split("_")[1].gsub("?","").to_sym # wtf happened to $1?!?!?
       puts function

@@ -9,7 +9,6 @@
       .error
         %p
           - @errors.each do |error|
-            - debugger
             == "#{error.resource.class} #{error.resource.id}:"
             = error
             %br

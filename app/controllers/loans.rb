@@ -39,8 +39,7 @@ class Loans < Application
     @loan = klass.new(attrs)
     raise NotFound if not @loan.client  # should be known though hidden field
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])
-    @loan.loan_product_id = @loan_product.id 
-    @loan.client = @client  # set direct context
+    @loan.loan_product_id = @loan_product.id     
     if @loan.save
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
     else
@@ -104,6 +103,7 @@ class Loans < Application
   def get_loan_and_attrs   # FIXME: this is a code dup with data_entry/loans
     loan_product = LoanProduct.get(params[:loan_product_id])
     attrs = params[loan_product.loan_type.snake_case.to_sym]
+    attrs[:client_id]=params[:client_id] if params[:client_id]
     raise NotFound if not params[:loan_type]
     klass = Kernel::const_get(params[:loan_type])
     [klass, attrs]
