@@ -4,7 +4,7 @@ class Branch
 
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false, :index => true
-  property :code,    String, :length => 5, :nullable => true, :index => true, :min => 1, :max => 5
+  property :code,    String, :length => 5, :nullable => true, :index => true, :min => 1, :max => 10
   property :address, Text
   property :created_at, DateTime
   
