@@ -12,7 +12,7 @@ class Branch
   has n, :centers
 
   validates_is_unique   :code
-  validates_length      :code, :min => 1, :max => 4
+  validates_length      :code, :min => 1, :max => 10
 
   validates_length      :name, :min => 3
   validates_present     :manager
