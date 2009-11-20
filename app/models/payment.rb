@@ -23,14 +23,14 @@ class Payment
 
 
   validates_present     :loan, :created_by, :received_by
-  validates_with_method :only_take_payments_on_disbursed_loans?
+  validates_with_method :only_take_payments_on_disbursed_loans?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :created_by,  :method => :created_by_active_user?
   validates_with_method :received_by, :method => :received_by_active_staff_member?
   validates_with_method :deleted_by,  :method => :properly_deleted?
-  validates_with_method :deleted_at,  :method => :properly_deleted?, :if => Proc.new{|t| t.type != :fee}
+  validates_with_method :deleted_at,  :method => :properly_deleted?
 #  validates_with_method :not_paying_too_much?
 #  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
-#  validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?
+  validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
 #  validates_with_method :principal,   :method => :is_positive?
 
   def self.from_csv(row, headers, loans)

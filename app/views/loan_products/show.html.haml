@@ -7,6 +7,15 @@
         = attr.humanize
       %td
         = @loan_product.send(attr)
+  %tr
+    %td
+      Fees
+    %td
+      - @loan_product.fees.each do |fee|
+        %ul
+          %li
+            = fee.description
+
 = link_to 'Edit',  url(:edit_loan_product,  @loan_product)
 |
 = link_to 'Back', url(:loan_products)

@@ -29,7 +29,6 @@ class GraphData < Application
 
     @labels, @stacks = [], []
     dates.sort.each_with_index do |date, index|
-      debugger
       future                = date > Date.today
       scheduled_outstanding = @loan.scheduled_outstanding_total_on(date).to_i  # or *_principal_on
       actual_outstanding    = future ? scheduled_outstanding : @loan.actual_outstanding_total_on(date).to_i  # or *_principal_on

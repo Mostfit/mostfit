@@ -26,7 +26,16 @@ class LoanProducts < Application
   end
 
   def create(loan_product)
+    loan_product[:payment_validation_methods] = params[:payment_validations] ? params[:payment_validations].keys.join(",") : ""
+    loan_product[:loan_validation_methods] = params[:loan_validations] ? params[:loan_validations].keys.join(",") : ""
     @loan_product = LoanProduct.new(loan_product)
+    @loan_product.fees = []
+    params[:fees] = params[:fees] or {}
+    params[:fees].each do |k,v|
+      f = Fee.get(k.to_i)
+      debugger
+      @loan_product.fees << f
+    end
     if @loan_product.save
       redirect resource(@loan_product), :message => {:notice => "LoanProduct was successfully created"}
     else
@@ -36,11 +45,18 @@ class LoanProducts < Application
   end
 
   def update(id, loan_product)
+    debugger
     @loan_product = LoanProduct.get(id)
     raise NotFound unless @loan_product
-    loan_product[:payment_validation_methods] = params[:payment_validations].keys.join(",")
-    loan_product[:loan_validation_methods] = params[:loan_validations].keys.join(",")
-    if @loan_product.update_attributes(loan_product)
+    fees = []
+    if params[:fees]
+      fees = params[:fees].map{|k,v| Fee.get(k.to_i)}
+    end
+    loan_product[:payment_validation_methods] = params[:payment_validations] ? params[:payment_validations].keys.join(",") : ""
+    loan_product[:loan_validation_methods] = params[:loan_validations] ? params[:loan_validations].keys.join(",") : ""
+    loan_product[:fees] = fees
+    u = @loan_product.update_attributes(loan_product)
+    if u
        redirect resource(@loan_product)
     else
       display @loan_product, :edit

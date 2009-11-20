@@ -25,6 +25,9 @@ class Fees < Application
   end
 
   def create(fee)
+    debugger
+    Fee.properties.select{|p| p.type == Integer or p.type == Float }.each{|f| fee[f.name] = nil if fee[f.name] == ""}
+    fee[:percentage] = fee[:percentage].to_f/100 
     @fee = Fee.new(fee)
     if @fee.save
       redirect resource(@fee), :message => {:notice => "Fee was successfully created"}
@@ -37,6 +40,7 @@ class Fees < Application
   def update(id, fee)
     @fee = Fee.get(id)
     raise NotFound unless @fee
+    Fee.properties.select{|p| p.type == Integer or p.type == Float }.each{|f| fee[f.name] = nil if fee[f.name] == ""}
     if @fee.update(fee)
        redirect resource(@fee)
     else

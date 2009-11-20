@@ -26,11 +26,15 @@
     %td
       = date_select_for @loan_product, :valid_upto
   
+%h2 Fees
+- Fee.all.each do |fee|
+  = check_box :name => "fees[#{fee.id}]", :checked => @loan_product.fees.include?(fee)
+  = fee.name
 %h2 Payment Validations
 - Misfit::PaymentValidators.instance_methods.each do |v|
   = check_box :name => "payment_validations[#{v}]", :checked => @loan_product.payment_validations.include?(v.to_sym)
   = v.humanize
-%h2 Payment Validations
+%h2 Loan Validations
 - Misfit::LoanValidators.instance_methods.each do |v|
   = check_box :name => "loan_validations[#{v}]", :checked => @loan_product.loan_validations.include?(v.to_sym)
   = v.humanize

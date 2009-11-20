@@ -44,7 +44,6 @@ class User
   end
 
   def can_access?(controller, action)
-    debugger
     return true if role == :admin
     r = (access_rights[action.to_s.to_sym] or access_rights[:all])
     return false if r.nil?

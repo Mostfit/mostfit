@@ -70,6 +70,21 @@
             then scheduled
             == (#{@loan.scheduled_disbursal_date})
   %tr
+    %td
+      fees applicable
+    %td
+      - @loan.loan_product.fees.each do |f|
+        = f.description
+  %tr
+    %td
+      fees paid
+    %td
+      == #{@loan.fees_paid} / #{@loan.fees_due}
+      - if @loan.fees_paid?
+        %span.green Paid
+
+
+  %tr
     %td status
     %td
       %b= @loan.status.to_s.gsub('_', ' ')

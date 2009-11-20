@@ -16,6 +16,8 @@ module Misfit
           else
             return true
           end
+        else
+          return true
       end
     end
 

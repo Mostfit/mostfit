@@ -22,7 +22,7 @@ class LoanProduct
   property :loan_validation_methods, Text
 
 
-  has n, :fees
+  has n, :fees, :through => Resource
   has n, :loans
 
   validates_with_method :min_is_less_than_max

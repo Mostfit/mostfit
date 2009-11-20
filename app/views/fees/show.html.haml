@@ -1,10 +1,10 @@
 %h1
-  Fees controller, show action
-%p
-  Edit this file in
-  %tt
-    app/views/fees/show.html.erb
+  Fee 
+  == #{@fee.id} : #{@fee.name}
+    
+= @fee.description
 
+%br
 = link_to 'Edit',  url(:edit_fee,  @fee)
 |
 = link_to 'Back', url(:fees)

@@ -1,12 +1,9 @@
-%h1 Fees controller, new action
-
-%p 
-  Edit this file in 
-  %tt app/views/fees/new.html.erb
+%h1 New fee
 
 = error_messages_for @fee
 
 = form_for(@fee, :action => url(:fees) ) do
+  = partial :fields
   %p
     = submit "Create"
 
