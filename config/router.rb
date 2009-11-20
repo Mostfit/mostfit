@@ -22,7 +22,7 @@ Merb::Router.prepare do
 
   
   # Adds the required routes for merb-auth using the password slice
-  match('/centers/:id/groups.:format').to(:controller => 'centers', :action => 'groups')
+  match('/centers/:id/groups(/:group_id).:format').to(:controller => 'centers', :action => 'groups')
   slice(:merb_auth_slice_password, :name_prefix => nil, :path_prefix => "")
   match('/search').to(:controller => 'search', :action => 'index')
   match('/reports/graphs').to(:controller => 'reports', :action => 'graphs')
@@ -59,7 +59,4 @@ Merb::Router.prepare do
   match('/:controller/:id').to(:action => 'redirect_to_show').name(:quick_link)
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
-
-
-
 end

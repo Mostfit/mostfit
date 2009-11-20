@@ -87,8 +87,15 @@ class Centers < Application
 
   def groups
     only_provides :json
-    @groups = Center.get(params[:id]).client_groups
-    display @groups
+    if params[:group_id]
+      group  = ClientGroup.get(params[:group_id])
+      center = Center.get(params[:id])
+      branch = center.branch
+      render "{code: '#{branch.code.strip if branch and branch.code}#{center.code.strip if center and center.code}#{group.code.strip if group and group.code}'}"
+    else
+      @groups = Center.get(params[:id]).client_groups
+      display @groups
+    end
   end
 
   private

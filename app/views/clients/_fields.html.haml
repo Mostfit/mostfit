@@ -17,8 +17,10 @@
       Group name
     %td
       %select{:id => "client_group_id", :name => "client[client_group_id]"}
+        %option{:value => ""}
+          Select the group for this person
         -if @center
-          = @center.client_groups.collect{|g| "<option #{'selected=\"selected\"' if g.id=@client.client_group_id} value='#{g.id}'>#{g.name}</option>"}.join
+          = @center.client_groups.collect{|g| "<option #{'selected=\"selected\"' if g.id==@client.client_group_id} value='#{g.id}'>#{g.name}</option>"}.join
       %a{:href => "#", :id => "new_client_group_link", :style => "#{@center ? 'display:block' : 'display: none;'}"}
         Add new group      
       %div{:id => "new_client_group_form"}

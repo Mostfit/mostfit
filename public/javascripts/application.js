@@ -29,7 +29,14 @@ function fillOptions(id, select){
 	});
 }
 function fillCode(center_id, group_id){
-    
+    $.ajax({
+	    type: "GET",
+	    dataType: "json",
+	    url: "/centers/"+center_id+"/groups/"+group_id+".json",
+	    success: function(data){
+		$("#client_reference").val(data["code"]);
+	    }
+	});
 }
 $(document).ready(function(){
 	$("#client_group_id").change(function(){
