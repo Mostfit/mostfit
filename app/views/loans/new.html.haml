@@ -14,6 +14,8 @@
               = product.name
               = hidden_field :name => "product_id", :value => product.id
           %td
+            = product.to_s
+          %td
             = submit "Proceed"
   = link_to 'cancel', resource(@branch, @center, @client, :loans)
 - else

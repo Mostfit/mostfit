@@ -8,11 +8,11 @@
       %span.greytext the name by which the branch is known
   %tr
     %td
-      Code:
+      Branch code:
     %td
-      ~ text_field :code, :size => 2
-    %br/
-    %span.greytext a two letter unique code for the branch
+      = text_field :code, :size => 2
+      %br/
+      %span.greytext a two letter unique code for the branch
   %tr
     %td
       Address:
@@ -30,4 +30,4 @@
     %td
       = submit submit_text
       &nbsp;&nbsp;
-      = link_to 'cancel', resource(:branches)
+      = link_to 'cancel', cancel_url

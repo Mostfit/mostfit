@@ -58,7 +58,6 @@ class User
 
   def method_missing(name, params)
     if x = /can_\w+\?/.match(name.to_s)
-      debugger
       return true if role == :admin
       function = x[0].split("_")[1].gsub("?","").to_sym # wtf happened to $1?!?!?
       puts function

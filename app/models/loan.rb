@@ -123,7 +123,7 @@ class Loan
     if product.respond_to?("#{method}_multiple")
       product_attr = product.send("#{method}_multiple")
       loan_attr = loan_attr*100 if method==:interest_rate
-      return  [false, "#{method.to_s.capitalize} should be in multiples of #{product_attr}"]  if not loan_attr.remainder(product_attr)==0
+      return  [false, "#{method.to_s.capitalize} should be in multiples of #{product_attr}"]  if not loan_attr.remainder(product_attr)<=EPSILON
     end
     return true
   end

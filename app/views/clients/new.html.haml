@@ -1,6 +1,8 @@
 %h1 Add a new client
 
 = error_messages_for @client
+- form_url   = (params[:controller]=="data_entry/clients" ? url(:enter_clients, :action => 'create') : resource(@branch, @center, :clients))
+- cancel_url = (params[:controller]=="data_entry/clients" ? url(:enter_clients) : resource(@branch, @center, :clients))
 
-= form_for(@client, :action => resource(@branch, @center, :clients), :multipart => true) do
-  = partial :fields, :submit_text => "Add client", :cancel_link => resource(@branch, @center, :clients)
+= form_for(@client, :action => form_url, :multipart => true) do
+  = partial("clients/fields", :submit_text => "Add client", :cancel_link => cancel_url)

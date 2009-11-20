@@ -6,14 +6,19 @@
       %td
         = select_center_for @client, :center
   -else
-    %input{:id => "client_center_id", :value => "#{@center.id}", :type => "hidden"}
+    %tr
+      %td 
+        For center
+      %td
+        = @center.name
+        %input{:id => "client_center_id", :value => "#{@center.id}", :type => "hidden"}
   %tr
     %td
       Group name
     %td
       %select{:id => "client_group_id", :name => "client[client_group_id]"}
         -if @center
-          = @center.client_groups.collect{|g| "<option value='#{g.id}'>#{g.name}</option>"}.join
+          = @center.client_groups.collect{|g| "<option #{'selected=\"selected\"' if g.id=@client.client_group_id} value='#{g.id}'>#{g.name}</option>"}.join
       %a{:href => "#", :id => "new_client_group_link", :style => "#{@center ? 'display:block' : 'display: none;'}"}
         Add new group      
       %div{:id => "new_client_group_form"}
@@ -26,7 +31,7 @@
     %td
       Reference:
     %td
-      = text_field :reference, :size => 40, :value => (@branch and @center and @client.reference.blank? ? "#{@branch.code}#{@center.code}" : @client.reference)
+      = text_field(:reference, :size => 40, :value => ((@client.reference.blank? and @center) ? "#{@branch.code}#{@center.code}" : @client.reference))
       %br/
       %span.greytext
         references are unique, a way to check that this is the only record of a client
