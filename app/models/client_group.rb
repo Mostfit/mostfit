@@ -6,7 +6,7 @@ class ClientGroup
   property :number_of_members, Integer, :nullable => true, :min => 1, :max => 20, :default => 5
   property :code,              String, :length => 14, :nullable => false, :index => true
 
-  validates_is_unique   :code
+  validates_is_unique   :code, :scope => :center_id
   validates_length      :code, :min => 1, :max => 14
 
   has n, :clients
