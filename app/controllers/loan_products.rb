@@ -33,8 +33,7 @@ class LoanProducts < Application
     params[:fees] = params[:fees] or {}
     params[:fees].each do |k,v|
       f = Fee.get(k.to_i)
-      debugger
-      @loan_product.fees << f
+      @loan_product.fees << f if f
     end
     if @loan_product.save
       redirect resource(@loan_product), :message => {:notice => "LoanProduct was successfully created"}
@@ -45,7 +44,6 @@ class LoanProducts < Application
   end
 
   def update(id, loan_product)
-    debugger
     @loan_product = LoanProduct.get(id)
     raise NotFound unless @loan_product
     fees = []
@@ -54,9 +52,9 @@ class LoanProducts < Application
     end
     loan_product[:payment_validation_methods] = params[:payment_validations] ? params[:payment_validations].keys.join(",") : ""
     loan_product[:loan_validation_methods] = params[:loan_validations] ? params[:loan_validations].keys.join(",") : ""
-    loan_product[:fees] = fees
-    u = @loan_product.update_attributes(loan_product)
-    if u
+    @loan_product.fees = fees
+    @loan_product.attributes = loan_product
+    if @loan_product.save
        redirect resource(@loan_product)
     else
       display @loan_product, :edit

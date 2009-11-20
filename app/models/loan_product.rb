@@ -1,5 +1,6 @@
 class LoanProduct
   include DataMapper::Resource  
+  
   property :id, Serial, :nullable => false, :index => true
   property :name, String, :nullable => false, :index => true, :min => 3
   property :max_amount, Integer, :nullable => false, :index => true
@@ -14,15 +15,17 @@ class LoanProduct
   property :min_number_of_installments, Integer, :nullable => false, :index => true, :min => 0  
 
   #This property is defined in init.rb after app load as Loan may not have loaded by the time this class initializes
-#  property :loan_type, Enum.send('[]'), :nullable => false, :index => true
+  #  property :loan_type, Enum.send('[]'), :nullable => false, :index => true
   property :valid_from, Date, :nullable => false, :index => true
   property :valid_upto, Date, :nullable => false, :index => true
+  
+  property :created_at, DateTime, :nullable => false, :default => DateTime.now
+  property :updated_at, DateTime, :nullable => true
 
   property :payment_validation_methods, Text
   property :loan_validation_methods, Text
 
-
-  has n, :fees, :through => Resource
+  has n, :fees, :through => Resource#, :mutable => true
   has n, :loans
 
   validates_with_method :min_is_less_than_max
@@ -30,6 +33,8 @@ class LoanProduct
   validates_is_number   :max_amount, :min_amount, :max_interest_rate, :min_interest_rate
   validates_with_method :check_loan_type_correctness
   
+  
+
   def self.from_csv(row, headers)
     obj = new(:name => row[headers[:name]], :min_amount => row[headers[:min_amount]], :max_amount => row[headers[:max_amount]], 
               :min_interest_rate => row[headers[:min_interest_rate]], :max_interest_rate => row[headers[:max_interest_rate]], 
