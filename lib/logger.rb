@@ -47,7 +47,8 @@ module Misfit
                              :auditable_type => object.class.to_s,
                              :user_name => session.user.login,
                              :action => params[:action],
-                             :changes => diff)
+                             :changes => diff,
+                             :type => :log)
         log.save
       end
     end

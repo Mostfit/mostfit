@@ -10,10 +10,14 @@ module DataEntry
     end
 
     def by_center
+      @center = Center.get(params[:center_id]) if params[:center_id]
+      @date = Date.parse(params[:for_date]) if params[:for_date]
+      @branch = @center.branch unless @center.nil?
       if request.method == :post
         bulk_payments_and_disbursals
+        debugger
         if @errors.blank?
-          params[:format] and params[:format]=="xml" ? display(@payment) : redirect(url(:data_entry), :message => {:notice => 'All payments made succesfully'})
+          redirect(url(:data_entry), :message => {:notice => 'All payments made succesfully'})
         else
           params[:format] and params[:format]=="xml" ? display("") : render      
         end
@@ -23,6 +27,7 @@ module DataEntry
     end
     
     def by_staff_member
+      debugger
       @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
       if request.method == :post
         if params[:staff_member_id]

@@ -44,12 +44,12 @@
       = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
         = hidden_field :name => 'for_date', :value => @date
         = hidden_field :name => 'center_id', :value => @center.id
-        = partial 'centers/cds'
+        = partial :cds
         = submit 'Make Payments'
 
   - else
     Choose a center to record a payment for
-    = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
+    = form_for(@payment, :action => url(:enter_payments, :action => 'by_center'), :method => :get) do
       %table.form
         %tr
           %th
