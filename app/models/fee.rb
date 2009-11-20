@@ -29,7 +29,7 @@ class Fee
   end
 
   def description
-    desc = ""
+    desc =  "#{name}"
     desc += "#{percentage} %" if percentage
     desc += "#{amount}" if amount
     desc += "minimum: #{min_amount}" if min_amount
