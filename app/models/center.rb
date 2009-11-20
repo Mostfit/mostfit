@@ -6,7 +6,7 @@ class Center
   property :id,                   Serial
   property :name,                 String, :length => 100, :nullable => false, :index => true
   property :center_leader_name,   String, :length => 100
-  property :code,                 String, :length => 5, :nullable => true, :index => true
+  property :code,                 String, :length => 12, :nullable => true, :index => true
   property :meeting_day,          Enum.send('[]', *DAYS), :nullable => false, :default => :none, :index => true
   property :meeting_time_hours,   Integer, :length => 2, :index => true
   property :meeting_time_minutes, Integer, :length => 2, :index => true
@@ -18,7 +18,7 @@ class Center
   has n, :client_groups
   
   validates_is_unique   :code
-  validates_length      :code, :min => 1, :max => 4
+  validates_length      :code, :min => 1, :max => 12
 
   validates_length      :name, :min => 3
   validates_present     :manager

@@ -4,10 +4,10 @@ class ClientGroup
   property :id,                Serial
   property :name,              String, :nullable => false
   property :number_of_members, Integer, :nullable => true, :min => 1, :max => 20, :default => 5
-  property :code,              String, :length => 5, :nullable => false, :index => true
+  property :code,              String, :length => 14, :nullable => false, :index => true
 
   validates_is_unique   :code
-  validates_length      :code, :min => 1, :max => 4
+  validates_length      :code, :min => 1, :max => 14
 
   has n, :clients
   belongs_to :center
