@@ -13,17 +13,6 @@
   %body
     .spacer/
     .container
-      - if session.authenticated?
-        #navigation
-          - if session.user.role == :admin
-            = link_to_with_class('admin', url(:admin))
-          - if session.user.role == :mis_manager || session.user.role == :admin
-            = link_to_with_class('dashboard', url(:dashboard))
-            = link_to_with_class('reports', url(:reports))
-            = link_to_with_class('browse loans', url(:branches))
-            = link_to_with_class('browse funds', url(:funders))
-            = link_to_with_class('staff members', url(:staff_members))
-          = link_to_with_class 'manage your mfi', url(:data_entry)
       #header
         #header_search_div{:style => 'margin: 2px; float: right; padding: 4px;'}
           - if session.authenticated?
@@ -35,6 +24,17 @@
             existing users can
             %b= link_to 'login', url(:login)
             to proceed
+        - if session.authenticated?
+          #navigation
+            - if session.user.role == :admin
+              = link_to_with_class('admin', url(:admin))
+            - if session.user.role == :mis_manager || session.user.role == :admin
+              = link_to_with_class('dashboard', url(:dashboard))
+              = link_to_with_class('reports', url(:reports))
+              = link_to_with_class('browse loans', url(:branches))
+              = link_to_with_class('browse funds', url(:funders))
+              = link_to_with_class('staff members', url(:staff_members))
+            = link_to_with_class 'manage your mfi', url(:data_entry)        
       #subheader
         #title
           demo mfi, mumbai

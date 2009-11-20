@@ -39,9 +39,11 @@ function fillCode(center_id, group_id){
 	});
 }
 $(document).ready(function(){
-	$("#client_group_id").change(function(){
-		fillCode($("#client_center_id").val(), $("#client_group_id").val());
-	    });
+	if(window.location.pathname.indexOf("edit")===-1){
+	    $("#client_group_id").change(function(){
+		    fillCode($("#client_center_id").val(), $("#client_group_id").val());
+		});
+	}
 	if($("div.log_box").length>0){
 	    setInterval(function(){
 		    spitLogs();

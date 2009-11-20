@@ -102,9 +102,9 @@ ol { list-style-position: outside; list-style-type: decimal; }
   padding-right: 20px;
   padding-top: 4px;
   padding-bottom: 4px;
-  position: absolute;
+  position: relative;
   top: 105px;
-  left: 550px;
+  left: 37%;
 }
 
 #navigation a {
