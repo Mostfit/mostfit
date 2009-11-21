@@ -30,7 +30,7 @@ class LoanProducts < Application
     loan_product[:loan_validation_methods] = params[:loan_validations] ? params[:loan_validations].keys.join(",") : ""
     @loan_product = LoanProduct.new(loan_product)
     @loan_product.fees = []
-    params[:fees] = params[:fees] or {}
+    params[:fees] = params[:fees] || {}
     params[:fees].each do |k,v|
       f = Fee.get(k.to_i)
       @loan_product.fees << f if f
