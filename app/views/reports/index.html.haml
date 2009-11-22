@@ -1,7 +1,7 @@
 %h1
   Reports
-
-%table{:width => "100%"}
+= link_to 'New Report','', :class => "add"
+%table.narrow.form{:width => "100%"}
   %thead
     %tr
       %th
@@ -9,8 +9,8 @@
         
   %tr
   - Report.descendants.each do |report|
-    %tr
+    %tr{:class => cycle('odd','')}
       %td
         = link_to report, url(:show_report, :report_type => report)
 
-= link_to 'New Report','', :class => "button"
+

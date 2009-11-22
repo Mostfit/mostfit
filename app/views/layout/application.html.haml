@@ -7,51 +7,40 @@
     %link{ :rel => "icon", :type => "image/ico", :href => "/favicon.ico" }/
     = css_include_tag :screen, :media => "screen, projection"
     = css_include_tag :print, :media => "print"
-    ~ "<!--[if IE]>\n  <link rel='Stylesheet' href='/stylesheets/ie.css' type='text/css' media='screen, projection'>\n<![endif]-->"
     = css_include_tag :style, :media => "screen, projection"
     = js_include_tag :swfobject, :jquery, :application
   %body
-    .spacer/
-    .container
-      #header
-        #header_search_div{:style => 'margin: 2px; float: right; padding: 4px;'}
-          - if session.authenticated?
-            == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})
-            %form{:action => '/search'}
-              %input{:name => 'query', :value => params[:query]}
-              %input{:type => 'submit', :value=>'search'}
-          - else
-            existing users can
-            %b= link_to 'login', url(:login)
-            to proceed
-        - if session.authenticated?
-          #navigation
-            - if session.user.role == :admin
-              = link_to_with_class('admin', url(:admin))
-            - if session.user.role == :mis_manager || session.user.role == :admin
-              = link_to_with_class('dashboard', url(:dashboard))
-              = link_to_with_class('reports', url(:reports))
-              = link_to_with_class('browse loans', url(:branches))
-              = link_to_with_class('browse funds', url(:funders))
-              = link_to_with_class('staff members', url(:staff_members))
-            = link_to_with_class 'manage your mfi', url(:data_entry)        
-      #subheader
-        #title
-          demo mfi, mumbai
-      #content
-        #breadcrums= breadcrums
 
+    #header
+      #login{:style => 'margin: 2px; float: right; padding: 4px;position:relative; right:150px;'}
+        - if session.authenticated?
+          == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})
+        - else
+          existing users can
+          %b= link_to 'login', url(:login)
+          to proceed
+
+    - if session.authenticated?
+      #navigation
+        = link_to_with_class('browse', url(:browse))
+        = link_to_with_class 'manage', url(:data_entry)
+        = link_to_with_class('dashboard', url(:dashboard))
+        = link_to_with_class('reports', url(:reports))
+      #header_search_div
+        %form{:action => '/search'}
+          %input{:name => 'query', :value => params[:query]}
+          %input{:type => 'submit', :value=>'search'}
+ 
+    #content
+      .container
+        #breadcrums= breadcrums
         - if message
           #flash-messages.span-14.prefix-5.suffix-5.last
             - message.each do |key, value|
               .flash{ :class => key.to_s }
-                %p= value
-
+              %p= value
         = catch_content :for_layout
 
-      %p
-        %br/
-        %br/
 
     #footer
       == &copy; 2009 Intellecap &mdash; This software is released under the #{link_to 'GNU Affero General Public License', 'http://www.gnu.org/licenses/agpl.html'}.

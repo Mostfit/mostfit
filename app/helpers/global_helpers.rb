@@ -4,7 +4,7 @@ module Merb
       link_to(name, url, :class => ((request.uri==(url) or request.uri.index(url)==0) ? "selected" : ""))
     end
 
-    def link_to_with_rights(text, path, method="GET",params = {})
+    def link_to_with_rights(text, path, params = {}, method="GET")
       uri = URI.parse(path)
       method = method.to_s.upcase || "GET"
       request = Merb::Request.new(
@@ -147,7 +147,7 @@ module Merb
           crums << link_to(part.gsub('_', ' '), url)  # add the resource name
         end
       end
-      ['', crums].join('&nbsp;<b>&gt;&gt;</b>&nbsp;')  # fancy separator
+      ['You are here', crums].join('&nbsp;<b>&gt;&gt;</b>&nbsp;')  # fancy separator
     end
 
     def format_currency(i)

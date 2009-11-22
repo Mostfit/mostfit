@@ -1,7 +1,7 @@
 %h1 Overview of all staff members
 
 %p
-  == Manage existing staff members or #{link_to 'create a new staff member', resource(:staff_members, :new), :class => "bold"}.
+  == #{link_to 'create a new staff member', resource(:staff_members, :new), :class => "add"}.
 
 - if @staff_members.blank?
   %p
@@ -15,21 +15,21 @@
           name
         %th
           status
-        %th{ :width => '50px' }
-          manages branches
-        %th{ :width => '70px' }
-          manages centers
-        %th{ :width => '70px' }
-          received payments
-        %th{ :width => '70px' }
+        %th
+          branches
+        %th
+          centers
+        %th
+          payments
+        %th
           applied loans
-        %th{ :width => '70px' }
+        %th
           approved loans
-        %th{ :width => '70px' }
+        %th
           rejected loans
-        %th{ :width => '70px' }
+        %th
           disbursed loans
-        %th{ :width => '70px' }
+        %th
           wrote off loans
     - for staff_member in @staff_members
       %tr{ :class => cycle('odd','') }
@@ -39,9 +39,9 @@
         %td
           %b= staff_member.active? ? 'active' : 'disabled'
         %td
-          = Branch.all(:manager_staff_id => staff_member.id).count
+          = Branch.all(:manager_staff_id => staff_member.id).count || "-"
         %td
-          = Center.all(:manager_staff_id => staff_member.id).count
+          = Center.all(:manager_staff_id => staff_member.id).count || "-"
         %td
           = Payment.all(:received_by_staff_id => staff_member.id).count
         %td
@@ -61,4 +61,4 @@
       %tr
         %td{ :colspan => 11 }
   = paginate @staff_members
-  = link_to 'Create a new staff member >>', url(:new_staff_member), :class => "button"
+

@@ -13,7 +13,7 @@ class MerbAuthSlicePassword::Sessions < MerbAuthSlicePassword::Application
   
   def update
     "Add an after filter to do stuff after login"
-     # redirect url(:data_entry) if session.user.data_entry_operator
+     #redirect url(:data_entry) if session.user.role == :data_entry
 
   end
 
