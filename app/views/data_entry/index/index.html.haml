@@ -24,7 +24,7 @@
         - @i += 1
 
 - if session.user.can_access?(:admin, :index)
-  %h2 Administration
+  %h1 Administration
   = link_to 'Manage Users', resource(:users), :class => 'edit'
   |
   = link_to 'Manage loan products', resource(:loan_products), :class => 'edit'

@@ -40,10 +40,10 @@
         =link_to('Edit', resource(@branch, @center, @client, :edit))
         to change)
 
-%h2== Loans for client <i>#{@client.name}</i>
-
 %p
-  == Manage existing loans or #{link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "bold"}.
+  = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
+
+%h2== Loans for client <i>#{@client.name}</i>
 
 
 - if @loans.blank?
@@ -124,4 +124,3 @@
 
 
 
-  = link_to 'New Loan >>', resource(@branch, @center, @client, :loans, :new), :class => "button"
