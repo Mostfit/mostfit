@@ -400,8 +400,17 @@ a.add, a.add:visited, a.add:link {
   background-image: url(/images/add.png);
   background-repeat: no-repeat;
   padding: 3px 0px 4px 30px;
-  color: #77B4D9;
+  color: #black;
   font-size: 16px;
+  font-weight: lighter
+}
+
+a.add_small, a.add_small:visited, a.add_small:link {
+  background-image: url(/images/add_small.jpg);
+  background-repeat: no-repeat;
+  padding: 0px 0px 0px 20px;
+  color: #black;
+  font-size: 12px;
   font-weight: lighter
 }
 
@@ -409,8 +418,17 @@ a.edit, a.edit:visited, a.add:link {
   background-image: url(/images/edit.png);
   background-repeat: no-repeat;
   padding: 3px 0px 4px 30px;
-  color: #77B4D9;
+  color: black;
   font-size: 16px;
+  font-weight: normal;
+}
+
+a.edit_small, a.edit_small:visited, a.edit_small:link {
+  background-image: url(/images/edit_small.jpg);
+  background-repeat: no-repeat;
+  padding: 0px 0px 0px 20px;
+  color: #black;
+  font-size: 12px;
   font-weight: lighter
 }
 

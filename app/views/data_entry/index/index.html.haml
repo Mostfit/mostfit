@@ -5,66 +5,30 @@
 %h3{:style => "color: #6C8506;"}
   Most forms are made especially for mass data entry.
 /%p At the bottom you find an overview of all modifications that you have made.
-%ul
-  - if session.user.can_manage?(:branch)
-    %li
-      %h2 Branches
-      = link_to 'add new branch', url(:enter_branches, :action => 'new'), :class => 'add'
-      | 
-      = link_to 'edit a branch', url(:enter_branches, :action => 'edit'), :class => 'edit'
-  - if session.user.can_manage?(:center)
-    %li
-      %h2 Centers
-      = link_to 'add new center', url(:enter_centers, :action => 'new'), :class => 'add'
-      |
-      = link_to 'edit a center', url(:enter_centers, :action => 'edit'), :class => 'edit'
-  - if session.user.can_manage?(:center)
-    %li
-      %h2 Groups
-      = link_to 'add a group to a center', url(:enter_groups, :action => 'new'), :class => 'add'
-      |
-      = link_to 'edit a group', url(:enter_groups, :action => 'index'), :class => 'edit'
-  - if session.user.can_manage?(:client)
-    %li
-      %h2 Clients
-      = link_to 'add new clients', url(:enter_clients, :action => 'new'), :class => 'add'
-      |
-      = link_to 'edit a client', url(:enter_clients, :action => 'index'), :class => 'edit'
-  - if session.user.can_manage?(:payment)
-    %li
-      %h2 Payments
-      = link_to 'record payments', url(:enter_payments, :action => 'record'), :class => 'add'
-      |
-      = link_to 'by center', url(:enter_payments, :action => 'by_center'), :class => 'add'
-      |
-      = link_to 'by staff member', url(:enter_payments, :action => 'by_staff_member'), :class => 'add'
-      |
-      = link_to 'delete a payment', url(:enter_payments, :action => 'delete'), :class => 'delete'
+- @i = 1
+%table{:width => "100%"}
+  - [:branch, :center, :group, :client, :payment, :loan, :attendancy].each do |thing|
+    - plural = thing.to_s.pluralize
+    - if (@i-1) % 3 == 0
+      %tr
+      - @i=1
+    - if session.user.can_manage?(thing)
+      %td
+        = image_tag "/images/#{plural}.jpg"
+      %td
+        %h3{:style => "border-bottom: dotted 1px #999"} 
+          = plural.capitalize
+        = link_to "Add new #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'new'), :class => 'add_small'
+        %br
+        = link_to "Edit a #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'edit'), :class => 'edit_small'
+        - @i += 1
 
-  - if session.user.can_manage?(:loan)
-    %li
-      %h2 Loans
-      = link_to 'create new loans', url(:enter_loans, :action => 'new'), :class => 'add'
-      |
-      = link_to 'edit a loan', url(:enter_loans, :action => 'edit'), :class => 'edit'
-      |
-      = link_to_with_rights 'approve unapproved loans', url(:enter_loans, :action => 'approve'), {:class => 'edit'}
-  - if session.user.can_manage?(:staff_member)
-    %li
-      %h2 Staff Members
-      = link_to 'create new loans', url(:enter_loans, :action => 'new'), :class => 'add'
-      |
-      = link_to 'edit a loan', url(:enter_loans, :action => 'edit'), :class => 'edit'
-      |
-      = link_to_with_rights 'approve unapproved loans', url(:enter_loans, :action => 'approve'), {:class => 'edit'}
-
-  - if session.user.can_access?(:admin, :index)
-    %li
-      %h2 Administration
-      = link_to 'Manage Users', resource(:users), :class => 'edit'
-      |
-      = link_to 'Manage loan products', resource(:loan_products), :class => 'edit'
-      |
-      = link_to 'Manage Staff Members', resource(:staff_members), :class => 'edit'
-      |
-      = link_to 'Upload data', url(:controller => 'admin', :action => "upload"), :class => 'edit'
+- if session.user.can_access?(:admin, :index)
+  %h2 Administration
+  = link_to 'Manage Users', resource(:users), :class => 'edit'
+  |
+  = link_to 'Manage loan products', resource(:loan_products), :class => 'edit'
+  |
+  = link_to 'Manage Staff Members', resource(:staff_members), :class => 'edit'
+  |
+  = link_to 'Upload data', url(:controller => 'admin', :action => "upload"), :class => 'edit'

@@ -3,8 +3,8 @@
 %h3
   Here you will find some convenience functions to browse your MFI
 
-%p
-  = link_to 'Branches', resource(:branches), :class => 'browse'
+= link_to 'Branches', resource(:branches), :class => 'browse'
+%br
+
 - Misfit::Extensions::Browse.instance_methods.each do |m|
-  %p
-    = link_to m.humanize, url(:browse, m), :class => 'browse'
+  = link_to m.humanize, url(:browse, m), :class => 'browse'
