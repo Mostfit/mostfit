@@ -29,7 +29,7 @@ class MerbAuthSlicePassword::Sessions < MerbAuthSlicePassword::Application
     message[:notice] = "Authenticated Successfully"
     redirect_back_or (session.user.role == :data_entry ? url(:data_entry) : "/"), :message => message, :ignore => [slice_url(:login), slice_url(:logout)]
   end
-  
+
   # @overwritable
   def redirect_after_logout
     message[:notice] = "Logged Out"
