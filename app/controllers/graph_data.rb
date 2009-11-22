@@ -155,7 +155,6 @@ class GraphData < Application
         { :val => [-overpaid, 0].max, :colour => (future ? '#ff5588' : '#aa0000'),
           :tip => "#{tip_base} shortfall of #{-overpaid} (#{percentage})" } ]
       @labels << ((index % step_size == 0) ? date.strftime("%b%d'%y") : '')
-      puts "Did t#{index} in total #{Time.now - t0} secs"
     end
     render_loan_graph('aggregate loan graph', @stacks, @labels, step_size, max_amount)
   end
@@ -184,12 +183,10 @@ class GraphData < Application
                      WHERE lh.loan_id = dt.loan_id 
                      AND lh.date = dt.da_te) AS dt1 GROUP BY weeknum ORDER BY date;})
 
-    puts "Finished query in #{Time.now - t0}"
     @labels, @stacks, max_amount = [], [], 0
     @t = nil
     structs.each_with_index do |s, index|
       # there is a problem with the week that spans two years as it gets spilt into 2008_52 and 2009_0 or similar
-      puts index
       if @t
         s['scheduled_outstanding_total'] += @t['scheduled_outstanding_total']
         s['actual_outstanding_total'] += @t['actual_outstanding_total']
@@ -218,7 +215,6 @@ class GraphData < Application
         { :val => [-overpaid, 0].max, :colour => (future ? '#ff5588' : '#aa0000'),
           :tip => "#{tip_base} shortfall of #{-overpaid} (#{percentage})" } ]
       @labels << ((index % step_size == 0) ? date.strftime("%b%d'%y") : '')
-      puts "Did t#{index} in total #{Time.now - t0} secs"
     end
     render_loan_graph('aggregate loan graph', @stacks, @labels, step_size, max_amount)
   end
