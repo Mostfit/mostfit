@@ -423,7 +423,7 @@ a.delete, a.delete:visited, a.delete:link {
   font-weight: lighter
 }
 
-a.browse, na.browse:visited, a.browse:link {
+a.browse, a.browse:visited, a.browse:link {
   background-image: url(/images/browse.jpeg);
   background-repeat: no-repeat;
   padding: 3px 0px 4px 30px;
