@@ -52,6 +52,8 @@ Merb::BootLoader.before_app_loads do
   DataMapper::Model.append_extensions DmPagination::Paginatable
   Paperclip.options[:image_magick_path] = "/usr/local/bin"
   Paperclip.options[:command_path] = "/usr/local/bin"
+  # load the extensions
+  require 'lib/extensions.rb'
 end
  
 Merb::BootLoader.after_app_loads do
@@ -72,7 +74,14 @@ Merb::BootLoader.after_app_loads do
     clause = Proc.new{|t| t.loan_product.loan_validations.include?(s)}
     Loan.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
   end
+
+  # set the rights
   require 'config/misfit'
+  
+  # enable the extensions
+  
+
+
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
   LoanProduct.property(:loan_type, LoanProduct::Enum.send('[]', *Loan.descendants.map{|x| x.to_s}), :nullable => false, :index => true)
   begin
