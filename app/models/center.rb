@@ -17,7 +17,7 @@ class Center
   has n, :clients
   has n, :client_groups
   
-  validates_is_unique   :code
+  validates_is_unique   :code, :scope => :branch_id
   validates_length      :code, :min => 1, :max => 12
 
   validates_length      :name, :min => 3

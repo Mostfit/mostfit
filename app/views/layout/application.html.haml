@@ -10,6 +10,7 @@
     = css_include_tag :style, :media => "screen, projection"
     = js_include_tag :swfobject, :jquery, :application
   %body
+
     #header
       #login{:style => 'margin: 2px; float: right; padding: 4px;position:relative; right:150px;'}
         - if session.authenticated?
