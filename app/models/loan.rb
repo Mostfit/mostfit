@@ -89,7 +89,7 @@ class Loan
               :scheduled_disbursal_date => Date.parse(row[headers[:scheduled_disbursal_date]]), 
               :scheduled_first_payment_date => Date.parse(row[headers[:scheduled_first_payment_date]]), 
               :applied_on => Date.parse(row[headers[:applied_on]]), :approved_on => Date.parse(row[headers[:approved_on]]), 
-              :disbursal_date => Date.parse(row[headers[:disbursal_date]]), :fees => row[headers[:fees]], :fees_total => row[headers[:fees_total]],
+              :disbursal_date => Date.parse(row[headers[:disbursal_date]]), 
               :disbursed_by_staff_id => StaffMember.first(:name => row[headers[:disbursed_by_staff]]).id, 
               :funding_line_id => funding_lines[row[headers[:funding_line_serial_number]]].id,
               :applied_by_staff_id => StaffMember.first(:name => row[headers[:applied_by_staff]]).id,

@@ -54,8 +54,6 @@ class Upload
               log.error("<font color='red'>#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors.to_a.join(', ')}</font>") if log
             end
           rescue Exception => e
-            puts(e.message)            
-            puts e.backtrace
             log.error("<font color='red'>#{model}: Problem in inserting #{model} #{row[headers[:serial_number]]}. Insert it manually later</font>") if log
             log.error("<font color='red'>#{model}: #{e.message}</font>") if log
           end

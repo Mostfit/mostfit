@@ -35,7 +35,10 @@ class Payment
 
   def self.from_csv(row, headers, loans)
     obj = new(:received_by_staff_id => StaffMember.first(:name => row[headers[:received_by_staff]]).id, :loan_id => loans[row[headers[:loan_serial_number]]].id, 
-              :principal => row[headers[:principal]], :interest =>  row[headers[:interest]], :received_on => Date.parse(row[headers[:received_on]]), 
+              :amount => row[headers[:principal]], :type => :principal, :received_on => Date.parse(row[headers[:received_on]]), 
+              :created_by_user_id => User.first.id)
+    obj = new(:received_by_staff_id => StaffMember.first(:name => row[headers[:received_by_staff]]).id, :loan_id => loans[row[headers[:loan_serial_number]]].id, 
+              :amount => row[headers[:interest]], :type => :interest, :received_on => Date.parse(row[headers[:received_on]]), 
               :created_by_user_id => User.first.id)
     [obj.save, obj]
   end
