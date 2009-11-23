@@ -35,7 +35,7 @@ class Loans < Application
 
   def create
     klass, attrs = get_loan_and_attrs
-    attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 1
+    attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan = klass.new(attrs)
     raise NotFound if not @loan.client  # should be known though hidden field
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])

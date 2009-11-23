@@ -105,11 +105,11 @@ class Loan
   def is_valid_loan_product_number_of_installments; is_valid_loan_product(:number_of_installments); end
 
   def is_valid_loan_product(method)
+    loan_attr    = self.send(method)
+    return [false, "No #{method} specified"] if loan_attr===""
     return [false, "No loan product chosen"] unless self.loan_product
     product = self.loan_product
-    loan_attr    = self.send(method)
     #Checking if the loan adheres to minimum and maximums of the loan product
-    debugger
     {:min => :minimum, :max => :maximum}.each{|k, v|
       product_attr = product.send("#{k}_#{method}")
       product_attr = product_attr.to_f/100 if method==:interest_rate
