@@ -25,7 +25,6 @@ class MerbAuthSlicePassword::Sessions < MerbAuthSlicePassword::Application
   private   
   # @overwritable
   def redirect_after_login
-    debugger
     message[:notice] = "Authenticated Successfully"
     redirect_back_or (session.user.role == :data_entry ? url(:data_entry) : "/"), :message => message, :ignore => [slice_url(:login), slice_url(:logout)]
   end

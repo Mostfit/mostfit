@@ -29,14 +29,12 @@ module Misfit
 
 
     def get_object_state
-      debugger
       model = self.class.to_s.singular
       object = eval"#{model}.get(params[:id])"
       @ributes = object.attributes
     end
     
     def _log
-      debugger
       f = File.open("log/#{self.class}.log","a")
       object = eval("@#{self.class.to_s.downcase.singular}")
       if object

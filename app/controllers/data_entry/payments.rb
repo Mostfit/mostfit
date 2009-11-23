@@ -15,7 +15,6 @@ module DataEntry
       @branch = @center.branch unless @center.nil?
       if request.method == :post
         bulk_payments_and_disbursals
-        debugger
         if @errors.blank?
           redirect(url(:data_entry), :message => {:notice => 'All payments made succesfully'})
         else
@@ -27,7 +26,6 @@ module DataEntry
     end
     
     def by_staff_member
-      debugger
       @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
       staff_id = params[:staff_member_id] || params[:received_by]
       if staff_id

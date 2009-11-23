@@ -25,7 +25,6 @@ class Fees < Application
   end
 
   def create(fee)
-    debugger
     Fee.properties.select{|p| p.type == Integer or p.type == Float }.each{|f| fee[f.name] = nil if fee[f.name] == ""}
     fee[:percentage] = fee[:percentage].to_f/100 
     @fee = Fee.new(fee)
