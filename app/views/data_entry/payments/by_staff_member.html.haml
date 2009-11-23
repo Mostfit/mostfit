@@ -1,15 +1,18 @@
+- debugger
 %h1
   = @date
 - if @staff_member and @date
   - if not @errors.blank?
     .error
       %p
-        - @errors.each do |payment|
-          Error paying loan
-          = payment.loan.id
-          - payment.errors.each do |k|
-            = k
-            %br
+        - @errors.each do |error|
+          Error with loan
+          %b
+            = error.resource.class == Payment ? error.resource.loan.id : error.resource.id
+            == :
+          - error.values.each do |v|
+            = v
+          %br
   %p
     = form_for(@payment, :action => url(:enter_payments, :action => 'by_staff_member')) do
       = submit 'Make Payments'

@@ -22,6 +22,11 @@
         %br
         = link_to "Edit a #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'edit'), :class => 'edit_small'
         - @i += 1
+        - if thing == :payment
+          %br
+          = link_to "By Center", url("enter_#{plural}".to_sym, :action => 'by_center'), :class => 'add_small'
+          %br
+          = link_to "By Staff Member", url("enter_#{plural}".to_sym, :action => 'by_staff_member'), :class => 'add_small'
 
 - if session.user.can_access?(:admin, :index)
   %h1 Administration

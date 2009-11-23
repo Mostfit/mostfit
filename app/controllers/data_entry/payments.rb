@@ -29,16 +29,21 @@ module DataEntry
     def by_staff_member
       debugger
       @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
+      staff_id = params[:staff_member_id] || params[:received_by]
+      if staff_id
+        @staff_member = StaffMember.get(staff_id.to_i)
+        raise NotFound unless @staff_member
+      end
       if request.method == :post
-        if params[:staff_member_id]
-          @staff_member = StaffMember.get(params[:staff_member_id])
-          raise NotFound unless @staff_member
-        end
         if params[:paid] or params[:disbursed]
           bulk_payments_and_disbursals
         end
       end
-      render
+      if @errors and @errors.blank?
+        redirect_to url(:enter_payments, action => 'by_staff_member'), :message => "All payments made succesfully"
+      else
+        render
+      end
     end
     
     def create(payment)
