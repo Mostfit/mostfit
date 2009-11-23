@@ -113,6 +113,7 @@ class Client
 
   private
   def convert_blank_to_nil
-    self.center_id=nil if self.center_id.blank?
+    self.center_id=nil       if self.center_id.blank?
+    self.client_group_id=nil if self.client_group_id.blank? 
   end
 end

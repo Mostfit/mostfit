@@ -28,7 +28,7 @@ class Clients < Application
 
   def create(client)
     @client = Client.new(client)
-    @client.center = @center  # set direct context
+    @client.center = @center if @center# set direct context
     if @client.save
       redirect resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' was successfully created"}
     else
