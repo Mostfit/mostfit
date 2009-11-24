@@ -1,12 +1,10 @@
-
-
 %h1 Data Entry
 %h3 Follow the links below to perform common actions quickly. 
 %h3{:style => "color: #6C8506;"}
   Most forms are made especially for mass data entry.
 /%p At the bottom you find an overview of all modifications that you have made.
 - @i = 1
-%table{:width => "100%"}
+%table#data_entry_index
   - [:branch, :center, :group, :client, :payment, :loan, :attendancy].each do |thing|
     - plural = thing.to_s.pluralize
     - if (@i-1) % 3 == 0
@@ -18,15 +16,19 @@
       %td
         %h3{:style => "border-bottom: dotted 1px #999"} 
           = plural.capitalize
-        = link_to "Add new #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'new'), :class => 'add_small'
-        %br
-        = link_to "Edit a #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'edit'), :class => 'edit_small'
-        - @i += 1
         - if thing == :payment
+          = link_to "Record a payment", url("enter_#{plural}".to_sym, :action => 'record'), :class => 'add_small'
           %br
           = link_to "By Center", url("enter_#{plural}".to_sym, :action => 'by_center'), :class => 'add_small'
           %br
           = link_to "By Staff Member", url("enter_#{plural}".to_sym, :action => 'by_staff_member'), :class => 'add_small'
+          %br
+          = link_to "Delete a payment", url("enter_#{plural}".to_sym, :action => 'delete'), :class => 'add_small'
+        -else
+          = link_to "Add new #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'new'), :class => 'add_small'
+          %br
+          = link_to "Edit a #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'edit'), :class => 'edit_small'
+        - @i += 1
 
 - if session.user.can_access?(:admin, :index)
   %h1 Administration

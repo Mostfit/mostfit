@@ -510,7 +510,15 @@ div.log_box{
     padding-left: 10px;
     overflow-y: auto;
 }
-
+table#data_entry_index{
+    padding: 0em;   
+}
+table#data_entry_index tr td{
+    padding: 0em;   
+}
+table#data_entry_index tr td img{
+    padding-left: 2em;   
+}
 
 
 
