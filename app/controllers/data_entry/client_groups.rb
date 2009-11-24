@@ -45,6 +45,18 @@ module DataEntry
         message[:error] = "Group failed to be saved"
         request.xhr? ? display(@client_group.errors, :status => 406) : render(:new)
       end
-    end    
+    end
+
+    def create_grt_date(id, grt_date, clients)
+      only_provides :html
+      @client_group = ClientGroup.get(id)
+      raise NotFound unless @client_group
+      clients.each{|client_id|
+        if client = Client.get(client_id)
+          client.update_attributes(:grt_pass_date => grt_date)
+        end
+      }
+      redirect(url(:enter_groups, :edit, @client_group), :message => {:notice => "GRT date for group was successfully saved"})
+    end
   end # ClientGroups    
 end

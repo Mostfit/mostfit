@@ -7,3 +7,39 @@
 
 = form_for(@client_group, :action => form_url) do
   = partial "client_groups/fields", :submit_text => "Save changes", :cancel_link => cancel_url
+
+%hr
+%h1 
+  Mark GRT pass these clients 
+= form_for(@client_group, :action => url(:enter_groups, :action => "create_grt_date", :id => @client_group), :method => :post) do
+  %table{:width => "50%"}
+    %tr{:align => "left"}
+      %th
+      %th
+        ID
+      %th
+        Reference
+      %th
+        Name
+      %th
+        GRT date
+  
+    -@client_group.clients.each do |client| 
+      %tr
+        %td
+          = check_box :name => "clients[]", :checked => true, :value => client.id
+        %td
+          =client.id
+        %td
+          =client.reference
+        %td
+          =client.name
+        %td
+          =client.grt_pass_date ? client.grt_pass_date.strftime("%d %b %Y") : " - "
+    %tr
+      %td{:colspan => 4}
+        =date_select "grt_date"
+    %tr
+      %td{:colspan => 4}
+        =submit "Save changes"
+     
