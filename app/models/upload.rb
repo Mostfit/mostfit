@@ -22,7 +22,7 @@ class Upload
   end
 
   def load_csv(log=nil)
-    models = [StaffMember, Branch, Center, Client, FundingLine, LoanProduct, Loan, Payment]
+    models = [StaffMember, Branch, Center, ClientGroup, Client, FundingLine, LoanProduct, Loan, Payment]
     funding_lines, loans = {}, {}
     models.each{|model|
       model.all.destroy!

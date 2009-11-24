@@ -47,7 +47,13 @@
         %th loans
         %th edit | delete
     %tbody
+    - group=-1
     - @clients.each do |client|
+      - if group!=client.client_group_id
+        - group = client.client_group_id 
+        %tr
+          %td{:colspan => 5, :align => "center", :style => "background: #ccc"}
+            %b= client.client_group ? client.client_group.code : "Not attached to any center"
       %tr{ :class => cycle('odd','') }
         %td &nbsp;
         %td

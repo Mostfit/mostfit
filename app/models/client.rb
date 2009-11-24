@@ -41,10 +41,13 @@ class Client
   validates_attachment_thumbnails :picture
   
   def self.from_csv(row, headers)
-    center = Center.first(:name => row[headers[:center]])
-    obj = new(:reference => row[headers[:reference]], :name => row[headers[:name]], :spouse_name => row[headers[:spouse_name]], 
-              :date_of_birth => Date.parse(row[headers[:date_of_birth]]), :address => row[headers[:address]], :date_joined => row[headers[:date_joined]],
-              :center_id => center.id)
+    center_id       = row[headers[:center]] ? Center.first(:name => row[headers[:center]].strip).id : 0
+    client_group_id = row[headers[:group_code]] ? ClientGroup.first(:code => row[headers[:group_code]].strip).id : nil
+    grt_date        = row[headers[:grt_date]] ? Date.parse(row[headers[:grt_date]]) : nil
+    obj             = new(:reference => row[headers[:reference]], :name => row[headers[:name]], :spouse_name => row[headers[:spouse_name]], 
+                          :date_of_birth => Date.parse(row[headers[:date_of_birth]]), :address => row[headers[:address]], :date_joined => row[headers[:date_joined]],
+                          :center_id => center_id, :grt_pass_date => grt_date,
+                          :client_group_id => client_group_id)
     [obj.save, obj]
   end
 

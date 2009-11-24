@@ -13,6 +13,12 @@ class ClientGroup
   belongs_to :center
   validates_is_unique :name, :scope => :center_id  
 
+  def self.from_csv(row, headers)
+    center = Center.first(:code => row[headers[:center_code]])
+    obj    = new(:name => row[headers[:name]], :center_id => center.id, :code => row[headers[:code]])
+    [obj.save, obj]
+  end
+
   def self.search(q)
     if /^\d+$/.match(q)
       all(:conditions => ["id = ? or code=?", q, q])
