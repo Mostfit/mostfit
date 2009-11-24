@@ -36,6 +36,13 @@ module Misfit
       end
       return true
     end
+    
+    def part_of_a_group_and_passed_grt?
+      client = loan.client
+      return [false, "Client is not part of a group"] if client.client_group_id.nil? or client.client_group_id.blank?
+      return [false, "Client has not passed GRT"] if client.grt_pass_date.nil? or client.grt_pass_date.blank?
+      return true
+    end
   end    #LoanValidators
 
 end
