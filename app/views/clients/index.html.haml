@@ -45,15 +45,23 @@
         %th id
         %th name
         %th loans
-        %th edit | delete
+        %th
     %tbody
     - group=-1
     - @clients.each do |client|
       - if group!=client.client_group_id
         - group = client.client_group_id 
         %tr
-          %td{:colspan => 5, :align => "center", :style => "background: #ccc"}
-            %b= client.client_group ? client.client_group.code : "Not attached to any center"
+          %td{:colspan => 5, :align => "center", :style => "background: #eee"}
+            - if client.client_group
+              %b
+                = client.client_group.name
+                (
+                =link_to('edit', resource(@branch, @center, client.client_group, :edit))
+                )
+            -else
+              "Not attached to any center"
+            
       %tr{ :class => cycle('odd','') }
         %td &nbsp;
         %td

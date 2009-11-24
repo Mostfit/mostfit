@@ -11,6 +11,7 @@ class Centers < Application
     @center = Center.get(id)
     raise NotFound unless @center
     @clients = @center.clients(:active => true, :order => [:client_group_id, :name])
+
     if params[:date]
       if params[:date].is_a? String
         @date = Date.parse(params[:date])
