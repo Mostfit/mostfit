@@ -28,6 +28,7 @@ module Misfit
 
   module LoanValidators
     def installments_are_integers?
+      debugger
       return true
       return [false, "Number of installments not defined"] if number_of_installments.nil? or number_of_installments.blank?
       (1..number_of_installments).each do |i|
@@ -38,7 +39,6 @@ module Misfit
     end
     
     def part_of_a_group_and_passed_grt?
-      client = loan.client
       return [false, "Client is not part of a group"] if client.client_group_id.nil? or client.client_group_id.blank?
       return [false, "Client has not passed GRT"] if client.grt_pass_date.nil? or client.grt_pass_date.blank?
       return true
