@@ -18,7 +18,7 @@
   %p
     Please select a client that you want to edit, either by its client ID, or through the center it belongs to.
   %table.form
-    = form_for(@client, :action => url(:controller => params[:controller], :action => 'index'), :method => :get) do
+    = form_for(@client, :action => url(:controller => params[:controller], :action => 'edit'), :method => :get) do
       %tr
         %td &nbsp;
       %tr
@@ -26,12 +26,12 @@
         %td
           Client ID, Name or Ref.:
         %td
-          = text_field :query, :size => 8
+          = text_field :client_id, :size => 8
         %td
           = submit "Proceed..."
       %tr
         %td &nbsp;
-    = form_for(@client, :action => url(:enter_clients, :action => 'index'), :method => :get) do
+    = form_for(@client, :action => url(:enter_clients, :action => 'edit'), :method => :get) do
       %tr
         %td &nbsp;
         %td

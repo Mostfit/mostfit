@@ -1,17 +1,6 @@
 module DataEntry
   class Clients < DataEntry::Controller
     provides :html, :xml
-    def index
-      if params[:query] and client = Client.get(params[:query]) || Client.first(:name => params[:query]) || Client.first(:reference => params[:query])
-        redirect(url(:enter_clients, :action => :edit, :id => client))
-      elsif params[:query] and params[:query].length>0
-        message[:error] = "No client by that id or name or reference number"
-      elsif params[:client] and params[:client][:center_id]
-        @center  = Center.get(params[:client][:center_id])
-      end
-      display([], "clients/search")
-    end
-    
     def new
       @client = Client.new
       display([@client], "clients/new")
@@ -29,18 +18,20 @@ module DataEntry
         params[:format]=='xml' ? display(@client): display([@clients], "clients/new")
       end
     end
-    
+        
     def edit
-      if params[:id] and @client = Client.get(params[:id]) || Client.first(:name => params[:id]) || Client.first(:reference => params[:id])
+      if (params[:id] and @client = Client.get(params[:id])) or (params[:client_id] and @client = Client.get(params[:client_id]) || Client.first(:name => params[:client_id]) || Client.first(:reference => params[:client_id]))
         @center = @client.center
         @branch = @center.branch
         display([@client, @center, @branch], "clients/edit")
-      elsif params[:id]
+      elsif params[:client_id]
         message[:error] = "No client by that id or name or reference number"
-        render      
+        display([@center], "clients/search")
       elsif params[:client] and params[:client][:center_id]
         @center  = Center.get(params[:client][:center_id])
-        render      
+        display([@center], "clients/search")
+      else
+        display([], "clients/search")
       end
     end
     

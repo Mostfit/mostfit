@@ -1,5 +1,5 @@
 %table.form
-  -if @client_group.center_id
+  -if @client_group.center_id and not @client_group.center_id.blank?
     =hidden_field :center_id, :value => @client_group.center_id
   -else
     %tr
@@ -16,7 +16,7 @@
     %td
       Group Code:
     %td
-      = text_field :code, :size => 3
+      = text_field :code, :size => 10
       %br/
       %span.greytext a two letter unique code for the group
   %tr
@@ -24,3 +24,12 @@
       Maximum clients:
     %td
       = text_field :number_of_members, :size => 3
+  %tr
+    %td
+    %td
+      = submit submit_text
+      - if request.xhr?
+        %a{:href => "#", :onclick => "$('#new_client_group_form').html('')"}
+          cancel
+      -else
+        = link_to 'cancel', cancel_link

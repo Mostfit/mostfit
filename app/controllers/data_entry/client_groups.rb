@@ -8,17 +8,20 @@ module DataEntry
       request.xhr? ? display([@client_group], "client_groups/new", :layout => false) : display([@client_group], "client_groups/new")
     end
 
-    def index
-      only_provides :html
-      @client_groups = ClientGroup.all(:order => [:center_id])
-      display [@client_groups], "client_groups/index"
-    end
-
-    def edit(id)
-      only_provides :html      
-      @client_group = ClientGroup.get(id)
-      raise NotFound unless @client_group
-      display @client_group, "client_groups/edit"
+    def edit
+      if (params[:id] and @client_group = ClientGroup.get(params[:id])) or (params[:group_id] and @client_group = ClientGroup.get(params[:group_id]) || ClientGroup.first(:name => params[:group_id]) || ClientGroup.first(:code => params[:group_id]))
+        @center = @client_group.center
+        @branch = @center.branch
+        display([@client_group, @client, @center, @branch], "client_groups/edit")
+      elsif params[:group_id] or params[:id]
+        message[:error] = "No group by that id or name or code"
+        display([], "client_groups/search")
+      elsif params[:client_group] and params[:client_group][:center_id]
+        @center  = Center.get(params[:client_group][:center_id])
+        display([@center], "client_groups/search")
+      else
+        display([], "client_groups/search")
+      end
     end
 
     def create(client_group)
@@ -28,7 +31,8 @@ module DataEntry
         request.xhr? ? display(@client_group) : redirect(url(:data_entry), :message => {:notice => "Group was successfully created"})
       else
         message[:error] = "Group failed to be created"
-        request.xhr? ? display(@client_group.errors, :status => 406) : render(:new)
+        @client_group.center_id = params[:center_id] if params[:center_id] and not params[:center_id].blank?
+        request.xhr? ? display(@client_group.errors, :status => 406) : display([@client_group], "client_groups/new")
       end
     end
 
