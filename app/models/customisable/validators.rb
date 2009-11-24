@@ -28,8 +28,6 @@ module Misfit
 
   module LoanValidators
     def installments_are_integers?
-      debugger
-      return true
       return [false, "Number of installments not defined"] if number_of_installments.nil? or number_of_installments.blank?
       (1..number_of_installments).each do |i|
         p = scheduled_principal_for_installment(i)
