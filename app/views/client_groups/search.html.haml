@@ -1,0 +1,44 @@
+- if @center
+  %h2 
+    Center: 
+    = @center.name
+  %table.form
+    - @center.client_groups.each do |group|
+      %tr
+        %td &nbsp;
+        %td
+          %b= group.name
+        %td
+          = group.code
+        %td
+          = form_for(group, :action => url(:enter_groups, :action => 'edit', :id => group.id), :method => :get) do
+            = submit "Proceed..."
+- else
+  %h1 Edit group
+  %p
+    Please select a group that you want to edit, either by its ID, code, name or through the center it belongs to.
+  %table.form
+    = form_for(@client_group, :action => url(:controller => params[:controller], :action => 'edit'), :method => :get) do
+      %tr
+        %td &nbsp;
+      %tr
+        %td &nbsp;
+        %td
+          Group ID, Name or Code:
+        %td
+          = text_field :group_id, :size => 8
+        %td
+          = submit "Proceed..."
+      %tr
+        %td &nbsp;
+    = form_for(@client_group, :action => url(:enter_groups, :action => 'edit'), :method => :get) do
+      %tr
+        %td &nbsp;
+        %td
+          Center:
+        %td
+          = select_center_for ClientGroup.new, :center
+        %td
+          = submit "Proceed..."
+
+
