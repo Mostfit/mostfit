@@ -7,6 +7,7 @@ Merb::Router.prepare do
   resources :staff_members
   resources :clients
   resources :client_groups
+  resources :loans
   resources :branches  do
     resources :centers  do
       resources :clients do

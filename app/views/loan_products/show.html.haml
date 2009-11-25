@@ -1,9 +1,10 @@
 %h1
   Loan products
-%table
+= link_to 'Edit',  url(:edit_loan_product,  @loan_product), :class => 'edit'
+%table.narrow.form
   - [:name, :loan_type, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments, :installment_frequency, :valid_from, :valid_upto, :payment_validation_methods, :loan_validation_methods].each do |attr|
     %tr
-      %td
+      %th{:style => "text-align: left, background-color:#616e4c; color:white;"}
         = attr.humanize
       %td
         = @loan_product.send(attr)
@@ -16,6 +17,4 @@
           %li
             = fee.description
 
-= link_to 'Edit',  url(:edit_loan_product,  @loan_product)
-|
-= link_to 'Back', url(:loan_products)
+

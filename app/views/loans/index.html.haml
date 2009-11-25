@@ -20,7 +20,7 @@
       = @client.spouse_name
   %tr.odd
     %td manager
-    %td= link_to @branch.manager.name, resource(@branch.manager)
+    %td= link_to @center.manager.name, resource(@center.manager)
   %tr
     %td at center
     %td
@@ -67,7 +67,7 @@
       %tr{ :class => cycle('odd','') }
         %td &nbsp;
         %td
-          = loan.id
+          = link_to loan.id, url(:quick_link, "loans", loan.id)
         %td
           %b= format_currency(loan.amount)
         %td

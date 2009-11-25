@@ -4,22 +4,33 @@
 
 - @centers = Center.all(:meeting_day => @date.weekday)
 - total_due = total_paid = 0
-%table{:style => "float:left"}
-  %tr
-    %th
-      Name
-    %th
-      Due
-    %th
-      Paid
-  - @centers.each do |center|
+%table.narrow{:style => "float:left; width: 450px;margin-right: 13px;"}
+  %thead
     %tr
+      %th
+        Name
+      %th
+        Due
+      %th
+        Paid
+  - @total_due = @total_paid = 0
+  - @centers.each do |center|
+    %tr{:class => cycle('odd','even')}
       - lh = LoanHistory.aggregate(:principal_due.sum, :interest_due.sum, :principal_paid.sum, :interest_paid.sum, :center_id => center.id, :date => @date)
       %td
-        = center.name
-      %td
-        = (lh[0] || 0) + (lh[1] || 0)
-      %td
-        = (lh[2] || 0) + (lh[3] || 0)
+        = link_to center.name, url(:quick_link, "centers", center.id) + "#weeksheet"
+      %td.numeric
+        = ((lh[0] || 0) + (lh[1] || 0))
+        - @total_due += ((lh[0] || 0) + (lh[1] || 0))
+      %td.numeric
+        = ((lh[2] || 0) + (lh[3] || 0))
+        - @total_paid = ((lh[2] || 0) + (lh[3] || 0))
+  %tr.total
+    %td
+      Total
+    %td.numeric
+      = @total_due
+    %td.numeric
+      = @total_paid
 
-= ofc2(630, 350, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'center_day', :date => @date) )
+= ofc2(500, 350, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'center_day', :date => @date) )

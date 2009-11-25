@@ -15,6 +15,7 @@ class Loans < Application
   end
 
   def show(id)
+    debugger
     @loan = Loan.get(id)
     raise NotFound unless @loan
     @payments = @loan.payments
@@ -92,10 +93,11 @@ class Loans < Application
 
   private
   def get_context
-    @branch = Branch.get(params[:branch_id])
-    @center = Center.get(params[:center_id])
-    @client = Client.get(params[:client_id])
-    raise NotFound unless @branch and @center and @client
+    raise NotFound unless @loan = Loan.get(params[:id])
+    @client = Client.get(params[:client_id]) || @loan.client
+    @center = Center.get(params[:center_id]) || @client.center
+    @branch = Branch.get(params[:branch_id]) || @center.branch
+    # raise NotFound unless @branch and @center and @client
   end
 
   # the loan is not of type Loan of a derived type, therefor we cannot just assume its name..

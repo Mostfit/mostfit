@@ -1,4 +1,8 @@
-- debugger
+#darkenBackground
+  #loading
+    = image_tag '/images/spinner.gif'
+    Please wait while we process your request
+    
 %h1
   = @date
 - if @staff_member and @date
@@ -15,7 +19,7 @@
           %br
   %p
     = form_for(@payment, :action => url(:enter_payments, :action => 'by_staff_member')) do
-      = submit 'Make Payments'
+      = submit 'Make Payments', :onclick => "javascript:$('#darkenBackground').show(); return true;"
       = hidden_field :name => 'for_date', :value => @date
       - @centers = @staff_member.centers.all(:meeting_day => Center.meeting_days[@date.wday])
       %h3
@@ -27,17 +31,17 @@
             = "Week #{@date.cweek} meeting sheet for center #{@center.name}"
         = hidden_field :name => 'center_id', :value => @center.id
         = partial :cds
-      = submit 'Make Payments'
+      = submit 'Make Payments', :onclick => "javascript:$('#darkenBackground').show(); return true;"
 
   - else
     Choose a staff member to record a payment for
-    = form_for(@payment, :action => url(:enter_payments, :action => 'by_staff_member')) do
+    = form_for(@payment, :action => url(:enter_payments, :action => 'by_staff_member'), :method => :get) do
       %table.form
         %tr
           %th
-            Staff Member Id
+            Staff Member
           %td
-            = text_field :name => 'staff_member_id'
+            = select :name => 'staff_member_id', :collection => [["","---"]] + (StaffMember.all.map{|sm| [sm.id.to_s, sm.name]})
         %tr
           %th
             For Date
