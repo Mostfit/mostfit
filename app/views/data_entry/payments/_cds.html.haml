@@ -1,7 +1,7 @@
 
 - if @center.meeting_day? @date
   Payments collected by 
-  = select :received_by, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :selected => @center.manager.id.to_s
+  = select :name => "payment[received_by]", :collection => StaffMember.all, :value_method => :id, :text_method => :name, :selected => @center.manager.id.to_s
 
   %table.narrow.form{ :width => '100%'}
     %thead
@@ -70,6 +70,8 @@
                 = lh.nil? ? 0 : (lh.principal_paid.to_i + lh.interest_paid.to_i)
               - else 
                 = text_field :name => "paid[#{loan.id}", :value => a, :cols => "5", :style => "width:50px;" 
+            %td
+              = check_box :name => "attendancy[#{lh.client_id if lh} ]", :checked => true
 
         - if loan_row_count == 0
           %tr{ :class => cycle('odd','') }
@@ -101,7 +103,7 @@
             
     %tfoot    
       %tr
-        %td{ :colspan => 12 }
+        %td{ :colspan => 14 }
 
   %h2 Disbursals
   - loans_to_disburse = @center.clients.loans(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil)

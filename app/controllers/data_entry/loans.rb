@@ -58,30 +58,63 @@ class Loans < DataEntry::Controller
     end
   end
 
-  def approve
-    if params[:id]
-      @center = Center.get(params[:id])
-      raise NotFound unless @center
+  def disburse
+    @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    @loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil).select{|l| l.status == :approved}
+    if request.method == :get
       render
-    elsif params[:approve]
-      params[:approve].each do |k,v|
-        l = Loan.get(k)
-        l.approved_on = Date.today
-        approver = StaffMember.get(params[:approved_by])
-        raise NotFound if approver.nil?
-        l.approved_by = approver
-        l.history_disabled = true
-        l.save
-      end
-      redirect "/data_entry", :message => {:notice => 'loans approved'}
     else
+      @errors = []
+      debugger
+      loans = params[:loans].select{|k,v| v[:disbursed?] == "on"}.to_hash
+      loans.keys.each do |id|
+        debugger
+        loan = Loan.get(id)
+        params[:loans][id].delete("disbursed?")
+        loan.update_attributes(params[:loans][id])
+        @errors << loan.errors if not loan.save
+      end
+      debugger
+      if @errors.blank?
+        redirect url(:data_entry), {:message => {:notice => "#{loans.count} loans disbursed. #{params[:loans].count - loans.count} loans not disbursed."}}
+      else
+        render
+      end
+    end
+  end
+
+  def approve
+    debugger
+    if request.method == :get
       @loans = Loan.all(:approved_on => nil)
-      @centers = {}
-      @loans.each do |l|
-        @centers[l.client.center_id] = @centers[l.client.center_id].nil? ? 1 : @centers[l.client.center_id] + 1
+      if params[:id]
+        @center = Center.get(params[:id])
+        raise NotFound unless @center
+      else
+        @centers = {}
+        @loans.each do |l|
+          @centers[l.client.center_id] = @centers[l.client.center_id].nil? ? 1 : @centers[l.client.center_id] + 1
+        end
       end
       render
     end
+    if request.method == :post
+      debugger
+      @errors = {}
+      loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
+      loans.keys.each do |id|
+        loan = Loan.get(id)
+        params[:loans][id].delete("approved?")
+        loan.update_attributes(params[:loans][id])
+        @errors << loan.errors
+      end
+      if errors.blank?
+        redirect "/data_entry", :message => {:notice => 'loans approved'}
+      else
+        render
+      end
+    end
+    render
   end
 
   private

@@ -85,9 +85,9 @@
 
   %p
     %br/
-  %h2
+  %h1
     == <a name = 'weeksheet'>Week #{@date.cweek} meeting sheet for center #{@center.name}</a>
-
+  = link_to 'Make payments', url(:enter_payments, :action => 'by_center', :center_id => @center.id, :for_date => @date), :class => "add"
 
   %table.narrow.form{ :style => "width: 100%;" }
     %tr.odd
@@ -112,6 +112,7 @@
           = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
 
 
+%a{:name => "weeksheet"}
 - if @center.meeting_day? @date
   %table.narrow.form{ :width => '100%' }
     %thead
@@ -140,7 +141,7 @@
             %td
               %b= link_to loan.client.name, resource(@branch, @center, loan.client)
             %td
-              = loan.id
+              = link_to loan.id, url(:quick_link, "loans", loan.id)
             %td.numeric
               - i = loan.amount
               %b= i.to_currency

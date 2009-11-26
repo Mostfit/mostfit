@@ -22,3 +22,8 @@
       Select role
     %td
       = select :role, :collection => User.roles
+  %tr
+    %td
+      Is a staff member?
+    %td
+      = select :staff_member, :collection => [["","---"]] + StaffMember.all.map{|s| [s.id.to_s, s.name]}

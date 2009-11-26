@@ -283,13 +283,17 @@ color: #fff;
 table.form, table.form td{
   border: 0px
 }
-table thead th {
-  background: #fff;
-  color: #999;
-  text-align: left;
-  font-size: 0.9em;
-  border-bottom: dashed 1px  #999;
+table thead tr {
+    border-right: solid 1px  #736f5d;
+}
 
+table thead th {
+  background: #C9C3A3;
+/*  background-image: url('/images/tab_bg.png');*/
+  color: #444;
+  text-align: left;
+  font-size: 1.2em;
+  border-bottom: solid 1px  #736f5d;
 }
 table tfoot td {
   background: #888;
@@ -299,12 +303,18 @@ table tfoot td {
 tr.odd {
   background: #fbf8f1;
 }
+tr.total {
+   border-top: 2px solid black;
+   border-bottom: 2px solid black;
+   font-weight: bold;
+}
 td {
   vertical-align: top;
 }
 td.numeric {
   text-align: center;
   border-right: 1px solid #999;
+  border-left: 1px solid #999;
 }
 table.narrow td, table.narrow th{
   padding: 2px;
@@ -416,7 +426,7 @@ a.add_small, a.add_small:visited, a.add_small:link {
   font-weight: lighter
 }
 
-a.edit, a.edit:visited, a.add:link {
+a.edit, a.edit:visited, a.edit:link {
   background-image: url(/images/edit.png);
   background-repeat: no-repeat;
   padding: 3px 0px 4px 30px;
@@ -523,6 +533,34 @@ table#data_entry_index tr td img{
 }
 
 
+#darkenBackground {
+background-color: rgb(0, 0, 0);
+opacity: 0.7; /* Safari, Opera */
+-moz-opacity:0.70; /* FireFox */
+filter: alpha(opacity=70); /* IE */
+z-index: 20;
+height: 100%;
+width: 100%;
+background-repeat:repeat;
+position:fixed;
+top: 0px;
+left: 0px;
+display: none;
+}
+
+#loading {
+  width:66%;
+  position: relative;
+  left: 16%;
+  top: 33%;
+  height: 33%;
+  font-size: 32px;
+  background: #999;
+  -moz-border-radius: 10px;
+  -moz-opacity: 1.0;
+  padding: 30px;
+  padding-top: 55px;
+}
 
 
 

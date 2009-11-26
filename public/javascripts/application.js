@@ -2,10 +2,10 @@
 var lineNos=0;
 function spitLogs(){
     $.get("/logs/"+$("div.log_box").attr("id"), function(data){
-	    lines = data.split("\n");	    
+	    lines = data.split("\n");
 	    if(lineNos < lines.length-1){
 		for(i=lineNos; i<lines.length-1; i++){
-		    $("div.log_box").append(lines[i]+'<br/>');	    
+		    $("div.log_box").append(lines[i]+'<br/>');
 		}
 		lineNos=lines.length-1;
 		$("div.log_box").attr({scrollTop: $("div.log_box").attr("scrollHeight") });
@@ -39,6 +39,9 @@ function fillCode(center_id, group_id){
 	});
 }
 $(document).ready(function(){
+		    $(document).shortkeys({
+					    'n': function(){alert('foo');}
+					  });
 	if(window.location.pathname.indexOf("edit")===-1){
 	    $("#client_group_id").change(function(){
 		    fillCode($("#client_center_id").val(), $("#client_group_id").val());
@@ -52,7 +55,7 @@ $(document).ready(function(){
 	$("#new_client_group_link").click(function(){
 		id=$("#client_center_id option:selected").val();
 		$.ajax({
-			type: "get", 
+			type: "get",
 			url: "/data_entry/groups/new?center_id="+id,
 			success: function(data){
 			    $("#new_client_group_form").html(data);
@@ -69,15 +72,15 @@ $(document).ready(function(){
 						$("#client_group_name").val();
 						fillOptions($("#client_center_id").val(), $("#client_group_name").val());
 						$("#new_client_group_form").html("");
-					    }, 
+					    },
 					    error: function(data){
 						alert(data.responseText);
-					    }					    
+					    }
 					});
 				    return false;
 				});
 			}
-		    });	       
+		    });
 	    });
 	if($("#client_center_id")){
 	    $("#client_center_id").change(function(){
@@ -94,4 +97,3 @@ $(document).ready(function(){
 		});
 	}
     });
-    

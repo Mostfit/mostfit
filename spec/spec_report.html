@@ -182,95 +182,201 @@ a {
 <div class="example_group">
   <dl>
   <dt id="example_group_1">User</dt>
+    <script type="text/javascript">makeRed('rspec-header');</script>
+    <script type="text/javascript">makeRed('example_group_1');</script>
     <script type="text/javascript">moveProgressBar('0.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid with name shorter than 3 characters</span></dd>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should not be valid with name shorter than 3 characters</span>
+      <div class="failure" id="failure_1">
+        <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:</pre></div>
+    <pre class="ruby"><code><span class="linenum">278</span>              <span class="ident">send</span><span class="punct">(</span><span class="ident">setter</span><span class="punct">,</span> <span class="ident">value</span><span class="punct">)</span>
+<span class="linenum">279</span>            <span class="keyword">else</span>
+<span class="offending"><span class="linenum">280</span>              <span class="keyword">raise</span> <span class="constant">ArgumentError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">The attribute '<span class="expr">#{name}</span>' is not accessible in <span class="expr">#{model}</span></span><span class="punct">&quot;</span></span>
+<span class="linenum">281</span>            <span class="keyword">end</span>
+<span class="linenum">282</span>          <span class="keyword">when</span> <span class="constant">Associations</span><span class="punct">::</span><span class="constant">Relationship</span><span class="punct">,</span> <span class="constant">Property</span></code></pre>
+      </div>
+    </dd>
     <script type="text/javascript">moveProgressBar('1.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not have a nil login </span></dd>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should not have a nil login </span>
+      <div class="failure" id="failure_2">
+        <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:</pre></div>
+    <pre class="ruby"><code><span class="linenum">278</span>              <span class="ident">send</span><span class="punct">(</span><span class="ident">setter</span><span class="punct">,</span> <span class="ident">value</span><span class="punct">)</span>
+<span class="linenum">279</span>            <span class="keyword">else</span>
+<span class="offending"><span class="linenum">280</span>              <span class="keyword">raise</span> <span class="constant">ArgumentError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">The attribute '<span class="expr">#{name}</span>' is not accessible in <span class="expr">#{model}</span></span><span class="punct">&quot;</span></span>
+<span class="linenum">281</span>            <span class="keyword">end</span>
+<span class="linenum">282</span>          <span class="keyword">when</span> <span class="constant">Associations</span><span class="punct">::</span><span class="constant">Relationship</span><span class="punct">,</span> <span class="constant">Property</span></code></pre>
+      </div>
+    </dd>
     <script type="text/javascript">moveProgressBar('2.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should be return for admin? if admin value set to true</span></dd>
-    <script type="text/javascript">moveProgressBar('3.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should be created before it is updated</span></dd>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should be return for admin? if admin value set to true</span>
+      <div class="failure" id="failure_3">
+        <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:</pre></div>
+    <pre class="ruby"><code><span class="linenum">278</span>              <span class="ident">send</span><span class="punct">(</span><span class="ident">setter</span><span class="punct">,</span> <span class="ident">value</span><span class="punct">)</span>
+<span class="linenum">279</span>            <span class="keyword">else</span>
+<span class="offending"><span class="linenum">280</span>              <span class="keyword">raise</span> <span class="constant">ArgumentError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">The attribute '<span class="expr">#{name}</span>' is not accessible in <span class="expr">#{model}</span></span><span class="punct">&quot;</span></span>
+<span class="linenum">281</span>            <span class="keyword">end</span>
+<span class="linenum">282</span>          <span class="keyword">when</span> <span class="constant">Associations</span><span class="punct">::</span><span class="constant">Relationship</span><span class="punct">,</span> <span class="constant">Property</span></code></pre>
+      </div>
+    </dd>
+    <script type="text/javascript">moveProgressBar('3.0');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should be created before it is updated</span>
+      <div class="failure" id="failure_4">
+        <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:</pre></div>
+    <pre class="ruby"><code><span class="linenum">278</span>              <span class="ident">send</span><span class="punct">(</span><span class="ident">setter</span><span class="punct">,</span> <span class="ident">value</span><span class="punct">)</span>
+<span class="linenum">279</span>            <span class="keyword">else</span>
+<span class="offending"><span class="linenum">280</span>              <span class="keyword">raise</span> <span class="constant">ArgumentError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">The attribute '<span class="expr">#{name}</span>' is not accessible in <span class="expr">#{model}</span></span><span class="punct">&quot;</span></span>
+<span class="linenum">281</span>            <span class="keyword">end</span>
+<span class="linenum">282</span>          <span class="keyword">when</span> <span class="constant">Associations</span><span class="punct">::</span><span class="constant">Relationship</span><span class="punct">,</span> <span class="constant">Property</span></code></pre>
+      </div>
+    </dd>
     <script type="text/javascript">moveProgressBar('3.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have a login name beginning with numbers, aplphabets and underscores </span></dd>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should have a login name beginning with numbers, aplphabets and underscores </span>
+      <div class="failure" id="failure_5">
+        <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:</pre></div>
+    <pre class="ruby"><code><span class="linenum">278</span>              <span class="ident">send</span><span class="punct">(</span><span class="ident">setter</span><span class="punct">,</span> <span class="ident">value</span><span class="punct">)</span>
+<span class="linenum">279</span>            <span class="keyword">else</span>
+<span class="offending"><span class="linenum">280</span>              <span class="keyword">raise</span> <span class="constant">ArgumentError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">The attribute '<span class="expr">#{name}</span>' is not accessible in <span class="expr">#{model}</span></span><span class="punct">&quot;</span></span>
+<span class="linenum">281</span>            <span class="keyword">end</span>
+<span class="linenum">282</span>          <span class="keyword">when</span> <span class="constant">Associations</span><span class="punct">::</span><span class="constant">Relationship</span><span class="punct">,</span> <span class="constant">Property</span></code></pre>
+      </div>
+    </dd>
     <script type="text/javascript">moveProgressBar('4.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not have false in all permission fields</span></dd>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should not have false in all permission fields</span>
+      <div class="failure" id="failure_6">
+        <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:</pre></div>
+    <pre class="ruby"><code><span class="linenum">278</span>              <span class="ident">send</span><span class="punct">(</span><span class="ident">setter</span><span class="punct">,</span> <span class="ident">value</span><span class="punct">)</span>
+<span class="linenum">279</span>            <span class="keyword">else</span>
+<span class="offending"><span class="linenum">280</span>              <span class="keyword">raise</span> <span class="constant">ArgumentError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">The attribute '<span class="expr">#{name}</span>' is not accessible in <span class="expr">#{model}</span></span><span class="punct">&quot;</span></span>
+<span class="linenum">281</span>            <span class="keyword">end</span>
+<span class="linenum">282</span>          <span class="keyword">when</span> <span class="constant">Associations</span><span class="punct">::</span><span class="constant">Relationship</span><span class="punct">,</span> <span class="constant">Property</span></code></pre>
+      </div>
+    </dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_2">Funder</dt>
-    <script type="text/javascript">moveProgressBar('5.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without having a name</span></dd>
-    <script type="text/javascript">moveProgressBar('6.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should be able to have funding lines</span></dd>
-    <script type="text/javascript">moveProgressBar('6.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct count of completed lines </span></dd>
-    <script type="text/javascript">moveProgressBar('7.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct count of active lines</span></dd>
-    <script type="text/javascript">moveProgressBar('8.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct count of total lines </span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_3">StaffMember</dt>
-    <script type="text/javascript">moveProgressBar('9.3');</script>
+  <dt id="example_group_2">StaffMember</dt>
+    <script type="text/javascript">moveProgressBar('5.3');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
-    <script type="text/javascript">moveProgressBar('10.0');</script>
+    <script type="text/javascript">moveProgressBar('6.1');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not  be valid without active boolean</span></dd>
-    <script type="text/javascript">moveProgressBar('10.8');</script>
+    <script type="text/javascript">moveProgressBar('6.9');</script>
     <dd class="spec passed"><span class="passed_spec_name">should be unique</span></dd>
-    <script type="text/javascript">moveProgressBar('11.6');</script>
+    <script type="text/javascript">moveProgressBar('7.6');</script>
     <dd class="spec passed"><span class="passed_spec_name">should have name length &gt; 3</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
+  <dt id="example_group_3">Funder</dt>
+    <script type="text/javascript">moveProgressBar('8.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without having a name</span></dd>
+    <script type="text/javascript">moveProgressBar('9.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be able to have funding lines</span></dd>
+    <script type="text/javascript">moveProgressBar('10.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct count of completed lines </span></dd>
+    <script type="text/javascript">moveProgressBar('10.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct count of active lines</span></dd>
+    <script type="text/javascript">moveProgressBar('11.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct count of total lines </span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
   <dt id="example_group_4">FundingLine</dt>
-    <script type="text/javascript">moveProgressBar('12.4');</script>
+    <script type="text/javascript">moveProgressBar('12.3');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a funder</span></dd>
-    <script type="text/javascript">moveProgressBar('13.1');</script>
+    <script type="text/javascript">moveProgressBar('13.0');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not have a blank interest_rate</span></dd>
-    <script type="text/javascript">moveProgressBar('13.9');</script>
+    <script type="text/javascript">moveProgressBar('13.8');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not have a blank disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('14.7');</script>
+    <script type="text/javascript">moveProgressBar('14.6');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not have a blank amount</span></dd>
-    <script type="text/javascript">moveProgressBar('15.5');</script>
+    <script type="text/javascript">moveProgressBar('15.3');</script>
     <dd class="spec passed"><span class="passed_spec_name">should not have blank last payment date</span></dd>
-    <script type="text/javascript">moveProgressBar('16.2');</script>
+    <script type="text/javascript">moveProgressBar('16.1');</script>
     <dd class="spec passed"><span class="passed_spec_name">should have first payment done before last payment</span></dd>
-    <script type="text/javascript">moveProgressBar('17.0');</script>
+    <script type="text/javascript">moveProgressBar('16.9');</script>
     <dd class="spec passed"><span class="passed_spec_name">should be disbursed before first payment</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
   <dt id="example_group_5">LoanType</dt>
-    <script type="text/javascript">makeYellow('rspec-header');</script>
     <script type="text/javascript">makeYellow('example_group_5');</script>
-    <script type="text/javascript">moveProgressBar('17.8');</script>
+    <script type="text/javascript">moveProgressBar('17.6');</script>
     <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
   <dt id="example_group_6">Upload</dt>
-    <script type="text/javascript">makeRed('rspec-header');</script>
     <script type="text/javascript">makeRed('example_group_6');</script>
-    <script type="text/javascript">moveProgressBar('17.8');</script>
+    <script type="text/javascript">moveProgressBar('17.6');</script>
     <dd class="spec failed">
       <span class="failed_spec_name">before(:all)</span>
-      <div class="failure" id="failure_1">
-        <div class="message"><pre>uninitialized constant Upload::CSV</pre></div>
-        <div class="backtrace"><pre>/home/svs/src/mostfit/app/models/upload.rb:32:in `load_csv'
-/home/svs/src/mostfit/app/models/upload.rb:27:in `each'
-/home/svs/src/mostfit/app/models/upload.rb:27:in `load_csv'
-./spec/models/upload_spec.rb:19:</pre></div>
-    <pre class="ruby"><code><span class="linenum">30</span>      <span class="ident">log</span><span class="punct">.</span><span class="ident">info</span><span class="punct">(&quot;</span><span class="string">Creating <span class="expr">#{model.to_s.plural}</span></span><span class="punct">&quot;)</span> <span class="keyword">if</span> <span class="ident">log</span>
-<span class="linenum">31</span>      <span class="ident">headers</span> <span class="punct">=</span> <span class="punct">{}</span>
-<span class="offending"><span class="linenum">32</span>      <span class="constant">CSV</span><span class="punct">.</span><span class="ident">open</span><span class="punct">(</span><span class="constant">File</span><span class="punct">.</span><span class="ident">join</span><span class="punct">(</span><span class="constant">Merb</span><span class="punct">.</span><span class="ident">root</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">uploads</span><span class="punct">&quot;,</span> <span class="attribute">@directory</span><span class="punct">,</span> <span class="ident">model</span><span class="punct">.</span><span class="ident">to_s</span><span class="punct">.</span><span class="ident">snake_case</span><span class="punct">.</span><span class="ident">pluralize</span><span class="punct">),</span> <span class="punct">&quot;</span><span class="string">r</span><span class="punct">&quot;).</span><span class="ident">each_with_index</span><span class="punct">{|</span><span class="ident">row</span><span class="punct">,</span> <span class="ident">idx</span><span class="punct">|</span></span>
-<span class="linenum">33</span>        <span class="keyword">if</span> <span class="ident">idx</span><span class="punct">==</span><span class="number">0</span>
-<span class="linenum">34</span>          <span class="ident">row</span><span class="punct">.</span><span class="ident">to_enum</span><span class="punct">(</span><span class="symbol">:each_with_index</span><span class="punct">).</span><span class="ident">collect</span><span class="punct">{|</span><span class="ident">name</span><span class="punct">,</span> <span class="ident">index</span><span class="punct">|</span> </code></pre>
+      <div class="failure" id="failure_7">
+        <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-validations-0.10.1/lib/dm-validations.rb:32:in `create'
+./spec/models/upload_spec.rb:5:</pre></div>
+    <pre class="ruby"><code><span class="linenum">278</span>              <span class="ident">send</span><span class="punct">(</span><span class="ident">setter</span><span class="punct">,</span> <span class="ident">value</span><span class="punct">)</span>
+<span class="linenum">279</span>            <span class="keyword">else</span>
+<span class="offending"><span class="linenum">280</span>              <span class="keyword">raise</span> <span class="constant">ArgumentError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">The attribute '<span class="expr">#{name}</span>' is not accessible in <span class="expr">#{model}</span></span><span class="punct">&quot;</span></span>
+<span class="linenum">281</span>            <span class="keyword">end</span>
+<span class="linenum">282</span>          <span class="keyword">when</span> <span class="constant">Associations</span><span class="punct">::</span><span class="constant">Relationship</span><span class="punct">,</span> <span class="constant">Property</span></code></pre>
       </div>
     </dd>
   </dl>
@@ -279,10 +385,10 @@ a {
   <dl>
   <dt id="example_group_7">Upload</dt>
     <script type="text/javascript">makeRed('example_group_7');</script>
-    <script type="text/javascript">moveProgressBar('17.8');</script>
+    <script type="text/javascript">moveProgressBar('17.6');</script>
     <dd class="spec failed">
       <span class="failed_spec_name">before(:all)</span>
-      <div class="failure" id="failure_2">
+      <div class="failure" id="failure_8">
         <div class="message"><pre>uninitialized constant CSV</pre></div>
         <div class="backtrace"><pre>./spec/models/functions_spec.rb:10:</pre></div>
     <pre class="ruby"><code><span class="linenum">8</span>    <span class="attribute">@installments</span> <span class="punct">=</span> <span class="number">50</span>
@@ -297,59 +403,43 @@ a {
 <div class="example_group">
   <dl>
   <dt id="example_group_8">Client</dt>
-    <script type="text/javascript">moveProgressBar('18.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a center</span></dd>
-    <script type="text/javascript">moveProgressBar('19.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
-    <script type="text/javascript">moveProgressBar('20.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a reference</span></dd>
-    <script type="text/javascript">moveProgressBar('20.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid with name shorter than 3 characters</span></dd>
     <script type="text/javascript">makeRed('example_group_8');</script>
-    <script type="text/javascript">moveProgressBar('21.7');</script>
+    <script type="text/javascript">moveProgressBar('17.6');</script>
     <dd class="spec failed">
-      <span class="failed_spec_name">should have a joining date</span>
-      <div class="failure" id="failure_3">
-        <div class="message"><pre>expected valid? to return false, got true</pre></div>
-        <div class="backtrace"><pre>./spec/models/client_spec.rb:52:</pre></div>
-    <pre class="ruby"><code><span class="linenum">50</span>  <span class="ident">it</span> <span class="punct">&quot;</span><span class="string">should have a joining date</span><span class="punct">&quot;</span> <span class="keyword">do</span>
-<span class="linenum">51</span>    <span class="attribute">@client</span><span class="punct">.</span><span class="ident">date_joined</span> <span class="punct">=</span> <span class="constant">nil</span>
-<span class="offending"><span class="linenum">52</span>    <span class="attribute">@client</span><span class="punct">.</span><span class="ident">should_not</span> <span class="ident">be_valid</span></span>
-<span class="linenum">53</span>  <span class="keyword">end</span>
-<span class="linenum">54</span> </code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('22.4');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should be able to 'have' loans</span>
-      <div class="failure" id="failure_4">
+      <span class="failed_spec_name">before(:all)</span>
+      <div class="failure" id="failure_9">
         <div class="message"><pre>expected valid? to return true, got false</pre></div>
-        <div class="backtrace"><pre>./spec/models/client_spec.rb:73:</pre></div>
-    <pre class="ruby"><code><span class="linenum">71</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">approved_by</span> <span class="punct">=</span> <span class="attribute">@manager</span>
-<span class="linenum">72</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">save</span>
-<span class="offending"><span class="linenum">73</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
-<span class="linenum">74</span>
-<span class="linenum">75</span>    <span class="attribute">@client</span><span class="punct">.</span><span class="ident">loans</span> <span class="punct">&lt;&lt;</span> <span class="attribute">@loan</span></code></pre>
+        <div class="backtrace"><pre>./spec/models/client_spec.rb:13:</pre></div>
+    <pre class="ruby"><code><span class="linenum">11</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
+<span class="linenum">12</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">14</span>
+<span class="linenum">15</span>    <span class="attribute">@center</span> <span class="punct">=</span> <span class="constant">Center</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Munnar hill center</span><span class="punct">&quot;)</span></code></pre>
       </div>
     </dd>
-    <script type="text/javascript">moveProgressBar('23.2');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">should not have more than one outstanding loan at a time if so specified (PENDING: Not Yet Implemented)</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
   <dt id="example_group_9">Payment</dt>
     <script type="text/javascript">makeRed('example_group_9');</script>
-    <script type="text/javascript">moveProgressBar('23.2');</script>
+    <script type="text/javascript">moveProgressBar('17.6');</script>
     <dd class="spec failed">
       <span class="failed_spec_name">before(:all)</span>
-      <div class="failure" id="failure_5">
-        <div class="message"><pre>expected valid? to return true, got false</pre></div>
-        <div class="backtrace"><pre>./spec/models/payment_spec.rb:52:</pre></div>
-    <pre class="ruby"><code><span class="linenum">50</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">disbursed_by</span> <span class="punct">=</span> <span class="attribute">@manager</span>
-<span class="linenum">51</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">save</span>
-<span class="offending"><span class="linenum">52</span>    <span class="attribute">@loan</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
-<span class="linenum">53</span>  <span class="keyword">end</span></code></pre>
+      <div class="failure" id="failure_10">
+        <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/payment_spec.rb:8:</pre></div>
+    <pre class="ruby"><code><span class="linenum">278</span>              <span class="ident">send</span><span class="punct">(</span><span class="ident">setter</span><span class="punct">,</span> <span class="ident">value</span><span class="punct">)</span>
+<span class="linenum">279</span>            <span class="keyword">else</span>
+<span class="offending"><span class="linenum">280</span>              <span class="keyword">raise</span> <span class="constant">ArgumentError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">The attribute '<span class="expr">#{name}</span>' is not accessible in <span class="expr">#{model}</span></span><span class="punct">&quot;</span></span>
+<span class="linenum">281</span>            <span class="keyword">end</span>
+<span class="linenum">282</span>          <span class="keyword">when</span> <span class="constant">Associations</span><span class="punct">::</span><span class="constant">Relationship</span><span class="punct">,</span> <span class="constant">Property</span></code></pre>
       </div>
     </dd>
   </dl>
@@ -357,36 +447,75 @@ a {
 <div class="example_group">
   <dl>
   <dt id="example_group_10">Branch</dt>
-    <script type="text/javascript">moveProgressBar('24.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a manager</span></dd>
-    <script type="text/javascript">moveProgressBar('24.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
-    <script type="text/javascript">moveProgressBar('25.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid with a name shorter than 3 characters</span></dd>
-    <script type="text/javascript">moveProgressBar('26.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should be able to 'have' centers</span></dd>
+    <script type="text/javascript">makeRed('example_group_10');</script>
+    <script type="text/javascript">moveProgressBar('18.4');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should not be valid without a manager</span>
+      <div class="failure" id="failure_11">
+        <div class="message"><pre>expected valid? to return true, got false</pre></div>
+        <div class="backtrace"><pre>./spec/models/branch_spec.rb:15:</pre></div>
+    <pre class="ruby"><code><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
+<span class="linenum">14</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">15</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">16</span>  <span class="keyword">end</span>
+<span class="linenum">17</span> </code></pre>
+      </div>
+    </dd>
+    <script type="text/javascript">moveProgressBar('19.2');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should not be valid without a name</span>
+      <div class="failure" id="failure_12">
+        <div class="message"><pre>expected valid? to return true, got false</pre></div>
+        <div class="backtrace"><pre>./spec/models/branch_spec.rb:15:</pre></div>
+    <pre class="ruby"><code><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
+<span class="linenum">14</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">15</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">16</span>  <span class="keyword">end</span>
+<span class="linenum">17</span> </code></pre>
+      </div>
+    </dd>
+    <script type="text/javascript">moveProgressBar('20.0');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should not be valid with a name shorter than 3 characters</span>
+      <div class="failure" id="failure_13">
+        <div class="message"><pre>expected valid? to return true, got false</pre></div>
+        <div class="backtrace"><pre>./spec/models/branch_spec.rb:15:</pre></div>
+    <pre class="ruby"><code><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
+<span class="linenum">14</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">15</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">16</span>  <span class="keyword">end</span>
+<span class="linenum">17</span> </code></pre>
+      </div>
+    </dd>
+    <script type="text/javascript">moveProgressBar('20.7');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">should be able to 'have' centers</span>
+      <div class="failure" id="failure_14">
+        <div class="message"><pre>expected valid? to return true, got false</pre></div>
+        <div class="backtrace"><pre>./spec/models/branch_spec.rb:15:</pre></div>
+    <pre class="ruby"><code><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
+<span class="linenum">14</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">15</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">16</span>  <span class="keyword">end</span>
+<span class="linenum">17</span> </code></pre>
+      </div>
+    </dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
   <dt id="example_group_11">Center</dt>
-    <script type="text/javascript">moveProgressBar('27.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a manager</span></dd>
-    <script type="text/javascript">moveProgressBar('27.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
-    <script type="text/javascript">moveProgressBar('28.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid with a name shorter than 3 characters</span></dd>
     <script type="text/javascript">makeRed('example_group_11');</script>
-    <script type="text/javascript">moveProgressBar('29.4');</script>
+    <script type="text/javascript">moveProgressBar('20.7');</script>
     <dd class="spec failed">
-      <span class="failed_spec_name">should be able to 'have' clients</span>
-      <div class="failure" id="failure_6">
-        <div class="message"><pre>undefined method `name' for nil:NilClass</pre></div>
-        <div class="backtrace"><pre>./spec/models/center_spec.rb:50:</pre></div>
-    <pre class="ruby"><code><span class="linenum">48</span>    <span class="attribute">@center</span><span class="punct">.</span><span class="ident">clients</span> <span class="punct">&lt;&lt;</span> <span class="attribute">@client</span>
-<span class="linenum">49</span>    <span class="attribute">@center</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span>
-<span class="offending"><span class="linenum">50</span>    <span class="attribute">@center</span><span class="punct">.</span><span class="ident">clients</span><span class="punct">.</span><span class="ident">first</span><span class="punct">.</span><span class="ident">name</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">eql</span><span class="punct">(</span><span class="ident">name</span><span class="punct">)</span></span>
-<span class="linenum">51</span>    <span class="attribute">@center</span><span class="punct">.</span><span class="ident">clients</span><span class="punct">.</span><span class="ident">first</span><span class="punct">.</span><span class="ident">reference</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">eql</span><span class="punct">(</span><span class="ident">ref</span><span class="punct">)</span></code></pre>
+      <span class="failed_spec_name">before(:all)</span>
+      <div class="failure" id="failure_15">
+        <div class="message"><pre>expected valid? to return true, got false</pre></div>
+        <div class="backtrace"><pre>./spec/models/center_spec.rb:13:</pre></div>
+    <pre class="ruby"><code><span class="linenum">11</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
+<span class="linenum">12</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">14</span>  <span class="keyword">end</span></code></pre>
       </div>
     </dd>
   </dl>
@@ -394,21 +523,27 @@ a {
 <div class="example_group">
   <dl>
   <dt id="example_group_12">Attendancy</dt>
-    <script type="text/javascript">moveProgressBar('30.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
-    <script type="text/javascript">moveProgressBar('31.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper date</span></dd>
-    <script type="text/javascript">moveProgressBar('31.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid when attendancy date is in future</span></dd>
-    <script type="text/javascript">moveProgressBar('32.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper status</span></dd>
+    <script type="text/javascript">makeRed('example_group_12');</script>
+    <script type="text/javascript">moveProgressBar('20.7');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">before(:all)</span>
+      <div class="failure" id="failure_16">
+        <div class="message"><pre>expected valid? to return true, got false</pre></div>
+        <div class="backtrace"><pre>./spec/models/attendancy_spec.rb:12:</pre></div>
+    <pre class="ruby"><code><span class="linenum">10</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
+<span class="linenum">11</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">12</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">13</span>
+<span class="linenum">14</span>    <span class="attribute">@center</span> <span class="punct">=</span> <span class="constant">Center</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Munnar hill center</span><span class="punct">&quot;)</span></code></pre>
+      </div>
+    </dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
   <dt id="example_group_13">LedgerEntry</dt>
     <script type="text/javascript">makeYellow('example_group_13');</script>
-    <script type="text/javascript">moveProgressBar('33.3');</script>
+    <script type="text/javascript">moveProgressBar('21.5');</script>
     <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
   </dl>
 </div>
@@ -416,156 +551,95 @@ a {
   <dl>
   <dt id="example_group_14">Fee</dt>
     <script type="text/javascript">makeYellow('example_group_14');</script>
-    <script type="text/javascript">moveProgressBar('34.1');</script>
+    <script type="text/javascript">moveProgressBar('22.3');</script>
     <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_15">Loan</dt>
-    <script type="text/javascript">moveProgressBar('34.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have a discrimintator</span></dd>
-    <script type="text/javascript">moveProgressBar('35.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
-    <script type="text/javascript">moveProgressBar('36.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being approved properly</span></dd>
-    <script type="text/javascript">moveProgressBar('37.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being validated properly</span></dd>
-    <script type="text/javascript">moveProgressBar('37.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being rejected properly</span></dd>
-    <script type="text/javascript">moveProgressBar('38.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
-    <script type="text/javascript">moveProgressBar('39.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper amount</span></dd>
-    <script type="text/javascript">moveProgressBar('40.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper interest_rate</span></dd>
-    <script type="text/javascript">moveProgressBar('41.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should be valid with a proper installment_frequency</span></dd>
-    <script type="text/javascript">moveProgressBar('41.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper installment_frequency</span></dd>
-    <script type="text/javascript">moveProgressBar('42.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper number_of_installments</span></dd>
-    <script type="text/javascript">moveProgressBar('43.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_first_payment_date</span></dd>
-    <script type="text/javascript">moveProgressBar('44.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('44.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid with a disbursal date earlier than the loan is approved</span></dd>
-    <script type="text/javascript">moveProgressBar('45.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid when validated_on is earlier than the disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('46.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid when written_off_on is earlier than the disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('47.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without approved_on earlier than scheduled_disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('48.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly written off</span></dd>
-    <script type="text/javascript">moveProgressBar('48.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly disbursed</span></dd>
-    <script type="text/javascript">moveProgressBar('49.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid when scheduled_first_payment_date if before scheduled_disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('50.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates</span></dd>
-    <script type="text/javascript">moveProgressBar('51.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.shift_date_by_installments should shift dates properly, even odd ones.. and backwards.</span></dd>
-    <script type="text/javascript">moveProgressBar('51.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.descendants should keep track of the subclasses (just testing dm-core functionality)</span></dd>
-    <script type="text/javascript">moveProgressBar('52.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.number_of_installments_before should do what it promises</span></dd>
-    <script type="text/javascript">makeYellow('example_group_15');</script>
-    <script type="text/javascript">moveProgressBar('53.4');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">.last_loan_history_date should have some tests -- albeit more a view thing (PENDING: Not Yet Implemented)</span></dd>
-    <script type="text/javascript">moveProgressBar('54.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.scheduled_repaid_on give the proper date</span></dd>
-    <script type="text/javascript">moveProgressBar('55.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have proper values for principal, interest and total to be received</span></dd>
-    <script type="text/javascript">moveProgressBar('55.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it written off</span></dd>
-    <script type="text/javascript">moveProgressBar('56.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it is repaid</span></dd>
-    <script type="text/javascript">moveProgressBar('57.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties before being approved</span></dd>
-    <script type="text/javascript">moveProgressBar('58.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties when being rejected</span></dd>
-    <script type="text/javascript">moveProgressBar('58.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">cannot repay an unsaved loan</span></dd>
-    <script type="text/javascript">moveProgressBar('59.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.installment_dates should give a list with some dates</span></dd>
-    <script type="text/javascript">moveProgressBar('60.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.payment_schedule should give correct results</span></dd>
-    <script type="text/javascript">moveProgressBar('61.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.payments_hash should give correct results</span></dd>
-    <script type="text/javascript">moveProgressBar('62.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">history should be correct</span></dd>
-    <script type="text/javascript">moveProgressBar('62.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should write the history correctly into the db</span></dd>
+  <dt id="example_group_15">LoanHistory</dt>
+    <script type="text/javascript">makeRed('example_group_15');</script>
+    <script type="text/javascript">moveProgressBar('22.3');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">before(:all)</span>
+      <div class="failure" id="failure_17">
+        <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/loan_history_spec.rb:7:</pre></div>
+    <pre class="ruby"><code><span class="linenum">278</span>              <span class="ident">send</span><span class="punct">(</span><span class="ident">setter</span><span class="punct">,</span> <span class="ident">value</span><span class="punct">)</span>
+<span class="linenum">279</span>            <span class="keyword">else</span>
+<span class="offending"><span class="linenum">280</span>              <span class="keyword">raise</span> <span class="constant">ArgumentError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">The attribute '<span class="expr">#{name}</span>' is not accessible in <span class="expr">#{model}</span></span><span class="punct">&quot;</span></span>
+<span class="linenum">281</span>            <span class="keyword">end</span>
+<span class="linenum">282</span>          <span class="keyword">when</span> <span class="constant">Associations</span><span class="punct">::</span><span class="constant">Relationship</span><span class="punct">,</span> <span class="constant">Property</span></code></pre>
+      </div>
+    </dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_16">LoanHistory</dt>
-    <script type="text/javascript">moveProgressBar('63.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without scheduled outstanding principal</span></dd>
-    <script type="text/javascript">moveProgressBar('64.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without scheduled outstanding total</span></dd>
-    <script type="text/javascript">moveProgressBar('65.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without actual outstanding principal</span></dd>
-    <script type="text/javascript">moveProgressBar('65.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without actual outstanding total</span></dd>
-    <script type="text/javascript">moveProgressBar('66.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without having a proper status</span></dd>
-    <script type="text/javascript">moveProgressBar('67.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if the combination if loan id and date is not unique</span></dd>
-    <script type="text/javascript">moveProgressBar('68.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct number of periods</span></dd>
-    <script type="text/javascript">moveProgressBar('68.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should start with the application date, approval date, disbursal date and first payment date</span></dd>
-    <script type="text/javascript">moveProgressBar('69.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have the following dates afterwards</span></dd>
-    <script type="text/javascript">moveProgressBar('70.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct amounts</span></dd>
+  <dt id="example_group_16">Loan</dt>
+    <script type="text/javascript">makeRed('example_group_16');</script>
+    <script type="text/javascript">moveProgressBar('22.3');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">before(:all)</span>
+      <div class="failure" id="failure_18">
+        <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/loan_spec.rb:8:</pre></div>
+    <pre class="ruby"><code><span class="linenum">278</span>              <span class="ident">send</span><span class="punct">(</span><span class="ident">setter</span><span class="punct">,</span> <span class="ident">value</span><span class="punct">)</span>
+<span class="linenum">279</span>            <span class="keyword">else</span>
+<span class="offending"><span class="linenum">280</span>              <span class="keyword">raise</span> <span class="constant">ArgumentError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">The attribute '<span class="expr">#{name}</span>' is not accessible in <span class="expr">#{model}</span></span><span class="punct">&quot;</span></span>
+<span class="linenum">281</span>            <span class="keyword">end</span>
+<span class="linenum">282</span>          <span class="keyword">when</span> <span class="constant">Associations</span><span class="punct">::</span><span class="constant">Relationship</span><span class="punct">,</span> <span class="constant">Property</span></code></pre>
+      </div>
+    </dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
   <dt id="example_group_17">Report</dt>
-    <script type="text/javascript">moveProgressBar('71.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have 2 * 7 centers and centers * 3 clients</span></dd>
-    <script type="text/javascript">moveProgressBar('72.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have proper statistics after first monday's payments</span></dd>
-    <script type="text/javascript">moveProgressBar('72.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct loan count</span></dd>
-    <script type="text/javascript">moveProgressBar('73.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct number of clients</span></dd>
-    <script type="text/javascript">moveProgressBar('74.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have correct client count event after we add our new loans</span></dd>
-    <script type="text/javascript">moveProgressBar('75.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should return correct repaid loan count</span></dd>
-    <script type="text/javascript">moveProgressBar('75.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should return correct repaid loan amount</span></dd>
-    <script type="text/javascript">moveProgressBar('76.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should return correct disbursed loan count</span></dd>
-    <script type="text/javascript">moveProgressBar('77.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should return correct disbursed loan amount</span></dd>
-    <script type="text/javascript">moveProgressBar('78.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct principal due</span></dd>
-    <script type="text/javascript">moveProgressBar('79.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct principal received</span></dd>
-    <script type="text/javascript">moveProgressBar('79.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct interest due</span></dd>
-    <script type="text/javascript">moveProgressBar('80.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct interest received</span></dd>
-    <script type="text/javascript">moveProgressBar('81.3');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct principal outstanding</span></dd>
-    <script type="text/javascript">moveProgressBar('82.1');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct scheduled principal outstanding</span></dd>
-    <script type="text/javascript">moveProgressBar('82.9');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct total outstanding</span></dd>
-    <script type="text/javascript">moveProgressBar('83.7');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct scheduled total outstanding</span></dd>
+    <script type="text/javascript">makeRed('example_group_17');</script>
+    <script type="text/javascript">moveProgressBar('22.3');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">before(:all)</span>
+      <div class="failure" id="failure_19">
+        <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/report_spec.rb:11:</pre></div>
+    <pre class="ruby"><code><span class="linenum">278</span>              <span class="ident">send</span><span class="punct">(</span><span class="ident">setter</span><span class="punct">,</span> <span class="ident">value</span><span class="punct">)</span>
+<span class="linenum">279</span>            <span class="keyword">else</span>
+<span class="offending"><span class="linenum">280</span>              <span class="keyword">raise</span> <span class="constant">ArgumentError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">The attribute '<span class="expr">#{name}</span>' is not accessible in <span class="expr">#{model}</span></span><span class="punct">&quot;</span></span>
+<span class="linenum">281</span>            <span class="keyword">end</span>
+<span class="linenum">282</span>          <span class="keyword">when</span> <span class="constant">Associations</span><span class="punct">::</span><span class="constant">Relationship</span><span class="punct">,</span> <span class="constant">Property</span></code></pre>
+      </div>
+    </dd>
   </dl>
 </div>
-<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>87.633235 seconds</strong>";</script>
-<script type="text/javascript">document.getElementById('totals').innerHTML = "108 examples, 6 failures, 5 pending";</script>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_18">ClientGroup</dt>
+    <script type="text/javascript">makeYellow('example_group_18');</script>
+    <script type="text/javascript">moveProgressBar('23.0');</script>
+    <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
+  </dl>
+</div>
+<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>57.80463 seconds</strong>";</script>
+<script type="text/javascript">document.getElementById('totals').innerHTML = "30 examples, 19 failures, 4 pending";</script>
 </div>
 </div>
 </body>

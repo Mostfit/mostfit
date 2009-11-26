@@ -1,17 +1,27 @@
+User should not be valid with name shorter than 3 characters
+User should not have a nil login 
+User should be return for admin? if admin value set to true
+User should be created before it is updated
+User should have a login name beginning with numbers, aplphabets and underscores 
+User should not have false in all permission fields
 Upload before(:all)
 Upload before(:all)
-Client should have a joining date
-Client should be able to 'have' loans
+Client before(:all)
 Payment before(:all)
-Center should be able to 'have' clients
+Branch should not be valid without a manager
+Branch should not be valid without a name
+Branch should not be valid with a name shorter than 3 characters
+Branch should be able to 'have' centers
+Center before(:all)
+Attendancy before(:all)
+LoanHistory before(:all)
+Loan before(:all)
+Report before(:all)
 
 Pending:
 
 LoanType should have specs (Not Yet Implemented)
 ./spec/models/loan_type_spec.rb:5
-
-Client should not have more than one outstanding loan at a time if so specified (Not Yet Implemented)
-./spec/models/client_spec.rb:97
 
 LedgerEntry should have specs (Not Yet Implemented)
 ./spec/models/ledger_entry_spec.rb:5
@@ -19,5 +29,5 @@ LedgerEntry should have specs (Not Yet Implemented)
 Fee should have specs (Not Yet Implemented)
 ./spec/models/fee_spec.rb:5
 
-Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
-./spec/models/loan_spec.rb:333
+ClientGroup should have specs (Not Yet Implemented)
+./spec/models/client_group_spec.rb:5

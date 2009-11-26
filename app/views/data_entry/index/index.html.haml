@@ -10,6 +10,7 @@
     - if (@i-1) % 3 == 0
       %tr
       - @i=1
+    - debugger
     - if session.user.can_manage?(thing)
       %td
         = image_tag "/images/#{plural}.jpg"
@@ -28,9 +29,22 @@
           = link_to "Add new #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'new'), :class => 'add_small'
           %br
           = link_to "Edit a #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'edit'), :class => 'edit_small'
+        - if thing == :loan
+          %br
+          - pa = Loan.all(:approved_on => nil).count
+          - if pa > 0
+            %b{:style => "color:green;"}
+              = link_to 'Approve Loans', url("enter_#{plural}".to_sym, :action => 'approve'), :class => 'edit_small', :style => "font-weight: bold;"
+              == (#{pa})
+          %br
+          - nd = Loan.all(:disbursal_date => nil, :scheduled_disbursal_date.lte => Date.today).count
+          - if nd > 0
+            %b{:style => "color:green;"}
+              = link_to 'Disburse Loans', url("enter_#{plural}".to_sym, :action => 'disburse'), :class => 'edit_small', :style => "font-weight: bold;"
+              == (#{nd})
         - @i += 1
 
-- if session.user.can_access?(:admin, :index)
+- if session.user.can_access?({:controller => "admin", :action => "index"})
   %h1 Administration
   = link_to 'Manage Users', resource(:users), :class => 'edit'
   |

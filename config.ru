@@ -2,10 +2,10 @@
 require 'rubygems'
 
 # Uncomment if your app uses bundled gems.
-# gems_dir = File.expand_path(File.join(File.dirname(__FILE__), 'gems'))
-# Gem.clear_paths
-# $BUNDLE = true
-# Gem.path.unshift(gems_dir)
+gems_dir = File.expand_path(File.join(File.dirname(__FILE__), 'gems'))
+Gem.clear_paths
+$BUNDLE = true
+Gem.path.unshift(gems_dir)
 
 require 'merb-core'
 

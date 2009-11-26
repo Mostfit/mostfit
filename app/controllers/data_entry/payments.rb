@@ -17,8 +17,10 @@ module DataEntry
         bulk_payments_and_disbursals
         if @errors.blank?
           redirect(url(:data_entry), :message => {:notice => 'All payments made succesfully'})
-        else
-          params[:format] and params[:format]=="xml" ? display("") : render      
+        elsif params[:format] and params[:format]=="xml"
+          display("")
+        else 
+          render      
         end
       else
         render
@@ -26,7 +28,8 @@ module DataEntry
     end
     
     def by_staff_member
-      @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
+      debugger
+      @date = params[:for_date] ? Date.parse(params[:for_date]) : Date.today
       staff_id = params[:staff_member_id] || params[:received_by]
       if staff_id
         @staff_member = StaffMember.get(staff_id.to_i)
@@ -36,11 +39,13 @@ module DataEntry
         if params[:paid] or params[:disbursed]
           bulk_payments_and_disbursals
         end
-      end
-      if @errors and @errors.blank?
-        redirect_to url(:enter_payments, action => 'by_staff_member'), :message => "All payments made succesfully"
+        if @errors.blank?
+          redirect url(:enter_payments, :action => 'by_staff_member'), :message => {:notice => "All payments made succesfully"}
+        else
+          render
+        end
       else
-        render
+        redirect url(:enter_payments, :action => 'by_staff_member', :staff_member_id => @staff_member.id, :for_date => @date)
       end
     end
     
@@ -101,7 +106,7 @@ module DataEntry
       if params[:paid]
         params[:paid].keys.each do |k|
           @loan = Loan.get(k.to_i)
-          @staff = StaffMember.get(params[:received_by])
+          @staff = StaffMember.get(params[:payment][:received_by])
           amounts = params[:paid][k.to_sym].to_i
           success, @payment = @loan.repay(amounts, session.user, @date, @staff, false)
           @errors << @payment.errors if not success
