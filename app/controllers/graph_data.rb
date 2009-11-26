@@ -274,10 +274,13 @@ class GraphData < Application
         type ="bar"
         while date <= max_date 
           values << (vals[date.year.to_s + "_" + date.month.to_s] or 0)
-          labels << (date.month % 3 == 0 ? date.month.to_s + "/" + date.year.to_s : "")
+          labels << "#{date.month.to_s}.#{date.year.to_s}"
           date = date >> 1
         end
-        type = "bar"
+        elements = [{:type => "bar", :values => values}]
+        title = {:text => "Client Addition by Day"}
+        x_axis = {:steps => 5, :labels => {:labels => labels.to_json}}
+        return {:elements => elements, :x_axis => x_axis, :title => title}.to_json
       when "client_cumulative"
         min_date = Client.all.min(:date_joined)
         max_date = Date.today >> 1
@@ -286,7 +289,7 @@ class GraphData < Application
         type ="bar"
         while date <= max_date 
           values << Client.all(:date_joined.lte => date).count
-          labels << (date.month % 3 == 0 ? date.month.to_s + "/" + date.year.to_s : "")
+          labels << date.month.to_s + "/" + date.year.to_s
           date = date >> 1
         end
       when "branch_pie"
@@ -300,7 +303,7 @@ class GraphData < Application
         color_value = 65280 + (color_ratio * (16711680 - 65280))
         color = color_value.to_i.to_s(16)
         color = "00" + color if color.length == 4
-        {:value => val.to_i, :label => "#{v[2]}\nReceived #{v[1].to_i} of #{(v[1]+v[0]).to_i}", :colour => color}
+        {:value => val.to_i, :label => "#{v[2]}( #{v[1].to_i}/ #{(v[1]+v[0]).to_i})", :colour => color}
       end
       type="pie" 
     end
@@ -308,37 +311,11 @@ class GraphData < Application
 
   end
 
-  def render_graph(vals, type = "bar", labels = [])
-    x = { :elements => {:type => "bar", :values => vals}}
-    case type
-      when "bar"
-      <<-JSON
-      { "elements":[
-          {
-            "type": "bar",
-            "values": #{vals.to_json}
-          }
-        ],
-        "y_axis": {
-         "max": #{vals.max * 1.1},
-          "steps": #{vals.max * 1.1 / 10}
-
-        },
-       "x_axis": {
-          "labels": { "labels": #{labels.to_json}}
-       }
-      }
-      JSON
-      when "pie"
-      <<-JSON
-      { "elements":[
-          {
-            "type": "pie",
-            "values": #{vals.to_json}
-          }
-        ]}
-      JSON
-    end
+  def render_graph(vals, type = "bar", labels = [], steps = 10)
+    x = { :elements => [{:type => type, :values => vals}]}
+    x_axis = {:labels => {:labels => labels.to_json, :steps => steps}}
+    x[:x_axis] = x_axis
+    return x.to_json
  end    
 
 

@@ -10,22 +10,57 @@
     %br
 
 - if @center
-  The following loans have not been approved yet for 
-  = link_to "this center.", "/centers/#{@center.id}"
+  %h2
+    The following loans have not been approved yet for 
+    = link_to "this center.", "/centers/#{@center.id}"
+  %h1 Approvals
+  - if not @errors.blank?
+    .error
+      %ul
+        - @errors.each do |e|
+          - e.values.each do |v|
+            %li
+              == Loan #{e.resource.id}: #{v}
+  - loans_to_approve = @loans
+  - if loans_to_approve.size > 0
+    = form_for(@loan, :action => url(:enter_loans, :action => "approve")) do
+      %table.narrow.form{ :width => '100%'}
+        %thead
+          %tr{:style => "font-size: 0.85em;"}
+            %th
+              id
+            %th
+              Client Name
+            %th
+              Details
+            %th
+              Approval Date
+            %th
+              Status
+            %th
+              Approved?
+            %th
+              Approved By
+        - loans_to_approve.each do |loan|
+          %tr{:class => cycle('odd','')}
+            %td
+              = loan.id
+            %td
+              = link_to loan.client.name, resource(loan.client)
+            %td
+              = link_to loan.description, url(:quick_link, "loans", loan.id)
+            %td
+              = date_select("loans[#{loan.id}][approved_on]")
+            %td 
+              = loan.status
+            %td
+              = check_box :name => "loans[#{loan.id}][approved?]"
+            %td
+              = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => [["","---"]] + StaffMember.all.map{|s| [s.id.to_s,s.name]}
+        %tfoot
+          %tr
+            %td{:colspan => 10}
+      = submit 'Approve these loans'
+  - else
+    Nothing to approve
   
-  = form_for(@loan, :action => url(:enter_loans, :action => 'approve')) do
-    %table
-      - Loan.all(:approved_on => nil, 'client.center_id' => @center.id).each do |l|
-        %tr
-          %td
-            %input{:type => :checkbox, :name => "approve[#{l.id}]"}
-          %td
-            = l.amount
-            @
-            = l.interest_rate
-            for client
-            = l.client.name
-          %td
-            = link_to "See", "/loans/#{l.id}"
-    = select :name => :approved_by, :collection => StaffMember.all.map {|sm| [sm.id, sm.name]}, :selected => @center.manager_staff_id.to_s
-    = submit "Approve these loans"

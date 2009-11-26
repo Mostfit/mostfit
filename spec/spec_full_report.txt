@@ -1,11 +1,17 @@
 
 User
-- should not be valid with name shorter than 3 characters
-- should not have a nil login 
-- should be return for admin? if admin value set to true
-- should be created before it is updated
-- should have a login name beginning with numbers, aplphabets and underscores 
-- should not have false in all permission fields
+- should not be valid with name shorter than 3 characters (FAILED - 1)
+- should not have a nil login  (FAILED - 2)
+- should be return for admin? if admin value set to true (FAILED - 3)
+- should be created before it is updated (FAILED - 4)
+- should have a login name beginning with numbers, aplphabets and underscores  (FAILED - 5)
+- should not have false in all permission fields (FAILED - 6)
+
+StaffMember
+- should not be valid without a name
+- should not  be valid without active boolean
+- should be unique
+- should have name length > 3
 
 Funder
 - should not be valid without having a name
@@ -13,12 +19,6 @@ Funder
 - should give correct count of completed lines 
 - should give correct count of active lines
 - should give correct count of total lines 
-
-StaffMember
-- should not be valid without a name
-- should not  be valid without active boolean
-- should be unique
-- should have name length > 3
 
 FundingLine
 - should not be valid without belonging to a funder
@@ -33,40 +33,28 @@ LoanType
 - should have specs (PENDING: Not Yet Implemented)
 
 Upload
-- before(:all) (FAILED - 1)
+- before(:all) (FAILED - 7)
 
 Upload
-- before(:all) (FAILED - 2)
+- before(:all) (FAILED - 8)
 
 Client
-- should not be valid without belonging to a center
-- should not be valid without a name
-- should not be valid without a reference
-- should not be valid with name shorter than 3 characters
-- should have a joining date (FAILED - 3)
-- should be able to 'have' loans (FAILED - 4)
-- should not have more than one outstanding loan at a time if so specified (PENDING: Not Yet Implemented)
+- before(:all) (FAILED - 9)
 
 Payment
-- before(:all) (FAILED - 5)
+- before(:all) (FAILED - 10)
 
 Branch
-- should not be valid without a manager
-- should not be valid without a name
-- should not be valid with a name shorter than 3 characters
-- should be able to 'have' centers
+- should not be valid without a manager (FAILED - 11)
+- should not be valid without a name (FAILED - 12)
+- should not be valid with a name shorter than 3 characters (FAILED - 13)
+- should be able to 'have' centers (FAILED - 14)
 
 Center
-- should not be valid without a manager
-- should not be valid without a name
-- should not be valid with a name shorter than 3 characters
-- should be able to 'have' clients (FAILED - 6)
+- before(:all) (FAILED - 15)
 
 Attendancy
-- should not be valid without belonging to a client
-- should not be valid without proper date
-- should not be valid when attendancy date is in future
-- should not be valid without proper status
+- before(:all) (FAILED - 16)
 
 LedgerEntry
 - should have specs (PENDING: Not Yet Implemented)
@@ -74,83 +62,22 @@ LedgerEntry
 Fee
 - should have specs (PENDING: Not Yet Implemented)
 
-Loan
-- should have a discrimintator
-- should not be valid without belonging to a client
-- should not be valid without being approved properly
-- should not be valid without being validated properly
-- should not be valid without being rejected properly
-- should not be valid without belonging to a client
-- should not be valid without a proper amount
-- should not be valid without a proper interest_rate
-- should be valid with a proper installment_frequency
-- should not be valid without proper installment_frequency
-- should not be valid without a proper number_of_installments
-- should not be valid without a scheduled_first_payment_date
-- should not be valid without a scheduled_disbursal_date
-- should not be valid with a disbursal date earlier than the loan is approved
-- should not be valid when validated_on is earlier than the disbursal_date
-- should not be valid when written_off_on is earlier than the disbursal_date
-- should not be valid without approved_on earlier than scheduled_disbursal_date
-- should not be valid without being properly written off
-- should not be valid without being properly disbursed
-- should not be valid when scheduled_first_payment_date if before scheduled_disbursal_date
-- should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates
-- .shift_date_by_installments should shift dates properly, even odd ones.. and backwards.
-- .descendants should keep track of the subclasses (just testing dm-core functionality)
-- .number_of_installments_before should do what it promises
-- .last_loan_history_date should have some tests -- albeit more a view thing (PENDING: Not Yet Implemented)
-- .scheduled_repaid_on give the proper date
-- should have proper values for principal, interest and total to be received
-- .status should give status accoring to changing properties up to it written off
-- .status should give status accoring to changing properties up to it is repaid
-- .status should give status accoring to changing properties before being approved
-- .status should give status accoring to changing properties when being rejected
-- cannot repay an unsaved loan
-- .installment_dates should give a list with some dates
-- .payment_schedule should give correct results
-- .payments_hash should give correct results
-- history should be correct
-- should write the history correctly into the db
-
 LoanHistory
-- should not be valid without scheduled outstanding principal
-- should not be valid without scheduled outstanding total
-- should not be valid without actual outstanding principal
-- should not be valid without actual outstanding total
-- should not be valid without having a proper status
-- should not be valid if the combination if loan id and date is not unique
-- should have correct number of periods
-- should start with the application date, approval date, disbursal date and first payment date
-- should have the following dates afterwards
-- should have correct amounts
+- before(:all) (FAILED - 17)
+
+Loan
+- before(:all) (FAILED - 18)
 
 Report
-- should have 2 * 7 centers and centers * 3 clients
-- should have proper statistics after first monday's payments
-- should have correct loan count
-- should have correct number of clients
-- should have correct client count event after we add our new loans
-- should return correct repaid loan count
-- should return correct repaid loan amount
-- should return correct disbursed loan count
-- should return correct disbursed loan amount
-- should give correct principal due
-- should give correct principal received
-- should give correct interest due
-- should give correct interest received
-- should give correct principal outstanding
-- should give correct scheduled principal outstanding
-- should give correct total outstanding
-- should give correct scheduled total outstanding
+- before(:all) (FAILED - 19)
+
+ClientGroup
+- should have specs (PENDING: Not Yet Implemented)
 
 Pending:
 
 LoanType should have specs (Not Yet Implemented)
 ./spec/models/loan_type_spec.rb:5
-
-Client should not have more than one outstanding loan at a time if so specified (Not Yet Implemented)
-./spec/models/client_spec.rb:97
 
 LedgerEntry should have specs (Not Yet Implemented)
 ./spec/models/ledger_entry_spec.rb:5
@@ -158,42 +85,171 @@ LedgerEntry should have specs (Not Yet Implemented)
 Fee should have specs (Not Yet Implemented)
 ./spec/models/fee_spec.rb:5
 
-Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
-./spec/models/loan_spec.rb:333
+ClientGroup should have specs (Not Yet Implemented)
+./spec/models/client_group_spec.rb:5
 
 1)
-NameError in 'Upload before(:all)'
-uninitialized constant Upload::CSV
-/home/svs/src/mostfit/app/models/upload.rb:32:in `load_csv'
-/home/svs/src/mostfit/app/models/upload.rb:27:in `each'
-/home/svs/src/mostfit/app/models/upload.rb:27:in `load_csv'
-./spec/models/upload_spec.rb:19:
+ArgumentError in 'User should not be valid with name shorter than 3 characters'
+The attribute 'admin' is not accessible in User
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:
 
 2)
+ArgumentError in 'User should not have a nil login '
+The attribute 'admin' is not accessible in User
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:
+
+3)
+ArgumentError in 'User should be return for admin? if admin value set to true'
+The attribute 'admin' is not accessible in User
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:
+
+4)
+ArgumentError in 'User should be created before it is updated'
+The attribute 'admin' is not accessible in User
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:
+
+5)
+ArgumentError in 'User should have a login name beginning with numbers, aplphabets and underscores '
+The attribute 'admin' is not accessible in User
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:
+
+6)
+ArgumentError in 'User should not have false in all permission fields'
+The attribute 'admin' is not accessible in User
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/user_spec.rb:7:
+
+7)
+ArgumentError in 'Upload before(:all)'
+The attribute 'admin' is not accessible in User
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-validations-0.10.1/lib/dm-validations.rb:32:in `create'
+./spec/models/upload_spec.rb:5:
+
+8)
 NameError in 'Upload before(:all)'
 uninitialized constant CSV
 ./spec/models/functions_spec.rb:10:
 
-3)
-'Client should have a joining date' FAILED
-expected valid? to return false, got true
-./spec/models/client_spec.rb:52:
-
-4)
-'Client should be able to 'have' loans' FAILED
+9)
+'Client before(:all)' FAILED
 expected valid? to return true, got false
-./spec/models/client_spec.rb:73:
+./spec/models/client_spec.rb:13:
 
-5)
-'Payment before(:all)' FAILED
+10)
+ArgumentError in 'Payment before(:all)'
+The attribute 'admin' is not accessible in User
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/payment_spec.rb:8:
+
+11)
+'Branch should not be valid without a manager' FAILED
 expected valid? to return true, got false
-./spec/models/payment_spec.rb:52:
+./spec/models/branch_spec.rb:15:
 
-6)
-NoMethodError in 'Center should be able to 'have' clients'
-undefined method `name' for nil:NilClass
-./spec/models/center_spec.rb:50:
+12)
+'Branch should not be valid without a name' FAILED
+expected valid? to return true, got false
+./spec/models/branch_spec.rb:15:
 
-Finished in 87.633235 seconds
+13)
+'Branch should not be valid with a name shorter than 3 characters' FAILED
+expected valid? to return true, got false
+./spec/models/branch_spec.rb:15:
 
-108 examples, 6 failures, 5 pending
+14)
+'Branch should be able to 'have' centers' FAILED
+expected valid? to return true, got false
+./spec/models/branch_spec.rb:15:
+
+15)
+'Center before(:all)' FAILED
+expected valid? to return true, got false
+./spec/models/center_spec.rb:13:
+
+16)
+'Attendancy before(:all)' FAILED
+expected valid? to return true, got false
+./spec/models/attendancy_spec.rb:12:
+
+17)
+ArgumentError in 'LoanHistory before(:all)'
+The attribute 'admin' is not accessible in User
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/loan_history_spec.rb:7:
+
+18)
+ArgumentError in 'Loan before(:all)'
+The attribute 'admin' is not accessible in User
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/loan_spec.rb:8:
+
+19)
+ArgumentError in 'Report before(:all)'
+The attribute 'admin' is not accessible in User
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
+./spec/models/report_spec.rb:11:
+
+Finished in 57.80463 seconds
+
+30 examples, 19 failures, 4 pending

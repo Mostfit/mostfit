@@ -4,7 +4,6 @@
       %td
         For center:
       %td
-        - debugger
         = select_center_for @client, :center
   -else
     %tr

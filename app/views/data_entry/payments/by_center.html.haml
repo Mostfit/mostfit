@@ -4,61 +4,63 @@
     (
     = Center.meeting_days[@date.wday]
     )
-  - if @center and @date
-    - if not @errors.blank?
-      .error
-        %p
-          - @errors.each do |error|
-            == "#{error.resource.class} #{error.resource.id}:"
-            = error
-            %br
-    %p
-      %br/
-    %h2
-      == Week #{@date.cweek} : Center #{@center.name}
-      == : Meeting day #{@center.meeting_day}
-    %a{ :name => 'weeksheet' }
-    
-    %table.narrow.form{ :style => "width: 100%;" }
-      %tr.odd
-        %td meeting at
-        %td
-          - if @center.meeting_day?(@date)
-            %b== #{@date} #{@center.meeting_time}
-          - else
-            %i no meeting today
-        %td
-          = link_to 'today', url(:enter_payments, :action => 'by_center', :for_date => Date.today, :center_id => @center.id) + '#weeksheet'
-          &nbsp;|&nbsp;
-          = link_to 'previous meeting', url(:enter_payments, :action => 'by_center', :for_date => @center.previous_meeting_date_from(@date), :center_id => @center.id) + '#weeksheet'
-          &nbsp;|&nbsp;
-          = link_to 'next meeting', url(:enter_payments, :action => 'by_center', :for_date => @center.next_meeting_date_from(@date), :center_id => @center.id) + '#weeksheet'
-      %tr
-        %td center manager
-        %td
-          = link_to @center.manager.name, resource(@center.manager)
-        %td
-          %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
-            = date_select 'date', @date
-            = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
-      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
-        = hidden_field :name => 'for_date', :value => @date
-        = hidden_field :name => 'center_id', :value => @center.id
-        = partial :cds
-        = submit 'Make Payments'
+- if @center and @date
+  - if not @errors.blank?
+    .error
+      - @errors.each do |error|
+        == Loan <b>#{error.resource.class == Payment ? error.resource.loan.id : loan.id} :</b>
+        = error.values.join("*")
+        %br
 
-  - else
-    Choose a center to record a payment for
-    = form_for(@payment, :action => url(:enter_payments, :action => 'by_center'), :method => :get) do
-      %table.form
-        %tr
-          %th
-            Center Id or Name
-          %td
-            = text_field :name => 'center_id'
-        %tr
-          %th
-            For Date
-          %td
-            = text_field :name => 'for_date', :value => Date.today
-      = submit 'Submit'
+  %h2
+    == Week #{@date.cweek} : Center #{@center.name}
+    == : Meeting day #{@center.meeting_day}
+  %a{ :name => 'weeksheet' }
+  %table.narrow.form{ :style => "width: 100%;" }
+    %tr.odd
+      %td meeting at
+      %td
+        - if @center.meeting_day?(@date)
+          %b== #{@date} #{@center.meeting_time}
+        - else
+          %i no meeting today
+      %td
+        = link_to 'today', url(:enter_payments, :action => 'by_center', :for_date => Date.today, :center_id => @center.id) + '#weeksheet'
+        &nbsp;|&nbsp;
+        = link_to 'previous meeting', url(:enter_payments, :action => 'by_center', :for_date => @center.previous_meeting_date_from(@date), :center_id => @center.id) + '#weeksheet'
+        &nbsp;|&nbsp;
+        = link_to 'next meeting', url(:enter_payments, :action => 'by_center', :for_date => @center.next_meeting_date_from(@date), :center_id => @center.id) + '#weeksheet'
+    %tr
+      %td center manager
+      %td
+        = link_to @center.manager.name, resource(@center.manager)
+      %td
+        %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
+          = date_select 'date', @date
+          = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
+  = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
+    = hidden_field :name => 'for_date', :value => @date
+    = hidden_field :name => 'center_id', :value => @center.id
+    = partial :cds
+    = submit 'Make Payments'
+
+- else
+  Choose a center to record a payment for
+  = form_for(@payment, :action => url(:enter_payments, :action => 'by_center'), :method => :get) do
+    %table
+      %tr
+        %th
+          Centers paying today
+        %td
+          = select :name => 'center_id', :collection => [["","---"]] + Center.all(:meeting_day => Date.today.weekday).map {|c| [c.id.to_s,c.name]}
+      %tr
+        %th
+          or any other center
+        %td
+          = text_field :name => 'center_text'
+      %tr
+        %th
+          For Date
+        %td
+          = text_field :name => 'for_date', :value => Date.today
+    = submit 'Submit'

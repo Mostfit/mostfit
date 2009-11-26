@@ -13,8 +13,7 @@ class MerbAuthSlicePassword::Sessions < MerbAuthSlicePassword::Application
   
   def update
     "Add an after filter to do stuff after login"
-     #redirect url(:data_entry) if session.user.role == :data_entry
-
+    # this is where the default scope hooks go
   end
 
   def destroy
@@ -26,7 +25,7 @@ class MerbAuthSlicePassword::Sessions < MerbAuthSlicePassword::Application
   # @overwritable
   def redirect_after_login
     message[:notice] = "Authenticated Successfully"
-    redirect_back_or (session.user.role == :data_entry ? url(:data_entry) : "/"), :message => message, :ignore => [slice_url(:login), slice_url(:logout)]
+    redirect_back_or (session.user.role == :data_entry ? url(:data_entry) : url(:browse)), :message => message, :ignore => [slice_url(:login), slice_url(:logout)]
   end
 
   # @overwritable

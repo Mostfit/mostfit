@@ -2,8 +2,10 @@ module DataEntry
   class Clients < DataEntry::Controller
     provides :html, :xml
     def new
+      @center  = Center.get(params[:center_id])
+      @branch = @center.branch if @center
       @client = Client.new
-      display([@client], "clients/new")
+      display([@client, @center], "clients/new")
     end
     
     def create(client)

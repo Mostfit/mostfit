@@ -3,8 +3,12 @@ class Application < Merb::Controller
   before :ensure_can_do
 
   def ensure_can_do
-    cont = ((request.params[:namespace] ? (request.params[:namespace] + "/") : "") + request.params[:controller]).to_sym
-    raise NotPrivileged unless session.user.can_access?(cont, request.params[:action].to_sym)
+    debugger
+    @route = Merb::Router.match(request)
+    raise NotPrivileged unless session.user.can_access?(@route[1], params)
+    if session.user.role == :staff_member
+      #change the scope of all in Centers, Branches, Loans,
+    end
   end
 
   def render_to_pdf(options = nil)

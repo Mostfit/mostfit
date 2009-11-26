@@ -1,28 +1,28 @@
 
-- if @branch.centers.clients.loans.size > 0
+- if (@branch and @branch.centers.clients.loans.size > 0)
   .graph
     = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'branch', :id => @branch.id, :scope_unit => 'months', :scope_size => 3) )
 
-%h1== Branch: <i>#{@branch.name}</i>
+- if @branch
+  %h1== Branch: <i>#{@branch.name}</i>
+  %table.narrow.form{ :style => "width: 40%;" }
+    %tr.odd
+      %td name
+      %td
+        %b= @branch.name
+        == (id: #{@branch.id})
+    %tr
+      %td manager
+      %td= link_to @branch.manager.name, resource(@branch.manager)
+    %tr.odd
+      %td centers
+      %td
+        %b= @branch.centers.size
+  %h2== Centers of the #{@branch.name} branch
+  %p
+    = link_to 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit"
+= link_to 'create a new center', url(:enter_centers, :action => 'new') + (@branch ? "?branch_id=#{@branch.id}" : ""), :class => "add"
 
-%table.narrow.form{ :style => "width: 40%;" }
-  %tr.odd
-    %td name
-    %td
-      %b= @branch.name
-      == (id: #{@branch.id})
-  %tr
-    %td manager
-    %td= link_to @branch.manager.name, resource(@branch.manager)
-  %tr.odd
-    %td centers
-    %td
-      %b= @branch.centers.size
-
-%p
-  = link_to 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit"
-  = link_to 'create a new center', resource(@branch, :centers, :new), :class => "add"
-%h2== Centers of the #{@branch.name} branch
 
 - if @centers.blank?
   %p
@@ -36,24 +36,25 @@
         %th name
         %th manager
         %th meeting
-        %th edit | delete
+        %th edit
     %tbody
     - for center in @centers
-      %tr{ :class => cycle('odd','') }
+      %tr{ :class => cycle('odd',''), :style => center.meeting_day == Date.today.weekday ?  'background: lightgreen;' : ''  }
         %td &nbsp;
         %td
           = center.id
         %td
-          %b= link_to center.name, resource(@branch, center)
+          %b= link_to center.name, url(:quick_link, "centers", center.id )
         %td
           = link_to center.manager.name, resource(center.manager)
         %td
           - if center.meeting_day
             == #{center.meeting_day.to_s.capitalize}#{(center.meeting_time_hours and center.meeting_time_minutes) ? ", #{center.meeting_time_hours}:#{center.meeting_time_minutes}" : ''}
         %td
-          = link_to 'edit', resource(@branch, center, :edit)
-          &nbsp;|&nbsp;
-          = link_to 'new client', resource(@branch, center, :clients, :new)
+          = link_to 'edit', url(:enter_centers, :action => 'edit') + "?query=#{center.id}"
+          - if @branch 
+            &nbsp;|&nbsp;
+            = link_to 'new client', url(:enter_clients, :action => 'new') + "?center_id=#{center.id}"
 
     %tfoot
       %tr
