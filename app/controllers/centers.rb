@@ -10,8 +10,12 @@ class Centers < Application
   def show(id)
     @center = Center.get(id)
     raise NotFound unless @center
-    clients = @center.clients(:active => true).group_by{|x| x.client_group.name}
-    @clients = clients.each{|k, v| clients[k] = v.sort_by{|x| x.name}}.values.flatten
+    clients = {}
+    @center.clients(:active => true).each{|c|
+      clients[c.client_group.name]||=[]
+      clients[c.client_group.name] << c
+    }
+    @clients = clients.each{|k, v| clients[k]=v.sort_by{|c| c.name} if v}.sort.collect{|k, v| v}.flatten
 
     if params[:date]
       if params[:date].is_a? String
