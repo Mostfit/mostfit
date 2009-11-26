@@ -113,6 +113,8 @@ class Loan
     {:min => :minimum, :max => :maximum}.each{|k, v|
       product_attr = product.send("#{k}_#{method}")
       product_attr = product_attr.to_f/100 if method==:interest_rate
+      loan_attr    = loan_attr.to_f        if method==:interest_rate
+
       if k==:min and loan_attr and product_attr and  loan_attr < product_attr
         return [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
       elsif k==:max and loan_attr and product_attr and  loan_attr > product_attr
