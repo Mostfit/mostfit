@@ -68,12 +68,12 @@ module Misfit
         controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
         model = route[:controller].singularize.to_sym
         action = route[:action]
-        if route.has_key?(:id)
-          return can_manage?(model, route[:id])
-        end
         r = (access_rights[action.to_s.to_sym] or access_rights[:all])
         return false if r.nil?
         if role == :staff_member
+          if route.has_key?(:id) and route[:id]
+            return can_manage?(model, route[:id])
+          end
           if controller == "payments"
             c = Center.get(route[:center_id])
             return (c.manager == staff_member and r.include?(:payments))
