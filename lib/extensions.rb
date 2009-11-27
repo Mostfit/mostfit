@@ -43,7 +43,6 @@ module Misfit
 
       def _can_manage?(model, id = nil)
         # this is the place to put all the ACL garbage so it doesn't pollute the core
-        debugger
         return old_can_manage?(model) if (id.nil? or role != :staff_member)
         model = Kernel.const_get(model.to_s.camel_case)
         if model == Loan
@@ -62,7 +61,6 @@ module Misfit
       
       def _can_access?(route,params = nil)
         # more garbage
-        debugger
         return true if role == :admin
         return true if route[:controller] == "graph_data"
         controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]

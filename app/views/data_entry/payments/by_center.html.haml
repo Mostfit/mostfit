@@ -9,7 +9,7 @@
     .error
       - @errors.each do |error|
         == Loan <b>#{error.resource.class == Payment ? error.resource.loan.id : loan.id} :</b>
-        = error.values.join("*")
+        = error
         %br
 
   %h2

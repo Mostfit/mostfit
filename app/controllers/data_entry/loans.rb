@@ -85,32 +85,24 @@ class Loans < DataEntry::Controller
 
   def approve
     debugger
+    @loans = Loan.all(:approved_on => nil)
     if request.method == :get
-      @loans = Loan.all(:approved_on => nil)
-      if params[:id]
-        @center = Center.get(params[:id])
-        raise NotFound unless @center
-      else
-        @centers = {}
-        @loans.each do |l|
-          @centers[l.client.center_id] = @centers[l.client.center_id].nil? ? 1 : @centers[l.client.center_id] + 1
-        end
-      end
       render
-    end
-    if request.method == :post
+    elsif request.method == :post
       debugger
-      @errors = {}
+      @errors = []
       loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
       loans.keys.each do |id|
         loan = Loan.get(id)
         params[:loans][id].delete("approved?")
         loan.update_attributes(params[:loans][id])
-        @errors << loan.errors
+        @errors << loan.errors unless loan.save
       end
-      if errors.blank?
+      if @errors.blank?
         redirect "/data_entry", :message => {:notice => 'loans approved'}
       else
+        @loans = Loan.all(:approved_on => nil)
+        @loans.each {|l| l.clear_cache}
         render
       end
     end

@@ -10,7 +10,6 @@
     - if (@i-1) % 3 == 0
       %tr
       - @i=1
-    - debugger
     - if session.user.can_manage?(thing)
       %td
         = image_tag "/images/#{plural}.jpg"
@@ -37,7 +36,7 @@
               = link_to 'Approve Loans', url("enter_#{plural}".to_sym, :action => 'approve'), :class => 'edit_small', :style => "font-weight: bold;"
               == (#{pa})
           %br
-          - nd = Loan.all(:disbursal_date => nil, :scheduled_disbursal_date.lte => Date.today).count
+          - nd = Loan.all(:disbursal_date => nil, :scheduled_disbursal_date.lte => Date.today).select{|l| l.status == :approved}.count
           - if nd > 0
             %b{:style => "color:green;"}
               = link_to 'Disburse Loans', url("enter_#{plural}".to_sym, :action => 'disburse'), :class => 'edit_small', :style => "font-weight: bold;"

@@ -34,7 +34,7 @@ module Misfit
       :admin => all_models,
       :mis_manager => all_models_except([:user, :admin]),
       :data_entry => {
-        :all => [:client, :loan, :payment]
+        :all => [:client, :loan, :payment],
       },
       :staff_member => {
         :all => [:client, :loan, :payment]
@@ -44,9 +44,12 @@ module Misfit
     @access_rights = {
       :admin => all_controllers,
       :mis_manager => all_controllers_except([:user, :admin]),
-      :data_entry => {:all => [:"data_entry/payments",:"data_entry/clients",:"data_entry/loans", :"data_entry/index"]},
-      :staff_member => {:all =>[:browse, :centers, :payments, :"data_entry/payments", :"data_entry/clients", :"data_entry/loans", :"data_entry/index"],
-                        :manages? => [:clients, :loans, :payments]}
+      :data_entry => {
+        :all => [:"data_entry/payments",:"data_entry/clients",:"data_entry/loans", :"data_entry/index"]
+      },
+      :staff_member => {
+        :all =>[:browse, :centers, :payments, :"data_entry/payments", :"data_entry/clients", :"data_entry/loans", :"data_entry/index"]
+      }
     }
 
     def self.crud_rights

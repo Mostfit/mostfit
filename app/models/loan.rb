@@ -550,6 +550,7 @@ class Loan
   def get_status(date = Date.today, total_received = nil) # we have this last parameter so we can speed up get_status
                                                           # considerably by passing total_received, i.e. from history_for
     #return @status if @status
+    debugger
     date = Date.parse(date)      if date.is_a? String
     return :applied_in_future    if applied_on > date  # non existant
     return :pending_approval     if applied_on <= date and

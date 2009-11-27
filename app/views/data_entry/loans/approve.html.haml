@@ -1,66 +1,55 @@
 %h2
   Approve loans
-- if @center.nil?
-  The following centers have unapproved loans
-  %br
-  - @centers.each do |k,v|
-    - center = Center.get(k)
-    = link_to "Center #{center.name}", url(:enter_approval_by_center, :id => center.id)
-    == ( #{Loan.all(:approved_on => nil, 'client.center_id' => center.id).count} loans )
-    %br
-
-- if @center
   %h2
-    The following loans have not been approved yet for 
-    = link_to "this center.", "/centers/#{@center.id}"
-  %h1 Approvals
-  - if not @errors.blank?
-    .error
-      %ul
-        - @errors.each do |e|
-          - e.values.each do |v|
-            %li
-              == Loan #{e.resource.id}: #{v}
-  - loans_to_approve = @loans
-  - if loans_to_approve.size > 0
-    = form_for(@loan, :action => url(:enter_loans, :action => "approve")) do
-      %table.narrow.form{ :width => '100%'}
-        %thead
-          %tr{:style => "font-size: 0.85em;"}
-            %th
-              id
-            %th
-              Client Name
-            %th
-              Details
-            %th
-              Approval Date
-            %th
-              Status
-            %th
-              Approved?
-            %th
-              Approved By
-        - loans_to_approve.each do |loan|
-          %tr{:class => cycle('odd','')}
-            %td
-              = loan.id
-            %td
-              = link_to loan.client.name, resource(loan.client)
-            %td
-              = link_to loan.description, url(:quick_link, "loans", loan.id)
-            %td
-              = date_select("loans[#{loan.id}][approved_on]")
-            %td 
-              = loan.status
-            %td
-              = check_box :name => "loans[#{loan.id}][approved?]"
-            %td
-              = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => [["","---"]] + StaffMember.all.map{|s| [s.id.to_s,s.name]}
-        %tfoot
-          %tr
-            %td{:colspan => 10}
-      = submit 'Approve these loans'
-  - else
-    Nothing to approve
-  
+    The following loans have not been approved yet
+- if not @errors.blank?
+  .error
+    %ul
+      - @errors.each do |e|
+        - e.values.each do |v|
+          %li
+            == Loan #{e.resource.id}: #{v}
+- loans_to_approve = @loans
+- if @loans.size > 0
+  = form_for(@loan, :action => url(:enter_loans, :action => "approve")) do
+    = hidden_field :name => :id, :value => @center.id
+    %table.narrow.form{ :width => '100%'}
+      %thead
+        %tr{:style => "font-size: 0.85em;"}
+          %th
+            id
+          %th
+            Client Name
+          %th
+            Details
+          %th
+            Approval Date
+          %th
+            Status
+          %th
+            Approved?
+          %th
+            Approved By
+      - @loans.each do |loan|
+        %tr{:class => cycle('odd','')}
+          %td
+            = loan.id
+          %td
+            = link_to loan.client.name, resource(loan.client)
+          %td
+            = link_to loan.description, url(:quick_link, "loans", loan.id)
+          %td
+            = date_select("loans[#{loan.id}][approved_on]")
+          %td 
+            = loan.status
+          %td
+            = check_box :name => "loans[#{loan.id}][approved?]"
+          %td
+            = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => [["","---"]] + StaffMember.all.map{|s| [s.id.to_s,s.name]}
+      %tfoot
+        %tr
+          %td{:colspan => 10}
+    = submit 'Approve these loans'
+- else
+  Nothing to approve
+

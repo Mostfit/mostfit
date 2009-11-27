@@ -46,7 +46,6 @@ class User
   end
 
   def can_access?(route, params = nil)
-    debugger
     return true if role == :admin
     return true if route[:controller] == "graph_data"
     controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
@@ -61,7 +60,6 @@ class User
   end
 
   def can_manage?(model, id = nil)
-    debugger
     return true if role == :admin
     return crud_rights.values.inject([]){|a,b| a + b}.uniq.include?(model.to_s.snake_case.to_sym)
   end

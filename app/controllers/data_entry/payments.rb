@@ -45,7 +45,8 @@ module DataEntry
           render
         end
       else
-        redirect url(:enter_payments, :action => 'by_staff_member', :staff_member_id => @staff_member.id, :for_date => @date)
+        #redirect url(:enter_payments, :action => 'by_staff_member', :staff_member_id => @staff_member.id, :for_date => @date)
+        render
       end
     end
     
