@@ -24,6 +24,9 @@ class Upload
   def load_csv(log=nil)
     models = [StaffMember, Branch, Center, ClientGroup, Client, FundingLine, LoanProduct, Loan, Payment]
     funding_lines, loans = {}, {}
+    User.all.each{|u|
+      u.destroy if not u.login=="admin"
+    }
     models.each{|model|
       model.all.destroy!
       log.info("Destroying old records for #{model.to_s.plural} (if any)") if log
@@ -49,7 +52,7 @@ class Upload
               #Storing funding lines and loans for serial number reference
               funding_lines[row[headers[:serial_number]]] = record if model==FundingLine
               loans[row[headers[:serial_number]]]         = record if model==Loan
-              log.info("Created #{idx-499} #{idx+1} entries. Some more left")    if idx%500==499
+              log.info("Created #{idx-99} - #{idx+1}. Some more left")    if idx%100==99
             else
               log.error("<font color='red'>#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors.to_a.join(', ')}</font>") if log
             end
