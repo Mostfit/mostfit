@@ -30,13 +30,13 @@
           = link_to "Edit a #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'edit'), :class => 'edit_small'
         - if thing == :loan
           %br
-          - pa = Loan.all(:approved_on => nil).count
+          - pa = Loan.all(:approved_on => nil).size
           - if pa > 0
             %b{:style => "color:green;"}
               = link_to 'Approve Loans', url("enter_#{plural}".to_sym, :action => 'approve'), :class => 'edit_small', :style => "font-weight: bold;"
               == (#{pa})
           %br
-          - nd = Loan.all(:disbursal_date => nil, :scheduled_disbursal_date.lte => Date.today).select{|l| l.status == :approved}.count
+          - nd = Loan.all(:disbursal_date => nil, :scheduled_disbursal_date.lte => Date.today).select{|l| l.status == :approved}.size
           - if nd > 0
             %b{:style => "color:green;"}
               = link_to 'Disburse Loans', url("enter_#{plural}".to_sym, :action => 'disburse'), :class => 'edit_small', :style => "font-weight: bold;"
