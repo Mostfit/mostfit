@@ -113,8 +113,9 @@ module DataEntry
           @loan = Loan.get(k.to_i)
           @type = params[:payment][:type]
           amounts = params[:paid][k.to_sym].to_i
-          success, @payment = @loan.repay(amounts, session.user, @date, @staff, false)
-          @errors << @payment.errors if not success
+          success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, false)
+          debugger
+          @errors << @prin.errors if @prin << @int.errors if @int << @fees.errors if @fees
         end
       end
       if params[:disbursed]
