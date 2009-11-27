@@ -309,7 +309,7 @@ class Loan
 
   def fees_due_on(date = Date.today)
     total_paid = fees_paid
-    @fees_due = fee_schedule.select{|k,v| k <= date}
+    @fees_due = fee_schedule.select{|k,v| k <= date}.to_hash
     @fees_due.each do |fee_date, amount|
       f = [amount, total_paid].min
       total_paid -= f
