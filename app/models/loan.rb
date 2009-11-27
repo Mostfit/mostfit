@@ -308,11 +308,6 @@ class Loan
   end
 
   def fees_due_on(date = Date.today)
-    @fee_schedule = {}
-    loan_product.fees.each do |f|
-      date = eval(f.payable_on.to_s)
-      @fee_schedule[date] = f.fees_for(self)
-    end
     total_paid = fees_paid
     @fees_due = fee_schedule
     @fees_due.each do |fee_date, amount|

@@ -40,6 +40,7 @@ class Loans < DataEntry::Controller
 
   def edit
     @loan = (params[:loan] and params[:loan][:id]) ? Loan.get(params[:loan][:id]) : Loan.new
+    @loan_product = @loan.loan_product
     render
   end
 

@@ -1,53 +1,53 @@
 = hidden_field :name => "loan_type", :value => @loan.class.to_s
-= hidden_field :name => "loan_product_id", :value => @loan.loan_product.id
+= hidden_field :name => "loan_product_id", :value => @loan_product.id
 %h3
-  ="This loan will be dispensed by loan product: #{@loan.loan_product.name}"
+  ="This loan will be dispensed by loan product: #{@loan_product.name}"
 %table.form
   %tr
     %td
       Amount:
     %td
-      - if @loan.loan_product.min_amount!=@loan.loan_product.max_amount 
+      - if @loan_product.min_amount!=@loan_product.max_amount 
         = text_field :amount, :size => 15
         %span.greytext in Rupees
-        = " (#{@loan.loan_product.min_amount} - #{@loan.loan_product.max_amount}) in multiples of Rs. #{@loan.loan_product.amount_multiple}"
+        = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
       - else
-        = @loan.loan_product.min_amount
+        = @loan_product.min_amount
         %span.greytext Rupees
-        = hidden_field :amount, :value => @loan.loan_product.min_amount
+        = hidden_field :amount, :value => @loan_product.min_amount
   %tr
     %td
       Interest rate:
     %td
-      - if @loan.loan_product.min_interest_rate != @loan.loan_product.max_interest_rate 
+      - if @loan_product.min_interest_rate != @loan_product.max_interest_rate 
         = text_field :interest_rate, :size => 15
         %span.greytext in Rupees
-        = " (#{@loan.loan_product.min_interest_rate} % - #{@loan.loan_product.max_interest_rate} %)"
+        = " (#{@loan_product.min_interest_rate} % - #{@loan_product.max_interest_rate} %)"
       - else
-        = @loan.loan_product.min_interest_rate
+        = @loan_product.min_interest_rate
         %span.greytext %
-        = hidden_field :interest_rate, :value => @loan.loan_product.min_interest_rate
+        = hidden_field :interest_rate, :value => @loan_product.min_interest_rate
       %br/
       %span.greytext the interest rate as a percentage
   %tr
     %td
       Installment frequency:
     %td
-      - if INSTALLMENT_FREQUENCIES.include?(@loan.loan_product.installment_frequency)
-        = hidden_field :installment_frequency, :value => @loan.loan_product.installment_frequency.to_s
-        = @loan.loan_product.installment_frequency.to_s
+      - if INSTALLMENT_FREQUENCIES.include?(@loan_product.installment_frequency)
+        = hidden_field :installment_frequency, :value => @loan_product.installment_frequency.to_s
+        = @loan_product.installment_frequency.to_s
       - else
         = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
   %tr
     %td
       Number of installments:
     %td
-      - if @loan.loan_product.min_number_of_installments==@loan.loan_product.max_number_of_installments
-        = @loan.loan_product.min_number_of_installments
-        = hidden_field :number_of_installments, :value => @loan.loan_product.min_number_of_installments
+      - if @loan_product.min_number_of_installments==@loan_product.max_number_of_installments
+        = @loan_product.min_number_of_installments
+        = hidden_field :number_of_installments, :value => @loan_product.min_number_of_installments
       - else
         = text_field :number_of_installments, :size => 4
-        = " (#{@loan.loan_product.min_number_of_installments} - #{@loan.loan_product.max_number_of_installments})"
+        = " (#{@loan_product.min_number_of_installments} - #{@loan_product.max_number_of_installments})"
   %tr
     %td
       Funding Line

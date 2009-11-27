@@ -63,10 +63,8 @@
               = i.to_currency
               - tot_interest += i
             %td
-              - f = 0
-              - if loan.fee_schedule.keys.include?(@date)
-                - f = loan.fees_due_on(@date).values.reduce(0){|a,b| a + b}
-                = f
+              - f = loan.fees_due_on(@date).values.reduce(0){|a,b| a + b}
+              = f
                 
             %td.numeric
               - a = p + i + f
