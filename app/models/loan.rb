@@ -254,7 +254,7 @@ class Loan
       # here the validations on the Payment should 
       debugger
       total        = input
-      total_fees_due_on_date = fees_due_on(received_on).values.reduce(0){|a,b| a+b}
+      total_fees_due_on_date = fees_due_on(received_on).values.inject(0){|a,b| a+b}
       fees_paid = [amount, total_fees_due_on_date].min
       total = input - fees_paid
       interest_due = [(-interest_overpaid_on(received_on)), 0].max
