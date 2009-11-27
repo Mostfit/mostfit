@@ -63,7 +63,7 @@
               = i.to_currency
               - tot_interest += i
             %td
-              - f = loan.fees_due_on(@date).values.reduce(0){|a,b| a + b}
+              - f = loan.fees_due_on(@date).values.inject(0){|a,b| a + b}
               = f
                 
             %td.numeric
