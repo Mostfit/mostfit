@@ -97,11 +97,15 @@ class Loans < Application
     if params[:id]
       @loan = Loan.get(params[:id])
       raise NotFound unless @loan
+      @client = @loan.client
+      @center = @client.center
+      @branch = @center.branch
+    else
+      @client = Client.get(params[:client_id])
+      @center = Center.get(params[:center_id])
+      @branch = Branch.get(params[:branch_id])
+      raise NotFound unless @branch and @center and @client
     end
-    @client = Client.get(params[:client_id]) || @loan.client
-    @center = Center.get(params[:center_id]) || @client.center
-    @branch = Branch.get(params[:branch_id]) || @center.branch
-    # raise NotFound unless @branch and @center and @client
   end
 
   # the loan is not of type Loan of a derived type, therefor we cannot just assume its name..
