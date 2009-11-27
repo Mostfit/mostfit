@@ -76,7 +76,7 @@ class Loans < DataEntry::Controller
       end
       debugger
       if @errors.blank?
-        redirect url(:data_entry), {:message => {:notice => "#{loans.count} loans disbursed. #{params[:loans].count - loans.count} loans not disbursed."}}
+        redirect url(:data_entry), {:message => {:notice => "#{loans.size} loans disbursed. #{params[:loans].size - loans.size} loans not disbursed."}}
       else
         render
       end
