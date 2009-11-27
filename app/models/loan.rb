@@ -254,7 +254,7 @@ class Loan
       # here the validations on the Payment should 
       debugger
       total        = input
-      total_fees_due_on_date = fees_due_on(received_on).values.reduce(0){|a,b| a+b}
+      total_fees_due_on_date = fees_due_on(received_on).values.inject(0){|a,b| a+b}
       fees_paid = [amount, total_fees_due_on_date].min
       total = input - fees_paid
       interest_due = [(-interest_overpaid_on(received_on)), 0].max
@@ -263,16 +263,25 @@ class Loan
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0].to_i, input[1].to_i
     end
-    fee_payment = Payment.new(:loan => self, :created_by => user,
-      :received_on => received_on, :received_by => received_by,
-      :amount => fees_paid.round, :type => :fees)
-    prin_payment = Payment.new(:loan => self, :created_by => user,
-      :received_on => received_on, :received_by => received_by,
-      :amount => principal.round, :type => :principal)
-    int_payment = Payment.new(:loan => self, :created_by => user,
-      :received_on => received_on, :received_by => received_by,
-      :amount => interest.round, :type => :interest)
-    save_status = (fee_payment.save or prin_payment.save or int_payment.save)
+    if fees_paid > 0
+      fee_payment = Payment.new(:loan => self, :created_by => user,
+                                :received_on => received_on, :received_by => received_by,
+                                :amount => fees_paid.round, :type => :fees)
+      fee_saved = fee_payment.save
+    end
+    if principal > 0
+      prin_payment = Payment.new(:loan => self, :created_by => user,
+                                 :received_on => received_on, :received_by => received_by,
+                                 :amount => principal.round, :type => :principal)
+      prin_saved = prin_payment.save
+    end
+    if interest > 0
+      int_payment = Payment.new(:loan => self, :created_by => user,
+                                :received_on => received_on, :received_by => received_by,
+                                :amount => interest.round, :type => :interest)
+      int_saved = int_payment.save
+    end
+    save_status = (fee_saved or prin_saved or int_saved)
     if save_status == true
       if defer_update #i.e. bulk updating loans
         Merb.run_later do
@@ -285,7 +294,7 @@ class Loan
     end
     #payment.principal, payment.interest = nil, nil unless total.nil?  # remove calculated pr./int. values from the form
     # Merb.logger.info "loan #{id}: #{received_on} => paid #{principal} + #{interest} | prin_paid #{principal_received_up_to(received_on)} | os_bal:#{actual_outstanding_principal_on(received_on)}"
-    [save_status, prin_payment, int_payment]  # return the success boolean and the payment object itself for further processing
+    [save_status, prin_payment, int_payment, fee_payment]  # return the success boolean and the payment object itself for further processing
   end
 
   # the way to delete payments from the db
@@ -309,7 +318,7 @@ class Loan
 
   def fees_due_on(date = Date.today)
     total_paid = fees_paid
-    @fees_due = fee_schedule.select{|k,v| k <= date}.to_hash
+    @fees_due = fee_schedule.select{|k,v| (k != nil and k <= date)}.to_hash
     @fees_due.each do |fee_date, amount|
       f = [amount, total_paid].min
       total_paid -= f
