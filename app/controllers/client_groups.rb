@@ -1,5 +1,6 @@
 class ClientGroups < Application
   # provides :xml, :yaml, :js
+  before :get_context, :only => ['edit', 'update']
 
   def index
     @client_groups = ClientGroup.all
@@ -40,7 +41,8 @@ class ClientGroups < Application
     @client_group = ClientGroup.get(id)
     raise NotFound unless @client_group
     if @client_group.update(client_group)
-       redirect resource(@client_group)
+      message  = {:notice => "Group was successfully edited"}
+      (@branch and @center) ? redirect(resource(@branch, @center), :message => message) : redirect(resource(@client_group), :message => message)
     else
       display @client_group, :edit
     end
@@ -56,4 +58,12 @@ class ClientGroups < Application
     end
   end
 
+  private
+  def get_context
+    if params[:branch_id] and params[:center_id] 
+      @branch = Branch.get(params[:branch_id]) 
+      @center = Center.get(params[:center_id]) 
+      raise NotFound unless @branch and @center
+    end
+  end
 end # ClientGroups
