@@ -49,7 +49,6 @@
       %td.numeric
         = ((lh[2] || 0) + (lh[3] || 0))
       %td.numeric
-        - debugger
         - scheduled_disbursal = center.clients.loans(:scheduled_disbursal_date => @date, :disbursal_date => nil).sum(:amount) || 0
         - total_scheduled_disbursal += scheduled_disbursal
         = scheduled_disbursal

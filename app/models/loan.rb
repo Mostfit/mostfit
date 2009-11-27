@@ -252,20 +252,27 @@ class Loan
       # the payment is filed on received_on without knowing about the future
       # it could happen that payment have been made after this payment
       # here the validations on the Payment should 
+      debugger
       total        = input
+      total_fees_due_on_date = fees_due_on(received_on).values.reduce(0){|a,b| a+b}
+      fees_paid = [amount, total_fees_due_on_date].min
+      total = input - fees_paid
       interest_due = [(-interest_overpaid_on(received_on)), 0].max
       interest     = [interest_due, total].min  # never more than total
       principal    = total - interest
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0].to_i, input[1].to_i
     end
+    fee_payment = Payment.new(:loan => self, :created_by => user,
+      :received_on => received_on, :received_by => received_by,
+      :amount => fees_paid.round, :type => :fees)
     prin_payment = Payment.new(:loan => self, :created_by => user,
       :received_on => received_on, :received_by => received_by,
       :amount => principal.round, :type => :principal)
     int_payment = Payment.new(:loan => self, :created_by => user,
       :received_on => received_on, :received_by => received_by,
       :amount => interest.round, :type => :interest)
-    save_status = (prin_payment.save and int_payment.save)
+    save_status = (fee_payment.save or prin_payment.save or int_payment.save)
     if save_status == true
       if defer_update #i.e. bulk updating loans
         Merb.run_later do
@@ -295,9 +302,26 @@ class Loan
 
   # LOAN INFO FUNCTIONS - CALCULATIONS
 
-  def fees_due
+  def total_fees_due
     fd = 0; loan_product.fees.each { |f| fd += f.fees_for(self)};
     fd
+  end
+
+  def fees_due_on(date = Date.today)
+    @fee_schedule = {}
+    loan_product.fees.each do |f|
+      date = eval(f.payable_on.to_s)
+      @fee_schedule[date] = f.fees_for(self)
+    end
+    total_paid = fees_paid
+    @fees_due = fee_schedule
+    @fees_due.each do |fee_date, amount|
+      next if fee_date > date
+      f = [amount, total_paid].min
+      total_paid -= f
+      @fees_due[fee_date] -= f
+    end
+    @fees_due
   end
 
   def fees_paid
@@ -305,7 +329,7 @@ class Loan
   end
 
   def fees_paid?
-    fees_paid >= fees_due
+    fees_paid >= total_fees_due
   end
   
   def fee_schedule
@@ -552,7 +576,6 @@ class Loan
   def get_status(date = Date.today, total_received = nil) # we have this last parameter so we can speed up get_status
                                                           # considerably by passing total_received, i.e. from history_for
     #return @status if @status
-    debugger
     date = Date.parse(date)      if date.is_a? String
     return :applied_in_future    if applied_on > date  # non existant
     return :pending_approval     if applied_on <= date and

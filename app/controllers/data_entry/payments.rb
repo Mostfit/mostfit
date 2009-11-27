@@ -103,11 +103,12 @@ module DataEntry
       @branch = @center.branch unless @center.nil?
       @clients = @center.clients unless @center.nil?
       @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
+      @staff = StaffMember.get(params[:payment][:received_by])
       @errors = []
       if params[:paid]
         params[:paid].keys.each do |k|
           @loan = Loan.get(k.to_i)
-          @staff = StaffMember.get(params[:payment][:received_by])
+          @type = params[:payment][:type]
           amounts = params[:paid][k.to_sym].to_i
           success, @payment = @loan.repay(amounts, session.user, @date, @staff, false)
           @errors << @payment.errors if not success

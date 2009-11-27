@@ -12,8 +12,9 @@ class Centers < Application
     raise NotFound unless @center
     clients = {}
     @center.clients(:active => true).each{|c|
-      clients[c.client_group.name]||=[]
-      clients[c.client_group.name] << c
+      group_name = c.client_group ? c.client_group.name : "No group"
+      clients[group_name]||=[]
+      clients[group_name] << c
     }
     @clients = clients.each{|k, v| clients[k]=v.sort_by{|c| c.name} if v}.sort.collect{|k, v| v}.flatten
 
