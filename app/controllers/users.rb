@@ -19,8 +19,8 @@ class Users < Application
   end
 
   def create(user)
-    @user = User.new(user)
     params[:user][:staff_member] = StaffMember.get(params[:user][:staff_member]) if params[:user][:staff_member]
+    @user = User.new(user)
     if @user.save
       redirect resource(:users), :message => {:notice => "Successfully created user '#{@user.login}'"}
     else

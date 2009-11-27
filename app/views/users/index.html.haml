@@ -10,10 +10,8 @@
       %th
       %th id
       %th login
-      %th data entry
-      %th mis manager
-      %th admin
-      %th read only
+      %th role
+      %th staff member?
       %th edit | delete
   %tbody
   - for user in @users
@@ -23,10 +21,10 @@
         = user.id
       %td
         %b= user.login
-      - User::ROLES.each do |role|
-        %td
-          -if user.role==role
-            %b Yes            
+      %td
+        = user.role.to_s.humanize
+      %td
+        = (link_to user.staff_member.name, resource(user.staff_member)) if user.staff_member
       - if session.user.id == 1  # only show to admin
         %td
           = link_to 'edit', resource(user, :edit)

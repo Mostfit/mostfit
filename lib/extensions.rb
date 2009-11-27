@@ -47,11 +47,12 @@ module Misfit
         model = Kernel.const_get(model.to_s.camel_case)
         if model == Loan
           l = Loan.get(id)
-          return l.client.center.manager == self.staff_member
+          return ((l.client.center.manager == self.staff_member) or (l.client.center.branch.manager == self.staff_member))
         elsif model == Client
           c = Client.get(id)
-          return c.center.manager == self.staff_member
+          return ((c.center.manager == self.staff_member) or (c.center.manager.branch == self.staff_member))
         elsif model.relationships.has_key?(:manager)
+          return false
           o = model.get(id)
           return o.manager == self.staff_member
         else
