@@ -94,7 +94,10 @@ class Loans < Application
 
   private
   def get_context
-    @loan = Loan.get(params[:id])
+    if params[:id]
+      @loan = Loan.get(params[:id])
+      raise NotFound unless @loan
+    end
     @client = Client.get(params[:client_id]) || @loan.client
     @center = Center.get(params[:center_id]) || @client.center
     @branch = Branch.get(params[:branch_id]) || @center.branch
