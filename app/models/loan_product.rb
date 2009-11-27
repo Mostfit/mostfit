@@ -45,11 +45,11 @@ class LoanProduct
   end
 
   def payment_validations
-    (payment_validation_methods or "").split(",").each.map{|m| m.to_sym}
+    (payment_validation_methods or "").split(",").map{|m| m.to_sym}
   end
 
   def loan_validations
-    (loan_validation_methods or "").split(",").each.map{|m| m.to_sym}
+    (loan_validation_methods or "").split(",").map{|m| m.to_sym}
   end
 
   def self.valid(date=Date.today)
