@@ -11,6 +11,9 @@ module DataEntry
 
     def by_center
       @center = Center.get(params[:center_id]) if params[:center_id]
+      if params[:center_text] and not @center
+          @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
+      end
       @date = Date.parse(params[:for_date]) if params[:for_date]
       @branch = @center.branch unless @center.nil?
       if request.method == :post
