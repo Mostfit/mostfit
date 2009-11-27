@@ -298,8 +298,9 @@ class GraphData < Application
       when "center_day"
       vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{params[:date]}' GROUP BY lh.center_id")
       values = vals.map do |v| 
+        debugger
         val = v[0] + v[1]
-        color_ratio = v[0]/val
+        color_ratio = val == 0 ? 1 : v[0]/val
         color_value = 65280 + (color_ratio * (16711680 - 65280))
         color = color_value.to_i.to_s(16)
         color = "00" + color if color.length == 4
