@@ -1,0 +1,136 @@
+---
+centers:
+  center_survey:
+    survery_conducted_by:
+      type: text
+      length: 20
+      position: 1 
+      validations:
+        minimum: 5
+        maximum: 20
+        required: true
+    survey_date:
+      type: date
+      position: 2
+      default: Date.today
+      validations:
+        required: true
+    area:
+      type: select_list
+      position: 3
+      values: [:rural, :semi_urban, :urban]
+      default_value: "Select area type"
+      validations:
+        required: true
+    respondent:
+      type: select_list
+      position: 4
+      values: [:aganwad_worker, :sarpanh_or_parshad, :local_resident, :shopkeeper]
+      default_value: "Select reposndent"
+      validations:
+        required: true
+    place_of_survey:
+      type: text
+      position: 5
+      length: 20
+      validations:
+        minimum: 5
+        maximum: 30
+        required: false
+    distance_from_branch:
+      type: integer
+      position: 6
+      length: 10
+      validations:
+        minimum: 0
+        maximum: 200
+        required: false
+    total_population:
+      type: table
+      position: 7
+      length: 10
+      default: 0
+      column_type: integer
+      minimum: 0        
+      columns: 
+        - female:
+          child:
+          total:
+        - sc_or_st:
+          bc:
+          ms:
+            label: Muslim
+          general:
+    language:
+      type: text
+      position: 8
+      length: 20
+      description: What is the most spoken language here
+      validations:
+        minimum: 5
+        maximum: 30
+        required: true
+    payment_of_wages:
+      type: table
+      position: 9
+      column_type: integer
+      columns:
+        female:
+        male:
+        child:
+          validation:
+            required: false
+      validation:
+        minimum: 5
+        maximum: 30
+        required: true
+    main_crops:
+      type: text
+      position: 10   
+      validations:
+        minimum: 0
+        maximum: 1000
+        required: false
+    avg_land_holding:
+      type: select_list
+      position: 11
+      values: [:good, :average, :poor]
+      default_value: "select average land holding"
+      validations:
+        required: true
+    political_situation:
+      type: text
+      position: 12
+      validations:
+        minimum: 0
+        maximum: 1000
+        required: false
+    law_and_order:
+      type: text
+      position: 13
+      validations:
+        minimum: 0
+        maximum: 1000
+        required: false
+    transport:
+      type: check_list
+      position: 14
+      values: [:bus, :tempo, :bullockcart, :tractor_trolley, :other]
+    drinking_water_facility:
+      position: 15
+      type: check_list
+      values: [:govt_supply, :boring, :well, :pond]
+    health_center:
+      position: 16
+      type: select_list
+      default_value: Is health care facility available in this area
+      values: [:yes, :no]
+    health_center_distance:
+      position: 16
+      type: integer
+      units: kms
+      default: 0	
+      validations:
+        minimum: 0
+        maximum: 1000
+        required: false
