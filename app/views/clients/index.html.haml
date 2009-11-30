@@ -87,7 +87,7 @@
     %br/
   %h1
     == <a name = 'weeksheet'>Week #{@date.cweek} meeting sheet for center #{@center.name}</a>
-  = link_to 'Make payments', url(:enter_payments, :action => 'by_center', :center_id => @center.id, :for_date => @date), :class => "add"
+  = link_to 'Record these activities', url(:enter_payments, :action => 'by_center', :center_id => @center.id, :for_date => @date), :class => "add"
 
   %table.narrow.form{ :style => "width: 100%;" }
     %tr.odd
@@ -113,7 +113,62 @@
 
 
 %a{:name => "weeksheet"}
+%h2 Approvals
+- @loans_to_approve = @center.clients.loans(:approved_on => nil)
+- if @loans_to_approve.size > 0
+  %table.narrow.form{ :width => '100%'}
+    %thead
+      %tr{:style => "font-size: 0.85em;"}
+        %th
+          Name
+        %th
+          Scheduled Disbursal Date
+        %th
+          Status
+    - @loans_to_approve.each do |loan|
+      %tr
+        %td
+          = loan.client.name
+        %td
+          = loan.scheduled_disbursal_date
+        %td
+          - late =  @date - loan.scheduled_disbursal_date
+          - if late > 0
+            == "#{late} days late"
+          - else
+            on time
+- else
+  No approvals today
+
 - if @center.meeting_day? @date
+
+  %h2 Disbursals
+  - @loans_to_disburse = @center.clients.loans(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil)
+  - if @loans_to_disburse.size > 0
+    %table.narrow.form{ :width => '100%'}
+      %thead
+        %tr{:style => "font-size: 0.85em;"}
+          %th
+            Name
+          %th
+            Scheduled Disbursal Date
+          %th
+            Status
+      - @loans_to_disburse.each do |loan|
+        %tr
+          %td
+            = loan.client.name
+          %td
+            = loan.scheduled_disbursal_date
+          %td
+            - late =  @date - loan.scheduled_disbursal_date
+            - if late > 0
+              == "#{late} days late"
+            - else
+              on time
+  - else
+    No disbursals today
+
   %table.narrow.form{ :width => '100%' }
     %thead
       %tr
@@ -203,6 +258,9 @@
     %tfoot    
       %tr
         %td{ :colspan => 12 }
+
+
+  
 
 - else
   %i This day is not a meeting day
