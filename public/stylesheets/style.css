@@ -562,5 +562,36 @@ display: none;
   padding-top: 55px;
 }
 
+table.report{
+    width: 100%;
+    border: 1px solid;
+    border-color: #ccc;
+    text-align: right;
+}
+table.report tr{
+    border: 1px solid;
+    border-color: #ccc;
+}
+table.report th{
+    border: 1px solid;
+    border-color: #ccc;
+    text-align: center;
+    background-color: #97b994;
+    color: white;
+}
+table.report td{
+    border: 1px solid;
+    border-color: #ccc;
+}
+table.report td.group{
+    text-align: center; 
+    background-color: #ddd;
+}
 
+table.report td.center{
+    border: 1px solid;
+    border-color: #ccc;
+    text-align: center; 
+    background-color: #efefef;
+}
 
