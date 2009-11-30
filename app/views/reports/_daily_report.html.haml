@@ -1,13 +1,3 @@
-= form_for(@report, :action => url(:show_report, :report_type => "DailyReport"), :method => :get) do
-  %table
-    %tr
-      %td
-        Daily report for
-      %td
-        =date_select_for(@report, "date", :date => @report.date)
-      %td
-        =submit "Go"
-
 %table{:style => "border: 1px solid #ccc;"}
   %tr{:style => "border: 1px solid #ccc; background-color: #97b994; color: white;"}
     %th
@@ -30,20 +20,32 @@
       No. of defaults
   - center_id, branch_id = nil, nil
   -@groups.each do |group_id, centers|
-    %tr
-      %td{:colspan => "9", :style => "text-align: center; background-color: #ddd;"}
-        %b
-          =@branches[group_id].name
-    -centers.each do |center_id, groups|
+    -if centers.keys.length>0
       %tr
-        %td{:colspan => "9", :style => "text-align: center; background-color: #efefef;"}
+        %td{:colspan => "9", :style => "text-align: center; background-color: #ddd;"}
           %b
-            =@centers[center_id].name      
-      -groups.each do |group_id, group|
-        %tr
-          %td
-            =group[-1]
-          -group[0..-2].each do |g|
-            %td
-              =g
+            =@branches[group_id].name
+      -centers.each do |center_id, groups|
+        -if groups.keys.length>0
+          %tr
+            %td{:colspan => "9", :style => "text-align: center; background-color: #efefef;"}
+              %b
+                =@centers[center_id].name
+          -groups.each do |group_id, group|
+            %tr
+              %td
+                =group[-1]
+              -group[0..-2].each do |g|
+                %td
+                  =g
+
+= form_for(@report, :action => url(:show_report, :report_type => "DailyReport"), :method => :get) do
+  %table
+    %tr
+      %td
+        Daily report for
+      %td
+        =date_select_for(@report, "date", :date => @report.date)
+      %td
+        =submit "Go"
 
