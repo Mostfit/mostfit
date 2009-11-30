@@ -5,6 +5,7 @@ module Merb
     end
 
     def link_to_with_rights(text, path, params = {}, method="GET")
+      debugger
       uri = URI.parse(path)
       method = method.to_s.upcase || "GET"
       request = Merb::Request.new(
@@ -12,7 +13,7 @@ module Merb
                                   Merb::Const::REQUEST_METHOD => method,
                                   Merb::Const::QUERY_STRING => uri.query)
       route = Merb::Router.match(request)[1] rescue nil
-      return link_to(text,path,params) if session.user.can_access?(route[:controller],route[:action])
+      return link_to(text,path,params) if session.user.can_access?(route)
     end
 
     def url_for_loan(loan, action = '')

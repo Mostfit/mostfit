@@ -409,12 +409,12 @@ a {
       <span class="failed_spec_name">before(:all)</span>
       <div class="failure" id="failure_9">
         <div class="message"><pre>expected valid? to return true, got false</pre></div>
-        <div class="backtrace"><pre>./spec/models/client_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
-<span class="linenum">12</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
-<span class="offending"><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
-<span class="linenum">14</span>
-<span class="linenum">15</span>    <span class="attribute">@center</span> <span class="punct">=</span> <span class="constant">Center</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Munnar hill center</span><span class="punct">&quot;)</span></code></pre>
+        <div class="backtrace"><pre>./spec/models/client_spec.rb:8:</pre></div>
+    <pre class="ruby"><code><span class="linenum">6</span>    <span class="attribute">@manager</span> <span class="punct">=</span> <span class="constant">StaffMember</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Mrs. M.A. Nerger</span><span class="punct">&quot;)</span>
+<span class="linenum">7</span>    <span class="attribute">@manager</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">8</span>    <span class="attribute">@manager</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">9</span>
+<span class="linenum">10</span>    <span class="attribute">@branch</span> <span class="punct">=</span> <span class="constant">Branch</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Kerela branch</span><span class="punct">&quot;)</span></code></pre>
       </div>
     </dd>
   </dl>
@@ -448,56 +448,16 @@ a {
   <dl>
   <dt id="example_group_10">Branch</dt>
     <script type="text/javascript">makeRed('example_group_10');</script>
-    <script type="text/javascript">moveProgressBar('18.4');</script>
+    <script type="text/javascript">moveProgressBar('17.6');</script>
     <dd class="spec failed">
-      <span class="failed_spec_name">should not be valid without a manager</span>
+      <span class="failed_spec_name">before(:all)</span>
       <div class="failure" id="failure_11">
         <div class="message"><pre>expected valid? to return true, got false</pre></div>
-        <div class="backtrace"><pre>./spec/models/branch_spec.rb:15:</pre></div>
-    <pre class="ruby"><code><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
-<span class="linenum">14</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
-<span class="offending"><span class="linenum">15</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
-<span class="linenum">16</span>  <span class="keyword">end</span>
-<span class="linenum">17</span> </code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('19.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should not be valid without a name</span>
-      <div class="failure" id="failure_12">
-        <div class="message"><pre>expected valid? to return true, got false</pre></div>
-        <div class="backtrace"><pre>./spec/models/branch_spec.rb:15:</pre></div>
-    <pre class="ruby"><code><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
-<span class="linenum">14</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
-<span class="offending"><span class="linenum">15</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
-<span class="linenum">16</span>  <span class="keyword">end</span>
-<span class="linenum">17</span> </code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('20.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should not be valid with a name shorter than 3 characters</span>
-      <div class="failure" id="failure_13">
-        <div class="message"><pre>expected valid? to return true, got false</pre></div>
-        <div class="backtrace"><pre>./spec/models/branch_spec.rb:15:</pre></div>
-    <pre class="ruby"><code><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
-<span class="linenum">14</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
-<span class="offending"><span class="linenum">15</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
-<span class="linenum">16</span>  <span class="keyword">end</span>
-<span class="linenum">17</span> </code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('20.7');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should be able to 'have' centers</span>
-      <div class="failure" id="failure_14">
-        <div class="message"><pre>expected valid? to return true, got false</pre></div>
-        <div class="backtrace"><pre>./spec/models/branch_spec.rb:15:</pre></div>
-    <pre class="ruby"><code><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
-<span class="linenum">14</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
-<span class="offending"><span class="linenum">15</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
-<span class="linenum">16</span>  <span class="keyword">end</span>
-<span class="linenum">17</span> </code></pre>
+        <div class="backtrace"><pre>./spec/models/branch_spec.rb:8:</pre></div>
+    <pre class="ruby"><code><span class="linenum">6</span>    <span class="attribute">@manager</span> <span class="punct">=</span> <span class="constant">StaffMember</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Mrs. M.A. Nerger</span><span class="punct">&quot;)</span>
+<span class="linenum">7</span>    <span class="attribute">@manager</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">8</span>    <span class="attribute">@manager</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">9</span>  <span class="keyword">end</span></code></pre>
       </div>
     </dd>
   </dl>
@@ -506,16 +466,17 @@ a {
   <dl>
   <dt id="example_group_11">Center</dt>
     <script type="text/javascript">makeRed('example_group_11');</script>
-    <script type="text/javascript">moveProgressBar('20.7');</script>
+    <script type="text/javascript">moveProgressBar('17.6');</script>
     <dd class="spec failed">
       <span class="failed_spec_name">before(:all)</span>
-      <div class="failure" id="failure_15">
+      <div class="failure" id="failure_12">
         <div class="message"><pre>expected valid? to return true, got false</pre></div>
-        <div class="backtrace"><pre>./spec/models/center_spec.rb:13:</pre></div>
-    <pre class="ruby"><code><span class="linenum">11</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
-<span class="linenum">12</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
-<span class="offending"><span class="linenum">13</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
-<span class="linenum">14</span>  <span class="keyword">end</span></code></pre>
+        <div class="backtrace"><pre>./spec/models/center_spec.rb:8:</pre></div>
+    <pre class="ruby"><code><span class="linenum">6</span>    <span class="attribute">@manager</span> <span class="punct">=</span> <span class="constant">StaffMember</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Mrs. M.A. Nerger</span><span class="punct">&quot;)</span>
+<span class="linenum">7</span>    <span class="attribute">@manager</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">8</span>    <span class="attribute">@manager</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">9</span>
+<span class="linenum">10</span>    <span class="attribute">@branch</span> <span class="punct">=</span> <span class="constant">Branch</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Kerela branch</span><span class="punct">&quot;)</span></code></pre>
       </div>
     </dd>
   </dl>
@@ -524,17 +485,17 @@ a {
   <dl>
   <dt id="example_group_12">Attendancy</dt>
     <script type="text/javascript">makeRed('example_group_12');</script>
-    <script type="text/javascript">moveProgressBar('20.7');</script>
+    <script type="text/javascript">moveProgressBar('17.6');</script>
     <dd class="spec failed">
       <span class="failed_spec_name">before(:all)</span>
-      <div class="failure" id="failure_16">
+      <div class="failure" id="failure_13">
         <div class="message"><pre>expected valid? to return true, got false</pre></div>
-        <div class="backtrace"><pre>./spec/models/attendancy_spec.rb:12:</pre></div>
-    <pre class="ruby"><code><span class="linenum">10</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">manager</span> <span class="punct">=</span> <span class="attribute">@manager</span>
-<span class="linenum">11</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">save</span>
-<span class="offending"><span class="linenum">12</span>    <span class="attribute">@branch</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
-<span class="linenum">13</span>
-<span class="linenum">14</span>    <span class="attribute">@center</span> <span class="punct">=</span> <span class="constant">Center</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Munnar hill center</span><span class="punct">&quot;)</span></code></pre>
+        <div class="backtrace"><pre>./spec/models/attendancy_spec.rb:7:</pre></div>
+    <pre class="ruby"><code><span class="linenum">5</span>    <span class="attribute">@manager</span> <span class="punct">=</span> <span class="constant">StaffMember</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Mrs. M.A. Nerger</span><span class="punct">&quot;)</span>
+<span class="linenum">6</span>    <span class="attribute">@manager</span><span class="punct">.</span><span class="ident">save</span>
+<span class="offending"><span class="linenum">7</span>    <span class="attribute">@manager</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">8</span>
+<span class="linenum">9</span>    <span class="attribute">@branch</span> <span class="punct">=</span> <span class="constant">Branch</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">Kerela branch</span><span class="punct">&quot;)</span></code></pre>
       </div>
     </dd>
   </dl>
@@ -543,7 +504,7 @@ a {
   <dl>
   <dt id="example_group_13">LedgerEntry</dt>
     <script type="text/javascript">makeYellow('example_group_13');</script>
-    <script type="text/javascript">moveProgressBar('21.5');</script>
+    <script type="text/javascript">moveProgressBar('18.4');</script>
     <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
   </dl>
 </div>
@@ -551,7 +512,7 @@ a {
   <dl>
   <dt id="example_group_14">Fee</dt>
     <script type="text/javascript">makeYellow('example_group_14');</script>
-    <script type="text/javascript">moveProgressBar('22.3');</script>
+    <script type="text/javascript">moveProgressBar('19.2');</script>
     <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
   </dl>
 </div>
@@ -559,10 +520,10 @@ a {
   <dl>
   <dt id="example_group_15">LoanHistory</dt>
     <script type="text/javascript">makeRed('example_group_15');</script>
-    <script type="text/javascript">moveProgressBar('22.3');</script>
+    <script type="text/javascript">moveProgressBar('19.2');</script>
     <dd class="spec failed">
       <span class="failed_spec_name">before(:all)</span>
-      <div class="failure" id="failure_17">
+      <div class="failure" id="failure_14">
         <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
         <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
 /home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
@@ -584,10 +545,10 @@ a {
   <dl>
   <dt id="example_group_16">Loan</dt>
     <script type="text/javascript">makeRed('example_group_16');</script>
-    <script type="text/javascript">moveProgressBar('22.3');</script>
+    <script type="text/javascript">moveProgressBar('19.2');</script>
     <dd class="spec failed">
       <span class="failed_spec_name">before(:all)</span>
-      <div class="failure" id="failure_18">
+      <div class="failure" id="failure_15">
         <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
         <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
 /home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
@@ -609,10 +570,10 @@ a {
   <dl>
   <dt id="example_group_17">Report</dt>
     <script type="text/javascript">makeRed('example_group_17');</script>
-    <script type="text/javascript">moveProgressBar('22.3');</script>
+    <script type="text/javascript">moveProgressBar('19.2');</script>
     <dd class="spec failed">
       <span class="failed_spec_name">before(:all)</span>
-      <div class="failure" id="failure_19">
+      <div class="failure" id="failure_16">
         <div class="message"><pre>The attribute 'admin' is not accessible in User</pre></div>
         <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
 /home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
@@ -634,12 +595,12 @@ a {
   <dl>
   <dt id="example_group_18">ClientGroup</dt>
     <script type="text/javascript">makeYellow('example_group_18');</script>
-    <script type="text/javascript">moveProgressBar('23.0');</script>
+    <script type="text/javascript">moveProgressBar('20.0');</script>
     <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
   </dl>
 </div>
-<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>57.80463 seconds</strong>";</script>
-<script type="text/javascript">document.getElementById('totals').innerHTML = "30 examples, 19 failures, 4 pending";</script>
+<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>46.250697 seconds</strong>";</script>
+<script type="text/javascript">document.getElementById('totals').innerHTML = "26 examples, 16 failures, 4 pending";</script>
 </div>
 </div>
 </body>

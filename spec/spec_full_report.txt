@@ -45,16 +45,13 @@ Payment
 - before(:all) (FAILED - 10)
 
 Branch
-- should not be valid without a manager (FAILED - 11)
-- should not be valid without a name (FAILED - 12)
-- should not be valid with a name shorter than 3 characters (FAILED - 13)
-- should be able to 'have' centers (FAILED - 14)
+- before(:all) (FAILED - 11)
 
 Center
-- before(:all) (FAILED - 15)
+- before(:all) (FAILED - 12)
 
 Attendancy
-- before(:all) (FAILED - 16)
+- before(:all) (FAILED - 13)
 
 LedgerEntry
 - should have specs (PENDING: Not Yet Implemented)
@@ -63,13 +60,13 @@ Fee
 - should have specs (PENDING: Not Yet Implemented)
 
 LoanHistory
-- before(:all) (FAILED - 17)
+- before(:all) (FAILED - 14)
 
 Loan
-- before(:all) (FAILED - 18)
+- before(:all) (FAILED - 15)
 
 Report
-- before(:all) (FAILED - 19)
+- before(:all) (FAILED - 16)
 
 ClientGroup
 - should have specs (PENDING: Not Yet Implemented)
@@ -174,7 +171,7 @@ uninitialized constant CSV
 9)
 'Client before(:all)' FAILED
 expected valid? to return true, got false
-./spec/models/client_spec.rb:13:
+./spec/models/client_spec.rb:8:
 
 10)
 ArgumentError in 'Payment before(:all)'
@@ -188,36 +185,21 @@ The attribute 'admin' is not accessible in User
 ./spec/models/payment_spec.rb:8:
 
 11)
-'Branch should not be valid without a manager' FAILED
+'Branch before(:all)' FAILED
 expected valid? to return true, got false
-./spec/models/branch_spec.rb:15:
+./spec/models/branch_spec.rb:8:
 
 12)
-'Branch should not be valid without a name' FAILED
-expected valid? to return true, got false
-./spec/models/branch_spec.rb:15:
-
-13)
-'Branch should not be valid with a name shorter than 3 characters' FAILED
-expected valid? to return true, got false
-./spec/models/branch_spec.rb:15:
-
-14)
-'Branch should be able to 'have' centers' FAILED
-expected valid? to return true, got false
-./spec/models/branch_spec.rb:15:
-
-15)
 'Center before(:all)' FAILED
 expected valid? to return true, got false
-./spec/models/center_spec.rb:13:
+./spec/models/center_spec.rb:8:
 
-16)
+13)
 'Attendancy before(:all)' FAILED
 expected valid? to return true, got false
-./spec/models/attendancy_spec.rb:12:
+./spec/models/attendancy_spec.rb:7:
 
-17)
+14)
 ArgumentError in 'LoanHistory before(:all)'
 The attribute 'admin' is not accessible in User
 /home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
@@ -228,7 +210,7 @@ The attribute 'admin' is not accessible in User
 /home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
 ./spec/models/loan_history_spec.rb:7:
 
-18)
+15)
 ArgumentError in 'Loan before(:all)'
 The attribute 'admin' is not accessible in User
 /home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
@@ -239,7 +221,7 @@ The attribute 'admin' is not accessible in User
 /home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
 ./spec/models/loan_spec.rb:8:
 
-19)
+16)
 ArgumentError in 'Report before(:all)'
 The attribute 'admin' is not accessible in User
 /home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
@@ -250,6 +232,6 @@ The attribute 'admin' is not accessible in User
 /home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
 ./spec/models/report_spec.rb:11:
 
-Finished in 57.80463 seconds
+Finished in 46.250697 seconds
 
-30 examples, 19 failures, 4 pending
+26 examples, 16 failures, 4 pending
