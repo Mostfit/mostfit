@@ -48,6 +48,15 @@ module Misfit
         additional_checks(request.route)
       end
 
+      def can_approve?(loan)
+        debugger
+        if role == :staff_member
+          return (loan.client.center.manager == staff_member or loan.client.center.branch.manager == staff_member)
+        end
+        return false if role == :read_only
+        return true
+      end
+
       def additional_checks(route)
         controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
         model = route[:controller].singularize.to_sym

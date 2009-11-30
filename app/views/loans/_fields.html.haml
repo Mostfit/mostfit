@@ -73,28 +73,28 @@
     %td
       on&nbsp;&nbsp;
       = date_select_for @loan, :scheduled_first_payment_date
-  %tr
-    %td &nbsp;
-  %tr
-    %td
-      Approved:
-    %td
-      on&nbsp;&nbsp;
-      = date_select_for @loan, :approved_on, :nullable => true
-      &nbsp;&nbsp;by&nbsp;&nbsp;
-      = select_staff_member_for @loan, :approved_by
-      %br/
-      %span.greytext these fields are optional so may be specified later
-  %tr
-    %td
-      Disbursed:
-    %td
-      on&nbsp;&nbsp;
-      = date_select_for @loan, :disbursal_date, :nullable => true
-      &nbsp;&nbsp;by&nbsp;&nbsp;
-      = select_staff_member_for @loan, :disbursed_by
-      %br/
-      %span.greytext these fields are optional so may be specified later
+  - if session.user.can_approve?(@loan)
+    - debugger
+    %tr
+      %td
+        Approved:
+      %td
+        on&nbsp;&nbsp;
+        = date_select_for @loan, :approved_on, :nullable => true
+        &nbsp;&nbsp;by&nbsp;&nbsp;
+        = select_staff_member_for @loan, :approved_by
+        %br/
+        %span.greytext these fields are optional so may be specified later
+    %tr
+      %td
+        Disbursed:
+      %td
+        on&nbsp;&nbsp;
+        = date_select_for @loan, :disbursal_date, :nullable => true
+        &nbsp;&nbsp;by&nbsp;&nbsp;
+        = select_staff_member_for @loan, :disbursed_by
+        %br/
+        %span.greytext these fields are optional so may be specified later
   %tr
     %td
     %td

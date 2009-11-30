@@ -27,6 +27,6 @@
       %td
         = center.clients.loans.sum(:amount)
       %td
-        = center.clients.loans.payments.sum(:principal)
+        = center.clients.loans.payments(:type=>:principal).sum(:amount)
       %td
         = LoanHistory.all(:current => true, 'loan.client.center_id' => center.id).sum(:amount_in_default) || 0
