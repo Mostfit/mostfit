@@ -1,6 +1,6 @@
 %h1
   Reports
-= link_to 'New Report','', :class => "add"
+/= link_to 'New Report','', :class => "add"
 %table.narrow.form{:width => "100%"}
   %thead
     %tr
@@ -9,4 +9,5 @@
         
   %tr
     %td
-      =link_to("Daily report", url(:show_report, :report_type => "DailyReport"))
+      %h3
+        =link_to("Daily report", url(:show_report, :report_type => "DailyReport"))
