@@ -13,7 +13,14 @@ class Reports < Application
 
     if klass==DailyReport
       #Generating daily report
-      @groups, @centers, @branches = DailyReport.new(params[:date]).generate(params)
+      if params[:daily_report] and params[:daily_report][:date]
+        date_hash = params[:daily_report][:date]
+        date  =  Date.parse(date_hash[:year] + "-" + date_hash[:month] + "-" + date_hash[:day])
+      else
+        date  = Date.today
+      end
+      @report = DailyReport.new(date)
+      @groups, @centers, @branches = @report.generate(params)
       display [@groups, @centers, @branches]
     elsif id.nil?
       @reports = klass.all

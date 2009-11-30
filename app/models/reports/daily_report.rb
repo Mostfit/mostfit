@@ -23,7 +23,7 @@ class DailyReport < Report
           #amount_applied,amount_sanctioned,amount_disbursed,principal_paidback,balance_outstanding,interest_collected, processing_fee, no_of_defaults, name
           groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, g.name]
           loan_ids = g.clients.loans.collect{|x| x.id}
-          groups[b.id][c.id][g.id][4] += if loan_ids.length > 0
+          groups[b.id][c.id][g.id][3] += if loan_ids.length > 0
                                            LoanHistory.sum_outstanding_for(self.date, loan_ids)[0].scheduled_outstanding_total.to_i
                                          else
                                            0
@@ -37,7 +37,7 @@ class DailyReport < Report
       center_id = client.center_id
       branch_id = centers[center_id].branch_id
 
-      groups[branch_id][center_id][client.client_group_id][3] += p.amount if p.type==:principal
+      groups[branch_id][center_id][client.client_group_id][4] += p.amount if p.type==:principal
       groups[branch_id][center_id][client.client_group_id][5] += p.amount if p.type==:interest
       groups[branch_id][center_id][client.client_group_id][6] += p.amount if p.type==:fee
     }

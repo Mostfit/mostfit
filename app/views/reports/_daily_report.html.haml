@@ -1,4 +1,13 @@
-=date_select_for :date
+= form_for(@report, :action => url(:show_report, :report_type => "DailyReport"), :method => :get) do
+  %table
+    %tr
+      %td
+        Daily report for
+      %td
+        =date_select_for(@report, "date", :date => @report.date)
+      %td
+        =submit "Go"
+
 %table{:style => "border: 1px solid #ccc;"}
   %tr{:style => "border: 1px solid #ccc; background-color: #97b994; color: white;"}
     %th
@@ -10,9 +19,9 @@
     %th
       Amount disbursed
     %th
-      Principal paid back
-    %th
       Balance outstanding
+    %th
+      Principal paid back
     %th
       Interest collected
     %th
