@@ -1,0 +1,40 @@
+=date_select_for :date
+%table{:style => "border: 1px solid #ccc;"}
+  %tr{:style => "border: 1px solid #ccc; background-color: #97b994; color: white;"}
+    %th
+      Group
+    %th
+      Amount applied
+    %th
+      Amount sanctioned
+    %th
+      Amount disbursed
+    %th
+      Principal paid back
+    %th
+      Balance outstanding
+    %th
+      Interest collected
+    %th
+      Processing fee
+    %th
+      No. of defaults
+  - center_id, branch_id = nil, nil
+  -@groups.each do |group_id, centers|
+    %tr
+      %td{:colspan => "9", :style => "text-align: center; background-color: #ddd;"}
+        %b
+          =@branches[group_id].name
+    -centers.each do |center_id, groups|
+      %tr
+        %td{:colspan => "9", :style => "text-align: center; background-color: #efefef;"}
+          %b
+            =@centers[center_id].name      
+      -groups.each do |group_id, group|
+        %tr
+          %td
+            =group[-1]
+          -group[0..-2].each do |g|
+            %td
+              =g
+

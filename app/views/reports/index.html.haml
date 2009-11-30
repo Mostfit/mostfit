@@ -8,9 +8,5 @@
         Please choose a Report Type
         
   %tr
-  - Report.descendants.each do |report|
-    %tr{:class => cycle('odd','')}
-      %td
-        = link_to report, url(:show_report, :report_type => report)
-
-
+    %td
+      =link_to("Daily report", url(:show_report, :report_type => "DailyReport"))

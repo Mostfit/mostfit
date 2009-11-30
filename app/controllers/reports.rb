@@ -9,29 +9,19 @@ class Reports < Application
   def show(report_type, id)
     provides :pdf
     klass = Kernel.const_get(report_type)
-    if id.nil?
+    @report = Report.get(id) if id
+
+    if klass==DailyReport
+      #Generating daily report
+      @groups, @centers, @branches = DailyReport.new(params[:date]).generate(params)
+      display [@groups, @centers, @branches]
+    elsif id.nil?
       @reports = klass.all
       display @reports
+    elsif id and params[:format] == "pdf"
+      send_data(@report.get_pdf.generate, :filename => 'report.pdf')
     else
-      @report = Report.get(id)
-      if params[:format] == "pdf"
-        pdf = PDF::HTMLDoc.new
-        pdf.set_option :bodycolor, :white
-        pdf.set_option :toc, false
-        pdf.set_option :portrait, true
-        pdf.set_option :links, true
-        pdf.set_option :webpage, true
-        pdf.set_option :left, '2cm'
-        pdf.set_option :right, '2cm'
-        pdf.set_option :header, "Header here!"
-        f = File.read("app/views/reports/_#{@report.name.snake_case.gsub(" ","_")}.pdf.haml")
-        report = Haml::Engine.new(f).render(Object.new, :report => @report)
-        pdf << report
-        pdf.footer ".t."
-        send_data pdf.generate, :filename => 'report.pdf'
-      else
-        display @report
-      end
+      display @report
     end
   end
 
