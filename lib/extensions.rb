@@ -40,7 +40,6 @@ module Misfit
       end
 
       def can_approve?(loan)
-        debugger
         if role == :staff_member
           return (loan.client.center.manager == staff_member or loan.client.center.branch.manager == staff_member)
         end
@@ -49,7 +48,6 @@ module Misfit
       end
 
       def additional_checks
-        debugger
         id = @route[:id]
         model = Kernel.const_get(@model.to_s.capitalize)
         if model == Loan
@@ -75,7 +73,6 @@ module Misfit
       
       def _can_access?(route,params = nil)
         # more garbage
-        debugger
         return true if role == :admin
         return true if route[:controller] == "graph_data"
         @route = route

@@ -5,7 +5,6 @@ module Merb
     end
 
     def link_to_with_rights(text, path, params = {}, method="GET")
-      debugger
       uri = URI.parse(path)
       method = method.to_s.upcase || "GET"
       request = Merb::Request.new(
