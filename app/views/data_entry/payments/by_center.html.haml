@@ -39,6 +39,26 @@
         %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
           = date_select 'date', @date
           = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
+  %h1 Approvals
+  - @loans_to_approve = @center.clients.loans(:approved_on => nil)
+  - if @loans_to_approve.size > 0
+    = form_for(@loan, :action => url(:enter_loans, :action => 'approve')) do
+      = partial :approvals
+      = submit 'Approve these loans'
+  - else
+    No approvals today
+
+  %h1 Disbursal
+  - @loans_to_disburse = @center.clients.loans(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil)
+  - if @loans_to_disburse.size > 0
+    = form_for(@loan, :action => url(:enter_loans, :action => 'disburse')) do
+      = partial :disbursals
+      = submit 'Disburse these loans'
+  - else
+    No disbursals today
+  
+
+  %h1 Payments
   = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
     = hidden_field :name => 'for_date', :value => @date
     = hidden_field :name => 'center_id', :value => @center.id

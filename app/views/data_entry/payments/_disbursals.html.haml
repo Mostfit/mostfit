@@ -1,0 +1,38 @@
+- if @loans_to_disburse.size > 0
+  %table.narrow.form{ :width => '100%'}
+    %thead
+      %tr{:style => "font-size: 0.85em;"}
+        %th
+          Name
+        %th
+          Scheduled Disbursal Date
+        %th
+          Status
+        %th
+          Disbursed?
+        %th
+          Disbursed On
+        %th
+          Disbursed By
+    - @loans_to_disburse.each do |loan|
+      %tr
+        %td
+          = loan.client.name
+        %td
+          = loan.scheduled_disbursal_date
+        %td
+          - late =  @date - loan.scheduled_disbursal_date
+          - if late > 0
+            == "#{late} days late"
+          - else
+            on time
+        %td
+          = check_box :name => "loans[#{loan.id}][disbursed?]"
+        %td
+          = date_select "loans[#{loan.id}][disbursal_date]"
+        %td
+          = select :name => "loans[#{loan.id}][disbursed_by_staff_id]", :collection => [["","---"]] + StaffMember.all.map{|sm| [sm.id.to_s,sm.name]}, :selected => loan.client.center.manager.id.to_s
+
+- else
+  No disbursals today
+    

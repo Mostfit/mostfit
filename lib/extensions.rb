@@ -45,6 +45,13 @@ module Misfit
         # this is the place to put all the ACL garbage so it doesn't pollute the core
         debugger
         return old_can_manage?(model) if (id.nil? or role != :staff_member)
+        additional_checks(request.route)
+      end
+
+      def additional_checks(route)
+        controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
+        model = route[:controller].singularize.to_sym
+        action = route[:action]
         model = Kernel.const_get(model.to_s.camel_case)
         if model == Loan
           l = Loan.get(id)
@@ -54,7 +61,11 @@ module Misfit
           return ((c.center.manager == self.staff_member) or (c.center.branch.manager == self.staff_member))
        elsif model == Center
           center = Center.get(id)
-          return center.branch.manager == self.staff_member
+          if route[:action] != "show"
+            return center.branch.manager == self.staff_member
+          else
+            return center.manager == self.staff_member
+          end
         elsif model.relationships.include?(:manager)
           o = model.get(id)
           return true if o.manager == self.staff_member
@@ -79,7 +90,7 @@ module Misfit
               return false
           end
           if route.has_key?(:id) and route[:id]
-            return can_manage?(model, route[:id])
+            return can_manage?(route, route[:id])
           end
           if controller == "payments"
             c = Center.get(route[:center_id])

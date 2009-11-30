@@ -86,14 +86,19 @@ class Loans < DataEntry::Controller
 
   def approve
     debugger
-    @loans = Loan.all(:approved_on => nil)
     if request.method == :get
+      if params[:center_id]
+        @loans_to_approve = @loan.all("client.center" => Center.get(params[:center_id]))
+      else
+        @loans_to_approve = Loan.all(:approved_on => nil)
+      end
+      @loans_to_approve.each {|l| l.clear_cache}
       render
-    elsif request.method == :post
+    else
       debugger
       @errors = []
-      loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
-      loans.keys.each do |id|
+      @loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
+      @loans.keys.each do |id|
         loan = Loan.get(id)
         params[:loans][id].delete("approved?")
         loan.update_attributes(params[:loans][id])
@@ -102,12 +107,10 @@ class Loans < DataEntry::Controller
       if @errors.blank?
         redirect "/data_entry", :message => {:notice => 'loans approved'}
       else
-        @loans = Loan.all(:approved_on => nil)
-        @loans.each {|l| l.clear_cache}
+        @loans_to_approve = Loan.all(:id.in => @loans.keys)
         render
       end
     end
-    render
   end
 
   private
