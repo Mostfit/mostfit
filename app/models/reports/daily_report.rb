@@ -19,11 +19,16 @@ class DailyReport < Report
         groups[b.id][c.id]||= {}
         centers[c.id]  = c
         c.client_groups.each{|g|
-          #0              1                 2                3                  4                   5                   6               7               8
-          #amount_applied,amount_sanctioned,amount_disbursed,principal_paidback,balance_outstanding,interest_collected, processing_fee, no_of_defaults, name
-          groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, g.name]
+          #0              1                 2                3                      4   5                 6                    7               8               9
+          #amount_applied,amount_sanctioned,amount_disbursed,balance_outstanding(p),tot,principal_paidback,interest_collected, processing_fee, no_of_defaults, name
+          groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, 0, g.name]
           loan_ids = g.clients.loans.collect{|x| x.id}
           groups[b.id][c.id][g.id][3] += if loan_ids.length > 0
+                                           LoanHistory.sum_outstanding_for(self.date, loan_ids)[0].scheduled_outstanding_principal.to_i
+                                         else
+                                           0
+                                         end
+          groups[b.id][c.id][g.id][4] += if loan_ids.length > 0
                                            LoanHistory.sum_outstanding_for(self.date, loan_ids)[0].scheduled_outstanding_total.to_i
                                          else
                                            0
@@ -47,7 +52,7 @@ class DailyReport < Report
       center_id = client.center_id
       branch_id = centers[center_id].branch_id
 
-      groups[branch_id][center_id][l.client.client_group_id][0] = l.amount
+      groups[branch_id][center_id][l.client.client_group_id][0] += l.amount
     }
 
     #2: Approved on
@@ -56,7 +61,7 @@ class DailyReport < Report
       center_id = client.center_id
       branch_id = centers[center_id].branch_id
 
-      groups[branch_id][center_id][l.client.client_group_id][1] = l.amount
+      groups[branch_id][center_id][l.client.client_group_id][1] += l.amount
     }
 
     #3: Disbursal date
@@ -65,7 +70,7 @@ class DailyReport < Report
       center_id = client.center_id
       branch_id = centers[center_id].branch_id
 
-      groups[branch_id][center_id][l.client.client_group_id][2] = l.amount
+      groups[branch_id][center_id][l.client.client_group_id][2] += l.amount
     }
     return [groups, centers, branches]
   end
