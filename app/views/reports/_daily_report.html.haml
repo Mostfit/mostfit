@@ -21,6 +21,7 @@
   - center_id, branch_id = nil, nil
   -@groups.each do |group_id, centers|
     -if centers.keys.length>0
+      -branch_total = []
       %tr
         %td{:colspan => "9", :style => "text-align: center; background-color: #ddd;"}
           %b
@@ -31,13 +32,30 @@
             %td{:colspan => "9", :style => "text-align: center; background-color: #efefef;"}
               %b
                 =@centers[center_id].name
+          - center_total = Array.new(groups.values.first.length-1, 0)
           -groups.each do |group_id, group|
             %tr
               %td
                 =group[-1]
-              -group[0..-2].each do |g|
+              -group[0..-2].each_with_index do |g, idx|
                 %td
                   =g
+                  -center_total[idx]+=g
+          %tr
+            %td
+              %b==Center total:
+              -branch_total.push(center_total)
+            -center_total.each do |ele|
+              %td
+                %b
+                  =ele
+      %tr
+        %td
+          %b==Branch total
+        -branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
+          %td
+            %b
+              =ele
 
 = form_for(@report, :action => url(:show_report, :report_type => "DailyReport"), :method => :get) do
   %table
