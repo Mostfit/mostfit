@@ -2,18 +2,18 @@
   .graph
     = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'client', :id => @client.id, :scope_unit => 'months', :scope_size => 3) )
 
-
-%h1{ :width => '50%' }== Client: <i>#{@client.name}</i>
-
-
+%h1{:width => '50%' }== Client: <i>#{@client.name}</i>
 %table.narrow.form{ :width => '50%' }
   %tr.odd
     %td{:rowspan => "5"}
       = image_tag @client.picture.url(:thumb)
-    %td name
+    %td 
+      name
     %td
-      %b= @client.name
+      %b
+        = @client.name
       == (id: #{@client.id}, ref: #{@client.reference})
+      == (#{link_to 'edit', url(:enter_clients, :action => 'edit', :id => @client)})
   %tr
     %td spouse name
     %td
@@ -39,7 +39,7 @@
         Not associated with a group yet (
         =link_to('Edit', resource(@branch, @center, @client, :edit))
         to change)
-
+    
 %p
   = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
 
