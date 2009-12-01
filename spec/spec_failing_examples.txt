@@ -8,10 +8,7 @@ Upload before(:all)
 Upload before(:all)
 Client before(:all)
 Payment before(:all)
-Branch should not be valid without a manager
-Branch should not be valid without a name
-Branch should not be valid with a name shorter than 3 characters
-Branch should be able to 'have' centers
+Branch before(:all)
 Center before(:all)
 Attendancy before(:all)
 LoanHistory before(:all)

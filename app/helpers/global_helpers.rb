@@ -12,7 +12,7 @@ module Merb
                                   Merb::Const::REQUEST_METHOD => method,
                                   Merb::Const::QUERY_STRING => uri.query)
       route = Merb::Router.match(request)[1] rescue nil
-      return link_to(text,path,params) if session.user.can_access?(route[:controller],route[:action])
+      return link_to(text,path,params) if session.user.can_access?(route)
     end
 
     def url_for_loan(loan, action = '')

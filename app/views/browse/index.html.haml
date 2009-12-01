@@ -6,8 +6,6 @@
 %ul
   %li
     = link_to 'Branches', url(:browse, :action => 'branches')
-  %li
-    = link_to 'Centers', url(:browse, :action => 'centers')
-  - Misfit::Extensions::Browse.instance_methods.each do |m|
+  - (Misfit::Extensions::Browse.instance_methods - ["before"]).each do |m|
     %li
       = link_to m.humanize, url(:browse, m)

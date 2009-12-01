@@ -9,6 +9,10 @@ class Date
     #week starts on monday
     WEEKDAYS[cwday - 1]
   end
+
+#  def to_s
+#    "#{year}-#{month}-#{day} (#{weekday.to_s[0..2]})"
+#  end
 end
 
 
