@@ -1,0 +1,36 @@
+---
+clients:
+  bank_account_particulars:
+    account_number:
+      type: text
+      length: 20
+      position: 1
+      validations:
+        minimum: 5
+        maximum: 20
+        required: false
+    type_of_account:
+      type: select_list
+      position: 2
+      values: [:savings, :current, :no_frill, :fixed_deposit, :loan, :other]
+      default_value: "Select account type"
+      validations:
+        required: false
+    bank_name:
+      type: text
+      position: 3
+      length: 20      
+      validations:
+        required: false
+    branch:
+      type: text
+      position: 4
+      length: 20
+      validations:
+        required: false
+    join_holder:
+      type: text
+      position: 5
+      length: 20
+      validations:
+        required: false
