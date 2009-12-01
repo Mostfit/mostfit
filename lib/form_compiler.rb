@@ -3,8 +3,9 @@ module CustomForm
     attr_accessor :form_data, :filename, :new_properties
 
     def initialize(_filename)
-      @filename  = _filename
-      @form_data = YAML.load(File.read(File.join("config", "forms", _filename)))       
+      @filename   = _filename
+      @form_data  = YAML.load(File.read(File.join("config", "forms", _filename)))       
+      p @form_data.keys
     end
     
     def compile
@@ -27,15 +28,33 @@ module CustomForm
       }
       model_file_append(new_properties.compact)
       model_file_append(new_validations.flatten.compact)
-      return new_fields
+      return fields
     end
 
     def compile_form(fields)
-      haml_file = ""
+      haml_file =  ""
+      haml_file << form_header
       fields.each{|field|
         haml_file += haml_row(field)
       }
+      haml_file << hr
       create_view_file(haml_file)
+    end
+    
+    def form_header
+      header = []
+      header << "%tr"
+      header << "  %td{:colspan => '2'}"
+      header << "    %h1==#{form_name.humanize}"
+      header.join("\n")+"\n"
+    end
+
+    def hr
+      str = []
+      str << "%tr"
+      str << "  %td{:colspan => '2'}"      
+      str << "    %hr"
+      str.join("\n")+"\n"
     end
     
     def haml_row(field)
