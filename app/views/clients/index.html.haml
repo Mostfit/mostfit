@@ -10,7 +10,7 @@
     %td name
     %td
       %b= @center.name
-      == (id: #{@center.id})
+      == (code: #{@center.code}, id: #{@center.id})
   %tr
     %td manager
     %td= link_to @center.manager.name, resource(@center.manager)

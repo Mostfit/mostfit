@@ -1,3 +1,4 @@
+
 %table.form
   - if @center.blank?
     %tr
@@ -60,7 +61,8 @@
       Address:
     %td
       ~ text_area :address, :rows => 6, :cols => 38
-  - if not @client.new_record?
+  =partial "clients/extra_fields" rescue nil
+  - if not @client.new?
     %tr
       %td
         Active:
@@ -68,7 +70,6 @@
         = check_box :active
         &nbsp;&nbsp;
         %span.greytext inactive member are not counted for attendancy
-  =partial 'clients/extra_fields' rescue nil
   %tr
     %td
       Photo

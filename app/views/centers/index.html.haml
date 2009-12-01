@@ -10,7 +10,7 @@
       %td name
       %td
         %b= @branch.name
-        == (id: #{@branch.id})
+        == (code: #{@branch.code}, id: #{@branch.id})
     %tr
       %td manager
       %td= link_to @branch.manager.name, resource(@branch.manager)
