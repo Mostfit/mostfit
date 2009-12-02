@@ -5,7 +5,6 @@ module CustomForm
     def initialize(_filename)
       @filename   = _filename
       @form_data  = YAML.load(File.read(File.join("config", "forms", _filename)))       
-      p @form_data.keys
     end
     
     def compile
@@ -170,7 +169,10 @@ module CustomForm
     def compile_property(field)
       new_property = "  property :#{field['name']}, #{find_type(field)}"
       new_property += ", :length => #{field['length']}" if field['length']
-      new_property += ", :default => #{field['default']}" if field['default'] and not field['default'].blank?      
+      new_property += ", :default => #{field['default']}" if field['default'] and not field['default'].blank?
+      if field['validations'] and field['validations'].key?('required')
+        new_property += ", :nullable => #{field['validations']['required'] ? 'false' : 'true'}"
+      end
       new_property
     end
 
@@ -188,7 +190,9 @@ module CustomForm
         new_validation << " validates_present #{field['name']}" if field['validations']['required'] and field['validations']['required']=='true'
         if field['validations']['minimum'] or  field['validations']['maximum']
           new_validation << "  validates_length :#{field['name']}" 
-          new_validation[-1] += ", :min => #{field['validations']['minimum']}" if field['validations']['minimum']
+          if field['validations']['minimum'] and not (field['validations'] and field['validations']['required'] and field['validations']['required']=='false')
+            new_validation[-1] += ", :min => #{field['validations']['minimum']}"
+          end
           new_validation[-1] += ", :max => #{field['validations']['maximum']}" if field['validations']['maximum']
         end
       end
