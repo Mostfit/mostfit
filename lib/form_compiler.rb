@@ -190,7 +190,7 @@ module CustomForm
         new_validation << " validates_present #{field['name']}" if field['validations']['required'] and field['validations']['required']=='true'
         if field['validations']['minimum'] or  field['validations']['maximum']
           new_validation << "  validates_length :#{field['name']}" 
-          if field['validations']['minimum'] and not (field['validations'] and field['validations']['required'] and field['validations']['required']=='false')
+          if field['validations']['minimum'] and not (field['validations'] and not field['validations']['required'])
             new_validation[-1] += ", :min => #{field['validations']['minimum']}"
           end
           new_validation[-1] += ", :max => #{field['validations']['maximum']}" if field['validations']['maximum']
@@ -257,8 +257,10 @@ module CustomForm
         return "Text"
       elsif ["date", "integer", "float"].include?(type)
         return type.capitalize
-      elsif type=="select_list"
-        return "Enum.send('[]', *[:#{field['values'].join(', :')}])"
+      elsif type=="select_list"        
+        arr = ":" + field['values'].join(', :')
+        arr = "0, #{arr}" if field['validations'] and field['validations'].key?('required') and not field['validations']['required']
+        return "Enum.send('[]', *[#{arr}])"
       elsif type=="table"
         return "String"
       elsif type=="check_list"
