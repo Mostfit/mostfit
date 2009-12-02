@@ -48,7 +48,7 @@ class DailyReport < Report
 
       groups[branch_id][center_id][client.client_group_id][3] += p.amount if p.type==:principal
       groups[branch_id][center_id][client.client_group_id][4] += p.amount if p.type==:interest
-      groups[branch_id][center_id][client.client_group_id][5] += p.amount if p.type==:fee
+      groups[branch_id][center_id][client.client_group_id][5] += p.amount if p.type==:fees
     }
     #1: Applied on
     Loan.all(:applied_on => date).each{|l|
