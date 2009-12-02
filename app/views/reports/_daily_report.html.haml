@@ -14,10 +14,10 @@
       Group
     %th{:colspan => "3"}
       Amount
-    %th{:colspan => "2"}
-      Balance outstanding
     %th{:colspan => "3"}
-      Paid back
+      Payment
+    %th{:colspan => "3"}
+      Balance outstanding
     %th
       No. of defaults
   %tr
@@ -31,26 +31,28 @@
     %th
       Principal
     %th
-      Total
+      Interest
+    %th
+      Fee
     %th
       Principal
     %th
       Interest
     %th
-      Fee
+      Total
     %th
   - center_id, branch_id = nil, nil
   -@groups.each do |group_id, centers|
     -if centers.keys.length>0
       -branch_total = []
       %tr
-        %td.group{:colspan => "10"}
+        %td.group{:colspan => "11"}
           %b
             =@branches[group_id].name
       -centers.each do |center_id, groups|
         -if groups.keys.length>0
           %tr
-            %td.center{:colspan => "10"}
+            %td.center{:colspan => "11"}
               %b
                 =@centers[center_id].name
           - center_total = Array.new(groups.values.first.length-1, 0)
