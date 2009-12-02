@@ -18,6 +18,12 @@ class Client
   property :client_group_id,Integer, :index => true, :nullable => true
   property :center_id,      Integer, :index => true, :nullable => true
   property :deleted_at,     ParanoidDateTime
+  property :account_number, String, :length => 20
+  property :type_of_account, Enum.send('[]', *[:savings, :current, :no_frill, :fixed_deposit, :loan, :other])
+  property :bank_name, String, :length => 20
+  property :branch, String, :length => 20
+  property :join_holder, String, :length => 20
+  validates_length :account_number, :min => 5, :max => 20
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},
