@@ -66,16 +66,13 @@ class Loans < DataEntry::Controller
       render
     else
       @errors = []
-      debugger
       loans = params[:loans].select{|k,v| v[:disbursed?] == "on"}.to_hash
       loans.keys.each do |id|
-        debugger
         loan = Loan.get(id)
         params[:loans][id].delete("disbursed?")
         loan.update_attributes(params[:loans][id])
         @errors << loan.errors if not loan.save
       end
-      debugger
       if @errors.blank?
         redirect url(:data_entry), {:message => {:notice => "#{loans.size} loans disbursed. #{params[:loans].size - loans.size} loans not disbursed."}}
       else
@@ -85,7 +82,6 @@ class Loans < DataEntry::Controller
   end
 
   def approve
-    debugger
     if request.method == :get
       if params[:center_id]
         @loans_to_approve = @loan.all("client.center" => Center.get(params[:center_id]))
@@ -95,7 +91,6 @@ class Loans < DataEntry::Controller
       @loans_to_approve.each {|l| l.clear_cache}
       render
     else
-      debugger
       @errors = []
       @loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
       @loans.keys.each do |id|

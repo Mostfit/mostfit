@@ -30,7 +30,6 @@ class Users < Application
   end
 
   def update(id, user)
-    debugger
     @user = User.get(id)
     params[:user][:staff_member] = StaffMember.get(params[:user][:staff_member]) if params[:user][:staff_member]
     raise NotFound unless @user

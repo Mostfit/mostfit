@@ -31,7 +31,6 @@ module DataEntry
     end
     
     def by_staff_member
-      debugger
       @date = params[:for_date] ? Date.parse(params[:for_date]) : Date.today
       staff_id = params[:staff_member_id] || params[:received_by]
       if staff_id
@@ -114,7 +113,6 @@ module DataEntry
           @type = params[:payment][:type]
           amounts = params[:paid][k.to_sym].to_i
           success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, false)
-          debugger
           @errors << @prin.errors if @prin
           @errors << @int.errors if @int 
           @errors << @fees.errors if @fees

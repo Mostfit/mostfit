@@ -7,7 +7,6 @@
 - if @center and @date
   - if not @errors.blank?
     .error
-      - debugger
       - @errors.each do |error|
         == Loan <b>#{error.resource.class == Payment ? error.resource.loan.id : error.resource.id} :</b>
         = error.values.join("*")
