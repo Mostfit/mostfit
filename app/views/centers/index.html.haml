@@ -21,7 +21,7 @@
   %h2== Centers of the #{@branch.name} branch
   %p
     = link_to 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit"
-= link_to 'create a new center', url(:enter_centers, :action => 'new') + (@branch ? "?branch_id=#{@branch.id}" : ""), :class => "add"
+= link_to 'create a new center', resource(@branch, :centers, :new), :class => "add"
 
 
 - if @centers.blank?
@@ -44,14 +44,14 @@
         %td
           = center.id
         %td
-          %b= link_to center.name, url(:quick_link, "centers", center.id )
+          %b= link_to center.name, resource(@branch, center )
         %td
           = link_to center.manager.name, resource(center.manager)
         %td
           - if center.meeting_day
             == #{center.meeting_day.to_s.capitalize}#{(center.meeting_time_hours and center.meeting_time_minutes) ? ", #{center.meeting_time_hours}:#{center.meeting_time_minutes}" : ''}
         %td
-          = link_to 'edit', url(:enter_centers, :action => 'edit') + "?query=#{center.id}"
+          = link_to 'edit', resource(@branch, center, :edit)
           - if @branch 
             &nbsp;|&nbsp;
             = link_to 'new client', url(:enter_clients, :action => 'new') + "?center_id=#{center.id}"

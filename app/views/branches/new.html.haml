@@ -2,6 +2,6 @@
 
 = error_messages_for @branch
 - form_url   =  resource(:branches, {:return => params[:return]})
-- cancel_url = (params[:controller]=="data_entry/branches" ? url(:data_entry) : resource(:branches))
+- cancel_url =  url(params[:return])
 = form_for(@branch, :action => form_url) do  
   = partial "branches/fields", :submit_text => "Create branch", :cancel_url => cancel_url

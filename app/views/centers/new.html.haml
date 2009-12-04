@@ -1,8 +1,8 @@
 %h1 Create new center
 
 = error_messages_for @center
-- form_url   = (params[:controller]=="data_entry/centers" ? url(:enter_centers, :action => 'create') : resource(@branch, :centers))
-- cancel_url = (params[:controller]=="data_entry/centers" ? url(:enter_centers) : resource(@branch, :centers))
+- form_url   = (@branch ? resource(@branch, :centers) : resource(:centers, {:return => params[:return]}))
+- cancel_url = params[:return] ? "/"+params[:return] : resource(@branch)
 
 = form_for(@center, :action => form_url) do
   = partial("centers/fields", :submit_text => 'Create new center', :cancel_url => cancel_url)
