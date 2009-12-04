@@ -21,9 +21,8 @@
         %th id
         %th received on
         %th received by
-        %th principal
-        %th interest
-        %th total
+        %th amount
+        %th type
     %tbody
     - for payment in @loan.payments
       %tr{ :class => cycle('odd','') }
@@ -38,8 +37,6 @@
           %b= payment.amount
         %td
           %b= payment.type
-        %td
-          %b= payment.total
         %td
           = form_for(@payment, :action => url(:enter_payments, :action => 'delete')) do
             = hidden_field :id, :value => payment.id 
