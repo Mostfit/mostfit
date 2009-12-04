@@ -8,7 +8,6 @@ module Misfit
       end
 
       def before
-        debugger
         if session.user.role == :staff_member
           @staff_member = session.user.staff_member
           @branches = Branch.all(:manager => @staff_member)
