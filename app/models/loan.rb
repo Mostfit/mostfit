@@ -251,7 +251,7 @@ class Loan
       # interest is paid first, the rest goes in as principal
       # the payment is filed on received_on without knowing about the future
       # it could happen that payment have been made after this payment
-      # here the validations on the Payment should       
+      # here the validations on the Payment should 
       total        = input
       total_fees_due_on_date = fees_due_on(received_on).values.inject(0){|a,b| a+b}
       fees_paid = [amount, total_fees_due_on_date].min

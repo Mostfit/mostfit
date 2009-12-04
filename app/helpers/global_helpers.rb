@@ -39,7 +39,6 @@ module Merb
         collection << ['', branch_name]
         catalog[branch_name].sort.each{ |k,v| collection << [k.to_s, "!!!!!!!!!#{v}"] }
       end
-      debugger
       html = select col,
         :collection   => collection,
         :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",

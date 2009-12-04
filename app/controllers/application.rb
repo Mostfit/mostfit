@@ -3,7 +3,6 @@ class Application < Merb::Controller
   before :ensure_can_do
 
   def ensure_can_do
-    debugger
     @route = Merb::Router.match(request)
     raise NotPrivileged unless session.user.can_access?(@route[1], params)
   end

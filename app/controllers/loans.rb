@@ -15,7 +15,6 @@ class Loans < Application
   end
 
   def show(id)
-    debugger
     @loan = Loan.get(id)
     raise NotFound unless @loan
     @payments = @loan.payments
