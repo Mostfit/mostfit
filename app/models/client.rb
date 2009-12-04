@@ -55,7 +55,7 @@ class Client
     if /^\d+$/.match(q)
       all(:conditions => {:id => q})
     else
-      all(:conditions => ["name like ?", q+'%'])
+      all(:conditions => ["reference=? or name like ?", q, q+'%'])
     end
   end
 
