@@ -13,13 +13,15 @@ class Reports < Application
 
     if klass==DailyReport
       #Generating daily report
-      if params[:daily_report] and params[:daily_report][:date]
-        date_hash = params[:daily_report][:date]
-        date  =  Date.parse(date_hash[:year] + "-" + date_hash[:month] + "-" + date_hash[:day])
-      else
-        date  = Date.today
-      end
+      date = get_date(params[:daily_report], :date)
       @report = DailyReport.new(date)
+      @groups, @centers, @branches = @report.generate(params)
+      display [@groups, @centers, @branches]      
+    elsif klass==TimeRangeReport
+      #Generating time range report
+      from_date = get_date(params[:time_range_report], :from_date)
+      to_date   = get_date(params[:time_range_report], :to_date)
+      @report   = TimeRangeReport.new(from_date==to_date ? from_date-7 : from_date, to_date)
       @groups, @centers, @branches = @report.generate(params)
       display [@groups, @centers, @branches]
     elsif id.nil?
@@ -75,4 +77,13 @@ class Reports < Application
     end
   end
 
+  private
+  def get_date(params, col)
+    if params and params.key?(col)
+      date_hash = params[col]
+      return Date.parse(date_hash[:year] + "-" + date_hash[:month] + "-" + date_hash[:day])
+    else
+      Date.today
+    end
+  end
 end # Reports

@@ -671,14 +671,14 @@ class Loan
     sql = %Q{ INSERT INTO loan_history(loan_id, date, status, 
               scheduled_outstanding_principal, scheduled_outstanding_total,
               actual_outstanding_principal, actual_outstanding_total, current, amount_in_default,
-              center_id, client_id, branch_id, days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid)
+              client_group_id, center_id, client_id, branch_id, days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid)
               VALUES }
     values = []
     calculate_history.each do |history|
       value = %Q{(#{id}, '#{history[:date]}', #{history[:status]}, #{history[:scheduled_outstanding_principal]}, 
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
                           #{history[:actual_outstanding_total]},#{history[:current]},
-                          #{history[:amount_in_default]}, #{client.center.id},#{client.id},#{client.center.branch.id},
+                          #{history[:amount_in_default]}, #{client.client_group_id}, #{client.center.id},#{client.id},#{client.center.branch.id},
                           #{history[:days_overdue]}, #{((history[:date] - d0) / 7).to_i + 1}, 
                           #{history[:principal_due]},#{history[:interest_due]},
                           #{history[:principal_paid]},#{history[:interest_paid]})}

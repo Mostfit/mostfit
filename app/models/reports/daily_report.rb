@@ -23,18 +23,16 @@ class DailyReport < Report
           #amount_applied,amount_sanctioned,amount_disbursed,bal_outstanding(p),bo(i),tot,principal_paidback,interest_collected, processing_fee, no_of_defaults, name
           groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, g.name]
           loan_ids = g.clients.loans.collect{|x| x.id}
-          principal= if loan_ids.length > 0
-                       LoanHistory.sum_outstanding_for(self.date, loan_ids)[0].scheduled_outstanding_principal.to_i
-                     else
-                       0
-                     end
-          groups[b.id][c.id][g.id][6] +=principal
 
-          total = if loan_ids.length > 0
-                    LoanHistory.sum_outstanding_for(self.date, loan_ids)[0].scheduled_outstanding_total.to_i
-                  else 
-                    0
-                  end
+          if loan_ids.length > 0
+            history  = LoanHistory.sum_outstanding_for(self.date, loan_ids)[0]
+            principal= history.scheduled_outstanding_principal.to_i
+            total    =  history.scheduled_outstanding_total.to_i
+          else
+            principal, total = 0, 0
+          end
+
+          groups[b.id][c.id][g.id][6] +=principal
           groups[b.id][c.id][g.id][8] += total
           groups[b.id][c.id][g.id][7] += total-principal
         }
