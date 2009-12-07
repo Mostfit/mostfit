@@ -10,6 +10,7 @@ class Centers < Application
   def show(id)
     @center = Center.get(id)
     raise NotFound unless @center
+    @branch = @center.branch if not @branch
     clients = {}
     @center.clients(:active => true).each{|c|
       group_name = c.client_group ? c.client_group.name : "No group"
