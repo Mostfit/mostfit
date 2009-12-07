@@ -1,0 +1,36 @@
+%table.narrow.form{ :width => '50%' }
+  %tr.odd
+    %td{:rowspan => "5"}
+      = image_tag @client.picture.url(:thumb)
+    %td 
+      name
+    %td
+      %b
+        = @client.name
+      == (id: #{@client.id}, ref: #{@client.reference})
+      == (#{link_to 'edit', url(:enter_clients, :action => 'edit', :id => @client)})
+  %tr
+    %td spouse name
+    %td
+      = @client.spouse_name
+  %tr.odd
+    %td manager
+    %td= link_to @center.manager.name, resource(@center.manager)
+  %tr
+    %td at center
+    %td
+      = link_to @center.name, resource(@branch, @center)
+      == (of branch #{link_to @branch.name, resource(@branch)})
+      %br/
+      %span.greytext
+        center managed by:
+        = link_to @center.branch.manager.name, resource(@center.manager)
+  %tr
+    %td group name
+    %td
+      -if @client.client_group
+        =@client.client_group.name
+      -else
+        Not associated with a group yet (
+        =link_to('Edit', resource(@branch, @center, @client, :edit))
+        to change)

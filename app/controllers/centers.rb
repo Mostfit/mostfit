@@ -48,7 +48,7 @@ class Centers < Application
     @center = Center.new(center)
     @center.branch = @branch  # set direct context
     if @center.save
-      redirect resource(@branch, :centers), :message => {:notice => "Center '#{@center.name}' was successfully created"}
+      redirect(params[:return]||resource(@branch, :centers), :message => {:notice => "Center '#{@center.name}' successfully created"})
     else
 #       message[:error] = "Center failed to be created"
       render :new  # error messages will be shown
@@ -66,7 +66,7 @@ class Centers < Application
     @center = Center.get(id)
     raise NotFound unless @center
     if @center.update_attributes(center)
-       redirect resource(@branch, :centers), :message => {:notice => "Center '#{@center.name}' has been edited"}
+      redirect(params[:return]||resource(@branch, :centers), :message => {:notice => "Center '#{@center.name}' has been successfully edited"})
     else
       display @center, :edit  # error messages will be shown
     end

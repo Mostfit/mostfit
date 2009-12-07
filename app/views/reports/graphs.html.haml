@@ -1,0 +1,4 @@
+%table{:style => "float: right"}
+  %tr
+    %td
+      = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'client_growth',  :scope_unit => 'months', :scope_size => 3) )

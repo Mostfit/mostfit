@@ -28,7 +28,8 @@ class LoanHistory
 
   belongs_to :loan#, :index => true
   belongs_to :client, :index => true         # speed up reports
-  belongs_to :center, :index => true         # by avoiding lots of joins!
+  belongs_to :client_group, :index => true, :nullable => true   # by avoiding 
+  belongs_to :center, :index => true         # lots of joins!
   belongs_to :branch, :index => true         # muahahahahahaha!
   
   validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
@@ -36,6 +37,25 @@ class LoanHistory
 
   # __DEPRECATED__ the prefered way to make history and future.
   # HISTORY IS NOW WRITTEN BY THE LOAN MODEL USING update_history_bulk_insert
+  def self.update_group
+    clients={}
+    LoanHistory.all.each{|lh|
+      next if lh.client_group_id or not lh.client_id
+      
+      clients[lh.client_id] = clients.key?(lh.client_id) ? clients[lh.client_id] : Client.get(lh.client_id)
+      
+      if clients[lh.client_id]
+        lh.client_group_id = clients[lh.client_id].client_group_id
+        if not lh.save
+          lh.errors
+        end
+      end
+    }
+    p clients.keys
+    puts "Done"
+  end
+
+  
 
   def self.write_for(loan, date)
     if result = LoanHistory::create(
@@ -81,5 +101,22 @@ class LoanHistory
         (select loan_id, max(ddiff) as diff from (select date, loan_id, datediff(now(),date) as ddiff,actual_outstanding_principal - scheduled_outstanding_principal as diff from loan_history where actual_outstanding_principal != scheduled_outstanding_principal and date < now()) as dt group by loan_id having diff < #{days}) as dt1;})
 
   end
-
+  
+  def self.sum_outstanding_by_group(from_date, to_date)
+    ids=repository.adapter.query("SELECT loan_id, max(date) date FROM loan_history 
+                                  WHERE status in (5,6) AND date>='#{from_date}' AND date<='#{to_date}' GROUP BY loan_id"
+                                 ).collect{|x| "(#{x.loan_id}, '#{x.date.to_s}')"}.join(",")
+    repository.adapter.query(%Q{
+      SELECT 
+        SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
+        SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
+        SUM(actual_outstanding_principal)    AS actual_outstanding_principal,
+        SUM(actual_outstanding_total)        AS actual_outstanding_total,
+        client_group_id,
+        center_id
+      FROM loan_history
+      WHERE (loan_id, date) in (#{ids}) 
+      GROUP BY client_group_id;
+    })
+  end
 end
