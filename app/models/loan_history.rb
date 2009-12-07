@@ -37,7 +37,7 @@ class LoanHistory
 
   # __DEPRECATED__ the prefered way to make history and future.
   # HISTORY IS NOW WRITTEN BY THE LOAN MODEL USING update_history_bulk_insert
-  def self.update_group
+  def self.add_group
     clients={}
     LoanHistory.all.each{|lh|
       next if lh.client_group_id or not lh.client_id
@@ -51,7 +51,6 @@ class LoanHistory
         end
       end
     }
-    p clients.keys
     puts "Done"
   end
 
