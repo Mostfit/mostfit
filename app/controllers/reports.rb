@@ -17,11 +17,11 @@ class Reports < Application
       @report = DailyReport.new(date)
       @groups, @centers, @branches = @report.generate(params)
       display [@groups, @centers, @branches]      
-    elsif klass==TimeRangeReport
+    elsif klass==ConsolidatedReport
       #Generating time range report
-      from_date = get_date(params[:time_range_report], :from_date)
-      to_date   = get_date(params[:time_range_report], :to_date)
-      @report   = TimeRangeReport.new(from_date==to_date ? from_date-7 : from_date, to_date)
+      from_date = get_date(params[:consolidated_report], :from_date)
+      to_date   = get_date(params[:consolidated_report], :to_date)
+      @report   = ConsolidatedReport.new(from_date==to_date ? from_date-7 : from_date, to_date)
       @groups, @centers, @branches = @report.generate(params)
       display [@groups, @centers, @branches]
     elsif id.nil?
