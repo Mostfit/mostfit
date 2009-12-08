@@ -17,6 +17,7 @@ class Client
   property :grt_pass_date,  Date,    :index => true, :nullable => true
   property :client_group_id,Integer, :index => true, :nullable => true
   property :center_id,      Integer, :index => true, :nullable => true
+  property :created_at,     DateTime
   property :deleted_at,     ParanoidDateTime
 
   has_attached_file :picture,
