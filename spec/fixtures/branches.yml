@@ -3,9 +3,10 @@
   :name: Mumbai
   :address: 
   :manager_staff_id: 1
-
+  :code: BOM
 2: 
   :id: 2
   :name: Dilli
   :address: 
   :manager_staff_id: 2
+  :code: DEL

@@ -422,7 +422,7 @@ a.add_small, a.add_small:visited, a.add_small:link {
   background-repeat: no-repeat;
   padding: 0px 0px 0px 20px;
   color: #black;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: lighter
 }
 
@@ -440,7 +440,7 @@ a.edit_small, a.edit_small:visited, a.edit_small:link {
   background-repeat: no-repeat;
   padding: 0px 0px 0px 20px;
   color: #black;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: lighter
 }
 

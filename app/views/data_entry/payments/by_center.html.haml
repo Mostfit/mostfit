@@ -55,8 +55,41 @@
       = submit 'Disburse these loans'
   - else
     No disbursals today
-  
 
+  %h1 Fees
+  - @fee_paying_loans = @center.clients.loans.select{|l| l.fees_paid? == false}
+  %table
+    %thead
+      %tr
+        %th
+          Loan id
+        %th
+          Description
+        %th
+          Total Fees Payable
+        %th
+          Fees Paid
+        %th
+          Fees Due
+      
+    - @fee_paying_loans.each do |fpl|
+      %tr
+        %td
+          = fpl.id
+        %td
+          = fpl.description
+        %td
+          - fpl.fee_schedule.each do |fs|
+            - fs.keys.each do |k|
+              = k
+              == :
+              = fs[k]
+        %td
+          = fpl.fees_paid
+        %td
+          = fpl.fees_payable_on(@date)
+    
+    
   %h1 Payments
   = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
     = hidden_field :name => 'for_date', :value => @date

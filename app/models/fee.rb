@@ -9,7 +9,7 @@ class Fee
   property :amount, Integer
   property :min_amount, Integer
   property :max_amount, Integer
-  property :payable_on, Enum.send('[]',*PAYABLE)
+  property :payable_on, Enum.send('[]',*PAYABLE), :nullable => false
 
   has n, :loan_products, :through => Resource
 
@@ -43,6 +43,6 @@ class Fee
 
   def fees_for(loan)
     return amount if amount
-    return [[min_amount || 0 , percentage * loan.amount].max, max_amount || (1.0/0)].min
+    return [[min_amount || 0 , (percentage ? percentage * loan.amount : 0)].max, max_amount || (1.0/0)].min
   end
 end

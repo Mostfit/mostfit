@@ -56,7 +56,7 @@ class Hash
       if has_key?(k) and other.has_key?(k)
         rhash[k] = self[k] - other[k]
       else
-        rhash[k] = nil
+        rhash[k] = self[k]
       end
     end
     rhash

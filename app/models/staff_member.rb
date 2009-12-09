@@ -16,7 +16,7 @@ class StaffMember
   has n, :written_off_loans, :child_key => [:written_off_by_staff_id], :model => 'Loan'
 
   has n, :payments, :child_key  => [:received_by_staff_id]
-  belongs_to :user
+  belongs_to :user, :nullable => true
   validates_is_unique :name
   validates_length :name, :min => 3
   

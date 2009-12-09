@@ -79,7 +79,7 @@
     %td
       fees paid
     %td
-      == #{@loan.fees_paid} / #{@loan.total_fees_due}
+      == #{@loan.total_fees_paid} / #{@loan.total_fees_due}
       - if @loan.fees_paid?
         %span.green Paid
 

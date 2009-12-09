@@ -23,7 +23,7 @@
         %th attended
           
     %tbody{:style => "text-align:left;" }
-      - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_total = 0, 0, 0, 0, 0, 0
+      - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_fees, tot_total = 0, 0, 0, 0, 0, 0, 0
       - @center.clients.each do |client|
         - loan_row_count = 0
         - Loan.all(:client_id => client.id).each do |loan|
@@ -63,8 +63,11 @@
               = i.to_currency
               - tot_interest += i
             %td
-              - f = loan.fees_due_on(@date).values.inject(0){|a,b| a + b}
+              - f = loan.total_fees_payable_on(@date) || 0
               = f
+              - tot_fees += f
+              %br
+              = loan.fees_payable_on
                 
             %td.numeric
               - a = p + i + f
@@ -103,6 +106,9 @@
             %b= tot_principal.to_currency
           %td.numeric
             %b= tot_interest.to_currency
+          %td
+            %b= tot_fees.to_currency
+          %td
           %td.numeric
             %b= tot_total.to_currency
             
