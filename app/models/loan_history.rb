@@ -35,7 +35,9 @@ class LoanHistory
   validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
 
-  def self.update_group
+  # __DEPRECATED__ the prefered way to make history and future.
+  # HISTORY IS NOW WRITTEN BY THE LOAN MODEL USING update_history_bulk_insert
+  def self.add_group
     clients={}
     LoanHistory.all.each{|lh|
       next if lh.client_group_id or not lh.client_id # what happens if group is changed?
@@ -49,7 +51,6 @@ class LoanHistory
         end
       end
     }
-    p clients.keys
     puts "Done"
   end
 
