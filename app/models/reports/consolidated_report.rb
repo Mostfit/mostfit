@@ -19,7 +19,7 @@ class ConsolidatedReport < Report
       branches[b.id] = b
       
       b.centers.each{|c|
-        next if params[:center_id] and not params[:center_id].blank? and not params[:center_id].to_i==c.id
+        next if params and params[:center_id] and not params[:center_id].blank? and not params[:center_id].to_i==c.id
         groups[b.id][c.id]||= {}
         centers[c.id]  = c
         c.client_groups.each{|g|
