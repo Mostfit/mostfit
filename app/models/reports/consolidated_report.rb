@@ -41,9 +41,9 @@ class ConsolidatedReport < Report
           groups[b.id][c.id][g.id][8] += total_actual
           groups[b.id][c.id][g.id][7] += total_actual - principal_actual
 
-          groups[b.id][c.id][g.id][9]  += principal_scheduled - principal_actual
-          groups[b.id][c.id][g.id][10] += (total_scheduled - total_actual) - (principal_scheduled - principal_actual)
-          groups[b.id][c.id][g.id][11] += total_scheduled - total_actual 
+          groups[b.id][c.id][g.id][9]  += principal_actual - principal_scheduled
+          groups[b.id][c.id][g.id][10] += (total_actual - total_scheduled) - (principal_actual - principal_scheduled)
+          groups[b.id][c.id][g.id][11] += total_actual - total_scheduled
         }
       }
     }
