@@ -20,6 +20,8 @@
       Payment
     %th{:colspan => "3"}
       Balance outstanding
+    %th{:colspan => "2"}
+      Payment shortfall
     %th
       No. of defaults
   %tr
@@ -43,22 +45,27 @@
     %th
       Total
     %th
+      Principal
+    %th
+      Total
+    %th
   - center_id, branch_id = nil, nil
+  - length = @groups.values.first.length
   -@groups.each do |group_id, centers|
     -if centers.keys.length>0
       -branch_total = []
       %tr
-        %td.group{:colspan => "11"}
+        %td.group{:colspan => length}
           %b
             =@branches[group_id].name
-      -centers.each do |center_id, groups|
+      -centers.sort_by{|center_id, groups| @centers[center_id].name}.each do |center_id, groups|
         -if groups.keys.length>0
           %tr
-            %td.center{:colspan => "11"}
+            %td.center{:colspan => length}
               %b
                 =@centers[center_id].name
-          - center_total = Array.new(groups.values.first.length-1, 0)
-          -groups.each do |group_id, group|
+          - center_total = Array.new(length-1, 0)
+          -groups.sort_by{|group_id, group| group[-1]}.each do |group_id, group|
             %tr
               %td{:style => "text-align: center; background-color: #efefef;"}
                 =group[-1]
