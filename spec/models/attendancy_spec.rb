@@ -8,12 +8,14 @@ describe Attendancy do
 
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
+    @branch.code = "bra"
     @branch.save
     @branch.should be_valid
 
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
     @center.branch  = @branch
+    @center.code = "cen"
     @center.save
     @center.should be_valid
     

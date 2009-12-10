@@ -8,7 +8,7 @@ describe Report do
     Funder.all.destroy!
     FundingLine.all.destroy!
     Loan.all.destroy!
-    @user = User.new(:login => 'Joe', :password => 'password', :password_confirmation => 'password', :admin => true)
+    @user = User.new(:login => 'Joe', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @user.save
     @user.should be_valid
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
@@ -47,6 +47,7 @@ describe Report do
         Merb.logger.info "\t generating branch"
         branch = instance_variable_set("@#{b}",Branch.new(:name => b))
         branch.manager = @manager
+        branch.code = b
         branch.save
         branch.should be_valid
         # and seven centres in each, one for each day
@@ -55,6 +56,7 @@ describe Report do
           center.manager = @manager
           center.branch = branch
           center.meeting_day = day
+          center.code = day
           center.save
           center.errors.each {|e| puts e}
           center.should be_valid

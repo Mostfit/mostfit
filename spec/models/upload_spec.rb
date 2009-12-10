@@ -2,7 +2,7 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Upload do
   before(:all) do
-    user=User.create(:admin => true, :active => true, :login => 'admin', :password => 'password', :password_confirmation => 'password')
+    user=User.create(:role => :admin, :active => true, :login => 'admin', :password => 'password', :password_confirmation => 'password')
     Payment.all.destroy!
     Client.all.destroy!
     StaffMember.all.destroy! 

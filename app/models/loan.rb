@@ -326,24 +326,15 @@ class Loan
 
   def fees_payable_on(date = Date.today)
     # returns a hash of fee type and amounts
-    debugger
     schedule = fee_schedule.select{|k,v| k <= Date.today}.collect{|k,v| v.to_a}
     scheduled_fees = schedule.size > 0 ? schedule[0].to_hash : {}
-    scheduled_fees - fees_paid
+    scheduled_fees - (fees_paid.values.inject({}){|a,b| a.merge(b)})
   end
 
   def fees_paid
     @fees_payments = {}
     payments(:type => :fees, :order => [:received_on]).each do |p|
-      if @fees_payments.has_key?(p.received_on)
-        if @fees_payments[p.received_on].has_key?(p.comment)
-          @fees_payments[p.received_on][p.comment] += p.amount
-        else
-          @fees_payments[p.received_on] = {p.comment => p.amount}
-        end
-      else
-        @fees_payments[p.received_on] = {p.comment => p.amount}
-      end
+      @fees_payments += {p.received_on => {p.comment => p.amount}}
     end
     @fees_payments
   end
@@ -356,11 +347,7 @@ class Loan
     @fee_schedule = {}
     loan_product.fees.each do |f|
       date = eval(f.payable_on.to_s)
-      if @fee_schedule.has_key?(date)
-        @fee_schedule[date][f.name] = f.fees_for(self)
-      else
-        @fee_schedule[date]= {f.name => f.fees_for(self)}
-      end
+      @fee_schedule += {date => {f.name => f.fees_for(self)}}
     end
     @fee_schedule
   end

@@ -4,7 +4,7 @@ describe LoanHistory do
 
   before(:all) do
     DataMapper.auto_migrate! if Merb.orm == :datamapper
-    @user = User.new(:id => 234, :login => 'Joey', :password => 'password', :password_confirmation => 'password', :admin => true)
+    @user = User.new(:id => 234, :login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @user.save
     @user.should be_valid
 
@@ -23,12 +23,14 @@ describe LoanHistory do
 
     @branch = Branch.new(:name => "Kerela branch", :id => 1)
     @branch.manager = @manager
+    @branch.code = "bra"
     @branch.save
     @branch.should be_valid
 
     @center = Center.new(:name => "Munnar hill center", :id => 1)
     @center.manager = @manager
     @center.branch  = @branch
+    @center.code = "cen"
     @center.save
     @center.should be_valid
 

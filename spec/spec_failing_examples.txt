@@ -1,5 +1,18 @@
+Upload before(:all)
 
 Pending:
 
-Fee should return correct fees_paid (Not Yet Implemented)
-./spec/models/fee_spec.rb:124
+LoanType should have specs (Not Yet Implemented)
+./spec/models/loan_type_spec.rb:5
+
+LedgerEntry should have specs (Not Yet Implemented)
+./spec/models/ledger_entry_spec.rb:5
+
+ClientGroup should have specs (Not Yet Implemented)
+./spec/models/client_group_spec.rb:5
+
+Client should not have more than one outstanding loan at a time if so specified (Not Yet Implemented)
+./spec/models/client_spec.rb:120
+
+Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
+./spec/models/loan_spec.rb:335

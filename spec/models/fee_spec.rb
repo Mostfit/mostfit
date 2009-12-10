@@ -67,7 +67,7 @@ describe Fee do
     @loan.valid?
     @loan.errors.each {|e| puts e}
     @loan.should be_valid
-
+    @loan.save
   end
 
 
@@ -115,7 +115,6 @@ describe Fee do
     @f2.payable_on = :applied_on
     @f2.should be_valid
     @f.percentage = 0.1
-    @loan_product.fees << @f
     @loan_product.fees << @f2
     @loan.fee_schedule.should == {@loan.applied_on => {"Test Fee" => 100, "Other Fee" => 111}}
   end
@@ -126,9 +125,7 @@ describe Fee do
     @f2.payable_on = :applied_on
     @f2.should be_valid
     @f.percentage = 0.1
-    @loan_product.fees << @f
-    @loan_product.fees << @f2
-    @loan.fees_payable.should == {@loan.applied_on => {"Test Fee" => 100, "Other Fee" => 111}}
+    @loan.fees_payable_on.should == {"Test Fee" => 100, "Other Fee" => 111}
   end
 
 
@@ -138,10 +135,23 @@ describe Fee do
     @f2.payable_on = :applied_on
     @f2.should be_valid
     @f.percentage = 0.1
-    @loan_product.fees << @f
-    @loan_product.fees << @f2
-    @loan
+#    @loan_product.fees << @f
+#    @loan_product.fees << @f2
+    @p = Payment.new(:amount => 20, :received_on => '2009-01-01', :type => :fees, 
+                     :received_by => @manager, :created_by => @user, :loan => @loan, :comment => "Test Fee")
+    @p.valid?
+    @p.errors.each {|e| puts e}
+    @p.should be_valid
+    @p.save
+    @loan.fees_paid.should == {Date.parse('2009-01-01') => {"Test Fee" => 20}}
+    @loan.total_fees_payable_on.should == 111 + 80
+    @loan.fees_payable_on.should == {"Test Fee" => 80, "Other Fee" => 111}
+    @p = Payment.new(:amount => 20, :received_on => '2009-01-01', :type => :fees, 
+                     :received_by => @manager, :created_by => @user, :loan => @loan, :comment => "Other Fee")
+    @p.save
+    @loan.total_fees_payable_on.should == 111 + 100 - 40
+    @loan.fees_paid.should == {Date.parse('2009-01-01') => {"Test Fee" => 20, "Other Fee" => 20}}
+    @loan.fees_payable_on.should == {"Test Fee" => 80, "Other Fee" => 91}
   end    
-  
 
 end

@@ -29,10 +29,10 @@ class Payment
   validates_with_method :received_by, :method => :received_by_active_staff_member?
   validates_with_method :deleted_by,  :method => :properly_deleted?
   validates_with_method :deleted_at,  :method => :properly_deleted?
-#  validates_with_method :not_paying_too_much?
+  validates_with_method :not_paying_too_much?
 #  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
   validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
-#  validates_with_method :principal,   :method => :is_positive?
+  validates_with_method :principal,   :method => :is_positive?
 
   def self.from_csv(row, headers, loans)
     obj = new(:received_by_staff_id => StaffMember.first(:name => row[headers[:received_by_staff]]).id, :loan_id => loans[row[headers[:loan_serial_number]]].id, 
@@ -94,11 +94,16 @@ class Payment
     return true if loan.disbursal_date.blank? ? false : loan.disbursal_date <= received_on
     [false, "Payments cannot be received before the loan is disbursed"]
   end
-  def not_paying_too_much_principal?
-    return true unless type == :principal
+  def not_paying_too_much?
     if new?  # do not do this check on updates, it will count itself double
-      a = loan.payments_hash[loan.payments_hash.keys.max]
-      if (((not a.blank?) and a[:total_principal]) ? a[:total_principal] : 0) + amount > loan.amount
+      if type == :principal
+        a = loan.actual_outstanding_principal_on(received_on)
+      elsif type == :interest
+        a = loan.actual_outstanding_interest_on(received_on)
+      elsif type == :fees
+        a = loan.total_fees_payable_on(received_on)
+      end
+      if (not a.blank?) and amount > a
         return [false, "Principal is more than the loans outstanding principal"]
       end
     end
@@ -114,16 +119,8 @@ class Payment
     true
   end
 
-  def principal_is_positive?
-    return true if principal.blank? ? true : principal >= 0
-    [false, "Principal cannot be less than zero"]
-  end
-  def interest_is_positive?
-    return true if interest.blank? ? true : interest >= 0
-    [false, "Interest cannot be less than zero"]
-  end
-  def total_is_positive?
-    return true if total.blank? ? true : total >= 0
-    [false, "Total cannot be less than zero"]
+  def is_positive?
+    return true if amount.blank? ? true : amount >= 0
+    [false, "Amount cannot be less than zero"]
   end
 end

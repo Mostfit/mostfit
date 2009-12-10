@@ -1,6 +1,7 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Upload do
+  require 'csv'
   include ExcelFormula
   before(:all) do
     @interest     =  0.10

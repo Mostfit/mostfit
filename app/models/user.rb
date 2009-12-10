@@ -36,6 +36,10 @@ class User
     }
     roles
   end
+
+  def admin?
+    role == :admin
+  end
   
   def crud_rights
     Misfit::Config.crud_rights[role]

@@ -5,7 +5,7 @@ describe Loan do
   before(:all) do
     Payment.all.destroy! if Payment.all.count > 0
     Client.all.destroy! if Client.count > 0
-    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :admin => true)
+    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @user.save
     @user.should be_valid
 
@@ -24,12 +24,14 @@ describe Loan do
 
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
+    @branch.code = "bra"
     @branch.save
     @branch.should be_valid
 
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
     @center.branch  = @branch
+    @center.code = "cen"
     @center.save
     @center.should be_valid
 
@@ -124,7 +126,7 @@ describe Loan do
   end
   it "should not be valid without a proper interest_rate" do
     @loan.interest_rate = nil
-    lambda {@loan.valid?}.should raise_error
+    @loan.should_not be_valid
     @loan.interest_rate = -1
     @loan.should_not be_valid
     @loan.interest_rate = -0.2

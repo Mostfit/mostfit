@@ -5,7 +5,7 @@ describe Payment do
   before(:all) do
 
     
-    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :admin => true)
+    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @user.save 
     @user.should be_valid
 
@@ -24,12 +24,14 @@ describe Payment do
 
     @branch = Branch.new(:name => "Kerela branch", :id => 1)
     @branch.manager = @manager
+    @branch.code = "bra"
     @branch.save
     @branch.should be_valid
 
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
     @center.branch  = @branch
+    @center.code = "cen"
     @center.save
     @center.should be_valid
 
@@ -39,6 +41,23 @@ describe Payment do
     @client.save
     @client.should be_valid
     
+    @loan_product = LoanProduct.new
+    @loan_product.name = "LP1"
+    @loan_product.max_amount = 1000
+    @loan_product.min_amount = 1000
+    @loan_product.max_interest_rate = 100
+    @loan_product.min_interest_rate = 0.1
+    @loan_product.installment_frequency = :weekly
+    @loan_product.max_number_of_installments = 100
+    @loan_product.min_number_of_installments = 25
+    @loan_product.loan_type = "DefaultLoan"
+    @loan_product.valid_from = Date.parse('2000-01-01')
+    @loan_product.valid_upto = Date.parse('2012-01-01')
+    @loan_product.save
+    @loan_product.errors.each {|e| puts e}
+    @loan_product.should be_valid
+
+
     @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 40, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
     @loan.history_disabled = true
     @loan.applied_by       = @manager
@@ -48,14 +67,16 @@ describe Payment do
     @loan.approved_by = @manager
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @manager
+    @loan.loan_product = @loan_product
     @loan.save
+    @loan.errors.each {|e| puts e}
     @loan.should be_valid
   end
 
   before(:each) do
     @user.active = true
     @manager.active = true
-    @payment = Payment.new(:principal=>1000,:interest=>0.2,:received_on=>"2000-12-06")
+    @payment = Payment.new(:amount =>1000,:type => :principal,:received_on=>"2000-12-06")
     @payment.created_by=@user
     @payment.received_by=@manager
     @payment.loan=@loan
@@ -97,15 +118,16 @@ describe Payment do
     @payment.received_on = nil
   end
   it "should not be valid if interest is negative" do
-    @payment.interest= -2
+    @payment.amount= -2
     @payment.should_not be_valid
   end
   it "should not be valid if principal is negative" do
-    @payment.interest=-600
+    @payment.amount=-600
+    @payment.type = :principal
     @payment.should_not be_valid
   end
   it "should not be valid if total is negative" do
-    @payment.principal =-1900
+    @payment.amount =-1900
     @payment.should_not be_valid
   end
   it "should not be valid if payment is received before disbursal of loan" do
@@ -113,11 +135,13 @@ describe Payment do
     @payment.should_not be_valid
   end
   it "should not be valid if paying too much principal" do
-    @payment.principal=5000
+    @payment.amount=5000
+    @payment.type = :principal
     @payment.should_not be_valid
   end
-  it "should not be valid if paying too much in total" do
-    @payment.interest=201
+  it "should not be valid if paying too much interest" do
+    @payment.type = :interest
+    @payment.amount = 201
     @payment.should_not be_valid
   end
 

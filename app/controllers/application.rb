@@ -23,42 +23,4 @@ class Application < Merb::Controller
 end
 
 
-# small monkey patch, real patch is submitted to extlib/merb/dm, hoping for inclusion soon
-class Date
-  def inspect
-    "<Date: #{self.to_s}>"
-  end
-end
 
-
-#Hash diffs are easy
-class Hash
-  def diff(other)
-    keys = self.keys
-    keys.each.select{|k| self[k] != other[k]}
-  end
-
-  def / (other)
-    rhash = {}
-    keys.each do |k|
-      if self.has_key?(k) and other.has_key?(k)
-        rhash[k] = self[k]/other[k]
-      else
-        rhash[k] = nil
-      end
-    end
-    rhash
-  end
-
-  def - (other)
-    rhash = {}
-    keys.each do |k|
-      if has_key?(k) and other.has_key?(k)
-        rhash[k] = self[k] - other[k]
-      else
-        rhash[k] = self[k]
-      end
-    end
-    rhash
-  end
-end
