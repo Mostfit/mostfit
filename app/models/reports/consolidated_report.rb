@@ -21,20 +21,26 @@ class ConsolidatedReport < Report
         groups[b.id][c.id]||= {}
         centers[c.id]  = c
         c.client_groups.each{|g|
-          #0              1                 2                3                  4     5   6                  7                   8               9               10
-          #amount_applied,amount_sanctioned,amount_disbursed,bal_outstanding(p),bo(i),tot,principal_paidback,interest_collected, processing_fee, no_of_defaults, name
-          groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, g.name]
+          #0              1                 2                3              4              5     6                  7         8    9,10        11         13
+          #amount_applied,amount_sanctioned,amount_disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults, name
+          groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, g.name]
           history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id}
           if history
-            principal= history.scheduled_outstanding_principal.to_i
-            total    =  history.scheduled_outstanding_total.to_i
+            principal_scheduled = history.scheduled_outstanding_principal.to_i
+            total_scheduled     = history.scheduled_outstanding_total.to_i
+
+            principal_actual = history.actual_outstanding_principal.to_i
+            total_actual     = history.actual_outstanding_total.to_i            
           else
-            principal, total = 0, 0
+            principal_scheduled, total_scheduled, principal_actual, total_actual = 0, 0, 0, 0
           end
 
-          groups[b.id][c.id][g.id][6] +=principal
-          groups[b.id][c.id][g.id][8] += total
-          groups[b.id][c.id][g.id][7] += total-principal
+          groups[b.id][c.id][g.id][6] += principal_actual
+          groups[b.id][c.id][g.id][8] += total_actual
+          groups[b.id][c.id][g.id][7] += total_actual - principal_actual
+
+          groups[b.id][c.id][g.id][9]  += principal_actual - principal_scheduled
+          groups[b.id][c.id][g.id][10] += total_actual     - total_scheduled
         }
       }
     }
