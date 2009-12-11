@@ -67,7 +67,7 @@
               = f
               - tot_fees += f
               %br
-              = loan.fees_payable_on
+              = loan.fees_payable_on(@date)
                 
             %td.numeric
               - a = p + i + f

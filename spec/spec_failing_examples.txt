@@ -1,18 +1,181 @@
-Upload before(:all)
+resource(@report) PUT redirect to the report show action
+resource(@report) GET responds successfully
+resource(@report, :edit) responds successfully
+resource(:reports, :new) responds successfully
+resource(@report) a successful DELETE should redirect to the index action
+resource(:reports) a successful POST redirects to resource(:reports)
+resource(:reports) GET responds successfully
+resource(@user) PUT redirect to the article show action
+resource(@user) GET responds successfully
+resource(@user, :edit) responds successfully
+resource(:users, :new) responds successfully
+resource(@user) a successful DELETE should redirect to the index action
+resource(:users) a successful POST redirects to resource(:users)
+resource(:users) GET responds successfully
+resource(@permission) PUT redirect to the article show action
+resource(@permission) GET responds successfully
+resource(@permission, :edit) responds successfully
+resource(:permissions, :new) responds successfully
+resource(@permission) a successful DELETE should redirect to the index action
+resource(:permissions) a successful POST redirects to resource(:permissions)
+resource(:permissions) GET has a list of permissions
+resource(:permissions) GET responds successfully
+resource(:permissions) GET contains a list of permissions
+resource(@payment) PUT redirect to the article show action
+resource(@payment) GET responds successfully
+resource(@payment, :edit) responds successfully
+resource(:payments, :new) responds successfully
+resource(@payment) a successful DELETE should redirect to the index action
+resource(:payments) a successful POST redirects to resource(:payments)
+resource(:payments) GET has a list of payments
+resource(:payments) GET responds successfully
+resource(:payments) GET contains a list of payments
+resource(@staff_member) PUT redirect to the article show action
+resource(@staff_member) GET responds successfully
+resource(@staff_member, :edit) responds successfully
+resource(:staff_members, :new) responds successfully
+resource(@staff_member) a successful DELETE should redirect to the index action
+resource(:staff_members) a successful POST redirects to resource(:staff_members)
+resource(:staff_members) GET responds successfully
+resource(@loan) PUT redirect to the article show action
+resource(@loan) GET responds successfully
+resource(@loan, :edit) responds successfully
+resource(:loans, :new) responds successfully
+resource(@loan) a successful DELETE should redirect to the index action
+resource(:loans) a successful POST redirects to resource(:loans)
+resource(:loans) GET responds successfully
+resource(@branch) PUT redirect to the article show action
+resource(@branch) GET responds successfully
+resource(@branch, :edit) responds successfully
+resource(:branches, :new) responds successfully
+resource(@branch) a successful DELETE should redirect to the index action
+resource(:branches) a successful POST redirects to resource(:branches)
+resource(:branches) GET responds successfully
+resource(@center) PUT redirect to the article show action
+resource(@center) GET responds successfully
+resource(@center, :edit) responds successfully
+resource(:centers, :new) responds successfully
+resource(@center) a successful DELETE should redirect to the index action
+resource(:centers) a successful POST redirects to resource(:centers)
+resource(:centers) GET responds successfully
+resource(@client) PUT redirect to the article show action
+resource(@client) GET responds successfully
+resource(@client, :edit) responds successfully
+resource(:clients, :new) responds successfully
+resource(@client) a successful DELETE should redirect to the index action
+resource(:clients) a successful POST redirects to resource(:clients)
+resource(:clients) GET responds successfully
+resource(@funder) PUT redirect to the funder show action
+resource(@funder) GET responds successfully
+resource(@funder, :edit) responds successfully
+resource(:funders, :new) responds successfully
+resource(@funder) a successful DELETE should redirect to the index action
+resource(:funders) a successful POST redirects to resource(:funders)
+resource(:funders) GET responds successfully
+resource(@funding_line) PUT redirect to the funding_line show action
+resource(@funding_line) GET responds successfully
+resource(@funding_line, :edit) responds successfully
+resource(:funding_lines, :new) responds successfully
+resource(@funding_line) a successful DELETE should redirect to the index action
+resource(:funding_lines) a successful POST redirects to resource(:funding_lines)
+resource(:funding_lines) GET has a list of funding_lines
+resource(:funding_lines) GET responds successfully
+resource(:funding_lines) GET contains a list of funding_lines
+resource(@loan_type) PUT redirect to the loan_type show action
+resource(@loan_type) GET responds successfully
+resource(@loan_type, :edit) responds successfully
+resource(:loan_types, :new) responds successfully
+resource(@loan_type) a successful DELETE should redirect to the index action
+resource(:loan_types) a successful POST redirects to resource(:loan_types)
+resource(:loan_types) GET has a list of loan_types
+resource(:loan_types) GET responds successfully
+resource(:loan_types) GET contains a list of loan_types
+resource(@ledger_entry) PUT redirect to the ledger_entry show action
+resource(@ledger_entry) GET responds successfully
+resource(@ledger_entry, :edit) responds successfully
+resource(:ledger_entries, :new) responds successfully
+resource(@ledger_entry) a successful DELETE should redirect to the index action
+resource(:ledger_entries) a successful POST redirects to resource(:ledger_entries)
+resource(:ledger_entries) GET responds successfully
+resource(@fee) PUT redirect to the fee show action
+resource(@fee) GET responds successfully
+resource(@fee, :edit) responds successfully
+resource(:fees, :new) responds successfully
+resource(@fee) a successful DELETE should redirect to the index action
+resource(:fees) a successful POST redirects to resource(:fees)
+resource(:fees) GET responds successfully
+resource(@client_group) PUT redirect to the client_group show action
+resource(@client_group) GET responds successfully
+resource(@client_group, :edit) responds successfully
+resource(:client_groups, :new) responds successfully
+resource(@client_group) a successful DELETE should redirect to the index action
+resource(:client_groups) a successful POST redirects to resource(:client_groups)
+resource(:client_groups) GET responds successfully
 
 Pending:
 
-LoanType should have specs (Not Yet Implemented)
-./spec/models/loan_type_spec.rb:5
+resource(:reports) GET has a list of reports (TODO)
+./spec/requests/reports_spec.rb:32
 
-LedgerEntry should have specs (Not Yet Implemented)
-./spec/models/ledger_entry_spec.rb:5
+resource(:reports) GET contains a list of reports (TODO)
+./spec/requests/reports_spec.rb:20
 
-ClientGroup should have specs (Not Yet Implemented)
-./spec/models/client_group_spec.rb:5
+resource(:users) GET has a list of users (TODO)
+./spec/requests/users_spec.rb:32
 
-Client should not have more than one outstanding loan at a time if so specified (Not Yet Implemented)
-./spec/models/client_spec.rb:120
+resource(:users) GET contains a list of users (TODO)
+./spec/requests/users_spec.rb:20
 
-Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
-./spec/models/loan_spec.rb:335
+resource(:staff_members) GET has a list of staff_members (TODO)
+./spec/requests/staff_members_spec.rb:32
+
+resource(:staff_members) GET contains a list of staff_members (TODO)
+./spec/requests/staff_members_spec.rb:20
+
+resource(:loans) GET has a list of loans (TODO)
+./spec/requests/loans_spec.rb:32
+
+resource(:loans) GET contains a list of loans (TODO)
+./spec/requests/loans_spec.rb:20
+
+resource(:branches) GET has a list of branches (TODO)
+./spec/requests/branches_spec.rb:35
+
+resource(:branches) GET contains a list of branches (TODO)
+./spec/requests/branches_spec.rb:23
+
+resource(:centers) GET has a list of centers (TODO)
+./spec/requests/centers_spec.rb:32
+
+resource(:centers) GET contains a list of centers (TODO)
+./spec/requests/centers_spec.rb:20
+
+resource(:clients) GET has a list of clients (TODO)
+./spec/requests/clients_spec.rb:32
+
+resource(:clients) GET contains a list of clients (TODO)
+./spec/requests/clients_spec.rb:20
+
+resource(:funders) GET has a list of funders (TODO)
+./spec/requests/funders_spec.rb:32
+
+resource(:funders) GET contains a list of funders (TODO)
+./spec/requests/funders_spec.rb:20
+
+resource(:ledger_entries) GET has a list of ledger_entries (TODO)
+./spec/requests/ledger_entries_spec.rb:32
+
+resource(:ledger_entries) GET contains a list of ledger_entries (TODO)
+./spec/requests/ledger_entries_spec.rb:20
+
+resource(:fees) GET has a list of fees (TODO)
+./spec/requests/fees_spec.rb:32
+
+resource(:fees) GET contains a list of fees (TODO)
+./spec/requests/fees_spec.rb:20
+
+resource(:client_groups) GET has a list of client_groups (TODO)
+./spec/requests/client_groups_spec.rb:32
+
+resource(:client_groups) GET contains a list of client_groups (TODO)
+./spec/requests/client_groups_spec.rb:20
