@@ -47,7 +47,9 @@ class Centers < Application
 
   def create(center)
     @center = Center.new(center)
-    @center.branch = @branch  # set direct context
+    if @branch
+      @center.branch = @branch  # set direct context
+    end
     if @center.save
       redirect(params[:return]||resource(@branch, :centers), :message => {:notice => "Center '#{@center.name}' successfully created"})
     else
