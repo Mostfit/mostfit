@@ -85,7 +85,7 @@
                   =ele
       %tr
         %td{:style => "text-align: center; background-color: #ccc;"}
-          %b==Branch total
+          %b==Branch total:
         -branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
           %td
             %b
