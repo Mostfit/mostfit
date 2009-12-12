@@ -28,4 +28,4 @@
     %td
       Payable on
     %td
-      = select :payable_on, :collection => Fee.payable_dates.map{|f| [f,f.to_s]}
+      = select :payable_on, :collection => Fee.payable_dates.map{|f| [f,f.humanize]}
