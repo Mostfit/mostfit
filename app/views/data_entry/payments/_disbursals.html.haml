@@ -3,7 +3,9 @@
     %thead
       %tr{:style => "font-size: 0.85em;"}
         %th
-          Name
+          Client Name
+        %th
+          Loan
         %th
           Scheduled Disbursal Date
         %th
@@ -17,7 +19,9 @@
     - @loans_to_disburse.each do |loan|
       %tr
         %td
-          = loan.client.name
+          = link_to loan.client.name, resource(loan.client)
+        %td
+          = link_to loan.description
         %td
           = loan.scheduled_disbursal_date
         %td

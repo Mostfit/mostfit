@@ -9,9 +9,12 @@ describe Branch do
   end
 
   before(:each) do
+    Branch.all.destroy!
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
+    @branch.code = "branch"
     @branch.save
+    @branch.errors.each {|e| p e}
     @branch.should be_valid
   end
  
@@ -35,6 +38,7 @@ describe Branch do
     @center = Center.new(:name => name)
     @center.branch  = @branch
     @center.manager = @manager
+    @center.code = "Cen"
     @center.save
     @center.errors.each {|e| puts e}
     @center.should be_valid
@@ -43,7 +47,7 @@ describe Branch do
     @branch.should be_valid
     @branch.centers.first.name.should eql(name)
 
-    kochin = Center.new(:name => 'Kochin harbour center')
+    kochin = Center.new(:name => 'Kochin harbour center', :code => "koch")
     kochin.branch  = @branch
     kochin.manager = @manager
     kochin.should be_valid

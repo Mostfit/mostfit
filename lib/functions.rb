@@ -16,13 +16,52 @@ class Date
 end
 
 
-#Hash diffs are easy
 
 class Hash
+  #Hash diffs are easy
   def diff(other)
     keys = self.keys
     keys.each.select{|k| self[k] != other[k]}
   end
+
+  def / (other)
+    rhash = {}
+    keys.each do |k|
+      if self.has_key?(k) and other.has_key?(k)
+        rhash[k] = self[k]/other[k]
+      else
+        rhash[k] = nil
+      end
+    end
+    rhash
+  end
+
+  def - (other)
+    rhash = {}
+    keys.each do |k|
+      if has_key?(k) and other.has_key?(k)
+        rhash[k] = self[k] - other[k]
+      else
+        rhash[k] = self[k]
+      end
+    end
+    rhash
+  end
+
+  def +(other)
+    rhash = {}
+    (keys + other.keys).uniq.each do |k|
+      if has_key?(k) and other.has_key?(k)
+        rhash[k] = self[k] + other[k]
+      elsif other.has_key?(k)
+        rhash[k] = other[k]
+      elsif has_key?(k)
+        rhash[k] = self[k]
+      end
+    end
+    rhash
+  end
+
 end
 
 module ExcelFormula

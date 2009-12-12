@@ -1,5 +1,6 @@
 class StaffMembers < Application
   include Pdf::DaySheet if PDF_WRITER
+  include DateParser
 
   def index
     # @current_page = ( params[:page] && ( params[:page].to_i > 0 ) ) ? params[:page].to_i : 1 
@@ -33,7 +34,7 @@ class StaffMembers < Application
   def day_sheet(id)
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
-    @date = (params[:date] and Date.parse(params[:date])) ? Date.parse(params[:date]) : Date.today
+    @date    = params[:date] ? parse_date(params[:date]) : Date.today
     @centers = @staff_member.centers(:meeting_day => Center.meeting_days[@date.cwday])
     if params[:format] == "pdf"      
       generate_pdf 

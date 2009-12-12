@@ -17,6 +17,7 @@ class Client
   property :grt_pass_date,  Date,    :index => true, :nullable => true
   property :client_group_id,Integer, :index => true, :nullable => true
   property :center_id,      Integer, :index => true, :nullable => true
+  property :created_at,     DateTime
   property :deleted_at,     ParanoidDateTime
   property :account_number, String, :length => 20, :nullable => true
   property :type_of_account, Enum.send('[]', *[0, :savings, :current, :no_frill, :fixed_deposit, :loan, :other]), :nullable => true
@@ -41,8 +42,8 @@ class Client
   belongs_to :client_group
 
   validates_length    :name, :min => 3
-#  validates_present   :center
-#  validates_present   :date_joined
+  validates_present   :center
+  validates_present   :date_joined
   validates_is_unique :reference
   validates_attachment_thumbnails :picture
   

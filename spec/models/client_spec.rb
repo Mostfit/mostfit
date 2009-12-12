@@ -9,14 +9,33 @@ describe Client do
 
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
+    @branch.code = "bra"
     @branch.save
     @branch.should be_valid
 
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
     @center.branch = @branch
+    @center.code = "cen"
     @center.save
     @center.should be_valid
+
+    @loan_product = LoanProduct.new
+    @loan_product.name = "LP1"
+    @loan_product.min_amount = 1000
+    @loan_product.max_amount = 100000
+    @loan_product.max_interest_rate = 100
+    @loan_product.min_interest_rate = 0.1
+    @loan_product.installment_frequency = :weekly
+    @loan_product.min_number_of_installments = 1
+    @loan_product.max_number_of_installments = 125
+    @loan_product.loan_type = "DefaultLoan"
+    @loan_product.valid_from = Date.parse('2000-01-01')
+    @loan_product.valid_upto = Date.parse('2012-01-01')
+    @loan_product.save
+    @loan_product.errors.each {|e| puts e}
+    @loan_product.should be_valid
+
   end
   
   before(:each) do
@@ -53,7 +72,8 @@ describe Client do
   end
  
   it "should be able to 'have' loans" do
-    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-03", :scheduled_disbursal_date => "2000-06-13")
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-03", :scheduled_disbursal_date => "2000-06-13", :loan_product_id => @loan_product.id)
+    @loan.save
     @loan.should_not be_valid
     @loan.applied_by  = @manager
     @loan.client      = @client
@@ -69,7 +89,9 @@ describe Client do
     @loan.funding_line = @funding_line
     @loan.approved_on = "2000-02-03"
     @loan.approved_by = @manager
+    @loan.loan_product = @loan_product
     @loan.save
+    @loan.errors.each {|e| p e}
     @loan.should be_valid
 
     @client.loans << @loan
@@ -85,6 +107,7 @@ describe Client do
     loan2.approved_by  = @manager
     loan2.client       = @client
     loan2.funding_line = @funding_line
+    loan2.loan_product = @loan_product
     loan2.save
     loan2.errors.each {|e| puts e}
     loan2.should be_valid

@@ -9,6 +9,7 @@ describe Center do
 
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
+    @branch.code = "bra"
     @branch.save
     @branch.should be_valid
   end
@@ -18,6 +19,7 @@ describe Center do
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
     @center.branch = @branch
+    @center.code = "center"
     @center.save
     @center.should be_valid
   end
@@ -41,10 +43,11 @@ describe Center do
     name = 'Ms C.L. Ient'
     ref  = 'XW000-2009.01.05'
     @client = Client.new(:name => name, :reference => ref, :date_joined => Date.today)
-    @client.save
     @client.center  = @center
+    @client.save
+    @client.errors.each {|e| p e}
     @client.should be_valid
-
+    
     @center.clients << @client
     @center.should be_valid
     @center.clients.first.name.should eql(name)

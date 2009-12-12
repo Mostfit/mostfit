@@ -253,7 +253,7 @@ class Loan
       # it could happen that payment have been made after this payment
       # here the validations on the Payment should 
       total        = input
-      total_fees_due_on_date = fees_due_on(received_on).values.inject(0){|a,b| a+b}
+      total_fees_due_on_date = total_fees_payable_on(received_on)
       fees_paid = [amount, total_fees_due_on_date].min
       total = input - fees_paid
       interest_due = [(-interest_overpaid_on(received_on)), 0].max
@@ -311,43 +311,49 @@ class Loan
   # LOAN INFO FUNCTIONS - CALCULATIONS
 
   def total_fees_due
-    fd = 0; loan_product.fees.each { |f| fd += f.fees_for(self)};
-    fd
+    total_fees_due = fee_schedule.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
   end
 
-  def fees_due_on(date = Date.today)
-    total_paid = fees_paid
-    @fees_due = fee_schedule.select{|k,v| (k != nil and k <= date)}.to_hash
-    @fees_due.each do |fee_date, amount|
-      f = [amount, total_paid].min
-      total_paid -= f
-      @fees_due[fee_date] -= f
-    end
-    @fees_due
-  end
-
-  def fees_paid
+  def total_fees_paid
     payments(:type => :fees).sum(:amount) || 0
   end
 
+  def total_fees_payable_on(date = Date.today)
+    # returns one consolidated number
+    total_fees_due = fee_schedule.select{|k,v| k <= date}.to_hash.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
+    total_fees_due - total_fees_paid
+  end
+
+  def fees_payable_on(date = Date.today)
+    # returns a hash of fee type and amounts
+    schedule = fee_schedule.select{|k,v| k <= Date.today}.collect{|k,v| v.to_a}
+    scheduled_fees = schedule.size > 0 ? schedule[0].to_hash : {}
+    scheduled_fees - (fees_paid.values.inject({}){|a,b| a.merge(b)})
+  end
+
+  def fees_paid
+    @fees_payments = {}
+    payments(:type => :fees, :order => [:received_on]).each do |p|
+      @fees_payments += {p.received_on => {p.comment => p.amount}}
+    end
+    @fees_payments
+  end
+
   def fees_paid?
-    fees_paid >= total_fees_due
+    total_fees_paid >= total_fees_due
   end
   
   def fee_schedule
     @fee_schedule = {}
     loan_product.fees.each do |f|
       date = eval(f.payable_on.to_s)
-      @fee_schedule[date] = f.fees_for(self)
+      @fee_schedule += {date => {f.name => f.fees_for(self)}}
     end
     @fee_schedule
   end
 
   def fee_payments
     @fees_payments = {}
-    payments(:type => :fees, :order => :received_on).each do |p|
-      @fees_payments[p.received_on] = p.amount
-    end
   end
 
   def payment_schedule
@@ -678,7 +684,7 @@ class Loan
       value = %Q{(#{id}, '#{history[:date]}', #{history[:status]}, #{history[:scheduled_outstanding_principal]}, 
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
                           #{history[:actual_outstanding_total]},#{history[:current]},
-                          #{history[:amount_in_default]}, #{client.client_group_id}, #{client.center.id},#{client.id},#{client.center.branch.id},
+                          #{history[:amount_in_default]}, #{client.client_group_id || "NULL"}, #{client.center.id},#{client.id},#{client.center.branch.id},
                           #{history[:days_overdue]}, #{((history[:date] - d0) / 7).to_i + 1}, 
                           #{history[:principal_due]},#{history[:interest_due]},
                           #{history[:principal_paid]},#{history[:interest_paid]})}

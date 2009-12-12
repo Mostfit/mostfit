@@ -17,6 +17,7 @@ module DataEntry
       @date = Date.parse(params[:for_date]) if params[:for_date]
       @branch = @center.branch unless @center.nil?
       if request.method == :post
+        debugger
         bulk_payments_and_disbursals
         if @errors.blank?
           redirect(url(:data_entry), :message => {:notice => 'All payments made succesfully'})

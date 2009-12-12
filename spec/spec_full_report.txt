@@ -1,237 +1,1222 @@
 
-User
-- should not be valid with name shorter than 3 characters (FAILED - 1)
-- should not have a nil login  (FAILED - 2)
-- should be return for admin? if admin value set to true (FAILED - 3)
-- should be created before it is updated (FAILED - 4)
-- should have a login name beginning with numbers, aplphabets and underscores  (FAILED - 5)
-- should not have false in all permission fields (FAILED - 6)
+resource(@report) PUT
+- redirect to the report show action (FAILED - 1)
 
-StaffMember
-- should not be valid without a name
-- should not  be valid without active boolean
-- should be unique
-- should have name length > 3
+resource(@report) GET
+- responds successfully (FAILED - 2)
 
-Funder
-- should not be valid without having a name
-- should be able to have funding lines
-- should give correct count of completed lines 
-- should give correct count of active lines
-- should give correct count of total lines 
+resource(@report, :edit)
+- responds successfully (FAILED - 3)
 
-FundingLine
-- should not be valid without belonging to a funder
-- should not have a blank interest_rate
-- should not have a blank disbursal_date
-- should not have a blank amount
-- should not have blank last payment date
-- should have first payment done before last payment
-- should be disbursed before first payment
+resource(:reports, :new)
+- responds successfully (FAILED - 4)
 
-LoanType
-- should have specs (PENDING: Not Yet Implemented)
+resource(@report) a successful DELETE
+- should redirect to the index action (FAILED - 5)
 
-Upload
-- before(:all) (FAILED - 7)
+resource(:reports) a successful POST
+- redirects to resource(:reports) (FAILED - 6)
 
-Upload
-- before(:all) (FAILED - 8)
+resource(:reports) GET
+- has a list of reports (PENDING: TODO)
 
-Client
-- before(:all) (FAILED - 9)
+resource(:reports) GET
+- responds successfully (FAILED - 7)
+- contains a list of reports (PENDING: TODO)
 
-Payment
-- before(:all) (FAILED - 10)
+resource(@user) PUT
+- redirect to the article show action (FAILED - 8)
 
-Branch
-- before(:all) (FAILED - 11)
+resource(@user) GET
+- responds successfully (FAILED - 9)
 
-Center
-- before(:all) (FAILED - 12)
+resource(@user, :edit)
+- responds successfully (FAILED - 10)
 
-Attendancy
-- before(:all) (FAILED - 13)
+resource(:users, :new)
+- responds successfully (FAILED - 11)
 
-LedgerEntry
-- should have specs (PENDING: Not Yet Implemented)
+resource(@user) a successful DELETE
+- should redirect to the index action (FAILED - 12)
 
-Fee
-- should have specs (PENDING: Not Yet Implemented)
+resource(:users) a successful POST
+- redirects to resource(:users) (FAILED - 13)
 
-LoanHistory
-- before(:all) (FAILED - 14)
+resource(:users) GET
+- has a list of users (PENDING: TODO)
 
-Loan
-- before(:all) (FAILED - 15)
+resource(:users) GET
+- responds successfully (FAILED - 14)
+- contains a list of users (PENDING: TODO)
 
-Report
-- before(:all) (FAILED - 16)
+resource(@permission) PUT
+- redirect to the article show action (FAILED - 15)
 
-ClientGroup
-- should have specs (PENDING: Not Yet Implemented)
+resource(@permission) GET
+- responds successfully (FAILED - 16)
+
+resource(@permission, :edit)
+- responds successfully (FAILED - 17)
+
+resource(:permissions, :new)
+- responds successfully (FAILED - 18)
+
+resource(@permission) a successful DELETE
+- should redirect to the index action (FAILED - 19)
+
+resource(:permissions) a successful POST
+- redirects to resource(:permissions) (FAILED - 20)
+
+resource(:permissions) GET
+- has a list of permissions (FAILED - 21)
+
+resource(:permissions) GET
+- responds successfully (FAILED - 22)
+- contains a list of permissions (FAILED - 23)
+
+resource(@payment) PUT
+- redirect to the article show action (FAILED - 24)
+
+resource(@payment) GET
+- responds successfully (FAILED - 25)
+
+resource(@payment, :edit)
+- responds successfully (FAILED - 26)
+
+resource(:payments, :new)
+- responds successfully (FAILED - 27)
+
+resource(@payment) a successful DELETE
+- should redirect to the index action (FAILED - 28)
+
+resource(:payments) a successful POST
+- redirects to resource(:payments) (FAILED - 29)
+
+resource(:payments) GET
+- has a list of payments (FAILED - 30)
+
+resource(:payments) GET
+- responds successfully (FAILED - 31)
+- contains a list of payments (FAILED - 32)
+
+resource(@staff_member) PUT
+- redirect to the article show action (FAILED - 33)
+
+resource(@staff_member) GET
+- responds successfully (FAILED - 34)
+
+resource(@staff_member, :edit)
+- responds successfully (FAILED - 35)
+
+resource(:staff_members, :new)
+- responds successfully (FAILED - 36)
+
+resource(@staff_member) a successful DELETE
+- should redirect to the index action (FAILED - 37)
+
+resource(:staff_members) a successful POST
+- redirects to resource(:staff_members) (FAILED - 38)
+
+resource(:staff_members) GET
+- has a list of staff_members (PENDING: TODO)
+
+resource(:staff_members) GET
+- responds successfully (FAILED - 39)
+- contains a list of staff_members (PENDING: TODO)
+
+resource(@loan) PUT
+- redirect to the article show action (FAILED - 40)
+
+resource(@loan) GET
+- responds successfully (FAILED - 41)
+
+resource(@loan, :edit)
+- responds successfully (FAILED - 42)
+
+resource(:loans, :new)
+- responds successfully (FAILED - 43)
+
+resource(@loan) a successful DELETE
+- should redirect to the index action (FAILED - 44)
+
+resource(:loans) a successful POST
+- redirects to resource(:loans) (FAILED - 45)
+
+resource(:loans) GET
+- has a list of loans (PENDING: TODO)
+
+resource(:loans) GET
+- responds successfully (FAILED - 46)
+- contains a list of loans (PENDING: TODO)
+
+resource(@branch) PUT
+- redirect to the article show action (FAILED - 47)
+
+resource(@branch) GET
+- responds successfully (FAILED - 48)
+
+resource(@branch, :edit)
+- responds successfully (FAILED - 49)
+
+resource(:branches, :new)
+- responds successfully (FAILED - 50)
+
+resource(@branch) a successful DELETE
+- should redirect to the index action (FAILED - 51)
+
+resource(:branches) a successful POST
+- redirects to resource(:branches) (FAILED - 52)
+
+resource(:branches) GET
+- has a list of branches (PENDING: TODO)
+
+resource(:branches) GET
+- responds successfully (FAILED - 53)
+- contains a list of branches (PENDING: TODO)
+
+resource(@center) PUT
+- redirect to the article show action (FAILED - 54)
+
+resource(@center) GET
+- responds successfully (FAILED - 55)
+
+resource(@center, :edit)
+- responds successfully (FAILED - 56)
+
+resource(:centers, :new)
+- responds successfully (FAILED - 57)
+
+resource(@center) a successful DELETE
+- should redirect to the index action (FAILED - 58)
+
+resource(:centers) a successful POST
+- redirects to resource(:centers) (FAILED - 59)
+
+resource(:centers) GET
+- has a list of centers (PENDING: TODO)
+
+resource(:centers) GET
+- responds successfully (FAILED - 60)
+- contains a list of centers (PENDING: TODO)
+
+resource(@client) PUT
+- redirect to the article show action (FAILED - 61)
+
+resource(@client) GET
+- responds successfully (FAILED - 62)
+
+resource(@client, :edit)
+- responds successfully (FAILED - 63)
+
+resource(:clients, :new)
+- responds successfully (FAILED - 64)
+
+resource(@client) a successful DELETE
+- should redirect to the index action (FAILED - 65)
+
+resource(:clients) a successful POST
+- redirects to resource(:clients) (FAILED - 66)
+
+resource(:clients) GET
+- has a list of clients (PENDING: TODO)
+
+resource(:clients) GET
+- responds successfully (FAILED - 67)
+- contains a list of clients (PENDING: TODO)
+
+resource(@funder) PUT
+- redirect to the funder show action (FAILED - 68)
+
+resource(@funder) GET
+- responds successfully (FAILED - 69)
+
+resource(@funder, :edit)
+- responds successfully (FAILED - 70)
+
+resource(:funders, :new)
+- responds successfully (FAILED - 71)
+
+resource(@funder) a successful DELETE
+- should redirect to the index action (FAILED - 72)
+
+resource(:funders) a successful POST
+- redirects to resource(:funders) (FAILED - 73)
+
+resource(:funders) GET
+- has a list of funders (PENDING: TODO)
+
+resource(:funders) GET
+- responds successfully (FAILED - 74)
+- contains a list of funders (PENDING: TODO)
+
+resource(@funding_line) PUT
+- redirect to the funding_line show action (FAILED - 75)
+
+resource(@funding_line) GET
+- responds successfully (FAILED - 76)
+
+resource(@funding_line, :edit)
+- responds successfully (FAILED - 77)
+
+resource(:funding_lines, :new)
+- responds successfully (FAILED - 78)
+
+resource(@funding_line) a successful DELETE
+- should redirect to the index action (FAILED - 79)
+
+resource(:funding_lines) a successful POST
+- redirects to resource(:funding_lines) (FAILED - 80)
+
+resource(:funding_lines) GET
+- has a list of funding_lines (FAILED - 81)
+
+resource(:funding_lines) GET
+- responds successfully (FAILED - 82)
+- contains a list of funding_lines (FAILED - 83)
+
+resource(@loan_type) PUT
+- redirect to the loan_type show action (FAILED - 84)
+
+resource(@loan_type) GET
+- responds successfully (FAILED - 85)
+
+resource(@loan_type, :edit)
+- responds successfully (FAILED - 86)
+
+resource(:loan_types, :new)
+- responds successfully (FAILED - 87)
+
+resource(@loan_type) a successful DELETE
+- should redirect to the index action (FAILED - 88)
+
+resource(:loan_types) a successful POST
+- redirects to resource(:loan_types) (FAILED - 89)
+
+resource(:loan_types) GET
+- has a list of loan_types (FAILED - 90)
+
+resource(:loan_types) GET
+- responds successfully (FAILED - 91)
+- contains a list of loan_types (FAILED - 92)
+
+resource(@ledger_entry) PUT
+- redirect to the ledger_entry show action (FAILED - 93)
+
+resource(@ledger_entry) GET
+- responds successfully (FAILED - 94)
+
+resource(@ledger_entry, :edit)
+- responds successfully (FAILED - 95)
+
+resource(:ledger_entries, :new)
+- responds successfully (FAILED - 96)
+
+resource(@ledger_entry) a successful DELETE
+- should redirect to the index action (FAILED - 97)
+
+resource(:ledger_entries) a successful POST
+- redirects to resource(:ledger_entries) (FAILED - 98)
+
+resource(:ledger_entries) GET
+- has a list of ledger_entries (PENDING: TODO)
+
+resource(:ledger_entries) GET
+- responds successfully (FAILED - 99)
+- contains a list of ledger_entries (PENDING: TODO)
+
+resource(@fee) PUT
+- redirect to the fee show action (FAILED - 100)
+
+resource(@fee) GET
+- responds successfully (FAILED - 101)
+
+resource(@fee, :edit)
+- responds successfully (FAILED - 102)
+
+resource(:fees, :new)
+- responds successfully (FAILED - 103)
+
+resource(@fee) a successful DELETE
+- should redirect to the index action (FAILED - 104)
+
+resource(:fees) a successful POST
+- redirects to resource(:fees) (FAILED - 105)
+
+resource(:fees) GET
+- has a list of fees (PENDING: TODO)
+
+resource(:fees) GET
+- responds successfully (FAILED - 106)
+- contains a list of fees (PENDING: TODO)
+
+resource(@client_group) PUT
+- redirect to the client_group show action (FAILED - 107)
+
+resource(@client_group) GET
+- responds successfully (FAILED - 108)
+
+resource(@client_group, :edit)
+- responds successfully (FAILED - 109)
+
+resource(:client_groups, :new)
+- responds successfully (FAILED - 110)
+
+resource(@client_group) a successful DELETE
+- should redirect to the index action (FAILED - 111)
+
+resource(:client_groups) a successful POST
+- redirects to resource(:client_groups) (FAILED - 112)
+
+resource(:client_groups) GET
+- has a list of client_groups (PENDING: TODO)
+
+resource(:client_groups) GET
+- responds successfully (FAILED - 113)
+- contains a list of client_groups (PENDING: TODO)
 
 Pending:
 
-LoanType should have specs (Not Yet Implemented)
-./spec/models/loan_type_spec.rb:5
+resource(:reports) GET has a list of reports (TODO)
+./spec/requests/reports_spec.rb:32
 
-LedgerEntry should have specs (Not Yet Implemented)
-./spec/models/ledger_entry_spec.rb:5
+resource(:reports) GET contains a list of reports (TODO)
+./spec/requests/reports_spec.rb:20
 
-Fee should have specs (Not Yet Implemented)
-./spec/models/fee_spec.rb:5
+resource(:users) GET has a list of users (TODO)
+./spec/requests/users_spec.rb:32
 
-ClientGroup should have specs (Not Yet Implemented)
-./spec/models/client_group_spec.rb:5
+resource(:users) GET contains a list of users (TODO)
+./spec/requests/users_spec.rb:20
+
+resource(:staff_members) GET has a list of staff_members (TODO)
+./spec/requests/staff_members_spec.rb:32
+
+resource(:staff_members) GET contains a list of staff_members (TODO)
+./spec/requests/staff_members_spec.rb:20
+
+resource(:loans) GET has a list of loans (TODO)
+./spec/requests/loans_spec.rb:32
+
+resource(:loans) GET contains a list of loans (TODO)
+./spec/requests/loans_spec.rb:20
+
+resource(:branches) GET has a list of branches (TODO)
+./spec/requests/branches_spec.rb:35
+
+resource(:branches) GET contains a list of branches (TODO)
+./spec/requests/branches_spec.rb:23
+
+resource(:centers) GET has a list of centers (TODO)
+./spec/requests/centers_spec.rb:32
+
+resource(:centers) GET contains a list of centers (TODO)
+./spec/requests/centers_spec.rb:20
+
+resource(:clients) GET has a list of clients (TODO)
+./spec/requests/clients_spec.rb:32
+
+resource(:clients) GET contains a list of clients (TODO)
+./spec/requests/clients_spec.rb:20
+
+resource(:funders) GET has a list of funders (TODO)
+./spec/requests/funders_spec.rb:32
+
+resource(:funders) GET contains a list of funders (TODO)
+./spec/requests/funders_spec.rb:20
+
+resource(:ledger_entries) GET has a list of ledger_entries (TODO)
+./spec/requests/ledger_entries_spec.rb:32
+
+resource(:ledger_entries) GET contains a list of ledger_entries (TODO)
+./spec/requests/ledger_entries_spec.rb:20
+
+resource(:fees) GET has a list of fees (TODO)
+./spec/requests/fees_spec.rb:32
+
+resource(:fees) GET contains a list of fees (TODO)
+./spec/requests/fees_spec.rb:20
+
+resource(:client_groups) GET has a list of client_groups (TODO)
+./spec/requests/client_groups_spec.rb:32
+
+resource(:client_groups) GET contains a list of client_groups (TODO)
+./spec/requests/client_groups_spec.rb:20
 
 1)
-ArgumentError in 'User should not be valid with name shorter than 3 characters'
-The attribute 'admin' is not accessible in User
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-./spec/models/user_spec.rb:7:
+Merb::Router::GenerationError in 'resource(@report) PUT redirect to the report show action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/reports_spec.rb:100:
 
 2)
-ArgumentError in 'User should not have a nil login '
-The attribute 'admin' is not accessible in User
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-./spec/models/user_spec.rb:7:
+Merb::Router::GenerationError in 'resource(@report) GET responds successfully'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/reports_spec.rb:89:
 
 3)
-ArgumentError in 'User should be return for admin? if admin value set to true'
-The attribute 'admin' is not accessible in User
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-./spec/models/user_spec.rb:7:
+Merb::Router::GenerationError in 'resource(@report, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/reports_spec.rb:77:
 
 4)
-ArgumentError in 'User should be created before it is updated'
-The attribute 'admin' is not accessible in User
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-./spec/models/user_spec.rb:7:
+'resource(:reports, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/reports/new' to be successful, but it returned a 401
+./spec/requests/reports_spec.rb:71:
 
 5)
-ArgumentError in 'User should have a login name beginning with numbers, aplphabets and underscores '
-The attribute 'admin' is not accessible in User
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-./spec/models/user_spec.rb:7:
+Merb::Router::GenerationError in 'resource(@report) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/reports_spec.rb:55:
 
 6)
-ArgumentError in 'User should not have false in all permission fields'
-The attribute 'admin' is not accessible in User
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-./spec/models/user_spec.rb:7:
+Merb::Router::GenerationError in 'resource(:reports) a successful POST redirects to resource(:reports)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/reports_spec.rb:46:
 
 7)
-ArgumentError in 'Upload before(:all)'
-The attribute 'admin' is not accessible in User
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-validations-0.10.1/lib/dm-validations.rb:32:in `create'
-./spec/models/upload_spec.rb:5:
+'resource(:reports) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/reports' to be successful, but it returned a 401
+./spec/requests/reports_spec.rb:17:
 
 8)
-NameError in 'Upload before(:all)'
-uninitialized constant CSV
-./spec/models/functions_spec.rb:10:
+Merb::Router::GenerationError in 'resource(@user) PUT redirect to the article show action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/users_spec.rb:100:
 
 9)
-'Client before(:all)' FAILED
-expected valid? to return true, got false
-./spec/models/client_spec.rb:8:
+Merb::Router::GenerationError in 'resource(@user) GET responds successfully'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/users_spec.rb:89:
 
 10)
-ArgumentError in 'Payment before(:all)'
-The attribute 'admin' is not accessible in User
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-./spec/models/payment_spec.rb:8:
+Merb::Router::GenerationError in 'resource(@user, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/users_spec.rb:77:
 
 11)
-'Branch before(:all)' FAILED
-expected valid? to return true, got false
-./spec/models/branch_spec.rb:8:
+'resource(:users, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/users/new' to be successful, but it returned a 401
+./spec/requests/users_spec.rb:71:
 
 12)
-'Center before(:all)' FAILED
-expected valid? to return true, got false
-./spec/models/center_spec.rb:8:
+Merb::Router::GenerationError in 'resource(@user) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/users_spec.rb:55:
 
 13)
-'Attendancy before(:all)' FAILED
-expected valid? to return true, got false
-./spec/models/attendancy_spec.rb:7:
+Merb::Router::GenerationError in 'resource(:users) a successful POST redirects to resource(:users)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/users_spec.rb:46:
 
 14)
-ArgumentError in 'LoanHistory before(:all)'
-The attribute 'admin' is not accessible in User
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-./spec/models/loan_history_spec.rb:7:
+'resource(:users) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/users' to be successful, but it returned a 401
+./spec/requests/users_spec.rb:17:
 
 15)
-ArgumentError in 'Loan before(:all)'
-The attribute 'admin' is not accessible in User
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-./spec/models/loan_spec.rb:8:
+NameError in 'resource(@permission) PUT redirect to the article show action'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:4:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
 
 16)
-ArgumentError in 'Report before(:all)'
-The attribute 'admin' is not accessible in User
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:280:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `each'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:274:in `attributes='
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/resource.rb:646:in `initialize'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-/home/svs/src/mostfit/gems/gems/dm-core-0.10.1/lib/dm-core/model.rb:389:in `new'
-./spec/models/report_spec.rb:11:
+NameError in 'resource(@permission) GET responds successfully'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:4:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
 
-Finished in 46.250697 seconds
+17)
+NameError in 'resource(@permission, :edit) responds successfully'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:4:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
 
-26 examples, 16 failures, 4 pending
+18)
+Merb::Router::GenerationError in 'resource(:permissions, :new) responds successfully'
+Resource route not found: [:permissions, :new]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/permissions_spec.rb:67:
+
+19)
+NameError in 'resource(@permission) a successful DELETE should redirect to the index action'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:4:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+20)
+NameError in 'resource(:permissions) a successful POST redirects to resource(:permissions)'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:40:
+
+21)
+NameError in 'resource(:permissions) GET has a list of permissions'
+uninitialized constant Permission
+./spec/requests/permissions_spec.rb:4:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+22)
+Merb::Router::GenerationError in 'resource(:permissions) GET responds successfully'
+Resource route not found: [:permissions]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/permissions_spec.rb:13:
+
+23)
+Merb::Router::GenerationError in 'resource(:permissions) GET contains a list of permissions'
+Resource route not found: [:permissions]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/permissions_spec.rb:13:
+
+24)
+Merb::Router::GenerationError in 'resource(@payment) PUT redirect to the article show action'
+Resource route not found: [:payments]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/payments_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+25)
+Merb::Router::GenerationError in 'resource(@payment) GET responds successfully'
+Resource route not found: [:payments]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/payments_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+26)
+Merb::Router::GenerationError in 'resource(@payment, :edit) responds successfully'
+Resource route not found: [:payments]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/payments_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+27)
+Merb::Router::GenerationError in 'resource(:payments, :new) responds successfully'
+Resource route not found: [:payments, :new]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/payments_spec.rb:67:
+
+28)
+Merb::Router::GenerationError in 'resource(@payment) a successful DELETE should redirect to the index action'
+Resource route not found: [:payments]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/payments_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+29)
+Merb::Router::GenerationError in 'resource(:payments) a successful POST redirects to resource(:payments)'
+Resource route not found: [:payments]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/payments_spec.rb:41:
+
+30)
+Merb::Router::GenerationError in 'resource(:payments) GET has a list of payments'
+Resource route not found: [:payments]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/payments_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+31)
+Merb::Router::GenerationError in 'resource(:payments) GET responds successfully'
+Resource route not found: [:payments]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/payments_spec.rb:13:
+
+32)
+Merb::Router::GenerationError in 'resource(:payments) GET contains a list of payments'
+Resource route not found: [:payments]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/payments_spec.rb:13:
+
+33)
+Merb::Router::GenerationError in 'resource(@staff_member) PUT redirect to the article show action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/staff_members_spec.rb:100:
+
+34)
+Merb::Router::GenerationError in 'resource(@staff_member) GET responds successfully'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/staff_members_spec.rb:89:
+
+35)
+Merb::Router::GenerationError in 'resource(@staff_member, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/staff_members_spec.rb:77:
+
+36)
+'resource(:staff_members, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/staff_members/new' to be successful, but it returned a 401
+./spec/requests/staff_members_spec.rb:71:
+
+37)
+Merb::Router::GenerationError in 'resource(@staff_member) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/staff_members_spec.rb:55:
+
+38)
+Merb::Router::GenerationError in 'resource(:staff_members) a successful POST redirects to resource(:staff_members)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/staff_members_spec.rb:46:
+
+39)
+'resource(:staff_members) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/staff_members' to be successful, but it returned a 401
+./spec/requests/staff_members_spec.rb:17:
+
+40)
+Merb::Router::GenerationError in 'resource(@loan) PUT redirect to the article show action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loans_spec.rb:100:
+
+41)
+Merb::Router::GenerationError in 'resource(@loan) GET responds successfully'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loans_spec.rb:89:
+
+42)
+Merb::Router::GenerationError in 'resource(@loan, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loans_spec.rb:77:
+
+43)
+'resource(:loans, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/loans/new' to be successful, but it returned a 401
+./spec/requests/loans_spec.rb:71:
+
+44)
+Merb::Router::GenerationError in 'resource(@loan) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loans_spec.rb:55:
+
+45)
+Merb::Router::GenerationError in 'resource(:loans) a successful POST redirects to resource(:loans)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loans_spec.rb:46:
+
+46)
+'resource(:loans) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/loans' to be successful, but it returned a 401
+./spec/requests/loans_spec.rb:17:
+
+47)
+Merb::Router::GenerationError in 'resource(@branch) PUT redirect to the article show action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/branches_spec.rb:103:
+
+48)
+Merb::Router::GenerationError in 'resource(@branch) GET responds successfully'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/branches_spec.rb:92:
+
+49)
+Merb::Router::GenerationError in 'resource(@branch, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/branches_spec.rb:80:
+
+50)
+'resource(:branches, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/branches/new' to be successful, but it returned a 401
+./spec/requests/branches_spec.rb:74:
+
+51)
+Merb::Router::GenerationError in 'resource(@branch) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/branches_spec.rb:58:
+
+52)
+Merb::Router::GenerationError in 'resource(:branches) a successful POST redirects to resource(:branches)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/branches_spec.rb:49:
+
+53)
+'resource(:branches) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/branches' to be successful, but it returned a 401
+./spec/requests/branches_spec.rb:20:
+
+54)
+Merb::Router::GenerationError in 'resource(@center) PUT redirect to the article show action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/centers_spec.rb:100:
+
+55)
+Merb::Router::GenerationError in 'resource(@center) GET responds successfully'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/centers_spec.rb:89:
+
+56)
+Merb::Router::GenerationError in 'resource(@center, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/centers_spec.rb:77:
+
+57)
+'resource(:centers, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/centers/new' to be successful, but it returned a 401
+./spec/requests/centers_spec.rb:71:
+
+58)
+Merb::Router::GenerationError in 'resource(@center) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/centers_spec.rb:55:
+
+59)
+Merb::Router::GenerationError in 'resource(:centers) a successful POST redirects to resource(:centers)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/centers_spec.rb:46:
+
+60)
+'resource(:centers) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/centers' to be successful, but it returned a 401
+./spec/requests/centers_spec.rb:17:
+
+61)
+Merb::Router::GenerationError in 'resource(@client) PUT redirect to the article show action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/clients_spec.rb:100:
+
+62)
+Merb::Router::GenerationError in 'resource(@client) GET responds successfully'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/clients_spec.rb:89:
+
+63)
+Merb::Router::GenerationError in 'resource(@client, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/clients_spec.rb:77:
+
+64)
+'resource(:clients, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/clients/new' to be successful, but it returned a 401
+./spec/requests/clients_spec.rb:71:
+
+65)
+Merb::Router::GenerationError in 'resource(@client) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/clients_spec.rb:55:
+
+66)
+Merb::Router::GenerationError in 'resource(:clients) a successful POST redirects to resource(:clients)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/clients_spec.rb:46:
+
+67)
+'resource(:clients) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/clients' to be successful, but it returned a 401
+./spec/requests/clients_spec.rb:17:
+
+68)
+Merb::Router::GenerationError in 'resource(@funder) PUT redirect to the funder show action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funders_spec.rb:100:
+
+69)
+Merb::Router::GenerationError in 'resource(@funder) GET responds successfully'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funders_spec.rb:89:
+
+70)
+Merb::Router::GenerationError in 'resource(@funder, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funders_spec.rb:77:
+
+71)
+'resource(:funders, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/funders/new' to be successful, but it returned a 401
+./spec/requests/funders_spec.rb:71:
+
+72)
+Merb::Router::GenerationError in 'resource(@funder) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funders_spec.rb:55:
+
+73)
+Merb::Router::GenerationError in 'resource(:funders) a successful POST redirects to resource(:funders)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funders_spec.rb:46:
+
+74)
+'resource(:funders) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/funders' to be successful, but it returned a 401
+./spec/requests/funders_spec.rb:17:
+
+75)
+Merb::Router::GenerationError in 'resource(@funding_line) PUT redirect to the funding_line show action'
+Resource route not found: [:funding_lines]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funding_lines_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+76)
+Merb::Router::GenerationError in 'resource(@funding_line) GET responds successfully'
+Resource route not found: [:funding_lines]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funding_lines_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+77)
+Merb::Router::GenerationError in 'resource(@funding_line, :edit) responds successfully'
+Resource route not found: [:funding_lines]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funding_lines_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+78)
+Merb::Router::GenerationError in 'resource(:funding_lines, :new) responds successfully'
+Resource route not found: [:funding_lines, :new]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funding_lines_spec.rb:67:
+
+79)
+Merb::Router::GenerationError in 'resource(@funding_line) a successful DELETE should redirect to the index action'
+Resource route not found: [:funding_lines]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funding_lines_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+80)
+Merb::Router::GenerationError in 'resource(:funding_lines) a successful POST redirects to resource(:funding_lines)'
+Resource route not found: [:funding_lines]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funding_lines_spec.rb:41:
+
+81)
+Merb::Router::GenerationError in 'resource(:funding_lines) GET has a list of funding_lines'
+Resource route not found: [:funding_lines]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funding_lines_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+82)
+Merb::Router::GenerationError in 'resource(:funding_lines) GET responds successfully'
+Resource route not found: [:funding_lines]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funding_lines_spec.rb:13:
+
+83)
+Merb::Router::GenerationError in 'resource(:funding_lines) GET contains a list of funding_lines'
+Resource route not found: [:funding_lines]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/funding_lines_spec.rb:13:
+
+84)
+Merb::Router::GenerationError in 'resource(@loan_type) PUT redirect to the loan_type show action'
+Resource route not found: [:loan_types]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loan_types_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+85)
+Merb::Router::GenerationError in 'resource(@loan_type) GET responds successfully'
+Resource route not found: [:loan_types]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loan_types_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+86)
+Merb::Router::GenerationError in 'resource(@loan_type, :edit) responds successfully'
+Resource route not found: [:loan_types]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loan_types_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+87)
+Merb::Router::GenerationError in 'resource(:loan_types, :new) responds successfully'
+Resource route not found: [:loan_types, :new]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loan_types_spec.rb:67:
+
+88)
+Merb::Router::GenerationError in 'resource(@loan_type) a successful DELETE should redirect to the index action'
+Resource route not found: [:loan_types]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loan_types_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+89)
+Merb::Router::GenerationError in 'resource(:loan_types) a successful POST redirects to resource(:loan_types)'
+Resource route not found: [:loan_types]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loan_types_spec.rb:41:
+
+90)
+Merb::Router::GenerationError in 'resource(:loan_types) GET has a list of loan_types'
+Resource route not found: [:loan_types]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loan_types_spec.rb:5:
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `instance_eval'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/test_ext/rspec.rb:11:in `given'
+
+91)
+Merb::Router::GenerationError in 'resource(:loan_types) GET responds successfully'
+Resource route not found: [:loan_types]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loan_types_spec.rb:13:
+
+92)
+Merb::Router::GenerationError in 'resource(:loan_types) GET contains a list of loan_types'
+Resource route not found: [:loan_types]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/loan_types_spec.rb:13:
+
+93)
+Merb::Router::GenerationError in 'resource(@ledger_entry) PUT redirect to the ledger_entry show action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/ledger_entries_spec.rb:100:
+
+94)
+Merb::Router::GenerationError in 'resource(@ledger_entry) GET responds successfully'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/ledger_entries_spec.rb:89:
+
+95)
+Merb::Router::GenerationError in 'resource(@ledger_entry, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/ledger_entries_spec.rb:77:
+
+96)
+'resource(:ledger_entries, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/ledger_entries/new' to be successful, but it returned a 401
+./spec/requests/ledger_entries_spec.rb:71:
+
+97)
+Merb::Router::GenerationError in 'resource(@ledger_entry) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/ledger_entries_spec.rb:55:
+
+98)
+Merb::Router::GenerationError in 'resource(:ledger_entries) a successful POST redirects to resource(:ledger_entries)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/ledger_entries_spec.rb:46:
+
+99)
+'resource(:ledger_entries) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/ledger_entries' to be successful, but it returned a 401
+./spec/requests/ledger_entries_spec.rb:17:
+
+100)
+Merb::Router::GenerationError in 'resource(@fee) PUT redirect to the fee show action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/fees_spec.rb:100:
+
+101)
+Merb::Router::GenerationError in 'resource(@fee) GET responds successfully'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/fees_spec.rb:89:
+
+102)
+Merb::Router::GenerationError in 'resource(@fee, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/fees_spec.rb:77:
+
+103)
+'resource(:fees, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/fees/new' to be successful, but it returned a 401
+./spec/requests/fees_spec.rb:71:
+
+104)
+Merb::Router::GenerationError in 'resource(@fee) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/fees_spec.rb:55:
+
+105)
+Merb::Router::GenerationError in 'resource(:fees) a successful POST redirects to resource(:fees)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/fees_spec.rb:46:
+
+106)
+'resource(:fees) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/fees' to be successful, but it returned a 401
+./spec/requests/fees_spec.rb:17:
+
+107)
+Merb::Router::GenerationError in 'resource(@client_group) PUT redirect to the client_group show action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/client_groups_spec.rb:100:
+
+108)
+Merb::Router::GenerationError in 'resource(@client_group) GET responds successfully'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/client_groups_spec.rb:89:
+
+109)
+Merb::Router::GenerationError in 'resource(@client_group, :edit) responds successfully'
+Resource route not found: [nil, :edit]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/client_groups_spec.rb:77:
+
+110)
+'resource(:client_groups, :new) responds successfully' FAILED
+Expected a GET to 'http://example.org/client_groups/new' to be successful, but it returned a 401
+./spec/requests/client_groups_spec.rb:71:
+
+111)
+Merb::Router::GenerationError in 'resource(@client_group) a successful DELETE should redirect to the index action'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/client_groups_spec.rb:55:
+
+112)
+Merb::Router::GenerationError in 'resource(:client_groups) a successful POST redirects to resource(:client_groups)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/client_groups_spec.rb:46:
+
+113)
+'resource(:client_groups) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/client_groups' to be successful, but it returned a 401
+./spec/requests/client_groups_spec.rb:17:
+
+Finished in 489.923572 seconds
+
+135 examples, 113 failures, 22 pending
