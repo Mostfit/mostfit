@@ -1,14 +1,21 @@
+=form_for(@staff_member, :action => url(:day_sheet, @staff_member), :method => :get, :style => "float: right;") do
+  Change date
+  = date_select "date", @date
+  =submit "Go"
+
 %h1 
   Day sheet for 
   = @staff_member.name
   for 
-  = @date 
-
+  = @date
+%br
 = link_to "Download pdf >>", url(:day_sheet_with_format, :format => "pdf", :date => @date), :style => "float: right;", :class => "button"
 - @centers.each do |center|
   %h2
-    = center.id
     = center.name
+    (
+    = center.code
+    )
   %table.narrow.form{ :width => '100%' }
     %thead
       %tr

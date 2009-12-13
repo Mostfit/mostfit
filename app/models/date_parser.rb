@@ -17,8 +17,9 @@ module DateParser
     end
   end
 
-  # function for parsing individual date values, takes a Mash, outputs a Date or nil
+  # function for parsing individual date values, takes a Mash or a string date, outputs a Date or nil
   def parse_date(value)
+    return Date.parse(value) if value.is_a? String
     args = [value[:year].to_i, value[:month].to_i, value[:day].to_i]
     return nil if args.include? 0
     begin

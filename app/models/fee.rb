@@ -29,11 +29,13 @@ class Fee
   end
 
   def description
-    desc =  "#{name}"
-    desc += "#{percentage} %" if percentage
-    desc += "#{amount}" if amount
-    desc += "minimum: #{min_amount}" if min_amount
-    desc += "maximum: #{max_amount}" if max_amount
+    desc =  "#{name}: "
+    desc += "#{percentage} %" if percentage and percentage>0
+    desc += " Amount Rs. #{amount}" if amount
+    if min_amount and max_amount and max_amount!=min_amount
+      desc += " Subject to a minimum of  Rs. #{min_amount}" if min_amount
+      desc += ", maximum of Rs. #{max_amount}" if max_amount
+    end
     desc
   end
 

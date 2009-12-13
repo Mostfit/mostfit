@@ -567,31 +567,39 @@ table.report{
     border: 1px solid;
     border-color: #ccc;
     text-align: right;
+    padding: 0px;
 }
 table.report tr{
     border: 1px solid;
     border-color: #ccc;
+    padding: 0px;
 }
 table.report th{
     border: 1px solid;
     border-color: #ccc;
     text-align: center;
+    font-size: 0.95em;
     background-color: #97b994;
     color: white;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 table.report td{
     border: 1px solid;
     border-color: #ccc;
+    font-size: 0.95em;
 }
 table.report td.group{
     text-align: center; 
     background-color: #ddd;
+    font-size: 0.95em;
 }
 
 table.report td.center{
     border: 1px solid;
     border-color: #ccc;
-    text-align: center; 
+    text-align: center;
+    font-size: 0.9em; 
     background-color: #efefef;
 }
 
