@@ -19,12 +19,13 @@ class Client
   property :center_id,      Integer, :index => true, :nullable => true
   property :created_at,     DateTime
   property :deleted_at,     ParanoidDateTime
-  # property :account_number, String, :length => 20, :nullable => true
-  # property :type_of_account, Enum.send('[]', *[0, :savings, :current, :no_frill, :fixed_deposit, :loan, :other]), :nullable => true
+  property :account_number, String, :length => 20, :nullable => true
+  property :type_of_account, Enum[0,:savings, :current, :no_frill, :fixed_deposit, :loan, :other]
   property :bank_name,      String, :length => 20, :nullable => true
   property :branch,         String, :length => 20, :nullable => true
   property :join_holder,    String, :length => 20, :nullable => true
   validates_length :account_number, :max => 20
+
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},
@@ -123,6 +124,7 @@ class Client
 
   private
   def convert_blank_to_nil
+    self.type_of_account = 0 if self.type_of_account == nil
     self.center_id=nil       if self.center_id.blank?
     self.client_group_id=nil if self.client_group_id.blank? 
   end

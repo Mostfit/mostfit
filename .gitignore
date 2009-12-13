@@ -4,6 +4,7 @@ tmp/*
 TAGS
 *~
 .#*
+*#
 schema/schema.rb
 schema/*_structure.sql
 schema/*.sqlite3

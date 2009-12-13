@@ -9,6 +9,6 @@ Fee
 - should return correct fees payable
 - should return correct fees_paid
 
-Finished in 2.223476 seconds
+Finished in 13.88279 seconds
 
 8 examples, 0 failures
