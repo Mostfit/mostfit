@@ -17,7 +17,6 @@
         %th installment
         %th principal due
         %th interest due
-        %th other payments
         %th total due
         %th paid
         %th attended
@@ -62,15 +61,8 @@
               - i = lh.nil? ? 0 : lh.interest_due.to_i
               = i.to_currency
               - tot_interest += i
-            %td
-              - f = loan.total_fees_payable_on(@date) || 0
-              = f
-              - tot_fees += f
-              %br
-              = loan.fees_payable_on(@date)
-                
             %td.numeric
-              - a = p + i + f
+              - a = p + i
               = a.to_currency
               - tot_total += a
             %td.numeric

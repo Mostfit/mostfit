@@ -1,13 +1,13 @@
-%h1
-  = link_to "Center #{@center.name}", resource(@center.branch, @center)
-
-%h2
-  = @date 
-  - if @center
-    (
-    = Center.meeting_days[@date.wday]
-    )
 - if @center and @date
+  %h1
+    = link_to "Center #{@center.name}", resource(@center.branch, @center)
+    = @date 
+    - if @center
+      (
+      = Center.meeting_days[@date.wday]
+      )
+
+  - debugger
   - if not @errors.blank?
     .error
       - @errors.each do |error|

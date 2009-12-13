@@ -3,10 +3,31 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 given "a staff_member exists" do
   StaffMember.all.destroy!
   request(resource(:staff_members), :method => "POST", 
-    :params => { :staff_member => { :id => nil }})
+    :params => { :staff_member => { :name => "Gevine" }})
 end
 
-describe "resource(:staff_members)" do
+given "an authenticated user" do
+  # load_fixtures :users, :staff_members, :branches, :centers, :clients #, :loans  #, :payments
+  User.all.destroy!
+  @u_data_entry = User.new(:login => 'data', :password => 'entry', :password_confirmation => 'entry', :role => :data_entry)
+  @u_data_entry.save
+  @u_data_entry.errors.each {|e| puts e}
+  puts "ERROR data" unless @u_data_entry.errors.blank?
+  @u_admin = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password', :role => :admin)
+  @u_admin.save
+  @u_admin.errors.each {|e| puts e}
+  puts "ERROR admin" unless @u_admin.errors.blank?
+  @u_mis_manager = User.new(:login => 'mis', :password => 'manager', :password_confirmation => 'manager', :role => :mis_manager)
+  @u_mis_manager.save
+  @u_mis_manager.errors.each {|e| puts e} 
+  puts "ERROR mis" if @u_mis_manager.errors unless @u_mis_manager.errors.blank?
+  response = request url(:perform_login), :method => "PUT", :params => { :login => 'admin', :password => 'password' }
+  response.should redirect
+end
+
+
+describe "resource(:staff_members)", :given => "an authenticated user" do
+
   describe "GET" do
     
     before(:each) do
@@ -39,11 +60,11 @@ describe "resource(:staff_members)" do
     before(:each) do
       StaffMember.all.destroy!
       @response = request(resource(:staff_members), :method => "POST", 
-        :params => { :staff_member => { :id => nil }})
+        :params => { :staff_member => { :name => "Test Staff Member" }})
     end
     
     it "redirects to resource(:staff_members)" do
-      @response.should redirect_to(resource(StaffMember.first), :message => {:notice => "staff_member was successfully created"})
+      @response.should redirect_to(resource(:staff_members), :message => {:notice => "StaffMember was successfully created"})
     end
     
   end
@@ -62,7 +83,7 @@ describe "resource(@staff_member)" do
    end
 end
 
-describe "resource(:staff_members, :new)" do
+describe "resource(:staff_members, :new)", :given => "an authenticated user"  do
   before(:each) do
     @response = request(resource(:staff_members, :new))
   end
