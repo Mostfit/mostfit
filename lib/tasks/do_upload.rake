@@ -8,6 +8,7 @@ require "log4r"
 namespace :db do
   desc "Create DB from excel sheet"
   task :upload, :directory, :filename do |task, args|
+    debugger
 #    include Log4r
     filename  = args[:filename]
     directory = args[:directory]

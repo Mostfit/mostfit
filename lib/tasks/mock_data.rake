@@ -12,7 +12,6 @@ require "merb-core"
 # here again, Merb will do it for you
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
-
 def load_fixtures(*files)
   files.each do |name|
     klass = Kernel::const_get(name.to_s.singularize.camel_case)
@@ -34,6 +33,7 @@ def load_fixtures(*files)
     end
   end
 end
+
 
 
 

@@ -1,14 +1,59 @@
 
-Fee
-- should have a name
-- should have either an amount or a percentage
-- should never return less than min_amount
-- should never return more than max_amount
-- should return correct fee_schedule for loan
-- should return correct fee_schedule for multiple fees even on the same date
-- should return correct fees payable
-- should return correct fees_paid
+resource(@branch) PUT
+- redirect to the article show action (FAILED - 1)
 
-Finished in 13.88279 seconds
+resource(@branch) GET
+- responds successfully (FAILED - 2)
 
-8 examples, 0 failures
+resource(@branch, :edit)
+- responds successfully (FAILED - 3)
+
+resource(:branches, :new)
+- responds successfully
+
+resource(@branch) a successful DELETE
+- should redirect to the index action
+
+resource(:branches) a successful POST
+- redirects to resource(:branches) (FAILED - 4)
+
+resource(:branches) GET
+- has a list of branches (PENDING: TODO)
+
+resource(:branches) GET
+- responds successfully
+- contains a list of branches (PENDING: TODO)
+
+Pending:
+
+resource(:branches) GET has a list of branches (TODO)
+./spec/requests/branches_spec.rb:39
+
+resource(:branches) GET contains a list of branches (TODO)
+./spec/requests/branches_spec.rb:27
+
+1)
+'resource(@branch) PUT redirect to the article show action' FAILED
+Expected a PUT to 'http://example.org/branches/1?branch[id]=1' to be a redirect, but it returned status code 401.
+./spec/requests/branches_spec.rb:115:
+
+2)
+'resource(@branch) GET responds successfully' FAILED
+Expected a GET to 'http://example.org/branches/1' to be successful, but it returned a 401
+./spec/requests/branches_spec.rb:103:
+
+3)
+'resource(@branch, :edit) responds successfully' FAILED
+Expected a GET to 'http://example.org/branches/1/edit' to be successful, but it returned a 401
+./spec/requests/branches_spec.rb:91:
+
+4)
+Merb::Router::GenerationError in 'resource(:branches) a successful POST redirects to resource(:branches)'
+Resource route not found: [nil]
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
+/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
+./spec/requests/branches_spec.rb:56:
+
+Finished in 5962.210045 seconds
+
+9 examples, 4 failures, 2 pending

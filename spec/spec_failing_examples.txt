@@ -1,0 +1,12 @@
+resource(@branch) PUT redirect to the article show action
+resource(@branch) GET responds successfully
+resource(@branch, :edit) responds successfully
+resource(:branches) a successful POST redirects to resource(:branches)
+
+Pending:
+
+resource(:branches) GET has a list of branches (TODO)
+./spec/requests/branches_spec.rb:39
+
+resource(:branches) GET contains a list of branches (TODO)
+./spec/requests/branches_spec.rb:27

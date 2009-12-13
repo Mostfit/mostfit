@@ -7,6 +7,7 @@ require "roo"
 namespace :excel do
   desc "Convert excel sheet into a bunch of csvs"
   task :to_csv, :directory, :filename do |task, args|
+    debugger
     excel = Excel.new(File.join(Merb.root, "uploads", args.directory, args.filename))
     excel.sheets.each{|sheet|
       excel.default_sheet=sheet

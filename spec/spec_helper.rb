@@ -23,3 +23,25 @@ Spec::Runner.configure do |config|
   end
   
 end
+
+def load_fixtures(*files)
+  files.each do |name|
+    klass = Kernel::const_get(name.to_s.singularize.camel_case)
+    yml_file =  "spec/fixtures/#{name}.yml"
+    puts "\nLoading: #{yml_file}"
+    entries = YAML::load_file(Merb.root / yml_file)
+    entries.each do |name, entry|
+      k = klass::new(entry)
+      puts "#{k} :#{name}"
+
+      if k.class == Loan  # do not update the hisotry for loans
+        k.history_disabled = true
+      end
+      unless k.save
+        puts "Validation errors saving a #{klass} (##{k.id}):"
+        p k.errors
+        raise
+      end
+    end
+  end
+end

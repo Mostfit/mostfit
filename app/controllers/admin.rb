@@ -5,6 +5,7 @@ class Admin < Application
   end
 
   def upload    
+    debugger
     if params[:file]
       file      = Upload.new(params[:file][:filename])      
       file.move(params[:file][:tempfile].path)

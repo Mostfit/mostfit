@@ -22,6 +22,7 @@ class Upload
   end
 
   def load_csv(log=nil)
+    require 'csv'
     models = [StaffMember, Branch, Center, ClientGroup, Client, FundingLine, LoanProduct, Loan, Payment]
     funding_lines, loans = {}, {}
     User.all.each{|u|
@@ -43,6 +44,7 @@ class Upload
               if model == Loan
                 model.from_csv(row, headers, funding_lines)
               elsif model==Payment
+                debugger
                 model.from_csv(row, headers, loans)
               else
                 model.from_csv(row, headers)
