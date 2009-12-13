@@ -181,119 +181,27 @@ a {
 <div class="results">
 <div class="example_group">
   <dl>
-  <dt id="example_group_1">resource(@staff_member) PUT</dt>
-    <script type="text/javascript">makeRed('rspec-header');</script>
-    <script type="text/javascript">makeRed('example_group_1');</script>
-    <script type="text/javascript">moveProgressBar('11.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the article show action</span>
-      <div class="failure" id="failure_1">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
-./spec/requests/staff_members_spec.rb:122:</pre></div>
-    <pre class="ruby"><code><span class="linenum">269</span>        
-<span class="linenum">270</span>        <span class="keyword">unless</span> <span class="ident">route</span> <span class="punct">=</span> <span class="constant">Merb</span><span class="punct">::</span><span class="constant">Router</span><span class="punct">.</span><span class="ident">resource_routes</span><span class="punct">[</span><span class="ident">key</span><span class="punct">]</span>
-<span class="offending"><span class="linenum">271</span>          <span class="keyword">raise</span> <span class="constant">Merb</span><span class="punct">::</span><span class="constant">Router</span><span class="punct">::</span><span class="constant">GenerationError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">Resource route not found: <span class="expr">#{args.inspect}</span></span><span class="punct">&quot;</span></span>
-<span class="linenum">272</span>        <span class="keyword">end</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_2">resource(@staff_member) GET</dt>
-    <script type="text/javascript">makeRed('example_group_2');</script>
-    <script type="text/javascript">moveProgressBar('22.2');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_2">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
-./spec/requests/staff_members_spec.rb:111:</pre></div>
-    <pre class="ruby"><code><span class="linenum">269</span>        
-<span class="linenum">270</span>        <span class="keyword">unless</span> <span class="ident">route</span> <span class="punct">=</span> <span class="constant">Merb</span><span class="punct">::</span><span class="constant">Router</span><span class="punct">.</span><span class="ident">resource_routes</span><span class="punct">[</span><span class="ident">key</span><span class="punct">]</span>
-<span class="offending"><span class="linenum">271</span>          <span class="keyword">raise</span> <span class="constant">Merb</span><span class="punct">::</span><span class="constant">Router</span><span class="punct">::</span><span class="constant">GenerationError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">Resource route not found: <span class="expr">#{args.inspect}</span></span><span class="punct">&quot;</span></span>
-<span class="linenum">272</span>        <span class="keyword">end</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_3">resource(@staff_member, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_3');</script>
-    <script type="text/javascript">moveProgressBar('33.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_3">
-        <div class="message"><pre>Resource route not found: [nil, :edit]</pre></div>
-        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
-./spec/requests/staff_members_spec.rb:99:</pre></div>
-    <pre class="ruby"><code><span class="linenum">269</span>        
-<span class="linenum">270</span>        <span class="keyword">unless</span> <span class="ident">route</span> <span class="punct">=</span> <span class="constant">Merb</span><span class="punct">::</span><span class="constant">Router</span><span class="punct">.</span><span class="ident">resource_routes</span><span class="punct">[</span><span class="ident">key</span><span class="punct">]</span>
-<span class="offending"><span class="linenum">271</span>          <span class="keyword">raise</span> <span class="constant">Merb</span><span class="punct">::</span><span class="constant">Router</span><span class="punct">::</span><span class="constant">GenerationError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">Resource route not found: <span class="expr">#{args.inspect}</span></span><span class="punct">&quot;</span></span>
-<span class="linenum">272</span>        <span class="keyword">end</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_4">resource(:staff_members, :new)</dt>
-    <script type="text/javascript">moveProgressBar('44.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">responds successfully</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_5">resource(@staff_member) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_5');</script>
-    <script type="text/javascript">moveProgressBar('55.5');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_4">
-        <div class="message"><pre>Resource route not found: [nil]</pre></div>
-        <div class="backtrace"><pre>/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
-./spec/requests/staff_members_spec.rb:76:</pre></div>
-    <pre class="ruby"><code><span class="linenum">269</span>        
-<span class="linenum">270</span>        <span class="keyword">unless</span> <span class="ident">route</span> <span class="punct">=</span> <span class="constant">Merb</span><span class="punct">::</span><span class="constant">Router</span><span class="punct">.</span><span class="ident">resource_routes</span><span class="punct">[</span><span class="ident">key</span><span class="punct">]</span>
-<span class="offending"><span class="linenum">271</span>          <span class="keyword">raise</span> <span class="constant">Merb</span><span class="punct">::</span><span class="constant">Router</span><span class="punct">::</span><span class="constant">GenerationError</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">Resource route not found: <span class="expr">#{args.inspect}</span></span><span class="punct">&quot;</span></span>
-<span class="linenum">272</span>        <span class="keyword">end</span></code></pre>
-      </div>
-    </dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_6">resource(:staff_members) a successful POST</dt>
-    <script type="text/javascript">moveProgressBar('66.6');</script>
-    <dd class="spec passed"><span class="passed_spec_name">redirects to resource(:staff_members)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_7">resource(:staff_members) GET</dt>
-    <script type="text/javascript">makeYellow('example_group_7');</script>
-    <script type="text/javascript">moveProgressBar('77.7');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">has a list of staff_members (PENDING: TODO)</span></dd>
-  </dl>
-</div>
-<div class="example_group">
-  <dl>
-  <dt id="example_group_8">resource(:staff_members) GET</dt>
-    <script type="text/javascript">moveProgressBar('88.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">responds successfully</span></dd>
-    <script type="text/javascript">makeYellow('example_group_8');</script>
+  <dt id="example_group_1">Fee</dt>
+    <script type="text/javascript">moveProgressBar('12.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have a name</span></dd>
+    <script type="text/javascript">moveProgressBar('25.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have either an amount or a percentage</span></dd>
+    <script type="text/javascript">moveProgressBar('37.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should never return less than min_amount</span></dd>
+    <script type="text/javascript">moveProgressBar('50.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should never return more than max_amount</span></dd>
+    <script type="text/javascript">moveProgressBar('62.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct fee_schedule for loan</span></dd>
+    <script type="text/javascript">moveProgressBar('75.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct fee_schedule for multiple fees even on the same date</span></dd>
+    <script type="text/javascript">moveProgressBar('87.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct fees payable</span></dd>
     <script type="text/javascript">moveProgressBar('100.0');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">contains a list of staff_members (PENDING: TODO)</span></dd>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct fees_paid</span></dd>
   </dl>
 </div>
-<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>19.552126 seconds</strong>";</script>
-<script type="text/javascript">document.getElementById('totals').innerHTML = "9 examples, 4 failures, 2 pending";</script>
+<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>2.223476 seconds</strong>";</script>
+<script type="text/javascript">document.getElementById('totals').innerHTML = "8 examples, 0 failures";</script>
 </div>
 </div>
 </body>

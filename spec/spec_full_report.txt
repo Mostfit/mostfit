@@ -1,65 +1,14 @@
 
-resource(@staff_member) PUT
-- redirect to the article show action (FAILED - 1)
+Fee
+- should have a name
+- should have either an amount or a percentage
+- should never return less than min_amount
+- should never return more than max_amount
+- should return correct fee_schedule for loan
+- should return correct fee_schedule for multiple fees even on the same date
+- should return correct fees payable
+- should return correct fees_paid
 
-resource(@staff_member) GET
-- responds successfully (FAILED - 2)
+Finished in 2.223476 seconds
 
-resource(@staff_member, :edit)
-- responds successfully (FAILED - 3)
-
-resource(:staff_members, :new)
-- responds successfully
-
-resource(@staff_member) a successful DELETE
-- should redirect to the index action (FAILED - 4)
-
-resource(:staff_members) a successful POST
-- redirects to resource(:staff_members)
-
-resource(:staff_members) GET
-- has a list of staff_members (PENDING: TODO)
-
-resource(:staff_members) GET
-- responds successfully
-- contains a list of staff_members (PENDING: TODO)
-
-Pending:
-
-resource(:staff_members) GET has a list of staff_members (TODO)
-./spec/requests/staff_members_spec.rb:53
-
-resource(:staff_members) GET contains a list of staff_members (TODO)
-./spec/requests/staff_members_spec.rb:41
-
-1)
-Merb::Router::GenerationError in 'resource(@staff_member) PUT redirect to the article show action'
-Resource route not found: [nil]
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
-./spec/requests/staff_members_spec.rb:122:
-
-2)
-Merb::Router::GenerationError in 'resource(@staff_member) GET responds successfully'
-Resource route not found: [nil]
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
-./spec/requests/staff_members_spec.rb:111:
-
-3)
-Merb::Router::GenerationError in 'resource(@staff_member, :edit) responds successfully'
-Resource route not found: [nil, :edit]
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
-./spec/requests/staff_members_spec.rb:99:
-
-4)
-Merb::Router::GenerationError in 'resource(@staff_member) a successful DELETE should redirect to the index action'
-Resource route not found: [nil]
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
-./spec/requests/staff_members_spec.rb:76:
-
-Finished in 19.552126 seconds
-
-9 examples, 4 failures, 2 pending
+8 examples, 0 failures

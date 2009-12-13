@@ -346,7 +346,6 @@ class Loan
   def fee_schedule
     @fee_schedule = {}
     loan_product.fees.each do |f|
-      debugger
       date = eval(f.payable_on.to_s)
       @fee_schedule += {date => {f.name => f.fees_for(self)}}
     end
