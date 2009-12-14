@@ -351,7 +351,7 @@ class Loan
     @fee_schedule = {}
     loan_product.fees.each do |f|
       date = eval(f.payable_on.to_s)
-      @fee_schedule += {date => {f.name => f.fees_for(self)}}
+      @fee_schedule += {date => {f.name => f.fees_for(self)}} unless date.nil?
     end
     @fee_schedule
   end
