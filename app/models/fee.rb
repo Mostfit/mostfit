@@ -1,7 +1,7 @@
 class Fee
   include DataMapper::Resource
   
-  PAYABLE = [:applied_on, :approved_on, :disbursal_date, :scheduled_first_payment_date, :first_payment_date]
+  PAYABLE = [:applied_on, :approved_on, :disbursal_date, :scheduled_first_payment_date, :first_payment_date, :grt_date]
 
   property :id, Serial
   property :name, String, :nullable => false

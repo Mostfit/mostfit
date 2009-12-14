@@ -177,6 +177,10 @@ class Loan
     self.funding_line and self.funding_line.funder.name or nil
   end
 
+  def grt_date
+    client.grt_pass_date
+  end
+
   # the arithmic of shifting by the installment_frequency (especially months is tricky)
   # used by many other methods, it accepts a negative +number+
   # TODO: decide if we should make sure returned date is a payment date.
