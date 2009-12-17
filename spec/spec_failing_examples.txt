@@ -1,12 +1,12 @@
-resource(@branch) PUT redirect to the article show action
-resource(@branch) GET responds successfully
-resource(@branch, :edit) responds successfully
-resource(:branches) a successful POST redirects to resource(:branches)
+resource(@center) PUT redirect to the article show action
+resource(@center, :edit) responds successfully
+resource(@center) a successful DELETE should redirect to the index action
+resource(:centers) a successful POST redirects to resource(:centers)
 
 Pending:
 
-resource(:branches) GET has a list of branches (TODO)
-./spec/requests/branches_spec.rb:39
+resource(:centers) GET has a list of centers (TODO)
+./spec/requests/centers_spec.rb:36
 
-resource(:branches) GET contains a list of branches (TODO)
-./spec/requests/branches_spec.rb:27
+resource(:centers) GET contains a list of centers (TODO)
+./spec/requests/centers_spec.rb:24

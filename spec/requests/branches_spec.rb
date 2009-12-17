@@ -14,6 +14,14 @@ given "an admin user" do
   response.should redirect
 end
 
+given "a branch and admin user exist" do
+  load_fixtures :users if User.all.blank?
+  load_fixtures :staff_members if StaffMember.all.blank?
+  load_fixtures :branches if Branch.all.blank?
+  response = request url(:perform_login), :method => "PUT", :params => { :login => 'admin', :password => 'password' }
+  response.should redirect
+end
+
 describe "resource(:branches)", :given => "an admin user" do
   describe "GET" do
     before(:each) do
@@ -45,15 +53,14 @@ describe "resource(:branches)", :given => "an admin user" do
   describe "a successful POST", :given => "an admin user" do
     before(:each) do
       Branch.all.destroy!
+      load_fixtures :staff_members if StaffMember.all.blank?
       @response = request(resource(:branches), :method => "POST", 
         :params => { :branch => { :name => "BR1", :code => "1234",
-                            :manager_id => StaffMember.first.id}})
-      debugger
+                            :manager_staff_id => StaffMember.first.id}})
     end
     
     it "redirects to resource(:branches)" do
-      debugger
-      @response.should redirect_to(resource(Branch.first), :message => {:notice => "branch was successfully created"})
+      @response.should redirect_to(resource(:branches), :message => {:notice => "branch was successfully created"})
     end
     
   end
@@ -82,7 +89,10 @@ describe "resource(:branches, :new)", :given => "an admin user" do
   end
 end
 
-describe "resource(@branch, :edit)", :given => "a branch exists" do
+describe "resource(@branch, :edit)", :given => "an admin user" do
+  before(:all) do
+    load_fixtures :staff_members, :branches if Branch.all.blank?
+  end
   before(:each) do
     @response = request(resource(Branch.first, :edit))
   end
@@ -92,7 +102,7 @@ describe "resource(@branch, :edit)", :given => "a branch exists" do
   end
 end
 
-describe "resource(@branch)", :given => "a branch exists" do
+describe "resource(@branch)", :given => "a branch and admin user exist" do
   
   describe "GET" do
     before(:each) do
@@ -112,7 +122,7 @@ describe "resource(@branch)", :given => "a branch exists" do
     end
   
     it "redirect to the article show action" do
-      @response.should redirect_to(resource(@branch))
+      @response.should redirect_to(resource(:branches))
     end
   end
   

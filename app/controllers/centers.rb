@@ -46,6 +46,7 @@ class Centers < Application
   end
 
   def create(center)
+    debugger
     @center = Center.new(center)
     if @branch
       @center.branch = @branch  # set direct context

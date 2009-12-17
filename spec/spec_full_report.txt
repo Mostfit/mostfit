@@ -1,59 +1,57 @@
 
-resource(@branch) PUT
+resource(@center) PUT
 - redirect to the article show action (FAILED - 1)
 
-resource(@branch) GET
+resource(@center) GET
+- responds successfully
+
+resource(@center, :edit)
 - responds successfully (FAILED - 2)
 
-resource(@branch, :edit)
-- responds successfully (FAILED - 3)
-
-resource(:branches, :new)
+resource(:centers, :new)
 - responds successfully
 
-resource(@branch) a successful DELETE
-- should redirect to the index action
+resource(@center) a successful DELETE
+- should redirect to the index action (FAILED - 3)
 
-resource(:branches) a successful POST
-- redirects to resource(:branches) (FAILED - 4)
+resource(:centers) a successful POST
+- redirects to resource(:centers) (FAILED - 4)
 
-resource(:branches) GET
-- has a list of branches (PENDING: TODO)
+resource(:centers) GET
+- has a list of centers (PENDING: TODO)
 
-resource(:branches) GET
+resource(:centers) GET
 - responds successfully
-- contains a list of branches (PENDING: TODO)
+- contains a list of centers (PENDING: TODO)
 
 Pending:
 
-resource(:branches) GET has a list of branches (TODO)
-./spec/requests/branches_spec.rb:39
+resource(:centers) GET has a list of centers (TODO)
+./spec/requests/centers_spec.rb:36
 
-resource(:branches) GET contains a list of branches (TODO)
-./spec/requests/branches_spec.rb:27
+resource(:centers) GET contains a list of centers (TODO)
+./spec/requests/centers_spec.rb:24
 
 1)
-'resource(@branch) PUT redirect to the article show action' FAILED
-Expected a PUT to 'http://example.org/branches/1?branch[id]=1' to be a redirect, but it returned status code 401.
-./spec/requests/branches_spec.rb:115:
+'resource(@center) PUT redirect to the article show action' FAILED
+Expected a PUT to 'http://example.org/centers/1?center[id]=1' to be a redirect, but it returned status code 500.
+./spec/requests/centers_spec.rb:110:
 
 2)
-'resource(@branch) GET responds successfully' FAILED
-Expected a GET to 'http://example.org/branches/1' to be successful, but it returned a 401
-./spec/requests/branches_spec.rb:103:
+'resource(@center, :edit) responds successfully' FAILED
+Expected a GET to 'http://example.org/centers/1/edit' to be successful, but it returned a 500
+./spec/requests/centers_spec.rb:86:
 
 3)
-'resource(@branch, :edit) responds successfully' FAILED
-Expected a GET to 'http://example.org/branches/1/edit' to be successful, but it returned a 401
-./spec/requests/branches_spec.rb:91:
+'resource(@center) a successful DELETE should redirect to the index action' FAILED
+Expected a DELETE to 'http://example.org/branches/2/centers/1' to redirect to </branches/1/centers>, but it redirected to </branches/2/centers?_message=BAh7BjoLbm90aWNlIidDZW50ZXIgJ0pRWklJMDAxJyBoYXMgYmVlbiBkZWxl%0AdGVk%0A>
+./spec/requests/centers_spec.rb:64:
 
 4)
-Merb::Router::GenerationError in 'resource(:branches) a successful POST redirects to resource(:branches)'
-Resource route not found: [nil]
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/dispatch/router.rb:271:in `resource'
-/home/svs/src/mostfit/gems/gems/merb-core-1.0.13/lib/merb-core/test/helpers/route_helper.rb:75:in `resource'
-./spec/requests/branches_spec.rb:56:
+'resource(:centers) a successful POST redirects to resource(:centers)' FAILED
+Expected a POST to 'http://example.org/branches/1/centers' to redirect to </centers/54>, but it redirected to </branches/1/centers?_message=BAh7BjoLbm90aWNlIiZDZW50ZXIgJ2FiYycgc3VjY2Vzc2Z1bGx5IGNyZWF0%0AZWQ%3D%0A>
+./spec/requests/centers_spec.rb:51:
 
-Finished in 5962.210045 seconds
+Finished in 105133.545492 seconds
 
 9 examples, 4 failures, 2 pending
