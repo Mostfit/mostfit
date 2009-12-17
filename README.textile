@@ -13,6 +13,7 @@ h2. Installation
 Edit config/dependencies.rb and make sure you have the correct version of the gems required. Edit config/example.database.yml, update the db name, username and password to reflect your database settings and save it as config/database.yml. Then:
 rake mock:load_demo
 Go get a cup of coffee when you see text whizzing by and by the time you finish your delicious beverage, the demo fixtures should have been loaded and the system set up for your use.
+Run "bin/merb" to start the server
 
 h2. Customizing
 
