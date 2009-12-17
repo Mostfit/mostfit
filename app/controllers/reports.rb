@@ -22,7 +22,8 @@ class Reports < Application
       from_date = get_date(params[:consolidated_report], :from_date)
       to_date   = get_date(params[:consolidated_report], :to_date)
       @report   = ConsolidatedReport.new(from_date==to_date ? from_date-7 : from_date, to_date)
-      @groups, @centers, @branches = @report.generate(params)
+      
+      @groups, @centers, @branches = @report.generate(params[:consolidated_report])
       display [@groups, @centers, @branches]
     elsif id.nil?
       @reports = klass.all

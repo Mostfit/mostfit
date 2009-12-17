@@ -1,5 +1,5 @@
 class ConsolidatedReport < Report
-  attr_accessor :from_date, :to_date
+  attr_accessor :from_date, :to_date, :branch_id, :center_id
 
   def initialize(from_date=Date.today-7, to_date=Date.today)
     @from_date   =  (from_date.class==Date) ? from_date : Date.parse(from_date)
@@ -14,10 +14,12 @@ class ConsolidatedReport < Report
   def generate(params)
     branches, centers, groups = {}, {}, {}
     histories = LoanHistory.sum_outstanding_by_group(self.from_date, self.to_date)
-    (params[:branch_id].nil? ? Branch.all(:order => [:name]) : Branch.all(params[:branch_id])).each{|b|
+    ((params and params[:branch_id] and not params[:branch_id].blank?) ? Branch.all(:id => params[:branch_id]) : Branch.all(:order => [:name])).each{|b|      
       groups[b.id]||= {}
       branches[b.id] = b
+      
       b.centers.each{|c|
+        next if params and params[:center_id] and not params[:center_id].blank? and not params[:center_id].to_i==c.id
         groups[b.id][c.id]||= {}
         centers[c.id]  = c
         c.client_groups.each{|g|
@@ -39,15 +41,16 @@ class ConsolidatedReport < Report
           groups[b.id][c.id][g.id][8] += total_actual
           groups[b.id][c.id][g.id][7] += total_actual - principal_actual
 
-          groups[b.id][c.id][g.id][9]  += principal_scheduled - principal_actual
-          groups[b.id][c.id][g.id][10] += (total_scheduled - total_actual) - (principal_scheduled - principal_actual)
-          groups[b.id][c.id][g.id][11] += total_scheduled - total_actual 
+          groups[b.id][c.id][g.id][9]  += principal_actual - principal_scheduled
+          groups[b.id][c.id][g.id][10] += (total_actual - total_scheduled) - (principal_actual - principal_scheduled)
+          groups[b.id][c.id][g.id][11] += total_actual - total_scheduled
         }
       }
     }
     Payment.all(:received_on.gte => from_date, :received_on.lte => to_date ).each{|p|
       client    = p.loan.client
       center_id = client.center_id
+      next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       if groups[branch_id][center_id][client.client_group_id]
         groups[branch_id][center_id][client.client_group_id][3] += p.amount if p.type==:principal 
@@ -59,6 +62,7 @@ class ConsolidatedReport < Report
     Loan.all(:applied_on.gte => from_date, :applied_on.lte => to_date).each{|l|
       client    = l.client
       center_id = client.center_id
+      next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
 
       groups[branch_id][center_id][l.client.client_group_id][0] += l.amount
@@ -68,6 +72,7 @@ class ConsolidatedReport < Report
     Loan.all(:approved_on.gte => from_date, :approved_on.lte => to_date).each{|l|
       client    = l.client
       center_id = client.center_id
+      next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
 
       groups[branch_id][center_id][l.client.client_group_id][1] += l.amount
@@ -77,6 +82,7 @@ class ConsolidatedReport < Report
     Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date).each{|l|
       client    = l.client
       center_id = client.center_id
+      next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
 
       groups[branch_id][center_id][l.client.client_group_id][2] += l.amount
