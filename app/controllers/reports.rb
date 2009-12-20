@@ -10,21 +10,25 @@ class Reports < Application
     provides :pdf
     klass = Kernel.const_get(report_type)
     @report = Report.get(id) if id
+    class_key  =  klass.to_s.snake_case.to_sym
 
-    if klass==DailyReport
-      #Generating daily report
-      date = get_date(params[:daily_report], :date)
-      @report = DailyReport.new(date)
-      @groups, @centers, @branches = @report.generate(params)
-      display [@groups, @centers, @branches]      
-    elsif klass==ConsolidatedReport
-      #Generating time range report
-      from_date = get_date(params[:consolidated_report], :from_date)
-      to_date   = get_date(params[:consolidated_report], :to_date)
-      @report   = ConsolidatedReport.new(from_date==to_date ? from_date-7 : from_date, to_date)
-      
-      @groups, @centers, @branches = @report.generate(params[:consolidated_report])
-      display [@groups, @centers, @branches]
+    dates = {}
+    if  params[class_key]
+      dates[:date]      = get_date(params[class_key], :date) if params[class_key][:date]
+      dates[:from_date] = get_date(params[class_key], :from_date) if params[class_key][:from_date]
+      dates[:to_date]   = get_date(params[class_key], :to_date) if params[class_key][:to_date]
+    end
+
+    if [DailyReport, ConsolidatedReport, TransactionLedger].include?(klass)
+      #Generating report
+      @report   = klass.new(params[class_key], dates)
+      if klass==TransactionLedger
+        @groups, @centers, @branches, @payments, @clients = @report.generate
+        display [@groups, @centers, @branches, @payments, @clients]
+      else
+        @groups, @centers, @branches = @report.generate
+        display [@groups, @centers, @branches]
+      end
     elsif id.nil?
       @reports = klass.all
       display @reports
@@ -83,8 +87,6 @@ class Reports < Application
     if params and params.key?(col)
       date_hash = params[col]
       return Date.parse(date_hash[:year] + "-" + date_hash[:month] + "-" + date_hash[:day])
-    else
-      Date.today
     end
   end
 end # Reports

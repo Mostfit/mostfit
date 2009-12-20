@@ -107,6 +107,7 @@ class LoanHistory
     ids=repository.adapter.query("SELECT loan_id, max(date) date FROM loan_history 
                                   WHERE status in (5,6) AND date>='#{from_date}' AND date<='#{to_date}' GROUP BY loan_id"
                                  ).collect{|x| "(#{x.loan_id}, '#{x.date.to_s}')"}.join(",")
+    return false if ids.length==0
     repository.adapter.query(%Q{
       SELECT 
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,

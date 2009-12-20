@@ -1,32 +1,39 @@
 class ConsolidatedReport < Report
-  attr_accessor :from_date, :to_date, :branch_id, :center_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id
 
-  def initialize(from_date=Date.today-7, to_date=Date.today)
-    @from_date   =  (from_date.class==Date) ? from_date : Date.parse(from_date)
-    @to_date     =  (to_date.class==Date) ?   to_date : Date.parse(to_date)
-    @name        = "Report from #{@from_date.strftime("%d-%m-%Y")} to #{@to_date.strftime("%d-%m-%Y")}"
-  end
+  def initialize(params, dates)
+    @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 7
+    @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
+    
+    @name   = "Report from #{@from_date.strftime("%d-%m-%Y")} to #{@to_date.strftime("%d-%m-%Y")}"
+    @branch = if params and params[:branch_id] and not params[:branch_id].nil?
+                Branch.all(:id => params[:branch_id])
+              else
+                Branch.all(:order => [:name])
+              end    
+    @center = Center.get(params[:center_id]) if params and params[:center_id] and not params[:center_id].blank?
+ end
   
   def name
     "Report from #{@from_date.strftime("%d-%m-%Y")} to #{@to_date.strftime("%d-%m-%Y")}"
   end
   
-  def generate(params)
+  def generate
     branches, centers, groups = {}, {}, {}
     histories = LoanHistory.sum_outstanding_by_group(self.from_date, self.to_date)
-    ((params and params[:branch_id] and not params[:branch_id].blank?) ? Branch.all(:id => params[:branch_id]) : Branch.all(:order => [:name])).each{|b|      
+    @branch.each{|b|
       groups[b.id]||= {}
       branches[b.id] = b
       
       b.centers.each{|c|
-        next if params and params[:center_id] and not params[:center_id].blank? and not params[:center_id].to_i==c.id
+        next if @center and @center.id!=c.id
         groups[b.id][c.id]||= {}
         centers[c.id]  = c
         c.client_groups.each{|g|
           #0              1                 2                3              4              5     6                  7         8    9,10,11     12         13
           #amount_applied,amount_sanctioned,amount_disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults, name
           groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, g.name]
-          history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id}
+          history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id} if histories
           if history
             principal_scheduled = history.scheduled_outstanding_principal.to_i
             total_scheduled     = history.scheduled_outstanding_total.to_i

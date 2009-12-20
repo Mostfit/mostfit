@@ -1,18 +1,23 @@
 class DailyReport < Report
   attr_accessor :date
 
-  def initialize(date=Date.today)
-    @date   =  (date.class==Date) ? date : Date.parse(date)
+  def initialize(params, dates)
+    @date   =  dates[:date]||Date.today
     @name   = "Report for #{@date.strftime("%d-%m-%Y")}"
+    if params and params[:branch_id] and not params[:branch_id].nil?
+      @branch = Branch.all(params[:branch_id])
+    else
+      @branch = Branch.all(:order => [:name])
+    end
   end
   
   def name
     "Report for #{date.strftime("%d-%m-%Y")}"
   end
   
-  def generate(params)
+  def generate
     branches, centers, groups = {}, {}, {}
-    (params[:branch_id].nil? ? Branch.all(:order => [:name]) : Branch.all(params[:branch_id])).each{|b|
+    @branch.each{|b|
       groups[b.id]||= {}
       branches[b.id] = b
       b.centers.each{|c|
