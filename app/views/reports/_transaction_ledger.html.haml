@@ -59,7 +59,7 @@
               %b
                 =@centers[center_id].name
           - center_total = Array.new(length-2, 0)
-          -groups.sort_by{|group_id, group| group[-1]}.each do |group_id, clients|
+          -groups.each do |group_id, clients|
             -flag=false; clients.each{|client| if @payments[client.id].keys.length>0; flag=true; end}
             -if flag
               %tr

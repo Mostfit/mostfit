@@ -6,7 +6,8 @@ class TransactionLedger < Report
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
 
     @name     = "Report from #{@from_date.strftime("%d-%m-%Y")} to #{@to_date.strftime("%d-%m-%Y")}"
-    @branch   = if params and params[:branch_id] and not params[:branch_id].nil?
+
+    @branch   = if params and params[:branch_id] and not params[:branch_id].blank?
                    Branch.all(:id => params[:branch_id])
                  else
                    Branch.all(:order => [:name])
@@ -33,7 +34,7 @@ class TransactionLedger < Report
         next if @center and not @center.find{|x| x.id==c.id}
         clients[b.id][c.id]||= {}
         centers[c.id]        = c
-        c.client_groups.each{|g|
+        c.client_groups.sort_by{|x| x.name}.each{|g|
           groups[g.id] = g
           clients[b.id][c.id][g.id] ||= []
           clients_grouped[g.id].each{|client|
