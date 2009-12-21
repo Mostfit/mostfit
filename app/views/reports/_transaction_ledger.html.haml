@@ -1,23 +1,28 @@
 = form_for(@report, :action => url(:show_report, :report_type => "TransactionLedger"), :method => :get) do
   %table
+    - branch_id = (params[:transaction_ledger] and params[:transaction_ledger][:branch_id]) ? params[:transaction_ledger][:branch_id] : nil
+    - center_id = (params[:transaction_ledger] and params[:transaction_ledger][:center_id]) ? params[:transaction_ledger][:center_id] : nil
+    - staff_member_id = (params[:transaction_ledger] and params[:transaction_ledger][:staff_member_id]) ? params[:transaction_ledger][:staff_member_id] : nil
     %tr
       %td
-        From date
-      %td
+        From date: 
         =date_select_for(@report, "from_date", :date => @report.from_date)
       %td
-        Upto date
-      %td
+        Upto date: 
         =date_select_for(@report, "to_date", :date => @report.to_date)
+      %td
+        Staff members:
+        =select(:staff_member_id , :collection => StaffMember.all.map{|x| [x.id, x.name]}, :include_blank => true, :selected => staff_member_id)
     %tr
       %td
-        - branch_id = (params[:transaction_ledger] and params[:transaction_ledger][:branch_id]) ? params[:transaction_ledger][:branch_id] : nil
-        - center_id = (params[:transaction_ledger] and params[:transaction_ledger][:center_id]) ? params[:transaction_ledger][:center_id] : nil
         Branch: 
         =select(:branch_id , :collection => Branch.all, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id)
       %td
-        Center: 
-        - centers = (branch_id and not branch_id.blank?) ? Center.all(:branch_id => branch_id, :order => [:name]) : Center.all(:order => [:name])
+        Center:
+        - if (staff_member_id and not staff_member_id.blank?)
+          - centers = StaffMember.get(staff_member_id).centers
+        - else
+          - centers = (branch_id and not branch_id.blank?) ? Center.all(:branch_id => branch_id, :order => [:name]) : Center.all(:order => [:name])
         =select(:center_id , :collection => centers.all.map{|x| [x.id, "#{x.branch.name} -- #{x.name}"]}, :include_blank => true, :selected => center_id)
       %td
         =submit "Go"
@@ -25,9 +30,9 @@
 %table.report
   %tr
     %th{:width => '20%'}
-      Client
-    %th{:width => '20%'}
       Date
+    %th{:width => '20%'}
+      Client
     %th
       Disbursed
     %th{:colspan => "4"}
@@ -46,46 +51,68 @@
       Total
   - center_id, branch_id = nil, nil
   - length = 7
-
+  - groups_available = @payments.values.collect{|x| x.keys}.flatten.uniq
   -@clients.each do |branch_id, centers|
     -if centers.keys.length>0
       -branch_total = []
       %tr
-        %td.group{:colspan => length}
+        %td.branch{:colspan => length}
           %b
             =@branches[branch_id].name
       -centers.sort_by{|center_id, groups| @centers[center_id].name}.each do |center_id, groups|
-        -if groups.keys.length>0
+        -if groups.keys.length>0 and (groups.keys & groups_available).length>0
           %tr
             %td.center{:colspan => length}
               %b
                 =@centers[center_id].name
           - center_total = Array.new(length-2, 0)
           -groups.each do |group_id, clients|
-            -flag=false; clients.each{|client| if @payments[client.id].keys.length>0; flag=true; end}
-            -if flag
+            -if groups_available.include?(group_id)
+              -group_total = Array.new(length-2, 0)
               %tr
-                %td.center{:colspan => length, :style => "text-align: center; background-color: #efefef;"}
-                  =@groups[group_id].name
-              -clients.each_with_index do |client, idx|
-                - if @payments[client.id].keys.length>0
-                  -@payments[client.id].keys.sort.each_with_index do |date, idx|
+                %td.group{:colspan => length}
+                  %b=@groups[group_id].name
+
+              -date_total = Array.new(length-2, 0)
+              -@payments.keys.sort.each_with_index do |date, idx|
+                -if @payments[date] and @payments[date][group_id] and @payments[date][group_id].keys.length>0
+                  -@payments[date][group_id].keys.each_with_index do |client_id, idx|
                     %tr
                       %td
-                        =client.name
-                      %td
                         = date
+                      %td
+                        =clients.find{|x| x.id==client_id}.name
                       -sum=0
-                      -@payments[client.id][date].each_with_index do |e, col|
+                      -@payments[date][group_id][client_id].each_with_index do |e, col|
                         %td
                           =e
                           -sum+=e if col>0
                           -center_total[col]+=e
+                          -group_total[col]+=e
+                          -date_total[col]+=e
                       %td
                         =sum
-                        -center_total[-1]+=sum
+                        -center_total[-1]+= sum
+                        -group_total[-1] += sum
+                        -date_total[-1]  += sum
+                  %tr
+                    %td.group_total
+                      %b
+                        Date total
+                    %td
+                      -group_total.each do |ele|
+                        %td
+                          %b=ele
+              %tr
+                %td.group_total
+                  %b==Group total
+                %td
+                -group_total.each do |ele|
+                  %td
+                    %b
+                      =ele
           %tr
-            %td{:style => "text-align: center; background-color: #efefef;"}
+            %td.center_total
               %b==Center total:
               -branch_total.push(center_total)
             %td
@@ -93,12 +120,14 @@
               %td
                 %b
                   =ele
-      %tr
-        %td{:style => "text-align: center; background-color: #ccc;"}
-          %b==Branch total:
-        %td
-        -branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
+      - branch_sum_arr = branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
+      - if branch_sum_arr.reduce{|x, sum| sum+=x}
+        %tr
+          %td.branch_total
+            %b==Branch total:
           %td
-            %b
-              =ele
+          -branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
+            %td
+              %b
+                =ele
 

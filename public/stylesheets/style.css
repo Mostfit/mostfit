@@ -591,15 +591,30 @@ table.report td{
 }
 table.report td.group{
     text-align: center; 
-    background-color: #ddd;
+    background-color: #eee;
     font-size: 0.95em;
 }
-
+table.report td.branch{
+    text-align: center; 
+    background-color: #ccc;
+    font-size: 0.95em;
+}
 table.report td.center{
     border: 1px solid;
     border-color: #ccc;
     text-align: center;
-    font-size: 0.9em; 
-    background-color: #efefef;
+    font-size: 1em; 
+    background-color: #ddd;
 }
-
+td.group_total{
+    text-align: center; 
+    background-color: #eee;    
+}
+td.center_total{
+    text-align: center; 
+    background-color: #ddd;
+}
+td.branch_total{
+    text-align: center; 
+    background-color: #ccc;    
+}

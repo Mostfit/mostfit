@@ -1,5 +1,5 @@
 class TransactionLedger < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id
 
   def initialize(params, dates)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today
@@ -14,6 +14,8 @@ class TransactionLedger < Report
                  end
     if params and params[:center_id] and not params[:center_id].blank? 
       @center = Center.all(:id => params[:center_id])
+    elsif params and params[:staff_member_id] and not params[:staff_member_id].blank?
+      @center = StaffMember.get(params[:staff_member_id]).centers
     else
       @center  = @branch.collect{|b| b.centers}.flatten
     end
@@ -39,7 +41,6 @@ class TransactionLedger < Report
           clients[b.id][c.id][g.id] ||= []
           clients_grouped[g.id].each{|client|
             clients[b.id][c.id][g.id].push(client)
-            payments[client.id]||={}
           } if clients_grouped[g.id]
         }
       }
@@ -49,20 +50,26 @@ class TransactionLedger < Report
       #0          1,                 2                3
       #disbursed, payment_principal, payment_interest,payment_fee      
       client = p.loan.client
-      next if not payments[client.id]
-      payments[client.id][p.received_on] = [0, 0, 0, 0] if not payments[client.id][p.received_on]
+      payments[p.received_on]||={}
+      payments[p.received_on][client.client_group_id]||={}
+      payments[p.received_on][client.client_group_id][client.id]||=[0, 0, 0, 0]
+
+      next if not payments[p.received_on][client.client_group_id][client.id]
+
       if p.type == :principal
-        payments[client.id][p.received_on][1] += p.amount
+        payments[p.received_on][client.client_group_id][client.id][1] += p.amount
       elsif p.type == :interest
-        payments[client.id][p.received_on][2] += p.amount
+        payments[p.received_on][client.client_group_id][client.id][2] += p.amount
       elsif p.type == :fees
-        payments[client.id][p.received_on][3] += p.amount
+        payments[p.received_on][client.client_group_id][client.id][3] += p.amount
       end
     }
+
     Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date).each{|loan|
-      next if not payments[loan.client_id]
-      payments[loan.client_id][loan.disbursal_date] = [0, 0, 0, 0] if not payments[loan.client_id][loan.disbursal_date]
-      payments[loan.client_id][loan.disbursal_date][0] = loan.amount
+      payments[loan.disbursal_date]||={}
+      payments[loan.disbursal_date][loan.client.client_group_id] ||= {}
+      payments[loan.disbursal_date][loan.client.client_group_id][loan.client_id]||=[0, 0, 0, 0]
+      payments[loan.disbursal_date][loan.client.client_group_id][loan.client_id][0] = loan.amount
     }
     return [groups, centers, branches, payments, clients]
   end
