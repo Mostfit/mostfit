@@ -14,7 +14,7 @@ class TransactionLedger < Report
     if params and params[:center_id] and not params[:center_id].blank? 
       @center = Center.all(:id => params[:center_id])
     else
-      @center  = branch.centers
+      @center  = @branch.collect{|b| b.centers}.flatten
     end
   end 
   
@@ -39,7 +39,7 @@ class TransactionLedger < Report
           clients_grouped[g.id].each{|client|
             clients[b.id][c.id][g.id].push(client)
             payments[client.id]||={}
-          }
+          } if clients_grouped[g.id]
         }
       }
     }
