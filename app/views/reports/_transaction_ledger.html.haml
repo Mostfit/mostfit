@@ -73,8 +73,8 @@
                 %td.group{:colspan => length}
                   %b=@groups[group_id].name
 
-              -date_total = Array.new(length-2, 0)
               -@payments.keys.sort.each_with_index do |date, idx|
+                -date_total = Array.new(length-2, 0)
                 -if @payments[date] and @payments[date][group_id] and @payments[date][group_id].keys.length>0
                   -@payments[date][group_id].keys.each_with_index do |client_id, idx|
                     %tr
@@ -100,7 +100,7 @@
                       %b
                         Date total
                     %td
-                      -group_total.each do |ele|
+                      -date_total.each do |ele|
                         %td
                           %b=ele
               %tr
