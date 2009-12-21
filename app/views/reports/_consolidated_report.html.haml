@@ -67,7 +67,7 @@
     -if centers.keys.length>0
       -branch_total = []
       %tr
-        %td.group{:colspan => length+1}
+        %td.branch{:colspan => length+1}
           %b
             =@branches[group_id].name
       -centers.sort_by{|center_id, groups| @centers[center_id].name}.each do |center_id, groups|
