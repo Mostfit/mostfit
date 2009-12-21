@@ -30,7 +30,7 @@
       Date
     %th
       Disbursed
-    %th{:colspan => "3"}
+    %th{:colspan => "4"}
       Payment
   %tr
     %th
@@ -42,8 +42,10 @@
       Interest
     %th
       Fee
+    %th
+      Total
   - center_id, branch_id = nil, nil
-  - length = 6
+  - length = 7
 
   -@clients.each do |branch_id, centers|
     -if centers.keys.length>0
@@ -73,10 +75,15 @@
                         =client.name
                       %td
                         = date
+                      -sum=0
                       -@payments[client.id][date].each_with_index do |e, col|
                         %td
                           =e
+                          -sum+=e if col>0
                           -center_total[col]+=e
+                      %td
+                        =sum
+                        -center_total[-1]+=sum
           %tr
             %td{:style => "text-align: center; background-color: #efefef;"}
               %b==Center total:
