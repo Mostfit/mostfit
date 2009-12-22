@@ -15,7 +15,7 @@
         =select(:staff_member_id , :collection => StaffMember.all.map{|x| [x.id, x.name]}, :include_blank => true, :selected => staff_member_id)
     %tr
       %td
-        Branch: 
+        Branch:
         =select(:branch_id , :collection => Branch.all, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id)
       %td
         Center:
@@ -66,17 +66,17 @@
               %b
                 =@centers[center_id].name
           - center_total = Array.new(length-2, 0)
-          -groups.each do |group_id, clients|
+          -groups.sort_by{|x| @groups[x[0]].name}.each do |group_id, clients|
             -if groups_available.include?(group_id)
               -group_total = Array.new(length-2, 0)
               %tr
                 %td.group{:colspan => length}
                   %b=@groups[group_id].name
 
-              -@payments.keys.sort.each_with_index do |date, idx|
+              -@payments.keys.sort.each do |date|
                 -date_total = Array.new(length-2, 0)
                 -if @payments[date] and @payments[date][group_id] and @payments[date][group_id].keys.length>0
-                  -@payments[date][group_id].keys.each_with_index do |client_id, idx|
+                  -@payments[date][group_id].keys.sort_by{|x| clients.find{|c| c.id==x}.name}.each do |client_id|
                     %tr
                       %td
                         = date
@@ -130,4 +130,3 @@
             %td
               %b
                 =ele
-
