@@ -1,15 +1,15 @@
 class Fee
   include DataMapper::Resource
   
-  PAYABLE = [:applied_on, :approved_on, :disbursal_date, :scheduled_first_payment_date, :first_payment_date, :grt_date]
+  PAYABLE = [:loan_applied_on, :loan_approved_on, :loan_disbursal_date, :loan_scheduled_first_payment_date, :loan_first_payment_date, :client_grt_pass_date, :client_date_joined]
 
-  property :id, Serial
-  property :name, String, :nullable => false
-  property :percentage, Float
-  property :amount, Integer
-  property :min_amount, Integer
-  property :max_amount, Integer
-  property :payable_on, Enum.send('[]',*PAYABLE), :nullable => false
+  property :id,            Serial
+  property :name,          String, :nullable => false
+  property :percentage,    Float
+  property :amount,        Integer
+  property :min_amount,    Integer
+  property :max_amount,    Integer
+  property :payable_on,    Enum.send('[]',*PAYABLE), :nullable => false
 
   has n, :loan_products, :through => Resource
 
