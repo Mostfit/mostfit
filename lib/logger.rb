@@ -3,7 +3,14 @@ module Misfit
     def self.start(controllers)
       controllers.each do |c|
         puts "logging #{c}\n"
-        cont = Kernel.const_get(c)
+        if c.index("::")  
+        debugger
+          k = Kernel.const_get(c.split("::")[0])
+          c = c.split("::")[1]
+        else 
+          k = Kernel
+        end
+        cont = k.const_get(c)
         cont.class_eval do
           include Misfit::ControllerFunctions
         end
@@ -29,12 +36,14 @@ module Misfit
 
 
     def get_object_state
+      debugger
       model = self.class.to_s.singular
       object = eval"#{model}.get(params[:id])"
       @ributes = object.attributes
     end
     
     def _log
+      debugger
       f = File.open("log/#{self.class}.log","a")
       object = eval("@#{self.class.to_s.downcase.singular}")
       if object

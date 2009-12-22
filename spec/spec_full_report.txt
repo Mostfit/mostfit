@@ -1,57 +1,17 @@
 
-resource(@center) PUT
-- redirect to the article show action (FAILED - 1)
+Fee
+- should have a name
+- should have either an amount or a percentage
+- should never return less than min_amount
+- should never return more than max_amount
+- should return correct fee_schedule for loan
+- should return correct fee_schedule for multiple fees even on the same date
+- should return correct fees payable
+- should return correct fees_paid
+- should give correct fee schedule for client
+- should work just as well for another fee
+- should pay client fees correctly
 
-resource(@center) GET
-- responds successfully
+Finished in 4.262922 seconds
 
-resource(@center, :edit)
-- responds successfully (FAILED - 2)
-
-resource(:centers, :new)
-- responds successfully
-
-resource(@center) a successful DELETE
-- should redirect to the index action (FAILED - 3)
-
-resource(:centers) a successful POST
-- redirects to resource(:centers) (FAILED - 4)
-
-resource(:centers) GET
-- has a list of centers (PENDING: TODO)
-
-resource(:centers) GET
-- responds successfully
-- contains a list of centers (PENDING: TODO)
-
-Pending:
-
-resource(:centers) GET has a list of centers (TODO)
-./spec/requests/centers_spec.rb:36
-
-resource(:centers) GET contains a list of centers (TODO)
-./spec/requests/centers_spec.rb:24
-
-1)
-'resource(@center) PUT redirect to the article show action' FAILED
-Expected a PUT to 'http://example.org/centers/1?center[id]=1' to be a redirect, but it returned status code 500.
-./spec/requests/centers_spec.rb:110:
-
-2)
-'resource(@center, :edit) responds successfully' FAILED
-Expected a GET to 'http://example.org/centers/1/edit' to be successful, but it returned a 500
-./spec/requests/centers_spec.rb:86:
-
-3)
-'resource(@center) a successful DELETE should redirect to the index action' FAILED
-Expected a DELETE to 'http://example.org/branches/2/centers/1' to redirect to </branches/1/centers>, but it redirected to </branches/2/centers?_message=BAh7BjoLbm90aWNlIidDZW50ZXIgJ0pRWklJMDAxJyBoYXMgYmVlbiBkZWxl%0AdGVk%0A>
-./spec/requests/centers_spec.rb:64:
-
-4)
-'resource(:centers) a successful POST redirects to resource(:centers)' FAILED
-Expected a POST to 'http://example.org/branches/1/centers' to redirect to </centers/54>, but it redirected to </branches/1/centers?_message=BAh7BjoLbm90aWNlIiZDZW50ZXIgJ2FiYycgc3VjY2Vzc2Z1bGx5IGNyZWF0%0AZWQ%3D%0A>
-./spec/requests/centers_spec.rb:51:
-
-Finished in 105133.545492 seconds
-
-9 examples, 4 failures, 2 pending
+11 examples, 0 failures
