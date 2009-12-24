@@ -77,24 +77,30 @@
                 -date_total = Array.new(length-2, 0)
                 -if @payments[date] and @payments[date][group_id] and @payments[date][group_id].keys.length>0
                   -@payments[date][group_id].keys.sort_by{|x| clients.find{|c| c.id==x}.name}.each do |client_id|
-                    %tr
-                      %td
-                        = date
-                      %td
-                        =clients.find{|x| x.id==client_id}.name
-                      -sum=0
-                      -@payments[date][group_id][client_id].each_with_index do |e, col|
+                    -itr=@payments[date][group_id][client_id].collect{|x| x.length}.max
+                    -itr.times do |i|
+                      %tr
                         %td
-                          =e
-                          -sum+=e if col>0
-                          -center_total[col]+=e
-                          -group_total[col]+=e
-                          -date_total[col]+=e
-                      %td
-                        =sum
-                        -center_total[-1]+= sum
-                        -group_total[-1] += sum
-                        -date_total[-1]  += sum
+                          = date
+                        %td
+                          =clients.find{|x| x.id==client_id}.name
+                        -sum=0
+                        -@payments[date][group_id][client_id].each_with_index do |e, col|
+                          %td
+                            -if e[i]
+                              =e[i]
+                              -e_val = e[i]
+                              -sum += e_val
+                              -center_total[col]+= e_val
+                              -group_total[col] += e_val
+                              -date_total[col]  += e_val
+                            -else
+                              0
+                        %td
+                          =sum
+                          -center_total[-1]+= sum
+                          -group_total[-1] += sum
+                          -date_total[-1]  += sum
                   %tr
                     %td.group_total
                       %b

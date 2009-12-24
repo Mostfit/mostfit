@@ -52,24 +52,24 @@ class TransactionLedger < Report
       client = p.loan.client
       payments[p.received_on]||={}
       payments[p.received_on][client.client_group_id]||={}
-      payments[p.received_on][client.client_group_id][client.id]||=[0, 0, 0, 0]
+      payments[p.received_on][client.client_group_id][client.id]||=[[], [], [], []]
 
       next if not payments[p.received_on][client.client_group_id][client.id]
 
       if p.type == :principal
-        payments[p.received_on][client.client_group_id][client.id][1] += p.amount
+        payments[p.received_on][client.client_group_id][client.id][1] << p.amount
       elsif p.type == :interest
-        payments[p.received_on][client.client_group_id][client.id][2] += p.amount
+        payments[p.received_on][client.client_group_id][client.id][2] << p.amount
       elsif p.type == :fees
-        payments[p.received_on][client.client_group_id][client.id][3] += p.amount
+        payments[p.received_on][client.client_group_id][client.id][3] << p.amount
       end
     }
 
     Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date).each{|loan|
       payments[loan.disbursal_date]||={}
       payments[loan.disbursal_date][loan.client.client_group_id] ||= {}
-      payments[loan.disbursal_date][loan.client.client_group_id][loan.client_id]||=[0, 0, 0, 0]
-      payments[loan.disbursal_date][loan.client.client_group_id][loan.client_id][0] = loan.amount
+      payments[loan.disbursal_date][loan.client.client_group_id][loan.client_id]||=[[], [], [], []]
+      payments[loan.disbursal_date][loan.client.client_group_id][loan.client_id][0] << loan.amount
     }
     return [groups, centers, branches, payments, clients]
   end
