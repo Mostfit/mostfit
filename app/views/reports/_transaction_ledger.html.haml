@@ -80,9 +80,9 @@
                     -itr=@payments[date][group_id][client_id].collect{|x| x.length}.max
                     -itr.times do |i|
                       %tr
-                        %td
-                          = date
-                        %td
+                        %td.align_left
+                          = date.strftime("%d-%m-%Y")
+                        %td.align_left
                           =clients.find{|x| x.id==client_id}.name
                         -sum=0
                         -@payments[date][group_id][client_id].each_with_index do |e, col|
