@@ -256,7 +256,6 @@ class Loan
       # the payment is filed on received_on without knowing about the future
       # it could happen that payment have been made after this payment
       # here the validations on the Payment should 
-      debugger
       total        = input
       total_fees_due_on_date = total_fees_payable_on(received_on)
       fees_paid = [amount, total_fees_due_on_date].min
