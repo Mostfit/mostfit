@@ -47,7 +47,7 @@ class Loan
   belongs_to :loan_product
 
   validates_with_method  :amount,                       :method => :amount_greater_than_zero?
-  validates_with_method  :amount,                       :method => :installments_are_integers?
+#  validates_with_method  :amount,                       :method => :installments_are_integers?
   validates_with_method  :interest_rate,                :method => :interest_rate_greater_than_zero?
   validates_with_method  :number_of_installments,       :method => :number_of_installments_greater_than_zero?
   validates_with_method  :applied_on,                   :method => :applied_before_appoved?
@@ -256,6 +256,7 @@ class Loan
       # the payment is filed on received_on without knowing about the future
       # it could happen that payment have been made after this payment
       # here the validations on the Payment should 
+      debugger
       total        = input
       total_fees_due_on_date = total_fees_payable_on(received_on)
       fees_paid = [amount, total_fees_due_on_date].min

@@ -4,7 +4,6 @@ module Misfit
       controllers.each do |c|
         puts "logging #{c}\n"
         if c.index("::")  
-        debugger
           k = Kernel.const_get(c.split("::")[0])
           c = c.split("::")[1]
         else 
@@ -48,8 +47,12 @@ module Misfit
       object = eval("@#{self.class.to_s.downcase.singular}")
       if object
         attributes = object.attributes
-        diff = @ributes.diff(attributes)
-        diff = diff.map{|k| {k => [@ributes[k],attributes[k]]} if k != :updated_at}.to_yaml
+        if @ributes
+          diff = @ributes.diff(attributes)
+          diff = diff.map{|k| {k => [@ributes[k],attributes[k]]} if k != :updated_at}.to_yaml
+        else
+          diff = ""
+        end
         log = AuditTrail.new(:auditable_id => object.id,
                              :auditable_type => object.class.to_s,
                              :user_name => session.user.login,

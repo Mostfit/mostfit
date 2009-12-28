@@ -8,10 +8,12 @@ class Payment
   # before :valid?, :add_loan_product_validations
   # after :valid?, :after_valid
   attr_writer :total  # just to be used in the form
+
+  PAYMENT_TYPES = [:principal, :interest, :fees]
   
   property :id,                 Serial
   property :amount,             Integer, :nullable => false, :index => true
-  property :type,               Enum[:principal, :interest, :fees], :index => true
+  property :type,               Enum.send('[]',*PAYMENT_TYPES), :index => true
   property :comment,            String, :length => 50
   property :received_on,        Date,    :nullable => false, :index => true
   property :deleted_by_user_id, Integer, :nullable => true, :index => true
@@ -53,6 +55,9 @@ class Payment
     amount
   end
 
+  def self.types
+    PAYMENT_TYPES
+  end
 
   private
   include DateParser  # mixin for the hook "before: valid?, :parse_dates"
