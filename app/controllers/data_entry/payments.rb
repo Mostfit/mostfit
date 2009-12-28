@@ -54,22 +54,28 @@ module DataEntry
     end
     
     def create(payment)
+      debugger
       raise NotFound unless @loan = Loan.get(payment[:loan_id])
-      
-      amounts = params[:total].to_i
-      unless amounts > 0  # if no total is given we use the principal/interest duo
-        amounts = [params[:principal].to_i, params[:interest].to_i]
-      end
+      amounts = payment[:amount].to_i
       receiving_staff = StaffMember.get(payment[:received_by])
       # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
-      succes, @payment = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff)
+      if payment[:type] == "total"
+        succes, @prin, @int, @fees  = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff)
+      else
+        payment[:received_by] = StaffMember.get(payment[:received_by]) #???
+        payment[:created_by] = session.user
+        @payment = Payment.new(payment)
+        succes = @payment.save
+      end
       if succes  # true if saved
         if params[:format]=='xml'
-          display @payment, ""
+          display [@prin, @int, @fees], ""
         else
           redirect url(:enter_payments, :action => 'record'), :message => {:notice => "Payment ##{@payment.id} has been registered"}
         end
       else
+        @payment ||= Payment.new
+        [@prin, @int, @fees].each {|o| o.errors.keys.each {|k| @payment.errors[k] = o.errors[k]} if o}
         params[:format]=='xml' ? display(@payment, :status => 400) : render(:record)
       end
     end

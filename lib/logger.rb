@@ -44,22 +44,25 @@ module Misfit
     def _log
       debugger
       f = File.open("log/#{self.class}.log","a")
-      object = eval("@#{self.class.to_s.downcase.singular}")
-      if object
-        attributes = object.attributes
-        if @ributes
-          diff = @ributes.diff(attributes)
-          diff = diff.map{|k| {k => [@ributes[k],attributes[k]]} if k != :updated_at}.to_yaml
-        else
-          diff = ""
+      begin
+        object = eval("@#{self.class.to_s.downcase.singular}")
+        if object
+          attributes = object.attributes
+          if @ributes
+            diff = @ributes.diff(attributes)
+            diff = diff.map{|k| {k => [@ributes[k],attributes[k]]} if k != :updated_at}.to_yaml
+          else
+            diff = ""
+          end
+          log = AuditTrail.new(:auditable_id => object.id,
+                               :auditable_type => object.class.to_s,
+                               :user_name => session.user.login,
+                               :action => params[:action],
+                               :changes => diff,
+                               :type => :log)
+          log.save
         end
-        log = AuditTrail.new(:auditable_id => object.id,
-                             :auditable_type => object.class.to_s,
-                             :user_name => session.user.login,
-                             :action => params[:action],
-                             :changes => diff,
-                             :type => :log)
-        log.save
+      rescue
       end
     end
   end
