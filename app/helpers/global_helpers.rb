@@ -1,5 +1,5 @@
 module Merb
-  module GlobalHelpers
+  module GlobalHelpers    
     def link_to_with_class(name, url)
       link_to(name, url, :class => ((request.uri==(url) or request.uri.index(url)==0) ? "selected" : ""))
     end
