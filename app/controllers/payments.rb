@@ -65,7 +65,7 @@ class Payments < Application
     only_provides :html
     @payment = Payment.get(id)
     raise NotFound unless @payment
-    display @payment
+    redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
   end
 
   def destroy(id)

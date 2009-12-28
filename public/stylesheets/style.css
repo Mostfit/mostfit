@@ -618,3 +618,6 @@ td.branch_total{
     text-align: center; 
     background-color: #ccc;    
 }
+td.align_left{
+    text-align: left;
+}

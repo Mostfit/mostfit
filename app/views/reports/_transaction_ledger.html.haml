@@ -15,7 +15,7 @@
         =select(:staff_member_id , :collection => StaffMember.all.map{|x| [x.id, x.name]}, :include_blank => true, :selected => staff_member_id)
     %tr
       %td
-        Branch: 
+        Branch:
         =select(:branch_id , :collection => Branch.all, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id)
       %td
         Center:
@@ -66,35 +66,41 @@
               %b
                 =@centers[center_id].name
           - center_total = Array.new(length-2, 0)
-          -groups.each do |group_id, clients|
+          -groups.sort_by{|x| @groups[x[0]].name}.each do |group_id, clients|
             -if groups_available.include?(group_id)
               -group_total = Array.new(length-2, 0)
               %tr
                 %td.group{:colspan => length}
                   %b=@groups[group_id].name
 
-              -@payments.keys.sort.each_with_index do |date, idx|
+              -@payments.keys.sort.each do |date|
                 -date_total = Array.new(length-2, 0)
                 -if @payments[date] and @payments[date][group_id] and @payments[date][group_id].keys.length>0
-                  -@payments[date][group_id].keys.each_with_index do |client_id, idx|
-                    %tr
-                      %td
-                        = date
-                      %td
-                        =clients.find{|x| x.id==client_id}.name
-                      -sum=0
-                      -@payments[date][group_id][client_id].each_with_index do |e, col|
+                  -@payments[date][group_id].keys.sort_by{|x| clients.find{|c| c.id==x}.name}.each do |client_id|
+                    -itr=@payments[date][group_id][client_id].collect{|x| x.length}.max
+                    -itr.times do |i|
+                      %tr
+                        %td.align_left
+                          = date.strftime("%d-%m-%Y")
+                        %td.align_left
+                          =clients.find{|x| x.id==client_id}.name
+                        -sum=0
+                        -@payments[date][group_id][client_id].each_with_index do |e, col|
+                          %td
+                            -if e[i]
+                              =e[i]
+                              -e_val = e[i]
+                              -sum += e_val
+                              -center_total[col]+= e_val
+                              -group_total[col] += e_val
+                              -date_total[col]  += e_val
+                            -else
+                              0
                         %td
-                          =e
-                          -sum+=e if col>0
-                          -center_total[col]+=e
-                          -group_total[col]+=e
-                          -date_total[col]+=e
-                      %td
-                        =sum
-                        -center_total[-1]+= sum
-                        -group_total[-1] += sum
-                        -date_total[-1]  += sum
+                          =sum
+                          -center_total[-1]+= sum
+                          -group_total[-1] += sum
+                          -date_total[-1]  += sum
                   %tr
                     %td.group_total
                       %b
@@ -130,4 +136,3 @@
             %td
               %b
                 =ele
-
