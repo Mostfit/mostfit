@@ -25,6 +25,7 @@ class Loan
   property :validation_comment,             Text
   property :created_at,                     DateTime, :index => true
   property :updated_at,                     DateTime, :index => true
+  property :deleted_at,                     ParanoidDateTime
   property :loan_product_id,                Integer,  :index => true
 
   property :applied_by_staff_id,            Integer, :nullable => true, :index => true 
