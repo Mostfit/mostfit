@@ -1,32 +1,14 @@
 %table.form
-  - if @loan.repayment_style == :allow_both
-    %tr
-      %td
-      %td Either provide both the principal and interest:
-  - if [:allow_both, :separated].include? @loan.repayment_style
-    %tr                                                  
-      %td Principal:
-      %td
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        = text_field :name => :principal, :size => 40
-    %tr
-      %td Interest:
-      %td
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        = text_field :name => :interest, :size => 40
-  - if @loan.repayment_style == :allow_both
-    %tr
-      %td
-      %td Or supply the total amount paid and we split it according to the loan type:
-  - if [:allow_both, :aggregated].include? @loan.repayment_style
-    %tr
-      %td Total:
-      %td
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        = text_field :name => :total, :size => 40
   %tr
     %td
+      Amount
     %td
+      = text_field :amount
+  %tr
+    %td
+      Type
+    %td
+      = select :type, :collection => [:total] + Payment.types, :text_method => :to_s, :value_method => :to_s
   %tr
     %td Received:
     %td

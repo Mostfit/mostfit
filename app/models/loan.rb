@@ -48,7 +48,7 @@ class Loan
   belongs_to :loan_product
 
   validates_with_method  :amount,                       :method => :amount_greater_than_zero?
-  validates_with_method  :amount,                       :method => :installments_are_integers?
+#  validates_with_method  :amount,                       :method => :installments_are_integers?
   validates_with_method  :interest_rate,                :method => :interest_rate_greater_than_zero?
   validates_with_method  :number_of_installments,       :method => :number_of_installments_greater_than_zero?
   validates_with_method  :applied_on,                   :method => :applied_before_appoved?
