@@ -13,7 +13,9 @@
       %b
         = @client.name
       == (id: #{@client.id}, ref: #{@client.reference})
-      == (#{link_to 'edit', url(:enter_clients, :action => 'edit', :id => @client)})
+      (
+      =link_to('edit', params[:controller]=="data_entry/clients" ? url(:enter_clients, :action => 'edit', :id => @client) : resource(@branch, @center, @client, :edit))
+      )
   %tr
     %td spouse name
     %td

@@ -10,6 +10,13 @@
     %td
       = select :type, :collection => [:total] + Payment.types, :text_method => :to_s, :value_method => :to_s
   %tr
+    %td
+      Repayment Style
+    %td
+      = select :name => :style, :collection => [["normal","int. then prin."],["prorata","pro rata"]]
+      %span.small
+        only applies to "total" repayment type
+  %tr
     %td Received:
     %td
       on&nbsp;&nbsp;
