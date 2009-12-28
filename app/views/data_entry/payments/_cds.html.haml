@@ -19,7 +19,7 @@
         %th interest due
         %th total due
         %th paid
-        %th attended
+        %th repayment type
           
     %tbody{:style => "text-align:left;" }
       - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_fees, tot_total = 0, 0, 0, 0, 0, 0, 0
@@ -69,9 +69,9 @@
               - if a == 0
                 = lh.nil? ? 0 : (lh.principal_paid.to_i + lh.interest_paid.to_i)
               - else 
-                = text_field :name => "paid[#{loan.id}", :value => a, :cols => "5", :style => "width:50px;" 
+                = text_field :name => "paid[loan][#{loan.id}", :value => (a > 0 ? a : 0), :cols => "5", :style => "width:50px;" 
             %td
-              = check_box :name => "attendancy[#{lh.client_id if lh} ]", :checked => true
+              = select :name => "payment_style[#{loan.id}]", :collection => [["normal","int. then prin."],["prorata","pro rata"]]
 
         - if loan_row_count == 0
           %tr{ :class => cycle('odd','') }

@@ -243,7 +243,9 @@ class Loan
   # this is the method used for creating payments, not directly on the Payment class
   # for +input+ it allows either a "total" amount as Fixnum or an array with
   # principal[0] and interest[1].
-  def repay(input, user, received_on, received_by, defer_update = false)
+
+
+  def repay(input, user, received_on, received_by, defer_update = false, style = :normal)
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
     unless input.is_a? Array or input.is_a? Fixnum
@@ -257,13 +259,17 @@ class Loan
       # the payment is filed on received_on without knowing about the future
       # it could happen that payment have been made after this payment
       # here the validations on the Payment should 
-      total        = input
-      total_fees_due_on_date = total_fees_payable_on(received_on)
-      fees_paid = [amount, total_fees_due_on_date].min
-      total = input - fees_paid
-      interest_due = [(-interest_overpaid_on(received_on)), 0].max
-      interest     = [interest_due, total].min  # never more than total
-      principal    = total - interest
+      if style == :normal
+        total        = input
+        total_fees_due_on_date = total_fees_payable_on(received_on)
+        fees_paid = [amount, total_fees_due_on_date].min
+        total = input - fees_paid
+        interest_due = [(-interest_overpaid_on(received_on)), 0].max
+        interest     = [interest_due, total].min  # never more than total
+        principal    = total - interest
+      elsif style == :prorata #does not pay fees
+        interest, principal = pay_prorata(input, received_on)
+      end
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0].to_i, input[1].to_i
     end
@@ -604,6 +610,9 @@ class Loan
 
 
   # LOAN INFO FUNCTIONS - DATES
+  def installment_for_date(date = Date.today)
+    installment_dates.select{|d| d <= date}.count
+  end
   def date_for_installment(number)
     shift_date_by_installments(scheduled_first_payment_date, number-1)
   end
@@ -705,6 +714,23 @@ class Loan
   private
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
   include Misfit::LoanValidators
+
+  # repayment styles
+  def pay_prorata(amount, received_on)
+    #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
+    i = used = prin = int = 0
+    d = received_on
+    while used <= amount
+      prin -= principal_overpaid_on(d)
+      int -= interest_overpaid_on(d)
+      used = (prin + int)
+      d = shift_date_by_installments(d, 1)
+    end
+    interest = amount * int/(prin + int)
+    principal = amount * prin/(prin + int)
+    [interest, principal]
+  end
+
   ## validations: read their method name and error to see what they do.
   def amount_greater_than_zero?
     return true if not amount.blank? and amount > 0
