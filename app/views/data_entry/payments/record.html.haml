@@ -1,7 +1,7 @@
 %h1 Record a new payment
 
 = error_messages_for @loan
-
+= error_messages_for @payment
 - if @loan
   = form_for(@payment, :action => url(:enter_payments, :action => 'create')) do
     = hidden_field :loan_id, :value => @loan.id
