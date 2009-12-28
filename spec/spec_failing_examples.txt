@@ -1,12 +1,18 @@
-resource(@center) PUT redirect to the article show action
-resource(@center, :edit) responds successfully
-resource(@center) a successful DELETE should redirect to the index action
-resource(:centers) a successful POST redirects to resource(:centers)
+Upload before(:all)
 
 Pending:
 
-resource(:centers) GET has a list of centers (TODO)
-./spec/requests/centers_spec.rb:36
+LoanType should have specs (Not Yet Implemented)
+./spec/models/loan_type_spec.rb:5
 
-resource(:centers) GET contains a list of centers (TODO)
-./spec/requests/centers_spec.rb:24
+Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
+./spec/models/loan_spec.rb:335
+
+LedgerEntry should have specs (Not Yet Implemented)
+./spec/models/ledger_entry_spec.rb:5
+
+Client should not have more than one outstanding loan at a time if so specified (Not Yet Implemented)
+./spec/models/client_spec.rb:120
+
+ClientGroup should have specs (Not Yet Implemented)
+./spec/models/client_group_spec.rb:5

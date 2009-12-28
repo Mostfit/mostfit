@@ -47,7 +47,7 @@ class Loan
   belongs_to :loan_product
 
   validates_with_method  :amount,                       :method => :amount_greater_than_zero?
-  validates_with_method  :amount,                       :method => :installments_are_integers?
+#  validates_with_method  :amount,                       :method => :installments_are_integers?
   validates_with_method  :interest_rate,                :method => :interest_rate_greater_than_zero?
   validates_with_method  :number_of_installments,       :method => :number_of_installments_greater_than_zero?
   validates_with_method  :applied_on,                   :method => :applied_before_appoved?
@@ -319,13 +319,13 @@ class Loan
   end
 
   def total_fees_paid
-    payments(:type => :fees).sum(:amount) || 0
+    payments(:type => :fees, :loan_id.not => nil).sum(:amount) || 0
   end
 
   def total_fees_payable_on(date = Date.today)
     # returns one consolidated number
-    total_fees_due = fee_schedule.select{|k,v| k <= date}.to_hash.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
-    total_fees_due - total_fees_paid
+    _total_fees_due = fee_schedule.select{|k,v| k <= date}.to_hash.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
+    _total_fees_due - total_fees_paid
   end
 
   def fees_payable_on(date = Date.today)
@@ -350,7 +350,7 @@ class Loan
   def fee_schedule
     @fee_schedule = {}
     loan_product.fees.each do |f|
-      date = eval(f.payable_on.to_s)
+      date = eval(f.payable_on.to_s.split("_")[1..-1].join("_"))
       @fee_schedule += {date => {f.name => f.fees_for(self)}} unless date.nil?
     end
     @fee_schedule

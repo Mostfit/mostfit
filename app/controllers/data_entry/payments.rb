@@ -108,16 +108,24 @@ module DataEntry
       @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
       @staff = StaffMember.get(params[:payment][:received_by])
       @errors = []
-      if params[:paid]
-        params[:paid].keys.each do |k|
+      if params[:paid][:loan]
+        params[:paid][:loan].keys.each do |k|
           @loan = Loan.get(k.to_i)
           @type = params[:payment][:type]
-          amounts = params[:paid][k.to_sym].to_i
+          amounts = params[:paid][:loan][k.to_sym].to_i
           success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, false)
           debugger
           @errors << @prin.errors if (@prin and not @prin.errors.blank?)
           @errors << @int.errors if (@int and not @int.errors.blank? )
           @errors << @fees.errors if (@fees and not @fees.errors.blank?)
+        end
+      end
+      debugger
+      if params[:paid][:client]
+        params[:paid][:client].keys.each do |k|
+          client = Client.get(k)
+          x = client.pay_fees(params[:paid][:client][k.to_sym].to_i, @date, @staff, session.user)
+          @errors << x unless x === true
         end
       end
       if params[:disbursed]

@@ -181,114 +181,390 @@ a {
 <div class="results">
 <div class="example_group">
   <dl>
-  <dt id="example_group_1">resource(@center) PUT</dt>
-    <script type="text/javascript">makeRed('rspec-header');</script>
-    <script type="text/javascript">makeRed('example_group_1');</script>
-    <script type="text/javascript">moveProgressBar('11.1');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirect to the article show action</span>
-      <div class="failure" id="failure_1">
-        <div class="message"><pre>Expected a PUT to 'http://example.org/centers/1?center[id]=1' to be a redirect, but it returned status code 500.</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:110:</pre></div>
-    <pre class="ruby"><code><span class="linenum">108</span>  
-<span class="linenum">109</span>    <span class="ident">it</span> <span class="punct">&quot;</span><span class="string">redirect to the article show action</span><span class="punct">&quot;</span> <span class="keyword">do</span>
-<span class="offending"><span class="linenum">110</span>      <span class="attribute">@response</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">redirect_to</span><span class="punct">(</span><span class="ident">resource</span><span class="punct">(</span><span class="attribute">@branch</span><span class="punct">,</span> <span class="symbol">:centers</span><span class="punct">))</span></span>
-<span class="linenum">111</span>    <span class="keyword">end</span>
-<span class="linenum">112</span>  <span class="keyword">end</span></code></pre>
-      </div>
-    </dd>
+  <dt id="example_group_1">User</dt>
+    <script type="text/javascript">moveProgressBar('0.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid with name shorter than 3 characters</span></dd>
+    <script type="text/javascript">moveProgressBar('1.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not have a nil login </span></dd>
+    <script type="text/javascript">moveProgressBar('2.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be return for admin? if admin value set to true</span></dd>
+    <script type="text/javascript">moveProgressBar('2.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be created before it is updated</span></dd>
+    <script type="text/javascript">moveProgressBar('3.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have a login name beginning with numbers, aplphabets and underscores </span></dd>
+    <script type="text/javascript">moveProgressBar('4.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have a role</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_2">resource(@center) GET</dt>
-    <script type="text/javascript">moveProgressBar('22.2');</script>
-    <dd class="spec passed"><span class="passed_spec_name">responds successfully</span></dd>
+  <dt id="example_group_2">Center</dt>
+    <script type="text/javascript">moveProgressBar('5.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a manager</span></dd>
+    <script type="text/javascript">moveProgressBar('5.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
+    <script type="text/javascript">moveProgressBar('6.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid with a name shorter than 3 characters</span></dd>
+    <script type="text/javascript">moveProgressBar('7.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be able to 'have' clients</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_3">resource(@center, :edit)</dt>
-    <script type="text/javascript">makeRed('example_group_3');</script>
-    <script type="text/javascript">moveProgressBar('33.3');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">responds successfully</span>
-      <div class="failure" id="failure_2">
-        <div class="message"><pre>Expected a GET to 'http://example.org/centers/1/edit' to be successful, but it returned a 500</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:86:</pre></div>
-    <pre class="ruby"><code><span class="linenum">84</span>  
-<span class="linenum">85</span>  <span class="ident">it</span> <span class="punct">&quot;</span><span class="string">responds successfully</span><span class="punct">&quot;</span> <span class="keyword">do</span>
-<span class="offending"><span class="linenum">86</span>    <span class="attribute">@response</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_successful</span></span>
-<span class="linenum">87</span>  <span class="keyword">end</span>
-<span class="linenum">88</span><span class="keyword">end</span></code></pre>
-      </div>
-    </dd>
+  <dt id="example_group_3">Payment</dt>
+    <script type="text/javascript">moveProgressBar('7.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a loan</span></dd>
+    <script type="text/javascript">moveProgressBar('8.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being created by a staff member</span></dd>
+    <script type="text/javascript">moveProgressBar('9.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being received by a staff member</span></dd>
+    <script type="text/javascript">moveProgressBar('10.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being created by active user</span></dd>
+    <script type="text/javascript">moveProgressBar('10.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without beng received by an active staff member</span></dd>
+    <script type="text/javascript">moveProgressBar('11.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly deleted</span></dd>
+    <script type="text/javascript">moveProgressBar('12.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if date of receival is in future</span></dd>
+    <script type="text/javascript">moveProgressBar('12.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if interest is negative</span></dd>
+    <script type="text/javascript">moveProgressBar('13.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if principal is negative</span></dd>
+    <script type="text/javascript">moveProgressBar('14.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if total is negative</span></dd>
+    <script type="text/javascript">moveProgressBar('15.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if payment is received before disbursal of loan</span></dd>
+    <script type="text/javascript">moveProgressBar('15.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if paying too much principal</span></dd>
+    <script type="text/javascript">moveProgressBar('16.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if paying too much interest</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_4">resource(:centers, :new)</dt>
-    <script type="text/javascript">moveProgressBar('44.4');</script>
-    <dd class="spec passed"><span class="passed_spec_name">responds successfully</span></dd>
+  <dt id="example_group_4">Report</dt>
+    <script type="text/javascript">moveProgressBar('17.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have 2 * 7 centers and centers * 3 clients</span></dd>
+    <script type="text/javascript">moveProgressBar('17.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have proper statistics after first monday's payments</span></dd>
+    <script type="text/javascript">moveProgressBar('18.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have correct loan count</span></dd>
+    <script type="text/javascript">moveProgressBar('19.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have correct number of clients</span></dd>
+    <script type="text/javascript">moveProgressBar('20.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have correct client count event after we add our new loans</span></dd>
+    <script type="text/javascript">moveProgressBar('20.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct repaid loan count</span></dd>
+    <script type="text/javascript">moveProgressBar('21.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct repaid loan amount</span></dd>
+    <script type="text/javascript">moveProgressBar('22.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct disbursed loan count</span></dd>
+    <script type="text/javascript">moveProgressBar('22.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct disbursed loan amount</span></dd>
+    <script type="text/javascript">moveProgressBar('23.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct principal due</span></dd>
+    <script type="text/javascript">moveProgressBar('24.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct principal received</span></dd>
+    <script type="text/javascript">moveProgressBar('25.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct interest due</span></dd>
+    <script type="text/javascript">moveProgressBar('25.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct interest received</span></dd>
+    <script type="text/javascript">moveProgressBar('26.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct principal outstanding</span></dd>
+    <script type="text/javascript">moveProgressBar('27.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct scheduled principal outstanding</span></dd>
+    <script type="text/javascript">moveProgressBar('27.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct total outstanding</span></dd>
+    <script type="text/javascript">moveProgressBar('28.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct scheduled total outstanding</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_5">resource(@center) a successful DELETE</dt>
-    <script type="text/javascript">makeRed('example_group_5');</script>
-    <script type="text/javascript">moveProgressBar('55.5');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should redirect to the index action</span>
-      <div class="failure" id="failure_3">
-        <div class="message"><pre>Expected a DELETE to 'http://example.org/branches/2/centers/1' to redirect to &lt;/branches/1/centers&gt;, but it redirected to &lt;/branches/2/centers?_message=BAh7BjoLbm90aWNlIidDZW50ZXIgJ0pRWklJMDAxJyBoYXMgYmVlbiBkZWxl%0AdGVk%0A&gt;</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:64:</pre></div>
-    <pre class="ruby"><code><span class="linenum">62</span>
-<span class="linenum">63</span>     <span class="ident">it</span> <span class="punct">&quot;</span><span class="string">should redirect to the index action</span><span class="punct">&quot;</span> <span class="keyword">do</span>
-<span class="offending"><span class="linenum">64</span>       <span class="attribute">@response</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">redirect_to</span><span class="punct">(</span><span class="ident">resource</span><span class="punct">(</span><span class="attribute">@branch</span><span class="punct">,</span> <span class="symbol">:centers</span><span class="punct">))</span></span>
-<span class="linenum">65</span>     <span class="keyword">end</span></code></pre>
-      </div>
-    </dd>
+  <dt id="example_group_5">Attendancy</dt>
+    <script type="text/javascript">moveProgressBar('29.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
+    <script type="text/javascript">moveProgressBar('30.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper date</span></dd>
+    <script type="text/javascript">moveProgressBar('30.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid when attendancy date is in future</span></dd>
+    <script type="text/javascript">moveProgressBar('31.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper status</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_6">resource(:centers) a successful POST</dt>
-    <script type="text/javascript">makeRed('example_group_6');</script>
-    <script type="text/javascript">moveProgressBar('66.6');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">redirects to resource(:centers)</span>
-      <div class="failure" id="failure_4">
-        <div class="message"><pre>Expected a POST to 'http://example.org/branches/1/centers' to redirect to &lt;/centers/54&gt;, but it redirected to &lt;/branches/1/centers?_message=BAh7BjoLbm90aWNlIiZDZW50ZXIgJ2FiYycgc3VjY2Vzc2Z1bGx5IGNyZWF0%0AZWQ%3D%0A&gt;</pre></div>
-        <div class="backtrace"><pre>./spec/requests/centers_spec.rb:51:</pre></div>
-    <pre class="ruby"><code><span class="linenum">49</span>    
-<span class="linenum">50</span>    <span class="ident">it</span> <span class="punct">&quot;</span><span class="string">redirects to resource(:centers)</span><span class="punct">&quot;</span> <span class="keyword">do</span>
-<span class="offending"><span class="linenum">51</span>      <span class="attribute">@response</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">redirect_to</span><span class="punct">(</span><span class="ident">resource</span><span class="punct">(</span><span class="constant">Center</span><span class="punct">.</span><span class="ident">first</span><span class="punct">),</span> <span class="symbol">:message</span> <span class="punct">=&gt;</span> <span class="punct">{</span><span class="symbol">:notice</span> <span class="punct">=&gt;</span> <span class="punct">&quot;</span><span class="string">center was successfully created</span><span class="punct">&quot;})</span></span>
-<span class="linenum">52</span>    <span class="keyword">end</span>
-<span class="linenum">53</span>    </code></pre>
-      </div>
-    </dd>
+  <dt id="example_group_6">LoanType</dt>
+    <script type="text/javascript">makeYellow('rspec-header');</script>
+    <script type="text/javascript">makeYellow('example_group_6');</script>
+    <script type="text/javascript">moveProgressBar('32.1');</script>
+    <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_7">resource(:centers) GET</dt>
+  <dt id="example_group_7">Loan</dt>
+    <script type="text/javascript">moveProgressBar('32.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have a discrimintator</span></dd>
+    <script type="text/javascript">moveProgressBar('33.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
+    <script type="text/javascript">moveProgressBar('34.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being approved properly</span></dd>
+    <script type="text/javascript">moveProgressBar('35.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being validated properly</span></dd>
+    <script type="text/javascript">moveProgressBar('35.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being rejected properly</span></dd>
+    <script type="text/javascript">moveProgressBar('36.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a client</span></dd>
+    <script type="text/javascript">moveProgressBar('37.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper amount</span></dd>
+    <script type="text/javascript">moveProgressBar('37.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper interest_rate</span></dd>
+    <script type="text/javascript">moveProgressBar('38.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be valid with a proper installment_frequency</span></dd>
+    <script type="text/javascript">moveProgressBar('39.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper installment_frequency</span></dd>
+    <script type="text/javascript">moveProgressBar('40.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper number_of_installments</span></dd>
+    <script type="text/javascript">moveProgressBar('40.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_first_payment_date</span></dd>
+    <script type="text/javascript">moveProgressBar('41.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('42.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid with a disbursal date earlier than the loan is approved</span></dd>
+    <script type="text/javascript">moveProgressBar('42.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid when validated_on is earlier than the disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('43.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid when written_off_on is earlier than the disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('44.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without approved_on earlier than scheduled_disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('45.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly written off</span></dd>
+    <script type="text/javascript">moveProgressBar('45.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly disbursed</span></dd>
+    <script type="text/javascript">moveProgressBar('46.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid when scheduled_first_payment_date if before scheduled_disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('47.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates</span></dd>
+    <script type="text/javascript">moveProgressBar('47.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.shift_date_by_installments should shift dates properly, even odd ones.. and backwards.</span></dd>
+    <script type="text/javascript">moveProgressBar('48.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.descendants should keep track of the subclasses (just testing dm-core functionality)</span></dd>
+    <script type="text/javascript">moveProgressBar('49.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.number_of_installments_before should do what it promises</span></dd>
+    <script type="text/javascript">makeYellow('rspec-header');</script>
     <script type="text/javascript">makeYellow('example_group_7');</script>
-    <script type="text/javascript">moveProgressBar('77.7');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">has a list of centers (PENDING: TODO)</span></dd>
+    <script type="text/javascript">moveProgressBar('50.0');</script>
+    <dd class="spec not_implemented"><span class="not_implemented_spec_name">.last_loan_history_date should have some tests -- albeit more a view thing (PENDING: Not Yet Implemented)</span></dd>
+    <script type="text/javascript">moveProgressBar('50.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.scheduled_repaid_on give the proper date</span></dd>
+    <script type="text/javascript">moveProgressBar('51.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have proper values for principal, interest and total to be received</span></dd>
+    <script type="text/javascript">moveProgressBar('52.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it written off</span></dd>
+    <script type="text/javascript">moveProgressBar('52.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it is repaid</span></dd>
+    <script type="text/javascript">moveProgressBar('53.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties before being approved</span></dd>
+    <script type="text/javascript">moveProgressBar('54.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties when being rejected</span></dd>
+    <script type="text/javascript">moveProgressBar('55.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">cannot repay an unsaved loan</span></dd>
+    <script type="text/javascript">moveProgressBar('55.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.installment_dates should give a list with some dates</span></dd>
+    <script type="text/javascript">moveProgressBar('56.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.payment_schedule should give correct results</span></dd>
+    <script type="text/javascript">moveProgressBar('57.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">.payments_hash should give correct results</span></dd>
+    <script type="text/javascript">moveProgressBar('57.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">history should be correct</span></dd>
+    <script type="text/javascript">moveProgressBar('58.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should write the history correctly into the db</span></dd>
   </dl>
 </div>
 <div class="example_group">
   <dl>
-  <dt id="example_group_8">resource(:centers) GET</dt>
-    <script type="text/javascript">moveProgressBar('88.8');</script>
-    <dd class="spec passed"><span class="passed_spec_name">responds successfully</span></dd>
-    <script type="text/javascript">makeYellow('example_group_8');</script>
-    <script type="text/javascript">moveProgressBar('100.0');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">contains a list of centers (PENDING: TODO)</span></dd>
+  <dt id="example_group_8">LoanHistory</dt>
+    <script type="text/javascript">moveProgressBar('59.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without scheduled outstanding principal</span></dd>
+    <script type="text/javascript">moveProgressBar('60.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without scheduled outstanding total</span></dd>
+    <script type="text/javascript">moveProgressBar('60.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without actual outstanding principal</span></dd>
+    <script type="text/javascript">moveProgressBar('61.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without actual outstanding total</span></dd>
+    <script type="text/javascript">moveProgressBar('62.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without having a proper status</span></dd>
+    <script type="text/javascript">moveProgressBar('62.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid if the combination if loan id and date is not unique</span></dd>
+    <script type="text/javascript">moveProgressBar('63.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have correct number of periods</span></dd>
+    <script type="text/javascript">moveProgressBar('64.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should start with the application date, approval date, disbursal date and first payment date</span></dd>
+    <script type="text/javascript">moveProgressBar('65.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have the following dates afterwards</span></dd>
+    <script type="text/javascript">moveProgressBar('65.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have correct amounts</span></dd>
   </dl>
 </div>
-<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>105133.545492 seconds</strong>";</script>
-<script type="text/javascript">document.getElementById('totals').innerHTML = "9 examples, 4 failures, 2 pending";</script>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_9">LedgerEntry</dt>
+    <script type="text/javascript">makeYellow('rspec-header');</script>
+    <script type="text/javascript">makeYellow('example_group_9');</script>
+    <script type="text/javascript">moveProgressBar('66.4');</script>
+    <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_10">StaffMember</dt>
+    <script type="text/javascript">moveProgressBar('67.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
+    <script type="text/javascript">moveProgressBar('67.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not  be valid without active boolean</span></dd>
+    <script type="text/javascript">moveProgressBar('68.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be unique</span></dd>
+    <script type="text/javascript">moveProgressBar('69.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have name length &gt; 3</span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_11">Funder</dt>
+    <script type="text/javascript">moveProgressBar('70.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without having a name</span></dd>
+    <script type="text/javascript">moveProgressBar('70.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be able to have funding lines</span></dd>
+    <script type="text/javascript">moveProgressBar('71.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct count of completed lines </span></dd>
+    <script type="text/javascript">moveProgressBar('72.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct count of active lines</span></dd>
+    <script type="text/javascript">moveProgressBar('72.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct count of total lines </span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_12">Upload</dt>
+    <script type="text/javascript">moveProgressBar('73.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">Should match calculation from excel</span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_13">Fee</dt>
+    <script type="text/javascript">moveProgressBar('74.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have a name</span></dd>
+    <script type="text/javascript">moveProgressBar('75.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have either an amount or a percentage</span></dd>
+    <script type="text/javascript">moveProgressBar('75.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should never return less than min_amount</span></dd>
+    <script type="text/javascript">moveProgressBar('76.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should never return more than max_amount</span></dd>
+    <script type="text/javascript">moveProgressBar('77.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct fee_schedule for loan</span></dd>
+    <script type="text/javascript">moveProgressBar('77.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct fee_schedule for multiple fees even on the same date</span></dd>
+    <script type="text/javascript">moveProgressBar('78.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct fees payable</span></dd>
+    <script type="text/javascript">moveProgressBar('79.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should return correct fees_paid</span></dd>
+    <script type="text/javascript">moveProgressBar('80.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should give correct fee schedule for client</span></dd>
+    <script type="text/javascript">moveProgressBar('80.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should work just as well for another fee</span></dd>
+    <script type="text/javascript">moveProgressBar('81.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should pay client fees correctly</span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_14">Client</dt>
+    <script type="text/javascript">moveProgressBar('82.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a center</span></dd>
+    <script type="text/javascript">moveProgressBar('82.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
+    <script type="text/javascript">moveProgressBar('83.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a reference</span></dd>
+    <script type="text/javascript">moveProgressBar('84.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid with name shorter than 3 characters</span></dd>
+    <script type="text/javascript">moveProgressBar('85.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have a joining date</span></dd>
+    <script type="text/javascript">moveProgressBar('85.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be able to 'have' loans</span></dd>
+    <script type="text/javascript">makeYellow('rspec-header');</script>
+    <script type="text/javascript">makeYellow('example_group_14');</script>
+    <script type="text/javascript">moveProgressBar('86.4');</script>
+    <dd class="spec not_implemented"><span class="not_implemented_spec_name">should not have more than one outstanding loan at a time if so specified (PENDING: Not Yet Implemented)</span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_15">ClientGroup</dt>
+    <script type="text/javascript">makeYellow('rspec-header');</script>
+    <script type="text/javascript">makeYellow('example_group_15');</script>
+    <script type="text/javascript">moveProgressBar('87.1');</script>
+    <dd class="spec not_implemented"><span class="not_implemented_spec_name">should have specs (PENDING: Not Yet Implemented)</span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_16">Upload</dt>
+    <script type="text/javascript">makeRed('rspec-header');</script>
+    <script type="text/javascript">makeRed('example_group_16');</script>
+    <script type="text/javascript">moveProgressBar('87.1');</script>
+    <dd class="spec failed">
+      <span class="failed_spec_name">before(:all)</span>
+      <div class="failure" id="failure_1">
+        <div class="message"><pre>undefined method `info' for nil:NilClass</pre></div>
+        <div class="backtrace"><pre>/home/svs/src/manndeshi/app/models/upload.rb:67:in `load_csv'
+/home/svs/src/manndeshi/app/models/upload.rb:31:in `each'
+/home/svs/src/manndeshi/app/models/upload.rb:31:in `load_csv'
+./spec/models/upload_spec.rb:19:</pre></div>
+    <pre class="ruby"><code><span class="linenum">65</span>        <span class="keyword">end</span>    
+<span class="linenum">66</span>      <span class="punct">}</span>
+<span class="offending"><span class="linenum">67</span>      <span class="ident">log</span><span class="punct">.</span><span class="ident">info</span><span class="punct">(&quot;</span><span class="string">&lt;font color='#8DC73F'&gt;&lt;b&gt;Created <span class="expr">#{model.count}</span> <span class="expr">#{model.to_s.plural}</span>&lt;/b&gt;&lt;/strong&gt;</span><span class="punct">&quot;)</span></span>
+<span class="linenum">68</span>    <span class="punct">}</span>
+<span class="linenum">69</span>  <span class="keyword">end</span></code></pre>
+      </div>
+    </dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_17">Branch</dt>
+    <script type="text/javascript">moveProgressBar('87.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a manager</span></dd>
+    <script type="text/javascript">moveProgressBar('88.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a name</span></dd>
+    <script type="text/javascript">moveProgressBar('89.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid with a name shorter than 3 characters</span></dd>
+    <script type="text/javascript">moveProgressBar('90.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be able to 'have' centers</span></dd>
+  </dl>
+</div>
+<div class="example_group">
+  <dl>
+  <dt id="example_group_18">FundingLine</dt>
+    <script type="text/javascript">moveProgressBar('90.7');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not be valid without belonging to a funder</span></dd>
+    <script type="text/javascript">moveProgressBar('91.4');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not have a blank interest_rate</span></dd>
+    <script type="text/javascript">moveProgressBar('92.1');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not have a blank disbursal_date</span></dd>
+    <script type="text/javascript">moveProgressBar('92.8');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not have a blank amount</span></dd>
+    <script type="text/javascript">moveProgressBar('93.5');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should not have blank last payment date</span></dd>
+    <script type="text/javascript">moveProgressBar('94.2');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should have first payment done before last payment</span></dd>
+    <script type="text/javascript">moveProgressBar('95.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be disbursed before first payment</span></dd>
+  </dl>
+</div>
+<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>80.820313 seconds</strong>";</script>
+<script type="text/javascript">document.getElementById('totals').innerHTML = "133 examples, 1 failure, 5 pending";</script>
 </div>
 </div>
 </body>

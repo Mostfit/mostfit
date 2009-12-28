@@ -27,7 +27,7 @@ Merb::BootLoader.before_app_loads do
                           :currency => { :unit => 'Rs.',  :format => '%u %n', :precision => 0 } })
   Numeric::Transformer.change_default_format(:mostfit_default)
   require 'config/constants.rb'
-#  require 'csv'
+  require 'csv'
   require 'uuid'
   require 'ftools'
   require 'logger'
@@ -62,7 +62,7 @@ Merb::BootLoader.after_app_loads do
   # Load MFI account details to allow this app to sync phone numbers of staffmembers to mostfit box. If this file is not present then no such updates will happen
   MFI_DETAILS = YAML.load(File.read(File.join(Merb.root, "config", "mfi.yml"))) if File.exists?(File.join(Merb.root, "config", "mfi.yml"))
   # Starting the logger takes time, so turn it off during development
-  # Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments']) #unless Merb.environment == "development" or Merb.environment == "test"
+  Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments', 'DataEntry::Payments']) #unless Merb.environment == "development" or Merb.environment == "test"
   # Load the validation hooks
   # ruby is too beautiful. 3 lines of code and all payments can get their appropriate validations which are decided by the
   # loan product.

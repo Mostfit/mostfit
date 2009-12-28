@@ -24,6 +24,10 @@ class Client
   property :bank_name,      String, :length => 20, :nullable => true
   property :branch,         String, :length => 20, :nullable => true
   property :join_holder,    String, :length => 20, :nullable => true
+  property :client_type,    Enum[:default], :default => :default
+
+  has n, :payments
+
   validates_length :account_number, :max => 20
 
 
@@ -67,60 +71,76 @@ class Client
     end
   end
 
-  def self.active(query = {},operator = "=", num_loans = 1)
-    client_ids = repository.adapter.query(%Q{
-      SELECT (id) 
-      FROM (
-         SELECT COUNT(loan_id),lh.status, lh.loan_id, client_id as id
-         FROM loan_history lh
-         WHERE current = true AND lh.status <= 3
-         GROUP BY client_id HAVING COUNT(loan_id) #{operator} #{num_loans}) as dt1;})
-    query[:id.in] = client_ids unless client_ids.empty?
-    Client.all(query)
+  def fees
+    # this is hardcoded for the moment. later, when one has more than one client_type and one refactors, 
+    # one will have to have this info read from the database
+    Fee.all.select{|f| f.payable_on.to_s.split("_")[0].downcase == "client"}
   end
 
-  def self.dormant(query = {}) # no loans outstanding
-    client_ids = repository.adapter.query(%Q{
-        SELECT id FROM clients WHERE id NOT IN
-          (SELECT client_id FROM 
-             (SELECT COUNT(loan_id), client_id 
-              FROM loan_history 
-              WHERE current = true AND status <= 3 
-              GROUP BY client_id) AS dt)})
-    query[:id.in] = client_ids unless client_ids.empty?
-    Client.all(query)
+  def total_fees_due
+    total_fees_due = fee_schedule.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
   end
 
-  def self.find_by_loan_cycle(loan_cycle, query = {})
-    # a person is deemed to be in a loan_cycle if the number of repaid / written off loans he has is 
-    # 1) equal to loan_cycle - 1 if he has a loan outstanding or
-    # but ONLY IF loan_cycle > 1
-    #
-    # TODO
-    # We can optimise this per model (i.e. branch) by returning one hash like {1 => 2436, 2 => 4367} etc
-    if loan_cycle == 1
-      client_ids = repository.adapter.query(" select client_id from (select count(client_id) as x, client_id, status from loan_history where current = true group by client_id having x = 1) as dt where dt.status <= 3")
-    else
-    # first find the Clients with repaid/written_off loans numbering loan_cycle - 1 and with loan outstanding
-      client_ids = repository.adapter.query(%Q{
-      SELECT (id) 
-      FROM (
-         SELECT COUNT(loan_id),client_id as id
-         FROM loan_history lh
-         WHERE current = true AND lh.status <= 3 and client_id in (
-             SELECT id FROM 
-               (SELECT COUNT(loan_id), client_id as id 
-                FROM loan_history lh 
-                WHERE current = true AND lh.status > 3 
-                GROUP BY client_id 
-                HAVING COUNT(loan_id) = #{loan_cycle - 1})  # this doesn't work for loan cycle one.
-                AS dt) 
-             GROUP BY client_id HAVING COUNT(loan_id) > 0) as dt1;})
+  def total_fees_paid
+    payments(:type => :fees, :loan_id => nil).sum(:amount) || 0
+  end
+
+  def total_fees_payable_on(date = Date.today)
+    # returns one consolidated number
+    total_fees_due = fee_schedule.select{|k,v| k <= date}.to_hash.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
+    total_fees_due - total_fees_paid
+  end
+
+  def fees_payable_on(date = Date.today)
+    # returns a hash of fee type and amounts
+    schedule = fee_schedule.select{|k,v| k <= Date.today}.collect{|k,v| v.to_a}
+    scheduled_fees = schedule.size > 0 ? schedule.map{|s| s.flatten}.to_hash : {}
+    scheduled_fees - (fees_paid.values.inject({}){|a,b| a.merge(b)})
+  end
+
+  def fees_paid
+    @fees_payments = {}
+    payments(:type => :fees, :order => [:received_on], :loan => nil).each do |p|
+      @fees_payments += {p.received_on => {p.comment => p.amount}}
     end
-    query[:id.in] = client_ids unless client_ids.empty?
-    Client.all(query)
+    @fees_payments
   end
 
+  def fees_paid?
+    total_fees_paid >= total_fees_due
+  end
+  
+  def fee_schedule
+    @fee_schedule = {}
+    fees.each do |f|
+      date = eval(f.payable_on.to_s.split("_")[1..-1].join("_"))
+      @fee_schedule += {date => {f.name => f.fees_for(self)}} unless date.nil?
+    end
+    @fee_schedule
+  end
+
+  def fee_payments
+    @fees_payments = {}
+  end
+
+  def pay_fees(amount, date, received_by, created_by)
+    @errors = []
+    fp = fees_payable_on(date)
+    pay_order = fee_schedule.keys.sort.map{|d| fee_schedule[d].keys}.flatten
+    pay_order.each do |k|
+      if fees_payable_on(date).has_key?(k)
+        p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k, 
+                        :received_by => received_by, :created_by => created_by, :client => self)
+        if p.save
+          amount -= p.amount
+          fp[k] -= p.amount
+        else
+          @errors << p.errors
+        end
+      end
+    end
+    @errors || true
+  end
 
   private
   def convert_blank_to_nil

@@ -58,7 +58,9 @@
 
   %h1 Fees
   - @fee_paying_loans = @center.clients.loans.select{|l| l.fees_paid? == false}
-  - unless @fee_paying_loans.blank?
+  - @fee_paying_clients = @center.clients.select{|c| c.fees_paid? == false}
+  - @fee_paying_things = @fee_paying_clients + @fee_paying_loans
+  - unless (@fee_paying_things).blank?
     = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
       = hidden_field :name => :for_date, :value => @date
       Fees collected by
@@ -69,9 +71,11 @@
         %thead
           %tr{:style => "font-size: 0.85em"}
             %th
-              Loan id
+              id
             %th
-              Description
+              Client
+            %th
+              Loan
             %th
               Total Fees Payable
             %th
@@ -81,25 +85,27 @@
             %th
               Fees Paid Today
       
-        - @fee_paying_loans.each do |fpl|
+        - @fee_paying_things.each do |fpt|
           %tr
             %td
-              = fpl.id
+              = fpt.id
             %td
-              = fpl.description
+              = fpt.class == Loan ? fpt.client.name : fpt.name
             %td
-              - fpl.fee_schedule.each do |date, fs|
+              = fpt.description if fpt.respond_to?("description")
+            %td
+              - fpt.fee_schedule.each do |date, fs|
                 - fs.each do |k,v|
                   = k
                   == :
                   = v
             %td
-              = fpl.fees_paid
+              = fpt.fees_paid
             %td
-              - fp = fpl.fees_payable_on(@date)
+              - fp = fpt.fees_payable_on(@date)
               = fp
             %td
-              = text_field :name => "paid[#{fpl.id}", :value => fpl.total_fees_payable_on(@date), :cols => "5", :style => "width:50px;" 
+              = text_field :name => "paid[#{fpt.class.to_s.snake_case}][#{fpt.id}]", :value => fpt.total_fees_payable_on(@date), :cols => "5", :style => "width:50px;" 
       = submit 'Pay Fees'
   - else
     No fees due today
