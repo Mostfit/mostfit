@@ -42,7 +42,7 @@ class Application < Merb::Controller
     if flag == true and obj.destroy
       # delete all the loan history
       LoanHistory.all(:loan_id => obj.id).destroy if model==Loan      
-      return_url = params[:return].split("/")[0..-4].join("/")
+      return_url = params[:return].split("/")[0..-3].join("/")
       redirect(return_url, :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
     else
       # spitting out the error message
