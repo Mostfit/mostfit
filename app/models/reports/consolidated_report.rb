@@ -55,7 +55,7 @@ class ConsolidatedReport < Report
       }
     }
     Payment.all(:received_on.gte => from_date, :received_on.lte => to_date ).each{|p|
-      client    = p.loan.client
+      client    = p.loan_id ? p.loan.client : p.client
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
