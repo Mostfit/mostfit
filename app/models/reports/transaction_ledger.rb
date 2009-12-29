@@ -49,7 +49,7 @@ class TransactionLedger < Report
     Payment.all(:received_on.gte => from_date, :received_on.lte => to_date).each{|p| 
       #0          1,                 2                3
       #disbursed, payment_principal, payment_interest,payment_fee      
-      client = p.loan.client
+      client = p.loan_id ? p.loan.client : p.client
       payments[p.received_on]||={}
       payments[p.received_on][client.client_group_id]||={}
       payments[p.received_on][client.client_group_id][client.id]||=[[], [], [], []]
