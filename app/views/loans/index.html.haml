@@ -5,7 +5,7 @@
 %h1{:width => '50%' }== Client: <i>#{@client.name}</i>
 %table.narrow.form{ :width => '50%' }
   %tr.odd
-    %td{:rowspan => "5"}
+    %td{:rowspan => "15"}
       = image_tag @client.picture.url(:thumb)
     %td 
       name
@@ -39,6 +39,19 @@
         Not associated with a group yet (
         =link_to('Edit', resource(@branch, @center, @client, :edit))
         to change)
+  %tr
+    %td
+      fees applicable
+    %td
+      - @client.fees.each do |f|
+        = f.description
+  %tr
+    %td
+      fees paid
+    %td
+      == #{@client.total_fees_paid} / #{@client.total_fees_due}
+      - if @client.fees_paid?
+        %span.green Paid
     
 %p
   = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
