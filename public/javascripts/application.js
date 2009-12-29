@@ -39,9 +39,13 @@ function fillCode(center_id, group_id){
 	});
 }
 $(document).ready(function(){
-		    $(document).shortkeys({
-					    'n': function(){alert('foo');}
-					  });
+	$(document).shortkeys({
+		'n': function(){alert('foo');}
+	    });
+	$('.delete').click(function() {
+		var answer = confirm('Are you sure?');
+		return answer;
+	    }); 
 	if(window.location.pathname.indexOf("edit")===-1){
 	    $("#client_group_id").change(function(){
 		    fillCode($("#client_center_id").val(), $("#client_group_id").val());
