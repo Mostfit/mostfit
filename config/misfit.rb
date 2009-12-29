@@ -3,7 +3,8 @@ module Misfit
     puts "Setting rights..."
 
     def self.model_names
-      DataMapper::Model.descendants.map{|d| d.to_s.snake_case.to_sym}
+      # Added an ugly patch for making alias of client_groups available
+      DataMapper::Model.descendants.map{|d| d.to_s.snake_case.to_sym} << :group
     end
 
     def self.controller_names
