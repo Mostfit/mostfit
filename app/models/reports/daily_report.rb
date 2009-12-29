@@ -45,7 +45,7 @@ class DailyReport < Report
     }
 
     Payment.all(:received_on => date).each{|p|
-      client    = p.loan.client
+      client    = p.loan_id ? p.loan.client : p.client
       center_id = client.center_id
       branch_id = centers[center_id].branch_id
       if groups[branch_id][center_id][client.client_group_id]
