@@ -6,7 +6,7 @@ class ConsolidatedReport < Report
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
     
     @name   = "Report from #{@from_date.strftime("%d-%m-%Y")} to #{@to_date.strftime("%d-%m-%Y")}"
-    @branch = if params and params[:branch_id] and not params[:branch_id].nil?
+    @branch = if params and params[:branch_id] and not params[:branch_id].blank?
                 Branch.all(:id => params[:branch_id])
               else
                 Branch.all(:order => [:name])
