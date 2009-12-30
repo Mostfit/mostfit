@@ -143,8 +143,8 @@
 - if @center.meeting_day? @date
 
   %h2 Disbursals
-  - @loans_to_disburse = @center.clients.loans(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil)
-  - if @loans_to_disburse.size > 0
+  - loans_to_disburse = @center.clients.loans(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil)
+  - if loans_to_disburse.size > 0
     %table.narrow.form{ :width => '100%'}
       %thead
         %tr{:style => "font-size: 0.85em;"}
@@ -154,7 +154,7 @@
             Scheduled Disbursal Date
           %th
             Status
-      - @loans_to_disburse.each do |loan|
+      - loans_to_disburse.each do |loan|
         %tr
           %td
             = loan.client.name
@@ -168,18 +168,15 @@
               on time
   - else
     No disbursals today
-
-  %table.narrow.form{ :width => '100%' }
+  %h2 Payments
+  %table.narrow.form{:width => '100%', :cellpadding => 2}
     %thead
       %tr
-        %th
         %th on name
-        %th id
+        %th loan id
         %th amount
         %th outstanding
-        %th.center status
         %th disbursed on
-        %th funder
         %th installment
         %th principal due
         %th interest due
@@ -192,7 +189,6 @@
           - #next if [nil, :repaid, :pending].include? loan.status
           - loan_row_count += 1
           %tr{ :class => cycle('odd','') }
-            %td &nbsp;
             %td
               %b= link_to loan.client.name, resource(@branch, @center, loan.client)
             %td
@@ -205,12 +201,8 @@
               - i = loan.actual_outstanding_principal_on(@date)
               %b= i.to_currency
               - tot_outstanding += i
-            %td.center
-              = loan.get_status(@date).to_s
             %td
               = loan.disbursal_date.to_s
-            %td
-              = loan.funder_name
             %td.numeric
               - i = loan.number_of_installments_before(@date)
               = i
@@ -230,13 +222,11 @@
         - if loan_row_count == 0
           %tr{ :class => cycle('odd','') }
             %td
-            %td
               %b= link_to client.name, resource(@branch, @center, client)
-            %td{ :colspan => 5 }
+            %td{ :colspan => 4 }
               %i nothing outstanding
       %tr{ :style => 'border-bottom: 2px solid;' }
         %tr
-          %td
           %td
           %td
           %td.numeric
@@ -245,9 +235,6 @@
             %b= tot_outstanding.to_currency
           %td
           %td
-          %td
-          %td.numeric
-            %b= tot_installments
           %td.numeric
             %b= tot_principal.to_currency
           %td.numeric
@@ -257,10 +244,6 @@
             
     %tfoot    
       %tr
-        %td{ :colspan => 12 }
-
-
-  
-
+        %td{ :colspan => 11 }  
 - else
   %i This day is not a meeting day
