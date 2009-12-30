@@ -20,13 +20,15 @@
     %tr{ :class => cycle('odd','even')}
       %td
         = link_to center.name, url(:branch_center, center.branch.id, center.id)
+      -c = center.clients
+      -l = c.loans
       %td
-        = center.clients.count
+        = c.count
       %td
-        = center.clients.loans.count
+        = l.count
       %td
-        = center.clients.loans.sum(:amount)
+        = l.count > 0 ? l.sum(:amount) : 0
       %td
-        = center.clients.loans.payments(:type=>:principal).sum(:amount)
+        = l.count > 0 ? l.payments(:type=>:principal).sum(:amount) : 0
       %td
         = LoanHistory.all(:current => true, 'loan.client.center_id' => center.id).sum(:amount_in_default) || 0
