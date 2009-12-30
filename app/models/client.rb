@@ -113,7 +113,7 @@ class Client
   def fee_schedule
     @fee_schedule = {}
     klass_identifier = self.class.to_s.snake_case
-    loan_product.fees.each do |f|
+    fees.each do |f|
       type, payable_on = f.payable_on.to_s.split("_")      
       if type == klass_identifier
         date = eval(payable_on.join("_"))
