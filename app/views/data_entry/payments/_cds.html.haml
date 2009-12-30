@@ -11,9 +11,7 @@
         %th id
         %th amount
         %th outstanding
-        %th.center status
         %th disbursed on
-        %th funder
         %th installment
         %th principal due
         %th interest due
@@ -43,12 +41,8 @@
               - p = lh.nil? ? 0 : lh.actual_outstanding_principal
               %b= p.to_currency
               - tot_outstanding += p
-            %td.center
-              = lh.status.to_s unless lh.nil?
             %td
               = loan.disbursal_date.to_s
-            %td
-              = loan.funder_name
             %td.numeric
               - ins = loan.number_of_installments_before(@date)
               = ins
@@ -91,19 +85,14 @@
             %b= tot_outstanding.to_currency
           %td
           %td
-          %td
-          %td.numeric
-            %b= tot_installments
           %td.numeric
             %b= tot_principal.to_currency
           %td.numeric
             %b= tot_interest.to_currency
           %td
-            %b= tot_fees.to_currency
-          %td
-          %td.numeric
             %b= tot_total.to_currency
-            
+          %td
+          %td.numeric            
     %tfoot    
       %tr
         %td{ :colspan => 14 }
