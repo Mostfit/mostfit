@@ -114,7 +114,7 @@ class Client
     @fee_schedule = {}
     klass_identifier = self.class.to_s.snake_case
     fees.each do |f|
-      type, payable_on = f.payable_on.to_s.split("_")      
+      type, *payable_on = f.payable_on.to_s.split("_")      
       if type == klass_identifier
         date = eval(payable_on.join("_"))
         @fee_schedule += {date => {f.name => f.fees_for(self)}} unless date.nil?
