@@ -262,7 +262,7 @@ class Loan
       if style == :normal
         total        = input
         total_fees_due_on_date = total_fees_payable_on(received_on)
-        fees_paid = [amount, total_fees_due_on_date].min
+        fees_paid = [total, total_fees_due_on_date].min
         total = input - fees_paid
         interest_due = [(-interest_overpaid_on(received_on)), 0].max
         interest     = [interest_due, total].min  # never more than total
@@ -718,18 +718,18 @@ class Loan
   include Misfit::LoanValidators
 
   # repayment styles
-  def pay_prorata(amount, received_on)
+  def pay_prorata(total, received_on)
     #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
     i = used = prin = int = 0
     d = received_on
-    while used <= amount
+    while used <= total
       prin -= principal_overpaid_on(d)
       int -= interest_overpaid_on(d)
       used = (prin + int)
       d = shift_date_by_installments(d, 1)
     end
-    interest = amount * int/(prin + int)
-    principal = amount * prin/(prin + int)
+    interest = total * int/(prin + int)
+    principal = total * prin/(prin + int)
     [interest, principal]
   end
 
