@@ -89,7 +89,7 @@
             %td
               = fpt.id
             %td
-              - if fpt.class == Loan 
+              - if fpt.class == Loan or fpt.respond_to?(:client)
                 = fpt.client.name
               - elsif fpt.respond_to?(:name)
                 = fpt.name
