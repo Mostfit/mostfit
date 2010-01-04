@@ -143,7 +143,7 @@ class Client
         end
       end
     end
-    @errors || true
+    @errors.blank? ? true : @errors
   end
 
   private
