@@ -320,6 +320,24 @@ class Loan
     false
   end
 
+  def pay_fees(amount, date, received_by, created_by)
+    @errors = []
+    fp = fees_payable_on(date)
+    pay_order = fee_schedule.keys.sort.map{|d| fee_schedule[d].keys}.flatten
+    pay_order.each do |k|
+      if fees_payable_on(date).has_key?(k)
+        p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k, 
+                        :received_by => received_by, :created_by => created_by, :client => client, :loan => self)
+        if p.save
+          amount -= p.amount
+          fp[k] -= p.amount
+        else
+          @errors << p.errors
+        end
+      end
+    end
+    @errors.blank? ? true : @errors
+  end
   # LOAN INFO FUNCTIONS - CALCULATIONS
 
   def total_fees_due

@@ -89,7 +89,7 @@
             %td
               = fpt.id
             %td
-              = fpt.class == Loan ? fpt.client.name : fpt.name
+              = Loan.descendants.include?(fpt.class) ? fpt.client.name : fpt.name
             %td
               = fpt.description if fpt.respond_to?("description")
             %td
@@ -104,7 +104,8 @@
               - fp = fpt.fees_payable_on(@date)
               = fp
             %td
-              = text_field :name => "paid[#{fpt.class.to_s.snake_case}][#{fpt.id}]", :value => fpt.total_fees_payable_on(@date), :cols => "5", :style => "width:50px;" 
+              - klass = Loan.descendants.include?(fpt.class) ? Loan : fpt.class
+              = text_field :name => "paid[#{klass.to_s.snake_case}][#{fpt.id}]", :value => fpt.total_fees_payable_on(@date), :cols => "5", :style => "width:50px;" 
       = submit 'Pay Fees'
   - else
     No fees due today

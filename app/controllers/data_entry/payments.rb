@@ -116,9 +116,14 @@ module DataEntry
       @errors = []
       if params[:paid][:loan]
         params[:paid][:loan].keys.each do |k|
+          debugger
           @loan = Loan.get(k.to_i)
-          @type = params[:payment][:type]
           amounts = params[:paid][:loan][k.to_sym].to_i
+          if params[:submit] == "Pay Fees" # dangerous!
+            @loan.pay_fees(amounts, @date, @staff, session.user)
+            return
+          end
+          @type = params[:payment][:type]
           debugger
           style = params[:payment_style][k.to_sym].to_sym
           success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, false, style)
