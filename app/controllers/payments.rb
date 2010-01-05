@@ -20,14 +20,14 @@ class Payments < Application
   end
 
   def create(payment)
-    debugger
     raise NotFound unless @loan
       
     amounts = payment[:amount].to_i
     receiving_staff = StaffMember.get(payment[:received_by])
     if payment[:type] == "total"
     # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
-      succes, @prin, @int, @fees = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff, params[:style])
+      debugger
+      succes, @prin, @int, @fees = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff, false, params[:style].to_sym)
       @payment = Payment.new
       @prin.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @prin
       @int.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @int

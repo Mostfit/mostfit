@@ -246,6 +246,7 @@ class Loan
 
 
   def repay(input, user, received_on, received_by, defer_update = false, style = :normal)
+    debugger
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
     unless input.is_a? Array or input.is_a? Fixnum
@@ -720,6 +721,7 @@ class Loan
   # repayment styles
   def pay_prorata(total, received_on)
     #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
+    debugger
     i = used = prin = int = 0
     d = received_on
     while used <= total
