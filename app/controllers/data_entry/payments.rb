@@ -12,7 +12,7 @@ module DataEntry
     def by_center
       @center = Center.get(params[:center_id]) if params[:center_id]
       if params[:center_text] and not @center
-          @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
+        @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
       end
       @date = Date.parse(params[:for_date]) if params[:for_date]
       @branch = @center.branch unless @center.nil?
@@ -121,7 +121,7 @@ module DataEntry
           amounts = params[:paid][:loan][k.to_sym].to_i
           if params[:submit] == "Pay Fees" # dangerous!
             @loan.pay_fees(amounts, @date, @staff, session.user)
-            return
+            next
           end
           @type = params[:payment][:type]
           debugger
