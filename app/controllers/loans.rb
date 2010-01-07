@@ -53,11 +53,11 @@ class Loans < Application
     @loan = Loan.get(id)
     @loan_product =  @loan.loan_product
     raise NotFound unless @loan
+    @loan.interest_rate*=100
     display @loan
   end
 
   def update(id)
-    debugger
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan = klass.get(id)
