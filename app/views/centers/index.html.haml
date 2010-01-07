@@ -54,7 +54,7 @@
           = link_to 'edit', resource(@branch, center, :edit)
           - if @branch 
             &nbsp;|&nbsp;
-            = link_to 'new client', url(:enter_clients, :action => 'new') + "?center_id=#{center.id}"
+            = link_to 'new client', resource(@branch, center, :clients, :new)
 
     %tfoot
       %tr
