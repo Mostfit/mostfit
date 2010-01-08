@@ -34,3 +34,241 @@
 %tr
   %td{:colspan => '2'}
     %hr
+%tr
+  %td{:colspan => '2'}
+    %h1==Family details
+%tr
+  %td
+    Number of family members:
+  %td
+    = text_field(:number_of_family_members, :size => 10)
+    %br/
+%tr
+  %td
+    Children:
+  %td
+    %table{:width => '100%'}
+      %tr
+        %td
+          Girls under 5 years
+        %td
+          Girls 5 to 15 years
+        %td
+          Girls over 5 years
+      %tr
+        %td
+          = text_field(:children_girls_under_5_years, :size => 10)
+        %td
+          = text_field(:children_girls_5_to_15_years, :size => 10)
+        %td
+          = text_field(:children_girls_over_5_years, :size => 10)
+      %tr
+        %td
+          Sons under 5 years
+        %td
+          Sons 5 to 15 years
+        %td
+          Sons over 5 years
+      %tr
+        %td
+          = text_field(:children_sons_under_5_years, :size => 10)
+        %td
+          = text_field(:children_sons_5_to_15_years, :size => 10)
+        %td
+          = text_field(:children_sons_over_5_years, :size => 10)
+    %br/
+%tr
+  %td
+    Not in school:
+  %td
+    %table{:width => '100%'}
+      %tr
+        %td
+          Working girls
+        %td
+          Bonded girls
+      %tr
+        %td
+          = text_field(:not_in_school_working_girls, :size => 10)
+        %td
+          = text_field(:not_in_school_bonded_girls, :size => 10)
+      %tr
+        %td
+          Working sons
+        %td
+          Bonded sons
+      %tr
+        %td
+          = text_field(:not_in_school_working_sons, :size => 10)
+        %td
+          = text_field(:not_in_school_bonded_sons, :size => 10)
+    %br/
+%tr
+  %td
+    School distance:
+  %td
+    = text_field(:school_distance, :size => 10)
+    %br/
+%tr
+  %td
+    Phc distance:
+  %td
+    = text_field(:phc_distance, :size => 10)
+    %br/
+%tr
+  %td{:colspan => '2'}
+    %hr
+%tr
+  %td{:colspan => '2'}
+    %h1==Literacy status
+%tr
+  %td
+    Member literate:
+  %td
+    = select(:member_literate, :collection => [[:no, "No"], [:yes, "Yes"]] , :prompt => "is this member litrate?")
+    %br/
+%tr
+  %td
+    Husband litrate:
+  %td
+    = select(:husband_litrate, :collection => [[:no, "No"], [:yes, "Yes"]] , :prompt => "is spouse litrate?")
+    %br/
+%tr
+  %td{:colspan => '2'}
+    %hr
+%tr
+  %td{:colspan => '2'}
+    %h1==Other economic information
+%tr
+  %td
+    Other productive asset:
+  %td
+    = text_field(:other_productive_asset, :size => 30)
+    %br/
+%tr
+  %td
+    Income regular:
+  %td
+    = select(:income_regular, :collection => [[:no, "No"], [:yes, "Yes"]] , :prompt => "is client income regular?")
+    %br/
+%tr
+  %td
+    Client migration:
+  %td
+    = select(:client_migration, :collection => [[:no, "No"], [:yes, "Yes"]] , :prompt => "is client a migrated resident?")
+    %br/
+%tr
+  %td
+    Pr loan amount:
+  %td
+    = text_field(:pr_loan_amount, :size => 10)
+    %br/
+%tr
+  %td
+    Other income:
+  %td
+    = text_field(:other_income, :size => 10)
+    %br/
+%tr
+  %td{:colspan => '2'}
+    %hr
+%tr
+  %td{:colspan => '2'}
+    %h1==Poverty overview
+%tr
+  %td
+    Total income:
+  %td
+    = text_field(:total_income, :size => 10)
+    %br/
+%tr
+  %td
+    Poverty status:
+  %td
+    = text_field(:poverty_status, :size => 10)
+    %br/
+%tr
+  %td
+    Irrigated land:
+  %td
+    %table{:width => '100%'}
+      %tr
+        %th
+        %th
+          own
+        %th
+          leased
+        %th
+          shared
+      %tr
+        %td
+          Fertile
+        %td
+          = text_field(:irrigated_land_own_fertile, :size => 10)
+        %td
+          = text_field(:irrigated_land_leased_fertile, :size => 10)
+        %td
+          = text_field(:irrigated_land_shared_fertile, :size => 10)
+      %tr
+        %td
+          Semifertile
+        %td
+          = text_field(:irrigated_land_own_semifertile, :size => 10)
+        %td
+          = text_field(:irrigated_land_leased_semifertile, :size => 10)
+        %td
+          = text_field(:irrigated_land_shared_semifertile, :size => 10)
+      %tr
+        %td
+          Wasteland
+        %td
+          = text_field(:irrigated_land_own_wasteland, :size => 10)
+        %td
+          = text_field(:irrigated_land_leased_wasteland, :size => 10)
+        %td
+          = text_field(:irrigated_land_shared_wasteland, :size => 10)
+    %br/
+%tr
+  %td
+    Not irrigated land:
+  %td
+    %table{:width => '100%'}
+      %tr
+        %th
+        %th
+          own
+        %th
+          leased
+        %th
+          shared
+      %tr
+        %td
+          Fertile
+        %td
+          = text_field(:not_irrigated_land_own_fertile, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_leased_fertile, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_shared_fertile, :size => 10)
+      %tr
+        %td
+          Semifertile
+        %td
+          = text_field(:not_irrigated_land_own_semifertile, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_leased_semifertile, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_shared_semifertile, :size => 10)
+      %tr
+        %td
+          Wasteland
+        %td
+          = text_field(:not_irrigated_land_own_wasteland, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_leased_wasteland, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_shared_wasteland, :size => 10)
+    %br/
+%tr
+  %td{:colspan => '2'}
+    %hr
