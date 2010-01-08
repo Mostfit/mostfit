@@ -96,37 +96,74 @@ module CustomForm
     def emit_table(field)
       str = []
       get_columns(field).each_with_index{|colgroup, idx|
-        str << compile_table(field, colgroup, idx==0)
+        str << compile_table(field, colgroup, idx)
       }
       str.flatten
     end
     
-    def compile_table(field, colgroup, emit_table_tag=true)
+    def compile_table(field, colgroup, row_num)
       table =  []
-      table << "%table{:width => '100%'}" if emit_table_tag
-      table << "  %tr"
-      colgroup.each{|column|
+      if row_num == 0
+        table << "%table{:width => '100%'}"
+        if field['rows'] #Emitting header
+          table << "  %tr"
+          table << "    %th"
+          field["columns"].each{|row|
+            table << "    %th"
+            table << "      #{row}"
+          }
+        end
+      end
+
+      if field['rows'] 
+        # Emit first row as column names
+        table << "  %tr"
         table << "    %td"
-        table << "      #{column[0].humanize}"
-#        table[-1]+="(#{opts['label']})" if opts and opts['label']
-      }
-      table << "  %tr"
+        table << "      #{field['rows'][row_num][0].humanize}"
+      else
+        table << "  %tr"
+        colgroup.each{|column|
+          table << "    %td"
+          table << "      #{column.to_a.flatten[0].humanize}"          
+          #        table[-1]+="(#{opts['label']})" if opts and opts['label']
+        }
+        table << "  %tr"
+      end
+
       colgroup.each{|column|        
         table << "    %td"
-        table << "  #{emit_field(column[-1])}"
+        table << "  #{emit_field(column.values[0])}"
       }
       table
     end
     
     def get_columns(field)
       return [] if field['columns'].nil?
+      return get_columns_with_rows(field) if field['rows']
       colgroups = []
-      colgroups << field['columns'] if field['columns'].is_a? Hash
+      colgroups << field['columns'].sort if field['columns'].is_a? Hash
       colgroups =  field['columns'] if field['columns'].is_a? Array
-
       colgroups.each{|colgroup|
-        colgroup.each{|column, opts|
-          colgroup[column] = get_column_opts(field, column)
+        colgroup.each{|column|
+          column[column.keys.first]=get_column_opts(field, column.keys.first)
+        }
+      }
+      colgroups
+    end
+
+    def get_columns_with_rows(field)
+      return [] if field['columns'].nil?
+      return [] if field['rows'].nil?
+      columns, rows = [], []
+      columns << field['columns'].sort    if field['columns'].is_a? Hash
+      columns =  field['columns'].flatten if field['columns'].is_a? Array
+      rows    << field['rows'].sort       if field['rows'].is_a? Hash
+      rows    =  field['rows'].flatten    if field['rows'].is_a? Array
+      colgroups = []; 
+      rows.each{|row| 
+        colgroups.push([])
+        columns.each{|column|
+          colgroups.last.push({"#{column}_#{row}" => get_column_opts(field, "#{column}_#{row}")})
         }
       }
       colgroups
@@ -144,7 +181,7 @@ module CustomForm
     end
     
     def create_view_file(content)
-      File.open(model_view_file_name, "w"){|f|
+      File.open(model_view_file_name, "a"){|f|
         f.puts content
       }
     end
@@ -258,9 +295,11 @@ module CustomForm
       elsif ["date", "integer", "float"].include?(type)
         return type.capitalize
       elsif type=="select_list"        
-        arr = ":" + field['values'].join(', :')
-        arr = "0, #{arr}" if field['validations'] and field['validations'].key?('required') and not field['validations']['required']
-        return "Enum.send('[]', *[#{arr}])"
+        arr   = "'" + field['values'].join("', '") + "'"
+        arr   = "'', #{arr}" if field['validations'] and field['validations'].key?('required') and not field['validations']['required']
+        str   = "Enum.send('[]', *[#{arr}])"
+        str   = "#{str}, :default => ''" if field['validations'] and field['validations'].key?('required') and not field['validations']['required']
+        return str
       elsif type=="table"
         return "String"
       elsif type=="check_list"
