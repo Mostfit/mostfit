@@ -1,0 +1,46 @@
+---
+clients:
+  poverty_overview:
+    total_income:
+      type: integer
+      position: 1
+      length: 10
+      validations:
+        required: false
+    poverty_status:
+      type: text
+      position: 2
+      length: 10
+      validations:
+        required: false
+    irrigated_land:
+      type: table
+      position: 3
+      minimum: 0
+      column_type: integer      
+      required: false
+      rows:
+        - - fertile
+        - - semifertile
+        - - wasteland
+      columns:
+        - - own
+        - - leased
+        - - shared
+    not_irrigated_land:
+      type: table
+      position: 3
+      minimum: 0
+      column_type: integer      
+      required: false
+      rows:
+        - - fertile
+        - - semifertile
+        - - wasteland
+      columns:
+        - - own
+        - - leased
+        - - shared
+
+
+        

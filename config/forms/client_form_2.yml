@@ -1,0 +1,58 @@
+---
+clients:
+  family_details:
+    number_of_family_members:
+      type: integer
+      length: 10
+      position: 1
+      validations:
+        minimum: 0
+        maximum: 20
+        required: false
+    children:
+      type: table
+      position: 2
+      length: 10
+      default: 0
+      column_type: integer
+      minimum: 0
+      required: false
+      columns: 
+        - - girls_under_5_years:
+          - girls_5_to_15_years:
+          - girls_over_5_years:
+        - - sons_under_5_years:
+          - sons_5_to_15_years:
+          - sons_over_5_years:
+    not_in_school:
+      type: table
+      position: 3
+      length: 10
+      default: 0
+      column_type: integer
+      minimum: 0
+      required: false  
+      columns: 
+        - - working_girls:
+          - bonded_girls:
+        - - working_sons:
+          - bonded_sons:
+    school_distance:
+      type: integer
+      length: 10
+      position: 4
+      label: in_kms
+      validations:
+        minimum: 0
+        maximum: 200
+        required: false
+    phc_distance:
+      type: integer
+      length: 10
+      label: in_kms
+      position: 5
+      validations:
+        minimum: 0
+        maximum: 500
+        required: false
+        

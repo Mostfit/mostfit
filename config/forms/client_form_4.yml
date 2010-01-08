@@ -1,0 +1,36 @@
+---
+clients:
+  other_economic_information:
+    other_productive_asset:
+      type: text
+      position: 1
+      length: 30
+      validations:
+        required: false
+    income_regular:
+      type: select_list
+      values: [:no, :yes]
+      position: 2
+      default_value: "is client income regular?"
+      validations:
+        required: false
+    client_migration:
+      type: select_list
+      values: [:no, :yes]
+      position: 3
+      default_value: "is client a migrated resident?"
+      validations:
+        required: false
+    pr_loan_amount:
+      type: integer
+      position: 4
+      length: 10
+      validations:
+        required: false
+    other_income:
+      type: integer
+      position: 4
+      length: 10
+      validations:
+        required: false
+        
