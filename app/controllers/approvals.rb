@@ -20,7 +20,7 @@ class Approvals < Application
 
   private
   def clients
-    @clients = Client.all(:approved_by_user_id => 0)
+    @clients = Client.all(:approved_by_user_id => nil)
   end
   
   def loans
@@ -28,6 +28,6 @@ class Approvals < Application
   end
   
   def payments
-    @payments = Payment.all(:approved_by_user_id => 0)    
+    @payments = Payment.all(:approved_by_user_id => nil)    
   end
 end

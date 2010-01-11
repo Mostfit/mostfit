@@ -219,12 +219,6 @@ class GraphData < Application
     render_loan_graph('aggregate loan graph', @stacks, @labels, step_size, max_amount)
   end
 
-
-
-
- 
-  
-
   def render_loan_graph(description, stacks, labels, step_size, max_amount)
     <<-JSON
     { "elements": [ { 
@@ -262,40 +256,47 @@ class GraphData < Application
   def dashboard
     labels = []
     case params[:id]
-      when "client_growth"
-        val = repository.adapter.query(%Q{
+    when "client_growth"
+      val = repository.adapter.query(%Q{
         SELECT CONCAT(YEAR(date_joined), '_', MONTH(date_joined)) as j, COUNT(id) FROM clients GROUP BY j
         })
-        vals = val.map {|v| [v[0],v[1]]}.to_hash 
-        min_date = Client.all.min(:date_joined)
-        max_date = Date.today >> 1
-        date = min_date
-        values = []
-        type ="bar"
-        while date <= max_date 
-          values << (vals[date.year.to_s + "_" + date.month.to_s] or 0)
-          labels << "#{date.month.to_s}.#{date.year.to_s}"
-          date = date >> 1
-        end
-        elements = [{:type => "bar", :values => values}]
-        title = {:text => "Client Addition by Day"}
-        x_axis = {:steps => 5, :labels => {:labels => labels.to_json}}
-        return {:elements => elements, :x_axis => x_axis, :title => title}.to_json
-      when "client_cumulative"
-        min_date = Client.all.min(:date_joined)
-        max_date = Date.today >> 1
-        date = min_date
-        values = []
-        type ="bar"
-        while date <= max_date 
-          values << Client.all(:date_joined.lte => date).count
-          labels << date.month.to_s + "/" + date.year.to_s
-          date = date >> 1
-        end
-      when "branch_pie"
+      vals = val.map {|v| [v[0],v[1]]}.to_hash 
+      min_date = Client.all.min(:date_joined)
+      max_date = Date.today >> 1
+      date = min_date
+      values = []
+      type ="bar"
+      while date <= max_date 
+        values << (vals[date.year.to_s + "_" + date.month.to_s] or 0)
+        labels << "#{date.month.to_s}.#{date.year.to_s}"
+        date = date >> 1
+      end
+      elements = [{:type => "bar", :values => values}]
+      title = {:text => ""}
+      x_axis = {:steps => 5, :labels => {:labels => labels.to_json}}
+      y_axis = {:steps => get_steps(values.max), :min => 0, :max => values.max}
+      return {:elements => elements, :x_axis => x_axis, :y_axis => y_axis, :title => title}.to_json
+    when "client_cumulative"
+      val = repository.adapter.query("select count(*) count, date_joined date from clients group by date(date_joined)").sort_by{|x| x.date}
+      min_date = val[0].date
+      max_date = val[-1].date
+      values = []
+      type ="line"
+      count = 0
+      val.each{|row|
+        count+=row.count
+        values << count
+        labels << row.date
+      }
+      elements = [{:type => "bar", :values => values}]
+      title = {:text => ""}
+      x_axis = {:steps => 5, :labels => {:labels => labels.to_json}}
+      y_axis = {:steps => get_steps(values.max), :min => 0, :max => values.max}
+      return {:elements => elements, :x_axis => x_axis, :y_axis => y_axis, :title => title}.to_json
+    when "branch_pie"
         values = Branch.all.map {|b| b.centers.clients.loans.sum(:amount) || 0 }
-        type = "pie"
-      when "center_day"
+      type = "pie"
+    when "center_day"
       vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{params[:date]}' GROUP BY lh.center_id")
       values = vals.map do |v| 
         val = v[0] + v[1]
@@ -308,7 +309,6 @@ class GraphData < Application
       type="pie" 
     end
     render_graph(values, type, labels)
-
   end
 
   def render_graph(vals, type = "bar", labels = [], steps = 10)
@@ -318,5 +318,17 @@ class GraphData < Application
     return x.to_json
  end    
 
-
+  private
+  def get_steps(max)
+    divisor = power(max)
+    (max/(10**divisor)).to_i*10*divisor
+  end
+  
+  def power(val, base=10)
+    itr=1
+    while val/(base**itr) > 1
+      itr+=1
+    end
+    return itr-1
+  end
 end

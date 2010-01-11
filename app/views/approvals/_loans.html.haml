@@ -1,0 +1,56 @@
+%h2
+  Loans
+=form_for(@loans, :action => url("approvals/update/loans")) do
+  %table{:width => "100%"}
+    %tr{:style => "text-align: left;"}
+      %th
+        Client Name
+      %th
+        Amount
+      %th
+        Appication date
+      %th
+        Disbursal date
+      %th
+        Branch
+      %th
+        Center
+      %th
+        Group
+      %th
+        Created by
+      %th
+        Creation date
+      %th
+        %a{:href => "#", :onclick => "$('input.loan_approval_box').attr('checked', true);"}
+          Check all
+        ==/
+        %a{:href => "#", :onclick => "$('input.loan_approval_box').attr('checked',false);"}
+          Check none
+    -@loans.each do |loan|
+      -client=loan.client
+      %tr
+        %td
+          =client.name
+        %td
+          =loan.amount
+        %td
+          =loan.applied_on
+        %td
+          =loan.disbursal_date
+        %td
+          =client.center ? client.center.branch.name : "-"
+        %td
+          =client.center ? client.center.name : "-"
+        %td
+          =client.client_group ? client.client_group.name : "-"
+        %td
+          =loan.created_by_user_id and loan.created_by_user_id>0 ? client.created_by.login : "-"
+        %td
+          =loan.created_at ? client.created_at.strftime("%Y-%m-%d") : ""
+        %td
+          =check_box(:name => "loans[#{loan.id}][]", :class => "loan_approval_box", :value => 1)
+    %tr
+      %td{:colspan => 9}
+      %td
+        =submit("Approve")
