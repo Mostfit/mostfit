@@ -12,7 +12,7 @@ module DataEntry
     def by_center
       @center = Center.get(params[:center_id]) if params[:center_id]
       if params[:center_text] and not @center
-          @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
+        @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
       end
       @date = Date.parse(params[:for_date]) if params[:for_date]
       @branch = @center.branch unless @center.nil?
@@ -116,7 +116,6 @@ module DataEntry
       @errors = []
       if params[:paid][:loan]
         params[:paid][:loan].keys.each do |k|
-          debugger
           @loan = Loan.get(k.to_i)
           amounts = params[:paid][:loan][k.to_sym].to_i
           if params[:submit] == "Pay Fees" # dangerous!
@@ -124,16 +123,13 @@ module DataEntry
             return
           end
           @type = params[:payment][:type]
-          debugger
           style = params[:payment_style][k.to_sym].to_sym
           success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, false, style)
-          debugger
           @errors << @prin.errors if (@prin and not @prin.errors.blank?)
           @errors << @int.errors if (@int and not @int.errors.blank? )
           @errors << @fees.errors if (@fees and not @fees.errors.blank?)
         end
       end
-      debugger
       if params[:paid][:client]
         params[:paid][:client].keys.each do |k|
           client = Client.get(k)

@@ -29,7 +29,7 @@ class Loan
   property :loan_product_id,                Integer,  :index => true
 
   property :applied_by_staff_id,            Integer, :nullable => true, :index => true 
-  property :approved_by_staff_id,           Integer, :nullable => true, :index => true 
+  property :approved_by_staff_id,           Integer, :nullable => true, :index => true
   property :rejected_by_staff_id,           Integer, :nullable => true, :index => true 
   property :disbursed_by_staff_id,          Integer, :nullable => true, :index => true 
   property :written_off_by_staff_id,        Integer, :nullable => true, :index => true 

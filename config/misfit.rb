@@ -48,6 +48,9 @@ module Misfit
       :data_entry => {
         :all => [:"data_entry/payments",:"data_entry/clients",:"data_entry/loans", :"data_entry/index"]
       },
+      :read_only => {
+        :all => [:browse, :centers, :payments, :clients, :"data_entry/payments",:"data_entry/clients",:"data_entry/loans", :"data_entry/index"]
+      },
       :staff_member => {
         :all =>[:browse, :centers, :payments, :clients, :"data_entry/payments", :"data_entry/clients", :"data_entry/loans", :"data_entry/index"],
       }

@@ -19,10 +19,13 @@ class Payment
   property :deleted_by_user_id, Integer, :nullable => true, :index => true
   property :created_at,         DateTime,:nullable => false, :default => Time.now, :index => true
   property :deleted_at,         ParanoidDateTime, :nullable => true, :index => true
+  property :created_by_user_id,  Integer, :nullable => false, :index => true
+  property :approved_by_user_id, Integer, :nullable => true, :index => true, :default => 0
 
   belongs_to :loan, :nullable => true
   belongs_to :client
   belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
+  belongs_to :approved_by, :child_key => [:approved_by_user_id],  :model => 'User'  
   belongs_to :received_by, :child_key => [:received_by_staff_id], :model => 'StaffMember'
   belongs_to :deleted_by,  :child_key => [:deleted_by_user_id],   :model => 'User'
 
