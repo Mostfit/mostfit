@@ -119,7 +119,7 @@ class Loan
       if k==:min and loan_attr and product_attr and  loan_attr < product_attr
         return [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
       elsif k==:max and loan_attr and product_attr and  loan_attr > product_attr
-        return  [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"] 
+       return  [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"] 
       end      
     }
     #check if loan is follows the minimum discrete value for amount and interest
