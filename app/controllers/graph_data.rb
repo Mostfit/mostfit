@@ -294,10 +294,11 @@ class GraphData < Application
       y_axis = {:steps => get_steps(values.max), :min => 0, :max => values.max}
       return {:elements => elements, :x_axis => x_axis, :y_axis => y_axis, :title => title}.to_json
     when "branch_pie"
-        values = Branch.all.map {|b| b.centers.clients.loans.sum(:amount) || 0 }
+      values = Branch.all.map{|b| loans = b.centers.clients.loans; loans.length>0 ? loans.sum(:amount) : 0 }
       type = "pie"
     when "center_day"
-      vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{params[:date]}' GROUP BY lh.center_id")
+      date =  Date.parse(params[:date])
+      vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{date.to_s}' GROUP BY lh.center_id")
       values = vals.map do |v| 
         val = v[0] + v[1]
         color_ratio = val == 0 ? 1 : v[0]/val
