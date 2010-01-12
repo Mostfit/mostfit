@@ -1,56 +1,59 @@
 %h2
   Payments
 =form_for(@payments, :action => url("approvals/update/payments")) do
-  %table{:width => "100%"}
-    %tr{:style => "text-align: left;"}
-      %th
-        Client Name
-      %th
-        Amount
-      %th
-        Type
-      %th
-        Branch
-      %th
-        Center
-      %th
-        Group
-      %th
-        Created by
-      %th
-        Collected by
-      %th
-        Creation date
-      %th
-        %a{:href => "#", :onclick => "$('input.payment_approval_box').attr('checked', true);"}
-          Check all
-        ==/
-        %a{:href => "#", :onclick => "$('input.payment_approval_box').attr('checked',false);"}
-          Check none
-    -@payments.each do |payment|
-      -client=payment.loan ? payment.loan.client : payment.client
+  - if @payments and @payments.length>0
+    %table{:width => "100%"}
+      %tr{:style => "text-align: left;"}
+        %th
+          Client Name
+        %th
+          Amount
+        %th
+          Type
+        %th
+          Branch
+        %th
+          Center
+        %th
+          Group
+        %th
+          Created by
+        %th
+          Collected by
+        %th
+          Creation date
+        %th
+          %a{:href => "#", :onclick => "$('input.payment_approval_box').attr('checked', true);"}
+            Check all
+          ==/
+          %a{:href => "#", :onclick => "$('input.payment_approval_box').attr('checked',false);"}
+            Check none
+      -@payments.each do |payment|
+        -client=payment.loan ? payment.loan.client : payment.client
+        %tr
+          %td
+            =client.name
+          %td
+            =payment.amount
+          %td
+            =payment.type
+          %td
+            =client.center ? client.center.branch.name : "-"
+          %td
+            =client.center ? client.center.name : "-"
+          %td
+            =client.client_group ? client.client_group.name : "-"
+          %td
+            =payment.created_by_user_id>0 ? payment.created_by.login : "-"
+          %td
+            =payment.received_by ? payment.received_by.name : ""
+          %td
+            =payment.created_at ? payment.created_at.strftime("%Y-%m-%d") : ""
+          %td
+            =check_box(:name => "payments[#{payment.id}][]", :class => "payment_approval_box", :value => 1)
       %tr
+        %td{:colspan => 9}
         %td
-          =client.name
-        %td
-          =payment.amount
-        %td
-          =payment.type
-        %td
-          =client.center ? client.center.branch.name : "-"
-        %td
-          =client.center ? client.center.name : "-"
-        %td
-          =client.client_group ? client.client_group.name : "-"
-        %td
-          =payment.created_by_user_id>0 ? payment.created_by.login : "-"
-        %td
-          =payment.received_by ? payment.received_by.name : ""
-        %td
-          =payment.created_at ? payment.created_at.strftime("%Y-%m-%d") : ""
-        %td
-          =check_box(:name => "payments[#{payment.id}][]", :class => "payment_approval_box", :value => 1)
-    %tr
-      %td{:colspan => 9}
-      %td
-        =submit("Approve")
+          =submit("Approve")
+  -else
+    %i==No pending approvals
