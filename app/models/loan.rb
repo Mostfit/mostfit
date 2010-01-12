@@ -140,7 +140,7 @@ class Loan
   end
 
   def clear_cache
-    @payments_cache = @schedule = @history_array = @fee_schedule = nil
+    @payments_cache = @schedule = @history_array = @fee_schedule = @hols = nil
   end
 
   # this method returns the last date the loan history makes sense
@@ -218,6 +218,16 @@ class Loan
     else
       new_date
     end
+    # shift date for holidays
+    @hols ||= Holiday.all.map{|h| [h.date, h]}.to_hash
+    while @hols.keys.include?(new_date)
+      case @hols[new_date].shift_meeting
+        when :before
+          new_date -= 1 
+        when :after
+          new_date += 1
+      end
+    end
     new_date
   end
 
@@ -246,7 +256,6 @@ class Loan
 
 
   def repay(input, user, received_on, received_by, defer_update = false, style = :normal)
-    debugger
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
     unless input.is_a? Array or input.is_a? Fixnum

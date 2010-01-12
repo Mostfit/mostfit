@@ -1,4 +1,35 @@
 
+StaffMember
+- should not be valid without a name
+- should not  be valid without active boolean
+- should be unique
+- should have name length > 3
+
+FundingLine
+- should not be valid without belonging to a funder
+- should not have a blank interest_rate
+- should not have a blank disbursal_date
+- should not have a blank amount
+- should not have blank last payment date
+- should have first payment done before last payment
+- should be disbursed before first payment
+
+Funder
+- should not be valid without having a name
+- should be able to have funding lines
+- should give correct count of completed lines 
+- should give correct count of active lines
+- should give correct count of total lines 
+
+LoanType
+- should have specs (PENDING: Not Yet Implemented)
+
+LedgerEntry
+- should have specs (PENDING: Not Yet Implemented)
+
+ClientGroup
+- should have specs (PENDING: Not Yet Implemented)
+
 User
 - should not be valid with name shorter than 3 characters
 - should not have a nil login 
@@ -7,26 +38,29 @@ User
 - should have a login name beginning with numbers, aplphabets and underscores 
 - should have a role
 
-Center
-- should not be valid without a manager
-- should not be valid without a name
-- should not be valid with a name shorter than 3 characters
-- should be able to 'have' clients
+Upload
+- before(:all) (FAILED - 1)
 
-Payment
-- should not be valid without belonging to a loan
-- should not be valid without being created by a staff member
-- should not be valid without being received by a staff member
-- should not be valid without being created by active user
-- should not be valid without beng received by an active staff member
-- should not be valid without being properly deleted
-- should not be valid if date of receival is in future
-- should not be valid if interest is negative
-- should not be valid if principal is negative
-- should not be valid if total is negative
-- should not be valid if payment is received before disbursal of loan
-- should not be valid if paying too much principal
-- should not be valid if paying too much interest
+Attendancy
+- should not be valid without belonging to a client
+- should not be valid without proper date
+- should not be valid when attendancy date is in future
+- should not be valid without proper status
+
+Upload
+- Should match calculation from excel
+
+LoanHistory
+- should not be valid without scheduled outstanding principal
+- should not be valid without scheduled outstanding total
+- should not be valid without actual outstanding principal
+- should not be valid without actual outstanding total
+- should not be valid without having a proper status
+- should not be valid if the combination if loan id and date is not unique
+- should have correct number of periods
+- should start with the application date, approval date, disbursal date and first payment date
+- should have the following dates afterwards
+- should have correct amounts
 
 Report
 - should have 2 * 7 centers and centers * 3 clients
@@ -47,14 +81,61 @@ Report
 - should give correct total outstanding
 - should give correct scheduled total outstanding
 
-Attendancy
-- should not be valid without belonging to a client
-- should not be valid without proper date
-- should not be valid when attendancy date is in future
-- should not be valid without proper status
+Branch
+- should not be valid without a manager
+- should not be valid without a name
+- should not be valid with a name shorter than 3 characters
+- should be able to 'have' centers
 
-LoanType
-- should have specs (PENDING: Not Yet Implemented)
+Center
+- should not be valid without a manager
+- should not be valid without a name
+- should not be valid with a name shorter than 3 characters
+- should be able to 'have' clients
+
+Client
+- should not be valid without belonging to a center
+- should not be valid without a name
+- should not be valid without a reference
+- should not be valid with name shorter than 3 characters
+- should have a joining date
+- should be able to 'have' loans
+- should not have more than one outstanding loan at a time if so specified (PENDING: Not Yet Implemented)
+
+Payment
+- should not be valid without belonging to a loan
+- should not be valid without being created by a staff member
+- should not be valid without being received by a staff member
+- should not be valid without being created by active user
+- should not be valid without beng received by an active staff member
+- should not be valid without being properly deleted
+- should not be valid if date of receival is in future
+- should not be valid if interest is negative
+- should not be valid if principal is negative
+- should not be valid if total is negative
+- should not be valid if payment is received before disbursal of loan
+- should not be valid if paying too much principal
+- should not be valid if paying too much interest
+
+Fee
+- should have a name
+- should have either an amount or a percentage
+- should never return less than min_amount
+- should never return more than max_amount
+- should return correct fee_schedule for loan
+- should return correct fee_schedule for multiple fees even on the same date
+- should return correct fees payable
+- should return correct fees_paid
+- should give correct fee schedule for client
+- should work just as well for another fee
+- should pay client fees correctly
+
+Holiday
+- should have a name
+- should have a date
+- should have a behaivour
+- should update
+- should have unique date
 
 Loan
 - should have a discrimintator
@@ -94,106 +175,33 @@ Loan
 - .payments_hash should give correct results
 - history should be correct
 - should write the history correctly into the db
-
-LoanHistory
-- should not be valid without scheduled outstanding principal
-- should not be valid without scheduled outstanding total
-- should not be valid without actual outstanding principal
-- should not be valid without actual outstanding total
-- should not be valid without having a proper status
-- should not be valid if the combination if loan id and date is not unique
-- should have correct number of periods
-- should start with the application date, approval date, disbursal date and first payment date
-- should have the following dates afterwards
-- should have correct amounts
-
-LedgerEntry
-- should have specs (PENDING: Not Yet Implemented)
-
-StaffMember
-- should not be valid without a name
-- should not  be valid without active boolean
-- should be unique
-- should have name length > 3
-
-Funder
-- should not be valid without having a name
-- should be able to have funding lines
-- should give correct count of completed lines 
-- should give correct count of active lines
-- should give correct count of total lines 
-
-Upload
-- Should match calculation from excel
-
-Fee
-- should have a name
-- should have either an amount or a percentage
-- should never return less than min_amount
-- should never return more than max_amount
-- should return correct fee_schedule for loan
-- should return correct fee_schedule for multiple fees even on the same date
-- should return correct fees payable
-- should return correct fees_paid
-- should give correct fee schedule for client
-- should work just as well for another fee
-- should pay client fees correctly
-
-Client
-- should not be valid without belonging to a center
-- should not be valid without a name
-- should not be valid without a reference
-- should not be valid with name shorter than 3 characters
-- should have a joining date
-- should be able to 'have' loans
-- should not have more than one outstanding loan at a time if so specified (PENDING: Not Yet Implemented)
-
-ClientGroup
-- should have specs (PENDING: Not Yet Implemented)
-
-Upload
-- before(:all) (FAILED - 1)
-
-Branch
-- should not be valid without a manager
-- should not be valid without a name
-- should not be valid with a name shorter than 3 characters
-- should be able to 'have' centers
-
-FundingLine
-- should not be valid without belonging to a funder
-- should not have a blank interest_rate
-- should not have a blank disbursal_date
-- should not have a blank amount
-- should not have blank last payment date
-- should have first payment done before last payment
-- should be disbursed before first payment
+- .installment_dates should correctly deal with holidays
 
 Pending:
 
 LoanType should have specs (Not Yet Implemented)
 ./spec/models/loan_type_spec.rb:5
 
-Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
-./spec/models/loan_spec.rb:335
-
 LedgerEntry should have specs (Not Yet Implemented)
 ./spec/models/ledger_entry_spec.rb:5
-
-Client should not have more than one outstanding loan at a time if so specified (Not Yet Implemented)
-./spec/models/client_spec.rb:120
 
 ClientGroup should have specs (Not Yet Implemented)
 ./spec/models/client_group_spec.rb:5
 
+Client should not have more than one outstanding loan at a time if so specified (Not Yet Implemented)
+./spec/models/client_spec.rb:120
+
+Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
+./spec/models/loan_spec.rb:335
+
 1)
 NoMethodError in 'Upload before(:all)'
 undefined method `info' for nil:NilClass
-/home/svs/src/manndeshi/app/models/upload.rb:67:in `load_csv'
-/home/svs/src/manndeshi/app/models/upload.rb:31:in `each'
-/home/svs/src/manndeshi/app/models/upload.rb:31:in `load_csv'
+/home/svs/src/mostfit/app/models/upload.rb:67:in `load_csv'
+/home/svs/src/mostfit/app/models/upload.rb:31:in `each'
+/home/svs/src/mostfit/app/models/upload.rb:31:in `load_csv'
 ./spec/models/upload_spec.rb:19:
 
-Finished in 80.820313 seconds
+Finished in 93.139384 seconds
 
-133 examples, 1 failure, 5 pending
+139 examples, 1 failure, 5 pending

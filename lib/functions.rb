@@ -10,6 +10,10 @@ class Date
     WEEKDAYS[cwday - 1]
   end
 
+  def is_holiday?
+    Holiday.all.include?(self)
+  end
+
 #  def to_s
 #    "#{year}-#{month}-#{day} (#{weekday.to_s[0..2]})"
 #  end

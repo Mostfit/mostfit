@@ -44,6 +44,7 @@ class Clients < Application
   end
 
   def update(id, client)
+    debugger
     @client = Client.get(id)
     raise NotFound unless @client
     if @client.update_attributes(client)

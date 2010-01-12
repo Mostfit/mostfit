@@ -506,5 +506,22 @@ describe Loan do
     lhs = LoanHistory.all(:loan_id => @loan.id, :order => [:date])
     lhs.last.current.should == true
   end
+
+  it ".installment_dates should correctly deal with holidays" do
+    Holiday.all.destroy!
+    d1 = @loan.installment_dates[5]
+    @h = Holiday.new(:name => "test", :date => d1, :shift_meeting => :before)
+    @h.save
+    @h.should be_valid
+    @loan.clear_cache
+    @loan.installment_dates[5].should == (d1 - 1)
+    @h.shift_meeting = :after
+    @h.save
+    @loan.clear_cache
+    @loan.installment_dates[5].should == (d1 + 1)
+    @h.destroy!
+    @loan.clear_cache
+  end
+
       
 end
