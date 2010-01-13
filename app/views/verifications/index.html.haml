@@ -1,7 +1,14 @@
 %h1
   Pending approval
 -if params[:model]
-  =date_select("date")
+  %form{:action => "/verifications", :enctype => "multipart/form-data",  :method => "GET"}
+    %input{:type => "hidden", :name => "model", :value => params[:model]}
+    %b
+      Date range:     
+    =date_select("from_date", @from_date)
+    ==-- 
+    =date_select("to_date", @to_date)
+    %input{:type => "submit", :value => "Filter"}
   =partial "verifications/#{params[:model]}" rescue nil
 -else
   %br

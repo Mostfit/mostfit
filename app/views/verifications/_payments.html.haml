@@ -5,17 +5,19 @@
     %table{:width => "100%"}
       %tr{:style => "text-align: left;"}
         %th
+          ID
+        %th
           Client Name
         %th
           Amount
         %th
           Type
         %th
+          Loan ID
+        %th
           Branch
         %th
           Center
-        %th
-          Group
         %th
           Created by
         %th
@@ -32,17 +34,19 @@
         -client=payment.loan ? payment.loan.client : payment.client
         %tr
           %td
+            =payment.id
+          %td
             =client.name
           %td
             =payment.amount
           %td
             =payment.type
           %td
+            =payment.loan_id
+          %td
             =client.center ? client.center.branch.name : "-"
           %td
             =client.center ? client.center.name : "-"
-          %td
-            =client.client_group ? client.client_group.name : "-"
           %td
             =payment.created_by_user_id>0 ? payment.created_by.login : "-"
           %td

@@ -5,6 +5,8 @@
     %table{:width => "100%"}
       %tr{:style => "text-align: left;"}
         %th
+          ID
+        %th
           Client Name
         %th
           Amount
@@ -31,6 +33,8 @@
       -@loans.each do |loan|
         -client=loan.client
         %tr
+          %td
+            =loan.id
           %td
             =client.name
           %td

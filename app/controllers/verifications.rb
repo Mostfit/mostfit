@@ -1,17 +1,21 @@
 class Verifications < Application
+  include DateParser
+
   def index
-    centers   = centers(session.user)
+    @centers   = centers(session.user)
+    @from_date = params[:from_date] ? parse_date(params[:from_date]).to_time         : Client.min(:created_at)
+    @to_date   = params[:to_date]   ? parse_date(params[:to_date]).to_time+24*3600-1 : DateTime.now
     case params[:model]
     when "clients"
-      @clients  = clients(centers) 
+      @clients  = clients
     when "loans"
-      @loans    = loans(centers)
+      @loans    = loans
     when "payments"
-      @payments = payments(centers)
+      @payments = payments
     else
-      @clients_count  = clients(centers).count
-      @loans_count    = loans(centers).count
-      @payments_count = payments(centers).count
+      @clients_count  = clients.count
+      @loans_count    = loans.count
+      @payments_count = payments.count
     end
     display "verifications/index"
   end
@@ -27,21 +31,24 @@ class Verifications < Application
   end
 
   private
-  def clients(centers = nil)
+  def clients
     hash = {:verified_by_user_id => nil}
-    hash[:center_id] = centers.map{|x| x.id} if centers
+    hash[:center_id] = @centers.map{|x| x.id} if @centers
+    hash[:created_at] = @from_date..@to_date
     Client.all(hash)
   end
   
-  def loans(centers = nil, type = :objects)
+  def loans(type = :objects)
     hash = {:verified_by_user_id => nil}
-    hash[:client_id] = Client.all(:center_id => centers.map{|x| x.id}).map{|x| x.id} if centers
+    hash[:client_id] = Client.all(:center_id => @centers.map{|x| x.id}).map{|x| x.id} if @centers
+    hash[:created_at] = @from_date..@to_date
     Loan.all(hash)
   end
   
   def payments(centers = nil, type = :objects)
     hash = {:verified_by_user_id => nil}
-    hash[:loan_id]   = Loan.all(:client_id => Client.all(:center_id => centers.map{|x| x.id}).map{|x| x.id}).map{|x| x.id} if centers
+    hash[:loan_id]   = Loan.all(:client_id => Client.all(:center_id => @centers.map{|x| x.id}).map{|x| x.id}).map{|x| x.id} if @centers
+    hash[:created_at] = @from_date..@to_date
     Payment.all(hash)
   end
 
