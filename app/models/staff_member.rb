@@ -5,6 +5,7 @@ class StaffMember
   property :name,    String, :length => 100, :nullable => false
   property :mobile_number,  String, :length => 12,  :nullable => true
   property :active,  Boolean, :default => true, :nullable => false  
+  property :user_id,  Integer,  :nullable => true  
   # no designations, they are derived from the relations it has
 
   has n, :branches, :child_key => [:manager_staff_id]
@@ -16,7 +17,7 @@ class StaffMember
   has n, :written_off_loans, :child_key => [:written_off_by_staff_id], :model => 'Loan'
 
   has n, :payments, :child_key  => [:received_by_staff_id]
-  belongs_to :user, :nullable => true
+  belongs_to :user
   validates_is_unique :name
   validates_length :name, :min => 3
   

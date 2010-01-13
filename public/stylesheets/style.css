@@ -204,6 +204,10 @@ ul.menu li {
   float: right;
   margin-top: 0px;
 }
+.graph_page{
+  float: left;
+  margin: 20px;
+}
 
 #breadcrums {
   font-size: 13px;

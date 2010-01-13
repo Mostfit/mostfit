@@ -23,26 +23,29 @@ class Loan
   property :validated_on,                   Date, :auto_validation => false, :index => true
 
   property :validation_comment,             Text
-  property :created_at,                     DateTime, :index => true
+  property :created_at,                     DateTime, :index => true, :default => Time.now
   property :updated_at,                     DateTime, :index => true
   property :deleted_at,                     ParanoidDateTime
   property :loan_product_id,                Integer,  :index => true
 
   property :applied_by_staff_id,            Integer, :nullable => true, :index => true 
-  property :approved_by_staff_id,           Integer, :nullable => true, :index => true 
+  property :approved_by_staff_id,           Integer, :nullable => true, :index => true
   property :rejected_by_staff_id,           Integer, :nullable => true, :index => true 
   property :disbursed_by_staff_id,          Integer, :nullable => true, :index => true 
   property :written_off_by_staff_id,        Integer, :nullable => true, :index => true 
   property :validated_by_staff_id,          Integer, :nullable => true, :index => true 
+  property :verified_by_user_id,            Integer, :nullable => true, :index => true
+  property :created_by_user_id,             Integer, :nullable => true, :index => true
   # associations
   belongs_to :client
   belongs_to :funding_line
-  belongs_to :applied_by,     :child_key => [:applied_by_staff_id],     :model => 'StaffMember'
-  belongs_to :approved_by,    :child_key => [:approved_by_staff_id],    :model => 'StaffMember'
-  belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],    :model => 'StaffMember'
-  belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],   :model => 'StaffMember'
-  belongs_to :written_off_by, :child_key => [:written_off_by_staff_id], :model => 'StaffMember'
-  belongs_to :validated_by,   :child_key => [:validated_by_staff_id],   :model => 'StaffMember'
+  belongs_to :applied_by,     :child_key => [:applied_by_staff_id],       :model => 'StaffMember'
+  belongs_to :approved_by,    :child_key => [:approved_by_staff_id],      :model => 'StaffMember'
+  belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],      :model => 'StaffMember'
+  belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],     :model => 'StaffMember'
+  belongs_to :written_off_by, :child_key => [:written_off_by_staff_id],   :model => 'StaffMember'
+  belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
+
   has n, :payments
   has n, :history, :model => 'LoanHistory'
   belongs_to :loan_product
@@ -325,7 +328,6 @@ class Loan
       clear_cache
       return true
     end
-    p payment.errors
     false
   end
 
