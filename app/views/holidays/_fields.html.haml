@@ -1,0 +1,16 @@
+%table
+  %tr
+    %th
+      Name
+    %td
+      = text_field :name
+  %tr
+    %th
+      Date
+    %td
+      = date_select_for @holiday, :date
+  %tr
+    %th
+      Shifts Meeting
+    %td
+      = select :shift_meeting, :collection => [[:before,"before"],[:after,"after"]]

@@ -29,6 +29,7 @@ class Clients < Application
   def create(client)
     @client = Client.new(client)
     @client.center = @center if @center# set direct context
+    @client.created_by_user_id = session.user.id
     if @client.save
       redirect resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' was successfully created"}
     else
@@ -40,12 +41,15 @@ class Clients < Application
     only_provides :html
     @client = Client.get(id)
     raise NotFound unless @client
+    disallow_updation_of_verified_clients
     display @client
   end
 
   def update(id, client)
+    debugger
     @client = Client.get(id)
     raise NotFound unless @client
+    disallow_updation_of_verified_clients
     if @client.update_attributes(client)
       if @branch and @center
         redirect(resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' has been edited"})
@@ -64,6 +68,7 @@ class Clients < Application
   def destroy(id)
     @client = Client.get(id)
     raise NotFound unless @client
+    disallow_updation_of_verified_clients
     if @client.destroy
       redirect resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' has been deleted"}
     else
@@ -88,5 +93,8 @@ class Clients < Application
       @center = Center.get(params[:center_id]) 
       raise NotFound unless @branch and @center
     end
+  end
+  def disallow_updation_of_verified_clients
+    raise NotPrivileged if @client.verified_by_user_id and not session.user.admin?
   end
 end # Clients

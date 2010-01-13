@@ -1,7 +1,19 @@
-.graph
-  = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'client_growth',  :scope_unit => 'months', :scope_size => 3) )
-  = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'branch_pie',  :scope_unit => 'months', :scope_size => 3) )
-  = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'client_cumulative',  :scope_unit => 'months', :scope_size => 3) )
-  = ofc2(430, 200, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'total', :scope_unit => 'months', :scope_size => 3) )
+= js_include_tag :swfobject, :jquery, :application, "jquery.shortkeys.js"
+.graph_page  
+  %h1
+    Client added by date
+  = @graph1
+.graph_page
+  %h1
+    Per branch growth
+  = @graph2
+.graph_page
+  %h1
+    Client cummulative growth
+  = @graph3
+.graph_page
+  %h1
+    Aggregate loan graph
+  = @graph4
 
 

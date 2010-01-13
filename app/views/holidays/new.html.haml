@@ -1,0 +1,9 @@
+%h1 New Holiday
+
+= error_messages_for @holiday
+
+= form_for(@holiday, :action => url(:holidays) ) do
+  = partial :fields
+  = submit "Create"
+
+= link_to 'Back', url(:holidays)

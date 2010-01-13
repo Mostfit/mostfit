@@ -17,8 +17,12 @@ class Client
   property :grt_pass_date,  Date,    :index => true, :nullable => true
   property :client_group_id,Integer, :index => true, :nullable => true
   property :center_id,      Integer, :index => true, :nullable => true
-  property :created_at,     DateTime
+  property :created_at,     DateTime, :default => Time.now
   property :deleted_at,     ParanoidDateTime
+  property :client_type,    Enum[:default], :default => :default
+  property :created_by_user_id,  Integer, :nullable => false, :index => true
+  property :verified_by_user_id, Integer, :nullable => true, :index => true
+
   property :account_number, String, :length => 20, :nullable => true
   property :type_of_account, Enum.send('[]', *['', 'savings', 'current', 'no_frill', 'fixed_deposit', 'loan', 'other'])
   property :bank_name,      String, :length => 20, :nullable => true
@@ -92,6 +96,8 @@ class Client
 
   validates_length :account_number, :max => 20
 
+  belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
+  belongs_to :verified_by, :child_key => [:verified_by_user_id],  :model => 'User'  
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},

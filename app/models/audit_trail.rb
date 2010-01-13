@@ -4,14 +4,11 @@ class AuditTrail
   property :id,              Serial
   property :auditable_id,    Integer, :nullable => false
   property :auditable_type,  String,  :nullable => false, :length => 50
-  property :user_name,       String,  :nullable => false  # the user name will not change often
   property :message,         String
-  property :action,          String,  :nullable => false, :length => 50
+  property :action,          Enum[:create, :update, :delete],  :nullable => false
   property :changes,         Yaml, :length => 20000
-#  property :version,         Integer, :nullable => false, :default => 0
   property :created_at,      DateTime
   property :type, Enum[:log, :warning, :error]
-
   belongs_to :user
 
   def trail_for(obj, limit = nil)

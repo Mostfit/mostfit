@@ -53,16 +53,18 @@ class Loans < Application
     @loan = Loan.get(id)
     @loan_product =  @loan.loan_product
     raise NotFound unless @loan
+    disallow_updation_of_verified_loans
+    @loan.interest_rate*=100
     display @loan
   end
 
   def update(id)
-    debugger
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan = klass.get(id)
     @loan_product =  @loan.loan_product
-    raise NotFound unless @loan
+    raise NotFound unless @loa
+    disallow_updation_of_verified_loans
     if @loan.update_attributes(attrs)
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
     else
@@ -76,6 +78,7 @@ class Loans < Application
 
   def destroy(id)
     @loan = Loan.get(id)
+    disallow_updation_of_verified_loans
     raise NotFound unless @loan
     if @loan.destroy
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been deleted"}
@@ -117,5 +120,9 @@ class Loans < Application
     raise NotFound if not params[:loan_type]
     klass = Kernel::const_get(params[:loan_type])
     [klass, attrs]
+  end
+
+  def disallow_updation_of_verified_loans
+    raise NotPrivileged if @loan.verified_by_user_id and not session.user.admin?
   end
 end # Loans

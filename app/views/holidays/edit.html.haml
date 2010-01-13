@@ -1,0 +1,9 @@
+%h1 Edit Holiday
+
+= error_messages_for @holiday
+
+= form_for(@holiday, :action => url(:holidays) ) do
+  = partial :fields
+  = submit "Edit"
+
+= link_to 'Back', url(:holidays)

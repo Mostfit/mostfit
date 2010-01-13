@@ -23,26 +23,29 @@ class Loan
   property :validated_on,                   Date, :auto_validation => false, :index => true
 
   property :validation_comment,             Text
-  property :created_at,                     DateTime, :index => true
+  property :created_at,                     DateTime, :index => true, :default => Time.now
   property :updated_at,                     DateTime, :index => true
   property :deleted_at,                     ParanoidDateTime
   property :loan_product_id,                Integer,  :index => true
 
   property :applied_by_staff_id,            Integer, :nullable => true, :index => true 
-  property :approved_by_staff_id,           Integer, :nullable => true, :index => true 
+  property :approved_by_staff_id,           Integer, :nullable => true, :index => true
   property :rejected_by_staff_id,           Integer, :nullable => true, :index => true 
   property :disbursed_by_staff_id,          Integer, :nullable => true, :index => true 
   property :written_off_by_staff_id,        Integer, :nullable => true, :index => true 
   property :validated_by_staff_id,          Integer, :nullable => true, :index => true 
+  property :verified_by_user_id,            Integer, :nullable => true, :index => true
+  property :created_by_user_id,             Integer, :nullable => true, :index => true
   # associations
   belongs_to :client
   belongs_to :funding_line
-  belongs_to :applied_by,     :child_key => [:applied_by_staff_id],     :model => 'StaffMember'
-  belongs_to :approved_by,    :child_key => [:approved_by_staff_id],    :model => 'StaffMember'
-  belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],    :model => 'StaffMember'
-  belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],   :model => 'StaffMember'
-  belongs_to :written_off_by, :child_key => [:written_off_by_staff_id], :model => 'StaffMember'
-  belongs_to :validated_by,   :child_key => [:validated_by_staff_id],   :model => 'StaffMember'
+  belongs_to :applied_by,     :child_key => [:applied_by_staff_id],       :model => 'StaffMember'
+  belongs_to :approved_by,    :child_key => [:approved_by_staff_id],      :model => 'StaffMember'
+  belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],      :model => 'StaffMember'
+  belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],     :model => 'StaffMember'
+  belongs_to :written_off_by, :child_key => [:written_off_by_staff_id],   :model => 'StaffMember'
+  belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
+
   has n, :payments
   has n, :history, :model => 'LoanHistory'
   belongs_to :loan_product
@@ -119,7 +122,7 @@ class Loan
       if k==:min and loan_attr and product_attr and  loan_attr < product_attr
         return [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
       elsif k==:max and loan_attr and product_attr and  loan_attr > product_attr
-        return  [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"] 
+       return  [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"] 
       end      
     }
     #check if loan is follows the minimum discrete value for amount and interest
@@ -140,7 +143,7 @@ class Loan
   end
 
   def clear_cache
-    @payments_cache = @schedule = @history_array = @fee_schedule = nil
+    @payments_cache = @schedule = @history_array = @fee_schedule = @hols = nil
   end
 
   # this method returns the last date the loan history makes sense
@@ -218,6 +221,16 @@ class Loan
     else
       new_date
     end
+    # shift date for holidays
+    @hols ||= Holiday.all.map{|h| [h.date, h]}.to_hash
+    while @hols.keys.include?(new_date)
+      case @hols[new_date].shift_meeting
+        when :before
+          new_date -= 1 
+        when :after
+          new_date += 1
+      end
+    end
     new_date
   end
 
@@ -246,7 +259,6 @@ class Loan
 
 
   def repay(input, user, received_on, received_by, defer_update = false, style = :normal)
-    debugger
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
     unless input.is_a? Array or input.is_a? Fixnum
@@ -316,7 +328,6 @@ class Loan
       clear_cache
       return true
     end
-    p payment.errors
     false
   end
 

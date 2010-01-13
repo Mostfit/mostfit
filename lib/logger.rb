@@ -35,6 +35,7 @@ module Misfit
 
 
     def get_object_state
+      debugger
       model = self.class.to_s.singular
       object = eval"#{model}.get(params[:id])"
       @ributes = object.attributes

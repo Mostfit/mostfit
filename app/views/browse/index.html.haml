@@ -5,9 +5,11 @@
 
 %ul
   %li
-    = link_to 'Branches', url(:browse, :action => 'branches')
+    = link_to('Branches', url(:browse, :action => 'branches'), :class => 'edit')
   %li
-    = link_to 'Staff members', resource(:staff_members)
+    = link_to('Staff members', resource(:staff_members), :class => 'edit')
   - (Misfit::Extensions::Browse.instance_methods - ["before"]).each do |m|
     %li
-      = link_to m.humanize, url(:browse, m)
+      = link_to(m.humanize, url(:browse, m), :class => 'edit')
+  %li
+    = link_to_with_rights 'Verify data', resource(:verifications), :class => 'edit'

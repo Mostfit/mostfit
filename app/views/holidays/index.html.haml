@@ -1,0 +1,27 @@
+%h1 Manage Holidays
+  
+%table{:width => "100%"}
+  %thead
+    %tr
+      %th
+        Holiday Name
+      %th
+        Date
+      %th
+        Shift Meeting
+      %th
+        Actions
+  - for holiday in @holidays
+    %tr{:class => cycle('odd','even')}
+      %td
+        = holiday.name
+      %td
+        = holiday.date
+      %td
+        = holiday.shift_meeting
+      %td
+        = link_to 'Show', url(:holiday, holiday)
+        |
+        = link_to 'Edit', url(:edit_holiday,  holiday)
+
+= link_to 'New', url(:new_holiday)
