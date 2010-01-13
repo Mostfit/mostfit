@@ -7,12 +7,6 @@ class Payments < Application
     display @payments
   end
 
-#   def show(id)
-#     @payment = Payment.get(id)
-#     raise NotFound unless @payment
-#     display @payment
-#   end
-
   def new
     only_provides :html
     @payment = Payment.new
@@ -44,27 +38,11 @@ class Payments < Application
     end
   end
 
-#   def edit(id)
-#     only_provides :html
-#     @payment = Payment.get(id)
-#     raise NotFound unless @payment
-#     display @payment
-#   end
-# 
-#   def update(id, payment)
-#     @payment = Payment.get(id)
-#     raise NotFound unless @payment
-#     if @payment.update_attributes(payment)
-#        redirect resource(@payment)
-#     else
-#       display @payment, :edit
-#     end
-#   end
-
   def delete(id)
     only_provides :html
     @payment = Payment.get(id)
     raise NotFound unless @payment
+    disallow_updation_of_verified_payments
     if @loan.delete_payment(@payment, session.user)
       redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
     else
@@ -75,6 +53,7 @@ class Payments < Application
   def destroy(id)
     @payment = Payment.get(id)
     raise NotFound unless @payment
+    disallow_updation_of_verified_payments
     if @loan.delete_payment(@payment, session.user)
       redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
     else
@@ -92,5 +71,8 @@ class Payments < Application
     @client = Client.get(params[:client_id])
     @loan   = Loan.get(params[:loan_id])
     raise NotFound unless @branch and @center and @client and @loan
+  end
+  def disallow_updation_of_verified_payments
+    raise NotPrivileged if @payment.verified_by_user_id and not session.user.admin?
   end
 end # Payments

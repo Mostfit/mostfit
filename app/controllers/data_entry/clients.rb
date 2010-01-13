@@ -10,6 +10,7 @@ module DataEntry
     
     def create(client)
       @client = Client.new(client)
+      @client.created_by_user_id = session.user.id
       if @client.save
         if params[:format]=='xml'#for xml thing return xml response
           display @client, ""

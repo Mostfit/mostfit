@@ -32,7 +32,6 @@ class Payment
 
   validates_present     :created_by, :received_by
   validates_with_method :loan_or_client_present?
-  validates_with_method :allowed_edit?, :unless => :new?
   validates_with_method :only_take_payments_on_disbursed_loans?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :created_by,  :method => :created_by_active_user?
   validates_with_method :received_by, :method => :received_by_active_staff_member?

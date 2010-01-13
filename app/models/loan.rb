@@ -23,7 +23,7 @@ class Loan
   property :validated_on,                   Date, :auto_validation => false, :index => true
 
   property :validation_comment,             Text
-  property :created_at,                     DateTime, :index => true
+  property :created_at,                     DateTime, :index => true, :default => Time.now
   property :updated_at,                     DateTime, :index => true
   property :deleted_at,                     ParanoidDateTime
   property :loan_product_id,                Integer,  :index => true
@@ -79,7 +79,6 @@ class Loan
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
-#  validates_with_method :allowed_edit?, :unless => :new?
   
   #product validations
   validates_with_method  :amount,                       :method => :is_valid_loan_product_amount
