@@ -9,9 +9,10 @@ class Approvals < Application
   def update(id)
     if ["clients", "loans", "payments"].include?(id) and params[id]
       klass = Kernel.const_get(id.singularize.capitalize)
-      approver_id = session.user.id
+      verifier_id = session.user.id
       klass.all(:id => params[id].keys).each{|obj|
-        obj.approved_by_user_id = approver_id
+        obj.verified_by_user_id = approver_id
+        debugger
         obj.save
       }
     end
@@ -20,14 +21,45 @@ class Approvals < Application
 
   private
   def clients
-    @clients = Client.all(:approved_by_user_id => nil)
+    if session.user.admin?
+      @clients = Client.all(:approved_by_user_id => nil)
+    elsif session.user.role==:staff_member
+      @clients = managed_centers(user).clients
+    else
+      @clients= []
+    end
   end
   
-  def loans
-    @loans = Loan.all(:approved_by_staff_id => nil)
+  def clients
+    if session.user.admin?
+      @loans = Loan.all(:approved_by_user_id => nil)
+    elsif session.user.role==:staff_member
+      @loans = managed_centers(user).clients.loans
+    else
+      @loans= []
+    end
   end
   
   def payments
-    @payments = Payment.all(:approved_by_user_id => nil)    
+    if session.user.admin?
+      @payments = Payment.all(:approved_by_user_id => nil)
+    elsif session.user.role==:staff_member
+      @payments = managed_centers(user).clients.loans.payments
+    else
+      @payments= []
+    end
+
+  end
+
+  def managed_centers(user)
+    staff = StaffMember.all(:user_id => user.id)
+    centers = []
+    if staff.length>0
+      debugger
+      centers << staff.branches.centers.map{|x| x.id}
+      centers << staff.centers.map{|x| x.id}
+      centers.uniq!
+    end
+    centers
   end
 end

@@ -1,6 +1,6 @@
 %h2
   Clients
-=form_for(@clients, :action => url("approvals/update/clients")) do
+=form_for(@clients, :action => url("verifications/update/clients")) do
   - if @clients and @clients.length>0
     %table{:width => "100%"}
       %tr{:style => "text-align: left;"}
@@ -51,4 +51,4 @@
         %td
           =submit("Approve")
   -else
-    %i==No pending approvals
+    %i==No pending verifications

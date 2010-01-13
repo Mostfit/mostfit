@@ -1,6 +1,6 @@
 %h2
   Payments
-=form_for(@payments, :action => url("approvals/update/payments")) do
+=form_for(@payments, :action => url("verifications/update/payments")) do
   - if @payments and @payments.length>0
     %table{:width => "100%"}
       %tr{:style => "text-align: left;"}
@@ -56,4 +56,4 @@
         %td
           =submit("Approve")
   -else
-    %i==No pending approvals
+    %i==No pending verifications

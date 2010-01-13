@@ -98,9 +98,9 @@ module DataEntry
       raise NotFound unless @payment
       @loan = @payment.loan
       if @loan.delete_payment(@payment, session.user)
-        redirect url(:enter_payments), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
+        redirect url(:data_entry), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
       else
-        redirect url(:enter_payments), :message => {:error => "Could not delete payment '#{@payment.id}'"}
+        redirect url(:data_entry), :message => {:notice => "Could not delete payment '#{@payment.id}'. #{@payment.errors.to_hash.values}"}
       end
     end
     

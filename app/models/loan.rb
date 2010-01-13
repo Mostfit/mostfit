@@ -34,15 +34,18 @@ class Loan
   property :disbursed_by_staff_id,          Integer, :nullable => true, :index => true 
   property :written_off_by_staff_id,        Integer, :nullable => true, :index => true 
   property :validated_by_staff_id,          Integer, :nullable => true, :index => true 
+  property :verified_by_user_id,            Integer, :nullable => true, :index => true
+  property :created_by_user_id,             Integer, :nullable => true, :index => true
   # associations
   belongs_to :client
   belongs_to :funding_line
-  belongs_to :applied_by,     :child_key => [:applied_by_staff_id],     :model => 'StaffMember'
-  belongs_to :approved_by,    :child_key => [:approved_by_staff_id],    :model => 'StaffMember'
-  belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],    :model => 'StaffMember'
-  belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],   :model => 'StaffMember'
-  belongs_to :written_off_by, :child_key => [:written_off_by_staff_id], :model => 'StaffMember'
-  belongs_to :validated_by,   :child_key => [:validated_by_staff_id],   :model => 'StaffMember'
+  belongs_to :applied_by,     :child_key => [:applied_by_staff_id],       :model => 'StaffMember'
+  belongs_to :approved_by,    :child_key => [:approved_by_staff_id],      :model => 'StaffMember'
+  belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],      :model => 'StaffMember'
+  belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],     :model => 'StaffMember'
+  belongs_to :written_off_by, :child_key => [:written_off_by_staff_id],   :model => 'StaffMember'
+  belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
+
   has n, :payments
   has n, :history, :model => 'LoanHistory'
   belongs_to :loan_product
@@ -76,6 +79,7 @@ class Loan
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
+#  validates_with_method :allowed_edit?, :unless => :new?
   
   #product validations
   validates_with_method  :amount,                       :method => :is_valid_loan_product_amount
@@ -316,7 +320,6 @@ class Loan
       clear_cache
       return true
     end
-    p payment.errors
     false
   end
 

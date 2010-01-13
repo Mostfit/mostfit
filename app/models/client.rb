@@ -21,14 +21,14 @@ class Client
   property :deleted_at,     ParanoidDateTime
   property :client_type,    Enum[:default], :default => :default
   property :created_by_user_id,  Integer, :nullable => false, :index => true
-  property :approved_by_user_id, Integer, :nullable => true, :index => true, :default => 0
+  property :verified_by_user_id, Integer, :nullable => true, :index => true
 
   has n, :payments
 
   validates_length :account_number, :max => 20
 
   belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
-  belongs_to :approved_by, :child_key => [:approved_by_user_id],  :model => 'User'  
+  belongs_to :verified_by, :child_key => [:verified_by_user_id],  :model => 'User'  
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},
