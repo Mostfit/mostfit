@@ -8,7 +8,7 @@
     = css_include_tag :screen, :media => "screen, projection"
     = css_include_tag :print, :media => "print"
     = css_include_tag :style, :media => "screen, projection"
-    = js_include_tag :swfobject, :jquery, :application, "jquery.shortkeys.js"
+    = js_include_tag :jquery, :application, "jquery.shortkeys.js", :swfobject
   %body
 
     #header
@@ -23,7 +23,9 @@
     - if session.authenticated?
       #navigation
         = link_to_with_class('browse', url(:browse))
-        = link_to_with_class 'manage', url(:data_entry)
+        = link_to_with_class('manage', url(:data_entry))
+        - if session.user.can_access?({:controller => "admin", :action => "index"})
+          = link_to_with_class('admin', url(:admin))
         = link_to_with_class('dashboard', url(:dashboard))
         = link_to_with_class('reports', url(:reports))
       #header_search_div

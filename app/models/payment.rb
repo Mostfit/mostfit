@@ -7,18 +7,21 @@ class Payment
   before :valid?, :check_client
   # before :valid?, :add_loan_product_validations
   # after :valid?, :after_valid
+  before :valid?, :check_client
   attr_writer :total  # just to be used in the form
 
   PAYMENT_TYPES = [:principal, :interest, :fees]
   
-  property :id,                 Serial
-  property :amount,             Integer, :nullable => false, :index => true
-  property :type,               Enum.send('[]',*PAYMENT_TYPES), :index => true
-  property :comment,            String, :length => 50
-  property :received_on,        Date,    :nullable => false, :index => true
-  property :deleted_by_user_id, Integer, :nullable => true, :index => true
-  property :created_at,         DateTime,:nullable => false, :default => Time.now, :index => true
-  property :deleted_at,         ParanoidDateTime, :nullable => true, :index => true
+  property :id,                  Serial
+  property :amount,              Integer, :nullable => false, :index => true
+  property :type,                Enum.send('[]',*PAYMENT_TYPES), :index => true
+  property :comment,             String, :length => 50
+  property :received_on,         Date,    :nullable => false, :index => true
+  property :deleted_by_user_id,  Integer, :nullable => true, :index => true
+  property :created_at,          DateTime,:nullable => false, :default => Time.now, :index => true
+  property :deleted_at,          ParanoidDateTime, :nullable => true, :index => true
+  property :created_by_user_id,  Integer, :nullable => false, :index => true
+  property :verified_by_user_id, Integer, :nullable => true, :index => true
 
   belongs_to :loan, :nullable => true
   belongs_to :client
@@ -34,12 +37,11 @@ class Payment
   validates_with_method :received_by, :method => :received_by_active_staff_member?
   validates_with_method :deleted_by,  :method => :properly_deleted?
   validates_with_method :deleted_at,  :method => :properly_deleted?
-  validates_with_method :not_paying_too_much?
+  validates_with_method :not_approved, :method => :not_approved, :on => [:destroy]
 #  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
   validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :principal,   :method => :is_positive?
-
-
+  
   def self.from_csv(row, headers, loans)
     obj = new(:received_by_staff_id => StaffMember.first(:name => row[headers[:received_by_staff]]).id, :loan_id => loans[row[headers[:loan_serial_number]]].id, 
               :amount => row[headers[:principal]], :type => :principal, :received_on => Date.parse(row[headers[:received_on]]), 
@@ -99,6 +101,16 @@ class Payment
     return true if (deleted_by and deleted_at) or (!deleted_by and !deleted_at)
     [false, "deleted_by and deleted_at properties have to be (un)set together"]
   end
+
+  def allowed_edit?
+    orig = self.class.get(self.id)
+    if verified_by_user_id and verified_by_user_id>0 and orig.verified_by_user_id and orig.verified_by_user_id>0
+      return [false, "Cannot delete or edit an approved payment"]
+    else
+      return true
+    end
+  end
+
   def only_take_payments_on_disbursed_loans?
 #    debugger
     if loan
