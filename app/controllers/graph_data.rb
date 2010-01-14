@@ -1,4 +1,6 @@
 class GraphData < Application
+  before :display_from_cache
+  after  :store_to_cache
 
   def loan(id)
     @loan      = Loan.get(id)
@@ -320,6 +322,31 @@ class GraphData < Application
  end    
 
   private
+  def display_from_cache
+    file = get_cached_filename
+    return true  unless File.exists?(file)
+    return true  if not File.mtime(file).to_date==Date.today
+    throw :halt, render(File.read(file), :layout => false)
+  end
+  
+  def store_to_cache
+    file = get_cached_filename
+    if not (File.exists?(file) and File.mtime(file).to_date==Date.today)
+      File.open(file, "w"){|f|
+        f.puts @body
+      }
+    end
+  end
+  
+  def get_cached_filename
+    hash = params.deep_clone
+    dir = File.join(Merb.root, "public", hash.delete(:controller).to_s, hash.delete(:action).to_s, hash.delete(:id).to_s)
+    unless File.exists?(dir)
+      FileUtils.mkdir_p(dir)
+    end
+    File.join(dir, hash.collect{|k,v| "#{k}_#{v}"})
+  end
+  
   def get_steps(max)
     divisor = power(max)
     (max/(10**divisor)).to_i*10*divisor

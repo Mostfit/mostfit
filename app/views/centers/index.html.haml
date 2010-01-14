@@ -1,7 +1,6 @@
-
-- if (@branch and @branch.centers.clients.loans.size > 0)
+- if (@branch)
   .graph
-    = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'branch', :id => @branch.id, :scope_unit => 'months', :scope_size => 3) )
+    = ofc2(430, 200, url(:graph_data, :action => 'branch', :id => @branch.id, :scope_unit => 'months', :scope_size => 3) )
 
 - if @branch
   %h1== Branch: <i>#{@branch.name}</i>
@@ -59,7 +58,5 @@
     %tfoot
       %tr
         %td{ :colspan => 7 }
-
-
   = paginate @centers
 
