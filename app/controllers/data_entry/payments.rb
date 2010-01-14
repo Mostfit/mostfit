@@ -10,6 +10,7 @@ module DataEntry
     end
 
     def by_center
+      debugger
       @center = Center.get(params[:center_id]) if params[:center_id]
       if params[:center_text] and not @center
         @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])

@@ -1,7 +1,7 @@
 class Holiday
   include DataMapper::Resource
   after :save, :update_loan_history
-  
+  after :destroy, :update_loan_history
   property :id, Serial
 
   property :name, String, :length => 50, :nullable => false
