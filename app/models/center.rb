@@ -85,6 +85,12 @@ class Center
     meeting_time_hours.two_digits + ':' + meeting_time_minutes.two_digits
   end
 
+  def self.paying_today(date = Date.today)
+    lh = LoanHistory.all(:date => date)
+    centers = lh.blank? ? [] : lh.loan.clients.centers
+    centers
+  end
+
   private
   def hours_valid?
     return true if meeting_time_hours.blank? or (0..23).include? meeting_time_hours.to_i
