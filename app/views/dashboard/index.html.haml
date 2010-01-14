@@ -1,18 +1,18 @@
 .graph_page  
   %h1
     Client added by date
-  = ofc2(430, 200, url(:graph_data, :action => 'dashboard', :id => 'client_growth',  :scope_unit => 'months', :scope_size => 3))
+  =chart(url(:graph_data, :action => 'dashboard', :id => 'client_growth',  :scope_unit => 'months', :scope_size => 3))
 .graph_page
   %h1
     Per branch growth
-  = ofc2(430, 200, url(:graph_data, :action => 'dashboard', :id => 'branch_pie',  :scope_unit => 'months', :scope_size => 3))
+  =chart(url(:graph_data, :action => 'dashboard', :id => 'branch_pie',  :scope_unit => 'months', :scope_size => 3))
 .graph_page
   %h1
     Client cummulative growth
-  = ofc2(430, 200, url(:graph_data, :action => 'dashboard', :id => 'client_cumulative',  :scope_unit => 'months', :scope_size => 3))
+  = chart(url(:graph_data, :action => 'dashboard', :id => 'client_cumulative',  :scope_unit => 'months', :scope_size => 3))
 .graph_page
   %h1
     Aggregate loan graph
-  = ofc2(430, 200, url(:graph_data, :action => 'total', :scope_unit => 'months', :scope_size => 3))
+  = chart(url(:graph_data, :action => 'total', :scope_unit => 'months', :scope_size => 3))
 
 
