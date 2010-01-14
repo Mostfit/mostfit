@@ -10,7 +10,6 @@ module DataEntry
     end
 
     def by_center
-      debugger
       @center = Center.get(params[:center_id]) if params[:center_id]
       if params[:center_text] and not @center
         @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
@@ -18,7 +17,6 @@ module DataEntry
       @date = Date.parse(params[:for_date]) if params[:for_date]
       @branch = @center.branch unless @center.nil?
       if request.method == :post
-        debugger
         bulk_payments_and_disbursals
         if @errors.blank?
           redirect(url(:data_entry), :message => {:notice => 'All payments made succesfully'})
@@ -55,7 +53,6 @@ module DataEntry
     end
     
     def create(payment)
-      debugger
       raise NotFound unless @loan = Loan.get(payment[:loan_id])
       amounts = payment[:amount].to_i
       receiving_staff = StaffMember.get(payment[:received_by])
