@@ -2,7 +2,7 @@
 
 = error_messages_for @holiday
 
-= form_for(@holiday, :action => url(:holidays) ) do
+= form_for(@holiday, :action => resource(@holiday) ) do
   = partial :fields
   = submit "Edit"
 

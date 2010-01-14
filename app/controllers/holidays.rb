@@ -39,7 +39,7 @@ class Holidays < Application
     @holiday = Holiday.get(id)
     raise NotFound unless @holiday
     if @holiday.update(holiday)
-       redirect resource(@holiday)
+      redirect resource(@holiday)
     else
       display @holiday, :edit
     end
