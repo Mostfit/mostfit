@@ -18,7 +18,9 @@ class Centers < Application
       clients[group_name]||=[]
       clients[group_name] << c
     }
-    @clients = clients.each{|k, v| clients[k]=v.sort_by{|c| c.name} if v}.sort.collect{|k, v| v}.flatten
+    @clients = clients.each{|k, v|
+      clients[k]=v.sort_by{|c| c.name} if v
+    }.sort.collect{|k, v| v}.flatten
 
     if params[:date]
       if params[:date].is_a? String
