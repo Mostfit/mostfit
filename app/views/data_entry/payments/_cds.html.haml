@@ -1,4 +1,4 @@
-- if @center.meeting_day? @date
+- if @md
 
   Payments collected by 
   = select :name => "payment[received_by]", :collection => StaffMember.all, :value_method => :id, :text_method => :name, :selected => @center.manager.id.to_s
