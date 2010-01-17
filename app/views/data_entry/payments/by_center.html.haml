@@ -1,4 +1,5 @@
 - if @center and @date
+  - @md = @center.meeting_day?(@date)
   %h1
     = link_to "Center #{@center.name}", resource(@center.branch, @center)
     = @date 
@@ -19,7 +20,7 @@
     %tr.odd
       %td meeting at
       %td
-        - if @center.meeting_day?(@date)
+        - if @md
           %b== #{@date} #{@center.meeting_time}
         - else
           %i no meeting today
