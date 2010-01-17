@@ -4,7 +4,7 @@ class Mfi
     :abstract 
   end 
 
-  attr_accessor :subdomain
+  attr_accessor :subdomain, :city_name, :state_id, :district_id
 
   property :id, Serial, :nullable => false, :index => true
   property :name, String, :nullable => false, :index => true
