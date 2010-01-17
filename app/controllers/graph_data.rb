@@ -127,6 +127,7 @@ class GraphData < Application
   end
 
   def common_aggregate_loan_graph(loan_ids, start_date, end_date) # __DEPRECATED__
+    return "{\"title\":{\"text\": \"No data to display\", \"style\": \"{font-size: 20px; color:#0000ff; text-align: center;}\"}}" unless (start_date and end_date)
     days = (end_date - start_date).to_i
     step_size = 1; i = 0   # make a nice round step size, not more than 20 steps
     while days/step_size > 50
@@ -162,6 +163,7 @@ class GraphData < Application
   end
 
   def weekly_aggregate_loan_graph(loan_ids, start_date, end_date)
+    return "{\"title\":{\"text\": \"No data to display\", \"style\": \"{font-size: 20px; color:#0000ff; text-align: center;}\"}}" unless (start_date and end_date)
     t0 =Time.now
     step_size = 12
     structs = repository.adapter.query(%Q{

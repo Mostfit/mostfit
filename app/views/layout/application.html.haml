@@ -10,8 +10,18 @@
     = css_include_tag :style, :media => "screen, projection"
     = js_include_tag :jquery, :application, "jquery.shortkeys.js", :swfobject
   %body
-
     #header
+      %h1.logo
+        -if $globals and $globals[:mfi_details]
+          -if $globals[:mfi_details][:logo] and not $globals[:mfi_details][:logo].blank?
+            = image_tag("logos/#{$globals[:mfi_details][:logo]}", :height => 50)
+          -elsif $globals[:mfi_details][:name]
+            %span{:style => "color: #{$globals[:mfi_details][:color]};"}
+              = $globals[:mfi_details][:name]
+          -else
+            MOSTFIT
+        -else
+          MOSTFIT
       #login{:style => 'margin: 2px; float: right; padding: 4px;position:relative; right:150px;'}
         - if session.authenticated?
           == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})
@@ -48,7 +58,9 @@
         = catch_content :for_layout
     #footer
       == &copy; 2009 Intellecap &mdash; This software is released under the #{link_to 'GNU Affero General Public License', 'http://www.gnu.org/licenses/agpl.html'}.
-
+      %p{:style => "float: right; position: relative; right: 10%"}
+        Powered by
+        =image_tag("/images/mosfit-logo.png")
 
       - if Merb::Config[:environment] == 'development'
         %p

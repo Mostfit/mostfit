@@ -78,7 +78,9 @@ class Center
 
 
   def meeting_day?(date)
-    date.cwday == Center.meeting_days.index(meeting_day)
+    x = LoanHistory.all(:date => date).loans.clients.centers.include?(self)
+    debugger
+    return x
   end
 
   def meeting_time

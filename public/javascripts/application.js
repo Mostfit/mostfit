@@ -39,6 +39,9 @@ function fillCode(center_id, group_id){
 	});
 }
 $(document).ready(function(){
+	if($('#mfi_color') && $('#mfi_color').length>0){
+	    $('#mfi_color').colorPicker();
+	}
 	$(document).shortkeys({
 		'n': function(){alert('foo');}
 	    });
