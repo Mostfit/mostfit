@@ -30,22 +30,4 @@ class Mfi
   def self.default_repository_name 
     :abstract 
   end 
-
-  def not_in_barred_list
-    if BARRED_DOMAINS.include?(self.subdomain)
-      return [false, "Sorry! This subdomain name cannot be used"]
-    elsif not /^[a-z.A-Z0-9]*$/.match(self.subdomain)
-      return [false, "Sorry! The subdomain is not valid. Sudomain can only have alphabets, numbers and dots"]
-    else
-      return true
-    end
-  end
-  
-  def set_state_id
-    if district_id and district = District.get(district_id)
-      self.state_id  =  district.state_id
-    else
-      self.state_id  = 0
-    end
-  end  
 end
