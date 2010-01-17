@@ -1,4 +1,5 @@
 class Mfi
+  DataMapper.setup(:abstract, "abstract::")
   include DataMapper::Resource
   def self.default_repository_name 
     :abstract 
