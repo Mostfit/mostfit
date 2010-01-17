@@ -52,7 +52,6 @@ Merb::BootLoader.before_app_loads do
   DataMapper::Model.append_extensions DmPagination::Paginatable
   Paperclip.options[:image_magick_path] = "/usr/local/bin"
   Paperclip.options[:command_path] = "/usr/local/bin"
-  DataMapper.setup(:abstract, "abstract::")
   # load the extensions
   require 'lib/extensions.rb'
 end

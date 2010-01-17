@@ -1,4 +1,5 @@
 class Mfi
+  DataMapper.setup(:abstract, "abstract::")
   include DataMapper::Resource
   attr_accessor :subdomain
 
