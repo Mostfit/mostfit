@@ -1,6 +1,9 @@
 class Mfi
-  DataMapper.setup(:abstract, "abstract::")
   include DataMapper::Resource
+  def self.default_repository_name 
+    :abstract 
+  end 
+
   attr_accessor :subdomain
 
   property :id, Serial, :nullable => false, :index => true
@@ -27,8 +30,4 @@ class Mfi
       self.logo = self.logo[:filename]
     end
   end
-  
-  def self.default_repository_name 
-    :abstract 
-  end 
 end
