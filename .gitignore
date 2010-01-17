@@ -30,3 +30,6 @@ public/logs
 uploads
 nbproject
 config.ru.bak
+db/*.sql
+public/images/logos
+public/graph_data

@@ -1,0 +1,77 @@
+= js_include_tag "jquery.colorPicker.js"
+= css_include_tag "colorPicker.css"
+= error_messages_for @mfi
+=form_for(@mfi, :action => url(:controller => :admin, :action => :update), :enctype => "multipart/form-data") do
+  %table.wide
+    %tr
+      %td
+        Name of the mfi
+      %td
+        =text_field :name
+    %tr
+      %td
+        Select Color for this name
+      %td
+        =text_field :color
+    %tr
+      %td
+        Or choose a logo
+    %tr
+      %td
+        Upload Logo
+      %td
+        - if @mfi.logo and not @mfi.logo.blank?
+          = image_tag("logos/#{@mfi.logo}")
+          %br
+          Change Image
+        %input{:name => "mfi[logo]", :size => "20",  :type => "file", :value => @mfi.logo}
+        %ul
+        %li==Height of the image should not be more than 50 pixels
+        %li==Only gif, jpg and png type images are allowed
+        %li==Maximum size is 100kb
+    %tr
+      %td
+        Address of MFI HQ
+      %td
+        =text_area :address
+    %tr
+      %td
+        Website (if any)
+      %td
+        =text_field :website
+    %tr
+      %td
+        Telephone number
+      %td
+        =text_field :telephone
+    %tr
+      %td{:colspan => "2"}
+        %h3 
+          Operational details (these will help us build a suitable system for you) 
+    %tr
+      %td
+        Number of clients
+      %td
+        =text_field :number_of_clients
+    %tr
+      %td
+        Number of centers
+      %td
+        =text_field :number_of_centers
+    %tr
+      %td
+        In operation since
+      %td
+        =date_select_for @mfi, :in_operation_since
+    %tr
+      %td
+        Number of branches
+      %td
+        =text_field :number_of_branches
+    %tr
+      %td
+        Email address
+      %td
+        =text_field :email
+  =submit "Save my details"
+
