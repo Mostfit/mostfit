@@ -79,7 +79,6 @@ class Center
 
   def meeting_day?(date)
     x = LoanHistory.all(:date => date).loans.clients.centers.include?(self)
-    debugger
     return x
   end
 
