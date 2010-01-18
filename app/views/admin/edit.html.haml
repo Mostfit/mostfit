@@ -20,7 +20,7 @@
       %td
         Upload Logo
       %td
-        - if @mfi.logo and not @mfi.logo.blank?
+        - if @mfi.logo_name and not @mfi.logo_name.blank?
           = image_tag("logos/#{@mfi.logo_name}")
           %br
           Change Image
