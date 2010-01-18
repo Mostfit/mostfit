@@ -21,10 +21,10 @@
         Upload Logo
       %td
         - if @mfi.logo and not @mfi.logo.blank?
-          = image_tag("logos/#{@mfi.logo}")
+          = image_tag("logos/#{@mfi.logo_name}")
           %br
           Change Image
-        %input{:name => "mfi[logo]", :size => "20",  :type => "file", :value => @mfi.logo}
+        %input{:name => "mfi[logo]", :size => "20",  :type => "file", :value => @mfi.logo_name}
         %ul
         %li==Height of the image should not be more than 50 pixels
         %li==Only gif, jpg and png type images are allowed
