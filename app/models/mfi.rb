@@ -4,7 +4,7 @@ class Mfi
     :abstract 
   end 
 
-  attr_accessor :subdomain, :city_name, :state_id, :district_id
+  attr_accessor :subdomain, :city_name, :state_id, :district_id, :logo
 
   property :id, Serial, :nullable => false, :index => true
   property :name, String, :nullable => false, :index => true
@@ -18,16 +18,24 @@ class Mfi
   property :email, String, :nullable => false, :index => true, :format => :email_address
   property :created, Boolean, :nullable => false, :index => true, :default => false
   property :color, String, :nullable => true
-  property :logo,  String, :nullable => true
+  property :logo_name,  String, :nullable => true
 
   validates_length :name, :min => 3, :max => 20
   before :valid?, :save_image
+  
+  def save
+    $globals ||= {}
+    $globals[:mfi_details] = self.attributes
+    File.open(File.join(Merb.root, "config", "mfi.yml"), "w"){|f|
+      f.puts @mfi.to_yaml
+    }
+  end
 
   def save_image
     if self.logo[:filename] and ["image/jpeg", "image/png", "image/gif"].include?(self.logo[:content_type])      
       File.makedirs(File.join(Merb.root, "public", "images", "logos"))
       FileUtils.mv(self.logo[:tempfile].path, File.join(Merb.root, "public", "images", "logos", self.logo[:filename]))
-      self.logo = self.logo[:filename]
+      self.logo_name = self.logo[:filename]
     end
   end
 end

@@ -29,11 +29,7 @@ class Admin < Application
   def update(mfi)
     @mfi  = Mfi.new(mfi)
     if @mfi.valid?
-      $globals ||= {}
-      $globals[:mfi_details] = @mfi.attributes
-      File.open(File.join(Merb.root, "config", "mfi.yml"), "w"){|f|
-        f.puts @mfi.to_yaml
-      }
+      @mfi.save
       redirect(url(:admin), :message => {:notice => "MFI details has been saved"})
     else
       render :edit
