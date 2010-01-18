@@ -34,9 +34,8 @@ class Mfi
   def save_image
     if self.logo[:filename] and ["image/jpeg", "image/png", "image/gif"].include?(self.logo[:content_type])      
       File.makedirs(File.join(Merb.root, "public", "images", "logos"))
-      File.chmod(777, File.join(Merb.root, "public", "images", "logos"))
       FileUtils.mv(self.logo[:tempfile].path, File.join(Merb.root, "public", "images", "logos", self.logo[:filename]))
-      File.chmod(777, File.join(Merb.root, "public", "images", "logos", self.logo[:filename]))
+      File.chmod(0755, File.join(Merb.root, "public", "images", "logos", self.logo[:filename]))
       self.logo_name = self.logo[:filename]
     end
   end
