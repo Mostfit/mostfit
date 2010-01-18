@@ -44,7 +44,6 @@ class Upload
               if model == Loan
                 model.from_csv(row, headers, funding_lines)
               elsif model==Payment
-                debugger
                 model.from_csv(row, headers, loans)
               else
                 model.from_csv(row, headers)

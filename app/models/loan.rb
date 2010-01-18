@@ -750,7 +750,6 @@ class Loan
   # repayment styles
   def pay_prorata(total, received_on)
     #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
-    debugger
     i = used = prin = int = 0
     d = received_on
     while used <= total

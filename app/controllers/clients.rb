@@ -46,7 +46,6 @@ class Clients < Application
   end
 
   def update(id, client)
-    debugger
     @client = Client.get(id)
     raise NotFound unless @client
     disallow_updation_of_verified_clients

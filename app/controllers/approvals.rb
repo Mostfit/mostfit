@@ -12,7 +12,6 @@ class Approvals < Application
       verifier_id = session.user.id
       klass.all(:id => params[id].keys).each{|obj|
         obj.verified_by_user_id = approver_id
-        debugger
         obj.save
       }
     end
@@ -55,7 +54,6 @@ class Approvals < Application
     staff = StaffMember.all(:user_id => user.id)
     centers = []
     if staff.length>0
-      debugger
       centers << staff.branches.centers.map{|x| x.id}
       centers << staff.centers.map{|x| x.id}
       centers.uniq!
