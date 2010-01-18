@@ -25,9 +25,9 @@ class Mfi
   
   def save
     $globals ||= {}
-    $globals[:mfi_details] = self.attributes
+    $globals[:mfi_details] = self.attributes    
     File.open(File.join(Merb.root, "config", "mfi.yml"), "w"){|f|
-      f.puts @mfi.to_yaml
+      f.puts self.to_yaml
     }
   end
 
