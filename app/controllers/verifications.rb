@@ -56,10 +56,10 @@ class Verifications < Application
     if user.admin?
       centers = Center.all
     else
+      centers = []
       staff = StaffMember.all(:user_id => user.id)
       if staff.length>0
         centers = staff.branches.centers
-        centers << staff.centers
         centers.uniq!
       end
     end
