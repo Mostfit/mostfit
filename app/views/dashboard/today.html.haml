@@ -1,7 +1,5 @@
 %h2
   today
-
-
 - @centers = Center.all(:meeting_day => @date.weekday)
 - total_due = total_paid = 0
 %table.narrow{:style => "float:left; width: 95%;margin-right: 13px;"}
@@ -76,4 +74,4 @@
       = total_disbursal
       
 
-= ofc2(500, 350, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'center_day', :date => @date) )
+= ofc2(800, 640, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'center_day', :date => @date) )

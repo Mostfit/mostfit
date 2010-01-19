@@ -31,8 +31,6 @@
   = link_to 'add a new client', resource(@branch, @center, :clients, :new), :class => "add"
 
 %h2== Clients of the #{@center.name} center
-
-
 - if @clients.blank?
   %p
     %i== No clients for the #{@branch.name} branch yet.
@@ -109,8 +107,6 @@
         %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
           = date_select 'date', @date
           = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
-
-
 %a{:name => "weeksheet"}
 %h2 Approvals
 - @loans_to_approve = @center.clients.loans(:approved_on => nil)
@@ -178,15 +174,17 @@
         %th installment
         %th principal due
         %th interest due
+        %th fee due
         %th total due
     %tbody
-      - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_total = 0, 0, 0, 0, 0, 0
+      - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_fee, tot_total = 0, 0, 0, 0, 0, 0, 0
       - @clients.each do |client|
         - loan_row_count = 0
         - Loan.all(:client_id => client.id).each do |loan|
           - #next if [nil, :repaid, :pending].include? loan.status
           - loan_row_count += 1
           %tr{ :class => cycle('odd','') }
+            - fee = 0
             %td
               %b= link_to loan.client.name, resource(@branch, @center, loan.client)
             %td
@@ -214,9 +212,13 @@
               = i.to_currency
               - tot_interest += i
             %td.numeric
+              - fee = loan.fees_paid? ? 0 : loan.fees_payable_on(@date).values.reduce{|s, x| s+=x}
+              = fee.to_currency
+              - tot_fee += fee
+            %td.numeric
               - i = [-loan.total_overpaid_on(@date), 0].max
-              = i.to_currency
-              - tot_total += i
+              = (i+fee).to_currency
+              - tot_total += (i + fee)
         - if loan_row_count == 0
           %tr{ :class => cycle('odd','') }
             %td
@@ -237,6 +239,8 @@
             %b= tot_principal.to_currency
           %td.numeric
             %b= tot_interest.to_currency
+          %td.numeric
+            %b= tot_fee.to_currency
           %td.numeric
             %b= tot_total.to_currency
             

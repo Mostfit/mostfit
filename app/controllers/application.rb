@@ -84,6 +84,3 @@ class Application < Merb::Controller
     [flag, children_present]
   end
 end
-
-
-
