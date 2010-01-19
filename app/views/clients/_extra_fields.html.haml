@@ -272,3 +272,21 @@
 %tr
   %td{:colspan => '2'}
     %hr
+%tr
+  %td{:colspan => '2'}
+    %h1==Caste religion data
+%tr
+  %td
+    Caste:
+  %td
+    = select(:caste, :collection => [[:sc, "Sc"], [:st, "St"], [:obc, "Obc"], [:general, "General"]] , :prompt => "Select caste")
+    %br/
+%tr
+  %td
+    Religion:
+  %td
+    = select(:religion, :collection => [[:hindu, "Hindu"], [:muslim, "Muslim"], [:sikh, "Sikh"], [:jain, "Jain"], [:buddha, "Buddha"], [:christian, "Christian"]] , :prompt => "Select religion")
+    %br/
+%tr
+  %td{:colspan => '2'}
+    %hr

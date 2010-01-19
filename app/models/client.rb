@@ -88,6 +88,8 @@ class Client
   property :not_irrigated_land_own_wasteland, Integer
   property :not_irrigated_land_leased_wasteland, Integer
   property :not_irrigated_land_shared_wasteland, Integer
+  property :caste, Enum.send('[]', *['', 'sc', 'st', 'obc', 'general']), :default => '', :nullable => true
+  property :religion, Enum.send('[]', *['', 'hindu', 'muslim', 'sikh', 'jain', 'buddha', 'christian']), :default => '', :nullable => true
   validates_length :number_of_family_members, :max => 20
   validates_length :school_distance, :max => 200
   validates_length :phc_distance, :max => 500
