@@ -18,6 +18,4 @@ class Browse < Application
     end
     render :template => 'centers/index'
   end
-
-
 end

@@ -16,6 +16,7 @@
       Repaid
     %th
       Amount In Default
+  -sum_clients, sum_loans, sum_disbursed, sum_repaid, sum_default = 0, 0, 0, 0, 0
   - for center in @centers
     %tr{ :class => cycle('odd','even')}
       %td
@@ -23,12 +24,30 @@
       -c = center.clients
       -l = c.loans
       %td
-        = c.count
+        = item = c.count
+        - sum_clients += item
       %td
-        = l.count
+        = item = l.count
+        - sum_loans   += item
       %td
-        = l.count > 0 ? l.sum(:amount) : 0
+        = item = (l and l.count > 0) ? l.sum(:amount) : 0
+        - sum_disbursed += item
+      %td      
+        = item = 0; item = l.payments(:type=>:principal).sum(:amount) || 0 if l and l.count> 0
+        - sum_repaid += item
       %td
-        = l.count > 0 ? l.payments(:type=>:principal).sum(:amount) : 0
+        = item = LoanHistory.all(:current => true, 'loan.client.center_id' => center.id).sum(:amount_in_default) || 0
+        - sum_default += item
+  %tfoot
+    %tr
       %td
-        = LoanHistory.all(:current => true, 'loan.client.center_id' => center.id).sum(:amount_in_default) || 0
+      %td
+        = sum_clients
+      %td
+        = sum_loans
+      %td
+        = sum_disbursed
+      %td
+        = sum_repaid
+      %td
+        = sum_default
