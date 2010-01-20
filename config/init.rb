@@ -110,5 +110,13 @@ Merb::BootLoader.after_app_loads do
       Merb.logger.info("Couldn't not load MFI details from config/mfi.yml. Possibly a wrong YAML file specification.")
     end
   end
+  module DmPagination
+    class PaginationBuilder
+      def url(params)
+        @context.params.delete(:action) if @context.params[:action] == 'index'        
+        @context.url(@context.params.merge(params).reject{|k,v| k=="_message"})
+      end
+    end
+  end
 end
 
