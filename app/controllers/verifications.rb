@@ -13,9 +13,11 @@ class Verifications < Application
     when "payments"
       @payments = payments
     else
-      @clients_count  = clients.count
-      @loans_count    = loans.count
-      @payments_count = payments.count
+      if @centers.length>0
+        @clients_count  = clients.count
+        @loans_count    = loans.count
+        @payments_count = payments.count
+      end
     end
     display "verifications/index"
   end
