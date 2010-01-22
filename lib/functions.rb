@@ -14,6 +14,20 @@ class Date
     Holiday.all.include?(self)
   end
 
+  def holiday_bump
+    @hols = HOLIDAYS
+    new_date = self
+    while @hols.keys.include?(new_date)
+      case @hols[new_date].shift_meeting
+        when :before
+          new_date -= 1 
+        when :after
+          new_date += 1
+      end
+    end
+
+    return new_date
+  end
 #  def to_s
 #    "#{year}-#{month}-#{day} (#{weekday.to_s[0..2]})"
 #  end
