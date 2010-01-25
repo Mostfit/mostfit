@@ -72,7 +72,6 @@
               %tr
                 %td.group{:colspan => length}
                   %b=@groups[group_id].name
-
               -@payments.keys.sort.each do |date|
                 -date_total = Array.new(length-2, 0)
                 -if @payments[date] and @payments[date][group_id] and @payments[date][group_id].keys.length>0
@@ -90,7 +89,7 @@
                             -if e[i]
                               =e[i]
                               -e_val = e[i]
-                              -sum += e_val
+                              -sum += e_val if col>0
                               -center_total[col]+= e_val
                               -group_total[col] += e_val
                               -date_total[col]  += e_val
