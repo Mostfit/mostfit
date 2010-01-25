@@ -35,9 +35,10 @@ class StaffMembers < Application
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
     @date    = params[:date] ? parse_date(params[:date]) : Date.today
+    @date    = @date.holiday_bump 
     @centers = @staff_member.centers(:meeting_day => Center.meeting_days[@date.cwday])
-    if params[:format] == "pdf"      
-      generate_pdf 
+    if params[:format] == "pdf"
+      generate_pdf
       send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf"), 
                 :filename => "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf")
     else
