@@ -1,6 +1,6 @@
 class GraphData < Application
   before :display_from_cache
-  after  :store_to_cache
+  after  :store_to_cache, :exclude => [:today]
 
   def loan(id)
     @loan      = Loan.get(id)
@@ -261,23 +261,21 @@ class GraphData < Application
     labels = []
     case params[:id]
     when "client_growth"
-      val = repository.adapter.query(%Q{
-        SELECT CONCAT(YEAR(date_joined), '_', MONTH(date_joined)) as j, COUNT(id) FROM clients GROUP BY j
-        })
-      vals = val.map {|v| [v[0],v[1]]}.to_hash 
-      min_date = Client.all.min(:date_joined)
+      vals = repository.adapter.query(%Q{
+        SELECT date_joined, COUNT(id) FROM clients GROUP BY MONTH(date_joined) ORDER BY MONTH(date_joined)
+        }).map {|v| [v[0],v[1]]}.to_hash
+      min_date = vals.keys.min
       max_date = Date.today >> 1
       date = min_date
       values = []
       type ="bar"
-      while date <= max_date 
-        values << (vals[date.year.to_s + "_" + date.month.to_s] or 0)
-        labels << "#{date.month.to_s}.#{date.year.to_s}"
-        date = date >> 1
-      end
+      vals.sort_by{|k,v| k}.each{|date, val|
+        values << val
+        labels << date
+      }
       elements = [{:type => "bar", :values => values}]
-      title = {:text => ""}
-      x_axis = {:steps => 5, :labels => {:labels => labels.to_json}}
+      title = {:text => "Per month growth"}
+      x_axis = {:labels => {:labels => labels.map{|x| x.strftime("%b %y")}}}
       y_axis = {:steps => get_steps(values.max), :min => 0, :max => values.max}
       return {:elements => elements, :x_axis => x_axis, :y_axis => y_axis, :title => title}.to_json
     when "client_cumulative"
