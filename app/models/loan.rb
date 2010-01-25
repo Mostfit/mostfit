@@ -222,8 +222,8 @@ class Loan
       new_date
     end
     # shift date for holidays
-    while HOLIDAYS.keys.include?(new_date)
-      case HOLIDAYS[new_date].shift_meeting
+    while $holidays.keys.include?(new_date)
+      case $holidays[new_date].shift_meeting
         when :before
           new_date -= 1 
         when :after

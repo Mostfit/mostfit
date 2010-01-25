@@ -19,7 +19,7 @@ class Reports < Application
       dates[:to_date]   = get_date(params[class_key], :to_date) if params[class_key][:to_date]
     end
 
-    if [DailyReport, ConsolidatedReport, TransactionLedger].include?(klass)
+    if [DailyReport, ConsolidatedReport, TransactionLedger, ProjectedReport].include?(klass)
       #Generating report
       @report   = klass.new(params[class_key], dates)
       if klass==TransactionLedger
