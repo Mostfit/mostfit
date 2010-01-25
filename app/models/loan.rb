@@ -222,9 +222,8 @@ class Loan
       new_date
     end
     # shift date for holidays
-    @hols ||= Holiday.all.map{|h| [h.date, h]}.to_hash
-    while @hols.keys.include?(new_date)
-      case @hols[new_date].shift_meeting
+    while HOLIDAYS.keys.include?(new_date)
+      case HOLIDAYS[new_date].shift_meeting
         when :before
           new_date -= 1 
         when :after
