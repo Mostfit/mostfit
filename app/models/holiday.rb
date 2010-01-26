@@ -9,7 +9,7 @@ class Holiday
   property :shift_meeting, Enum[:before, :after]
   
   def update_loan_history
-    HOLIDAYS = Holiday.all.map{|h| [h.date, h]}.to_hash
+    Misfit::Config.refresh_holidays
     LoanHistory.all(:date => date).loans.each{|l| l.update_history}
   end
 
