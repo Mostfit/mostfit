@@ -15,7 +15,7 @@ class Date
   end
 
   def holiday_bump
-    @hols = Misfit::Config.holidays
+    @hols = $holidays
     new_date = self
     while @hols.keys.include?(new_date)
       case @hols[new_date].shift_meeting
@@ -25,7 +25,6 @@ class Date
           new_date += 1
       end
     end
-
     return new_date
   end
 #  def to_s
