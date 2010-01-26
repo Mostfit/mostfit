@@ -78,6 +78,8 @@ class Loan
   validates_with_method  :validated_by,                 :method => :properly_validated?
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
+  # validates_with_method  :dates_are_not_holidays
+
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
   
   #product validations
@@ -189,7 +191,7 @@ class Loan
   # used by many other methods, it accepts a negative +number+
   # TODO: decide if we should make sure returned date is a payment date.
   def shift_date_by_installments(date, number, ensure_meeting_day = true)
-    return date if number == 0
+    return date.holiday_bump if number == 0
     case installment_frequency
       when :daily
         new_date =  date + number
@@ -218,19 +220,8 @@ class Loan
       next_meeting_day = client.center.next_meeting_date_from(new_date)
       new_date = next_meeting_day unless new_date.weekday == client.center.meeting_day
       #new_date - new_date.cwday + Center.meeting_days.index(client.center.meeting_day)
-    else
-      new_date
     end
-    # shift date for holidays
-    while $holidays.keys.include?(new_date)
-      case $holidays[new_date].shift_meeting
-        when :before
-          new_date -= 1 
-        when :after
-          new_date += 1
-      end
-    end
-    new_date
+    new_date.holiday_bump
   end
 
   def self.description
@@ -676,7 +667,7 @@ class Loan
     t = Time.now
     current = nil
     @history_array = []
-    dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on,scheduled_first_payment_date] + payment_dates + installment_dates).compact.uniq.sort
+    dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on,scheduled_first_payment_date].map{|d| d.holiday_bump if d.is_a?(Date)} + payment_dates + installment_dates).compact.uniq.sort
     last_paid_date = nil
     dates.each_with_index do |date,i|
       current = ((dates[[i-1,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or (i == dates.size - 1 and dates[i] < Date.today)) ? 1 : 0
@@ -763,6 +754,13 @@ class Loan
   end
 
   ## validations: read their method name and error to see what they do.
+      
+  def dates_are_not_holidays
+    h = ["scheduled_disbursal_date", "scheduled_first_payment_date"].map{|d| [d,Misfit::Config.holidays.include?(self.send(d))]}.reject{|e| e[1] == false}
+    return true if h.blank?
+    return [false, h.map{|f| f[0]}.join(", ") + " are holidays"]
+  end
+
   def amount_greater_than_zero?
     return true if not amount.blank? and amount > 0
     [false, "Loan amount should be greater than zero"]

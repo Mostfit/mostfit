@@ -32,7 +32,19 @@ class Date
 #  end
 end
 
+module Misfit
+  module Config
+    attr_accessor :hols
 
+    def self.holidays
+      @hols ||= Holiday.all.map{|h| [h.date, h]}.to_hash
+    end
+
+    def self.refresh_holidays
+      @hols = nil
+    end
+  end
+end
 
 class Hash
   #Hash diffs are easy
