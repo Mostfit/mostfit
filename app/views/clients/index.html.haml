@@ -192,16 +192,13 @@
             %td.numeric
               - i = loan.amount
               %b= i.to_currency
-              - debugger
               - tot_amount += i
             %td.numeric
               - i = loan.actual_outstanding_principal_on(@date)
               %b= i.to_currency
               - tot_outstanding += i
-              - debugger
             %td
               = loan.disbursal_date.to_s
-              - debugger
             %td.numeric
               - i = loan.number_of_installments_before(@date)
               = i

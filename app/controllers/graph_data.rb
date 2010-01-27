@@ -182,7 +182,8 @@ class GraphData < Application
                            concat(year(date),'_',week(date)) AS weeknum
                            FROM loan_history 
                            WHERE loan_id IN (#{loan_ids.join(",")})
-                           GROUP BY loan_id, weeknum) AS dt, 
+                           AND status in (5,6)
+                           GROUP BY loan_id, weeknum) AS dt,
                            loan_history lh 
                      WHERE lh.loan_id = dt.loan_id 
                      AND lh.date = dt.da_te) AS dt1 GROUP BY weeknum ORDER BY date;})
