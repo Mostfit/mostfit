@@ -11,11 +11,7 @@ class GraphData < Application
 
     # add dates before the first installment to include the disbursal date
     d = @loan.shift_date_by_installments(dates.min, -1)
-    while d >= @loan.disbursal_date
-      offset += 1
-      dates  << d
-      d = @loan.shift_date_by_installments(d, -1)
-    end
+    dates  << d
 
     step_size = 1; i = 0   # make a nice round step size, not more than 20 steps
     while (dates.size + offset) / step_size > 20
