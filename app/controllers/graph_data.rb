@@ -31,7 +31,7 @@ class GraphData < Application
       scheduled_outstanding = @loan.scheduled_outstanding_total_on(date).to_i  # or *_principal_on
       actual_outstanding    = future ? scheduled_outstanding : @loan.actual_outstanding_total_on(date).to_i  # or *_principal_on
       overpaid              = scheduled_outstanding - actual_outstanding  # negative means shortfall
-      tip_base              = "##{index+1}, #{date.strftime("%a %b %d %Y")}#{(future ? ' (future)' : '')}<br>"
+      tip_base              = "##{index+1}, #{date}#{(future ? ' (future)' : '')}<br>"
       percentage            = scheduled_outstanding == 0 ? '0' : (overpaid.abs.to_f/scheduled_outstanding*100).round.to_s + '%'
       @stacks << [
         { :val => [scheduled_outstanding, actual_outstanding].min, :colour => (future ? '#55aaff' : '#003d4a'),
@@ -106,7 +106,7 @@ class GraphData < Application
       actual_outstanding    = future ? scheduled_outstanding : (s['actual_outstanding_total'].to_i or 0)     # or *_principal
       max_amount            = [max_amount, scheduled_outstanding, actual_outstanding].max
       overpaid              = scheduled_outstanding - actual_outstanding  # negative means shortfall
-      tip_base              = "##{index+1}, #{date.strftime("%a %b %d %Y")}#{(future ? ' (future)' : '')}<br>"
+      tip_base              = "##{index+1}, #{date}#{(future ? ' (future)' : '')}<br>"
       percentage            = scheduled_outstanding == 0 ? '0' : (overpaid.abs.to_f/scheduled_outstanding*100).round.to_s + '%'
       @stacks << [
         { :val => [scheduled_outstanding, actual_outstanding].min, :colour => (future ? '#55aaff' : '#003d4a'),
@@ -117,7 +117,7 @@ class GraphData < Application
           :tip => "#{tip_base} overpaid #{ overpaid} (#{percentage})" },
         { :val => [-overpaid, 0].max, :colour => (future ? '#ff5588' : '#aa0000'),
           :tip => "#{tip_base} shortfall of #{-overpaid} (#{percentage})" } ]
-      @labels << ((index % step_size == 0) ? date.strftime("%b%d'%y") : '')
+      @labels << ((index % step_size == 0) ? date : '')
     end
     render_loan_graph('aggregate loan graph', @stacks, @labels, step_size, max_amount)
   end
@@ -142,7 +142,7 @@ class GraphData < Application
       actual_outstanding    = future ? scheduled_outstanding : (s['actual_outstanding_total'].to_i or 0)     # or *_principal
       max_amount            = [max_amount, scheduled_outstanding, actual_outstanding].max
       overpaid              = scheduled_outstanding - actual_outstanding  # negative means shortfall
-      tip_base              = "##{index+1}, #{date.strftime("%a %b %d %Y")}#{(future ? ' (future)' : '')}<br>"
+      tip_base              = "##{index+1}, #{date}#{(future ? ' (future)' : '')}<br>"
       percentage            = scheduled_outstanding == 0 ? '0' : (overpaid.abs.to_f/scheduled_outstanding*100).round.to_s + '%'
       @stacks << [
         { :val => [scheduled_outstanding, actual_outstanding].min, :colour => (future ? '#55aaff' : '#003d4a'),
@@ -153,7 +153,7 @@ class GraphData < Application
           :tip => "#{tip_base} overpaid #{ overpaid} (#{percentage})" },
         { :val => [-overpaid, 0].max, :colour => (future ? '#ff5588' : '#aa0000'),
           :tip => "#{tip_base} shortfall of #{-overpaid} (#{percentage})" } ]
-      @labels << ((index % step_size == 0) ? date.strftime("%b%d'%y") : '')
+      @labels << ((index % step_size == 0) ? date : '')
     end
     render_loan_graph('aggregate loan graph', @stacks, @labels, step_size, max_amount)
   end
@@ -204,7 +204,7 @@ class GraphData < Application
       actual_outstanding    = future ? scheduled_outstanding : (s['actual_outstanding_total'].to_i or 0)     # or *_principal
       max_amount            = [max_amount, scheduled_outstanding, actual_outstanding].max
       overpaid              = scheduled_outstanding - actual_outstanding  # negative means shortfall
-      tip_base              = "##{index+1}, #{date.strftime("%a %b %d %Y")}#{(future ? ' (future)' : '')}<br>"
+      tip_base              = "##{index+1}, #{date}#{(future ? ' (future)' : '')}<br>"
       percentage            = scheduled_outstanding == 0 ? '0' : (overpaid.abs.to_f/scheduled_outstanding*100).round.to_s + '%'
       @stacks << [
         { :val => [scheduled_outstanding, actual_outstanding].min, :colour => (future ? '#55aaff' : '#003d4a'),
@@ -215,7 +215,7 @@ class GraphData < Application
           :tip => "#{tip_base} overpaid #{ overpaid} (#{percentage})" },
         { :val => [-overpaid, 0].max, :colour => (future ? '#ff5588' : '#aa0000'),
           :tip => "#{tip_base} shortfall of #{-overpaid} (#{percentage})" } ]
-      @labels << ((index % step_size == 0) ? date.strftime("%b%d'%y") : '')
+      @labels << ((index % step_size == 0) ? date : '')
     end
     render_loan_graph('aggregate loan graph', @stacks, @labels, step_size, max_amount)
   end

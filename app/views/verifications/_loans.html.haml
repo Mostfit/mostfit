@@ -52,7 +52,7 @@
           %td
             =loan.created_by_user_id and loan.created_by_user_id>0 ? client.created_by.login : "-"
           %td
-            =loan.created_at ? loan.created_at.strftime("%Y-%m-%d") : ""
+            =loan.created_at ? loan.created_at : ""
           %td
             =check_box(:name => "loans[#{loan.id}][]", :class => "loan_approval_box", :value => 1)
       %tr

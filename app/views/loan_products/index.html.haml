@@ -34,4 +34,4 @@
       %td
         = loan_product.min_interest_rate!=loan_product.max_interest_rate ? "#{loan_product.min_interest_rate} - #{loan_product.max_interest_rate}" : loan_product.min_interest_rate
       %td
-        = loan_product.valid_from!=loan_product.valid_upto ? "#{loan_product.valid_from.strftime("%d-%b %Y")} to #{loan_product.valid_upto.strftime("%d-%b %Y")}" : loan_product.valid_upto.strftime("%d-%b %Y")
+        = loan_product.valid_from!=loan_product.valid_upto ? "#{loan_product.valid_from} to #{loan_product.valid_upto}" : loan_product.valid_upto
