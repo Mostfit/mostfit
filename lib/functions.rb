@@ -120,6 +120,12 @@ class Hash
 
 end
 
+class String
+  def camelcase(str='')
+    self.split('_').map{|x| x}.join(str)
+  end
+end
+
 module ExcelFormula
   def pmt(interest, installments, present_value, future_value, paid_before=1)  
     vPow = (1 + interest) ** installments

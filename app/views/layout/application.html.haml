@@ -3,7 +3,7 @@
   %head
     %meta{ :content => "text/html; charset=utf-8", "http-equiv" => "content-type" }/
     %title
-      = 'mis-fit' + (catch_content(:title) ? '' : ": #{catch_content(:title)}")
+      = page_title
     %link{ :rel => "icon", :type => "image/ico", :href => "/favicon.ico" }/
     = css_include_tag :screen, :media => "screen, projection"
     = css_include_tag :print, :media => "print"
