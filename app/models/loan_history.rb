@@ -90,7 +90,7 @@ class LoanHistory
         SUM(actual_outstanding_total)        AS actual_outstanding_total
       FROM
       (select scheduled_outstanding_principal,scheduled_outstanding_total, actual_outstanding_principal, actual_outstanding_total from
-        (select loan_id, max(date) as date from loan_history where date <= '#{date.to_s}' and loan_id in (#{loan_ids.join(', ')}) and status in (5,6) group by loan_id) as dt, 
+        (select loan_id, max(date) as date from loan_history where date <= '#{date.strftime('%Y-%m-%d')}' and loan_id in (#{loan_ids.join(', ')}) and status in (5,6) group by loan_id) as dt, 
         loan_history lh 
       where lh.loan_id = dt.loan_id and lh.date = dt.date) as dt1;})
   end
