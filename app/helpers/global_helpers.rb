@@ -1,5 +1,14 @@
 module Merb
-  module GlobalHelpers    
+  module GlobalHelpers
+    CRUD_ACTIONS = ["list", "index", "show", "edit", "new"]
+    def page_title
+      begin
+        generate_page_title
+      rescue
+        return "MostFit" rescue Exception
+      end
+    end
+
     def link_to_with_class(name, url)
       link_to(name, url, :class => ((request.uri==(url) or request.uri.index(url)==0) ? "selected" : ""))
     end
@@ -202,5 +211,36 @@ module Merb
                          });
      </script>"
     end
+    private
+    def join_segments(*args)
+      args.map{|x| x.class==Array ? x.uniq : x}.flatten.reject{|x| not x or x.blank?}.join(' - ').capitalize
+    end
+
+    def generate_page_title
+      prefix, postfix = [], []
+      controller=params[:controller].split("/")[-1]
+      controller_name = (params[:action]=="list" or params[:action]=="index") ? controller.camelcase(' ') : controller.singularize.camelcase(' ')
+      controller_name = controller_name.map{|x| x.camelcase(' ')}.join(' ')
+      prefix  << params[:namespace].camelcase(' ') if params[:namespace]
+      postfix << params[:action].camelcase(' ') if not CRUD_ACTIONS.include?(params[:action])
+      prefix  << params[:action].camelcase(' ') if CRUD_ACTIONS[3..-1].include?(params[:action])
+      
+      return "Loan for #{@loan.client.name}" if controller=="payments" and @loan
+      return params[:report_type] if controller=="reports" and params[:report_type]
+
+      #Check if @<controller> is available
+      unless instance_variables.include?("@"+controller.singularize)
+        return join_segments(prefix, controller_name, postfix)
+      end
+
+      #if @<controller> is indeed present
+      obj = instance_variable_get("@"+controller.singularize)
+#      prefix  += "New" if obj.new?
+      postfix << "for #{@loan.client.name}" if obj.respond_to?(:client)
+
+      return join_segments(prefix, controller_name, obj.name, postfix) if obj.respond_to?(:name) and not obj.new?
+      #catch all
+      return join_segments(prefix, controller_name, postfix)
+    end    
   end
 end

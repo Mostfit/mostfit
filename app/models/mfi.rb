@@ -1,6 +1,8 @@
 class Mfi
   include DataMapper::Resource
-  def self.default_repository_name 
+  DateFormats = ["%d-%m-%Y", "%Y-%m-%d", "%Y-%d-%m", "%d/%m/%Y", "%m/%d/%Y", "%d-%m-%y", "%y-%m-%d", "%y-%d-%m", "%d/%m/%y", "%m/%d/%y", "%d %B, %Y", "%d %B, %Y", "%A, %d %B %Y", "%A, %d %m %Y"]
+
+  def self.default_repository_name
     :abstract 
   end 
 
@@ -19,16 +21,17 @@ class Mfi
   property :created, Boolean, :nullable => false, :index => true, :default => false
   property :color, String, :nullable => true
   property :logo_name,  String, :nullable => true
-
+  property :date_format, Enum.send('[]', *DateFormats), :nullable => true, :index => true
   validates_length :name, :min => 3, :max => 20
   before :valid?, :save_image
   
   def save
     $globals ||= {}
-    $globals[:mfi_details] = self.attributes    
+    $globals[:mfi_details] = self.attributes
     File.open(File.join(Merb.root, "config", "mfi.yml"), "w"){|f|
       f.puts self.to_yaml
     }
+    Misfit::Config::DateFormat.compile
   end
 
   def save_image

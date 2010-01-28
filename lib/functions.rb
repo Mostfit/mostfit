@@ -41,7 +41,6 @@ class Date
     days.uniq
   end
 
-
 private
   def was_yesterday_holiday_shifted_today?
     yesterday = self-1
@@ -54,9 +53,6 @@ private
     return true if $holidays[yesterday] and $holidays[yesterday].shift_meeting==:before
     return false
   end
-#  def to_s
-#    "#{year}-#{month}-#{day} (#{weekday.to_s[0..2]})"
-#  end
 end
 
 module Misfit
@@ -118,6 +114,12 @@ class Hash
     rhash
   end
 
+end
+
+class String
+  def camelcase(str='')
+    self.split('_').map{|x| x}.join(str)
+  end
 end
 
 module ExcelFormula

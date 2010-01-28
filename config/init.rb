@@ -60,8 +60,7 @@ end
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
   # Load MFI account details to allow this app to sync phone numbers of staffmembers to mostfit box. If this file is not present then no such updates will happen
-  $holidays = Holiday.all.map{|h| [h.date, h]}.to_hash
-  MFI_DETAILS = YAML.load(File.read(File.join(Merb.root, "config", "mfi.yml"))) if File.exists?(File.join(Merb.root, "config", "mfi.yml"))
+  begin; $holidays = Holiday.all.map{|h| [h.date, h]}.to_hash; rescue; end
   # Starting the logger takes time, so turn it off during development
   Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments', 'DataEntry::Payments']) #unless Merb.environment == "development" or Merb.environment == "test"
   # Load the validation hooks
@@ -83,7 +82,6 @@ Merb::BootLoader.after_app_loads do
   
   # enable the extensions
   Misfit::Extensions.hook
-
 
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
   LoanProduct.property(:loan_type, LoanProduct::Enum.send('[]', *Loan.descendants.map{|x| x.to_s}), :nullable => false, :index => true)
@@ -111,6 +109,8 @@ Merb::BootLoader.after_app_loads do
       Merb.logger.info("Couldn't not load MFI details from config/mfi.yml. Possibly a wrong YAML file specification.")
     end
   end
+  Misfit::Config::DateFormat.compile
+
   module DmPagination
     class PaginationBuilder
       def url(params)

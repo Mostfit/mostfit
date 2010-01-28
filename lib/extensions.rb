@@ -1,6 +1,5 @@
 module Misfit
   module Extensions
-
     module Browse
       def self.included(base)
         Merb.logger.info "Included Misfit::Extensions::Browse by #{base}"
@@ -114,8 +113,6 @@ module Misfit
           include module_eval("Misfit::Extensions::#{mod}")
         end
       end
-    end
-  end 
-  
-
+    end    
+  end
 end

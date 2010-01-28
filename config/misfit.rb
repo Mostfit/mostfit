@@ -63,5 +63,18 @@ module Misfit
     def self.access_rights
       @access_rights
     end
+    
+    module DateFormat
+      def self.compile
+        if $globals and $globals[:mfi_details] and format=$globals[:mfi_details][:date_format] and Mfi::DateFormats.include?(format)
+          Date.class_eval do
+            def to_s
+              self.strftime($globals[:mfi_details][:date_format])
+            end
+          end
+          Merb.logger.info("Date format set to:: #{$globals[:mfi_details][:date_format]}")
+        end
+      end
+    end
   end
 end

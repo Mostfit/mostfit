@@ -80,7 +80,7 @@
                     -itr.times do |i|
                       %tr
                         %td.align_left
-                          = date.strftime("%d-%m-%Y")
+                          = date
                         %td.align_left
                           =clients.find{|x| x.id==client_id}.name
                         -sum=0
