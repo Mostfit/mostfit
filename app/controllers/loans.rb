@@ -63,7 +63,7 @@ class Loans < Application
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan = klass.get(id)
     @loan_product =  @loan.loan_product
-    raise NotFound unless @loa
+    raise NotFound unless @loan
     disallow_updation_of_verified_loans
     if @loan.update_attributes(attrs)
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
