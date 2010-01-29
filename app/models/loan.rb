@@ -717,7 +717,7 @@ class Loan
               VALUES }
     values = []
     calculate_history.each do |history|
-      value = %Q{(#{id}, '#{history[:date]}', #{history[:status]}, #{history[:scheduled_outstanding_principal]}, 
+      value = %Q{(#{id}, '#{history[:date].strftime('%Y-%m-%d')}', #{history[:status]}, #{history[:scheduled_outstanding_principal]}, 
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
                           #{history[:actual_outstanding_total]},#{history[:current]},
                           #{history[:amount_in_default]}, #{client.client_group_id || "NULL"}, #{client.center.id},#{client.id},#{client.center.branch.id},
