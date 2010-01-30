@@ -529,35 +529,43 @@ table.report td{
     border-color: #ccc;
     font-size: 0.95em;
 }
-table.report td.group{
+table.report tr.group td:first-child{
     text-align: center; 
     background-color: #eee;
     font-size: 0.95em;
 }
-table.report td.branch{
+table.report tr.branch{
     text-align: center; 
     background-color: #ccc;
     font-size: 0.95em;
 }
-table.report td.center{
+table.report tr.center{
     border: 1px solid;
     border-color: #ccc;
     text-align: center;
     font-size: 1em; 
     background-color: #ddd;
 }
-td.group_total{
+table.report tr.group_total td:first-child{
     text-align: center; 
     background-color: #eee;    
 }
-td.center_total{
+table.report tr.center_total td:first-child{
     text-align: center; 
     background-color: #ddd;
 }
-td.branch_total{
+table.report tr.branch_total td:first-child{
     text-align: center; 
     background-color: #ccc;    
 }
-td.align_left{
+table.report tr.align_left{
     text-align: left;
+}
+table.report tr td a{
+    color: blue;
+    float: right;
+}
+a.expand_all{
+    color: blue;
+    float: right;    
 }
