@@ -38,7 +38,52 @@ function fillCode(center_id, group_id){
 	    }
 	});
 }
+function setToggleText(){
+    $("table.report tr td a").each(function(){
+	    if($(this).parent().parent().next().css("display")!="none"){
+		$(this).text($(this).text().replace('Expand', 'Collapse'));
+		$(this).addClass('collapse');
+		$(this).removeClass('expand');
+	    }else{
+		$(this).text($(this).text().replace('Collapse', 'Expand'));
+		$(this).addClass('expand');
+		$(this).removeClass('collapse');
+	    }
+	});
+}
 $(document).ready(function(){
+	//Handling reports
+	if($("table.report").length>0){
+	    $("table.report tr").hide();
+	    $("table.report tr.branch").show();
+	    $("table.report tr.branch_total").show();
+	    $("table.report tr.header").show();
+	    $("table.report").before("<a class='expand_all'>Expand all</a>");
+	    $("table.report tr.branch td").append("<a id='center' class='expand'>Expand centers</a>");
+	    $("table.report tr.center td").append("<a id='group' class='expand'>Expand groups</a>");
+	    if($("table.report tr.date").length>0)
+		$("table.report tr.group td").append("<a id='date' class='expand'>Expand dates</a>");
+	    $("a.expand_all").click(function(){		    
+		    $("table.report tr").show();
+		    setToggleText();
+		});
+	    $("table.report tr td a").click(function(){
+		    action=$(this).attr("class").trim();
+		    child_type=$(this).attr("id");
+		    child_type_total=child_type+"_total";
+		    parent_type = $(this).parent().parent().attr("class");
+		    if(action==="expand"){
+			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type).show();
+			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type_total).show();
+		    }else{
+			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type).hide();
+			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type_total).hide();
+		    }
+		    if(parent_type=="branch" && action=="collapse")
+			$(this).parent().parent().nextUntil("tr.branch_total").hide();		    
+		    setToggleText();
+		});	    
+	}
 	if($('#mfi_color') && $('#mfi_color').length>0){
 	    $('#mfi_color').colorPicker();
 	}

@@ -28,7 +28,7 @@
         =submit "Go"
 
 %table.report
-  %tr
+  %tr.header
     %th{:width => '20%'}
       Date
     %th{:width => '20%'}
@@ -37,7 +37,7 @@
       Disbursed
     %th{:colspan => "4"}
       Payment
-  %tr
+  %tr.header
     %th
     %th
     %th
@@ -55,22 +55,22 @@
   -@clients.each do |branch_id, centers|
     -if centers.keys.length>0
       -branch_total = []
-      %tr
-        %td.branch{:colspan => length}
+      %tr.branch
+        %td{:colspan => length}
           %b
             =@branches[branch_id].name
       -centers.sort_by{|center_id, groups| @centers[center_id].name}.each do |center_id, groups|
         -if groups.keys.length>0 and (groups.keys & groups_available).length>0
-          %tr
-            %td.center{:colspan => length}
+          %tr.center
+            %td{:colspan => length}
               %b
                 =@centers[center_id].name
           - center_total = Array.new(length-2, 0)
           -groups.sort_by{|x| @groups[x[0]].name}.each do |group_id, clients|
             -if groups_available.include?(group_id)
               -group_total = Array.new(length-2, 0)
-              %tr
-                %td.group{:colspan => length}
+              %tr.group
+                %td{:colspan => length}
                   %b=@groups[group_id].name
               -@payments.keys.sort.each do |date|
                 -date_total = Array.new(length-2, 0)
@@ -78,7 +78,7 @@
                   -@payments[date][group_id].keys.sort_by{|x| clients.find{|c| c.id==x}.name}.each do |client_id|
                     -itr=@payments[date][group_id][client_id].collect{|x| x.length}.max
                     -itr.times do |i|
-                      %tr
+                      %tr.date
                         %td.align_left
                           = date
                         %td.align_left
@@ -100,24 +100,24 @@
                           -center_total[-1]+= sum
                           -group_total[-1] += sum
                           -date_total[-1]  += sum
-                  %tr
-                    %td.group_total
+                  %tr.date_total
+                    %td
                       %b
                         Date total
                     %td
                       -date_total.each do |ele|
                         %td
                           %b=ele
-              %tr
-                %td.group_total
+              %tr.group_total
+                %td
                   %b==Group total
                 %td
                 -group_total.each do |ele|
                   %td
                     %b
                       =ele
-          %tr
-            %td.center_total
+          %tr.center_total
+            %td
               %b==Center total:
               -branch_total.push(center_total)
             %td
@@ -127,8 +127,8 @@
                   =ele
       - branch_sum_arr = branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
       - if branch_sum_arr.reduce{|x, sum| sum+=x}
-        %tr
-          %td.branch_total
+        %tr.branch_total
+          %td
             %b==Branch total:
           %td
           -branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
