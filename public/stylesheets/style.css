@@ -564,8 +564,10 @@ table.report tr.align_left{
 table.report tr td a{
     color: blue;
     float: right;
+    cursor: pointer;
 }
 a.expand_all{
     color: blue;
-    float: right;    
+    float: right;
+    cursor: pointer; 
 }

@@ -1,6 +1,6 @@
 class Reports < Application
+  Types = [DailyReport, ConsolidatedReport, TransactionLedger, ProjectedReport, LoanDisbursementRegister]
   # provides :xml, :yaml, :js
-
   def index
     @reports = Report.all
     display @reports
@@ -19,12 +19,15 @@ class Reports < Application
       dates[:to_date]   = get_date(params[class_key], :to_date) if params[class_key][:to_date]
     end
 
-    if [DailyReport, ConsolidatedReport, TransactionLedger, ProjectedReport].include?(klass)
+    if Reports::Types.include?(klass)
       #Generating report
       @report   = klass.new(params[class_key], dates)
       if klass==TransactionLedger
         @groups, @centers, @branches, @payments, @clients = @report.generate
         display [@groups, @centers, @branches, @payments, @clients]
+      elsif klass==LoanDisbursementRegister
+        @groups, @centers, @branches, @loans, @loan_products = @report.generate
+        display [@groups, @centers, @branches, @loans, @loan_products]
       else
         @groups, @centers, @branches = @report.generate
         display [@groups, @centers, @branches]

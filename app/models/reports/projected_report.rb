@@ -17,6 +17,10 @@ class ProjectedReport < Report
   def name
     "Projected cash flow from #{@from_date} to #{@to_date}"
   end
+
+  def self.name
+    "Cash projection report"
+  end
   
   def generate
     branches, centers, groups = {}, {}, {}
