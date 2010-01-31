@@ -14,6 +14,10 @@ class DailyReport < Report
   def name
     "Report for #{date}"
   end
+
+  def self.name
+    "Daily report"
+  end
   
   def generate
     branches, centers, groups = {}, {}, {}

@@ -63,6 +63,8 @@ $(document).ready(function(){
 	    $("table.report tr.center td").append("<a id='group' class='expand'>Expand groups</a>");
 	    if($("table.report tr.date").length>0)
 		$("table.report tr.group td").append("<a id='date' class='expand'>Expand dates</a>");
+	    if($("table.report tr.loan").length>0)
+		$("table.report tr.group td").append("<a id='loan' class='expand'>Expand loans</a>");
 	    $("a.expand_all").click(function(){		    
 		    $("table.report tr").show();
 		    setToggleText();
@@ -72,12 +74,13 @@ $(document).ready(function(){
 		    child_type=$(this).attr("id");
 		    child_type_total=child_type+"_total";
 		    parent_type = $(this).parent().parent().attr("class");
+		    parent_type_total=parent_type+"_total";
 		    if(action==="expand"){
 			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type).show();
 			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type_total).show();
 		    }else{
-			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type).hide();
-			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type_total).hide();
+			$(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
+			$(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
 		    }
 		    if(parent_type=="branch" && action=="collapse")
 			$(this).parent().parent().nextUntil("tr.branch_total").hide();		    

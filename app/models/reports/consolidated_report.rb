@@ -18,6 +18,10 @@ class ConsolidatedReport < Report
     "Report from #{@from_date} to #{@to_date}"
   end
   
+  def self.name
+    "Consolidated report"
+  end
+  
   def generate
     branches, centers, groups = {}, {}, {}
     histories = LoanHistory.sum_outstanding_by_group(self.from_date, self.to_date)

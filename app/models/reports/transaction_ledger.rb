@@ -21,6 +21,10 @@ class TransactionLedger < Report
     end
   end 
   
+  def self.name
+    "Transaction ledger"
+  end
+
   def generate
     branches, centers, groups, clients, payments = {}, {}, {}, {}, {}
     clients_grouped={}
