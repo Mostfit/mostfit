@@ -571,3 +571,17 @@ a.expand_all{
     float: right;
     cursor: pointer; 
 }
+a.moreinfo{
+    color: blue;
+    cursor: pointer; 
+}
+a.lessinfo{
+    color: blue;
+    cursor: pointer; 
+}
+table.moreinfo{
+    background: #eee;    
+}
+table.moreinfo tr td:first-child{
+    font-weight: bold;
+}

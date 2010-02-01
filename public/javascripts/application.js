@@ -87,6 +87,23 @@ $(document).ready(function(){
 		    setToggleText();
 		});	    
 	}
+	if($("a.moreinfo").length>0){
+	    $("a.moreinfo").click(function(){
+		    path="/"+$(this).attr("id").split("_").join("/");
+		    $("a.moreinfo").append("<img id='spinner' src='/images/spinner.gif'>");
+		    $("table.moreinfo").remove();
+		    $.get(path, function(data){
+				$("a.moreinfo").after("<a class='lessinfo'>Less info about this branch</a>").after(data);
+				$("a.moreinfo").hide();
+				$("img#spinner").remove();
+				$("a.lessinfo").click(function(){
+					$("a.moreinfo").show();
+					$("table.moreinfo").remove();
+					$("a.lessinfo").remove();
+				    });				
+			    });
+		});
+	}
 	if($('#mfi_color') && $('#mfi_color').length>0){
 	    $('#mfi_color').colorPicker();
 	}

@@ -1,0 +1,36 @@
+%table.moreinfo
+  %tr
+    %td
+      Branch formation date
+    %td
+      =@branch.created_at||@centers.sort_by{|x| x.created_at}[0].created_at.strftime($globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y")
+  %tr
+    %td
+      Number of Centers
+    %td
+      =@centers_count
+  %tr
+    %td
+      Number of Groups
+    %td
+      =@groups_count
+  %tr
+    %td
+      Number of Clients
+    %td
+      =@clients_count
+  %tr
+    %td
+      Total Loans Outstanding
+    %td
+      =@loan_data.loans_count
+  %tr
+    %td
+      Total Amount Overdue
+    %td
+      =@loan_data.actual_outstanding_total.to_currency
+  %tr
+    %td
+      Number of Inactive Members
+    %td
+      =@clients_count - @loan_data.clients_count
