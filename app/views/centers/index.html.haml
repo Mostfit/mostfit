@@ -13,10 +13,8 @@
     %tr
       %td manager
       %td= link_to @branch.manager.name, resource(@branch.manager)
-    %tr.odd
-      %td centers
-      %td
-        %b= @branch.centers.size
+  %a.moreinfo{:id => "branches_moreinfo_#{@branch.id}"}
+    More info about this branch
   %h2== Centers of the #{@branch.name} branch
   %p
     = link_to 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit"
