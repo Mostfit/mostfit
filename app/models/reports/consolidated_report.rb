@@ -5,7 +5,7 @@ class ConsolidatedReport < Report
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 7
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
     
-    @name   = "Report from #{@from_date.strftime("%d-%m-%Y")} to #{@to_date.strftime("%d-%m-%Y")}"
+    @name   = "Report from #{@from_date} to #{@to_date}"
     @branch = if params and params[:branch_id] and not params[:branch_id].blank?
                 Branch.all(:id => params[:branch_id])
               else
@@ -15,7 +15,11 @@ class ConsolidatedReport < Report
  end
   
   def name
-    "Report from #{@from_date.strftime("%d-%m-%Y")} to #{@to_date.strftime("%d-%m-%Y")}"
+    "Report from #{@from_date} to #{@to_date}"
+  end
+  
+  def self.name
+    "Consolidated report"
   end
   
   def generate

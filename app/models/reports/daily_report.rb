@@ -3,7 +3,7 @@ class DailyReport < Report
 
   def initialize(params, dates)
     @date   =  dates[:date]||Date.today
-    @name   = "Report for #{@date.strftime("%d-%m-%Y")}"
+    @name   = "Report for #{@date}"
     if params and params[:branch_id] and not params[:branch_id].nil?
       @branch = Branch.all(params[:branch_id])
     else
@@ -12,7 +12,11 @@ class DailyReport < Report
   end
   
   def name
-    "Report for #{date.strftime("%d-%m-%Y")}"
+    "Report for #{date}"
+  end
+
+  def self.name
+    "Daily report"
   end
   
   def generate

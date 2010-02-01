@@ -46,11 +46,13 @@ class Loans < DataEntry::Controller
 
   def update
     klass, attrs = get_loan_and_attrs
+    attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan = klass.get(params[klass.to_s.snake_case.to_sym][:id])
     raise NotFound unless @loan
+    @loan_product = @loan.loan_product
     if @loan.update_attributes(attrs)
       if params[:format]=='xml'
-            display @loan, ""
+        display @loan, ""
       else
         redirect url(:enter_loans, :action => 'new'), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
       end

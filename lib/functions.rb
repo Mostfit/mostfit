@@ -15,10 +15,10 @@ class Date
   end
 
   def holiday_bump
-    @hols = $holidays
+    hols = $holidays
     new_date = self
-    while @hols.keys.include?(new_date)
-      case @hols[new_date].shift_meeting
+    while hols.keys.include?(new_date)
+      case hols[new_date].shift_meeting
         when :before
           new_date -= 1 
         when :after
@@ -26,10 +26,33 @@ class Date
       end
     end
     return new_date
+  end  
+  
+  def holidays_shifted_today
+    return self-1 if was_yesterday_holiday_shifted_today?
+    return self+1 if is_tommorow_holiday_shifted_today?
+    return self
   end
-#  def to_s
-#    "#{year}-#{month}-#{day} (#{weekday.to_s[0..2]})"
-#  end
+  
+  def weekdays
+    days       = []
+    days      << self.weekday
+    days      << self.holidays_shifted_today.weekday
+    days.uniq
+  end
+
+private
+  def was_yesterday_holiday_shifted_today?
+    yesterday = self-1
+    return true if $holidays[yesterday] and $holidays[yesterday].shift_meeting==:after
+    return false
+  end
+
+  def is_tommorow_holiday_shifted_today?
+    yesterday = self+1
+    return true if $holidays[yesterday] and $holidays[yesterday].shift_meeting==:before
+    return false
+  end
 end
 
 module Misfit
@@ -91,6 +114,12 @@ class Hash
     rhash
   end
 
+end
+
+class String
+  def camelcase(str='')
+    self.split('_').map{|x| x}.join(str)
+  end
 end
 
 module ExcelFormula

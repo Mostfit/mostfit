@@ -16,6 +16,7 @@ class Center
 
   has n, :clients
   has n, :client_groups
+  has n, :loan_history
   
   validates_is_unique   :code, :scope => :branch_id
   validates_length      :code, :min => 1, :max => 12

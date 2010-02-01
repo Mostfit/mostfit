@@ -4,11 +4,11 @@ class PerformanceReport < Report
   def initialize(start_date)
     self.start_date = (start_date.is_a? Date) ? start_date : Date.parse(start_date)
     self.end_date   = self.start_date + (Date.new(start_date.year,12,31).to_date<<(12-start_date.month)).day
-    @name = "Performance report upto #{end_date.strftime("%d-%m-%Y")}"
+    @name = "Performance report upto #{end_date}"
   end
 
   def name
-    "Performance report upto #{end_date.strftime("%d-%m-%Y")}"
+    "Performance report upto #{end_date}"
   end
 
   def to_str

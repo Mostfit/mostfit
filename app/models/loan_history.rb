@@ -90,7 +90,7 @@ class LoanHistory
         SUM(actual_outstanding_total)        AS actual_outstanding_total
       FROM
       (select scheduled_outstanding_principal,scheduled_outstanding_total, actual_outstanding_principal, actual_outstanding_total from
-        (select loan_id, max(date) as date from loan_history where date <= '#{date.to_s}' and loan_id in (#{loan_ids.join(', ')}) and status in (5,6) group by loan_id) as dt, 
+        (select loan_id, max(date) as date from loan_history where date <= '#{date.strftime('%Y-%m-%d')}' and loan_id in (#{loan_ids.join(', ')}) and status in (5,6) group by loan_id) as dt, 
         loan_history lh 
       where lh.loan_id = dt.loan_id and lh.date = dt.date) as dt1;})
   end
@@ -105,8 +105,8 @@ class LoanHistory
   
   def self.sum_outstanding_by_group(from_date, to_date)
     ids=repository.adapter.query("SELECT loan_id, max(date) date FROM loan_history 
-                                  WHERE status in (5,6) AND date>='#{from_date}' AND date<='#{to_date}' GROUP BY loan_id"
-                                 ).collect{|x| "(#{x.loan_id}, '#{x.date.to_s}')"}.join(",")
+                                  WHERE status in (5,6) AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}' GROUP BY loan_id"
+                                 ).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
     return false if ids.length==0
     repository.adapter.query(%Q{
       SELECT 
@@ -121,4 +121,27 @@ class LoanHistory
       GROUP BY client_group_id;
     })
   end
+
+  def self.sum_outstanding_for_branch(branch_id, from_date=Date.today-7, to_date=Date.today)
+    ids=repository.adapter.query("SELECT loan_id, max(date) date FROM loan_history 
+                                  WHERE status in (5,6) AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}'
+                                  AND branch_id=#{branch_id}
+                                  GROUP BY loan_id"
+                                 ).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
+    return false if ids.length==0
+    repository.adapter.query(%Q{
+      SELECT
+        SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
+        SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
+        SUM(actual_outstanding_principal)    AS actual_outstanding_principal,
+        SUM(actual_outstanding_total)        AS actual_outstanding_total,
+        COUNT(DISTINCT(loan_id))             AS loans_count,
+        COUNT(DISTINCT(client_id))           AS clients_count,
+        branch_id
+      FROM loan_history
+      WHERE (loan_id, date) in (#{ids})
+      GROUP BY branch_id
+    })
+  end
+
 end

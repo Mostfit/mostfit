@@ -1,6 +1,5 @@
 module Misfit
   module Extensions
-
     module Browse
       def self.included(base)
         Merb.logger.info "Included Misfit::Extensions::Browse by #{base}"
@@ -19,7 +18,7 @@ module Misfit
       
       def centers_paying_today
         @date = params[:date] ? Date.parse(params[:date]) : Date.today
-        @centers = Center.all(:meeting_day => @date.weekday)
+        @centers = Center.all(:id => LoanHistory.all(:date => Date.today).map{|x| x.center_id}.uniq)
         render :template => 'dashboard/today'
       end
     end # Browse
@@ -114,8 +113,6 @@ module Misfit
           include module_eval("Misfit::Extensions::#{mod}")
         end
       end
-    end
-  end 
-  
-
+    end    
+  end
 end

@@ -73,5 +73,14 @@
         Email address
       %td
         =text_field :email
+    %tr
+      %td{:colspan => 2}
+        %hr
+    %tr
+      %td
+        Specify prefered date format
+      %td
+        =select :date_format, :collection => Mfi::DateFormats.map{|x| [x, Date.today.strftime(x)]}
+     
   =submit "Save my details"
 

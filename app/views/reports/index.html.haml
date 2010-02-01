@@ -7,19 +7,8 @@
       %th
         Please choose a Report Type
         
-  %tr
-    %td
-      %h3
-        =link_to("Daily report", url(:show_report, :report_type => "DailyReport"))
-  %tr
-    %td
-      %h3
-        =link_to("Consolidated report", url(:show_report, :report_type => "ConsolidatedReport"))
-  %tr
-    %td
-      %h3
-        =link_to("Transaction ledger", url(:show_report, :report_type => "TransactionLedger"))
-  %tr
-    %td
-      %h3
-        =link_to("Projected Report", url(:show_report, :report_type => "ProjectedReport"))
+  -Reports::Types.each do |report|
+    %tr
+      %td
+        %h3
+          =link_to(report.name, url(:show_report, :report_type => report))

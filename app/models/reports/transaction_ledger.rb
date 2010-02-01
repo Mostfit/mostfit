@@ -5,7 +5,7 @@ class TransactionLedger < Report
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
 
-    @name     = "Report from #{@from_date.strftime("%d-%m-%Y")} to #{@to_date.strftime("%d-%m-%Y")}"
+    @name     = "Report from #{@from_date} to #{@to_date}"
 
     @branch   = if params and params[:branch_id] and not params[:branch_id].blank?
                    Branch.all(:id => params[:branch_id])
@@ -21,6 +21,10 @@ class TransactionLedger < Report
     end
   end 
   
+  def self.name
+    "Transaction ledger"
+  end
+
   def generate
     branches, centers, groups, clients, payments = {}, {}, {}, {}, {}
     clients_grouped={}

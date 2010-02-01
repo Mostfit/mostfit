@@ -35,7 +35,7 @@
         %td
           =client.name
         %td
-          =client.grt_pass_date ? client.grt_pass_date.strftime("%d %b %Y") : " - "
+          =client.grt_pass_date ? client.grt_pass_date : " - "
     %tr
       %td{:colspan => 4}
         =date_select "grt_date"

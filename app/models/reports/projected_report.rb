@@ -5,7 +5,7 @@ class ProjectedReport < Report
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today + 1
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today + 7
     
-    @name   = "Projected cash flow from #{@from_date.strftime("%d-%m-%Y")} to #{@to_date.strftime("%d-%m-%Y")}"
+    @name   = "Projected cash flow from #{@from_date} to #{@to_date}"
     @branch = if params and params[:branch_id] and not params[:branch_id].blank?
                 Branch.all(:id => params[:branch_id])
               else
@@ -15,7 +15,11 @@ class ProjectedReport < Report
  end
   
   def name
-    "Projected cash flow from #{@from_date.strftime("%d-%m-%Y")} to #{@to_date.strftime("%d-%m-%Y")}"
+    "Projected cash flow from #{@from_date} to #{@to_date}"
+  end
+
+  def self.name
+    "Cash projection report"
   end
   
   def generate

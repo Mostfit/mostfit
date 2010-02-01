@@ -67,7 +67,10 @@ class User
     return true if role == :admin
     return crud_rights.values.inject([]){|a,b| a + b}.uniq.include?(model.to_s.snake_case.to_sym)
   end
-  
+
+  def to_s
+    login
+  end
 
   def method_missing(name, params)
     if x = /can_\w+\?/.match(name.to_s)
