@@ -857,14 +857,14 @@ class A50Loan < Loan
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
+    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments 
     amount.to_f / number_of_installments
   end
 
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments - 1
+    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
     number < 45 ? total_interest_to_be_received / 45 : 0
   end
 end
