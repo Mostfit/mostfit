@@ -147,3 +147,16 @@ module ExcelFormula
     (vPow * present_value - future_value)/(vPow - 1) * actual_interest_rate
   end
 end
+
+module FinancialFunctions
+  def npv(cashflows, discount_rate)
+    (cashflows.enum_for(:each_with_index).collect{|x,i| x/((1+discount_rate)**i)}).inject(0){|a,b| a+b}
+  end
+
+  def irr(cash_flows, iterations = 100)
+    (1..iterations).inject do |rate,|
+      npv = cash_flows.enum_for(:each_with_index).inject {|(m,),(c,t)| m+c/(1.0+rate)**t}
+      rate * (1 - npv / cash_flows.first)
+    end
+  end
+end
