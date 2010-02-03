@@ -1,0 +1,31 @@
+%h1
+  Targets
+%table{:width => "100%"}
+  %tr
+    %th
+      Attached to
+    %th
+      Start value
+    %th
+      To reach
+    %th
+      Deadline date
+    %th
+      Assigned to
+    %th
+  - for target in @targets
+    %tr
+      %td
+        = target.type.to_s.camelcase(' ')
+      %td
+        = target.start_value
+      %td
+        = target.target_value
+      %td
+        = target.deadline
+      %td
+        = target.responsible.name
+      %td
+        = link_to 'Edit', url(:edit_target,  target)
+
+= link_to 'New', url(:new_target)

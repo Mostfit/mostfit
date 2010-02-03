@@ -5,30 +5,33 @@ class Client
 
   before :valid?, :parse_dates
   before :valid?, :convert_blank_to_nil
+  before :valid?, :add_created_by_staff_member
 
-  property :id,             Serial
-  property :reference,      String, :length => 100, :nullable => false, :index => true
-  property :name,           String, :length => 100, :nullable => false, :index => true
-  property :spouse_name,    String, :length => 100
-  property :date_of_birth,  Date,   :index => true
-  property :address,        Text
-  property :active,         Boolean, :default => true, :nullable => false, :index => true
-  property :date_joined,    Date,    :index => true
-  property :grt_pass_date,  Date,    :index => true, :nullable => true
-  property :client_group_id,Integer, :index => true, :nullable => true
-  property :center_id,      Integer, :index => true, :nullable => true
-  property :created_at,     DateTime, :default => Time.now
-  property :deleted_at,     ParanoidDateTime
-  property :client_type,    Enum[:default], :default => :default
+  property :id,              Serial
+  property :reference,       String, :length => 100, :nullable => false, :index => true
+  property :name,            String, :length => 100, :nullable => false, :index => true
+  property :spouse_name,     String, :length => 100
+  property :date_of_birth,   Date,   :index => true
+  property :address,         Text
+  property :active,          Boolean, :default => true, :nullable => false, :index => true
+  property :date_joined,     Date,    :index => true
+  property :grt_pass_date,   Date,    :index => true, :nullable => true
+  property :client_group_id, Integer, :index => true, :nullable => true
+  property :center_id,       Integer, :index => true, :nullable => true
+  property :created_at,      DateTime, :default => Time.now
+  property :deleted_at,      ParanoidDateTime
+  property :client_type,     Enum[:default], :default => :default
   property :created_by_user_id,  Integer, :nullable => false, :index => true
+  property :created_by_staff_member_id,  Integer, :nullable => false, :index => true
   property :verified_by_user_id, Integer, :nullable => true, :index => true
 
   has n, :payments
 
   validates_length :account_number, :max => 20
 
-  belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
-  belongs_to :verified_by, :child_key => [:verified_by_user_id],  :model => 'User'  
+  belongs_to :created_by,        :child_key => [:created_by_user_id],         :model => 'User'
+  belongs_to :created_by_staff,  :child_key => [:created_by_staff_member_id], :model => 'StaffMember'
+  belongs_to :verified_by,       :child_key => [:verified_by_user_id],        :model => 'User'  
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},
@@ -150,5 +153,11 @@ class Client
     self.type_of_account = 0 if self.respond_to?(:type_of_account) and self.type_of_account == nil
     self.center_id=nil       if self.center_id.blank?
     self.client_group_id=nil if self.client_group_id.blank? 
+  end
+  
+  def add_created_by_staff_member
+    if self.center and self.new?
+      self.created_by_staff_member_id = self.center.manager_staff_id
+    end
   end
 end
