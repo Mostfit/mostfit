@@ -77,7 +77,7 @@ class ConsolidatedReport < Report
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id
-      groups[branch_id][center_id][l.client.client_group_id ? l.client_group_id : 0][0] += l.amount
+      groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][0] += l.amount
     }
 
     #2: Approved on
