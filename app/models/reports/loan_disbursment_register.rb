@@ -49,7 +49,7 @@ class LoanDisbursementRegister < Report
       branch_id = centers[center_id].branch_id
       if not l.client.client_group_id
         loans[branch_id][center_id][0] ||= []
-        groups[0]="No group"
+        groups[0]=ClientGroup.new(:name => "No group", :id => 0)
       end
       loans[branch_id][center_id][l.client.client_group_id||0].push([client.reference,client.name,client.spouse_name,l.loan_product_id,l.id,l.disbursal_date,l.amount])
     }
