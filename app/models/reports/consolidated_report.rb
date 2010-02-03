@@ -64,6 +64,7 @@ class ConsolidatedReport < Report
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       if groups[branch_id][center_id]
+        groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id
         groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][3] += p.amount if p.type==:principal 
         groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][4] += p.amount if p.type==:interest
         groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][5] += p.amount if p.type==:fees
@@ -75,6 +76,7 @@ class ConsolidatedReport < Report
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
+      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id
       groups[branch_id][center_id][l.client.client_group_id ? l.client_group_id : 0][0] += l.amount
     }
 
@@ -84,7 +86,7 @@ class ConsolidatedReport < Report
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
-
+      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id
       groups[branch_id][center_id][l.client.client_group_id ? l.client_group_id : 0][1] += l.amount
     }
 
@@ -94,7 +96,7 @@ class ConsolidatedReport < Report
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
-
+      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id
       groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][2] += l.amount
     }
     return [groups, centers, branches]
