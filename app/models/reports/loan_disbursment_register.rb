@@ -47,7 +47,11 @@ class LoanDisbursementRegister < Report
       next if not centers.key?(center_id)
       loan_products[l.loan_product_id] = l.loan_product if not loan_products.key?(l.loan_product_id)
       branch_id = centers[center_id].branch_id
-      loans[branch_id][center_id][l.client.client_group_id].push([client.reference, client.name, client.spouse_name, l.loan_product_id, l.id, l.disbursal_date, l.amount])
+      if not l.client.client_group_id
+        loans[branch_id][center_id][0] ||= []
+        groups[0]="No group"
+      end
+      loans[branch_id][center_id][l.client.client_group_id||0].push([client.reference,client.name,client.spouse_name,l.loan_product_id,l.id,l.disbursal_date,l.amount])
     }
     return [groups, centers, branches, loans, loan_products]
   end
