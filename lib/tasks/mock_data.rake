@@ -71,7 +71,7 @@ namespace :mock do
         puts e
       end
       raise
-    end                         
+    end
     #first make the branches
     25.times do |i|
       sm = StaffMember.new(:name => "Branch Manager #{i}" )
@@ -92,9 +92,9 @@ namespace :mock do
       # make 400 centers per branch
       400.times do |j|
         md = Center.meeting_days[[1,rand(7)].min]
-        
-        center = Center.new(:branch => b, :name => "br #{i} cen #{j}", 
-                            :manager => cms[rand(20)], 
+
+        center = Center.new(:branch => b, :name => "br #{i} cen #{j}",
+                            :manager => cms[rand(20)],
                             :meeting_day => Center.meeting_days[rand(7)])
         center.save
         puts "center #{center.name} : manager => #{center.manager.name}"
@@ -118,7 +118,7 @@ namespace :mock do
       client_sql = %Q{INSERT INTO clients (name, date_joined, reference, center_id) VALUES }
       loan_sql = %Q{ INSERT INTO loans (client_id, amount, interest_rate, installment_frequency, number_of_installments,
                                    applied_on, applied_by_staff_id, approved_on, approved_by_staff_id,
-                                   scheduled_disbursal_date, scheduled_first_payment_date, 
+                                   scheduled_disbursal_date, scheduled_first_payment_date,
                                    disbursed_by_staff_id, disbursal_date,
                                    funding_line_id, discriminator) VALUES }
       values = []
@@ -160,7 +160,7 @@ namespace :mock do
     end
     puts "1: #{Time.now - t0}"
     loan_ids.each do |loan_id|
-      sql = " INSERT INTO `payments` (`received_by_staff_id`, `amount`, `type`, `created_by_user_id`, `loan_id`, `received_on`) VALUES ";
+      sql = " INSERT INTO `payments` (`received_by_staff_id`, `amount`, `type`, `created_by_user_id`, `loan_id`, `received_on`, `client_id`) VALUES ";
       _t0 = Time.now
       loan = Loan.get(loan_id)
       staff_member = loan.client.center.manager
@@ -171,8 +171,8 @@ namespace :mock do
       int = loan.scheduled_interest_for_installment(1)
       values = []
       dates.each do |date|
-        values << "(#{staff_member.id}, #{prin}, 1, 1, #{loan.id}, '#{date}')"
-        values << "(#{staff_member.id}, #{int}, 2, 1, #{loan.id}, '#{date}')"
+        values << "(#{staff_member.id}, #{prin}, 1, 1, #{loan.id}, '#{date}', #{loan.client.id})"
+        values << "(#{staff_member.id}, #{int}, 2, 1, #{loan.id}, '#{date}', #{loan.client.id})"
       end
       puts "done constructing sql in #{Time.now - _t0}"
       if not values.empty?
@@ -206,7 +206,7 @@ namespace :mock do
     end
     t0 = Time.now
     loan_ids.each do |loan_id|
-      loan = Loan.get(loan_id)   
+      loan = Loan.get(loan_id)
       puts "1: #{Time.now - t0}"
       loan.update_history_bulk_insert
       puts "2: #{Time.now - t0}"
@@ -221,7 +221,7 @@ namespace :mock do
   task :historify_unhistorified do
     t0 = Time.now
     Merb.logger.info! "Start mock:history rake task at #{t0}"
-    Loan.all.each do |l| 
+    Loan.all.each do |l|
       l.update_history if l.history.blank?
     end
     t1 = Time.now
@@ -247,12 +247,12 @@ end
 
 # some fixture loader if found online, more features, none we need so far it seems...
 # # $map = Hash.new
-# # 
+# #
 # # path = Merb.root / "spec" / "fixtures"
 # # files = ["users", "news_items", "privs"]
 # # files.reverse.each { |f| f.classify.constantize.create_table! }
 # # files.map! { |f| (path / f) + ".yml" }
-# # 
+# #
 # # files.each do |path|
 # #   puts "Processing #{path}"
 # #   fixtures = YAML::load_file(path) || {}

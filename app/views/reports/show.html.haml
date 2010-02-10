@@ -1,3 +1,4 @@
+- debugger
 - if ["PerformanceReport", "DailyReport"].include?(params[:report_type])
   = partial "#{params[:report_type].snake_case.gsub(" ","_")}"
 - elsif @reports
@@ -9,4 +10,5 @@
 - else
   %h1
     =@report.name
-  = partial "#{params[:report_type].snake_case.gsub(" ","_")}"
+  = partial "#{params[:report_type].snake_case.gsub(" ","_")}".to_sym
+
