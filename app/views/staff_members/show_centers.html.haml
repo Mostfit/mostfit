@@ -27,13 +27,13 @@
         = item = c.count
         - sum_clients += item
       %td
-        = item = l.count
+        = item = l.count if c.size>0
         - sum_loans   += item
       %td
-        = item = (l and l.count > 0) ? l.sum(:amount) : 0
+        = item = (c.size>0 and l and l.count > 0) ? l.sum(:amount) : 0
         - sum_disbursed += item
       %td      
-        = item = 0; item = l.payments(:type=>:principal).sum(:amount) || 0 if l and l.count> 0
+        = item = 0; item = l.payments(:type=>:principal).sum(:amount) || 0 if c.size>0 and l and l.count> 0
         - sum_repaid += item
       %td
         = item = LoanHistory.all(:current => true, 'loan.client.center_id' => center.id).sum(:amount_in_default) || 0

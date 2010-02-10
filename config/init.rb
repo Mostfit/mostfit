@@ -1,20 +1,20 @@
 # Go to http://wiki.merbivore.com/pages/init-rb
- 
+
 require 'config/dependencies.rb'
 
 use_orm :datamapper
 use_test :rspec
 use_template_engine :haml
- 
+
 Merb::Config.use do |c|
   c[:use_mutex] = true
   c[:session_store] = 'cookie'  # can also be 'memory', 'memcache', 'container', 'datamapper
-  
+
   # cookie session store configuration
   c[:session_secret_key]  = '573a2e64628a0656a8149f6f6b802d11bfc74123'  # required for cookie session store
   c[:session_id_key] = '_mostfit_session_id' # cookie session id key, defaults to "_session_id"
 end
- 
+
 Merb::BootLoader.before_app_loads do
   DataMapper.setup(:abstract, "abstract::")
   # This will get executed after dependencies have been loaded but before your app's classes have loaded.
@@ -56,7 +56,7 @@ Merb::BootLoader.before_app_loads do
   # load the extensions
   require 'lib/extensions.rb'
 end
- 
+
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
   # Load MFI account details to allow this app to sync phone numbers of staffmembers to mostfit box. If this file is not present then no such updates will happen
@@ -79,7 +79,7 @@ Merb::BootLoader.after_app_loads do
 
   # set the rights
   require 'config/misfit'
-  
+
   # enable the extensions
   Misfit::Extensions.hook
 
@@ -110,11 +110,14 @@ Merb::BootLoader.after_app_loads do
     end
   end
   Misfit::Config::DateFormat.compile
+  #Add here to make sure all clients and client_groups have created_by_staff_id
+  Client.all(:created_by_staff_member_id => nil).each{|c| c.created_by_staff = c.center.manager; c.save}
+  ClientGroup.all(:created_by_staff_member_id => nil).each{|c| c.created_by_staff = c.center.manager; c.save}
 
   module DmPagination
     class PaginationBuilder
       def url(params)
-        @context.params.delete(:action) if @context.params[:action] == 'index'        
+        @context.params.delete(:action) if @context.params[:action] == 'index'
         @context.url(@context.params.merge(params).reject{|k,v| k=="_message"})
       end
     end

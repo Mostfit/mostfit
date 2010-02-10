@@ -1,5 +1,5 @@
 class Reports < Application
-  Types = [DailyReport, ConsolidatedReport, TransactionLedger, ProjectedReport, LoanDisbursementRegister]
+  Types = [DailyReport, ConsolidatedReport, TransactionLedger, ProjectedReport, LoanDisbursementRegister, LateDisbursalsReport, TargetReport]
   # provides :xml, :yaml, :js
   def index
     @reports = Report.all
@@ -7,6 +7,7 @@ class Reports < Application
   end
 
   def show(report_type, id)
+    debugger
     provides :pdf
     klass = Kernel.const_get(report_type)
     @report = Report.get(id) if id
@@ -28,6 +29,12 @@ class Reports < Application
       elsif klass==LoanDisbursementRegister
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
+      elsif klass==LateDisbursalsReport
+        @data  = @report.generate
+        display @data
+      elsif klass==TargetReport
+        @targets = @report.generate
+        display [@targets]
       else
         @groups, @centers, @branches = @report.generate
         display [@groups, @centers, @branches]

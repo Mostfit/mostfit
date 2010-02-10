@@ -30,4 +30,21 @@ class StaffMember
               :active => true)
     [obj.save, obj]
   end
+
+  def clients
+    Client.all(:created_by_staff_member_id => self.id)
+  end
+
+  def centers
+    Center.all(:manager => self)
+  end
+
+  def loans
+    Loan.all(:applied_by_staff_id => self.id)
+  end
+
+  def client_groups
+    ClientGroup.all(:created_by_staff_member_id => self.id)
+  end
+
 end

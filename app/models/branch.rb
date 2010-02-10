@@ -27,6 +27,18 @@ class Branch
     centers.paginate(:page => params[:page], :per_page => 15)
   end
 
+  def client_groups
+    self.centers.client_groups
+  end
+
+  def clients
+    self.centers.clients
+  end
+
+  def loans
+    self.centers.clients.loans
+  end
+
   def self.search(q)
     if /^\d+$/.match(q)
       Branch.all(:conditions => {:id => q})

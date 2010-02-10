@@ -1,0 +1,23 @@
+%table.form
+  %tr
+    %td
+      Target for
+    %td
+      = select :type, :collection => Target::Types.map{|x| [x.to_s.camelcase(' '), x.to_s]}, :text_method => :first, :value_method => :last, :prompt => "&lt;select a valid attache&gt;"
+  %tr
+    %td
+      Target
+    %td
+      = text_field :target_value
+  %tr
+    %td
+      Deadline
+    %td
+      = date_select_for @target, :deadline
+  %tr
+    %td
+      Responsibility of:
+    %td
+      = select :attached_to, :collection => Target::ValidAttaches.map{|x| [x.to_s, x.to_s.camelcase(' ')]}, :prompt => "&lt;select a valid attache&gt;"
+    %td
+      = select :attached_id, :collection => @objects, :text_method => :name, :value_method => :id
