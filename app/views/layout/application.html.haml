@@ -15,8 +15,8 @@
         -if $globals and $globals[:mfi_details]
           -if $globals[:mfi_details][:logo_name] and not $globals[:mfi_details][:logo_name].blank?
             = image_tag("logos/#{$globals[:mfi_details][:logo_name]}", :height => 50)
-          -elsif $globals[:mfi_details][:name]
-            %span{:style => "color: #{$globals[:mfi_details][:color]};"}
+          -if $globals[:mfi_details][:name]
+            %span{:style => "color: #{$globals[:mfi_details][:color]}; vertical-align: top"}
               = $globals[:mfi_details][:name]
           -else
             MOSTFIT

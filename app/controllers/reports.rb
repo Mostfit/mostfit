@@ -1,5 +1,5 @@
 class Reports < Application
-  Types = [DailyReport, ConsolidatedReport, TransactionLedger, ProjectedReport, LoanDisbursementRegister, LateDisbursalsReport]
+  Types = [DailyReport, ConsolidatedReport, TransactionLedger, ProjectedReport, LoanDisbursementRegister, LateDisbursalsReport, TargetReport]
   # provides :xml, :yaml, :js
   def index
     @reports = Report.all
@@ -32,6 +32,9 @@ class Reports < Application
       elsif klass==LateDisbursalsReport
         @loans = @report.generate
         display [@loans]
+      elsif klass==TargetReport
+        @targets = @report.generate
+        display [@targets]
       else
         @groups, @centers, @branches = @report.generate
         display [@groups, @centers, @branches]

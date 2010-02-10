@@ -1,0 +1,8 @@
+%h1 Edit target
+= error_messages_for @target
+= form_for(@target, :action => url(:targets) ) do
+  = partial :fields
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:targets)

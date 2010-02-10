@@ -219,11 +219,11 @@ module Merb
     def generate_page_title
       prefix, postfix = [], []
       controller=params[:controller].split("/")[-1]
-      controller_name = (params[:action]=="list" or params[:action]=="index") ? controller.camelcase(' ') : controller.singularize.camelcase(' ')
-      controller_name = controller_name.map{|x| x.camelcase(' ')}.join(' ')
-      prefix  << params[:namespace].camelcase(' ') if params[:namespace]
-      postfix << params[:action].camelcase(' ') if not CRUD_ACTIONS.include?(params[:action])
-      prefix  << params[:action].camelcase(' ') if CRUD_ACTIONS[3..-1].include?(params[:action])
+      controller_name = (params[:action]=="list" or params[:action]=="index") ? controller.join_snake(' ') : controller.singularize.join_snake(' ')
+      controller_name = controller_name.map{|x| x.join_snake(' ')}.join(' ')
+      prefix  << params[:namespace].join_snake(' ') if params[:namespace]
+      postfix << params[:action].join_snake(' ') if not CRUD_ACTIONS.include?(params[:action])
+      prefix  << params[:action].join_snake(' ') if CRUD_ACTIONS[3..-1].include?(params[:action])
       
       return "Loan for #{@loan.client.name}" if controller=="payments" and @loan
       return params[:report_type] if controller=="reports" and params[:report_type]

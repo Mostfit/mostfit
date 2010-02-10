@@ -40,6 +40,12 @@ class Date
     days      << self.holidays_shifted_today.weekday
     days.uniq
   end
+  
+  def to_yaml( opts={} )
+    YAML::quick_emit( self, opts ) do |out|
+      out.scalar( "tag:yaml.org,2002:timestamp", self.strftime("%Y-%m-%d"), :plain )
+    end
+  end
 
 private
   def was_yesterday_holiday_shifted_today?
@@ -117,8 +123,20 @@ class Hash
 end
 
 class String
-  def camelcase(str='')
+  def join_snake(str='')
     self.split('_').map{|x| x}.join(str)
+  end
+
+  def camelcase(str='')
+    self.split('_').map{|x| x.capitalize}.join(str)
+  end
+end
+
+
+class Float
+  alias_method :round_orig, :round
+  def round(n=0)
+    (self * (10.0 ** n)).round_orig * (10.0 ** (-n))
   end
 end
 

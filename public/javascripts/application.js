@@ -52,8 +52,21 @@ function setToggleText(){
 	});
 }
 $(document).ready(function(){
+	//Handling targets form
+	$("select#target_attached_to").change(function(){
+		$.ajax({
+			url: "/targets/all/"+$(this).val()+".json",
+			success: function(data){
+			    $("select#target_attached_id option").remove();
+			    $.each(data, function(i, obj){
+				    $("select#target_attached_id").append($("<option></option>").attr("value",obj["id"]).text(obj["name"]));
+				});
+			},
+			dataType: "json"
+		    });
+	    });
 	//Handling reports
-	if($("table.report").length>0){
+	if($("table.report").length>0 && !$("table.report").hasClass("nojs")){
 	    $("table.report tr").hide();
 	    $("table.report tr.branch").show();
 	    $("table.report tr.branch_total").show();

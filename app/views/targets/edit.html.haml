@@ -1,0 +1,12 @@
+%h1
+  Targets controller, edit action
+= error_messages_for @target
+
+= form_for(@target, :action => url(:target, @target)) do
+  = partial :fields
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:target, @target)
+|
+= link_to 'Back', url(:targets)

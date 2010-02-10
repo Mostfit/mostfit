@@ -92,6 +92,10 @@ class Center
     centers = lh.blank? ? [] : lh.loan.clients.centers
     centers
   end
+  
+  def loans
+    self.clients.loans
+  end
 
   private
   def hours_valid?

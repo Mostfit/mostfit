@@ -109,7 +109,10 @@ Merb::BootLoader.after_app_loads do
       Merb.logger.info("Couldn't not load MFI details from config/mfi.yml. Possibly a wrong YAML file specification.")
     end
   end
-  Misfit::Config::DateFormat.compile
+  Misfit::Config::DateFormat.compile  
+  #Add here to make sure all clients and client_groups have created_by_staff_id
+  Client.all(:created_by_staff_id => nil).each{|c| c.created_by_staff = c.center.manager; c.save}
+  ClientGroup.all(:created_by_staff_id => nil).each{|c| c.created_by_staff = c.center.manager; c.save}
 
   module DmPagination
     class PaginationBuilder
