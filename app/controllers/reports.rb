@@ -30,8 +30,8 @@ class Reports < Application
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
       elsif klass==LateDisbursalsReport
-        @loans = @report.generate
-        display [@loans]
+        @data  = @report.generate
+        display @data
       elsif klass==TargetReport
         @targets = @report.generate
         display [@targets]
