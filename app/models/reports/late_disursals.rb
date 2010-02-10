@@ -15,7 +15,7 @@ class LateDisbursalsReport < Report
 
   def generate
     debugger
-    loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil)
+    loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil) || Loan.all(:approved_on => nil)
     centers = loans.clients.centers
     branches = centers.branches
     r = { }

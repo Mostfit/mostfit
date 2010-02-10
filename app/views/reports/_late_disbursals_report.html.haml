@@ -37,13 +37,15 @@
       Scheduled Disbursal Date
     %th
       Days delayed
+    %th
+      Status
   - @data.each do |branch, centers|
     %tr.branch
-      %td{:colspan => 5}
+      %td{:colspan => 6}
         = branch.name
     - centers.each do |center, loans|
       %tr.center
-        %td{:colspan => 5}
+        %td{:colspan => 6}
           = center.name
       - loans.each do |l|
         %tr
@@ -57,3 +59,5 @@
             = l.scheduled_disbursal_date
           %td
             = @report.date - l.scheduled_disbursal_date
+          %td
+            = l.get_status(@report.date)
