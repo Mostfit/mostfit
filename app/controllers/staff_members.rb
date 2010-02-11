@@ -3,7 +3,7 @@ class StaffMembers < Application
   include DateParser
 
   def index
-    # @current_page = ( params[:page] && ( params[:page].to_i > 0 ) ) ? params[:page].to_i : 1 
+    # @current_page = ( params[:page] && ( params[:page].to_i > 0 ) ) ? params[:page].to_i : 1
     #per_page = 15
     # @staff_members = StaffMember.all(:order => [:id], :offset => (@current_page - 1 ) * per_page, :limit => per_page)
     @staff_members = StaffMember.paginate(:page => params[:page], :per_page => 15)
@@ -39,10 +39,10 @@ class StaffMembers < Application
     days      << Center.meeting_days[@date.cwday]
     @date      = @date.holiday_bump
     days      << Center.meeting_days[@date.cwday]
-    @centers   = @staff_member.centers(:meeting_day => days.uniq)
+    @centers   = @staff_member.centers.all(:meeting_day => days.uniq)
     if params[:format] == "pdf"
       generate_pdf
-      send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf"), 
+      send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf"),
                 :filename => "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf")
     else
       display @centers
