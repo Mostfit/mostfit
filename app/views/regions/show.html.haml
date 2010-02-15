@@ -2,6 +2,7 @@
   == Region #{@region.name}
   = link_to 'Edit',  url(:edit_region,  @region), :class => "edit"
 
+= link_to 'Add a new area', resource(@region, :areas, :new), :class => "add"
 %h3
   == Areas under #{@region.name}
 - if @region.areas.count == 0
@@ -10,8 +11,25 @@
     = link_to 'Click here', resource(@region, :areas) 
     to add one
 - else 
-  %ol
+  %table.narrow
+    %thead
+      %tr
+        %th
+          id
+        %th
+          name
+        %th
+          action
     - @region.areas.each do |a|
-      = link_to a.name, resource(a)
+      %tr
+        %td
+          = a.id
+        %td
+          = link_to a.name, resource(a)
+        %td
+          = link_to 'Show', resource(a)
+          |
+          = link_to 'Edit', resource(a, :edit)
+          
 
 = link_to 'Back', url(:regions)
