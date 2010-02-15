@@ -1,15 +1,29 @@
 %h1
   Area
   = @area.name
+  = link_to 'Edit',  url(:edit_area,  @area), :class => "edit"
 
 %h2 Branches in this area
 - if @area.branches.blank?
-  %h3 No branches
-- @area.branches.each do |b|
-  = link_to b.name, resource(b)
-  %br
+  %h2 No branches
+
+- else
+  %table.narrow.form{:width => "100%"}
+    %thead
+      %tr
+        %th
+          id
+        %th
+          name
+    - @area.branches.each do |b|
+      %tr{:class => cycle('odd','even')}
+        %td
+          = b.id
+        %td
+          = link_to b.name, resource(b)
+
 
 %p
-= link_to 'Edit',  url(:edit_area,  @area)
+
 |
 = link_to 'Back', url(:areas)

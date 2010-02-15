@@ -1,12 +1,17 @@
 %h1
   == Region #{@region.name}
-%h2 
-  == Areas in #{@region.name}
+  = link_to 'Edit',  url(:edit_region,  @region), :class => "edit"
 
-= link_to_with_rights "Add an area to #{@region.name}", resource(@region, :areas, :new)
-%ul
-  - @region.areas.each do |a|
-    = link_to a.name, resource(a)
-= link_to 'Edit',  url(:edit_region,  @region)
-|
+%h3
+  == Areas under #{@region.name}
+- if @region.areas.count == 0
+  .flash.notice
+    == #{@region.name} does not have any Areas. 
+    = link_to 'Click here', resource(@region, :areas) 
+    to add one
+- else 
+  %ol
+    - @region.areas.each do |a|
+      = link_to a.name, resource(a)
+
 = link_to 'Back', url(:regions)

@@ -1,0 +1,15 @@
+%h1
+  Occupations controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/occupations/edit.html.erb
+= error_messages_for @occupation
+
+= form_for(@occupation, :action => url(:occupation, @occupation)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:occupation, @occupation)
+|
+= link_to 'Back', url(:occupations)

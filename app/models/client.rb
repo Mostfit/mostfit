@@ -104,6 +104,7 @@ class Client
   belongs_to :created_by,        :child_key => [:created_by_user_id],         :model => 'User'
   belongs_to :created_by_staff,  :child_key => [:created_by_staff_member_id], :model => 'StaffMember'
   belongs_to :verified_by,       :child_key => [:verified_by_user_id],        :model => 'User'
+  belongs_to :occupation
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},

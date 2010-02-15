@@ -1,0 +1,16 @@
+%h1
+  LoanPurposes controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/loan_purposes/index.html.erb
+%table
+  %tr
+  - for loan_purpose in @loan_purposes
+    %tr
+      %td
+        = link_to 'Show', url(:loan_purpose, loan_purpose)
+      %td
+        = link_to 'Edit', url(:edit_loan_purpose,  loan_purpose)
+
+= link_to 'New', url(:new_loan_purpose)

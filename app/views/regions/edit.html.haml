@@ -4,7 +4,7 @@
 = error_messages_for @region
 
 = form_for(@region, :action => url(:region, @region)) do
-  = text_field :name
+  = partial :fields
   = submit "Update"
 
 = link_to 'Show', url(:region, @region)

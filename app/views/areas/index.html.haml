@@ -1,13 +1,30 @@
 %h1
   Areas
 
-%table
-  %tr
-  - for area in @areas
+- if @areas.count == 0
+  .flash
+    .notice
+      No areas
+- else
+  %table.narrow
+    %thead
+      %tr
+        %th
+          id
+        %th
+          name
+        %th.actions
+          actions
     %tr
-      %td
-        = link_to 'Show', url(:area, area)
-      %td
-        = link_to 'Edit', url(:edit_area,  area)
+      - for area in @areas
+        %tr
+          %td
+            = area.id
+          %td
+            = link_to area.name, resource(area.region, area)
+          %td
+            = link_to 'Show', url(:area, area)
+            |
+            = link_to 'Edit', url(:edit_area,  area)
 
 = link_to 'New', url(:new_area)

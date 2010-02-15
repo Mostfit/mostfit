@@ -6,7 +6,7 @@ class Loan
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
   attr_accessor :interest_percentage  # set to true to disable history writing by this object
-  
+
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false, :index => true
   property :amount,                         Integer, :nullable => false, :index => true  # see helper for formatting
@@ -28,14 +28,16 @@ class Loan
   property :deleted_at,                     ParanoidDateTime
   property :loan_product_id,                Integer,  :index => true
 
-  property :applied_by_staff_id,            Integer, :nullable => true, :index => true 
+  property :applied_by_staff_id,            Integer, :nullable => true, :index => true
   property :approved_by_staff_id,           Integer, :nullable => true, :index => true
-  property :rejected_by_staff_id,           Integer, :nullable => true, :index => true 
-  property :disbursed_by_staff_id,          Integer, :nullable => true, :index => true 
-  property :written_off_by_staff_id,        Integer, :nullable => true, :index => true 
-  property :validated_by_staff_id,          Integer, :nullable => true, :index => true 
+  property :rejected_by_staff_id,           Integer, :nullable => true, :index => true
+  property :disbursed_by_staff_id,          Integer, :nullable => true, :index => true
+  property :written_off_by_staff_id,        Integer, :nullable => true, :index => true
+  property :validated_by_staff_id,          Integer, :nullable => true, :index => true
   property :verified_by_user_id,            Integer, :nullable => true, :index => true
   property :created_by_user_id,             Integer, :nullable => true, :index => true
+
+
   # associations
   belongs_to :client
   belongs_to :funding_line
@@ -45,7 +47,7 @@ class Loan
   belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],     :model => 'StaffMember'
   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id],   :model => 'StaffMember'
   belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
-
+  belongs_to :loan_purpose
   has n, :payments
   has n, :history, :model => 'LoanHistory'
   belongs_to :loan_product
@@ -81,22 +83,22 @@ class Loan
   # validates_with_method  :dates_are_not_holidays
 
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
-  
+
   #product validations
   validates_with_method  :amount,                       :method => :is_valid_loan_product_amount
   validates_with_method  :interest_rate,                :method => :is_valid_loan_product_interest_rate
   validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
 
-  
+
   def self.from_csv(row, headers, funding_lines)
-    obj = new(:loan_product_id => LoanProduct.first(:name => row[headers[:product]]).id, :amount => row[headers[:amount]], 
-              :interest_rate => row[headers[:interest_rate]], 
-              :installment_frequency => row[headers[:installment_frequency]], :number_of_installments => row[headers[:number_of_installments]], 
-              :scheduled_disbursal_date => Date.parse(row[headers[:scheduled_disbursal_date]]), 
-              :scheduled_first_payment_date => Date.parse(row[headers[:scheduled_first_payment_date]]), 
-              :applied_on => Date.parse(row[headers[:applied_on]]), :approved_on => Date.parse(row[headers[:approved_on]]), 
-              :disbursal_date => Date.parse(row[headers[:disbursal_date]]), 
-              :disbursed_by_staff_id => StaffMember.first(:name => row[headers[:disbursed_by_staff]]).id, 
+    obj = new(:loan_product_id => LoanProduct.first(:name => row[headers[:product]]).id, :amount => row[headers[:amount]],
+              :interest_rate => row[headers[:interest_rate]],
+              :installment_frequency => row[headers[:installment_frequency]], :number_of_installments => row[headers[:number_of_installments]],
+              :scheduled_disbursal_date => Date.parse(row[headers[:scheduled_disbursal_date]]),
+              :scheduled_first_payment_date => Date.parse(row[headers[:scheduled_first_payment_date]]),
+              :applied_on => Date.parse(row[headers[:applied_on]]), :approved_on => Date.parse(row[headers[:approved_on]]),
+              :disbursal_date => Date.parse(row[headers[:disbursal_date]]),
+              :disbursed_by_staff_id => StaffMember.first(:name => row[headers[:disbursed_by_staff]]).id,
               :funding_line_id => funding_lines[row[headers[:funding_line_serial_number]]].id,
               :applied_by_staff_id => StaffMember.first(:name => row[headers[:applied_by_staff]]).id,
               :approved_by_staff_id => StaffMember.first(:name => row[headers[:approved_by_staff]]).id,
@@ -124,8 +126,8 @@ class Loan
       if k==:min and loan_attr and product_attr and  loan_attr < product_attr
         return [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
       elsif k==:max and loan_attr and product_attr and  loan_attr > product_attr
-       return  [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"] 
-      end      
+       return  [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
+      end
     }
     #check if loan is follows the minimum discrete value for amount and interest
     if product.respond_to?("#{method}_multiple")
@@ -231,7 +233,7 @@ class Loan
   def description
     "#{amount} @ #{interest_percentage}%"
   end
-  
+
   def fields_partial; ''; end  # without reimplementation in the descendants these will render the default shizzle
   def show_partial;   ''; end
 
@@ -261,7 +263,7 @@ class Loan
       # interest is paid first, the rest goes in as principal
       # the payment is filed on received_on without knowing about the future
       # it could happen that payment have been made after this payment
-      # here the validations on the Payment should 
+      # here the validations on the Payment should
       if style == :normal
         total        = input
         total_fees_due_on_date = total_fees_payable_on(received_on)
@@ -327,7 +329,7 @@ class Loan
     pay_order = fee_schedule.keys.sort.map{|d| fee_schedule[d].keys}.flatten
     pay_order.each do |k|
       if fees_payable_on(date).has_key?(k)
-        p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k, 
+        p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k,
                         :received_by => received_by, :created_by => created_by, :client => client, :loan => self)
         if p.save
           amount -= p.amount
@@ -373,13 +375,13 @@ class Loan
   def fees_paid?
     total_fees_paid >= total_fees_due
   end
-  
+
   def fee_schedule
     @fee_schedule = {}
     klass_identifier = "loan"
     loan_product.fees.each do |f|
-      type, *payable_on = f.payable_on.to_s.split("_")      
-      date = eval(payable_on.join("_")) if type == klass_identifier 
+      type, *payable_on = f.payable_on.to_s.split("_")
+      date = eval(payable_on.join("_")) if type == klass_identifier
       @fee_schedule += {date => {f.name => f.fees_for(self)}} unless date.nil?
     end
     @fee_schedule
@@ -409,7 +411,7 @@ class Loan
         :total_principal            => (principal_so_far),
         :total_interest             => (interest_so_far),
         :total                      => principal_so_far + interest_so_far,
-        :balance                    => balance, 
+        :balance                    => balance,
       }
     end
     # we have to do the following to avoid the circular reference from total_to_be_received.
@@ -421,10 +423,10 @@ class Loan
   def payments_hash
     return @payments_cache if @payments_cache
     sql = %Q{
-        SELECT SUM(amount * IF(type=1,1,0)) AS principal, 
+        SELECT SUM(amount * IF(type=1,1,0)) AS principal,
                SUM(amount * IF(type=2,1,0)) AS interest,
-               received_on 
-        FROM payments 
+               received_on
+        FROM payments
         WHERE (deleted_at IS NULL) AND (loan_id = #{self.id})
         GROUP BY received_on}
     structs = id ? repository.adapter.query(sql) : []
@@ -437,7 +439,7 @@ class Loan
     structs.each do |payment|
       # we know the received_on dates are in ascending order as we
       # walk through (so we can do the += thingy)
-      
+
       @payments_cache[payment.received_on] = {
         :principal                 => payment.principal.to_i,
         :interest                  => payment.interest.to_i,
@@ -449,14 +451,14 @@ class Loan
     end
     dates = (installment_dates + payment_dates)
     dates = dates.uniq.sort.reject{|d| d <= structs[-1].received_on} unless structs.blank?
-    dates.each do |date| 
+    dates.each do |date|
       @payments_cache[date] = {:principal => 0, :interest => 0, :total_principal => principal, :total_interest => interest, :total => total, :balance => amount - principal, :total_balance => total_balance - total}
     end
     @payments_cache
   end
 
 
-  # TODO these should logically be private. 
+  # TODO these should logically be private.
   def get_from_cache(cache, column, date)
     date = Date.parse(date) if date.is_a? String
     return 0 if cache.blank?
@@ -466,13 +468,13 @@ class Loan
       return 0 if (column == :principal or column == :interest)
       keys = cache.keys.sort
       if date < keys.min
-        rv = (column == :all ? cache[keys.min] : cache[keys.min][column]) 
+        rv = (column == :all ? cache[keys.min] : cache[keys.min][column])
       elsif date >= keys.max
         rv = (column == :all ? cache[keys.max] : cache[keys.max][column])
       else
-        keys.each_with_index do |k,i| 
+        keys.each_with_index do |k,i|
           if keys[[i+1,keys.size - 1].min] > date
-            rv = (column == :all ? cache[k] : cache[k][column]) 
+            rv = (column == :all ? cache[k] : cache[k][column])
             break
           end
         end
@@ -525,7 +527,7 @@ class Loan
   def total_interest_to_be_received; get_scheduled(:total_interest, self.scheduled_maturity_date).to_i; end
   def total_to_be_received; total_principal_to_be_received.to_i + total_interest_to_be_received.to_i; end
 
-  def scheduled_principal_up_to(date); get_scheduled(:total_principal, date).to_i; end 
+  def scheduled_principal_up_to(date); get_scheduled(:total_principal, date).to_i; end
   def scheduled_interest_up_to(date);  get_scheduled(:total_interest,  date).to_i; end
   def scheduled_total_up_to(date); scheduled_principal_up_to(date).to_i + scheduled_interest_up_to(date).to_i;  end
 
@@ -570,7 +572,7 @@ class Loan
     end
     [result, number_of_installments].min  # never return more than the number_of_installments
   end
-  
+
 
   # LOAN INFO FUNCTIONS - ACTUALS
   # the following methods basically count the payments (PAYMENT-RECEIVED perspective)
@@ -685,14 +687,14 @@ class Loan
       int = interest_received_on(date)
       default = (principal_due + interest_due > prin + int) and date >= scheduled_first_payment_date
       if default
-        last_paid_date ||= dates[[i,dates.size-1].min] 
+        last_paid_date ||= dates[[i,dates.size-1].min]
         days_overdue = [0,date - last_paid_date].max
       else
         last_paid_date = nil
         days_overdue = 0
       end
-      @history_array << {:loan_id => id, :date => date, 
-                           :status => STATUSES.index(get_status(date)) + 1, 
+      @history_array << {:loan_id => id, :date => date,
+                           :status => STATUSES.index(get_status(date)) + 1,
                            :scheduled_outstanding_principal => scheduled_outstanding_principal,
                            :scheduled_outstanding_total => scheduled_outstanding_total,
                            :actual_outstanding_principal => actual_outstanding_principal,
@@ -710,18 +712,18 @@ class Loan
     t = Time.now
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
     d0 = Date.parse('2000-01-03')
-    sql = %Q{ INSERT INTO loan_history(loan_id, date, status, 
+    sql = %Q{ INSERT INTO loan_history(loan_id, date, status,
               scheduled_outstanding_principal, scheduled_outstanding_total,
               actual_outstanding_principal, actual_outstanding_total, current, amount_in_default,
               client_group_id, center_id, client_id, branch_id, days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid)
               VALUES }
     values = []
     calculate_history.each do |history|
-      value = %Q{(#{id}, '#{history[:date].strftime('%Y-%m-%d')}', #{history[:status]}, #{history[:scheduled_outstanding_principal]}, 
+      value = %Q{(#{id}, '#{history[:date].strftime('%Y-%m-%d')}', #{history[:status]}, #{history[:scheduled_outstanding_principal]},
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
                           #{history[:actual_outstanding_total]},#{history[:current]},
                           #{history[:amount_in_default]}, #{client.client_group_id || "NULL"}, #{client.center.id},#{client.id},#{client.center.branch.id},
-                          #{history[:days_overdue]}, #{((history[:date] - d0) / 7).to_i + 1}, 
+                          #{history[:days_overdue]}, #{((history[:date] - d0) / 7).to_i + 1},
                           #{history[:principal_due]},#{history[:interest_due]},
                           #{history[:principal_paid]},#{history[:interest_paid]})}
 
@@ -754,7 +756,7 @@ class Loan
   end
 
   ## validations: read their method name and error to see what they do.
-      
+
   def dates_are_not_holidays
     h = ["scheduled_disbursal_date", "scheduled_first_payment_date"].map{|d| [d,Misfit::Config.holidays.include?(self.send(d))]}.reject{|e| e[1] == false}
     return true if h.blank?
@@ -857,7 +859,7 @@ class A50Loan < Loan
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments 
+    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
     amount.to_f / number_of_installments
   end
 
@@ -874,7 +876,7 @@ class EquatedWeekly < Loan
   # typically reimplemented in subclasses
   include ExcelFormula
   property :purpose,  String
-  
+
   attr_accessor :defaults
 
   def defaults
@@ -908,7 +910,7 @@ class EquatedWeekly < Loan
     payment             = pmt(interest_rate/number_of_installments, number_of_installments, amount, 0, 0)
     interest_payable    = 0
     balance             = amount
-    
+
     1.upto(number){|installment|
       interest_payable  = balance * interest_rate / number_of_installments
       principal_payable = payment - interest_payable

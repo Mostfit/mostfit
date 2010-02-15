@@ -1,0 +1,15 @@
+%h1
+  LoanPurposes controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/loan_purposes/edit.html.erb
+= error_messages_for @loan_purpose
+
+= form_for(@loan_purpose, :action => url(:loan_purpose, @loan_purpose)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:loan_purpose, @loan_purpose)
+|
+= link_to 'Back', url(:loan_purposes)

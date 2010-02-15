@@ -50,6 +50,11 @@
         = " (#{@loan_product.min_number_of_installments} - #{@loan_product.max_number_of_installments})"
   %tr
     %td
+      Loan Purpose:
+    %td
+      = select :loan_purpose, :collection => LoanPurpose.all.map{|lp| [lp.id.to_s, lp.value]}, :prompt => "----", :selected = @loan.loan_purpose ? @loan.loan_purpose.id : nil
+  %tr
+    %td
       Funding Line
     %td
       = select_funding_line_for @loan, :funding_line

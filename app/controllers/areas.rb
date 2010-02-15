@@ -2,9 +2,12 @@ class Areas < Application
   # provides :xml, :yaml, :js
   before :get_region
   def index
-    debugger
     @areas = @region ? @region.areas : Area.all
-    display @areas
+    if @region
+      render "regions/show"
+    else
+      display @areas
+    end
   end
 
   def show(id)

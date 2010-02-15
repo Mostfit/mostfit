@@ -1,0 +1,11 @@
+%table
+  %tr
+    %td
+      Region Name
+    %td
+      = text_field :name
+  %tr
+    %td
+      Manager
+    %td
+      = select :manager_id, :collection => StaffMember.all.map{|s| [s.id, s.name]}, :prompt => "---"

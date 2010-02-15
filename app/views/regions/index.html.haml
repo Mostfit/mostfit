@@ -1,19 +1,19 @@
 %h1
   Regions
 
-%table.narrow{:width=>"100%"}
+%table.narrow.form{:width=>"100%"}
   %thead
     %tr
-      %td
+      %th
         id
-      %td
-        Name
-      %td
-        Areas
-      %td
-        Edit
+      %th
+        name
+      %th
+        areas
+      %th
+        edit
   - for region in @regions
-    %tr
+    %tr{:class => cycle('odd','even')}
       %td
         = region.id
       %td 

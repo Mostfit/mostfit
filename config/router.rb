@@ -1,5 +1,7 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :occupations
+  resources :loan_purposes
   resources :regions do
     resources :areas do
       resources :branches
