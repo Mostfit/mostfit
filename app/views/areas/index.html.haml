@@ -1,0 +1,13 @@
+%h1
+  Areas
+
+%table
+  %tr
+  - for area in @areas
+    %tr
+      %td
+        = link_to 'Show', url(:area, area)
+      %td
+        = link_to 'Edit', url(:edit_area,  area)
+
+= link_to 'New', url(:new_area)

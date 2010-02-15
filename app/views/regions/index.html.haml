@@ -1,0 +1,26 @@
+%h1
+  Regions
+
+%table.narrow{:width=>"100%"}
+  %thead
+    %tr
+      %td
+        id
+      %td
+        Name
+      %td
+        Areas
+      %td
+        Edit
+  - for region in @regions
+    %tr
+      %td
+        = region.id
+      %td 
+        = link_to region.name, resource(region)
+      %td
+        = region.areas.count
+      %td
+        = link_to 'Edit', url(:edit_region,  region)
+
+= link_to 'New', url(:new_region)

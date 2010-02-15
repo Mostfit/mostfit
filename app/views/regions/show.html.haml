@@ -1,0 +1,12 @@
+%h1
+  == Region #{@region.name}
+%h2 
+  == Areas in #{@region.name}
+
+= link_to_with_rights "Add an area to #{@region.name}", resource(@region, :areas, :new)
+%ul
+  - @region.areas.each do |a|
+    = link_to a.name, resource(a)
+= link_to 'Edit',  url(:edit_region,  @region)
+|
+= link_to 'Back', url(:regions)

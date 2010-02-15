@@ -1,0 +1,15 @@
+%h1
+  Area
+  = @area.name
+
+%h2 Branches in this area
+- if @area.branches.blank?
+  %h3 No branches
+- @area.branches.each do |b|
+  = link_to b.name, resource(b)
+  %br
+
+%p
+= link_to 'Edit',  url(:edit_area,  @area)
+|
+= link_to 'Back', url(:areas)

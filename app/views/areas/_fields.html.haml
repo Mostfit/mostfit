@@ -1,0 +1,17 @@
+= error_messages_for @area
+
+= form_for(@area, :action => url(:areas) ) do
+  Name
+  = text_field :name
+  %br
+  Region
+  - if @region
+    = hidden_field :region_id, :value => @region.id
+    %b
+      = @region.name
+  - else
+    = select :region, :collection =>  Region.all.map{|r| [r, r.name]}, :prompt => "---", :selected => @area.region ? @area.region.id.to_s : nil
+  %br
+  = submit "Create"
+
+= link_to 'Back', url(:areas)

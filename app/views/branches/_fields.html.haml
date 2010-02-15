@@ -27,6 +27,14 @@
       %span.greytext pick the staff member that manages this branch
   %tr
     %td
+      Area
+    %td
+      = select :area_id, :collection => Area.all.map{|a| [a.id.to_s, a.name]}, :prompt => "---"
+      %br/
+      %span.greytext pick the staff member that manages this branch
+
+  %tr
+    %td
     %td
       = submit submit_text
       &nbsp;&nbsp;

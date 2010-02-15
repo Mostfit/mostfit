@@ -1,0 +1,12 @@
+%h1
+  Region
+  = @region.name
+= error_messages_for @region
+
+= form_for(@region, :action => url(:region, @region)) do
+  = text_field :name
+  = submit "Update"
+
+= link_to 'Show', url(:region, @region)
+|
+= link_to 'Back', url(:regions)

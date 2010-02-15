@@ -37,7 +37,7 @@ describe Client do
     @loan_product.should be_valid
 
   end
-  
+
   before(:each) do
     Client.all.destroy!
     @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => Date.today)
@@ -45,17 +45,17 @@ describe Client do
     @client.save
     @client.should be_valid
   end
- 
+
   it "should not be valid without belonging to a center" do
     @client.center = nil
     @client.should_not be_valid
   end
- 
+
   it "should not be valid without a name" do
     @client.name = nil
     @client.should_not be_valid
   end
-  
+
   it "should not be valid without a reference" do
     @client.reference = nil
     @client.should_not be_valid
@@ -70,7 +70,7 @@ describe Client do
     @client.date_joined = nil
     @client.should_not be_valid
   end
- 
+
   it "should be able to 'have' loans" do
     @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-03", :scheduled_disbursal_date => "2000-06-13", :loan_product_id => @loan_product.id)
     @loan.save
@@ -118,5 +118,9 @@ describe Client do
   end
 
   it "should not have more than one outstanding loan at a time if so specified"
+
+  it "should deal with death of a client" do
+    @client.deceased_on = Date.today
+  end
 
 end

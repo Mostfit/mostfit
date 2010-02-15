@@ -20,6 +20,7 @@ class Client
   property :center_id,       Integer, :index => true, :nullable => true
   property :created_at,      DateTime, :default => Time.now
   property :deleted_at,      ParanoidDateTime
+  property :deceased_on,     Date
   property :client_type,     Enum[:default], :default => :default
   property :created_by_user_id,  Integer, :nullable => false, :index => true
   property :created_by_staff_member_id,  Integer, :nullable => false, :index => true
@@ -102,7 +103,7 @@ class Client
 
   belongs_to :created_by,        :child_key => [:created_by_user_id],         :model => 'User'
   belongs_to :created_by_staff,  :child_key => [:created_by_staff_member_id], :model => 'StaffMember'
-  belongs_to :verified_by,       :child_key => [:verified_by_user_id],        :model => 'User'  
+  belongs_to :verified_by,       :child_key => [:verified_by_user_id],        :model => 'User'
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},
@@ -124,12 +125,12 @@ class Client
   validates_present   :date_joined
   validates_is_unique :reference
   validates_attachment_thumbnails :picture
-  
+
   def self.from_csv(row, headers)
     center_id       = row[headers[:center]] ? Center.first(:name => row[headers[:center]].strip).id : 0
     client_group_id = row[headers[:group_code]] ? ClientGroup.first(:code => row[headers[:group_code]].strip).id : nil
     grt_date        = row[headers[:grt_date]] ? Date.parse(row[headers[:grt_date]]) : nil
-    obj             = new(:reference => row[headers[:reference]], :name => row[headers[:name]], :spouse_name => row[headers[:spouse_name]], 
+    obj             = new(:reference => row[headers[:reference]], :name => row[headers[:name]], :spouse_name => row[headers[:spouse_name]],
                           :date_of_birth => Date.parse(row[headers[:date_of_birth]]), :address => row[headers[:address]], :date_joined => row[headers[:date_joined]],
                           :center_id => center_id, :grt_pass_date => grt_date, :created_by => User.first,
                           :client_group_id => client_group_id)
@@ -145,7 +146,7 @@ class Client
   end
 
   def fees
-    # this is hardcoded for the moment. later, when one has more than one client_type and one refactors, 
+    # this is hardcoded for the moment. later, when one has more than one client_type and one refactors,
     # one will have to have this info read from the database
     Fee.all.select{|f| f.payable_on.to_s.split("_")[0].downcase == "client"}
   end
@@ -187,7 +188,7 @@ class Client
     @fee_schedule = {}
     klass_identifier = self.class.to_s.snake_case
     fees.each do |f|
-      type, *payable_on = f.payable_on.to_s.split("_")      
+      type, *payable_on = f.payable_on.to_s.split("_")
       if type == klass_identifier
         date = eval(payable_on.join("_"))
         @fee_schedule += {date => {f.name => f.fees_for(self)}} unless date.nil?
@@ -206,7 +207,7 @@ class Client
     pay_order = fee_schedule.keys.sort.map{|d| fee_schedule[d].keys}.flatten
     pay_order.each do |k|
       if fees_payable_on(date).has_key?(k)
-        p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k, 
+        p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k,
                         :received_by => received_by, :created_by => created_by, :client => self)
         if p.save
           amount -= p.amount
@@ -228,7 +229,7 @@ class Client
     }
     self.type_of_account = 0 if self.type_of_account == nil
   end
-  
+
   def add_created_by_staff_member
     if self.center and self.new?
       self.created_by_staff_member_id = self.center.manager_staff_id

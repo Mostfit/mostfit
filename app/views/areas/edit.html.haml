@@ -1,0 +1,12 @@
+%h1
+  Area
+  = @area.name
+= error_messages_for @area
+
+= form_for(@area, :action => url(:area, @area)) do
+  = text_field :name
+  = submit "Update"
+
+= link_to 'Show', url(:area, @area)
+|
+= link_to 'Back', url(:areas)

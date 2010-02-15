@@ -4,6 +4,7 @@ module Misfit
       def self.included(base)
         Merb.logger.info "Included Misfit::Extensions::Browse by #{base}"
         base.show_action(:centers_paying_today)
+        base.show_action(:regions)
       end
 
       def before
@@ -14,16 +15,20 @@ module Misfit
           @template = 'browse/for_staff_member'
         end
       end
-        
-      
+
+
       def centers_paying_today
         @date = params[:date] ? Date.parse(params[:date]) : Date.today
         @centers = Center.all(:id => LoanHistory.all(:date => Date.today).map{|x| x.center_id}.uniq)
         render :template => 'dashboard/today'
       end
+
+      def regions
+        redirect "/regions"
+      end
     end # Browse
 
-    module User 
+    module User
       #add hooks to before and after can_access? and can_manage? methods to override their behaviour
       # here we add hooks to see if the user can manage a particular instance of a model.
       def self.included(base)
@@ -68,7 +73,7 @@ module Misfit
           return false
         end
       end
-      
+
       def _can_access?(route,params = nil)
         # more garbage
         return true if role == :admin
@@ -108,11 +113,11 @@ module Misfit
       # includes the modules in their respective classes
       self.constants.each do |mod|
         object = Kernel.const_get(mod.to_s)
-        object.class_eval do 
+        object.class_eval do
           Merb.logger.info("Hooking extensions for #{mod}")
           include module_eval("Misfit::Extensions::#{mod}")
         end
       end
-    end    
+    end
   end
 end

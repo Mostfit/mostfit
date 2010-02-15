@@ -7,8 +7,9 @@ class Branch
   property :code,    String, :length => 10, :nullable => true, :index => true, :min => 1, :max => 10
   property :address, Text
   property :created_at, DateTime
-  
+
   belongs_to :manager, :child_key => [:manager_staff_id], :model => 'StaffMember'
+  belongs_to :area
   has n, :centers
 
   validates_is_unique   :code
@@ -19,10 +20,10 @@ class Branch
   validates_with_method :manager, :method => :manager_is_an_active_staff_member?
 
   def self.from_csv(row, headers)
-    obj = new(:code => row[headers[:code]], :name => row[headers[:name]], :address => row[headers[:address]], :manager_staff_id => StaffMember.first(:name => row[headers[:manager]]).id) 
+    obj = new(:code => row[headers[:code]], :name => row[headers[:name]], :address => row[headers[:address]], :manager_staff_id => StaffMember.first(:name => row[headers[:manager]]).id)
     [obj.save, obj]
   end
-  
+
   def centers_with_paginate(params)
     centers.paginate(:page => params[:page], :per_page => 15)
   end

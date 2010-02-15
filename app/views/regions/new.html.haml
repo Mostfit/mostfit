@@ -1,0 +1,10 @@
+%h1 New Region
+
+= error_messages_for @region
+
+= form_for(@region, :action => url(:regions) ) do
+  %p
+    = text_field :name
+    = submit "Create"
+
+= link_to 'Back', url(:regions)

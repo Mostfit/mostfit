@@ -12,7 +12,7 @@ class Branches < Application
     @centers = @branch.centers_with_paginate(:page => params[:page])
     display [@branch, @centers], 'centers/index'
   end
-  
+
   def moreinfo(id)
     @branch = Branch.get(id)
     raise NotFound unless @branch
@@ -56,6 +56,7 @@ class Branches < Application
   end
 
   def update(id, branch)
+    debugger
     @branch = Branch.get(id)
     raise NotFound unless @branch
     if @branch.update_attributes(branch)
