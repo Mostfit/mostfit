@@ -1,16 +1,28 @@
 %h1
-  Occupations controller, index action
-%p
-  Edit this file in
-  %tt
-    app/views/occupations/index.html.erb
-%table
-  %tr
+  Occupations 
+= link_to 'Add an occupation', url(:new_occupation), :class => 'add'
+%table.narrow
+  %thead
+    %tr
+      %th
+        id
+      %th
+        occupation
+      %th
+        code
+      %th
+        actions
+
   - for occupation in @occupations
     %tr
       %td
-        = link_to 'Show', url(:occupation, occupation)
+        = occupation.id
       %td
+        = occupation.name
+      %td
+        = occupation.code
+      %td
+        = link_to 'Show', url(:occupation, occupation)
+        |
         = link_to 'Edit', url(:edit_occupation,  occupation)
 
-= link_to 'New', url(:new_occupation)

@@ -65,6 +65,12 @@
       Address:
     %td
       ~ text_area :address, :rows => 6, :cols => 38
+  %tr
+    %td
+      Occupation
+    %td
+      = select :occupation_id, :collection => Occupation.all, :value_method => :id, :text_method => :name, :prompt => "---"
+
   =partial "clients/extra_fields" rescue nil
   - if not @client.new?
     %tr

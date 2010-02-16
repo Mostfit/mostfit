@@ -28,7 +28,7 @@ class Occupations < Application
   def create(occupation)
     @occupation = Occupation.new(occupation)
     if @occupation.save
-      redirect resource(@occupation), :message => {:notice => "Occupation was successfully created"}
+      redirect resource(:occupations), :message => {:notice => "Occupation was successfully created"}
     else
       message[:error] = "Occupation failed to be created"
       render :new
@@ -39,7 +39,7 @@ class Occupations < Application
     @occupation = Occupation.get(id)
     raise NotFound unless @occupation
     if @occupation.update(occupation)
-       redirect resource(@occupation)
+      redirect resource(:occupations), :message => {:notice => "Occupation was updated"}
     else
       display @occupation, :edit
     end
