@@ -47,7 +47,7 @@ class Loan
   belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],     :model => 'StaffMember'
   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id],   :model => 'StaffMember'
   belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
-  belongs_to :loan_purpose
+  belongs_to :loan_purpose, :model => 'Occupation'
   has n, :payments
   has n, :history, :model => 'LoanHistory'
   belongs_to :loan_product

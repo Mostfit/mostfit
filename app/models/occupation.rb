@@ -5,4 +5,7 @@ class Occupation
   property :name, String
   property :code, String, :length => 3
 
+  has n, :clients
+  has n, :loans
+
 end

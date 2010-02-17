@@ -52,7 +52,7 @@
     %td
       Loan Purpose:
     %td
-      = select :loan_purpose, :collection => LoanPurpose.all.map{|lp| [lp.id.to_s, lp.value]}, :prompt => "----", :selected = @loan.loan_purpose ? @loan.loan_purpose.id : nil
+      = select :loan_purpose_id, :collection => Occupation.all, :value_method => :id, :text_method => :name, :prompt => "----", :selected => @loan.loan_purpose ? @loan.loan_purpose.id : nil
   %tr
     %td
       Funding Line
