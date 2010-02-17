@@ -844,7 +844,7 @@ class A50Loan < Loan
   # a fine example of a subclassing (if it was finished)
   # these 2 methods define the pay back scheme
   # typically reimplemented in subclasses
-  property :purpose,  String
+  # property :purpose,  String
 
   attr_accessor :defaults
 
@@ -875,7 +875,7 @@ class EquatedWeekly < Loan
   # these 2 methods define the pay back scheme
   # typically reimplemented in subclasses
   include ExcelFormula
-  property :purpose,  String
+  # property :purpose,  String
 
   attr_accessor :defaults
 

@@ -61,6 +61,7 @@ class Loans < Application
   def update(id)
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
+    attrs[:occupation_id] = nil if attrs[:occupation_id] == ''
     @loan = klass.get(id)
     @loan_product =  @loan.loan_product
     raise NotFound unless @loan
