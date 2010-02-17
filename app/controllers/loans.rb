@@ -66,7 +66,8 @@ class Loans < Application
     raise NotFound unless @loan
     disallow_updation_of_verified_loans
     debugger
-    if @loan.update_attributes(attrs)
+    @loan.update_attributes(attrs)
+    if @loan.errors.blank?
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
     else
       display @loan, :edit  # error messages will be shown

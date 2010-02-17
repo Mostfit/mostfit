@@ -5,7 +5,7 @@ class Loan
   after  :destroy, :update_history
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
-  attr_accessor :interest_percentage  # set to true to disable history writing by this object
+  attr_accessor :interest_percentage
 
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false, :index => true
@@ -37,7 +37,6 @@ class Loan
   property :verified_by_user_id,            Integer, :nullable => true, :index => true
   property :created_by_user_id,             Integer, :nullable => true, :index => true
 
-
   # associations
   belongs_to :client
   belongs_to :funding_line
@@ -47,7 +46,8 @@ class Loan
   belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],     :model => 'StaffMember'
   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id],   :model => 'StaffMember'
   belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
-  belongs_to :loan_purpose, :model => 'Occupation'
+
+  belongs_to :occupation, :nullable => true
   has n, :payments
   has n, :history, :model => 'LoanHistory'
   belongs_to :loan_product

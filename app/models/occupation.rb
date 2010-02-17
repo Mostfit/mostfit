@@ -6,6 +6,6 @@ class Occupation
   property :code, String, :length => 3
 
   has n, :clients
-  has n, :loans
+  has n, :loans, :child_key => [:loan_purpose_id]
 
 end
