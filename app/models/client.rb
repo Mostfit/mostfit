@@ -130,6 +130,7 @@ class Client
   validates_present   :date_joined
   validates_is_unique :reference
   validates_attachment_thumbnails :picture
+  validates_with_method :dates_make_sense
 
   def self.from_csv(row, headers)
     center_id       = row[headers[:center]] ? Center.first(:name => row[headers[:center]].strip).id : 0
@@ -225,6 +226,10 @@ class Client
     @errors.blank? ? true : @errors
   end
 
+  def self.flags
+    FLAGS
+  end
+
   private
   def convert_blank_to_nil
     self.attributes.each{|k, v|
@@ -242,7 +247,9 @@ class Client
     end
   end
 
-  def self.flags
-    FLAGS
+  def dates_make_sense
+    return [false, "GRT Pass Date cannot be before Date Joined"] if grt_pass_date < date_joined
+    return [false, "Client cannot die before he became a client"] if deceased_on < date_joined or deceased_on < grt_pass_date
+    true
   end
 end
