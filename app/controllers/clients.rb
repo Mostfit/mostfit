@@ -46,10 +46,12 @@ class Clients < Application
   end
 
   def update(id, client)
+    debugger
     @client = Client.get(id)
     raise NotFound unless @client
     disallow_updation_of_verified_clients
     if @client.update_attributes(client)
+      @client.tags = params[:tags].keys.map{|k| k.to_sym}
       if @branch and @center
         redirect(resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' has been edited"})
       else

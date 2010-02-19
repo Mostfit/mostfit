@@ -1,0 +1,10 @@
+%h1 
+  == New Insurance Policy for Client #{@client.name}
+
+= error_messages_for @insurance_policy
+
+= form_for(@insurance_policy, :action => resource(@client, :insurance_policies) ) do
+  = partial :fields
+  = submit "Create new Insurance Policy"
+
+= link_to 'Back', url(:insurance_policies)

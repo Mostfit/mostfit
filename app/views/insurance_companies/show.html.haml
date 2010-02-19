@@ -1,0 +1,9 @@
+%h1
+  = @insurance_company.name
+
+%p
+  No further info.
+
+= link_to 'Edit',  url(:edit_insurance_company,  @insurance_company)
+|
+= link_to 'Back', url(:insurance_companies)

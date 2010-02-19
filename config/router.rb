@@ -1,5 +1,7 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :insurance_policies
+  resources :insurance_companies
   resources :occupations
   resources :loan_purposes
   resources :regions do
@@ -16,7 +18,9 @@ Merb::Router.prepare do
   resources :loan_products
   resources :users
   resources :staff_members
-  resources :clients
+  resources :clients do
+  resources :insurance_policies
+  end
   resources :client_groups
   resources :loans
   resources :centers

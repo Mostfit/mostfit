@@ -1,0 +1,10 @@
+%h1
+  InsurancePolicy #
+  = @insurance_policy.policy_no
+
+%h2
+  = @insurance_policy.description
+
+= link_to 'Edit',  resource(@client, @insurance_policy,  :edit)
+|
+= link_to 'Back', url(@client, :insurance_policies)

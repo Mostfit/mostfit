@@ -54,7 +54,16 @@
       == #{@client.total_fees_paid} / #{@client.total_fees_due}
       - if @client.fees_paid?
         %span.green Paid
-    
+  %tr
+    %td
+      = link_to "Insurance Policies", resource(@client, :insurance_policies)
+    %td
+      - if @client.insurance_policies.blank?
+        No insurance policies.
+        = link_to "[Add one]", resource(@client, :insurance_policies, :new)
+      - else
+        - @client.insurance_policies.each do |ip|
+          = link_to ip.description, resource(@client, ip)
 %p
   = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
 

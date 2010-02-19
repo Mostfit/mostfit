@@ -1,0 +1,12 @@
+%h1
+  Edit 
+  = @insurance_company.name
+= error_messages_for @insurance_company
+
+= form_for(@insurance_company, :action => url(:insurance_company, @insurance_company)) do
+  = partial :fields
+  = submit "Update"
+
+= link_to 'Show', url(:insurance_company, @insurance_company)
+|
+= link_to 'Back', url(:insurance_companies)

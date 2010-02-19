@@ -1,0 +1,33 @@
+%table
+  %tr
+    %td
+      Insurance Company
+    %td
+      = select :insurance_company_id, :collection => InsuranceCompany.all, :prompt => "---", :value_method => :id, :text_method => :name
+  %tr
+    %td
+      Policy Number
+    %td
+      = text_field :policy_no
+  %tr
+    %td
+      Sum Insured
+    %td
+      = text_field :sum_insured
+  %tr
+    %td
+      Premium
+    %td
+      = text_field :premium
+  %tr
+    %td
+      Date from
+    %td
+      = date_select_for(@insurance_policy, "date_from", :date => @insurance_policy.date_from)
+  %tr
+    %td
+      Date to
+    %td
+      = date_select_for(@insurance_policy, "date_to", :date => @insurance_policy.date_to)
+      = hidden_field :client_id, :value => @client.id
+    

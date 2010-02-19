@@ -1,0 +1,9 @@
+%h1 New Insurance Company
+
+= error_messages_for @insurance_company
+
+= form_for(@insurance_company, :action => url(:insurance_companies) ) do
+  = partial :fields
+  = submit "Create"
+
+= link_to 'Back', url(:insurance_companies)

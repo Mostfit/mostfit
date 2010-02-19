@@ -30,6 +30,13 @@
       Name:
     %td
       = text_field :name, :size => 40
+      %br
+      %b 
+        Mark this user as:
+        %br
+      - Client.flags.each do |f|
+        = f
+        = check_box :name => "tags[#{f}]", :checked => @client.tags.include?(f)
   %tr
     %td
       Reference:
@@ -45,6 +52,11 @@
       Date of birth:
     %td
       = date_select_for @client, :date_of_birth, :nullable => true
+  %tr
+    %td
+      Date of death:
+    %td
+      = date_select_for @client, :deceased_on, :nullable => true
   %tr
     %td
       Date joined

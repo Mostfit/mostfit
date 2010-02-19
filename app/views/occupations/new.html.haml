@@ -1,13 +1,9 @@
-%h1 Occupations controller, new action
-
-%p 
-  Edit this file in 
-  %tt app/views/occupations/new.html.erb
+%h1 New Occupation
 
 = error_messages_for @occupation
 
 = form_for(@occupation, :action => url(:occupations) ) do
-  %p
-    = submit "Create"
+  = partial :fields
+  = submit "Create"
 
 = link_to 'Back', url(:occupations)

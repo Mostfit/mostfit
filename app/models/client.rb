@@ -3,6 +3,8 @@ class Client
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
   include DataMapper::Resource
 
+  FLAGS = [:insincere]
+
   before :valid?, :parse_dates
   before :valid?, :convert_blank_to_nil
   before :valid?, :add_created_by_staff_member
@@ -20,11 +22,13 @@ class Client
   property :center_id,       Integer, :index => true, :nullable => true
   property :created_at,      DateTime, :default => Time.now
   property :deleted_at,      ParanoidDateTime
+  property :updated_at,      DateTime
   property :deceased_on,     Date
   property :client_type,     Enum[:default], :default => :default
   property :created_by_user_id,  Integer, :nullable => false, :index => true
   property :created_by_staff_member_id,  Integer, :nullable => false, :index => true
   property :verified_by_user_id, Integer, :nullable => true, :index => true
+  property :tags, Flag.send("[]", *FLAGS)
 
   property :account_number, String, :length => 20, :nullable => true
   property :type_of_account, Enum.send('[]', *['', 'savings', 'current', 'no_frill', 'fixed_deposit', 'loan', 'other'])
@@ -98,7 +102,7 @@ class Client
   validates_length :phc_distance, :max => 500
 
   has n, :payments
-
+  has n, :insurance_policies
   validates_length :account_number, :max => 20
 
   belongs_to :created_by,        :child_key => [:created_by_user_id],         :model => 'User'
@@ -236,5 +240,9 @@ class Client
     if self.center and self.new?
       self.created_by_staff_member_id = self.center.manager_staff_id
     end
+  end
+
+  def self.flags
+    FLAGS
   end
 end

@@ -1,0 +1,12 @@
+%h1
+  Edit Insurance Policy
+  = @insurance_policy.description
+
+= error_messages_for @insurance_policy
+= form_for(@insurance_policy, :action => url(:insurance_policy, @insurance_policy)) do
+  = partial :fields
+  = submit "Update"
+
+= link_to 'Show', url(:insurance_policy, @insurance_policy)
+|
+= link_to 'Back', url(:insurance_policies)

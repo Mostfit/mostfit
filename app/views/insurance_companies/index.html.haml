@@ -1,0 +1,24 @@
+%h1
+  InsuranceCompanies 
+
+%table.narrow
+  %thead
+    %tr
+      %th
+        id
+      %th
+        Name
+      %th
+        Actions
+  - for insurance_company in @insurance_companies
+    %tr
+      %td
+        = insurance_company.id
+      %td
+        = insurance_company.name
+      %td
+        = link_to 'Show', url(:insurance_company, insurance_company)
+        |
+        = link_to 'Edit', url(:edit_insurance_company,  insurance_company)
+
+= link_to 'New', url(:new_insurance_company)

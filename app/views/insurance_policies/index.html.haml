@@ -1,0 +1,31 @@
+%h1
+  Insurance Policies
+  == for #{@client.name}
+
+%table.narrow
+  %thead
+    %tr
+      %th
+        id
+      %th
+        policy details
+      %th
+        insurance company
+      %th
+        actions
+      
+  %tr
+  - for insurance_policy in @insurance_policies
+    %tr
+      %td
+        = insurance_policy.id
+      %td
+        = link_to insurance_policy.description, resource(insurance_policy.client, insurance_policy)
+      %td
+        = link_to insurance_policy.insurance_company.name, resource(insurance_policy.insurance_company)
+      %td
+        = link_to 'Show', resource(@client, insurance_policy)
+        |
+        = link_to 'Edit', resource(@client, insurance_policy, :edit)
+
+= link_to 'New', resource(@client, :insurance_policies, :new)
