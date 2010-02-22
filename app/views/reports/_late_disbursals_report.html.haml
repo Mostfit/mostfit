@@ -24,7 +24,7 @@
         =select(:center_id , :collection => centers.all.map{|x| [x.id, "#{x.branch.name} -- #{x.name}"]}, :include_blank => true, :selected => center_id)
       %td
         =submit "Go"
-
+- length = 6
 %table.report
   %tr.header
     %th{:width => '20%'}
@@ -40,15 +40,18 @@
     %th
       Status
   - @data.each do |branch, centers|
+    -branch_total = 0
     %tr.branch
-      %td{:colspan => 6}
+      %td{:colspan => length}
         = branch.name
     - centers.each do |center, loans|
+      -center_total = 0
       %tr.center
-        %td{:colspan => 6}
+        %td{:colspan => length}
           = center.name
       - loans.each do |l|
-        %tr
+        -center_total += l.amount
+        %tr.group
           %td
             = @report.date
           %td
@@ -61,3 +64,18 @@
             = @report.date - l.scheduled_disbursal_date
           %td
             = l.get_status(@report.date)
+      %tr.center_total
+        %td
+          Center total
+        %td
+          =center_total
+          -branch_total+=center_total
+        -4.times do
+          %td
+    %tr.branch_total
+      %td
+        Branch total
+      %td
+        =branch_total
+      -4.times do
+        %td
