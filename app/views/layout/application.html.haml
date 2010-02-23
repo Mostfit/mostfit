@@ -32,12 +32,11 @@
 
     - if session.authenticated?
       #navigation
-        = link_to_with_class('browse', url(:browse))
-        = link_to_with_class('manage', url(:data_entry))
-        - if session.user.can_access?({:controller => "admin", :action => "index"})
-          = link_to_with_class('admin', url(:admin))
-        = link_to_with_class('dashboard', url(:dashboard))
-        = link_to_with_class('reports', url(:reports))
+        = link_to_with_rights('browse', url(:browse))
+        = link_to_with_rights('manage', url(:data_entry))
+        = link_to_with_rights('admin', url(:admin))
+        = link_to_with_rights('dashboard', url(:dashboard))
+        = link_to_with_rights('reports', url(:reports))
       #header_search_div
         %form{:action => '/search'}
           %input{:name => 'query', :value => params[:query]}

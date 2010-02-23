@@ -29,6 +29,7 @@ module Misfit
     end # Browse
 
     module User
+      CUD_Actions =["create", "new", "edit", "update", "destroy"]
       #add hooks to before and after can_access? and can_manage? methods to override their behaviour
       # here we add hooks to see if the user can manage a particular instance of a model.
       def self.included(base)
@@ -85,6 +86,7 @@ module Misfit
         return true if @action == "redirect_to_show"
         r = (access_rights[@action.to_s.to_sym] or access_rights[:all])
         return false if @action == "approve" and role == :data_entry
+        return false if role == :read_only and CUD_Actions.include?(@action)
         return false if r.nil?
         if role == :staff_member
           if @route.has_key?(:id) and @route[:id]
