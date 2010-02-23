@@ -213,7 +213,7 @@
               - tot_interest += i
             %td.numeric
               - fee = loan.fees_paid? ? 0 : loan.fees_payable_on(@date).values.reduce{|s, x| s+=x}
-              = fee.to_currency
+              = fee ? fee.to_currency : 0
               - tot_fee += fee
             %td.numeric
               - i = [-loan.total_overpaid_on(@date), 0].max
