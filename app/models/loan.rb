@@ -88,7 +88,7 @@ class Loan
   validates_with_method  :amount,                       :method => :is_valid_loan_product_amount
   validates_with_method  :interest_rate,                :method => :is_valid_loan_product_interest_rate
   validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
-
+  validates_with_method  :clients,                      :method => :check_client_sincerity
 
   def self.from_csv(row, headers, funding_lines)
     obj = new(:loan_product_id => LoanProduct.first(:name => row[headers[:product]]).id, :amount => row[headers[:amount]],
@@ -761,6 +761,10 @@ class Loan
     h = ["scheduled_disbursal_date", "scheduled_first_payment_date"].map{|d| [d,Misfit::Config.holidays.include?(self.send(d))]}.reject{|e| e[1] == false}
     return true if h.blank?
     return [false, h.map{|f| f[0]}.join(", ") + " are holidays"]
+  end
+  def check_client_sincerity
+    return [false, "Client is marked insincere and is not eligible for a loan"] if client.tags and client.tags.include?(:insincere)
+    return true
   end
 
   def amount_greater_than_zero?

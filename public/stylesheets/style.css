@@ -588,3 +588,12 @@ table.moreinfo{
 table.moreinfo tr td:first-child{
     font-weight: bold;
 }
+h3.blocked{
+    width: 80%;
+    text-align: center;
+    background-color: #eee;
+    color: #E88E02;
+    padding: 10px;
+    font-family: Helvetica;
+    font-size: 15px;
+}

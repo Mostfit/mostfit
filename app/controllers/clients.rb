@@ -31,7 +31,7 @@ class Clients < Application
     @client.center = @center if @center# set direct context
     @client.created_by_user_id = session.user.id
     if @client.save
-      redirect resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' was successfully created"}
+      redirect(params[:return]||resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' successfully created"})
     else
       render :new  # error messages will be shown
     end
@@ -46,14 +46,14 @@ class Clients < Application
   end
 
   def update(id, client)
-    debugger
     @client = Client.get(id)
     raise NotFound unless @client
     disallow_updation_of_verified_clients
     if @client.update_attributes(client)
       @client.tags = params[:tags].keys.map{|k| k.to_sym}
+      @client.save
       if @branch and @center
-        redirect(resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' has been edited"})
+        redirect(params[:return]||resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' has been edited"})
       else
         redirect(resource(@client, :edit), :message => {:notice => "Client '#{@client.name}' has been edited"})
       end

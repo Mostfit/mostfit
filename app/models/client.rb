@@ -248,8 +248,9 @@ class Client
   end
 
   def dates_make_sense
-    return [false, "GRT Pass Date cannot be before Date Joined"] if grt_pass_date < date_joined
-    return [false, "Client cannot die before he became a client"] if deceased_on < date_joined or deceased_on < grt_pass_date
+    return true if not grt_pass_date or not date_joined 
+    return [false, "GRT Pass Date cannot be before Date Joined"]  if grt_pass_date < date_joined
+    return [false, "Client cannot die before he became a client"] if deceased_on and (deceased_on < date_joined or deceased_on < grt_pass_date)
     true
   end
 end

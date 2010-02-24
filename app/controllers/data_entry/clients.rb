@@ -5,23 +5,9 @@ module DataEntry
       @center  = Center.get(params[:center_id])
       @branch = @center.branch if @center
       @client = Client.new
-      display([@client, @center], "clients/new")
+      redirect(resource(:clients, :new, {:return => :data_entry}))
     end
     
-    def create(client)
-      @client = Client.new(client)
-      @client.created_by_user_id = session.user.id
-      if @client.save
-        if params[:format]=='xml'#for xml thing return xml response
-          display @client, ""
-        else
-          redirect url(:enter_clients, :action => 'new'), :message => {:notice => "Client '#{@client.name}' was successfully created"}
-        end
-      else
-        params[:format]=='xml' ? display(@client): display([@clients], "clients/new")
-      end
-    end
-        
     def edit
       if (params[:id] and @client = Client.get(params[:id])) or (params[:client_id] and @client = Client.get(params[:client_id]) || Client.first(:name => params[:client_id]) || Client.first(:reference => params[:client_id]))
         @center = @client.center
@@ -35,18 +21,6 @@ module DataEntry
         display([@center], "clients/search")
       else
         display([], "clients/search")
-      end
-    end
-    
-    def update(id, client)
-      @client = Client.get(id)
-      raise NotFound unless @client    
-      if @client.update_attributes(client)
-        redirect url(:enter_clients, :action => 'index'), :message => {:notice => "Client '#{@client.name}' has been edited"}
-      else
-        @center = @client.center
-        @branch = @center.branch
-        display([@client, @center, @branch], "clients/edit")
       end
     end
   end  

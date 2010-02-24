@@ -1,7 +1,6 @@
 - if @client.loans.size > 0
   .graph
     = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'client', :id => @client.id, :scope_unit => 'months', :scope_size => 3) )
-
 %h1{:width => '50%' }== Client: <i>#{@client.name}</i>
 %table.narrow.form{ :style =>'width:50%' }
   %tr.odd
@@ -64,8 +63,12 @@
       - else
         - @client.insurance_policies.each do |ip|
           = link_to ip.description, resource(@client, ip)
-%p
-  = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
+-if @client.tags and @client.tags.include?(:insincere)
+  %h3.blocked
+    This client is insincere and is not elgible for a loan
+-else
+  %p
+    = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
 
 %h2== Loans for client <i>#{@client.name}</i>
 
