@@ -10,7 +10,7 @@ module Merb
     end
 
     def link_to_with_class(name, url)
-      link_to(name, url, :class => ((request.uri==(url) or request.uri.index(url)==0) ? "selected" : ""))
+      link_to_with_rights(name, url, :class => ((request.uri==(url) or request.uri.index(url)==0) ? "selected" : ""))
     end
 
     def link_to_with_rights(text, path, params = {}, method="GET")

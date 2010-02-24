@@ -36,7 +36,7 @@
         %br
       - Client.flags.each do |f|
         = f
-        = check_box :name => "tags[#{f}]", :checked => @client.tags.include?(f)
+        = check_box :name => "tags[#{f}]", :checked => @client.tags && @client.tags.include?(f)
   %tr
     %td
       Reference:
