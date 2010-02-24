@@ -78,12 +78,16 @@ $(document).ready(function(){
 		$("table.report tr.group td").append("<a id='date' class='expand'>Expand dates</a>");
 	    if($("table.report tr.loan").length>0)
 		$("table.report tr.group td").append("<a id='loan' class='expand'>Expand loans</a>");
-	    $("a.expand_all").click(function(){		    
+	    $("a.expand_all").click(function(){
 		    $("table.report tr").show();
 		    setToggleText();
 		});
+	    $("a.collapse_all").click(function(){
+		    $("table.report tr").hide();
+		    setToggleText();
+		});
 	    $("table.report tr td a").click(function(){
-		    action=$(this).attr("class").trim();
+		    action=$(this).attr("class");
 		    child_type=$(this).attr("id");
 		    child_type_total=child_type+"_total";
 		    parent_type = $(this).parent().parent().attr("class");
