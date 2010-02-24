@@ -1,8 +1,11 @@
 %h1== Edit the '#{@client.name}' client details
 
 = error_messages_for @client
-- cancel_url = (params[:controller]=="data_entry/clients" ? url(:data_entry) : resource(@branch, @center, :clients))
-- form_url   = (params[:controller]=="data_entry/clients" ? url(:enter_clients, :action => "update", :id => @client) : resource(@branch, @center, @client))
+- form_url   = (@branch ? resource(@branch, @center, :clients) : resource(:clients, {:return => params[:return]}))
+- cancel_url = params[:return] ? "/"+params[:return] : resource(@branch, @center, @client)
+
+- cancel_url = (params[:return] ? resource(@branch, @center, @client, {:return => params[:return]}) : resource(@branch, @center, @client))
+- form_url   = (params[:return] ? resource(@branch, @center, @client, {:return => params[:return]}) : resource(@branch, @center, @client))
 
 = form_for(@client, :action => form_url, :multipart => true) do
   = partial "clients/fields", :submit_text => "Save changes", :cancel_link => cancel_url

@@ -12,7 +12,7 @@ module DataEntry
       if (params[:id] and @client = Client.get(params[:id])) or (params[:client_id] and @client = Client.get(params[:client_id]) || Client.first(:name => params[:client_id]) || Client.first(:reference => params[:client_id]))
         @center = @client.center
         @branch = @center.branch
-        display([@client, @center, @branch], "clients/edit")
+        redirect(resource(@branch, @center, @client, :edit, {:return => "/data_entry"}))
       elsif params[:client_id]
         message[:error] = "No client by that id or name or reference number"
         display([@center], "clients/search")
