@@ -1,17 +1,11 @@
 class LoanDisbursementRegister < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id
 
   def initialize(params, dates)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 7
-    @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
-    
+    @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today    
     @name   = "Report from #{@from_date} to #{@to_date}"
-    @branch = if params and params[:branch_id] and not params[:branch_id].blank?
-                Branch.all(:id => params[:branch_id])
-              else
-                Branch.all(:order => [:name])
-              end    
-    @center = Center.get(params[:center_id]) if params and params[:center_id] and not params[:center_id].blank?
+    get_parameters(params)
  end
   
   def name

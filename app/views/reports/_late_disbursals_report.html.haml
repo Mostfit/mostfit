@@ -1,29 +1,4 @@
-= form_for(@report, :action => url(:show_report, :report_type => "LateDisbursalsReport"), :method => :get) do
-  %table
-    - branch_id = (params[:transaction_ledger] and params[:transaction_ledger][:branch_id]) ? params[:transaction_ledger][:branch_id] : nil
-    - center_id = (params[:transaction_ledger] and params[:transaction_ledger][:center_id]) ? params[:transaction_ledger][:center_id] : nil
-    - staff_member_id = (params[:transaction_ledger] and params[:transaction_ledger][:staff_member_id]) ? params[:transaction_ledger][:staff_member_id] : nil
-    %tr
-      %td
-        Date: 
-        =date_select_for(@report, "date", :date => @report.date)
-      %td
-      %td
-        Staff members:
-        =select(:staff_member_id , :collection => StaffMember.all.map{|x| [x.id, x.name]}, :include_blank => true, :selected => staff_member_id)
-    %tr
-      %td
-        Branch:
-        =select(:branch_id , :collection => Branch.all, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id)
-      %td
-        Center:
-        - if (staff_member_id and not staff_member_id.blank?)
-          - centers = StaffMember.get(staff_member_id).centers
-        - else
-          - centers = (branch_id and not branch_id.blank?) ? Center.all(:branch_id => branch_id, :order => [:name]) : Center.all(:order => [:name])
-        =select(:center_id , :collection => centers.all.map{|x| [x.id, "#{x.branch.name} -- #{x.name}"]}, :include_blank => true, :selected => center_id)
-      %td
-        =submit "Go"
+=partial :form
 - length = 6
 %table.report
   %tr.header

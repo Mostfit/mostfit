@@ -1,5 +1,7 @@
 class Reports < Application
   Types = [DailyReport, ConsolidatedReport, TransactionLedger, ProjectedReport, LoanDisbursementRegister, LateDisbursalsReport, TargetReport]
+  layout :determine_layout 
+
   # provides :xml, :yaml, :js
   def index
     @reports = Report.all
@@ -7,18 +9,11 @@ class Reports < Application
   end
 
   def show(report_type, id)
-    debugger
     provides :pdf
     klass = Kernel.const_get(report_type)
     @report = Report.get(id) if id
     class_key  =  klass.to_s.snake_case.to_sym
-
-    dates = {}
-    if  params[class_key]
-      dates[:date]      = get_date(params[class_key], :date) if params[class_key][:date]
-      dates[:from_date] = get_date(params[class_key], :from_date) if params[class_key][:from_date]
-      dates[:to_date]   = get_date(params[class_key], :to_date) if params[class_key][:to_date]
-    end
+    dates = get_dates(class_key)
 
     if Reports::Types.include?(klass)
       #Generating report
@@ -93,10 +88,24 @@ class Reports < Application
   end
 
   private
+  def get_dates(class_key)
+    dates = {}
+    if  params[class_key]
+      dates[:date]      = get_date(params[class_key], :date) if params[class_key][:date]
+      dates[:from_date] = get_date(params[class_key], :from_date) if params[class_key][:from_date]
+      dates[:to_date]   = get_date(params[class_key], :to_date) if params[class_key][:to_date]
+    end
+    dates
+  end
+
   def get_date(params, col)
     if params and params.key?(col)
       date_hash = params[col]
       return Date.parse(date_hash[:year] + "-" + date_hash[:month] + "-" + date_hash[:day])
     end
+  end
+  
+  def determine_layout
+    return "printer" if params[:layout] and params[:layout]=="printer"
   end
 end # Reports

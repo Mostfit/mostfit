@@ -36,7 +36,8 @@ a:link[href^="http://"]:after, a[href^="http://"]:visited:after { content: " (" 
 a[href^="http://"] {color:#000; }
 
 /* Table */
-table { margin: 1px; text-align:left; }
+table { margin: 1px; text-align:left; width: 100%}
+tr.branch { margin: 1px; background: #ddd; text-align: center; width: 100%}
 th { border-bottom: 1px solid #333;  font-weight: bold; }
 td { border-bottom: 1px solid #333; }
 th,td { padding: 4px 10px 4px 0; }

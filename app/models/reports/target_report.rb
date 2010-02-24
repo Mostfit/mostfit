@@ -1,5 +1,5 @@
 class TargetReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id
   
   def initialize(params, dates)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today-7
@@ -7,6 +7,7 @@ class TargetReport < Report
     @name   = "Report from #{@from_date} to #{@to_date}"
     @branch = Branch.get(params[:branch_id]) if params and params[:branch_id] and not params[:branch_id].blank?
     @center = Center.get(params[:center_id]) if params and params[:center_id] and not params[:center_id].blank?
+    @staff_member = StaffMember.get(params[:staff_member_id]) if params and params[:staff_member_id] and not params[:staff_member_id].blank?
   end
   
   def name

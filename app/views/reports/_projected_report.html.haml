@@ -4,29 +4,33 @@
     %th
       Group
     %th{:colspan => "1"}
-      Amount
-    %th{:colspan => "3"}
+      Disbursal scheduled
+    %th{:colspan => "4"}
       Payment scheduled
-    %th{:colspan => "3"}
+    %th{:colspan => "4"}
       Balance outstanding
   %tr.header
     %th
     %th
-      Applied
+      Amount
     %th
       Principal
     %th
       Interest
+    %th
+      Fee
     %th
       Total
     %th
       Principal
     %th
       Interest
+    %th
+      Fee
     %th
       Total
   - center_id, branch_id = nil, nil
-  - length = 7
+  - length = 9
   -@groups.each do |group_id, centers|
     -if centers.keys.length>0
       -branch_total = []

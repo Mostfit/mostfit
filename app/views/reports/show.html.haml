@@ -1,4 +1,3 @@
-- debugger
 - if ["PerformanceReport", "DailyReport"].include?(params[:report_type])
   = partial "#{params[:report_type].snake_case.gsub(" ","_")}"
 - elsif @reports
@@ -10,5 +9,7 @@
 - else
   %h1
     =@report.name
+  - if not params[:layout] 
+    = link_to("Printer friendly version", get_printer_url, {:style => "float: right;", :target => "_BLANK"})
   = partial "#{params[:report_type].snake_case.gsub(" ","_")}".to_sym
 
