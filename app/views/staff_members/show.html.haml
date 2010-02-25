@@ -6,5 +6,7 @@
     = link_to 'Day Sheet >>', url(:day_sheet, @staff_member.id), :class => "bold"
   %li
     = link_to 'Centers Managed >>', url(:show_staff_member_centers, @staff_member.id), :class => "bold"
+  %li
+    = link_to 'edit', resource(@staff_member, :edit)
 %p
   = link_to '<< back', resource(:staff_members), :class => "button"

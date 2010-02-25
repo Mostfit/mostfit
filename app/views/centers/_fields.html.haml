@@ -1,10 +1,9 @@
 %table.form
-  - if @branch.blank?
-    %tr
-      %td
-        Branch 
-      %td
-        = select :name => 'center[branch_id]', :collection => Branch.all.map {|b| [b.id,b.name]}
+  %tr
+    %td
+      Branch 
+    %td
+      = select :name => 'center[branch_id]', :collection => Branch.all.map {|b| [b.id,b.name]}
   %tr
     %td
       Center name:

@@ -72,7 +72,7 @@ class Centers < Application
     @center = Center.get(id)
     raise NotFound unless @center
     if @center.update_attributes(center)
-      redirect(params[:return]||resource(@branch), :message => {:notice => "Center '#{@center.name}' has been successfully edited"})
+      redirect(params[:return]||resource(@center.branch), :message => {:notice => "Center '#{@center.name}' has been successfully edited"})
     else
       display @center, :edit  # error messages will be shown
     end

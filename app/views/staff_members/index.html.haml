@@ -7,92 +7,108 @@
   %p
     %i No staff members been created yet.
 - else
-  %table.narrow.form{ :width => '100%' }
+  %table.report.nojs{:width => '100%'}
     %thead
       %tr
-        %th
         %th
           name
         %th
           status
-        %th
+        %th{:colspan => 2}
           branches
-        %th
+        %th{:colspan => 2}
           centers
-        %th
-          payments
-        %th
+        %th{:colspan => 2}
           applied loans
-        %th
+        %th{:colspan => 2}
           approved loans
-        %th
+        %th{:colspan => 2}
           rejected loans
-        %th
+        %th{:colspan => 2}
           disbursed loans
-        %th
+        %th{:colspan => 2}
           wrote off loans
-    - sum_branches, sum_centers, sum_payments, sum_applied_loans, sum_approved_loans, sum_rejected_loans, sum_disbursed_loans, sum_wrote_off_loans = 0,0,0,0,0,0,0,0
+      %tr
+        %th{:colspan => 2}
+        -7.times do
+          %th
+            This month
+          %th
+            Total
+
+
+    - sum_total      = 0,0,0,0,0,0,0
+    - sum_tm         = 0,0,0,0,0,0,0
+    - this_month     = Date.today - Date.today.day + 1
     - for staff_member in @staff_members
       %tr{ :class => cycle('odd','') }
-        %td
         %td
           %b= link_to staff_member.name, resource(staff_member)
         %td
           %b= staff_member.active? ? 'active' : 'disabled'
         %td
-          - item = Branch.all(:manager_staff_id => staff_member.id).count
-          - sum_branches += item
+          - item = Branch.all(:manager_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - sum_tm[0] += item
           =  item || "-"
         %td
-          - item = Center.all(:manager_staff_id => staff_member.id).count || "-"
-          - sum_centers += item
+          - item = Branch.all(:manager_staff_id => staff_member.id).count
+          - sum_total[0] += item
+          =  item || "-"
+        %td
+          - item = Center.all(:manager_staff_id => staff_member.id, :created_at.gte => this_month).count || "-"
+          - sum_tm[1] += item
           = item || "-"
         %td
-          - item = Payment.all(:received_by_staff_id => staff_member.id).count
-          - sum_payments += item
+          - item = Center.all(:manager_staff_id => staff_member.id).count || "-"
+          - sum_total[1] += item
+          = item || "-"
+        %td
+          - item = Loan.all(:applied_by_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - sum_tm[2] += item
           = item || "-"
         %td
           - item = Loan.all(:applied_by_staff_id => staff_member.id).count
-          - sum_applied_loans += item
+          - sum_total[2] += item
+          = item || "-"
+        %td
+          - item = Loan.all(:approved_by_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - sum_tm[3] += item
           = item || "-"
         %td
           - item = Loan.all(:approved_by_staff_id => staff_member.id).count
-          - sum_approved_loans += item
+          - sum_total[3] += item
+          = item || "-"
+        %td
+          - item = Loan.all(:rejected_by_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - sum_tm[4] += item
           = item || "-"
         %td
           - item = Loan.all(:rejected_by_staff_id => staff_member.id).count
-          - sum_rejected_loans += item
+          - sum_total[4] += item
+          = item || "-"
+        %td
+          - item = Loan.all(:disbursed_by_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - sum_tm[5] += item
           = item || "-"
         %td
           - item = Loan.all(:disbursed_by_staff_id => staff_member.id).count
-          - sum_disbursed_loans += item
+          - sum_total[5] += item
+          = item || "-"
+        %td
+          - item = Loan.all(:written_off_by_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - sum_tm[6] += item
           = item || "-"
         %td
           - item = Loan.all(:written_off_by_staff_id => staff_member.id).count
-          - sum_wrote_off_loans += item
+          - sum_total[6] += item
           = item || "-"
-        %td
-          = link_to 'edit', resource(staff_member, :edit)
-
     %tfoot
       %tr
-        %td{ :colspan => 3 }
-        %td
-          =sum_branches
-        %td
-          =sum_centers
-        %td
-          =sum_payments
-        %td
-          =sum_applied_loans
-        %td
-          =sum_approved_loans
-        %td
-          =sum_rejected_loans
-        %td
-          =sum_disbursed_loans
-        %td
-          =sum_wrote_off_loans
-
+        %td{:colspan => 2 }
+        -7.times do |i|
+          %td
+            =sum_tm[i]
+          %td
+            =sum_total[i]
   = paginate @staff_members
 
