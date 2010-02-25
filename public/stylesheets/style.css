@@ -268,7 +268,13 @@ table.narrow th{
     background-color: #ccc;
     color: black;   
 }
-
+table.narrow tr.group{
+    text-align: center;
+    background: #eee;    
+}
+table.narrow tr.group td{
+    font-weight: bold;
+} 
 /* .container .error, .container .notice, .container .success */
 #flash-messages
 {
@@ -527,6 +533,9 @@ table.report th{
     padding-left: 2px;
     padding-right: 2px;
 }
+table.report tbody{
+    overflow: scroll;
+}
 table.report td{
     border: 1px solid;
     border-color: #ccc;
@@ -596,4 +605,32 @@ h3.blocked{
     padding: 10px;
     font-family: Helvetica;
     font-size: 15px;
+}
+div.tab_container{
+    border: 1px solid #CDD3FE;
+}
+ul.tabs{
+    margin-left: 0px;
+    background-color: #CDD3FE;
+    height: 45px;
+    border-bottom: 3px solid #CDD3FE;
+}
+ul.tabs li{
+    display: inline;
+    padding: 5px;
+    cursor: pointer;   
+    margin-top: 25px;
+    margin-right: 5px;
+    list-style-type: none;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #CDD3FE;
+    position: relative;
+    top: 25px;
+    border: 1px solid #EDF3FE;
+    font-weight: strong;
+}
+ul.tabs li.active{
+    border-bottom: 3px solid white;
+    background-color: white;
 }

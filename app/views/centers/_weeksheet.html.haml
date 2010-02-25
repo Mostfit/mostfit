@@ -1,0 +1,15 @@
+%h1
+  == <a name = 'weeksheet'>Week #{@date.cweek} meeting sheet for center #{@center.name}</a>
+  = link_to 'Record these activities', url(:enter_payments, :action => 'by_center', :center_id => @center.id, :for_date => @date), :class => "add"
+=partial "centers/meeting_selector_form"
+%a{:name => "weeksheet"}
+%h2 Approvals
+=partial "centers/approvals", {:loans_to_approve => @center.clients.loans(:approved_on => nil)}
+
+- if @center.meeting_day?(@date)
+  %h2 Disbursals
+  =partial "centers/disbursals", {:loans_to_disburse => @center.clients.loans(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil), :center => @center, :branch => @center.branch, :date => @date}
+  %h2 Payments
+  =partial "centers/payments", {:clients => @clients, :branch => @center.branch, :center => @center, :date => @date}
+- else
+  %i This day is not a meeting day

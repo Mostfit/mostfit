@@ -1,0 +1,21 @@
+%table.narrow.form{ :style => "width: 100%;" }
+  %tr.odd
+    %td meeting at
+    %td
+      - if @md
+        %b== #{@date} #{@center.meeting_time}
+      - else
+        %i no meeting today
+    %td
+      = link_to 'today', resource(@branch, @center, :date => Date.today) + '#weeksheet'
+      &nbsp;|&nbsp;
+      = link_to 'previous meeting', resource(@branch, @center, :date => @center.previous_meeting_date_from(@date)) + '#weeksheet'
+      &nbsp;|&nbsp;
+      = link_to 'next meeting', resource(@branch, @center, :date => @center.next_meeting_date_from(@date)) + '#weeksheet'
+  %tr
+    %td center manager
+    %td= link_to @center.manager.name, resource(@center.manager)
+    %td
+      %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
+        = date_select 'date', @date
+        = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'

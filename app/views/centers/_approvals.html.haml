@@ -1,0 +1,36 @@
+- if loans_to_approve.size > 0
+  %table.narrow.form{ :width => '100%'}
+    %thead
+      %tr{:style => "font-size: 0.85em;"}
+        %th
+          Name
+        %th
+          Scheduled Disbursal Date
+        %th
+          Status
+    - loans_to_approve.group_by{|x| x.client.client_group}.sort_by{|x| x[0].name}.each do |group, loans|
+      %tr.group
+        %td{:colspan => 5}
+          - if group
+            %b
+              = group.name
+              (
+              =link_to('edit', resource(@branch, @center, group, :edit))
+              )
+          -else
+            "Not attached to any center"      
+      -loans.each do |loan|
+        %tr
+          %td
+            = loan.client.name
+          %td
+            = loan.scheduled_disbursal_date
+          %td
+            - late =  @date - loan.scheduled_disbursal_date
+            - if late > 0
+              == "#{late} days late"
+            - else
+              on time
+- else
+  No approvals today
+
