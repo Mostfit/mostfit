@@ -1,0 +1,49 @@
+%h2== Clients of the #{@center.name} center
+- if @clients.blank?
+  %p
+    %i== No clients for the #{@branch.name} branch yet.
+- else
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th id
+        %th name
+        %th loans
+        %th
+    %tbody
+    - group=-1
+    - @clients.each do |client|
+      - if group!=client.client_group_id
+        - group = client.client_group_id 
+        %tr.group
+          %td{:colspan => 5}
+            - if client.client_group
+              %b
+                = client.client_group.name
+                (
+                =link_to('edit', resource(@branch, @center, client.client_group, :edit))
+                )
+            -else
+              "Not attached to any center"
+            
+      %tr{ :class => cycle('odd','') }
+        %td &nbsp;
+        %td
+          = client.id
+        %td
+          %b= link_to client.name, resource(@branch, @center, client)
+        %td
+          %b= client.loans.size
+          == (#{link_to 'view', resource(@branch, @center, client, :loans)})
+        %td
+          = link_to 'edit', resource(@branch, @center, client, :edit)
+          &nbsp;|&nbsp;
+          = link_to 'new loan', resource(@branch, @center, client, :loans, :new)
+
+    %tfoot
+      %tr
+        %td{ :colspan => 7 }
+
+
+  = link_to 'Create new client', resource(@branch, @center, :clients, :new)
