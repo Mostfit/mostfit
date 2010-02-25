@@ -573,6 +573,10 @@ table.report tr.branch_total td:first-child{
 table.report tr.align_left{
     text-align: left;
 }
+table.report tr.total{
+    text-align: right;
+    font-weight: bold;
+}
 table.report tr td a{
     color: blue;
     float: right;

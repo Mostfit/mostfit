@@ -102,13 +102,12 @@
           - item = Loan.all(:written_off_by_staff_id => staff_member.id).count
           - sum_total[6] += item
           = item || "-"
-    %tfoot
-      %tr
-        %td{:colspan => 2 }
-        -7.times do |i|
-          %td
-            =sum_tm[i]
-          %td
-            =sum_total[i]
+    %tr.total
+      %td{:colspan => 2 }
+      -7.times do |i|
+        %td
+          =sum_tm[i]
+        %td
+          =sum_total[i]
   = paginate @staff_members
 
