@@ -36,6 +36,7 @@ class Loan
   property :validated_by_staff_id,          Integer, :nullable => true, :index => true
   property :verified_by_user_id,            Integer, :nullable => true, :index => true
   property :created_by_user_id,             Integer, :nullable => true, :index => true
+  property :cheque_number,                  Integer, :nullable => true, :index => true
 
   # associations
   belongs_to :client
@@ -47,7 +48,7 @@ class Loan
   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id],   :model => 'StaffMember'
   belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
 
-  belongs_to :occupation, :nullable => true
+  belongs_to :occupation, :nullable => true, :index => true
   has n, :payments
   has n, :history, :model => 'LoanHistory'
   belongs_to :loan_product

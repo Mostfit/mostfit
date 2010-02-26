@@ -12,7 +12,7 @@
 - if @loans_to_approve.size > 0
   = form_for(@loan, :action => url(:enter_loans, :action => "approve")) do
     = hidden_field :name => :id, :value => @center.id
-    %table.narrow.form{ :width => '100%'}
+    %table.report.nojs
       %thead
         %tr{:style => "font-size: 0.85em;"}
           %th
@@ -33,21 +33,21 @@
             Approved By
       - @loans_to_approve.each do |loan|
         %tr{:class => cycle('odd','')}
-          %td
-            = loan.id
-          %td
+          %td.number
+            = link_to loan.id, url(:quick_link, "loans", loan.id)
+          %td.text
             = link_to loan.client.name, resource(loan.client)
-          %td
-            = link_to loan.description, url(:quick_link, "loans", loan.id)
-          %td
+          %td.number
+            = loan.description
+          %td.text
             = link_to loan.client.center.name, url(:quick_link, "centers", loan.client.center.id)
-          %td
+          %td.text
             = date_select("loans[#{loan.id}][approved_on]")
-          %td 
+          %td.text
             = loan.status
           %td
             = check_box :name => "loans[#{loan.id}][approved?]"
-          %td
+          %td.text
             = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => [["","---"]] + StaffMember.all.map{|s| [s.id.to_s,s.name]}, :selected => loan.client.center.manager.id.to_s
       %tfoot
         %tr

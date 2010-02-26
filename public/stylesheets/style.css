@@ -534,12 +534,20 @@ table.report th{
     padding-right: 2px;
 }
 table.report tbody{
-    overflow: scroll;
 }
 table.report td{
     border: 1px solid;
     border-color: #ccc;
     font-size: 0.95em;
+}
+table.report tr td.text{
+    text-align: left;
+}
+table.report tr td.text a{
+    float: left;
+}
+table.report tr td.number{
+    text-align: right;
 }
 table.report tr.group td:first-child{
     text-align: center; 
