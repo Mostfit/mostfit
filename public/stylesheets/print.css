@@ -54,3 +54,60 @@ tr {page-break-inside: avoid;}
 .container a.button, .container button {
   display:none;
 }
+table.report{
+    width: 100%;
+    border: 1px solid;
+    text-align: right;
+    padding: 0px;
+}
+table.report tr{
+    border: 1px solid;
+    padding: 0px;
+}
+table.report th{
+    border: 1px solid black;
+    text-align: center;
+    font-size: 0.95em;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+table.report tbody{
+    overflow: scroll;
+}
+table.report td{
+    border: 1px solid;
+    border-color: #ccc;
+    font-size: 0.95em;
+}
+table.report tr.group td:first-child{
+    text-align: center; 
+    font-size: 0.95em;
+}
+table.report tr.branch{
+    text-align: center; 
+    font-size: 0.95em;
+}
+table.report tr.center{
+    border: 1px solid;
+    text-align: center;
+    font-size: 1em; 
+}
+table.report tr.group_total td:first-child{
+    text-align: center; 
+    background-color: #eee;    
+}
+table.report tr.center_total td:first-child{
+    text-align: center; 
+    background-color: #ddd;
+}
+table.report tr.branch_total td:first-child{
+    text-align: center; 
+    background-color: #ccc;    
+}
+table.report tr.align_left{
+    text-align: left;
+}
+table.report tr.total{
+    text-align: right;
+    font-weight: bold;
+}
