@@ -73,6 +73,7 @@ function showThis(li, idx){
 	);
 	remote.remove();
     }
+    window.location.hash=$(li).attr("id");
 }
 $(document).ready(function(){
 	//Handling targets form

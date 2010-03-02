@@ -99,8 +99,22 @@ class LoanHistory
     # this does not work as expected if the loan is repaid and goes back into default within the days we are looking at it.
     defaulted_loan_ids = repository.adapter.query(%Q{
       SELECT loan_id FROM
-        (select loan_id, max(ddiff) as diff from (select date, loan_id, datediff(now(),date) as ddiff,actual_outstanding_principal - scheduled_outstanding_principal as diff from loan_history where actual_outstanding_principal != scheduled_outstanding_principal and date < now()) as dt group by loan_id having diff < #{days}) as dt1;})
+        (SELECT loan_id, max(ddiff) as diff 
+         FROM (SELECT date, loan_id, datediff(now(),date) as ddiff,actual_outstanding_principal - scheduled_outstanding_principal as diff 
+               FROM loan_history 
+               WHERE actual_outstanding_principal != scheduled_outstanding_principal and date < now()) as dt group by loan_id having diff < #{days}) as dt1;})
+  end
 
+  def self.defaulted_loan_info_by_branch(branch_id, days = 7, date = Date.today, query ={})
+    # this does not work as expected if the loan is repaid and goes back into default within the days we are looking at it.
+    repository.adapter.query(%Q{
+         SELECT sum(pdiff) principal, sum(tdiff) total FROM
+         (SELECT actual_outstanding_principal - scheduled_outstanding_principal as pdiff, 
+                actual_outstanding_total - scheduled_outstanding_total as tdiff
+         FROM loan_history 
+         WHERE actual_outstanding_principal != scheduled_outstanding_principal 
+         AND branch_id=#{branch_id} AND current=1
+         AND date < now()) as dt WHERE pdiff>0 AND tdiff>0;})
   end
   
   def self.sum_outstanding_by_group(from_date, to_date)
@@ -121,6 +135,7 @@ class LoanHistory
       GROUP BY client_group_id;
     })
   end
+
 
   def self.sum_outstanding_for_branch(branch_id, from_date=Date.today-7, to_date=Date.today)
     ids=repository.adapter.query("SELECT loan_id, max(date) date FROM loan_history 
