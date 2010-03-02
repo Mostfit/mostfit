@@ -55,7 +55,24 @@ function showThis(li, idx){
     $("div.tab_container div.tab").hide();
     $("div.tab_container ul.tabs li.active").removeClass("active");
     $(li).addClass("active");
-    $($("div.tab_container div.tab")[idx]).show();
+    tab = $($("div.tab_container div.tab")[idx]).show();
+    remote = $(tab).find("input:hidden");
+    if(remote.length>0 && remote.attr("name")=="_load_remote"){
+	$.ajax({
+               url: remote.val(),
+	       success: function(data){
+		   $($("div.tab_container div.tab")[idx]).html(data);
+		},
+		beforeSend: function(){
+		    $('#spinner').show();
+		},
+		complete: function(){
+		    $('#spinner').hide();
+		}
+	    }
+	);
+	remote.remove();
+    }
 }
 $(document).ready(function(){
 	//Handling targets form
@@ -87,6 +104,7 @@ $(document).ready(function(){
 	    }else{
 		$("div.tab_container div.tab:first").show();
 	    }
+	    $("div.tab_container").append("<img src='/images/spinner.gif' id='spinner' style='display: none;'>")
 	}
 	//Handling reports
 	if($("table.report").length>0 && !$("table.report").hasClass("nojs")){

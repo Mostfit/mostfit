@@ -1,5 +1,6 @@
 class Centers < Application
   before :get_context, :exclude => ['redirect_to_show', 'groups']
+  before :get_date,    :only    => ['show', 'weeksheet']
   provides :xml, :yaml, :js
 
   def index
@@ -11,26 +12,7 @@ class Centers < Application
     @center = Center.get(id)
     raise NotFound unless @center
     @branch =  @center.branch if not @branch
-
-    clients = {}
-    @center.clients(:active => true).each{|c|
-      group_name = c.client_group ? c.client_group.name : "No group"
-      clients[group_name]||=[]
-      clients[group_name] << c
-    }
-    @clients = clients.each{|k, v|
-      clients[k]=v.sort_by{|c| c.name} if v
-    }.sort.collect{|k, v| v}.flatten
-
-    if params[:date]
-      if params[:date].is_a? String
-        @date = Date.parse(params[:date])
-      elsif params[:date].is_a? Mash
-        @date = parse_date(params[:date])
-      end
-    else
-      @date = Date.today
-    end
+    get_grouped_clients
     display [@center, @clients, @date], 'clients/index'
   end
 
@@ -111,13 +93,44 @@ class Centers < Application
     end
   end
 
+  def weeksheet
+    get_grouped_clients
+    partial "centers/weeksheet"
+  end
+
   private
   include DateParser  # for the parse_date method used somewhere here..
 
   # this works from proper urls
   def get_context
-    @branch = Branch.get(params[:branch_id])
+    @branch       = Branch.get(params[:branch_id])
     @staff_member = StaffMember.get(params[:staff_member_id])
+    @center       = Center.get(params[:center_id]) if params[:center_id]
     # raise NotFound unless @branch
   end
+
+  def get_date
+    if params[:date]
+      if params[:date].is_a? String
+        @date = Date.parse(params[:date])
+      elsif params[:date].is_a? Mash
+        @date = parse_date(params[:date])
+      end
+    else
+      @date = Date.today
+    end
+  end
+  
+  def get_grouped_clients
+    clients = {}
+    @center.clients(:active => true).each{|c|
+      group_name = c.client_group ? c.client_group.name : "No group"
+      clients[group_name]||=[]
+      clients[group_name] << c
+    }
+    @clients = clients.each{|k, v|
+      clients[k]=v.sort_by{|c| c.name} if v
+    }.sort.collect{|k, v| v}.flatten
+  end
+
 end # Centers
