@@ -8,4 +8,4 @@ Merb::Config.use { |c|
   # or redirect logger using IO handle
   # c[:log_stream] = STDOUT
 }
-Paperclip.options[:command_path] = "/usr/local/bin"
+
