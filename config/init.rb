@@ -51,8 +51,13 @@ Merb::BootLoader.before_app_loads do
     puts "--------------------------------------------------------------------------------"
   end
   DataMapper::Model.append_extensions DmPagination::Paginatable
-  Paperclip.options[:image_magick_path] = "/usr/local/bin"
-  Paperclip.options[:command_path] = "/usr/local/bin"
+  if Merb.env=="development"
+    Paperclip.options[:image_magick_path] = "/usr/local/bin"
+    Paperclip.options[:command_path] = "/usr/local/bin"
+  else
+    Paperclip.options[:image_magick_path] = "/usr/bin"
+    Paperclip.options[:command_path] = "/usr/bin"
+  end
   # load the extensions
   require 'lib/extensions.rb'
 end
