@@ -71,8 +71,10 @@ class Loans < DataEntry::Controller
       loans = params[:loans].select{|k,v| v[:disbursed?] == "on"}.to_hash
       loans.keys.each do |id|
         loan = Loan.get(id)
-        params[:loans][id].delete("disbursed?")
-        loan.update_attributes(params[:loans][id])
+        loan.disbursal_date = params[:loans][id][:disbursal_date]
+        loan.cheque_number  = params[:loans][id][:cheque_number] and params[:loans][id][:cheque_number].to_i>0 ? params[:loans][id][:cheque_number] : nil
+        loan.disbursed_by   = StaffMember.get(params[:loans][id][:disbursed_by_staff_id])
+        loan.save
         @errors << loan.errors if not loan.save
       end
       if @errors.blank?

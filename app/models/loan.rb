@@ -36,7 +36,7 @@ class Loan
   property :validated_by_staff_id,          Integer, :nullable => true, :index => true
   property :verified_by_user_id,            Integer, :nullable => true, :index => true
   property :created_by_user_id,             Integer, :nullable => true, :index => true
-  property :cheque_number,                  Integer, :nullable => true, :index => true
+  property :cheque_number,                  String,  :length => 20, :nullable => true, :index => true
 
   # associations
   belongs_to :client
@@ -81,6 +81,7 @@ class Loan
   validates_with_method  :validated_by,                 :method => :properly_validated?
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
+  validates_with_method  :cheque_number,                :method => :check_validity_of_cheque_number
   # validates_with_method  :dates_are_not_holidays
 
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
@@ -90,6 +91,12 @@ class Loan
   validates_with_method  :interest_rate,                :method => :is_valid_loan_product_interest_rate
   validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
   validates_with_method  :clients,                      :method => :check_client_sincerity
+
+  def check_validity_of_cheque_number
+    return true if not self.cheque_number or (self.cheque_number and self.cheque_number.blank?)
+    return [false, "This cheque is already used"] if Loan.all(:cheque_number => self.cheque_number, :id.not => self.id).count>0
+    return true
+  end
 
   def self.from_csv(row, headers, funding_lines)
     obj = new(:loan_product_id => LoanProduct.first(:name => row[headers[:product]]).id, :amount => row[headers[:amount]],

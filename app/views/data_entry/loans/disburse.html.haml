@@ -7,6 +7,7 @@
         %li
           == Loan #{e.resource.id}: #{v}
 - loans_to_disburse = @loans
+- staff_members = StaffMember.all.map{|s| [s.id.to_s,s.name]}
 - if loans_to_disburse.size > 0
   = form_for(@loan, :action => url(:enter_loans, :action => "disburse")) do
     %table.report.nojs
@@ -53,7 +54,7 @@
           %td
             = text_field :name => "loans[#{loan.id}][cheque_number]", :size => 8
           %td
-            = select :name => "loans[#{loan.id}][disbursed_by_staff_id]", :collection => StaffMember.all.map{|s| [s.id.to_s,s.name]}, :selected => loan.client.center.manager.id.to_s
+            = select :name => "loans[#{loan.id}][disbursed_by_staff_id]", :collection => staff_members, :selected => loan.client.center.manager.id.to_s
       %tfoot
         %tr
           %td{:colspan => 10}
