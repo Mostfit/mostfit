@@ -36,7 +36,7 @@
         %td
           = check_box :name => "loans[#{loan.id}][disbursed?]"
         %td
-          = text_field "loans[#{loan.id}][cheque_number]".to_sym, :size => 8
+          = text_field "loans[#{loan.id}][cheque_number]".to_sym, :size => 8, :value => loan.cheque_number
         %td
           = date_select "loans[#{loan.id}][disbursal_date]"
         %td

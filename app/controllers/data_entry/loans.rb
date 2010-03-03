@@ -68,6 +68,15 @@ class Loans < DataEntry::Controller
       render
     else
       @errors = []
+      cheque_numbers = params[:loans].select{|k,v| v[:disbursed?]!= "on" and not v[:cheque_number].blank?}.to_hash
+      #save cheque numbers
+      cheque_numbers.keys.each do |id|
+        loan = Loan.get(id)
+        loan.cheque_number  = params[:loans][id][:cheque_number] and params[:loans][id][:cheque_number].to_i>0 ? params[:loans][id][:cheque_number] : nil
+        loan.save
+      end
+
+      # disburse loans
       loans = params[:loans].select{|k,v| v[:disbursed?] == "on"}.to_hash
       loans.keys.each do |id|
         loan = Loan.get(id)
