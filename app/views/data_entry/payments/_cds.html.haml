@@ -3,10 +3,9 @@
   Payments collected by 
   = select :name => "payment[received_by]", :collection => StaffMember.all, :value_method => :id, :text_method => :name, :selected => @center.manager.id.to_s
 
-  %table.narrow.form{ :width => '100%'}
+  %table.report.nojs
     %thead
       %tr{:style => "font-size: 0.85em;"}
-        %th
         %th name
         %th id
         %th amount
@@ -28,38 +27,37 @@
           - #next if [nil, :repaid, :pending].include? loan.status
           - loan_row_count += 1
           %tr{ :class => cycle('odd','') }
-            %td &nbsp;
-            %td
+            %td.text
               %b= link_to loan.client.name, resource(@center.branch, @center, loan.client)
-            %td
+            %td.number
               = loan.id
-            %td.numeric
+            %td.number
               - amt = loan.amount
               %b= amt.to_currency
               - tot_amount += amt
-            %td.numeric
+            %td.number
               - p = lh.nil? ? 0 : lh.actual_outstanding_principal
               %b= p.to_currency
               - tot_outstanding += p
-            %td
+            %td.text
               = loan.disbursal_date.to_s
-            %td.numeric
+            %td.number
               - ins = loan.number_of_installments_before(@date)
               = ins
               - tot_installments += ins
-            %td.numeric
+            %td.number
               - p = lh.nil? ? 0 : lh.principal_due.to_i
               = p.to_currency
               - tot_principal += p
-            %td.numeric
+            %td.number
               - i = lh.nil? ? 0 : lh.interest_due.to_i
               = i.to_currency
               - tot_interest += i
-            %td.numeric
+            %td.number
               - a = p + i
               = a.to_currency
               - tot_total += a
-            %td.numeric
+            %td.number
               - if a == 0
                 = lh.nil? ? 0 : (lh.principal_paid.to_i + lh.interest_paid.to_i)
               - else 
@@ -69,10 +67,9 @@
 
         - if loan_row_count == 0
           %tr{ :class => cycle('odd','') }
-            %td
-            %td
+            %td.text
               %b= link_to client.name, resource(@branch, @center, client)
-            %td{ :colspan => 5 }
+            %td{ :colspan => 10 }
               %i nothing outstanding
       %tr{ :style => 'border-bottom: 2px solid;' }
         %tr

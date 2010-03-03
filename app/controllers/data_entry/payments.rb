@@ -19,7 +19,7 @@ module DataEntry
       if request.method == :post
         bulk_payments_and_disbursals
         if @errors.blank?
-          redirect(url(:data_entry), :message => {:notice => 'All payments made succesfully'})
+          redirect(params[:return]||url(:data_entry), :message => {:notice => 'All payments made succesfully'})
         elsif params[:format] and params[:format]=="xml"
           display("")
         else 
@@ -69,7 +69,7 @@ module DataEntry
         if params[:format]=='xml'
           display [@prin, @int, @fees], ""
         else
-          redirect url(:enter_payments, :action => 'record'), :message => {:notice => "Payment ##{@payment.id} has been registered"}
+          redirect(params[:return] || url(:enter_payments, :action => 'record'), :message => {:notice => "Payment ##{@payment.id} has been registered"})
         end
       else
         @payment ||= Payment.new

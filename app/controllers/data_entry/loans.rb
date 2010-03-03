@@ -78,7 +78,7 @@ class Loans < DataEntry::Controller
         @errors << loan.errors if not loan.save
       end
       if @errors.blank?
-        redirect url(:data_entry), {:message => {:notice => "#{loans.size} loans disbursed. #{params[:loans].size - loans.size} loans not disbursed."}}
+        redirect params{:return]||url(:data_entry), {:message => {:notice => "#{loans.size} loans disbursed. #{params[:loans].size - loans.size} loans not disbursed."}}
       else
         render
       end
@@ -104,7 +104,7 @@ class Loans < DataEntry::Controller
         @errors << loan.errors unless loan.save
       end
       if @errors.blank?
-        redirect "/data_entry", :message => {:notice => 'loans approved'}
+        redirect(params[:return]||"/data_entry", :message => {:notice => 'loans approved'})
       else
         @loans_to_approve = Loan.all(:id.in => @loans.keys)
         render

@@ -1,5 +1,6 @@
-- if @loans_to_disburse.size > 0
-  %table.narrow.form{ :width => '100%'}
+- staff_members = StaffMember.all.map{|s| [s.id.to_s,s.name]}
+- if loans_to_disburse.size > 0
+  %table.report.nojs
     %thead
       %tr{:style => "font-size: 0.85em;"}
         %th
@@ -13,10 +14,12 @@
         %th
           Disbursed?
         %th
+          Cheque number
+        %th
           Disbursed On
         %th
           Disbursed By
-    - @loans_to_disburse.each do |loan|
+    - loans_to_disburse.each do |loan|
       %tr
         %td
           = link_to loan.client.name, resource(loan.client)
@@ -25,7 +28,7 @@
         %td
           = loan.scheduled_disbursal_date
         %td
-          - late =  @date - loan.scheduled_disbursal_date
+          - late =  date - loan.scheduled_disbursal_date
           - if late > 0
             == "#{late} days late"
           - else
@@ -33,9 +36,11 @@
         %td
           = check_box :name => "loans[#{loan.id}][disbursed?]"
         %td
+          = text_field "loans[#{loan.id}][cheque_number]".to_sym
+        %td
           = date_select "loans[#{loan.id}][disbursal_date]"
         %td
-          = select :name => "loans[#{loan.id}][disbursed_by_staff_id]", :collection => [["","---"]] + StaffMember.all.map{|sm| [sm.id.to_s,sm.name]}, :selected => loan.client.center.manager.id.to_s
+          = select :name => "loans[#{loan.id}][disbursed_by_staff_id]", :collection => [["","---"]] + staff_members, :selected => loan.client.center.manager.id.to_s
 
 - else
   No disbursals today

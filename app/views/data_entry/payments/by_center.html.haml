@@ -16,7 +16,7 @@
         %br
 
   %a{ :name => 'weeksheet' }
-  %table.narrow.form{ :style => "width: 100%;" }
+  %table.narrow.form{:style => "width: 100%"}
     %tr.odd
       %td meeting at
       %td
@@ -41,7 +41,7 @@
   %h1 Approvals
   - @loans_to_approve = @center.clients.loans(:approved_on => nil)
   - if @loans_to_approve.size > 0
-    = form_for(@loan, :action => url(:enter_loans, :action => 'approve')) do
+    = form_for(@loan, :action => url(:enter_loans, :action => 'approve', :return => resource(@branch, @center))) do
       = partial :approvals
       = submit 'Approve these loans'
   - else
@@ -50,8 +50,8 @@
   %h1 Disbursal
   - @loans_to_disburse = @center.clients.loans(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil)
   - if @loans_to_disburse.size > 0
-    = form_for(@loan, :action => url(:enter_loans, :action => 'disburse')) do
-      = partial :disbursals
+    = form_for(@loan, :action => url(:enter_loans, :action => 'disburse', :return => resource(@branch, @center))) do
+      = partial :disbursals, {:loans_to_disburse => @loans_to_disburse, :date => @date}
       = submit 'Disburse these loans'
   - else
     No disbursals today
@@ -61,13 +61,13 @@
   - @fee_paying_clients = @center.clients.select{|c| c.fees_paid? == false}
   - @fee_paying_things = @fee_paying_clients + @fee_paying_loans
   - unless (@fee_paying_things).blank?
-    = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
+    = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center))) do
       = hidden_field :name => :for_date, :value => @date
       Fees collected by
       = select :name => "payment[received_by]", :collection => [["","---"]] + StaffMember.all.map{|sm| [sm.id.to_s,sm.name]}, :selected => @center.manager.id.to_s
 
 
-      %table.narrow.form{:style => "width:100%"}
+      %table.report.nojs{:style => "width:100%"}
         %thead
           %tr{:style => "font-size: 0.85em"}
             %th
@@ -89,11 +89,11 @@
           %tr
             %td
               = fpt.id
-            %td
+            %td.text
               = Loan.descendants.include?(fpt.class) ? fpt.client.name : fpt.name
-            %td
+            %td.text
               = fpt.description if fpt.respond_to?("description")
-            %td
+            %td.text
               - fpt.fee_schedule.each do |date, fs|
                 - fs.each do |k,v|
                   = k
@@ -101,7 +101,7 @@
                   = v
             %td
               = fpt.fees_paid
-            %td
+            %td.text
               - fp = fpt.fees_payable_on(@date)
               = fp
             %td
@@ -112,7 +112,7 @@
     No fees due today
     
   %h1 Payments
-  = form_for(@payment, :action => url(:enter_payments, :action => 'by_center')) do
+  = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center))) do
     = hidden_field :name => 'for_date', :value => @date
     = hidden_field :name => 'center_id', :value => @center.id
     = partial :cds
