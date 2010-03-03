@@ -1,0 +1,25 @@
+%table.report.nojs
+  %tr.header
+    %th
+      S. No.
+    %th
+      Occupation
+    %th
+      Number of clients
+    %th
+      Number of loans
+    %th
+      Amount disbursed
+  - @data.each_with_index do |row, idx|
+    %tr
+      %td
+        = idx+1
+      %td
+        = row[:occupation]||"None"
+      %td
+        = row[:clients]
+      %td
+        = row[:loans]
+      %td
+        = row[:amount] ? row[:amount].to_currency : 0
+

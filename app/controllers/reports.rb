@@ -1,5 +1,5 @@
 class Reports < Application
-  Types = [DailyReport, ConsolidatedReport, TransactionLedger, ProjectedReport, LoanDisbursementRegister, LateDisbursalsReport, TargetReport]
+  Types = [DailyReport, ConsolidatedReport, TransactionLedger, ProjectedReport, LoanDisbursementRegister, LateDisbursalsReport, TargetReport, LoanPurposeReport, ClientOccupationReport]
   layout :determine_layout 
 
   # provides :xml, :yaml, :js
@@ -24,7 +24,7 @@ class Reports < Application
       elsif klass==LoanDisbursementRegister
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
-      elsif klass==LateDisbursalsReport
+      elsif [LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport].include?(klass)
         @data  = @report.generate
         display @data
       elsif klass==TargetReport

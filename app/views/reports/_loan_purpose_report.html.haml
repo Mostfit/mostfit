@@ -1,0 +1,20 @@
+%table.report.nojs
+  %tr.header
+    %th
+      S. No.
+    %th
+      Purpose
+    %th
+      Number of loans
+    %th
+      Amount disbursed
+  - @data.each_with_index do |row, idx|
+    %tr
+      %td
+        = idx+1
+      %td
+        = row[:purpose]||"None"
+      %td
+        = row[:count]
+      %td
+        = row[:amount].to_currency
