@@ -2,7 +2,7 @@
 
 = error_messages_for @client
 - form_url   = (@branch ? resource(@branch, @center, :clients) : resource(:clients, {:return => params[:return]}))
-- cancel_url = params[:return] ? "/"+params[:return] : resource(@branch, @center, @client)
+- cancel_url = params[:return] ? "/"+params[:return] : resource(@branch, @center)
 
 = form_for(@client, :action => form_url, :multipart => true) do
   = partial("clients/fields", :submit_text => "Add client", :cancel_link => cancel_url)
