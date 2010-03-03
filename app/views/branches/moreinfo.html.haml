@@ -28,17 +28,17 @@
     %td
       Total Amount Outstanding
     %td
-      =@loan_data.actual_outstanding_principal.to_currency
+      =@loan_data.actual_outstanding_principal ? @loan_data.actual_outstanding_principal.to_currency : "-"
   %tr
     %td
       Total Principal Overdue
     %td
-      =@defaulted.principal.to_currency
+      =@defaulted.principal ? @defaulted.principal.to_currency : "-"
   %tr
     %td
       Total Interest Overdue
     %td
-      =(@defaulted.total.to_i-@defaulted.principal.to_i).to_currency
+      =@defaulted.total and @defaulted.principal ? (@defaulted.total.to_i-@defaulted.principal.to_i).to_currency : "-"
   %tr
     %td
       Number of center managers
