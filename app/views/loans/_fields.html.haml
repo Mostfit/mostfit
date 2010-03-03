@@ -52,7 +52,7 @@
     %td
       Loan Purpose:
     %td
-      = select :occupation_id, :collection => Occupation.all, :value_method => :id, :text_method => :name, :prompt => "----", :selected => @loan.occupation ? @loan.occupation.id.to_s : nil
+      = select :occupation_id, :collection => Occupation.all.map{|x| [x.id, x.name]}, :prompt => "----"
   %tr
     %td
       Funding Line
