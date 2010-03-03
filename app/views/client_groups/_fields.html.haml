@@ -1,12 +1,9 @@
 %table.form
-  -if @client_group.center_id and not @client_group.center_id.blank?
-    =hidden_field :center_id, :value => @client_group.center_id
-  -else
-    %tr
-      %td
-        For center:
-      %td
-        = select_center_for @client_group, :center
+  %tr
+    %td
+      For center:
+    %td
+      = select_center_for @client_group, :center
   %tr
     %td
       Group name:

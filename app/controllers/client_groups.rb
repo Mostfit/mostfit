@@ -41,8 +41,8 @@ class ClientGroups < Application
     @client_group = ClientGroup.get(id)
     raise NotFound unless @client_group
     if @client_group.update(client_group)
-      message  = {:notice => "Group was successfully edited"}
-      (@branch and @center) ? redirect(resource(@branch, @center), :message => message) : redirect(resource(@client_group), :message => message)
+      message  = {:notice => "Group was successfully edited"}      
+      (@branch and @center) ? redirect(resource(@client_group.center.branch, @client_group.center), :message => message) : redirect(resource(@client_group), :message => message)
     else
       display @client_group, :edit
     end
