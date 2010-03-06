@@ -73,4 +73,4 @@
       = total_disbursal
       
 
-= ofc2(800, 640, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'center_day', :date => @date) )
+= ofc2(800, 640, url(:graph_data, :action => 'dashboard', :id => 'center_day', :date => @date) )

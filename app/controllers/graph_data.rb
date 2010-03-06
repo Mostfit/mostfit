@@ -297,7 +297,7 @@ class GraphData < Application
       type = "pie"
     when "center_day"
       date =  Date.parse(params[:date])
-      vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{date.to_s}' GROUP BY lh.center_id")
+      vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{date.strftime('%Y-%m-%d')}' GROUP BY lh.center_id")
       values = vals.map do |v| 
         val = v[0] + v[1]
         color_ratio = val == 0 ? 1 : v[0]/val
@@ -321,8 +321,8 @@ class GraphData < Application
   private
   def display_from_cache
     file = get_cached_filename
-    return true  unless File.exists?(file)
-    return true  if not File.mtime(file).to_date==Date.today
+    return true unless File.exists?(file)
+    return true if not File.mtime(file).to_date==Date.today
     throw :halt, render(File.read(file), :layout => false)
   end
   
