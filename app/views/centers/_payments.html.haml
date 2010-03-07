@@ -13,10 +13,10 @@
       %th total due
   %tbody
     - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_fee, tot_total = 0, 0, 0, 0, 0, 0, 0
-    - clients.group_by{|x| x.client_group}.sort_by{|x| x[0].name}.each do |group, client_grouped|
+    - clients.group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each do |group, client_grouped|
       %tr.group
         %td{:colspan => 10}
-          =group.name
+          =group ? group.name : "none"
       - grp_amount, grp_outstanding, grp_installments, grp_principal, grp_interest, grp_fee, grp_total = 0, 0, 0, 0, 0, 0, 0
       -client_grouped.each do |client| 
         - loan_row_count = 0
