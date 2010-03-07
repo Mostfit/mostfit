@@ -1,15 +1,17 @@
 %h1
   Browse
 
-%h2 Welcome #{session.user.login}
+%h2
+  ="Welcome #{session.user.login}"
 
 - if not @branches.blank?
-  %h3 You manage #{@branches.count} branches
+  %h3
+    ="You manage #{@branches.count} branches"
   %ul{:style => 'display: inline;'}
     - @branches.each do |branch|
       %li
         = link_to branch.name, resource(branch)
 - if not @centers.blank?
   %h3 
-    You manage #{@centers.count} centers
+    ="You manage #{@centers.count} centers"
     = link_to '[View]', url(:browse, :action =>'centers')

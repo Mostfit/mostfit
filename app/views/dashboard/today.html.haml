@@ -23,54 +23,53 @@
       %th
         Actual Disbursal
   - total_prin_due = total_prin_paid = total_int_due = total_int_paid = total_scheduled_disbursal = total_disbursal  = 0
-  - @centers.each do |center|
+  - @data.each do |center|
     %tr{:class => cycle('odd','even')}
-      - lh = LoanHistory.aggregate(:principal_due.sum, :interest_due.sum, :principal_paid.sum, :interest_paid.sum, :center_id => center.id, :date => @date)
       %td
         = link_to center.name, url(:quick_link, "centers", center.id) + "#weeksheet"
       %td.numeric
-        = lh[0] || 0
-        - total_prin_due += (lh[0] || 0)
+        = center.pd.to_i || 0
+        - total_prin_due += (center.pd || 0)
       %td.numeric
-        = lh[2] || 0
-        - total_prin_paid += (lh[2] || 0)
+        = center.pp.to_i || 0
+        - total_prin_paid += (center.pp || 0)
       %td.numeric
-        = lh[1] || 0
-        - total_int_due += (lh[1] || 0)
+        = center.intd.to_i || 0
+        - total_int_due += (center.intd || 0)
       %td.numeric
-        = lh[3] || 0
-        - total_int_paid += (lh[3] || 0)
+        = center.intp.to_i || 0
+        - total_int_paid += (center.intp || 0)
       %td.numeric
-        = ((lh[0] || 0) + (lh[1] || 0))
+        = ((center.pd || 0) + (center.intd || 0)).to_i
       %td.numeric
-        = ((lh[2] || 0) + (lh[3] || 0))
+        = ((center.pp || 0) + (center.intp || 0)).to_i
       %td.numeric
-        - scheduled_disbursal = center.clients.loans(:scheduled_disbursal_date => @date, :disbursal_date => nil).sum(:amount) || 0
+        - scheduled_disbursal = @disbursals.find_all{|loan| loan.disbursal_date==nil and loan.client.center.id==center.id}.inject(0){|s,x| s+=x.amount}
         - total_scheduled_disbursal += scheduled_disbursal
         = scheduled_disbursal
       %td.numeric
-        - disbursal = center.clients.loans(:scheduled_disbursal_date => @date, :disbursal_date.not => nil).sum(:amount).to_i || 0
+        - disbursal = @disbursals.find_all{|loan| loan.disbursal_date!=nil and loan.client.center.id==center.id}.inject(0){|s,x| s+=x.amount}
         - total_disbursal += disbursal
         = disbursal
   %tr.total
     %td
       Total
     %td.numeric
-      = total_prin_due
+      = total_prin_due.to_i
     %td.numeric
-      = total_prin_paid
+      = total_prin_paid.to_i
     %td.numeric
-      = total_int_due
+      = total_int_due.to_i
     %td.numeric
-      = total_int_paid
+      = total_int_paid.to_i
     %td.numeric
-      = total_int_due + total_prin_due
+      = (total_int_due + total_prin_due).to_i
     %td.numeric
-      = total_int_paid + total_prin_paid
+      = (total_int_paid + total_prin_paid).to_i
     %td.numeric
       = total_scheduled_disbursal
     %td.numeric
       = total_disbursal
       
 
-= ofc2(800, 640, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'center_day', :date => @date) )
+= ofc2(800, 640, url(:graph_data, :action => 'dashboard', :id => 'center_day', :date => @date) )

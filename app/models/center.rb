@@ -88,8 +88,8 @@ class Center
   end
 
   def self.paying_today(date = Date.today)
-    lh = LoanHistory.all(:date => date)
-    centers = lh.blank? ? [] : lh.loan.clients.centers
+    center_ids = LoanHistory.all(:date => date||Date.today).map{|x| x.center_id}
+    centers = center_ids.blank? ? [] : Center.all(:id => center_ids)
     centers
   end
   

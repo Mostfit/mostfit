@@ -1,5 +1,4 @@
 class Browse < Application
-
   before :before
 
   def index
