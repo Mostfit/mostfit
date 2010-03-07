@@ -71,4 +71,14 @@ class LoanProducts < Application
     end
   end
 
+  def design
+    if request.method == :post
+      debugger
+      params[:loan][:disbursal_date] = params[:loan][:scheduled_disbursal_date]
+      @loan = Loan.new(params[:loan])
+    else
+      @loan = Loan.new
+    end
+    render
+  end
 end # LoanProducts

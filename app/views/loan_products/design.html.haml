@@ -1,0 +1,52 @@
+= form_for(@loan, :action => url(:design_loan_product)) do
+  %table
+    %tr
+      %td
+        Loan Product
+      %td
+        = select :loan_product_id, :collection => LoanProduct.all, :text_method => :name, :value_method => :id, :prompt => 'Please choose a loan product'
+    %tr
+      %td
+        Amount
+      %td
+        = text_field :amount
+    %tr
+      %td
+        Disbursal Date
+      %td
+        = date_select_for @loan, :scheduled_disbursal_date
+    %tr
+      %td
+        First Payment Date
+      %td
+        = date_select_for @loan, :scheduled_first_payment_date
+    %tr
+      %td
+        Interest Rate
+      %td
+        = text_field :interest_rate
+    %tr
+      %td
+        Number of Installments
+      %td
+        = text_field :number_of_installments
+    %tr
+      %td
+        Installment Frequency
+      %td
+        = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
+  = submit 'Calculate IRR'
+
+%h1
+  This loan has an IRR of
+  = @loan.irr
+
+- cf = @loan.cash_flow if @loan.loan_product
+- if cf
+  %table
+    - cf.each do |c|
+      %tr
+        %td
+          = c[0]
+        %td
+          = c[1]

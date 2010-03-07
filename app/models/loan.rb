@@ -351,6 +351,37 @@ class Loan
   end
   # LOAN INFO FUNCTIONS - CALCULATIONS
 
+  def cash_flow(type = :scheduled)
+    # Hash of dates and +/- amounts. 
+    # This differs from payment_schedule and payments_hash in that it includes fees. 
+    # Perhaps it would be better if those functions returned a comprehensive listing, but for the time being, this is okay
+    # TODO : make payments_hash and payment_schedule return comprehensve cashflows (i.e. fees,etc  as well.)
+    debugger
+    fs = type == :scheduled ? fee_schedule : fees_paid
+    fsh = fs.map{|f,v| [f,{:fees => v.values.inject(0){|a,b| a+b}}]}.to_hash
+    cf = type == :scheduled ? payment_schedule : payments_hash
+    cf += fsh
+    dd = type == :scheduled ? scheduled_disbursal_date : disbursal_date
+    cf += {dd => {:principal => -amount}}
+    cf = cf.keys.sort.map{|k| v=cf[k];[k,(v[:principal] || 0) + (v[:interest] || 0) + (v[:fees] || 0)]}
+    return cf
+  end
+
+  def irr(iterations = 100)
+    begin
+      cf = cash_flow
+      min_date = cf[0][0]
+      (1..iterations).inject do |rate,|
+        # trust me, this is correct. i think
+        npv = cf.map{|x| [1/(1+(x[0]-min_date)/365*rate),x[1]]}.inject(0){|a,b| a + (b[0]*b[1])}
+        rate * (1 - npv / cf.first[1])
+      end
+    rescue
+      "NaN"
+    end
+  end
+
+
   def total_fees_due
     total_fees_due = fee_schedule.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
   end
@@ -385,6 +416,7 @@ class Loan
   end
 
   def fee_schedule
+    debugger
     @fee_schedule = {}
     klass_identifier = "loan"
     loan_product.fees.each do |f|
@@ -402,23 +434,26 @@ class Loan
   def payment_schedule
     return @schedule if @schedule
     @schedule = {}
-    principal_so_far, interest_so_far, total = 0, 0
+    principal_so_far = interest_so_far = fees_so_far = total = 0
     balance = amount
-    @schedule[disbursal_date || scheduled_disbursal_date] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0,
-      :balance => balance, :total => 0}
+    fs = fee_schedule
+    @schedule[disbursal_date || scheduled_disbursal_date] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
     (1..number_of_installments).each do |number|
       date      = shift_date_by_installments(scheduled_first_payment_date, number - 1)
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
       principal_so_far += principal
       interest_so_far  += interest
+      fees = fs.has_key?(date) ? fs[date].values.inject(0){|a,b| a+b} : 0
+      fees_so_far += fees || 0
       balance -= principal
       @schedule[date] = {
         :principal                  => principal,
         :interest                   => interest,
+        :fees                       => fees,
         :total_principal            => (principal_so_far),
         :total_interest             => (interest_so_far),
-        :total                      => principal_so_far + interest_so_far,
+        :total                      => principal_so_far + interest_so_far + fees_so_far,
         :balance                    => balance,
       }
     end

@@ -1,0 +1,34 @@
+= form_for(@loan, url(:calc_irr)) do
+  %table
+    %tr
+      %td
+        Amount
+      %td
+        = text_field :name => 'loan[amount]'
+    %tr
+      %td
+        Disbursal Date
+      %td
+        = date_select_for @loan, :disbursal_date
+    %tr
+      %td
+        First Payment Date
+      %td
+        = date_select_for @loan, :scheduled_first_payment_date
+    %tr
+      %td
+        Interest Rate
+      %td
+        = text_field :interest_rate
+    %tr
+      %td
+        Interest Rate
+      %td
+        = text_field :interest_rate
+    %tr
+      %td
+        Loan Product
+      %td
+        = select :collection => LoanProduct.all, :text_method => :name, :value_method => :id, :prompt => 'Please choose a loan product'
+
+    

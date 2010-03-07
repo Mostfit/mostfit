@@ -523,5 +523,8 @@ describe Loan do
     @loan.clear_cache
   end
 
+  it "should give correct cashflow for irr" do
+  end
+
       
 end

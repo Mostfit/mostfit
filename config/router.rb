@@ -19,7 +19,7 @@ Merb::Router.prepare do
   resources :users
   resources :staff_members
   resources :clients do
-  resources :insurance_policies
+    resources :insurance_policies
   end
   resources :client_groups
   resources :loans
@@ -37,6 +37,8 @@ Merb::Router.prepare do
   resources :funders do
     resources :funding_lines
   end
+
+  match('/design').to(:controller => 'loan_products', :action => 'design').name(:design_loan_product)
 
   match('/centers/:id/groups(/:group_id).:format').to(:controller => 'centers', :action => 'groups')
   slice(:merb_auth_slice_password, :name_prefix => nil, :path_prefix => "")
@@ -72,7 +74,6 @@ Merb::Router.prepare do
   match('/staff_members/:id/day_sheet').to(:controller => 'staff_members', :action => 'day_sheet').name(:day_sheet)
   match('/staff_members/:id/day_sheet.:format').to(:controller => 'staff_members', :action => 'day_sheet', :format => ":format").name(:day_sheet_with_format)
   match('/browse(/:action)').to(:controller => 'browse').name(:browse)
-
   # this uses the redirect_to_show methods on the controllers to redirect some models to their appropriate urls
   match('/:controller/:id').to(:action => 'redirect_to_show').name(:quick_link)
   default_routes
