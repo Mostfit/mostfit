@@ -7,7 +7,7 @@ require "log4r"
 namespace :db do
   desc "Create DB from excel sheet"
   task :upload, :directory, :filename do |task, args|
-#    include Log4r
+    #    include Log4r
     filename  = args[:filename]
     directory = args[:directory]
 
@@ -20,7 +20,7 @@ namespace :db do
     log.level = Log4r::INFO
 
     log.info("File has been uploaded to the server. Now processing it into a bunch of csv files")
-    `rake 'excel:to_csv[#{directory}, #{filename}]'`
+    puts `ruby #{Merb.root}/lib/tasks/excel.rb #{directory} #{filename}`
     log.info("CSV extraction complete. Processing files.")
     file.load_csv(log)
     log.info("CSV files are now loaded into the DB. Creating loan schedules.")
