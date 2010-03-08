@@ -1,0 +1,13 @@
+%h1 Grts controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/grts/new.html.erb
+
+= error_messages_for @grt
+
+= form_for(@grt, :action => url(:grts) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:grts)

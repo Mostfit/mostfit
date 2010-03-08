@@ -17,6 +17,14 @@ class ClientGroup
   belongs_to :created_by_staff,  :child_key => [:created_by_staff_member_id], :model => 'StaffMember'
   validates_is_unique :name, :scope => :center_id  
 
+  has n, :cgts
+  has n, :grts
+
+  # TODO: we need some way of tracking the CGT and GRT for wach of these groups. One solution is:
+  # has n, :cgts        has n, :grts
+  # or do we need a state machine?
+
+
   def sync_clients
     Client.all(:client_group_id => self.id).each{|client|
       client.center = self.center

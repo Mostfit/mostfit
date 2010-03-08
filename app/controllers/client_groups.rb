@@ -10,6 +10,7 @@ class ClientGroups < Application
   def show(id)
     @client_group = ClientGroup.get(id)
     raise NotFound unless @client_group
+    @cgts = @client_group.cgts
     display @client_group
   end
 

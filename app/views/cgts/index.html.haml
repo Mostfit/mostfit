@@ -1,0 +1,11 @@
+= partial :cgts
+
+= form_for(@cgt, :action => resource(@client_group, :cgts)) do
+  = error_messages_for(@cgt)
+  %h3
+    %a.add Add a CGT day number
+    = text_field :day_number, :style => 'width: 20px'
+    on 
+    = date_select_for @cgt, :date
+    = hidden_field :client_group_id, :value => @client_group.id
+    = submit 'Add CGT'

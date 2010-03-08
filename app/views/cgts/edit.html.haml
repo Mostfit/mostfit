@@ -1,0 +1,24 @@
+%h1
+  Edit CGT
+
+= error_messages_for @cgt
+
+= form_for(@cgt, :action => resource(@client_group, @cgt)) do
+  %table
+    %tr
+      %th
+        Date
+      %td
+        = date_select_for @cgt, :date
+    %tr
+      %th
+        Day number
+      %td
+        = text_field :day_number, :style => 'width: 20px'
+    %tr
+      %th
+        Status
+      %td
+        = select :status, :collection => Cgt.statuses, :value_method => :to_s 
+  = submit "Update"
+

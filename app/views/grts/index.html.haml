@@ -1,0 +1,16 @@
+%h1
+  Grts controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/grts/index.html.erb
+%table
+  %tr
+  - for grt in @grts
+    %tr
+      %td
+        = link_to 'Show', url(:grt, grt)
+      %td
+        = link_to 'Edit', url(:edit_grt,  grt)
+
+= link_to 'New', url(:new_grt)

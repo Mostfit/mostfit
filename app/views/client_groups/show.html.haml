@@ -1,10 +1,22 @@
-%h1
-  ClientGroups controller, show action
-%p
-  Edit this file in
-  %tt
-    app/views/client_groups/show.html.erb
+%h1 
+  == Clients for #{@client_group.name}
+%table.narrow
+  %tr
+    %thead
+      %th
+        id
+      %th
+        Name
+  - @client_group.clients.each do |client|
+    %tr
+      %td
+        = client.id
+      %td
+        = link_to client.name, resource(client)
+  
+  
+= partial 'cgts/cgts'
 
-= link_to 'Edit',  url(:edit_client_group,  @client_group)
-|
-= link_to 'Back', url(:client_groups)
+%h2 Clients
+
+
