@@ -35,5 +35,5 @@
   %div.tab
     =partial "clients/list"
   %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => url(:weeksheet, :center_id => @center.id, :branch_id => @branch.id)}
+    %input{:type => "hidden", :name => "_load_remote", :value => url(:weeksheet, :center_id => @center.id, :branch_id => @branch.id, :date => @date)}
     /=partial "centers/weeksheet"
