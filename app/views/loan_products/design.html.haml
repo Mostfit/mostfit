@@ -42,7 +42,8 @@
 
 %h1
   This loan has an IRR of
-  = @loan.irr
+  - irr = @loan.irr
+  = irr.is_a?(Numeric) ? ('%.2f' %(irr * 100)).to_s + "%" : irr
 
 - cf = @loan.cash_flow if @loan.loan_product
 - if cf
