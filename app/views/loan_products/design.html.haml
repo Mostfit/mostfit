@@ -19,7 +19,7 @@
         %td.legend
           Interest Rate
         %td
-          = text_field :interest_rate, :value => @loan.interest_rate*100
+          = text_field :interest_rate, :value => @loan.interest_rate ? @loan.interest_rate*100 : ''
       %tr
         %td.legend
           Disbursal Date
@@ -49,6 +49,11 @@
 - cf = @loan.cash_flow if @loan.loan_product
 - if cf
   %table
+    %tr
+      %th
+        Date
+      %th
+        Cash flow
     - cf.each do |c|
       %tr
         %td
