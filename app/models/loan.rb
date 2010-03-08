@@ -356,7 +356,6 @@ class Loan
     # This differs from payment_schedule and payments_hash in that it includes fees. 
     # Perhaps it would be better if those functions returned a comprehensive listing, but for the time being, this is okay
     # TODO : make payments_hash and payment_schedule return comprehensve cashflows (i.e. fees,etc  as well.)
-    debugger
     fs = type == :scheduled ? fee_schedule : fees_paid
     fsh = fs.map{|f,v| [f,{:fees => v.values.inject(0){|a,b| a+b}}]}.to_hash
     cf = type == :scheduled ? payment_schedule : payments_hash
@@ -416,7 +415,6 @@ class Loan
   end
 
   def fee_schedule
-    debugger
     @fee_schedule = {}
     klass_identifier = "loan"
     loan_product.fees.each do |f|
