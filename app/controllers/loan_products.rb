@@ -74,6 +74,7 @@ class LoanProducts < Application
   def design
     if request.method == :post
       params[:loan][:disbursal_date] = params[:loan][:scheduled_disbursal_date]
+      params[:loan][:interest_rate]   = params[:loan][:interest_rate].to_f / 100
       @loan = Loan.new(params[:loan])
     else
       @loan = Loan.new

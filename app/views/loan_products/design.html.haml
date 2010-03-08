@@ -1,44 +1,45 @@
-.notice
-  %h2 Loan Product IRR helper
-  You can use the form below to calculate the IRR on a loan for a particular loan product. Please make sure that your loan product is setup correctly and that you choose the correct loan product below
-= form_for(@loan, :action => url(:design_loan_product)) do
-  %table
-    %tr
-      %td
-        Loan Product
-      %td
-        = select :loan_product_id, :collection => LoanProduct.all, :text_method => :name, :value_method => :id, :prompt => 'Please choose a loan product'
-    %tr
-      %td
-        Amount
-      %td
-        = text_field :amount
-    %tr
-      %td
-        Disbursal Date
-      %td
-        = date_select_for @loan, :scheduled_disbursal_date
-    %tr
-      %td
-        First Payment Date
-      %td
-        = date_select_for @loan, :scheduled_first_payment_date
-    %tr
-      %td
-        Interest Rate
-      %td
-        = text_field :interest_rate
-    %tr
-      %td
-        Number of Installments
-      %td
-        = text_field :number_of_installments
-    %tr
-      %td
-        Installment Frequency
-      %td
-        = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
-  = submit 'Calculate IRR'
+%div.form_container
+  .notice
+    %h3 Loan Product IRR helper
+    Use the form below to calculate the IRR on a loan for a particular loan product.
+  = form_for(@loan, :action => url(:design_loan_product)) do
+    %table.border
+      %tr
+        %td.legend
+          Loan Product
+        %td
+          = select :loan_product_id, :collection => LoanProduct.all, :text_method => :name, :value_method => :id, :prompt => 'Please choose a loan product'
+        %td
+        %td
+      %tr
+        %td.legend
+          Amount
+        %td
+          = text_field :amount
+        %td.legend
+          Interest Rate
+        %td
+          = text_field :interest_rate, :value => @loan.interest_rate*100
+      %tr
+        %td.legend
+          Disbursal Date
+        %td
+          = date_select_for @loan, :scheduled_disbursal_date
+        %td.legend
+          First Payment Date
+        %td
+          = date_select_for @loan, :scheduled_first_payment_date
+      %tr
+      %tr
+        %td.legend
+          Number of Installments
+        %td
+          = text_field :number_of_installments
+        %td.legend
+          Installment Frequency
+        %td
+          = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
+    = submit 'Calculate IRR'
 
 %h1
   This loan has an IRR of
