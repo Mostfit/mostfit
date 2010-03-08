@@ -1,5 +1,5 @@
 class Loans < Application
-  before :get_context, :exclude => ['redirect_to_show']
+  before :get_context, :exclude => ['redirect_to_show', 'approve', 'disburse']
   provides :xml, :yaml, :js
 
   def index
@@ -66,7 +66,6 @@ class Loans < Application
     @loan_product =  @loan.loan_product
     raise NotFound unless @loan
     disallow_updation_of_verified_loans
-    debugger
     @loan.update_attributes(attrs)
     if @loan.errors.blank?
       redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
@@ -95,6 +94,39 @@ class Loans < Application
     raise NotFound unless @loan = Loan.get(id)
     @branch, @center, @client = @loan.client.center.branch, @loan.client.center, @loan.client
     redirect url_for_loan(@loan)
+  end
+  
+  def disburse
+    @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    @loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil).select{|l| l.status == :approved}
+    if request.method == :get
+      render 
+    else
+      @errors = []
+      cheque_numbers = params[:loans].select{|k,v| v[:disbursed?]!= "on" and not v[:cheque_number].blank?}.to_hash
+      #save cheque numbers
+      cheque_numbers.keys.each do |id|
+        loan = Loan.get(id)
+        loan.cheque_number  = params[:loans][id][:cheque_number] and params[:loans][id][:cheque_number].to_i>0 ? params[:loans][id][:cheque_number] : nil
+        loan.save
+      end
+
+      # disburse loans
+      loans = params[:loans].select{|k,v| v[:disbursed?] == "on"}.to_hash
+      loans.keys.each do |id|
+        loan = Loan.get(id)
+        loan.disbursal_date = params[:loans][id][:disbursal_date]
+        loan.cheque_number  = params[:loans][id][:cheque_number] and params[:loans][id][:cheque_number].to_i>0 ? params[:loans][id][:cheque_number] : nil
+        loan.disbursed_by   = StaffMember.get(params[:loans][id][:disbursed_by_staff_id])
+        loan.save
+        @errors << loan.errors if not loan.save
+      end
+      if @errors.blank?
+        redirect params[:return]||url(:data_entry),{:message => {:notice => "#{loans.size} loans disbursed. #{params[:loans].size - loans.size} loans not disbursed."}}
+      else
+        render
+      end
+    end
   end
 
   def disburse
@@ -156,7 +188,6 @@ class Loans < Application
       end
     end
   end
-
 
   private
   def get_context

@@ -9,7 +9,7 @@
 - staff_members = StaffMember.all.map{|s| [s.id.to_s,s.name]}
 - loans_to_disburse = @loans
 - if loans_to_disburse.size > 0
-  = form_for(@loan, :action => url(:enter_loans, :action => "disburse")) do
+  = form_for(@loan, :action => url(:loan_actions, :action => "disburse")) do
     %table.report.nojs
       %thead
         %tr

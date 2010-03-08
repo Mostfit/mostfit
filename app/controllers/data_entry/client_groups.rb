@@ -5,6 +5,7 @@ module DataEntry
       only_provides :html
       @client_group = ClientGroup.new      
       @client_group.center_id = params[:center_id] if params[:center_id]
+      @center  = Center.get(params[:center_id])
       request.xhr? ? display([@client_group], "client_groups/new", :layout => false) : display([@client_group], "client_groups/new")
     end
 
