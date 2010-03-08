@@ -73,7 +73,6 @@ class LoanProducts < Application
 
   def design
     if request.method == :post
-      debugger
       params[:loan][:disbursal_date] = params[:loan][:scheduled_disbursal_date]
       @loan = Loan.new(params[:loan])
     else

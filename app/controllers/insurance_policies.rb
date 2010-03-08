@@ -30,7 +30,6 @@ class InsurancePolicies < Application
     @insurance_policy = InsurancePolicy.new(insurance_policy)
     @insurance_policy.client = @client
     @insurance_policy.status = Date.today > @insurance_policy.date_to ? :expired : :active
-    debugger
     if @insurance_policy.save
       redirect resource(@client, :insurance_policies), :message => {:notice => "Insurance Policy was successfully created"}
     else
