@@ -38,7 +38,7 @@
               - tot_amount += i
               - grp_amount += i
             %td.numeric
-              - i = lh.actual_outstanding_principal
+              - i = lh ? lh.actual_outstanding_principal : 0
               %b= i.to_currency
               - tot_outstanding += i
               - grp_outstanding += i
@@ -50,12 +50,12 @@
               - tot_installments += i
               - grp_installments += i
             %td.numeric
-              - i = [lh.principal_due, 0].max
+              - i = [(lh ? lh.principal_due : 0), 0].max
               = i.to_currency
               - tot_principal += i
               - grp_principal += i
             %td.numeric
-              - i = [lh.interest_due, 0].max
+              - i = [(lh ? lh.interest_due : 0), 0].max
               = i.to_currency
               - tot_interest += i
               - grp_interest += i
@@ -66,7 +66,7 @@
               - tot_fee += fee
               - grp_fee += fee
             %td.numeric
-              - i = [lh.principal_due+lh.interest_due, 0].max
+              - i = [(lh ? (lh.principal_due+lh.interest_due): 0), 0].max
               = (i+fee).to_currency
               - tot_total += (i + fee)
               - grp_total += (i + fee)

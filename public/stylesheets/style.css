@@ -201,33 +201,21 @@ border: 1px solid #8c9292;
 #content h4{
   font-size: 110%;
 }
-
-/*.top{margin-top: 0px; padding-top: 0px;}
-.box-bottom
-{
-  overflow: hidden;
-  background: #003568;
-  height: 10px;
-}
-
-p.button{
-padding-left: 20px;
-padding-right: 20px;
-color: #fff;
-margin-bottom: 8px;
-}
-p.button a:link, p.button a:visited, p.button a:active {
-font-weight: bold;
-color: #fff;
-}*/
-
 table.form, table.form td{
-  border: 0px
+  border: 0px;
+}
+table.border{
+  width: 90%;
+  border: 1px solid orange;
+  font-weight: bold;
+}
+table.form td.legend{
+  border: 1px;
+  font-weight: bold;
 }
 table thead tr {
     border-right: solid 1px  #736f5d;
 }
-
 table thead th {
   background: #C9C3A3;
 /*  background-image: url('/images/tab_bg.png');*/
