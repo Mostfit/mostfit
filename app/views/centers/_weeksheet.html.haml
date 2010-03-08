@@ -4,13 +4,13 @@
 =partial "centers/meeting_selector_form"
 %a{:name => "weeksheet"}
 %h2 Approvals
-=partial "centers/approvals", {:loans_to_approve => @center.clients.loans(:approved_on => nil)}
+=partial "centers/approvals", {:loans_to_approve => Loan.all(:client_id => @clients.map{|x| x.id}, :approved_on => nil)}
 
 - if @center.meeting_day?(@date)
   %h2 Disbursals
   - date_with_holiday = [@date, @date.holidays_shifted_today].max
-  =partial "centers/disbursals", {:loans_to_disburse => @center.clients.loans(:scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil), :center => @center, :branch => @center.branch, :date => @date}
+  =partial "centers/disbursals", {:loans_to_disburse => Loan.all(:client_id => @clients.map{|x| x.id}, :scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil), :center => @center, :branch => @center.branch, :date => @date}
   %h2 Payments
-  =partial "centers/payments", {:clients => @clients, :branch => @center.branch, :center => @center, :date => @date}
+  =partial "centers/payments", {:loans => Loan.all(:client_id => @clients.map{|x| x.id}), :clients => @clients_grouped, :branch => @center.branch, :center => @center, :date => @date}
 - else
   %i This day is not a meeting day

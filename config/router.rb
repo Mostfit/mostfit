@@ -22,7 +22,7 @@ Merb::Router.prepare do
     resources :insurance_policies
   end
   resources :client_groups
-  resources :loans
+  resources :loans, :id => %r(\d+)
   resources :centers
   resources :branches  do
     resources :centers  do
@@ -70,10 +70,10 @@ Merb::Router.prepare do
   match('/entrance(/:action)').to(:controller => 'entrance').name(:entrance)
   match('/branches/:branch_id/centers/:center_id/clients/:client_id/test').to( :controller => 'loans', :action => 'test')
   match('/branches/:branch_id/centers/:center_id/weeksheet').to( :controller => 'centers', :action => 'weeksheet').name(:weeksheet)
-  match('/loans/latest').to(:controller => 'loans', :action => 'latest')
   match('/staff_members/:id/day_sheet').to(:controller => 'staff_members', :action => 'day_sheet').name(:day_sheet)
   match('/staff_members/:id/day_sheet.:format').to(:controller => 'staff_members', :action => 'day_sheet', :format => ":format").name(:day_sheet_with_format)
   match('/browse(/:action)').to(:controller => 'browse').name(:browse)
+  match('/loans/:action').to(:controller => 'loans').name(:loan_actions)
   # this uses the redirect_to_show methods on the controllers to redirect some models to their appropriate urls
   match('/:controller/:id').to(:action => 'redirect_to_show').name(:quick_link)
   default_routes

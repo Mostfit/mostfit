@@ -51,7 +51,7 @@
   - date_with_holiday = [@date, @date.holidays_shifted_today].max
   - @loans_to_disburse = @center.clients.loans(:scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil)
   - if @loans_to_disburse.size > 0
-    = form_for(@loan, :action => url(:enter_loans, :action => 'disburse', :return => resource(@branch, @center))) do
+    = form_for(@loan, :action => url(:loan_actions, :action => 'disburse', :return => resource(@branch, @center))) do
       = partial :disbursals, {:loans_to_disburse => @loans_to_disburse, :date => @date}
       = submit 'Disburse these loans'
   - else

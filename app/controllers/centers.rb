@@ -11,8 +11,8 @@ class Centers < Application
   def show(id)
     @center = Center.get(id)
     raise NotFound unless @center
-    @branch =  @center.branch if not @branch
-    get_grouped_clients
+    @branch  =  @center.branch if not @branch
+    @clients = get_grouped_clients
     display [@center, @clients, @date], 'clients/index'
   end
 
@@ -94,7 +94,8 @@ class Centers < Application
   end
 
   def weeksheet
-    get_grouped_clients
+    @clients_grouped = get_grouped_clients
+    @clients = @center.clients(:active => true)
     partial "centers/weeksheet"
   end
 
@@ -128,7 +129,7 @@ class Centers < Application
       clients[group_name]||=[]
       clients[group_name] << c
     }
-    @clients = clients.each{|k, v|
+    clients.each{|k, v|
       clients[k]=v.sort_by{|c| c.name} if v
     }.sort.collect{|k, v| v}.flatten
   end

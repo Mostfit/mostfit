@@ -183,8 +183,8 @@ $(document).ready(function(){
 		    spitLogs();
 		}, 2000);
 	}
-	$("#new_client_group_link").click(function(){
-		id=$("#client_center_id option:selected").val();
+	$("#new_client_group_link").click(function(){                
+		id=$("#client_center_id option:selected").val() || $("#client_center_id").val();
 		$.ajax({
 			type: "get",
 			url: "/data_entry/groups/new?center_id="+id,

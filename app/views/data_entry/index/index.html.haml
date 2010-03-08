@@ -32,10 +32,10 @@
           %br
           - pa = Loan.all(:approved_on => nil).size
           %b{:style => "color:green;"}
-            = link_to_with_rights "Approve Loans (#{pa})<br/>", url("enter_#{plural}".to_sym, :action => 'approve'), :class => 'edit_small', :style => "font-weight: bold;"
+            = link_to_with_rights("Approve Loans (#{pa})<br/>", url(:loan_actions,:action => 'approve'), :class => 'edit_small',:style => "font-weight: bold;")
           - nd = Loan.all(:disbursal_date => nil, :scheduled_disbursal_date.lte => Date.today).select{|l| l.status == :approved}.size
           %b{:style => "color:green;"}
-            = link_to_with_rights "Disburse Loans (#{nd})", url("enter_#{plural}".to_sym, :action => 'disburse'), :class => 'edit_small', :style => "font-weight: bold;"
+            = link_to_with_rights("Disburse Loans (#{nd})", url(:loan_actions, :action => 'disburse'), :class => 'edit_small',:style =>"font-weight: bold;")
             == 
         - @i += 1
 
