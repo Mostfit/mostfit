@@ -24,6 +24,7 @@
   - center_id, branch_id = nil, nil
   - length = 7
   - groups_available = @payments.values.collect{|x| x.keys}.flatten.uniq
+  - org_total = []
   -@clients.each do |branch_id, centers|
     -if centers.keys.length>0
       -branch_total = []
@@ -103,7 +104,16 @@
           %td
             %b==Branch total:
           %td
-          -branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
+          - org_total << branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
+          -org_total.last.each do |ele|
             %td
               %b
                 =ele
+  %tr.org_total
+    %td
+      %b==Total:
+    %td
+    -org_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
+      %td
+        %b
+          =ele
