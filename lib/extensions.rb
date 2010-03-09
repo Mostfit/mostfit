@@ -69,11 +69,8 @@ module Misfit
           return ((c.center.manager == self.staff_member) or (c.center.branch.manager == self.staff_member))
        elsif model == Center
           center = Center.get(id)
-          if @action != "show"
-            return center.branch.manager == self.staff_member
-          else
-            return center.manager == self.staff_member
-          end
+          return true if @action == "show" and center.manager == self.staff_member
+          return center.branch.manager == self.staff_member
         elsif model.relationships.include?(:manager)
           o = model.get(id)
           return true if o.manager == self.staff_member
@@ -112,7 +109,7 @@ module Misfit
               c = Center.get(params[:staff_member_id])
               return c ? (c.manager == staff_member or c.branch.staff_member == staff_member) : false
             end
-          end
+          end          
         end
         r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
       end

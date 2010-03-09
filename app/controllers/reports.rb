@@ -17,7 +17,7 @@ class Reports < Application
 
     if Reports::Types.include?(klass)
       #Generating report
-      @report   = klass.new(params[class_key], dates)
+      @report   = klass.new(params[class_key], dates, session.user)
       if klass==TransactionLedger
         @groups, @centers, @branches, @payments, @clients = @report.generate
         display [@groups, @centers, @branches, @payments, @clients]
