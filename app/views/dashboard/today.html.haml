@@ -44,7 +44,7 @@
       %td.numeric
         = ((center.pp || 0) + (center.intp || 0)).to_i
       %td.numeric
-        - scheduled_disbursal = @disbursals.find_all{|loan| loan.disbursal_date==nil and loan.client.center.id==center.id}.inject(0){|s,x| s+=x.amount}
+        - scheduled_disbursal=@disbursals.find_all{|loan| loan.scheduled_disbursal_date==Date.today and loan.client.center.id==center.id}.inject(0){|s,x| s+=x.amount}
         - total_scheduled_disbursal += scheduled_disbursal
         = scheduled_disbursal
       %td.numeric
