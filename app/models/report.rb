@@ -32,18 +32,20 @@ class Report
     pdf
   end
 
-  def get_parameters(params)
-    @branch = if params and params[:branch_id] and not params[:branch_id].blank?
-                Branch.all(:id => params[:branch_id])
+  def get_parameters(params, user=nil)
+    @branch = if user and user.role==:staff_member
+                [user.staff_member.centers.branches, user.staff_member.branches].flatten
               else
-                Branch.all(:order => [:name])
+                (params and params[:branch_id] and not params[:branch_id].blank?) ? Branch.all(:id => params[:branch_id]) : Branch.all(:order => [:name])
+              end
+    @center = if user and user.role==:staff_member
+                [user.staff_member.centers, user.staff_member.branches.centers].flatten
+              elsif params and params[:center_id] and not params[:center_id].blank?
+                Center.all(:id => params[:center_id])
+              elsif params and params[:staff_member_id] and not params[:staff_member_id].blank?
+                StaffMember.get(params[:staff_member_id]).centers
+              else
+                @branch.collect{|b| b.centers}.flatten
               end    
-    if params and params[:center_id] and not params[:center_id].blank?
-      @center = Center.all(:id => params[:center_id])
-    elsif params and params[:staff_member_id] and not params[:staff_member_id].blank?
-      @center = StaffMember.get(params[:staff_member_id]).centers
-    else
-      @center  = @branch.collect{|b| b.centers}.flatten
-    end    
   end
 end

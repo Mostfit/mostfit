@@ -1,14 +1,10 @@
 class DailyReport < Report
   attr_accessor :date
 
-  def initialize(params, dates)
+  def initialize(params, dates, user)
     @date   =  dates[:date]||Date.today
     @name   = "Report for #{@date}"
-    if params and params[:branch_id] and not params[:branch_id].nil?
-      @branch = Branch.all(params[:branch_id])
-    else
-      @branch = Branch.all(:order => [:name])
-    end
+    get_parameters(params, user)
   end
   
   def name
@@ -25,6 +21,7 @@ class DailyReport < Report
       groups[b.id]||= {}
       branches[b.id] = b
       b.centers.each{|c|
+        next if @center and not @center.find{|x| x.id==c.id}
         groups[b.id][c.id]||= {}
         centers[c.id]  = c
         c.client_groups.each{|g|
@@ -51,6 +48,7 @@ class DailyReport < Report
     Payment.all(:received_on => date).each{|p|
       client    = p.loan_id ? p.loan.client : p.client
       center_id = client.center_id
+      next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       if groups[branch_id][center_id][client.client_group_id]
         groups[branch_id][center_id][client.client_group_id][3] += p.amount if p.type==:principal
@@ -62,6 +60,7 @@ class DailyReport < Report
     Loan.all(:applied_on => date).each{|l|
       client    = l.client
       center_id = client.center_id
+      next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
 
       groups[branch_id][center_id][l.client.client_group_id][0] += l.amount
@@ -71,6 +70,7 @@ class DailyReport < Report
     Loan.all(:approved_on => date).each{|l|
       client    = l.client
       center_id = client.center_id
+      next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
 
       groups[branch_id][center_id][l.client.client_group_id][1] += l.amount
@@ -80,8 +80,8 @@ class DailyReport < Report
     Loan.all(:disbursal_date => date).each{|l|
       client    = l.client
       center_id = client.center_id
+      next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
-
       groups[branch_id][center_id][l.client.client_group_id][2] += l.amount
     }
     return [groups, centers, branches]
