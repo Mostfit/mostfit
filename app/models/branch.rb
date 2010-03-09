@@ -7,9 +7,10 @@ class Branch
   property :code,    String, :length => 10, :nullable => true, :index => true, :min => 1, :max => 10
   property :address, Text
   property :created_at, DateTime
+  property :area_id, Integer, :nullable => true
 
   belongs_to :manager, :child_key => [:manager_staff_id], :model => 'StaffMember'
-  belongs_to :area
+  belongs_to :area, :nullable => true
   has n, :centers
 
   validates_is_unique   :code

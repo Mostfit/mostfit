@@ -22,7 +22,6 @@ class Upload
   end
 
   def load_csv(log=nil)
-    require 'csv'
     models = [StaffMember, Branch, Center, ClientGroup, Client, FundingLine, LoanProduct, Loan, Payment]
     funding_lines, loans = {}, {}
     User.all.each{|u|
@@ -33,7 +32,7 @@ class Upload
       log.info("Destroying old records for #{model.to_s.plural} (if any)") if log
       log.info("Creating #{model.to_s.plural}") if log
       headers = {}
-      CSV.open(File.join(Merb.root, "uploads", @directory, model.to_s.snake_case.pluralize), "r").each_with_index{|row, idx|
+      FasterCSV.open(File.join(Merb.root, "uploads", @directory, model.to_s.snake_case.pluralize), "r").each_with_index{|row, idx|
         if idx==0
           row.to_enum(:each_with_index).collect{|name, index| 
             headers[name.downcase.gsub(' ', '_').to_sym] = index

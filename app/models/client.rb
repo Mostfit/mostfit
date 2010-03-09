@@ -239,6 +239,7 @@ class Client
     }
     self.type_of_account = 0 if self.type_of_account == nil
     self.occupation = nil if self.occupation.blank?
+    self.type_of_account='' if self.type_of_account.nil? or self.type_of_account=="0"
   end
 
   def add_created_by_staff_member
@@ -250,7 +251,7 @@ class Client
   def dates_make_sense
     return true if not grt_pass_date or not date_joined 
     return [false, "GRT Pass Date cannot be before Date Joined"]  if grt_pass_date < date_joined
-    return [false, "Client cannot die before he became a client"] if deceased_on and (deceased_on < date_joined or deceased_on < grt_pass_date)
+    return [false, "Client cannot die before he became a client"] if deceased_on and (deceased_on < date_joined or deceased_on < grt_pass_date)    
     true
   end
 end

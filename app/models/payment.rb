@@ -45,12 +45,12 @@ class Payment
   validates_with_method :principal,   :method => :is_positive?
   
   def self.from_csv(row, headers, loans)
-    obj = new(:received_by_staff_id => StaffMember.first(:name => row[headers[:received_by_staff]]).id, :loan_id => loans[row[headers[:loan_serial_number]]].id, 
+    obj = new(:received_by => StaffMember.first(:name => row[headers[:received_by_staff]]), :loan => loans[row[headers[:loan_serial_number]]], 
               :amount => row[headers[:principal]], :type => :principal, :received_on => Date.parse(row[headers[:received_on]]), 
-              :created_by_user_id => User.first.id)
-    obj = new(:received_by_staff_id => StaffMember.first(:name => row[headers[:received_by_staff]]).id, :loan_id => loans[row[headers[:loan_serial_number]]].id, 
+              :created_by => User.first)
+    obj = new(:received_by => StaffMember.first(:name => row[headers[:received_by_staff]]), :loan => loans[row[headers[:loan_serial_number]]], 
               :amount => row[headers[:interest]], :type => :interest, :received_on => Date.parse(row[headers[:received_on]]), 
-              :created_by_user_id => User.first.id)
+              :created_by => User.first)
     [obj.save, obj]
   end
 
