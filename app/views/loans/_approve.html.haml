@@ -10,7 +10,7 @@
           %li
             == Loan #{e.resource.id}: #{v}
 - if @loans_to_approve.size > 0
-  = form_for(@loan, :action => url(:enter_loans, :action => "approve")) do
+  = form_for(@loan, :action => url(:loan_actions, :action => "approve")) do
     = hidden_field :name => :id, :value => @center.id
     %table.report.nojs
       %thead

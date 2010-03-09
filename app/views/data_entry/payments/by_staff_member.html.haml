@@ -17,7 +17,6 @@
           - error.values.each do |v|
             = v
           %br
-  %p
     = form_for(@payment, :action => url(:enter_payments, :action => 'by_staff_member')) do
       = submit 'Make Payments', :onclick => "javascript:$('#darkenBackground').show(); return true;"
       = hidden_field :name => 'for_date', :value => @date
