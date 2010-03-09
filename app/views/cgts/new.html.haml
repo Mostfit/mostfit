@@ -1,0 +1,13 @@
+%h1 Cgts controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/cgts/new.html.erb
+
+= error_messages_for @cgt
+
+= form_for(@cgt, :action => url(:cgts) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:cgts)

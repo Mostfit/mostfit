@@ -21,7 +21,10 @@ Merb::Router.prepare do
   resources :clients do
     resources :insurance_policies
   end
-  resources :client_groups
+  resources :client_groups do
+    resources :grts
+    resources :cgts
+  end
   resources :loans, :id => %r(\d+)
   resources :centers
   resources :branches  do

@@ -1,0 +1,38 @@
+%h1
+  == Cgts for #{@client_group.name} in Center #{@client_group.center.name}
+
+= link_to 'Add a CGT Date', resource(@client_group, :cgts, :new), :class => 'add'
+- if @cgts.blank?
+  .notice
+    %h3 
+      No CGTs scheduled yet
+      = link_to 'Add a CGT Date', resource(@client_group, :cgts, :new)
+- else
+  %table.narrow
+    %tr
+      %thead
+        %th
+          id
+        %th
+          Date
+        %th
+          CGT Day Number
+        %th
+          Status
+        %th
+          Actions
+
+    - for cgt in @cgts
+      %tr
+        %td
+          = cgt.id
+        %td
+          = cgt.date
+        %td
+          = cgt.day_number
+        %td
+          = cgt.status
+        %td
+          = link_to 'Show', resource(@client_group, cgt)
+          |
+          = link_to 'Edit', resource(@client_group, cgt, :edit)
