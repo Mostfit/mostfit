@@ -9,6 +9,7 @@ namespace :excel do
   task :to_csv, :directory, :filename do |task, args|
     excel = Excel.new(File.join(Merb.root, "uploads", args.directory, args.filename))
     excel.sheets.each{|sheet|
+      puts sheet
       excel.default_sheet=sheet
       excel.to_csv(File.join(Merb.root, "uploads", args.directory, sheet))
     }
