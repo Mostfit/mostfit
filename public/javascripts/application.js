@@ -112,6 +112,7 @@ $(document).ready(function(){
 	    $("table.report tr").hide();
 	    $("table.report tr.branch").show();
 	    $("table.report tr.branch_total").show();
+	    $("table.report tr.org_total").show();
 	    $("table.report tr.header").show();
 	    $("table.report").before("<a class='expand_all'>Expand all</a>");
 	    $("table.report tr.branch td").append("<a id='center' class='expand'>Expand centers</a>");

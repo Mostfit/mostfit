@@ -1,10 +1,10 @@
 class LateDisbursalsReport < Report
   attr_accessor :date, :branch, :center, :branch_id, :center_id, :staff_member_id
 
-  def initialize(params,dates)
+  def initialize(params,dates, user)
     @date = dates.blank? ? Date.today : dates[:date]
     @name   = "Report from #{@from_date} to #{@to_date}"
-    get_parameters(params)
+    get_parameters(params, user)
   end
 
   def name

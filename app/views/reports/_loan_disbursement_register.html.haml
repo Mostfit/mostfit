@@ -17,6 +17,7 @@
       Amount
   - center_id, branch_id = nil, nil
   - length = 7
+  - org_total = []
   -summable_columns = [6]
   -@loans.each do |branch_id, centers|
     -if centers.keys.length>0
@@ -66,8 +67,19 @@
         %td
           %b==Branch total:
         -branch_total = branch_total.reject{|x| x.class!=Array or (x.class==Array and x.length==0)}.transpose.collect{|x| x.reduce{|sum, x| sum+=x}}
+        - org_total << branch_total
         -1.upto(length-1).each do |col|
           %td
             -if summable_columns.include?(col)
               %b
                 =branch_total[summable_columns.index(col)]
+  %tr.org_total
+    %td
+      %b==Total:
+    -org_total = org_total.reject{|x| x.class!=Array or (x.class==Array and x.length==0)}.transpose.collect{|x| x.reduce{|sum, x| sum+=x}}
+    -1.upto(length-1).each do |col|
+      %td
+        -if summable_columns.include?(col)
+          %b
+            =org_total[summable_columns.index(col)]
+      

@@ -1,15 +1,20 @@
 %h1
-  Grts controller, edit action
-%p
-  Edit this file in
-  %tt
-    app/views/grts/edit.html.erb
+  Edit GRT
+
 = error_messages_for @grt
 
-= form_for(@grt, :action => url(:grt, @grt)) do
-  %p
-    = submit "Update"
-
-= link_to 'Show', url(:grt, @grt)
-|
-= link_to 'Back', url(:grts)
+= form_for(@grt, :action => resource(@client_group, @grt)) do
+  %table
+    %tr
+      %th
+        Date
+      %td
+        = date_select_for @grt, :date
+    %tr
+      %th
+        Status
+      %td
+        = select :status, :collection => Grt.statuses, :value_method => :to_s, :prompt => '---'
+  = submit 'Update GRT'
+  
+= link_to 'Back', resource(@client_group, :grts)

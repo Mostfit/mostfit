@@ -42,6 +42,7 @@
     %th
   - center_id, branch_id = nil, nil
   - length = 13
+  - org_total = []
   -@groups.each do |group_id, centers|
     -if centers.keys.length>0
       -branch_total = []
@@ -73,10 +74,18 @@
                 %b
                   =ele
       %tr.branch_total
-        %td{:style => "text-align: center; background-color: #ccc;"}
+        %td
           %b==Branch total:
-        -branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
+        - org_total << branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
+        - org_total.last.each do |ele|
           %td
             %b
               =ele
+  %tr.org_total
+    %td
+      %b==Total
+    -org_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
+      %td
+        %b
+          =ele
 
