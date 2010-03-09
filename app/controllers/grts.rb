@@ -1,8 +1,10 @@
 class Grts < Application
   # provides :xml, :yaml, :js
+  before :get_context
 
   def index
-    @grts = Grt.all
+    @grts = @client_group.grts
+    @grt = Grt.new
     display @grts
   end
 
@@ -27,19 +29,22 @@ class Grts < Application
 
   def create(grt)
     @grt = Grt.new(grt)
+    @grt.client_group = @client_group
     if @grt.save
-      redirect resource(@grt), :message => {:notice => "Grt was successfully created"}
+      redirect resource(@client_group, :grts), :message => {:notice => "GRT was created succesfully"}
     else
-      message[:error] = "Grt failed to be created"
-      render :new
+      message[:error] = "Cgt failed to be created"
+      @grts = @client_group.grts
+      render :index
     end
   end
 
   def update(id, grt)
     @grt = Grt.get(id)
+    @grt.client_group = @client_group
     raise NotFound unless @grt
     if @grt.update(grt)
-       redirect resource(@grt)
+      redirect resource(:grts)
     else
       display @grt, :edit
     end
@@ -53,6 +58,12 @@ class Grts < Application
     else
       raise InternalServerError
     end
+  end
+
+  private
+  def get_context
+    @client_group = params[:client_group_id] ? ClientGroup.get(params[:client_group_id]) : nil
+    raise NotFound unless @client_group
   end
 
 end # Grts

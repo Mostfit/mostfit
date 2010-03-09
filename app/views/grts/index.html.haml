@@ -1,16 +1,12 @@
 %h1
-  Grts controller, index action
-%p
-  Edit this file in
-  %tt
-    app/views/grts/index.html.erb
-%table
-  %tr
-  - for grt in @grts
-    %tr
-      %td
-        = link_to 'Show', url(:grt, grt)
-      %td
-        = link_to 'Edit', url(:edit_grt,  grt)
+  == GRTs for Client Group "#{@client_group.name}"
 
-= link_to 'New', url(:new_grt)
+= link_to 'Add a GRT Date', resource(@client_group, :grts, :new), :class => 'add'
+= partial 'grts/grts'
+
+= error_messages_for @grt
+%h2
+  = form_for(@grt, :action => resource(@client_group, :grts)) do
+    Add a GRT on
+    = date_select_for @grt, :date
+    = submit 'Add GRT'

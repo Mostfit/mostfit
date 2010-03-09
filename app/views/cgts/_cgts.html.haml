@@ -1,7 +1,3 @@
-%h1
-  == Cgts for #{@client_group.name} in Center #{@client_group.center.name}
-
-= link_to 'Add a CGT Date', resource(@client_group, :cgts, :new), :class => 'add'
 - if @cgts.blank?
   .notice
     %h3 

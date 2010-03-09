@@ -11,6 +11,7 @@ class ClientGroups < Application
     @client_group = ClientGroup.get(id)
     raise NotFound unless @client_group
     @cgts = @client_group.cgts
+    @grts = @client_group.grts
     display @client_group
   end
 
@@ -61,7 +62,12 @@ class ClientGroups < Application
 
   private
   def get_context
-    if params[:branch_id] and params[:center_id] 
+    if params[:id]
+      @client_group = ClientGroup.get(params[:id])
+      raise NotFound unless @client_group
+      @branch = @client_group.center.branch
+      @center = @client_group.center
+    elsif params[:branch_id] and params[:center_id] 
       @branch = Branch.get(params[:branch_id]) 
       @center = Center.get(params[:center_id]) 
       raise NotFound unless @branch and @center

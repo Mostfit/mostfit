@@ -1,9 +1,78 @@
 
-StaffMember
-- should not be valid without a name
-- should not  be valid without active boolean
-- should be unique
-- should have name length > 3
+resource(@report) PUT
+- redirect to the report show action (FAILED - 1)
+
+resource(@report) GET
+- before(:all) (FAILED - 2)
+
+resource(@report, :edit)
+- responds successfully (FAILED - 3)
+
+resource(:reports, :new)
+- responds successfully (FAILED - 4)
+
+resource(@report) a successful DELETE
+- should redirect to the index action (FAILED - 5)
+
+resource(:reports) a successful POST
+- redirects to resource(:reports) (FAILED - 6)
+
+resource(:reports) GET
+- has a list of reports (PENDING: TODO)
+
+resource(:reports) GET
+- responds successfully (FAILED - 7)
+- contains a list of reports (PENDING: TODO)
+
+resource(@payment) PUT
+- redirect to the article show action (FAILED - 8)
+
+resource(@payment) GET
+- responds successfully (FAILED - 9)
+
+resource(@payment, :edit)
+- responds successfully (FAILED - 10)
+
+resource(:payments, :new)
+- responds successfully (FAILED - 11)
+
+resource(@payment) a successful DELETE
+- should redirect to the index action (FAILED - 12)
+
+resource(:payments) a successful POST
+- redirects to resource(:payments) (FAILED - 13)
+
+resource(:payments) GET
+- has a list of payments (FAILED - 14)
+
+resource(:payments) GET
+- responds successfully (FAILED - 15)
+- contains a list of payments (FAILED - 16)
+
+resource(@user) PUT
+- redirect to the article show action (FAILED - 17)
+
+resource(@user) GET
+- responds successfully (FAILED - 18)
+
+resource(@user, :edit)
+- responds successfully (FAILED - 19)
+
+resource(:users, :new)
+- responds successfully (FAILED - 20)
+
+resource(@user) a successful DELETE
+- should redirect to the index action (FAILED - 21)
+
+resource(:users) a successful POST
+- redirects to resource(:users) (FAILED - 22)
+
+resource(:users) GET
+- has a list of users (PENDING: TODO)
+
+resource(:users) GET
+- responds successfully (FAILED - 23)
+- contains a list of users (PENDING: TODO)
 
 FundingLine
 - should not be valid without belonging to a funder
@@ -14,6 +83,31 @@ FundingLine
 - should have first payment done before last payment
 - should be disbursed before first payment
 
+resource(@permission) PUT
+- redirect to the article show action (FAILED - 24)
+
+resource(@permission) GET
+- responds successfully (FAILED - 25)
+
+resource(@permission, :edit)
+- responds successfully (FAILED - 26)
+
+resource(:permissions, :new)
+- responds successfully (FAILED - 27)
+
+resource(@permission) a successful DELETE
+- should redirect to the index action (FAILED - 28)
+
+resource(:permissions) a successful POST
+- redirects to resource(:permissions) (FAILED - 29)
+
+resource(:permissions) GET
+- has a list of permissions (FAILED - 30)
+
+resource(:permissions) GET
+- responds successfully (FAILED - 31)
+- contains a list of permissions (FAILED - 32)
+
 Funder
 - should not be valid without having a name
 - should be able to have funding lines
@@ -21,14 +115,223 @@ Funder
 - should give correct count of active lines
 - should give correct count of total lines 
 
+StaffMember
+- should not be valid without a name
+- should not  be valid without active boolean
+- should be unique
+- should have name length > 3
+
+resource(@loan) PUT
+- redirect to the article show action (FAILED - 33)
+
+resource(@loan) GET
+- responds successfully (FAILED - 34)
+
+resource(@loan, :edit)
+- responds successfully (FAILED - 35)
+
+resource(:loans, :new)
+- responds successfully (FAILED - 36)
+
+resource(@loan) a successful DELETE
+- should redirect to the index action (FAILED - 37)
+
+resource(:loans) a successful POST
+- redirects to resource(:loans) (FAILED - 38)
+
+resource(:loans) GET
+- has a list of loans (PENDING: TODO)
+
+resource(:loans) GET
+- responds successfully (FAILED - 39)
+- contains a list of loans (PENDING: TODO)
+
+resource(@client) PUT
+- redirect to the article show action (FAILED - 40)
+
+resource(@client) GET
+- responds successfully (FAILED - 41)
+
+resource(@client, :edit)
+- responds successfully (FAILED - 42)
+
+resource(:clients, :new)
+- responds successfully (FAILED - 43)
+
+resource(@client) a successful DELETE
+- should redirect to the index action (FAILED - 44)
+
+resource(:clients) a successful POST
+- redirects to resource(:clients) (FAILED - 45)
+
+resource(:clients) GET
+- has a list of clients (PENDING: TODO)
+
+resource(:clients) GET
+- responds successfully (FAILED - 46)
+- contains a list of clients (PENDING: TODO)
+
+resource(@funder) PUT
+- redirect to the funder show action (FAILED - 47)
+
+resource(@funder) GET
+- responds successfully (FAILED - 48)
+
+resource(@funder, :edit)
+- responds successfully (FAILED - 49)
+
+resource(:funders, :new)
+- responds successfully (FAILED - 50)
+
+resource(@funder) a successful DELETE
+- should redirect to the index action (FAILED - 51)
+
+resource(:funders) a successful POST
+- redirects to resource(:funders) (FAILED - 52)
+
+resource(:funders) GET
+- has a list of funders (PENDING: TODO)
+
+resource(:funders) GET
+- responds successfully (FAILED - 53)
+- contains a list of funders (PENDING: TODO)
+
+resource(@funding_line) PUT
+- redirect to the funding_line show action (FAILED - 54)
+
+resource(@funding_line) GET
+- responds successfully (FAILED - 55)
+
+resource(@funding_line, :edit)
+- responds successfully (FAILED - 56)
+
+resource(:funding_lines, :new)
+- responds successfully (FAILED - 57)
+
+resource(@funding_line) a successful DELETE
+- should redirect to the index action (FAILED - 58)
+
+resource(:funding_lines) a successful POST
+- redirects to resource(:funding_lines) (FAILED - 59)
+
+resource(:funding_lines) GET
+- has a list of funding_lines (FAILED - 60)
+
+resource(:funding_lines) GET
+- responds successfully (FAILED - 61)
+- contains a list of funding_lines (FAILED - 62)
+
+Controllers 
+- before(:all) (FAILED - 63)
+
 LoanType
 - should have specs (PENDING: Not Yet Implemented)
+
+resource(@loan_type) PUT
+- redirect to the loan_type show action (FAILED - 64)
+
+resource(@loan_type) GET
+- responds successfully (FAILED - 65)
+
+resource(@loan_type, :edit)
+- responds successfully (FAILED - 66)
+
+resource(:loan_types, :new)
+- responds successfully (FAILED - 67)
+
+resource(@loan_type) a successful DELETE
+- should redirect to the index action (FAILED - 68)
+
+resource(:loan_types) a successful POST
+- redirects to resource(:loan_types) (FAILED - 69)
+
+resource(:loan_types) GET
+- has a list of loan_types (FAILED - 70)
+
+resource(:loan_types) GET
+- responds successfully (FAILED - 71)
+- contains a list of loan_types (FAILED - 72)
+
+resource(@ledger_entry) PUT
+- redirect to the ledger_entry show action (FAILED - 73)
+
+resource(@ledger_entry) GET
+- responds successfully (FAILED - 74)
+
+resource(@ledger_entry, :edit)
+- responds successfully (FAILED - 75)
+
+resource(:ledger_entries, :new)
+- responds successfully (FAILED - 76)
+
+resource(@ledger_entry) a successful DELETE
+- should redirect to the index action (FAILED - 77)
+
+resource(:ledger_entries) a successful POST
+- redirects to resource(:ledger_entries) (FAILED - 78)
+
+resource(:ledger_entries) GET
+- has a list of ledger_entries (PENDING: TODO)
+
+resource(:ledger_entries) GET
+- responds successfully (FAILED - 79)
+- contains a list of ledger_entries (PENDING: TODO)
 
 LedgerEntry
 - should have specs (PENDING: Not Yet Implemented)
 
+resource(@fee) PUT
+- redirect to the fee show action (FAILED - 80)
+
+resource(@fee) GET
+- responds successfully (FAILED - 81)
+
+resource(@fee, :edit)
+- responds successfully (FAILED - 82)
+
+resource(:fees, :new)
+- responds successfully (FAILED - 83)
+
+resource(@fee) a successful DELETE
+- should redirect to the index action (FAILED - 84)
+
+resource(:fees) a successful POST
+- redirects to resource(:fees) (FAILED - 85)
+
+resource(:fees) GET
+- has a list of fees (PENDING: TODO)
+
+resource(:fees) GET
+- responds successfully (FAILED - 86)
+- contains a list of fees (PENDING: TODO)
+
 ClientGroup
 - should have specs (PENDING: Not Yet Implemented)
+
+resource(@client_group) PUT
+- redirect to the client_group show action (FAILED - 87)
+
+resource(@client_group) GET
+- responds successfully (FAILED - 88)
+
+resource(@client_group, :edit)
+- responds successfully (FAILED - 89)
+
+resource(:client_groups, :new)
+- responds successfully (FAILED - 90)
+
+resource(@client_group) a successful DELETE
+- should redirect to the index action (FAILED - 91)
+
+resource(:client_groups) a successful POST
+- redirects to resource(:client_groups) (FAILED - 92)
+
+resource(:client_groups) GET
+- has a list of client_groups (PENDING: TODO)
+
+resource(:client_groups) GET
+- responds successfully (FAILED - 93)
+- contains a list of client_groups (PENDING: TODO)
 
 User
 - should not be valid with name shorter than 3 characters
@@ -39,96 +342,134 @@ User
 - should have a role
 
 Upload
-- before(:all) (FAILED - 1)
+- before(:all) (FAILED - 94)
 
 Attendancy
-- should not be valid without belonging to a client
-- should not be valid without proper date
-- should not be valid when attendancy date is in future
-- should not be valid without proper status
+- before(:all) (FAILED - 95)
 
 Upload
 - Should match calculation from excel
 
 LoanHistory
-- should not be valid without scheduled outstanding principal
-- should not be valid without scheduled outstanding total
-- should not be valid without actual outstanding principal
-- should not be valid without actual outstanding total
-- should not be valid without having a proper status
-- should not be valid if the combination if loan id and date is not unique
-- should have correct number of periods
-- should start with the application date, approval date, disbursal date and first payment date
-- should have the following dates afterwards
-- should have correct amounts
+- before(:all) (FAILED - 96)
 
 Report
-- should have 2 * 7 centers and centers * 3 clients
-- should have proper statistics after first monday's payments
-- should have correct loan count
-- should have correct number of clients
-- should have correct client count event after we add our new loans
-- should return correct repaid loan count
-- should return correct repaid loan amount
-- should return correct disbursed loan count
-- should return correct disbursed loan amount
-- should give correct principal due
-- should give correct principal received
-- should give correct interest due
-- should give correct interest received
-- should give correct principal outstanding
-- should give correct scheduled principal outstanding
-- should give correct total outstanding
-- should give correct scheduled total outstanding
+- before(:all) (FAILED - 97)
 
 Branch
-- should not be valid without a manager
-- should not be valid without a name
-- should not be valid with a name shorter than 3 characters
-- should be able to 'have' centers
+- should not be valid without a manager (FAILED - 98)
+- should not be valid without a name (FAILED - 99)
+- should not be valid with a name shorter than 3 characters (FAILED - 100)
+- should be able to 'have' centers (FAILED - 101)
 
 Center
-- should not be valid without a manager
-- should not be valid without a name
-- should not be valid with a name shorter than 3 characters
-- should be able to 'have' clients
+- before(:all) (FAILED - 102)
 
-Client
-- should not be valid without belonging to a center
-- should not be valid without a name
-- should not be valid without a reference
-- should not be valid with name shorter than 3 characters
-- should have a joining date
-- should be able to 'have' loans
-- should not have more than one outstanding loan at a time if so specified (PENDING: Not Yet Implemented)
+resource(@staff_member) PUT
+- redirect to the article show action (FAILED - 103)
+
+resource(@staff_member) GET
+- responds successfully (FAILED - 104)
+
+resource(@staff_member, :edit)
+- responds successfully (FAILED - 105)
+
+resource(:staff_members, :new)
+- responds successfully
+
+resource(@staff_member) a successful DELETE
+- should redirect to the index action (FAILED - 106)
+
+resource(:staff_members) a successful POST
+- redirects to resource(:staff_members)
+
+resource(:staff_members) GET
+- has a list of staff_members (PENDING: TODO)
+
+resource(:staff_members) GET
+- responds successfully
+- contains a list of staff_members (PENDING: TODO)
+
+resource(@branch) PUT
+- redirect to the article show action (FAILED - 107)
+
+resource(@branch) GET
+- responds successfully (FAILED - 108)
+
+resource(@branch, :edit)
+- responds successfully (FAILED - 109)
+
+resource(:branches, :new)
+- responds successfully
+
+resource(@branch) a successful DELETE
+- should redirect to the index action (FAILED - 110)
+
+resource(:branches) a successful POST
+- redirects to resource(:branches) (FAILED - 111)
+
+resource(:branches) GET
+- has a list of branches (PENDING: TODO)
+
+resource(:branches) GET
+- responds successfully
+- contains a list of branches (PENDING: TODO)
+
+resource(@center) PUT
+- redirect to the article show action (FAILED - 112)
+
+resource(@center) GET
+- responds successfully (FAILED - 113)
+
+resource(@center, :edit)
+- responds successfully (FAILED - 114)
+
+resource(:centers, :new)
+- responds successfully (FAILED - 115)
+
+resource(@center) a successful DELETE
+- should redirect to the index action (FAILED - 116)
+
+resource(:centers) a successful POST
+- redirects to resource(:centers) (FAILED - 117)
+
+resource(:centers) GET
+- has a list of centers (FAILED - 118)
+
+resource(:centers) GET
+- responds successfully (FAILED - 119)
+- contains a list of centers (FAILED - 120)
 
 Payment
-- should not be valid without belonging to a loan
-- should not be valid without being created by a staff member
-- should not be valid without being received by a staff member
-- should not be valid without being created by active user
-- should not be valid without beng received by an active staff member
-- should not be valid without being properly deleted
-- should not be valid if date of receival is in future
-- should not be valid if interest is negative
-- should not be valid if principal is negative
-- should not be valid if total is negative
-- should not be valid if payment is received before disbursal of loan
-- should not be valid if paying too much principal
-- should not be valid if paying too much interest
+- before(:all) (FAILED - 121)
 
 Fee
-- should have a name
-- should have either an amount or a percentage
-- should never return less than min_amount
-- should never return more than max_amount
-- should return correct fee_schedule for loan
-- should return correct fee_schedule for multiple fees even on the same date
-- should return correct fees payable
-- should return correct fees_paid
-- should give correct fee schedule for client
-- should work just as well for another fee
-- should pay client fees correctly
+- before(:all) (FAILED - 122)
+
+resource(@holiday) PUT
+- redirect to the holiday show action (FAILED - 123)
+
+resource(@holiday) GET
+- responds successfully (FAILED - 124)
+
+resource(@holiday, :edit)
+- responds successfully (FAILED - 125)
+
+resource(:holidays, :new)
+- responds successfully (FAILED - 126)
+
+resource(@holiday) a successful DELETE
+- should redirect to the index action (FAILED - 127)
+
+resource(:holidays) a successful POST
+- redirects to resource(:holidays) (FAILED - 128)
+
+resource(:holidays) GET
+- has a list of holidays (PENDING: TODO)
+
+resource(:holidays) GET
+- responds successfully (FAILED - 129)
+- contains a list of holidays (PENDING: TODO)
 
 Holiday
 - should have a name
@@ -137,71 +478,135 @@ Holiday
 - should update
 - should have unique date
 
-Loan
-- should have a discrimintator
-- should not be valid without belonging to a client
-- should not be valid without being approved properly
-- should not be valid without being validated properly
-- should not be valid without being rejected properly
-- should not be valid without belonging to a client
-- should not be valid without a proper amount
-- should not be valid without a proper interest_rate
-- should be valid with a proper installment_frequency
-- should not be valid without proper installment_frequency
-- should not be valid without a proper number_of_installments
-- should not be valid without a scheduled_first_payment_date
-- should not be valid without a scheduled_disbursal_date
-- should not be valid with a disbursal date earlier than the loan is approved
-- should not be valid when validated_on is earlier than the disbursal_date
-- should not be valid when written_off_on is earlier than the disbursal_date
-- should not be valid without approved_on earlier than scheduled_disbursal_date
-- should not be valid without being properly written off
-- should not be valid without being properly disbursed
-- should not be valid when scheduled_first_payment_date if before scheduled_disbursal_date
-- should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates
-- .shift_date_by_installments should shift dates properly, even odd ones.. and backwards.
-- .descendants should keep track of the subclasses (just testing dm-core functionality)
-- .number_of_installments_before should do what it promises
-- .last_loan_history_date should have some tests -- albeit more a view thing (PENDING: Not Yet Implemented)
-- .scheduled_repaid_on give the proper date
-- should have proper values for principal, interest and total to be received
-- .status should give status accoring to changing properties up to it written off
-- .status should give status accoring to changing properties up to it is repaid
-- .status should give status accoring to changing properties before being approved
-- .status should give status accoring to changing properties when being rejected
-- cannot repay an unsaved loan
-- .installment_dates should give a list with some dates
-- .payment_schedule should give correct results
-- .payments_hash should give correct results
-- history should be correct
-- should write the history correctly into the db
-- .installment_dates should correctly deal with holidays
+/data_entry/branches GET
+- responds successfully (FAILED - 130)
 
-Pending:
+resource(@target) PUT
+- redirect to the target show action (FAILED - 131)
 
-LoanType should have specs (Not Yet Implemented)
-./spec/models/loan_type_spec.rb:5
+resource(@target) GET
+- responds successfully (FAILED - 132)
 
-LedgerEntry should have specs (Not Yet Implemented)
-./spec/models/ledger_entry_spec.rb:5
+resource(@target, :edit)
+- responds successfully (FAILED - 133)
 
-ClientGroup should have specs (Not Yet Implemented)
-./spec/models/client_group_spec.rb:5
+resource(:targets, :new)
+- responds successfully (FAILED - 134)
 
-Client should not have more than one outstanding loan at a time if so specified (Not Yet Implemented)
-./spec/models/client_spec.rb:120
+resource(@target) a successful DELETE
+- should redirect to the index action (FAILED - 135)
 
-Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
-./spec/models/loan_spec.rb:335
+resource(:targets) a successful POST
+- redirects to resource(:targets) (FAILED - 136)
 
-1)
-NoMethodError in 'Upload before(:all)'
-undefined method `info' for nil:NilClass
-/home/svs/src/mostfit/app/models/upload.rb:67:in `load_csv'
-/home/svs/src/mostfit/app/models/upload.rb:31:in `each'
-/home/svs/src/mostfit/app/models/upload.rb:31:in `load_csv'
-./spec/models/upload_spec.rb:19:
+resource(:targets) GET
+- has a list of targets (PENDING: TODO)
 
-Finished in 93.139384 seconds
+resource(:targets) GET
+- responds successfully (FAILED - 137)
+- contains a list of targets (PENDING: TODO)
 
-139 examples, 1 failure, 5 pending
+Target
+- should have specs (PENDING: Not Yet Implemented)
+
+resource(@area) PUT
+- redirect to the area show action (FAILED - 138)
+
+resource(@area) GET
+- responds successfully (FAILED - 139)
+
+resource(@area, :edit)
+- responds successfully (FAILED - 140)
+
+resource(:areas, :new)
+- responds successfully (FAILED - 141)
+
+resource(@area) a successful DELETE
+- should redirect to the index action (FAILED - 142)
+
+resource(:areas) a successful POST
+- redirects to resource(:areas) (FAILED - 143)
+
+resource(:areas) GET
+- has a list of areas (PENDING: TODO)
+
+resource(:areas) GET
+- responds successfully (FAILED - 144)
+- contains a list of areas (PENDING: TODO)
+
+Client
+- before(:all) (FAILED - 145)
+
+Area
+- should have a name (FAILED - 146)
+- should have some branches (FAILED - 147)
+
+Region
+- should have specs (PENDING: Not Yet Implemented)
+
+resource(@region) PUT
+- redirect to the region show action (FAILED - 148)
+
+resource(@region) GET
+- responds successfully (FAILED - 149)
+
+resource(@region, :edit)
+- responds successfully (FAILED - 150)
+
+resource(:regions, :new)
+- responds successfully (FAILED - 151)
+
+resource(@region) a successful DELETE
+- should redirect to the index action (FAILED - 152)
+
+resource(:regions) a successful POST
+- redirects to resource(:regions) (FAILED - 153)
+
+resource(:regions) GET
+- has a list of regions (PENDING: TODO)
+
+resource(:regions) GET
+- responds successfully (FAILED - 154)
+- contains a list of regions (PENDING: TODO)
+
+Occupation
+- should have specs (PENDING: Not Yet Implemented)
+
+resource(@occupation) PUT
+- redirect to the occupation show action (FAILED - 155)
+
+resource(@occupation) GET
+- responds successfully (FAILED - 156)
+
+resource(@occupation, :edit)
+- responds successfully (FAILED - 157)
+
+resource(:occupations, :new)
+- responds successfully (FAILED - 158)
+
+resource(@occupation) a successful DELETE
+- should redirect to the index action (FAILED - 159)
+
+resource(:occupations) a successful POST
+- redirects to resource(:occupations) (FAILED - 160)
+
+resource(:occupations) GET
+- has a list of occupations (PENDING: TODO)
+
+resource(:occupations) GET
+- responds successfully (FAILED - 161)
+- contains a list of occupations (PENDING: TODO)
+
+LoanPurpose
+- should have specs (PENDING: Not Yet Implemented)
+
+resource(@loan_purpose) PUT
+- redirect to the loan_purpose show action (FAILED - 162)
+
+resource(@loan_purpose) GET
+- responds successfully (FAILED - 163)
+
+resource(@loan_purpose, :edit)
+- before(:all) (FAILED - 164)
+
+resource(:loan_purposes, :new)

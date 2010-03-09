@@ -1,5 +1,6 @@
 %h1 
   == Clients for #{@client_group.name}
+%h2 Clients
 %table.narrow
   %tr
     %thead
@@ -15,8 +16,12 @@
         = link_to client.name, resource(client)
   
   
+%h1 CGTs
+= link_to 'Manage CGTs', resource(@client_group, :cgts), :class => 'edit'
 = partial 'cgts/cgts'
 
-%h2 Clients
+%h1 GRTs
+= link_to 'Manage GRTs', resource(@client_group, :grts), :class => 'edit'
+= partial 'grts/grts'
 
 

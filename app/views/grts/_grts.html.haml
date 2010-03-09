@@ -1,0 +1,30 @@
+- if @grts.blank?
+  .notice
+    %h3 
+      No GRTs scheduled yet
+      = link_to 'Add a GRT Date', resource(@client_group, :grts, :new)
+- else
+  %table.narrow
+    %tr
+      %thead
+        %th
+          id
+        %th
+          Date
+        %th
+          Status
+        %th
+          Actions
+
+    - for grt in @grts
+      %tr
+        %td
+          = grt.id
+        %td
+          = grt.date
+        %td
+          = grt.status
+        %td
+          = link_to 'Show', resource(@client_group, grt)
+          |
+          = link_to 'Edit', resource(@client_group, grt, :edit)
