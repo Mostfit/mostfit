@@ -1,5 +1,5 @@
 class GraphData < Application
-  before :display_from_cache
+  before :display_from_cache, :exclude => [:today]
   after  :store_to_cache, :exclude => [:today]
 
   def loan(id)
@@ -300,7 +300,8 @@ class GraphData < Application
       vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{date.strftime('%Y-%m-%d')}' GROUP BY lh.center_id")
       values = vals.map do |v| 
         val = v[0] + v[1]
-        color_ratio = val == 0 ? 1 : v[0]/val
+        color_ratio = (val == 0 ? 1 : v[0]/val)
+        color_ratio = 0 if color_ratio < 0 
         color_value = 65280 + (color_ratio * (16711680 - 65280))
         color = color_value.to_i.to_s(16)
         color = "00" + color if color.length == 4
@@ -320,6 +321,7 @@ class GraphData < Application
 
   private
   def display_from_cache
+    return false if params[:action]=="dashboard" and params[:id]=="center_day"
     file = get_cached_filename
     return true unless File.exists?(file)
     return true if not File.mtime(file).to_date==Date.today
@@ -327,6 +329,7 @@ class GraphData < Application
   end
   
   def store_to_cache
+    return false if params[:action]=="dashboard" and params[:id]=="center_day"
     file = get_cached_filename
     if not (File.exists?(file) and File.mtime(file).to_date==Date.today)
       File.open(file, "w"){|f|
