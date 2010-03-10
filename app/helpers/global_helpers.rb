@@ -24,17 +24,24 @@ module Merb
       return link_to(text,path,params) if session.user.can_access?(route)
     end
 
-    def url_for_loan(loan, action = '')
+    def url_for_loan(loan, action = '', opts = {})
       # this is to generate links to loans, as the resouce method doesn't work for descendant classes of Loan
       # it expects the whole context (@branch, @center, @client) to exist
-      base = url(:branch_center_client, @branch.id, @center.id, @client.id)
-      base + "/loans/#{loan.id}/" + action
+      base = if @branch and @center and @client
+               url(:branch_center_client, @branch.id, @center.id, @client.id)
+             elsif @client
+               url(:branch_center_client, @client.center.branch_id, @client.center_id, @client.id)
+             else
+               client = loan.client
+               url(:branch_center_client, client.center.branch_id, client.center_id, client.id)
+             end
+      base + "/loans/#{loan.id}/" + action.to_s + (opts.length>0 ? "?#{opts.inject([]){|s,x| s << "#{x[0]}=#{x[1]}"}.join("&")}" : '')
     end
 
     def select_staff_member_for(obj, col, attrs = {})
       id_col = "#{col.to_s}_staff_id".to_sym
       select(col,
-      :collection   => [["0", "<Select a staff member"]] + StaffMember.all(:active => true).map{|x| [x.id, x.name]},
+      :collection   => staff_members_collection,
       :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
       :id           => "#{obj.class.to_s.snake_case}_#{id_col}",
       :selected     => ((obj.send(id_col) and obj.send(id_col)!="") ? obj.send(id_col).to_s : "0"))
@@ -43,7 +50,7 @@ module Merb
     def select_center_for(obj, col, attrs = {})
       id_col = "#{col.to_s}_id".to_sym
       collection = []
-      catalog = Center.catalog
+      catalog = Center.catalog(session.user)
       catalog.keys.sort.each do |branch_name|
         collection << ['', branch_name]
         catalog[branch_name].sort.each{ |k,v| collection << [k.to_s, "!!!!!!!!!#{v}"] }
@@ -211,7 +218,24 @@ module Merb
                          });
      </script>"
     end
+
+    def centers_paying_today_collection(date)
+      [["","---"]] + Center.paying_today(session.user, date).map {|c| [c.id.to_s,c.name]}
+    end
+
     private
+    def staff_members_collection
+      if session.user.role==:staff_member
+        staff = session.user.staff_member
+        bms  = staff.branches.collect{|x| x.manager}
+        cms  = staff.branches.centers.collect{|x| x.manager}               
+        managers = [bms, cms, staff].flatten.uniq
+        [["0", "<Select a staff member"]] + managers.map{|x| [x.id, x.name]}
+      else
+        [["0", "<Select a staff member"]] + StaffMember.all(:active => true).map{|x| [x.id, x.name]}
+      end
+    end
+
     def join_segments(*args)
       args.map{|x| x.class==Array ? x.uniq : x}.flatten.reject{|x| not x or x.blank?}.join(' - ').capitalize
     end

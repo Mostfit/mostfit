@@ -78,7 +78,7 @@
     %td
       on&nbsp;&nbsp;
       = date_select_for @loan, :scheduled_first_payment_date
-  - if session.user.can_approve?(@loan)
+  - if session.user.can_approve?(@loan.new? ? @client : @loan)
     %tr
       %td
         Approved:

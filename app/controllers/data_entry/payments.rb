@@ -2,9 +2,9 @@ module DataEntry
   class Payments < DataEntry::Controller
     provides :html, :xml
     def record
-      @payment = (params[:payment] and params[:payment][:id]) ? Payment.get(params[:payment][:id]) : Payment.new
-      if params[:payment] and params[:payment][:loan_id]
-        @loan = Loan.get(params[:payment][:loan_id])
+      @payment = (params and params[:id]) ? Payment.get(params[:id]) : Payment.new
+      if params and params[:loan_id]
+        @loan = Loan.get(params[:loan_id])
       end
       render
     end
@@ -80,11 +80,11 @@ module DataEntry
     
     def delete
       only_provides :html
-      if params[:payment] and params[:payment][:loan_id]
-        @loan = Loan.get(params[:payment][:loan_id])
+      if params and params[:loan_id]
+        @loan = Loan.get(params[:loan_id])
       end
-      if params[:payment] and params[:payment][:id]
-        @payment = Payment.get(params[:payment][:id])
+      if params and params[:id]
+        @payment = Payment.get(params[:id])
       else
         @payment = Payment.new
       end

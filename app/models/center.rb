@@ -51,11 +51,20 @@ class Center
 
   # a simple catalog (Hash) of center names and ids grouped by branches
   # returns some like: {"One branch" => {1 => 'center1', 2 => 'center2'}, "b2" => {3 => 'c3', 4 => 'c4'}} 
-  def self.catalog
+  def self.catalog(user=nil)
     result = {}
     branch_names = {}
-    Branch.all(:fields => [:id, :name]).each { |b| branch_names[b.id] = b.name }
-    Center.all(:fields => [:id, :name, :branch_id]).each do |center|
+
+    if user.role==:staff_member
+      staff_member = user.staff_member
+      [staff_member.centers.branches, staff_member.branches].flatten.each{|b| branch_names[b.id] = b.name }
+      centers = [staff_member.centers, staff_member.branches.centers].flatten
+    else
+      Branch.all(:fields => [:id, :name]).each{|b| branch_names[b.id] = b.name}
+      centers = Center.all(:fields => [:id, :name, :branch_id])
+    end
+         
+    centers.each do |center|
       branch = branch_names[center.branch_id]
       result[branch] ||= {}
       result[branch][center.id] = center.name
@@ -87,9 +96,14 @@ class Center
     meeting_time_hours.two_digits + ':' + meeting_time_minutes.two_digits
   end
 
-  def self.paying_today(date = Date.today)
+  def self.paying_today(user, date = Date.today)
     center_ids = LoanHistory.all(:date => date||Date.today).map{|x| x.center_id}
     centers = center_ids.blank? ? [] : Center.all(:id => center_ids)
+    centers
+    if user.role==:staff_member
+      staff = user.staff_member
+      centers = (staff.branches.count > 0 ? ([staff.centers, staff.branches.centers].flatten.uniq & centers) : (staff.centers & centers))
+    end
     centers
   end
   

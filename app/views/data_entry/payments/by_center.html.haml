@@ -65,7 +65,7 @@
     = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center))) do
       = hidden_field :name => :for_date, :value => @date
       Fees collected by
-      = select :name => "payment[received_by]", :collection => [["","---"]] + StaffMember.all.map{|sm| [sm.id.to_s,sm.name]}, :selected => @center.manager.id.to_s
+      = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s
 
 
       %table.report.nojs{:style => "width:100%"}
@@ -127,7 +127,7 @@
         %th
           Centers paying today
         %td
-          = select :name => 'center_id', :collection => [["","---"]] + Center.paying_today(@date).map {|c| [c.id.to_s,c.name]}
+          = select :name => 'center_id', :collection => centers_paying_today_collection(@date)
       %tr
         %th
           or any other center

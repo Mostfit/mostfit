@@ -31,6 +31,10 @@ class StaffMember
     [obj.save, obj]
   end
 
+  def branches
+    Branch.all(:manager => self)
+  end
+
   def clients
     Client.all(:created_by_staff_member_id => self.id)
   end
