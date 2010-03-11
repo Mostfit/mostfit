@@ -11,8 +11,8 @@
       Balance outstanding
     %th{:colspan => "3"}
       Balance Overdue
-    %th
-      No. of defaults     
+    %th{:colspan => "3"}
+      Advance payment
   %tr.header
     %th
     %th
@@ -40,8 +40,13 @@
     %th
       Total
     %th
+      Principal
+    %th
+      Interest
+    %th
+      Total
   - center_id, branch_id = nil, nil
-  - length = 13
+  - length = 15
   - org_total = []
   -@groups.each do |group_id, centers|
     -if centers.keys.length>0

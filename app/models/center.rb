@@ -81,7 +81,7 @@ class Center
 
   def previous_meeting_date_from(date)
     meeting_wday = Center.meeting_days.index(meeting_day)
-    previous_meeting_date = date - date.wday + meeting_wday - 7
+    previous_meeting_date = date - date.wday + meeting_wday
     previous_meeting_date -= 7 if previous_meeting_date >= date
     previous_meeting_date.holiday_bump
   end

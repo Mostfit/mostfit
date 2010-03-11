@@ -128,6 +128,8 @@ class LoanHistory
         SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
         SUM(actual_outstanding_principal)    AS actual_outstanding_principal,
         SUM(actual_outstanding_total)        AS actual_outstanding_total,
+        SUM(if(actual_outstanding_principal<scheduled_outstanding_principal,  scheduled_outstanding_principal-actual_outstanding_principal,0)) AS advance_principal,
+        SUM(if(actual_outstanding_total<scheduled_outstanding_total,          scheduled_outstanding_total-actual_outstanding_total,0))         AS advance_total,
         client_group_id,
         center_id
       FROM loan_history
@@ -148,8 +150,10 @@ class LoanHistory
       SELECT
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
         SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
-        SUM(actual_outstanding_principal)    AS actual_outstanding_principal,
-        SUM(actual_outstanding_total)        AS actual_outstanding_total,
+        SUM(if(actual_outstanding_principal>0, actual_outstanding_principal,0))    AS actual_outstanding_principal,
+        SUM(if(actual_outstanding_total>0,     actual_outstanding_total, 0))        AS actual_outstanding_total,
+        SUM(if(actual_outstanding_principal<0, actual_outstanding_principal,0))    AS advance_principal,
+        SUM(if(actual_outstanding_total<0,     actual_outstanding_total,0))        AS advacne_total,
         COUNT(DISTINCT(loan_id))             AS loans_count,
         COUNT(DISTINCT(client_id))           AS clients_count,
         branch_id
