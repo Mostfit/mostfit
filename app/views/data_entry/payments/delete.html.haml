@@ -5,7 +5,7 @@
 - if @payment and not @payment.new_record?
 
   %p== Are you sure you want to delete payment '#{@payment.id}'?
-  = form_for(@payment, :action => url(:enter_payments, :action => 'destroy')) do
+  = form_for(@payment, :action => url(:enter_payments, :action => 'destroy'), :method => :get) do
     = hidden_field :id, :value => @payment.id
     = submit "Delete it!"
     &nbsp;&nbsp;
@@ -50,7 +50,7 @@
     Please select a loan that you want to delete a payment for by entering its loan ID.
 
   %table.form
-    = form_for(@payment, :action => url(:enter_payments, :action => 'delete')) do
+    = form(:action => url(:enter_payments, :action => 'delete'), :method => :get) do
       %tr
         %td &nbsp;
       %tr

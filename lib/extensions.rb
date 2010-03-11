@@ -37,6 +37,7 @@ module Misfit
 
     module User
       CUD_Actions =["create", "new", "edit", "update", "destroy"]
+      CR_Actions =["create", "new", "index", "show"]
       #add hooks to before and after can_access? and can_manage? methods to override their behaviour
       # here we add hooks to see if the user can manage a particular instance of a model.
       def self.included(base)
@@ -50,9 +51,14 @@ module Misfit
         end
       end
 
-      def can_approve?(loan)
+      def can_approve?(obj)        
         if role == :staff_member
-          return (loan.client.center.manager == staff_member or loan.client.center.branch.manager == staff_member)
+          if obj.class==Client
+            return (obj.center.branch.manager == staff_member)
+          elsif obj.class==Loan or Loan.descendants.map{|x| x}.include?(obj.class)
+            return (obj.client.center.branch.manager == staff_member) 
+          end
+          retrun false
         end
         return false if role == :read_only
         return true
@@ -60,7 +66,7 @@ module Misfit
 
       def additional_checks
         id = @route[:id]
-        model = Kernel.const_get(@model.to_s.capitalize)
+        model = Kernel.const_get(@model.to_s.split("/")[-1].capitalize)
         if model == Loan
           l = Loan.get(id)
           return ((l.client.center.manager == self.staff_member) or (l.client.center.branch.manager == self.staff_member))
@@ -79,6 +85,20 @@ module Misfit
         end
       end
 
+      def is_manager_of?(obj)
+        staff = self.staff_member      
+        return true if obj and obj.new?
+        if obj.class==Client and not (obj.center.manager==staff or obj.center.branch.manager==staff)
+          return false
+        elsif obj.class==Center and not (obj.manager==staff or obj.branch.manager==staff)
+          return false
+        elsif obj.class==Loan   and not (obj.client.center.manager==staff or obj.client.center.branch.manager==staff)
+          return false
+        end
+        return true
+      end
+
+      
       def _can_access?(route,params = nil)
         # more garbage
         return true if role == :admin
@@ -93,23 +113,28 @@ module Misfit
         return false if role == :read_only and CUD_Actions.include?(@action)
         return false if r.nil?
         if role == :staff_member
-          if @route.has_key?(:id) and @route[:id]
-            return additional_checks
+          return additional_checks if @route.has_key?(:id) and @route[:id]
+
+          if params and params[:branch_id]
+            b = Branch.get(params[:branch_id])
+            return (b.manager == staff_member or b.centers.manager.include?(staff_member))
           end
-          if @controller == "payments"
-            c = Center.get(@route[:center_id])
-            return ((c.manager == staff_member or c.branch.manager == staff_member) and r.include?(:payments))
+
+          if params and params[:center_id]
+            c = Center.get(params[:center_id])
+            return ((c.manager == staff_member or c.branch.manager == staff_member))
           end
-          if @controller == "data_entry/payments"
-            if route[:action] == "by_center"
-              c = Center.get(params[:center_id])
-              return c ? (c.manager == staff_member or c.branch.manager == staff_member) : false
-            end
-            if @route[:action] == "by_staff_member"
-              c = Center.get(params[:staff_member_id])
-              return c ? (c.manager == staff_member or c.branch.staff_member == staff_member) : false
-            end
-          end          
+
+          if params and params[:client_id]
+            c = Client.get(params[:client_id])
+            return ((c.center.manager == staff_member or c.center.branch.manager == staff_member))
+          end
+          
+          if params and params[:loan_id]
+            l = Loan.get(params[:loan_id])
+            return ((l.client.center.manager == staff_member or l.client.center.branch.manager == staff_member))
+          end
+          
         end
         r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
       end

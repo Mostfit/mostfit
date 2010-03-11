@@ -11,7 +11,11 @@ class Entrance < Merb::Controller  # not inherit from Application as that thing 
   def root
 #    redirect url(:entrance)  # no switch, nicer for the demo
     if session.authenticated?
-      redirect url(:branches)  # this should be the cockpit page in later versions
+      if session.user.role==:data_entry
+        redirect url(:data_entry)
+      else 
+        redirect url(:browse)  # this should be the cockpit page in later versions
+      end
     else
       redirect url(:entrance)
     end

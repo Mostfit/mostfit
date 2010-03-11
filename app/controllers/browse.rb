@@ -15,6 +15,7 @@ class Browse < Application
     else
       @centers = Center.all.paginate(:per_page => 15, :page => params[:page] || 1)
     end
+    @branch =  @centers.branch[0]
     render :template => 'centers/index'
   end
 end

@@ -41,7 +41,11 @@ class Loans < Application
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])
     @loan.loan_product_id = @loan_product.id     
     if @loan.save
-      redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
+      if params[:return]
+        redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' was successfully created"})
+      else
+        redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
+      end
     else
       @loan.interest_rate *= 100
       render :new  # error messages will be shown
@@ -68,7 +72,11 @@ class Loans < Application
     disallow_updation_of_verified_loans
     @loan.update_attributes(attrs)
     if @loan.errors.blank?
-      redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
+      if params[:return]
+        redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' has been edited"})
+      else
+        redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
+      end
     else
       display @loan, :edit  # error messages will be shown
     end
