@@ -229,7 +229,6 @@ $(document).ready(function(){
 		});
 	}
 
-
   function daysInMonth(month, year){
     isLeap = false;
     if ((year%4 == 0 && year%100 != 0)||year%400 == 0) isLeap = true;
@@ -239,7 +238,6 @@ $(document).ready(function(){
     if (month == 2 && isLeap == false) days = 28;
     return days;
   }
-
 
   function dateFromAge(ageYear, ageMonth, ageDay){
  
@@ -298,18 +296,18 @@ $(document).ready(function(){
 
 	if($("#client_date_of_birth_day, #client_date_of_birth_month, #client_date_of_birth_year")){
 
-    $('#client_date_of_birth_year').parent().append('&nbsp;&nbsp;OR &nbsp;&nbsp;<span class="greytext">Enter the age in Years: </span><input size="4" id="age_year_field" type="text"></input>&nbsp;');
-    $('#client_date_of_birth_month').parent().append('<span class="greytext"> Months: </span><input size="2" id="age_month_field" type="text"></input>&nbsp;');
-    $('#client_date_of_birth_day').parent().append('<span class="greytext"> and Days: </span><input size="2" id="age_day_field" type="text"></input>&nbsp;');
-    $('#client_date_of_birth_day').parent().append('<button id="calculateDOB">Calculate</button>');
+    $('#client_date_of_birth_year').parent().append('&nbsp;&nbsp;OR &nbsp;&nbsp;<span class="greytext">Enter the age in Years: </span><input size="2" id="age_year_field" type="text"></input>&nbsp;');
+    $('#client_date_of_birth_month').parent().append('<span class="greytext"> Months: </span><input size="1" id="age_month_field" type="text"></input>&nbsp;');
+    $('#client_date_of_birth_day').parent().append('<span class="greytext"> and Days: </span><input size="1" id="age_day_field" type="text"></input>&nbsp;');
+    $('#client_date_of_birth_day').parent().append('&nbsp;&nbsp;<button id="calculateDOB">Calculate</button>');
 
     $('#calculateDOB').click(function(){
-    dob = dateFromAge(parseInt($('#age_year_field').val()), parseInt($('#age_month_field').val()), parseInt($('#age_day_field').val()));
-    $('#client_date_of_birth_year').val(dob[0]);
-    $('#client_date_of_birth_month').val(dob[1]);
-    $('#client_date_of_birth_day').val(dob[2]);      
-    return false;
-      })
+      dob = dateFromAge(parseInt($('#age_year_field').val()), parseInt($('#age_month_field').val()), parseInt($('#age_day_field').val()));
+      $('#client_date_of_birth_year').val(dob[0]);
+      $('#client_date_of_birth_month').val(dob[1]);
+      $('#client_date_of_birth_day').val(dob[2]);      
+      return false;
+    })
 
-        }
-    });
+  }
+});
