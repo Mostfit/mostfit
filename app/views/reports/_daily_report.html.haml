@@ -12,13 +12,15 @@
     %th
       Group
     %th{:colspan => "3"}
-      Amount
-    %th{:colspan => "3"}
+      Loan amount
+    %th{:colspan => "4"}
       Payment
     %th{:colspan => "3"}
       Balance outstanding
-    %th
-      No. of defaults
+    %th{:colspan => "3"}
+      Balance Overdue
+    %th{:colspan => "3"}
+      Advance payment
   %tr.header
     %th
     %th
@@ -34,25 +36,39 @@
     %th
       Fee
     %th
+      Total
+    %th
       Principal
     %th
       Interest
     %th
       Total
     %th
+      Principal
+    %th
+      Interest
+    %th
+      Total
+    %th
+      Principal
+    %th
+      Interest
+    %th
+      Total
   - center_id, branch_id = nil, nil
   - org_total = []
+  - length = 16
   -@groups.each do |group_id, centers|
     -if centers.keys.length>0
       -branch_total = []
       %tr.branch
-        %td{:colspan => "11"}
+        %td{:colspan => length+1}
           %b
             =@branches[group_id].name
       -centers.each do |center_id, groups|
         -if groups.keys.length>0
           %tr.center
-            %td{:colspan => "11"}
+            %td{:colspan => length+1}
               %b
                 =@centers[center_id].name
           - center_total = Array.new(groups.values.first.length-1, 0)
@@ -61,9 +77,13 @@
               %td
                 =group[-1]
               -group[0..-2].each_with_index do |g, idx|
-                %td
-                  =g
-                  -center_total[idx]+=g
+                -if idx==6
+                  %td
+                    =center_total[6]+=group[3]+group[4]+group[5]
+                -else
+                  %td
+                    =g
+                    -center_total[idx]+=g
           %tr.center_total
             %td
               %b==Center total:
