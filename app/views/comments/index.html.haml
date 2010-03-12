@@ -1,0 +1,16 @@
+%h1
+  Comments controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/comments/index.html.erb
+%table
+  %tr
+  - for comment in @comments
+    %tr
+      %td
+        = link_to 'Show', url(:comment, comment)
+      %td
+        = link_to 'Edit', url(:edit_comment,  comment)
+
+= link_to 'New', url(:new_comment)

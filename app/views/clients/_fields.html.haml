@@ -51,12 +51,22 @@
     %td
       Date of birth:
     %td
+<<<<<<< Updated upstream:app/views/clients/_fields.html.haml
       = date_select_for @client, :date_of_birth, :nullable => true, :min_date => Date.today-36500, :max_date => Date.today-1000
   %tr
     %td
       Date of death:
     %td
       = date_select_for @client, :deceased_on, :nullable => true, :max_date => Date.today
+=======
+      = date_select_for @client, :date_of_birth, :nullable => true
+  - unless @client.new?
+    %tr
+      %td
+        Date of death:
+      %td
+        = date_select_for @client, :deceased_on, :nullable => true
+>>>>>>> Stashed changes:app/views/clients/_fields.html.haml
   %tr
     %td
       Date joined

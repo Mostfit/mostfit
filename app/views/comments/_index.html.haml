@@ -1,0 +1,14 @@
+- @comments = Comment.all(:parent_model => object.class.to_s, :parent_id => object.id)
+- if @comments.blank?
+  No comments yet. 
+- else
+  %table.narrow
+    - @comments.each do |comment|
+      %tr{:class => cycle('even','odd')}
+        %td{:style => "width: 20%"}
+          %b
+            = comment.user.login
+          %br
+          = comment.created_at.to_s
+        %td
+          = comment.text
