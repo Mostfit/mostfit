@@ -17,7 +17,7 @@
     = center.code
     )
   = partial "centers/payments", {:clients => center.clients, :branch => center.branch, :center => center, :date => @date, :loans => center.loans}
-  - if center.clients.loans.all(:scheduled_disbursal_date => @date).count > 0
+  - if center.clients.count > 0 and center.clients.loans.all(:scheduled_disbursal_date => @date).count > 0
     - tot_disbursement = 0
     %table.narrow.form{ :width => '100%' }
       %tr
