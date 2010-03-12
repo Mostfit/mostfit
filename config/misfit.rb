@@ -72,7 +72,21 @@ module Misfit
               self.strftime($globals[:mfi_details][:date_format])
             end
           end
-          Merb.logger.info("Date format set to:: #{$globals[:mfi_details][:date_format]}")
+          Date.instance_eval do
+            def min_date
+              if $globals && $globals[:mfi_details] && $globals[:mfi_details][:in_operation_since]
+                $globals[:mfi_details][:in_operation_since]
+              else
+                Date.parse("2000-01-01")
+              end
+            end
+          end
+          Date.instance_eval do
+            def max_date
+              today+1000
+            end
+          end
+          Merb.logger.info("Date format set to:: #{$globals[:mfi_details][:date_format]} and min date is #{Date.min_date}")
         end
       end
     end

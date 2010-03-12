@@ -26,7 +26,9 @@
           %th
             Status
           %th
-            Disbursed?
+            Scheduled First Payment Date
+          %th
+            Disburse?
           %th
             Cheque number
           %th
@@ -42,13 +44,16 @@
           %td.text
             = loan.scheduled_disbursal_date
           %td.text
-            = date_select("loans[#{loan.id}][disbursal_date]")
+            = date_select("loans[#{loan.id}][disbursal_date]", Date.today, {:min_date => loan.scheduled_disbursal_date})
           %td.text
             - late =  @date - loan.scheduled_disbursal_date
             - if late > 0
-              == #{late} days late
+              == #{late} days late         
             - else
               on time
+          %td
+            - if late
+              =date_select("loans[#{loan.id}][scheduled_first_payment_date]", Date.today, {:min_date => loan.scheduled_first_payment_date}) 
           %td
             = check_box :name => "loans[#{loan.id}][disbursed?]"
           %td
