@@ -1,6 +1,8 @@
 module Merb
   module GlobalHelpers
     CRUD_ACTIONS = ["list", "index", "show", "edit", "new"]
+    MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    
     def page_title
       begin
         generate_page_title
@@ -82,15 +84,16 @@ module Merb
     end
 
 
-    MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-    def date_select(name, date=Date.today)
+    def date_select(name, date=Date.today, opts={})
       # defaults to Date.today
       # should refactor
       attrs = {}
       attrs.merge!(:name => name)
       attrs.merge!(:date => date)
       attrs.merge!(:id => name)
-      attrs.merge(:date => date)
+      attrs.merge!(:date     => date)
+      attrs.merge!(:min_date => opts[:min_date]||Date.min_date)
+      attrs.merge!(:max_date => opts[:max_date]||Date.max_date)
       date_select_html(attrs) 
     end
 
@@ -102,6 +105,8 @@ module Merb
       date = Date.today if date.blank? and not nullable
       date = nil        if date.blank? and nullable
       attrs.merge!(:date => date)
+      attrs.merge!(:min_date => attrs[:min_date]||Date.min_date)
+      attrs.merge!(:max_date => attrs[:max_date]||Date.max_date)
       date_select_html(attrs, obj, col)
 #       errorify_field(attrs, col)
     end
@@ -125,15 +130,17 @@ module Merb
         :class      => obj ? (obj.errors[col] ? 'error' : '') : nil,
         :collection => (nullable ? [['', '-']] : []) + MONTHS.map { |x| count += 1; x = [count, x] }
       )
-      
+
+      min_year = attrs[:min_date] ? attrs[:min_date].year : 1900
+      max_year = attrs[:max_date] ? attrs[:max_date].year : date.year + 3
       year_attrs = attrs.merge(
         :name       => attrs[:name] + '[year]',
         :id         => attrs[:id] + '_year',
         :selected   => (date ? date.year.to_s : ''),
         :class      => obj ? (obj.errors[col] ? 'error' : '') : nil,
-        :collection => (nullable ? [['', '-']] : []) + (1900..Time.now.year + 3).to_a.reverse.map{|x| x = [x.to_s, x.to_s]}
+        :collection => (nullable ? [['', '-']] : []) + (min_year..max_year).to_a.reverse.map{|x| x = [x.to_s, x.to_s]}
       )
-      select(month_attrs) + '&nbsp;' + select(day_attrs) + '&nbsp;' + select(year_attrs)
+      select(month_attrs) + '' + select(day_attrs) + '' + select(year_attrs)
     end
 
 
@@ -235,7 +242,7 @@ module Merb
         [["0", "<Select a staff member"]] + StaffMember.all(:active => true).map{|x| [x.id, x.name]}
       end
     end
-
+    
     def join_segments(*args)
       args.map{|x| x.class==Array ? x.uniq : x}.flatten.reject{|x| not x or x.blank?}.join(' - ').capitalize
     end
