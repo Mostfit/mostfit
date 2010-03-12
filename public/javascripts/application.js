@@ -311,7 +311,7 @@ $(document).ready(function(){
   }
 
   if($('.notice')){
-    $('.notice').prepend('<div align="right"><a href="#" class="closeNotice" class = "closeNotice">[X]</a></div>');
+    $('.notice').prepend('<div style="margin-top: 0; float:right"><a href="#" class="closeNotice" class = "closeNotice">[X]</a></div>');
   }
 
   $('.closeNotice').click(function(){
