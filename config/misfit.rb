@@ -74,7 +74,7 @@ module Misfit
           end
           Date.instance_eval do
             def min_date
-              if $globals && $globals[:mfi_details] && $globals[:mfi_details][:in_operation_since]
+              if $globals && $globals[:mfi_details] && $globals[:mfi_details][:in_operation_since] and not $globals[:mfi_details][:in_operation_since].blank?
                 $globals[:mfi_details][:in_operation_since]
               else
                 Date.parse("2000-01-01")
