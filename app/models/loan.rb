@@ -996,6 +996,11 @@ end
 
 class BulletLoanWithPeriodicInterest < BulletLoan
   
+  def scheduled_interest_for_installment(number)
+    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    (amount * interest_rate / number_of_installments).to_i
+  end
+
   def scheduled_principal_for_installment(number)
     return 0 if number < number_of_installments
     return amount if number == number_of_installments
