@@ -73,7 +73,7 @@
   %tr.org_total
     %td
       %b==Total:
-    -org_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
+    -org_total.find_all{|x| x.length==length}.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
       %td
         %b
           =ele

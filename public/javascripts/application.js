@@ -294,7 +294,7 @@ $(document).ready(function(){
     return birthDate;
   }
 
-	if($("#client_date_of_birth_day, #client_date_of_birth_month, #client_date_of_birth_year")){
+  if($("#client_date_of_birth_day, #client_date_of_birth_month, #client_date_of_birth_year")){
 
     $('#client_date_of_birth_year').parent().append('&nbsp;&nbsp;OR &nbsp;&nbsp;<span class="greytext">Enter the age in Years: </span><input size="2" id="age_year_field" type="text"></input>&nbsp;');
     $('#client_date_of_birth_month').parent().append('<span class="greytext"> Months: </span><input size="1" id="age_month_field" type="text"></input>&nbsp;');
@@ -308,6 +308,14 @@ $(document).ready(function(){
       $('#client_date_of_birth_day').val(dob[2]);      
       return false;
     })
-
   }
+
+  if($('.notice')){
+    $('.notice').prepend('<div style="margin-top: 0; float:right"><a href="#" class="closeNotice" class = "closeNotice">[X]</a></div>');
+  }
+
+  $('.closeNotice').click(function(){
+     $('.closeNotice').addClass('notice'); 
+     $('.notice').remove();
+  })
 });

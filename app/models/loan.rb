@@ -443,7 +443,8 @@ class Loan
     principal_so_far = interest_so_far = fees_so_far = total = 0
     balance = amount
     fs = fee_schedule
-    @schedule[disbursal_date || scheduled_disbursal_date] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
+    dd = disbursal_date || scheduled_disbursal_date
+    @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
     (1..number_of_installments).each do |number|
       date      = shift_date_by_installments(scheduled_first_payment_date, number - 1)
       principal = scheduled_principal_for_installment(number)
