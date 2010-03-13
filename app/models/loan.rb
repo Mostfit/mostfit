@@ -11,8 +11,8 @@ class Loan
   property :discriminator,                  Discriminator, :nullable => false, :index => true
 
   property :amount,                         Integer, :nullable => false, :index => true  # this is the disbursed amount
-  property :amount_applied_for,             Integer, :nullable => false, :index => true
-  property :amount_sanctioned,              Integer, :nullable => false, :index => true
+  property :amount_applied_for,             Integer, :index => true
+  property :amount_sanctioned,              Integer, :index => true
 
 
   property :interest_rate,                  Float, :nullable => false, :index => true
@@ -996,15 +996,9 @@ end
 
 class BulletLoanWithPeriodicInterest < BulletLoan
   
-  def scheduled_interest_for_installment(number)
-    if number == 1
-      d1 = disbursal_date || scheduled_disbursal_date 
-      d2 = scheduled_first_payment_date
-    else
-      d1 = shift_date_by_installments(scheduled_first_payment_date, number - 1)
-      d2 = shift_date_by_installments(scheduled_first_payment_date, number)
-    end
-    amount * interest_rate * d1.days360(d2)/360
+  def scheduled_principal_for_installment(number)
+    return 0 if number < number_of_installments
+    return amount if number == number_of_installments
   end
   
 end
