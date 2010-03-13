@@ -971,6 +971,39 @@ class EquatedWeekly < Loan
     }
     return interest_payable.to_i
   end
+
+
 end
 
 
+class BulletLoan < Loan
+  before :save, :set_installments_to_1
+  
+  def scheduled_interest_for_installment(number = 1)
+    amount * interest_rate * (disbursal_date || scheduled_disbursal_date).days360(scheduled_first_payment_date)/360
+  end
+  
+  def scheduled_principal_for_installment(number = 1)
+    amount
+  end
+  
+  private
+  def set_installments_to_1
+    number_of_installments = 1
+  end
+end
+
+class BulletLoanWithPeriodicInterest < BulletLoan
+  
+  def scheduled_interest_for_installment(number)
+    if number == 1
+      d1 = disbursal_date || scheduled_disbursal_date 
+      d2 = scheduled_first_payment_date
+    else
+      d1 = shift_date_by_installments(scheduled_first_payment_date, number - 1)
+      d2 = shift_date_by_installments(scheduled_first_payment_date, number)
+    end
+    amount * interest_rate * d1.days360(d2)/360
+  end
+  
+end

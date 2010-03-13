@@ -47,6 +47,17 @@ class Date
     end
   end
 
+  def days360(other)
+    y1 = self.year;   y2 = other.year
+    m1 = self.month;  m2 = other.month
+    d1 = self.day;    d2 = other.day
+
+    d1 = (d1 == 31) ? 30 : d1
+    d2 = (d2 == 31) ? 30 : d2
+    
+    360 * (y2-y1) + 30 * (m2-m1) + (d2-d1)
+  end
+
 private
   def was_yesterday_holiday_shifted_today?
     yesterday = self-1
