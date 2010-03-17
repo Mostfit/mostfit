@@ -56,11 +56,10 @@
         %p
         = catch_content :for_layout
     #footer
-      == &copy; 2009 Intellecap &mdash; This software is released under the #{link_to 'GNU Affero General Public License', 'http://www.gnu.org/licenses/agpl.html'}.
-      %p{:style => "float: right; position: relative; right: 10%"}
+      %p{:style => "position: relative; right: 10%; float: right;"}
         Powered by
-        =image_tag("/images/mosfit-logo.png")
-
+        =image_tag("/images/mostfit_logo.png", :height => 100)
+      == &copy; 2009 Intellecap &mdash; This software is released under the #{link_to 'GNU Affero General Public License', 'http://www.gnu.org/licenses/agpl.html'}.
       - if Merb::Config[:environment] == 'development'
         %p
           %a{ :name => "debug" }/
