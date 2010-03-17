@@ -22,6 +22,8 @@
           %th
             Details
           %th
+            Amount
+          %th
             Center
           %th
             Approval Date
@@ -39,6 +41,8 @@
             = link_to loan.client.name, resource(loan.client)
           %td.number
             = loan.description
+          %td.number
+            = text_field :name => "loans[#{loan.id}][amount_sanctioned]", :value => loan.amount, :size => 6
           %td.text
             = link_to loan.client.center.name, url(:quick_link, "centers", loan.client.center.id)
           %td.text

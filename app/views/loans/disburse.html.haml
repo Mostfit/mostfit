@@ -40,7 +40,7 @@
           %td.text
             = link_to loan.client.name, resource(loan.client)
           %td.number  
-            = loan.amount
+            = text_field :name => "loans[#{loan.id}][amount]", :size => 8, :value => loan.amount
           %td.text
             = loan.scheduled_disbursal_date
           %td.text
