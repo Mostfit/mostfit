@@ -17,6 +17,6 @@ class LoanPurposeReport < Report
   end
   
   def generate    
-    repository.adapter.query("SELECT o.name purpose, count(*) count, sum(amount) amount FROM loans LEFT OUTER JOIN occupations o ON o.id=loans.occupation_id WHERE loans.client_id IN (#{Client.all(:id => @center.map{|x| x.id}).map{|x| x.id}.join(',')}) GROUP BY occupation_id")
+    repository.adapter.query("SELECT o.name purpose, count(*) count, sum(amount) amount FROM loans LEFT OUTER JOIN occupations o ON o.id=loans.occupation_id WHERE loans.client_id IN (#{Client.all(:fields => [:id], :center_id => @center.map{|x| x.id}).map{|x| x.id}.join(',')}) GROUP BY occupation_id")
   end
 end

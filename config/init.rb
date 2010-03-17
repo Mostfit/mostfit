@@ -41,6 +41,7 @@ Merb::BootLoader.before_app_loads do
     require "pdf/simpletable"
     require "lib/logger.rb"
     require 'lib/string.rb'
+    require 'lib/grapher.rb'
     require("lib/pdfs/day_sheet.rb")
     require("lib/functions.rb")
     PDF_WRITER = true
