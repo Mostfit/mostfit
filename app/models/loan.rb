@@ -1032,34 +1032,34 @@ end
 # We do this once, generically, for any repayment schedule, by calling super and  rejecting anything from the loan schedule that does not belong to us
 # Remember, the payments on the loan remain exactly the same as before for the customer.
 
-Loan.descendants.each do |c|
-  k = Class.new(c)
-  Object.const_set "TakeOver#{c.to_s}", k # we have to name it first otherwise DataMapper craps out
-  Kernel.const_get("TakeOver#{c.to_s}").class_eval do
-    property :original_amount,             Integer, :nullable => false
-    property :original_disbursal_date,     Date, :nullable => false
-    property :original_first_payment_date, Date, :nullable => false
-    property :taken_over_on,               Date, :nullable => false
-    property :taken_over_on_installment,   Integer
+# Loan.descendants.each do |c|
+#   k = Class.new(c)
+#   Object.const_set "TakeOver#{c.to_s}", k # we have to name it first otherwise DataMapper craps out
+#   Kernel.const_get("TakeOver#{c.to_s}").class_eval do
+#     property :original_amount,             Integer, :nullable => false
+#     property :original_disbursal_date,     Date, :nullable => false
+#     property :original_first_payment_date, Date, :nullable => false
+#     property :taken_over_on,               Date, :nullable => false
+#     property :taken_over_on_installment,   Integer
     
-#    validates_with_method :taken_over_properly
+# #    validates_with_method :taken_over_properly
     
-    def payment_schedule
-      raise ArgumentError "This takeover loan is missing takeover information"  unless (taken_over_on || taken_over_on_installment)
-      taken_over_on_installment = number_of_installments_before(taken_over_on) if taken_over_on
-      # recreate the original loan
-      new_amount = amount
-      amount = original_amount
-      disbursal_date = original_disbursal_date
-      # generate the payments_schedule
-      super
-      #chop off what we doesn't belong to us
-      taken_over_on ||= @schedule.keys[(taken_over_on_installment - 1)]
-      @schedule = @schedule.reject{|k,v| k < taken_over_on}
-      dd = disbursal_date || scheduled_disbursal_date
-      @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
-      @schedule
-    end
-  end # Class.new
-end # each
+#     def payment_schedule
+#       raise ArgumentError "This takeover loan is missing takeover information"  unless (taken_over_on || taken_over_on_installment)
+#       taken_over_on_installment = number_of_installments_before(taken_over_on) if taken_over_on
+#       # recreate the original loan
+#       new_amount = amount
+#       amount = original_amount
+#       disbursal_date = original_disbursal_date
+#       # generate the payments_schedule
+#       super
+#       #chop off what we doesn't belong to us
+#       taken_over_on ||= @schedule.keys[(taken_over_on_installment - 1)]
+#       @schedule = @schedule.reject{|k,v| k < taken_over_on}
+#       dd = disbursal_date || scheduled_disbursal_date
+#       @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
+#       @schedule
+#     end
+#   end # Class.new
+# end # each
 
