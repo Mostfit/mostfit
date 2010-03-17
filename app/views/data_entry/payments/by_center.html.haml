@@ -41,8 +41,8 @@
   %h1 Approvals
   - @loans_to_approve = @center.clients.loans(:approved_on => nil)
   - if @loans_to_approve.size > 0
-    = form_for(@loan, :action => url(:enter_loans, :action => 'approve', :return => resource(@branch, @center))) do
-      = partial :approvals
+    = form_for(@loan, :action => url(:loan_actions, 'approve', :return => resource(@branch, @center))) do
+      = partial "loans/approve"
       = submit 'Approve these loans'
   - else
     No approvals today
@@ -52,7 +52,7 @@
   - @loans_to_disburse = @center.clients.loans(:scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil)
   - if @loans_to_disburse.size > 0
     = form_for(@loan, :action => url(:loan_actions, :action => 'disburse', :return => resource(@branch, @center))) do
-      = partial :disbursals, {:loans_to_disburse => @loans_to_disburse, :date => @date}
+      = partial "loans/disburse", {:loans_to_disburse => @loans_to_disburse, :date => @date}
       = submit 'Disburse these loans'
   - else
     No disbursals today

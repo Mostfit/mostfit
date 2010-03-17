@@ -1,1 +1,19 @@
-= partial :approve
+%h2
+  Approve loans
+  %h2
+    The following loans have not been approved yet
+- if not @errors.blank?
+  .error
+    %ul
+      - @errors.each do |e|
+        - e.values.each do |v|
+          %li
+            == Loan #{e.resource.id}: #{v}
+- if @loans_to_approve.size > 0
+  = form_for(@loan, :action => url(:loan_actions, :action => "approve")) do
+    = hidden_field :name => :id, :value => @center.id
+    = partial :approve
+    = submit 'Approve these loans'
+- else
+  Nothing to approve
+

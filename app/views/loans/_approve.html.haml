@@ -1,62 +1,45 @@
-%h2
-  Approve loans
-  %h2
-    The following loans have not been approved yet
-- if not @errors.blank?
-  .error
-    %ul
-      - @errors.each do |e|
-        - e.values.each do |v|
-          %li
-            == Loan #{e.resource.id}: #{v}
-- if @loans_to_approve.size > 0
-  = form_for(@loan, :action => url(:loan_actions, :action => "approve")) do
-    = hidden_field :name => :id, :value => @center.id
-    %table.report.nojs
-      %thead
-        %tr{:style => "font-size: 0.85em;"}
-          %th
-            id
-          %th
-            Client Name
-          %th
-            Details
-          %th
-            Amount
-          %th
-            Center
-          %th
-            Approval Date
-          %th
-            Status
-          %th
-            Approved?
-          %th
-            Approved By
-      - @loans_to_approve.each do |loan|
-        %tr{:class => cycle('odd','')}
-          %td.number
-            = link_to loan.id, url(:quick_link, "loans", loan.id)
-          %td.text
-            = link_to loan.client.name, resource(loan.client)
-          %td.number
-            = loan.description
-          %td.number
-            = text_field :name => "loans[#{loan.id}][amount_sanctioned]", :value => loan.amount, :size => 6
-          %td.text
-            = link_to loan.client.center.name, url(:quick_link, "centers", loan.client.center.id)
-          %td.text
-            = date_select("loans[#{loan.id}][approved_on]")
-          %td.text
-            = loan.status
-          %td
-            = check_box :name => "loans[#{loan.id}][approved?]"
-          %td.text
-            = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => staff_members_collection, :selected => loan.client.center.manager.id.to_s
-      %tfoot
-        %tr
-          %td{:colspan => 10}
-    = submit 'Approve these loans'
-- else
-  Nothing to approve
-
+%table.report.nojs    
+  %thead
+    %tr{:style => "font-size: 0.85em;"}
+      %th
+        id
+      %th
+        Client Name
+      %th
+        Details
+      %th
+        Amount
+      %th
+        Center
+      %th
+        Approval Date
+      %th
+        Status
+      %th
+        Approved?
+      %th
+        Approved By
+  -@loans_to_approve.each do |loan|
+    %tr{:class => cycle('odd','')}
+      %td.number
+        = link_to loan.id, url(:quick_link, "loans", loan.id)
+      %td.text
+        = link_to loan.client.name, resource(loan.client)
+      %td.number
+        = loan.description
+      %td.number
+        = text_field :name => "loans[#{loan.id}][amount_sanctioned]", :value => loan.amount, :size => 6
+      %td.text
+        = link_to loan.client.center.name, url(:quick_link, "centers", loan.client.center.id)
+      %td.text
+        = date_select("loans[#{loan.id}][approved_on]")
+      %td.text
+        = loan.status
+      %td
+        = check_box :name => "loans[#{loan.id}][approved?]"
+      %td.text
+        = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => staff_members_collection, :selected => loan.client.center.manager.id.to_s
+  %tfoot
+    %tr
+      %td{:colspan => 10}
+  
