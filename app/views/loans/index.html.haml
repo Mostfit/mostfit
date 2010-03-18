@@ -1,14 +1,14 @@
 .tab      
   - if @client.loans.size > 0
     .graph
-      = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'client', :id => @client.id, :scope_unit => 'months', :scope_size => 3) )
+      = ofc2(450, 250, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'client', :id => @client.id, :scope_unit => 'months', :scope_size => 3) )
   %h1{:width => '50%' }== Client: <i>#{@client.name}</i>
   %table.narrow.form{ :style =>'width:50%' }
     %tr.odd
       %td{:rowspan => "15"}
         = image_tag @client.picture.url(:thumb)
       %td 
-      name
+        name
       %td
         %b
           = @client.name

@@ -55,8 +55,8 @@ Merb::BootLoader.before_app_loads do
   end
   DataMapper::Model.append_extensions DmPagination::Paginatable
   if Merb.env=="development"
-    Paperclip.options[:image_magick_path] = "/usr/local/bin"
-    Paperclip.options[:command_path] = "/usr/local/bin"
+    Paperclip.options[:image_magick_path] = "/usr/bin"
+    Paperclip.options[:command_path] = "/usr/bin"
   else
     Paperclip.options[:image_magick_path] = "/usr/bin"
     Paperclip.options[:command_path] = "/usr/bin"
