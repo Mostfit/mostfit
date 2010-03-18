@@ -2,6 +2,8 @@ class Branch
   extend Reporting::BranchReports
   include DataMapper::Resource
 
+  before :convert_blank_to_nil
+  
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false, :index => true
   property :code,    String, :length => 10, :nullable => true, :index => true, :min => 1, :max => 10
@@ -53,5 +55,13 @@ class Branch
   def manager_is_an_active_staff_member?
     return true if manager and manager.active
     [false, "Managing staff member is currently not active"]
+  end
+
+  def convert_blank_to_nil
+    self.attributes.each{|k, v|
+      if v.is_a?(String) and v.empty? and self.class.send(k).type==Integer
+        self.send("#{k}=", nil)
+      end
+    }
   end
 end
