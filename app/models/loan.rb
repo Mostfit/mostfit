@@ -47,7 +47,6 @@ class Loan
   property :taken_over_on,                     Date, :nullable => true
   property :taken_over_on_installment_number,  Integer, :nullable => true 
 
-
   # associations
   belongs_to :client
   belongs_to :funding_line

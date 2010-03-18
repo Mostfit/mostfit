@@ -40,6 +40,7 @@ class Loans < Application
     raise NotFound if not @loan.client  # should be known though hidden field
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])
     @loan.loan_product_id = @loan_product.id     
+    @loan.amount          = @loan.amount_applied_for
     if @loan.save
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' was successfully created"})
@@ -68,6 +69,7 @@ class Loans < Application
     attrs[:occupation_id] = nil if attrs[:occupation_id] == ''
     @loan = klass.get(id)
     @loan_product =  @loan.loan_product
+    @loan.amount  = @loan.amount_applied_for
     raise NotFound unless @loan
     disallow_updation_of_verified_loans
     @loan.update_attributes(attrs)
@@ -125,7 +127,8 @@ class Loans < Application
         loan = Loan.get(id)
         loan.disbursal_date = params[:loans][id][:disbursal_date]
         loan.cheque_number  = params[:loans][id][:cheque_number] and params[:loans][id][:cheque_number].to_i>0 ? params[:loans][id][:cheque_number] : nil
-        loan.scheduled_first_payment_date = params[:loans][id][:scheduled_first_payment_date]
+        loan.scheduled_first_payment_date = params[:loans][id][:scheduled_first_payment_date] if params[:loans][id][:scheduled_first_payment_date]
+        loan.amount         = params[:loans][id][:amount]
         loan.disbursed_by   = StaffMember.get(params[:loans][id][:disbursed_by_staff_id])
         loan.save
         @errors << loan.errors if not loan.save
@@ -152,8 +155,10 @@ class Loans < Application
       @loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
       @loans.keys.each do |id|
         loan = Loan.get(id)
-        params[:loans][id].delete("approved?")
-        loan.update_attributes(params[:loans][id])
+        params[:loans][id].delete("approved?")        
+        params[:loans][id][:amount] = params[:loans][id][:amount_sanctioned]
+        loan.update(params[:loans][id])
+        loan.save
         @errors << loan.errors unless loan.save
       end
       if @errors.blank?

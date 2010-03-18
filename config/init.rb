@@ -6,8 +6,10 @@ use_orm :datamapper
 use_test :rspec
 use_template_engine :haml
 
+Merb::Dispatcher.use_mutex = false
+
 Merb::Config.use do |c|
-  c[:use_mutex] = true
+  c[:use_mutex] = false
   c[:session_store] = 'cookie'  # can also be 'memory', 'memcache', 'container', 'datamapper
 
   # cookie session store configuration
