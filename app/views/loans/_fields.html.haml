@@ -14,7 +14,7 @@
       - else
         = @loan_product.min_amount
         %span.greytext Rupees
-        = hidden_field :amount, :value => @loan_product.min_amount
+        = hidden_field :amount_applied_for, :value => @loan_product.min_amount
   %tr
     %td
       Interest rate:
