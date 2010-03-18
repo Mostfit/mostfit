@@ -94,7 +94,7 @@ class ::Gem::SpecFetcher
       spec = ::Gem::Format.from_file_by_path(file).spec
       [[spec, file]]
     else
-      old_fetch(dependency, all, matching_platform, prerelease)
+      old_fetch(dependency, all, matching_platform)
     end
   end
 end
