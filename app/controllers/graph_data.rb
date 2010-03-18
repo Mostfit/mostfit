@@ -1,4 +1,5 @@
 class GraphData < Application
+  COLORS = ["edd400", "f57900", "c17d11", "73d216", "3465a4", "75507b", "cc0000"]
   include Grapher
   before :display_from_cache, :exclude => [:today]
   after  :store_to_cache, :exclude => [:today]
