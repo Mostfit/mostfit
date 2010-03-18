@@ -44,9 +44,8 @@ class Loan
   property :created_by_user_id,             Integer, :nullable => true, :index => true
   property :cheque_number,                  String,  :length => 20, :nullable => true, :index => true
 
-  property :takeover_loan,                     Boolean, :default => false
-  property :taken_over_on,                     Date, :nullable => true
-  property :taken_over_on_installment_number,  Integer, :nullable => true 
+#  property :taken_over_on,                     Date
+#  property :taken_over_on_installment_number,  Integer 
 
   # associations
   belongs_to :client
@@ -92,16 +91,16 @@ class Loan
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :cheque_number,                :method => :check_validity_of_cheque_number
-  validates_with_method  :taken_over_properly,          :if => Proc.new{|l| l.takeover_loan}
+
   # validates_with_method  :dates_are_not_holidays
 
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
-
   #product validations
   validates_with_method  :amount,                       :method => :is_valid_loan_product_amount
   validates_with_method  :interest_rate,                :method => :is_valid_loan_product_interest_rate
   validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
   validates_with_method  :clients,                      :method => :check_client_sincerity
+
 
   def check_validity_of_cheque_number
     return true if not self.cheque_number or (self.cheque_number and self.cheque_number.blank?)
@@ -159,6 +158,13 @@ class Loan
 
 
   # MISC FUNCTIONS
+  def _show_cf #convenience function to see cashflow in console
+    ps = payment_schedule
+    puts
+    ps.keys.sort.each {|d| puts "#{d}\t|  #{ps[d].values.map{|v| "%.2f" % v}.join("\t|  ")}"}
+    puts
+  end
+
   def self.search(q)
     if /^\d+$/.match(q)
       all(:conditions => {:id => q})
@@ -892,15 +898,6 @@ class Loan
     return true if (validated_on and validated_by) or (validated_on.blank? and validated_by.blank? and validation_comment.blank?)
     [false, "The validation date, the validating staff member the loan should both be given"]
   end
-  def taken_over_properly?
-    if taken_over_on_installment_number and (taken_over_on_installment_number < number_of_installments)
-      return true
-    elsif taken_over_on and (taken_over_on < scheduled_maturity_date)
-      return true
-    else
-      return [false, "Takeover date or installment does not jive with this loan"]
-    end
-  end  
         
 end
 
@@ -1033,6 +1030,7 @@ class BulletLoanWithPeriodicInterest < BulletLoan
 end
 
 
+
 # TAKEOVER LOANS!!
 # these loans are exisitng loans that are taken over by us. They work like this:
 # We create a descendant of each Loan sublass and suffix it with Takeover. i.e. BulletLoanTakeover
@@ -1040,34 +1038,67 @@ end
 # We do this once, generically, for any repayment schedule, by calling super and  rejecting anything from the loan schedule that does not belong to us
 # Remember, the payments on the loan remain exactly the same as before for the customer.
 
-# Loan.descendants.each do |c|
-#   k = Class.new(c)
-#   Object.const_set "TakeOver#{c.to_s}", k # we have to name it first otherwise DataMapper craps out
-#   Kernel.const_get("TakeOver#{c.to_s}").class_eval do
-#     property :original_amount,             Integer, :nullable => false
-#     property :original_disbursal_date,     Date, :nullable => false
-#     property :original_first_payment_date, Date, :nullable => false
-#     property :taken_over_on,               Date, :nullable => false
-#     property :taken_over_on_installment,   Integer
-    
-# #    validates_with_method :taken_over_properly
-    
-#     def payment_schedule
-#       raise ArgumentError "This takeover loan is missing takeover information"  unless (taken_over_on || taken_over_on_installment)
-#       taken_over_on_installment = number_of_installments_before(taken_over_on) if taken_over_on
-#       # recreate the original loan
-#       new_amount = amount
-#       amount = original_amount
-#       disbursal_date = original_disbursal_date
-#       # generate the payments_schedule
-#       super
-#       #chop off what we doesn't belong to us
-#       taken_over_on ||= @schedule.keys[(taken_over_on_installment - 1)]
-#       @schedule = @schedule.reject{|k,v| k < taken_over_on}
-#       dd = disbursal_date || scheduled_disbursal_date
-#       @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
-#       @schedule
-#     end
-#   end # Class.new
-# end # each
 
+Loan.descendants.to_a.each do |c|
+  k = Class.new(c)
+  Object.const_set "TakeOver#{c.to_s}", k # we have to name it first otherwise DataMapper craps out
+  Kernel.const_get("TakeOver#{c.to_s}").class_eval do
+    
+    before :save, :set_amount
+
+    property :original_amount,                    Integer
+    property :original_disbursal_date,            Date
+    property :original_first_payment_date,        Date
+    property :taken_over_on,                      Date
+    property :taken_over_on_installment_number,   Integer
+    
+    validates_with_method :original_properties_specified?
+    validates_with_method :taken_over_properly?
+
+    def set_amount
+    end
+
+    def original_properties_specified?
+      blanks = []
+      [:original_amount, :original_disbursal_date, :original_first_payment_date].each do |o|
+        blanks << o.to_s.humanize if send(o).blank?
+      end
+      return true if blanks.blank?
+      return [false, "#{blanks.join(',')} must be specified"]
+    end
+
+    def taken_over_properly?
+      if taken_over_on_installment_number and (taken_over_on_installment_number < number_of_installments)
+        return true
+      elsif taken_over_on and (taken_over_on < scheduled_maturity_date)
+        return true
+      else
+        return [false, "Takeover date or installment does not jive with this loan"]
+      end
+    end  
+
+    
+    def payment_schedule
+      raise ArgumentError "This takeover loan is missing takeover information"  unless (self.taken_over_on || self.taken_over_on_installment_number)
+      self.taken_over_on_installment_number = number_of_installments_before(self.taken_over_on) if self.taken_over_on
+      # recreate the original loan
+      new_amount = amount
+      new_disbursal_date = disbursal_date
+      new_scheduled_disbursal_date = scheduled_disbursal_date
+      amount = original_amount
+      disbursal_date = original_disbursal_date
+      # generate the payments_schedule
+      super
+      # chop off what doesn't belong to us
+      self.taken_over_on ||= @schedule.keys.sort[(self.taken_over_on_installment_number) - 1]
+      @schedule = @schedule.reject{|k,v| k < self.taken_over_on}
+      dd = disbursal_date || scheduled_disbursal_date
+      disbursal_date = new_disbursal_date
+      scheduled_disbursal_date = new_scheduled_disbursal_date
+      amount = @schedule[@schedule.keys.min][:balance]
+      @schedule.delete(@schedule.keys.min)
+      @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => amount, :total => 0}
+      @schedule
+    end
+  end # Class.new
+end # each
