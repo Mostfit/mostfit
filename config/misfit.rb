@@ -49,10 +49,10 @@ module Misfit
         :all => [:"data_entry/payments",:"data_entry/clients",:"data_entry/loans", :"data_entry/index"]
       },
       :read_only => {
-        :all => [:browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports]
+        :all => [:search, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports]
       },
       :staff_member => {
-        :all =>[:browse, :centers, :payments, :clients, :reports, :"data_entry/payments", :"data_entry/clients", :"data_entry/loans", :"data_entry/index"],
+        :all =>[:search, :browse, :centers, :payments, :clients, :reports, :"data_entry/payments", :"data_entry/clients", :"data_entry/loans", :"data_entry/index"],
       }
     }
 
