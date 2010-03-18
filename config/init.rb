@@ -6,8 +6,10 @@ use_orm :datamapper
 use_test :rspec
 use_template_engine :haml
 
+Merb::Dispatcher.use_mutex = false
+
 Merb::Config.use do |c|
-  c[:use_mutex] = true
+  c[:use_mutex] = false
   c[:session_store] = 'cookie'  # can also be 'memory', 'memcache', 'container', 'datamapper
 
   # cookie session store configuration
@@ -41,6 +43,7 @@ Merb::BootLoader.before_app_loads do
     require "pdf/simpletable"
     require "lib/logger.rb"
     require 'lib/string.rb'
+    require 'lib/grapher.rb'
     require("lib/pdfs/day_sheet.rb")
     require("lib/functions.rb")
     PDF_WRITER = true

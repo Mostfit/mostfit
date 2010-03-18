@@ -3,12 +3,12 @@
     %td
       Branch
     %td
-      - if not @center.new?
-        = select :name => 'center[branch_id]', :collection => Branch.all.map{|b| [b.id,b.name]}
+      - if @branch and not @center.new?
+        =select :name => 'center[branch_id]', :collection => Branch.all.map{|b| [b.id,b.name]}, :selected => @branch.id.to_s
       -elsif @branch and @center.new?
-        = select :name => 'center[branch_id]', :collection => Branch.all(:id => @branch.id).map{|b| [b.id,b.name]}
+        =select :name => 'center[branch_id]', :collection => Branch.all(:id => @branch.id).map{|b| [b.id,b.name]}
       -else
-        = select :name => 'center[branch_id]', :collection => Branch.all.map{|b| [b.id,b.name]}
+        =select :name => 'center[branch_id]', :collection => Branch.all.map{|b| [b.id,b.name]}
   %tr
     %td
       Center name:

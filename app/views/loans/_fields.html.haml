@@ -8,13 +8,13 @@
       Amount:
     %td
       - if @loan_product.min_amount!=@loan_product.max_amount 
-        = text_field :amount, :size => 15
+        = text_field :amount_applied_for, :size => 15
         %span.greytext in Rupees
         = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
       - else
         = @loan_product.min_amount
         %span.greytext Rupees
-        = hidden_field :amount, :value => @loan_product.min_amount
+        = hidden_field :amount_applied_for, :value => @loan_product.min_amount
   %tr
     %td
       Interest rate:
