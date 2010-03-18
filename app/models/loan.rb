@@ -1,6 +1,7 @@
 class Loan
   include DataMapper::Resource
   before :valid?,  :parse_dates
+  before :save,    :convert_blank_to_nil
   after  :save,    :update_history  # also seems to do updates
   after  :destroy, :update_history
 
@@ -793,6 +794,14 @@ class Loan
   private
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
   include Misfit::LoanValidators
+
+  def convert_blank_to_nil
+    self.attributes.each{|k, v|
+      if v.is_a?(String) and v.empty? and self.class.send(k).type==Integer
+        self.send("#{k}=", nil)
+      end
+    }
+  end
 
   # repayment styles
   def pay_prorata(total, received_on)
