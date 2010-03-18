@@ -2,7 +2,7 @@ class Branch
   extend Reporting::BranchReports
   include DataMapper::Resource
 
-  before :convert_blank_to_nil
+  before :save, :convert_blank_to_nil
   
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false, :index => true
