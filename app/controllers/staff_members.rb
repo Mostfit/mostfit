@@ -6,8 +6,8 @@ class StaffMembers < Application
   def index
     per_page = 15
     @staff_members = if params[:branch_id] and not params[:branch_id].blank?
-                       @branch = Branch.all(:id => params[:branch_id])
-                       StaffMember.all(:id => (@branch.manager.map{|x| x.id} + @branch.centers.manager.map{|x| x.id}).flatten.uniq).paginate(:page => params[:page], 
+                       @branch = Branch.get(params[:branch_id])
+                       StaffMember.all(:id => ([@branch.manager.id] + @branch.centers.manager.map{|x| x.id}).flatten.uniq).paginate(:page => params[:page], 
                                                                                                                                              :per_page => per_page)
                      else
                        StaffMember.paginate(:page => params[:page], :per_page => per_page)
