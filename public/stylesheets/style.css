@@ -575,6 +575,11 @@ a.expand_all{
     float: right;
     cursor: pointer; 
 }
+a.collapse_all{
+    color: blue;
+    float: right;
+    cursor: pointer; 
+}
 a.moreinfo{
     color: blue;
     cursor: pointer; 

@@ -1,8 +1,13 @@
-%h1 Overview of all staff members
-
+%div{:style => "float: right"}
+  %b Branch selector
+  =form(:method => :get, :action => url(:staff_members)) do 
+    = select :branch_id, :collection => Branch.all, :text_method => :name, :value_method => :id, :prompt => "All branches"
+    = submit "Go"
+%h1
+  Overview of all staff members 
+  = " of #{@branch.name}" if @branch
 %p
   == #{link_to 'create a new staff member', resource(:staff_members, :new), :class => "add"}.
-
 - if @staff_members.blank?
   %p
     %i No staff members been created yet.

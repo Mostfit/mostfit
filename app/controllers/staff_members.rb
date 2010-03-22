@@ -4,10 +4,14 @@ class StaffMembers < Application
   layout :determine_layout
 
   def index
-    # @current_page = ( params[:page] && ( params[:page].to_i > 0 ) ) ? params[:page].to_i : 1
-    #per_page = 15
-    # @staff_members = StaffMember.all(:order => [:id], :offset => (@current_page - 1 ) * per_page, :limit => per_page)
-    @staff_members = StaffMember.paginate(:page => params[:page], :per_page => 15)
+    per_page = 15
+    @staff_members = if params[:branch_id] and not params[:branch_id].blank?
+                       @branch = Branch.get(params[:branch_id])
+                       StaffMember.all(:id => ([@branch.manager.id] + @branch.centers.manager.map{|x| x.id}).flatten.uniq).paginate(:page => params[:page], 
+                                                                                                                                             :per_page => per_page)
+                     else
+                       StaffMember.paginate(:page => params[:page], :per_page => per_page)
+                     end
     display @staff_members
   end
 

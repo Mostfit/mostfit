@@ -3,7 +3,7 @@ class Verifications < Application
 
   def index
     @centers   = centers(session.user)
-    @from_date = params[:from_date] ? parse_date(params[:from_date]).to_time         : Client.min(:created_at)-1
+    @from_date = params[:from_date] ? parse_date(params[:from_date]).to_time         : Date.min_date
     @to_date   = params[:to_date]   ? parse_date(params[:to_date]).to_time+24*3600-1 : DateTime.now
     case params[:model]
     when "clients"
