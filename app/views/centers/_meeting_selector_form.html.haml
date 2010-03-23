@@ -16,6 +16,6 @@
     %td center manager
     %td= link_to @center.manager.name, resource(@center.manager)
     %td
-      %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
+      %form{ :action => resource(@branch, @center) + '#weeksheet', :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
         = date_select 'date', @date
         = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
