@@ -35,8 +35,9 @@
       %td
         = link_to @center.manager.name, resource(@center.manager)
       %td
-        %form{ :action => resource(@branch, @center), :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
-          = date_select 'date', @date
+        %form{:action => url(:enter_payments, :action => 'by_center'), :method => 'GET', :style => 'margin: 0px; padding: 0px;'}
+          = date_select 'for_date', @date
+          = hidden_field :name => :center_id, :value => @center.id
           = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
   %h1 Approvals
   - @loans_to_approve = @center.clients.loans(:approved_on => nil)

@@ -14,7 +14,12 @@ module DataEntry
       if params[:center_text] and not @center
         @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
       end
-      @date = Date.parse(params[:for_date]) if params[:for_date]
+      if params[:for_date]
+        if params[:for_date][:month] and params[:for_date][:day] and params[:for_date][:year]
+          params[:for_date] = "#{params[:for_date][:year]}-#{params[:for_date][:month]}-#{params[:for_date][:day]}"
+        end
+        @date = Date.parse(params[:for_date])
+      end
       @branch = @center.branch unless @center.nil?
       if request.method == :post
         bulk_payments_and_disbursals
