@@ -458,7 +458,7 @@ class Loan
     dd = disbursal_date || scheduled_disbursal_date
     @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
     (1..number_of_installments).each do |number|
-      date      = shift_date_by_installments(scheduled_first_payment_date, number - 1)
+      date      = shift_date_by_installments(scheduled_first_payment_date, number - 1, installment_frequency == :weekly ? true : false)
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
       principal_so_far += principal
@@ -712,7 +712,7 @@ class Loan
   end
   # the installment dates
   def installment_dates
-    (0..(number_of_installments-1)).to_a.map { |x| shift_date_by_installments(scheduled_first_payment_date, x) }
+    (0..(number_of_installments-1)).to_a.map { |x| shift_date_by_installments(scheduled_first_payment_date, x, [:weekly, :biweekly].include?(installment_frequency)) }
   end
 
   # HISTORY
