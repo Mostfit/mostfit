@@ -38,7 +38,10 @@
     %td
       Total Interest Overdue
     %td
-      =@defaulted.total and @defaulted.principal ? (@defaulted.total.to_i-@defaulted.principal.to_i).to_currency : "-"
+      -if @defaulted.total and @defaulted.principal
+        =(@defaulted.total.to_i-@defaulted.principal.to_i).to_currency
+      -else
+        -
   %tr
     %td
       Number of center managers
