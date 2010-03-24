@@ -1,6 +1,16 @@
 %h1
   == Region #{@region.name}
   = link_to 'Edit',  url(:edit_region,  @region), :class => "edit"
+%table
+  %tr.odd
+    %td Address
+    %td=@region.address
+  %tr
+    %td Contact number
+    %td=@region.contact_number
+  %tr.odd
+    %td Landmark
+    %td=@region.landmark
 
 = link_to 'Add a new area', resource(@region, :areas, :new), :class => "add"
 %h3

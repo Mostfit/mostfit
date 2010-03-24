@@ -3,6 +3,9 @@ class Region
 
   property :id, Serial
   property :name, Text
+  property :address,              Text,   :lazy => true
+  property :contact_number,       String, :length => 40, :lazy => true
+  property :landmark,             String, :length => 100, :lazy => true  
 
   has n, :areas
   belongs_to :manager, :model => "StaffMember"

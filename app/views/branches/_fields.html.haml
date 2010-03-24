@@ -20,6 +20,16 @@
       ~ text_area :address, :rows => 6, :cols => 38
   %tr
     %td
+      Contact phone number:
+    %td
+      = text_field :contact_number, :size => 15
+  %tr
+    %td
+      Landmark:
+    %td
+      = text_field :landmark, :size => 25
+  %tr
+    %td
       Managed by:
     %td
       = select_staff_member_for @branch, :manager

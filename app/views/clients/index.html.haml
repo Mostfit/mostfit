@@ -1,5 +1,5 @@
 .graph
-  = ofc2(430, 200, url(:graph_data, :action => 'center', :id => @center.id, :scope_unit => 'months', :scope_size => 3) )
+  = ofc2(430, 250, url(:graph_data, :action => 'center', :id => @center.id, :scope_unit => 'months', :scope_size => 3) )
 
 %h1== Center: <i>#{@center.name}</i>
 %div.maininfo
@@ -23,6 +23,15 @@
     %tr
       %td meeting
       %td== #{@center.meeting_day.to_s.capitalize}#{(@center.meeting_time_hours and @center.meeting_time_minutes) ? ", #{@center.meeting_time_hours}:#{@center.meeting_time_minutes}" : ''}
+    %tr.odd
+      %td Address
+      %td=@center.address
+    %tr
+      %td Contact number
+      %td=@center.contact_number
+    %tr.odd
+      %td Landmark
+      %td=@center.landmark
   %p
     = link_to 'edit this center\'s details', resource(@branch, @center, :edit), :class => "edit"
     = link_to 'add a new client', resource(@branch, @center, :clients, :new), :class => "add"

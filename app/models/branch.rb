@@ -7,9 +7,11 @@ class Branch
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false, :index => true
   property :code,    String, :length => 10, :nullable => true, :index => true, :min => 1, :max => 10
-  property :address, Text, :lazy => true
-  property :created_at, DateTime
-  property :area_id, Integer, :nullable => true
+  property :address, Text,   :lazy => true
+  property :contact_number, String, :length => 40, :lazy => true
+  property :landmark,       String, :length => 100, :lazy => true  
+  property :created_at,     DateTime
+  property :area_id,        Integer, :nullable => true
 
   belongs_to :manager, :child_key => [:manager_staff_id], :model => 'StaffMember'
   belongs_to :area, :nullable => true

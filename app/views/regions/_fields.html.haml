@@ -9,3 +9,18 @@
       Manager
     %td
       = select :manager_id, :collection => StaffMember.all.map{|s| [s.id, s.name]}, :prompt => "---"
+  %tr
+    %td
+      Address:
+    %td
+      ~ text_area :address, :rows => 6, :cols => 38
+  %tr
+    %td
+      Contact phone number:
+    %td
+      = text_field :contact_number, :size => 15
+  %tr
+    %td
+      Landmark:
+    %td
+      = text_field :landmark, :size => 25

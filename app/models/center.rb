@@ -7,6 +7,9 @@ class Center
   property :name,                 String, :length => 100, :nullable => false, :index => true
   property :center_leader_name,   String, :length => 100
   property :code,                 String, :length => 12, :nullable => true, :index => true
+  property :address,              Text,   :lazy => true
+  property :contact_number,       String, :length => 40, :lazy => true
+  property :landmark,             String, :length => 100, :lazy => true  
   property :meeting_day,          Enum.send('[]', *DAYS), :nullable => false, :default => :none, :index => true
   property :meeting_time_hours,   Integer, :length => 2, :index => true
   property :meeting_time_minutes, Integer, :length => 2, :index => true

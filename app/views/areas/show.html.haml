@@ -2,6 +2,16 @@
   Area
   = @area.name
   = link_to 'Edit',  url(:edit_area,  @area), :class => "edit"
+%table
+  %tr.odd
+    %td Address
+    %td=@area.address
+  %tr
+    %td Contact number
+    %td=@area.contact_number
+  %tr.odd
+    %td Landmark
+    %td=@area.landmark
 
 %h2 Branches in this area
 - if @area.branches.blank?
