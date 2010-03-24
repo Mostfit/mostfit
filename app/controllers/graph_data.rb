@@ -1,5 +1,5 @@
 class GraphData < Application
-  COLORS = ["edd400", "f57900", "c17d11", "73d216", "3465a4", "75507b", "cc0000"]
+  COLORS = ["edd400", "f57900", "c17d11", "73d216", "3465a4", "75507b", "cc0000", "fce94f", "3465a4", "fcaf3e", "204a87", "ad7fa8", "875678", "456789", "234567"]
   include Grapher
   before :display_from_cache, :exclude => [:today]
   after  :store_to_cache, :exclude => [:today]
@@ -78,7 +78,7 @@ class GraphData < Application
   def branch(id)
     @branch    = Branch.get(id)
     start_date = repository.adapter.query("select MIN(l.scheduled_disbursal_date) start_date FROM loans l, clients cl, centers c, branches b WHERE l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id AND b.id=#{id.to_i}")[0]
-    end_date   = Date.today  # (@client.loans.map { |l| l.last_loan_history_date }).max
+    end_date   = Date.today
     loan_ids   = repository.adapter.query("select l.id start_date FROM loans l, clients cl, centers c, branches b WHERE l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id AND b.id=#{id.to_i}")
     weekly_aggregate_loan_graph(loan_ids, start_date, end_date)
   end
@@ -319,32 +319,30 @@ class GraphData < Application
       graph.data(vals)
       graph.x_axis.steps=1
       return graph.generate
-    when "client_cumulative"
-      val = repository.adapter.query("select count(*) count, date_joined date from clients group by date(date_joined)").sort_by{|x| x.date}
-      min_date = val[0].date
-      max_date = val[-1].date
-      values = []
-      type ="line"
-      count = 0
-      val.each{|row|
-        count+=row.count
-        values << count
-        labels << row.date
-      }
-      elements = [{:type => "bar", :values => values}]
-      title = {:text => "Cumulative client growth"}
-      x_axis = {:steps => 5, :labels => {:labels => labels.to_json}}
-      y_axis = {:steps => get_steps(values.max), :min => 0, :max => values.max}
-      return {:elements => elements, :x_axis => x_axis, :y_axis => y_axis, :title => title}.to_json
+    when "client_breakup"
+      graph  = PieGraph.new("Client #{params[:scope_unit]} breakup")
+      graph.data(group_by_values(Client, {:allow_blank => true}), :first, :last)
+      return graph.generate
+    when "loan_breakup"      
+      graph  = PieGraph.new("Loan #{params[:scope_unit]} breakup")
+      data   = group_by_values(Loan, {:allow_blank => true})
+      avg    = data.collect{|x| x[0]}.reduce{|s,x| s+=x}.to_f/(data.length)
+      graph.data(data, :first, :last)
+      return graph.generate
+    when "client_cumulative"      
+      vals = repository.adapter.query("select count(*) count, date_joined date from clients group by date(date_joined)").sort_by{|x| x.date}.each{|x|
+        x.date=x.date.strftime("%b %y")}
+      graph = BarGraph.new("Client cumulative growth")
+      graph.data(vals)
+      graph.x_axis.steps=5
+      return graph.generate
     when "branch_pie"
       vals = repository.adapter.query(%Q{SELECT SUM(l.amount) amount, b.name name
                                          FROM loans l, clients cl, centers c, branches b
                                          WHERE l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
-      values = []
-      vals.each_with_index{|v, idx| 
-        values << {:value => v.amount.to_i, :label => "#{v.name}", :colour => COLORS[idx]}
-      }
-      type = "pie"
+      graph = PieGraph.new("Branch growth by loan value")
+      graph.data(vals, :amount, :name)
+      graph.generate
     when "center_day"
       date =  Date.parse(params[:date])
       vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{date.strftime('%Y-%m-%d')}' GROUP BY lh.center_id")
@@ -370,6 +368,36 @@ class GraphData < Application
  end    
 
   private
+  def group_by_values(model, opts = {})
+    opts[:allow_blank]=false if not opts.key?(:allow_blank)
+    group_by = params[:scope_unit].to_sym
+    property = model.properties.find{|x| x.name==group_by} 
+
+    if property and property.type.class==Class
+      lookup = property.type.flag_map
+    elsif property
+      lookup = false
+    elsif model.relationships.key?(group_by)
+      lookup = {}
+      model.relationships[group_by].parent_model.all.each{|x| lookup[x.id]=x.name}
+      group_by = model.relationships[group_by].child_key.first.name
+    end
+
+    if lookup
+      lookup[""]  = lookup[nil] = "Not specified" if opts[:allow_blank]
+      return model.aggregate(:all.count, group_by).map{|c| 
+        id = c[1].to_i
+        [c[0], lookup[id]]
+      }.reject{|x| x[1].nil? or x[1].blank?}
+    else
+      if opts[:allow_blank]
+        return model.aggregate(:all.count, group_by)
+      else
+        return model.aggregate(:all.count, group_by).reject{|x| x.nil? or x.blank?}
+      end
+    end
+  end
+
   def display_from_cache
     return false if params[:action]=="dashboard" and params[:id]=="center_day"
     file = get_cached_filename

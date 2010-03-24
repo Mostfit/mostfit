@@ -75,8 +75,8 @@
   %ul.tabs
     %li#loans Loans
     %li#comments Comments
-        
-  .tab
+    %li#trail Audit Trail        
+  %div.tab
     %h2== Loans for client <i>#{@client.name}</i>
     
     - if @loans.blank?
@@ -154,10 +154,12 @@
         %tfoot
           %tr
             %td{ :colspan => 9 }
-  .tab  
+  %div.tab  
     %h2 Comments
     = partial 'comments/index', :object => @client
     %p
       %h3 Add a comment
       = partial 'comments/form'
     
+  %div.tab 
+    %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}

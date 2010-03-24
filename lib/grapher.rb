@@ -1,14 +1,12 @@
 module Grapher
-  COLOURS = ["edd400", "f57900", "c17d11", "73d216", "3465a4", "75507b", "cc0000"]
+  COLOURS = ["edd400", "f57900", "c17d11", "73d216", "3465a4", "75507b", "cc0000", "fce94f", "3465a4", "fcaf3e", "204a87", "ad7fa8", "a9a9a9", "9c5555", 
+             "fa9ad7", "a57654", "76a554", "5476a5", "900f57", "21673d", "abcdef", "fcba45", "bafc87", "3efcf5", "a44567", "7fa8ad", "f02323", "b0a3f3",
+             "abc123", "123abc", "5a6704", "293a47", "234def", "987def", "789056", "123456", "456789", "fefefe", "4512a9", "23f023", "ffffff"]
   class Graph
     attr_accessor :title, :type, :elements, :x_axis, :y_axis, :data_type
     def initialize(title, type)
       @elements = {:type => type, :values => []}
       @data_type = :cumulative
-      unless type=="pie"
-        @x_axis   = Axis.new("x")
-        @y_axis   = Axis.new("y")
-      end
       @title    = Title.new(title)
     end
     
@@ -16,8 +14,8 @@ module Grapher
       @elements[:values].push(val)
     end
 
-    def labels(val)
-      @x_axis.labels.push(val.to_s)
+    def get_values
+      @elements[:values]
     end
 
     def data(values_and_labels, value_method =:count, label_method=:date)
@@ -27,7 +25,7 @@ module Grapher
           count+=row.send(value_method)
           values(count)
         else
-          values(row.count)
+          values(row.send(value_method))
         end
         labels(row.send(label_method))
       }
@@ -56,7 +54,7 @@ module Grapher
     end
 
     def generate
-      @rotation=270 if @rotation==0 and @labels.join.length/@steps>50
+      @rotation=270 if @rotation==0 and @steps>0 and @labels.join.length/@steps>50
       if @type=="x"
         {:labels => {:steps => @steps, :rotate => @rotation, :labels => @labels}}
       else
@@ -91,8 +89,15 @@ module Grapher
   end
 
   class BarGraph < Graph
+    attr_accessor :x_axis, :y_axis
     def initialize(title)
       super(title, "bar")
+      @x_axis   = Axis.new("x")
+      @y_axis   = Axis.new("y")
+    end
+
+    def labels(val)
+      @x_axis.labels.push(val.to_s)
     end
   end
 
@@ -101,10 +106,16 @@ module Grapher
       super(title, "pie")
     end
 
-    def data(values_and_labels, value_method=:count, label_method=:date, colours=COLOURS)
-      count = 0
-      values_and_labels.each_with_index{|row, idx|
-        self.values({:value => get_value(row, value_method), :label => row.send(label_method), :colour => colours[idx]})
+    def data(values_and_labels, value_method=:count, label_method=:date, opts={})
+      opts[:colour]= COLOURS if not opts[:colour]
+      sum = 0      
+      values_and_labels.each_with_index{|row, idx|        
+        val = get_value(row, value_method)
+        sum+= val
+        self.values({:value => val, :label => row.send(label_method), :colour => opts[:colour][idx]})                      
+      }
+      self.get_values.each{|value|
+        value[:tip] = "#{value[:label]}: #{(value[:value]*100.0/sum).round(2)}% (#{value[:value]})"
       }
     end
     

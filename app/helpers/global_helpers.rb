@@ -229,6 +229,27 @@ module Merb
     def centers_paying_today_collection(date)
       [["","---"]] + Center.paying_today(session.user, date).map {|c| [c.id.to_s,c.name]}
     end
+    
+    def audit_trail_url
+      "/audit_trails?"+params.to_a.map{|x| "audit_for[#{x[0]}]=#{x[1]}"}.join("&")
+    end
+
+    def diff_display(arr, model)
+      
+      arr.map{|change|
+        change.map{|k, v|
+          str="<tr><td>#{k.humanize}</td><td>"
+          str+=if v.class==Array and v.length>1
+                 "changed from #{v.first}</td><td>to #{v.last}"
+               elsif v.class==Array
+                 "#{v.first}"
+               else
+                 "#{v}"
+               end
+          str+="</td></tr>"
+        }
+      }
+    end
 
     private
     def staff_members_collection

@@ -2,7 +2,6 @@ module Misfit
   module Logger
     def self.start(controllers)
       controllers.each do |c|
-        puts "logging #{c}\n"
         if c.index("::")  
           k = Kernel.const_get(c.split("::")[0])
           c = c.split("::")[1]
@@ -36,7 +35,7 @@ module Misfit
 
     def get_object_state
       model = self.class.to_s.singular
-      object = eval"#{model}.get(params[:id])"
+      object = eval "#{model}.get(params[:id])"
       @ributes = object.attributes
     end
     
@@ -50,17 +49,15 @@ module Misfit
             diff = @ributes.diff(attributes)
             diff = diff.map{|k| {k => [@ributes[k],attributes[k]]} if k != :updated_at}.to_yaml
           else
-            diff = ""
+            diff = attributes.map{|k, v| {k => [attributes[k]]} if k != :updated_at}.to_yaml
           end
-          log = AuditTrail.new(:auditable_id => object.id,
-                               :auditable_type => object.class.to_s,
-                               :user_name => session.user.login,
-                               :action => params[:action],
-                               :changes => diff,
-                               :type => :log)
+          log = AuditTrail.new(:auditable_id => object.id, :action => params[:action], :changes => diff, :type => :log,
+                               :auditable_type => object.class.to_s, :user => session.user)  
           log.save
         end
-      rescue
+      rescue Exception => e
+        puts e
+        puts e.backtrace
       end
     end
   end

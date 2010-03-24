@@ -63,7 +63,7 @@ class Application < Merb::Controller
     model =  obj.class
     # add child definitions to children; For loan model do not add history
     children = model.relationships.find_all{|x|
-      x[0] if x[1].class==DataMapper::Associations::OneToMany::Relationship and not x[0]=="history"
+      x[0] if x[1].class==DataMapper::Associations::OneToMany::Relationship and not x[0]=="history" and not x[0]=="audit_trails"
     }
    
     children_present = {}

@@ -94,106 +94,114 @@
 
 = link_to 'edit this loan >>', url_for_loan(@loan, 'edit'), :class => "button"
 
+%div.tab_container
+  %ul.tabs
+    %li#payment_schedule Payment Schedule
+    %li#payments_made Payments made
+    %li#trail Audit Trail        
 
-%h2== Payment schedule
-%table.narrow.form{ :width => '100%' }
-  %thead
-    %tr
-      %th
-      %th date due
-      %th scheduled balance
-      %th scheduled payment
-      %th actual balance
-      %th actual payments
-      %th difference
-  %tbody
-  - first, passed = true, false  # these are for printing the "today" row
-  - last_payment = @loan.payments.first(:order => [:received_on.desc])
-  - last_payment_date = last_payment.received_on if last_payment
-  - principal_so_far = interest_so_far = principal_received_so_far = interest_received_so_far = 0
-  - @history = @loan.calculate_history
-  - @history.each_with_index do |h,i|
-    - principal_so_far += h[:principal_due]
-    - interest_so_far += h[:interest_due]
-    - principal_received_so_far += h[:principal_paid]
-    - interest_received_so_far += h[:interest_paid]
-    - scheduled_principal = i > 0 ? @history[i-1][:scheduled_outstanding_principal] - h[:scheduled_outstanding_principal] : 0
-    - scheduled_interest = i > 0 ? @history[i-1][:scheduled_outstanding_total] - h[:scheduled_outstanding_total] - scheduled_principal : 0
-    - if h[:date] > Date.today and not passed
-      - passed = true
-      - if not first
+  %div.tab
+    %h2== Payment schedule
+    %table.narrow.form{ :width => '100%' }
+      %thead
+        %tr
+          %th
+          %th date due
+          %th scheduled balance
+          %th scheduled payment
+          %th actual balance
+          %th actual payments
+          %th difference
+      %tbody
+      - first, passed = true, false  # these are for printing the "today" row
+      - last_payment = @loan.payments.first(:order => [:received_on.desc])
+      - last_payment_date = last_payment.received_on if last_payment
+      - principal_so_far = interest_so_far = principal_received_so_far = interest_received_so_far = 0
+      - @history = @loan.calculate_history
+      - @history.each_with_index do |h,i|
+        - principal_so_far += h[:principal_due]
+        - interest_so_far += h[:interest_due]
+        - principal_received_so_far += h[:principal_paid]
+        - interest_received_so_far += h[:interest_paid]
+        - scheduled_principal = i > 0 ? @history[i-1][:scheduled_outstanding_principal] - h[:scheduled_outstanding_principal] : 0
+        - scheduled_interest = i > 0 ? @history[i-1][:scheduled_outstanding_total] - h[:scheduled_outstanding_total] - scheduled_principal : 0
+        - if h[:date] > Date.today and not passed
+          - passed = true
+          - if not first
+            %tr{ :class => cycle('odd','') }
+              %td{ :colspan => 6, :style => "text-align: center;" }
+                %span.greytext== today (#{Date.today})
+        - first = false
         %tr{ :class => cycle('odd','') }
-          %td{ :colspan => 6, :style => "text-align: center;" }
-            %span.greytext== today (#{Date.today})
-    - first = false
-    %tr{ :class => cycle('odd','') }
-      %td &nbsp;
-      %td
-        = h[:date]
-      %td
-        %b= format_currency h[:scheduled_outstanding_principal]
-      %td
-        %b= format_currency(scheduled_principal + scheduled_interest)
-        %br/
-        %span.greytext== #{scheduled_principal.round} principal + #{scheduled_interest.round} interest
-      %td
-        - if last_payment_date and (h[:date] <= last_payment_date or h[:date] <= Date.today)
-          %b= format_currency h[:actual_outstanding_principal]
-      %td
-        - if last_payment_date and (h[:date] <= last_payment_date or h[:date] <= Date.today)
-          %b= format_currency h[:principal_paid] + h[:interest_paid]
-          %br/
-          %span.greytext
-            == #{h[:principal_paid]} principal + #{h[:interest_paid]} interest
-      %td
-        - if h[:date] <= Date.today
-          %b
-            %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
-              = format_currency h[:amount_in_default].abs
-          %br/
-          %span.greytext
-            %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
-              = format("%.0f%", (h[:amount_in_default].abs.to_f / @loan.total_to_be_received) * 100)
-            = h[:amount_in_default] <= 0 ? 'overpaid' : 'shortfall'
-  %tfoot
-    %tr
-      %td{ :colspan => 7 }
-
-%h2== Payments &mdash; (#{link_to 'new', url_for_loan(@loan, 'payments/new')})
-
-- if @loan.payments.blank?
-  %p
-    %i No payments have been made so far.
-- else
-  %table.narrow.form{ :width => '100%' }
-    %thead
-      %tr
-        %th
-        %th id
-        %th received on
-        %th received by
-        %th amount
-        %th type
-        %th delete
-    %tbody
-    - for payment in @loan.payments
-      %tr{ :class => cycle('odd','') }
-        %td &nbsp;
-        %td
-          = payment.id
-        %td
-          %i= payment.received_on
-        %td
-          %b= link_to payment.received_by.name, resource(payment.received_by)
-        %td
-          %b= payment.amount
-        %td
-          %b= payment.type.to_s
-        %td
-          = link_to 'delete', url_for_loan(@loan, "payments/#{payment.id}/delete")
-
-    %tfoot
-      %tr
-        %td{ :colspan => 8 }
-
-%p= link_to 'new payment >>', url_for_loan(@loan, 'payments/new'), :class => "button"
+          %td &nbsp;
+          %td
+            = h[:date]
+          %td
+            %b= format_currency h[:scheduled_outstanding_principal]
+          %td
+            %b= format_currency(scheduled_principal + scheduled_interest)
+            %br/
+            %span.greytext== #{scheduled_principal.round} principal + #{scheduled_interest.round} interest
+          %td
+            - if last_payment_date and (h[:date] <= last_payment_date or h[:date] <= Date.today)
+              %b= format_currency h[:actual_outstanding_principal]
+          %td
+            - if last_payment_date and (h[:date] <= last_payment_date or h[:date] <= Date.today)
+              %b= format_currency h[:principal_paid] + h[:interest_paid]
+              %br/
+              %span.greytext
+                == #{h[:principal_paid]} principal + #{h[:interest_paid]} interest
+          %td
+            - if h[:date] <= Date.today
+              %b
+                %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
+                  = format_currency h[:amount_in_default].abs
+              %br/
+              %span.greytext
+                %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
+                  = format("%.0f%", (h[:amount_in_default].abs.to_f / @loan.total_to_be_received) * 100)
+                = h[:amount_in_default] <= 0 ? 'overpaid' : 'shortfall'
+      %tfoot
+        %tr
+          %td{ :colspan => 7 }
+  %div.tab
+    %h2== Payments &mdash; (#{link_to 'new', url_for_loan(@loan, 'payments/new')})
+    
+    - if @loan.payments.blank?
+      %p
+        %i No payments have been made so far.
+    - else
+      %table.narrow.form{ :width => '100%' }
+        %thead
+          %tr
+            %th
+            %th id
+            %th received on
+            %th received by
+            %th amount
+            %th type
+            %th delete
+        %tbody
+        - for payment in @loan.payments
+          %tr{ :class => cycle('odd','') }
+            %td &nbsp;
+            %td
+              = payment.id
+            %td
+              %i= payment.received_on
+            %td
+              %b= link_to payment.received_by.name, resource(payment.received_by)
+            %td
+              %b= payment.amount
+            %td
+              %b= payment.type.to_s
+            %td
+              = link_to 'delete', url_for_loan(@loan, "payments/#{payment.id}/delete")
+    
+        %tfoot
+          %tr
+            %td{ :colspan => 8 }
+    
+    %p= link_to 'new payment >>', url_for_loan(@loan, 'payments/new'), :class => "button"
+  %div.tab 
+    %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}

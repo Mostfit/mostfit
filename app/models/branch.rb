@@ -14,6 +14,7 @@ class Branch
   belongs_to :manager, :child_key => [:manager_staff_id], :model => 'StaffMember'
   belongs_to :area, :nullable => true
   has n, :centers
+  has n, :audit_trails, :auditable_type => "Branch", :child_key => ["auditable_id"]
 
   validates_is_unique   :code
   validates_length      :code, :min => 1, :max => 10

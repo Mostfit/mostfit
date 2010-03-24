@@ -124,6 +124,7 @@ class Client
   has n, :loans
   belongs_to :center
   belongs_to :client_group
+  belongs_to :occupation
 
   validates_length    :name, :min => 3
   validates_present   :center
