@@ -31,4 +31,8 @@
     %td
       = date_select_for(@insurance_policy, "date_to", :date => @insurance_policy.date_to)
       = hidden_field :client_id, :value => @client.id
-    
+  %tr
+    %td
+      Status
+    %td
+      = select(:status, :collection => InsurancePolicy::POLICY_STATUSES.map{|x| [x, x]})

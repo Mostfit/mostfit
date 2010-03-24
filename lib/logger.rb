@@ -47,17 +47,19 @@ module Misfit
           attributes = object.attributes
           if @ributes
             diff = @ributes.diff(attributes)
-            diff = diff.map{|k| {k => [@ributes[k],attributes[k]]} if k != :updated_at}.to_yaml
+            diff = diff.map{|k| {k => [@ributes[k],attributes[k]]} if k != :updated_at}
           else
-            diff = attributes.map{|k, v| {k => [attributes[k]]} if k != :updated_at}.to_yaml
+            diff = [attributes.select{|k, v| v and not v.blank? and not v==0}.to_hash]
+            diff.first[:discriminator] = diff.first[:discriminator].to_s if diff.first[:discriminator]
           end
-          log = AuditTrail.new(:auditable_id => object.id, :action => params[:action], :changes => diff, :type => :log,
+          diff.first[:discriminator] = diff.first[:discriminator].to_s if diff.first.key?(:discriminator)
+          log = AuditTrail.new(:auditable_id => object.id, :action => params[:action], :changes => diff.to_yaml, :type => :log,
                                :auditable_type => object.class.to_s, :user => session.user)  
           log.save
         end
       rescue Exception => e
-        puts e
-        puts e.backtrace
+        Merb.logger.info(e.to_s)
+        Merb.logger.info(e.backtrace.join("\n"))
       end
     end
   end

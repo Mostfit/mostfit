@@ -51,6 +51,14 @@ module Misfit
       return [false, "#{failed.join(",")} must be #{meeting_day}"]      unless failed.blank?
       return true
     end
+
+    def insurance_must_be_mandatory
+      return [false, "Client does not have an insurance"] if client.insurance_policies.nil? or client.insurance_policies.length==0
+      return [false, "Insurance is not valid anymore"]    if client.insurance_policies.sort_by{|x| x.date_to}.last.date_to <= self.applied_on
+      return [false, "Insurance is not active"]           if not client.insurance_policies.collect{|x| x.status}.include?(:active)
+      return true
+    end
+
   end    #LoanValidators
 
 end
