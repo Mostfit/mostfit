@@ -52,61 +52,75 @@
         %td
           %b= staff_member.active? ? 'active' : 'disabled'
         %td
-          - item = Branch.all(:manager_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - hash = {:manager_staff_id => staff_member.id, :created_at.gte => this_month}
+          - item = Branch.all(hash).count
           - sum_tm[0] += item
-          =  item || "-"
+          =link_to(item, search_url(hash, Branch))||"-"
         %td
-          - item = Branch.all(:manager_staff_id => staff_member.id).count
+          - hash = {:manager_staff_id => staff_member.id}
+          - item = Branch.all(hash).count
           - sum_total[0] += item
-          =  item || "-"
+          =link_to(item, search_url(hash, Branch))||"-"
         %td
-          - item = Center.all(:manager_staff_id => staff_member.id, :created_at.gte => this_month).count || "-"
+          - hash = {:manager_staff_id => staff_member.id, :created_at.gte => this_month}
+          - item = Center.all(hash).count || "-"
           - sum_tm[1] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Center))||"-"
         %td
-          - item = Center.all(:manager_staff_id => staff_member.id).count || "-"
+          - hash = {:manager_staff_id => staff_member.id}
+          - item = Center.all(hash).count || "-"
           - sum_total[1] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Center))||"-"
         %td
-          - item = Loan.all(:applied_by_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - hash = {:applied_by_staff_id => staff_member.id, :created_at.gte => this_month}
+          - item = Loan.all(hash).count
           - sum_tm[2] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Loan))||"-"
         %td
-          - item = Loan.all(:applied_by_staff_id => staff_member.id).count
+          - hash = {:applied_by_staff_id => staff_member.id}
+          - item = Loan.all(hash).count
           - sum_total[2] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Loan))||"-"
         %td
-          - item = Loan.all(:approved_by_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - hash = {:approved_by_staff_id => staff_member.id, :created_at.gte => this_month}
+          - item = Loan.all(hash).count
           - sum_tm[3] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Loan))||"-"
         %td
-          - item = Loan.all(:approved_by_staff_id => staff_member.id).count
+          - hash = {:approved_by_staff_id => staff_member.id}
+          - item = Loan.all(hash).count
           - sum_total[3] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Loan))||"-"
         %td
-          - item = Loan.all(:rejected_by_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - hash = {:rejected_by_staff_id => staff_member.id, :created_at.gte => this_month}
+          - item = Loan.all(hash).count
           - sum_tm[4] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Loan))||"-"
         %td
-          - item = Loan.all(:rejected_by_staff_id => staff_member.id).count
+          - hash = {:rejected_by_staff_id => staff_member.id}
+          - item = Loan.all(hash).count
           - sum_total[4] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Loan))||"-"
         %td
-          - item = Loan.all(:disbursed_by_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - hash = {:disbursed_by_staff_id => staff_member.id, :created_at.gte => this_month}
+          - item = Loan.all(hash).count
           - sum_tm[5] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Loan))||"-"
         %td
-          - item = Loan.all(:disbursed_by_staff_id => staff_member.id).count
+          - hash = {:disbursed_by_staff_id => staff_member.id}
+          - item = Loan.all(hash).count
           - sum_total[5] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Loan))||"-"
         %td
-          - item = Loan.all(:written_off_by_staff_id => staff_member.id, :created_at.gte => this_month).count
+          - hash = {:written_off_by_staff_id => staff_member.id, :created_at.gte => this_month}
+          - item = Loan.all(hash).count
           - sum_tm[6] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Loan))||"-"
         %td
-          - item = Loan.all(:written_off_by_staff_id => staff_member.id).count
+          - hash = {:written_off_by_staff_id => staff_member.id}
+          - item = Loan.all(hash).count
           - sum_total[6] += item
-          = item || "-"
+          = link_to(item, search_url(hash, Loan))||"-"
     %tr.total
       %td{:colspan => 2 }
       -7.times do |i|

@@ -234,8 +234,7 @@ module Merb
       "/audit_trails?"+params.to_a.map{|x| "audit_for[#{x[0]}]=#{x[1]}"}.join("&")
     end
 
-    def diff_display(arr, model)
-      
+    def diff_display(arr, model)      
       arr.map{|change|
         change.map{|k, v|
           str="<tr><td>#{k.humanize}</td><td>"
@@ -249,6 +248,16 @@ module Merb
           str+="</td></tr>"
         }
       }
+    end
+
+    def search_url(hash, model)
+      hash[:controller] = "search"
+      hash[:action]     = "advanced"
+      hash[:model]      = model.to_s.downcase
+      hash              = hash.map{|x| 
+        [(x[0].class==DataMapper::Query::Operator ? "#{x[0].target}.#{x[0].operator}" : x[0]), x[1]]
+      }.to_hash
+      url(hash)
     end
 
     private

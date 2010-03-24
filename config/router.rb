@@ -47,7 +47,7 @@ Merb::Router.prepare do
 
   match('/centers/:id/groups(/:group_id).:format').to(:controller => 'centers', :action => 'groups')
   slice(:merb_auth_slice_password, :name_prefix => nil, :path_prefix => "")
-  match('/search').to(:controller => 'search', :action => 'index')
+  match('/search(/:action)').to(:controller => 'search')
   match('/reports/graphs').to(:controller => 'reports', :action => 'graphs')
   match('/reports/:report_type(/:id)').to(:controller => 'reports', :action => 'show').name(:show_report)
   resources :reports

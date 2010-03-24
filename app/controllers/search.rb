@@ -19,4 +19,18 @@ class Search < Application
       display "No results"
     end
   end
+
+  def advanced
+    if params[:model] and [:branch, :center, :client, :loan, :client_group].include?(params[:model].to_sym)
+      model = Kernel.const_get(params[:model].capitalize)
+      hash  = params.deep_clone
+      hash.delete(:controller)
+      hash.delete(:action)
+      hash.delete(:model)      
+      instance_variable_set("@#{model.to_s.downcase.pluralize}", model.all(hash))
+      render :index
+    else
+      display "No results"
+    end
+  end
 end
