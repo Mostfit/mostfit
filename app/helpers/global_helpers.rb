@@ -260,6 +260,17 @@ module Merb
       url(hash)
     end
 
+    def use_tinymce
+      @content_for_tinymce = "" 
+      content_for :tinymce do
+        js_include_tag "tiny_mce/tiny_mce"
+      end
+      @content_for_tinymce_init = "" 
+      content_for :tinymce_init do
+        js_include_tag "mce_editor"
+      end
+    end
+
     private
     def staff_members_collection
       if session.user.role==:staff_member

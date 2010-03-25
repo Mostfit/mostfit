@@ -1,4 +1,6 @@
 = js_include_tag "jquery.colorPicker.js"
+= js_include_tag "tiny_mce/tiny_mce.js"
+= js_include_tag "mce_editor.js"
 = css_include_tag "colorPicker.css"
 = error_messages_for @mfi
 =form_for(@mfi, :action => url(:controller => :admin, :action => :update), :enctype => "multipart/form-data") do
@@ -22,7 +24,7 @@
       %td
         - if @mfi.logo_name and not @mfi.logo_name.blank?          
           %div#logo_file_name
-            = image_tag("logos/#{@mfi.logo_name}")
+            = image_tag("logos/#{@mfi.logo_name}", :height => 50)
             %input{:type => "hidden", :name => "mfi[logo_name]", :value => @mfi.logo_name}          
             %br
             %a{:href => "javascript: $('div#logo_file_name').remove()"}
@@ -85,6 +87,12 @@
         Specify prefered date format
       %td
         =select :date_format, :collection => Mfi::DateFormats.map{|x| [x, Date.today.strftime(x)]}
+  %table{:width => "100%"}     
+    %tr
+      %th
+        Text
+      %td
+        =text_area :main_text, :rows => 40, :cols => 120, :class => "mceEditor"
      
   =submit "Save my details"
 

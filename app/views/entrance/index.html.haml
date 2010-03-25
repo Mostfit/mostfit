@@ -1,22 +1,11 @@
 - demo_uri = url(:branches)
-
-- if session.authenticated?
-  Dashboard comes here
-  .graph
-    = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'client_growth',  :scope_unit => 'months', :scope_size => 3) )
-    = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'branch_pie',  :scope_unit => 'months', :scope_size => 3) )
-    = ofc2(430, 200, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'dashboard', :id => 'client_cumulative',  :scope_unit => 'months', :scope_size => 3) )
-    = ofc2(430, 200, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'total', :scope_unit => 'months', :scope_size => 3) )
-
-  %br
-    
+-if $globals and $globals[:mfi_details] and $globals[:mfi_details][:main_text] and $globals[:mfi_details][:main_text].strip.length>5
+  =$globals[:mfi_details][:main_text]
 - else
-
   %div{ :style => 'float: right; text-align: center;' }
     %a{ :href => 'http://intellecap.net', :title => 'respect to the sole patron of mostfit' }
       %img{ :src => '/images/intellecap-logo.png', :style => 'float: right;' }
     %br/
-    &nbsp;
     %br/
     &nbsp;
     %br/
@@ -34,7 +23,7 @@
   
   %h1 MIS FIT &mdash; a free and open source MIS for MFI's
   
-  %p== Welcome visitor. This is the homepage of MISFIT an #{link_to 'MIS', 'http://en.wikipedia.org/wiki/Management_Information_System'} for #{link_to 'MFIs', 'http://en.wikipedia.org/wiki/Microfinance_institution'} developed by #{link_to 'Intellecap', 'http://intellecap.net'}. This software is release under the #{link_to 'GNU Affero Public License (v3)', 'http://www.fsf.org/licensing/licenses/agpl-3.0.html'}, in simple terms: it is open source. Hurray!
+  %p== Welcome. This is the homepage of MISFIT an #{link_to 'MIS', 'http://en.wikipedia.org/wiki/Management_Information_System'} for #{link_to 'MFIs', 'http://en.wikipedia.org/wiki/Microfinance_institution'} developed by #{link_to 'Intellecap', 'http://intellecap.net'}. This software is release under the #{link_to 'GNU Affero Public License (v3)', 'http://www.fsf.org/licensing/licenses/agpl-3.0.html'}, in simple terms: it is open source.
   
   %h2 <a href="/branches" class="button">Try our demo >></a>
   <a href="/branches">Login</a> with username "admin" and password "password" (without the quotes)
