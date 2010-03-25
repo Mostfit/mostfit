@@ -4,95 +4,104 @@
 = css_include_tag "colorPicker.css"
 = error_messages_for @mfi
 =form_for(@mfi, :action => url(:controller => :admin, :action => :update), :enctype => "multipart/form-data") do
-  %table.wide
-    %tr
-      %td
-        Name of the mfi
-      %td
-        =text_field :name
-    %tr
-      %td
-        Select Color for this name
-      %td
-        =text_field :color
-    %tr
-      %td
-        and choose a logo
-    %tr
-      %td
-        Upload Logo
-      %td
-        - if @mfi.logo_name and not @mfi.logo_name.blank?          
-          %div#logo_file_name
-            = image_tag("logos/#{@mfi.logo_name}", :height => 50)
-            %input{:type => "hidden", :name => "mfi[logo_name]", :value => @mfi.logo_name}          
-            %br
-            %a{:href => "javascript: $('div#logo_file_name').remove()"}
-              Remove Image
-          Change Image 
-        %input{:name => "mfi[logo]", :size => "20",  :type => "file", :value => @mfi.logo_name}
-        %ul
-        %li==Height of the image should not be more than 50 pixels
-        %li==Only gif, jpg and png type images are allowed
-        %li==Maximum size is 100kb
-    %tr
-      %td
-        Address of MFI HQ
-      %td
-        =text_area :address
-    %tr
-      %td
-        Website (if any)
-      %td
-        =text_field :website
-    %tr
-      %td
-        Telephone number
-      %td
-        =text_field :telephone
-    %tr
-      %td{:colspan => "2"}
-        %h3 
-          Operational details (these will help us build a suitable system for you) 
-    %tr
-      %td
-        Number of clients
-      %td
-        =text_field :number_of_clients
-    %tr
-      %td
-        Number of centers
-      %td
-        =text_field :number_of_centers
-    %tr
-      %td
-        In operation since
-      %td
-        =date_select_for @mfi, :in_operation_since
-    %tr
-      %td
-        Number of branches
-      %td
-        =text_field :number_of_branches
-    %tr
-      %td
-        Email address
-      %td
-        =text_field :email
-    %tr
-      %td{:colspan => 2}
-        %hr
-    %tr
-      %td
-        Specify prefered date format
-      %td
-        =select :date_format, :collection => Mfi::DateFormats.map{|x| [x, Date.today.strftime(x)]}
-  %table{:width => "100%"}     
-    %tr
-      %th
-        Text
-      %td
-        =text_area :main_text, :rows => 40, :cols => 120, :class => "mceEditor"
-     
+  %div.tab_container
+    %ul.tabs
+      %li#contact Contact details
+      %li#operational Operational details
+      %li#info Main page
+    %div.tab
+      %table.wide
+        %tr
+          %td
+            Name of the mfi
+          %td
+            =text_field :name
+        %tr
+          %td
+            Select Color for this name
+          %td
+            =text_field :color
+        %tr
+          %td
+            and choose a logo
+        %tr
+          %td
+            Upload Logo
+          %td
+            - if @mfi.logo_name and not @mfi.logo_name.blank?          
+              %div#logo_file_name
+                = image_tag("logos/#{@mfi.logo_name}", :height => 50)
+                %input{:type => "hidden", :name => "mfi[logo_name]", :value => @mfi.logo_name}          
+                %br
+                %a{:href => "javascript: $('div#logo_file_name').remove()"}
+                  Remove Image
+              Change Image 
+            %input{:name => "mfi[logo]", :size => "20",  :type => "file", :value => @mfi.logo_name}
+            %ul
+            %li==Height of the image should not be more than 50 pixels
+            %li==Only gif, jpg and png type images are allowed
+            %li==Maximum size is 100kb
+        %tr
+          %td
+            Address of MFI HQ
+          %td
+            =text_area :address
+        %tr
+          %td
+            Website (if any)
+          %td
+            =text_field :website
+        %tr
+          %td
+            Telephone number
+          %td
+            =text_field :telephone
+    %div.tab
+      %table
+        %tr
+          %td{:colspan => "2"}
+            %h3 
+              Operational details (these will help us build a suitable system for you) 
+        %tr
+          %td
+            Number of clients
+          %td
+            =text_field :number_of_clients
+        %tr
+          %td
+            Number of centers
+          %td
+            =text_field :number_of_centers
+        %tr
+          %td
+            In operation since
+          %td
+            =date_select_for @mfi, :in_operation_since, {:min_date => Date.parse("2000-01-01")}
+        %tr
+          %td
+            Number of branches
+          %td
+            =text_field :number_of_branches
+        %tr
+          %td
+            Email address
+          %td
+            =text_field :email
+        %tr
+          %td{:colspan => 2}
+            %hr
+        %tr
+          %td
+            Specify prefered date format
+          %td
+            =select :date_format, :collection => Mfi::DateFormats.map{|x| [x, Date.today.strftime(x)]}
+    %div.tab    
+      %table{:width => "100%"}     
+        %tr
+          %th
+            Text
+          %td
+            =text_area :main_text, :rows => 40, :cols => 120, :class => "mceEditor"
+       
   =submit "Save my details"
-
+  
