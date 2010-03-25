@@ -44,6 +44,12 @@ class Loan
   property :created_by_user_id,             Integer, :nullable => true, :index => true
   property :cheque_number,                  String,  :length => 20, :nullable => true, :index => true
 
+  property :original_amount,                    Integer
+  property :original_disbursal_date,            Date
+  property :original_first_payment_date,        Date
+  property :taken_over_on,                      Date
+  property :taken_over_on_installment_number,   Integer
+  
 #  property :taken_over_on,                     Date
 #  property :taken_over_on_installment_number,  Integer 
 
@@ -1043,15 +1049,7 @@ Loan.descendants.to_a.each do |c|
   k = Class.new(c)
   Object.const_set "TakeOver#{c.to_s}", k # we have to name it first otherwise DataMapper craps out
   Kernel.const_get("TakeOver#{c.to_s}").class_eval do
-    
     before :save, :set_amount
-
-    property :original_amount,                    Integer
-    property :original_disbursal_date,            Date
-    property :original_first_payment_date,        Date
-    property :taken_over_on,                      Date
-    property :taken_over_on_installment_number,   Integer
-    
     validates_with_method :original_properties_specified?
     validates_with_method :taken_over_properly?
 
