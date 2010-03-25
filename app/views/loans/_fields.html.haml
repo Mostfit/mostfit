@@ -1,3 +1,4 @@
+- take_over_loan = /^TakeOver/.match(@loan_product.loan_type)
 = hidden_field :name => "loan_type", :value => @loan.class.to_s
 = hidden_field :name => "loan_product_id", :value => @loan_product.id
 %h3
@@ -78,27 +79,40 @@
     %td
       on&nbsp;&nbsp;
       = date_select_for @loan, :scheduled_first_payment_date
-  - if session.user.can_approve?(@loan.new? ? @client : @loan)
+  - if take_over_loan
+    %tr
+      %td{:colspan => 2}
+        %b This is a take over loan product and needs details of the takeover
     %tr
       %td
-        Approved:
+        Original amount:
       %td
-        on&nbsp;&nbsp;
-        = date_select_for @loan, :approved_on, :nullable => true
-        &nbsp;&nbsp;by&nbsp;&nbsp;
-        = select_staff_member_for @loan, :approved_by
-        %br/
-        %span.greytext these fields are optional so may be specified later
+        = text_field :original_amount, :size => 15
+        %span.greytext the amount which originally disbursed
     %tr
       %td
-        Disbursed:
+        Original disbursal date:
       %td
-        on&nbsp;&nbsp;
-        = date_select_for @loan, :disbursal_date, :nullable => true
-        &nbsp;&nbsp;by&nbsp;&nbsp;
-        = select_staff_member_for @loan, :disbursed_by
-        %br/
-        %span.greytext these fields are optional so may be specified later
+        = date_select_for @loan, :original_disbursal_date
+        %span.greytext the date on which this loand originally disbursed
+    %tr
+      %td
+        Original first payment date:
+      %td
+        = date_select_for @loan, :original_first_payment_date
+        %span.greytext the date on which first payment was made for this loan
+    %tr
+      %td
+        Taken over on:
+      %td
+        = date_select_for @loan, :taken_over_on
+        %span.greytext the date on which this loan was taken over
+    %tr
+      %td
+        Taken installment number:
+      %td
+        = text_field :taken_over_on_installment_number, :size => 5
+        %span.greytext number of installments already paid
   %tr
     %td
     %td

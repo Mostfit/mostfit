@@ -1098,6 +1098,8 @@ Loan.descendants.to_a.each do |c|
       amount = @schedule[@schedule.keys.min][:balance]
       @schedule.delete(@schedule.keys.min)
       @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => amount, :total => 0}
+      total = @schedule[@schedule.keys.max][:total]
+      @schedule.each { |k,v| v[:total_balance] = total - v[:total]}
       @schedule
     end
   end # Class.new
