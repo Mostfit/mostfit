@@ -1,7 +1,7 @@
 class Loan
   include DataMapper::Resource
   before :valid?,  :parse_dates
-  before :save,    :convert_blank_to_nil
+  before :valid?,    :convert_blank_to_nil
   after  :save,    :update_history  # also seems to do updates
   after  :destroy, :update_history
 
@@ -733,6 +733,7 @@ class Loan
   end
 
   def calculate_history
+    debugger
     return @history_array if @history_array
     t = Time.now
     current = nil
@@ -1049,13 +1050,13 @@ Loan.descendants.to_a.each do |c|
   k = Class.new(c)
   Object.const_set "TakeOver#{c.to_s}", k # we have to name it first otherwise DataMapper craps out
   Kernel.const_get("TakeOver#{c.to_s}").class_eval do
-    before :save, :set_amount
+    before :valid?, :set_amount
     validates_with_method :original_properties_specified?
     validates_with_method :taken_over_properly?
 
     def set_amount
       # this sets the amount to be the outstanding amount unless it is already set
-      amount = payment_schedule[payment_schedule.keys.min][:balance] unless amount
+      amount = payment_schedule[payment_schedule.keys.min][:balance] 
     end
 
     def original_properties_specified?
@@ -1068,8 +1069,10 @@ Loan.descendants.to_a.each do |c|
     end
 
     def taken_over_properly?
+      debugger
       if taken_over_on_installment_number and (taken_over_on_installment_number < number_of_installments)
         return true
+
       elsif taken_over_on and (taken_over_on < scheduled_maturity_date)
         return true
       else
@@ -1083,11 +1086,13 @@ Loan.descendants.to_a.each do |c|
       raise ArgumentError "This takeover loan is missing takeover information"  unless (self.taken_over_on || self.taken_over_on_installment_number)
       self.taken_over_on_installment_number = number_of_installments_before(self.taken_over_on) if self.taken_over_on
       # recreate the original loan
+      debugger
       new_amount = amount
       new_disbursal_date = disbursal_date
       new_scheduled_disbursal_date = scheduled_disbursal_date
-      amount = original_amount
-      disbursal_date = original_disbursal_date
+      self.scheduled_first_payment_date = original_first_payment_date
+      self.amount = original_amount
+      self.disbursal_date = original_disbursal_date
       # generate the payments_schedule
       super
       # chop off what doesn't belong to us

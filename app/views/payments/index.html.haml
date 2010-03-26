@@ -52,6 +52,11 @@
       - else
         to be disbursed on
         = @loan.scheduled_disbursal_date
+      - if @loan.class.to_s.match(/^TakeOver/)
+        %br
+        %i 
+          original loan disbursed on
+          = @loan.original_disbursal_date
   %tr.odd
     %td first payment
     %td
@@ -69,6 +74,12 @@
             = difference_in_days(@loan.scheduled_first_payment_date, actual_first_payment, ['days earlier', 'days later'])
             then scheduled
             == (#{@loan.scheduled_disbursal_date})
+      - if @loan.class.to_s.match(/^TakeOver/)
+        %br
+        %i 
+          original first payment date
+          = @loan.original_first_payment_date
+
   %tr
     %td
       fees applicable

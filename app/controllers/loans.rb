@@ -64,16 +64,17 @@ class Loans < Application
   end
 
   def update(id)
+    debugger
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     attrs[:occupation_id] = nil if attrs[:occupation_id] == ''
     @loan = klass.get(id)
-    @loan_product =  @loan.loan_product
-    @loan.amount  = @loan.amount_applied_for
     raise NotFound unless @loan
     disallow_updation_of_verified_loans
     @loan.update_attributes(attrs)
-    if @loan.errors.blank?
+    @loan_product =  @loan.loan_product
+    @loan.amount  = @loan.amount_applied_for if @loan.amount_applied_for
+    if @loan.save
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' has been edited"})
       else
