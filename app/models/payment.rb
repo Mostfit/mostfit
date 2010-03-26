@@ -125,8 +125,9 @@ class Payment
   end
   def not_received_before_loan_is_disbursed?
     if loan
-      return true if loan.disbursal_date.blank? ? false : loan.disbursal_date <= received_on
-      [false, "Payments cannot be received before the loan is disbursed"]
+      return [false, "Payments cannot be received before the loan is disbursed"] if loan.disbursal_date.blank?
+      return [false, "Payments cannot be received before the loan disbursal date"] if loan.disbursal_date > received_on
+      return true
     end
   end
   def not_paying_too_much?

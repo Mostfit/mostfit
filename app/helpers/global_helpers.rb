@@ -1,6 +1,8 @@
 module Merb
   module GlobalHelpers
     CRUD_ACTIONS = ["list", "index", "show", "edit", "new"]
+    MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    
     def page_title
       begin
         generate_page_title
@@ -24,17 +26,24 @@ module Merb
       return link_to(text,path,params) if session.user.can_access?(route)
     end
 
-    def url_for_loan(loan, action = '')
+    def url_for_loan(loan, action = '', opts = {})
       # this is to generate links to loans, as the resouce method doesn't work for descendant classes of Loan
       # it expects the whole context (@branch, @center, @client) to exist
-      base = url(:branch_center_client, @branch.id, @center.id, @client.id)
-      base + "/loans/#{loan.id}/" + action
+      base = if @branch and @center and @client
+               url(:branch_center_client, @branch.id, @center.id, @client.id)
+             elsif @client
+               url(:branch_center_client, @client.center.branch_id, @client.center_id, @client.id)
+             else
+               client = loan.client
+               url(:branch_center_client, client.center.branch_id, client.center_id, client.id)
+             end
+      base + "/loans/#{loan.id}/" + action.to_s + (opts.length>0 ? "?#{opts.inject([]){|s,x| s << "#{x[0]}=#{x[1]}"}.join("&")}" : '')
     end
 
     def select_staff_member_for(obj, col, attrs = {})
       id_col = "#{col.to_s}_staff_id".to_sym
       select(col,
-      :collection   => [["0", "<Select a staff member"]] + StaffMember.all(:active => true).map{|x| [x.id, x.name]},
+      :collection   => staff_members_collection,
       :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
       :id           => "#{obj.class.to_s.snake_case}_#{id_col}",
       :selected     => ((obj.send(id_col) and obj.send(id_col)!="") ? obj.send(id_col).to_s : "0"))
@@ -43,7 +52,7 @@ module Merb
     def select_center_for(obj, col, attrs = {})
       id_col = "#{col.to_s}_id".to_sym
       collection = []
-      catalog = Center.catalog
+      catalog = Center.catalog(session.user)
       catalog.keys.sort.each do |branch_name|
         collection << ['', branch_name]
         catalog[branch_name].sort.each{ |k,v| collection << [k.to_s, "!!!!!!!!!#{v}"] }
@@ -75,15 +84,16 @@ module Merb
     end
 
 
-    MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-    def date_select(name, date=Date.today)
+    def date_select(name, date=Date.today, opts={})
       # defaults to Date.today
       # should refactor
       attrs = {}
       attrs.merge!(:name => name)
       attrs.merge!(:date => date)
       attrs.merge!(:id => name)
-      attrs.merge(:date => date)
+      attrs.merge!(:date     => date)
+      attrs.merge!(:min_date => opts[:min_date]||Date.min_date)
+      attrs.merge!(:max_date => opts[:max_date]||Date.max_date)
       date_select_html(attrs) 
     end
 
@@ -95,6 +105,8 @@ module Merb
       date = Date.today if date.blank? and not nullable
       date = nil        if date.blank? and nullable
       attrs.merge!(:date => date)
+      attrs.merge!(:min_date => attrs[:min_date]||Date.min_date)
+      attrs.merge!(:max_date => attrs[:max_date]||Date.max_date)
       date_select_html(attrs, obj, col)
 #       errorify_field(attrs, col)
     end
@@ -118,15 +130,17 @@ module Merb
         :class      => obj ? (obj.errors[col] ? 'error' : '') : nil,
         :collection => (nullable ? [['', '-']] : []) + MONTHS.map { |x| count += 1; x = [count, x] }
       )
-      
+
+      min_year = attrs[:min_date] ? attrs[:min_date].year : 1900
+      max_year = attrs[:max_date] ? attrs[:max_date].year : date.year + 3
       year_attrs = attrs.merge(
         :name       => attrs[:name] + '[year]',
         :id         => attrs[:id] + '_year',
         :selected   => (date ? date.year.to_s : ''),
         :class      => obj ? (obj.errors[col] ? 'error' : '') : nil,
-        :collection => (nullable ? [['', '-']] : []) + (1900..Time.now.year + 3).to_a.reverse.map{|x| x = [x.to_s, x.to_s]}
+        :collection => (nullable ? [['', '-']] : []) + (min_year..max_year).to_a.reverse.map{|x| x = [x.to_s, x.to_s]}
       )
-      select(month_attrs) + '&nbsp;' + select(day_attrs) + '&nbsp;' + select(year_attrs)
+      select(month_attrs) + '' + select(day_attrs) + '' + select(year_attrs)
     end
 
 
@@ -211,7 +225,24 @@ module Merb
                          });
      </script>"
     end
+
+    def centers_paying_today_collection(date)
+      [["","---"]] + Center.paying_today(session.user, date).map {|c| [c.id.to_s,c.name]}
+    end
+
     private
+    def staff_members_collection
+      if session.user.role==:staff_member
+        staff = session.user.staff_member
+        bms  = staff.branches.collect{|x| x.manager}
+        cms  = staff.branches.centers.collect{|x| x.manager}               
+        managers = [bms, cms, staff].flatten.uniq
+        [["0", "<Select a staff member"]] + managers.map{|x| [x.id, x.name]}
+      else
+        [["0", "<Select a staff member"]] + StaffMember.all(:active => true).map{|x| [x.id, x.name]}
+      end
+    end
+    
     def join_segments(*args)
       args.map{|x| x.class==Array ? x.uniq : x}.flatten.reject{|x| not x or x.blank?}.join(' - ').capitalize
     end

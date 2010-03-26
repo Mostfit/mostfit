@@ -13,5 +13,6 @@
         = link_to branch.name, resource(branch)
 - if not @centers.blank?
   %h3 
-    ="You manage #{@centers.count} centers"
-    = link_to '[View]', url(:browse, :action =>'centers')
+    - @centers.branch.each do |branch|
+      ="You manage #{@centers.find_all{|c| c.branch_id==branch.id}.count} centers in #{branch.name} branch"
+      = link_to '[View]', url(:browse, :action =>'centers')

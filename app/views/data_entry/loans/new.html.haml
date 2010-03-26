@@ -16,14 +16,12 @@
               = hidden_field :name => "client_id", :value => @client.id
               = submit "Proceed"
   - else
-    = form_for(@loan, :action => url(:enter_loans, :action => 'create')) do
+    = form_for(@loan, :action => resource(@client.center.branch, @client.center, @client, :loans, {:return => "/data_entry"})) do
       = hidden_field :client_id, :value => @client.id
       - if @loan.fields_partial.blank?
         = partial 'loans/fields', :submit_text => "Create loan for #{@client.name}", :cancel_link => url(:data_entry)
       - else
         = @loan.fields_partial
-
-
 - else
   %p
     Please select the client that you want to create a loan for by entering its client ID.

@@ -1,0 +1,13 @@
+%h1 Comments controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/comments/new.html.erb
+
+= error_messages_for @comment
+
+= form_for(@comment, :action => url(:comments) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:comments)

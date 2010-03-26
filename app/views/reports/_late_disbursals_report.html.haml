@@ -14,6 +14,7 @@
       Days delayed
     %th
       Status
+  - org_total = 0
   - @data.each do |branch, centers|
     -branch_total = 0
     %tr.branch
@@ -51,6 +52,14 @@
       %td
         Branch total
       %td
+        -org_total+=branch_total
         =branch_total
       -4.times do
         %td
+  %tr.org_total
+    %td
+      Total
+    %td
+      =org_total
+    -4.times do
+      %td

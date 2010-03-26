@@ -30,25 +30,32 @@ class ConsolidatedReport < Report
         c.client_groups.each{|g|
           #0              1                 2                3              4              5     6                  7         8    9,10,11     12         13
           #amount_applied,amount_sanctioned,amount_disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults, name
-          groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, g.name]
+          groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, g.name]
           history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id} if histories
           if history
             principal_scheduled = history.scheduled_outstanding_principal.to_i
             total_scheduled     = history.scheduled_outstanding_total.to_i
 
             principal_actual = history.actual_outstanding_principal.to_i
-            total_actual     = history.actual_outstanding_total.to_i            
+            total_actual     = history.actual_outstanding_total.to_i
+            
+            principal_advance = history.advance_principal.to_i
+            total_advance     = history.advance_total.to_i
           else
-            principal_scheduled, total_scheduled, principal_actual, total_actual = 0, 0, 0, 0
+            principal_scheduled, total_scheduled, principal_actual, total_actual, principal_advance, total_advance = 0, 0, 0, 0, 0, 0
           end
 
-          groups[b.id][c.id][g.id][6] += principal_actual
-          groups[b.id][c.id][g.id][8] += total_actual
-          groups[b.id][c.id][g.id][7] += total_actual - principal_actual
+          groups[b.id][c.id][g.id][7] += principal_actual
+          groups[b.id][c.id][g.id][9] += total_actual
+          groups[b.id][c.id][g.id][8] += total_actual - principal_actual
 
-          groups[b.id][c.id][g.id][9]  += principal_actual - principal_scheduled
-          groups[b.id][c.id][g.id][10] += (total_actual - total_scheduled) - (principal_actual - principal_scheduled)
-          groups[b.id][c.id][g.id][11] += total_actual - total_scheduled
+          groups[b.id][c.id][g.id][10]  += (principal_actual > principal_scheduled ? principal_actual-principal_scheduled : 0)
+          groups[b.id][c.id][g.id][11] += ((total_actual-principal_actual) > (total_scheduled-principal_scheduled) ? (total_actual-principal_actual - (total_scheduled-principal_scheduled)) : 0)
+          groups[b.id][c.id][g.id][12] += total_actual > total_scheduled ? total_actual - total_scheduled : 0
+
+          groups[b.id][c.id][g.id][13]  += principal_advance
+          groups[b.id][c.id][g.id][15] += total_advance
+          groups[b.id][c.id][g.id][14] += (total_advance - principal_advance)
         }
       }
     }
@@ -58,7 +65,7 @@ class ConsolidatedReport < Report
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       if groups[branch_id][center_id]
-        groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id
+        groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
         groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][3] += p.amount if p.type==:principal 
         groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][4] += p.amount if p.type==:interest
         groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][5] += p.amount if p.type==:fees
@@ -70,7 +77,7 @@ class ConsolidatedReport < Report
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
-      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id
+      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id and not groups[branch_id][center_id][0]
       groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][0] += l.amount
     }
 
@@ -80,7 +87,7 @@ class ConsolidatedReport < Report
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
-      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id
+      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id and not groups[branch_id][center_id][0]
       groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][1] += l.amount
     }
 
@@ -90,7 +97,7 @@ class ConsolidatedReport < Report
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
-      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id
+      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id and not groups[branch_id][center_id][0]
       groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][2] += l.amount
     }
     return [groups, centers, branches]

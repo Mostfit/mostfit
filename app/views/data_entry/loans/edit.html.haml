@@ -22,7 +22,7 @@
           = submit "Proceed..."
 
 - else
-  = form_for(@loan, :action => url(:enter_loans, :action => 'update')) do
+  = form_for(@loan, :action => url_for_loan(@loan, '', {:return => "/data_entry"})) do
     = hidden_field :id, :value => @loan.id
     = partial 'loans/fields', :submit_text => "Save changes on loan ##{@loan.id}", :cancel_link => url(:data_entry)
 

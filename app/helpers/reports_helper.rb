@@ -3,7 +3,7 @@ module Merb
     def get_printer_url
       request.env["REQUEST_URI"] + (request.env["REQUEST_URI"].index("?") ? "&" : "?") + "layout=printer"
     end
-    
+
     def branches
       if session.user.role==:staff_member
         [session.user.staff_member.centers.branches, session.user.staff_member.branches].flatten
@@ -31,5 +31,7 @@ module Merb
                          end      
       staff_members.map{|x| [x.id, x.name]}
     end
+
+    
   end
 end # Merb

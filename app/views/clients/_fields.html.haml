@@ -51,22 +51,23 @@
     %td
       Date of birth:
     %td
-      = date_select_for @client, :date_of_birth, :nullable => true
-  %tr
-    %td
-      Date of death:
-    %td
-      = date_select_for @client, :deceased_on, :nullable => true
+      = date_select_for @client, :date_of_birth, :nullable => true, :min_date => Date.today-36500, :max_date => Date.today-1000
+  - unless @client.new?
+    %tr
+      %td
+        Date of death:
+      %td
+        = date_select_for @client, :deceased_on, :nullable => true
   %tr
     %td
       Date joined
     %td
-      = date_select_for @client, :date_joined
+      = date_select_for @client, :date_joined, :max_date => Date.today
   %tr
     %td
       Date of sucessful group recognization test:
     %td
-      = date_select_for @client, :grt_pass_date, :nullable => true
+      = date_select_for @client, :grt_pass_date, :nullable => true, :max_date => Date.today
   %tr
     %td
       Spouse name:

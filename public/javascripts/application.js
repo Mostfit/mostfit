@@ -112,6 +112,7 @@ $(document).ready(function(){
 	    $("table.report tr").hide();
 	    $("table.report tr.branch").show();
 	    $("table.report tr.branch_total").show();
+	    $("table.report tr.org_total").show();
 	    $("table.report tr.header").show();
 	    $("table.report").before("<a class='expand_all'>Expand all</a>");
 	    $("table.report tr.branch td").append("<a id='center' class='expand'>Expand centers</a>");
@@ -227,4 +228,94 @@ $(document).ready(function(){
 			});
 		});
 	}
-    });
+
+  function daysInMonth(month, year){
+    isLeap = false;
+    if ((year%4 == 0 && year%100 != 0)||year%400 == 0) isLeap = true;
+    if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) days = 31;
+    if (month == 4 || month == 6 || month == 9 || month == 11) days = 30;
+    if (month == 2 && isLeap) days = 29;
+    if (month == 2 && isLeap == false) days = 28;
+    return days;
+  }
+
+  function dateFromAge(ageYear, ageMonth, ageDay){
+ 
+    $('#age_year_field').removeClass('error');
+    $('#age_month_field').removeClass('error');
+    $('#age_day_field').removeClass('error');
+    var birthDate = new Array();
+    today = new Date();
+    todayDay = today.getDate();
+    todayMonth = today.getMonth()+ 1;
+    todayYear = today.getFullYear();
+    
+    var returnEarly;
+    if (ageMonth > 11 || ageMonth < 0){
+      $('#age_month_field').addClass('error');
+      returnEarly = true;
+    }
+    if (ageDay > 31 || ageDay < 0){
+      $('#age_day_field').addClass('error');
+      returnEarly = true;
+    }
+
+    if (returnEarly) return false;
+    
+    if(ageDay < todayDay){
+      if (ageMonth < todayMonth){
+        birthDate[1] = todayMonth - ageMonth;
+        birthDate[0] = todayYear - ageYear;    
+      }
+      else{
+        birthDate[1] = todayMonth - ageMonth + 12;
+        birthDate[0] = todayYear - ageYear - 1;    
+      }
+    }
+    else{
+      if (ageMonth < todayMonth -1){
+        birthDate[1] = todayMonth - ageMonth -1 ;
+        birthDate[0] = todayYear - ageYear;            
+      }
+      else{
+        birthDate[1] = todayMonth - ageMonth + 12 -1 ;
+        birthDate[0] = todayYear - ageYear - 1 ;
+      }
+    }
+    
+    days = daysInMonth(birthDate[1], birthDate[0]);
+
+    if(ageDay < todayDay){
+      birthDate[2] = todayDay - ageDay;
+    }
+    else{
+      birthDate[2] = days + todayDay - ageDay;
+    }
+    return birthDate;
+  }
+
+  if($("#client_date_of_birth_day, #client_date_of_birth_month, #client_date_of_birth_year")){
+
+    $('#client_date_of_birth_year').parent().append('&nbsp;&nbsp;OR &nbsp;&nbsp;<span class="greytext">Enter the age in Years: </span><input size="2" id="age_year_field" type="text"></input>&nbsp;');
+    $('#client_date_of_birth_month').parent().append('<span class="greytext"> Months: </span><input size="1" id="age_month_field" type="text"></input>&nbsp;');
+    $('#client_date_of_birth_day').parent().append('<span class="greytext"> and Days: </span><input size="1" id="age_day_field" type="text"></input>&nbsp;');
+    $('#client_date_of_birth_day').parent().append('&nbsp;&nbsp;<button id="calculateDOB">Calculate</button>');
+
+    $('#calculateDOB').click(function(){
+      dob = dateFromAge(parseInt($('#age_year_field').val()), parseInt($('#age_month_field').val()), parseInt($('#age_day_field').val()));
+      $('#client_date_of_birth_year').val(dob[0]);
+      $('#client_date_of_birth_month').val(dob[1]);
+      $('#client_date_of_birth_day').val(dob[2]);      
+      return false;
+    })
+  }
+
+  if($('.notice')){
+    $('.notice').prepend('<div style="margin-top: 0; float:right"><a href="#" class="closeNotice" class = "closeNotice">[X]</a></div>');
+  }
+
+  $('.closeNotice').click(function(){
+     $('.closeNotice').addClass('notice'); 
+     $('.notice').remove();
+  })
+});

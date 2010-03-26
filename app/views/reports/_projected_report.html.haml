@@ -31,6 +31,7 @@
       Total
   - center_id, branch_id = nil, nil
   - length = 9
+  - org_total = []
   -@groups.each do |group_id, centers|
     -if centers.keys.length>0
       -branch_total = []
@@ -64,8 +65,16 @@
       %tr.branch_total
         %td
           %b==Branch total:
-        -branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
+        - org_total << branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
+        -org_total.last.each do |ele|
           %td
             %b
               =ele
+  %tr.org_total
+    %td
+      %b==Total:
+    -org_total.find_all{|x| x.length==length}.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
+      %td
+        %b
+          =ele
 

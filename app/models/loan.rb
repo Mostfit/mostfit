@@ -1,6 +1,7 @@
 class Loan
   include DataMapper::Resource
   before :valid?,  :parse_dates
+  before :save,    :convert_blank_to_nil
   after  :save,    :update_history  # also seems to do updates
   after  :destroy, :update_history
 
@@ -9,7 +10,12 @@ class Loan
 
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false, :index => true
-  property :amount,                         Integer, :nullable => false, :index => true  # see helper for formatting
+
+  property :amount,                         Integer, :nullable => false, :index => true  # this is the disbursed amount
+  property :amount_applied_for,             Integer, :index => true
+  property :amount_sanctioned,              Integer, :index => true
+
+
   property :interest_rate,                  Float, :nullable => false, :index => true
   property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
   property :number_of_installments,         Integer, :nullable => false, :index => true
@@ -37,6 +43,9 @@ class Loan
   property :verified_by_user_id,            Integer, :nullable => true, :index => true
   property :created_by_user_id,             Integer, :nullable => true, :index => true
   property :cheque_number,                  String,  :length => 20, :nullable => true, :index => true
+
+#  property :taken_over_on,                     Date
+#  property :taken_over_on_installment_number,  Integer 
 
   # associations
   belongs_to :client
@@ -82,15 +91,16 @@ class Loan
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :cheque_number,                :method => :check_validity_of_cheque_number
+
   # validates_with_method  :dates_are_not_holidays
 
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
-
   #product validations
   validates_with_method  :amount,                       :method => :is_valid_loan_product_amount
   validates_with_method  :interest_rate,                :method => :is_valid_loan_product_interest_rate
   validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
   validates_with_method  :clients,                      :method => :check_client_sincerity
+
 
   def check_validity_of_cheque_number
     return true if not self.cheque_number or (self.cheque_number and self.cheque_number.blank?)
@@ -148,6 +158,13 @@ class Loan
 
 
   # MISC FUNCTIONS
+  def _show_cf #convenience function to see cashflow in console
+    ps = payment_schedule
+    puts
+    ps.keys.sort.each {|d| puts "#{d}\t|  #{ps[d].values.map{|v| "%.2f" % v}.join("\t|  ")}"}
+    puts
+  end
+
   def self.search(q)
     if /^\d+$/.match(q)
       all(:conditions => {:id => q})
@@ -438,7 +455,8 @@ class Loan
     principal_so_far = interest_so_far = fees_so_far = total = 0
     balance = amount
     fs = fee_schedule
-    @schedule[disbursal_date || scheduled_disbursal_date] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
+    dd = disbursal_date || scheduled_disbursal_date
+    @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
     (1..number_of_installments).each do |number|
       date      = shift_date_by_installments(scheduled_first_payment_date, number - 1)
       principal = scheduled_principal_for_installment(number)
@@ -783,6 +801,14 @@ class Loan
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
   include Misfit::LoanValidators
 
+  def convert_blank_to_nil
+    self.attributes.each{|k, v|
+      if v.is_a?(String) and v.empty? and self.class.send(k).type==Integer
+        self.send("#{k}=", nil)
+      end
+    }
+  end
+
   # repayment styles
   def pay_prorata(total, received_on)
     #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
@@ -872,6 +898,7 @@ class Loan
     return true if (validated_on and validated_by) or (validated_on.blank? and validated_by.blank? and validation_comment.blank?)
     [false, "The validation date, the validating staff member the loan should both be given"]
   end
+        
 end
 
 class DefaultLoan < Loan
@@ -966,6 +993,112 @@ class EquatedWeekly < Loan
     }
     return interest_payable.to_i
   end
+
+
 end
 
 
+class BulletLoan < Loan
+  before :save, :set_installments_to_1
+  
+  def scheduled_interest_for_installment(number = 1)
+    amount * interest_rate * (disbursal_date || scheduled_disbursal_date).days360(scheduled_first_payment_date)/360
+  end
+  
+  def scheduled_principal_for_installment(number = 1)
+    amount
+  end
+  
+  private
+  def set_installments_to_1
+    number_of_installments = 1
+  end
+end
+
+class BulletLoanWithPeriodicInterest < BulletLoan
+  
+  def scheduled_interest_for_installment(number)
+    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    (amount * interest_rate / number_of_installments).to_i
+  end
+
+  def scheduled_principal_for_installment(number)
+    return 0 if number < number_of_installments
+    return amount if number == number_of_installments
+  end
+  
+end
+
+
+
+# TAKEOVER LOANS!!
+# these loans are exisitng loans that are taken over by us. They work like this:
+# We create a descendant of each Loan sublass and suffix it with Takeover. i.e. BulletLoanTakeover
+# In our system, all payments are rebased from the installment we take it over from
+# We do this once, generically, for any repayment schedule, by calling super and  rejecting anything from the loan schedule that does not belong to us
+# Remember, the payments on the loan remain exactly the same as before for the customer.
+
+
+Loan.descendants.to_a.each do |c|
+  k = Class.new(c)
+  Object.const_set "TakeOver#{c.to_s}", k # we have to name it first otherwise DataMapper craps out
+  Kernel.const_get("TakeOver#{c.to_s}").class_eval do
+    
+    before :save, :set_amount
+
+    property :original_amount,                    Integer
+    property :original_disbursal_date,            Date
+    property :original_first_payment_date,        Date
+    property :taken_over_on,                      Date
+    property :taken_over_on_installment_number,   Integer
+    
+    validates_with_method :original_properties_specified?
+    validates_with_method :taken_over_properly?
+
+    def set_amount
+    end
+
+    def original_properties_specified?
+      blanks = []
+      [:original_amount, :original_disbursal_date, :original_first_payment_date].each do |o|
+        blanks << o.to_s.humanize if send(o).blank?
+      end
+      return true if blanks.blank?
+      return [false, "#{blanks.join(',')} must be specified"]
+    end
+
+    def taken_over_properly?
+      if taken_over_on_installment_number and (taken_over_on_installment_number < number_of_installments)
+        return true
+      elsif taken_over_on and (taken_over_on < scheduled_maturity_date)
+        return true
+      else
+        return [false, "Takeover date or installment does not jive with this loan"]
+      end
+    end  
+
+    
+    def payment_schedule
+      raise ArgumentError "This takeover loan is missing takeover information"  unless (self.taken_over_on || self.taken_over_on_installment_number)
+      self.taken_over_on_installment_number = number_of_installments_before(self.taken_over_on) if self.taken_over_on
+      # recreate the original loan
+      new_amount = amount
+      new_disbursal_date = disbursal_date
+      new_scheduled_disbursal_date = scheduled_disbursal_date
+      amount = original_amount
+      disbursal_date = original_disbursal_date
+      # generate the payments_schedule
+      super
+      # chop off what doesn't belong to us
+      self.taken_over_on ||= @schedule.keys.sort[(self.taken_over_on_installment_number) - 1]
+      @schedule = @schedule.reject{|k,v| k < self.taken_over_on}
+      dd = disbursal_date || scheduled_disbursal_date
+      disbursal_date = new_disbursal_date
+      scheduled_disbursal_date = new_scheduled_disbursal_date
+      amount = @schedule[@schedule.keys.min][:balance]
+      @schedule.delete(@schedule.keys.min)
+      @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => amount, :total => 0}
+      @schedule
+    end
+  end # Class.new
+end # each

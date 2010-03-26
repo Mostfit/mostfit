@@ -40,7 +40,7 @@
           %th
             Staff Member
           %td
-            = select :name => 'staff_member_id', :collection => [["","---"]] + (StaffMember.all.map{|sm| [sm.id.to_s, sm.name]})
+            = select :name => 'staff_member_id', :collection => staff_members_collection
         %tr
           %th
             For Date

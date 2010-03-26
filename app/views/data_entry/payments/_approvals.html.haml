@@ -31,5 +31,5 @@
       %td
         = date_select "loans[#{loan.id}][approved_on]"
       %td
-        = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => [["","---"]] + StaffMember.all.map{|sm| [sm.id.to_s,sm.name]}, :selected => loan.client.center.manager.id.to_s
+        = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => staff_members_collection, :selected => loan.client.center.manager.id.to_s
 

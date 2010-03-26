@@ -1,6 +1,6 @@
 - if (@branch)
   .graph
-    = ofc2(430, 200, url(:graph_data, :action => 'branch', :id => @branch.id, :scope_unit => 'months', :scope_size => 3) )
+    = ofc2(450, 200, url(:graph_data, :action => 'branch', :id => @branch.id, :scope_unit => 'months', :scope_size => 3) )
 
 - if @branch
   %h1== Branch: <i>#{@branch.name}</i>

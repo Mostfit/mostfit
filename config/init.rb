@@ -6,8 +6,10 @@ use_orm :datamapper
 use_test :rspec
 use_template_engine :haml
 
+Merb::Dispatcher.use_mutex = false
+
 Merb::Config.use do |c|
-  c[:use_mutex] = true
+  c[:use_mutex] = false
   c[:session_store] = 'cookie'  # can also be 'memory', 'memcache', 'container', 'datamapper
 
   # cookie session store configuration
@@ -41,6 +43,7 @@ Merb::BootLoader.before_app_loads do
     require "pdf/simpletable"
     require "lib/logger.rb"
     require 'lib/string.rb'
+    require 'lib/grapher.rb'
     require("lib/pdfs/day_sheet.rb")
     require("lib/functions.rb")
     PDF_WRITER = true
@@ -52,8 +55,8 @@ Merb::BootLoader.before_app_loads do
   end
   DataMapper::Model.append_extensions DmPagination::Paginatable
   if Merb.env=="development"
-    Paperclip.options[:image_magick_path] = "/usr/local/bin"
-    Paperclip.options[:command_path] = "/usr/local/bin"
+    Paperclip.options[:image_magick_path] = "/usr/bin"
+    Paperclip.options[:command_path] = "/usr/bin"
   else
     Paperclip.options[:image_magick_path] = "/usr/bin"
     Paperclip.options[:command_path] = "/usr/bin"
@@ -65,6 +68,8 @@ end
 Merb::BootLoader.after_app_loads do
   # This will get executed after your app's classes have been loaded.
   # Load MFI account details to allow this app to sync phone numbers of staffmembers to mostfit box. If this file is not present then no such updates will happen
+  loan_types = Loan.descendants
+
   begin; $holidays = Holiday.all.map{|h| [h.date, h]}.to_hash; rescue; end
   # Starting the logger takes time, so turn it off during development
   Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments', 'DataEntry::Payments']) #unless Merb.environment == "development" or Merb.environment == "test"
@@ -73,12 +78,20 @@ Merb::BootLoader.after_app_loads do
   # loan product.
   Misfit::PaymentValidators.instance_methods.map{|m| m.to_sym}.each do |s|
     clause = Proc.new{|t| t.loan and (t.loan.loan_product.payment_validations.include?(s))}
-    Payment.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
+    if DataMapper::VERSION == "0.10.1"
+      Payment.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
+    elsif DataMapper::VERSION == "0.10.2"
+      Payment.send(:add_validator_to_context, {:context => [:default], :if => clause}, [s], DataMapper::Validate::MethodValidator)
+    end
   end
   Misfit::LoanValidators.instance_methods.map{|m| m.to_sym}.each do |s|
     clause = Proc.new{|t| t.loan_product.loan_validations.include?(s)}
     Loan.descendants.each do |loan|
-      loan.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
+      if DataMapper::VERSION == "0.10.1"
+        loan.add_validator_to_context({:context =>  :default, :if => clause}, [s], DataMapper::Validate::MethodValidator)
+      elsif DataMapper::VERSION == "0.10.2"
+        loan.send(:add_validator_to_context,{:context => [:default], :if => clause}, [s], DataMapper::Validate::MethodValidator)
+      end
     end
   end
 
@@ -127,5 +140,7 @@ Merb::BootLoader.after_app_loads do
       end
     end
   end
+
+
 end
 

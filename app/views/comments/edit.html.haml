@@ -1,0 +1,15 @@
+%h1
+  Comments controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/comments/edit.html.erb
+= error_messages_for @comment
+
+= form_for(@comment, :action => url(:comment, @comment)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:comment, @comment)
+|
+= link_to 'Back', url(:comments)

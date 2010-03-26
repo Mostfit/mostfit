@@ -1,6 +1,7 @@
 class StaffMembers < Application
   include Pdf::DaySheet if PDF_WRITER
   include DateParser
+  layout :determine_layout
 
   def index
     # @current_page = ( params[:page] && ( params[:page].to_i > 0 ) ) ? params[:page].to_i : 1
@@ -98,4 +99,8 @@ class StaffMembers < Application
     end
   end
 
+  private
+  def determine_layout
+    return "printer" if params[:layout] and params[:layout]=="printer"
+  end
 end # StaffMembers

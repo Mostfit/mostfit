@@ -41,8 +41,8 @@
   %h1 Approvals
   - @loans_to_approve = @center.clients.loans(:approved_on => nil)
   - if @loans_to_approve.size > 0
-    = form_for(@loan, :action => url(:enter_loans, :action => 'approve', :return => resource(@branch, @center))) do
-      = partial :approvals
+    = form_for(@loan, :action => url(:loan_actions, 'approve', :return => resource(@branch, @center))) do
+      = partial "loans/approve"
       = submit 'Approve these loans'
   - else
     No approvals today
@@ -52,7 +52,7 @@
   - @loans_to_disburse = @center.clients.loans(:scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil)
   - if @loans_to_disburse.size > 0
     = form_for(@loan, :action => url(:loan_actions, :action => 'disburse', :return => resource(@branch, @center))) do
-      = partial :disbursals, {:loans_to_disburse => @loans_to_disburse, :date => @date}
+      = partial "loans/disburse", {:loans_to_disburse => @loans_to_disburse, :date => @date}
       = submit 'Disburse these loans'
   - else
     No disbursals today
@@ -65,7 +65,7 @@
     = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center))) do
       = hidden_field :name => :for_date, :value => @date
       Fees collected by
-      = select :name => "payment[received_by]", :collection => [["","---"]] + StaffMember.all.map{|sm| [sm.id.to_s,sm.name]}, :selected => @center.manager.id.to_s
+      = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s
 
 
       %table.report.nojs{:style => "width:100%"}
@@ -127,7 +127,7 @@
         %th
           Centers paying today
         %td
-          = select :name => 'center_id', :collection => [["","---"]] + Center.paying_today(@date).map {|c| [c.id.to_s,c.name]}
+          = select :name => 'center_id', :collection => centers_paying_today_collection(@date)
       %tr
         %th
           or any other center

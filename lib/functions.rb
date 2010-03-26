@@ -47,7 +47,31 @@ class Date
     end
   end
 
-private
+  def days360(other)
+    y1 = self.year;   y2 = other.year
+    m1 = self.month;  m2 = other.month
+    d1 = self.day;    d2 = other.day
+
+    d1 = (d1 == 31) ? 30 : d1
+    d2 = (d2 == 31) ? 30 : d2
+    
+    360 * (y2-y1) + 30 * (m2-m1) + (d2-d1)
+  end
+
+  def self.min_date
+    if $globals && $globals[:mfi_details] && $globals[:mfi_details][:in_operation_since] and not $globals[:mfi_details][:in_operation_since].blank?
+      $globals[:mfi_details][:in_operation_since]
+    else
+      Date.parse("2000-01-01")
+    end
+  end
+
+
+  def self.max_date
+    today+1000
+  end
+
+  private
   def was_yesterday_holiday_shifted_today?
     yesterday = self-1
     return true if $holidays[yesterday] and $holidays[yesterday].shift_meeting==:after

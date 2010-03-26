@@ -38,6 +38,7 @@ describe Loan do
     @client = Client.new(:name => 'Ms C.L. Ient', :reference => Time.now.to_s)
     @client.center  = @center
     @client.date_joined = Date.parse('2006-01-01')
+    @client.created_by_user_id = 1
     @client.save
     @client.errors.each {|e| puts e}
     @client.should be_valid
@@ -526,5 +527,18 @@ describe Loan do
   it "should give correct cashflow for irr" do
   end
 
-      
+  it "should takeover properly" do
+    @loan2 = Object.const_get("TakeOver#{@loan.class}").new
+    @loan2.attributes = @loan.attributes
+    @loan2.original_amount = @loan.amount
+    @loan2.original_disbursal_date = @loan.scheduled_disbursal_date
+    @loan2.original_first_payment_date = @loan.scheduled_first_payment_date
+    @loan2.taken_over_on_installment_number = 10
+    @loan2.should be_valid
+    @loan._show_cf; @loan2._show_cf
+    @loan2.payment_schedule.count.should == @loan.payment_schedule.count - 10
+    @loan2.taken_over_on = Date.parse("2001-02-04")
+    @loan2.clear_cache
+    @loan2.payment_schedule.count.should == @loan.payment_schedule.count - 10
+  end
 end

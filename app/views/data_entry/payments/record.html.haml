@@ -12,7 +12,7 @@
     Please select a loan that you want to record a payment for by entering its loan ID.
 
   %table.form
-    = form_for(@payment, :action => url(:enter_payments, :action => 'record')) do
+    = form(:action => url(:enter_payments, :action => 'record')) do
       %tr
         %td &nbsp;
       %tr
