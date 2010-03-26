@@ -4,15 +4,17 @@ end
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 require File.join(Merb.root, "lib", "form_compiler")
 
-namespace :form do
-  desc "Compile form for given model"
-  task :compile, :filename do |task, args|
-    if args[:filename]
-      filename = args[:filename]
-      form  = CustomForm::Compiler.new(filename)
-      form.compile
-    else
+namespace :mostfit do
+  namespace :form do
+    desc "Compile form for given model"
+    task :compile, :filename do |task, args|
+      if args[:filename]
+        filename = args[:filename]
+        form  = CustomForm::Compiler.new(filename)
+        form.compile
+      else
       "no filename given"
+      end
     end
   end
 end

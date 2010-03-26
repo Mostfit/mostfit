@@ -733,7 +733,6 @@ class Loan
   end
 
   def calculate_history
-    debugger
     return @history_array if @history_array
     t = Time.now
     current = nil
@@ -1069,7 +1068,6 @@ Loan.descendants.to_a.each do |c|
     end
 
     def taken_over_properly?
-      debugger
       if taken_over_on_installment_number and (taken_over_on_installment_number < number_of_installments)
         return true
 
@@ -1086,7 +1084,6 @@ Loan.descendants.to_a.each do |c|
       raise ArgumentError "This takeover loan is missing takeover information"  unless (self.taken_over_on || self.taken_over_on_installment_number)
       self.taken_over_on_installment_number = number_of_installments_before(self.taken_over_on) if self.taken_over_on
       # recreate the original loan
-      debugger
       new_amount = amount
       new_disbursal_date = disbursal_date
       new_scheduled_disbursal_date = scheduled_disbursal_date

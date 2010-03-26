@@ -11,7 +11,7 @@ require "merb-core"
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 
-namespace :accounts do
+namespace :mostfit do
   desc "recreate the ledgers"
   task :recreate_ledgers do
     puts "recreating ledgers"

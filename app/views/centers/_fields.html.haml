@@ -23,6 +23,13 @@
       %span.greytext a two letter unique code for the center
   %tr
     %td
+      Creation date:
+    %td
+      = date_select_for @branch, :creation_date
+      %br/
+      %span.greytext pick the date this center was created on
+  %tr
+    %td
       Meeting every:
     %td
       - options = [['none', '<none>']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
