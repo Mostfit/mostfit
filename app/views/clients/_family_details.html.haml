@@ -1,0 +1,85 @@
+%table
+  %tr
+    %td{:colspan => '2'}
+      %h1==Family details
+  %tr
+    %td
+      Number of family members:
+    %td
+      = text_field(:number_of_family_members, :size => 10)
+      %br/
+  %tr
+    %td
+      Children:
+    %td
+      %table{:width => '100%'}
+      %tr
+        %td
+          Girls under 5 years
+        %td
+          Girls 5 to 15 years
+        %td
+          Girls over 5 years
+      %tr
+        %td
+          = text_field(:children_girls_under_5_years, :size => 10)
+        %td
+          = text_field(:children_girls_5_to_15_years, :size => 10)
+        %td
+          = text_field(:children_girls_over_5_years, :size => 10)
+      %tr
+        %td
+          Sons under 5 years
+        %td
+          Sons 5 to 15 years
+        %td
+          Sons over 5 years
+      %tr
+        %td
+          = text_field(:children_sons_under_5_years, :size => 10)
+        %td
+          = text_field(:children_sons_5_to_15_years, :size => 10)
+        %td
+          = text_field(:children_sons_over_5_years, :size => 10)
+      %br/
+  %tr
+    %td
+      Not in school:
+    %td
+      %table{:width => '100%'}
+      %tr
+        %td
+          Working girls
+        %td
+          Bonded girls
+      %tr
+        %td
+          = text_field(:not_in_school_working_girls, :size => 10)
+        %td
+          = text_field(:not_in_school_bonded_girls, :size => 10)
+      %tr
+        %td
+          Working sons
+        %td
+          Bonded sons
+      %tr
+        %td
+          = text_field(:not_in_school_working_sons, :size => 10)
+        %td
+          = text_field(:not_in_school_bonded_sons, :size => 10)
+      %br/
+  %tr
+    %td
+      School distance:
+    %td
+      = text_field(:school_distance, :size => 10)
+      %br/
+  %tr
+    %td
+      Phc distance:
+    %td
+      = text_field(:phc_distance, :size => 10)
+      %br/
+  %tr
+    %td{:colspan => '2'}
+      %hr

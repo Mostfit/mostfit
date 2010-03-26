@@ -1,0 +1,31 @@
+%table
+  %tr
+    %td{:colspan => '2'}
+      %h1==Demographic data
+  %tr
+    %td
+      Religion:
+    %td
+      = select(:religion, :collection => [[:hindu, "Hindu"], [:muslim, "Muslim"], [:sikh, "Sikh"], [:jain, "Jain"], [:buddha, "Buddha"], [:christian, "Christian"]] , :prompt => "Select religion")
+      %br/
+  %tr
+    %td
+      Caste:
+    %td
+      = select(:caste, :collection => [[:sc, "Sc"], [:st, "St"], [:obc, "Obc"], [:general, "General"]] , :prompt => "Select caste")
+      %br/
+  %tr
+    %td
+      Member literate:
+    %td
+      = select(:member_literate, :collection => [[:no, "No"], [:yes, "Yes"]] , :prompt => "is this member litrate?")
+      %br/
+  %tr
+    %td
+      Husband litrate:
+    %td
+      = select(:husband_litrate, :collection => [[:no, "No"], [:yes, "Yes"]] , :prompt => "is spouse litrate?")
+      %br/
+  %tr
+    %td{:colspan => '2'}
+      %hr

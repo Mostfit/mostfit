@@ -1,10 +1,11 @@
 module CustomForm
   class Compiler
-    attr_accessor :form_data, :filename, :new_properties
+    attr_accessor :form_data, :filename, :new_properties, :form_name
 
-    def initialize(_filename)
+    def initialize(model, _filename)
       @filename   = _filename
-      @form_data  = YAML.load(File.read(File.join("config", "forms", _filename)))       
+      @form_data  = YAML.load(File.read(File.join(Merb.root, "config", "forms", model, _filename)))
+      @form_name = form_data[form_data.keys.first].keys.first
     end
     
     def compile
@@ -15,11 +16,19 @@ module CustomForm
 
     private
     def compile_model
-      properties = model.properties
       new_properties, new_validations, new_fields = [], [], []
-      
+      properties = model.properties
+
       fields.each{|field|
-        if not properties.find{|property| property.name==field['name'].to_sym}
+        if field['type']=="table"
+          emit_property(field).each{|new_prop|
+            if not properties.find{|property| property.name==(new_prop.split(',')[0].split("property")[-1].strip[1..-1].to_sym)}
+              new_properties  << new_prop
+              new_validations << emit_validation(field)
+              new_fields      << field
+            end
+          }
+        elsif not properties.find{|property| property.name==field['name'].to_sym}
           new_properties  << emit_property(field)
           new_validations << emit_validation(field)
           new_fields      << field
@@ -42,29 +51,30 @@ module CustomForm
     
     def form_header
       header = []
-      header << "%tr"
-      header << "  %td{:colspan => '2'}"
-      header << "    %h1==#{form_name.humanize}"
+      header << "%table"
+      header << "  %tr"
+      header << "    %td{:colspan => '2'}"
+      header << "      %h1==#{form_name.humanize}"
       header.join("\n")+"\n"
     end
 
     def hr
       str = []
-      str << "%tr"
-      str << "  %td{:colspan => '2'}"      
-      str << "    %hr"
+      str << "  %tr"
+      str << "    %td{:colspan => '2'}"      
+      str << "      %hr"
       str.join("\n")+"\n"
     end
     
     def haml_row(field)
       str  = []
-      str << "%tr"
-      str << "  %td"
-      str << "    #{field[:label]||field['name'].humanize}:"
-      str << "  %td"
-      str << emit_field(field)
-      str << "    %br/"
-      str << "    %span.greytext #{field['description']}" if field['description']
+      str << "  %tr"
+      str << "    %td"
+      str << "      #{field[:label]||field['name'].humanize}:"
+      str << "    %td"
+      str << "  " + emit_field(field)
+      str << "      %br/"
+      str << "      %span.greytext #{field['description']}" if field['description']
       str.join("\n")+"\n"
     end
     
@@ -195,7 +205,7 @@ module CustomForm
             str << compile_property(col)
           }
         }
-        return(str.join("\n"))
+        return(str)
       else
         return(compile_property(field))
       end
@@ -250,7 +260,7 @@ module CustomForm
     end
 
     def model_view_file_name
-      File.join(Merb.root, "app", "views", model.to_s.downcase.pluralize, "_extra_fields.html.haml")
+      File.join(Merb.root, "app", "views", model.to_s.downcase.pluralize, "_#{form_name}.html.haml")
     end
     
     def model_file
@@ -274,10 +284,6 @@ module CustomForm
       }
       f.puts(orig_file[last_property_line..-1])
       f.close
-    end
-
-    def form_name
-      form_data[form_data.keys.first].keys.first
     end
     
     #Get the fields sorted by position

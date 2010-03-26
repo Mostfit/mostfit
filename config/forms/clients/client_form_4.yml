@@ -1,36 +1,46 @@
 ---
 clients:
-  other_economic_information:
-    other_productive_asset:
-      type: text
+  poverty_overview:
+    total_income:
+      type: integer
       position: 1
-      length: 30
+      length: 10
       validations:
         required: false
-    income_regular:
-      type: select_list
-      values: [:no, :yes]
+    poverty_status:
+      type: text
       position: 2
-      default_value: "is client income regular?"
+      length: 10
       validations:
         required: false
-    client_migration:
-      type: select_list
-      values: [:no, :yes]
+    irrigated_land:
+      type: table
       position: 3
-      default_value: "is client a migrated resident?"
-      validations:
-        required: false
-    pr_loan_amount:
-      type: integer
-      position: 4
-      length: 10
-      validations:
-        required: false
-    other_income:
-      type: integer
-      position: 4
-      length: 10
-      validations:
-        required: false
+      minimum: 0
+      column_type: integer      
+      required: false
+      rows:
+        - - fertile
+        - - semifertile
+        - - wasteland
+      columns:
+        - - own
+        - - leased
+        - - shared
+    not_irrigated_land:
+      type: table
+      position: 3
+      minimum: 0
+      column_type: integer      
+      required: false
+      rows:
+        - - fertile
+        - - semifertile
+        - - wasteland
+      columns:
+        - - own
+        - - leased
+        - - shared
+
+
         

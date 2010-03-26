@@ -1,0 +1,37 @@
+%table
+  %tr
+    %td{:colspan => '2'}
+      %h1==Income information
+  %tr
+    %td
+      Other productive asset:
+    %td
+      = text_field(:other_productive_asset, :size => 30)
+      %br/
+  %tr
+    %td
+      Income regular:
+    %td
+      = select(:income_regular, :collection => [[:no, "No"], [:yes, "Yes"]] , :prompt => "is client income regular?")
+      %br/
+  %tr
+    %td
+      Client migration:
+    %td
+      = select(:client_migration, :collection => [[:no, "No"], [:yes, "Yes"]] , :prompt => "is client a migrated resident?")
+      %br/
+  %tr
+    %td
+      Pr loan amount:
+    %td
+      = text_field(:pr_loan_amount, :size => 10)
+      %br/
+  %tr
+    %td
+      Other income:
+    %td
+      = text_field(:other_income, :size => 10)
+      %br/
+  %tr
+    %td{:colspan => '2'}
+      %hr
