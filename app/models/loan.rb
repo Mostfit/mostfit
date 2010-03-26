@@ -1054,6 +1054,8 @@ Loan.descendants.to_a.each do |c|
     validates_with_method :taken_over_properly?
 
     def set_amount
+      # this sets the amount to be the outstanding amount unless it is already set
+      amount = payment_schedule[payment_schedule.keys.min][:balance] unless amount
     end
 
     def original_properties_specified?
@@ -1077,6 +1079,7 @@ Loan.descendants.to_a.each do |c|
 
     
     def payment_schedule
+      return @schedule if @schedule
       raise ArgumentError "This takeover loan is missing takeover information"  unless (self.taken_over_on || self.taken_over_on_installment_number)
       self.taken_over_on_installment_number = number_of_installments_before(self.taken_over_on) if self.taken_over_on
       # recreate the original loan
