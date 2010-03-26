@@ -10,7 +10,7 @@
 = form_for(@client, :action => form_url, :multipart => true) do
   = partial "clients/fields", :submit_text => "Save changes", :cancel_link => cancel_url
 
-= submit "Save client"
+  = submit "Save client"
 &nbsp;&nbsp;
 = link_to 'cancel', cancel_url
 
