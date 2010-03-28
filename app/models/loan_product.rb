@@ -1,26 +1,26 @@
 class LoanProduct
   include DataMapper::Resource  
   
-  property :id, Serial, :nullable => false, :index => true
-  property :name, String, :nullable => false, :index => true, :min => 3
-  property :max_amount, Integer, :nullable => false, :index => true
-  property :min_amount, Integer, :nullable => false, :index => true
-  property :amount_multiple, Integer, :nullable => false, :index => true, :default => 1, :min => 1
-  property :max_interest_rate, Integer, :nullable => false, :index => true, :max => 100
-  property :min_interest_rate, Integer, :nullable => false, :index => true, :min => 0
-  property :interest_rate_multiple, Integer, :nullable => false, :index => true, :default => 1, :min => 0.1
-  property :installment_frequency, Enum.send('[]', *([:any] + INSTALLMENT_FREQUENCIES)), :nullable => true, :index => true
+  property :id, Serial, :required => true, :index => true
+  property :name, String, :required => true, :index => true, :min => 3
+  property :max_amount, Integer, :required => true, :index => true
+  property :min_amount, Integer, :required => true, :index => true
+  property :amount_multiple, Integer, :required => true, :index => true, :default => 1, :min => 1
+  property :max_interest_rate, Integer, :required => true, :index => true, :max => 100
+  property :min_interest_rate, Integer, :required => true, :index => true, :min => 0
+  property :interest_rate_multiple, Integer, :required => true, :index => true, :default => 1, :min => 0.1
+  property :installment_frequency, Enum.send('[]', *([:any] + INSTALLMENT_FREQUENCIES)), :required => false, :index => true
 
-  property :max_number_of_installments, Integer, :nullable => false, :index => true, :max => 1000
-  property :min_number_of_installments, Integer, :nullable => false, :index => true, :min => 0  
+  property :max_number_of_installments, Integer, :required => true, :index => true, :max => 1000
+  property :min_number_of_installments, Integer, :required => true, :index => true, :min => 0  
 
   #This property is defined in init.rb after app load as Loan may not have loaded by the time this class initializes
-  #  property :loan_type, Enum.send('[]'), :nullable => false, :index => true
-  property :valid_from, Date, :nullable => false, :index => true
-  property :valid_upto, Date, :nullable => false, :index => true
+  #  property :loan_type, Enum.send('[]'), :required => true, :index => true
+  property :valid_from, Date, :required => true, :index => true
+  property :valid_upto, Date, :required => true, :index => true
   
-  property :created_at, DateTime, :nullable => false, :default => DateTime.now
-  property :updated_at, DateTime, :nullable => true
+  property :created_at, DateTime, :required => true, :default => DateTime.now
+  property :updated_at, DateTime, :required => false
 
   property :payment_validation_methods, Text
   property :loan_validation_methods, Text

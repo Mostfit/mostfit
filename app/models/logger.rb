@@ -80,9 +80,9 @@ class ActionLog
   include DataMapper::Resource
 
   property :id, Serial
-  property :action,               String, :length => 20, :nullable => false
-  property :klass,                String, :length => 50, :nullable => false
-  property :record,               String, :length => 30, :nullable => false
+  property :action,               String, :length => 20, :required => true
+  property :klass,                String, :length => 50, :required => true
+  property :record,               String, :length => 30, :required => true
   property :time,                 DateTime, :default => Proc.new { |r,p| Time.now }, :writer => :private
 
   belongs_to :user

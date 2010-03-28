@@ -5,7 +5,7 @@ class LoanHistory
   property :loan_id,                   Integer, :key => true
   property :date,                      Date,    :key => true  # the day that this record applies to
   property :created_at,                DateTime  # automatic, nice for benchmarking runs
-  property :run_number,                Integer, :nullable => false, :default => 0
+  property :run_number,                Integer, :required => true, :default => 0
   property :current,                   Boolean  # tracks the row refering to the loans current status. we can query for these
                                                 # during reporting. I put it here to save an extra write to the db during 
                                                 # update_history_now
@@ -15,20 +15,20 @@ class LoanHistory
   property :week_id,                    Integer # good for aggregating.
 
   # some properties for similarly named methods of a loan:
-  property :scheduled_outstanding_total,     Integer, :nullable => false, :index => true
-  property :scheduled_outstanding_principal, Integer, :nullable => false, :index => true
-  property :actual_outstanding_total,        Integer, :nullable => false, :index => true
-  property :actual_outstanding_principal,    Integer, :nullable => false, :index => true
-  property :principal_due,                  Integer, :nullable => false, :index => true
-  property :interest_due,                  Integer, :nullable => false, :index => true
-  property :principal_paid,                  Integer, :nullable => false, :index => true
-  property :interest_paid,                  Integer, :nullable => false, :index => true
+  property :scheduled_outstanding_total,     Integer, :required => true, :index => true
+  property :scheduled_outstanding_principal, Integer, :required => true, :index => true
+  property :actual_outstanding_total,        Integer, :required => true, :index => true
+  property :actual_outstanding_principal,    Integer, :required => true, :index => true
+  property :principal_due,                  Integer, :required => true, :index => true
+  property :interest_due,                  Integer, :required => true, :index => true
+  property :principal_paid,                  Integer, :required => true, :index => true
+  property :interest_paid,                  Integer, :required => true, :index => true
 
   property :status,                          Enum.send('[]', *STATUSES)
 
   belongs_to :loan#, :index => true
   belongs_to :client, :index => true         # speed up reports
-  belongs_to :client_group, :index => true, :nullable => true   # by avoiding 
+  belongs_to :client_group, :index => true, :required => false   # by avoiding 
   belongs_to :center, :index => true         # lots of joins!
   belongs_to :branch, :index => true         # muahahahahahaha!
   

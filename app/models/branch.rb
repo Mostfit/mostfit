@@ -5,14 +5,14 @@ class Branch
   before :save, :convert_blank_to_nil
   
   property :id,      Serial
-  property :name,    String, :length => 100, :nullable => false, :index => true
-  property :code,    String, :length => 10, :nullable => true, :index => true, :min => 1, :max => 10
+  property :name,    String, :length => 100, :required => true, :index => true
+  property :code,    String, :length => 10, :required => false, :index => true, :min => 1, :max => 10
   property :address, Text, :lazy => true
   property :created_at, DateTime
-  property :area_id, Integer, :nullable => true
+  property :area_id, Integer, :required => false
 
   belongs_to :manager, :child_key => [:manager_staff_id], :model => 'StaffMember'
-  belongs_to :area, :nullable => true
+  belongs_to :area, :required => false
   has n, :centers
 
   validates_is_unique   :code
