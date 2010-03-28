@@ -5,4 +5,8 @@
 - cancel_url = params[:return] ? "/"+params[:return] : resource(@branch, @center)
 
 = form_for(@client, :action => form_url, :multipart => true) do
-  = partial("clients/fields", :submit_text => "Add client", :cancel_link => cancel_url)
+  = partial("clients/fields")
+
+  = submit "Add client"
+= link_to 'cancel', cancel_url
+

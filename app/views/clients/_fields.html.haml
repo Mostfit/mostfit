@@ -1,108 +1,20 @@
-
-%table.form
-  - if @center.blank?
-    %tr
-      %td
-        For center:
-      %td
-        = select_center_for @client, :center
-  -else
-    %tr
-      %td 
-        For center
-      %td
-        = @center.name
-        %input{:id => "client_center_id", :value => "#{@center.id}", :type => "hidden"}
-  %tr
-    %td
-      Group name
-    %td
-      %select{:id => "client_group_id", :name => "client[client_group_id]"}
-        %option{:value => ""}
-          Select the group for this person
-        -if @center
-          = @center.client_groups.collect{|g| "<option #{'selected=\"selected\"' if g.id==@client.client_group_id} value='#{g.id}'>#{g.name}</option>"}.join
-      %a{:href => "#", :id => "new_client_group_link", :style => "#{@center ? 'display:block' : 'display: none;'}"}
-        Add new group      
-      %div{:id => "new_client_group_form"}
-  %tr
-    %td
-      Name:
-    %td
-      = text_field :name, :size => 40
-      %br
-      %b 
-        Mark this user as:
-        %br
-      - Client.flags.each do |f|
-        = f
-        = check_box :name => "tags[#{f}]", :checked => @client.tags && @client.tags.include?(f)
-  %tr
-    %td
-      Reference:
-    %td
-      = text_field(:reference, :size => 40, :value => ((@client.reference.blank? and @center) ? "#{@branch.code}#{@center.code}" : @client.reference))
-      %br/
-      %span.greytext
-        references are unique, a way to check that this is the only record of a client
-        %br/
-        for this reason it is advisable to use a government ID as reference
-  %tr
-    %td
-      Date of birth:
-    %td
-      = date_select_for @client, :date_of_birth, :nullable => true, :min_date => Date.today-36500, :max_date => Date.today-1000
-  - unless @client.new?
-    %tr
-      %td
-        Date of death:
-      %td
-        = date_select_for @client, :deceased_on, :nullable => true
-  %tr
-    %td
-      Date joined
-    %td
-      = date_select_for @client, :date_joined, :max_date => Date.today
-  %tr
-    %td
-      Date of sucessful group recognization test:
-    %td
-      = date_select_for @client, :grt_pass_date, :nullable => true, :max_date => Date.today
-  %tr
-    %td
-      Spouse name:
-    %td
-      = text_field :spouse_name, :size => 40
-  %tr
-    %td
-      Address:
-    %td
-      ~ text_area :address, :rows => 6, :cols => 38
-  %tr
-    %td
-      Occupation
-    %td
-      = select :occupation_id, :collection => Occupation.all, :value_method => :id, :text_method => :name, :prompt => "---"
-
-  =partial "clients/extra_fields" rescue nil
-  - if not @client.new?
-    %tr
-      %td
-        Active:
-      %td
-        = check_box :active
-        &nbsp;&nbsp;
-        %span.greytext inactive member are not counted for attendancy
-  %tr
-    %td
-      Photo
-    %td
-      = image_tag @client.picture.url(:medium)
-      = file_field :picture
-  %tr
-    %td
-    %td
-      = submit submit_text
-      &nbsp;&nbsp;
-      = link_to 'cancel', cancel_link
-
+%div.tab_container
+  %ul.tabs
+    %li#basic_info Basic info
+    %li#bank_account_data Bank Account Data
+    %li#family_details Family Details
+    %li#income_information Income Information
+    %li#poverty_overview Poverty Overview
+    %li#demographic_data Demographic Data
+  %div.tab
+    =partial 'clients/basic_info'
+  %div.tab
+    =partial 'clients/bank_account_data'
+  %div.tab
+    =partial 'clients/family_details'
+  %div.tab
+    =partial 'clients/income_information'
+  %div.tab
+    =partial 'clients/poverty_overview'
+  %div.tab
+    =partial 'clients/demographic_data'

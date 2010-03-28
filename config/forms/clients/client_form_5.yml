@@ -1,0 +1,31 @@
+---
+clients:
+  demographic_data:
+    religion:
+      type: select_list
+      position: 1
+      values: [:hindu, :muslim, :sikh, :jain, buddha, :christian]
+      default_value: "Select religion"
+      validations:
+        required: false
+    caste:
+      type: select_list
+      position: 2
+      values: [:sc, :st, :obc, :general]
+      default_value: "Select caste"
+      validations:
+        required: false
+    member_literate:
+      type: select_list
+      position: 3
+      values: [:no, :yes]
+      default_value: "is this member litrate?"
+      validations:
+        required: false
+    husband_litrate:
+      type: select_list
+      values: [:no, :yes]
+      position: 4
+      default_value: "is spouse litrate?"
+      validations:
+        required: false

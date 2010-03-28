@@ -10,7 +10,7 @@ require "merb-core"
 # here again, Merb will do it for you
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
-namespace :db do
+namespace :mostfit do
   desc "populate the database using the csv's"
   task :sync_audit_trails do
     [Branch, Center, Client, Loan, Payment].each{|klass|

@@ -9,7 +9,7 @@ class Admin < Application
       file      = Upload.new(params[:file][:filename])      
       file.move(params[:file][:tempfile].path)
       Process.fork{
-        `rake 'db:upload[#{file.directory}, #{file.filename}]'`
+        `rake 'mostfit:upload[#{file.directory}, #{file.filename}]'`
       }
       redirect "/admin/upload_status/#{file.directory}"
     else

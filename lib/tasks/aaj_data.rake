@@ -11,7 +11,7 @@ require "merb-core"
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 
-namespace :aaj do
+namespace :mostfit do
   desc "populate the database using the csv's"
   task :csv_to_database do
     DataMapper.auto_migrate! if Merb.orm == :datamapper

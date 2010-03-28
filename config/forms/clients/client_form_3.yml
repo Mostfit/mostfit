@@ -1,6 +1,6 @@
 ---
 clients:
-  other_economic_information:
+  income_information:
     other_productive_asset:
       type: text
       position: 1

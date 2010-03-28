@@ -52,7 +52,7 @@
         %td
           %b= staff_member.active? ? 'active' : 'disabled'
         %td
-          - hash = {:manager_staff_id => staff_member.id, :created_at.gte => this_month}
+          - hash = {:manager_staff_id => staff_member.id, :creation_date.gte => this_month}
           - item = Branch.all(hash).count
           - sum_tm[0] += item
           =link_to(item, search_url(hash, Branch))||"-"
@@ -62,7 +62,7 @@
           - sum_total[0] += item
           =link_to(item, search_url(hash, Branch))||"-"
         %td
-          - hash = {:manager_staff_id => staff_member.id, :created_at.gte => this_month}
+          - hash = {:manager_staff_id => staff_member.id, :creation_date.gte => this_month}
           - item = Center.all(hash).count || "-"
           - sum_tm[1] += item
           = link_to(item, search_url(hash, Center))||"-"

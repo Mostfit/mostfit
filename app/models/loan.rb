@@ -1072,7 +1072,6 @@ Loan.descendants.to_a.each do |c|
     end
 
     def taken_over_properly?
-      debugger
       if taken_over_on_installment_number and (taken_over_on_installment_number < number_of_installments)
         return true
 

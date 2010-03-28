@@ -14,6 +14,7 @@ class Center
   property :meeting_time_hours,   Integer, :length => 2, :index => true
   property :meeting_time_minutes, Integer, :length => 2, :index => true
   property :created_at,           DateTime, :nullable => false, :default => Time.now, :index => true
+  property :creation_date,        Date
   belongs_to :branch
   belongs_to :manager, :child_key => [:manager_staff_id], :model => 'StaffMember'
 

@@ -1,0 +1,101 @@
+%table
+  %tr
+    %td{:colspan => '2'}
+      %h1==Poverty overview
+  %tr
+    %td
+      Total income:
+    %td
+      = text_field(:total_income, :size => 10)
+      %br/
+  %tr
+    %td
+      Poverty status:
+    %td
+      = text_field(:poverty_status, :size => 10)
+      %br/
+  %tr
+    %td
+      Irrigated land:
+    %td
+      %table{:width => '100%'}
+      %tr
+        %th
+        %th
+          own
+        %th
+          leased
+        %th
+          shared
+      %tr
+        %td
+          Fertile
+        %td
+          = text_field(:irrigated_land_own_fertile, :size => 10)
+        %td
+          = text_field(:irrigated_land_leased_fertile, :size => 10)
+        %td
+          = text_field(:irrigated_land_shared_fertile, :size => 10)
+      %tr
+        %td
+          Semifertile
+        %td
+          = text_field(:irrigated_land_own_semifertile, :size => 10)
+        %td
+          = text_field(:irrigated_land_leased_semifertile, :size => 10)
+        %td
+          = text_field(:irrigated_land_shared_semifertile, :size => 10)
+      %tr
+        %td
+          Wasteland
+        %td
+          = text_field(:irrigated_land_own_wasteland, :size => 10)
+        %td
+          = text_field(:irrigated_land_leased_wasteland, :size => 10)
+        %td
+          = text_field(:irrigated_land_shared_wasteland, :size => 10)
+      %br/
+  %tr
+    %td
+      Not irrigated land:
+    %td
+      %table{:width => '100%'}
+      %tr
+        %th
+        %th
+          own
+        %th
+          leased
+        %th
+          shared
+      %tr
+        %td
+          Fertile
+        %td
+          = text_field(:not_irrigated_land_own_fertile, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_leased_fertile, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_shared_fertile, :size => 10)
+      %tr
+        %td
+          Semifertile
+        %td
+          = text_field(:not_irrigated_land_own_semifertile, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_leased_semifertile, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_shared_semifertile, :size => 10)
+      %tr
+        %td
+          Wasteland
+        %td
+          = text_field(:not_irrigated_land_own_wasteland, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_leased_wasteland, :size => 10)
+        %td
+          = text_field(:not_irrigated_land_shared_wasteland, :size => 10)
+      %br/
+  %tr
+    %td{:colspan => '2'}
+      %hr

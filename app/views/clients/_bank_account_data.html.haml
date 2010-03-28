@@ -1,0 +1,37 @@
+%table
+  %tr
+    %td{:colspan => '2'}
+      %h1==Bank account data
+  %tr
+    %td
+      Account number:
+    %td
+      = text_field(:account_number, :size => 20)
+      %br/
+  %tr
+    %td
+      Type of account:
+    %td
+      = select(:type_of_account, :collection => [[:savings, "Savings"], [:current, "Current"], [:no_frill, "No frill"], [:fixed_deposit, "Fixed deposit"], [:loan, "Loan"], [:other, "Other"]] , :prompt => "Select account type")
+      %br/
+  %tr
+    %td
+      Bank name:
+    %td
+      = text_field(:bank_name, :size => 20)
+      %br/
+  %tr
+    %td
+      Branch:
+    %td
+      = text_field(:branch, :size => 20)
+      %br/
+  %tr
+    %td
+      Join holder:
+    %td
+      = text_field(:join_holder, :size => 20)
+      %br/
+  %tr
+    %td{:colspan => '2'}
+      %hr

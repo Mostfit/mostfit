@@ -1,6 +1,6 @@
 ---
 clients:
-  bank_account_particulars:
+  bank_account_data:
     account_number:
       type: text
       length: 20
