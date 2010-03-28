@@ -56,6 +56,8 @@ class Loan
   # associations
   belongs_to :client
   belongs_to :funding_line
+  belongs_to :loan_product
+  belongs_to :occupation,     :nullable  => true,                         :index => true
   belongs_to :applied_by,     :child_key => [:applied_by_staff_id],       :model => 'StaffMember'
   belongs_to :approved_by,    :child_key => [:approved_by_staff_id],      :model => 'StaffMember'
   belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],      :model => 'StaffMember'
@@ -63,10 +65,8 @@ class Loan
   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id],   :model => 'StaffMember'
   belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
   belongs_to :created_by,     :child_key => [:created_by_user_id],        :model => 'User'
-  belongs_to :occupation, :nullable => true, :index => true
+  has n, :history,                                                        :model => 'LoanHistory'
   has n, :payments
-  has n, :history, :model => 'LoanHistory'
-  belongs_to :loan_product
 
   #validations
 
@@ -843,7 +843,7 @@ class Loan
     return [false, h.map{|f| f[0]}.join(", ") + " are holidays"]
   end
   def check_client_sincerity
-    return [false, "Client is marked insincere and is not eligible for a loan"] if client.tags and client.tags.include?(:insincere)
+    return [false, "Client is marked insincere and is not eligible for a loan"] if client and client.tags and client.tags.include?(:insincere)
     return true
   end
 

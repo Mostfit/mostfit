@@ -1,12 +1,56 @@
 
 Loan
-- before(:all) (FAILED - 1)
+- should have a discrimintator
+- should not be valid without belonging to a client
+- should not be valid without being approved properly
+- should not be valid without being validated properly
+- should not be valid without being rejected properly
+- should not be valid without belonging to a client
+- should not be valid without a proper amount
+- should not be valid without a proper interest_rate
+- should be valid with a proper installment_frequency
+- should not be valid without proper installment_frequency
+- should not be valid without a proper number_of_installments
+- should not be valid without a scheduled_first_payment_date
+- should not be valid without a scheduled_disbursal_date
+- should not be valid with a disbursal date earlier than the loan is approved
+- should not be valid when validated_on is earlier than the disbursal_date
+- should not be valid when written_off_on is earlier than the disbursal_date
+- should not be valid without approved_on earlier than scheduled_disbursal_date
+- should not be valid without being properly written off
+- should not be valid without being properly disbursed
+- should not be valid when scheduled_first_payment_date if before scheduled_disbursal_date
+- should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates
+- .shift_date_by_installments should shift dates properly, even odd ones.. and backwards.
+- .descendants should keep track of the subclasses (just testing dm-core functionality)
+- .number_of_installments_before should do what it promises
+- .last_loan_history_date should have some tests -- albeit more a view thing (PENDING: Not Yet Implemented)
+- .scheduled_repaid_on give the proper date
+- should have proper values for principal, interest and total to be received
+- .status should give status accoring to changing properties up to it written off
+- .status should give status accoring to changing properties up to it is repaid
+- .status should give status accoring to changing properties before being approved
+- .status should give status accoring to changing properties when being rejected
+- cannot repay an unsaved loan
+- .installment_dates should give a list with some dates
+- .payment_schedule should give correct results
+- .payments_hash should give correct results
+- history should be correct
+- should write the history correctly into the db
+- .installment_dates should correctly deal with holidays
+- should give correct cashflow for irr
+- should takeover properly (FAILED - 1)
+
+Pending:
+
+Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
+./spec/models/loan_spec.rb:336
 
 1)
-'Loan before(:all)' FAILED
+'Loan should takeover properly' FAILED
 expected valid? to return true, got false
-./spec/models/loan_spec.rb:44:
+./spec/models/loan_spec.rb:538:
 
-Finished in 7.602847 seconds
+Finished in 15.994158 seconds
 
-0 examples, 1 failure
+40 examples, 1 failure, 1 pending
