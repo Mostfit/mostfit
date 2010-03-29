@@ -11,9 +11,25 @@
 
 %table.narrow.form{ :style => 'width : 50%' }
   %tr.odd
-    %td{ :width => '30%' } amount
+    %td{ :width => '30%' } amount disbursed
     %td
-      == <b>#{@loan.amount}</b> @
+      -if @loan.disbursal_date
+        == <b>#{@loan.amount}</b> @
+        %b= format("%.2f%", @loan.interest_rate*100)
+      -else
+        Not disbursed yet
+  %tr
+    %td{ :width => '30%' } amount sanctioned
+    %td
+      -if @loan.approved_on
+        == <b>#{@loan.amount_sanctioned}</b> @
+        %b= format("%.2f%", @loan.interest_rate*100)
+      -else
+        Not approved yet
+  %tr
+    %td{ :width => '30%' } amount applied
+    %td
+      == <b>#{@loan.amount_applied_for}</b> @
       %b= format("%.2f%", @loan.interest_rate*100)
   %tr
     %td type

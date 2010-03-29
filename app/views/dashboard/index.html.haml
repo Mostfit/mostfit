@@ -1,9 +1,9 @@
 .tab_container
   %ul.tabs
-    %li#branch Branch growth
-    %li#centers Center growth
-    %li#clients Client growth
-    %li#loan Loan growth
+    %li#branch Branch
+    %li#centers Center
+    %li#clients Client
+    %li#loan Loan
   .tab
     =chart(url(:graph_data, :action => 'branch_pie_by_loan',  :scope_unit => 'months', :scope_size => 3)) 
     =chart(url(:graph_data, :action => 'branch_pie_by_client',  :scope_unit => 'months', :scope_size => 3)) 
@@ -14,8 +14,15 @@
         =chart(url(:graph_data, :action => 'branch', :id => branch.id,  :scope_unit => 'months', :scope_size => 3), 450, 270) 
         =chart(url(:graph_data, :action => 'clients_by_branch', :id => branch.id,  :scope_unit => 'months', :scope_size => 3), 450, 270) 
   .tab
-    = chart(url(:graph_data, :action => 'centers', :scope_unit => 'months', :scope_size => 3), 800, 300) 
-
+    %div
+      %h1 
+        Overall
+      =chart(url(:graph_data, :action => 'centers',  :scope_unit => 'months', :scope_size => 3), 450, 270) 
+    -Branch.all.each do |branch|
+      %div
+        %h1 
+          =branch.name
+        =chart(url(:graph_data, :action => 'centers', :id => branch.id,  :scope_unit => 'months', :scope_size => 3), 450, 270) 
   .tab
     = chart(url(:graph_data, :action => 'dashboard', :id => 'client_cumulative',  :scope_unit => 'months', :scope_size => 3), 450, 270)
     = chart(url(:graph_data, :action => 'dashboard', :id => 'client_growth',  :scope_unit => 'months', :scope_size => 3), 450, 270)

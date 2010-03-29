@@ -71,8 +71,8 @@ class Loans < Application
     raise NotFound unless @loan
     disallow_updation_of_verified_loans
     @loan.update_attributes(attrs)
-    @loan_product =  @loan.loan_product
-    @loan.amount  = @loan.amount_applied_for if @loan.amount_applied_for
+    @loan_product = @loan.loan_product
+
     if @loan.save
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' has been edited"})

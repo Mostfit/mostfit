@@ -66,11 +66,15 @@ class GraphData < Application
     common_aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
-  def centers    
-    vals  = repository.adapter.query("select count(c.id) count, date(c.created_at) date from centers c group by date(c.created_at)").sort_by{|x| x.date}
-    graph = BarGraph.new("Centers' growth")
-    vals  = repository.adapter.query("select count(cl.id) count, cl.date_joined date from clients cl, centers c where c.branch_id=#{@branch.id} and cl.center_id=c.id group by date(cl.date_joined)").sort_by{|x| x.date}
-    graph.data(vals)
+  def centers
+    graph = BarGraph.new("Growth of centers")
+    if params[:id]
+      @branch =  Branch.get(params[:id])
+      vals  = Center.all(:branch => @branch).aggregate(:all.count, :creation_date)
+    else
+      vals  = Center.all.aggregate(:all.count, :creation_date)
+    end
+    graph.data(vals, :first, :last)
     graph.x_axis.steps=2
     return graph.generate
   end
@@ -84,7 +88,7 @@ class GraphData < Application
   end
 
   def branch_pie_by_loan
-    graph = PieGraph.new("Branch growth by loan value")
+    graph = PieGraph.new("Branch status by loan value")
     vals = repository.adapter.query(%Q{SELECT SUM(l.amount) amount, b.name name
                                        FROM loans l, clients cl, centers c, branches b
                                        WHERE l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
@@ -93,7 +97,7 @@ class GraphData < Application
   end
 
   def branch_pie_by_client
-    graph = PieGraph.new("Branch growth by client count")
+    graph = PieGraph.new("Branch status by client count")
     vals = repository.adapter.query(%Q{SELECT COUNT(cl.id) count, b.name name
                                        FROM clients cl, centers c, branches b
                                        WHERE cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
@@ -103,7 +107,7 @@ class GraphData < Application
 
   def clients_by_branch(id)
     @branch    = Branch.get(id)
-    graph = BarGraph.new("Client growth at #{@branch.name}")
+    graph = BarGraph.new("Client status at #{@branch.name}")
     vals  = repository.adapter.query("select count(cl.id) count, cl.date_joined date from clients cl, centers c where c.branch_id=#{@branch.id} and cl.center_id=c.id group by date(cl.date_joined)").sort_by{|x| x.date}
     graph.data(vals)
     graph.x_axis.steps=5
