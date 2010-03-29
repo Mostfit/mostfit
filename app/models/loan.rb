@@ -1091,6 +1091,9 @@ Loan.descendants.to_a.each do |c|
     def payment_schedule
       return @schedule if @schedule
       raise ArgumentError "This takeover loan is missing takeover information"  unless (self.taken_over_on || self.taken_over_on_installment_number)
+      raise ArgumentError unless installment_frequency == :weekly
+      # TODO this exception is raised because we need to respect the first payment date and subsequent dates have to be 
+      # adjusted to jive with everything else.
       self.taken_over_on_installment_number = number_of_installments_before(self.taken_over_on) if self.taken_over_on
       #store original values
       _amount = amount
@@ -1115,6 +1118,14 @@ Loan.descendants.to_a.each do |c|
       self.amount = @schedule[@schedule.keys.min][:balance]
       @schedule.delete(@schedule.keys.min)
       @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => amount, :total => 0}
+      total = @schedule[@schedule.keys.sort[1]][:total_balance]
+      # adjust all the dates
+      adjusted_schedule = {}
+      orig_dates = @schedule.keys.sort
+      installment_dates.each_with_index do |d,i|
+        adjusted_schedule[d] = payment_schedule[orig_dates[i]] if i < @schedule.count
+      end
+      @schedule = {@schedule.keys.min => @schedule[@schedule.keys.min]} + adjusted_schedule
       # recreate the totals
       ti = tp = 0
       @schedule.keys.sort.each_with_index do |dt,i|
@@ -1125,7 +1136,6 @@ Loan.descendants.to_a.each do |c|
         
       end
       # do total_balance
-      total = @schedule[@schedule.keys.sort[1]][:total_balance]
       @schedule.each { |k,v| 
         v[:total_balance] = total - v[:total]
       }
