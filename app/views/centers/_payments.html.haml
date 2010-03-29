@@ -61,7 +61,7 @@
               - grp_interest += i
             %td.numeric
               /- fee = loan.fees_paid? ? 0 : loan.fees_payable_on(date).values.inject(0){|s, x| s+=x}
-              - fee = fees_applicable[loan.id].due
+              - fee = fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
               = fee.to_currency
               - tot_fee += fee
               - grp_fee += fee
