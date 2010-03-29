@@ -332,5 +332,28 @@ $(document).ready(function(){
   $('.closeNotice').click(function(){
      $('.closeNotice').addClass('notice'); 
      $('.notice').remove();
-  })
+  });
+
+  $("#reporting_form select").change(function(){
+	  var types = ["model", "property", "operator", "value"];
+	  id = $(this).attr("id");
+	  $(this).find("option:selected").each(function(){
+		  for(i=types.indexOf(id)+1; i<=types.length; i++){
+		      console.log(i);
+		      $("#reporting_form select#"+types[i]).html("");
+		  }
+		  nextType = types[types.indexOf(id)+1];
+		  $.ajax({
+			url: "/search/get?"+$("#reporting_form").serialize(),
+			success: function(data){
+                              if(nextType==="value"){
+				  $("#reporting_form span#"+nextType).html(data);
+			      }else{
+				  $("#reporting_form select#"+nextType).html("");
+				  $("#reporting_form select#"+nextType).append(data);
+			      }
+			}
+		    });
+	      });
+      });
 });

@@ -4,18 +4,19 @@
 %h3
   ="This loan will be dispensed by loan product: #{@loan_product.name}"
 %table.form
-  %tr
-    %td
-      Amount:
-    %td
-      - if @loan_product.min_amount!=@loan_product.max_amount 
-        = text_field :amount_applied_for, :size => 15
-        %span.greytext in Rupees
-        = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
-      - else
-        = @loan_product.min_amount
-        %span.greytext Rupees
-        = hidden_field :amount_applied_for, :value => @loan_product.min_amount
+  - if not take_over_loan
+    %tr
+      %td
+        Applied Amount:
+      %td
+        - if @loan_product.min_amount!=@loan_product.max_amount
+          = text_field :amount_applied_for, :size => 15
+          %span.greytext in Rupees
+          = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
+        - else
+          = @loan_product.min_amount
+          %span.greytext Rupees
+          = hidden_field :amount_applied_for, :value => @loan_product.min_amount
   %tr
     %td
       Interest rate:
@@ -113,6 +114,52 @@
       %td
         = text_field :taken_over_on_installment_number, :size => 5
         %span.greytext number of installments already paid
+  -if not @loan.new? and session.user.role==:admin
+    %tr
+      %td
+        Approved Amount:
+      %td
+        - if @loan_product.min_amount!=@loan_product.max_amount
+          = text_field :amount_sanctioned, :size => 15
+          %span.greytext in Rupees
+          = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
+        - else
+          = @loan_product.min_amount
+          %span.greytext Rupees
+          = hidden_field :amount_applied_for, :value => @loan_product.min_amount
+    %tr
+      %td
+        Approval date:
+      %td
+        on&nbsp;&nbsp;
+        = date_select_for @loan, :approved_on, :nullable => true
+        &nbsp;&nbsp;by&nbsp;&nbsp;
+        = select_staff_member_for @loan, :approved_by
+        %br/
+        %span.greytext these fields are optional so may be specified later
+
+    %tr
+      %td
+        Disbursed Amount:
+      %td
+        - if @loan_product.min_amount!=@loan_product.max_amount
+          = text_field :amount, :size => 15
+          %span.greytext in Rupees
+          = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
+        - else
+          = @loan_product.min_amount
+          %span.greytext Rupees
+          = hidden_field :amount_applied_for, :value => @loan_product.min_amount
+    %tr
+      %td
+        Disbursal date:
+      %td
+        on&nbsp;&nbsp;
+        = date_select_for @loan, :disbursal_date, :nullable => true
+        &nbsp;&nbsp;by&nbsp;&nbsp;
+        = select_staff_member_for @loan, :disbursed_by
+        %br/
+        %span.greytext these fields are optional so may be specified later
   %tr
     %td
     %td

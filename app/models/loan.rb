@@ -158,7 +158,7 @@ class Loan
     if product.respond_to?("#{method}_multiple")
       product_attr = product.send("#{method}_multiple")
       loan_attr = loan_attr*100 if method==:interest_rate
-      return  [false, "#{method.to_s.capitalize} should be in multiples of #{product_attr}"]  if not loan_attr.remainder(product_attr)<=EPSILON
+      return  [false, "#{method.to_s.capitalize} should be in multiples of #{product_attr}"]  if not loan_attr or not loan_attr.remainder(product_attr)<=EPSILON
     end
     return true
   end
@@ -1059,7 +1059,8 @@ Loan.descendants.to_a.each do |c|
 
     def set_amount
       # this sets the amount to be the outstanding amount unless it is already set
-      amount = payment_schedule[payment_schedule.keys.min][:balance] 
+      amount = payment_schedule[payment_schedule.keys.min][:balance]
+      amount_applied_for = amount
     end
 
     def original_properties_specified?
