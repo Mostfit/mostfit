@@ -90,7 +90,7 @@ module Merb
       attrs = {}
       attrs.merge!(:name => name)
       attrs.merge!(:date => date)
-      attrs.merge!(:id => name)
+      attrs.merge!(:id => opts[:id]||name)
       attrs.merge!(:date     => date)
       attrs.merge!(:min_date => opts[:min_date]||Date.min_date)
       attrs.merge!(:max_date => opts[:max_date]||Date.max_date)
