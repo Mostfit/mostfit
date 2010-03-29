@@ -68,8 +68,11 @@ class Loan
   has n, :history, :model => 'LoanHistory'
   belongs_to :loan_product
 
+  #validations
+
+  validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
+
   validates_with_method  :amount,                       :method => :amount_greater_than_zero?
-#  validates_with_method  :amount,                       :method => :installments_are_integers?
   validates_with_method  :interest_rate,                :method => :interest_rate_greater_than_zero?
   validates_with_method  :number_of_installments,       :method => :number_of_installments_greater_than_zero?
   validates_with_method  :applied_on,                   :method => :applied_before_appoved?
@@ -98,10 +101,8 @@ class Loan
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :cheque_number,                :method => :check_validity_of_cheque_number
 
-  # validates_with_method  :dates_are_not_holidays
-
-  validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
   #product validations
+
   validates_with_method  :amount,                       :method => :is_valid_loan_product_amount
   validates_with_method  :interest_rate,                :method => :is_valid_loan_product_interest_rate
   validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
@@ -456,6 +457,10 @@ class Loan
   end
 
   def payment_schedule
+    # this is the fount of all knowledge regarding the scheduled payments for the loan. 
+    # it feeds into every other calculation about the loan schedule such as get_scheduled, calculate_history, etc.
+    # if this is wrong, everything about this loan is wrong.
+
     return @schedule if @schedule
     @schedule = {}
     principal_so_far = interest_so_far = fees_so_far = total = 0
@@ -464,7 +469,7 @@ class Loan
     dd = disbursal_date || scheduled_disbursal_date
     @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
     (1..number_of_installments).each do |number|
-      date      = shift_date_by_installments(scheduled_first_payment_date, number - 1, installment_frequency == :weekly ? true : false)
+      date      = shift_date_by_installments(scheduled_first_payment_date, number - 1, [:weekly, :biweekly].include?(installment_frequency))
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
       principal_so_far += principal
@@ -489,6 +494,7 @@ class Loan
   end
 
   def payments_hash
+    # this is the fount of knowledge for actual payments on the loan
     return @payments_cache if @payments_cache
     sql = %Q{
         SELECT SUM(amount * IF(type=1,1,0)) AS principal,
@@ -526,43 +532,6 @@ class Loan
   end
 
 
-  # TODO these should logically be private.
-  def get_from_cache(cache, column, date)
-    date = Date.parse(date) if date.is_a? String
-    return 0 if cache.blank?
-    if cache.has_key?(date)
-      return (column == :all ? cache[date] : cache[date][column])
-    else
-      return 0 if (column == :principal or column == :interest)
-      keys = cache.keys.sort
-      if date < keys.min
-        rv = (column == :all ? cache[keys.min] : cache[keys.min][column])
-      elsif date >= keys.max
-        rv = (column == :all ? cache[keys.max] : cache[keys.max][column])
-      else
-        keys.each_with_index do |k,i|
-          if keys[[i+1,keys.size - 1].min] > date
-            rv = (column == :all ? cache[k] : cache[k][column])
-            break
-          end
-        end
-      end
-      if rv.is_a? Hash
-        rv[:principal] = 0; rv[:interest] = 0
-      end
-      rv
-    end
-  end
-
-  def get_scheduled(column, date) # helper function for readable functions below. make private
-    payment_schedule if @schedule.nil?
-    get_from_cache(payment_schedule, column, date)
-  end
-
-  def get_actual(column, date)
-    payments_hash if @payments_cache.nil?
-    get_from_cache(payments_hash, column, date)
-  end
 
   # LOAN INFO FUNCTIONS - SCHEDULED
 
@@ -734,63 +703,60 @@ class Loan
 
   def calculate_history
     return @history_array if @history_array
-    t = Time.now
-    current = nil
-    @history_array = []
+    t = Time.now; @history_array = []
     dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on,scheduled_first_payment_date].map{|d| d.holiday_bump if d.is_a?(Date)} + payment_dates + installment_dates).compact.uniq.sort
     last_paid_date = nil
     dates.each_with_index do |date,i|
-      current = ((dates[[i-1,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or (i == dates.size - 1 and dates[i] < Date.today)) ? 1 : 0
+      current   = ((dates[[i-1,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or 
+                   (i == dates.size - 1 and dates[i] < Date.today))
       scheduled = get_scheduled(:all, date)
-      actual = get_actual(:all, date)
-      # puts "#{i} #{date} #{scheduled[:balance]} #{actual[:balance]} :: #{scheduled[:principal]} #{actual[:principal]}"
-      scheduled_outstanding_principal = scheduled[:balance]
-      scheduled_outstanding_total = scheduled[:total_balance]
-      actual_outstanding_principal = actual[:balance]
-      actual_outstanding_total = actual[:total_balance]
-      total_due = actual_outstanding_total - scheduled_outstanding_total
-      principal_due = actual_outstanding_principal - scheduled_outstanding_principal
-      interest_due = actual_outstanding_total - scheduled_outstanding_total - principal_due
-      prin = principal_received_on(date)
-      int = interest_received_on(date)
-      default = (principal_due + interest_due > prin + int) and date >= scheduled_first_payment_date
-      if default
-        last_paid_date ||= dates[[i,dates.size-1].min]
-        days_overdue = [0,date - last_paid_date].max
+      actual    = get_actual(:all, date)
+      prin      = principal_received_on(date)
+      int       = interest_received_on(date)
+      if (actual[:total_balance] - scheduled[:total_balance] > prin + int) and date >= scheduled_first_payment_date # there is a default
+        last_paid_date ||= dates[[i,dates.size-1].min];        days_overdue = [0,date - last_paid_date].max
       else
-        last_paid_date = nil
-        days_overdue = 0
+        last_paid_date = nil;        days_overdue = 0
       end
-      @history_array << {:loan_id => id, :date => date,
-                           :status => STATUSES.index(get_status(date)) + 1,
-                           :scheduled_outstanding_principal => scheduled_outstanding_principal,
-                           :scheduled_outstanding_total => scheduled_outstanding_total,
-                           :actual_outstanding_principal => actual_outstanding_principal,
-                           :actual_outstanding_total => actual_outstanding_total,
-                           :amount_in_default => actual_outstanding_principal - scheduled_outstanding_principal,
-                           :days_overdue => days_overdue, :current => current || 0,
-                           :principal_due => principal_due, :interest_due => interest_due,
-                           :principal_paid => prin, :interest_paid => int}
+      @history_array << {
+        :loan_id                             => id, 
+        :date                                => date,
+        :status                              => STATUSES.index(get_status(date)) + 1,
+        :scheduled_outstanding_principal     => scheduled[:balance],
+        :scheduled_outstanding_total         => scheduled[:total_balance],
+        :actual_outstanding_principal        => actual[:balance],
+        :actual_outstanding_total            => actual[:total_balance],
+        :amount_in_default                   => actual[:balance] - scheduled[:balance],
+        :days_overdue                        => days_overdue, 
+        :current                             => current,
+        :principal_due                       => actual[:balance] - scheduled[:balance], 
+        :interest_due                        => actual[:total_balance] - scheduled[:total_balance] - (actual[:balance] - scheduled[:balance]),
+        :principal_paid                      => prin, 
+        :interest_paid                       => int
+      }
     end
     Merb.logger.info "History calculation took #{Time.now - t} seconds"
     @history_array
   end
 
   def update_history_bulk_insert
+    # this gets the history from calculate_history and does one single insert into the database
     t = Time.now
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
     d0 = Date.parse('2000-01-03')
     sql = %Q{ INSERT INTO loan_history(loan_id, date, status,
-              scheduled_outstanding_principal, scheduled_outstanding_total,
-              actual_outstanding_principal, actual_outstanding_total, current, amount_in_default,
-              client_group_id, center_id, client_id, branch_id, days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid)
+                                       scheduled_outstanding_principal, scheduled_outstanding_total,
+                                       actual_outstanding_principal, actual_outstanding_total, current, 
+                                       amount_in_default, client_group_id, center_id, client_id, branch_id, 
+                                       days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid)
               VALUES }
     values = []
     calculate_history.each do |history|
       value = %Q{(#{id}, '#{history[:date].strftime('%Y-%m-%d')}', #{history[:status]}, #{history[:scheduled_outstanding_principal]},
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
-                          #{history[:actual_outstanding_total]},#{history[:current]},
-                          #{history[:amount_in_default]}, #{client.client_group_id || "NULL"}, #{client.center.id},#{client.id},#{client.center.branch.id},
+                          #{history[:actual_outstanding_total]},#{history[:current] ? 1 : 0},
+                          #{history[:amount_in_default]}, #{client.client_group_id || "NULL"}, 
+                          #{client.center.id},#{client.id},#{client.center.branch.id},
                           #{history[:days_overdue]}, #{((history[:date] - d0) / 7).to_i + 1},
                           #{history[:principal_due]},#{history[:interest_due]},
                           #{history[:principal_paid]},#{history[:interest_paid]})}
@@ -829,6 +795,44 @@ class Loan
     interest = total * int/(prin + int)
     principal = total * prin/(prin + int)
     [interest, principal]
+  end
+
+  # TODO these should logically be private.
+  def get_from_cache(cache, column, date)
+    date = Date.parse(date) if date.is_a? String
+    return 0 if cache.blank?
+    if cache.has_key?(date)
+      return (column == :all ? cache[date] : cache[date][column])
+    else
+      return 0 if (column == :principal or column == :interest)
+      keys = cache.keys.sort
+      if date < keys.min
+        rv = (column == :all ? cache[keys.min] : cache[keys.min][column])
+      elsif date >= keys.max
+        rv = (column == :all ? cache[keys.max] : cache[keys.max][column])
+      else
+        keys.each_with_index do |k,i|
+          if keys[[i+1,keys.size - 1].min] > date
+            rv = (column == :all ? cache[k] : cache[k][column])
+            break
+          end
+        end
+      end
+      if rv.is_a? Hash
+        rv[:principal] = 0; rv[:interest] = 0
+      end
+      rv
+    end
+  end
+
+  def get_scheduled(column, date) 
+    payment_schedule if @schedule.nil?
+    get_from_cache(payment_schedule, column, date)
+  end
+
+  def get_actual(column, date)
+    payments_hash if @payments_cache.nil?
+    get_from_cache(payments_hash, column, date)
   end
 
   ## validations: read their method name and error to see what they do.
@@ -1078,15 +1082,22 @@ Loan.descendants.to_a.each do |c|
       end
     end  
 
+    def calculate_history
+      super
+      @history_array = @history_array.reject{|h| h[:date] < applied_on}
+      return @history_array
+    end
     
     def payment_schedule
       return @schedule if @schedule
       raise ArgumentError "This takeover loan is missing takeover information"  unless (self.taken_over_on || self.taken_over_on_installment_number)
       self.taken_over_on_installment_number = number_of_installments_before(self.taken_over_on) if self.taken_over_on
+      #store original values
+      _amount = amount
+      _disbursal_date = disbursal_date
+      _scheduled_disbursal_date = scheduled_disbursal_date
+      _fp_date = scheduled_first_payment_date
       # recreate the original loan
-      new_amount = amount
-      new_disbursal_date = disbursal_date
-      new_scheduled_disbursal_date = scheduled_disbursal_date
       self.scheduled_first_payment_date = original_first_payment_date
       self.amount = original_amount
       self.disbursal_date = original_disbursal_date
@@ -1095,14 +1106,29 @@ Loan.descendants.to_a.each do |c|
       # chop off what doesn't belong to us
       self.taken_over_on ||= @schedule.keys.sort[(self.taken_over_on_installment_number) - 1]
       @schedule = @schedule.reject{|k,v| k < self.taken_over_on}
-      dd = disbursal_date || scheduled_disbursal_date
-      disbursal_date = new_disbursal_date
-      scheduled_disbursal_date = new_scheduled_disbursal_date
-      amount = @schedule[@schedule.keys.min][:balance]
+      # reset the original values
+      self.disbursal_date = _disbursal_date
+      self.scheduled_disbursal_date = _scheduled_disbursal_date
+      self.scheduled_first_payment_date = _fp_date
+      # adjust the first line of the payment_schedule
+      dd = self.disbursal_date || self.scheduled_disbursal_date
+      self.amount = @schedule[@schedule.keys.min][:balance]
       @schedule.delete(@schedule.keys.min)
       @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => amount, :total => 0}
-      total = @schedule[@schedule.keys.max][:total]
-      @schedule.each { |k,v| v[:total_balance] = total - v[:total]}
+      # recreate the totals
+      ti = tp = 0
+      @schedule.keys.sort.each_with_index do |dt,i|
+        @schedule[dt][:total_interest] = ti += @schedule[dt][:interest]
+        @schedule[dt][:principal] = i == 0 ? 0 : @schedule[@schedule.keys.sort[i-1]][:balance] - @schedule[dt][:balance]
+        @schedule[dt][:total_principal] = tp += @schedule[dt][:principal]
+        @schedule[dt][:total] = i == 0 ? 0 : ti + tp
+        
+      end
+      # do total_balance
+      total = @schedule[@schedule.keys.sort[1]][:total_balance]
+      @schedule.each { |k,v| 
+        v[:total_balance] = total - v[:total]
+      }
       @schedule
     end
   end # Class.new

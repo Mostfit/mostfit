@@ -182,116 +182,25 @@ a {
 <div class="example_group">
   <dl>
   <dt id="example_group_1">Loan</dt>
-    <script type="text/javascript">moveProgressBar('2.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have a discrimintator</span></dd>
     <script type="text/javascript">makeRed('rspec-header');</script>
     <script type="text/javascript">makeRed('example_group_1');</script>
-    <script type="text/javascript">moveProgressBar('5.0');</script>
+    <script type="text/javascript">moveProgressBar('0.0');</script>
     <dd class="spec failed">
-      <span class="failed_spec_name">should not be valid without belonging to a client</span>
+      <span class="failed_spec_name">before(:all)</span>
       <div class="failure" id="failure_1">
-        <div class="message"><pre>undefined method `tags' for nil:NilClass</pre></div>
-        <div class="backtrace"><pre>/home/svs/src/mostfit/app/models/loan.rb:836:in `check_client_sincerity'
-./spec/models/loan_spec.rb:82:</pre></div>
-    <pre class="ruby"><code><span class="linenum">834</span>  <span class="keyword">end</span>
-<span class="linenum">835</span>  <span class="keyword">def </span><span class="method">check_client_sincerity</span>
-<span class="offending"><span class="linenum">836</span>    <span class="keyword">return</span> <span class="punct">[</span><span class="constant">false</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">Client is marked insincere and is not eligible for a loan</span><span class="punct">&quot;]</span> <span class="keyword">if</span> <span class="ident">client</span><span class="punct">.</span><span class="ident">tags</span> <span class="keyword">and</span> <span class="ident">client</span><span class="punct">.</span><span class="ident">tags</span><span class="punct">.</span><span class="ident">include?</span><span class="punct">(</span><span class="symbol">:insincere</span><span class="punct">)</span></span>
-<span class="linenum">837</span>    <span class="keyword">return</span> <span class="constant">true</span>
-<span class="linenum">838</span>  <span class="keyword">end</span></code></pre>
+        <div class="message"><pre>expected valid? to return true, got false</pre></div>
+        <div class="backtrace"><pre>./spec/models/loan_spec.rb:44:</pre></div>
+    <pre class="ruby"><code><span class="linenum">42</span>    <span class="attribute">@client</span><span class="punct">.</span><span class="ident">save</span>
+<span class="linenum">43</span>    <span class="attribute">@client</span><span class="punct">.</span><span class="ident">errors</span><span class="punct">.</span><span class="ident">each</span> <span class="punct">{|</span><span class="ident">e</span><span class="punct">|</span> <span class="ident">puts</span> <span class="ident">e</span><span class="punct">}</span>
+<span class="offending"><span class="linenum">44</span>    <span class="attribute">@client</span><span class="punct">.</span><span class="ident">should</span> <span class="ident">be_valid</span></span>
+<span class="linenum">45</span>    <span class="comment"># validation needs to check for uniqueness, therefor calls the db, therefor we dont do it</span>
+<span class="linenum">46</span>    <span class="attribute">@loan_product</span> <span class="punct">=</span> <span class="constant">LoanProduct</span><span class="punct">.</span><span class="ident">new</span></code></pre>
       </div>
     </dd>
-    <script type="text/javascript">moveProgressBar('7.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being approved properly</span></dd>
-    <script type="text/javascript">moveProgressBar('10.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being validated properly</span></dd>
-    <script type="text/javascript">moveProgressBar('12.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being rejected properly</span></dd>
-    <script type="text/javascript">moveProgressBar('15.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">should not be valid without belonging to a client</span>
-      <div class="failure" id="failure_2">
-        <div class="message"><pre>undefined method `tags' for nil:NilClass</pre></div>
-        <div class="backtrace"><pre>/home/svs/src/mostfit/app/models/loan.rb:836:in `check_client_sincerity'
-./spec/models/loan_spec.rb:118:</pre></div>
-    <pre class="ruby"><code><span class="linenum">834</span>  <span class="keyword">end</span>
-<span class="linenum">835</span>  <span class="keyword">def </span><span class="method">check_client_sincerity</span>
-<span class="offending"><span class="linenum">836</span>    <span class="keyword">return</span> <span class="punct">[</span><span class="constant">false</span><span class="punct">,</span> <span class="punct">&quot;</span><span class="string">Client is marked insincere and is not eligible for a loan</span><span class="punct">&quot;]</span> <span class="keyword">if</span> <span class="ident">client</span><span class="punct">.</span><span class="ident">tags</span> <span class="keyword">and</span> <span class="ident">client</span><span class="punct">.</span><span class="ident">tags</span><span class="punct">.</span><span class="ident">include?</span><span class="punct">(</span><span class="symbol">:insincere</span><span class="punct">)</span></span>
-<span class="linenum">837</span>    <span class="keyword">return</span> <span class="constant">true</span>
-<span class="linenum">838</span>  <span class="keyword">end</span></code></pre>
-      </div>
-    </dd>
-    <script type="text/javascript">moveProgressBar('17.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper amount</span></dd>
-    <script type="text/javascript">moveProgressBar('20.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper interest_rate</span></dd>
-    <script type="text/javascript">moveProgressBar('22.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should be valid with a proper installment_frequency</span></dd>
-    <script type="text/javascript">moveProgressBar('25.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without proper installment_frequency</span></dd>
-    <script type="text/javascript">moveProgressBar('27.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a proper number_of_installments</span></dd>
-    <script type="text/javascript">moveProgressBar('30.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_first_payment_date</span></dd>
-    <script type="text/javascript">moveProgressBar('32.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without a scheduled_disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('35.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid with a disbursal date earlier than the loan is approved</span></dd>
-    <script type="text/javascript">moveProgressBar('37.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid when validated_on is earlier than the disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('40.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid when written_off_on is earlier than the disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('42.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without approved_on earlier than scheduled_disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('45.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly written off</span></dd>
-    <script type="text/javascript">moveProgressBar('47.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid without being properly disbursed</span></dd>
-    <script type="text/javascript">moveProgressBar('50.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid when scheduled_first_payment_date if before scheduled_disbursal_date</span></dd>
-    <script type="text/javascript">moveProgressBar('52.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates</span></dd>
-    <script type="text/javascript">moveProgressBar('55.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.shift_date_by_installments should shift dates properly, even odd ones.. and backwards.</span></dd>
-    <script type="text/javascript">moveProgressBar('57.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.descendants should keep track of the subclasses (just testing dm-core functionality)</span></dd>
-    <script type="text/javascript">moveProgressBar('60.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.number_of_installments_before should do what it promises</span></dd>
-    <script type="text/javascript">moveProgressBar('62.5');</script>
-    <dd class="spec not_implemented"><span class="not_implemented_spec_name">.last_loan_history_date should have some tests -- albeit more a view thing (PENDING: Not Yet Implemented)</span></dd>
-    <script type="text/javascript">moveProgressBar('65.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.scheduled_repaid_on give the proper date</span></dd>
-    <script type="text/javascript">moveProgressBar('67.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should have proper values for principal, interest and total to be received</span></dd>
-    <script type="text/javascript">moveProgressBar('70.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it written off</span></dd>
-    <script type="text/javascript">moveProgressBar('72.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties up to it is repaid</span></dd>
-    <script type="text/javascript">moveProgressBar('75.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties before being approved</span></dd>
-    <script type="text/javascript">moveProgressBar('77.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.status should give status accoring to changing properties when being rejected</span></dd>
-    <script type="text/javascript">moveProgressBar('80.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">cannot repay an unsaved loan</span></dd>
-    <script type="text/javascript">moveProgressBar('82.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.installment_dates should give a list with some dates</span></dd>
-    <script type="text/javascript">moveProgressBar('85.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.payment_schedule should give correct results</span></dd>
-    <script type="text/javascript">moveProgressBar('87.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.payments_hash should give correct results</span></dd>
-    <script type="text/javascript">moveProgressBar('90.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">history should be correct</span></dd>
-    <script type="text/javascript">moveProgressBar('92.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should write the history correctly into the db</span></dd>
-    <script type="text/javascript">moveProgressBar('95.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">.installment_dates should correctly deal with holidays</span></dd>
-    <script type="text/javascript">moveProgressBar('97.5');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should give correct cashflow for irr</span></dd>
-    <script type="text/javascript">moveProgressBar('100.0');</script>
-    <dd class="spec passed"><span class="passed_spec_name">should takeover properly</span></dd>
   </dl>
 </div>
-<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>6.138299 seconds</strong>";</script>
-<script type="text/javascript">document.getElementById('totals').innerHTML = "40 examples, 2 failures, 1 pending";</script>
+<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>7.602847 seconds</strong>";</script>
+<script type="text/javascript">document.getElementById('totals').innerHTML = "0 examples, 1 failure";</script>
 </div>
 </div>
 </body>
