@@ -67,6 +67,8 @@ Merb::Router.prepare do
 
   match('/admin(/:action)').to(:controller => 'admin').name(:admin)
   match('/admin(/:action/:id)').to(:controller => 'admin').name(:admin)
+  match('/dashboard/clients/:id(/branch_id/:branch_id)(/center_id/:center_id)(/staff_member_id/:staff_member_id)').to(:action => "clients", :controller => 'dashboard').name(:dashboard_client_actions)
+  match('/dashboard/clients/breakup(/group_by/:group_by)(/branch_id/:branch_id)(/center_id/:center_id)(/staff_member_id/:staff_member_id)').to(:id => "breakup", :action => "clients", :controller => 'dashboard').name(:dashboard_breakup_clients)
   match('/dashboard(/:action)').to(:controller => 'dashboard').name(:dashboard)
 
   match('/graph_data/:action(/:id)').to(:controller => 'graph_data').name(:graph_data)

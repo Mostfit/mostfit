@@ -164,6 +164,19 @@ class Float
   end
 end
 
+class Array
+  # Takes a function and groups by a nested array return by dm-aggrgates using the given function
+  def group_by_function(func)
+    group_by{|x| 
+      func.call(x[0])
+    }.map{|k,v| 
+      [k, v.map{|x| x[1]}.reduce{|s,x| 
+         s+=x
+       }]
+    }.sort_by{|x| x[0]}
+  end
+end
+
 module ExcelFormula
   def pmt(interest, installments, present_value, future_value, paid_before=1)  
     vPow = (1 + interest) ** installments
