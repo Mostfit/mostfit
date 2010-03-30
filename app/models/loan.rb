@@ -1059,6 +1059,7 @@ Loan.descendants.to_a.each do |c|
 
     def set_amount
       # this sets the amount to be the outstanding amount unless it is already set
+      debugger
       amount = payment_schedule[payment_schedule.keys.min][:balance]
       amount_applied_for = amount
     end
@@ -1109,26 +1110,28 @@ Loan.descendants.to_a.each do |c|
       super
       # chop off what doesn't belong to us
       self.taken_over_on ||= @schedule.keys.sort[(self.taken_over_on_installment_number) - 1]
-      @schedule = @schedule.reject{|k,v| k < self.taken_over_on}
+      last_date = @schedule.reject{|k,v| k > self.taken_over_on}.keys.max
+      total = @schedule[last_date][:total_balance]
+      self.amount = @schedule[last_date][:balance]
+      @schedule = @schedule.reject{|k,v| k <  last_date}
       # reset the original values
       self.disbursal_date = _disbursal_date
       self.scheduled_disbursal_date = _scheduled_disbursal_date
       self.scheduled_first_payment_date = _fp_date
       # adjust the first line of the payment_schedule
       dd = self.disbursal_date || self.scheduled_disbursal_date
-      self.amount = @schedule[@schedule.keys.min][:balance]
       @schedule.delete(@schedule.keys.min)
       @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => amount, :total => 0}
-      total = @schedule[@schedule.keys.sort[1]][:total_balance]
       # adjust all the dates
       adjusted_schedule = {}
-      orig_dates = @schedule.keys.sort
+      orig_dates = @schedule.keys.sort[1..-1]
       installment_dates.each_with_index do |d,i|
-        adjusted_schedule[d] = payment_schedule[orig_dates[i]] if i < @schedule.count
+        adjusted_schedule[d] = payment_schedule[orig_dates[i]] if i < @schedule.count - 1
       end
       @schedule = {@schedule.keys.min => @schedule[@schedule.keys.min]} + adjusted_schedule
       # recreate the totals
       ti = tp = 0
+      debugger
       @schedule.keys.sort.each_with_index do |dt,i|
         @schedule[dt][:total_interest] = ti += @schedule[dt][:interest]
         @schedule[dt][:principal] = i == 0 ? 0 : @schedule[@schedule.keys.sort[i-1]][:balance] - @schedule[dt][:balance]
@@ -1142,5 +1145,28 @@ Loan.descendants.to_a.each do |c|
       }
       @schedule
     end
+    
+    def _show_original_cf
+      #store original values
+      _amount = amount
+      _disbursal_date = disbursal_date
+      _scheduled_disbursal_date = scheduled_disbursal_date
+      _fp_date = scheduled_first_payment_date
+      _original_amount = amount
+      # recreate the original loan
+      self.scheduled_first_payment_date = original_first_payment_date
+      self.amount = original_amount
+      self.disbursal_date = original_disbursal_date
+      self.amount = original_amount
+      # generate the payments_schedule
+      clear_cache
+      
+      _show_cf
+      self.disbursal_date = _disbursal_date
+      self.scheduled_disbursal_date = _scheduled_disbursal_date
+      self.scheduled_first_payment_date = _fp_date
+      self.amount = _original_amount
+    end
+
   end # Class.new
 end # each
