@@ -1,5 +1,8 @@
 class Dashboard < Application
   include Grapher
+  before :display_from_cache, :exclude => [:index]
+  after  :store_to_cache, :exclude => [:index]
+
   def index
     render
   end
@@ -66,6 +69,19 @@ class Dashboard < Application
       avg    = data.collect{|x| x[0]}.reduce{|s,x| s+=x}.to_f/(data.length)
       graph.data(data, :first, :last)
       return graph.generate
+    when "aging"
+      ages = {1 => 0, 2 => 0, 3 => 0, 4  => 0, 5 => 0, 6 => 0, 7 => 0, 8 => 0, 9 => 0, 10 => 0}
+      Loan.all(:disbursal_date.not => nil).each{|l|
+        ages[(100*(Date.today-l.disbursal_date)/(l.number_of_installments * l.installment_frequency_in_days)/10).ceil]+=1
+      }
+      vals = []
+      ages.to_a.sort_by{|x| x[0]}.each{|key, count|
+        vals.push([count, "#{(key-1)*10} to #{key*10} %"])
+      }      
+      graph = BarGraph.new("Aging analysis")
+      graph.data_type=:individual
+      graph.data(vals)
+      return graph.generate      
     end
   end
 
@@ -142,11 +158,14 @@ class Dashboard < Application
   
   def get_cached_filename
     hash = params.deep_clone
-    dir = File.join(Merb.root, "public", hash.delete(:controller).to_s, hash.delete(:action).to_s, hash.delete(:id).to_s)
+    controller = hash.delete(:controller).to_s
+    action     = hash.delete(:action).to_s
+    [:format, :submit].each{|x| hash.delete(x)}
+    dir = File.join(Merb.root, "public", controller, action)
     unless File.exists?(dir)
       FileUtils.mkdir_p(dir)
     end
-    File.join(dir, hash.collect{|k,v| "#{k}_#{v}"})
+    File.join(dir, hash.collect{|k,v| "#{k}_#{v}"}.join("_"))
   end
   
   def get_steps(max)
