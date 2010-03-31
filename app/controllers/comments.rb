@@ -27,10 +27,13 @@ class Comments < Application
   end
 
   def create(comment)
-    debugger
     @comment = Comment.new(comment)
     if @comment.save
-      redirect resource(@parent), :message => {:notice => "Comment was successfully created"}
+      if request.xhr?
+        partial "comments/index", :object => @parent
+      else
+        redirect resource(@parent), :message => {:notice => "Comment was successfully created"}
+      end
     else
       message[:error] = "Comment failed to be created"
       render :new
@@ -60,7 +63,6 @@ class Comments < Application
   private
   
   def get_context
-    debugger
     uri = request.env["HTTP_REFERER"].split("/")
     @parent_model = uri[-2].singular.camel_case
     @parent_id = uri[-1]

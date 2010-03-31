@@ -334,6 +334,24 @@ $(document).ready(function(){
      $('.notice').remove();
   });
 
+  $("#comments_form").submit(function(){
+	  form = $("#comments_form");
+	  $.ajax({
+		  type: "POST",
+		  url: form.attr("action"),
+		  data: form.serialize(),
+		  success: function(data){
+		      $("table.comments").html(data);
+		      $("table.comments tr:last").hide().prev().hide();
+		      $("textarea#comment_text").val("");
+		      $("table.comments tr:last").fadeIn("slow").prev().fadeIn("slow")
+		  },
+		  error: function(data){
+		      alert("sorry could not add that");
+		  }
+	      });
+	  return false;
+      });
   $("#reporting_form select").change(function(){
 	  var types = ["model", "property", "operator", "value"];
 	  id = $(this).attr("id");
