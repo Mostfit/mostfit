@@ -1,0 +1,8 @@
+= error_messages_for @document
+= form_for(@document, :action => resource(:documents, :parent_id => @parent.id, :parent_model => @parent.class)) do
+  =partial :fields
+  %tr
+    %td
+    %td
+      = submit "Create"
+  

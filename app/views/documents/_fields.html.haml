@@ -1,0 +1,31 @@
+%table
+  %tr
+    %td
+      Document type
+    %td
+      =select :document_type_id, :collection => DocumentType.all.map{|x| [x.id, x.name]}, :prompt => "Choose the type of document"
+  %tr
+    %td
+      Issuing authority
+    %td
+      =text_field :issuing_authority
+  %tr
+    %td
+      Number
+    %td
+      =text_field :number
+  %tr
+    %td
+      Date of issue
+    %td
+      =date_select_for @document, :date_of_issue
+  %tr
+    %td
+      Valid Date
+    %td
+      =date_select_for @document, :valid_upto
+  %tr
+    %td
+      Select document
+    %td
+      =file_field :document

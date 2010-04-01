@@ -1,5 +1,7 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :document_types
+  resources :documents
   resources :comments
   resources :audit_trails
   resources :insurance_policies

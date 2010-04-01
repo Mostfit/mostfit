@@ -1,0 +1,8 @@
+%h1 Document Types
+= error_messages_for @document_type
+
+= form_for(@document_type, :action => url(:document_types) ) do
+  =partial :fields
+  = submit "Create"
+
+= link_to 'Back', url(:admin)

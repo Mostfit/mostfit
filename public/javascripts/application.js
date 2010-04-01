@@ -62,6 +62,7 @@ function showThis(li, idx){
                url: remote.val(),
 	       success: function(data){
 		   $($("div.tab_container div.tab")[idx]).html(data);
+		   create_remotes();
 		},
 		beforeSend: function(){
 		    $('#spinner').show();
@@ -151,8 +152,23 @@ function dateFromAge(ageYear, ageMonth, ageDay){
     }
     return birthDate;
 }
-
+function create_remotes(){
+    $("a._remote_").click(function(){	    
+	    href=$(this).attr("href");
+	    a=$(this);
+	    $.ajax({
+		    type: "GET",
+		    url: href,
+		    success: function(data){
+			$(a).after(data);
+			$(a).remove();
+		    }
+		});
+	    return false;
+	});
+}
 $(document).ready(function(){
+	create_remotes();
 	//Handling targets form
 	$("select#target_attached_to").change(function(){
 		$.ajax({
@@ -182,7 +198,7 @@ $(document).ready(function(){
 	    }else{
 		$("div.tab_container div.tab:first").show();
 	    }
-	    $("div.tab_container").append("<img src='/images/spinner.gif' id='spinner' style='display: none;'>")
+	    $("div.tab_container").append("<img src='/images/spinner.gif' id='spinner' style='display: none;'>");
 	}
 	//Handling reports
 	if($("table.report").length>0 && !$("table.report").hasClass("nojs")){

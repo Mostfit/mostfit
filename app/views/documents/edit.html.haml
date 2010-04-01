@@ -1,0 +1,7 @@
+= error_messages_for @document
+= form_for(@document, :action => url(:document, @document)) do
+  =partial :fields
+  %tr
+    %td
+    %td
+      = submit "Save"

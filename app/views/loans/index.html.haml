@@ -75,7 +75,8 @@
   %ul.tabs
     %li#loans Loans
     %li#comments Comments
-    %li#trail Audit Trail        
+    %li#trail Audit Trail
+    %li#documents Documents
   %div.tab
     %h2== Loans for client <i>#{@client.name}</i>
     
@@ -162,3 +163,5 @@
     
   %div.tab 
     %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+  %div.tab 
+    %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @client.id, :parent_model => Client)}
