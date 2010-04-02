@@ -17,7 +17,7 @@ class ConsolidatedReport < Report
   end
   
   def generate
-    branches, centers, groups = {}, {}, {}
+    branches, centers, groups, clients, loans = {}, {}, {}, {}, {}
     histories = LoanHistory.sum_outstanding_by_group(self.from_date, self.to_date)
     @branch.each{|b|
       groups[b.id]||= {}
@@ -59,8 +59,15 @@ class ConsolidatedReport < Report
         }
       }
     }
-    Payment.all(:received_on.gte => from_date, :received_on.lte => to_date ).each{|p|
-      client    = p.loan ? p.loan.client : p.client
+    repository.adapter.query("select id, center_id, client_group_id from clients where center_id in (#{centers.keys.join(',')})").each{|c|
+      clients[c.id] = c
+    }
+    repository.adapter.query("select id, client_id, amount  FROM loans WHERE client_id in (#{clients.keys.join(',')})").each{|l|
+      loans[l.id] =  l
+    }
+
+    Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id, :type, :loan_id, :amount, :client_id]).each{|p|
+      client    = p.loan_id ? clients[loans[p.loan_id].client_id] : clients[p.client_id]
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
@@ -72,33 +79,34 @@ class ConsolidatedReport < Report
       end
     }
     #1: Applied on
-    Loan.all(:applied_on.gte => from_date, :applied_on.lte => to_date).each{|l|
-      client    = l.client
+    Loan.all(:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :client_id]).each{|l|
+      client    = clients[l.client_id]
+      center_id = client.center_id
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
-      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id and not groups[branch_id][center_id][0]
-      groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][0] += l.amount
+      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
+      groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][0] += l.amount
     }
 
     #2: Approved on
-    Loan.all(:approved_on.gte => from_date, :approved_on.lte => to_date).each{|l|
-      client    = l.client
+    Loan.all(:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id]).each{|l|
+      client    = clients[l.client_id]
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
-      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id and not groups[branch_id][center_id][0]
-      groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][1] += l.amount
+      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
+      groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][1] += l.amount
     }
 
     #3: Disbursal date
-    Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date).each{|l|
-      client    = l.client
+    Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id]).each{|l|
+      client    = clients[l.client_id]
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
-      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not l.client.client_group_id and not groups[branch_id][center_id][0]
-      groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][2] += l.amount
+      groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
+      groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][2] += l.amount
     }
     return [groups, centers, branches]
   end
