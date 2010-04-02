@@ -32,6 +32,10 @@
     %tr.odd
       %td Landmark
       %td=@center.landmark
+    %tr
+      %td Center leader
+      - leader = @center.leader
+      %td=leader.client.name if leader
   %p
     = link_to 'edit this center\'s details', resource(@branch, @center, :edit), :class => "edit"
     = link_to 'add a new client', resource(@branch, @center, :clients, :new), :class => "add"
@@ -43,8 +47,8 @@
       Weeksheet
     %li#trail
       Audit trail
-  %div.tab
-    =partial "clients/list"
+  %div.tab    
+    =partial "clients/list", :center_leader => leader
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url(:weeksheet, :center_id => @center.id, :branch_id => @branch.id, :date => @date)}
     /=partial "centers/weeksheet"
