@@ -21,11 +21,23 @@ class Dashboard < Application
                                        FROM clients cl, centers c, branches b
                                        WHERE cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
         graph.data(vals, [:count, :to_i], :name)
+      elsif params[:group_by]=="borrower_clients"
+        graph = PieGraph.new("Branch status by borrower client count")
+        vals = repository.adapter.query(%Q{SELECT COUNT(cl.id) count, b.name name
+                                       FROM clients cl, centers c, branches b, loans l
+                                       WHERE cl.center_id=c.id AND cl.id=l.client_id AND b.id=c.branch_id GROUP BY b.id;})
+        graph.data(vals, [:count, :to_i], :name)
       elsif params[:group_by]=="loan"
         graph = PieGraph.new("Branch status by #{params[:group_by]} amount")
         vals = repository.adapter.query(%Q{SELECT SUM(l.amount) amount, b.name name
                                        FROM loans l, clients cl, centers c, branches b
-                                       WHERE l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
+                                       WHERE l.disbursal_date is not NULL and l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
+        graph.data(vals, [:amount, :to_i], :name)
+      elsif params[:group_by]=="loan_count"
+        graph = PieGraph.new("Branch status by #{params[:group_by]} count")
+        vals = repository.adapter.query(%Q{SELECT count(l.id) amount, b.name name
+                                       FROM loans l, clients cl, centers c, branches b
+                                       WHERE l.disbursal_date is not NULL and l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
         graph.data(vals, [:amount, :to_i], :name)
       end
       return graph.generate
