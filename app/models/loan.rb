@@ -1073,7 +1073,6 @@ Loan.descendants.to_a.each do |c|
 
     def set_amount
       # this sets the amount to be the outstanding amount unless it is already set
-      debugger
       amount = payment_schedule[payment_schedule.keys.min][:balance]
       amount_applied_for = amount
     end
@@ -1145,7 +1144,6 @@ Loan.descendants.to_a.each do |c|
       @schedule = {@schedule.keys.min => @schedule[@schedule.keys.min]} + adjusted_schedule
       # recreate the totals
       ti = tp = 0
-      debugger
       @schedule.keys.sort.each_with_index do |dt,i|
         @schedule[dt][:total_interest] = ti += @schedule[dt][:interest]
         @schedule[dt][:principal] = i == 0 ? 0 : @schedule[@schedule.keys.sort[i-1]][:balance] - @schedule[dt][:balance]
