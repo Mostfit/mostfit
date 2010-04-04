@@ -71,7 +71,7 @@ class Dashboard < Application
       return graph.generate
     when "aging"
       ages = {1 => 0, 2 => 0, 3 => 0, 4  => 0, 5 => 0, 6 => 0, 7 => 0, 8 => 0, 9 => 0, 10 => 0}
-      Loan.all(:disbursal_date.not => nil).each{|l|
+      Loan.all(:disbursal_date.not => nil, :disbursal_date.lte => Date.today).each{|l|
         ages[(100*(Date.today-l.disbursal_date)/(l.number_of_installments * l.installment_frequency_in_days)/10).ceil]+=1
       }
       vals = []
