@@ -5,14 +5,14 @@ class Target
   ValidAttaches = [:branch, :center, :staff_member]
 
   property :id,            Serial
-  property :target_value,  Integer, :nullable => false, :index => true
-  property :start_value,   Integer, :nullable => false, :index => true
-  property :type,          Enum.send('[]', *Types), :nullable => false, :index => true
-  property :deadline,      Date, :nullable => false, :index => true
-  property :attached_to,   Enum.send('[]', *ValidAttaches), :nullable => false, :index => true
-  property :attached_id,   Integer, :nullable => false, :index => true
+  property :target_value,  Integer, :required => true, :index => true
+  property :start_value,   Integer, :required => true, :index => true
+  property :type,          Enum.send('[]', *Types), :required => true, :index => true
+  property :deadline,      Date, :required => true, :index => true
+  property :attached_to,   Enum.send('[]', *ValidAttaches), :required => true, :index => true
+  property :attached_id,   Integer, :required => true, :index => true
   property :created_at,    DateTime, :default => Time.now
-  property :present_value, Integer, :nullable => true, :index => true
+  property :present_value, Integer, :required => false, :index => true
   property :checked_at,    Date
 
   validates_with_method :attached_id, :check_existance

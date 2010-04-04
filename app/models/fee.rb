@@ -5,12 +5,12 @@ class Fee
   FeeDue = Struct.new(:applicable, :payed, :due)
 
   property :id,            Serial
-  property :name,          String, :nullable => false
+  property :name,          String, :required => true
   property :percentage,    Float
   property :amount,        Integer
   property :min_amount,    Integer
   property :max_amount,    Integer
-  property :payable_on,    Enum.send('[]',*PAYABLE), :nullable => false
+  property :payable_on,    Enum.send('[]',*PAYABLE), :required => true
 
   has n, :loan_products, :through => Resource
 

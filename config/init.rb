@@ -102,7 +102,7 @@ Merb::BootLoader.after_app_loads do
   Misfit::Extensions.hook
 
   Merb.add_mime_type(:pdf, :to_pdf, %w[application/pdf], "Content-Encoding" => "gzip")
-  LoanProduct.property(:loan_type, LoanProduct::Enum.send('[]', *Loan.descendants.map{|x| x.to_s}), :nullable => false, :index => true)
+  LoanProduct.property(:loan_type, LoanProduct::Enum.send('[]', *Loan.descendants.map{|x| x.to_s}), :required => true, :index => true)
   begin
     if User.all.empty?
       u = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password', :role => :admin)

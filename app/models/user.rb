@@ -4,15 +4,15 @@ class User
   before :destroy, :prevent_destroying_admin
 
   property :id,           Serial
-  property :login,        String, :nullable => false
+  property :login,        String, :required => true
   property :created_at,   DateTime              
   property :updated_at,   DateTime
-  property :active,       Boolean, :default => true, :nullable => false
+  property :active,       Boolean, :default => true, :required => true
 
   # permissions
   # to add to this, only add at the back of the array
   ROLES = [:data_entry, :mis_manager, :admin, :read_only, :staff_member]
-  property :role, Enum.send('[]', *ROLES), :nullable => false
+  property :role, Enum.send('[]', *ROLES), :required => true
 
   # it gets                                   
   #   - :password and :password_confirmation accessors

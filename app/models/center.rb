@@ -4,7 +4,7 @@ class Center
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   
   property :id,                   Serial
-  property :name,                 String, :length => 100, :nullable => false, :index => true
+  property :name,                 String, :length => 100, :required => true, :index => true
   property :center_leader_name,   String, :length => 100
   property :code,                 String, :length => 12, :nullable => true, :index => true
   property :address,              Text,   :lazy => true

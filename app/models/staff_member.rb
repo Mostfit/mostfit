@@ -2,10 +2,10 @@ class StaffMember
   include DataMapper::Resource
   
   property :id,      Serial
-  property :name,    String, :length => 100, :nullable => false
-  property :mobile_number,  String, :length => 12,  :nullable => true
-  property :active,  Boolean, :default => true, :nullable => false  
-  property :user_id,  Integer,  :nullable => true  
+  property :name,    String, :length => 100, :required => true
+  property :mobile_number,  String, :length => 12,  :required => false
+  property :active,  Boolean, :default => true, :required => true  
+  property :user_id,  Integer,  :required => false  
   # no designations, they are derived from the relations it has
 
   has n, :branches, :child_key => [:manager_staff_id]

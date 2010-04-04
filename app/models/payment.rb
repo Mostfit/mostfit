@@ -13,19 +13,19 @@ class Payment
   PAYMENT_TYPES = [:principal, :interest, :fees]
   
   property :id,                  Serial
-  property :amount,              Integer, :nullable => false, :index => true
+  property :amount,              Integer, :required => true, :index => true
   property :type,                Enum.send('[]',*PAYMENT_TYPES), :index => true
   property :comment,             String, :length => 50
-  property :received_on,         Date,    :nullable => false, :index => true
-  property :deleted_by_user_id,  Integer, :nullable => true, :index => true
-  property :created_at,          DateTime,:nullable => false, :default => Time.now, :index => true
-  property :deleted_at,          ParanoidDateTime, :nullable => true, :index => true
-  property :created_by_user_id,  Integer, :nullable => false, :index => true
-  property :verified_by_user_id, Integer, :nullable => true, :index => true
-  property :loan_id,             Integer, :nullable => true, :index => true
-  property :client_id,           Integer, :nullable => true, :index => true
+  property :received_on,         Date,    :required => true, :index => true
+  property :deleted_by_user_id,  Integer, :required => false, :index => true
+  property :created_at,          DateTime,:required => true, :default => Time.now, :index => true
+  property :deleted_at,          ParanoidDateTime, :required => false, :index => true
+  property :created_by_user_id,  Integer, :required => true, :index => true
+  property :verified_by_user_id, Integer, :required => false, :index => true
+  property :loan_id,             Integer, :required => false, :index => true
+  property :client_id,           Integer, :required => false, :index => true
 
-  belongs_to :loan, :nullable => true
+  belongs_to :loan, :required => false
   belongs_to :client
   belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
   belongs_to :received_by, :child_key => [:received_by_staff_id], :model => 'StaffMember'
