@@ -25,7 +25,7 @@
     %td
       Creation date:
     %td
-      = date_select_for @branch, :creation_date
+      = date_select_for @center, :creation_date
       %br/
       %span.greytext pick the date this center was created on
   %tr
@@ -62,6 +62,13 @@
       Landmark:
     %td
       = text_field :landmark, :size => 25
+  -if not @center.new?
+    %tr
+      %td
+        Center leader:
+      %td
+        - leader_client_id = @center.leader ? @center.leader.client_id : nil
+        = select :leader, :collection => @center.clients(:order => [:name]).map{|x| [x.id, x.name]}, :selected => leader_client_id, :prompt => "Choose center leader"
   =partial "centers/extra_fields"
   %tr
     %td

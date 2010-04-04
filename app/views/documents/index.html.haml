@@ -1,0 +1,21 @@
+%table
+  %tr
+  - for document in @documents
+    %tr
+      %td
+        = document.document_type.name
+      %td
+        = document.number
+      %td
+        = document.date_of_issue
+      %td
+        = document.valid_upto
+      %td
+        = document.issuing_authority
+      %td
+        = link_to 'download', document.document.url
+      %td
+        = link_to 'Edit', url(:edit_document,  document, {:parent_id => @parent.id, :parent_model => @parent.class}), :class => "_remote_"
+%a{:href => resource(:documents, :new, :parent_id => @parent.id, :parent_model => @parent.class), :class => "_remote_"}
+  New
+

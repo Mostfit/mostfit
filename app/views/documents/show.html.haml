@@ -1,0 +1,38 @@
+-parent = @document.parent
+%h1  
+  ="Document for #{parent.class.to_s.downcase} #{parent.name}"
+%table
+  %tr
+    %td
+      %b Document type
+    %td
+      = @document.document_type.name
+  %tr
+    %td
+      %b Document number
+    %td
+      = @document.number
+  %tr
+    %td
+      %b Date of issue
+    %td
+      = @document.date_of_issue
+  %tr
+    %td
+      %b Date of expiry
+    %td
+      = @document.valid_upto
+  %tr
+    %td
+      %b Issuing authority
+    %td
+      = @document.issuing_authority
+  %tr
+    %td
+      %b Download
+    %td
+      = link_to "here", @document.document.url
+
+= link_to 'Edit',  url(:edit_document,  @document)
+|
+= link_to 'Back', resource(parent)

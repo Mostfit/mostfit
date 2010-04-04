@@ -1,5 +1,5 @@
 - @comment = Comment.new
-= form_for(@comment, :action => resource(:comments)) do
-  = text_area :text, :cols => 50, :rows => 10
+= form_for(@comment, :id => "comments_form", :action => resource(:comments)) do
+  = text_area :text, :cols => 80, :rows => 10
   %br
   = submit 'Add a Comment'

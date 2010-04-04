@@ -231,6 +231,16 @@ class Client
     FLAGS
   end
 
+  def make_center_leader
+    return "Already is center leader for #{center.name}" if CenterLeader.first(:client => self, :center => self.center)
+    CenterLeader.all(:center => center, :current => true).each{|cl|
+      cl.current = false
+      cl.date_deassigned = Date.today
+      cl.save
+    }
+    CenterLeader.create(:center => center, :client => self, :current => true, :date_assigned => Date.today)
+  end
+
   private
   def convert_blank_to_nil
     self.attributes.each{|k, v|

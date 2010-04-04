@@ -20,6 +20,12 @@ module Grapher
 
     def data(values_and_labels, value_method =:count, label_method=:date)
       count = 0
+      #set value and label methods to first and last if the set is an array
+      if values_and_labels.first.class==Array and value_method==:count and label_method==:date
+        value_method = :first
+        label_method = :last
+      end
+
       values_and_labels.each{|row|
         if @data_type==:cumulative
           count+=row.send(value_method)
@@ -44,13 +50,13 @@ module Grapher
       @steps    = 1
       @type     = type
       @labels   = []
-      @autoscale = false
+      @autoscale = true
     end
 
     def smoothen(values)
       @min   = values.min > 0 ? 0 : values.min
       @max   = values.max > 0 ? values.max : 0
-      @steps = get_steps(values.max)
+      @steps = get_steps(values.max) if @autoscale
     end
 
     def generate
@@ -65,7 +71,7 @@ module Grapher
     private
     def get_steps(max)
       divisor = power(max)
-      (max/(10**divisor)).to_i*10*divisor
+      (max/(10**divisor))*(10**divisor)/10
     end
     
     def power(val, base=10)

@@ -57,7 +57,7 @@ class ProjectedReport < Report
       }
     }
     #1: Applied on
-    Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date).each{|l|
+    Loan.all(:scheduled_disbursal_date.gte => from_date, :scheduled_disbursal_date.lte => to_date).each{|l|
       client    = l.client
       center_id = client.center_id
       next if not centers.key?(center_id)

@@ -631,3 +631,21 @@ ul.tabs li.active{
     border-bottom: 3px solid white;
     background-color: white;
 }
+table.comments{
+    margin: 0px;
+    width: 80%; 
+    border: 0px;
+    margin-left: 10px;
+}
+table.comments tr td{
+    padding-bottom: 20px;
+}
+table.comments tr.even td{
+    padding-bottom: 0px;
+}
+table.comments tr.odd td{
+    padding-bottom: 0px;
+}
+table.comments tr td span{
+    color: #aaa;
+}

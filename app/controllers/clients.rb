@@ -76,7 +76,17 @@ class Clients < Application
       raise InternalServerError
     end
   end
-
+  
+  def make_center_leader(id)
+    @client = Client.get(id)
+    raise NotFound unless @client
+    if @client.make_center_leader
+      return "Made center leader"
+    else
+      return "Cannot be made center leader"
+    end
+  end
+  
   # this redirects to the proper url, used from the router
   def redirect_to_show(id)
     raise NotFound unless @client = Client.get(id)

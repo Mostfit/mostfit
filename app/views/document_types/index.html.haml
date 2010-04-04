@@ -1,0 +1,14 @@
+%h1
+  Document Types
+%table
+  %tr
+  - for document_type in @document_types
+    %tr
+      %td
+        =document_type.name
+      %td
+        = link_to 'Edit', url(:edit_document_type,  document_type)
+
+= link_to 'New', url(:new_document_type)
+|
+= link_to 'Back', url(:admin)

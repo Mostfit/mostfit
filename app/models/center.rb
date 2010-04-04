@@ -114,7 +114,18 @@ class Center
   def loans
     self.clients.loans
   end
-
+  
+  def leader
+    CenterLeader.first(:center => self, :current => true)
+  end
+  
+  def leader=(id)
+    if id 
+      client = Client.get(id)
+      client.make_center_leader
+    end
+  end
+  
   private
   def hours_valid?
     return true if meeting_time_hours.blank? or (0..23).include? meeting_time_hours.to_i

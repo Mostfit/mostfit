@@ -178,6 +178,20 @@ class Loan
     end
   end
 
+  #return installment frequencies in days
+  def installment_frequency_in_days
+    case installment_frequency
+    when :weekly
+      7
+    when :daily
+      1
+    when :monthly
+      30
+    when :bi_weekly
+      15
+    end
+  end
+
   def clear_cache
     @payments_cache = @schedule = @history_array = @fee_schedule = @hols = nil
   end
@@ -542,7 +556,7 @@ class Loan
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
     raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-    amount.to_f / number_of_installments
+    (amount.to_f / number_of_installments).ceil
   end
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
@@ -1059,7 +1073,6 @@ Loan.descendants.to_a.each do |c|
 
     def set_amount
       # this sets the amount to be the outstanding amount unless it is already set
-      debugger
       amount = payment_schedule[payment_schedule.keys.min][:balance]
       amount_applied_for = amount
     end
@@ -1131,7 +1144,6 @@ Loan.descendants.to_a.each do |c|
       @schedule = {@schedule.keys.min => @schedule[@schedule.keys.min]} + adjusted_schedule
       # recreate the totals
       ti = tp = 0
-      debugger
       @schedule.keys.sort.each_with_index do |dt,i|
         @schedule[dt][:total_interest] = ti += @schedule[dt][:interest]
         @schedule[dt][:principal] = i == 0 ? 0 : @schedule[@schedule.keys.sort[i-1]][:balance] - @schedule[dt][:balance]
