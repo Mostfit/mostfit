@@ -8,9 +8,9 @@ class Mfi
 
   attr_accessor :subdomain, :city_name, :state_id, :district_id, :logo
 
-  property :id, Serial, :required => true, :index => true
-  property :name, String, :required => true, :index => true
-  property :address, Text, :required => true, :index => false
+  property :id, Serial, :nullable => false, :index => true
+  property :name, String, :nullable => false, :index => true
+  property :address, Text, :nullable => false, :index => false
   property :website, String
   property :telephone, String, :nullable => false, :index => true
   property :number_of_clients, Integer, :nullable => false, :index => true

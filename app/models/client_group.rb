@@ -4,10 +4,10 @@ class ClientGroup
   after :save, :sync_clients
 
   property :id,                Serial
-  property :name,              String, :required => true
-  property :number_of_members, Integer, :required => false, :min => 1, :max => 20, :default => 5
-  property :code,              String, :length => 14, :required => true, :index => true
-  property :created_by_staff_member_id,  Integer, :required => true, :index => true
+  property :name,              String, :nullable => false
+  property :number_of_members, Integer, :nullable => true, :min => 1, :max => 20, :default => 5
+  property :code,              String, :length => 14, :nullable => false, :index => true
+  property :created_by_staff_member_id,  Integer, :nullable => false, :index => true
 
   validates_is_unique   :code, :scope => :center_id
   validates_length      :code, :min => 1, :max => 14

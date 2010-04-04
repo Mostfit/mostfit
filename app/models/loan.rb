@@ -9,19 +9,19 @@ class Loan
   attr_accessor :interest_percentage
 
   property :id,                             Serial
-  property :discriminator,                  Discriminator, :required => true, :index => true
+  property :discriminator,                  Discriminator, :nullable => false, :index => true
 
-  property :amount,                         Integer, :required => true, :index => true  # this is the disbursed amount
+  property :amount,                         Integer, :nullable => false, :index => true  # this is the disbursed amount
   property :amount_applied_for,             Integer, :index => true
   property :amount_sanctioned,              Integer, :index => true
 
 
-  property :interest_rate,                  Float, :required => true, :index => true
-  property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :required => true, :index => true
-  property :number_of_installments,         Integer, :required => true, :index => true
-  property :scheduled_disbursal_date,       Date, :required => true, :auto_validation => false, :index => true
-  property :scheduled_first_payment_date,   Date, :required => true, :auto_validation => false, :index => true
-  property :applied_on,                     Date, :required => true, :auto_validation => false, :index => true
+  property :interest_rate,                  Float, :nullable => false, :index => true
+  property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
+  property :number_of_installments,         Integer, :nullable => false, :index => true
+  property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false, :index => true
+  property :scheduled_first_payment_date,   Date, :nullable => false, :auto_validation => false, :index => true
+  property :applied_on,                     Date, :nullable => false, :auto_validation => false, :index => true
   property :approved_on,                    Date, :auto_validation => false, :index => true
   property :rejected_on,                    Date, :auto_validation => false, :index => true
   property :disbursal_date,                 Date, :auto_validation => false, :index => true
@@ -34,15 +34,15 @@ class Loan
   property :deleted_at,                     ParanoidDateTime
   property :loan_product_id,                Integer,  :index => true
 
-  property :applied_by_staff_id,            Integer, :required => false, :index => true
-  property :approved_by_staff_id,           Integer, :required => false, :index => true
-  property :rejected_by_staff_id,           Integer, :required => false, :index => true
-  property :disbursed_by_staff_id,          Integer, :required => false, :index => true
-  property :written_off_by_staff_id,        Integer, :required => false, :index => true
-  property :validated_by_staff_id,          Integer, :required => false, :index => true
-  property :verified_by_user_id,            Integer, :required => false, :index => true
-  property :created_by_user_id,             Integer, :required => false, :index => true
-  property :cheque_number,                  String,  :length => 20, :required => false, :index => true
+  property :applied_by_staff_id,            Integer, :nullable => true, :index => true
+  property :approved_by_staff_id,           Integer, :nullable => true, :index => true
+  property :rejected_by_staff_id,           Integer, :nullable => true, :index => true
+  property :disbursed_by_staff_id,          Integer, :nullable => true, :index => true
+  property :written_off_by_staff_id,        Integer, :nullable => true, :index => true
+  property :validated_by_staff_id,          Integer, :nullable => true, :index => true
+  property :verified_by_user_id,            Integer, :nullable => true, :index => true
+  property :created_by_user_id,             Integer, :nullable => true, :index => true
+  property :cheque_number,                  String,  :length => 20, :nullable => true, :index => true
 
   property :original_amount,                    Integer
   property :original_disbursal_date,            Date

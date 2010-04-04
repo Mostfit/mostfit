@@ -4,12 +4,12 @@ class InsurancePolicy
   POLICY_STATUSES = [:active, :expired, :claim_pending, :claim_settled]
   
   property :id, Serial
-  property :policy_no, String, :required => true
-  property :sum_insured, Integer, :required => true
-  property :premium, Integer, :required => true
-  property :date_from, Date, :required => true
-  property :date_to, Date, :required => true
-  property :status, Enum.send("[]", *POLICY_STATUSES), :required => false
+  property :policy_no, String, :nullable => false
+  property :sum_insured, Integer, :nullable => false
+  property :premium, Integer, :nullable => false
+  property :date_from, Date, :nullable => false
+  property :date_to, Date, :nullable => false
+  property :status, Enum.send("[]", *POLICY_STATUSES), :nullable => true
 
   belongs_to :insurance_company
   belongs_to :client

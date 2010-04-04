@@ -10,33 +10,33 @@ class Client
   before :valid?, :add_created_by_staff_member
 
   property :id,              Serial
-  property :reference,       String, :length => 100, :required => true, :index => true
-  property :name,            String, :length => 100, :required => true, :index => true
+  property :reference,       String, :length => 100, :nullable => false, :index => true
+  property :name,            String, :length => 100, :nullable => false, :index => true
   property :spouse_name,     String, :length => 100
   property :date_of_birth,   Date,   :index => true
   property :address,         Text
-  property :active,          Boolean, :default => true, :required => true, :index => true
+  property :active,          Boolean, :default => true, :nullable => false, :index => true
   property :date_joined,     Date,    :index => true
-  property :grt_pass_date,   Date,    :index => true, :required => false
-  property :client_group_id, Integer, :index => true, :required => false
-  property :center_id,       Integer, :index => true, :required => false
+  property :grt_pass_date,   Date,    :index => true, :nullable => true
+  property :client_group_id, Integer, :index => true, :nullable => true
+  property :center_id,       Integer, :index => true, :nullable => true
   property :created_at,      DateTime, :default => Time.now
   property :deleted_at,      ParanoidDateTime
   property :updated_at,      DateTime
   property :deceased_on,     Date
   property :client_type,     Enum[:default], :default => :default
-  property :created_by_user_id,  Integer, :required => true, :index => true
-  property :created_by_staff_member_id,  Integer, :required => true, :index => true
-  property :verified_by_user_id, Integer, :required => false, :index => true
+  property :created_by_user_id,  Integer, :nullable => false, :index => true
+  property :created_by_staff_member_id,  Integer, :nullable => false, :index => true
+  property :verified_by_user_id, Integer, :nullable => true, :index => true
   property :tags, Flag.send("[]", *FLAGS)
 
-  property :account_number, String, :length => 20, :required => false
+  property :account_number, String, :length => 20, :nullable => true
   property :type_of_account, Enum.send('[]', *['', 'savings', 'current', 'no_frill', 'fixed_deposit', 'loan', 'other'])
-  property :bank_name,      String, :length => 20, :required => false
-  property :branch,         String, :length => 20, :required => false
-  property :join_holder,    String, :length => 20, :required => false
+  property :bank_name,      String, :length => 20, :nullable => true
+  property :branch,         String, :length => 20, :nullable => true
+  property :join_holder,    String, :length => 20, :nullable => true
   property :client_type,    Enum[:default], :default => :default
-  property :number_of_family_members, Integer, :length => 10, :required => false
+  property :number_of_family_members, Integer, :length => 10, :nullable => true
   property :children_girls_under_5_years, Integer, :length => 10, :default => 0
   property :children_girls_5_to_15_years, Integer, :length => 10, :default => 0
   property :children_girls_over_5_years, Integer, :length => 10, :default => 0
@@ -47,17 +47,17 @@ class Client
   property :not_in_school_bonded_girls, Integer, :length => 10, :default => 0
   property :not_in_school_working_sons, Integer, :length => 10, :default => 0
   property :not_in_school_bonded_sons, Integer, :length => 10, :default => 0
-  property :school_distance, Integer, :length => 10, :required => false
-  property :phc_distance, Integer, :length => 10, :required => false
-  property :member_literate, Enum.send('[]', *['', 'no', 'yes']), :default => '', :required => false
-  property :husband_litrate, Enum.send('[]', *['', 'no', 'yes']), :default => '', :required => false
-  property :other_productive_asset, String, :length => 30, :required => false
-  property :income_regular, Enum.send('[]', *['', 'no', 'yes']), :default => '', :required => false
-  property :client_migration, Enum.send('[]', *['', 'no', 'yes']), :default => '', :required => false
-  property :pr_loan_amount, Integer, :length => 10, :required => false
-  property :other_income, Integer, :length => 10, :required => false
-  property :total_income, Integer, :length => 10, :required => false
-  property :poverty_status, String, :length => 10, :required => false
+  property :school_distance, Integer, :length => 10, :nullable => true
+  property :phc_distance, Integer, :length => 10, :nullable => true
+  property :member_literate, Enum.send('[]', *['', 'no', 'yes']), :default => '', :nullable => true
+  property :husband_litrate, Enum.send('[]', *['', 'no', 'yes']), :default => '', :nullable => true
+  property :other_productive_asset, String, :length => 30, :nullable => true
+  property :income_regular, Enum.send('[]', *['', 'no', 'yes']), :default => '', :nullable => true
+  property :client_migration, Enum.send('[]', *['', 'no', 'yes']), :default => '', :nullable => true
+  property :pr_loan_amount, Integer, :length => 10, :nullable => true
+  property :other_income, Integer, :length => 10, :nullable => true
+  property :total_income, Integer, :length => 10, :nullable => true
+  property :poverty_status, String, :length => 10, :nullable => true
   property :irrigated_land_own_fertile, Integer
   property :irrigated_land_leased_fertile, Integer
   property :irrigated_land_shared_fertile, Integer
@@ -95,8 +95,8 @@ class Client
   property :not_irrigated_land_own_wasteland, Integer
   property :not_irrigated_land_leased_wasteland, Integer
   property :not_irrigated_land_shared_wasteland, Integer
-  property :caste, Enum.send('[]', *['', 'sc', 'st', 'obc', 'general']), :default => '', :required => false
-  property :religion, Enum.send('[]', *['', 'hindu', 'muslim', 'sikh', 'jain', 'buddhist', 'christian']), :default => '', :required => false
+  property :caste, Enum.send('[]', *['', 'sc', 'st', 'obc', 'general']), :default => '', :nullable => true
+  property :religion, Enum.send('[]', *['', 'hindu', 'muslim', 'sikh', 'jain', 'buddhist', 'christian']), :default => '', :nullable => true
   validates_length :number_of_family_members, :max => 20
   validates_length :school_distance, :max => 200
   validates_length :phc_distance, :max => 500
@@ -108,7 +108,7 @@ class Client
   belongs_to :created_by,        :child_key => [:created_by_user_id],         :model => 'User'
   belongs_to :created_by_staff,  :child_key => [:created_by_staff_member_id], :model => 'StaffMember'
   belongs_to :verified_by,       :child_key => [:verified_by_user_id],        :model => 'User'
-  belongs_to :occupation, :required => false
+  belongs_to :occupation, :nullable => true
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},
