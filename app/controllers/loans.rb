@@ -80,6 +80,7 @@ class Loans < Application
         redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
       end
     else
+      @loan.interest_rate*=100
       display @loan, :edit  # error messages will be shown
     end
   end
