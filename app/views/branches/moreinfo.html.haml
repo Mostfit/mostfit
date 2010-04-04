@@ -3,7 +3,7 @@
     %td
       Branch formation date
     %td
-      =@branch.created_at||@centers.sort_by{|x| x.created_at}[0].created_at.strftime($globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y")
+      =@branch.creation_date.strftime($globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y")
   %tr
     %td
       Number of Centers
