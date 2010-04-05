@@ -35,10 +35,10 @@ module Misfit
       :admin => all_models,
       :mis_manager => all_models_except([:user, :admin]),
       :data_entry => {
-        :all => [:client, :loan, :payment],
+        :all => [:client, :loan, :payment, :document],
       },
       :staff_member => {
-        :all => [:client, :loan, :payment]
+        :all => [:client, :loan, :payment, :documents]
       }
     }
 
@@ -46,13 +46,14 @@ module Misfit
       :admin => all_controllers,
       :mis_manager => all_controllers_except([:users, :admin]),
       :data_entry => {
-        :all => [:search, :"data_entry/payments",:"data_entry/clients",:"data_entry/loans", :"data_entry/index"]
+        :all => [:search, :documents, :"data_entry/payments",:"data_entry/clients",:"data_entry/loans", :"data_entry/index"]
       },
       :read_only => {
-        :all => [:search, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports]
+        :all => [:search, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents]
       },
       :staff_member => {
-        :all =>[:search, :browse, :centers, :payments, :clients, :reports, :"data_entry/payments", :"data_entry/clients", :"data_entry/loans", :"data_entry/index"],
+        :all =>[:documents, :search, :browse, :centers, :payments, :clients, 
+                :reports, :"data_entry/payments", :"data_entry/clients", :"data_entry/loans", :"data_entry/index"]
       }
     }
 
