@@ -1,5 +1,19 @@
-%table
-  %tr
+%table{:width => "100%"}
+  %tr    
+    %th
+      Type
+    %th
+      Number
+    %th
+      Date of issue
+    %th
+      Valid upto
+    %th
+      Issued by
+    %th
+      Description
+    %th
+      Preview
   - for document in @documents
     %tr
       %td
@@ -13,9 +27,14 @@
       %td
         = document.issuing_authority
       %td
+        = document.description
+      %td
+        -if /^image\//.match(Document.last.document_content_type)
+          =image_tag(document.document.url, :height => 50)
+        -else
+          Not available
+      %td
         = link_to 'download', document.document.url
       %td
-        = link_to 'Edit', url(:edit_document,  document, {:parent_id => @parent.id, :parent_model => @parent.class}), :class => "_remote_"
-%a{:href => resource(:documents, :new, :parent_id => @parent.id, :parent_model => @parent.class), :class => "_remote_"}
-  New
-
+        = link_to_with_rights('Edit', url(:edit_document,  document, {:parent_id => @parent.id, :parent_model => @parent.class}), :class => "_remote_")
+=link_to_with_rights("New", resource(:documents, :new, :parent_id => @parent.id, :parent_model => @parent.class), :class => "_remote_")

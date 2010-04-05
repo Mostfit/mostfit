@@ -55,6 +55,7 @@ class User
     controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
     model = route[:controller].singularize.to_sym
     action = route[:action]
+
     if route.has_key?(:id)
       return can_manage?(model, route[:id])
     end

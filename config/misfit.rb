@@ -35,10 +35,10 @@ module Misfit
       :admin => all_models,
       :mis_manager => all_models_except([:user, :admin]),
       :data_entry => {
-        :all => [:client, :loan, :payment, :document],
+        :all => [:client, :loan, :payment, :document, :client_groups, :groups],
       },
       :staff_member => {
-        :all => [:client, :loan, :payment, :documents]
+        :all => [:client, :loan, :payment, :documents, :client_groups, :groups]
       }
     }
 
@@ -52,7 +52,7 @@ module Misfit
         :all => [:search, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents]
       },
       :staff_member => {
-        :all =>[:documents, :search, :browse, :centers, :payments, :clients, 
+        :all =>[:documents, :search, :browse, :centers, :payments, :clients, :client_groups, :groups, :audit_trail,
                 :reports, :"data_entry/payments", :"data_entry/clients", :"data_entry/loans", :"data_entry/index"]
       }
     }

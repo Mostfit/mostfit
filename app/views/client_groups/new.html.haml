@@ -2,8 +2,8 @@
   %h1 Add a new Group
 
 = error_messages_for @client_group
-- form_url   = (params[:controller]=="data_entry/client_groups" ? url(:enter_groups, :action => "create") : resource(@branch, @center, :client_groups))
-- cancel_url = (params[:controller]=="data_entry/client_groups" ? url(:enter_groups) : resource(@branch, @center, :client_groups))
+- form_url   = (@branch and @center ? resource(@branch, @center, :client_groups) : resource(:client_groups, {:return => params[:return]}))
+- cancel_url = params[:return] ? "/"+params[:return] : resource(@branch, @center)
 
 = form_for(@client_group, :action => form_url, :id => "new_client_group_form") do
   = partial "client_groups/fields", :submit_text => "Create group", :cancel_link => cancel_url

@@ -45,6 +45,8 @@
       Clients
     %li#weeksheet
       Weeksheet
+    %li#documents
+      Documents
     %li#trail
       Audit trail
   %div.tab    
@@ -52,5 +54,7 @@
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url(:weeksheet, :center_id => @center.id, :branch_id => @branch.id, :date => @date)}
     /=partial "centers/weeksheet"
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @center.id, :parent_model => Center)}
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}

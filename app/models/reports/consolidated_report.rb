@@ -66,8 +66,9 @@ class ConsolidatedReport < Report
       loans[l.id] =  l
     }
 
-    Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id, :type, :loan_id, :amount, :client_id]).each{|p|
-      client    = p.loan_id ? clients[loans[p.loan_id].client_id] : clients[p.client_id]
+    Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id,:type,:loan_id,:amount,:client_id], :client_id => clients.keys).each{|p|
+      client    = (p.loan_id and clients[loans[p.loan_id].client_id] ? clients[loans[p.loan_id].client_id] : clients[p.client_id])
+      next unless client
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
@@ -79,7 +80,7 @@ class ConsolidatedReport < Report
       end
     }
     #1: Applied on
-    Loan.all(:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :client_id]).each{|l|
+    Loan.all(:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :client_id], :client_id => clients.keys).each{|l|
       client    = clients[l.client_id]
       center_id = client.center_id
       center_id = client.center_id
@@ -90,7 +91,7 @@ class ConsolidatedReport < Report
     }
 
     #2: Approved on
-    Loan.all(:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id]).each{|l|
+    Loan.all(:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id], :client_id => clients.keys).each{|l|
       client    = clients[l.client_id]
       center_id = client.center_id
       next if not centers.key?(center_id)
@@ -100,7 +101,7 @@ class ConsolidatedReport < Report
     }
 
     #3: Disbursal date
-    Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id]).each{|l|
+    Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id], :client_id => clients.keys).each{|l|
       client    = clients[l.client_id]
       center_id = client.center_id
       next if not centers.key?(center_id)

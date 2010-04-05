@@ -1,5 +1,6 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  match('/documents/list').to(:controller => 'documents', :action => 'list')
   resources :document_types
   resources :documents
   resources :comments

@@ -35,6 +35,8 @@
         Centers
       %li#info
         Info
+      %li#documents
+        Documents
       %li#trail
         Audit Trail
     %div.tab
@@ -42,5 +44,7 @@
       =partial "centers/list"
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => "moreinfo/#{@branch.id}"}
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @branch.id, :parent_model => Branch)}
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}

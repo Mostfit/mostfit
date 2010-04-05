@@ -26,6 +26,11 @@
       =date_select_for @document, :valid_upto
   %tr
     %td
+      Description(optional)
+    %td
+      =text_area :description
+  %tr
+    %td
       Select document
     %td
       =file_field :document

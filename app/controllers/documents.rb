@@ -1,6 +1,10 @@
 class Documents < Application
   before :get_parent, :only => [:index, :new, :edit, :create]
   # provides :xml, :yaml, :js
+  def list
+    @documents = Document.all(:parent_id => params[:parent_id], :parent_model => Mfi)
+    render :index
+  end
 
   def index
     @documents = Document.all(:parent_id => params[:parent_id], :parent_model => Kernel.const_get(params[:parent_model]))

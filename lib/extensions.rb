@@ -8,7 +8,7 @@ module Misfit
       end
 
       def before
-        if session.user.role == :staff_member
+        if session.user.staff_member
           @staff_member = session.user.staff_member
           @branches = Branch.all(:manager => @staff_member)
           @centers = Center.all(:manager => @staff_member)
@@ -52,7 +52,7 @@ module Misfit
       end
 
       def can_approve?(obj)        
-        if role == :staff_member
+        if staff_member
           if obj.class==Client
             return (obj.center.branch.manager == staff_member)
           elsif obj.class==Loan or Loan.descendants.map{|x| x}.include?(obj.class)
@@ -75,9 +75,9 @@ module Misfit
           return ((c.center.manager == self.staff_member) or (c.center.branch.manager == self.staff_member))
        elsif model == Center
           center = Center.get(id)
-          return true if @action == "show" and center.manager == self.staff_member
+          return true if center.manager == self.staff_member
           return center.branch.manager == self.staff_member
-        elsif model.relationships.include?(:manager)
+        elsif model.respond_to?(:relationships) and model.relationships.include?(:manager)
           o = model.get(id)
           return true if o.manager == self.staff_member
         else
@@ -103,16 +103,18 @@ module Misfit
         # more garbage
         return true if role == :admin
         return true if route[:controller] == "graph_data"
+        
         @route = route
         @controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
         @model = route[:controller].singularize.to_sym
         @action = route[:action]
+        return false if route[:controller] == "documents" and CUD_Actions.include?(@action)
         return true if @action == "redirect_to_show"
         r = (access_rights[@action.to_s.to_sym] or access_rights[:all])
         return false if @action == "approve" and role == :data_entry
         return false if role == :read_only and CUD_Actions.include?(@action)
         return false if r.nil?
-        if role == :staff_member
+        if staff_member
           return additional_checks if @route.has_key?(:id) and @route[:id]
 
           if params and params[:branch_id]

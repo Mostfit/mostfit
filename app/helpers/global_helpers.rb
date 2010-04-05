@@ -272,7 +272,7 @@ module Merb
     end
 
     def get_accessible_branches
-      if session.user.role==:staff_member
+      if session.user.staff_member
         [session.user.staff_member.centers.branches, session.user.staff_member.branches].flatten
       else
         Branch.all
@@ -280,7 +280,7 @@ module Merb
     end
     
     def get_accessible_centers(branch_id)
-      centers = if session.user.role==:staff_member
+      centers = if session.user.staff_member
                   [session.user.staff_member.centers, session.user.staff_member.branches.centers].flatten
                 elsif branch_id and not branch_id.blank?
                   Center.all(:branch_id => branch_id, :order => [:name])
@@ -291,7 +291,7 @@ module Merb
     end
 
     def get_accessible_staff_members      
-      staff_members   =  if session.user.role==:staff_member
+      staff_members   =  if session.user.staff_member
                            StaffMember.all(:id => session.user.staff_member.id)
                          else
                            StaffMember.all
@@ -302,7 +302,7 @@ module Merb
 
     private
     def staff_members_collection
-      if session.user.role==:staff_member
+      if session.user.staff_member
         staff = session.user.staff_member
         bms  = staff.branches.collect{|x| x.manager}
         cms  = staff.branches.centers.collect{|x| x.manager}               

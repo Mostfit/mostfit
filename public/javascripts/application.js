@@ -285,14 +285,14 @@ $(document).ready(function(){
 		id=$("#client_center_id option:selected").val() || $("#client_center_id").val();
 		$.ajax({
 			type: "get",
-			url: "/data_entry/groups/new?center_id="+id,
+			url: "/client_groups/new?center_id="+id,
 			success: function(data){
 			    $("#new_client_group_form").html(data);
 			    $("#new_client_group_form").submit(function(){
 				    $.ajax({
 					    type: "POST",
 					    dataType: "json",
-					    url: "/data_entry/groups/create",
+					    url: "/client_groups",
 					    data: "client_group[name]="+$("#client_group_name").val()
 						+ "&client_group[number_of_members]=" + $("#client_group_number_of_members").val()
 						+ "&client_group[center_id]=" + $("#client_center_id").val()
@@ -303,7 +303,7 @@ $(document).ready(function(){
 						$("#new_client_group_form").html("");
 					    },
 					    error: function(data){
-						alert(data.responseText);
+						alert("Cannot be created");
 					    }
 					});
 				    return false;

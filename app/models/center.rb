@@ -59,7 +59,7 @@ class Center
     result = {}
     branch_names = {}
 
-    if user.role==:staff_member
+    if user.staff_member
       staff_member = user.staff_member
       [staff_member.centers.branches, staff_member.branches].flatten.each{|b| branch_names[b.id] = b.name }
       centers = [staff_member.centers, staff_member.branches.centers].flatten
@@ -104,7 +104,7 @@ class Center
     center_ids = LoanHistory.all(:date => date||Date.today).map{|x| x.center_id}
     centers = center_ids.blank? ? [] : Center.all(:id => center_ids)
     centers
-    if user.role==:staff_member
+    if user.staff_member
       staff = user.staff_member
       centers = (staff.branches.count > 0 ? ([staff.centers, staff.branches.centers].flatten.uniq & centers) : (staff.centers & centers))
     end
