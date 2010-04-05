@@ -13,7 +13,6 @@ class Branch
   property :created_at,     DateTime, :nullable => false, :default => Time.now, :index => true
   property :creation_date,  Date, :default => Date.today
   property :area_id,        Integer, :nullable => true
-
   belongs_to :manager, :child_key => [:manager_staff_id], :model => 'StaffMember'
   belongs_to :area, :nullable => true
   has n, :centers

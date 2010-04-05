@@ -31,7 +31,7 @@
         = hidden_field :name => 'center_id', :value => @center.id
         = partial :cds
       = submit 'Make Payments', :onclick => "javascript:$('#darkenBackground').show(); return true;"
-
+ 
   - else
     Choose a staff member to record a payment for
     = form_for(@payment, :action => url(:enter_payments, :action => 'by_staff_member'), :method => :get) do

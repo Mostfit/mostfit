@@ -20,7 +20,7 @@
           %td{:colspan => 5}
             - if client.client_group
               %b
-                = client.client_group.name
+                = link_to client.client_group.name, resource(client.client_group)
                 (
                 =link_to('edit', resource(@branch, @center, client.client_group, :edit))
                 )
