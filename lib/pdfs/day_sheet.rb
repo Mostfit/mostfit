@@ -1,38 +1,17 @@
 module Pdf
   module DaySheet
-
-
-#  def generate_pdf
-#    debugger
-#    pdf = PDF::HTMLDoc.new
-#    pdf.set_option :bodycolor, :white
-#    pdf.set_option :toc, false
-#    pdf.set_option :portrait, true
-#    pdf.set_option :links, true
-#    pdf.set_option :webpage, true
-#    pdf.set_option :left, '2cm'
-#    pdf.set_option :right, '2cm'
-#    pdf.set_option :header, "Header here!"
-#    pdf.set_option :outfile, "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf"
-#    f = File.read("app/views/staff_members/day_sheet.html.haml")
-#    report = Haml::Engine.new(f).render(Object.new)
-#    pdf << report
-#    pdf.footer ".t."
-#    pdf.generate
-#    pdf.save_as("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf")
-##    f = File.read("app/views/reports/_#{name.snake_case.gsub(" ","_")}.pdf.haml")
-##    report = Haml::Engine.new(f).render(Object.new, :report => self)
-#    return pdf
-#  end
-
     def generate_pdf
       pdf = PDF::Writer.new(:orientation => :landscape)
       pdf.select_font "Times-Roman"
-      pdf.text "Day sheet for #{@staff_member.name} for #{@date}", :font_size => 30, :justification => :center    
-      @centers.each{|center|
-        pdf.start_new_page                
+      pdf.text "Day sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
+      pdf.text("\n")
+      @centers.sort_by{|x| x.meeting_time_hours + x.meeting_time_hours}.each_with_index{|center, idx|
+        pdf.start_new_page if idx > 0
+        pdf.text "Center: #{center.name}, Manager: #{@staff_member.name}, signature: ______________________", :font_size => 12, :justification => :left
+        pdf.text("Center leader: #{center.leader.client.name}, signature: ______________________", :font_size => 12, :justification => :left) if center.leader
+        pdf.text("Date: #{@date}, Time: #{center.meeting_time_hours}:#{center.meeting_time_minutes}", :font_size => 12, :justification => :left)
+        pdf.text("\n")
         table = PDF::SimpleTable.new
-        table.title = "Center name: #{center.name}"
         table.data = []
         tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, total_due = 0, 0, 0, 0, 0, 0
         
@@ -90,3 +69,27 @@ module Pdf
     end
   end
 end
+
+#  def generate_pdf
+#    debugger
+#    pdf = PDF::HTMLDoc.new
+#    pdf.set_option :bodycolor, :white
+#    pdf.set_option :toc, false
+#    pdf.set_option :portrait, true
+#    pdf.set_option :links, true
+#    pdf.set_option :webpage, true
+#    pdf.set_option :left, '2cm'
+#    pdf.set_option :right, '2cm'
+#    pdf.set_option :header, "Header here!"
+#    pdf.set_option :outfile, "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf"
+#    f = File.read("app/views/staff_members/day_sheet.html.haml")
+#    report = Haml::Engine.new(f).render(Object.new)
+#    pdf << report
+#    pdf.footer ".t."
+#    pdf.generate
+#    pdf.save_as("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf")
+##    f = File.read("app/views/reports/_#{name.snake_case.gsub(" ","_")}.pdf.haml")
+##    report = Haml::Engine.new(f).render(Object.new, :report => self)
+#    return pdf
+#  end
+
