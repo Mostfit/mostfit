@@ -7,5 +7,5 @@ class Occupation
 
   has n, :clients
   has n, :loans
-
+  default_scope(:default).update(:order => [:name])
 end

@@ -5,4 +5,5 @@ class LoanPurpose
   property :value, String
   property :code, String, :length => 3
 
+  default_scope(:default).update(:order => [:value])
 end

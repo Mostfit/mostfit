@@ -6,4 +6,6 @@ class DocumentType
   
   has n, :documents
   validates_is_unique :name
+  
+  default_scope(:default).update(:order => [:name])
 end

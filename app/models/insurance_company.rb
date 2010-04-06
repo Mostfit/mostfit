@@ -6,4 +6,5 @@ class InsuranceCompany
 
   has n, :insurance_policies
   validates_is_unique :name
+  default_scope(:default).update(:order => [:name])
 end

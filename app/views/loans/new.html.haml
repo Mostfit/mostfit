@@ -17,6 +17,9 @@
             = product.to_s
           %td
             = submit "Proceed"
+  -if @loan_products.length==0
+    %div.error
+      =link_to("There are no loan products available. Create one now", resource(:loan_products, :new)) 
   = link_to 'cancel', resource(@branch, @center, @client, :loans)
 - else
   = form_for(@loan, :action => resource(@branch, @center, @client, :loans)) do
