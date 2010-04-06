@@ -4,26 +4,26 @@ class Documents < Application
   # provides :xml, :yaml, :js
   def index
     @documents = Document.all(:parent_id => @parent.id, :parent_model => @parent.model, :valid_upto.gte => Date.today)
-    display @documents, :layout => determine_layout
+    display @documents, :layout => layout?
   end
 
   def show(id)
     @document = Document.get(id)
     raise NotFound unless @document
-    display @document, :layout => determine_layout
+    display @document, :layout => layout?
   end
 
   def new
     only_provides :html
     @document = Document.new
-    display @document, :layout => determine_layout
+    display @document, :layout => layout?
   end
 
   def edit(id)
     only_provides :html
     @document = Document.get(id)
     raise NotFound unless @document
-    display @document, :layout => determine_layout
+    display @document, :layout => layout?
   end
 
   def create(document)
@@ -68,9 +68,4 @@ private
       @parent = Mfi.new($globals ? $globals[:mfi_details] : {})
     end
   end
-
-  def determine_layout
-    return(request.xhr? ? false : :application)
-  end
-
 end # Documents

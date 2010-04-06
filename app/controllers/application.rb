@@ -58,6 +58,10 @@ class Application < Merb::Controller
   end
 
   private 
+  def layout?
+    return(request.xhr? ? false : :application)
+  end
+
   def get_dependent_relationships(obj)
     flag  = true
     model =  obj.class
