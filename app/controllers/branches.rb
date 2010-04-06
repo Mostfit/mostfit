@@ -20,7 +20,7 @@ class Branches < Application
     @centers_count =  @centers.size
     @groups_count  =  @centers.client_groups.size
     @clients_count =  @centers.clients(:fields => [:id]).size
-    @loan_data     =  LoanHistory.sum_outstanding_for_branch(@branch.id)[0]
+    @loan_data     =  LoanHistory.sum_outstanding_for_branch(@branch.id)
     @defaulted     =  LoanHistory.defaulted_loan_info_by_branch(@branch.id)[0]
     render :file => 'branches/moreinfo', :layout => false
   end
