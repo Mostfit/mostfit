@@ -29,12 +29,12 @@
       %td
         = document.description
       %td
-        -if /^image\//.match(Document.last.document_content_type)
+        -if /^image\//.match(document.document_content_type)
           =image_tag(document.document.url, :height => 50)
         -else
           Not available
       %td
         = link_to 'download', document.document.url
       %td
-        = link_to_with_rights('Edit', url(:edit_document,  document, {:parent_id => @parent.id, :parent_model => @parent.class}), :class => "_remote_")
-=link_to_with_rights("New", resource(:documents, :new, :parent_id => @parent.id, :parent_model => @parent.class), :class => "_remote_")
+        = link_to_with_rights('Edit', url(:edit_document,  document, {:parent_id => @parent.id, :parent_model => @parent.class}), :class => (request.xhr? ? "_remote_" : ""))
+=link_to_with_rights("New", resource(:documents, :new, :parent_id => @parent.id, :parent_model => @parent.class), :class => (request.xhr? ? "_remote_" : ""))

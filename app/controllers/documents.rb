@@ -1,33 +1,29 @@
 class Documents < Application
   before :get_parent, :only => [:index, :new, :edit, :create]
-  # provides :xml, :yaml, :js
-  def list
-    @documents = Document.all(:parent_id => params[:parent_id], :parent_model => Mfi)
-    render :index
-  end
 
+  # provides :xml, :yaml, :js
   def index
-    @documents = Document.all(:parent_id => params[:parent_id], :parent_model => Kernel.const_get(params[:parent_model]))
-    display @documents, :layout => false
+    @documents = Document.all(:parent_id => @parent.id, :parent_model => @parent.model, :valid_upto.gte => Date.today)
+    display @documents, :layout => determine_layout
   end
 
   def show(id)
     @document = Document.get(id)
     raise NotFound unless @document
-    display @document
+    display @document, :layout => determine_layout
   end
 
   def new
     only_provides :html
     @document = Document.new
-    display @document, :layout => false
+    display @document, :layout => determine_layout
   end
 
   def edit(id)
     only_provides :html
     @document = Document.get(id)
     raise NotFound unless @document
-    display @document, :layout => false
+    display @document, :layout => determine_layout
   end
 
   def create(document)
@@ -35,7 +31,8 @@ class Documents < Application
     @document.parent_model = @parent.class
     @document.parent_id    = @parent.id
     if @document.save
-      redirect(resource(@document.parent)+"#documents", :message => {:notice => "Document was successfully created"})
+      notice = "Document was successfully created"
+      redirect((@document.parent ? resource(@document.parent)+"#documents" : resource(:documents)), :message => {:notice => notice})
     else
       message[:error] = "Document failed to be created"
       render :new
@@ -46,9 +43,10 @@ class Documents < Application
     @document = Document.get(id)
     raise NotFound unless @document
     if @document.update(document)
-       redirect resource(@document.parent)+"#documents"
+      notice = "Document was successfully created"
+      redirect((@document.parent ? resource(@document.parent)+"#documents" : resource(:documents)), :message => {:notice => notice})
     else
-      display @parent
+      display(@document.parent ? @document.parent : :documents)
     end
   end
 
@@ -64,6 +62,15 @@ class Documents < Application
 
 private
   def get_parent
-    @parent = Kernel.const_get(params[:parent_model]).get(params[:parent_id])
+    if params[:parent_model] and params[:parent_id]
+      @parent = Kernel.const_get(params[:parent_model]).get(params[:parent_id])
+    else
+      @parent = Mfi.new($globals ? $globals[:mfi_details] : {})
+    end
   end
+
+  def determine_layout
+    return(request.xhr? ? false : :application)
+  end
+
 end # Documents
