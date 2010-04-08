@@ -5,7 +5,6 @@ class Center
   
   property :id,                   Serial
   property :name,                 String, :length => 100, :nullable => false, :index => true
-  property :center_leader_name,   String, :length => 100
   property :code,                 String, :length => 12, :nullable => true, :index => true
   property :address,              Text,   :lazy => true
   property :contact_number,       String, :length => 40, :lazy => true
@@ -44,7 +43,7 @@ class Center
     if /^\d+$/.match(q)
       all(:conditions => ["id = ? or code=?", q, q])
     else
-      all(:conditions => ["code=? or name like ? or center_leader_name like ?", q, q+'%', q+'%'])
+      all(:conditions => ["code=? or name like ?", q, q+'%'])
     end
   end
 
@@ -120,8 +119,9 @@ class Center
   end
   
   def leader=(id)
-    if id 
+    if id
       client = Client.get(id)
+      return if not client
       client.make_center_leader
     end
   end
