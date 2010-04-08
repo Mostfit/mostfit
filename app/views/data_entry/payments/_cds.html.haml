@@ -58,10 +58,10 @@
               = a.to_currency
               - tot_total += a
             %td.number
-              - if a == 0
-                = lh.nil? ? 0 : (lh.principal_paid.to_i + lh.interest_paid.to_i)
-              - else 
-                = text_field :name => "paid[loan][#{loan.id}", :value => (a > 0 ? a : 0), :cols => "5", :style => "width:50px;" 
+              /- if a == 0
+                /= lh.nil? ? 0 : (lh.principal_paid.to_i + lh.interest_paid.to_i)
+              /- else 
+              = text_field :name => "paid[loan][#{loan.id}", :value => (a > 0 ? a : 0), :cols => "5", :style => "width:50px;" 
             %td 
               = select :name => "payment_style[#{loan.id}]", :collection => [["prorata","pro rata"],["normal","fees => int => prin."]]
 
