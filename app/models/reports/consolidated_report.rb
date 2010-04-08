@@ -66,8 +66,12 @@ class ConsolidatedReport < Report
       loans[l.id] =  l
     }
 
-    Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id,:type,:loan_id,:amount,:client_id], :client_id => clients.keys).each{|p|
-      client    = (p.loan_id and clients[loans[p.loan_id].client_id] ? clients[loans[p.loan_id].client_id] : clients[p.client_id])
+    Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id,:type,:loan_id,:amount,:client_id]).each{|p|
+      if p.loan_id and loans[p.loan_id] and clients.key?(loans[p.loan_id].client_id)
+        client = clients[loans[p.loan_id].client_id]
+      elsif clients.key?(p.client_id)
+        client = clients[p.client_id]
+      end
       next unless client
       center_id = client.center_id
       next if not centers.key?(center_id)
