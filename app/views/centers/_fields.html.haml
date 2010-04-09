@@ -1,78 +1,52 @@
-%table.form
-  %tr
-    %td
-      Branch
-    %td
-      - if @branch and not @center.new?
-        =select :name => 'center[branch_id]', :collection => Branch.all.map{|b| [b.id,b.name]}, :selected => @branch.id.to_s
-      -elsif @branch and @center.new?
-        =select :name => 'center[branch_id]', :collection => Branch.all(:id => @branch.id).map{|b| [b.id,b.name]}
-      -else
-        =select :name => 'center[branch_id]', :collection => Branch.all.map{|b| [b.id,b.name]}
-  %tr
-    %td
-      Center name:
-    %td
-      = text_field :name, :size => 40
-  %tr
-    %td
-      Center code:
-    %td
-      = text_field :code, :size => 2
-      %br/
-      %span.greytext a two letter unique code for the center
-  %tr
-    %td
-      Creation date:
-    %td
-      = date_select_for @center, :creation_date
-      %br/
-      %span.greytext pick the date this center was created on
-  %tr
-    %td
-      Meeting every:
-    %td
-      - options = [['none', '<none>']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
-      = select :meeting_day, :collection => options
-      &nbsp;&nbsp;on&nbsp;&nbsp;
-      = text_field :meeting_time_hours,   :size => 2
-      %b :
-      = text_field :meeting_time_minutes, :size => 2
-      &nbsp;&nbsp;
-      %span.greytext time is in a 24 hour format
-  %tr
-    %td
-      Managed by:
-    %td
-      = select_staff_member_for @center, :manager
-      %br/
-      %span.greytext pick the staff member that manages this center
-  %tr
-    %td
-      Address:
-    %td
-      ~ text_area :address, :rows => 6, :cols => 38
-  %tr
-    %td
-      Contact phone number:
-    %td
-      = text_field :contact_number, :size => 15
-  %tr
-    %td
-      Landmark:
-    %td
-      = text_field :landmark, :size => 25
-  -if not @center.new?
-    %tr
-      %td
-        Center leader:
-      %td
-        - leader_client_id = @center.leader ? @center.leader.client_id : nil
-        = select :leader, :collection => @center.clients(:order => [:name]).map{|x| [x.id, x.name]}, :selected => leader_client_id, :prompt => "Choose center leader"
-  =partial "centers/extra_fields"
-  %tr
-    %td
-    %td
-      = submit submit_text
-      &nbsp;&nbsp;
-      = link_to 'cancel', cancel_url
+%p
+  %label{:for => "branch"}Branch
+  - if @branch and not @center.new?
+    = select :name => 'center[branch_id]', :collection => Branch.all.map{|b| [b.id,b.name]}, :selected => @branch.id.to_s
+  -elsif @branch and @center.new?
+    = select :name => 'center[branch_id]', :collection => Branch.all(:id => @branch.id).map{|b| [b.id,b.name]}
+  -else
+    = select :name => 'center[branch_id]', :collection => Branch.all.map{|b| [b.id,b.name]}
+%p
+  %label{:for => "name"}Center name:
+  = text_field :name, :size => 40
+%p
+  %label{:for =>"code"}Center code:
+  = text_field :code, :size => 2
+  %br/
+  %span.greytext a two letter unique code for the center
+%p
+  %label{:for =>"creation_date"}Creation date:
+  = date_select_for @center, :creation_date
+  %br/
+  %span.greytext pick the date this center was created on
+%p
+  %label{:for =>"meeting day"}Meeting every:
+  - options = [['none', '<none>']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
+  = select :meeting_day, :collection => options
+  &nbsp;&nbsp;on&nbsp;&nbsp;
+  = text_field :meeting_time_hours,   :size => 2
+  %b :
+  = text_field :meeting_time_minutes, :size => 2
+  &nbsp;&nbsp;
+  %span.greytext time is in a 24 hour format
+%p
+  %label{:for =>""}Managed by:
+  = select_staff_member_for @center, :manager
+  %br/
+  %span.greytext pick the staff member that manages this center
+%p
+  %label{:for =>""}Address:
+  = text_area :address, :rows => 6, :cols => 38
+%p
+  %label{:for =>""}Contact phone number:
+  = text_field :contact_number, :size => 15
+%p
+  %label{:for =>""}Landmark:
+  = text_field :landmark, :size => 25
+- unless @center.new?
+  %p
+    %label{:for =>""}Center leader:
+    - leader_client_id = @center.leader ? @center.leader.client_id : nil
+    = select :leader, :collection => @center.clients(:order => [:name]).map{|x| [x.id, x.name]}, :selected => leader_client_id, :prompt => "Choose center leader"
+%button{:class => "add", :type => "submit"}
+  = submit_text

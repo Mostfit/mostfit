@@ -81,7 +81,7 @@ function showTableTrs(){
     $("table.report tr.branch").show();
     $("table.report tr.branch_total").show();
     $("table.report tr.org_total").show();
-    $("table.report tr.header").show();    
+    $("table.report tr.header").show();
 }
 function daysInMonth(month, year){
     isLeap = false;
@@ -93,13 +93,13 @@ function daysInMonth(month, year){
     return days;
 }
 
-function dateFromAge(ageYear, ageMonth, ageDay){      
+function dateFromAge(ageYear, ageMonth, ageDay){
     $('#age_year_field').removeClass('error');
     $('#age_month_field').removeClass('error');
     $('#age_day_field').removeClass('error');
     var birthDate = new Array();
     today = new Date();
-    
+
     todayDay = today.getDate();
     todayMonth = today.getMonth()+ 1;
     todayYear = today.getFullYear();
@@ -118,32 +118,32 @@ function dateFromAge(ageYear, ageMonth, ageDay){
 	$('#age_day_field').addClass('error');
 	returnEarly = true;
     }
-    
+
     if (returnEarly) return false;
-    
+
     if(ageDay < todayDay){
 	if (ageMonth < todayMonth){
 	    birthDate[1] = todayMonth - ageMonth;
-	    birthDate[0] = todayYear - ageYear;    
+	    birthDate[0] = todayYear - ageYear;
 	}
       else{
 	  birthDate[1] = todayMonth - ageMonth + 12;
-	  birthDate[0] = todayYear - ageYear - 1;    
+	  birthDate[0] = todayYear - ageYear - 1;
       }
     }
     else{
 	if (ageMonth < todayMonth -1){
 	    birthDate[1] = todayMonth - ageMonth -1 ;
-	    birthDate[0] = todayYear - ageYear;            
+	    birthDate[0] = todayYear - ageYear;
 	}
 	else{
 	    birthDate[1] = todayMonth - ageMonth + 12 -1 ;
 	    birthDate[0] = todayYear - ageYear - 1 ;
 	}
     }
-    
+
     days = daysInMonth(birthDate[1], birthDate[0]);
-    
+
     if(ageDay < todayDay){
 	birthDate[2] = todayDay - ageDay;
     }
@@ -153,7 +153,7 @@ function dateFromAge(ageYear, ageMonth, ageDay){
     return birthDate;
 }
 function create_remotes(){
-    $("a._remote_").click(function(){	    
+    $("a._remote_").click(function(){
 	    href=$(this).attr("href");
 	    a=$(this);
 	    $.ajax({
@@ -170,6 +170,7 @@ function create_remotes(){
 $(document).ready(function(){
 	create_remotes();
 	//Handling targets form
+	$('form').highlight();
 	$("select#target_attached_to").change(function(){
 		$.ajax({
 			url: "/targets/all/"+$(this).val()+".json",
@@ -216,9 +217,9 @@ $(document).ready(function(){
 			$(this).text($(this).text().replace('Expand', 'Collapse'));
 		    }else{
 			$(this).text($(this).text().replace('Collapse', 'Expand'));
-			showTableTrs();			
+			showTableTrs();
 		    }
-		    setToggleText();			
+		    setToggleText();
 		});
 	    $("a.collapse_all").click(function(){
 		    $(this).text($(this).text().replace('Collapse', 'Expand'));
@@ -240,9 +241,9 @@ $(document).ready(function(){
 			$(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
 		    }
 		    if(parent_type=="branch" && action=="collapse")
-			$(this).parent().parent().nextUntil("tr.branch_total").hide();		    
+			$(this).parent().parent().nextUntil("tr.branch_total").hide();
 		    setToggleText();
-		});	    
+		});
 	}
 	if($("a.moreinfo").length>0){
 	    $("a.moreinfo").click(function(){
@@ -257,7 +258,7 @@ $(document).ready(function(){
 					$("a.moreinfo").show();
 					$("table.moreinfo").remove();
 					$("a.lessinfo").remove();
-				    });				
+				    });
 			    });
 		});
 	}
@@ -270,7 +271,7 @@ $(document).ready(function(){
 	$('.delete').click(function() {
 		var answer = confirm('Are you sure?');
 		return answer;
-	    }); 
+	    });
 	if(window.location.pathname.indexOf("edit")===-1){
 	    $("#client_group_id").change(function(){
 		    fillCode($("#client_center_id").val(), $("#client_group_id").val());
@@ -281,7 +282,7 @@ $(document).ready(function(){
 		    spitLogs();
 		}, 2000);
 	}
-	$("#new_client_group_link").click(function(){                
+	$("#new_client_group_link").click(function(){
 		id=$("#client_center_id option:selected").val() || $("#client_center_id").val();
 		$.ajax({
 			type: "get",
@@ -346,7 +347,7 @@ $(document).ready(function(){
   }
 
   $('.closeNotice').click(function(){
-     $('.closeNotice').addClass('notice'); 
+     $('.closeNotice').addClass('notice');
      $('.notice').remove();
   });
 

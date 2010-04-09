@@ -1,0 +1,15 @@
+%h1
+  ClientTypes controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/client_types/edit.html.erb
+= error_messages_for @client_type
+
+= form_for(@client_type, :action => url(:client_type, @client_type)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:client_type, @client_type)
+|
+= link_to 'Back', url(:client_types)

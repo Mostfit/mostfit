@@ -1,9 +1,10 @@
 body {
     background: #B0AA9A;
     color: #222;
-    font-family: Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
+    font-family: "Lucida Grande", Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
     padding: 0px;
     margin: 0px;
+    letter-spacing: -0.06em;
 }
 h1 {
     color: #E88E02;
@@ -279,6 +280,8 @@ font-weight: bold;
 margin: 0px;
 }
 
+.container .notice {
+}
 
 .error h2{
   color: #8a1f11;
@@ -290,6 +293,8 @@ margin: 0px;
 input[type="text"], input[type="password"], textarea {
   font-size: 100%;
   font-family: sans;
+  background: #FFFFFF url(/images/fieldbg.gif) repeat-x scroll center top
+
 }
 
 .asterisk {
@@ -341,10 +346,18 @@ a.nopic { background:none; padding:0; margin:0; }
 a.add, a.add:visited, a.add:link {
   background-image: url(/images/add.png);
   background-repeat: no-repeat;
+  background-color: #62ed1e;
+  background-position: 1px 3px;
+  border-color: #9AFF20 #4AB517 #4AB517 #9AFF20;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
   padding: 3px 0px 4px 30px;
-  color: #black;
+  color: #2c2c2c;
   font-size: 16px;
-  font-weight: lighter
+  padding: 6px 35px 4px;
+  margin: 5px 5px 10px;
 }
 
 a.add_small, a.add_small:visited, a.add_small:link {
@@ -648,4 +661,75 @@ table.comments tr.odd td{
 }
 table.comments tr td span{
     color: #aaa;
+}
+
+
+form.form {
+/*  background-color: #F6E8B1; */
+  background-color: #F5F6D4;
+  border: solid 2px #696C82;
+  font-family: "Lucida Grande";
+  font-size: 14px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 66%;
+  padding: 0px;
+
+}
+
+form h1 {
+  font-family: "Lucida Grande", Helvetica, sans;
+  background-color: #CDD3FE;
+  line-height: 2em;
+  margin: 0px;
+  color: #3c3c3c;
+  text-indent: 15px;
+  letter-spacing: -0.07em;
+}
+fieldset {
+  border: 0px;
+  margin: 0px;
+}
+
+form.form label {
+  display: block;
+}
+form.form td {
+  vertical-align: middle;
+}
+
+form.form p {
+  margin: 4px;
+}
+
+legend {
+  margin: 0px;
+  padding: 10px;
+  background: #B7CA79;
+  color: white;
+  -moz-box-shadow: 2px 2px 2px grey;
+}
+
+_button {
+  background: url(/images/tick.png) no-repeat #B7CA79 10px 6px;
+  text-indent: 30px;
+  font-size: 16px;
+  padding: 4px;
+}
+
+button.add {
+  background-image: url(/images/add.png);
+  background-repeat: no-repeat;
+  background-color: #62ed1e;
+  background-position: 1px 3px;
+  border-color: #9AFF20 #4AB517 #4AB517 #9AFF20;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  padding: 3px 0px 4px 30px;
+  color: #2c2c2c;
+  font-size: 16px;
+  padding: 6px 35px 4px;
+  margin: 5px 5px 10px;
 }
