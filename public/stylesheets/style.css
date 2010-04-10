@@ -1,10 +1,9 @@
 body {
     background: #B0AA9A;
     color: #222;
-    font-family: "Lucida Grande", Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
+    font-family: Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
     padding: 0px;
     margin: 0px;
-    letter-spacing: -0.06em;
 }
 h1 {
     color: #E88E02;
@@ -29,6 +28,8 @@ h2 {
   margin-left: 10%;
   padding: 0px 10px 10px 10px;
   min-height: 450px;
+  border: 1px solid #c9c9c9;
+
 }
 .container a:link, .container a:visited, .container a:active{
   /*color: #bc6624;*/
@@ -90,36 +91,33 @@ h1.logo{
 /**************************************/
 #navigation
 {
-  color: black;
-  padding-top: 4px;
+  background: white;
   position: relative;
-  top: -27px;
-  width: 50%;
-  left: 10%;
+  top: 66px;
+  height: 40px;
 }
 
 #navigation a {
-  background: #eee none repeat scroll 0 0;
-  padding: 4px 10px 3px 10px;
-  color: black;
-  width: 50px;
+  background:  #75B516 repeat scroll 0 0;
+  position: relative;
+  top: 11px;
+  left: -70px;
+  padding: 4px 15px 3px 10px;
+  color: white;
   text-decoration: none;
   font-weight: 500;
   font-size: 1.75em;
   margin: 0px;
-  -moz-border-radius: 5px 5px 0px 0px;
-  -webkit-border-radius: 5px 5px 0px 0px;
-  border: 1px solid #75B516;
+  border: 1px solid #c9c9c9;
 }
 #navigation a:hover{
-  background: #eee;
-  border: 1px solid #E88E02;
+  background: #5C8F11;
 }
 #navigation a.selected{
-  border: 0px;
-  background: #E88E02;
-  border-bottom: 1px solid #E88E02;
-  color: white;
+  background: white;
+  color: #3c3c3c;
+  border-bottom: 0px 
+  z-index:10;
 }
 
 #page-title h1 {
@@ -135,7 +133,6 @@ h1.logo{
 {
   margin: 0px;
   position: relative;
-  top: -24px;
 }
 
 .graph{
@@ -198,6 +195,8 @@ border: 1px solid #8c9292;
 }
 #content h3{
   font-size: 118%;
+  color: #5C8F11;
+  letter-spacing: 0.02em;
 }
 #content h4{
   font-size: 110%;
@@ -347,13 +346,13 @@ a.nopic { background:none; padding:0; margin:0; }
 a.add, a.add:visited, a.add:link {
   background-image: url(/images/add.png);
   background-repeat: no-repeat;
-  background-color: #62ed1e;
+  /* background-color: #62ed1e; */
   background-position: 1px 3px;
-  border-color: #9AFF20 #4AB517 #4AB517 #9AFF20;
+  /*border-color: #9AFF20 #4AB517 #4AB517 #9AFF20;
   border-width: 2px;
   border-style: solid;
   border-radius: 5px;
-  -moz-border-radius: 5px;
+  -moz-border-radius: 5px;*/
   padding: 3px 0px 4px 30px;
   color: #2c2c2c;
   font-size: 16px;
@@ -437,7 +436,7 @@ a.button:visited {
 {
   background: #fff;
   background-position: 125px 0px;
-  height: 90px;
+  height: 100px;
   border-top: 5px solid #75b516;
   width: 100%;
   position: relative;
@@ -448,7 +447,6 @@ a.button:visited {
 
 #header_search_div {
     position:relative; 
-    top:-55px; 
     right:10%;
     float:right;
     padding: 3px;
@@ -718,7 +716,7 @@ _button {
   padding: 4px;
 }
 
-button.add {
+button.add_ {
   background-image: url(/images/add.png);
   background-repeat: no-repeat;
   background-color: #62ed1e;

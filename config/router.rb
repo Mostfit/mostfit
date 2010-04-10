@@ -4,6 +4,7 @@ Merb::Router.prepare do
   resources :client_types
   match('/documents/list').to(:controller => 'documents', :action => 'list')
   resources :document_types
+  resources :comments        
   resources :documents
   resources :audit_trails
   resources :insurance_policies
