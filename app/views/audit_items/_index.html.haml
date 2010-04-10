@@ -1,0 +1,8 @@
+%table
+  - @audit_items.each do |a|
+    %tr{:class => cycle('odd','even')}
+      %td
+        = a.description
+      %td
+        = link_to_with_rights "details", resource(a)
+        

@@ -733,3 +733,18 @@ button.add {
   padding: 6px 35px 4px;
   margin: 5px 5px 10px;
 }
+
+table.tall {
+  border: solid 2px lightgrey;
+}
+
+table.tall thead {
+  background-color: #FBF8F1;
+  font-weight: bold;
+  border-bottom: solid 1px lightgrey;
+}
+table.tall th {
+  background-color: #FBF8F1;
+  padding: 10px 10px 10px 40px;
+  text-align: right;
+}

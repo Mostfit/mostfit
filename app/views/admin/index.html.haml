@@ -10,6 +10,8 @@
     %li
       = link_to_with_rights 'Manage Targets', resource(:targets), :class => 'edit'
     %li
+      = link_to_with_rights 'Manage Audits', resource(:audit_items), :class => 'edit'
+    %li
       = link_to_with_rights 'Manage Staff Members', resource(:staff_members), :class => 'edit'
     %li
       = link_to_with_rights 'Manage Holidays', url(:controller => 'holidays', :action => "index"), :class => 'edit'

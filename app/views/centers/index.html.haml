@@ -37,8 +37,12 @@
         Info
       %li#documents
         Documents
+      %li#comments
+        Comments
+      %li#audit
+        Audits
       %li#trail
-        Audit Trail
+        Data Changes
     %div.tab
       %h2== Centers of the #{@branch.name} branch    
       =partial "centers/list"
@@ -46,5 +50,12 @@
       %input{:type => "hidden", :name => "_load_remote", :value => "moreinfo/#{@branch.id}"}
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @branch.id, :parent_model => Branch)}
+    %div.tab
+      = partial 'comments/index', :object => @branch
+      %p
+        %h3 Add a comment
+        = partial 'comments/form'
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :id => @branch.id, :model => "Branch")}
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
