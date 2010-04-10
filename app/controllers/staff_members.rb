@@ -5,8 +5,11 @@ class StaffMembers < Application
 
   def index
     per_page = 15
-    debugger
-    @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    if params[:date].is_a? Hash
+      @date = Date.new(params[:date][:year].to_i, params[:date][:month].to_i, params[:date][:day].to_i)
+    else
+      @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    end
     @staff_members = if params[:branch_id] and not params[:branch_id].blank?
                        @branch = Branch.get(params[:branch_id])
                        StaffMember.all(:id => ([@branch.manager.id] + @branch.centers.manager.map{|x| x.id}).flatten.uniq).paginate(:page => params[:page], 
