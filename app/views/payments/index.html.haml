@@ -125,7 +125,8 @@
   %ul.tabs
     %li#payment_schedule Payment Schedule
     %li#payments_made Payments made
-    %li#trail Audit Trail        
+    %li#audit Audits
+    %li#trail History
 
   %div.tab
     %h2== Payment schedule
@@ -230,5 +231,7 @@
             %td{ :colspan => 8 }
     
     %p= link_to 'new payment >>', url_for_loan(@loan, 'payments/new'), :class => "button"
+  %div.tab 
+    %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :model => "Loan", :id => @loan.id)}
   %div.tab 
     %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}

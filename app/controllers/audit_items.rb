@@ -2,7 +2,6 @@ class AuditItems < Application
   # provides :xml, :yaml, :js
 
   def index
-    debugger
     if (params[:id] and params[:model])
       if params[:status]
         @audit_items = AuditItem.all(:status => params[:status].to_sym,:audited_model => params[:model].camel_case, :audited_id => params[:id])
