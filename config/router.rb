@@ -3,7 +3,6 @@ Merb::Router.prepare do
   match('/documents/list').to(:controller => 'documents', :action => 'list')
   resources :document_types
   resources :documents
-  resources :comments
   resources :audit_trails
   resources :insurance_policies
   resources :insurance_companies
@@ -36,6 +35,8 @@ Merb::Router.prepare do
     resources :centers  do
       resources :client_groups
       resources :clients do
+        resources :payments
+        resources :comments        
         resources :loans  do
           resources :payments
         end
@@ -50,7 +51,7 @@ Merb::Router.prepare do
 
   match('/centers/:id/groups(/:group_id).:format').to(:controller => 'centers', :action => 'groups')
   slice(:merb_auth_slice_password, :name_prefix => nil, :path_prefix => "")
-  match('/search(/:action)').to(:controller => 'search')
+  match('/search(/:action)').to(:controller => 'searches')
   match('/reports/graphs').to(:controller => 'reports', :action => 'graphs')
   match('/reports/:report_type(/:id)').to(:controller => 'reports', :action => 'show').name(:show_report)
   resources :reports
