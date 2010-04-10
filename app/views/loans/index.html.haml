@@ -70,6 +70,7 @@
     %li#trail History
     %li#documents Documents
     %li#insurance Insurance
+    %li#payments Payments
   %div.tab
     %h2== Loans for client <i>#{@client.name}</i>
     
@@ -184,3 +185,5 @@
           - else
             - @client.insurance_policies.each do |ip|
               = link_to ip.description, resource(@client, ip)
+  %div.tab 
+    %input{:type => "hidden", :name => "_load_remote", :value => resource(@branch, @center, @client, :payments)}
