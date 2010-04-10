@@ -1,0 +1,21 @@
+%h1
+  Client Types
+
+= link_to 'New Client Type', url(:new_client_type), :class => "add"
+%br
+%table.form.narrow{:style => "margin-top: 10px;"}
+  %thead
+    %tr
+      %th
+        Name
+      %th
+        Action
+  - for client_type in @client_types
+    %tr
+      %td
+        = client_type.type
+      %td
+        = link_to 'Show', url(:client_type, client_type)
+        |
+        = link_to 'Edit', url(:edit_client_type,  client_type)
+

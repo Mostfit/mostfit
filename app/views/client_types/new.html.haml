@@ -1,0 +1,15 @@
+%h1 New Client Type
+
+= error_messages_for @client_type
+
+= form_for(@client_type, :action => url(:client_types), :class => "form" ) do
+  %fieldset
+    %label      Type
+    = text_field :type
+    %label Applicable Fees
+    - Fee.all.select{|f| f.payable_on.to_s.split("_")[0] == "client"}.each do |f|
+      = f.name.humanize
+      = check_box :name => "fees[#{f.id}]"
+  %button{:type => "submit", :class => "add"} "Create a new Client Type"
+
+= link_to 'Back', url(:client_types)

@@ -1,0 +1,13 @@
+%h1
+  = @client_type.type
+  Client
+
+%h3 The following fees are applicable on this client type:
+%ul
+  - @client_type.fees.each do |f|
+    %li
+      = f.description
+
+= link_to 'Edit',  url(:edit_client_type,  @client_type)
+|
+= link_to 'Back', url(:client_types)

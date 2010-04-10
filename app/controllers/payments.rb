@@ -13,6 +13,11 @@ class Payments < Application
     display @payment
   end
 
+
+  def show(id)
+    display @payment
+  end
+
   def create(payment)
     raise NotFound unless @loan
       
@@ -42,10 +47,18 @@ class Payments < Application
     @payment = Payment.get(id)
     raise NotFound unless @payment
     disallow_updation_of_verified_payments
-    if @loan.delete_payment(@payment, session.user)
-      redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
+    if @loan
+      if @loan.delete_payment(@payment, session.user)
+        redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
+      else
+        redirect url_for_loan(@loan, 'payments'), :message => {:error => "Could not delete payment '#{@payment.id}'"}
+      end
     else
-      redirect url_for_loan(@loan, 'payments'), :message => {:error => "Could not delete payment '#{@payment.id}'"}
+      if @payment.destroy!
+        redirect resource(@payment.client), :message => {:notice => "Payment was deleted"}
+      else
+        display @payment, :message => {:notice => 'Payment was not deleted'}
+      end
     end
   end
 
@@ -65,11 +78,20 @@ class Payments < Application
   include DateParser
 
   def get_context
-    @branch = Branch.get(params[:branch_id])
-    @center = Center.get(params[:center_id])
-    @client = Client.get(params[:client_id])
-    @loan   = Loan.get(params[:loan_id])
-    raise NotFound unless @branch and @center and @client and @loan
+    if params[:id]
+      @payment = Payment.get(params[:id])
+      raise NotFound unless @payment
+      @loan = @payment.loan
+      @client = @payment.client
+      @center = @client.center
+      @branch = @center.branch
+    else
+      @branch = Branch.get(params[:branch_id])
+      @center = Center.get(params[:center_id])
+      @client = Client.get(params[:client_id])
+      @loan   = Loan.get(params[:loan_id])
+    end
+    raise NotFound unless @branch and @center and @client
   end
   def disallow_updation_of_verified_payments
     raise NotPrivileged if @payment.verified_by_user_id and not session.user.admin?

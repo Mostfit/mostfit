@@ -1,5 +1,7 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :audit_items
+  resources :client_types
   match('/documents/list').to(:controller => 'documents', :action => 'list')
   resources :document_types
   resources :documents
@@ -31,6 +33,7 @@ Merb::Router.prepare do
   end
   resources :loans, :id => %r(\d+)
   resources :centers
+  resources :payments
   resources :branches  do
     resources :centers  do
       resources :client_groups

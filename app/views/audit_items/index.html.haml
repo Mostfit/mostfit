@@ -1,0 +1,35 @@
+%h1
+  Audit Items
+
+= link_to 'New Audit Item', url(:new_audit_item), :class => "add"
+
+%p
+  - if @audit_items.blank?
+    %h2 No audit items here
+  - else
+    %table.narrow
+      %tr
+        %thead
+          %th Object
+          %th Due
+          %th Status
+          %th Result
+          %th Comments
+          %th Action
+      - for audit_item in @audit_items
+        %tr{:class => cycle('odd','even')}
+          %td
+            = link_to audit_item.object.name, resource(audit_item.object)
+          %td
+            = audit_item.due_on
+          %td
+            = audit_item.status
+          %td
+            = audit_item.result
+          %td.numeric
+            = Comment.for(audit_item).count
+          %td
+            = link_to 'Show', url(:audit_item, audit_item)
+            |
+            = link_to 'Edit', url(:edit_audit_item,  audit_item)
+

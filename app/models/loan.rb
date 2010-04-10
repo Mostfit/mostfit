@@ -165,6 +165,10 @@ class Loan
 
 
   # MISC FUNCTIONS
+  def description
+    "#{id}:Rs. #{amount} @ #{interest_rate} for client #{client.name}"
+  end
+
   def _show_cf #convenience function to see cashflow in console
     ps = payment_schedule
     puts

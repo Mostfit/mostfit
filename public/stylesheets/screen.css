@@ -64,7 +64,7 @@ input[type='text'] { cursor: text; }
 
 /* TABLES */
 
-.container table { border-top: 1px solid #ccc;  border-left: 1px solid #ccc; }
+/* .container table { border-top: 1px solid #ccc;  border-left: 1px solid #ccc; } */
 /* .container th, .container td { border-bottom: 1px solid #ddd; border-right: 1px solid #ccc; }*/
 
 /* MARGINS & PADDINGS */
@@ -82,7 +82,7 @@ input[type='text'] { cursor: text; }
 .container caption { padding-bottom: .8em; } /* padding instead of margin for IE */
 .container blockquote { padding: 0 1em; margin: 1.6em 0; }
 .container fieldset { padding: 0 1em 1em 1em; margin: 1.6em 0; } /* padding-top is margin-top for fieldsets in Opera */
-.container legend { padding-left: .8em; padding-right: .8em; }
+.container legend { padding-left: .8em; padding-right: .8em; display: block;}
 .container legend+* { margin-top: 1em; } /* compensates for the opera margin bug */
 .container textarea, .container input { padding: .3em .4em .15em .4em; }
 .container select { padding: .1em .2em 0 .2em; }
@@ -272,7 +272,9 @@ hr.space {background:#fff;color:#fff;}
 .container div.error, .container div.notice, .container div.success {padding:.8em;margin-bottom:1.6em;border:2px solid #ddd;}
 .container div.error {background:#FBE3E4;color:#8a1f11;border-color:#FBC2C4;}
 input.error, textarea.error, select.error {background:#FBE3E4;}
-.container div.notice {background:#FFF6BF;color:#514721;border-color:#FFD324;}
+.container div.notice {background:#FFF6BF;color:#514721;border-color:#FFD324;  background: url(/images/tick.png) no-repeat;
+  background-position: 10px 10px;
+}
 .container div.success {background:#E6EFC2;color:#264409;border-color:#C6D880;}
 .container .error a {color:#8a1f11; background:none; padding:0; margin:0; }
 .container .notice a {color:#514721; background:none; padding:0; margin:0; }

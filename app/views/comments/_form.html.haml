@@ -2,4 +2,5 @@
 = form_for(@comment, :id => "comments_form", :action => resource(:comments)) do
   = text_area :text, :cols => 80, :rows => 10
   %br
-  = submit 'Add a Comment'
+  %button{:type => 'submit', :class => 'add'}
+    Add a Comment

@@ -64,8 +64,10 @@
 %div.tab_container
   %ul.tabs
     %li#loans Loans
+    %li#payments Payments
     %li#comments Comments
-    %li#trail Audit Trail
+    %li#audit Audits
+    %li#trail History
     %li#documents Documents
     %li#insurance Insurance
     %li#payments Payments
@@ -147,11 +149,25 @@
         %tfoot
           %tr
             %td{ :colspan => 9 }
+  %div.tab
+    %h4 These are only client fee payments. For loan payments, please refer to the particular loans
+    %table.narrow
+      - Payment.all(:loan => nil, :client => @client).each do |p|
+        %tr
+          %td Rs. #{p.amount}
+          %td #{p.type}
+          %td #{p.comment}
+          %td
+            = link_to_with_rights 'show', resource(p)
+
+      
   %div.tab  
     = partial 'comments/index', :object => @client
     %p
       %h3 Add a comment
       = partial 'comments/form'
+  %div.tab 
+    %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :id => @client.id, :model => "Client")}
     
   %div.tab 
     %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
