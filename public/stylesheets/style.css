@@ -204,6 +204,7 @@ border: 1px solid #8c9292;
 }
 table.form, table.form td{
   border: 0px;
+  font-family: Helvetica;
 }
 table.border{
   width: 90%;
