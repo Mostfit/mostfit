@@ -39,7 +39,7 @@
         = link_to_with_class('reports', url(:reports))
       #header_search_div
         %form{:action => '/search', :class => 'search'}
-          %input{:name => 'query', :value => params[:query]}
+          %input{:name => 'query', :value => params[:query], :style => "width: 200px"}
           %input{:type => 'submit', :value=>'search'}
  
     #content
