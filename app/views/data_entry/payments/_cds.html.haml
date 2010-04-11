@@ -1,7 +1,7 @@
 - if @md
 
   Payments collected by 
-  = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s
+  = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'payments_received_by'
 
   %table.report.nojs
     %thead
@@ -59,7 +59,7 @@
               - tot_total += a
             %td.number
               /- if a == 0
-                /= lh.nil? ? 0 : (lh.principal_paid.to_i + lh.interest_paid.to_i)
+              /= lh.nil? ? 0 : (lh.principal_paid.to_i + lh.interest_paid.to_i)
               /- else 
               = text_field :name => "paid[loan][#{loan.id}", :value => (a > 0 ? a : 0), :cols => "5", :style => "width:50px;" 
             %td 
