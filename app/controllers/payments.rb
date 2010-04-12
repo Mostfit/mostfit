@@ -3,8 +3,13 @@ class Payments < Application
   provides :xml, :yaml, :js
 
   def index
-    @payments = @loan.payments
-    display @payments
+    if @loan
+      @payments = @loan.payments
+      display @payments
+    elsif @client
+      @payments = @client.payments
+      partial :list      
+    end
   end
 
   def new
@@ -78,19 +83,10 @@ class Payments < Application
   include DateParser
 
   def get_context
-    if params[:id]
-      @payment = Payment.get(params[:id])
-      raise NotFound unless @payment
-      @loan = @payment.loan
-      @client = @payment.client
-      @center = @client.center
-      @branch = @center.branch
-    else
-      @branch = Branch.get(params[:branch_id])
-      @center = Center.get(params[:center_id])
-      @client = Client.get(params[:client_id])
-      @loan   = Loan.get(params[:loan_id])
-    end
+    @branch = Branch.get(params[:branch_id])
+    @center = Center.get(params[:center_id])
+    @client = Client.get(params[:client_id])
+    @loan   = Loan.get(params[:loan_id]) if params[:loan_id]
     raise NotFound unless @branch and @center and @client
   end
   def disallow_updation_of_verified_payments
