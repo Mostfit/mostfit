@@ -4,7 +4,11 @@ class Centers < Application
   provides :xml, :yaml, :js
 
   def index
-    @centers = Center.all(:branch_id => @branch.id).paginate(:per_page => 15)
+    
+    hash = {:order => [:meeting_day]}
+    hash[:manager] = session.user.staff_member if session.user.role == :staff_member
+    hash[:branch] = @branch if @branch
+    @centers = Center.all(hash).paginate(:per_page => 15, :page => params[:page] || 1)
     display @centers
   end
 
