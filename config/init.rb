@@ -72,7 +72,7 @@ Merb::BootLoader.after_app_loads do
 
   begin; $holidays = Holiday.all.map{|h| [h.date, h]}.to_hash; rescue; end
   # Starting the logger takes time, so turn it off during development
-  Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments', 'DataEntry::Payments']) #unless Merb.environment == "development" or Merb.environment == "test"
+#  Misfit::Logger.start(['Loans', 'Clients','Centers','Branches','Payments', 'DataEntry::Payments']) #unless Merb.environment == "development" or Merb.environment == "test"
   # Load the validation hooks
   # ruby is too beautiful. 3 lines of code and all payments can get their appropriate validations which are decided by the
   # loan product.
