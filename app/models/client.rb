@@ -104,6 +104,7 @@ class Client
   has n, :loans
   has n, :payments
   has n, :insurance_policies
+  has n, :attendances
   validates_length :account_number, :max => 20
 
   belongs_to :center

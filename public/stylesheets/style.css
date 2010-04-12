@@ -214,17 +214,21 @@ table.form td.legend{
   border: 1px;
   font-weight: bold;
 }
+
+table {
+
+}
 table thead tr {
-    border-right: solid 1px  #736f5d;
+    background: #CDD3FE;
 }
 table thead th {
-  background: #C9C3A3;
 /*  background-image: url('/images/tab_bg.png');*/
+  padding: 0px;
   color: #444;
   text-align: left;
   font-size: 1.2em;
-  border-bottom: solid 1px  #736f5d;
 }
+
 table tfoot td {
   background: #888;
   color: #fff;

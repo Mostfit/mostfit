@@ -70,6 +70,7 @@
     %li#documents Documents
     %li#insurance Insurance
     %li#payments Payments
+    %li#attendance Attendance
   %div.tab
     %h2== Loans for client <i>#{@client.name}</i>
     
@@ -174,3 +175,5 @@
               = link_to ip.description, resource(@client, ip)
   %div.tab 
     %input{:type => "hidden", :name => "_load_remote", :value => resource(@branch, @center, @client, :payments)}
+  %div.tab 
+    %input{:type => "hidden", :name => "_load_remote", :value => resource( @client, :attendances)}
