@@ -5,25 +5,26 @@
 /%p At the bottom you find an overview of all modifications that you have made.
 - @i = 1
 %table#data_entry_index
+  -user = session.user
   - [:branch, :center, :group, :client, :loan, :payment].each do |thing|
     - plural = thing.to_s.pluralize
     - if (@i-1) % 3 == 0
       %tr
       - @i=1
-    - if session.user.can_manage?(thing)
+    - if user.can_manage?(thing)
       %td
         = image_tag "/images/#{plural}.jpg"
       %td
         %h3{:style => "border-bottom: dotted 1px #999"} 
           = plural.capitalize
         - if thing == :payment
-          = link_to_with_rights "Record a payment", url("enter_#{plural}".to_sym, :action => 'record'), :class => 'add_small'
+          = link_to "Record a payment", url("enter_#{plural}".to_sym, :action => 'record'), :class => 'add_small'
           %br
-          = link_to_with_rights "By Center", url("enter_#{plural}".to_sym, :action => 'by_center'), :class => 'add_small'
+          = link_to "By Center", url("enter_#{plural}".to_sym, :action => 'by_center'), :class => 'add_small'
           %br
-          = link_to_with_rights "By Staff Member", url("enter_#{plural}".to_sym, :action => 'by_staff_member'), :class => 'add_small'
+          = link_to "By Staff Member", url("enter_#{plural}".to_sym, :action => 'by_staff_member'), :class => 'add_small'
           %br
-          = link_to_with_rights "Delete a payment", url("enter_#{plural}".to_sym, :action => 'delete'), :class => 'add_small'
+          = link_to "Delete a payment", url("enter_#{plural}".to_sym, :action => 'delete'), :class => 'add_small'
         -else
           = link_to_with_rights "Add new #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'new'), :class => 'add_small'
           %br

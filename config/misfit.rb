@@ -35,10 +35,10 @@ module Misfit
       :admin => all_models,
       :mis_manager => all_models_except([:user, :admin]),
       :data_entry => {
-        :all => [:client, :loan, :payment, :document, :client_groups, :groups],
+        :all => [:client, :loan, :payment, :document, :client_group, :group, :insurance_company, :insurance_policy],
       },
       :staff_member => {
-        :all => [:client, :loan, :payment, :documents, :client_groups, :groups]
+        :all => [:center, :client, :loan, :payment, :document, :client_group, :group, :comment, :insurance_company, :staff_member]
       }
     }
 
@@ -46,14 +46,16 @@ module Misfit
       :admin => all_controllers,
       :mis_manager => all_controllers_except([:users, :admin]),
       :data_entry => {
-        :all => [:search, :documents, :"data_entry/payments",:"data_entry/clients",:"data_entry/loans", :"data_entry/index"]
+        :all => [:search, :comments, :documents, :"data_entry/payments",:"data_entry/clients",:"data_entry/loans", :"data_entry/index"]
       },
       :read_only => {
-        :all => [:search, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents]
+        :all => [:searches, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :insurance_policies, 
+                 :insurance_companies, :audit_items, ]
       },
       :staff_member => {
-        :all =>[:documents, :search, :browse, :centers, :payments, :clients, :client_groups, :groups, :audit_trail,
-                :reports, :"data_entry/payments", :"data_entry/clients", :"data_entry/loans", :"data_entry/index"]
+        :all => [:documents, :searches, :browse, :branches, :centers, :payments, :clients, :client_groups, :groups, :audit_trails, :comments, :insurance_policies, 
+                 :reports, :"data_entry/centers", :"data_entry/client_groups", :"data_entry/payments", :"data_entry/clients", :staff_members, :audit_items,
+                 :"data_entry/loans", :"data_entry/index", :insurance_companies]
       }
     }
 

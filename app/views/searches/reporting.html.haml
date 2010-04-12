@@ -1,0 +1,25 @@
+- if @objects.length>0
+  -relations = @model.relationships.reject{|name, rel| rel.class!=DataMapper::Associations::ManyToOne::Relationship}.inject({}){|s,x| s+={x[1].child_key.collect{|y| y.name}.first => x[0]}}
+  %div{:style => "float: left; padding-right: 35px;"}
+    %h2
+      =@model.name.capitalize
+    %table
+      %tr
+        -@model.properties.each do |p|
+          -if p.type!=DataMapper::Types::Text and p.name!=:created_at and p.name!=:updated_at
+            %th
+              =relations.key?(p.name) ? relations[p.name] : p.name
+      -@objects.each do |obj|
+        %tr
+          -@model.properties.each do |p|
+            -if p.type!=DataMapper::Types::Text and p.name!=:created_at and p.name!=:updated_at
+              %td
+                -if relations.key?(p.name)
+                  -child_obj = obj.send(relations[p.name])
+                  =child_obj.respond_to?(:name) ? child_obj.name : child_obj
+                -elsif obj.respond_to?(p.name)
+                  =obj.send(p.name)
+                -else
+                  =obj.to_s
+-else
+  No records

@@ -10,9 +10,12 @@ module Misfit
       def before
         if session.user.staff_member
           @staff_member = session.user.staff_member
-          @branches = Branch.all(:manager => @staff_member)
-          @centers = Center.all(:manager => @staff_member)
-          @template = 'browse/for_staff_member'
+          if branch = Branch.all(:manager => @staff_member)
+            true
+          else
+            @centers = Center.all(:manager => @staff_member)
+            @template = 'browse/for_staff_member'
+          end
         end
       end
 
@@ -56,7 +59,7 @@ module Misfit
           if obj.class==Client
             return (obj.center.branch.manager == staff_member)
           elsif obj.class==Loan or Loan.descendants.map{|x| x}.include?(obj.class)
-            return (obj.client.center.branch.manager == staff_member) 
+            return (obj.client.center.branch.manager == staff_member)
           end
           retrun false
         end
@@ -66,20 +69,26 @@ module Misfit
 
       def additional_checks
         id = @route[:id]
-        model = Kernel.const_get(@model.to_s.split("/")[-1].capitalize)
+        staff_member = self.staff_member
+        model = Kernel.const_get(@model.to_s.split("/")[-1].camelcase)
         if model == Loan
           l = Loan.get(id)
-          return ((l.client.center.manager == self.staff_member) or (l.client.center.branch.manager == self.staff_member))
+          return ((l.client.center.manager == staff_member) or (l.client.center.branch.manager == staff_member))
         elsif model == Client
           c = Client.get(id)
-          return ((c.center.manager == self.staff_member) or (c.center.branch.manager == self.staff_member))
+          return ((c.center.manager == self.staff_member) or (c.center.branch.manager == staff_member))
+        elsif model == Branch
+          branch = Branch.get(id)
+          return ((branch.manager == staff_member) or (branch.centers.manager == staff_member))
        elsif model == Center
           center = Center.get(id)
-          return true if center.manager == self.staff_member
-          return center.branch.manager == self.staff_member
+          return true if center.manager == staff_member
+          return center.branch.manager == staff_member
         elsif model.respond_to?(:relationships) and model.relationships.include?(:manager)
           o = model.get(id)
-          return true if o.manager == self.staff_member
+          return true if o.manager == staff_member
+        elsif [Comment, Document, InsurancePolicy, InsuranceCompany].include?(model)
+          reutrn true
         else
           return false
         end
@@ -116,7 +125,6 @@ module Misfit
         return false if r.nil?
         if staff_member
           return additional_checks if @route.has_key?(:id) and @route[:id]
-
           if params and params[:branch_id]
             b = Branch.get(params[:branch_id])
             return (b.manager == staff_member or b.centers.manager.include?(staff_member))
