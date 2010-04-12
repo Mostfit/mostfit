@@ -23,6 +23,7 @@ module DataEntry
       @branch = @center.branch unless @center.nil?
       if request.method == :post
         bulk_payments_and_disbursals
+        mark_attendance
         if @errors.blank?
           redirect(params[:return]||url(:data_entry), :message => {:notice => 'All payments made succesfully'})
         elsif params[:format] and params[:format]=="xml"
@@ -148,6 +149,24 @@ module DataEntry
           @loan.disbursed_by = @staff
           @errors << @loan.errors if not @loan.save
         end
+      end
+    end
+
+    def mark_attendance
+      debugger
+      params[:attendance].each do |client_id, status|
+        client = Client.get(client_id)
+        if status == "late" 
+          status = "present"
+          late = true
+        end
+        a = Attendance.all(:date => @date, :client_id => client_id, :center_id => client.center.id)[0]
+        if a
+          a.update(:status => status, :late => late)
+        else
+          a = Attendance.new(:date => @date, :client_id => client_id, :center_id => client.center.id, :status => status, :late => late)
+        end
+        @errors << a.errors unless a.save
       end
     end
 
