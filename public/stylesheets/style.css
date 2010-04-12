@@ -665,20 +665,20 @@ table.comments tr td span{
 
 form.form {
 /*  background-color: #F6E8B1; */
-  background-color: #F5F6D4;
+/*  background-color: #F5F6D4; */
   border: solid 2px #696C82;
   font-family: "Lucida Grande";
   font-size: 14px;
   margin-left: auto;
   margin-right: auto;
-  width: 66%;
+  width: 95%;
   padding: 0px;
 
 }
 
 form h1 {
   font-family: "Lucida Grande", Helvetica, sans;
-  background-color: #CDD3FE;
+   background-color: #CEFF85;
   line-height: 2em;
   margin: 0px;
   color: #3c3c3c;
@@ -693,12 +693,21 @@ fieldset {
 form.form label {
   display: block;
 }
+label {
+  display: inline-block;
+  width: 200px;
+  text-align: right;
+  margin-right: 5px;
+  vertical-align: top;
+}
 form.form td {
   vertical-align: middle;
 }
 
-form.form p {
-  margin: 4px;
+form p {
+  padding: 7px 7px;
+/*  border-bottom: solid 1px lightgrey; */
+  margin-bottom: 0px;
 }
 
 legend {

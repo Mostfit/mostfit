@@ -1,12 +1,10 @@
 %p
   %label{:for => "name"}Branch Name
   = text_field :name, :size => 40
-  %br
   %span.greytext the name by which the branch is known
 %p
   %label{:for => "code"}Branch code
   = text_field :code, :size => 10
-  %br
   %span.greytext a two letter unique code for the branch
 %p
   %label{:for => "address"}Address:
@@ -22,19 +20,16 @@
   %label{:for => "creation_date"}
     Creation date:
   = date_select_for @branch, :creation_date
-  %br/
   %span.greytext pick the date this branch was created on
 %p
   %label{:for => "managed_by"}
     Managed by:
   = select_staff_member_for @branch, :manager
-  %br/
   %span.greytext pick the staff member that manages this branch
 %p
   %label{:for => "area"}
     Area
   = select :area_id, :collection => Area.all.map{|a| [a.id.to_s, a.name]}, :prompt => "---"
-  %br/
   %span.greytext pick the staff member that manages this branch
     
 %button{:type => "submit", :class => "add"}
