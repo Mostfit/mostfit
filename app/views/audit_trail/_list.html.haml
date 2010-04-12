@@ -17,7 +17,7 @@
       %td.text
         =trail.action
       %td.text
-        ="<table width='100%'>#{diff_display(trail.changes, trail.auditable_type)}</table>"
+        ="<table width='100%'>#{diff_display(trail.changes, trail.auditable_type, trail.action)}</table>"
       %td
         =trail.created_at.strftime("%d-%m-%Y %H:%M")
       %td

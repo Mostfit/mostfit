@@ -234,14 +234,14 @@ module Merb
       "/audit_trails?"+params.to_a.map{|x| "audit_for[#{x[0]}]=#{x[1]}"}.join("&")
     end
 
-    def diff_display(arr, model)      
+    def diff_display(arr, model, action)      
       arr.map{|change|
         change.map{|k, v|
           str="<tr><td>#{k.humanize}</td><td>"
-          str+=if v.class==Array and v.length>1
+          str+=if action==:update
                  "changed from #{v.first}</td><td>to #{v.last}"
-               elsif v.class==Array
-                 "#{v.first}"
+               elsif action==:create and v.class==Array
+                 "#{v}"
                else
                  "#{v}"
                end

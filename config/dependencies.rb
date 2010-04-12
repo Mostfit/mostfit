@@ -33,11 +33,13 @@ dependency "dm-timestamps", dm_gems_version
 dependency "dm-types", dm_gems_version
 dependency "dm-validations", dm_gems_version
 dependency "dm-serializer", dm_gems_version
+dependency "dm-observer", dm_gems_version
 
 dependency "dm-paperclip"
 dependency "merb-gen", merb_gems_version
 dependency "dm-pagination"
 dependency "htmldoc"
-#dependency "dm-pagination/paginatable"
-#dependency "prawn"
+dependency "dm-pagination"
+#dependency "pdf-writer"
+dependency "uuid"
 #dependency "dm-is-paginated"
