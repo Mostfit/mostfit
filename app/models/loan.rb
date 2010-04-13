@@ -576,8 +576,6 @@ class Loan
   #    scheduled_[principal, interest, total]_up_to(date)
   #    scheduled_[principal, interest, total]_on(date)
 
-
-
   def total_principal_to_be_received; get_scheduled(:total_principal, self.scheduled_maturity_date).to_i; end
   def total_interest_to_be_received; get_scheduled(:total_interest, self.scheduled_maturity_date).to_i; end
   def total_to_be_received; total_principal_to_be_received.to_i + total_interest_to_be_received.to_i; end

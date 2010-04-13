@@ -49,7 +49,7 @@ class StaffMembers < Application
     days      << Center.meeting_days[@date.cwday]
     @date      = @date.holiday_bump
     days      << Center.meeting_days[@date.cwday]
-    @centers   = @staff_member.centers.all(:meeting_day => days.uniq)
+    @centers   = @staff_member.centers.all(:meeting_day => days.uniq).sort_by{|x| x.name}
     if params[:format] == "pdf"
       generate_pdf
       send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf"),

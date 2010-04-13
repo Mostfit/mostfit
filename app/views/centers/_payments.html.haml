@@ -20,16 +20,15 @@
         %td{:colspan => 10}
           =group ? group.name : "none"
       - grp_amount, grp_outstanding, grp_installments, grp_principal, grp_interest, grp_fee, grp_total = 0, 0, 0, 0, 0, 0, 0
-      -client_grouped.each do |client| 
+      -client_grouped.sort_by{|x| x.name}.each do |client| 
         - loan_row_count = 0
         - loans.find_all{|x| x.client_id==client.id and x.disbursal_date}.each do |loan|
-          - #next if [nil, :repaid, :pending].include? loan.status
           - lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
           - loan_row_count += 1
           %tr{ :class => cycle('odd','') }
             - fee = 0
             %td
-              %b= link_to loan.client.name, resource(branch, center, loan.client)
+              %b= link_to client.name, resource(branch, center, client)
             %td
               = link_to loan.id, url(:quick_link, "loans", loan.id)
             %td.numeric
@@ -60,7 +59,6 @@
               - tot_interest += i
               - grp_interest += i
             %td.numeric
-              /- fee = loan.fees_paid? ? 0 : loan.fees_payable_on(date).values.inject(0){|s, x| s+=x}
               - fee = fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
               = fee.to_currency
               - tot_fee += fee
