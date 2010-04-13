@@ -11,17 +11,13 @@
     = js_include_tag :jquery, :application, "jquery.shortkeys.js", :swfobject, "jquery.highlight.js"
   %body
     #header
-      %h1.logo
-        -if $globals and $globals[:mfi_details]
-          -if $globals[:mfi_details][:logo_name] and not $globals[:mfi_details][:logo_name].blank?
-            = image_tag("logos/#{$globals[:mfi_details][:logo_name]}", :height => 50)
-          -if $globals[:mfi_details][:name]
-            %span{:style => "color: #{$globals[:mfi_details][:color]}; vertical-align: top"}
-              = $globals[:mfi_details][:name]
-          -else
-            MOSTFIT
-        -else
-          MOSTFIT
+      #login{:style => 'margin: 2px; float: right; padding: 4px;position:relative; right:150px;'}
+        - if session.authenticated?
+          == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})
+        - else
+          existing users can
+          %b= link_to 'login', url(:login)
+          to proceed
       - if session.authenticated?
         #navigation
           = link_to_with_class('browse', url(:browse))
@@ -33,16 +29,17 @@
             %form{:action => '/search', :class => 'search'}
               %input{:name => 'query', :value => params[:query], :style => "width: 200px"}
               %input{:type => 'submit', :value=>'search'}
-
-      #login{:style => 'margin: 2px; float: right; padding: 4px;position:relative; right:150px;'}
-        - if session.authenticated?
-          == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})
-        - else
-          existing users can
-          %b= link_to 'login', url(:login)
-          to proceed
-
- 
+      %h1.logo
+        -if $globals and $globals[:mfi_details]
+          %span{:style => "color: #{$globals[:mfi_details][:color]};"}
+            -if $globals[:mfi_details][:logo_name] and not $globals[:mfi_details][:logo_name].blank?
+              = image_tag("logos/#{$globals[:mfi_details][:logo_name]}", :height => 50)
+            -if $globals[:mfi_details][:name]
+              = $globals[:mfi_details][:name]
+            -else
+              MOSTFIT
+        -else
+          MOSTFIT
     #content
       .container
         #breadcrums= breadcrums

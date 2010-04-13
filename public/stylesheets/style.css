@@ -81,11 +81,15 @@ ol { list-style-position: outside; list-style-type: decimal; }
 }
 h1.logo{
     left: 10%;
-    position: relative;
-    color: orange;
+    position: absolute;
+    top: 0px;
     float: left;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
 }
-
+h1.logo span{
+    vertical-align: top;
+}
 /**************************************/
 /*             NAVIGATION             */
 /**************************************/
@@ -94,6 +98,7 @@ h1.logo{
   background: white;
   position: relative;
   top: 66px;
+  left: 10%;
   height: 40px;
 }
 
@@ -101,7 +106,6 @@ h1.logo{
   background:  #75B516 repeat scroll 0 0;
   position: relative;
   top: 11px;
-  left: -70px;
   padding: 4px 15px 3px 10px;
   color: white;
   text-decoration: none;
