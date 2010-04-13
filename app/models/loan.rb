@@ -725,8 +725,8 @@ class Loan
     dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on,scheduled_first_payment_date].map{|d| d.holiday_bump if d.is_a?(Date)} + payment_dates + installment_dates).compact.uniq.sort
     last_paid_date = nil
     dates.each_with_index do |date,i|
-      current   = ((dates[[i-1,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or 
-                   (i == dates.size - 1 and dates[i] < Date.today))
+      current   = date == Date.today ? true : (((dates[[i,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or 
+                   (i == dates.size - 1 and dates[i] < Date.today)))
       scheduled = get_scheduled(:all, date)
       actual    = get_actual(:all, date)
       prin      = principal_received_on(date)
@@ -766,7 +766,8 @@ class Loan
                                        scheduled_outstanding_principal, scheduled_outstanding_total,
                                        actual_outstanding_principal, actual_outstanding_total, current, 
                                        amount_in_default, client_group_id, center_id, client_id, branch_id, 
-                                       days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid)
+                                       days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid,
+                                       created_at)
               VALUES }
     values = []
     calculate_history.each do |history|
@@ -777,7 +778,7 @@ class Loan
                           #{client.center.id},#{client.id},#{client.center.branch.id},
                           #{history[:days_overdue]}, #{((history[:date] - d0) / 7).to_i + 1},
                           #{history[:principal_due]},#{history[:interest_due]},
-                          #{history[:principal_paid]},#{history[:interest_paid]})}
+                          #{history[:principal_paid]},#{history[:interest_paid]}, '#{DateTime.now.strftime("%Y-%m-%d %H:%M:%S")}')}
 
 
      values << value

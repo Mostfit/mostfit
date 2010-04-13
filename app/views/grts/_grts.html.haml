@@ -17,7 +17,7 @@
           Actions
 
     - for grt in @grts
-      %tr
+      %tr{:class => cycle('odd','even')}
         %td
           = grt.id
         %td

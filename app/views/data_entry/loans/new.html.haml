@@ -16,7 +16,7 @@
               = hidden_field :name => "client_id", :value => @client.id
               = submit "Proceed"
   - else
-    = form_for(@loan, :action => resource(@client.center.branch, @client.center, @client, :loans, {:return => "/data_entry"})) do
+    = form_for(@loan, :action => resource(@client.center.branch, @client.center, @client, :loans, {:return => "/data_entry"}), :onsubmit => "if ($('#applied_by').val() != '#{@client.center.manager.id}') {return confirm('Applier is not center manager. Proceed with payments?')};") do
       = hidden_field :client_id, :value => @client.id
       - if @loan.fields_partial.blank?
         = partial 'loans/fields', :submit_text => "Create loan for #{@client.name}", :cancel_link => url(:data_entry)

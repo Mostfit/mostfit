@@ -38,6 +38,7 @@ class AuditItems < Application
   end
 
   def create(audit_item)
+    debugger
     @audit_item = AuditItem.new(audit_item)
     if @audit_item.save
       redirect resource(@audit_item), :message => {:notice => "AuditItem was successfully created"}

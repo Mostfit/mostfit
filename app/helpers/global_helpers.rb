@@ -41,12 +41,14 @@ module Merb
     end
 
     def select_staff_member_for(obj, col, attrs = {})
+      debugger
       id_col = "#{col.to_s}_staff_id".to_sym
+      selected = ((obj.send(id_col) and obj.send(id_col)!="") ? obj.send(id_col).to_s : attrs[:selected] || "0")
       select(col,
       :collection   => staff_members_collection,
       :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
-      :id           => "#{obj.class.to_s.snake_case}_#{id_col}",
-      :selected     => ((obj.send(id_col) and obj.send(id_col)!="") ? obj.send(id_col).to_s : "0"))
+      :id           => attrs[:id] || "#{obj.class.to_s.snake_case}_#{id_col}",
+      :selected     => selected)
     end
 
     def select_center_for(obj, col, attrs = {})

@@ -1,7 +1,7 @@
 class AuditItem
   include DataMapper::Resource
 
-  AUDITABLES = ["Branch","Center","Group","Client","Loan","Payment","StaffMember"]
+  AUDITABLES = ["Branch","Center","Client","ClientGroup","Loan","Payment","StaffMember"]
 
   property :id, Serial
 
@@ -16,11 +16,13 @@ class AuditItem
   belongs_to :assigned_to, :model => StaffMember
 
   validates_with_method :result, :result_needs_completed
+  validates_with_method :object_exists
   def description
     "Audit of #{object.name} due by #{due_on}"
   end
 
   def object
+    debugger
     Kernel.const_get(audited_model).get(audited_id)
   end
 
@@ -28,6 +30,12 @@ class AuditItem
     return [false, "Cannot set result unless audit is marked complete"] if result != "" and status != :completed
     return true
   end
+
+  def object_exists
+    return [false, "No #{audited_model} with id #{audited_id} exists"] unless object
+    return true
+  end
+            
   
   def self.auditables
     AUDITABLES

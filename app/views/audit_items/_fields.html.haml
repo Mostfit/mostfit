@@ -3,10 +3,13 @@
   = select :audited_model, :collection => AuditItem.auditables, :value_method => :to_s, :prompt => "---"
 %p
   %label Id
-  = text_field :id
+  = text_field :audited_id
 %p 
   %label Audit Due On
   = date_select_for @audit_item, :due_on
+%p
+  %label Assigned To
+  = select :assigned_to_id, :collection => StaffMember.all(:active => true), :value_method => :id, :text_method => :name, :prompt => "---"
 - unless @audit_item.new?
   %p
     %label Status
