@@ -700,6 +700,7 @@ fieldset {
 
 form.form label {
   display: block;
+  text-align: left;
 }
 label {
   display: inline-block;
