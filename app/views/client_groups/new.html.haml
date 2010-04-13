@@ -3,8 +3,7 @@
 
 = error_messages_for @client_group
 - form_url   = (@branch and @center ? resource(@branch, @center, :client_groups) : resource(:client_groups, {:return => params[:return]}))
-- cancel_url = params[:return] ? "/"+params[:return] : resource(@branch, @center)
-
+- cancel_url = params[:return] ? "/"+params[:return] : (@center ? resource(@branch, @center) : "/data_entry")
 = form_for(@client_group, :action => form_url, :id => "new_client_group_form") do
   = partial "client_groups/fields", :submit_text => "Create group", :cancel_link => cancel_url
 
