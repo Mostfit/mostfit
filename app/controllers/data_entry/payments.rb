@@ -156,15 +156,11 @@ module DataEntry
       debugger
       params[:attendance].each do |client_id, status|
         client = Client.get(client_id)
-        if status == "late" 
-          status = "present"
-          late = true
-        end
-        a = Attendance.all(:date => @date, :client_id => client_id, :center_id => client.center.id)[0]
+        a = Attendance.first(:date => @date, :client_id => client_id, :center_id => client.center.id)
         if a
-          a.update(:status => status, :late => late)
+          a.update(:status => status)
         else
-          a = Attendance.new(:date => @date, :client_id => client_id, :center_id => client.center.id, :status => status, :late => late)
+          a = Attendance.new(:date => @date, :client_id => client_id, :center_id => client.center.id, :status => status)
         end
         @errors << a.errors unless a.save
       end

@@ -21,6 +21,7 @@
           
     %tbody{:style => "text-align:left;" }
       - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_fees, tot_total = 0, 0, 0, 0, 0, 0, 0
+      - atts = Attendance.all(:client => @center.clients, :date => @date).map{|x| [x.client_id,x]}.to_hash
       - @center.clients.each do |client|
         - loan_row_count = 0
         - Loan.all(:client_id => client.id, :disbursal_date.not => nil).each do |loan|
@@ -67,8 +68,8 @@
               = select :name => "payment_style[#{loan.id}]", :collection => [["prorata","pro rata"],["normal","fees=>int=>prin"]]
             - if loan_row_count == 1
               %td
-                - att = Attendance.first(:date => @date, :client => client)[0]
-                = select :name => "attendance[#{client.id}]", :collection => Attendance.attendancy_states + ["late"], :value_method => :to_s, :selected => att.late ? "late" : att.status.to_s
+                - att = atts[client.id]
+                = select :name => "attendance[#{client.id}]", :collection => Attendance.attendancy_states, :value_method => :to_s, :selected => (att ? att.status.to_s : "present")
         - if loan_row_count == 0
           %tr{ :class => cycle('odd','') }
             %td.text
@@ -76,8 +77,8 @@
             %td{ :colspan => 10 }
               %i nothing outstanding
             %td
-              - att = Attendance.first(:date => @date, :client => client)[0]
-              = select :name => "attendance[#{client.id}]", :collection => Attendance.attendancy_states + ["late"], :value_method => :to_s, :selected => att.late ? "late" : att.status.to_s
+              - att = atts[client.id]
+              = select :name => "attendance[#{client.id}]", :collection => Attendance.attendancy_states, :value_method => :to_s, :selected => (att ? att.status.to_s : "present")
 
       %tr{ :style => 'border-bottom: 2px solid;' }
         %tr

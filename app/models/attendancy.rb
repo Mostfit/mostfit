@@ -1,12 +1,11 @@
 class Attendance
   include DataMapper::Resource
   
-  ATTENDANCY_STATES = ["present", "on leave", "absent", "proxy"]
+  ATTENDANCY_STATES = ["present", "late", "on leave", "absent", "proxy"]
 
   property :id,              Serial
   property :date,            Date
   property :status,          Enum.send('[]', *ATTENDANCY_STATES), :nullable => false
-  property :late,            Boolean, :default => false
 
   belongs_to :client
   belongs_to :center
