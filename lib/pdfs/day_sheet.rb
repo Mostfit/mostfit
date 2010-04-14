@@ -97,7 +97,6 @@ module Pdf
 end
 
 #  def generate_pdf
-#    debugger
 #    pdf = PDF::HTMLDoc.new
 #    pdf.set_option :bodycolor, :white
 #    pdf.set_option :toc, false

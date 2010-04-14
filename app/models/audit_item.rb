@@ -22,7 +22,6 @@ class AuditItem
   end
 
   def object
-    debugger
     Kernel.const_get(audited_model).get(audited_id)
   end
 

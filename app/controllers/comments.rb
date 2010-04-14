@@ -31,7 +31,6 @@ class Comments < Application
   end
 
   def create(comment)
-    debugger
     @comment = Comment.new(comment)
     if @comment.save
       if request.xhr?

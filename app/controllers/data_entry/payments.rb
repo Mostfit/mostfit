@@ -153,7 +153,6 @@ module DataEntry
     end
 
     def mark_attendance
-      debugger
       params[:attendance].each do |client_id, status|
         client = Client.get(client_id)
         a = Attendance.first(:date => @date, :client_id => client_id, :center_id => client.center.id)

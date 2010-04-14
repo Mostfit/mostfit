@@ -3,7 +3,6 @@ module DataEntry
     provides :html, :xml
 
     def new
-      debugger
       if params[:client_id]
         @client = Client.get(params[:client_id]) || Client.first(:name => params[:client_id]) || Client.first(:reference => params[:client_id])
         if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])

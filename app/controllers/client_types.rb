@@ -26,7 +26,6 @@ class ClientTypes < Application
   end
 
   def create(client_type)
-    debugger
     @client_type = ClientType.new(client_type)
     @client_type.fees = Fee.all(:id => params[:fees].keys) if params[:fees]
     if @client_type.save

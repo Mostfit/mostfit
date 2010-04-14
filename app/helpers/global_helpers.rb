@@ -41,7 +41,6 @@ module Merb
     end
 
     def select_staff_member_for(obj, col, attrs = {})
-      debugger
       id_col = "#{col.to_s}_staff_id".to_sym
       selected = ((obj.send(id_col) and obj.send(id_col)!="") ? obj.send(id_col).to_s : attrs[:selected] || "0")
       select(col,
