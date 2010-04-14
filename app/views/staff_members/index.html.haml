@@ -45,86 +45,100 @@
             This month
           %th
             Total
-
-
     - sum_total      = 0,0,0,0,0,0,0
     - sum_tm         = 0,0,0,0,0,0,0
     - this_month     = Date.new(@date.year, @date.month, 1)
-    - this_month_end = @date
+    - this_month_end = @date+1
+    -    
     - for staff_member in @staff_members
       %tr{ :class => cycle('odd','') }
-        %td
+        %td.text
           %b= link_to staff_member.name, resource(staff_member)
         %td
           %b= staff_member.active? ? 'active' : 'disabled'
         %td
           - hash = {:manager_staff_id => staff_member.id, :creation_date.gte => this_month, :creation_date.lte => this_month_end}
-          - item = Branch.all(hash).count
+          - item = @branch_managers_thismonth.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_tm[0] += item
           =link_to(item, search_url(hash, Branch))||"-"
         %td
           - hash = {:manager_staff_id => staff_member.id}
-          - item = Branch.all(hash).count
+          - item = @branch_managers_overall.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_total[0] += item
           =link_to(item, search_url(hash, Branch))||"-"
         %td
           - hash = {:manager_staff_id => staff_member.id, :creation_date.gte => this_month, :creation_date.lte => this_month_end}
-          - item = Center.all(hash).count || "-"
+          - item = @center_managers_thismonth.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_tm[1] += item
           = link_to(item, search_url(hash, Center))||"-"
         %td
           - hash = {:manager_staff_id => staff_member.id}
-          - item = Center.all(hash).count || "-"
+          - item = @center_managers_overall.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_total[1] += item
           = link_to(item, search_url(hash, Center))||"-"
         %td
           - hash = {:applied_by_staff_id => staff_member.id, :applied_on.gte => this_month, :applied_on.lte => this_month_end}
-          - item = Loan.all(hash).count
+          - item = @applied_loans_thismonth.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_tm[2] += item
           = link_to(item, search_url(hash, Loan))||"-"
         %td
           - hash = {:applied_by_staff_id => staff_member.id}
-          - item = Loan.all(hash).count
+          - item = @applied_loans_overall.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_total[2] += item
           = link_to(item, search_url(hash, Loan))||"-"
         %td
           - hash = {:approved_by_staff_id => staff_member.id, :approved_on.gte => this_month, :approved_on.lte => this_month_end}
-          - item = Loan.all(hash).count
+          - item = @approved_loans_thismonth.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_tm[3] += item
           = link_to(item, search_url(hash, Loan))||"-"
         %td
           - hash = {:approved_by_staff_id => staff_member.id}
-          - item = Loan.all(hash).count
+          - item = @approved_loans_overall.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_total[3] += item
           = link_to(item, search_url(hash, Loan))||"-"
         %td
           - hash = {:rejected_by_staff_id => staff_member.id, :rejected_on.gte => this_month, :rejected_on.lte => this_month_end}
-          - item = Loan.all(hash).count
+          - item = @rejected_loans_thismonth.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_tm[4] += item
           = link_to(item, search_url(hash, Loan))||"-"
         %td
           - hash = {:rejected_by_staff_id => staff_member.id}
-          - item = Loan.all(hash).count
+          - item = @rejected_loans_overall.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_total[4] += item
           = link_to(item, search_url(hash, Loan))||"-"
         %td
           - hash = {:disbursed_by_staff_id => staff_member.id, :disbursal_date.gte => this_month, :disbursal_date.lte => this_month_end}
-          - item = Loan.all(hash).count
+          - item = @disbursed_loans_thismonth.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_tm[5] += item
           = link_to(item, search_url(hash, Loan))||"-"
         %td
           - hash = {:disbursed_by_staff_id => staff_member.id}
-          - item = Loan.all(hash).count
+          - item = @disbursed_loans_overall.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_total[5] += item
           = link_to(item, search_url(hash, Loan))||"-"
         %td
           - hash = {:written_off_by_staff_id => staff_member.id, :written_off_on.gte => this_month, :written_off_on.lte => this_month_end}
-          - item = Loan.all(hash).count
+          - item = @writtenoff_loans_thismonth.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
+
           - sum_tm[6] += item
           = link_to(item, search_url(hash, Loan))||"-"
         %td
           - hash = {:written_off_by_staff_id => staff_member.id}
-          - item = Loan.all(hash).count
+          - item = @writtenoff_loans_overall.find{|x| x[0]==staff_member.id}
+          - item = item ? item[1] : 0
           - sum_total[6] += item
           = link_to(item, search_url(hash, Loan))||"-"
     %tr.total
