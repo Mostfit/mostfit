@@ -11,6 +11,7 @@ class Region
   belongs_to :manager, :model => "StaffMember"
 
   validates_present :manager
+  validates_is_unique :name
   validates_length :name, :max => 20, :min => 1
 
 end
