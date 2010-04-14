@@ -4,5 +4,5 @@
 
 = error_messages_for @loan
 
-= form_for(@loan, :action => url_for_loan(@loan)) do
+= form_for(@loan, :action => url_for_loan(@loan), :onsubmit => "if ($('#applied_by').val() != '#{@client.center.manager.id}') {return confirm('Applier is not center manager. Proceed with edit?')};") do
   = partial :fields, :submit_text => "Save changes", :cancel_link => url_for_loan(@loan)
