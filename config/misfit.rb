@@ -50,7 +50,7 @@ module Misfit
       },
       :read_only => {
         :all => [:searches, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :insurance_policies, 
-                 :insurance_companies, :audit_items, :areas]
+                 :insurance_companies, :audit_items, :areas, :staff_members]
       },
       :staff_member => {
         :all => [:documents, :searches, :browse, :branches, :centers, :payments, :clients, :client_groups, :groups, :audit_trails, :comments, :insurance_policies, 
