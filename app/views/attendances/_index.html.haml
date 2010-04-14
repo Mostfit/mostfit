@@ -1,0 +1,14 @@
+%table.form.narrow{:style => "width: 80%;margin-left: 10%"}
+  %thead
+    %tr
+      %th
+        Date
+      %th
+        Status
+  - @attendances.each do |a|
+    %tr{:class => cycle('odd','even')}
+      %td
+        = a.date
+      %td
+        = a.status
+

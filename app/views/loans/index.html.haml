@@ -54,16 +54,6 @@
         == #{@client.total_fees_paid} / #{@client.total_fees_due}
         - if @client.fees_paid?
           %span.green Paid
-    %tr
-      %td
-        = link_to "Insurance Policies", resource(@client, :insurance_policies)
-      %td
-        - if @client.insurance_policies.blank?
-          No insurance policies.
-          = link_to "[Add one]", resource(@client, :insurance_policies, :new)
-        - else
-          - @client.insurance_policies.each do |ip|
-            = link_to ip.description, resource(@client, ip)
   -if @client.tags and @client.tags.include?(:insincere)
     %h3.blocked
       This client is insincere and is not elgible for a loan
@@ -75,8 +65,12 @@
   %ul.tabs
     %li#loans Loans
     %li#comments Comments
-    %li#trail Audit Trail
+    %li#audit Audits
+    %li#trail History
     %li#documents Documents
+    %li#insurance Insurance
+    %li#payments Payments
+    %li#attendance Attendance
   %div.tab
     %h2== Loans for client <i>#{@client.name}</i>
     
@@ -160,8 +154,26 @@
     %p
       %h3 Add a comment
       = partial 'comments/form'
+  %div.tab 
+    %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :id => @client.id, :model => "Client")}
     
   %div.tab 
     %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
   %div.tab 
     %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @client.id, :parent_model => Client)}
+  %div.tab
+    %table
+      %tr
+        %td
+          = link_to "Insurance Policies", resource(@client, :insurance_policies)
+        %td
+          - if @client.insurance_policies.blank?
+            No insurance policies.
+            = link_to "[Add one]", resource(@client, :insurance_policies, :new)
+          - else
+            - @client.insurance_policies.each do |ip|
+              = link_to ip.description, resource(@client, ip)
+  %div.tab 
+    %input{:type => "hidden", :name => "_load_remote", :value => resource(@branch, @center, @client, :payments)}
+  %div.tab 
+    %input{:type => "hidden", :name => "_load_remote", :value => resource( @client, :attendances)}

@@ -6,11 +6,11 @@
     - @comments.each do |comment|
       %tr{:class => cycle('even','odd')}
         %td
-          = comment.text
-      %tr
-        %td
+          %p
+            = comment.text
           %span
             by
             = comment.user.login
             at
             = comment.created_at.strftime("%d-%B-%Y %H:%M")
+

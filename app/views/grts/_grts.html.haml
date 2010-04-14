@@ -2,7 +2,7 @@
   .notice
     %h3 
       No GRTs scheduled yet
-      = link_to 'Add a GRT Date', resource(@client_group, :grts, :new)
+
 - else
   %table.narrow
     %tr
@@ -17,7 +17,7 @@
           Actions
 
     - for grt in @grts
-      %tr
+      %tr{:class => cycle('odd','even')}
         %td
           = grt.id
         %td

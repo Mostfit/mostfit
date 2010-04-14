@@ -5,8 +5,10 @@
     %li#clients Client
     %li#loan Loan
   .tab
-    =chart(url(:action => 'branch', :group_by => 'loan')) 
-    =chart(url(:action => 'branch', :group_by => 'client')) 
+    =chart(url(:action => 'branch', :group_by => 'loan'))
+    =chart(url(:action => 'branch', :group_by => 'loan_count')) 
+    =chart(url(:action => 'branch', :group_by => 'client'))
+    =chart(url(:action => 'branch', :group_by => 'borrower_clients')) 
     -Branch.all.each do |branch|
       %div
         %h1 

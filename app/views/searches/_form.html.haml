@@ -1,0 +1,28 @@
+%tr{:id => "formdiv_#{@counter}"}
+  %td
+    %b Model
+  %td
+    -if @model and @model.class==Class
+      = @model.name
+      %input{:type => "hidden", :name => "model[#{@counter}]", :id => "model_#{@counter}", :value => @model.name}
+    -elsif @model
+      =select :name => "model[#{@counter}]", :id => "model_#{@counter}", :collection => @model.map{|x| [x, x.camelcase]}, :prompt => "choose model"
+    -else
+      = select :name => "model[#{@counter}]", :id => "model_#{@counter}", :collection => model_names, :prompt => "choose model"
+  %td
+    %b Property
+  %td
+    = select :name => "property[#{@counter}]", :id => "property_#{@counter}", :collection => (@model and @properties ? @properties.map{|x| [x,x]} : []), :prompt => "choose property"
+  %td
+    %b operator
+  %td
+    = select :name => "operator[#{@counter}]", :id => "operator_#{@counter}", :collection => [], :prompt => "choose operator"
+  %td
+    %b values
+  %td
+    %span{:id => "value_#{@counter}"}
+  %td
+    %b more
+  %td
+    = select :name => "more[#{@counter}]", :id => "more_#{@counter}", :class => "more", :collection => ["and", "or", "not", "chain"], :prompt => "choose operator"
+%tr

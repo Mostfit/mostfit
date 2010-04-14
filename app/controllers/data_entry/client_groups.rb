@@ -25,29 +25,6 @@ module DataEntry
       end
     end
 
-    def create(client_group)
-      only_provides :html, :json
-      @client_group = ClientGroup.new(client_group)
-      if @client_group.save
-        request.xhr? ? display(@client_group) : redirect(url(:data_entry), :message => {:notice => "Group was successfully created"})
-      else
-        message[:error] = "Group failed to be created"
-        @client_group.center_id = params[:center_id] if params[:center_id] and not params[:center_id].blank?
-        request.xhr? ? display(@client_group.errors, :status => 406) : display([@client_group], "client_groups/new")
-      end
-    end
-
-    def update(id, client_group)
-      @client_group = ClientGroup.get(id)
-      raise NotFound unless @client_group
-      if @client_group.update(client_group)
-        request.xhr? ? display(@client_group) : redirect(url(:data_entry), :message => {:notice => "Group was successfully saved"})
-      else
-        message[:error] = "Group failed to be saved"
-        request.xhr? ? display(@client_group.errors, :status => 406) : render(:new)
-      end
-    end
-
     def create_grt_date(id, grt_date, clients)
       only_provides :html
       @client_group = ClientGroup.get(id)

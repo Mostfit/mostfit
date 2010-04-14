@@ -1,0 +1,19 @@
+%p
+  %label Model
+  = select :audited_model, :collection => AuditItem.auditables, :value_method => :to_s, :prompt => "---"
+%p
+  %label Id
+  = text_field :audited_id
+%p 
+  %label Audit Due On
+  = date_select_for @audit_item, :due_on
+%p
+  %label Assigned To
+  = select :assigned_to_id, :collection => StaffMember.all(:active => true), :value_method => :id, :text_method => :name, :prompt => "---"
+- unless @audit_item.new?
+  %p
+    %label Status
+    = select :status, :collection => [:outstanding, :completed], :value_method => :to_s
+  %p
+    %label Result
+    = select :status, :collection => ['', :pass, :fail], :value_method => :to_s

@@ -17,14 +17,23 @@ class ClientGroups < Application
 
   def new
     only_provides :html
-    @client_group = ClientGroup.new
-    display @client_group
+    @client_group = ClientGroup.new      
+    if params[:center_id]
+      @client_group.center_id = params[:center_id]
+      @center  = Center.get(params[:center_id])
+      @branch  = @center.branch 
+    end
+    request.xhr? ? display([@client_group], "client_groups/new", :layout => false) : display([@client_group], "client_groups/new")
   end
 
   def edit(id)
     only_provides :html
     @client_group = ClientGroup.get(id)
     raise NotFound unless @client_group
+    if @client_group.center
+      @center  = @client_group.center
+      @branch  = @center.branch 
+    end
     display @client_group
   end
 

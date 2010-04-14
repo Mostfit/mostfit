@@ -53,7 +53,7 @@ class Clients < Application
       @client.tags = params[:tags].keys.map{|k| k.to_sym} if params[:tags]
       @client.save
       if @branch and @center
-        redirect(params[:return]||resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' has been edited"})
+        redirect(params[:return]||resource(@branch, @center, @client), :message => {:notice => "Client '#{@client.name}' has been edited"})
       else
         redirect(resource(@client, :edit), :message => {:notice => "Client '#{@client.name}' has been edited"})
       end

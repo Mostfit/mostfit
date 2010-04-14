@@ -1,15 +1,21 @@
-=form_for(@staff_member, :action => url(:day_sheet, @staff_member), :method => :get, :style => "float: right;") do
-  Change date
-  = date_select "date", @date
-  =submit "Go"
-
+%div{:style => "width:30%; float: right; padding: 10px; border: solid 1px lightgrey"}
+  =form_for(@staff_member, :action => url(:day_sheet, @staff_member), :method => :get) do
+    Change date
+    = date_select "date", @date
+    =submit "Go"
+    - all_centers = @staff_member.centers
+    -if all_centers.length>0
+      = link_to 'previous day', url(:day_sheet, :date => LoanHistory.all(:center => all_centers, :date.lt => @date).max(:date))
+      = link_to 'next day', url(:day_sheet, :date => LoanHistory.all(:center => all_centers, :date.gt => @date).min(:date)), :style => "padding-left: 120px;"
 %h1 
   Day sheet for 
   = @staff_member.name
   for 
   = @date
+%p
+  = link_to "Download pdf >>", url(:day_sheet_with_format, :format => "pdf", :date => @date), :style => "float: left; margin-left: 25px", :class => "button"
 %br
-= link_to "Download pdf >>", url(:day_sheet_with_format, :format => "pdf", :date => @date), :style => "float: right;", :class => "button"
+%br
 - @centers.each do |center|
   %h2
     = center.name
@@ -41,3 +47,4 @@
           %td{ :colspan => 12 }
   - else
     No disbursements today
+  %hr

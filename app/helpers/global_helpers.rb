@@ -42,11 +42,12 @@ module Merb
 
     def select_staff_member_for(obj, col, attrs = {})
       id_col = "#{col.to_s}_staff_id".to_sym
+      selected = ((obj.send(id_col) and obj.send(id_col)!="") ? obj.send(id_col).to_s : attrs[:selected] || "0")
       select(col,
       :collection   => staff_members_collection,
       :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
-      :id           => "#{obj.class.to_s.snake_case}_#{id_col}",
-      :selected     => ((obj.send(id_col) and obj.send(id_col)!="") ? obj.send(id_col).to_s : "0"))
+      :id           => attrs[:id] || "#{obj.class.to_s.snake_case}_#{id_col}",
+      :selected     => selected)
     end
 
     def select_center_for(obj, col, attrs = {})
@@ -234,14 +235,14 @@ module Merb
       "/audit_trails?"+params.to_a.map{|x| "audit_for[#{x[0]}]=#{x[1]}"}.join("&")
     end
 
-    def diff_display(arr, model)      
+    def diff_display(arr, model, action)      
       arr.map{|change|
         change.map{|k, v|
           str="<tr><td>#{k.humanize}</td><td>"
-          str+=if v.class==Array and v.length>1
+          str+=if action==:update
                  "changed from #{v.first}</td><td>to #{v.last}"
-               elsif v.class==Array
-                 "#{v.first}"
+               elsif action==:create and v.class==Array
+                 "#{v}"
                else
                  "#{v}"
                end
@@ -272,7 +273,7 @@ module Merb
     end
 
     def get_accessible_branches
-      if session.user.role==:staff_member
+      if session.user.staff_member
         [session.user.staff_member.centers.branches, session.user.staff_member.branches].flatten
       else
         Branch.all
@@ -280,7 +281,7 @@ module Merb
     end
     
     def get_accessible_centers(branch_id)
-      centers = if session.user.role==:staff_member
+      centers = if session.user.staff_member
                   [session.user.staff_member.centers, session.user.staff_member.branches.centers].flatten
                 elsif branch_id and not branch_id.blank?
                   Center.all(:branch_id => branch_id, :order => [:name])
@@ -291,7 +292,7 @@ module Merb
     end
 
     def get_accessible_staff_members      
-      staff_members   =  if session.user.role==:staff_member
+      staff_members   =  if session.user.staff_member
                            StaffMember.all(:id => session.user.staff_member.id)
                          else
                            StaffMember.all
@@ -302,7 +303,7 @@ module Merb
 
     private
     def staff_members_collection
-      if session.user.role==:staff_member
+      if session.user.staff_member
         staff = session.user.staff_member
         bms  = staff.branches.collect{|x| x.manager}
         cms  = staff.branches.centers.collect{|x| x.manager}               

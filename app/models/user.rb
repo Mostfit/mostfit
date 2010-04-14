@@ -29,6 +29,10 @@ class User
   has n, :payments_deleted, :child_key => [:deleted_by_user_id], :model => 'Payment'
   has n, :audit_trail, :model => 'AuditTrail'
 
+  def name
+    login
+  end
+
   def self.roles
     roles = []
     ROLES.each_with_index{|v, idx|
@@ -55,6 +59,7 @@ class User
     controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
     model = route[:controller].singularize.to_sym
     action = route[:action]
+
     if route.has_key?(:id)
       return can_manage?(model, route[:id])
     end

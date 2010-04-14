@@ -8,11 +8,14 @@ module Misfit
       end
 
       def before
-        if session.user.role == :staff_member
+        if session.user.staff_member
           @staff_member = session.user.staff_member
-          @branches = Branch.all(:manager => @staff_member)
-          @centers = Center.all(:manager => @staff_member)
-          @template = 'browse/for_staff_member'
+          if branch = Branch.all(:manager => @staff_member)
+            true
+          else
+            @centers = Center.all(:manager => @staff_member)
+            @template = 'browse/for_staff_member'
+          end
         end
       end
 
@@ -28,10 +31,6 @@ module Misfit
                                         GROUP BY center_id ORDER BY c.name})
         @disbursals = Loan.all(:client_id => client_ids, :scheduled_disbursal_date => @date)
         render :template => 'dashboard/today'
-      end
-
-      def regions
-        redirect "/regions"
       end
     end # Browse
 
@@ -52,11 +51,11 @@ module Misfit
       end
 
       def can_approve?(obj)        
-        if role == :staff_member
+        if staff_member
           if obj.class==Client
             return (obj.center.branch.manager == staff_member)
           elsif obj.class==Loan or Loan.descendants.map{|x| x}.include?(obj.class)
-            return (obj.client.center.branch.manager == staff_member) 
+            return (obj.client.center.branch.manager == staff_member)
           end
           retrun false
         end
@@ -65,21 +64,33 @@ module Misfit
       end
 
       def additional_checks
-        id = @route[:id]
-        model = Kernel.const_get(@model.to_s.split("/")[-1].capitalize)
+        id = @route[:id].to_i
+        staff_member = self.staff_member
+        model = Kernel.const_get(@model.to_s.split("/")[-1].camelcase)
         if model == Loan
           l = Loan.get(id)
-          return ((l.client.center.manager == self.staff_member) or (l.client.center.branch.manager == self.staff_member))
+          return ((l.client.center.manager == staff_member) or (l.client.center.branch.manager == staff_member))
+        elsif model == StaffMember
+          #Trying to check his own profile? Allowed!
+          return true if staff_member.id==id
+          st = StaffMember.get(id)
+          #Allow access to this staff member if it is his branch manager
+          return(st.centers.branches.manager.include?(staff_member))
         elsif model == Client
           c = Client.get(id)
-          return ((c.center.manager == self.staff_member) or (c.center.branch.manager == self.staff_member))
+          return ((c.center.manager == staff_member) or (c.center.branch.manager == staff_member))
+        elsif model == Branch
+          branch = Branch.get(id)
+          return ((branch.manager == staff_member) or (branch.centers.manager == staff_member))
        elsif model == Center
           center = Center.get(id)
-          return true if @action == "show" and center.manager == self.staff_member
-          return center.branch.manager == self.staff_member
-        elsif model.relationships.include?(:manager)
+          return true if center.manager == staff_member
+          return center.branch.manager == staff_member
+        elsif model.respond_to?(:relationships) and model.relationships.include?(:manager)
           o = model.get(id)
-          return true if o.manager == self.staff_member
+          return true if o.manager == staff_member
+        elsif [Comment, Document, InsurancePolicy, InsuranceCompany].include?(model)
+          reutrn true
         else
           return false
         end
@@ -103,18 +114,19 @@ module Misfit
         # more garbage
         return true if role == :admin
         return true if route[:controller] == "graph_data"
+        
         @route = route
         @controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
         @model = route[:controller].singularize.to_sym
         @action = route[:action]
+        return false if route[:controller] == "documents" and CUD_Actions.include?(@action)
         return true if @action == "redirect_to_show"
         r = (access_rights[@action.to_s.to_sym] or access_rights[:all])
         return false if @action == "approve" and role == :data_entry
         return false if role == :read_only and CUD_Actions.include?(@action)
         return false if r.nil?
-        if role == :staff_member
+        if staff_member
           return additional_checks if @route.has_key?(:id) and @route[:id]
-
           if params and params[:branch_id]
             b = Branch.get(params[:branch_id])
             return (b.manager == staff_member or b.centers.manager.include?(staff_member))
@@ -134,7 +146,6 @@ module Misfit
             l = Loan.get(params[:loan_id])
             return ((l.client.center.manager == staff_member or l.client.center.branch.manager == staff_member))
           end
-          
         end
         r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
       end

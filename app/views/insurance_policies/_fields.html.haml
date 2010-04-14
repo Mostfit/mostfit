@@ -4,12 +4,17 @@
       Insurance Company
     %td
       = select :insurance_company_id, :collection => InsuranceCompany.all, :prompt => "---", :value_method => :id, :text_method => :name
-      = link_to 'Add a company', resource(:insurance_companies, :new)
+      = link_to 'Add a company', resource(:insurance_companies, :new, {:return => (@client ? resource(@client, :insurance_policies, :new) : nil)}),:class => "_remote_"
   %tr
     %td
       Policy Number
     %td
       = text_field :policy_no
+  %tr
+    %td
+      Application number
+    %td
+      = text_field :application_number
   %tr
     %td
       Sum Insured
@@ -36,3 +41,8 @@
       Status
     %td
       = select(:status, :collection => InsurancePolicy::POLICY_STATUSES.map{|x| [x, x]})
+  %tr
+    %td
+      Cover for
+    %td
+      = select(:cover_for, :collection => InsurancePolicy::COVER_FOR.map{|x| [x, x]}, :prompt => "---")

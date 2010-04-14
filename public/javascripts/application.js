@@ -81,7 +81,7 @@ function showTableTrs(){
     $("table.report tr.branch").show();
     $("table.report tr.branch_total").show();
     $("table.report tr.org_total").show();
-    $("table.report tr.header").show();    
+    $("table.report tr.header").show();
 }
 function daysInMonth(month, year){
     isLeap = false;
@@ -93,13 +93,13 @@ function daysInMonth(month, year){
     return days;
 }
 
-function dateFromAge(ageYear, ageMonth, ageDay){      
+function dateFromAge(ageYear, ageMonth, ageDay){
     $('#age_year_field').removeClass('error');
     $('#age_month_field').removeClass('error');
     $('#age_day_field').removeClass('error');
     var birthDate = new Array();
     today = new Date();
-    
+
     todayDay = today.getDate();
     todayMonth = today.getMonth()+ 1;
     todayYear = today.getFullYear();
@@ -118,32 +118,32 @@ function dateFromAge(ageYear, ageMonth, ageDay){
 	$('#age_day_field').addClass('error');
 	returnEarly = true;
     }
-    
+
     if (returnEarly) return false;
-    
+
     if(ageDay < todayDay){
 	if (ageMonth < todayMonth){
 	    birthDate[1] = todayMonth - ageMonth;
-	    birthDate[0] = todayYear - ageYear;    
+	    birthDate[0] = todayYear - ageYear;
 	}
       else{
 	  birthDate[1] = todayMonth - ageMonth + 12;
-	  birthDate[0] = todayYear - ageYear - 1;    
+	  birthDate[0] = todayYear - ageYear - 1;
       }
     }
     else{
 	if (ageMonth < todayMonth -1){
 	    birthDate[1] = todayMonth - ageMonth -1 ;
-	    birthDate[0] = todayYear - ageYear;            
+	    birthDate[0] = todayYear - ageYear;
 	}
 	else{
 	    birthDate[1] = todayMonth - ageMonth + 12 -1 ;
 	    birthDate[0] = todayYear - ageYear - 1 ;
 	}
     }
-    
+
     days = daysInMonth(birthDate[1], birthDate[0]);
-    
+
     if(ageDay < todayDay){
 	birthDate[2] = todayDay - ageDay;
     }
@@ -153,7 +153,7 @@ function dateFromAge(ageYear, ageMonth, ageDay){
     return birthDate;
 }
 function create_remotes(){
-    $("a._remote_").click(function(){	    
+    $("a._remote_").click(function(){
 	    href=$(this).attr("href");
 	    a=$(this);
 	    $.ajax({
@@ -167,9 +167,56 @@ function create_remotes(){
 	    return false;
 	});
 }
+function attachReportingFormEvents(){
+  $("#reporting_form select").change(function(){
+	  if($(this).attr("class")=="more")
+	      return;
+	  var types = ["model", "property", "operator", "value"];
+	  id = $(this).attr("id");
+	  name = $(this).attr("name").split(/\[/)[0];
+	  counter = $(this).attr("name").split(/\[/)[1].split("]")[0];
+
+	  $(this).find("option:selected").each(function(){
+		  for(i=types.indexOf(name)+1; i<=types.length; i++){
+		      $("#reporting_form select#"+types[i]+"_"+counter).html("");
+		  }
+		  nextType = types[types.indexOf(id.split('_')[0])+1];
+		  $.ajax({
+			url: "/search/get?counter="+counter+"&"+$("#reporting_form").serialize(),
+			success: function(data){
+                              if(nextType==="value"){
+				  $("#reporting_form span#"+nextType+'_'+counter).html(data);
+			      }else{
+				  $("#reporting_form select#"+nextType+'_'+counter).html("");
+				  $("#reporting_form select#"+nextType+'_'+counter).append(data);
+			      }
+			}
+		    });
+	      });
+      });
+  $("#reporting_form select.more").change(function(){
+	  var type = $(this);
+	  var counter = parseInt($(this).attr("name").split(/\[/)[1].split("]")[0]);
+	  if($("#reporting_form select#model_"+counter).length>0)
+	      model=$("#reporting_form select#model_"+counter).val();
+	  else
+	      model=$("#reporting_form select#model_1").val();
+	  $.ajax({
+		  url: "/search/reporting?counter="+(counter+1)+"&model="+model+"&more="+type.val(),
+		  success: function(data){
+		      $("tr#formdiv_"+(counter+1)).html("");
+		      $("tr#formdiv_"+(counter)).after(data);
+		      attachReportingFormEvents();
+		  }
+	      });
+      });
+}
+
+
 $(document).ready(function(){
 	create_remotes();
 	//Handling targets form
+	$('form').highlight();
 	$("select#target_attached_to").change(function(){
 		$.ajax({
 			url: "/targets/all/"+$(this).val()+".json",
@@ -216,9 +263,9 @@ $(document).ready(function(){
 			$(this).text($(this).text().replace('Expand', 'Collapse'));
 		    }else{
 			$(this).text($(this).text().replace('Collapse', 'Expand'));
-			showTableTrs();			
+			showTableTrs();
 		    }
-		    setToggleText();			
+		    setToggleText();
 		});
 	    $("a.collapse_all").click(function(){
 		    $(this).text($(this).text().replace('Collapse', 'Expand'));
@@ -240,9 +287,9 @@ $(document).ready(function(){
 			$(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
 		    }
 		    if(parent_type=="branch" && action=="collapse")
-			$(this).parent().parent().nextUntil("tr.branch_total").hide();		    
+			$(this).parent().parent().nextUntil("tr.branch_total").hide();
 		    setToggleText();
-		});	    
+		});
 	}
 	if($("a.moreinfo").length>0){
 	    $("a.moreinfo").click(function(){
@@ -257,7 +304,7 @@ $(document).ready(function(){
 					$("a.moreinfo").show();
 					$("table.moreinfo").remove();
 					$("a.lessinfo").remove();
-				    });				
+				    });
 			    });
 		});
 	}
@@ -270,7 +317,7 @@ $(document).ready(function(){
 	$('.delete').click(function() {
 		var answer = confirm('Are you sure?');
 		return answer;
-	    }); 
+	    });
 	if(window.location.pathname.indexOf("edit")===-1){
 	    $("#client_group_id").change(function(){
 		    fillCode($("#client_center_id").val(), $("#client_group_id").val());
@@ -281,18 +328,18 @@ $(document).ready(function(){
 		    spitLogs();
 		}, 2000);
 	}
-	$("#new_client_group_link").click(function(){                
+	$("#new_client_group_link").click(function(){
 		id=$("#client_center_id option:selected").val() || $("#client_center_id").val();
 		$.ajax({
 			type: "get",
-			url: "/data_entry/groups/new?center_id="+id,
+			url: "/client_groups/new?center_id="+id,
 			success: function(data){
 			    $("#new_client_group_form").html(data);
 			    $("#new_client_group_form").submit(function(){
 				    $.ajax({
 					    type: "POST",
 					    dataType: "json",
-					    url: "/data_entry/groups/create",
+					    url: "/client_groups",
 					    data: "client_group[name]="+$("#client_group_name").val()
 						+ "&client_group[number_of_members]=" + $("#client_group_number_of_members").val()
 						+ "&client_group[center_id]=" + $("#client_center_id").val()
@@ -303,7 +350,7 @@ $(document).ready(function(){
 						$("#new_client_group_form").html("");
 					    },
 					    error: function(data){
-						alert(data.responseText);
+						alert("Cannot be created");
 					    }
 					});
 				    return false;
@@ -346,7 +393,7 @@ $(document).ready(function(){
   }
 
   $('.closeNotice').click(function(){
-     $('.closeNotice').addClass('notice'); 
+     $('.closeNotice').addClass('notice');
      $('.notice').remove();
   });
 
@@ -360,7 +407,7 @@ $(document).ready(function(){
 		      $("table.comments").html(data);
 		      $("table.comments tr:last").hide().prev().hide();
 		      $("textarea#comment_text").val("");
-		      $("table.comments tr:last").fadeIn("slow").prev().fadeIn("slow")
+		      $("table.comments tr:last").fadeIn("slow").prev().fadeIn("slow");
 		  },
 		  error: function(data){
 		      alert("sorry could not add that");
@@ -368,26 +415,5 @@ $(document).ready(function(){
 	      });
 	  return false;
       });
-  $("#reporting_form select").change(function(){
-	  var types = ["model", "property", "operator", "value"];
-	  id = $(this).attr("id");
-	  $(this).find("option:selected").each(function(){
-		  for(i=types.indexOf(id)+1; i<=types.length; i++){
-		      console.log(i);
-		      $("#reporting_form select#"+types[i]).html("");
-		  }
-		  nextType = types[types.indexOf(id)+1];
-		  $.ajax({
-			url: "/search/get?"+$("#reporting_form").serialize(),
-			success: function(data){
-                              if(nextType==="value"){
-				  $("#reporting_form span#"+nextType).html(data);
-			      }else{
-				  $("#reporting_form select#"+nextType).html("");
-				  $("#reporting_form select#"+nextType).append(data);
-			      }
-			}
-		    });
-	      });
-      });
+  attachReportingFormEvents();
 });

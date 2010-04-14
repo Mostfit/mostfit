@@ -22,7 +22,7 @@ class Approvals < Application
   def clients
     if session.user.admin?
       @clients = Client.all(:approved_by_user_id => nil)
-    elsif session.user.role==:staff_member
+    elsif session.user.staff_member
       @clients = managed_centers(user).clients
     else
       @clients= []
@@ -32,7 +32,7 @@ class Approvals < Application
   def clients
     if session.user.admin?
       @loans = Loan.all(:approved_by_user_id => nil)
-    elsif session.user.role==:staff_member
+    elsif session.user.staff_member
       @loans = managed_centers(user).clients.loans
     else
       @loans= []
@@ -42,7 +42,7 @@ class Approvals < Application
   def payments
     if session.user.admin?
       @payments = Payment.all(:approved_by_user_id => nil)
-    elsif session.user.role==:staff_member
+    elsif session.user.staff_member
       @payments = managed_centers(user).clients.loans.payments
     else
       @payments= []

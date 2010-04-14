@@ -14,10 +14,11 @@ class TransactionLedger < Report
 
   def generate
     branches, centers, groups, clients, payments = {}, {}, {}, {}, {}
-    clients_grouped={}
-    Client.all(:client_group_id.gt => 0).each{|client|
+    clients_grouped, clients_ungrouped = {}, {}
+    Client.all(:fields => [:id, :client_group_id, :center_id, :name], :client_group_id.gt => 0).each{|client|
       clients_grouped[client.client_group_id]||=[]
       clients_grouped[client.client_group_id].push(client)
+      clients_ungrouped[client.id]=client
     }
     @branch.each{|b|
       clients[b.id]||= {}
@@ -40,7 +41,7 @@ class TransactionLedger < Report
     Payment.all(:received_on.gte => from_date, :received_on.lte => to_date).each{|p|
       #0          1,                 2                3
       #disbursed, payment_principal, payment_interest,payment_fee
-      client = p.loan_id ? p.loan.client : p.client
+      client = p.client_id ? clients_ungrouped[p.client_id] : p.loan.client(:fields => [:id, :client_group_id])
       payments[p.received_on]||={}
       payments[p.received_on][client.client_group_id]||={}
       payments[p.received_on][client.client_group_id][client.id]||=[[], [], [], []]
@@ -57,10 +58,11 @@ class TransactionLedger < Report
     }
 
     Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date).each{|loan|
+      client = clients_ungrouped[loan.client_id]
       payments[loan.disbursal_date]||={}
-      payments[loan.disbursal_date][loan.client.client_group_id] ||= {}
-      payments[loan.disbursal_date][loan.client.client_group_id][loan.client_id]||=[[], [], [], []]
-      payments[loan.disbursal_date][loan.client.client_group_id][loan.client_id][0] << loan.amount
+      payments[loan.disbursal_date][client.client_group_id] ||= {}
+      payments[loan.disbursal_date][client.client_group_id][client.id]||=[[], [], [], []]
+      payments[loan.disbursal_date][client.client_group_id][client.id][0] << loan.amount
     }
     return [groups, centers, branches, payments, clients]
   end

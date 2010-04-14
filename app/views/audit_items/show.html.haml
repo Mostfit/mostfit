@@ -1,0 +1,35 @@
+%h1 Audit Item
+
+= link_to 'Edit',  url(:edit_audit_item,  @audit_item), :class => 'edit'
+
+%table.tall
+  %thead
+    %tr
+      %td{:colspan => "2"}
+        = @audit_item.description
+  %tr
+    %th
+      Audited Item
+    %td
+      = link_to @audit_item.object.name, resource(@audit_item.object)
+      == Type: #{@audit_item.audited_model}
+  %tr
+    %th
+      Due
+    %td
+      = @audit_item.due_on
+  %tr
+    %th
+      Status
+    %td
+      = @audit_item.status
+  %tr
+    %th
+      Result
+    %td
+      = @audit_item.result
+
+= partial 'comments/index', :object => @audit_item1
+= partial 'comments/form'      
+|
+= link_to 'Back', url(:audit_items)

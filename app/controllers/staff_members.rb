@@ -4,14 +4,43 @@ class StaffMembers < Application
   layout :determine_layout
 
   def index
-    per_page = 15
+    per_page = 25
+    if params[:date].is_a? Hash
+      @date = Date.new(params[:date][:year].to_i, params[:date][:month].to_i, params[:date][:day].to_i)
+    else
+      @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    end
     @staff_members = if params[:branch_id] and not params[:branch_id].blank?
                        @branch = Branch.get(params[:branch_id])
-                       StaffMember.all(:id => ([@branch.manager.id] + @branch.centers.manager.map{|x| x.id}).flatten.uniq).paginate(:page => params[:page], 
+                       StaffMember.all(:id => ([@branch.manager.id] << @branch.centers.manager.map{|x| x.id}).flatten.uniq).paginate(:page => params[:page], 
                                                                                                                                              :per_page => per_page)
                      else
                        StaffMember.paginate(:page => params[:page], :per_page => per_page)
                      end
+    first_of_this_month = Date.new(@date.year, @date.month, 1)
+    end_of_this_month   = @date
+    
+    @branch_managers_overall   = Branch.all(:creation_date.lte => @date).aggregate(:manager_staff_id, :all.count)
+    @branch_managers_thismonth = Branch.all(:creation_date.lte => @date, :creation_date.gte => first_of_this_month).aggregate(:manager_staff_id, :all.count)
+
+    @center_managers_overall   = Center.all(:creation_date.lte => @date).aggregate(:manager_staff_id, :all.count)
+    @center_managers_thismonth = Center.all(:creation_date.lte => @date).all(:creation_date.gte => first_of_this_month).aggregate(:manager_staff_id, :all.count)
+
+    @applied_loans_overall     = Loan.all(:applied_on.lte => @date).aggregate(:applied_by_staff_id, :all.count)
+    @applied_loans_thismonth   = Loan.all(:applied_on.lte => @date, :applied_on.gte => first_of_this_month).aggregate(:applied_by_staff_id, :all.count)
+
+    @approved_loans_overall    = Loan.all(:approved_on.lte => @date).aggregate(:approved_by_staff_id, :all.count)
+    @approved_loans_thismonth  = Loan.all(:approved_on.lte => @date, :approved_on.gte => first_of_this_month).aggregate(:approved_by_staff_id, :all.count)
+
+    @rejected_loans_overall    = Loan.all(:rejected_on.lte => @date).aggregate(:rejected_by_staff_id, :all.count)
+    @rejected_loans_thismonth  = Loan.all(:rejected_on.lte => @date, :rejected_on.gte => first_of_this_month).aggregate(:rejected_by_staff_id, :all.count)
+
+    @disbursed_loans_overall   = Loan.all(:disbursal_date.lte => @date).aggregate(:disbursed_by_staff_id, :all.count)
+    @disbursed_loans_thismonth = Loan.all(:disbursal_date.lte => @date, :disbursal_date.gte => first_of_this_month).aggregate(:disbursed_by_staff_id, :all.count)
+
+    @writtenoff_loans_overall  = Loan.all(:written_off_on.lte => @date).aggregate(:written_off_by_staff_id, :all.count)
+    @writtenoff_loans_thismonth= Loan.all(:written_off_on.lte => @date, :written_off_on.gte => first_of_this_month).aggregate(:written_off_by_staff_id, :all.count)
+
     display @staff_members
   end
 
@@ -44,7 +73,7 @@ class StaffMembers < Application
     days      << Center.meeting_days[@date.cwday]
     @date      = @date.holiday_bump
     days      << Center.meeting_days[@date.cwday]
-    @centers   = @staff_member.centers.all(:meeting_day => days.uniq)
+    @centers   = @staff_member.centers.all(:meeting_day => days.uniq).sort_by{|x| x.name}
     if params[:format] == "pdf"
       generate_pdf
       send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf"),

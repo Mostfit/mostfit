@@ -23,12 +23,12 @@
     %td
       Number of borrower clients
     %td
-      =@loan_data.loans_count
+      =(@loan_data and @loan_data.length>0) ? @loan_data.first.loans_count : 0
   %tr
     %td
       Total Amount Outstanding
     %td
-      =@loan_data.actual_outstanding_principal ? @loan_data.actual_outstanding_principal.to_currency : "-"
+      =(@loan_data and @loan_data.length>0 and @loan_data.first.actual_outstanding_principal) ? @loan_data[0].actual_outstanding_principal.to_currency : "-"
   %tr
     %td
       Total Principal Overdue

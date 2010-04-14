@@ -4,7 +4,11 @@ class Comments < Application
 
   def index
     @comments = Comment.all(:parent_model => @parent_model, :parent_id => @parent_id)
-    display @comments
+    if request.xhr?
+      partial "comments/index", :object => @parent
+    else
+      display @comments
+    end
   end
 
   def show(id)

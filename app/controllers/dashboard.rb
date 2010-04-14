@@ -21,11 +21,23 @@ class Dashboard < Application
                                        FROM clients cl, centers c, branches b
                                        WHERE cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
         graph.data(vals, [:count, :to_i], :name)
+      elsif params[:group_by]=="borrower_clients"
+        graph = PieGraph.new("Branch status by borrower client count")
+        vals = repository.adapter.query(%Q{SELECT COUNT(cl.id) count, b.name name
+                                       FROM clients cl, centers c, branches b, loans l
+                                       WHERE l.disbursal_date is not NULL and cl.center_id=c.id AND cl.id=l.client_id AND b.id=c.branch_id GROUP BY b.id;})
+        graph.data(vals, [:count, :to_i], :name)
       elsif params[:group_by]=="loan"
         graph = PieGraph.new("Branch status by #{params[:group_by]} amount")
         vals = repository.adapter.query(%Q{SELECT SUM(l.amount) amount, b.name name
                                        FROM loans l, clients cl, centers c, branches b
-                                       WHERE l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
+                                       WHERE l.disbursal_date is not NULL and l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
+        graph.data(vals, [:amount, :to_i], :name)
+      elsif params[:group_by]=="loan_count"
+        graph = PieGraph.new("Branch status by loan count")
+        vals = repository.adapter.query(%Q{SELECT count(l.id) amount, b.name name
+                                       FROM loans l, clients cl, centers c, branches b
+                                       WHERE l.disbursal_date is not NULL and l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
         graph.data(vals, [:amount, :to_i], :name)
       end
       return graph.generate
@@ -71,7 +83,7 @@ class Dashboard < Application
       return graph.generate
     when "aging"
       ages = {1 => 0, 2 => 0, 3 => 0, 4  => 0, 5 => 0, 6 => 0, 7 => 0, 8 => 0, 9 => 0, 10 => 0}
-      Loan.all(:disbursal_date.not => nil).each{|l|
+      Loan.all(:disbursal_date.not => nil, :disbursal_date.lte => Date.today).each{|l|
         ages[(100*(Date.today-l.disbursal_date)/(l.number_of_installments * l.installment_frequency_in_days)/10).ceil]+=1
       }
       vals = []

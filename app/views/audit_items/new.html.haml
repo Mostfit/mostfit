@@ -1,0 +1,9 @@
+
+= form_for(@audit_item, :action => url(:audit_items), :class => "form" ) do
+  %h1 New audit Item
+  = error_messages_for @audit_item
+  %fieldset
+    = partial :fields
+  = submit "Create"
+
+= link_to 'Back', url(:audit_items)

@@ -14,8 +14,8 @@ class InsuranceCompanies < Application
 
   def new
     only_provides :html
-    @insurance_company = InsuranceCompany.new
-    display @insurance_company
+    @insurance_company = InsuranceCompany.new    
+    display @insurance_company, :layout => layout?
   end
 
   def edit(id)
@@ -28,7 +28,7 @@ class InsuranceCompanies < Application
   def create(insurance_company)
     @insurance_company = InsuranceCompany.new(insurance_company)
     if @insurance_company.save
-      redirect resource(:insurance_companies), :message => {:notice => "InsuranceCompany was successfully created"}
+      redirect(params[:return]||resource(:insurance_companies), :message => {:notice => "InsuranceCompany was successfully created"})
     else
       message[:error] = "InsuranceCompany failed to be created"
       render :new

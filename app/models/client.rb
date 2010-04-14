@@ -24,7 +24,7 @@ class Client
   property :deleted_at,      ParanoidDateTime
   property :updated_at,      DateTime
   property :deceased_on,     Date
-  property :client_type,     Enum[:default], :default => :default
+#  property :client_type,     Enum["standard", "takeover"] #, :default => "standard"
   property :created_by_user_id,  Integer, :nullable => false, :index => true
   property :created_by_staff_member_id,  Integer, :nullable => false, :index => true
   property :verified_by_user_id, Integer, :nullable => true, :index => true
@@ -35,7 +35,7 @@ class Client
   property :bank_name,      String, :length => 20, :nullable => true
   property :branch,         String, :length => 20, :nullable => true
   property :join_holder,    String, :length => 20, :nullable => true
-  property :client_type,    Enum[:default], :default => :default
+#  property :client_type,    Enum[:default], :default => :default
   property :number_of_family_members, Integer, :length => 10, :nullable => true
   property :children_girls_under_5_years, Integer, :length => 10, :default => 0
   property :children_girls_5_to_15_years, Integer, :length => 10, :default => 0
@@ -101,14 +101,19 @@ class Client
   validates_length :school_distance, :max => 200
   validates_length :phc_distance, :max => 500
 
+  has n, :loans
   has n, :payments
   has n, :insurance_policies
+  has n, :attendances
   validates_length :account_number, :max => 20
 
+  belongs_to :center
+  belongs_to :client_group
+  belongs_to :occupation, :nullable => true
+  belongs_to :client_type
   belongs_to :created_by,        :child_key => [:created_by_user_id],         :model => 'User'
   belongs_to :created_by_staff,  :child_key => [:created_by_staff_member_id], :model => 'StaffMember'
   belongs_to :verified_by,       :child_key => [:verified_by_user_id],        :model => 'User'
-  belongs_to :occupation, :nullable => true
 
   has_attached_file :picture,
       :styles => {:medium => "300x300>", :thumb => "60x60#"},
@@ -121,9 +126,7 @@ class Client
       :url => "/uploads/:class/:id/:attachment/:style/:basename.:extension",
       :path => "#{Merb.root}/public/uploads/:class/:id/:attachment/:style/:basename.:extension"
 
-  has n, :loans
-  belongs_to :center
-  belongs_to :client_group
+
 
 
   validates_length    :name, :min => 3
@@ -155,7 +158,7 @@ class Client
   def fees
     # this is hardcoded for the moment. later, when one has more than one client_type and one refactors,
     # one will have to have this info read from the database
-    Fee.all.select{|f| f.payable_on.to_s.split("_")[0].downcase == "client"}
+    client_type ? client_type.fees : Fee.all.select{|f| f.payable_on.to_s.split("_")[0].downcase == "client"} 
   end
 
   def total_fees_due
@@ -194,9 +197,11 @@ class Client
   def fee_schedule
     @fee_schedule = {}
     klass_identifier = self.class.to_s.snake_case
-    fees.each do |f|
+    (client_type ? client_type.fees : Fee.all).each do |f|
       type, *payable_on = f.payable_on.to_s.split("_")
       if type == klass_identifier
+        # after adding the client_type, we should no longer need to check if the fee is for Client or Loan.
+        # However, we have to add the checks to the client type TODO
         date = eval(payable_on.join("_"))
         @fee_schedule += {date => {f.name => f.fees_for(self)}} unless date.nil?
       end

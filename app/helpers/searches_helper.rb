@@ -1,5 +1,5 @@
 module Merb
-  module SearchHelper
+  module SearchesHelper
     def model_names
       (DataMapper::Model.descendants).reject{|x| 
         x.ancestors.include?(Loan) or x.ancestors.include?(Report) or [Mfi, ActionLog, AuditTrail, Cgt, Comment, LedgerEntry].include?(x)

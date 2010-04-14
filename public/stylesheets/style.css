@@ -28,6 +28,8 @@ h2 {
   margin-left: 10%;
   padding: 0px 10px 10px 10px;
   min-height: 450px;
+  border: 1px solid #c9c9c9;
+
 }
 .container a:link, .container a:visited, .container a:active{
   /*color: #bc6624;*/
@@ -79,46 +81,48 @@ ol { list-style-position: outside; list-style-type: decimal; }
 }
 h1.logo{
     left: 10%;
-    position: relative;
-    color: orange;
+    position: absolute;
+    top: 0px;
     float: left;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
 }
-
+h1.logo span{
+    vertical-align: top;
+}
 /**************************************/
 /*             NAVIGATION             */
 /**************************************/
 #navigation
 {
-  color: black;
-  padding-top: 4px;
+  background: white;
   position: relative;
-  top: -27px;
-  width: 50%;
+  top: 66px;
   left: 10%;
+  height: 40px;
+  width: 90%;
 }
 
 #navigation a {
-  background: #eee none repeat scroll 0 0;
-  padding: 4px 10px 3px 10px;
-  color: black;
-  width: 50px;
+  background:  #75B516 repeat scroll 0 0;
+  position: relative;
+  top: 11px;
+  padding: 4px 15px 3px 10px;
+  color: white;
   text-decoration: none;
   font-weight: 500;
   font-size: 1.75em;
   margin: 0px;
-  -moz-border-radius: 5px 5px 0px 0px;
-  -webkit-border-radius: 5px 5px 0px 0px;
-  border: 1px solid #75B516;
+  border: 1px solid #c9c9c9;
 }
 #navigation a:hover{
-  background: #eee;
-  border: 1px solid #E88E02;
+  background: #5C8F11;
 }
 #navigation a.selected{
-  border: 0px;
-  background: #E88E02;
-  border-bottom: 1px solid #E88E02;
-  color: white;
+  background: white;
+  color: #3c3c3c;
+  border-bottom: 0px 
+  z-index:10;
 }
 
 #page-title h1 {
@@ -134,7 +138,6 @@ h1.logo{
 {
   margin: 0px;
   position: relative;
-  top: -24px;
 }
 
 .graph{
@@ -197,12 +200,15 @@ border: 1px solid #8c9292;
 }
 #content h3{
   font-size: 118%;
+  color: #5C8F11;
+  letter-spacing: 0.02em;
 }
 #content h4{
   font-size: 110%;
 }
 table.form, table.form td{
   border: 0px;
+  font-family: Helvetica;
 }
 table.border{
   width: 90%;
@@ -213,17 +219,21 @@ table.form td.legend{
   border: 1px;
   font-weight: bold;
 }
+
+table {
+
+}
 table thead tr {
-    border-right: solid 1px  #736f5d;
+    background: #CDD3FE;
 }
 table thead th {
-  background: #C9C3A3;
 /*  background-image: url('/images/tab_bg.png');*/
+  padding: 0px;
   color: #444;
   text-align: left;
   font-size: 1.2em;
-  border-bottom: solid 1px  #736f5d;
 }
+
 table tfoot td {
   background: #888;
   color: #fff;
@@ -279,6 +289,8 @@ font-weight: bold;
 margin: 0px;
 }
 
+.container .notice {
+}
 
 .error h2{
   color: #8a1f11;
@@ -290,6 +302,8 @@ margin: 0px;
 input[type="text"], input[type="password"], textarea {
   font-size: 100%;
   font-family: sans;
+  background: #FFFFFF url(/images/fieldbg.gif) repeat-x scroll center top
+
 }
 
 .asterisk {
@@ -341,10 +355,18 @@ a.nopic { background:none; padding:0; margin:0; }
 a.add, a.add:visited, a.add:link {
   background-image: url(/images/add.png);
   background-repeat: no-repeat;
+  /* background-color: #62ed1e; */
+  background-position: 1px 3px;
+  /*border-color: #9AFF20 #4AB517 #4AB517 #9AFF20;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 5px;
+  -moz-border-radius: 5px;*/
   padding: 3px 0px 4px 30px;
-  color: #black;
+  color: #2c2c2c;
   font-size: 16px;
-  font-weight: lighter
+  padding: 6px 35px 4px;
+  margin: 5px 5px 10px;
 }
 
 a.add_small, a.add_small:visited, a.add_small:link {
@@ -423,7 +445,7 @@ a.button:visited {
 {
   background: #fff;
   background-position: 125px 0px;
-  height: 90px;
+  height: 100px;
   border-top: 5px solid #75b516;
   width: 100%;
   position: relative;
@@ -434,7 +456,6 @@ a.button:visited {
 
 #header_search_div {
     position:relative; 
-    top:-55px; 
     right:10%;
     float:right;
     padding: 3px;
@@ -648,4 +669,100 @@ table.comments tr.odd td{
 }
 table.comments tr td span{
     color: #aaa;
+}
+
+
+form.form {
+/*  background-color: #F6E8B1; */
+/*  background-color: #F5F6D4; */
+  border: solid 2px #696C82;
+  font-family: "Lucida Grande";
+  font-size: 14px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 95%;
+  padding: 0px;
+
+}
+
+form h1 {
+  font-family: "Lucida Grande", Helvetica, sans;
+   background-color: #CEFF85;
+  line-height: 2em;
+  margin: 0px;
+  color: #3c3c3c;
+  text-indent: 15px;
+  letter-spacing: -0.07em;
+}
+fieldset {
+  border: 0px;
+  margin: 0px;
+}
+
+form.form label {
+  display: block;
+  text-align: left;
+}
+label {
+  display: inline-block;
+  width: 200px;
+  text-align: right;
+  margin-right: 5px;
+  vertical-align: top;
+}
+form.form td {
+  vertical-align: middle;
+}
+
+form p {
+  padding: 7px 7px;
+/*  border-bottom: solid 1px lightgrey; */
+  margin-bottom: 0px;
+}
+
+legend {
+  margin: 0px;
+  padding: 10px;
+  background: #B7CA79;
+  color: white;
+  -moz-box-shadow: 2px 2px 2px grey;
+}
+
+_button {
+  background: url(/images/tick.png) no-repeat #B7CA79 10px 6px;
+  text-indent: 30px;
+  font-size: 16px;
+  padding: 4px;
+}
+
+button.add_ {
+  background-image: url(/images/add.png);
+  background-repeat: no-repeat;
+  background-color: #62ed1e;
+  background-position: 1px 3px;
+  border-color: #9AFF20 #4AB517 #4AB517 #9AFF20;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  padding: 3px 0px 4px 30px;
+  color: #2c2c2c;
+  font-size: 16px;
+  padding: 6px 35px 4px;
+  margin: 5px 5px 10px;
+}
+
+table.tall {
+  border: solid 2px lightgrey;
+}
+
+table.tall thead {
+  background-color: #FBF8F1;
+  font-weight: bold;
+  border-bottom: solid 1px lightgrey;
+}
+table.tall th {
+  background-color: #FBF8F1;
+  padding: 10px 10px 10px 40px;
+  text-align: right;
 }

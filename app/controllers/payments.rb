@@ -3,13 +3,23 @@ class Payments < Application
   provides :xml, :yaml, :js
 
   def index
-    @payments = @loan.payments
-    display @payments
+    if @loan
+      @payments = @loan.payments
+      display @payments
+    elsif @client
+      @payments = @client.payments
+      partial :list      
+    end
   end
 
   def new
     only_provides :html
     @payment = Payment.new
+    display @payment
+  end
+
+
+  def show(id)
     display @payment
   end
 
@@ -42,10 +52,18 @@ class Payments < Application
     @payment = Payment.get(id)
     raise NotFound unless @payment
     disallow_updation_of_verified_payments
-    if @loan.delete_payment(@payment, session.user)
-      redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
+    if @loan
+      if @loan.delete_payment(@payment, session.user)
+        redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
+      else
+        redirect url_for_loan(@loan, 'payments'), :message => {:error => "Could not delete payment '#{@payment.id}'"}
+      end
     else
-      redirect url_for_loan(@loan, 'payments'), :message => {:error => "Could not delete payment '#{@payment.id}'"}
+      if @payment.destroy!
+        redirect resource(@payment.client), :message => {:notice => "Payment was deleted"}
+      else
+        display @payment, :message => {:notice => 'Payment was not deleted'}
+      end
     end
   end
 
@@ -68,8 +86,8 @@ class Payments < Application
     @branch = Branch.get(params[:branch_id])
     @center = Center.get(params[:center_id])
     @client = Client.get(params[:client_id])
-    @loan   = Loan.get(params[:loan_id])
-    raise NotFound unless @branch and @center and @client and @loan
+    @loan   = Loan.get(params[:loan_id]) if params[:loan_id]
+    raise NotFound unless @branch and @center and @client
   end
   def disallow_updation_of_verified_payments
     raise NotPrivileged if @payment.verified_by_user_id and not session.user.admin?

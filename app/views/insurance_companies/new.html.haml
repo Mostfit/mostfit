@@ -2,7 +2,7 @@
 
 = error_messages_for @insurance_company
 
-= form_for(@insurance_company, :action => url(:insurance_companies) ) do
+= form_for(@insurance_company, :action => url(:insurance_companies, {:return => params[:return]}) ) do
   = partial :fields
   = submit "Create"
 

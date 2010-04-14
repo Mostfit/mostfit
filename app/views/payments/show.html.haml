@@ -1,0 +1,46 @@
+%h1 
+  Payment 
+  = @payment.id
+
+%table.tall
+  %tr
+    %th
+      Loan
+    %td
+      - if @payment.loan
+        = link_to @payment.loan.description, resource(@payment.loan) 
+      - else 
+        N/A
+  %tr
+    %th
+      Client
+    %td
+      = @payment.client.name
+  %tr
+    %th
+      Type
+    %td
+      = @payment.type
+  %tr
+    %th
+      Comment
+    %td
+      = @payment.comment
+  %tr
+    %th
+      Received on
+    %td
+      = @payment.received_on
+  %tr
+    %th
+      Received by
+    %td
+      = @payment.received_by.name
+  %tr
+    %th
+      Actions
+    %td
+      = link_to_with_rights 'delete', resource(@payment, :delete), :class => 'delete'
+
+
+      

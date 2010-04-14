@@ -20,17 +20,18 @@
       %th
         Approved By
   -@loans_to_approve.each do |loan|
+    - client = @clients.find{|x| x.id==loan.client_id}
     %tr{:class => cycle('odd','')}
       %td.number
         = link_to loan.id, url(:quick_link, "loans", loan.id)
       %td.text
-        = link_to loan.client.name, resource(loan.client)
+        = link_to loan.client.name, resource(client)
       %td.number
         = loan.description
       %td.number
         = text_field :name => "loans[#{loan.id}][amount_sanctioned]", :value => loan.amount, :size => 6
       %td.text
-        = link_to loan.client.center.name, url(:quick_link, "centers", loan.client.center.id)
+        = link_to client.center.name, url(:quick_link, "centers", client.center.id)
       %td.text
         = date_select("loans[#{loan.id}][approved_on]")
       %td.text
@@ -38,7 +39,7 @@
       %td
         = check_box :name => "loans[#{loan.id}][approved?]"
       %td.text
-        = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => staff_members_collection, :selected => loan.client.center.manager.id.to_s
+        = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => staff_members_collection, :selected => client.center.manager.id.to_s
   %tfoot
     %tr
       %td{:colspan => 10}

@@ -1,6 +1,11 @@
 class Application < Merb::Controller
   before :ensure_authenticated
   before :ensure_can_do
+  before :insert_session_to_observer
+
+  def insert_session_to_observer
+    DataAccessObserver.insert_session(session.object_id)
+  end
 
   def ensure_can_do
     @route = Merb::Router.match(request)
@@ -58,6 +63,10 @@ class Application < Merb::Controller
   end
 
   private 
+  def layout?
+    return(request.xhr? ? false : :application)
+  end
+
   def get_dependent_relationships(obj)
     flag  = true
     model =  obj.class

@@ -1,7 +1,7 @@
 - if @md
 
   Payments collected by 
-  = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s
+  = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'payments_received_by'
 
   %table.report.nojs
     %thead
@@ -17,60 +17,73 @@
         %th total due
         %th paid
         %th repayment type
+        %th attendance
           
     %tbody{:style => "text-align:left;" }
+      - @branch||=@center.branch
       - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_fees, tot_total = 0, 0, 0, 0, 0, 0, 0
-      - @center.clients.each do |client|
-        - loan_row_count = 0
-        - Loan.all(:client_id => client.id, :disbursal_date.not => nil).each do |loan|
-          - lh = loan.history(:date => @date)[0] #TODO make this work even for non payment dates
-          - #next if [nil, :repaid, :pending].include? loan.status
-          - loan_row_count += 1
-          %tr{ :class => cycle('odd','') }
-            %td.text
-              %b= link_to loan.client.name, resource(@center.branch, @center, loan.client)
-            %td.number
-              = loan.id
-            %td.number
-              - amt = loan.amount
-              %b= amt.to_currency
-              - tot_amount += amt
-            %td.number
-              - p = lh.nil? ? 0 : lh.actual_outstanding_principal
-              %b= p.to_currency
-              - tot_outstanding += p
-            %td.text
-              = loan.disbursal_date.to_s
-            %td.number
-              - ins = loan.number_of_installments_before(@date)
-              = ins
-              - tot_installments += ins
-            %td.number
-              - p = lh.nil? ? 0 : lh.principal_due.to_i
-              = p.to_currency
-              - tot_principal += p
-            %td.number
-              - i = lh.nil? ? 0 : lh.interest_due.to_i
-              = i.to_currency
-              - tot_interest += i
-            %td.number
-              - a = p + i
-              = a.to_currency
-              - tot_total += a
-            %td.number
-              - if a == 0
-                = lh.nil? ? 0 : (lh.principal_paid.to_i + lh.interest_paid.to_i)
-              - else 
-                = text_field :name => "paid[loan][#{loan.id}", :value => (a > 0 ? a : 0), :cols => "5", :style => "width:50px;" 
-            %td 
-              = select :name => "payment_style[#{loan.id}]", :collection => [["prorata","pro rata"],["normal","fees => int => prin."]]
+      - clients = Client.all(:center_id => @center.id, :fields => [:id, :name, :client_group_id, :center_id])
+      - atts = Attendance.all(:client_id => clients.map{|x| x.id}, :date => @date).map{|x| [x.client_id,x]}.to_hash
+      - loans = Loan.all(:client_id => clients.map{|x| x.id})
+      - histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
+      - clients.group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each do |group, clients_grouped|
+        %tr.group
+          %td{:colspan => 12}
+            =group ? group.name : "none"
+        -clients_grouped.sort_by{|x| x.name}.each do |client|
+          - loan_row_count = 0
+          - loans.find_all{|l| l.client_id == client.id and l.disbursal_date}.each do |loan|
+            - lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
+            - loan_row_count += 1
+            %tr{ :class => cycle('odd','') }
+              %td.text
+                %b= link_to client.name, resource(@branch, @center, client)
+              %td.number
+                = loan.id
+              %td.number
+                - amt = loan.amount
+                %b= amt.to_currency
+                - tot_amount += amt
+              %td.number
+                - p = lh.nil? ? 0 : lh.actual_outstanding_principal
+                %b= p.to_currency
+                - tot_outstanding += p
+              %td.text
+                = loan.disbursal_date.to_s
+              %td.number
+                - ins = loan.number_of_installments_before(@date)
+                = ins
+                - tot_installments += ins
+              %td.number
+                - p = lh.nil? ? 0 : lh.principal_due.to_i
+                = p.to_currency
+                - tot_principal += p
+              %td.number
+                - i = lh.nil? ? 0 : lh.interest_due.to_i
+                = i.to_currency
+                - tot_interest += i
+              %td.number
+                - a = p + i
+                = a.to_currency
+                - tot_total += a
+              %td.number
+                = text_field :name => "paid[loan][#{loan.id}]", :value => [a,0].max, :cols => "5", :style => "width:50px;" 
+              %td 
+                = select :name => "payment_style[#{loan.id}]", :collection => [["prorata","pro rata"],["normal","fees=>int=>prin"]]
+              - if loan_row_count == 1
+                %td
+                  - att = atts[client.id]
+                  = select :name => "attendance[#{client.id}]", :collection => Attendance.attendancy_states, :value_method => :to_s, :selected => (att ? att.status.to_s : "present")
+          - if loan_row_count == 0
+            %tr{ :class => cycle('odd','') }
+              %td.text
+                %b= link_to client.name, resource(@branch, @center, client)
+              %td{ :colspan => 10 }
+                %i nothing outstanding
+              %td
+                - att = atts[client.id]
+                = select :name => "attendance[#{client.id}]", :collection => Attendance.attendancy_states, :value_method => :to_s, :selected => (att ? att.status.to_s : "present")
 
-        - if loan_row_count == 0
-          %tr{ :class => cycle('odd','') }
-            %td.text
-              %b= link_to client.name, resource(@branch, @center, client)
-            %td{ :colspan => 10 }
-              %i nothing outstanding
       %tr{ :style => 'border-bottom: 2px solid;' }
         %tr
           %td
@@ -93,8 +106,5 @@
     %tfoot    
       %tr
         %td{ :colspan => 14 }
-
-    
-
 - else
   %i This day is not a meeting day
