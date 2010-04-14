@@ -32,10 +32,6 @@ module Misfit
         @disbursals = Loan.all(:client_id => client_ids, :scheduled_disbursal_date => @date)
         render :template => 'dashboard/today'
       end
-
-      def regions
-        redirect "/regions"
-      end
     end # Browse
 
     module User
@@ -68,15 +64,21 @@ module Misfit
       end
 
       def additional_checks
-        id = @route[:id]
+        id = @route[:id].to_i
         staff_member = self.staff_member
         model = Kernel.const_get(@model.to_s.split("/")[-1].camelcase)
         if model == Loan
           l = Loan.get(id)
           return ((l.client.center.manager == staff_member) or (l.client.center.branch.manager == staff_member))
+        elsif model == StaffMember
+          #Trying to check his own profile? Allowed!
+          return true if staff_member.id==id
+          st = StaffMember.get(id)
+          #Allow access to this staff member if it is his branch manager
+          return(st.centers.branches.manager.include?(staff_member))
         elsif model == Client
           c = Client.get(id)
-          return ((c.center.manager == self.staff_member) or (c.center.branch.manager == staff_member))
+          return ((c.center.manager == staff_member) or (c.center.branch.manager == staff_member))
         elsif model == Branch
           branch = Branch.get(id)
           return ((branch.manager == staff_member) or (branch.centers.manager == staff_member))
@@ -144,7 +146,6 @@ module Misfit
             l = Loan.get(params[:loan_id])
             return ((l.client.center.manager == staff_member or l.client.center.branch.manager == staff_member))
           end
-          
         end
         r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
       end

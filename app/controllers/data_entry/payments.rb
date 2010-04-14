@@ -20,7 +20,12 @@ module DataEntry
         end
         @date = Date.parse(params[:for_date])
       end
-      @branch = @center.branch unless @center.nil?
+
+      unless @center.nil?
+        @branch = @center.branch
+        @clients = Client.all(:center_id => @center.id)
+      end
+
       if request.method == :post
         bulk_payments_and_disbursals
         mark_attendance

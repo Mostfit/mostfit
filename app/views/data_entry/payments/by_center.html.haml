@@ -40,7 +40,7 @@
           = hidden_field :name => :center_id, :value => @center.id
           = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
   %h1 Approvals
-  - @loans_to_approve = @center.clients.loans(:approved_on => nil)
+  - @loans_to_approve = @clients.loans(:approved_on => nil)
   - if @loans_to_approve.size > 0
     = form_for(@loan, :action => url(:loan_actions, 'approve', :return => resource(@branch, @center))) do
       = partial "loans/approve"
@@ -50,7 +50,7 @@
 
   %h1 Disbursal
   - date_with_holiday = [@date, @date.holidays_shifted_today].max
-  - @loans_to_disburse = @center.clients.loans(:scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil)
+  - @loans_to_disburse = @clients.loans(:scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil)
   - if @loans_to_disburse.size > 0
     = form_for(@loan, :action => url(:loan_actions, :action => 'disburse', :return => resource(@branch, @center))) do
       = partial "loans/disburse", {:loans_to_disburse => @loans_to_disburse, :date => @date}
@@ -59,16 +59,14 @@
     No disbursals today
 
   %h1 Fees
-  - @fee_paying_loans = @center.clients.loans.select{|l| l.fees_paid? == false}
-  - @fee_paying_clients = @center.clients.select{|c| c.fees_paid? == false}
+  - @fee_paying_loans = @clients.loans.select{|l| l.fees_paid? == false}
+  - @fee_paying_clients = @clients.select{|c| c.fees_paid? == false}
   - @fee_paying_things = @fee_paying_clients + @fee_paying_loans
   - unless (@fee_paying_things).blank?
     = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "if ($('#fees_received_by').val() != '#{@center.manager.id}') {return confirm('Fee receiver is not center manager. Proceed with payments?')};") do
       = hidden_field :name => :for_date, :value => @date
       Fees collected by
       = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'fees_received_by'
-
-
       %table.report.nojs{:style => "width:100%"}
         %thead
           %tr{:style => "font-size: 0.85em"}
