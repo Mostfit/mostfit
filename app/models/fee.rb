@@ -13,7 +13,7 @@ class Fee
   property :payable_on,    Enum.send('[]',*PAYABLE), :nullable => false
 
   has n, :loan_products, :through => Resource
-
+  has n, :client_types, :through => Resource
   # anything else will have to be ruby code - sorry
   
   validates_with_method :amount_is_okay

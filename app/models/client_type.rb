@@ -5,7 +5,7 @@ class ClientType
 
   property :type, String
 
-  has n, :fees
+  has n, :fees, :through => Resource
 
 
 end
