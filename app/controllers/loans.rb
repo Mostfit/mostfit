@@ -73,7 +73,7 @@ class Loans < Application
     @loan.update_attributes(attrs)
     @loan_product = @loan.loan_product
 
-    if @loan.save
+    if @loan.save or @loan.errors.length==0
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' has been edited"})
       else
