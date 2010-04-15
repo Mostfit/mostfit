@@ -167,6 +167,7 @@ class Loans < Application
         redirect(params[:return]||"/data_entry", :message => {:notice => 'loans approved'})
       else
         @loans_to_approve = Loan.all(:id.in => @loans.keys)
+        @clients =  @loans_to_approve.clients
         render
       end
     end
