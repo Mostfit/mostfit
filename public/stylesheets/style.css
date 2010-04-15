@@ -83,7 +83,7 @@ h1.logo{
     left: 10%;
     position: absolute;
     top: 0px;
-    float: left;
+    height: 60px;
     padding-bottom: 0px;
     margin-bottom: 0px;
 }
@@ -96,17 +96,14 @@ h1.logo span{
 #navigation
 {
   background: white;
-  position: relative;
-  top: 66px;
+  position: absolute;
+  top: 77px;
   left: 10%;
-  height: 40px;
   width: 90%;
 }
 
 #navigation a {
   background:  #75B516 repeat scroll 0 0;
-  position: relative;
-  top: 11px;
   padding: 4px 15px 3px 10px;
   color: white;
   text-decoration: none;
