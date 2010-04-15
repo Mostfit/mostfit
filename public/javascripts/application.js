@@ -215,8 +215,8 @@ function attachReportingFormEvents(){
 
 $(document).ready(function(){
 	create_remotes();
-	//Handling targets form
 	$('form').highlight();
+	//Handling targets form
 	$("select#target_attached_to").change(function(){
 		$.ajax({
 			url: "/targets/all/"+$(this).val()+".json",
@@ -417,3 +417,20 @@ $(document).ready(function(){
       });
   attachReportingFormEvents();
 });
+
+function confirm_for(things) {
+  /* given a hash of ids and values, this function asks a confirmation to proceed if the values of the elements
+   * are not the same as the provided values
+   */
+  errors = [];
+  for (thing in things) {
+    if ($('#'+thing).val() != things[thing] + "") {
+      errors.push(thing);
+    }
+  }
+  if (errors.length > 0) {
+    return confirm(errors.join(",") + " are not the standard value. Proceed?");
+  } else {
+    return true;
+  }
+}

@@ -1,3 +1,6 @@
+:javascript
+  o = {"applied_by":#{@center.manager.id}}
+
 %h1 Add a new loan
 
 = error_messages_for @loan
@@ -22,7 +25,7 @@
       =link_to("There are no loan products available. Create one now", resource(:loan_products, :new)) 
   = link_to 'cancel', resource(@branch, @center, @client, :loans)
 - else
-  = form_for(@loan, :action => resource(@branch, @center, @client, :loans), :onsubmit => "if ($('#applied_by').val() != '#{@center.manager.id}') {return confirm('Applier is not center manager. Proceed?')};") do
+  = form_for(@loan, :action => resource(@branch, @center, @client, :loans), :onsubmit => "javascript: return confirm_for(o);") do
     - if @loan.fields_partial.blank?
       = partial :fields, :submit_text => "Create loan for #{@client.name}", :cancel_link => resource(@branch, @center, @client, :loans)
     - else
