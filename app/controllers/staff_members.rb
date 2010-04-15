@@ -12,8 +12,9 @@ class StaffMembers < Application
     end
     @staff_members = if params[:branch_id] and not params[:branch_id].blank?
                        @branch = Branch.get(params[:branch_id])
-                       StaffMember.all(:id => ([@branch.manager.id] << @branch.centers.manager.map{|x| x.id}).flatten.uniq).paginate(:page => params[:page], 
-                                                                                                                                             :per_page => per_page)
+                       staff_members = StaffMember.related_to(@branch)
+                       ids = ([staff_members, @branch.manager.id] << @branch.centers.manager.map{|x| x.id}).flatten.uniq
+                       StaffMember.all(:id => ids).paginate(:page => params[:page], :per_page => per_page)
                      else
                        StaffMember.paginate(:page => params[:page], :per_page => per_page)
                      end
