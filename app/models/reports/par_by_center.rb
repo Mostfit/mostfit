@@ -31,6 +31,7 @@ class ParByCenterReport < Report
       ORDER BY branch_id, center_id})
                                     
     r = {}
+    loans = Loan.all(:id => loan_ids.map{|lid| lid.split("_")[0]})
     pars.each do |p|
       if r.has_key?(p.branch_id)
         if r[p.branch_id].has_key?(p.center_id)
