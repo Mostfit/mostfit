@@ -9,57 +9,62 @@
     %th{:width => '20%'}
       Client
     %th
-      Scheduled Disbursal Date
+      Amount in  default
     %th
-      Days delayed
-    %th
-      Status
-  - org_total = 0
+      Days Overdue
+  - org_total = org_total_default = 0
   - @data.each do |branch, centers|
-    -branch_total = 0
+    -branch_total =  branch_total_default = 0
     %tr.branch
       %td{:colspan => length}
         = branch.name
     - centers.each do |center, loans|
-      -center_total = 0
+      -center_total = center_total_default = 0
       %tr.center
         %td{:colspan => length}
           = center.name
       - loans.each do |l|
-        -center_total += l.amount
+        -center_total += l[0].amount
+        -center_total_default += l[1].amount_in_default
         %tr.group
           %td
             = @report.date
           %td
-            = l.description
+            = l[0].description
           %td
-            = l.client.name
+            = l[0].client.name
           %td 
-            = l.scheduled_disbursal_date
+            = l[1].amount_in_default
           %td
-            = @report.date - l.scheduled_disbursal_date
-          %td
-            = l.get_status(@report.date)
+            = l[1].late_by
       %tr.center_total
         %td
           Center total
         %td
           =center_total
           -branch_total+=center_total
-        -4.times do
-          %td
+        %td
+        %td
+          =center_total_default
+          -branch_total_default += center_total_default
+        %td
     %tr.branch_total
       %td
         Branch total
       %td
         -org_total+=branch_total
         =branch_total
-      -4.times do
-        %td
+      %td
+      %td
+        -org_total_default += branch_total_default
+        =branch_total_default
+      %td
   %tr.org_total
     %td
       Total
     %td
       =org_total
-    -4.times do
-      %td
+    %td
+    %td
+      = org_total_default
+    %td
