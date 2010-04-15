@@ -30,6 +30,7 @@ module Pdf
             loan_row_count=0
             loans.find_all{|l| l.client_id==client.id and l.disbursal_date}.each{|loan|
               lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
+              next if not lh
               loan_row_count+=1
               fee = fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
               actual_outstanding = (lh ? lh.actual_outstanding_principal : 0)
