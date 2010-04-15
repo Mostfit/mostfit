@@ -1,3 +1,6 @@
+:javascript
+  o = {"applied_by":#{@client.center.manager.id}, "approved_by":#{@client.center.branch.manager.id}, "disbursed_by":#{@client.center.manager.id}}
+
 - take_over_loan = /^TakeOver/.match(@loan_product.loan_type)
 = hidden_field :name => "loan_type", :value => @loan.class.to_s
 = hidden_field :name => "loan_product_id", :value => @loan_product.id
@@ -134,7 +137,7 @@
         on&nbsp;&nbsp;
         = date_select_for @loan, :approved_on, :nullable => true
         &nbsp;&nbsp;by&nbsp;&nbsp;
-        = select_staff_member_for @loan, :approved_by
+        = select_staff_member_for @loan, :approved_by, :id => "approved_by"
         %br/
         %span.greytext these fields are optional so may be specified later
 
@@ -157,7 +160,7 @@
         on&nbsp;&nbsp;
         = date_select_for @loan, :disbursal_date, :nullable => true
         &nbsp;&nbsp;by&nbsp;&nbsp;
-        = select_staff_member_for @loan, :disbursed_by
+        = select_staff_member_for @loan, :disbursed_by, :id => "disbursed_by"
         %br/
         %span.greytext these fields are optional so may be specified later
   %tr
