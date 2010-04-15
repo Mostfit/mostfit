@@ -3,8 +3,8 @@ class Centers < Application
   before :get_date,    :only    => ['show', 'weeksheet']
   provides :xml, :yaml, :js
 
-  def index
-    
+  def index    
+    redirect resource(@branch) if @branch
     hash = {:order => [:meeting_day]}
     hash[:manager] = session.user.staff_member if session.user.role == :staff_member
     hash[:branch] = @branch if @branch
