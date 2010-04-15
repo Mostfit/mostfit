@@ -150,6 +150,7 @@ class Loans < Application
         @loans_to_approve = Loan.all(:approved_on => nil)
       end
       @loans_to_approve.each {|l| l.clear_cache}
+      @clients =  @loans_to_approve.clients
       render
     else
       @errors = []
