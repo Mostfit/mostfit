@@ -1,5 +1,5 @@
 :javascript
-  o = {"applied_by":#{@center.manager.id}, "approved_by":#{@branch.manager.id}, "disbursed_by":#{@center.manager.id}}
+  o = {"applied_by":#{@client.center.manager.id}, "approved_by":#{@client.center.branch.manager.id}, "disbursed_by":#{@client.center.manager.id}}
 
 - take_over_loan = /^TakeOver/.match(@loan_product.loan_type)
 = hidden_field :name => "loan_type", :value => @loan.class.to_s
