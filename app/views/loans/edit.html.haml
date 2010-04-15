@@ -1,5 +1,3 @@
-:javascript
-  o = {"applied_by":#{@center.manager.id}, "approved_by":#{@branch.manager.id}, "disbursed_by":#{@center.manager.id}}
 %h1
   == Editing loan ##{@loan.id} for 
   %i= link_to @loan.client.name, resource(@branch, @center, @client)
