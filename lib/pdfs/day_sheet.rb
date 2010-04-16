@@ -9,7 +9,7 @@ module Pdf
         pdf.start_new_page if idx > 0
         pdf.text "Center: #{center.name}, Manager: #{@staff_member.name}, signature: ______________________", :font_size => 12, :justification => :left
         pdf.text("Center leader: #{center.leader.client.name}, signature: ______________________", :font_size => 12, :justification => :left) if center.leader
-        pdf.text("Date: #{@date}, Time: #{center.meeting_time_hours}:#{center.meeting_time_minutes}", :font_size => 12, :justification => :left)
+        pdf.text("Date: #{@date}, Time: #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}", :font_size => 12, :justification => :left)
         pdf.text("\n")
         table = PDF::SimpleTable.new
         table.data = []
