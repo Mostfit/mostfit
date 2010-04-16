@@ -62,7 +62,8 @@ class ConsolidatedReport < Report
     repository.adapter.query("select id, center_id, client_group_id from clients where center_id in (#{centers.keys.join(',')})").each{|c|
       clients[c.id] = c
     }
-    repository.adapter.query("select id, client_id, amount  FROM loans WHERE client_id in (#{clients.keys.join(',')})").each{|l|
+    client_ids = clients.keys.length>0 ? clients.keys.join(',') : "NULL"
+    repository.adapter.query("select id, client_id, amount  FROM loans WHERE client_id in (#{client_ids})").each{|l|
       loans[l.id] =  l
     }
 
