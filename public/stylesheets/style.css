@@ -456,6 +456,7 @@ a.button:visited {
     right:10%;
     float:right;
     padding: 3px;
+    top: -10px;
 }
 #header_search_div input{
     font-size: 1.5em;
