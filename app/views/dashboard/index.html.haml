@@ -5,26 +5,24 @@
     %li#clients Client
     %li#loan Loan
   .tab
-    =chart(url(:action => 'branch', :group_by => 'loan'))
-    =chart(url(:action => 'branch', :group_by => 'loan_count')) 
-    =chart(url(:action => 'branch', :group_by => 'client'))
-    =chart(url(:action => 'branch', :group_by => 'borrower_clients')) 
-    -Branch.all.each do |branch|
+    =chart(url(:action => 'branch', :group_by => 'loan'), 800, 400)
+    =chart(url(:action => 'branch', :group_by => 'loan_count'), 800, 400) 
+    =chart(url(:action => 'branch', :group_by => 'client'), 800, 400)
+    =chart(url(:action => 'branch', :group_by => 'borrower_clients'), 800, 400) 
+    %form.__remote__
+      %b Select branch
+      =select :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select branch"
+      =submit "Go"
       %div
-        %h1 
-          =branch.name
-        =chart(url(:dashboard, :action => 'branch', :id => branch.id), 450, 270) 
-        =chart(url(:graph_data, :action => 'branch', :id => branch.id, :scope_unit => 'months', :scope_size => 3), 450, 270) 
   .tab
     %div
       %h1 
         Overall
       =chart(url(:dashboard, :action => 'centers',  :scope_unit => 'months', :scope_size => 3), 450, 270) 
-    -Branch.all.each do |branch|
-      %div
-        %h1 
-          =branch.name
-        =chart(url(:action => 'centers', :id => branch.id,  :scope_unit => 'months', :scope_size => 3), 450, 270) 
+    %p
+      Select branch
+      %form.__remote__
+      %div.dashboard_center_loader
   .tab
     =partial :form
     - seg = {:branch_id => params[:branch_id], :center_id => params[:center_id], :staff_member_id => params[:staff_member_id]}.map{|k,v| "#{k}/#{v}" if not v.blank?}.compact.join("/")

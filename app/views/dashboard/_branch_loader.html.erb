@@ -1,0 +1,4 @@
+%h1 
+  =branch.name
+=chart(url(:dashboard, :action => 'branch', :id => branch.id), 450, 270) 
+=chart(url(:graph_data, :action => 'branch', :id => branch.id, :scope_unit => 'months', :scope_size => 3), 450, 270) 
