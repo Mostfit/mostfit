@@ -166,6 +166,17 @@ function create_remotes(){
 		});
 	    return false;
 	});
+    $("form._remote_").submit(function(){
+	    form = $(this);
+	    $.ajax({
+		    type: form.attr("method"),
+		    url: form.attr("action"),
+		    success: function(data){
+			form.find("div").html(data);
+		    }
+		});
+	    return false;
+	});
 }
 function attachReportingFormEvents(id){
     $("#reporting_form tr#"+id+" select").change(function(){
@@ -234,7 +245,6 @@ function confirm_for(things) {
 
 
 $(document).ready(function(){
-
 	create_remotes();
 	$('form').highlight();
 	//Handling targets form
@@ -352,7 +362,7 @@ $(document).ready(function(){
 			type: "get",
 			url: "/client_groups/new?center_id="+id,
 			success: function(data){
-			    $("#new_client_group_form").html(data);
+			    $("#new_client_group_form").append(data);
 			    $("#new_client_group_form").submit(function(){
 				    $.ajax({
 					    type: "POST",
@@ -414,7 +424,6 @@ $(document).ready(function(){
      $('.closeNotice').addClass('notice');
      $('.notice').remove();
   });
-
   $("#comments_form").submit(function(){
 	  form = $("#comments_form");
 	  $.ajax({
