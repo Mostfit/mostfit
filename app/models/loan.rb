@@ -1175,7 +1175,7 @@ Loan.descendants.to_a.each do |c|
       self.amount = original_amount
       # generate the payments_schedule
       clear_cache
-      
+      debugger
       _show_cf
       self.disbursal_date = _disbursal_date
       self.scheduled_disbursal_date = _scheduled_disbursal_date

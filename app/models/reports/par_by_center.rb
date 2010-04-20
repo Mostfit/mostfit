@@ -32,10 +32,10 @@ class ParByCenterReport < Report
       ORDER BY branch_id, center_id}
     pars = repository.adapter.query(query)
     par_map = pars.map{|p| [p.loan_id, p]}.to_hash
-    debugger
+
                                     
     r = {}
-    Branch.all.each do |b|
+    @branch.each do |b|
       r[b] = {}
       b.centers.each do |c|
         next if @center and not @center.find{|x| x.id==c.id}        
