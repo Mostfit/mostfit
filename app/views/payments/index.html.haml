@@ -183,7 +183,7 @@
             - if h[:date] <= Date.today
               %b
                 %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
-                  = h[:amount_in_default].abs
+                  = h[:amount_in_default].round
               %br/
               %span.greytext
                 %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
