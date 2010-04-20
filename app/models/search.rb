@@ -47,7 +47,7 @@ class Search
   private
   def self.chain_queries(models, queries)
     #No chaining
-    return models.first.all(queries.inject({}){|s,x| s.merge(x)}) if models.uniq.length==1
+    return models.first.all(queries.values.first) if models.uniq.length==1
     #chaining
     objs = nil
     objs = models.first.all(queries[models.first])

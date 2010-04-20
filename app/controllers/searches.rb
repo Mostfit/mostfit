@@ -60,7 +60,7 @@ class Searches < Application
       ops = Search.get_operators(property)
       ops = [["", "Select operator"]] + ops
       return "#{ops.collect{|x| "<option value='#{x.first.to_s}'>#{x.last.to_s}"}.join('</option>')}</option>", :layout => false
-    else      
+    else
       return get_values(model, property, params[:counter])
     end
   end
@@ -75,7 +75,8 @@ class Searches < Application
       return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", :collection => property.parent_model.all, 
                     :value_method => :id, :text_method => :name,:prompt => "Choose #{property.name}")
     elsif property.type.class==Class
-      return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", :collection => property.type.flag_map.to_a, :prompt => "Choose #{property.name}")
+      return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", 
+                    :collection => property.type.flag_map.to_a, :prompt => "Choose #{property.name}")
     end
   end
 
@@ -88,5 +89,4 @@ class Searches < Application
       end
     }
   end
-
 end

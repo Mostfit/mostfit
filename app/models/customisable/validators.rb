@@ -29,9 +29,10 @@ module Misfit
   module LoanValidators
     def installments_are_integers?
       return [false, "Number of installments not defined"] if number_of_installments.nil? or number_of_installments.blank?
-      (1..number_of_installments).each do |i|
-        p = scheduled_principal_for_installment(i)
-        return [false, "Amount must yield integer installments"] if p.to_i != p
+      self.payment_schedule.each do |date, val|
+        pri = val[:principal]
+        int = val[:interest]
+        return [false, "Amount must yield integer installments"] if (pri+int).to_i != (pri+int)
       end
       return true
     end

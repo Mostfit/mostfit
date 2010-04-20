@@ -178,12 +178,12 @@
               %b= format_currency h[:principal_paid] + h[:interest_paid]
               %br/
               %span.greytext
-                == #{h[:principal_paid]} principal + #{h[:interest_paid]} interest
+                == #{format_currency h[:principal_paid]} principal + #{format_currency h[:interest_paid]} interest
           %td
             - if h[:date] <= Date.today
               %b
                 %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
-                  = format_currency h[:amount_in_default].abs
+                  = h[:amount_in_default].round
               %br/
               %span.greytext
                 %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
