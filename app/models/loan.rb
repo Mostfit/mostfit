@@ -1130,7 +1130,7 @@ Loan.descendants.to_a.each do |c|
       self.taken_over_on ||= @schedule.keys.sort[(self.taken_over_on_installment_number) - 1]
       last_date = @schedule.reject{|k,v| k > self.taken_over_on}.keys.max
       total = @schedule[last_date][:total_balance]
-      self.amount = @schedule[last_date][:balance]
+      self.amount = @schedule[last_date][:balance].ceil
       @schedule = @schedule.reject{|k,v| k <  last_date}
       # reset the original values
       self.disbursal_date = _disbursal_date
@@ -1138,8 +1138,9 @@ Loan.descendants.to_a.each do |c|
       self.scheduled_first_payment_date = _fp_date
       # adjust the first line of the payment_schedule
       dd = self.disbursal_date || self.scheduled_disbursal_date
+      balance = @schedule[last_date][:balance]
       @schedule.delete(@schedule.keys.min)
-      @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => amount, :total => 0}
+      @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
       # adjust all the dates
       adjusted_schedule = {}
       orig_dates = @schedule.keys.sort[1..-1]
