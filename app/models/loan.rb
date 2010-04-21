@@ -539,7 +539,7 @@ class Loan
         :interest                  => payment.interest,
         :total_principal           => (principal += payment.principal),
         :total_interest            => (interest  += payment.interest),
-        :total                     => (total     +=payment.principal + payment.interest),
+        :total                     => (total     += payment.principal + payment.interest),
         :balance                   => amount - principal,
         :total_balance             => total_balance - total}
     end
@@ -1058,6 +1058,42 @@ class BulletLoanWithPeriodicInterest < BulletLoan
   
 end
 
+class PararthRounded < Loan
+
+  def scheduled_principal_for_installment(number)
+    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    rounding_schedule[number][:principal]
+  end
+
+  def scheduled_interest_for_installment(number)
+    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    rounding_schedule[number][:interest]
+  end
+
+  def rounding_schedule
+    return @_rounding_schedule if @_rounding_schedule
+    @_rounding_schedule = {}
+    debugger
+    _prin_per_installment = amount.to_f / number_of_installments
+    _total = amount * (1 + interest_rate) # cannot use total_to_be_received without blowing the universe up
+    _installment = _total / number_of_installments
+    rf = 0;
+    (1..number_of_installments).to_a.each do |i| 
+      prin = (_prin_per_installment + rf).round
+      rf = _prin_per_installment - prin + rf
+      int = _installment - prin
+      @_rounding_schedule[i] =  {:principal => prin, :interest => int}
+    end
+    debugger
+    return @_rounding_schedule
+  end
+
+  def clear_cache
+    super
+    @_rounding_schedule = nil
+  end
+    
+end
 
 
 # TAKEOVER LOANS!!
