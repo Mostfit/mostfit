@@ -54,7 +54,6 @@ class DailyReport < Report
           groups[b.id][c.id][g.id][13]  += principal_advance
           groups[b.id][c.id][g.id][15] += total_advance
           groups[b.id][c.id][g.id][14] += (total_advance - principal_advance)
-
         }
       }
     }

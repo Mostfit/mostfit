@@ -35,11 +35,15 @@ class Search
         vals[idx] = prop.type.flag_map[vals[idx].to_i]
       end
     }
-    
     queries    = {}
     models.each_with_index{|model, idx|
-      queries[model]||={}
-      queries[model][properties[idx].to_sym.send(operators[idx].to_sym)] = vals[idx]
+      queries[model]||= {}
+      prop = properties[idx].to_sym.send(operators[idx].to_sym)
+      if queries[model][prop]
+        queries[model][prop] << vals[idx]
+      else
+        queries[model][prop] = [vals[idx]]
+      end
     }
     return self.chain_queries(models.uniq, queries)
   end
@@ -47,7 +51,7 @@ class Search
   private
   def self.chain_queries(models, queries)
     #No chaining
-    return models.first.all(queries.inject({}){|s,x| s.merge(x)}) if models.uniq.length==1
+    return models.first.all(queries.values.first) if models.uniq.length==1
     #chaining
     objs = nil
     objs = models.first.all(queries[models.first])

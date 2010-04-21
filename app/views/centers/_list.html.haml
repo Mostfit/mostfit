@@ -23,7 +23,7 @@
           = link_to center.manager.name, resource(center.manager)
         %td
           - if center.meeting_day
-            == #{center.meeting_day.to_s.capitalize}#{(center.meeting_time_hours and center.meeting_time_minutes) ? ", #{center.meeting_time_hours}:#{center.meeting_time_minutes}" : ''}
+            == #{center.meeting_day.to_s.capitalize}#{(center.meeting_time_hours and center.meeting_time_minutes) ? ", #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}" : ''}
         %td
           = link_to 'edit', resource(@branch, center, :edit)
           - if @branch 

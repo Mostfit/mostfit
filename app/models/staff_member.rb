@@ -50,5 +50,23 @@ class StaffMember
   def client_groups
     ClientGroup.all(:created_by_staff_member_id => self.id)
   end
-
+  
+  def self.related_to(obj)
+    staff_members = []    
+    [:applied_by_staff_id, :approved_by_staff_id, :rejected_by_staff_id, :disbursed_by_staff_id, :written_off_by_staff_id].each{|type|
+      staff_members << if obj.class==Branch
+                         repository.adapter.query(%Q{SELECT distinct(#{type}) FROM branches b, centers c, clients cl, loans l
+                                                    WHERE b.id=#{obj.id} and c.branch_id=b.id and cl.center_id=c.id and l.client_id=cl.id})
+                       elsif obj.class==Center
+                         repository.adapter.query(%Q{SELECT distinct(#{type}) FROM centers c, clients cl, loans l
+                                                    WHERE c.id=#{obj.id} and cl.center_id=c.id and l.client_id=cl.id})
+                       elsif obj.class==Client
+                         repository.adapter.query(%Q{SELECT distinct(#{type}) FROM centers c, clients cl, loans l
+                                                    WHERE cl.id=#{obj.id} and l.client_id=cl.id})
+                       end 
+    }
+    staff_members = staff_members.flatten.uniq.compact
+    staff_members.delete(0)
+    return staff_members
+  end
 end

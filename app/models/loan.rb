@@ -171,8 +171,10 @@ class Loan
 
   def _show_cf #convenience function to see cashflow in console
     ps = payment_schedule
-    puts
-    ps.keys.sort.each {|d| puts "#{d}\t|  #{ps[d].values.map{|v| "%.2f" % v}.join("\t|  ")}"}
+    puts "     date\t| #{ps.first.last.keys.join("\t|  ")}"
+    ps.keys.sort.each {|d| 
+      puts "#{d}\t|  #{ps[d].values.map{|v| "%.2f" % v}.join("\t|  ")}"
+    }
     puts
   end
 
@@ -501,13 +503,13 @@ class Loan
         :fees                       => fees,
         :total_principal            => (principal_so_far),
         :total_interest             => (interest_so_far),
-        :total                      => principal_so_far + interest_so_far + fees_so_far,
-        :balance                    => balance,
+        :total                      => (principal_so_far + interest_so_far + fees_so_far).round(2),
+        :balance                    => balance.round(2),
       }
     end
     # we have to do the following to avoid the circular reference from total_to_be_received.
     total = @schedule[@schedule.keys.max][:total]
-    @schedule.each { |k,v| v[:total_balance] = total - v[:total]}
+    @schedule.each { |k,v| v[:total_balance] = (total - v[:total]).round(2)}
     @schedule
   end
 
@@ -533,11 +535,11 @@ class Loan
       # walk through (so we can do the += thingy)
 
       @payments_cache[payment.received_on] = {
-        :principal                 => payment.principal.to_i,
-        :interest                  => payment.interest.to_i,
-        :total_principal           => (principal += payment.principal.to_i),
-        :total_interest            => (interest  += payment.interest.to_i),
-        :total                     => (total     +=payment.principal.to_i + payment.interest.to_i),
+        :principal                 => payment.principal,
+        :interest                  => payment.interest,
+        :total_principal           => (principal += payment.principal),
+        :total_interest            => (interest  += payment.interest),
+        :total                     => (total     += payment.principal + payment.interest),
         :balance                   => amount - principal,
         :total_balance             => total_balance - total}
     end
@@ -560,13 +562,13 @@ class Loan
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
     raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-    (amount.to_f / number_of_installments).ceil
+    (amount.to_f / number_of_installments).round(2)
   end
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
     raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-    (amount * interest_rate / number_of_installments).to_i
+    (amount * interest_rate / number_of_installments).round(2)
   end
 
   # These info functions need not be overridden in derived classes.
@@ -576,17 +578,17 @@ class Loan
   #    scheduled_[principal, interest, total]_up_to(date)
   #    scheduled_[principal, interest, total]_on(date)
 
-  def total_principal_to_be_received; get_scheduled(:total_principal, self.scheduled_maturity_date).to_i; end
-  def total_interest_to_be_received; get_scheduled(:total_interest, self.scheduled_maturity_date).to_i; end
-  def total_to_be_received; total_principal_to_be_received.to_i + total_interest_to_be_received.to_i; end
+  def total_principal_to_be_received; get_scheduled(:total_principal, self.scheduled_maturity_date); end
+  def total_interest_to_be_received; get_scheduled(:total_interest, self.scheduled_maturity_date); end
+  def total_to_be_received; (total_principal_to_be_received + total_interest_to_be_received).to_i; end
 
-  def scheduled_principal_up_to(date); get_scheduled(:total_principal, date).to_i; end
-  def scheduled_interest_up_to(date);  get_scheduled(:total_interest,  date).to_i; end
-  def scheduled_total_up_to(date); scheduled_principal_up_to(date).to_i + scheduled_interest_up_to(date).to_i;  end
+  def scheduled_principal_up_to(date); get_scheduled(:total_principal, date); end
+  def scheduled_interest_up_to(date);  get_scheduled(:total_interest,  date); end
+  def scheduled_total_up_to(date); (scheduled_principal_up_to(date) + scheduled_interest_up_to(date)).to_i;  end
 
 
-  def scheduled_principal_due_on(date); get_scheduled(:principal, date).to_i; end
-  def scheduled_interest_due_on(date); get_scheduled(:interest, date).to_i; end
+  def scheduled_principal_due_on(date); get_scheduled(:principal, date); end
+  def scheduled_interest_due_on(date); get_scheduled(:interest, date); end
   def scheduled_total_due_on(date); scheduled_principal_due_on(dqte) + scheduled_interest_due_on(date); end
   # these 3 methods return scheduled amounts from a LOAN-OUTSTANDING perspective
   # they are purely calculated -- no calls to its payments or loan_history)
@@ -642,10 +644,10 @@ class Loan
   # these 3 methods return overpayment amounts (PAYMENT-RECEIVED perspective)
   # negative values mean shortfall (we're positive-minded at intellecap)
   def principal_overpaid_on(date)
-    (principal_received_up_to(date) - scheduled_principal_up_to(date)).to_i
+    (principal_received_up_to(date) - scheduled_principal_up_to(date))
   end
   def interest_overpaid_on(date)
-    (interest_received_up_to(date) - scheduled_interest_up_to(date)).to_i
+    (interest_received_up_to(date) - scheduled_interest_up_to(date))
   end
   def total_overpaid_on(date)
     total_received_up_to(date) - scheduled_total_up_to(date)
@@ -1056,6 +1058,42 @@ class BulletLoanWithPeriodicInterest < BulletLoan
   
 end
 
+class PararthRounded < Loan
+
+  def scheduled_principal_for_installment(number)
+    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    rounding_schedule[number][:principal]
+  end
+
+  def scheduled_interest_for_installment(number)
+    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    rounding_schedule[number][:interest]
+  end
+
+  def rounding_schedule
+    return @_rounding_schedule if @_rounding_schedule
+    @_rounding_schedule = {}
+    debugger
+    _prin_per_installment = amount.to_f / number_of_installments
+    _total = amount * (1 + interest_rate) # cannot use total_to_be_received without blowing the universe up
+    _installment = _total / number_of_installments
+    rf = 0;
+    (1..number_of_installments).to_a.each do |i| 
+      prin = (_prin_per_installment + rf).round
+      rf = _prin_per_installment - prin + rf
+      int = _installment - prin
+      @_rounding_schedule[i] =  {:principal => prin, :interest => int}
+    end
+    debugger
+    return @_rounding_schedule
+  end
+
+  def clear_cache
+    super
+    @_rounding_schedule = nil
+  end
+    
+end
 
 
 # TAKEOVER LOANS!!
@@ -1128,7 +1166,7 @@ Loan.descendants.to_a.each do |c|
       self.taken_over_on ||= @schedule.keys.sort[(self.taken_over_on_installment_number) - 1]
       last_date = @schedule.reject{|k,v| k > self.taken_over_on}.keys.max
       total = @schedule[last_date][:total_balance]
-      self.amount = @schedule[last_date][:balance]
+      self.amount = @schedule[last_date][:balance].ceil
       @schedule = @schedule.reject{|k,v| k <  last_date}
       # reset the original values
       self.disbursal_date = _disbursal_date
@@ -1136,8 +1174,9 @@ Loan.descendants.to_a.each do |c|
       self.scheduled_first_payment_date = _fp_date
       # adjust the first line of the payment_schedule
       dd = self.disbursal_date || self.scheduled_disbursal_date
+      balance = @schedule[last_date][:balance]
       @schedule.delete(@schedule.keys.min)
-      @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => amount, :total => 0}
+      @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
       # adjust all the dates
       adjusted_schedule = {}
       orig_dates = @schedule.keys.sort[1..-1]
@@ -1147,12 +1186,11 @@ Loan.descendants.to_a.each do |c|
       @schedule = {@schedule.keys.min => @schedule[@schedule.keys.min]} + adjusted_schedule
       # recreate the totals
       ti = tp = 0
-      @schedule.keys.sort.each_with_index do |dt,i|
+      @schedule.keys.sort.each_with_index do |dt,idx|
         @schedule[dt][:total_interest] = ti += @schedule[dt][:interest]
-        @schedule[dt][:principal] = i == 0 ? 0 : @schedule[@schedule.keys.sort[i-1]][:balance] - @schedule[dt][:balance]
+        @schedule[dt][:principal] = idx == 0 ? 0 : (@schedule[@schedule.keys.sort[idx-1]][:balance] - @schedule[dt][:balance]).round(2)
         @schedule[dt][:total_principal] = tp += @schedule[dt][:principal]
-        @schedule[dt][:total] = i == 0 ? 0 : ti + tp
-        
+        @schedule[dt][:total] = idx == 0 ? 0 : ti + tp
       end
       # do total_balance
       @schedule.each { |k,v| 
@@ -1175,7 +1213,7 @@ Loan.descendants.to_a.each do |c|
       self.amount = original_amount
       # generate the payments_schedule
       clear_cache
-      
+      debugger
       _show_cf
       self.disbursal_date = _disbursal_date
       self.scheduled_disbursal_date = _scheduled_disbursal_date

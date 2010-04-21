@@ -16,12 +16,13 @@
   = link_to "Download pdf >>", url(:day_sheet_with_format, :format => "pdf", :date => @date), :style => "float: left; margin-left: 25px", :class => "button"
 %br
 %br
-- @centers.each do |center|
+- @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each do |center|
   %h2
     = center.name
     (
     = center.code
-    )
+    ) at 
+    = "#{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}"
   = partial "centers/payments", {:clients => center.clients, :branch => center.branch, :center => center, :date => @date, :loans => center.loans}
   - if center.clients.count > 0 and center.clients.loans.all(:scheduled_disbursal_date => @date).count > 0
     - tot_disbursement = 0

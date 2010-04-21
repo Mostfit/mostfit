@@ -1,8 +1,8 @@
 %h1
-  == Edit loan ##{@loan.id} for 
+  == Editing loan ##{@loan.id} for 
   %i= link_to @loan.client.name, resource(@branch, @center, @client)
 
 = error_messages_for @loan
 
-= form_for(@loan, :action => url_for_loan(@loan), :onsubmit => "if ($('#applied_by').val() != '#{@client.center.manager.id}') {return confirm('Applier is not center manager. Proceed with edit?')};") do
+= form_for(@loan, :action => url_for_loan(@loan), :class => 'loan', :onsubmit => "javascript:return confirm_for(o);") do
   = partial :fields, :submit_text => "Save changes", :cancel_link => url_for_loan(@loan)

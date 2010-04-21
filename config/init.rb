@@ -128,9 +128,6 @@ Merb::BootLoader.after_app_loads do
     end
   end
   Misfit::Config::DateFormat.compile
-  #Add here to make sure all clients and client_groups have created_by_staff_id
-  Client.all(:created_by_staff_member_id => nil).each{|c| c.created_by_staff = c.center.manager; c.save}
-  ClientGroup.all(:created_by_staff_member_id => nil).each{|c| c.created_by_staff = c.center.manager; c.save}
 
   module DmPagination
     class PaginationBuilder

@@ -6,20 +6,34 @@
     %table
       %tr
         -@model.properties.each do |p|
-          -if p.type!=DataMapper::Types::Text and p.name!=:created_at and p.name!=:updated_at
+          -if @fields[@model.to_s.snake_case] and (@fields[@model.to_s.snake_case][p.name] or relations.key?(p.name)) 
             %th
-              =relations.key?(p.name) ? relations[p.name] : p.name
+              =relations.key?(p.name) ? relations[p.name].camelcase(' ') : p.name.to_s.camelcase(' ')
+        - fields =  @fields.deep_clone
+        - fields.delete(@model.to_s.snake_case)    
       -@objects.each do |obj|
         %tr
           -@model.properties.each do |p|
-            -if p.type!=DataMapper::Types::Text and p.name!=:created_at and p.name!=:updated_at
-              %td
-                -if relations.key?(p.name)
-                  -child_obj = obj.send(relations[p.name])
-                  =child_obj.respond_to?(:name) ? child_obj.name : child_obj
-                -elsif obj.respond_to?(p.name)
-                  =obj.send(p.name)
+            -if @fields[@model.to_s.snake_case] and (@fields[@model.to_s.snake_case][p.name] or relations.key?(p.name))
+              -if relations.key?(p.name) and child_obj = obj.send(relations[p.name])
+                -if @fields[child_obj.class.name.snake_case]
+                  - @fields[child_obj.class.name.snake_case].each do |k,v|
+                    %td
+                      -data = child_obj.send(k)
+                      - if [String, Date, Integer, Float].include?(data.class)
+                        =data
+                      -elsif data.respond_to?(:name)
+                        =data.name
+                      -else
+                        =data.to_s
                 -else
+                  %td
+                    =child_obj.respond_to?(:name) ? child_obj.name : child_obj
+              -elsif obj.respond_to?(p.name)
+                %td
+                  =obj.send(p.name)
+              -else
+                %td
                   =obj.to_s
 -else
   No records

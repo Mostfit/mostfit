@@ -73,7 +73,7 @@ class Loans < Application
     @loan.update_attributes(attrs)
     @loan_product = @loan.loan_product
 
-    if @loan.save
+    if @loan.save or @loan.errors.length==0
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' has been edited"})
       else
@@ -150,6 +150,7 @@ class Loans < Application
         @loans_to_approve = Loan.all(:approved_on => nil)
       end
       @loans_to_approve.each {|l| l.clear_cache}
+      @clients =  @loans_to_approve.clients
       render
     else
       @errors = []
@@ -166,6 +167,7 @@ class Loans < Application
         redirect(params[:return]||"/data_entry", :message => {:notice => 'loans approved'})
       else
         @loans_to_approve = Loan.all(:id.in => @loans.keys)
+        @clients =  @loans_to_approve.clients
         render
       end
     end

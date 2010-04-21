@@ -22,7 +22,7 @@
           = submit "Proceed..."
 
 - else
-  = form_for(@loan, :action => url_for_loan(@loan, '', {:return => "/data_entry"}), :onsubmit => "if ($('#applied_by').val() != '#{@client.center.manager.id}') {return confirm('Applier is not center manager. Proceed with payments?')};") do
+  = form_for(@loan, :action => url_for_loan(@loan, '', {:return => "/data_entry"}), :class => 'loan', :onsubmit => "javascript: return confirm_for(o);") do
     = hidden_field :id, :value => @loan.id
     = partial 'loans/fields', :submit_text => "Save changes on loan ##{@loan.id}", :cancel_link => url(:data_entry)
 

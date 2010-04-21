@@ -452,10 +452,12 @@ a.button:visited {
 }
 
 #header_search_div {
-    position:relative; 
-    right:10%;
-    float:right;
+    position: absolute; 
+    right: 10%;
     padding: 3px;
+    padding-bottom: 0px;    
+    vertical-align: top;
+    top: -12px;
 }
 #header_search_div input{
     font-size: 1.5em;

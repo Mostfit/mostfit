@@ -1,0 +1,70 @@
+=partial :form
+- length = 6
+%table.report
+  %tr.header
+    %th{:width => '20%'}
+      Date
+    %th{:width => '20%'}
+      Loan
+    %th{:width => '20%'}
+      Client
+    %th
+      Amount in  default
+    %th
+      Days Overdue
+  - org_total = org_total_default = 0
+  - @data.each do |branch, centers|
+    -branch_total =  branch_total_default = 0
+    %tr.branch
+      %td{:colspan => length}
+        = branch.name
+    - centers.each do |center, loans|
+      -center_total = center_total_default = 0
+      %tr.center
+        %td{:colspan => length}
+          = center.name
+      - loans.each do |l|
+        -center_total += l[0].amount
+        -center_total_default += l[1].amount_in_default
+        %tr.group
+          %td
+            = @report.date
+          %td
+            = l[0].description
+          %td
+            = l[0].client.name
+          %td 
+            = l[1].amount_in_default
+          %td
+            = l[1].late_by
+      %tr.center_total
+        %td
+          Center total
+        %td
+          =center_total
+          -branch_total+=center_total
+        %td
+        %td
+          =center_total_default
+          -branch_total_default += center_total_default
+        %td
+    %tr.branch_total
+      %td
+        Branch total
+      %td
+        -org_total+=branch_total
+        =branch_total
+      %td
+      %td
+        -org_total_default += branch_total_default
+        =branch_total_default
+      %td
+  %tr.org_total
+    %td
+      Total
+    %td
+      =org_total
+    %td
+    %td
+      = org_total_default
+    %td

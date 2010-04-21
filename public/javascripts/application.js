@@ -155,6 +155,9 @@ function dateFromAge(ageYear, ageMonth, ageDay){
 function create_remotes(){
     $("a._remote_").click(function(){
 	    href=$(this).attr("href");
+	    if($(this).hasClass("self")){
+		href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+	    }
 	    a=$(this);
 	    $.ajax({
 		    type: "GET",
@@ -166,9 +169,21 @@ function create_remotes(){
 		});
 	    return false;
 	});
+    $("form._remote_").submit(function(){
+	    form = $(this);
+	    $.ajax({
+		    type: form.attr("method"),
+		    url: form.attr("action"),
+		    data: form.serialize(),
+		    success: function(data){
+			form.find("div").html(data);
+		    }
+		});
+	    return false;
+	});
 }
-function attachReportingFormEvents(){
-  $("#reporting_form select").change(function(){
+function attachReportingFormEvents(id){
+    $("#reporting_form tr#"+id+" select").change(function(){
 	  if($(this).attr("class")=="more")
 	      return;
 	  var types = ["model", "property", "operator", "value"];
@@ -185,38 +200,58 @@ function attachReportingFormEvents(){
 			url: "/search/get?counter="+counter+"&"+$("#reporting_form").serialize(),
 			success: function(data){
                               if(nextType==="value"){
-				  $("#reporting_form span#"+nextType+'_'+counter).html(data);
+				  $("#reporting_form span#"+nextType+'_'+counter).html(data);				  
 			      }else{
 				  $("#reporting_form select#"+nextType+'_'+counter).html("");
 				  $("#reporting_form select#"+nextType+'_'+counter).append(data);
 			      }
-			}
+			  }
 		    });
 	      });
       });
-  $("#reporting_form select.more").change(function(){
+  $("#reporting_form tr#"+id+" select.more").change(function(){
 	  var type = $(this);
 	  var counter = parseInt($(this).attr("name").split(/\[/)[1].split("]")[0]);
-	  if($("#reporting_form select#model_"+counter).length>0)
+	  if($("#reporting_form select#model_"+counter).length>0){
 	      model=$("#reporting_form select#model_"+counter).val();
-	  else
+	  }else if($("#reporting_form input#model_"+counter).length>0){
+	      model=$("#reporting_form input#model_"+counter).attr("value");
+	  }else{
 	      model=$("#reporting_form select#model_1").val();
+	  }
 	  $.ajax({
 		  url: "/search/reporting?counter="+(counter+1)+"&model="+model+"&more="+type.val(),
 		  success: function(data){
-		      $("tr#formdiv_"+(counter+1)).html("");
+		      $("tr#formdiv_"+(counter+1)).unbind().remove();
 		      $("tr#formdiv_"+(counter)).after(data);
-		      attachReportingFormEvents();
+		      attachReportingFormEvents("formdiv_"+(counter+1));
 		  }
 	      });
       });
 }
 
+function confirm_for(things) {
+  /* given a hash of ids and values, this function asks a confirmation to proceed if the values of the elements
+   * are not the same as the provided values
+   */
+  errors = [];
+  for (thing in things) {
+    if (($('#'+thing).val() != (things[thing] + "")) && $('#' + thing).val() != null) {
+      errors.push(thing);
+    }
+  }
+  if (errors.length > 0) {
+    return confirm(errors.join(",") + " are not the standard value. Proceed?");
+  } else {
+    return true;
+  }
+}
+
 
 $(document).ready(function(){
 	create_remotes();
-	//Handling targets form
 	$('form').highlight();
+	//Handling targets form
 	$("select#target_attached_to").change(function(){
 		$.ajax({
 			url: "/targets/all/"+$(this).val()+".json",
@@ -311,9 +346,6 @@ $(document).ready(function(){
 	if($('#mfi_color') && $('#mfi_color').length>0){
 	    $('#mfi_color').colorPicker();
 	}
-	$(document).shortkeys({
-		'n': function(){alert('foo');}
-	    });
 	$('.delete').click(function() {
 		var answer = confirm('Are you sure?');
 		return answer;
@@ -334,7 +366,7 @@ $(document).ready(function(){
 			type: "get",
 			url: "/client_groups/new?center_id="+id,
 			success: function(data){
-			    $("#new_client_group_form").html(data);
+			    $("#new_client_group_form").append(data);
 			    $("#new_client_group_form").submit(function(){
 				    $.ajax({
 					    type: "POST",
@@ -396,7 +428,6 @@ $(document).ready(function(){
      $('.closeNotice').addClass('notice');
      $('.notice').remove();
   });
-
   $("#comments_form").submit(function(){
 	  form = $("#comments_form");
 	  $.ajax({
@@ -415,5 +446,6 @@ $(document).ready(function(){
 	      });
 	  return false;
       });
-  attachReportingFormEvents();
+  attachReportingFormEvents("formdiv_1");
 });
+

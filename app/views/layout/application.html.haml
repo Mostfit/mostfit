@@ -8,7 +8,7 @@
     = css_include_tag :screen, :media => "screen, projection"
     = css_include_tag :print, :media => "print"
     = css_include_tag :style, :media => "screen, projection"
-    = js_include_tag :jquery, :application, "jquery.shortkeys.js", :swfobject, "jquery.highlight.js"
+    = js_include_tag :jquery, :application, :swfobject, "jquery.highlight.js"
   %body
     #header
       #login{:style => 'margin: 2px; float: right; padding: 4px;position:relative; right:150px;'}
@@ -18,17 +18,6 @@
           existing users can
           %b= link_to 'login', url(:login)
           to proceed
-      - if session.authenticated?
-        #navigation
-          = link_to_with_class('browse', url(:browse))
-          = link_to_with_class('manage', url(:data_entry))
-          = link_to_with_class('admin', url(:admin))
-          = link_to_with_class('dashboard', url(:dashboard))
-          = link_to_with_class('reports', url(:reports))
-          #header_search_div
-            %form{:action => '/search', :class => 'search'}
-              %input{:name => 'query', :value => params[:query], :style => "width: 200px"}
-              %input{:type => 'submit', :value=>'search'}
       %h1.logo
         -if $globals and $globals[:mfi_details]
           %span{:style => "color: #{$globals[:mfi_details][:color]};"}
@@ -40,6 +29,17 @@
               MOSTFIT
         -else
           MOSTFIT
+      - if session.authenticated?
+        #navigation
+          = link_to_with_class('browse', url(:browse))
+          = link_to_with_class('manage', url(:data_entry))
+          = link_to_with_class('admin', url(:admin))
+          = link_to_with_class('dashboard', url(:dashboard))
+          = link_to_with_class('reports', url(:reports))
+          #header_search_div
+            %form{:action => '/search', :class => 'search'}
+              %input{:name => 'query', :value => params[:query], :style => "width: 200px"}
+              %input{:type => 'submit', :value=>'search'}
     #content
       .container
         #breadcrums= breadcrums
