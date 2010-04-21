@@ -42,6 +42,7 @@ class TransactionLedger < Report
       #0          1,                 2                3
       #disbursed, payment_principal, payment_interest,payment_fee
       client = p.client_id ? clients_ungrouped[p.client_id] : p.loan.client(:fields => [:id, :client_group_id])
+      next if not client
       payments[p.received_on]||={}
       payments[p.received_on][client.client_group_id]||={}
       payments[p.received_on][client.client_group_id][client.id]||=[[], [], [], []]
@@ -59,6 +60,7 @@ class TransactionLedger < Report
 
     Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date).each{|loan|
       client = clients_ungrouped[loan.client_id]
+      next if not client
       payments[loan.disbursal_date]||={}
       payments[loan.disbursal_date][client.client_group_id] ||= {}
       payments[loan.disbursal_date][client.client_group_id][client.id]||=[[], [], [], []]
