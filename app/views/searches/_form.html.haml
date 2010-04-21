@@ -14,7 +14,7 @@
   %td
     -if @model and @model.class==Class
       = @model.name
-      %input{:type => "hidden", :name => "model[#{@counter}]", :id => "model_#{@counter}", :value => @model.name}
+      %input{:type => "hidden", :name => "model[#{@counter}]", :id => "model_#{@counter}", :value => @model.name.snake_case}
     -elsif @model
       =select :name => "model[#{@counter}]", :id => "model_#{@counter}", :collection => @model.map{|x| [x, x.camelcase]}, :prompt => "choose model"
     -else

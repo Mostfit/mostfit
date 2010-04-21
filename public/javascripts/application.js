@@ -155,6 +155,9 @@ function dateFromAge(ageYear, ageMonth, ageDay){
 function create_remotes(){
     $("a._remote_").click(function(){
 	    href=$(this).attr("href");
+	    if($(this).hasClass("self")){
+		href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+	    }
 	    a=$(this);
 	    $.ajax({
 		    type: "GET",
@@ -171,6 +174,7 @@ function create_remotes(){
 	    $.ajax({
 		    type: form.attr("method"),
 		    url: form.attr("action"),
+		    data: form.serialize(),
 		    success: function(data){
 			form.find("div").html(data);
 		    }

@@ -1,0 +1,13 @@
+-@properties.each do |model, properties|
+  %h2
+    = model
+  %table
+    - properties.each do |property|
+      %tr
+        %td
+          =check_box(:name => "fields[#{model}][#{property.to_s}]")
+        %td
+          = property.to_s.camelcase
+  
+%p
+  =submit "Go"

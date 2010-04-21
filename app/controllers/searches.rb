@@ -26,10 +26,23 @@ class Searches < Application
     end
   end
 
+  #get fields for all the models selected in form
+  def fields
+    hash  = params.deep_clone
+    hash.delete(:controller)
+    hash.delete(:action)
+    @properties = {}
+    hash[:model].each{|counter, model|
+      klass = Kernel.const_get(model.camelcase)
+      @properties[model] = get_properties_for(klass)
+    }
+    partial :fields
+  end
+
   def reporting
     @counter = params[:counter]||1
     if request.xhr?
-      @model = Kernel.const_get(params[:model].camelcase)      
+      @model = Kernel.const_get(params[:model].camelcase)
       if params[:more]=="chain"
         @model = @model.relationships.find_all{|key, prop| prop.class==DataMapper::Associations::OneToMany::Relationship}.map{|x| x[0].singularize}
       elsif params[:model]
@@ -45,6 +58,7 @@ class Searches < Application
       hash.delete(:submit)      
       @objects = Search.process(hash)
       @model   = @objects.first.class
+      @fields  = params[:fields]
       render :reporting
     end
   end
