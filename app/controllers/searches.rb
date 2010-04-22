@@ -52,11 +52,8 @@ class Searches < Application
     elsif request.method==:get
       render :advanced, :layout => layout?
     elsif request.method==:post
-      hash  = params.dup
-      hash.delete(:action)
-      hash.delete(:controller)
-      hash.delete(:submit)      
-      @objects = Search.process(hash)
+      @search = Search.new(params)
+      @objects = @search.process
       @model   = @objects.first.class
       @fields  = params[:fields]
       render :reporting

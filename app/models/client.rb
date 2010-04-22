@@ -33,7 +33,7 @@ class Client
   property :account_number, String, :length => 20, :nullable => true
   property :type_of_account, Enum.send('[]', *['', 'savings', 'current', 'no_frill', 'fixed_deposit', 'loan', 'other'])
   property :bank_name,      String, :length => 20, :nullable => true
-  property :branch,         String, :length => 20, :nullable => true
+  property :bank_branch,         String, :length => 20, :nullable => true
   property :join_holder,    String, :length => 20, :nullable => true
 #  property :client_type,    Enum[:default], :default => :default
   property :number_of_family_members, Integer, :length => 10, :nullable => true
