@@ -53,11 +53,11 @@
                     -if summable_columns.include?(col)
                       %b
                         =group_total[summable_columns.index(col)]
-                        -center_total.push(group_total)
+                -center_total.push(group_total)
           %tr.center_total
             %td
               %b==Center total:
-            -branch_total.push(center_total.reject{|x| x.class!=Array}.transpose.collect{|x| x.reduce{|sum, x| sum+=x}})
+            -branch_total.push(center_total.reject{|x| x.class!=Array}.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}})
             -1.upto(length-1).each do |col|
               %td
                 -if summable_columns.include?(col)

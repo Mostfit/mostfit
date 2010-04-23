@@ -52,7 +52,8 @@ class Searches < Application
     elsif request.method==:get
       render :advanced, :layout => layout?
     elsif request.method==:post
-      @search = Search.new(params)
+      @search  = Search.new(params)
+      @bookmark= Bookmark.new
       @objects = @search.process
       @model   = @objects.first.class
       @fields  = params[:fields]

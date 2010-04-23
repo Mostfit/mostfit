@@ -1,0 +1,18 @@
+%h1
+  -text = (params[:type] and params[:type]=="custom_reports") ? "Custom Report" : "Bookmark"
+  = text.pluralize
+%table{:width => "50%"}
+  - for bookmark in @bookmarks
+    %tr
+      %td
+        -if bookmark.user=session.user
+          =link_to("[Edit]", resource(bookmark, :edit), :style => "float: right")
+        - if bookmark.method==:get
+          = link_to bookmark.name, url(:controller => bookmark.controller, :action => bookmark.action)
+        -else
+          %form{:action => url(YAML.load(bookmark.route).last), :method => bookmark.method, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
+            =transform_raw_post_to_hidden_fields(bookmark.params)
+            %a{:href => "#", :onclick => "$(this).parent().submit()"}
+              =bookmark.name
+%h2
+  = link_to("Create New #{text}", "/search/reporting", :class => "add")

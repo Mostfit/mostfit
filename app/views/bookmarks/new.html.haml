@@ -1,0 +1,13 @@
+%h1 Bookmarks controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/bookmarks/new.html.erb
+
+= error_messages_for @bookmark
+
+= form_for(@bookmark, :action => url(:bookmarks) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:bookmarks)

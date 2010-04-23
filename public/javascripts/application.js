@@ -155,12 +155,14 @@ function dateFromAge(ageYear, ageMonth, ageDay){
 function create_remotes(){
     $("a._remote_").click(function(){
 	    href=$(this).attr("href");
+	    method="GET"
 	    if($(this).hasClass("self")){
 		href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+                method="POST"
 	    }
 	    a=$(this);
 	    $.ajax({
-		    type: "GET",
+		    type: "POST",
 		    url: href,
 		    success: function(data){
 			$(a).after(data);
@@ -446,6 +448,22 @@ $(document).ready(function(){
 	      });
 	  return false;
       });
+  $("#bookmark_form input:checkbox").click(function(){
+	  if($(this).attr("value")==="all" && $(this).attr("checked")===true){
+	      $("#bookmark_form input:checkbox").each(function(){
+		      $(this).attr("checked", "true");		      
+		  });
+	      $("#bookmark_form input[value='none']").attr("checked", "");
+	  }
+	  if($(this).attr("value")==="none" && $(this).attr("checked")===true){
+	      $("#bookmark_form input:checkbox").each(function(){
+		      $(this).attr("checked", "");		      
+		  });
+	      $("#bookmark_form input[value='none']").attr("checked", "true");
+	  }
+
+      });
+  
   attachReportingFormEvents("formdiv_1");
 });
 
