@@ -24,7 +24,7 @@ class ParByCenterReport < Report
       GROUP BY loan_id})
     # These are the lines from the loan history
     query = %Q{
-      SELECT loan_id, branch_id, center_id, client_id, amount_in_default, days_overdue + DATEDIFF('#{@date.strftime("%Y-%m-%d")}', created_at) as late_by,
+      SELECT loan_id, branch_id, center_id, client_id, amount_in_default, days_overdue as late_by, created_at,
              actual_outstanding_total-scheduled_outstanding_total total_due, actual_outstanding_principal-scheduled_outstanding_principal principal_due
       FROM loan_history 
       WHERE (loan_id,date) IN (#{rows.map{|x| "(#{x[0]}, '#{x[1].strftime("%Y-%m-%d")}')"}.join(',')})
@@ -46,8 +46,11 @@ class ParByCenterReport < Report
         r[branch][center] = []
         center_defaults[center.id].each do |default|
           loan = loans[default.loan_id]
+          if @date-default.created_at>0
+            late_by = default.late_by + (@date-default.created_at.to_date).to_i
+          end
           r[branch][center] << [clients[default.client_id].name, clients[default.client_id].reference, loan.cycle_number, loan.loan_product.name, loan.amount, 
-                                loan.installment_frequency, default.principal_due, default.total_due-default.principal_due, default.total_due, default.late_by]
+                                loan.installment_frequency, default.principal_due, default.total_due-default.principal_due, default.total_due, late_by]
         end
       end
     end
