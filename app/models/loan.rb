@@ -709,9 +709,9 @@ class Loan
     (0..(number_of_installments-1)).to_a.map { |x| shift_date_by_installments(scheduled_first_payment_date, x, [:weekly, :biweekly].include?(installment_frequency)) }
   end
 
-  #Increment/sync the loan cycle number
+  #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
   def update_cycle_number
-    self.cycle_number=self.client.loans(:id.lt => id).count+1
+    self.cycle_number=self.client.loans(:id.lt => id, :disbursal_date.not => nil).count+1
   end
 
   # HISTORY
