@@ -28,9 +28,9 @@ class ProjectedReport < Report
         groups[b.id][c.id]||= {}
         centers[c.id]  = c
         c.client_groups.each{|g|
-          #0              1              2              3                 4                 5,                  6                    7      
-          #amount_applied,outstanding(p),outstanding(i),outstanding(fee),Outstanding(total),principal(scheduled),interest(scheudled),fee(scheduled)
-          groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, 0, g.name]
+          #0              1                2              3                 4                 5,                  6                    7      
+          #amount_applied,amount_santioned,outstanding(p),outstanding(i),outstanding(fee),Outstanding(total),principal(scheduled),interest(scheudled),fee(scheduled)
+          groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, g.name]
           history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id} if histories
           if history
             principal_scheduled = history.scheduled_outstanding_principal.to_i
@@ -42,28 +42,29 @@ class ProjectedReport < Report
             principal_scheduled, total_scheduled, principal_actual, total_actual = 0, 0, 0, 0
           end
 
-          groups[b.id][c.id][g.id][1] += principal_actual - principal_scheduled > 0 ? principal_actual - principal_scheduled : 0
+          groups[b.id][c.id][g.id][2] += principal_actual - principal_scheduled > 0 ? principal_actual - principal_scheduled : 0
           int  = (total_actual - total_scheduled) - (principal_actual - principal_scheduled)
-          groups[b.id][c.id][g.id][2] += int >0 ? int : 0
-          groups[b.id][c.id][g.id][3] += 0
-          groups[b.id][c.id][g.id][4] += total_actual - total_scheduled>0 ? total_actual - total_scheduled : 0 
+          groups[b.id][c.id][g.id][3] += int >0 ? int : 0
+          groups[b.id][c.id][g.id][4] += 0
+          groups[b.id][c.id][g.id][5] += total_actual - total_scheduled>0 ? total_actual - total_scheduled : 0 
 
-          groups[b.id][c.id][g.id][5] += principal_scheduled
-          groups[b.id][c.id][g.id][6] += total_scheduled - principal_scheduled
-          groups[b.id][c.id][g.id][7] += 0
-          groups[b.id][c.id][g.id][8] += total_scheduled
+          groups[b.id][c.id][g.id][6] += principal_scheduled
+          groups[b.id][c.id][g.id][7] += total_scheduled - principal_scheduled
+          groups[b.id][c.id][g.id][8] += 0
+          groups[b.id][c.id][g.id][9] += total_scheduled
 
         }
       }
     }
     #1: Applied on
-    Loan.all(:scheduled_disbursal_date.gte => from_date, :scheduled_disbursal_date.lte => to_date).each{|l|
+    (Loan.all(:scheduled_disbursal_date.gte => from_date, :scheduled_disbursal_date.lte => to_date) + Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date)).each{|l|
       client    = l.client
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
 
-      groups[branch_id][center_id][l.client.client_group_id][0] += l.amount
+      groups[branch_id][center_id][l.client.client_group_id][0] += l.amount_applied_for||l.amount
+      groups[branch_id][center_id][l.client.client_group_id][1] += l.amount_sanctioned||l.amount
     }
     return [groups, centers, branches]
   end

@@ -3,7 +3,7 @@
   %tr.header
     %th
       Group
-    %th{:colspan => "1"}
+    %th{:colspan => "2"}
       Disbursal scheduled
     %th{:colspan => "4"}
       Payment scheduled
@@ -12,7 +12,9 @@
   %tr.header
     %th
     %th
-      Amount
+      Applied
+    %th
+      Sanctioned
     %th
       Principal
     %th
@@ -30,7 +32,7 @@
     %th
       Total
   - center_id, branch_id = nil, nil
-  - length = 9
+  - length = 10
   - org_total = []
   -@groups.each do |group_id, centers|
     -if centers.keys.length>0

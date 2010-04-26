@@ -1,70 +1,73 @@
 =partial :form
-- length = 6
+- length = 10
 %table.report
   %tr.header
-    %th{:width => '20%'}
-      Date
-    %th{:width => '20%'}
-      Loan
-    %th{:width => '20%'}
+    %th
+    %th
       Client
     %th
-      Amount in  default
+      Reference
     %th
-      Days Overdue
-  - org_total = org_total_default = 0
+      Loan seq.
+    %th
+      Product
+    %th
+      Amount
+    %th
+      Frequency
+    %th
+      Principal due
+    %th
+      Interest due
+    %th
+      Total due
+    %th
+      Days late
+  - summable_columns = [4,6,7,8]
+  - org_total = Array.new(summable_columns.length, 0)
   - @data.each do |branch, centers|
-    -branch_total =  branch_total_default = 0
+    -branch_total = Array.new(summable_columns.length, 0)
     %tr.branch
-      %td{:colspan => length}
+      %td{:colspan => length+1}
         = branch.name
     - centers.each do |center, loans|
-      -center_total = center_total_default = 0
+      -center_total = []
       %tr.center
-        %td{:colspan => length}
+        %td{:colspan => length+1}
           = center.name
       - loans.each do |l|
-        -center_total += l[0].amount
-        -center_total_default += l[1].amount_in_default
+        -center_total << summable_columns.collect{|x| l[x]}
         %tr.group
           %td
-            = @report.date
-          %td
-            = l[0].description
-          %td
-            = l[0].client.name
-          %td 
-            = l[1].amount_in_default
-          %td
-            = l[1].late_by
+          -l.each_with_index do |e, i|
+            %td
+              = e
+      - center_total = center_total.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}}
       %tr.center_total
         %td
           Center total
-        %td
-          =center_total
-          -branch_total+=center_total
-        %td
-        %td
-          =center_total_default
-          -branch_total_default += center_total_default
-        %td
+        -0.upto(length-1).each do |col|
+          %td
+            -if summable_columns.include?(col)
+              %b
+                =center_total[summable_columns.index(col)]
+        -branch_total.push(center_total) if center_total.class==Array
+    -branch_total=branch_total.reject{|x| x.class!=Array or x.length!=summable_columns.length}.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}}
     %tr.branch_total
       %td
         Branch total
-      %td
-        -org_total+=branch_total
-        =branch_total
-      %td
-      %td
-        -org_total_default += branch_total_default
-        =branch_total_default
-      %td
+        -0.upto(length-1).each do |col|
+          %td
+            -if summable_columns.include?(col)
+              %b
+                =branch_total[summable_columns.index(col)]
+        - org_total.push(branch_total)
   %tr.org_total
     %td
       Total
-    %td
-      =org_total
-    %td
-    %td
-      = org_total_default
-    %td
+    -org_total = org_total.reject{|x| x.class!=Array or x.length!=summable_columns.length}.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}}
+    -0.upto(length-1).each do |col|
+      %td
+        -if summable_columns.include?(col)
+          %b
+            =org_total[summable_columns.index(col)]
