@@ -139,13 +139,8 @@ class LoanHistory
   end
 
 
-  def self.sum_outstanding_for_branch(branch_id, from_date=Date.today-7, to_date=Date.today)
-    ids=repository.adapter.query("SELECT loan_id, max(date) date FROM loan_history 
-                                  WHERE status in (5,6) AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}'
-                                  AND branch_id=#{branch_id}
-                                  GROUP BY loan_id"
-                                 ).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
-    return false if ids.length==0
+  def self.sum_outstanding_for(obj, from_date=Date.today-7, to_date=Date.today)
+    q = "#{obj.class.name.snake_case}_id"
     repository.adapter.query(%Q{
       SELECT
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
@@ -158,9 +153,34 @@ class LoanHistory
         COUNT(DISTINCT(client_id))           AS clients_count,
         branch_id
       FROM loan_history
-      WHERE (loan_id, date) in (#{ids})
-      GROUP BY branch_id
+      WHERE #{q}=#{obj.id} AND current=1 AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}' AND status in (5,6)
+      GROUP BY #{q}
     })
   end
 
+  def self.amount_disbursed_for(obj, from_date, to_date)
+    query = if obj.class==Branch
+              %Q{
+                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 FROM branches b, centers c, clients cl, loans l 
+                 WHERE b.id=#{obj.id} and c.branch_id=b.id and cl.center_id=c.id and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
+                       and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
+               }
+            elsif obj.class==Center
+              %Q{
+                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 FROM   centers c, clients cl, loans l 
+                 WHERE  c.id=#{obj.id} and cl.center_id=c.id and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
+                        and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
+               }
+            elsif obj.class==ClientGroup
+              %Q{
+                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 FROM   client_groups cg, clients cl, loans l 
+                 WHERE  cg.id=#{obj.id} and cl.client_group_id=cg.id and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
+                        and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
+               }
+            end
+    repository.adapter.query(query).first
+  end
 end

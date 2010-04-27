@@ -1,7 +1,6 @@
 0:
   :id: 1
   :name: JQZII001
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -11,7 +10,6 @@
 1:
   :id: 2
   :name: JQZII002
-  :center_leader_name: 
   :meeting_day: :thursday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -21,7 +19,6 @@
 2:
   :id: 3
   :name: JQZII005
-  :center_leader_name: 
   :meeting_day: :monday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -31,7 +28,6 @@
 3:
   :id: 4
   :name: JQZII007
-  :center_leader_name: 
   :meeting_day: :friday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -41,7 +37,6 @@
 4:
   :id: 5
   :name: JQZII012
-  :center_leader_name: 
   :meeting_day: :thursday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -51,7 +46,6 @@
 5:
   :id: 6
   :name: JQZI013
-  :center_leader_name: 
   :meeting_day: :monday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -61,7 +55,6 @@
 6:
   :id: 7
   :name: JQZII015
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -71,7 +64,6 @@
 7:
   :id: 8
   :name: JQZI018
-  :center_leader_name: 
   :meeting_day: :tuesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -81,7 +73,6 @@
 8:
   :id: 9
   :name: JQZI025
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -91,7 +82,6 @@
 9:
   :id: 10
   :name: JQZI027
-  :center_leader_name: 
   :meeting_day: :wednesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -101,7 +91,6 @@
 10:
   :id: 11
   :name: JQZII029
-  :center_leader_name: 
   :meeting_day: :thursday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -111,7 +100,6 @@
 11:
   :id: 12
   :name: JQZII031
-  :center_leader_name: 
   :meeting_day: :thursday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -121,7 +109,6 @@
 12:
   :id: 13
   :name: JQZII032
-  :center_leader_name: 
   :meeting_day: :friday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -131,7 +118,6 @@
 13:
   :id: 14
   :name: JQZII055
-  :center_leader_name: 
   :meeting_day: :thursday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -141,7 +127,6 @@
 14:
   :id: 15
   :name: JQZII057
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -151,7 +136,6 @@
 15:
   :id: 16
   :name: JQZII058
-  :center_leader_name: 
   :meeting_day: :friday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -161,7 +145,6 @@
 16:
   :id: 17
   :name: JQZII060
-  :center_leader_name: 
   :meeting_day: :wednesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -171,7 +154,6 @@
 17:
   :id: 18
   :name: JQZII068
-  :center_leader_name: 
   :meeting_day: :monday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -181,7 +163,6 @@
 18:
   :id: 19
   :name: JQZII069
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -191,7 +172,6 @@
 19:
   :id: 20
   :name: JQZII075
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -201,7 +181,6 @@
 20:
   :id: 21
   :name: JQZII082
-  :center_leader_name: 
   :meeting_day: :tuesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -211,7 +190,6 @@
 21:
   :id: 22
   :name: JQZII091
-  :center_leader_name: 
   :meeting_day: :tuesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -221,7 +199,6 @@
 22:
   :id: 23
   :name: JQZII093
-  :center_leader_name: 
   :meeting_day: :friday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -231,7 +208,6 @@
 23:
   :id: 24
   :name: JQZII096
-  :center_leader_name: 
   :meeting_day: :tuesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -241,7 +217,6 @@
 24:
   :id: 25
   :name: JQZII099
-  :center_leader_name: 
   :meeting_day: :wednesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -251,7 +226,6 @@
 25:
   :id: 26
   :name: JQZII0102
-  :center_leader_name: 
   :meeting_day: :friday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -261,7 +235,6 @@
 26:
   :id: 27
   :name: JQZII0103
-  :center_leader_name: 
   :meeting_day: :friday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -271,7 +244,6 @@
 27:
   :id: 28
   :name: JQZII0105
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -281,7 +253,6 @@
 28:
   :id: 29
   :name: JQZII0114
-  :center_leader_name: 
   :meeting_day: :thursday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -291,7 +262,6 @@
 29:
   :id: 30
   :name: JQZII004
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -301,7 +271,6 @@
 30:
   :id: 31
   :name: JQZII006
-  :center_leader_name: 
   :meeting_day: :wednesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -311,7 +280,6 @@
 31:
   :id: 32
   :name: JQZII008
-  :center_leader_name: 
   :meeting_day: :friday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -321,7 +289,6 @@
 32:
   :id: 33
   :name: JQZI011
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -331,7 +298,6 @@
 33:
   :id: 34
   :name: JQZII014
-  :center_leader_name: 
   :meeting_day: :friday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -341,7 +307,6 @@
 34:
   :id: 35
   :name: JQZI019
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -351,7 +316,6 @@
 35:
   :id: 36
   :name: JQZII021
-  :center_leader_name: 
   :meeting_day: :wednesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -361,7 +325,6 @@
 36:
   :id: 37
   :name: JQZI024
-  :center_leader_name: 
   :meeting_day: :tuesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -371,7 +334,6 @@
 37:
   :id: 38
   :name: JQZII030
-  :center_leader_name: 
   :meeting_day: :friday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -381,7 +343,6 @@
 38:
   :id: 39
   :name: JQZII041
-  :center_leader_name: 
   :meeting_day: :wednesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -391,7 +352,6 @@
 39:
   :id: 40
   :name: JQZII046
-  :center_leader_name: 
   :meeting_day: :monday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -401,7 +361,6 @@
 40:
   :id: 41
   :name: JQZII047
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -411,7 +370,6 @@
 41:
   :id: 42
   :name: JQZII049
-  :center_leader_name: 
   :meeting_day: :monday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -421,7 +379,7 @@
 42:
   :id: 43
   :name: JQZII050
-  :center_leader_name: 
+   
   :meeting_day: :thursday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -431,7 +389,6 @@
 43:
   :id: 44
   :name: JQZII054
-  :center_leader_name: 
   :meeting_day: :friday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -441,7 +398,6 @@
 44:
   :id: 45
   :name: JQZII083
-  :center_leader_name: 
   :meeting_day: :thursday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -451,7 +407,6 @@
 45:
   :id: 46
   :name: JQZII084
-  :center_leader_name: 
   :meeting_day: :thursday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -461,7 +416,6 @@
 46:
   :id: 47
   :name: JQZII088
-  :center_leader_name: 
   :meeting_day: :tuesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -471,7 +425,6 @@
 47:
   :id: 48
   :name: JQZII0115
-  :center_leader_name: 
   :meeting_day: :saturday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -481,7 +434,6 @@
 48:
   :id: 49
   :name: JQZII0118
-  :center_leader_name: 
   :meeting_day: :monday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -491,7 +443,6 @@
 49:
   :id: 50
   :name: JQZII0119
-  :center_leader_name: 
   :meeting_day: :monday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -500,8 +451,7 @@
   :code: 50
 50:
   :id: 51
-  :name: JQZII0120
-  :center_leader_name: 
+  :name: JQZII0120   
   :meeting_day: :wednesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -510,8 +460,7 @@
   :code: 51
 51:
   :id: 52
-  :name: JQZII0121
-  :center_leader_name: 
+  :name: JQZII0121   
   :meeting_day: :wednesday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30
@@ -520,8 +469,7 @@
   :code: 52
 52:
   :id: 53
-  :name: JQZII0122
-  :center_leader_name: 
+  :name: JQZII0122   
   :meeting_day: :monday
   :meeting_time_hours: 9
   :meeting_time_minutes: 30

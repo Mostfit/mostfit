@@ -14,14 +14,20 @@ class Branches < Application
   end
 
   def moreinfo(id)
+    @from_date = params[:from_date]||Date.min_date
+    @to_date   = params[:to_date]||Date.max_date
+
     @branch = Branch.get(id)
     raise NotFound unless @branch
     @centers       = @branch.centers
-    @centers_count =  @centers.size
-    @groups_count  =  @centers.client_groups.size
-    @clients_count =  @centers.clients(:fields => [:id]).size
-    @loan_data     =  LoanHistory.sum_outstanding_for_branch(@branch.id)
-    @defaulted     =  LoanHistory.defaulted_loan_info_by_branch(@branch.id)[0]
+    @clients       = @centers.clients(:fields => [:id])
+    @centers_count = @centers.size
+    @groups_count  = @centers.client_groups(:fields => [:id]).count
+    @clients_count = @clients.count
+    @payments      = Payment.collected_for(@branch, @from_date, @to_date)
+    @loan_disbursed= LoanHistory.amount_disbursed_for(@branch, @from_date, @to_date)
+    @loan_data     = LoanHistory.sum_outstanding_for(@branch, @from_date, @to_date)
+    @defaulted     = LoanHistory.defaulted_loan_info_by_branch(@branch.id)[0]
     render :file => 'branches/moreinfo', :layout => false
   end
 

@@ -3,7 +3,7 @@ class Loan
   before :valid?,  :parse_dates
   before :valid?,  :convert_blank_to_nil
   after  :save,    :update_history  # also seems to do updates
-  before :create,  :update_loan_cycle
+  before :create,  :update_cycle_number
   after  :destroy, :update_history
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
