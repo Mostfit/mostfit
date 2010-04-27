@@ -1,5 +1,6 @@
 class Branches < Application
   provides :xml, :yaml, :js
+  include DateParser
 
   def index
     @branches = Branch.paginate(:page => params[:page], :per_page => 15)
@@ -14,21 +15,30 @@ class Branches < Application
   end
 
   def moreinfo(id)
-    @from_date = params[:from_date]||Date.min_date
-    @to_date   = params[:to_date]||Date.max_date
-
+    @render_form = true
+    @render_form = false if params[:_target_]
+    @from_date = params[:from_date] ? parse_date(params[:from_date]) : Date.min_date
+    @to_date   = params[:to_date]   ? parse_date(params[:to_date])   : Date.today
+    allow_nil  = (params[:from_date] or params[:to_date]) ? false : true
     @branch = Branch.get(id)
     raise NotFound unless @branch
-    @centers       = @branch.centers
-    @clients       = @centers.clients(:fields => [:id])
-    @centers_count = @centers.size
-    @groups_count  = @centers.client_groups(:fields => [:id]).count
-    @clients_count = @clients.count
+
+    if allow_nil
+      @centers       = @branch.centers
+      @clients       = @centers.clients(:fields => [:id])
+    else
+      @centers       = @branch.centers(:creation_date.lte => @to_date, :creation_date.gte => @from_date)
+      @clients       = @centers.clients(:fields => [:id], :date_joined.lte => @to_date, :date_joined.gte => @from_date)
+    end
+
+    @centers_count = @centers.count
+    @groups_count  = (@centers_count>0) ? @centers.client_groups(:fields => [:id]).count : 0
+    @clients_count = (@centers_count>0) ? @clients.count : 0
     @payments      = Payment.collected_for(@branch, @from_date, @to_date)
     @fees          = Fee.collected_for(@branch, @from_date, @to_date)
     @loan_disbursed= LoanHistory.amount_disbursed_for(@branch, @from_date, @to_date)
     @loan_data     = LoanHistory.sum_outstanding_for(@branch, @from_date, @to_date)
-    @defaulted     = LoanHistory.defaulted_loan_info_by_branch(@branch.id)[0]
+    @defaulted     = LoanHistory.defaulted_loan_info_for(@branch, @to_date)
     render :file => 'branches/moreinfo', :layout => false
   end
 

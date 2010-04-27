@@ -1,4 +1,12 @@
-%table.moreinfo
+-if @render_form
+  =form(:action => "/branches/moreinfo/#{@branch.id}", :class => "_remote_") do
+    %input{:type => 'hidden', :value => "moreinfo", :name => "_target_"}
+    %b From
+    =date_select "from_date", @from_date
+    %b To
+    =date_select "to_date", @to_date
+    =submit "GO"
+%table.moreinfo#moreinfo
   %tr
     %td
       Branch formation date
@@ -28,7 +36,7 @@
     %td
       Total Amount Disbursed
     %td
-      =@loan_disbursed.amount.to_currency
+      =(@loan_disbursed and @loan_disbursed.amount) ? @loan_disbursed.amount.to_currency : 0
   %tr
     %td
       Total Amount Outstanding
@@ -59,15 +67,15 @@
     %td
       Total Principal Overdue
     %td
-      =@defaulted.principal ? @defaulted.principal.to_currency : "-"
+      =(@defaulted and @defaulted.principal_due) ? @defaulted.principal_due.to_currency : 0
   %tr
     %td
       Total Interest Overdue
     %td
-      -if @defaulted.total and @defaulted.principal
-        =(@defaulted.total.to_i-@defaulted.principal.to_i).to_currency
+      -if @defaulted and @defaulted.total_due and @defaulted.principal_due
+        =(@defaulted.total_due.to_i-@defaulted.principal_due.to_i).to_currency
       -else
-        -
+        0
   %tr
     %td
       Number of center managers

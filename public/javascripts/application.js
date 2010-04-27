@@ -173,12 +173,21 @@ function create_remotes(){
 	});
     $("form._remote_").submit(function(){
 	    form = $(this);
+	    $(form).after("<img id='spinner' src='/images/spinner.gif' />");
 	    $.ajax({
 		    type: form.attr("method"),
 		    url: form.attr("action"),
 		    data: form.serialize(),
 		    success: function(data){
-			form.find("div").html(data);
+			if(form.find("div").length>0)
+			    form.find("div").html(data);
+			else if(form.find("table").length>0){
+			    form.find("table").html(data);
+			}else if(form.find("input[name='_target_']").length>0){
+			    id=form.find("input[name='_target_']").attr("value");
+			    $("#"+id).html(data);
+			}
+			$("#spinner").remove();
 		    }
 		});
 	    return false;
