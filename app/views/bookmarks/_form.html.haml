@@ -8,6 +8,6 @@
       %input{:type => "hidden", :name => "bookmark[title]",  :value => page_title}
       %input{:type => "hidden", :name => "bookmark[method]", :value => request.method}
       %input{:type => "hidden", :name => "bookmark[route]",  :value => @route.to_yaml}
-      %input{:type => "hidden", :name => "bookmark[type]",   :value => type}
+      %input{:type => "hidden", :name => "bookmark[type]",   :value => bookmark_type}
       %input{:type => "hidden", :name => "bookmark[params]", :value => request.raw_post}
       =submit "Save"

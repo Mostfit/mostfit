@@ -27,7 +27,7 @@ class Bookmarks < Application
 
   def create(bookmark)
     @bookmark = Bookmark.new(bookmark)
-    @bookmark.user =  session.user
+    @bookmark.user =  session.user    
     if @bookmark.save
       notice = @bookmark.type==:other ? "Bookmark created" : "Report saved"
       request.xhr? ? render(notice, :layout => false) : redirect(resource(@bookmark), :message => {:notice => "Bookmark was successfully created"})

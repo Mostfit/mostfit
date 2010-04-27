@@ -62,8 +62,12 @@ class Search
       if [Hash, Mash].include?(vals[idx].class) and property_type = model.properties.find{|x| x.name==prop.target}.type and [Date, DateTime].include?(property_type)
         vals[idx] = parse_date(vals[idx].collect{|k,v| {k.to_sym => v}}.inject({}){|s,x| s+=x})
         queries[model][prop] = vals[idx]
+      elsif queries[model][prop]
+        val = queries[model][prop]
+        queries[model][prop] = []
+        queries[model][prop].push(val)
       else
-        queries[model][prop] ? (queries[model][prop].push(vals[idx])) : (queries[model][prop] = [vals[idx]])
+        queries[model][prop] = vals[idx]
       end
 
     }
