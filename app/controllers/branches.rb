@@ -25,6 +25,7 @@ class Branches < Application
     @groups_count  = @centers.client_groups(:fields => [:id]).count
     @clients_count = @clients.count
     @payments      = Payment.collected_for(@branch, @from_date, @to_date)
+    @fees          = Fee.collected_for(@branch, @from_date, @to_date)
     @loan_disbursed= LoanHistory.amount_disbursed_for(@branch, @from_date, @to_date)
     @loan_data     = LoanHistory.sum_outstanding_for(@branch, @from_date, @to_date)
     @defaulted     = LoanHistory.defaulted_loan_info_by_branch(@branch.id)[0]

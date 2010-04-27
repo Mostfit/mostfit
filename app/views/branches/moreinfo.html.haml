@@ -48,7 +48,13 @@
     %td
       Fee Received
     %td
-      =(@payments and @payments[:fees]) ? @payments[:fees].to_currency : "0"
+      %table        
+        -@fees.each do |fee, amount|
+          %tr
+            %td
+              =fee
+            %td
+              =amount
   %tr
     %td
       Total Principal Overdue
