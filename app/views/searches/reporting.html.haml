@@ -4,7 +4,7 @@
   = partial "bookmarks/form", :bookmark_type => 'custom_reports'
   %div{:style => "padding-right: 35px;"}
     %h2
-      - klass = @objects.first.class.superclass==Loan ? "loan" : @objects.first.class.to_s.snake_case
+      - klass = @objects.first.class.ancestors.include?(Loan) ? "loan" : @objects.first.class.to_s.snake_case
       = klass.camelcase
     %table
       %tr
