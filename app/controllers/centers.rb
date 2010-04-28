@@ -12,32 +12,6 @@ class Centers < Application
     display @centers
   end
 
-  #serves info tab for center
-  def moreinfo(id)
-    @render_form = true
-    @render_form = false if params[:_target_]
-    @from_date = params[:from_date] ? parse_date(params[:from_date]) : Date.min_date
-    @to_date   = params[:to_date]   ? parse_date(params[:to_date])   : Date.today
-    allow_nil  = (params[:from_date] or params[:to_date]) ? false : true
-    @center    = Center.get(id)
-    raise NotFound unless @center
-
-    if allow_nil
-      @clients       = @center.clients(:fields => [:id])
-    else
-      @clients       = @center.clients(:fields => [:id], :date_joined.lte => @to_date, :date_joined.gte => @from_date)
-    end
-
-    @groups_count  = @center.client_groups(:fields => [:id]).count
-    @clients_count = @clients.count
-    @payments      = Payment.collected_for(@center, @from_date, @to_date)
-    @fees          = Fee.collected_for(@center, @from_date, @to_date)
-    @loan_disbursed= LoanHistory.amount_disbursed_for(@center, @from_date, @to_date)
-    @loan_data     = LoanHistory.sum_outstanding_for(@center, @from_date, @to_date)
-    @defaulted     = LoanHistory.defaulted_loan_info_for(@center, @to_date)
-    render :file => 'branches/moreinfo', :layout => false
-  end
-
   def show(id)
     @center = Center.get(id)
     raise NotFound unless @center

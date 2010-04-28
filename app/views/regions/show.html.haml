@@ -50,4 +50,4 @@
             %td
               = link_to 'Edit', resource(a, :edit)
   %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => "moreinfo/#{@region.id}"}
+    %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@region.id}?for=region"}
