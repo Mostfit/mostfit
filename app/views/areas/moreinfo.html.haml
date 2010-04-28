@@ -1,5 +1,5 @@
 -if @render_form
-  =form(:action => "/branches/moreinfo/#{@branch.id}", :class => "_remote_") do
+  =form(:action => "/areas/moreinfo/#{@area.id}", :class => "_remote_") do
     %input{:type => 'hidden', :value => "moreinfo", :name => "_target_"}
     %b From
     =date_select "from_date", @from_date
@@ -9,9 +9,14 @@
 %table.moreinfo#moreinfo
   %tr
     %td
-      Branch formation date
+      Area formation date
     %td
-      =@branch.creation_date.strftime($globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y")
+      =@area.creation_date
+  %tr
+    %td
+      Number of Branches
+    %td
+      =@branches.count
   %tr
     %td
       Number of Centers
@@ -78,12 +83,12 @@
         0
   %tr
     %td
-      Number of center managers
+      Number of managers
     %td
-      =@centers.managers.count
+      =@branches.centers.managers.count
   %tr
     %td
-      Managers
+      Center Managers
     %td
       %ul
-        =@center.managers.collect{|sm| "<li>#{link_to(sm.name, resource(sm))}</li>"}.join
+        =@branches.centers.managers.collect{|sm| "<li>#{link_to(sm.name, resource(sm))}</li>"}.join

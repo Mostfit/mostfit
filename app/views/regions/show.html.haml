@@ -13,33 +13,41 @@
     %td=@region.landmark
 
 = link_to 'Add a new area', resource(@region, :areas, :new), :class => "add"
-%h3
-  == Areas under #{@region.name}
-- if @region.areas.count == 0
-  .flash.notice
-    == #{@region.name} does not have any Areas. 
-    = link_to 'Click here', resource(@region, :areas) 
-    to add one
-- else 
-  %table.narrow
-    %thead
-      %tr
-        %th
-          id
-        %th
-          name
-        %th
-          action
-    - @region.areas.each do |a|
-      %tr
-        %td
-          = a.id
-        %td
-          = link_to a.name, resource(a)
-        %td
-          = link_to 'Show', resource(a)
-          |
-          = link_to 'Edit', resource(a, :edit)
-          
-
-= link_to 'Back', url(:regions)
+%div.tab_container
+  %ul.tabs
+    %li#areas
+      Areas
+    %li#info
+      Info
+  %div.tab
+    %h3
+      == Areas under #{@region.name}
+    - if @region.areas.count == 0
+      .flash.notice
+        == #{@region.name} does not have any Areas. 
+        = link_to 'Click here', resource(@region, :areas) 
+        to add one
+    - else 
+      %table.narrow
+        %thead
+          %tr
+            %th
+              id
+            %th
+              name
+            %th
+              branches
+            %th
+              action
+        - @region.areas.each do |a|
+          %tr
+            %td
+              = a.id
+            %td
+              = link_to a.name, resource(a)
+            %td
+              = link_to a.branches.count, resource(a)
+            %td
+              = link_to 'Edit', resource(a, :edit)
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => "moreinfo/#{@region.id}"}

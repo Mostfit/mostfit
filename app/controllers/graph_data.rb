@@ -146,7 +146,7 @@ class GraphData < Application
     dates.each_with_index do |date, index|
       t0 =Time.now
       future                = date > Date.today
-      s                     = LoanHistory.sum_outstanding_for(date, loan_ids)[0]
+      s                     = LoanHistory.sum_outstanding_for_loans(date, loan_ids)[0]
       scheduled_outstanding = (s['scheduled_outstanding_total'].to_i or 0)  # or *_principal
       actual_outstanding    = future ? scheduled_outstanding : (s['actual_outstanding_total'].to_i or 0)     # or *_principal
       max_amount            = [max_amount, scheduled_outstanding, actual_outstanding].max

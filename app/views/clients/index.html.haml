@@ -43,6 +43,8 @@
   %ul.tabs
     %li#centers
       Clients
+    %li#info
+      Info
     %li#weeksheet
       Weeksheet
     %li#documents
@@ -53,6 +55,8 @@
       History
   %div.tab    
     =partial "clients/list", :center_leader => leader
+  %div.tab    
+    %input{:type => "hidden", :name => "_load_remote", :value => "/centers/moreinfo/#{@center.id}"}
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url(:weeksheet, :center_id => @center.id, :branch_id => @branch.id, :date => @date)}
     /=partial "centers/weeksheet"

@@ -9,14 +9,9 @@
 %table.moreinfo#moreinfo
   %tr
     %td
-      Branch formation date
+      Center formation date
     %td
-      =@branch.creation_date.strftime($globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y")
-  %tr
-    %td
-      Number of Centers
-    %td
-      =@centers_count
+      =@center.creation_date
   %tr
     %td
       Number of Groups
@@ -78,12 +73,8 @@
         0
   %tr
     %td
-      Number of center managers
+      Manager
     %td
-      =@centers.managers.count
-  %tr
-    %td
-      Managers
-    %td
-      %ul
-        =@center.managers.collect{|sm| "<li>#{link_to(sm.name, resource(sm))}</li>"}.join
+      -manager=@center.manager
+      =link_to(manager.name, resource(manager))
+        

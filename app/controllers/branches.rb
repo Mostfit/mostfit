@@ -13,7 +13,8 @@ class Branches < Application
     @centers = @branch.centers_with_paginate(:page => params[:page])
     display [@branch, @centers], 'centers/index'
   end
-
+  
+  # serves info tab for branch
   def moreinfo(id)
     @render_form = true
     @render_form = false if params[:_target_]

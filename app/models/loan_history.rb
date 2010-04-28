@@ -81,7 +81,7 @@ class LoanHistory
     %Q{(#{history.id}, '#{date}', #{status}, #{history.scheduled_outstanding_principal_on(date)}, #{history.scheduled_outstanding_total_on(date)}, #{history.actual_outstanding_principal_on(date)},#{history.actual_outstanding_total_on(date)})}
   end
 
-  def self.sum_outstanding_for(date, loan_ids)
+  def self.sum_outstanding_for_loans(date, loan_ids)
     repository.adapter.query(%Q{
       SELECT
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
@@ -91,7 +91,7 @@ class LoanHistory
       FROM
       (select scheduled_outstanding_principal,scheduled_outstanding_total, actual_outstanding_principal, actual_outstanding_total from
         (select loan_id, max(date) as date from loan_history where date <= '#{date.strftime('%Y-%m-%d')}' and loan_id in (#{loan_ids.join(', ')}) and status in (5,6) group by loan_id) as dt, 
-        loan_history lh 
+        loan_history lh
       where lh.loan_id = dt.loan_id and lh.date = dt.date) as dt1;})
   end
 
@@ -124,6 +124,10 @@ class LoanHistory
       query = "center_id=#{obj.id}"
     elsif obj.class==ClientGroup
       query = "client_group_id=#{obj.id}"
+    elsif obj.class==Region or obj.class==Area      
+      ids = (obj.class==Region ? obj.areas : obj).send(:branches, {:fields => [:id]}).map{|x| x.id}
+      ids = (ids.length==0 ? "NULL" : ids.join(","))
+      query="branch_id in (#{ids})"
     end
     
     # either we list or we aggregate depending on type
@@ -179,9 +183,16 @@ class LoanHistory
 
 
   def self.sum_outstanding_for(obj, from_date=Date.today-7, to_date=Date.today)
-    q = "#{obj.class.name.snake_case}_id"
-    repository.adapter.query(%Q{
-      SELECT
+    if [Branch, Center, ClientGroup].include?(obj.class)
+      q = "#{obj.class.name.snake_case}_id"
+      query = "#{q}=#{obj.id}"
+    elsif obj.class==Region or obj.class==Area
+      ids = (obj.class==Region ? obj.areas.branches(:fields => [:id]).map{|x| x.id} : obj.branches(:fields => [:id]).map{|x| x.id})
+      ids = (ids.length==0 ? "NULL" : ids.join(","))
+      query="branch_id in (#{ids})"
+      q = "branch_id"
+    end
+    select  = %Q{
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
         SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
         SUM(if(actual_outstanding_principal>0, actual_outstanding_principal,0))    AS actual_outstanding_principal,
@@ -191,8 +202,11 @@ class LoanHistory
         COUNT(DISTINCT(loan_id))             AS loans_count,
         COUNT(DISTINCT(client_id))           AS clients_count,
         branch_id
+    }
+    repository.adapter.query(%Q{
+      SELECT #{select}
       FROM loan_history
-      WHERE #{q}=#{obj.id} AND current=1 AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}' AND status in (5,6)
+      WHERE #{query} AND current=1 AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}' AND status in (5,6)
       GROUP BY #{q}
     })
   end
@@ -218,6 +232,22 @@ class LoanHistory
                  FROM   client_groups cg, clients cl, loans l 
                  WHERE  cg.id=#{obj.id} and cl.client_group_id=cg.id and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
                         and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
+               }
+            elsif obj.class==Area
+              %Q{
+                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 FROM  regions r, areas a, branches b, centers c, clients cl, loans l 
+                 WHERE a.id=#{obj.id} and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
+                       and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
+                       and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
+               }
+            elsif obj.class==Region
+              %Q{
+                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 FROM  regions r, areas a, branches b, centers c, clients cl, loans l 
+                 WHERE r.id=#{obj.id} and r.id=a.region_id and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
+                       and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
+                       and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
                }
             end
     repository.adapter.query(query).first

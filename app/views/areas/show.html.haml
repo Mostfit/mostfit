@@ -13,27 +13,29 @@
     %td Landmark
     %td=@area.landmark
 
-%h2 Branches in this area
-- if @area.branches.blank?
-  %h2 No branches
-
-- else
-  %table.narrow.form{:width => "100%"}
-    %thead
-      %tr
-        %th
-          id
-        %th
-          name
-    - @area.branches.each do |b|
-      %tr{:class => cycle('odd','even')}
-        %td
-          = b.id
-        %td
-          = link_to b.name, resource(b)
-
-
-%p
-
-|
-= link_to 'Back', url(:areas)
+%div.tab_container
+  %ul.tabs
+    %li#branches
+      Branches
+    %li#info
+      Info
+  %div.tab
+    %h2 Branches in this area
+    - if @area.branches.blank?
+      %h2 No branches
+    - else
+    %table.narrow.form{:width => "100%"}
+      %thead
+        %tr
+          %th
+            id
+          %th
+            name
+      - @area.branches.each do |b|
+        %tr{:class => cycle('odd','even')}
+          %td
+            = b.id
+          %td
+            = link_to b.name, resource(b)
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => "moreinfo/#{@area.id}"}

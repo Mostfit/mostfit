@@ -93,6 +93,20 @@ class Fee
                  l.client_id=cl.id and (p.loan_id=l.id or p.client_id=cl.id) and p.type=3
                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
               };
+    elsif obj.class==Area
+      from  = "areas a, branches b, centers c, clients cl, loans l , payments p"
+      where = %Q{
+                  a.id=#{obj.id} and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
+                  and l.client_id=cl.id and p.loan_id=l.id and p.type in (1,2)
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
+    elsif obj.class==Region
+      from  = "regions r, areas a, branches b, centers c, clients cl, loans l , payments p"
+      where = %Q{
+                  r.id=#{obj.id} and r.id=a.region_id and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
+                  and l.client_id=cl.id and p.loan_id=l.id and p.type in (1,2)
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
     end
     repository.adapter.query(%Q{
                              SELECT SUM(p.amount) amount, p.comment
