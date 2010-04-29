@@ -1,4 +1,5 @@
 class Info < Application
+  include DateParser
   # serves info tab for branch
   def moreinfo(id)
     date_hash  = set_info_form_params
@@ -22,7 +23,6 @@ class Info < Application
     end
     @branches  = @areas.branches(date_hash)   if @areas and not @branches
     @centers   = @branches.centers(date_hash) if @branches and not @centers
-    client_hash= date_hash+ {:fields => [:id]}
     @clients   = @centers.clients(client_hash)
 
     set_more_info(@obj)
@@ -42,6 +42,13 @@ private
     end
   end
 
+  def client_hash
+    if params[:from_date]
+      return {:fields => [:id], :date_joined.lte => @to_date, :date_joined.gte => @from_date}
+    else
+      return {:fields => [:id]}
+    end
+  end
   def set_more_info(obj)
     @centers_count = @centers.count
     @groups_count  = (@centers_count>0) ? @centers.client_groups(:fields => [:id]).count : 0
