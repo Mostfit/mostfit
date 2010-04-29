@@ -97,6 +97,12 @@ class Payment
                   and l.client_id=cl.id and p.loan_id=l.id and p.type in (1,2)
                   and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
                };
+    elsif obj.class==StaffMember
+      from  = "payments p"
+      where = %Q{                  
+                  p.received_by_staff_id=#{obj.id} and p.type in (1,2)
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
     end
     repository.adapter.query(%Q{
                              SELECT SUM(p.amount) amount, p.type payment_type

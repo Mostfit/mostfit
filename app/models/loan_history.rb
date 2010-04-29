@@ -128,6 +128,10 @@ class LoanHistory
       ids = (obj.class==Region ? obj.areas : obj).send(:branches, {:fields => [:id]}).map{|x| x.id}
       ids = (ids.length==0 ? "NULL" : ids.join(","))
       query="branch_id in (#{ids})"
+    elsif obj.class==StaffMember
+      ids = Loan.all(:fields => [:id], :disbursed_by_staff_id => obj.id).map{|x| x.id}
+      ids = (ids.length==0 ? "NULL" : ids.join(","))
+      query = "loan_id in (#{ids})"
     end
     
     # either we list or we aggregate depending on type
@@ -191,6 +195,11 @@ class LoanHistory
       ids = (ids.length==0 ? "NULL" : ids.join(","))
       query="branch_id in (#{ids})"
       q = "branch_id"
+    elsif obj.class==StaffMember
+      ids = Loan.all(:fields => [:id], :disbursed_by_staff_id => obj.id).map{|x| x.id}
+      ids = (ids.length==0 ? "NULL" : ids.join(","))
+      query="loan_id in (#{ids})"
+      q = "branch_id"
     end
     select  = %Q{
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
@@ -247,6 +256,13 @@ class LoanHistory
                  FROM  regions r, areas a, branches b, centers c, clients cl, loans l 
                  WHERE r.id=#{obj.id} and r.id=a.region_id and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
                        and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
+                       and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
+               }
+            elsif obj.class==StaffMember
+              %Q{
+                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 FROM  loans l 
+                 WHERE l.disbursal_date is not null and l.deleted_at is null and l.disbursed_by_staff_id=#{obj.id} 
                        and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
                }
             end

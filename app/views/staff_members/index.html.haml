@@ -116,17 +116,17 @@
           = link_to(item, search_url(hash, Loan))||"-"
         %td
           - hash = {:written_off_by_staff_id => staff_member.id, :written_off_on.gte => this_month, :written_off_on.lte => this_month_end}
-          - item = @writtenoff_loans_thismonth.find{|x| x[0]==staff_member.id}
+          - item = @written_off_loans_thismonth.find{|x| x[0]==staff_member.id}
           - item = item ? item[1] : 0
           = link_to(item, search_url(hash, Loan))||"-"
         %td
           - hash = {:written_off_by_staff_id => staff_member.id}
-          - item = @writtenoff_loans_overall.find{|x| x[0]==staff_member.id}
+          - item = @written_off_loans_overall.find{|x| x[0]==staff_member.id}
           - item = item ? item[1] : 0
           = link_to(item, search_url(hash, Loan))||"-"
     - sum_total      = 0,0,0,0,0,0,0
     - sum_tm         = 0,0,0,0,0,0,0
-    - vars = [:branch_managers, :center_managers, :applied_loans, :approved_loans, :rejected_loans, :disbursed_loans, :writtenoff_loans]
+    - vars = [:branch_managers, :center_managers, :applied_loans, :approved_loans, :rejected_loans, :disbursed_loans, :written_off_loans]
     - if @staff_members.num_pages==@staff_members.page
       %tr.total
         %td{:colspan => 2 }

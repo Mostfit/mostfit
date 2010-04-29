@@ -6,7 +6,7 @@
     %b To
     =date_select "to_date", @to_date
     =submit "GO"
-%table.moreinfo#moreinfo
+%table.moreinfo#moreinfo{:width => "40%"}
   %tr
     %td
       ="#{@obj.class.name} formation date"
@@ -91,13 +91,13 @@
         =(@defaulted.total_due.to_i-@defaulted.principal_due.to_i).to_currency
       -else
         0
-  -if @branches
+  -if @centers and not @obj.class==StaffMember
     %tr
       %td
-        Number of managers
+        Number of center managers
       %td
-        =@branches.centers.managers.count
-  -if @centers
+        =@centers.managers.count
+  -if @centers and not @obj.class==StaffMember
     %tr
       %td
         Center Managers

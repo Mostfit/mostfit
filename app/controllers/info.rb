@@ -7,13 +7,21 @@ class Info < Application
     @obj       = klass.get(id)
     raise NotFound unless @obj
 
-    @areas     = @obj.areas(date_hash)     if @obj.class==Region
-    @branches  = @obj.branches(date_hash)  if @obj.class==Area
-    @centers   = @obj.centers(date_hash)   if @obj.class==Branch
-    @centers   = Center.all(:id =>@obj.id) if @obj.class==Center
-    
-    @branches  = @areas.branches(date_hash)   if @areas
-    @centers   = @branches.centers(date_hash) if @branches
+    if @obj.class==Region
+      @areas     = @obj.areas(date_hash)
+    elsif @obj.class==Area
+      @branches  = @obj.branches(date_hash)
+    elsif @obj.class==Branch
+      @centers   = @obj.centers(date_hash)
+    elsif @obj.class==Center
+      @centers   = Center.all(:id =>@obj.id)
+    elsif @obj.class==StaffMember
+      @areas     = @obj.areas
+      @branches  = @obj.branches
+      @centers   = @obj.centers
+    end
+    @branches  = @areas.branches(date_hash)   if @areas and not @branches
+    @centers   = @branches.centers(date_hash) if @branches and not @centers
     client_hash= date_hash+ {:fields => [:id]}
     @clients   = @centers.clients(client_hash)
 
