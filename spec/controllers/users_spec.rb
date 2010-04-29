@@ -1,24 +1,6 @@
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'test')
 
-def load_fixtures(*files)
-  DataMapper.auto_migrate! if Merb.orm == :datamapper
-  files.each do |name|
-    klass = Kernel::const_get(name.to_s.singularize.camel_case)
-    yml_file =  "spec/fixtures/#{name}.yml"
-    entries = YAML::load_file(Merb.root / yml_file)
-    entries.each do |name, entry|
-      k = klass::new(entry)
-      k.history_disabled = true if k.class == Loan  # do not update the hisotry for loans
-      k.client_type = ClientType.first if k.class==Client
-      unless k.save
-        puts "Validation errors saving a #{klass} (##{k.id}):"
-        p k.errors
-      end
-    end
-  end
-end
-
 describe "Controllers "  do
   before(:all) do
     load_fixtures :users, :staff_members, :branches, :centers, :client_types, :clients, :loan_products #, :loans  #, :payments

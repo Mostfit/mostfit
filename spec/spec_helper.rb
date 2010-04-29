@@ -19,29 +19,26 @@ Spec::Runner.configure do |config|
   config.include(Merb::Test::ControllerHelper)
 
   config.before(:all) do
-    DataMapper.auto_migrate! if Merb.orm == :datamapper
+#    DataMapper.auto_migrate! if Merb.orm == :datamapper
   end
   
 end
 
 def load_fixtures(*files)
+  DataMapper.auto_migrate! if Merb.orm == :datamapper
   files.each do |name|
     klass = Kernel::const_get(name.to_s.singularize.camel_case)
     yml_file =  "spec/fixtures/#{name}.yml"
-    puts "\nLoading: #{yml_file}"
     entries = YAML::load_file(Merb.root / yml_file)
     entries.each do |name, entry|
       k = klass::new(entry)
-      puts "#{k} :#{name}"
-
-      if k.class == Loan  # do not update the hisotry for loans
-        k.history_disabled = true
-      end
+      k.history_disabled = true if k.class == Loan  # do not update the hisotry for loans
+      k.client_type = ClientType.first if k.class==Client
       unless k.save
         puts "Validation errors saving a #{klass} (##{k.id}):"
         p k.errors
-        raise
       end
     end
   end
 end
+
