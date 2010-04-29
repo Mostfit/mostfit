@@ -17,6 +17,7 @@ class Date
   def holiday_bump
     hols = $holidays
     new_date = self
+    return new_date unless hols
     while hols.keys.include?(new_date)
       case hols[new_date].shift_meeting
         when :before

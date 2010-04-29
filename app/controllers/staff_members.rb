@@ -20,29 +20,53 @@ class StaffMembers < Application
                      end
     first_of_this_month = Date.new(@date.year, @date.month, 1)
     end_of_this_month   = @date
-    
-    @branch_managers_overall   = Branch.all(:creation_date.lte => @date).aggregate(:manager_staff_id, :all.count)
-    @branch_managers_thismonth = Branch.all(:creation_date.lte => @date, :creation_date.gte => first_of_this_month).aggregate(:manager_staff_id, :all.count)
 
-    @center_managers_overall   = Center.all(:creation_date.lte => @date).aggregate(:manager_staff_id, :all.count)
-    @center_managers_thismonth = Center.all(:creation_date.lte => @date).all(:creation_date.gte => first_of_this_month).aggregate(:manager_staff_id, :all.count)
+    { 
+      :branch_managers => Branch, :center_managers => Center, :applied_loans => Loan, :approved_loans => Loan, 
+      :rejected_loans  => Loan, :disbursed_loans => Loan, :written_off_loans => Loan
+    }.each{|type, klass|
+      if klass==Branch or klass==Center
+        aggregate_by   = :manager_staff_id
+        overall_cond   = {:creation_date.lte => @date}
+        thismonth_cond = {:creation_date.lte => @date, :creation_date.gte => first_of_this_month}
+      else
+        name           = (type.to_s.split('_')-["loans"]).join("_")
+        aggregate_by   = (name + "_by_staff_id").to_sym
+        date_key       = name=="disbursed" ? :disbursal_date : (name+"_on").to_sym
+        overall_cond   = {date_key.lte => @date}
+        thismonth_cond = {date_key.lte => @date, date_key.gte => first_of_this_month}
+      end
 
-    @applied_loans_overall     = Loan.all(:applied_on.lte => @date).aggregate(:applied_by_staff_id, :all.count)
-    @applied_loans_thismonth   = Loan.all(:applied_on.lte => @date, :applied_on.gte => first_of_this_month).aggregate(:applied_by_staff_id, :all.count)
-
-    @approved_loans_overall    = Loan.all(:approved_on.lte => @date).aggregate(:approved_by_staff_id, :all.count)
-    @approved_loans_thismonth  = Loan.all(:approved_on.lte => @date, :approved_on.gte => first_of_this_month).aggregate(:approved_by_staff_id, :all.count)
-
-    @rejected_loans_overall    = Loan.all(:rejected_on.lte => @date).aggregate(:rejected_by_staff_id, :all.count)
-    @rejected_loans_thismonth  = Loan.all(:rejected_on.lte => @date, :rejected_on.gte => first_of_this_month).aggregate(:rejected_by_staff_id, :all.count)
-
-    @disbursed_loans_overall   = Loan.all(:disbursal_date.lte => @date).aggregate(:disbursed_by_staff_id, :all.count)
-    @disbursed_loans_thismonth = Loan.all(:disbursal_date.lte => @date, :disbursal_date.gte => first_of_this_month).aggregate(:disbursed_by_staff_id, :all.count)
-
-    @writtenoff_loans_overall  = Loan.all(:written_off_on.lte => @date).aggregate(:written_off_by_staff_id, :all.count)
-    @writtenoff_loans_thismonth= Loan.all(:written_off_on.lte => @date, :written_off_on.gte => first_of_this_month).aggregate(:written_off_by_staff_id, :all.count)
-
+      instance_variable_set("@#{type}_overall",   klass.all(overall_cond).aggregate(aggregate_by, :all.count))
+      instance_variable_set("@#{type}_thismonth", klass.all(thismonth_cond).aggregate(aggregate_by, :all.count))      
+    }
     display @staff_members
+  end
+
+  #serves info tab for staff member
+  def moreinfo(id)
+    @render_form = true
+    @render_form = false if params[:_target_]
+    @from_date   = params[:from_date] ? parse_date(params[:from_date]) : Date.min_date
+    @to_date     = params[:to_date]   ? parse_date(params[:to_date])   : Date.today
+    allow_nil    = (params[:from_date] or params[:to_date]) ? false : true
+    @staff_member= StaffMember.get(id)
+    raise NotFound unless @staff_member
+
+    if allow_nil
+      @clients       = @center.clients(:fields => [:id])
+    else
+      @clients       = @center.clients(:fields => [:id], :date_joined.lte => @to_date, :date_joined.gte => @from_date)
+    end
+
+    @groups_count  = @center.client_groups(:fields => [:id]).count
+    @clients_count = @clients.count
+    @payments      = Payment.collected_for(@center, @from_date, @to_date)
+    @fees          = Fee.collected_for(@center, @from_date, @to_date)
+    @loan_disbursed= LoanHistory.amount_disbursed_for(@center, @from_date, @to_date)
+    @loan_data     = LoanHistory.sum_outstanding_for(@center, @from_date, @to_date)
+    @defaulted     = LoanHistory.defaulted_loan_info_for(@center, @to_date)
+    render :file => 'branches/moreinfo', :layout => false
   end
 
   def show_centers(id)
@@ -87,6 +111,7 @@ class StaffMembers < Application
   def show(id)
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
+    @manages = {:regions => @staff_member.regions, :areas => @staff_member.areas, :branches => @staff_member.branches, :centers => @staff_member.centers}
     display @staff_member
   end
 

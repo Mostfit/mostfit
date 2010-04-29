@@ -15,6 +15,13 @@
       %span.greytext mobile number of the staff member so that he/she can make mobile updates from this number
   %tr
     %td
+      Joining date:
+    %td
+      = date_select_for @staff_member, :creation_date
+      &nbsp;&nbsp;
+      %span.greytext date this staff member joined active duty
+  %tr
+    %td
       Active:
     %td
       = check_box :active

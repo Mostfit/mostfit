@@ -4,14 +4,17 @@ class StaffMember
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false
   property :mobile_number,  String, :length => 12,  :nullable => true
+  property :creation_date,  Date, :length => 12,  :nullable => true, :lazy => true
   property :active,  Boolean, :default => true, :nullable => false  
   property :user_id,  Integer,  :nullable => true  
   # no designations, they are derived from the relations it has
 
-  has n, :branches, :child_key => [:manager_staff_id]
-  has n, :centers, :child_key => [:manager_staff_id]
+  has n, :branches,          :child_key => [:manager_staff_id]
+  has n, :centers,           :child_key => [:manager_staff_id]
+  has n, :regions,           :child_key => [:manager_staff_id]
+  has n, :areas,             :child_key => [:manager_staff_id]
   has n, :approved_loans,    :child_key => [:approved_by_staff_id],    :model => 'Loan'
-  has n, :applied_loans,    :child_key => [:applied_by_staff_id],    :model => 'Loan'
+  has n, :applied_loans,     :child_key => [:applied_by_staff_id],    :model => 'Loan'
   has n, :rejected_loans,    :child_key => [:rejected_by_staff_id],    :model => 'Loan'
   has n, :disbursed_loans,   :child_key => [:disbursed_by_staff_id],   :model => 'Loan'
   has n, :written_off_loans, :child_key => [:written_off_by_staff_id], :model => 'Loan'
@@ -31,16 +34,8 @@ class StaffMember
     [obj.save, obj]
   end
 
-  def branches
-    Branch.all(:manager => self)
-  end
-
   def clients
     Client.all(:created_by_staff_member_id => self.id)
-  end
-
-  def centers
-    Center.all(:manager => self)
   end
 
   def loans
