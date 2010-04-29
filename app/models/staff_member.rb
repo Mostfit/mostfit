@@ -11,8 +11,8 @@ class StaffMember
 
   has n, :branches,          :child_key => [:manager_staff_id]
   has n, :centers,           :child_key => [:manager_staff_id]
-  has n, :regions,           :child_key => [:manager_staff_id]
-  has n, :areas,             :child_key => [:manager_staff_id]
+  has n, :regions,           :child_key => [:manager_id]
+  has n, :areas,             :child_key => [:manager_id]
   has n, :approved_loans,    :child_key => [:approved_by_staff_id],    :model => 'Loan'
   has n, :applied_loans,     :child_key => [:applied_by_staff_id],    :model => 'Loan'
   has n, :rejected_loans,    :child_key => [:rejected_by_staff_id],    :model => 'Loan'

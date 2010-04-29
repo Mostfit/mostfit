@@ -1,6 +1,6 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
-describe Attendancy do
+describe Attendance do
   before(:all) do
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
     @manager.save
