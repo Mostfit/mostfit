@@ -21,11 +21,11 @@ class TargetReport < Report
 
   def generate
     targets = []
-    hash = if @branch_id
+    hash = if @branch_id and @branch_id.to_i > 0 
              {:attached_to => :branch, :attached_id => @branch.map{|x| x.id}}
-           elsif @center_id
+           elsif @center_id and @center_id.to_i > 0 
              {:attached_to => :center, :attached_id => @center.map{|x| x.id}}
-           elsif @staff_member_id
+           elsif @staff_member_id and @staff_member_id.to_i > 0 
              {:attached_to => :staff_member, :attached_id => @staff_member.map{|x| x.id}}
            else
              {}
