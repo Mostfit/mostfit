@@ -1151,7 +1151,6 @@ Loan.descendants.to_a.each do |c|
     def payment_schedule
       return @schedule if @schedule
       raise ArgumentError "This takeover loan is missing takeover information"  unless (self.taken_over_on || self.taken_over_on_installment_number)
-      raise ArgumentError unless installment_frequency == :weekly
       # TODO this exception is raised because we need to respect the first payment date and subsequent dates have to be 
       # adjusted to jive with everything else.
       self.taken_over_on_installment_number = number_of_installments_before(self.taken_over_on) if self.taken_over_on

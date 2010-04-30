@@ -286,9 +286,9 @@ module Merb
                 elsif branch_id and not branch_id.blank?
                   Center.all(:branch_id => branch_id, :order => [:name])
                 else 
-                  Center.all(:order => [:name])
+                  []
                 end      
-      centers.map{|x| [x.id, "#{x.branch.name} -- #{x.name}"]}
+      centers.map{|x| [x.id, "#{x.name}"]}
     end
 
     def get_accessible_staff_members      

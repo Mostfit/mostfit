@@ -1,5 +1,5 @@
 class LateDisbursalsReport < Report
-  attr_accessor :date, :branch, :center, :branch_id, :center_id, :staff_member_id
+  attr_accessor :date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id
 
   def initialize(params,dates, user)
     @date = dates.blank? ? Date.today : dates[:date]
@@ -16,7 +16,11 @@ class LateDisbursalsReport < Report
   end
 
   def generate
-    loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil) || Loan.all(:approved_on => nil)
+    if loan_product_id
+      loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :loan_product_id => loan_product_id) || Loan.all(:approved_on => nil, :loan_product_id => loan_product_id)
+    else
+      loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil) || Loan.all(:approved_on => nil)
+    end
     r = { }
     @branch.each do |b|
       r[b] = { }
