@@ -64,7 +64,7 @@ module Pdf
           } #clients end
           table.data.push({"amount" => group_amount.to_currency, "outstanding" => group_outstanding.to_currency,
                             "principal due" => group_principal.to_currency, "interest due" => group_interest.to_currency,
-                            "fee" => tot_fee, "total due" => group_due.to_currency                            
+                            "fee" => tot_fee.to_currency, "total due" => group_due.to_currency                            
                           })
           tot_amount         += group_amount
           tot_outstanding    += group_outstanding
