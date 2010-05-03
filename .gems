@@ -21,7 +21,7 @@ dm-types --version 0.10.1
 dm-validations --version 0.10.1
 dm-serializer --version 0.10.1
 dm-observer --version 0.10.1
-dm-paperclip --verrsion 2.1.4
+dm-paperclip --version 2.1.4
 merb-gen --version 1.0.13
 dm-pagination --version 0.4.0
 htmldoc
