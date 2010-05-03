@@ -1,31 +1,31 @@
-gem install merb-core --version 1.0.13
-gem install merb-action-args --version 1.0.13
-gem install merb-assets --version 1.0.13
-gem install merb-helpers --version 1.0.13
-gem install merb-mailer --version 1.0.13
-gem install merb-haml --version 1.0.13
-gem install merb-slices --version 1.0.13
-gem install merb-auth-core --version 1.0.13
-gem install merb-auth-more --version 1.0.13
-gem install merb-auth-slice-password --version 1.0.13
-gem install merb-param-protection --version 1.0.13
-gem install merb-exceptions --version 1.0.13
-gem install merb_datamapper --version 1.0.13
-gem install data_objects --version 0.10.0
-gem install do_mysql --version 0.10.0
-gem install dm-core --version 0.10.1
-gem install dm-aggregates --version 0.10.1
-gem install dm-migrations --version 0.10.1
-gem install dm-timestamps --version 0.10.1
-gem install dm-types --version 0.10.1
-gem install dm-validations --version 0.10.1
-gem install dm-serializer --version 0.10.1
-gem install dm-observer --version 0.10.1
-gem install dm-paperclip
-gem install merb-gen --version 1.0.13
-gem install dm-pagination
-gem install htmldoc
-gem install dm-pagination
-gem install pdf-writer
-gem install uuid
-gem install dm-is-paginated
+merb-core --version 1.0.13
+merb-action-args --version 1.0.13
+merb-assets --version 1.0.13
+merb-helpers --version 1.0.13
+merb-mailer --version 1.0.13
+merb-haml --version 1.0.13
+merb-slices --version 1.0.13
+merb-auth-core --version 1.0.13
+merb-auth-more --version 1.0.13
+merb-auth-slice-password --version 1.0.13
+merb-param-protection --version 1.0.13
+merb-exceptions --version 1.0.13
+merb_datamapper --version 1.0.13
+data_objects --version 0.10.0
+do_mysql --version 0.10.0
+dm-core --version 0.10.1
+dm-aggregates --version 0.10.1
+dm-migrations --version 0.10.1
+dm-timestamps --version 0.10.1
+dm-types --version 0.10.1
+dm-validations --version 0.10.1
+dm-serializer --version 0.10.1
+dm-observer --version 0.10.1
+dm-paperclip
+merb-gen --version 1.0.13
+dm-pagination
+htmldoc
+dm-pagination
+pdf-writer
+uuid
+dm-is-paginated
