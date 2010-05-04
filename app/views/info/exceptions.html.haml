@@ -1,3 +1,4 @@
+- obj_id = "#{@obj.class.name.snake_case}_id".to_sym
 %table.moreinfo#moreinfo
   %tr
     %td GRT failures
@@ -11,17 +12,20 @@
     %td
       Unverified clients
     %td
-      = Client.count(:verified_by_user_id => nil)
+      - hash = {:verified_by_user_id => nil, :center_id => @center_ids}
+      = link_to(Client.count(hash), resource(:verifications, {:model => :clients, obj_id => @obj.id}), :target => "BLANK")
   %tr
     %td
       Unverified loans
     %td
-      = Loan.count(:verified_by_user_id => nil)
+      - hash = {:verified_by_user_id => nil, :client_id => @client_ids}
+      = link_to(Loan.count(hash), resource(:verifications, {:model => :loans, obj_id => @obj.id}), :target => "BLANK")
   %tr
     %td
       Unverified payments
     %td
-      = Payment.count(:verified_by_user_id => nil)
+      - hash = {:verified_by_user_id => nil, :client_id => @client_ids}
+      = link_to(Payment.count(hash), resource(:verifications, {:model => :payments, obj_id => @obj.id}), :target => "BLANK")
   %tr
     %td
       Difference in amount applied and disbursed
@@ -36,12 +40,15 @@
     %td
       Delayed disbursements
     %td
-      = @delayed_disbursals
+      = link_to(@delayed_disbursals, url(:show_report, :report_type => "LateDisbursalsReport", :late_disbursals_report => {obj_id => @obj.id}), :target => "BLANK")
   %tr
     %td
       Delayed repayments
     %td
-      = @delayed_repayments ? @delayed_repayments.principal_due.to_currency : 0
+      - if @delayed_repayments
+        = link_to(@delayed_repayments.principal_due.to_currency, url(:show_report, :report_type => 'ParByCenterReport', :par_by_center_report => {obj_id => @obj.id}), :target => "BLANK")
+      -else
+        0
   %tr
     %td
       Loans created by admin

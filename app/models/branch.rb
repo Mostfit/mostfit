@@ -34,16 +34,16 @@ class Branch
     centers.paginate(:page => params[:page], :per_page => 15)
   end
 
-  def client_groups
-    self.centers.client_groups
+  def client_groups(hash={})
+    self.centers.client_groups(hash)
   end
 
-  def clients
-    self.centers.clients
+  def clients(hash={})
+    self.centers.clients(hash)
   end
 
-  def loans
-    self.centers.clients.loans
+  def loans(hash={})
+    self.centers.clients.loans(hash)
   end
 
   def self.search(q)

@@ -33,6 +33,8 @@ class Info < Application
     klass      = Kernel.const_get(params[:for].camelcase)
     @obj       = klass.get(id)
     raise NotFound unless @obj
+    @center_ids = @obj.centers(:fields => [:id]).map{|x| x.id}
+    @client_ids = @obj.clients(:fields => [:id]).map{|x| x.id}
 
     @amount_noteq_applied=repository.adapter.query(%Q{
        SELECT count(*) FROM loans l, clients cl, centers c, branches b 
@@ -52,7 +54,8 @@ class Info < Application
     @delayed_repayments = LoanHistory.defaulted_loan_info_for(@obj)
     @loans_created_by_admin = User.all(:role => :admin).audit_trails(:action => :create, :auditable_type => "Loan").count(:auditable_id)
     @loans_edited_by_admin  = User.all(:role => :admin).audit_trails(:action => :update, :auditable_type => "Loan").count(:auditable_id)
-    @loans_edited_by_admin  = User.all(:role => :admin).audit_trails(:action => :destroy, :auditable_type => "Loan").count(:auditable_id)
+    @loans_deleted_by_admin = User.all(:role => :admin).audit_trails(:action => :destroy,:auditable_type => "Loan").count(:auditable_id)
+    @clients_without_insurance = (@client_ids - InsurancePolicy.all(:fields => [:client_id]).map{|x| x.client_id}).length
     render :file => 'info/exceptions', :layout => false
   end
 
