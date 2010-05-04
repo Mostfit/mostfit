@@ -29,6 +29,33 @@ class Info < Application
     render :file => 'info/moreinfo', :layout => false
   end
 
+  def exceptions(id)
+    klass      = Kernel.const_get(params[:for].camelcase)
+    @obj       = klass.get(id)
+    raise NotFound unless @obj
+
+    @amount_noteq_applied=repository.adapter.query(%Q{
+       SELECT count(*) FROM loans l, clients cl, centers c, branches b 
+       WHERE  b.id=#{@obj.id} AND c.branch_id=b.id AND cl.center_id=c.id AND l.client_id=cl.id
+       AND l.amount!=l.amount_applied_for AND l.deleted_at is NULL and l.disbursal_date is not NULL 
+    })
+    @amount_noteq_approved=repository.adapter.query(%Q{
+       SELECT count(*) FROM loans l, clients cl, centers c, branches b 
+       WHERE  b.id=#{@obj.id} AND c.branch_id=b.id AND cl.center_id=c.id AND l.client_id=cl.id
+       AND l.amount!=l.amount_sanctioned AND l.deleted_at is NULL and l.disbursal_date is not NULL 
+    })
+    @delayed_disbursals = repository.adapter.query(%Q{
+       SELECT count(*) FROM loans l, clients cl, centers c, branches b 
+       WHERE  b.id=#{@obj.id} AND c.branch_id=b.id AND cl.center_id=c.id AND l.client_id=cl.id
+       AND    l.scheduled_disbursal_date < NOW() AND l.deleted_at is NULL and l.disbursal_date is NULL 
+    })
+    @delayed_repayments = LoanHistory.defaulted_loan_info_for(@obj)
+    @loans_created_by_admin = User.all(:role => :admin).audit_trails(:action => :create, :auditable_type => "Loan").count(:auditable_id)
+    @loans_edited_by_admin  = User.all(:role => :admin).audit_trails(:action => :update, :auditable_type => "Loan").count(:auditable_id)
+    @loans_edited_by_admin  = User.all(:role => :admin).audit_trails(:action => :destroy, :auditable_type => "Loan").count(:auditable_id)
+    render :file => 'info/exceptions', :layout => false
+  end
+
 private
   def set_info_form_params
     @render_form = true

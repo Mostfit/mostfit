@@ -50,5 +50,13 @@ class DataAccessObserver
   
   after :save do
     DataAccessObserver.log(self)
+  end  
+    
+  before :destroy do
+    DataAccessObserver.get_object_state(self, :destroy) if not self.new?
+  end
+
+  after :destroy do
+    DataAccessObserver.log(self)
   end
 end

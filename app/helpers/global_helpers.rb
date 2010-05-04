@@ -237,6 +237,7 @@ module Merb
 
     def diff_display(arr, model, action)      
       arr.map{|change|
+        next unless change
         change.map{|k, v|
           str="<tr><td>#{k.humanize}</td><td>"
           str+=if action==:update

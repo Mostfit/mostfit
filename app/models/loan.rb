@@ -68,7 +68,7 @@ class Loan
   belongs_to :created_by,     :child_key => [:created_by_user_id],        :model => 'User'
   has n, :history,                                                        :model => 'LoanHistory'
   has n, :payments
-
+  has n, :audit_trails,       :child_key => [:auditable_id], :auditable_type => "Loan"
   #validations
 
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on

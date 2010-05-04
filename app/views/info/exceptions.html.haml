@@ -1,0 +1,64 @@
+%table.moreinfo#moreinfo
+  %tr
+    %td GRT failures
+    %td 
+      - hash = {:client_group => Branch.all.centers.client_groups}
+      =link_to("once", search_url(hash, Grt))
+      =link_to("twice", search_url(hash, Grt))
+      =link_to("thrice", search_url(hash, Grt))
+      =link_to("more", search_url(hash, Grt))
+  %tr
+    %td
+      Unverified clients
+    %td
+      = Client.count(:verified_by_user_id => nil)
+  %tr
+    %td
+      Unverified loans
+    %td
+      = Loan.count(:verified_by_user_id => nil)
+  %tr
+    %td
+      Unverified payments
+    %td
+      = Payment.count(:verified_by_user_id => nil)
+  %tr
+    %td
+      Difference in amount applied and disbursed
+    %td
+      =@amount_noteq_applied[0]
+  %tr
+    %td
+      Difference in amount approved and disbursed
+    %td
+      =@amount_noteq_approved[0]
+  %tr
+    %td
+      Delayed disbursements
+    %td
+      = @delayed_disbursals
+  %tr
+    %td
+      Delayed repayments
+    %td
+      = @delayed_repayments ? @delayed_repayments.principal_due.to_currency : 0
+  %tr
+    %td
+      Loans created by admin
+    %td
+      = @loans_created_by_admin
+  %tr
+    %td
+      Loans edited by admin
+    %td
+      = @loans_edited_by_admin
+  %tr
+    %td
+      Loans deleted by admin
+    %td
+      = @loans_deleted_by_admin
+  %tr
+    %td
+      Clients without insurance
+    %td
+      = @clients_without_insurance
