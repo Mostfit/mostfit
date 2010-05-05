@@ -2,6 +2,7 @@ class User
   include DataMapper::Resource
 
   before :destroy, :prevent_destroying_admin
+  after  :save,    :set_staff_member
 
   property :id,           Serial
   property :login,        String, :nullable => false
@@ -28,6 +29,14 @@ class User
   has n, :payments_created, :child_key => [:created_by_user_id], :model => 'Payment'
   has n, :payments_deleted, :child_key => [:deleted_by_user_id], :model => 'Payment'
   has n, :audit_trail, :model => 'AuditTrail'
+  
+  def set_staff_member
+    if self.staff_member
+      staff          = StaffMember.get(self.staff_member.id)
+      staff.user_id  = self.id
+      staff.save
+    end
+  end
 
   def name
     login
