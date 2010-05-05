@@ -11,11 +11,18 @@ class Exceptions < Merb::Controller
   end
 
   def not_privileged
-    if request.env['HTTP_REFERER'] 
+    if request.xhr?
+      return("Sorry! Not allowed to perform this action.")
+    elsif request.env['HTTP_REFERER'] 
       redirect request.env['HTTP_REFERER'], :message => { :error => 'Sorry, not enough privileges to do this' }
     else
       render
     end
+  end
+
+  def not_authorized
+    return "Not privileged" if request.xhr?
+    render
   end
 
 end
