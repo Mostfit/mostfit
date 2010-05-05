@@ -93,7 +93,7 @@ Merb::Router.prepare do
   match('/browse(/:action)').to(:controller => 'browse').name(:browse)
   match('/loans/:action').to(:controller => 'loans').name(:loan_actions)
   # this uses the redirect_to_show methods on the controllers to redirect some models to their appropriate urls
-  match('/documents/new').to(:action => 'new', :controller => "documents").name(:documents_new_link)
+  match('/documents/:action(/:id)').to(:controller => "documents").name(:documents_action_link)
   match('/:controller/:id').to(:action => 'redirect_to_show').name(:quick_link)
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
