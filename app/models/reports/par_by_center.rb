@@ -1,5 +1,5 @@
 class ParByCenterReport < Report
-  attr_accessor :date, :branch, :center, :branch_id, :center_id, :staff_member_id
+  attr_accessor :date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :late_by_days
 
   def initialize(params,dates, user)
     @date = dates.blank? ? Date.today : dates[:date]
@@ -37,7 +37,9 @@ class ParByCenterReport < Report
       center_defaults[p.center_id] << p
     }
     clients = Client.all(:id => par_data.map{|x| x.client_id}, :fields => [:id, :name, :reference, :center_id]).map{|x| [x.id, x]}.to_hash
-    loans   = Loan.all(:client_id => clients.keys, :fields => [:id, :client_id, :loan_product_id, :amount]).map{|x| [x.id, x]}.to_hash
+    hash    = {:client_id => clients.keys, :fields => [:id, :client_id, :loan_product_id, :amount]}
+    hash[:loan_product_id] = loan_product_id if loan_product_id
+    loans   = Loan.all(hash).map{|x| [x.id, x]}.to_hash
     r = {}
     @branch.each do |branch|
       r[branch] = {}
@@ -45,12 +47,15 @@ class ParByCenterReport < Report
         next if not center_defaults[center.id]
         r[branch][center] = []
         center_defaults[center.id].each do |default|
+          next if not loans.key?(default.loan_id)          
           loan = loans[default.loan_id]
-          if @date-default.created_at>0
+          default.late_by
+          if default.created_at and @date-default.created_at>0
             late_by = default.late_by + (@date-default.created_at.to_date).to_i
+            next if late_by_days and late_by < late_by_days
+            r[branch][center] << [clients[default.client_id].name, clients[default.client_id].reference, loan.cycle_number, loan.loan_product.name, loan.amount, 
+                                  loan.installment_frequency, default.principal_due, default.total_due-default.principal_due, default.total_due, late_by]
           end
-          r[branch][center] << [clients[default.client_id].name, clients[default.client_id].reference, loan.cycle_number, loan.loan_product.name, loan.amount, 
-                                loan.installment_frequency, default.principal_due, default.total_due-default.principal_due, default.total_due, late_by]
         end
       end
     end

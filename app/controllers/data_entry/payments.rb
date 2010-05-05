@@ -51,6 +51,7 @@ module DataEntry
       if request.method == :post
         if params[:paid] or params[:disbursed]
           bulk_payments_and_disbursals
+          mark_attendance
         end
         if @errors.blank?
           redirect url(:enter_payments, :action => 'by_staff_member'), :message => {:notice => "All payments made succesfully"}
@@ -158,6 +159,7 @@ module DataEntry
     end
 
     def mark_attendance
+      return if not params or not params[:attendance] 
       params[:attendance].each do |client_id, status|
         client = Client.get(client_id)
         a = Attendance.first(:date => @date, :client_id => client_id, :center_id => client.center.id)

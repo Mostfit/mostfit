@@ -1,5 +1,5 @@
 class ProjectedReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id
 
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today + 1
@@ -18,7 +18,7 @@ class ProjectedReport < Report
   
   def generate
     branches, centers, groups = {}, {}, {}
-    histories = LoanHistory.sum_outstanding_by_group(self.from_date, self.to_date)
+    histories = LoanHistory.sum_outstanding_by_group(self.from_date, self.to_date, self.loan_product_id)
     @branch.each{|b|
       groups[b.id]||= {}
       branches[b.id] = b
@@ -57,7 +57,13 @@ class ProjectedReport < Report
       }
     }
     #1: Applied on
-    (Loan.all(:scheduled_disbursal_date.gte => from_date, :scheduled_disbursal_date.lte => to_date) + Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date)).each{|l|
+    hash_sch= {:scheduled_disbursal_date.gte => from_date, :scheduled_disbursal_date.lte => to_date}
+    hash_sch[:loan_product_id] = loan_product_id if loan_product_id
+
+    hash_act= {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date}
+    hash_act[:loan_product_id] = loan_product_id if loan_product_id
+
+    (Loan.all(hash_sch) + Loan.all(hash_act)).each{|l|
       client    = l.client
       center_id = client.center_id
       next if not centers.key?(center_id)

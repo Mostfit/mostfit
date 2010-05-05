@@ -1,12 +1,12 @@
 -if @render_form
-  =form(:action => "/regions/moreinfo/#{@obj.id}?for=#{@klass}", :class => "_remote_") do
+  =form(:action => "/info/moreinfo/#{@obj.id}?for=#{@obj.class.name.snake_case}", :class => "_remote_") do
     %input{:type => 'hidden', :value => "moreinfo", :name => "_target_"}
     %b From
     =date_select "from_date", @from_date
     %b To
     =date_select "to_date", @to_date
     =submit "GO"
-%table.moreinfo#moreinfo{:width => "40%"}
+%table.moreinfo#moreinfo
   %tr
     %td
       ="#{@obj.class.name} formation date"

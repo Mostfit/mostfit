@@ -113,14 +113,20 @@ module Misfit
       def _can_access?(route,params = nil)
         # more garbage
         return true if role == :admin
-        return true if route[:controller] == "graph_data"
+        return true if route[:controller] == "graph_data" or route[:controller] == "info"
         
         @route = route
         @controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
         @model = route[:controller].singularize.to_sym
         @action = route[:action]
-        return false if route[:controller] == "documents" and CUD_Actions.include?(@action)
         return true if @action == "redirect_to_show"
+        if @controller=="documents" and CUD_Actions.include?(@action)
+          return true  if params[:parent_model]=="Client"
+          return false if params[:parent_model]=="Mfi"    and (role!=:admin or role!=:mis_manager)
+          return true  if params[:parent_model]=="Center" and (role==:staff_member or role==:mis_manager or role==:admin)
+          return true  if params[:parent_model]=="Branch" and (role==:staff_member and Branch.get(params[:parent_id]).manager==staff_member)
+          return false
+        end
         r = (access_rights[@action.to_s.to_sym] or access_rights[:all])
         return false if @action == "approve" and role == :data_entry
         return false if role == :read_only and CUD_Actions.include?(@action)

@@ -23,7 +23,7 @@ module Merb
                                   Merb::Const::REQUEST_METHOD => method,
                                   Merb::Const::QUERY_STRING => uri.query)
       route = Merb::Router.match(request)[1] rescue nil
-      return link_to(text,path,params) if session.user.can_access?(route)
+      return link_to(text,path,params) if session.user.can_access?(route, params)
     end
 
     def url_for_loan(loan, action = '', opts = {})
@@ -237,6 +237,7 @@ module Merb
 
     def diff_display(arr, model, action)      
       arr.map{|change|
+        next unless change
         change.map{|k, v|
           str="<tr><td>#{k.humanize}</td><td>"
           str+=if action==:update
@@ -286,9 +287,9 @@ module Merb
                 elsif branch_id and not branch_id.blank?
                   Center.all(:branch_id => branch_id, :order => [:name])
                 else 
-                  Center.all(:order => [:name])
+                  []
                 end      
-      centers.map{|x| [x.id, "#{x.branch.name} -- #{x.name}"]}
+      centers.map{|x| [x.id, "#{x.name}"]}
     end
 
     def get_accessible_staff_members      

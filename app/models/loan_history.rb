@@ -164,10 +164,19 @@ class LoanHistory
   end
 
 
-  def self.sum_outstanding_by_group(from_date, to_date)
-    ids=repository.adapter.query("SELECT loan_id, max(date) date FROM loan_history 
-                                  WHERE status in (5,6) AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}' GROUP BY loan_id"
-                                 ).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
+  def self.sum_outstanding_by_group(from_date, to_date, loan_product_id=nil)
+    extra, from = "", "loan_history lh"
+    if loan_product_id and loan_product_id.to_i>0
+      extra = "AND lh.loan_id=l.id AND l.loan_product_id=#{loan_product_id}"
+      from += ", loans l"
+    end
+    ids=repository.adapter.query(%Q{
+                                 SELECT lh.loan_id loan_id, max(lh.date) date
+                                 FROM #{from}
+                                 WHERE lh.status in (5,6) AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' 
+                                 AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{extra}
+                                 GROUP BY lh.loan_id
+                                 }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
     return false if ids.length==0
     repository.adapter.query(%Q{
       SELECT 

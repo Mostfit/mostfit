@@ -1,0 +1,71 @@
+- obj_id = "#{@obj.class.name.snake_case}_id".to_sym
+%table.moreinfo#moreinfo
+  %tr
+    %td GRT failures
+    %td 
+      - hash = {:client_group => Branch.all.centers.client_groups}
+      =link_to("once", search_url(hash, Grt))
+      =link_to("twice", search_url(hash, Grt))
+      =link_to("thrice", search_url(hash, Grt))
+      =link_to("more", search_url(hash, Grt))
+  %tr
+    %td
+      Unverified clients
+    %td
+      - hash = {:verified_by_user_id => nil, :center_id => @center_ids}
+      = link_to(Client.count(hash), resource(:verifications, {:model => :clients, obj_id => @obj.id}), :target => "BLANK")
+  %tr
+    %td
+      Unverified loans
+    %td
+      - hash = {:verified_by_user_id => nil, :client_id => @client_ids}
+      = link_to(Loan.count(hash), resource(:verifications, {:model => :loans, obj_id => @obj.id}), :target => "BLANK")
+  %tr
+    %td
+      Unverified payments
+    %td
+      - hash = {:verified_by_user_id => nil, :client_id => @client_ids}
+      = link_to(Payment.count(hash), resource(:verifications, {:model => :payments, obj_id => @obj.id}), :target => "BLANK")
+  %tr
+    %td
+      Difference in amount applied and disbursed
+    %td
+      =@amount_noteq_applied[0]
+  %tr
+    %td
+      Difference in amount approved and disbursed
+    %td
+      =@amount_noteq_approved[0]
+  %tr
+    %td
+      Delayed disbursements
+    %td
+      = link_to(@delayed_disbursals, url(:show_report, :report_type => "LateDisbursalsReport", :late_disbursals_report => {obj_id => @obj.id}), :target => "BLANK")
+  %tr
+    %td
+      Delayed repayments
+    %td
+      - if @delayed_repayments
+        = link_to(@delayed_repayments.principal_due.to_currency, url(:show_report, :report_type => 'ParByCenterReport', :par_by_center_report => {obj_id => @obj.id}), :target => "BLANK")
+      -else
+        0
+  %tr
+    %td
+      Loans created by admin
+    %td
+      = @loans_created_by_admin
+  %tr
+    %td
+      Loans edited by admin
+    %td
+      = @loans_edited_by_admin
+  %tr
+    %td
+      Loans deleted by admin
+    %td
+      = @loans_deleted_by_admin
+  %tr
+    %td
+      Clients without insurance
+    %td
+      = @clients_without_insurance

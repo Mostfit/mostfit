@@ -1,5 +1,5 @@
 class DailyReport < Report
-  attr_accessor :date
+  attr_accessor :date, :loan_product_id, :branch_id, :center_id, :staff_member_id
 
   def initialize(params, dates, user)
     @date   =  dates[:date]||Date.today
@@ -8,7 +8,7 @@ class DailyReport < Report
   end
   
   def name
-    "Report for #{date}"
+    "Daily Report for #{date}"
   end
 
   def self.name
@@ -17,7 +17,7 @@ class DailyReport < Report
   
   def generate
     branches, centers, groups = {}, {}, {}
-    histories = LoanHistory.sum_outstanding_by_group(self.date-7, self.date)
+    histories = LoanHistory.sum_outstanding_by_group(self.date-7, self.date, self.loan_product_id)
     @branch.each{|b|
       groups[b.id]||= {}
       branches[b.id] = b
@@ -57,11 +57,12 @@ class DailyReport < Report
         }
       }
     }
-
+    
     Payment.all(:received_on => date).each{|p|
       client    = p.loan_id ? p.loan.client : p.client
       center_id = client.center_id
       next if not centers.key?(center_id)
+      next if loan_product_id and p.loan.loan_product_id!=loan_product_id
       branch_id = centers[center_id].branch_id
       if groups[branch_id][center_id][client.client_group_id]
         groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
@@ -71,7 +72,9 @@ class DailyReport < Report
       end
     }
     #1: Applied on
-    Loan.all(:applied_on => date).each{|l|
+    hash = {:applied_on => date}
+    hash[:loan_product_id] = loan_product_id if loan_product_id
+    Loan.all(hash).each{|l|
       client    = l.client
       center_id = client.center_id
       next if not centers.key?(center_id)
@@ -81,23 +84,27 @@ class DailyReport < Report
     }
 
     #2: Approved on
-    Loan.all(:approved_on => date).each{|l|
+    hash = {:approved_on => date}
+    hash[:loan_product_id] = loan_product_id if loan_product_id
+    Loan.all(hash).each{|l|
       client    = l.client
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
-      groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][0] += l.amount
+      groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][1] += l.amount
     }
 
     #3: Disbursal date
-    Loan.all(:disbursal_date => date).each{|l|
+    hash = {:disbursal_date => date}
+    hash[:loan_product_id] = loan_product_id if loan_product_id
+    Loan.all(hash).each{|l|
       client    = l.client
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
-      groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][0] += l.amount
+      groups[branch_id][center_id][l.client.client_group_id ? l.client.client_group_id : 0][2] += l.amount
     }
     return [groups, centers, branches]
   end

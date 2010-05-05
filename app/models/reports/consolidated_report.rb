@@ -1,15 +1,15 @@
 class ConsolidatedReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id
 
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 7
-    @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today  
+    @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
     @name   = "Report from #{@from_date} to #{@to_date}"
     get_parameters(params, user)
   end
   
   def name
-    "Report from #{@from_date} to #{@to_date}"
+    "Consolidated Report from #{@from_date} to #{@to_date}"
   end
   
   def self.name
@@ -18,7 +18,7 @@ class ConsolidatedReport < Report
   
   def generate
     branches, centers, groups, clients, loans = {}, {}, {}, {}, {}
-    histories = LoanHistory.sum_outstanding_by_group(self.from_date, self.to_date)
+    histories = LoanHistory.sum_outstanding_by_group(self.from_date, self.to_date, self.loan_product_id)
     @branch.each{|b|
       groups[b.id]||= {}
       branches[b.id] = b
@@ -59,18 +59,24 @@ class ConsolidatedReport < Report
         }
       }
     }
-    repository.adapter.query("select id, center_id, client_group_id from clients where center_id in (#{centers.keys.join(',')})").each{|c|
+    
+    center_ids  = centers.keys.length>0 ? centers.keys.join(',') : "NULL"
+    repository.adapter.query("select id, center_id, client_group_id from clients where center_id in (#{center_ids})").each{|c|
       clients[c.id] = c
     }
     client_ids = clients.keys.length>0 ? clients.keys.join(',') : "NULL"
-    repository.adapter.query("select id, client_id, amount  FROM loans WHERE client_id in (#{client_ids})").each{|l|
+
+    #getting all the loans from the client list above. Filter also by loan product when provided
+    query = "l.client_id=c.id and c.center_id in (#{center_ids})"
+    query+=" and l.loan_product_id=#{self.loan_product_id}" if self.loan_product_id
+    repository.adapter.query("select l.id, l.client_id, l.amount  FROM loans l, clients c WHERE #{query}").each{|l|
       loans[l.id] =  l
     }
 
     Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id,:type,:loan_id,:amount,:client_id]).each{|p|
       if p.loan_id and loans[p.loan_id] and clients.key?(loans[p.loan_id].client_id)
         client = clients[loans[p.loan_id].client_id]
-      elsif clients.key?(p.client_id)
+      elsif clients.key?(p.client_id) and p.type==3
         client = clients[p.client_id]
       end
       next unless client
@@ -85,7 +91,10 @@ class ConsolidatedReport < Report
       end
     }
     #1: Applied on
-    Loan.all(:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :client_id], :client_id => clients.keys).each{|l|
+    hash = {:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :client_id], :client_id => clients.keys}
+    hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
+
+    Loan.all(hash).each{|l|
       client    = clients[l.client_id]
       center_id = client.center_id
       center_id = client.center_id
@@ -96,7 +105,9 @@ class ConsolidatedReport < Report
     }
 
     #2: Approved on
-    Loan.all(:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id], :client_id => clients.keys).each{|l|
+    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id], :client_id => clients.keys}
+    hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
+    Loan.all(hash).each{|l|
       client    = clients[l.client_id]
       center_id = client.center_id
       next if not centers.key?(center_id)
@@ -106,7 +117,9 @@ class ConsolidatedReport < Report
     }
 
     #3: Disbursal date
-    Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id], :client_id => clients.keys).each{|l|
+    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id], :client_id => clients.keys}
+    hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
+    Loan.all(hash).each{|l|
       client    = clients[l.client_id]
       center_id = client.center_id
       next if not centers.key?(center_id)

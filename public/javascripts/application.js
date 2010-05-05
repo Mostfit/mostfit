@@ -67,6 +67,10 @@ function showThis(li, idx){
 		beforeSend: function(){
 		    $('#spinner').show();
 		},
+		error: function(xhr, text, errorThrown){
+		    txt = "<div class='error'>"+xhr.responseText+"</div>"
+		    $($("div.tab_container div.tab")[idx]).html(txt);
+		},
 		complete: function(){
 		    $('#spinner').hide();
 		}
@@ -167,6 +171,10 @@ function create_remotes(){
 		    success: function(data){
 			$(a).after(data);
 			$(a).remove();
+		    },
+		    error: function(xhr, text, errorThrown){
+			txt = "<div class='error'>"+xhr.responseText+"</div>"
+			$(a).after(txt);			
 		    }
 		});
 	    return false;
@@ -188,6 +196,11 @@ function create_remotes(){
 			    $("#"+id).html(data);
 			}
 			$("#spinner").remove();
+		    },
+		    error: function(xhr, text, errorThrown){
+			txt = "<div class='error'>"+xhr.responseText+"</div>"
+			form.before(txt);
+			$("#spinner").remove();			
 		    }
 		});
 	    return false;

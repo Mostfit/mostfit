@@ -1,12 +1,4 @@
-= form_for(@report, :action => url(:show_report, :report_type => "DailyReport"), :method => :get) do
-  %table
-    %tr
-      %td
-        Daily report for
-      %td
-        =date_select_for(@report, "date", :date => @report.date)
-      %td
-        =submit "Go"
+=partial :form
 %table.report
   %tr.header
     %th

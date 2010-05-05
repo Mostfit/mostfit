@@ -1,5 +1,5 @@
 class LoanSanctionRegister < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id
 
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 7
@@ -35,7 +35,9 @@ class LoanSanctionRegister < Report
     #0      1           2           3               4             5                 6
     #ref_no,client_name,spouse_name,loan_product_id,loan_sequence,approval_date,   amount
     #1: Applied on
-    Loan.all(:approved_on.gte => from_date, :approved_on.lte => to_date).each{|l|
+    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date}
+    hash[:loan_product_id] = loan_product_id if loan_product_id
+    Loan.all(hash).each{|l|
       client    = l.client
       center_id = client.center_id      
       next if not centers.key?(center_id)
