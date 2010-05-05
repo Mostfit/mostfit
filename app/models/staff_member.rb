@@ -4,7 +4,7 @@ class StaffMember
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false
   property :mobile_number,  String, :length => 12,  :nullable => true
-  property :creation_date,  Date, :length => 12,  :nullable => true, :lazy => true
+  property :creation_date,  Date, :length => 12,  :nullable => true, :default => Date.today
   property :active,  Boolean, :default => true, :nullable => false  
   property :user_id,  Integer,  :nullable => true  
   # no designations, they are derived from the relations it has
