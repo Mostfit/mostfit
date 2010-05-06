@@ -49,8 +49,7 @@ Merb::Router.prepare do
       end
     end
   end
-  resources :funders do
-    resources :funding_lines
+  resources :funders do    resources :funding_lines
   end
 
   match('/design').to(:controller => 'loan_products', :action => 'design').name(:design_loan_product)
@@ -94,7 +93,7 @@ Merb::Router.prepare do
   match('/loans/:action').to(:controller => 'loans').name(:loan_actions)
   # this uses the redirect_to_show methods on the controllers to redirect some models to their appropriate urls
   match('/documents/:action(/:id)').to(:controller => "documents").name(:documents_action_link)
-  match('/:controller/:id').to(:action => 'redirect_to_show').name(:quick_link)
+  match('/:controller/:id', :id => %r(\d+)).to(:action => 'redirect_to_show').name(:quick_link)
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
 end
