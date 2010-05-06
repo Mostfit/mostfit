@@ -75,6 +75,8 @@ module Misfit
           return true if staff_member.id==id
           st = StaffMember.get(id)
           #Allow access to this staff member if it is his branch manager
+          # do not allow a staff member any other staff member access
+          return false if st.branches.length==0
           return(st.centers.branches.manager.include?(staff_member))
         elsif model == Client
           c = Client.get(id)
