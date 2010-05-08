@@ -1,6 +1,5 @@
 %h1 
   = @staff_member.name
-
 %ul
   %li
     = link_to 'Day Sheet >>', url(:day_sheet, @staff_member.id), :class => "bold"
@@ -10,3 +9,19 @@
     = link_to 'edit', resource(@staff_member, :edit)
 %p
   = link_to '<< back', resource(:staff_members), :class => "button"
+
+%div.tab_container
+  %ul.tabs
+    %li#manages Manages
+    %li#info Info
+  %div.tab
+    - @manages.keys.each do |type|
+      -if @manages[type].length> 0
+        %h2
+          ="#{type.to_s.capitalize} managed"
+        %ul
+          -@manages[type].each do |obj|
+            %li
+              =link_to(obj.name, resource(obj))
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@staff_member.id}?for=staff_member"}

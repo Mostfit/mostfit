@@ -1,4 +1,4 @@
-- if ["PerformanceReport", "DailyReport"].include?(params[:report_type])
+- if ["PerformanceReport"].include?(params[:report_type])
   = partial "#{params[:report_type].snake_case.gsub(" ","_")}"
 - elsif @reports
   %h1

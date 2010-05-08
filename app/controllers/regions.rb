@@ -1,5 +1,6 @@
 class Regions < Application
   # provides :xml, :yaml, :js
+  include DateParser
 
   def index
     @regions = Region.all
@@ -11,7 +12,7 @@ class Regions < Application
     raise NotFound unless @region
     display @region
   end
-
+  
   def new
     only_provides :html
     @region = Region.new
@@ -44,15 +45,4 @@ class Regions < Application
       display @region, :edit
     end
   end
-
-  def destroy(id)
-    @region = Region.get(id)
-    raise NotFound unless @region
-    if @region.destroy
-      redirect resource(:regions)
-    else
-      raise InternalServerError
-    end
-  end
-
 end # Regions

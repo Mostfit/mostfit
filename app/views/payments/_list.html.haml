@@ -28,7 +28,7 @@
         %td
           %b= payment.type.to_s
         %td
-          = link_to 'delete', url_for_loan(@loan, "payments/#{payment.id}/delete")
+          = link_to 'delete', url_for_loan(payment.loan, "payments/#{payment.id}/delete")
 
     %tfoot
       %tr

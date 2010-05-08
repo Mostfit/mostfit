@@ -1,6 +1,1 @@
-Loan should takeover properly
-
-Pending:
-
-Loan .last_loan_history_date should have some tests -- albeit more a view thing (Not Yet Implemented)
-./spec/models/loan_spec.rb:336
+Controllers  before(:all)

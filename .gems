@@ -1,0 +1,30 @@
+merb-core -v 1.0.13
+merb-action-args -v 1.0.13
+merb-assets -v 1.0.13
+merb-helpers -v 1.0.13
+merb-mailer -v 1.0.13
+merb-haml -v 1.0.13
+merb-slices -v 1.0.13
+merb-auth-core -v 1.0.13
+merb-auth-more -v 1.0.13
+merb-auth-slice-password -v 1.0.13
+merb-param-protection -v 1.0.13
+merb-exceptions -v 1.0.13
+merb_datamapper -v 1.0.13
+data_objects -v 0.10.0
+do_mysql -v 0.10.0
+dm-core -v 0.10.1
+dm-aggregates -v 0.10.1
+dm-migrations -v 0.10.1
+dm-timestamps -v 0.10.1
+dm-types -v 0.10.1
+dm-validations -v 0.10.1
+dm-serializer -v 0.10.1
+dm-observer -v 0.10.1
+dm-paperclip -v 2.1.4
+merb-gen -v 1.0.13
+dm-pagination -v 0.4.0
+htmldoc
+pdf-writer
+uuid
+

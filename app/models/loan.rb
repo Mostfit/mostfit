@@ -1,8 +1,9 @@
 class Loan
   include DataMapper::Resource
   before :valid?,  :parse_dates
-  before :valid?,    :convert_blank_to_nil
+  before :valid?,  :convert_blank_to_nil
   after  :save,    :update_history  # also seems to do updates
+  before :create,  :update_cycle_number
   after  :destroy, :update_history
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
@@ -15,7 +16,6 @@ class Loan
   property :amount_applied_for,             Integer, :index => true
   property :amount_sanctioned,              Integer, :index => true
 
-
   property :interest_rate,                  Float, :nullable => false, :index => true
   property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
   property :number_of_installments,         Integer, :nullable => false, :index => true
@@ -27,7 +27,7 @@ class Loan
   property :disbursal_date,                 Date, :auto_validation => false, :index => true
   property :written_off_on,                 Date, :auto_validation => false, :index => true
   property :validated_on,                   Date, :auto_validation => false, :index => true
-
+  
   property :validation_comment,             Text
   property :created_at,                     DateTime, :index => true, :default => Time.now
   property :updated_at,                     DateTime, :index => true
@@ -43,6 +43,7 @@ class Loan
   property :verified_by_user_id,            Integer, :nullable => true, :index => true
   property :created_by_user_id,             Integer, :nullable => true, :index => true
   property :cheque_number,                  String,  :length => 20, :nullable => true, :index => true
+  property :cycle_number,                   Integer, :default => 1, :nullable => false, :index => true
 
   property :original_amount,                    Integer
   property :original_disbursal_date,            Date
@@ -67,7 +68,7 @@ class Loan
   belongs_to :created_by,     :child_key => [:created_by_user_id],        :model => 'User'
   has n, :history,                                                        :model => 'LoanHistory'
   has n, :payments
-
+  has n, :audit_trails,       :child_key => [:auditable_id], :auditable_type => "Loan"
   #validations
 
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
@@ -708,6 +709,11 @@ class Loan
     (0..(number_of_installments-1)).to_a.map { |x| shift_date_by_installments(scheduled_first_payment_date, x, [:weekly, :biweekly].include?(installment_frequency)) }
   end
 
+  #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
+  def update_cycle_number
+    self.cycle_number=self.client.loans(:id.lt => id, :disbursal_date.not => nil).count+1
+  end
+
   # HISTORY
 
   # Moved this method here from instead of the LoanHistory model for purposes of speed. We sacrifice a bit of readability
@@ -1073,7 +1079,6 @@ class PararthRounded < Loan
   def rounding_schedule
     return @_rounding_schedule if @_rounding_schedule
     @_rounding_schedule = {}
-    debugger
     _prin_per_installment = amount.to_f / number_of_installments
     _total = amount * (1 + interest_rate) # cannot use total_to_be_received without blowing the universe up
     _installment = _total / number_of_installments
@@ -1084,7 +1089,6 @@ class PararthRounded < Loan
       int = _installment - prin
       @_rounding_schedule[i] =  {:principal => prin, :interest => int}
     end
-    debugger
     return @_rounding_schedule
   end
 
@@ -1147,7 +1151,6 @@ Loan.descendants.to_a.each do |c|
     def payment_schedule
       return @schedule if @schedule
       raise ArgumentError "This takeover loan is missing takeover information"  unless (self.taken_over_on || self.taken_over_on_installment_number)
-      raise ArgumentError unless installment_frequency == :weekly
       # TODO this exception is raised because we need to respect the first payment date and subsequent dates have to be 
       # adjusted to jive with everything else.
       self.taken_over_on_installment_number = number_of_installments_before(self.taken_over_on) if self.taken_over_on

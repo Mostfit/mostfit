@@ -59,8 +59,9 @@ class Payments < Application
         redirect url_for_loan(@loan, 'payments'), :message => {:error => "Could not delete payment '#{@payment.id}'"}
       end
     else
+      @client = @payment.client
       if @payment.destroy!
-        redirect resource(@payment.client), :message => {:notice => "Payment was deleted"}
+        redirect resource(@client), :message => {:notice => "Payment was deleted"}
       else
         display @payment, :message => {:notice => 'Payment was not deleted'}
       end

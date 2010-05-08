@@ -67,6 +67,10 @@ function showThis(li, idx){
 		beforeSend: function(){
 		    $('#spinner').show();
 		},
+		error: function(xhr, text, errorThrown){
+		    txt = "<div class='error'>"+xhr.responseText+"</div>"
+		    $($("div.tab_container div.tab")[idx]).html(txt);
+		},
 		complete: function(){
 		    $('#spinner').hide();
 		}
@@ -155,28 +159,48 @@ function dateFromAge(ageYear, ageMonth, ageDay){
 function create_remotes(){
     $("a._remote_").click(function(){
 	    href=$(this).attr("href");
+	    method="GET"
 	    if($(this).hasClass("self")){
 		href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+                method="POST"
 	    }
 	    a=$(this);
 	    $.ajax({
-		    type: "GET",
+		    type: "POST",
 		    url: href,
 		    success: function(data){
 			$(a).after(data);
 			$(a).remove();
+		    },
+		    error: function(xhr, text, errorThrown){
+			txt = "<div class='error'>"+xhr.responseText+"</div>"
+			$(a).after(txt);			
 		    }
 		});
 	    return false;
 	});
     $("form._remote_").submit(function(){
 	    form = $(this);
+	    $(form).after("<img id='spinner' src='/images/spinner.gif' />");
 	    $.ajax({
 		    type: form.attr("method"),
 		    url: form.attr("action"),
 		    data: form.serialize(),
 		    success: function(data){
-			form.find("div").html(data);
+			if(form.find("div").length>0)
+			    form.find("div").html(data);
+			else if(form.find("table").length>0){
+			    form.find("table").html(data);
+			}else if(form.find("input[name='_target_']").length>0){
+			    id=form.find("input[name='_target_']").attr("value");
+			    $("#"+id).html(data);
+			}
+			$("#spinner").remove();
+		    },
+		    error: function(xhr, text, errorThrown){
+			txt = "<div class='error'>"+xhr.responseText+"</div>"
+			form.before(txt);
+			$("#spinner").remove();			
 		    }
 		});
 	    return false;
@@ -446,6 +470,22 @@ $(document).ready(function(){
 	      });
 	  return false;
       });
+  $("#bookmark_form input:checkbox").click(function(){
+	  if($(this).attr("value")==="all" && $(this).attr("checked")===true){
+	      $("#bookmark_form input:checkbox").each(function(){
+		      $(this).attr("checked", "true");		      
+		  });
+	      $("#bookmark_form input[value='none']").attr("checked", "");
+	  }
+	  if($(this).attr("value")==="none" && $(this).attr("checked")===true){
+	      $("#bookmark_form input:checkbox").each(function(){
+		      $(this).attr("checked", "");		      
+		  });
+	      $("#bookmark_form input[value='none']").attr("checked", "true");
+	  }
+
+      });
+  
   attachReportingFormEvents("formdiv_1");
 });
 

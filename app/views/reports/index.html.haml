@@ -12,3 +12,7 @@
       %td
         %h3
           =link_to(report.name, url(:show_report, :report_type => report))
+  %tr
+    %td
+      %h3
+        =link_to("Custom reports", resource(:bookmarks, :type => "custom_reports"))      

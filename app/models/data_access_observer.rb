@@ -1,6 +1,6 @@
 class DataAccessObserver
   include DataMapper::Observer
-  observe Center, Branch, Client, Loan
+  observe Branch, Center, Client, Loan
   
   def self.insert_session(id)
     @_session = ObjectSpace._id2ref(id)
@@ -49,6 +49,14 @@ class DataAccessObserver
   end  
   
   after :save do
+    DataAccessObserver.log(self)
+  end  
+    
+  before :destroy do
+    DataAccessObserver.get_object_state(self, :destroy) if not self.new?
+  end
+
+  after :destroy do
     DataAccessObserver.log(self)
   end
 end

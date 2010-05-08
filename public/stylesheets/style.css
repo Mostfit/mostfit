@@ -765,3 +765,9 @@ table.tall th {
   padding: 10px 10px 10px 40px;
   text-align: right;
 }
+.floating_form{
+    position: absolute;
+    background: lightyellow;
+    padding: 10px;
+    border: 1px solid orange;
+}

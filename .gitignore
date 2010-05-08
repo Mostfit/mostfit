@@ -26,6 +26,7 @@ config/database.yml
 result_file.txt
 .emacs*
 config/database.yml
+config/mfi.yml
 *pdf
 public/logs
 uploads

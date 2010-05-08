@@ -1,6 +1,8 @@
 class Areas < Application
   # provides :xml, :yaml, :js
+  include DateParser
   before :get_region
+
   def index
     @areas = @region ? @region.areas : Area.all
     if @region

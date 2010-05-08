@@ -67,7 +67,62 @@ class Fee
                                 FROM payments p
                                 WHERE (p.loan_id IN (#{loan_ids}) OR p.client_id IN (#{client_ids})) AND p.type=3 AND deleted_at is NULL;})
   end
-  
+
+  # faster compilation of fee collected for/by a given obj. This obj can be a branch, center, area, region or staff member
+  def self.collected_for(obj, from_date=Date.min_date, to_date=Date.max_date)
+    if obj.class==Branch
+      from  = "branches b, centers c, clients cl, loans l, payments p"
+      where = %Q{
+                  b.id=#{obj.id} and c.branch_id=b.id and cl.center_id=c.id and l.client_id=cl.id and (p.loan_id=l.id or p.client_id=cl.id) and p.type=3
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
+    elsif obj.class==Center
+      from  = "centers c, clients cl, loans l , payments p"
+      where = %Q{
+                  c.id=#{obj.id} and cl.center_id=c.id and l.client_id=cl.id and (p.loan_id=l.id or p.client_id=cl.id) and p.type=3
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
+    elsif obj.class==ClientGroup
+      from  = "client_groups cg, clients cl, loans l , payments p"
+      where = %Q{
+                 cg.id=#{obj.id} and cg.id=c.client_group_id and l.client_id=cl.id and (p.loan_id=l.id or p.client_id=cl.id) and p.type=3
+                 and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+              };
+    elsif obj.class==Client
+      from  = "clients cl, loans l , payments p"
+      where = %Q{
+                 l.client_id=cl.id and (p.loan_id=l.id or p.client_id=cl.id) and p.type=3
+                 and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+              };
+    elsif obj.class==Area
+      from  = "areas a, branches b, centers c, clients cl, loans l , payments p"
+      where = %Q{
+                  a.id=#{obj.id} and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
+                  and l.client_id=cl.id and p.loan_id=l.id and p.type=3
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
+    elsif obj.class==Region
+      from  = "regions r, areas a, branches b, centers c, clients cl, loans l , payments p"
+      where = %Q{
+                  r.id=#{obj.id} and r.id=a.region_id and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
+                  and l.client_id=cl.id and p.loan_id=l.id and p.type=3
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
+    elsif obj.class==StaffMember
+      from  = "payments p"
+      where = %Q{
+                  p.received_by_staff_id=#{obj.id} and p.type=3
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
+    end
+    repository.adapter.query(%Q{
+                             SELECT SUM(p.amount) amount, p.comment
+                             FROM #{from}
+                             WHERE #{where}
+                             GROUP BY comment
+                           }).map{|x| [x.comment, x.amount.to_i]}.to_hash
+  end
+
   def self.due(loan_ids)
     fees_applicable = self.applicable(loan_ids)
     fees_payed      = self.payed(loan_ids, fees_applicable.map{|x| x.client_id})

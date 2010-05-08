@@ -47,5 +47,15 @@ class Report
               else
                 @branch.collect{|b| b.centers}.flatten
               end    
+    @loan_product_id = if params and params[:loan_product_id] and params[:loan_product_id].to_i>0
+                      params[:loan_product_id].to_i
+                    else
+                      nil
+                    end
+    @late_by_days = if params and params[:late_by_days] and params[:late_by_days].to_i>0
+                      params[:late_by_days].to_i + 1
+                    else
+                      nil
+                    end
   end
 end

@@ -3,6 +3,11 @@ class Verifications < Application
 
   def index
     @centers   = centers(session.user)
+    if params[:branch_id]
+      @branch    = Branch.get(params[:branch_id])
+      @centers   = @centers.reject{|x| x.branch_id!=@branch.id}
+    end
+
     @from_date = params[:from_date] ? parse_date(params[:from_date]).to_time         : Date.min_date
     @to_date   = params[:to_date]   ? parse_date(params[:to_date]).to_time+24*3600-1 : DateTime.now
     case params[:model]
@@ -35,22 +40,25 @@ class Verifications < Application
   private
   def clients
     hash = {:verified_by_user_id => nil}
-    hash[:center_id] = @centers.map{|x| x.id} if @centers
+    hash[:center_id]  = @centers.map{|x| x.id} if @centers
     hash[:created_at] = @from_date..@to_date
+    hash[:fields]     = [:id]
     Client.all(hash)
   end
   
   def loans(type = :objects)
     hash = {:verified_by_user_id => nil}
-    hash[:client_id] = Client.all(:center_id => @centers.map{|x| x.id}).map{|x| x.id} if @centers
+    hash[:client_id] = Client.all(:center_id => @centers.map{|x| x.id}, :fields => [:id]).map{|x| x.id} if @centers
     hash[:created_at] = @from_date..@to_date
+    hash[:fields]     = [:id]
     Loan.all(hash)
   end
   
   def payments(centers = nil, type = :objects)
     hash = {:verified_by_user_id => nil}
-    hash[:loan_id]   = Loan.all(:client_id => Client.all(:center_id => @centers.map{|x| x.id}).map{|x| x.id}).map{|x| x.id} if @centers
+    hash[:loan_id]   = Loan.all(:client_id => Client.all(:center_id => @centers.map{|x| x.id}, :fields => [:id]).map{|x| x.id}).map{|x| x.id} if @centers
     hash[:created_at] = @from_date..@to_date
+    hash[:fields]     = [:id]
     Payment.all(hash)
   end
 

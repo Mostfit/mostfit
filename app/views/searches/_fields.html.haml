@@ -7,7 +7,7 @@
         %td
           =check_box(:name => "fields[#{model}][#{property.to_s}]")
         %td
-          = property.to_s.camelcase
+          = property.to_s.camelcase(' ')
   
 %p
   =submit "Go"

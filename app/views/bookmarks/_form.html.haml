@@ -1,0 +1,13 @@
+%div{:style => "float: right;"}
+  %a{:onclick => "$('#form_for_bookmark_saving').toggle();", :href => "#"}
+    ="Save this #{(type==:custom_report ? 'report' : 'page')}"
+  = form_for(@bookmark, :action => resource(:bookmarks), :class => "_remote_", :style => "display: none;", :id => "form_for_bookmark_saving") do  
+    %div.floating_form
+      Save as
+      %input{:type => "text", :name => "bookmark[name]"}
+      %input{:type => "hidden", :name => "bookmark[title]",  :value => page_title}
+      %input{:type => "hidden", :name => "bookmark[method]", :value => request.method}
+      %input{:type => "hidden", :name => "bookmark[route]",  :value => @route.to_yaml}
+      %input{:type => "hidden", :name => "bookmark[type]",   :value => bookmark_type}
+      %input{:type => "hidden", :name => "bookmark[params]", :value => request.raw_post}
+      =submit "Save"

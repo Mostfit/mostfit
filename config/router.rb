@@ -1,9 +1,9 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :bookmarks
   resources :audit_items
   resources :attendances
   resources :client_types
-  match('/documents/list').to(:controller => 'documents', :action => 'list')
   resources :document_types
   resources :comments        
   resources :documents
@@ -49,15 +49,15 @@ Merb::Router.prepare do
       end
     end
   end
-  resources :funders do
-    resources :funding_lines
+  resources :funders do    resources :funding_lines
   end
 
   match('/design').to(:controller => 'loan_products', :action => 'design').name(:design_loan_product)
-
   match('/centers/:id/groups(/:group_id).:format').to(:controller => 'centers', :action => 'groups')
+
   slice(:merb_auth_slice_password, :name_prefix => nil, :path_prefix => "")
   match('/search(/:action)').to(:controller => 'searches')
+  match('/searches(/:action)').to(:controller => 'searches')
   match('/reports/graphs').to(:controller => 'reports', :action => 'graphs')
   match('/reports/:report_type(/:id)').to(:controller => 'reports', :action => 'show').name(:show_report)
   resources :reports
@@ -92,7 +92,8 @@ Merb::Router.prepare do
   match('/browse(/:action)').to(:controller => 'browse').name(:browse)
   match('/loans/:action').to(:controller => 'loans').name(:loan_actions)
   # this uses the redirect_to_show methods on the controllers to redirect some models to their appropriate urls
-  match('/:controller/:id').to(:action => 'redirect_to_show').name(:quick_link)
+  match('/documents/:action(/:id)').to(:controller => "documents").name(:documents_action_link)
+  match('/:controller/:id', :id => %r(\d+)).to(:action => 'redirect_to_show').name(:quick_link)
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
 end

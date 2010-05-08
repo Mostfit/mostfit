@@ -1,0 +1,25 @@
+%h1
+  =@bookmark.name
+= form_for(@bookmark, :action => url(:bookmark, @bookmark), :id => "bookmark_form") do
+  %table
+    %tr
+      %td
+        Name:
+      %td
+        =text_field :name, :size => 70
+    %tr
+      %td
+        Page Title:
+      %td
+        =text_field :title, :size => 70
+    %tr
+      %td
+        Accessible to:
+      %td
+        -Bookmark::ShareWith.each do |sw|
+          =check_box :name => "bookmark[share_with][]", :value => sw, :checked => @bookmark.share_with.include?(sw) ? true : false
+          = sw.to_s.camelcase(' ')
+  %p
+    = submit "Update"
+
+= link_to 'Back', url(:bookmarks)

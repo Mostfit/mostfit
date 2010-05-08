@@ -35,6 +35,8 @@
         Centers
       %li#info
         Info
+      %li#exceptions
+        Exceptions
       %li#documents
         Documents
       %li#comments
@@ -47,7 +49,9 @@
       %h2== Centers of the #{@branch.name} branch    
       =partial "centers/list"
     %div.tab
-      %input{:type => "hidden", :name => "_load_remote", :value => "moreinfo/#{@branch.id}"}
+      %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@branch.id}?for=branch"}
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => "/info/exceptions/#{@branch.id}?for=branch"}
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @branch.id, :parent_model => Branch)}
     %div.tab

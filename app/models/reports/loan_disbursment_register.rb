@@ -1,5 +1,5 @@
 class LoanDisbursementRegister < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id
 
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 7
@@ -9,7 +9,7 @@ class LoanDisbursementRegister < Report
  end
   
   def name
-    "Report from #{@from_date} to #{@to_date}"
+    "Loan disbursement register from #{@from_date} to #{@to_date}"
   end
   
   def self.name
@@ -35,7 +35,9 @@ class LoanDisbursementRegister < Report
     #0      1           2           3               4             5                 6
     #ref_no,client_name,spouse_name,loan_product_id,loan_sequence,disbursement_date,amount
     #1: Applied on
-    Loan.all(:disbursal_date.gte => from_date, :disbursal_date.lte => to_date).each{|l|
+    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date}
+    hash[:loan_product_id] = loan_product_id if loan_product_id
+    Loan.all(hash).each{|l|
       client    = l.client
       center_id = client.center_id      
       next if not centers.key?(center_id)
@@ -45,7 +47,8 @@ class LoanDisbursementRegister < Report
         loans[branch_id][center_id][0] ||= []
         groups[0]=ClientGroup.new(:name => "No group", :id => 0)
       end
-      loans[branch_id][center_id][l.client.client_group_id||0].push([client.reference,client.name,client.spouse_name,l.loan_product_id,l.id,l.disbursal_date,l.amount])
+      loans[branch_id][center_id][l.client.client_group_id||0].push([client.reference, client.name, client.spouse_name, 
+                                                                     l.loan_product_id, l.cycle_number, l.disbursal_date, l.amount])
     }
     return [groups, centers, branches, loans, loan_products]
   end
