@@ -33,13 +33,14 @@ class Report
   end
 
   def get_parameters(params, user=nil)
-    @branch = if user and user.staff_member
-                [user.staff_member.centers.branches, user.staff_member.branches].flatten
+    st = user.staff_member
+    @branch = if user and st
+                [st.centers.branches, st.branches].flatten
               else
                 (params and params[:branch_id] and not params[:branch_id].blank?) ? Branch.all(:id => params[:branch_id]) : Branch.all(:order => [:name])
               end
-    @center = if user and user.staff_member
-                [user.staff_member.centers, user.staff_member.branches.centers].flatten
+    @center = if user and st and (not params[:staff_member_id] or params[:staff_member_id].blank?)
+                [st.centers, st.branches.centers].flatten
               elsif params and params[:center_id] and not params[:center_id].blank?
                 Center.all(:id => params[:center_id])
               elsif params and params[:staff_member_id] and not params[:staff_member_id].blank?

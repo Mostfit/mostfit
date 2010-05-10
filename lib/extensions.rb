@@ -21,8 +21,15 @@ module Misfit
 
       def centers_paying_today
         @date = params[:date] ? Date.parse(params[:date]) : Date.today
-        center_ids = LoanHistory.all(:date => Date.today).map{|x| x.center_id}.uniq.join(',')
-        center_ids = "NULL" if center_ids.blank?
+        center_ids = LoanHistory.all(:date => Date.today).map{|x| x.center_id}.uniq
+        # restrict branch manager and center managers to their own branches
+        if session.user.role==:staff_member
+          st = session.user.staff_member
+          center_ids = ([st.branches.centers.map{|x| x.id}, st.centers.map{|x| x.id}].flatten.compact) & center_ids
+        end
+
+        center_ids = ["NULL"] if center_ids.length==0
+        center_ids = center_ids.join(',')
         client_ids = repository.adapter.query(%Q{SELECT c.id FROM clients c WHERE c.center_id IN (#{center_ids})})
         @data = repository.adapter.query(%Q{SELECT c.id as id, c.name name, SUM(principal_due) pd, SUM(interest_due) intd, 
                                                    SUM(principal_paid) pp, SUM(`interest_paid`) intp
@@ -76,14 +83,14 @@ module Misfit
           st = StaffMember.get(id)
           #Allow access to this staff member if it is his branch manager
           # do not allow a staff member any other staff member access
-          return false if st.branches.length==0
+          return false if staff_member.branches.length==0
           return(st.centers.branches.manager.include?(staff_member))
         elsif model == Client
           c = Client.get(id)
           return ((c.center.manager == staff_member) or (c.center.branch.manager == staff_member))
         elsif model == Branch
           branch = Branch.get(id)
-          return ((branch.manager == staff_member) or (branch.centers.manager == staff_member))
+          return ((branch.manager == staff_member) or (branch.centers.manager.include?(staff_member)))
        elsif model == Center
           center = Center.get(id)
           return true if center.manager == staff_member
@@ -131,13 +138,18 @@ module Misfit
         end
         r = (access_rights[@action.to_s.to_sym] or access_rights[:all])
         return false if @action == "approve" and role == :data_entry
-        return false if role == :read_only and CUD_Actions.include?(@action)
+        return false if role == :read_only and CUD_Actions.include?(@action) 
         return false if r.nil?
         if staff_member
+          # Only allow branch managers to edit or create a new staff member, branch or a center
+          if ["staff_members", "branches", "centers"].include?(@controller) and CUD_Actions.include?(@action)
+            return staff_member.branches.length>0
+          end
+
           return additional_checks if @route.has_key?(:id) and @route[:id]
-          if params and params[:branch_id]
+          if params and params[:branch_id] and not params[:branch_id].blank?
             b = Branch.get(params[:branch_id])
-            return (b.manager == staff_member or b.centers.manager.include?(staff_member))
+            return (b.manager == staff_member or b.centers.managers.include?(staff_member))
           end
 
           if params and params[:center_id]
@@ -153,7 +165,7 @@ module Misfit
           if params and params[:loan_id]
             l = Loan.get(params[:loan_id])
             return ((l.client.center.manager == staff_member or l.client.center.branch.manager == staff_member))
-          end
+          end                     
         end
         r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
       end
