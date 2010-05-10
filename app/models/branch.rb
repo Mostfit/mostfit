@@ -30,8 +30,14 @@ class Branch
     [obj.save, obj]
   end
 
-  def centers_with_paginate(params)
-    centers.paginate(:page => params[:page], :per_page => 15)
+  def centers_with_paginate(params, user)
+    hash = {:order => [:meeting_day]}
+    # This the logged in person is a staff member and he is not a branch manager
+    if user.role == :staff_member and user.staff_member.branches.length==0
+      hash[:manager] = user.staff_member
+    end
+    hash[:branch] = self    
+    Center.all(hash).paginate(:page => params[:page], :per_page => 15)
   end
 
   def client_groups(hash={})

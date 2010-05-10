@@ -26,8 +26,8 @@
       %td Landmark
       %td=@branch.landmark
   %p
-    = link_to 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit"
-    = link_to 'create a new center', resource(@branch, :centers, :new), :class => "add"
+    = link_to_with_rights 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit"
+    = link_to_with_rights 'create a new center', resource(@branch, :centers, :new), :class => "add"
 
   %div.tab_container
     %ul.tabs

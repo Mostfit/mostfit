@@ -5,41 +5,12 @@ class StaffMembers < Application
 
   def index
     per_page = 25
-    if params[:date].is_a? Hash
-      @date = Date.new(params[:date][:year].to_i, params[:date][:month].to_i, params[:date][:day].to_i)
-    else
-      @date = params[:date] ? Date.parse(params[:date]) : Date.today
-    end
-    @staff_members = if params[:branch_id] and not params[:branch_id].blank?
-                       @branch = Branch.get(params[:branch_id])
-                       staff_members = StaffMember.related_to(@branch)
-                       ids = ([staff_members, @branch.manager.id] << @branch.centers.manager.map{|x| x.id}).flatten.uniq
-                       StaffMember.all(:id => ids).paginate(:page => params[:page], :per_page => per_page)
-                     else
-                       StaffMember.paginate(:page => params[:page], :per_page => per_page)
-                     end
-    first_of_this_month = Date.new(@date.year, @date.month, 1)
-    end_of_this_month   = @date
+    @date = params[:date] ? parse_date(params[:date]) : Date.today
 
-    { 
-      :branch_managers => Branch, :center_managers => Center, :applied_loans => Loan, :approved_loans => Loan, 
-      :rejected_loans  => Loan, :disbursed_loans => Loan, :written_off_loans => Loan
-    }.each{|type, klass|
-      if klass==Branch or klass==Center
-        aggregate_by   = :manager_staff_id
-        overall_cond   = {:creation_date.lte => @date}
-        thismonth_cond = {:creation_date.lte => @date, :creation_date.gte => first_of_this_month}
-      else
-        name           = (type.to_s.split('_')-["loans"]).join("_")
-        aggregate_by   = (name + "_by_staff_id").to_sym
-        date_key       = name=="disbursed" ? :disbursal_date : (name+"_on").to_sym
-        overall_cond   = {date_key.lte => @date}
-        thismonth_cond = {date_key.lte => @date, date_key.gte => first_of_this_month}
-      end
+    hash = get_staff_members_hash
+    @staff_members = StaffMember.all(hash).paginate(:page => params[:page], :per_page => per_page)
+    set_staff_member_counts
 
-      instance_variable_set("@#{type}_overall",   klass.all(overall_cond).aggregate(aggregate_by, :all.count))
-      instance_variable_set("@#{type}_thismonth", klass.all(thismonth_cond).aggregate(aggregate_by, :all.count))      
-    }
     display @staff_members
   end
 
@@ -161,5 +132,49 @@ class StaffMembers < Application
   private
   def determine_layout
     return "printer" if params[:layout] and params[:layout]=="printer"
+  end
+  
+  def get_staff_members_hash
+    if session.user.role == :staff_member
+      st = session.user.staff_member
+      ids = []
+      [st.branches, st.centers.branches].flatten.uniq.each{|branch|        
+        staff_members = StaffMember.related_to(branch)
+        ids += ([staff_members, branch.manager.id] << branch.centers.manager.map{|x| x.id}).flatten.uniq        
+      }
+      return {:id => ids}
+    elsif params[:branch_id] and not params[:branch_id].blank?
+      branch = Branch.get(params[:branch_id])
+      staff_members = StaffMember.related_to(branch)
+      ids = ([staff_members, branch.manager.id] << branch.centers.manager.map{|x| x.id}).flatten.uniq
+      return {:id => ids}
+    else
+      return {}
+    end
+  end
+
+  def set_staff_member_counts
+    first_of_this_month = Date.new(@date.year, @date.month, 1)
+    end_of_this_month   = @date
+
+    { 
+      :branch_managers => Branch, :center_managers => Center, :applied_loans => Loan, :approved_loans => Loan, 
+      :rejected_loans  => Loan, :disbursed_loans => Loan, :written_off_loans => Loan
+    }.each{|type, klass|
+      if klass==Branch or klass==Center
+        aggregate_by   = :manager_staff_id
+        overall_cond   = {:creation_date.lte => @date}
+        thismonth_cond = {:creation_date.lte => @date, :creation_date.gte => first_of_this_month}
+      else
+        name           = (type.to_s.split('_')-["loans"]).join("_")
+        aggregate_by   = (name + "_by_staff_id").to_sym
+        date_key       = name=="disbursed" ? :disbursal_date : (name+"_on").to_sym
+        overall_cond   = {date_key.lte => @date}
+        thismonth_cond = {date_key.lte => @date, date_key.gte => first_of_this_month}
+      end
+      
+      instance_variable_set("@#{type}_overall",   klass.all(overall_cond).aggregate(aggregate_by, :all.count))
+      instance_variable_set("@#{type}_thismonth", klass.all(thismonth_cond).aggregate(aggregate_by, :all.count))      
+    }
   end
 end # StaffMembers

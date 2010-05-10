@@ -275,7 +275,20 @@ class GraphData < Application
       graph.generate
     when "center_day"
       date =  Date.parse(params[:date])
-      vals = repository.adapter.query("SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name FROM loan_history lh, centers c WHERE lh.center_id = c.id AND date = '#{date.strftime('%Y-%m-%d')}' GROUP BY lh.center_id")
+      # restrict branch manager and center managers to their own branches
+      centers = ""
+      if session.user.role==:staff_member
+        st = session.user.staff_member
+        center_ids = [st.branches.centers.map{|x| x.id}, st.centers.map{|x| x.id}].flatten.compact
+        center_ids = ["NULL"] if center_ids.length==0
+        center_ids = "AND center_id in (#{center_ids.join(',')})"
+      end
+      
+      vals = repository.adapter.query(%Q{
+                                         SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name
+                                         FROM loan_history lh, centers c
+                                         WHERE lh.center_id = c.id #{center_ids} AND date = '#{date.strftime('%Y-%m-%d')}' GROUP BY lh.center_id})
+      
       values = vals.map do |v| 
         val = v[0] + v[1]
         color_ratio = (val == 0 ? 1 : v[0]/val)
