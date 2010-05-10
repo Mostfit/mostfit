@@ -294,7 +294,12 @@ module Merb
 
     def get_accessible_staff_members      
       staff_members   =  if session.user.staff_member
-                           StaffMember.all(:id => session.user.staff_member.id)
+                           st = session.user.staff_member
+                           if branches = st.branches and branches.length>0
+                             [st] + branches.centers.managers 
+                           else
+                             st
+                           end
                          else
                            StaffMember.all
                          end      
