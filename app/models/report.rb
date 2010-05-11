@@ -39,7 +39,7 @@ class Report
               else
                 (params and params[:branch_id] and not params[:branch_id].blank?) ? Branch.all(:id => params[:branch_id]) : Branch.all(:order => [:name])
               end
-    @center = if user and st and (not params[:staff_member_id] or params[:staff_member_id].blank?)
+    @center = if user and st and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
                 [st.centers, st.branches.centers].flatten
               elsif params and params[:center_id] and not params[:center_id].blank?
                 Center.all(:id => params[:center_id])

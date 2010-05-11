@@ -40,7 +40,7 @@ module Merb
       base + "/loans/#{loan.id}/" + action.to_s + (opts.length>0 ? "?#{opts.inject([]){|s,x| s << "#{x[0]}=#{x[1]}"}.join("&")}" : '')
     end
 
-    def select_staff_member_for(obj, col, attrs = {})
+    def select_staff_member_for(obj, col, attrs = {}, allow_unsigned=false)
       id_col = "#{col.to_s}_staff_id".to_sym
       selected = ((obj.send(id_col) and obj.send(id_col)!="") ? obj.send(id_col).to_s : attrs[:selected] || "0")
       select(col,
@@ -56,7 +56,7 @@ module Merb
       catalog = Center.catalog(session.user)
       catalog.keys.sort.each do |branch_name|
         collection << ['', branch_name]
-        catalog[branch_name].sort.each{ |k,v| collection << [k.to_s, "!!!!!!!!!#{v}"] }
+        catalog[branch_name].sort_by{|x| x[1]}.each{ |k,v| collection << [k.to_s, "!!!!!!!!!#{v}"] }
       end
       html = select col,
         :collection   => collection,
@@ -277,7 +277,7 @@ module Merb
       if session.user.staff_member
         [session.user.staff_member.centers.branches, session.user.staff_member.branches].flatten
       else
-        Branch.all
+        Branch.all(:order => [:name])
       end
     end
     
@@ -303,12 +303,12 @@ module Merb
                          else
                            StaffMember.all
                          end      
-      staff_members.map{|x| [x.id, x.name]}
+      staff_members.sort_by{|x| x.name}.map{|x| [x.id, x.name]}
     end
 
 
     private
-    def staff_members_collection
+    def staff_members_collection(allow_unsigned=false)
       if session.user.staff_member
         staff = session.user.staff_member
         bms  = staff.branches.collect{|x| x.manager}
