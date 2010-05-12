@@ -96,7 +96,7 @@
       %td
         Number of center managers
       %td
-        =@centers.managers.count
+        =@centers.managers.count if @centers and @centers.length>0
   -if @centers and not @obj.class==StaffMember
     %tr
       %td
