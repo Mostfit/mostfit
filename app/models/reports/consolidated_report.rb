@@ -61,7 +61,7 @@ class ConsolidatedReport < Report
     }
     
     center_ids  = centers.keys.length>0 ? centers.keys.join(',') : "NULL"
-    repository.adapter.query("select id, center_id, client_group_id from clients where center_id in (#{center_ids})").each{|c|
+    repository.adapter.query("select id, center_id, client_group_id from clients where center_id in (#{center_ids}) AND deleted_at is NULL").each{|c|
       clients[c.id] = c
     }
     client_ids = clients.keys.length>0 ? clients.keys.join(',') : "NULL"
