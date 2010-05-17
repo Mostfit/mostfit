@@ -52,7 +52,7 @@ class ParByCenterReport < Report
           default.late_by
           if default.created_at and @date-default.created_at>0
             late_by = default.late_by + (@date-default.created_at.to_date).to_i
-            next if late_by_days and late_by < late_by_days
+            next if late_by_days and late_by <= late_by_days
             r[branch][center] << [clients[default.client_id].name, clients[default.client_id].reference, loan.cycle_number, loan.loan_product.name, loan.amount, 
                                   loan.installment_frequency, default.principal_due, default.total_due-default.principal_due, default.total_due, late_by]
           end

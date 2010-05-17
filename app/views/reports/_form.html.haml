@@ -28,6 +28,11 @@
             Late by more than:
             =text_field(:late_by_days, :size => 10)
             days
+        -if @report.respond_to?(:absent_more_than)
+          %td
+            Absent by more than:
+            =text_field(:absent_more_than, :size => 3)
+            days
       %tr
         %td
           Branch: 
