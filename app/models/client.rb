@@ -177,9 +177,11 @@ class Client
 
   def fees_payable_on(date = Date.today)
     # returns a hash of fee type and amounts
-    schedule = fee_schedule.select{|k,v| k <= Date.today}.collect{|k,v| v.to_a}
-    scheduled_fees = schedule.size > 0 ? schedule.map{|s| s.flatten}.to_hash : {}
-    scheduled_fees - (fees_paid.values.inject({}){|a,b| a.merge(b)})
+    #    schedule = fee_schedule.select{|k,v| k <= Date.today}.collect{|k,v| v.to_a}
+    #    scheduled_fees = schedule.size > 0 ? schedule.map{|s| s.flatten}.to_hash : {}
+    #    scheduled_fees - (fees_paid.values.inject({}){|a,b| a.merge(b)})
+    scheduled_fees = fee_schedule.select{|k,v| k <= date}.collect{|k,v| {v.keys.first.downcase => v.values.first}}.inject({}){|s,x| s+=x}
+    (scheduled_fees - (fees_paid.values.inject({}){|s,x| s+={x.keys.first.downcase => x.values.first}})).reject{|k,v| v<=0}
   end
 
   def fees_paid

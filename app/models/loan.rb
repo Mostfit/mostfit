@@ -379,14 +379,15 @@ class Loan
   def pay_fees(amount, date, received_by, created_by)
     @errors = []
     fp = fees_payable_on(date)
-    pay_order = fee_schedule.keys.sort.map{|d| fee_schedule[d].keys}.flatten
+    fs = fee_schedule
+    pay_order = fs.keys.sort.map{|d| fs[d].keys}.flatten.uniq
     pay_order.each do |k|
-      if fees_payable_on(date).has_key?(k)
-        p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k,
+      if fp.has_key?(k.downcase)
+        p = Payment.new(:amount => [fp[k.downcase],amount].min, :type => :fees, :received_on => date, :comment => k,
                         :received_by => received_by, :created_by => created_by, :client => client, :loan => self)
         if p.save
           amount -= p.amount
-          fp[k] -= p.amount
+          fp[k.downcase]  -= p.amount
         else
           @errors << p.errors
         end
@@ -445,14 +446,14 @@ class Loan
 
   def fees_payable_on(date = Date.today)
     # returns a hash of fee type and amounts
-    schedule = fee_schedule.select{|k,v| k <= Date.today}.collect{|k,v| v.to_a}
-    scheduled_fees = schedule.size > 0 ? schedule[0].to_hash : {}
-    scheduled_fees - (fees_paid.values.inject({}){|a,b| a.merge(b)})
+    scheduled_fees = fee_schedule.select{|k,v| k <= date}.collect{|k,v| {v.keys.first.downcase => v.values.first}}.inject({}){|s,x| s+=x}
+    #scheduled_fees = schedule.size > 0 ? schedule.inject({}){|s,x| s+={x.keys.first.downcase => x.values.first}}.to_hash : {}
+    (scheduled_fees - (fees_paid.values.inject({}){|s,x| s+={x.keys.first.downcase => x.values.first}})).reject{|k,v| v<=0}
   end
 
   def fees_paid
     @fees_payments = {}
-    payments(:type => :fees, :order => [:received_on]).each do |p|
+    payments(:type => :fees, :order => [:received_on], :amount.gt => 0).each do |p|
       @fees_payments += {p.received_on => {p.comment => p.amount}}
     end
     @fees_payments
@@ -468,7 +469,13 @@ class Loan
     loan_product.fees.each do |f|
       type, *payable_on = f.payable_on.to_s.split("_")
       date = eval(payable_on.join("_")) if type == klass_identifier
-      @fee_schedule += {date => {f.name => f.fees_for(self)}} unless date.nil?
+      if date.class==Date
+        @fee_schedule += {date => {f.name => f.fees_for(self)}} unless date.nil?
+      elsif date.class==Array
+        date.each{|date|
+          @fee_schedule += {date => {f.name => f.fees_for(self)}} unless date.nil?
+        }
+      end
     end
     @fee_schedule
   end
