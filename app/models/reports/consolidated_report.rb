@@ -36,11 +36,11 @@ class ConsolidatedReport < Report
             principal_scheduled = history.scheduled_outstanding_principal.to_i
             total_scheduled     = history.scheduled_outstanding_total.to_i
 
-            principal_actual = history.actual_outstanding_principal.to_i
-            total_actual     = history.actual_outstanding_total.to_i
+            principal_actual    = history.actual_outstanding_principal.to_i
+            total_actual        = history.actual_outstanding_total.to_i
             
-            principal_advance = history.advance_principal.to_i
-            total_advance     = history.advance_total.to_i
+            principal_advance   = history.advance_principal.to_i
+            total_advance       = history.advance_total.to_i
           else
             principal_scheduled, total_scheduled, principal_actual, total_actual, principal_advance, total_advance = 0, 0, 0, 0, 0, 0
           end
@@ -61,7 +61,7 @@ class ConsolidatedReport < Report
     }
     
     center_ids  = centers.keys.length>0 ? centers.keys.join(',') : "NULL"
-    repository.adapter.query("select id, center_id, client_group_id from clients where center_id in (#{center_ids})").each{|c|
+    repository.adapter.query("select id, center_id, client_group_id from clients where center_id in (#{center_ids}) AND deleted_at is NULL").each{|c|
       clients[c.id] = c
     }
     client_ids = clients.keys.length>0 ? clients.keys.join(',') : "NULL"
@@ -69,14 +69,14 @@ class ConsolidatedReport < Report
     #getting all the loans from the client list above. Filter also by loan product when provided
     query = "l.client_id=c.id and c.center_id in (#{center_ids})"
     query+=" and l.loan_product_id=#{self.loan_product_id}" if self.loan_product_id
-    repository.adapter.query("select l.id, l.client_id, l.amount  FROM loans l, clients c WHERE #{query}").each{|l|
+    repository.adapter.query("select l.id, l.client_id, l.amount FROM loans l, clients c WHERE #{query}").each{|l|
       loans[l.id] =  l
     }
 
     Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id,:type,:loan_id,:amount,:client_id]).each{|p|
       if p.loan_id and loans[p.loan_id] and clients.key?(loans[p.loan_id].client_id)
         client = clients[loans[p.loan_id].client_id]
-      elsif clients.key?(p.client_id) and p.type==3
+      elsif clients.key?(p.client_id)
         client = clients[p.client_id]
       end
       next unless client

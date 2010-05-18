@@ -59,10 +59,10 @@
     No disbursals today
 
   %h1 Fees
-  - @fee_paying_loans = @clients.loans.select{|l| l.fees_paid? == false}
-  - @fee_paying_clients = @clients.select{|c| c.fees_paid? == false}
+  - @fee_paying_loans   = @loans.collect{|x| {x => x.fees_payable_on(Date.today)}}.inject({}){|s,x| s+=x}
+  - @fee_paying_clients = @clients.collect{|x| {x => x.fees_payable_on(Date.today)}}.inject({}){|s,x| s+=x}
   - @fee_paying_things = @fee_paying_clients + @fee_paying_loans
-  - unless (@fee_paying_things).blank?
+  - unless @fee_paying_things.values.inject({}){|s,x| s+=x}.length==0
     = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "javascript: return confirm_for({'received_by': #{@center.manager.id};") do
       = hidden_field :name => :for_date, :value => @date
       Fees collected by
@@ -81,32 +81,29 @@
             %th
               Fees Already Paid
             %th
-              Fees Due
+              Fees Due Today
             %th
-              Fees Paid Today
-      
-        - @fee_paying_things.each do |fpt|
+              Fees      
+        - @fee_paying_things.each do |obj, fee|
+          - next if fee.size==0
           %tr{:class => cycle('odd','even')}
             %td
-              = fpt.id
+              = obj.id
             %td.text
-              = Loan.descendants.include?(fpt.class) ? fpt.client.name : fpt.name
+              = Loan.descendants.include?(obj.class) ? obj.client.name : obj.name
             %td.text
-              = fpt.description if fpt.respond_to?("description")
+              = obj.description if obj.respond_to?("description")
             %td.text
-              - fpt.fee_schedule.each do |date, fs|
-                - fs.each do |k,v|
-                  = k
-                  == :
-                  = v
+              = obj.total_fees_due
+            %td.text
+              - obj.fees_paid.values.each do |fp|
+                = "#{fp.keys}: #{fp.values}"
+            %td.text
+              - fee.each do |k,v|
+                ="#{k}: #{v}"
             %td
-              = fpt.fees_paid
-            %td.text
-              - fp = fpt.fees_payable_on(@date)
-              = fp
-            %td
-              - klass = Loan.descendants.include?(fpt.class) ? Loan : fpt.class
-              = text_field :name => "paid[#{klass.to_s.snake_case}][#{fpt.id}]", :value => fpt.total_fees_payable_on(@date), :cols => "5", :style => "width:50px;" 
+              - klass = Loan.descendants.include?(obj.class) ? Loan : obj.class
+              = text_field :name => "paid[#{klass.to_s.snake_case}][#{obj.id}]", :value => fee.values.inject(0){|s,x| s+=x}, :cols => "5", :style => "width:50px;" 
       = submit 'Pay Fees'
   - else
     No fees due today

@@ -316,6 +316,8 @@ $(document).ready(function(){
 		$("table.report tr.group td").append("<a id='date' class='expand'>Expand dates</a>");
 	    if($("table.report tr.loan").length>0)
 		$("table.report tr.group td").append("<a id='loan' class='expand'>Expand loans</a>");
+	    if($("table.report tr.client").length>0)
+		$("table.report tr.group td").append("<a id='client' class='expand'>Expand clients</a>");
 	    $("a.expand_all").click(function(){
 		    if($(this).text().indexOf("Expand")>=0){
 			$("table.report tr").show();

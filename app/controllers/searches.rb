@@ -86,6 +86,9 @@ class Searches < Application
     elsif property.class==DataMapper::Associations::ManyToOne::Relationship
       return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", :collection => property.parent_model.all, 
                     :value_method => :id, :text_method => :name,:prompt => "Choose #{property.name}")
+    elsif property.type==DataMapper::Types::Boolean
+      return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", 
+                    :collection => [["true", "yes"], ["false", "no"]], :prompt => "Choose #{property.name}")      
     elsif property.type.class==Class
       return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", 
                     :collection => property.type.flag_map.to_a, :prompt => "Choose #{property.name}")

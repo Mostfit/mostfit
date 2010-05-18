@@ -23,7 +23,8 @@ module DataEntry
 
       unless @center.nil?
         @branch = @center.branch
-        @clients = Client.all(:center_id => @center.id)
+        @clients = Client.all(:center_id => @center.id, :fields => [:id, :name, :center_id, :client_group_id])
+        @loans   = @clients.loans(:disbursal_date.not => nil)
       end
 
       if request.method == :post
@@ -120,7 +121,7 @@ module DataEntry
     def bulk_payments_and_disbursals
       @center = Center.get(params[:center_id]) || Center.first(:name => params[:center_id]) 
       @branch = @center.branch unless @center.nil?
-      @clients = @center.clients unless @center.nil?
+      @clients = @center.clients(:fields => [:id, :name, :center_id, :client_group_id]) unless @center.nil?
       @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
       @staff = StaffMember.get(params[:payment][:received_by])
       @errors = []

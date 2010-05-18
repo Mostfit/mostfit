@@ -1,7 +1,7 @@
 class Fee
   include DataMapper::Resource
   
-  PAYABLE = [:loan_applied_on, :loan_approved_on, :loan_disbursal_date, :loan_scheduled_first_payment_date, :loan_first_payment_date, :client_grt_pass_date, :client_date_joined]
+  PAYABLE = [:loan_applied_on, :loan_approved_on, :loan_disbursal_date, :loan_scheduled_first_payment_date, :loan_first_payment_date, :client_grt_pass_date, :client_date_joined, :loan_installment_dates]
   FeeDue = Struct.new(:applicable, :payed, :due)
 
   property :id,            Serial
