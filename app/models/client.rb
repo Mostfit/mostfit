@@ -220,12 +220,12 @@ class Client
     fp = fees_payable_on(date)
     pay_order = fee_schedule.keys.sort.map{|d| fee_schedule[d].keys}.flatten
     pay_order.each do |k|
-      if fees_payable_on(date).has_key?(k)
-        p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k,
+      if fees_payable_on(date).has_key?(k.downcase)
+        p = Payment.new(:amount => [fp[k.downcase],amount].min, :type => :fees, :received_on => date, :comment => k,
                         :received_by => received_by, :created_by => created_by, :client => self)
         if p.save
           amount -= p.amount
-          fp[k] -= p.amount
+          fp[k.downcase] -= p.amount
         else
           @errors << p.errors
         end

@@ -129,7 +129,7 @@ module DataEntry
         params[:paid][:loan].keys.each do |k|
           @loan = Loan.get(k.to_i)
           amounts = params[:paid][:loan][k.to_sym].to_i
-          if params[:submit] == "Pay Fees" # dangerous!
+          if params[:submit] == "Pay Fees" # dangerous!            
             @loan.pay_fees(amounts, @date, @staff, session.user)
             next
           end
@@ -143,6 +143,8 @@ module DataEntry
       end
       if params[:paid][:client]
         params[:paid][:client].keys.each do |k|
+          debugger
+
           client = Client.get(k)
           x = client.pay_fees(params[:paid][:client][k.to_sym].to_i, @date, @staff, session.user)
           @errors << x unless x === true

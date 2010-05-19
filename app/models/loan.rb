@@ -271,9 +271,9 @@ class Loan
       else
         raise ArgumentError.new("Strange period you got..")
     end
-    if self.client and self.client.center and self.client.center.meeting_day != :none and ensure_meeting_day
-      next_meeting_day = client.center.next_meeting_date_from(new_date)
-      new_date = next_meeting_day unless new_date.weekday == client.center.meeting_day
+    if cl=self.client(:fields => [:id, :center_id]) and cen=cl.center and cen.meeting_day != :none and ensure_meeting_day
+      next_meeting_day = cen.next_meeting_date_from(new_date)
+      new_date = next_meeting_day unless new_date.weekday == cen.meeting_day
       #new_date - new_date.cwday + Center.meeting_days.index(client.center.meeting_day)
     end
     new_date.holiday_bump
