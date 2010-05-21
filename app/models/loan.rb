@@ -118,7 +118,7 @@ class Loan
 
   def self.from_csv(row, headers, funding_lines)
     obj = new(:loan_product_id => LoanProduct.first(:name => row[headers[:product]]).id, :amount => row[headers[:amount]],
-              :interest_rate => row[headers[:interest_rate]]/100,
+              :interest_rate => row[headers[:interest_rate]].to_f/100,
               :installment_frequency => row[headers[:installment_frequency]], :number_of_installments => row[headers[:number_of_installments]],
               :scheduled_disbursal_date => Date.parse(row[headers[:scheduled_disbursal_date]]),
               :scheduled_first_payment_date => Date.parse(row[headers[:scheduled_first_payment_date]]),
