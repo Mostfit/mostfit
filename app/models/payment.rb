@@ -45,12 +45,18 @@ class Payment
   validates_with_method :principal,   :method => :is_positive?
   
   def self.from_csv(row, headers, loans)
-    obj = new(:received_by => StaffMember.first(:name => row[headers[:received_by_staff]]), :loan => loans[row[headers[:loan_serial_number]]], 
-              :amount => row[headers[:principal]], :type => :principal, :received_on => Date.parse(row[headers[:received_on]]), 
-              :created_by => User.first)
-    obj = new(:received_by => StaffMember.first(:name => row[headers[:received_by_staff]]), :loan => loans[row[headers[:loan_serial_number]]], 
-              :amount => row[headers[:interest]], :type => :interest, :received_on => Date.parse(row[headers[:received_on]]), 
-              :created_by => User.first)
+    if row[headers[:principal]]
+      obj = new(:received_by => StaffMember.first(:name => row[headers[:received_by_staff]]), :loan => loans[row[headers[:loan_serial_number]]], 
+                :amount => row[headers[:principal]], :type => :principal, :received_on => Date.parse(row[headers[:received_on]]), 
+                :created_by => User.first)
+      obj.save
+    end
+    
+    if row[headers[:interest]]
+      obj = new(:received_by => StaffMember.first(:name => row[headers[:received_by_staff]]), :loan => loans[row[headers[:loan_serial_number]]], 
+                :amount => row[headers[:interest]], :type => :interest, :received_on => Date.parse(row[headers[:received_on]]), 
+                :created_by => User.first)
+    end
     [obj.save, obj]
   end
 
