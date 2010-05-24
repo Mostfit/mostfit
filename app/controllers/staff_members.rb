@@ -65,10 +65,10 @@ class StaffMembers < Application
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
     @date      = params[:date] ? parse_date(params[:date]) : Date.today
+    @date     = @date.holiday_bump
     days       = []
     days      << Center.meeting_days[@date.cwday]
-    @date      = @date.holiday_bump
-    days      << Center.meeting_days[@date.cwday]
+    days      << Center.meeting_days[@date.holidays_shifted_today.cwday]
     @centers   = @staff_member.centers.all(:meeting_day => days.uniq).sort_by{|x| x.name}
     if params[:format] == "pdf"
       generate_pdf
