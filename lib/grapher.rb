@@ -39,7 +39,10 @@ module Grapher
     
     def generate
       @y_axis.smoothen(@elements[:values]) if @y_axis
-      return {:elements => [@elements], :x_axis => (@x_axis ? @x_axis.generate : ""), :y_axis => (@y_axis ? @y_axis.generate : ""), :title => (@title ? @title.generate : "")}.to_json
+      return {
+        :elements => [@elements], :x_axis => (@x_axis ? @x_axis.generate : ""), :y_axis => (@y_axis ? @y_axis.generate : ""), 
+        :title => (@title ? @title.generate : "")
+      }.to_json
     end
   end
 

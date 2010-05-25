@@ -224,36 +224,37 @@ class LoanHistory
     repository.adapter.query(%Q{
       SELECT #{select}
       FROM loan_history
-      WHERE #{query} AND current=1 AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}' AND status in (5,6)
+      WHERE #{query} AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}' AND status in (5,6)
       GROUP BY #{q}
     })
   end
 
   def self.amount_disbursed_for(obj, from_date, to_date)
+    select = "SELECT sum(l.amount) amount, COUNT(l.id) loan_count, COUNT(DISTINCT(l.client_id)) client_count"
     query = if obj.class==Branch
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM branches b, centers c, clients cl, loans l 
                  WHERE b.id=#{obj.id} and c.branch_id=b.id and cl.center_id=c.id and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
                        and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
                }
             elsif obj.class==Center
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM   centers c, clients cl, loans l 
                  WHERE  c.id=#{obj.id} and cl.center_id=c.id and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
                         and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
                }
             elsif obj.class==ClientGroup
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM   client_groups cg, clients cl, loans l 
                  WHERE  cg.id=#{obj.id} and cl.client_group_id=cg.id and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
                         and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
                }
             elsif obj.class==Area
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM  regions r, areas a, branches b, centers c, clients cl, loans l 
                  WHERE a.id=#{obj.id} and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
                        and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
@@ -261,7 +262,7 @@ class LoanHistory
                }
             elsif obj.class==Region
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM  regions r, areas a, branches b, centers c, clients cl, loans l 
                  WHERE r.id=#{obj.id} and r.id=a.region_id and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
                        and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
@@ -269,7 +270,7 @@ class LoanHistory
                }
             elsif obj.class==StaffMember
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM  loans l 
                  WHERE l.disbursal_date is not null and l.deleted_at is null and l.disbursed_by_staff_id=#{obj.id} 
                        and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
