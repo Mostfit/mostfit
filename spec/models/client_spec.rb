@@ -6,6 +6,10 @@ describe Client do
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
     @manager.save
     @manager.should be_valid
+    
+    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin, :active => true)
+    @user.should be_valid
+    @user.save
 
     @user = User.new(:login => "clientcreator", :password => "client", :password_confirmation => "client", :role => :admin)
     @user.save

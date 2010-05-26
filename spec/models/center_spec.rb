@@ -8,6 +8,10 @@ describe Center do
     @manager.save
     @manager.should be_valid
 
+    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin, :active => true)
+    @user.should be_valid
+    @user.save
+
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
     @branch.code = "bra"
@@ -44,9 +48,10 @@ describe Center do
     name = 'Ms C.L. Ient'
     ref  = 'XW000-2009.01.05'
     @user = User.create(:login => "branchmanager", :password => "branchmanager", :password_confirmation => "branchmanager", :role => :mis_manager)
-    @client = Client.new(:name => name, :reference => ref, :date_joined => Date.today, 
-                         :client_type => ClientType.create(:type => "standard"), :created_by => @user)
-    @client.center  = @center
+    @client = Client.new(:name => name, :reference => ref, :date_joined => Date.today, :client_type => ClientType.create(:type => "standard"))
+    @client.center     = @center
+    @client.created_by = @user
+    @client.save
     @client.errors.each {|e| p e}
     @client.should be_valid
     @client.save
@@ -59,6 +64,7 @@ describe Center do
     client2 = Client.new(:name => 'Mr. T.A. Kesmoney', :reference => 'AN000THER_REF', :date_joined => Date.today,
                          :client_type => ClientType.first, :created_by => @user)
     client2.center  = @center
+    client2.created_by = @user
     client2.save
     client2.should be_valid
 
