@@ -21,6 +21,7 @@ module DataEntry
     def edit
       @loan = (params[:loan] and params[:loan][:id]) ? Loan.get(params[:loan][:id]) : Loan.new
       @client = @loan.client(:fields => [:id, :name, :center_id, :client_group_id])
+      @loan.interest_rate *= 100
       @loan_product = @loan.loan_product
       render
     end
