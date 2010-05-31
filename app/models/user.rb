@@ -23,6 +23,7 @@ class User
   validates_format :login, :with => /^[A-Za-z0-9_]+$/
   validates_length :login, :min => 3
   validates_is_unique :login
+  validates_length :password, :min => 6  
   has 1, :staff_member
 
 
