@@ -91,7 +91,7 @@ module Pdf
         table.header_gap = 10
         table.render_on(pdf)
       } #centers end
-      pdf.save_as("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf")
+      pdf.save_as("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
       return pdf
     end
   end

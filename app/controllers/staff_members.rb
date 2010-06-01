@@ -72,8 +72,8 @@ class StaffMembers < Application
     @centers   = @staff_member.centers.all(:meeting_day => days.uniq).sort_by{|x| x.name}
     if params[:format] == "pdf"
       generate_pdf
-      send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf"),
-                :filename => "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf")
+      send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf"),
+                :filename => "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
     else
       display @centers
     end
