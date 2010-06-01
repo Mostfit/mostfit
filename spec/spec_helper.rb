@@ -19,7 +19,7 @@ Spec::Runner.configure do |config|
   config.include(Merb::Test::ControllerHelper)
 
   config.before(:all) do
-#    DataMapper.auto_migrate! if Merb.orm == :datamapper
+    DataMapper.auto_migrate! if Merb.orm == :datamapper
   end
   
 end

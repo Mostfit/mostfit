@@ -57,6 +57,22 @@ class Users < Application
     end
   end
 
+  def change_password
+    user = params[:user]
+    @user = session.user
+    if request.method==:put and user.key?(:password) and user.key?(:password_confirmation)
+      @user.password = user[:password]
+      @user.password_confirmation = user[:password]
+      if @user.save
+        redirect("/browse", :message => {:notice => "Password changed successfully"})
+      else
+        render
+      end
+    else
+      render
+    end
+  end
+  
   private
   def ensure_is_admin
     raise Unauthenticted unless session.user.id == 1
