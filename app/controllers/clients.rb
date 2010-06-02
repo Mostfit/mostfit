@@ -50,7 +50,11 @@ class Clients < Application
     raise NotFound unless @client
     disallow_updation_of_verified_clients
     if @client.update_attributes(client)      
-      @client.tags = params[:tags].keys.map{|k| k.to_sym} if params[:tags]
+      if params[:tags]
+        @client.tags = params[:tags].keys.map{|k| k.to_sym} 
+      else
+        @client.tags = []
+      end
       @client.save
       if @branch and @center
         redirect(params[:return]||resource(@branch, @center, @client), :message => {:notice => "Client '#{@client.name}' has been edited"})
