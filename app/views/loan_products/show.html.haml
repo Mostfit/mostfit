@@ -1,6 +1,8 @@
 %h1
   Loan products
 = link_to 'Edit',  url(:edit_loan_product,  @loan_product), :class => 'edit'
+|
+= link_to 'Back', url(:loan_products)
 %table{:style => "width: 50%; text-align: left;"}
   - [:name, :loan_type, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments, :installment_frequency, :valid_from, :valid_upto].each do |attr|
     %tr
