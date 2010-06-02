@@ -2,8 +2,11 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Area do
 
-  before(:each) do
-    @area = Area.new(:name => "test area")
+  before(:all) do
+    @manager = StaffMember.create(:name => "Region manager")
+    @region  = Region.create(:name => "test region2", :manager => @manager)
+    @region.should be_valid
+    @area = Area.create(:name => "test area", :region => @region, :manager => @manager)
     @area.should be_valid
   end
 
@@ -26,6 +29,9 @@ describe Area do
     @branch.should be_valid
 
     @branch.area = @area
+    @branch.save
+    p @branch.area
+    p @area.branches
     @area.branches.should == [@branch]
   end
 

@@ -217,6 +217,21 @@ namespace :mostfit do
       Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{Loan.all.size} loans with #{Payment.all.size} payments, at #{t1}"
     end
 
+    desc "Recreate all history"
+    task :update_all_history do
+      t0 = Time.now
+      Merb.logger.info! "Start mock:history rake task at #{t0}"
+      loan_ids = repository.adapter.query("SELECT id from loans")
+      t0 = Time.now
+      loan_ids.each do |loan_id|
+        loan = Loan.get(loan_id)
+        loan.update_history
+      end
+      t1 = Time.now
+      secs = (t1 - t0).round
+      Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{Loan.all.size} loans with #{Payment.all.size} payments, at #{t1}"
+    end
+
     desc "Historify unhistorified loans"
     task :historify_unhistorified do
       t0 = Time.now
