@@ -27,7 +27,7 @@ class Payments < Application
     raise NotFound unless @loan
       
     amounts = payment[:amount].to_i
-    receiving_staff = StaffMember.get(payment[:received_by])
+    receiving_staff = StaffMember.get(payment[:received_by_staff_id])
     if payment[:type] == "total"
     # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
       succes, @prin, @int, @fees = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff, false, params[:style].to_sym)
@@ -37,7 +37,10 @@ class Payments < Application
       @fees.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @fees
     else
       @payment = Payment.new(payment)
-      succes = Payment.save
+      @payment.loan = @loan if @loan
+      @payment.client = @client if @client
+      @payment.created_by = session.user
+      succes = @payment.save
     end
     
     if succes  # true if saved

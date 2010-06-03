@@ -73,7 +73,6 @@ module DataEntry
       if payment[:type] == "total"
         succes, @prin, @int, @fees  = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff)
       else
-        payment[:received_by] = StaffMember.get(payment[:received_by]) #???
         payment[:created_by] = session.user
         @payment = Payment.new(payment)
         succes = @payment.save
