@@ -496,10 +496,18 @@ class Loan
     fs = fee_schedule
     dd = disbursal_date || scheduled_disbursal_date
     @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
+    repayed =  false
     (1..number_of_installments).each do |number|
       date      = shift_date_by_installments(scheduled_first_payment_date, number - 1, [:weekly, :biweekly].include?(installment_frequency))
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
+      next if repayed
+      repayed   = true if amount == principal_received_up_to(date)
+      if amount - principal_received_up_to(date) < principal
+        principal = 0
+        interest  = 0        
+      end
+      
       principal_so_far += principal
       interest_so_far  += interest
       fees = fs.has_key?(date) ? fs[date].values.inject(0){|a,b| a+b} : 0
@@ -691,8 +699,15 @@ class Loan
     return :rejected             if (rejected_on and rejected_on <= date)
     return :written_off          if (written_off_on and written_off_on <= date)
     total_received ||= total_received_up_to(date)
+    principal_received ||= principal_received_up_to(date)
     return :disbursed          if (date == disbursal_date) and total_received < total_to_be_received
-    @status = total_received  >= total_to_be_received ? :repaid : :outstanding
+    if total_received >= total_to_be_received
+      @status =  :repaid
+    elsif total_principal_to_be_received<=principal_received and scheduled_interest_up_to(date)<=interest_received_up_to(Date.today)
+      @status =  :repaid
+    else
+      @status =  :outstanding
+    end
   end
 
 
@@ -737,6 +752,8 @@ class Loan
     t = Time.now; @history_array = []
     dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on,scheduled_first_payment_date].map{|d| d.holiday_bump if d.is_a?(Date)} + payment_dates + installment_dates).compact.uniq.sort
     last_paid_date = nil
+    
+    repayed=false
     dates.each_with_index do |date,i|
       current   = date == Date.today ? true : (((dates[[i,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or 
                    (i == dates.size - 1 and dates[i] < Date.today)))
@@ -749,8 +766,12 @@ class Loan
       else
         last_paid_date = nil;        days_overdue = 0
       end
+      next if repayed
+      principal_due  = actual[:balance] - scheduled[:balance]
+      interest_due   = actual[:total_balance] - scheduled[:total_balance] - (actual[:balance] - scheduled[:balance])
+      repayed = true if actual[:balance]<=0 and interest_due<=0
       @history_array << {
-        :loan_id                             => id, 
+        :loan_id                             => id,
         :date                                => date,
         :status                              => STATUSES.index(get_status(date)) + 1,
         :scheduled_outstanding_principal     => scheduled[:balance],
@@ -760,8 +781,8 @@ class Loan
         :amount_in_default                   => actual[:balance] - scheduled[:balance],
         :days_overdue                        => days_overdue, 
         :current                             => current,
-        :principal_due                       => actual[:balance] - scheduled[:balance], 
-        :interest_due                        => actual[:total_balance] - scheduled[:total_balance] - (actual[:balance] - scheduled[:balance]),
+        :principal_due                       => principal_due, 
+        :interest_due                        => interest_due,
         :principal_paid                      => prin, 
         :interest_paid                       => int
       }
