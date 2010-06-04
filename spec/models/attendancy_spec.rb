@@ -18,8 +18,14 @@ describe Attendance do
     @center.code = "cen"
     @center.save
     @center.should be_valid
-    
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => '2008-01-01')
+
+    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin, :active => true)
+    @user.should be_valid
+    @user.save
+
+    @client_type  =  ClientType.first||ClientType.create(:type => "standard")
+
+    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => '2008-01-01', :created_by => @user, :client_type => @client_type)
     @client.center  = @center
     @client.save
     @client.errors.each {|e| puts e}
@@ -27,8 +33,9 @@ describe Attendance do
   end
 
   before(:each) do
-    @attendancy=Attendancy.new(:date=>"2009-02-02",:status=>:absent)
+    @attendancy=Attendance.new(:date => "2009-02-02", :status => :absent)
     @attendancy.client=@client
+    @attendancy.center=@client.center    
     @attendancy.valid?
     @attendancy.errors.each {|e| puts e}
     # @attendancy.should be_valid
