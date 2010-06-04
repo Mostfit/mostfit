@@ -36,7 +36,9 @@ describe Fee do
     @center.errors.each {|e| puts e}
     @center.should be_valid
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => Time.now.to_s)
+    @client_type  =  ClientType.first||ClientType.create(:type => "standard")
+
+    @client = Client.new(:name => 'Ms C.L. Ient', :reference => Time.now.to_s, :client_type => @client_type, :created_by => @user)
     @client.center  = @center
     @client.date_joined = Date.parse('2006-01-01')
 #    @client.type_of_account = :savings
