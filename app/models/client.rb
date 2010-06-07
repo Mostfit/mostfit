@@ -126,9 +126,6 @@ class Client
       :url => "/uploads/:class/:id/:attachment/:style/:basename.:extension",
       :path => "#{Merb.root}/public/uploads/:class/:id/:attachment/:style/:basename.:extension"
 
-
-
-
   validates_length    :name, :min => 3
   validates_present   :center
   validates_present   :date_joined
@@ -191,14 +188,14 @@ class Client
     #    schedule = fee_schedule.select{|k,v| k <= Date.today}.collect{|k,v| v.to_a}
     #    scheduled_fees = schedule.size > 0 ? schedule.map{|s| s.flatten}.to_hash : {}
     #    scheduled_fees - (fees_paid.values.inject({}){|a,b| a.merge(b)})
-    scheduled_fees = fee_schedule.select{|k,v| k <= date}.collect{|k,v| {v.keys.first.downcase => v.values.first}}.inject({}){|s,x| s+=x}
-    (scheduled_fees - (fees_paid.values.inject({}){|s,x| s+={x.keys.first.downcase => x.values.first}})).reject{|k,v| v<=0}
+    scheduled_fees = fee_schedule.reject{|k,v| k > date}.values.inject({}){|s,x| s+=x}
+    (scheduled_fees - (fees_paid.reject{|k,v| k > date}.values.inject({}){|s,x| s+=x})).reject{|k,v| v<=0}
   end
 
   def fees_paid
     @fees_payments = {}
     payments(:type => :fees, :order => [:received_on], :loan => nil).each do |p|
-      @fees_payments += {p.received_on => {p.comment => p.amount}}
+      @fees_payments += {p.received_on => {p.fee => p.amount}}
     end
     @fees_payments
   end
@@ -215,8 +212,8 @@ class Client
       if type == klass_identifier
         # after adding the client_type, we should no longer need to check if the fee is for Client or Loan.
         # However, we have to add the checks to the client type TODO
-        date = eval(payable_on.join("_"))
-        @fee_schedule += {date => {f.name => f.fees_for(self)}} unless date.nil?
+        date = send(payable_on.join("_"))
+        @fee_schedule += {date => {f => f.fees_for(self)}} unless date.nil?
       end
     end
     @fee_schedule
@@ -231,14 +228,14 @@ class Client
     fp = fees_payable_on(date)
     pay_order = fee_schedule.keys.sort.map{|d| fee_schedule[d].keys}.flatten
     pay_order.each do |k|
-      if fees_payable_on(date).has_key?(k.downcase)
-        p = Payment.new(:amount => [fp[k.downcase],amount].min, :type => :fees, :received_on => date, :comment => k,
-                        :received_by => received_by, :created_by => created_by, :client => self)
-        if p.save
-          amount -= p.amount
-          fp[k.downcase] -= p.amount
+      if fees_payable_on(date).has_key?(k)
+        if pay = Payment.create(:amount => [fp[k], amount].min, :type => :fees, :received_on => date, :comment => k.name, :fee => k,
+                                :received_by => received_by, :created_by => created_by, :client => self)
+
+          amount -= pay.amount
+          fp[k] -= pay.amount
         else
-          @errors << p.errors
+          @errors << pay.errors
         end
       end
     end
