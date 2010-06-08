@@ -42,7 +42,7 @@ class Payment
   validates_with_method :deleted_at,  :method => :properly_deleted?
   validates_with_method :not_approved, :method => :not_approved, :on => [:destroy]
   validates_with_method :not_approved, :method => :not_paying_too_much?
-#  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
+  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
   validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :principal,   :method => :is_positive?
   

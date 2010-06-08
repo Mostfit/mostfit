@@ -495,7 +495,10 @@ class Loan
     balance = amount
     fs = fee_schedule
     dd = disbursal_date || scheduled_disbursal_date
-    @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
+    fees_so_far = fs.has_key?(dd) ? fs[dd].values.inject(0){|a,b| a+b} : 0
+
+    @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0, :fees => fees_so_far}
+
     repayed =  false
     (1..number_of_installments).each do |number|
       date      = shift_date_by_installments(scheduled_first_payment_date, number - 1, [:weekly, :biweekly].include?(installment_frequency))
@@ -529,6 +532,10 @@ class Loan
     @schedule
   end
 
+  def _show_ps
+    puts payment_schedule.sort.map{|d, h| [d, h[:principal], h[:interest], h[:fees], h[:total_principal], h[:total_interest], h[:total]].join("\t")}.join("\n")
+  end
+  
   def payments_hash
     # this is the fount of knowledge for actual payments on the loan
     return @payments_cache if @payments_cache
@@ -538,7 +545,7 @@ class Loan
                received_on
         FROM payments
         WHERE (deleted_at IS NULL) AND (loan_id = #{self.id})
-        GROUP BY received_on}
+        GROUP BY received_on ORDER BY received_on}
     structs = id ? repository.adapter.query(sql) : []
     @payments_cache = {}
     total_balance = total_to_be_received
@@ -567,8 +574,14 @@ class Loan
     @payments_cache
   end
 
-
-
+  def _show_ph
+    puts payments_hash.sort.map{|d, h|
+      [
+       d, h[:principal].to_i, h[:interest].to_i, h[:total_principal].to_i, h[:total_interest].to_i, h[:total].to_i, h[:balance].to_i, h[:total_balance].to_i
+      ].join("\t")
+    }.join("\n")
+  end
+  
   # LOAN INFO FUNCTIONS - SCHEDULED
 
   # these 2 methods define the pay back scheme
@@ -749,6 +762,8 @@ class Loan
 
   def calculate_history
     return @history_array if @history_array
+    # Crazy heisenbug is fixed by prefetching payments hash
+    payments_hash
     t = Time.now; @history_array = []
     dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on,scheduled_first_payment_date].map{|d| d.holiday_bump if d.is_a?(Date)} + payment_dates + installment_dates).compact.uniq.sort
     last_paid_date = nil
@@ -770,6 +785,7 @@ class Loan
       principal_due  = actual[:balance] - scheduled[:balance]
       interest_due   = actual[:total_balance] - scheduled[:total_balance] - (actual[:balance] - scheduled[:balance])
       repayed = true if actual[:balance]<=0 and interest_due<=0
+
       @history_array << {
         :loan_id                             => id,
         :date                                => date,
@@ -789,6 +805,15 @@ class Loan
     end
     Merb.logger.info "History calculation took #{Time.now - t} seconds"
     @history_array
+  end
+
+  def _show_his
+    puts calculate_history.sort_by{|x| x[:date]}.map{|h| 
+      [
+       h[:date], h[:scheduled_outstanding_principal].to_i, h[:scheduled_outstanding_total].to_i, h[:actual_outstanding_principal].to_i, 
+       h[:actual_outstanding_total].to_i, h[:principal_paid].to_i, h[:interest_paid].to_i, h[:principal_due].to_i, h[:interest_due].to_i
+      ].join("\t")
+    }.join("\n")
   end
 
   def update_history_bulk_insert
