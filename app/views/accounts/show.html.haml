@@ -1,0 +1,13 @@
+
+%tabel
+  %tr
+    %td
+      %h2  Name
+    %td 
+  = @account.name
+  %br
+= link_to 'Edit',  url(:edit_account,  @accounts)
+|
+= link_to 'Back', url(:accounts)
+
+
