@@ -31,3 +31,6 @@
       = link_to_with_rights 'Edit Details', url(:controller => "admin", :action => "edit"), :class => 'edit'
     %li
       = link_to_with_rights 'Upload data', url(:controller => 'admin', :action => "upload"), :class => 'edit'
+    %li
+      = link_to_with_rights 'Accounting', resource(:accountings), :class => 'edit'
+   
