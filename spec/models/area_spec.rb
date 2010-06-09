@@ -19,21 +19,18 @@ describe Area do
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
     @manager.save
     @manager.should be_valid
+    @area.name =  "Foo"
 
     Branch.all.destroy!
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
     @branch.code = "branch"
+    @branch.area = @area
     @branch.save
     @branch.errors.each {|e| p e}
     @branch.should be_valid
 
-    @branch.area = @area
-    @branch.save
-    p @branch.area
-    p @area.branches
+    @branch.should be_valid
     @area.branches.should == [@branch]
   end
-
-
 end
