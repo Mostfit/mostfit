@@ -1,0 +1,18 @@
+%h1
+  ChartOfAccount controller, index action
+
+%table
+  %tr
+    %th
+      Account Name
+    %th
+      Code
+  %tr
+  - for chart_of_account in @chart_of_accounts
+    %tr
+      %td
+        = link_to chart_of_account.name, url(:chart_of_account, chart_of_account)
+      %td
+        = link_to chart_of_account.gl_code, url(:edit_chart_of_account,  chart_of_account)
+
+= link_to 'New', url(:new_chart_of_account)
