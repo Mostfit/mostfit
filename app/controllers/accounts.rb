@@ -2,13 +2,8 @@ class Accounts < Application
   # provides :xml, :yaml, :js
 
   def index
-    if request.xhr? and params[:account_type_id]
-      @accounts = Account.all(:account_type_id => params[:account_type_id])
-      partial :accounts_selection
-    else
-      @accounts = Account.all
-      display @accounts
-    end
+    @accounts = Account.all
+    display @accounts
   end
 
   def show(id)
