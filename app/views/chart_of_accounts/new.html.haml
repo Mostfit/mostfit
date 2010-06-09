@@ -1,0 +1,11 @@
+- form_url   =  resource(:chart_of_accounts, {:return => params[:return]})
+=error_messages_for @chart_of_account
+
+= form_for(@chart_of_account, :action => form_url, :class => "form" ) do
+  %h1 Create a new Account
+
+  %fieldset
+    = partial "chart_of_accounts/fields"
+    = submit "Create Account"
+    = link_to 'Cancel', url(:admin)
+
