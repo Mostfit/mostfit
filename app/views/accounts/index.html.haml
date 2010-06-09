@@ -1,0 +1,16 @@
+
+%table
+  %tr
+    %th
+      Account Name
+    %th
+      GL Code
+  %tr
+  - for account in @accounts
+    %tr
+      %td
+        = link_to account.name, url(:account, account)
+      %td
+        = link_to account.gl_code, url(:edit_account,  account)
+
+= link_to 'New', url(:new_account)
