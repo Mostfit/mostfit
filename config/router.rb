@@ -1,6 +1,6 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
-  resources :chart_of_accounts
+  resources :accounts
   resources :bookmarks
   resources :audit_items
   resources :attendances
