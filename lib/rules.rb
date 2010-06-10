@@ -26,35 +26,39 @@ module Merb
       end
       
       def allow(hash)
-        if hash[:condition].class==Array
-          hash[:condition][1] = "<"  if hash[:condition][1] == :less_than
-          hash[:condition][1] = "<=" if hash[:condition][1] == :less_than_equal
-          hash[:condition][1] = ">"  if hash[:condition][1] == :greater_than
-          hash[:condition][1] = ">=" if hash[:condition][1] == :greater_than_equal
-          condition = hash[:condition].join(" ")
-        elsif hash[:condition].class==Hash
-          condition = hash[:condition].to_a.join(" => ")
-        end
-        hash[:model].validates_with_method()
-        puts "Allow obj of #{hash[:model]} apply on #{hash[:on]} 'obj.#{condition}'"
+        condition = get_condition(hash)
+        hash[:model].validates_with_method()       
+        print "Allow a #{hash[:model]} object on #{hash[:on]} if 'object.#{condition}'"
+        print " subject to a precondition of #{hash[:if]}" if hash.key?(:if)
+        puts
       end
       
       def reject(hash)
-        if hash[:condition].class==Array
-          hash[:condition][1] = "<"  if hash[:condition][1] == :less_than
-          hash[:condition][1] = "<=" if hash[:condition][1] == :less_than_equal
-          hash[:condition][1] = ">"  if hash[:condition][1] == :greater_than
-          hash[:condition][1] = ">=" if hash[:condition][1] == :greater_than_equal
-          condition = hash[:condition].join(" ")
-        elsif hash[:condition].class==Hash
-          condition = hash[:condition].to_a.join(" => ")
-        end
-        puts "Reject obj of #{hash[:model]} apply on #{hash[:on]} 'obj.#{condition}'"
+        condition = get_condition(hash)
+        print "Reject a #{hash[:model]} object on #{hash[:on]} if 'obj.#{condition}'"
+        print " subject to a precondition of #{hash[:if]}" if hash.key?(:if)
+        puts
       end
       
       def self.rules
         @@rules
       end
+
+      private
+      def get_condition(hash)
+        if hash[:condition].class==Array
+          hash[:condition][1] = "<"  if hash[:condition][1] == :less_than
+          hash[:condition][1] = "<=" if hash[:condition][1] == :less_than_equal
+          hash[:condition][1] = ">"  if hash[:condition][1] == :greater_than
+          hash[:condition][1] = ">=" if hash[:condition][1] == :greater_than_equal
+          hash[:condition][1] = "==" if hash[:condition][1] == :equal
+          condition = hash[:condition].join(" ")
+        elsif hash[:condition].class==Hash
+          condition = hash[:condition].to_a.join(" => ")
+        end
+        condition
+      end
+
     end
   end    
 end    
