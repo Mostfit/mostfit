@@ -96,7 +96,9 @@ Merb::BootLoader.after_app_loads do
 
   # set the rights
   require 'config/misfit'
-
+  require 'lib/rules'
+  
+  Mostfit::Business::Rule.deploy
   # enable the extensions
   Misfit::Extensions.hook
 
