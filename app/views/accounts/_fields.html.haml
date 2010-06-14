@@ -1,6 +1,21 @@
 %table
   %tr
     %td
+      Account Type
+    %td
+      - options = [['none', '<select type>']] + (Account.account_types.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
+      = select :account_type, :collection => options
+  
+  %tr
+    %td
+      Parent Account 
+    %td
+     
+      = select :parent_account_id, :collection => Account.all.map { |a| [a.name]} 
+
+ 
+  %tr
+    %td
       Name
     %td
       =text_field :name
@@ -9,16 +24,3 @@
       GL Code
     %td
       =text_field :gl_code
-  %tr
-    %td
-      Parent Account 
-    %td
-      =select :parent_gl_id, :collection => Account.all.map{|a| [a.name]}.sort
-  %tr
-    %td
-      Account Type
-    %td
-      - options = [['none', '<select type>']] + (Account.account_types.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
-      = select :account_type, :collection => options
- 
-     
