@@ -106,10 +106,11 @@ class Dashboard < Application
   def clients
     case params[:id]
     when "growth"
-      dater =  Proc.new{|x| x.strftime('%Y-%m')}
+      dater =  Proc.new{|x| x.strftime('%Y-%b')}
       vals  = get_clients.aggregate(:all.count, :fields => [:date_joined]).group_by_function(dater)
       graph = BarGraph.new("Client growth per month")
       graph.data_type=:individual
+      graph.x_axis.steps=5
       graph.data(vals, :last, :first)
       return graph.generate
     when "cumulative"
