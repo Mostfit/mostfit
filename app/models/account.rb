@@ -1,18 +1,15 @@
 class Account
   include DataMapper::Resource
-  TYPES = [:none, :assets, :expenditure, :income, :liabilities ]
+ # TYPES = [:none, :assets, :expenditure, :income, :liabilities ]
   property :id,                Serial  
   property :name,              String
   property :gl_code,           String
   property :parent_account_id,      String
-  property :account_type,      Enum.send('[]', *TYPES), :nullable => false , :default => :none, :index => true
+ # property :account_type,      Enum.send('[]', *TYPES), :nullable => false , :default => :none, :index => true
 
   belongs_to :account, :model => 'Account', :child_key => [:parent_account_id]
-
-def self.account_types
- TYPES
-end 
-
+  belongs_to :account_type
+  
 end
 
 # class AccountTransaction
