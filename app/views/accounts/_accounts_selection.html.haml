@@ -1,0 +1,4 @@
+%option
+-@accounts.each do |account|
+  %option{:value => account.id}
+    =account.name
