@@ -18,7 +18,6 @@ function spitLogs(){
 	    }
 	});
 }
-
 function fillOptions(id, select){
     $.ajax({
 	    type: "GET",
@@ -494,8 +493,12 @@ $(document).ready(function(){
 	  }
 
       });
-  $("#client_active").change(function(){
-	  $("#inactive_options").toggle();
+  $("#account_account_type_id").change(function(select){
+	  val=$("#account_account_type_id").val();
+	  $.ajax({
+		  url: "/accounts?account_type_id="+val,
+		      success: function(data){$("#account_parent_account_id").html(data);}		  
+	      });
       });
   attachReportingFormEvents("formdiv_1");
   $("a.enlarge_image").click(function(a){
