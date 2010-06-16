@@ -4,7 +4,7 @@ class Journal
   property :id,             Serial
   property :comment,        String 
   property :transaction_id, Integer
-  property :creation_date,  DateTime
+  property :created_at,  DateTime
 
   belongs_to :batch
   has n, :postings

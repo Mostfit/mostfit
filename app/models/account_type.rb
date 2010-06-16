@@ -10,4 +10,5 @@ class AccountType
   validates_present :code
   validates_length :name,   :minimum => 3
   validates_length :code,   :minimum => 3
+  validates_is_unique :code
 end
