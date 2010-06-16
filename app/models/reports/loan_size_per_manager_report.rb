@@ -9,11 +9,11 @@ class LoanSizePerManagerReport < Report
   end
 
   def name
-    "Average Loan Size per Center Manager Report"
+    "Average Loan Size Report"
   end
 
   def self.name
-    "Average Loan Size per Center Manager Report"
+    "Average Loan Size Report"
   end
 
   def generate
@@ -23,11 +23,20 @@ class LoanSizePerManagerReport < Report
       data[branch] = {}
     }
     StaffMember.all.each{|x| staff[x.id]=x}
+    @branch.each{|branch|
+      branch.centers.group_by{|c| c.manager}.each{|s, centers|
+        data[branch][s] = [centers.count, Client.all(:center => centers).count, 0, 0, 0, 0, 0]
+      }
+    }
 
     disbursal_data.each{|x|
       next unless branch = @branch.find{|b| b.id==x.branch_id}
-      data[branch][staff[x.manager_id]] = []
-      data[branch][staff[x.manager_id]] = [x.center_count, x.client_count, 0, 0, x.amount, x.lavg, x.amount/x.center_count]
+      data[branch][staff[x.manager_id]] = [0, 0, 0, 0, 0, 0, 0] if not data[branch][staff[x.manager_id]]
+      data[branch][staff[x.manager_id]][2] = 0
+      data[branch][staff[x.manager_id]][3] = 0
+      data[branch][staff[x.manager_id]][4] = x.amount
+      data[branch][staff[x.manager_id]][5] = x.lavg
+      data[branch][staff[x.manager_id]][6] = x.amount/x.center_count
     }
 
     approval_data.each{|x|
@@ -50,6 +59,12 @@ class LoanSizePerManagerReport < Report
         data[branch][staff[x.manager_id]] = [centers.count, loans_count, 0, 0, 0, 0, 0]
       end
       data[branch][staff[x.manager_id]][2] += x.amount
+    }
+    @branch.each{|branch|
+      branch.centers.each{|center|
+        next if data[branch] and data[branch][center.manager]
+        data[branch][center.manager] = [center.manager.centers.count, 0, 0, 0, 0, 0, 0]
+      }
     }
     return data
   end
