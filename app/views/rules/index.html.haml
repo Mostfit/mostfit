@@ -1,0 +1,16 @@
+%h1
+  Rules controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/rules/index.html.erb
+%table
+  %tr
+  - for rule in @rules
+    %tr
+      %td
+        = link_to 'Show', url(:rule, rule)
+      %td
+        = link_to 'Edit', url(:edit_rule,  rule)
+
+= link_to 'New', url(:new_rule)
