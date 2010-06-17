@@ -1,0 +1,9 @@
+%table
+  %tr
+    %td
+      Loan Utilization
+    %td
+      =form_for(:loan, :class => "_remote_", :action => url(:controller => :loans, :action => :update_utilization, :id => @loan.id), :method => "POST") do
+        %div
+        =select :loan_utilization_id, :collection => LoanUtilization.all.map{|lu| [lu.id, lu.name]}, :include_blank => true
+        =submit "Save"

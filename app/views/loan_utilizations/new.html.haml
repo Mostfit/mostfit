@@ -1,0 +1,10 @@
+%h1 Loan Utilization
+
+= form_for(@loan_utilization, :action => url(:loan_utilizations) ) do
+  %p
+    Name
+    =text_field(:name)
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:loan_utilizations)

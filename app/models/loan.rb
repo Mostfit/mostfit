@@ -50,6 +50,8 @@ class Loan
   property :original_first_payment_date,        Date
   property :taken_over_on,                      Date
   property :taken_over_on_installment_number,   Integer
+
+  property :loan_utilization_id,                Integer, :lazy => true, :nullable => true
   
 #  property :taken_over_on,                     Date
 #  property :taken_over_on_installment_number,  Integer 
@@ -66,6 +68,7 @@ class Loan
   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id],   :model => 'StaffMember'
   belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
   belongs_to :created_by,     :child_key => [:created_by_user_id],        :model => 'User'
+  belongs_to :loan_utilization
   has n, :history,                                                        :model => 'LoanHistory'
   has n, :payments
   has n, :audit_trails,       :child_key => [:auditable_id], :auditable_type => "Loan"
@@ -140,14 +143,16 @@ class Loan
 
   def is_valid_loan_product(method)
     loan_attr    = self.send(method)
-    return [false, "No #{method} specified"] if loan_attr===""
+    return [false, "No #{method} specified"] if not loan_attr or loan_attr===""
     return [false, "No loan product chosen"] unless self.loan_product
     product = self.loan_product
     #Checking if the loan adheres to minimum and maximums of the loan product
     {:min => :minimum, :max => :maximum}.each{|k, v|
       product_attr = product.send("#{k}_#{method}")
-      product_attr = product_attr.to_f/100 if method==:interest_rate
-      loan_attr    = loan_attr.to_f        if method==:interest_rate
+      if method==:interest_rate
+        product_attr = product_attr.to_f/100
+        loan_attr    = loan_attr.to_f
+      end
 
       if k==:min and loan_attr and product_attr and  loan_attr < product_attr
         return [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
@@ -160,12 +165,8 @@ class Loan
       product_attr = product.send("#{method}_multiple")
       loan_attr = loan_attr*100 if method==:interest_rate
       remainder = loan_attr.remainder(product_attr)
-      if method==:interest_rate
-        remainder = remainder/100
-        return  [false, "#{method.to_s.capitalize} should be in multiples of #{product_attr}"]  if not loan_attr or not remainder<=(EPSILON/100)
-      else
-        return  [false, "#{method.to_s.capitalize} should be in multiples of #{product_attr}"]  if not loan_attr or not remainder<=EPSILON        
-      end
+      remainder = remainder/100 if method==:interest_rate
+      return  [false, "#{method.to_s.capitalize} should be in multiples of #{product_attr}"]  if not loan_attr or remainder > EPSILON
     end
     return true
   end

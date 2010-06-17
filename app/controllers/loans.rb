@@ -173,6 +173,20 @@ class Loans < Application
     end
   end
 
+  def misc(id)
+    @loan = Loan.get(id)
+    request.xhr? ? render(:layout => false) : render
+  end
+
+  def update_utilization(id)
+    @loan =  Loan.get(id)    
+    if @loan.update!(:loan_utilization_id => params[:loan][:loan_utilization_id])
+      request.xhr? ? render("Saved loan utilization", :layout => false) : redirect(resource(@loan))
+    else
+      request.xhr? ? render(@loan.errors.to_a.map{|x| x.join(":")}.join(", "), :layout => false, :status => 400) : render(resource(@loan, :edit))
+    end
+  end
+
   private
   def get_context
     if params[:id]

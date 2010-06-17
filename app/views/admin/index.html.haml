@@ -26,6 +26,8 @@
     %li
       = link_to_with_rights 'Manage Occupations', resource(:occupations), :class => 'edit'
     %li
+      = link_to_with_rights 'Manage Loan Utilizations', resource(:loan_utilizations), :class => 'edit'
+    %li
       = link_to_with_rights 'Manage document types', resource(:document_types), :class => 'edit'
     %li
       = link_to_with_rights 'Edit Details', url(:controller => "admin", :action => "edit"), :class => 'edit'

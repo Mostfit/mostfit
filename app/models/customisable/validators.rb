@@ -38,16 +38,17 @@ module Misfit
     end
     
     def part_of_a_group_and_passed_grt?
-      return [false, "Client is not part of a group"] if client.client_group_id.nil? or client.client_group_id.blank?
+      return [false, "Client is not part of a group"] if not client or client.client_group_id.nil? or client.client_group_id.blank?
       return [false, "Client has not passed GRT"] if client.grt_pass_date.nil? or client.grt_pass_date.blank?
       return true
     end
 
     def scheduled_dates_must_be_center_meeting_days
-      meeting_day = self.client.center.meeting_day
+      return [false, "Not client defined"] if not client
+      meeting_day = client.center.meeting_day
       failed = []
       ["scheduled_first_payment_date", "scheduled_disbursal_date"].each do |d|
-        failed << d unless instance_eval(d).weekday == meeting_day
+        failed << d if not instance_eval(d) or not instance_eval(d).weekday == meeting_day
       end
       return [false, "#{failed.join(",")} must be #{meeting_day}"]      unless failed.blank?
       return true
