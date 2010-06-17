@@ -198,6 +198,7 @@ function create_remotes(){
 			$("#spinner").remove();
 		    },
 		    error: function(xhr, text, errorThrown){
+			$("div.error").remove();
 			txt = "<div class='error'>"+xhr.responseText+"</div>"
 			form.before(txt);
 			$("#spinner").remove();			
