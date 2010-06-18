@@ -224,7 +224,7 @@ class LoanHistory
     repository.adapter.query(%Q{
       SELECT #{select}
       FROM loan_history
-      WHERE #{query} AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}' AND status in (5,6)
+      WHERE #{query} AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}' AND current=1 AND status in (5,6)
       GROUP BY #{q}
     })
   end
