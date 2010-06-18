@@ -3,28 +3,26 @@
     %td 
       Rule Name
     %td
-      =text_field :name
-  %tr 
-    %td
-      Branch
-    %td
-      =select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
-
+      = text_field :name
   %tr
     %td
       Action
     %td
-      - options = (RuleBook::ACTIONS.map { |x| [x.to_s, x.to_s.capitalize] })
-      =select :action, :collection => options, :prompt => "Select action"
+      = select :action
+
 
   %tr
     %td
       Credit Account Name
     %td
-      =select :credit_account_id, :collection => Account.all.map{ |x| [x.id ,x.name]}, :prompt => "Select credit Account"
+      = select :credit_account_id, :collection => Account.all.map{ |x| [x.id ,x.name]}, :prompt => "Select credit Account"
   %tr
     %td
       Debit Account Name 
     %td
-      =select :debit_account_id, :collection => Account.all.map{ |x| [x.id, x.name]}, :prompt => "Select debit Account"
- 
+      = select :debit_account_id, :collection => Account.all.map{ |x| [x.id, x.name]}, :prompt => "Select debit Account"
+  %tr 
+    %td
+      Branch
+    %td
+      = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"

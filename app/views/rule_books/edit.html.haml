@@ -1,9 +1,15 @@
-- form_url   =  resource(:rule_books, {:return => params[:return]})
+%h1
+  RuleBooks controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/rule_books/edit.html.erb
 = error_messages_for @rule_book
-= form_for(@rule_book, :action => form_url, :class => "form") do
-  %fieldset
-    %h1 Edit a Rule
-    = partial "rule_books/fields"
+
+= form_for(@rule_book, :action => url(:rule_book, @rule_book)) do
+  %p
     = submit "Update"
 
+= link_to 'Show', url(:rule_book, @rule_book)
+|
 = link_to 'Back', url(:rule_books)
