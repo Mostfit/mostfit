@@ -32,8 +32,9 @@
             =group ? group.name : "none"
         -clients_grouped.sort_by{|x| x.name}.each do |client|
           - loan_row_count = 0
-          - loans.find_all{|l| l.client_id == client.id and l.disbursal_date and l.status!=:repaid}.each do |loan|
+          - loans.find_all{|l| l.client_id == client.id and l.disbursal_date}.each do |loan|
             - lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
+            - next if lh.status==:repaid
             - loan_row_count += 1
             %tr{ :class => cycle('odd','') }
               %td.text
