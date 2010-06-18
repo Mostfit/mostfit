@@ -14,9 +14,9 @@ class Verifications < Application
     when "clients"
       @clients  = clients.paginate(:page => params[:page], :per_page => 10)
     when "loans"
-      @loans    = loans.paginate(:page => params[:page], :per_page => 10)
+      @loans    = loans.paginate(:page => params[:page], :per_page => 20)
     when "payments"
-      @payments = payments.paginate(:page => params[:page], :per_page => 25)
+      @payments = payments.paginate(:page => params[:page], :per_page => 100)
     else
       if @centers.length>0
         @clients_count  = clients.count
@@ -56,7 +56,9 @@ class Verifications < Application
   
   def payments(centers = nil, type = :objects)
     hash = {:verified_by_user_id => nil}
-    hash[:loan_id]   = Loan.all(:client_id => Client.all(:center_id => @centers.map{|x| x.id}, :fields => [:id]).map{|x| x.id}).map{|x| x.id} if @centers
+    if @centers and not session.user.role==:admin
+      hash[:loan_id]   = Loan.all(:client_id => Client.all(:center_id => @centers.map{|x| x.id}, :fields => [:id]).map{|x| x.id}).map{|x| x.id}
+    end
     hash[:created_at] = @from_date..@to_date
     hash[:fields]     = [:id]
     Payment.all(hash)
