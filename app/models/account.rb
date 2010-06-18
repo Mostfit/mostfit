@@ -15,7 +15,6 @@ class Account
   validates_length  :name,     :minimum => 3
   validates_length  :gl_code,  :minimum => 3  
   validates_is_unique :gl_code
-  validates_is_number :gl_code
   validates_is_number :opening_balance
 end
 
