@@ -360,21 +360,22 @@ class Loan
                                   :amount => interest.round, :type => :interest)
         payments.push(int_payment)
       end
-      
-      if not payments.collect{|payment| payment.save}.include?(false)
-        if defer_update #i.e. bulk updating loans
-          Merb.run_later do
-            update_history
-          end
-        else
-          update_history  # update the history if we saved a payment
-        end
-        return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
-      else
+      if payments.collect{|payment| payment.save}.include?(false)
         t.rollback
         return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees},]        
       end
     end
+    
+    if defer_update #i.e. bulk updating loans
+      Merb.run_later do
+        update_history
+      end
+    else
+      update_history  # update the history if we saved a payment
+    end
+    return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
+
+
     
     # return the success boolean and the payment object itself for further processing
   end

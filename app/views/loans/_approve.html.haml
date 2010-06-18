@@ -45,3 +45,4 @@
     %tr
       %td{:colspan => 10}
   
+= paginate @loans_to_approve if @loans_to_approve.respond_to?(:page)
