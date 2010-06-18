@@ -338,38 +338,45 @@ class Loan
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0].to_i, input[1].to_i
     end
-    if fees_paid > 0
-      fee_payment = Payment.new(:loan => self, :created_by => user,
-                                :received_on => received_on, :received_by => received_by,
-                                :amount => fees_paid.round, :type => :fees)
-      fee_saved = fee_payment.save
-    end
-    if principal > 0
-      prin_payment = Payment.new(:loan => self, :created_by => user,
-                                 :received_on => received_on, :received_by => received_by,
-                                 :amount => principal.round, :type => :principal)
-      prin_saved = prin_payment.save
-    end
-    if interest > 0
-      int_payment = Payment.new(:loan => self, :created_by => user,
-                                :received_on => received_on, :received_by => received_by,
-                                :amount => interest.round, :type => :interest)
-      int_saved = int_payment.save
-    end
-    save_status = (fee_saved or prin_saved or int_saved)
-    if save_status == true
-      if defer_update #i.e. bulk updating loans
-        Merb.run_later do
-          update_history
-        end
-      else
-        update_history  # update the history if we saved a payment
+
+    save_status = nil
+    Payment.transaction do |t|
+      payments = []
+      if fees_paid > 0
+        fee_payment = Payment.new(:loan => self, :created_by => user,
+                                  :received_on => received_on, :received_by => received_by,
+                                  :amount => fees_paid.round, :type => :fees)
+        payments.push(fee_payment)
       end
-      clear_cache
+      if principal > 0
+        prin_payment = Payment.new(:loan => self, :created_by => user,
+                                   :received_on => received_on, :received_by => received_by,
+                                   :amount => principal.round, :type => :principal)        
+        payments.push(prin_payment)
+      end
+      if interest > 0
+        int_payment = Payment.new(:loan => self, :created_by => user,
+                                  :received_on => received_on, :received_by => received_by,
+                                  :amount => interest.round, :type => :interest)
+        payments.push(int_payment)
+      end
+      
+      if not payments.collect{|payment| payment.save}.include?(false)
+        if defer_update #i.e. bulk updating loans
+          Merb.run_later do
+            update_history
+          end
+        else
+          update_history  # update the history if we saved a payment
+        end
+        return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
+      else
+        t.rollback
+        return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees},]        
+      end
     end
-    #payment.principal, payment.interest = nil, nil unless total.nil?  # remove calculated pr./int. values from the form
-    # Merb.logger.info "loan #{id}: #{received_on} => paid #{principal} + #{interest} | prin_paid #{principal_received_up_to(received_on)} | os_bal:#{actual_outstanding_principal_on(received_on)}"
-    [save_status, prin_payment, int_payment, fee_payment]  # return the success boolean and the payment object itself for further processing
+    
+    # return the success boolean and the payment object itself for further processing
   end
 
   # the way to delete payments from the db
