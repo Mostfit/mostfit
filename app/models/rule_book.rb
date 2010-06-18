@@ -2,7 +2,7 @@ class RuleBook
   include DataMapper::Resource
   property :id,   Serial
   property :name, String
-  property :action, Enum[:principal, :interest, :fees, :disbursement]
+  property :action, Enum.send('[]',*['','principal', 'interest', 'fees', 'disbursement'])
 
   belongs_to :credit_account, Account
   belongs_to :debit_account,  Account

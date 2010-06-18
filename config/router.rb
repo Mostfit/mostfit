@@ -1,7 +1,7 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
   resources :loan_utilizations
-  resources :book_keepings
+  resources :rule_books
   resources :account_types
   resources :accounts
   resources :bookmarks
