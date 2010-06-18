@@ -1,6 +1,6 @@
 module Mostfit
   module Business
-    class Rule
+    class Rules
       @@rules = {}
       REJECT_REGEX = /^(Merb|merb)::*/
       
@@ -11,8 +11,8 @@ module Mostfit
       def initialize
       end
       
-      def all_models
-        DataMapper::Model.descendants.map{|d| d.to_s.snake_case.to_sym}
+      def self.all_models
+        DataMapper::Model.descendants.reject{|x| x.superclass!=Object}.map{|d| d.to_s.snake_case.to_sym}
       end
 
       def self.tree

@@ -3,7 +3,7 @@
     %td
       %b Name
     %td
-      =text_field :name
+      =text_field :name, :size => 40
 
   %tr
     %td
@@ -21,7 +21,7 @@
     %td
       %b On action
     %td
-      = select :on, :collection => Rule.properties[:on].type.flag_map.map{|k,v| [v.to_s, v.to_s]}
+      = select :on, :collection => Rule.properties[:on].type.flag_map.map{|k,v| [v.to_s, v.to_s]}, :class => "_remote_"
 
   %tr
     %td

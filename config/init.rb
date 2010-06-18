@@ -30,6 +30,7 @@ Merb::BootLoader.before_app_loads do
                           :currency => { :unit => 'Rs.',  :format => '%u %n', :precision => 0 } })
   Numeric::Transformer.change_default_format(:mostfit_default)
   require 'config/constants.rb'
+  require 'lib/rules'
 #  require 'csv'
   require 'uuid'
   require 'ftools'
@@ -96,9 +97,8 @@ Merb::BootLoader.after_app_loads do
 
   # set the rights
   require 'config/misfit'
-  require 'lib/rules'
   
-  Mostfit::Business::Rule.deploy
+  Mostfit::Business::Rules.deploy
   # enable the extensions
   Misfit::Extensions.hook
 
