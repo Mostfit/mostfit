@@ -19,10 +19,10 @@ class LoanHistory
   property :scheduled_outstanding_principal, Integer, :nullable => false, :index => true
   property :actual_outstanding_total,        Integer, :nullable => false, :index => true
   property :actual_outstanding_principal,    Integer, :nullable => false, :index => true
-  property :principal_due,                  Integer, :nullable => false, :index => true
-  property :interest_due,                  Integer, :nullable => false, :index => true
+  property :principal_due,                   Integer, :nullable => false, :index => true
+  property :interest_due,                    Integer, :nullable => false, :index => true
   property :principal_paid,                  Integer, :nullable => false, :index => true
-  property :interest_paid,                  Integer, :nullable => false, :index => true
+  property :interest_paid,                   Integer, :nullable => false, :index => true
 
   property :status,                          Enum.send('[]', *STATUSES)
 
