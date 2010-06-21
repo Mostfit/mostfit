@@ -296,4 +296,44 @@ class LoanHistory
             end
     repository.adapter.query(query).first
   end
+
+  def self.borrower_clients_count_in(obj)
+    froms = ["clients cl", "loans l"]
+    conditions = ["cl.id=l.client_id", "l.deleted_at is NULL"]
+
+    klass = (obj.class == Array or obj.class==DataMapper::Associations::OneToMany::Collection) ? obj.first.class : obj.class
+    obj   = (obj.class == Array or obj.class==DataMapper::Associations::OneToMany::Collection) ? obj : [obj]
+
+    if klass==Branch
+      froms << "centers c" 
+      froms << "branches b"
+      conditions << "b.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "cl.center_id=c.id"
+      conditions << "c.branch_id=b.id"
+    elsif klass==Center
+      froms << "centers c"
+      conditions << "cl.center_id=c.id"
+      conditions << "c.id in (#{obj.map{|x| x.id}.join(',')})"
+    elsif klass==Area
+      froms << "centers c"
+      froms << "branches b"
+      froms << "areas a"
+      conditions << "a.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "a.id=b.area_id"
+      conditions << "c.branch_id=b.id"
+      conditions << "cl.center_id=c.id"
+    elsif klass==Region
+      froms << "centers c"
+      froms << "branches b"
+      froms << "areas a"
+      froms << "regions r"
+      conditions << "r.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "r.id=a.region_id"
+      conditions << "a.id=b.area_id"
+      conditions << "c.branch_id=b.id"
+      conditions << "cl.center_id=c.id"
+    end
+
+    repository.adapter.query("SELECT count(*) FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
+  end
 end
