@@ -1,0 +1,32 @@
+%table
+  %h1 List of Accounting Rules
+  %tr
+    %th 
+      Rule Name 
+    %th
+      Branch
+    %th 
+      Action
+    %th
+      Credit
+    %th
+      Debit
+  %tr
+  - for rule_book in @rule_books    
+    %tr
+      %td
+        = rule_book.name
+      %td
+        = rule_book.branch.name
+      %td 
+        = rule_book.action
+      %td 
+        = rule_book.credit_account.name
+      %td
+        = rule_book.debit_account.name
+      %td
+        = link_to 'Edit', url(:edit_rule_book,  rule_book)
+
+= link_to 'New', url(:new_rule_book)
+|
+= link_to 'Back', url(:account_types)
