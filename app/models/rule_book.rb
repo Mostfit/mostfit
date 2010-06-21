@@ -1,8 +1,9 @@
 class RuleBook
   include DataMapper::Resource
+  ACTIONS = ['principal', 'interest', 'fees', 'disbursement']
   property :id,   Serial
   property :name, String
-  property :action, Enum.send('[]',*['','principal', 'interest', 'fees', 'disbursement'])
+  property :action, Enum.send('[]',*ACTIONS)
 
   belongs_to :credit_account, Account
   belongs_to :debit_account,  Account
@@ -19,5 +20,9 @@ class RuleBook
     rule = first(:action => transaction_type, :branch => branch)
     [rule.debit_account, rule.credit_account]
   end
+
+  def self.actions
+     ACTIONS
+  end 
 
 end
