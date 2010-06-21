@@ -12,6 +12,12 @@
       %td
         = link_to account_type.code, url(:edit_account_type, account_type)
       
-
-= link_to 'New Account Type',url(:new_account_type)
-= link_to 'Manage Account', url(:accounts)
+  %tr
+    %th
+      = link_to 'New Account Type',url(:new_account_type)
+  %tr
+    %th 
+      = link_to 'Manage Account', url(:accounts) 
+  %tr 
+    %th
+      = link_to 'Create New Rule', url(:rule_books)
