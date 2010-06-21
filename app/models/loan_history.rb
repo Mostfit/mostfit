@@ -146,11 +146,17 @@ class LoanHistory
                };
     end
       
+    ids=repository.adapter.query(%Q{
+                                 SELECT lh.loan_id loan_id, max(lh.date) date
+                                 FROM loan_history lh
+                                 WHERE lh.status in (5,6) AND lh.date<='#{date.strftime('%Y-%m-%d')}' AND #{query}
+                                 GROUP BY lh.loan_id
+                                 }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")    
     # these are the loan history lines which represent the last line before @date
     rows = repository.adapter.query(%Q{
       SELECT loan_id,max(date)
       FROM loan_history
-      WHERE date < '#{date.strftime("%Y-%m-%d")}' and amount_in_default > 0 and status in (5,6) and #{query}
+      WHERE amount_in_default > 0 and status in (5,6) and (loan_id, date) in (#{ids})
       GROUP BY loan_id})
     return nil if rows and rows.length==0
 
