@@ -178,6 +178,7 @@ class LoanHistory
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
     return false if ids.length==0
+    
     repository.adapter.query(%Q{
       SELECT 
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
@@ -210,6 +211,16 @@ class LoanHistory
       query="loan_id in (#{ids})"
       q = "branch_id"
     end
+
+    ids=repository.adapter.query(%Q{
+                                 SELECT lh.loan_id loan_id, max(lh.date) date
+                                 FROM loan_history lh
+                                 WHERE lh.status in (5,6) AND #{query} AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' 
+                                 AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
+                                 GROUP BY lh.loan_id
+                                 }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
+    return false if ids.length==0
+    
     select  = %Q{
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
         SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
@@ -221,10 +232,11 @@ class LoanHistory
         COUNT(DISTINCT(client_id))           AS clients_count,
         branch_id
     }
+
     repository.adapter.query(%Q{
       SELECT #{select}
       FROM loan_history
-      WHERE #{query} AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}' AND current=1 AND status in (5,6)
+      WHERE (loan_id, date) in (#{ids})
       GROUP BY #{q}
     })
   end
