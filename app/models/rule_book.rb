@@ -12,17 +12,13 @@ class RuleBook
   def self.get_accounts(obj)
     if obj.class==Payment
       transaction_type = obj.type
-      branch  = obj.loan.client.center.branch
-    else
+#      branch  = obj.loan.client.center.branch 
+    elsif obj.class.superclass==Loan
       transaction_type = :disbursement
-      branch  = obj.client.center.branch
+#     branch  = obj.client.center.branch
     end
-    rule = first(:action => transaction_type, :branch => branch)
-    [rule.debit_account, rule.credit_account]
+    rule = first(:action => transaction_type)
+    [rule.credit_account, rule.debit_account]
   end
-
-  def self.actions
-     ACTIONS
-  end 
 
 end
