@@ -185,6 +185,28 @@ function create_remotes(){
 		});
 	    return false;
 	});
+    $("select.rules").change(function(eve){
+	    select = $(eve.currentTarget);
+	    select.after("<img id='spinner' src='/images/spinner.gif' />");
+	    id=select.attr("id");
+	    form  = select.parent();
+	    url   = "/rules/keys?model="+select.val();
+	    action = form.find("input[name='"+id+"_action']").val();
+	    $.ajax({
+		    type: "POST",
+		    url: url,
+		    success: function(data){
+			$("div.conditions").html(data);
+			$("#spinner").remove();
+		    },
+		    error: function(xhr, text, errorThrown){
+			txt = "<div class='error'>"+xhr.responseText+"</div>"
+			form.before(txt);
+			$("#spinner").remove();			
+		    }
+		});
+	    return false;	    
+	});
     $("form._remote_").submit(function(){
 	    form = $(this);
 	    $(form).after("<img id='spinner' src='/images/spinner.gif' />");

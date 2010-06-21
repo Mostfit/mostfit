@@ -9,22 +9,21 @@
     %td
       %b Allow
     %td
-      = select :permit, :collection => [[:yes, "Yes"], [:no, "No"]]
-
+      = select :permit, :collection => [[:yes, "Yes"], [:no, "No"]]  
   %tr
     %td
       %b Applicable for
     %td
-      = select :name, :collection => Mostfit::Business::Rules.all_models.map{|x| [x.to_s, x.to_s.camelcase(' ')]}.sort
-
+      = select :name, :collection => Mostfit::Business::Rules.all_models.map{|x| [x.to_s, x.to_s.camelcase(' ')]}.sort, :class => "rules"
   %tr
     %td
       %b On action
     %td
-      = select :on, :collection => Rule.properties[:on].type.flag_map.map{|k,v| [v.to_s, v.to_s]}, :class => "_remote_"
+      = select :on, :collection => Rule.properties[:on].type.flag_map.map{|k,v| [v.to_s, v.to_s]}
 
   %tr
     %td
-      %b Pre Conditions
+      %b Condition
     %td
-      = select :key
+      %div.conditions
+

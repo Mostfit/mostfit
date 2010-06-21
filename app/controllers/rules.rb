@@ -55,4 +55,9 @@ class Rules < Application
     end
   end
 
+  def keys(model)
+    model = Kernel.const_get(model.camelcase)    
+    render(select(:name => "key[]", :collection => (model.properties.map{|x| x.name.to_s} + model.relationships.keys), :class => "rules"), :layout => false)
+  end
+  
 end # Rules
