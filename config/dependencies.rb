@@ -34,7 +34,7 @@ dependency "dm-types", dm_gems_version
 dependency "dm-validations", dm_gems_version
 dependency "dm-serializer", dm_gems_version
 dependency "dm-observer", dm_gems_version
-dependency "dm-is-tree", dm_gems_version
+dependency "dm-is_tree", dm_gems_version
 
 dependency "dm-paperclip"
 dependency "merb-gen", merb_gems_version
