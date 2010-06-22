@@ -10,6 +10,7 @@ class AccountPaymentObserver
         credit_account, debit_account = RuleBook.get_accounts(obj)
 
         journal = Journal.new(:comment => "Payment: #{obj.type} - #{obj.amount}", 
+                              :date = obj.received_on,
                               :transaction_id => obj.id, :created_at => Time.now)
         journal_saved  = journal.save      
         
