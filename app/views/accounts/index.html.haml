@@ -5,12 +5,19 @@
       Account Name
     %th
       GL Code
+    %th
+      Account Type
   %tr
   - for account in @accounts
     %tr
       %td
-        = link_to account.name, url(:account, account)
+        = account.name
       %td
-        = link_to account.gl_code, url(:edit_account,  account)
-
-= link_to 'New', url(:new_account)
+        = account.gl_code
+      %td
+        = account.account_type.name
+      %td
+        = link_to 'Edit', url(:edit_account,  account)
+= link_to 'New', url(:new_account) 
+| 
+= link_to 'Back', url(:account_types)
