@@ -8,6 +8,8 @@ class Account
   property :parent_id,              String
   belongs_to :account, :model => 'Account', :child_key => [:parent_id]
   belongs_to :account_type
+   
+  has n, :postings
   is :tree, :order => :name
 
   validates_present :name 
