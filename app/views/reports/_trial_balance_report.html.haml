@@ -1,0 +1,36 @@
+=partial :form
+%table.report.nojs
+  %tr.header
+    %th
+      Account Type
+    %th
+      Account 
+    %th
+      Debit
+    %th
+      Credit
+ 
+  - length = 3
+  - org_total = []
+  - debit_sum, credit_sum = 0 , 0
+  - @data.each do |account|
+    %tr
+      %td
+        = account.account_type.name
+      %td
+        = account.name      
+      %td
+        - debit = (Posting.all(:account => account).sum(:amount, :amount.lte => 0)||0) * -1
+        - debit_sum += debit
+        = debit
+      %td
+        - credit = Posting.all(:account => account).sum(:amount, :amount.gte => 0)||0
+        - credit_sum += credit
+        = credit
+  %tr
+    %td
+    %td
+    %td
+      =debit_sum
+    %td
+      =credit_sum
