@@ -38,7 +38,7 @@ namespace :mostfit do
   desc "Make account entries for previous Loans and Payments"
   task :recreate_accounts do
     puts "Making account entries for Payments"
-    Payment.all.each do |p|
+    Payment.all(:deleted_at => nil).each do |p|
       AccountPaymentObserver.make_posting_entries(p)
     end
     puts "Making account entries for Loans"
