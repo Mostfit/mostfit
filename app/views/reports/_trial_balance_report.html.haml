@@ -20,11 +20,11 @@
       %td
         = account.name      
       %td
-        - debit = (Posting.all(:account => account).sum(:amount, :amount.lte => 0)||0) * -1
+        - debit = (account.postings.sum(:amount, :amount.lte => 0)||0) * -1
         - debit_sum += debit
         = debit
       %td
-        - credit = Posting.all(:account => account).sum(:amount, :amount.gte => 0)||0
+        - credit = account.postings.sum(:amount, :amount.gte => 0)||0
         - credit_sum += credit
         = credit
   %tr
