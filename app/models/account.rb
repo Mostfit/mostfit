@@ -5,10 +5,10 @@ class Account
   property :name,                   String
   property :opening_balance,        Integer, :default => 0 
   property :gl_code,                String
-  property :parent_account_id,      String
-  belongs_to :account, :model => 'Account', :child_key => [:parent_account_id]
+  property :parent_id,              String
+  belongs_to :account, :model => 'Account', :child_key => [:parent_id]
   belongs_to :account_type
-
+  is :tree, :order => :name
 
   validates_present :name 
   validates_present :gl_code
