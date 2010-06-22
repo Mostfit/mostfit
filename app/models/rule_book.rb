@@ -7,7 +7,7 @@ class RuleBook
 
   belongs_to :credit_account, Account
   belongs_to :debit_account,  Account
-  belongs_to :branch,         Branch 
+  belongs_to :branch,         Branch, :nullable => true
 
   def self.get_accounts(obj)
     if obj.class==Payment
