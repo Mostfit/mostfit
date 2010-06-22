@@ -29,6 +29,9 @@ module Misfit
   module LoanValidators
     def installments_are_integers?
       return [false, "Number of installments not defined"] if number_of_installments.nil? or number_of_installments.blank?
+      return [false, "Amount not defined"] unless amount
+      return [false, "Interest rate not defined"] unless interest_rate
+
       self.payment_schedule.each do |date, val|
         pri = val[:principal]
         int = val[:interest]

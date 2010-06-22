@@ -104,6 +104,7 @@ class Loan
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :cheque_number,                :method => :check_validity_of_cheque_number
+  validates_with_method  :client_active,                :method => :is_client_active
 
   #product validations
 
@@ -1001,7 +1002,11 @@ class Loan
     return true if (validated_on and validated_by) or (validated_on.blank? and validated_by.blank? and validation_comment.blank?)
     [false, "The validation date, the validating staff member the loan should both be given"]
   end
-        
+  def is_client_active
+    unless client.active
+      return [false, "This is client is no more active"]
+    end
+  end
 end
 
 class DefaultLoan < Loan

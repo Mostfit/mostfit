@@ -57,6 +57,9 @@
   -if @client.tags and @client.tags.include?(:insincere)
     %h3.blocked
       This client is insincere and is not elgible for a loan
+  -elsif not @client.active
+    %h3.blocked
+      This client is not active anymore
   -else
     %p
       = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
