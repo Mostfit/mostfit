@@ -72,16 +72,30 @@ class Fee
     fees
   end
 
-  def self.paid(loan_ids, client_ids)
-    loan_ids   = loan_ids.length>0 ? loan_ids.join(",") : "NULL"
+  def self.paid(client_ids)
     client_ids = client_ids.length>0 ? client_ids.join(",") : "NULL"
     repository.adapter.query(%Q{
-                                SELECT loan_id, client_id, amount, id
+                                SELECT client_id, SUM(amount) amount
                                 FROM payments p
-                                WHERE (p.loan_id IN (#{loan_ids}) OR p.client_id IN (#{client_ids})) AND p.type=3 AND deleted_at is NULL;})
+                                WHERE p.client_id IN (#{client_ids}) AND p.type=3 AND deleted_at is NULL GROUP BY client_id;})
   end
 
-  # faster compilation of fee collected for/by a given obj. This obj can be a branch, center, area, region or staff member
+  def self.due(loan_ids)
+    fees_applicable = self.applicable(loan_ids)
+    client_ids      = Loan.all(:id => loan_ids, :fields => [:id, :client_id]).map{|x| x.client_id}
+    fees_paid       = self.paid(client_ids)
+    fees = {}
+    loan_ids.each{|lid|
+      applicable = fees_applicable.find{|x| x.loan_id==lid}
+      next if not applicable
+      paid      = fees_paid.find{|x| x.client_id==applicable.client_id}
+      paid      = paid ? paid.amount.to_i : 0
+      fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable.to_i : 0), paid, (applicable ? applicable.fees_applicable : 0) - paid)
+    }
+    fees
+  end
+
+   # faster compilation of fee collected for/by a given obj. This obj can be a branch, center, area, region or staff member
   def self.collected_for(obj, from_date=Date.min_date, to_date=Date.max_date)
     if obj.class==Branch
       from  = "branches b, centers c, clients cl, payments p"
@@ -136,18 +150,5 @@ class Fee
                            }).map{|x| [x.comment, x.amount.to_i]}.to_hash
   end
 
-  def self.due(loan_ids)
-    fees_applicable = self.applicable(loan_ids)
-    fees_paid      = self.paid(loan_ids, [])
-    fees = {}
-    loan_ids.each{|lid|
-      applicable = fees_applicable.find{|x| x.loan_id==lid}
-      next if not applicable
-      paid      = fees_paid.find_all{|x| 
-        (x and x.loan_id==lid) or (x and x.client_id==applicable.client_id)
-      }.collect{|x| x.amount}.inject(0){|s,x| s+=x}
-      fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable : 0), paid, (applicable ? applicable.fees_applicable : 0) - paid)
-    }
-    fees
-  end
+
 end

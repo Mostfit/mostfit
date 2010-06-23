@@ -56,11 +56,11 @@
                 = ins
                 - tot_installments += ins
               %td.number
-                - p = lh.nil? ? 0 : lh.principal_due.to_i
+                - p = lh.nil? ? 0 : [lh.principal_due.to_i, 0].max
                 = p.to_currency
                 - tot_principal += p
               %td.number
-                - i = lh.nil? ? 0 : lh.interest_due.to_i
+                - i = lh.nil? ? 0 : [lh.interest_due.to_i,0].max
                 = i.to_currency
                 - tot_interest += i
               %td.number
