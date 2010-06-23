@@ -5,7 +5,7 @@ describe Account do
     AccountType.all.destroy!
     @account_type = AccountType.new(:name => "Assets", :code => "AST")
     @account_type.save
-    @account_type.error
+    @account_type.errors
     @account_type.should be_valid
   end
 
@@ -14,7 +14,7 @@ describe Account do
     @account = Account.new(:name => "Cash Account", :gl_code => "CA1001")
     @account.account_type = @account_type
     @account.save
-    @account.error
+    @account.errors
     @account.should be_valid
   end
   
@@ -46,7 +46,7 @@ describe Account do
   it "should be able to 'have' account" do
     @acc = Account.new(:name => "Income Account", :gl_code => "IA1002", :account_type => @account_type)
     @acc.save
-    @acc.error
+    @acc.errors
     @acc.should be_valid
     
     @account.account = @acc
