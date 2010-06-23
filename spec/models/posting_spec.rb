@@ -2,7 +2,7 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Posting do
   before (:all) do
-    @account_type = AccountType.new()
+    @account_type = AccountType.new(:name => "Assets", :code => "AST")
     @account_type.save
     @account_type.errors
     @account_type.should be_valid
@@ -17,7 +17,7 @@ describe Posting do
     @account.errors
     @account.should be_valid
     
-    @currency = Currency.new(:name => "rupee")
+    @currency = Currency.new(:name => "INR")
     @currency.save
     @currency.errors
     @currency.should be_valid
