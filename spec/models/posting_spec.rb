@@ -4,22 +4,22 @@ describe Posting do
   before (:all) do
     @account_type = AccountType.new()
     @account_type.save
-    @account_type.error
+    @account_type.errors
     @account_type.should be_valid
     
     @journal  = Journal.new(:comment => "A principal is repayed", :transaction_id => 100, :date => Date.today, :created_at => Date.today)
     @journal.save
-    @journal.error
+    @journal.errors
     @journal.should be_valid
     
     @account  = Account.new(:name => "Income Account", :gl_code => "IA1002", :account_type => @account_type)
     @account.save
-    @account.error
+    @account.errors
     @account.should be_valid
     
     @currency = Currency.new(:name => "rupee")
     @currency.save
-    @currency.error
+    @currency.errors
     @currency.should be_valid
   end
   
