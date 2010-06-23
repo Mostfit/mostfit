@@ -1,6 +1,7 @@
 class RuleBook
   include DataMapper::Resource
   ACTIONS = ['principal', 'interest', 'fees', 'disbursement']
+
   property :id,   Serial
   property :name, String
   property :action, Enum.send('[]',*ACTIONS)
@@ -8,8 +9,12 @@ class RuleBook
   belongs_to :credit_account, Account
   belongs_to :debit_account,  Account
   belongs_to :branch,         Branch, :nullable => true
-  validates_length :name, :min => 3
-  validates_with_method  :credit_account,   :method => :credit_account_is_not_same_as_debit_account
+
+  validates_present      :name
+  validates_length       :name,     :minimum => 3
+  validates_with_method  :credit_account,   :method => :credit_account_is_not_same_as_debit_account?
+
+
 
   def self.get_accounts(obj)
     if obj.class==Payment
