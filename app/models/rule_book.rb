@@ -9,6 +9,7 @@ class RuleBook
   belongs_to :debit_account,  Account
   belongs_to :branch,         Branch, :nullable => true
   validates_length :name, :min => 3
+  validates_with_method  :credit_account,   :method => :credit_account_is_not_same_as_debit_account
 
   def self.get_accounts(obj)
     if obj.class==Payment
@@ -21,9 +22,10 @@ class RuleBook
     rule = first(:action => transaction_type)
     [rule.credit_account, rule.debit_account]
   end
-
-  def self.actions
-    ACTIONS
+  
+  def credit_account_is_not_same_as_debit_account?
+    return true if credit_account != debit_account
+    [false, "Credit and Debit account cannot be same"]
   end
-
+  
 end
