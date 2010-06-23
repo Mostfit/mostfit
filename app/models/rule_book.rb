@@ -22,4 +22,8 @@ class RuleBook
     [rule.credit_account, rule.debit_account]
   end
 
+  def self.actions
+    ACTIONS
+  end
+
 end
