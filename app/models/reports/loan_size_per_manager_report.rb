@@ -40,8 +40,6 @@ class LoanSizePerManagerReport < Report
       data[branch][s][2] = 0
       data[branch][s][3] = 0
       data[branch][s][4] = x.amount
-      data[branch][s][5] = data[branch][s][1]>0 ? x.amount/data[branch][s][1] : 0
-      data[branch][s][6] = x.amount/x.center_count
     }
 
     approval_data.each{|x|
@@ -52,8 +50,6 @@ class LoanSizePerManagerReport < Report
         data[branch][staff[x.manager_id]] = [centers.count, clients_count, 0, 0, 0, 0, 0]
       end
       data[branch][staff[x.manager_id]][3]  += x.amount
-      avg = data[branch][staff[x.manager_id]][0]>0 ? x.amount/data[branch][staff[x.manager_id]][0] : 0
-      data[branch][staff[x.manager_id]][-1] += avg
     }
 
     applied_data.each{|x|
@@ -69,6 +65,10 @@ class LoanSizePerManagerReport < Report
       branch.centers.each{|center|
         next if data[branch] and data[branch][center.manager]
         data[branch][center.manager] = [center.manager.centers.count, 0, 0, 0, 0, 0, 0]
+      }
+      data[branch].each{|s, d|
+        data[branch][s][5] = data[branch][s][1]>0 ? data[branch][s][4]/data[branch][s][1] : 0
+        data[branch][s][6] = data[branch][s][0]>0 ? data[branch][s][4]/data[branch][s][0] : 0
       }
     }
     return data
