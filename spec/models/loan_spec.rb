@@ -360,11 +360,14 @@ describe Loan do
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by   = @manager
     @loan.status.should == :outstanding
+    lambda{@loan.repay(@loan.total_to_be_received, @user, Date.today, @manager)}.should raise_error
+
+    @loan.save
+    @loan.history_disabled=false
+    @loan.update_history
     # no payments on unsaved (new_record? == true) loans:
-    lambda { @loan.repay(@loan.total_to_be_received, @user, Date.today, @manager) }.should raise_error
     @loan.save.should == true
     r = @loan.repay(@loan.total_to_be_received, @user, Date.today, @manager)
-    p r[1].errors unless r[0]
     r[0].should == true
     @loan.status.should == :repaid
     @loan.status(@loan.scheduled_disbursal_date - 1).should == :approved
@@ -423,20 +426,22 @@ describe Loan do
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @manager
     # @loan.id = nil
+    @loan.history_disabled=false
     7.times do |i|
       status = @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
-      status[1].errors.each {|e| puts e}
+      status[0].should be_true      
     end
+    @loan.update_history
     @loan.payments_hash.keys.sort.each_with_index do |k,i|
       case i
-        when 0 
-          k.should == @loan.scheduled_disbursal_date
-        else
-          k.should == @loan.scheduled_first_payment_date + (7*(i-1))
+      when 0
+        k.should == @loan.scheduled_disbursal_date
+      else
+        k.should == @loan.scheduled_first_payment_date + (7*(i-1))
       end
       if i >= 3
         ps = @loan.payments_hash[k]
-        ps[:total_principal].should == 40 * (i) unless i > 7
+        ps[:total_principal].to_i.should == 40 * (i) unless i > 7
         ps[:total_interest].should == (200/25) * (i) unless i > 7
       end
     end
@@ -450,11 +455,12 @@ describe Loan do
     @loan.get_status(@loan.scheduled_disbursal_date).should == :disbursed
     @loan.save
     @loan.errors.each {|e| puts e}
-    @loan.history_disabled = true
+    @loan.history_disabled=false
     7.times do |i|
       p = @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
-      p[1].errors.each {|e| puts e}
+      p[0].should be_true
     end
+    @loan.update_history
     hist = @loan.calculate_history
     os_prin = 1000
     os_tot = 1200
@@ -498,15 +504,11 @@ describe Loan do
     @loan.get_status(@loan.scheduled_disbursal_date).should == :disbursed
     @loan.save
     @loan.errors.each {|e| puts e}
-    @loan.history_disabled = true
+    @loan.history_disabled=false
     7.times do |i|
       p = @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
       p[1].errors.each {|e| puts e}
     end
-    @loan.history_disabled = false
-    @loan.update_history_bulk_insert
-    lhs = LoanHistory.all(:loan_id => @loan.id, :order => [:date])
-    lhs.last.current.should == true
   end
 
   it ".installment_dates should correctly deal with holidays" do
