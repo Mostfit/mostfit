@@ -14,7 +14,7 @@
     %td
       Action
     %td
-      - options = (RuleBook.actions.map { |x| [x.to_s, x.to_s.capitalize] })
+      - options = (RuleBook::ACTIONS.map { |x| [x.to_s, x.to_s.capitalize] })
       =select :action, :collection => options, :prompt => "Select action"
 
   %tr
