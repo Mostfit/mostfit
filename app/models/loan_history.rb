@@ -19,10 +19,10 @@ class LoanHistory
   property :scheduled_outstanding_principal, Integer, :nullable => false, :index => true
   property :actual_outstanding_total,        Integer, :nullable => false, :index => true
   property :actual_outstanding_principal,    Integer, :nullable => false, :index => true
-  property :principal_due,                  Integer, :nullable => false, :index => true
-  property :interest_due,                  Integer, :nullable => false, :index => true
+  property :principal_due,                   Integer, :nullable => false, :index => true
+  property :interest_due,                    Integer, :nullable => false, :index => true
   property :principal_paid,                  Integer, :nullable => false, :index => true
-  property :interest_paid,                  Integer, :nullable => false, :index => true
+  property :interest_paid,                   Integer, :nullable => false, :index => true
 
   property :status,                          Enum.send('[]', *STATUSES)
 
@@ -146,11 +146,17 @@ class LoanHistory
                };
     end
       
+    ids=repository.adapter.query(%Q{
+                                 SELECT lh.loan_id loan_id, max(lh.date) date
+                                 FROM loan_history lh
+                                 WHERE lh.status in (5,6) AND lh.date<='#{date.strftime('%Y-%m-%d')}' AND #{query}
+                                 GROUP BY lh.loan_id
+                                 }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")    
     # these are the loan history lines which represent the last line before @date
     rows = repository.adapter.query(%Q{
       SELECT loan_id,max(date)
       FROM loan_history
-      WHERE date < '#{date.strftime("%Y-%m-%d")}' and amount_in_default > 0 and status in (5,6) and #{query}
+      WHERE amount_in_default > 0 and status in (5,6) and (loan_id, date) in (#{ids})
       GROUP BY loan_id})
     return nil if rows and rows.length==0
 
@@ -178,6 +184,7 @@ class LoanHistory
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
     return false if ids.length==0
+    
     repository.adapter.query(%Q{
       SELECT 
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
@@ -210,6 +217,16 @@ class LoanHistory
       query="loan_id in (#{ids})"
       q = "branch_id"
     end
+
+    ids=repository.adapter.query(%Q{
+                                 SELECT lh.loan_id loan_id, max(lh.date) date
+                                 FROM loan_history lh
+                                 WHERE lh.status in (5,6) AND #{query} AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' 
+                                 AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
+                                 GROUP BY lh.loan_id
+                                 }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
+    return false if ids.length==0
+    
     select  = %Q{
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
         SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
@@ -221,39 +238,41 @@ class LoanHistory
         COUNT(DISTINCT(client_id))           AS clients_count,
         branch_id
     }
+
     repository.adapter.query(%Q{
       SELECT #{select}
       FROM loan_history
-      WHERE #{query} AND current=1 AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}' AND status in (5,6)
+      WHERE (loan_id, date) in (#{ids})
       GROUP BY #{q}
     })
   end
 
   def self.amount_disbursed_for(obj, from_date, to_date)
+    select = "SELECT sum(l.amount) amount, COUNT(l.id) loan_count, COUNT(DISTINCT(l.client_id)) client_count"
     query = if obj.class==Branch
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM branches b, centers c, clients cl, loans l 
                  WHERE b.id=#{obj.id} and c.branch_id=b.id and cl.center_id=c.id and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
                        and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
                }
             elsif obj.class==Center
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM   centers c, clients cl, loans l 
                  WHERE  c.id=#{obj.id} and cl.center_id=c.id and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
                         and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
                }
             elsif obj.class==ClientGroup
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM   client_groups cg, clients cl, loans l 
                  WHERE  cg.id=#{obj.id} and cl.client_group_id=cg.id and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
                         and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
                }
             elsif obj.class==Area
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM  regions r, areas a, branches b, centers c, clients cl, loans l 
                  WHERE a.id=#{obj.id} and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
                        and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
@@ -261,7 +280,7 @@ class LoanHistory
                }
             elsif obj.class==Region
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM  regions r, areas a, branches b, centers c, clients cl, loans l 
                  WHERE r.id=#{obj.id} and r.id=a.region_id and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
                        and l.client_id=cl.id and l.disbursal_date is not null and l.deleted_at is null
@@ -269,12 +288,52 @@ class LoanHistory
                }
             elsif obj.class==StaffMember
               %Q{
-                 SELECT sum(l.amount) amount, COUNT(l.id)
+                 #{select}
                  FROM  loans l 
                  WHERE l.disbursal_date is not null and l.deleted_at is null and l.disbursed_by_staff_id=#{obj.id} 
                        and l.disbursal_date<='#{to_date.strftime('%Y-%m-%d')}' and l.disbursal_date>='#{from_date.strftime('%Y-%m-%d')}'
                }
             end
     repository.adapter.query(query).first
+  end
+
+  def self.borrower_clients_count_in(obj)
+    froms = ["clients cl", "loans l"]
+    conditions = ["cl.id=l.client_id", "l.deleted_at is NULL"]
+
+    klass = (obj.class == Array or obj.class==DataMapper::Associations::OneToMany::Collection) ? obj.first.class : obj.class
+    obj   = (obj.class == Array or obj.class==DataMapper::Associations::OneToMany::Collection) ? obj : [obj]
+
+    if klass==Branch
+      froms << "centers c" 
+      froms << "branches b"
+      conditions << "b.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "cl.center_id=c.id"
+      conditions << "c.branch_id=b.id"
+    elsif klass==Center
+      froms << "centers c"
+      conditions << "cl.center_id=c.id"
+      conditions << "c.id in (#{obj.map{|x| x.id}.join(',')})"
+    elsif klass==Area
+      froms << "centers c"
+      froms << "branches b"
+      froms << "areas a"
+      conditions << "a.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "a.id=b.area_id"
+      conditions << "c.branch_id=b.id"
+      conditions << "cl.center_id=c.id"
+    elsif klass==Region
+      froms << "centers c"
+      froms << "branches b"
+      froms << "areas a"
+      froms << "regions r"
+      conditions << "r.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "r.id=a.region_id"
+      conditions << "a.id=b.area_id"
+      conditions << "c.branch_id=b.id"
+      conditions << "cl.center_id=c.id"
+    end
+
+    repository.adapter.query("SELECT count(*) FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end
 end

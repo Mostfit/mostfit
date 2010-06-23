@@ -23,7 +23,8 @@ module DataEntry
 
       unless @center.nil?
         @branch = @center.branch
-        @clients = Client.all(:center_id => @center.id)
+        @clients = Client.all(:center_id => @center.id, :fields => [:id, :name, :center_id, :client_group_id])
+        @loans   = @clients.loans(:disbursal_date.not => nil)
       end
 
       if request.method == :post
@@ -72,7 +73,6 @@ module DataEntry
       if payment[:type] == "total"
         succes, @prin, @int, @fees  = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff)
       else
-        payment[:received_by] = StaffMember.get(payment[:received_by]) #???
         payment[:created_by] = session.user
         @payment = Payment.new(payment)
         succes = @payment.save
@@ -120,7 +120,7 @@ module DataEntry
     def bulk_payments_and_disbursals
       @center = Center.get(params[:center_id]) || Center.first(:name => params[:center_id]) 
       @branch = @center.branch unless @center.nil?
-      @clients = @center.clients unless @center.nil?
+      @clients = @center.clients(:fields => [:id, :name, :center_id, :client_group_id]) unless @center.nil?
       @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
       @staff = StaffMember.get(params[:payment][:received_by])
       @errors = []
@@ -128,12 +128,13 @@ module DataEntry
         params[:paid][:loan].keys.each do |k|
           @loan = Loan.get(k.to_i)
           amounts = params[:paid][:loan][k.to_sym].to_i
-          if params[:submit] == "Pay Fees" # dangerous!
+          if params[:submit] == "Pay Fees" # dangerous!            
             @loan.pay_fees(amounts, @date, @staff, session.user)
             next
           end
           @type = params[:payment][:type]
           style = params[:payment_style][k.to_sym].to_sym
+          next if amounts<=0          
           success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, false, style)
           @errors << @prin.errors if (@prin and not @prin.errors.blank?)
           @errors << @int.errors if (@int and not @int.errors.blank? )
@@ -142,6 +143,8 @@ module DataEntry
       end
       if params[:paid][:client]
         params[:paid][:client].keys.each do |k|
+          debugger
+
           client = Client.get(k)
           x = client.pay_fees(params[:paid][:client][k.to_sym].to_i, @date, @staff, session.user)
           @errors << x unless x === true

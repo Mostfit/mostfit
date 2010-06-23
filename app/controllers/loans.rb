@@ -109,9 +109,9 @@ class Loans < Application
   
   def disburse
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
-    @loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil).select{|l| l.status == :approved}
     if request.method == :get
-      render 
+      @loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil).paginate(:page => params[:page], :per_page => 10)
+      render
     else
       @errors = []
       cheque_numbers = params[:loans].select{|k,v| v[:disbursed?]!= "on" and not v[:cheque_number].blank?}.to_hash
@@ -147,7 +147,7 @@ class Loans < Application
       if params[:center_id]
         @loans_to_approve = @loan.all("client.center" => Center.get(params[:center_id]))
       else
-        @loans_to_approve = Loan.all(:approved_on => nil)
+        @loans_to_approve = Loan.all(:approved_on => nil).paginate(:page => params[:page], :per_page => 10)
       end
       @loans_to_approve.each {|l| l.clear_cache}
       @clients =  @loans_to_approve.clients
@@ -170,6 +170,20 @@ class Loans < Application
         @clients =  @loans_to_approve.clients
         render
       end
+    end
+  end
+
+  def misc(id)
+    @loan = Loan.get(id)
+    request.xhr? ? render(:layout => false) : render
+  end
+
+  def update_utilization(id)
+    @loan =  Loan.get(id)    
+    if @loan.update!(:loan_utilization_id => params[:loan][:loan_utilization_id])
+      request.xhr? ? render("Saved loan utilization", :layout => false) : redirect(resource(@loan))
+    else
+      request.xhr? ? render(@loan.errors.to_a.map{|x| x.join(":")}.join(", "), :layout => false, :status => 400) : render(resource(@loan, :edit))
     end
   end
 

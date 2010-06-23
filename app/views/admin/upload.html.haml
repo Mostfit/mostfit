@@ -23,5 +23,13 @@
           Payments
         %li
           Loan products 
+    %h4
+      Download sample excel sheet 
+      %a{:href => "/upload_data.xls"}
+        here
+      %br
+      %b Do you Want to erase data ?
+      = check_box :erase   
     %input{:name => "file", :size => "80",  :type => "file"}
     %input{:type => "submit", :value => "Upload"}
+ 

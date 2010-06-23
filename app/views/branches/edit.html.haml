@@ -1,5 +1,5 @@
 - form_url   = url(:controller => params[:controller], :action => 'update', :id => @branch, :return => params[:return])
-- cancel_url = params[:return] ? params[:data_entry] : resource(@branch)
+- cancel_url = params[:return] ? params[:return] : resource(@branch)
 = form_for(@branch, :action => form_url, :class => "") do
   %h1== Edit the '#{@branch.name}' branch details
   = error_messages_for @branch

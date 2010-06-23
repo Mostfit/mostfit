@@ -4,9 +4,10 @@ class Admin < Application
     render
   end
 
-  def upload    
-    if params[:file]
-      file      = Upload.new(params[:file][:filename])      
+  def upload 
+    data = params[:erase]
+    if params[:file] and params[:file][:filename] and params[:file][:tempfile]
+      file      = Upload.new(params[:file][:filename])
       file.move(params[:file][:tempfile].path)
       Process.fork{
         `rake 'mostfit:upload[#{file.directory}, #{file.filename}]'`

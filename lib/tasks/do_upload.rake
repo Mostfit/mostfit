@@ -1,7 +1,7 @@
 if (local_gem_dir = File.join(File.dirname(__FILE__), '..', '..', 'gems')) && $BUNDLE.nil?
   $BUNDLE = true; Gem.clear_paths; Gem.path.unshift(local_gem_dir)
 end
-Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
+Merb.start_environment(:environment => ENV['MERB_ENV'] || 'production')
 require "log4r"
 
 namespace :mostfit do
@@ -23,8 +23,8 @@ namespace :mostfit do
     puts `ruby #{Merb.root}/lib/tasks/excel.rb #{directory} #{filename}`
     log.info("CSV extraction complete. Processing files.")
     file.load_csv(log)
-    log.info("CSV files are now loaded into the DB. Creating loan schedules.")
-    `rake mock:update_history`
+    log.info("CSV files are now loaded into the DB. Creating loan schedules. This may take a few minutes.")
+    `rake mostfit:mock:update_all_history`
     log.info("<h2>Processing complete! Your MIS is now ready for use. Please take a note of all the errors reported here(if any) and rectify them.</h2>")            
   end
 end

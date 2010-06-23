@@ -6,6 +6,14 @@ describe Client do
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
     @manager.save
     @manager.should be_valid
+    
+    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin, :active => true)
+    @user.should be_valid
+    @user.save
+
+    @user = User.new(:login => "clientcreator", :password => "client", :password_confirmation => "client", :role => :admin)
+    @user.save
+    @user.should be_valid
 
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
@@ -35,12 +43,13 @@ describe Client do
     @loan_product.save
     @loan_product.errors.each {|e| puts e}
     @loan_product.should be_valid
-
+    @client_type = ClientType.create(:type => "standard")
   end
 
   before(:each) do
     Client.all.destroy!
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => Date.today)
+    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => Date.today, 
+                         :client_type => @client_type, :created_by => User.first)
     @client.center  = @center
     @client.save
     @client.should be_valid

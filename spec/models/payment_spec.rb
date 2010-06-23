@@ -3,8 +3,6 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe Payment do
 
   before(:all) do
-
-    
     @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @user.save 
     @user.should be_valid
@@ -17,7 +15,8 @@ describe Payment do
     @funder.save
     @funder.should be_valid
 
-    @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03", :id => 1)
+    @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", 
+                                    :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03", :id => 1)
     @funding_line.funder = @funder
     @funding_line.save
     @funding_line.should be_valid
@@ -35,7 +34,7 @@ describe Payment do
     @center.save
     @center.should be_valid
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05')
+    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :client_type => ClientType.create(:type => "standard"), :created_by => @user)
     @client.center  = @center
     @client.date_joined = Date.parse('2008-01-01')
     @client.save

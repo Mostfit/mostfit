@@ -41,7 +41,6 @@ Merb::BootLoader.before_app_loads do
     require 'dm-pagination/pagination_builder'
     require "pdf/writer"
     require "pdf/simpletable"
-    require "lib/logger.rb"
     require 'lib/string.rb'
     require 'lib/grapher.rb'
     require("lib/pdfs/day_sheet.rb")

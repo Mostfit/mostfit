@@ -44,9 +44,14 @@
         =@clients_count
   %tr
     %td
-      Number of borrower clients
+      New borrower clients added
     %td
-      =(@loan_data and @loan_data.length>0) ? @loan_data.first.loans_count : 0
+      =(@loan_disbursed and @loan_disbursed.length>0) ? @loan_disbursed.client_count : 0
+  %tr
+    %td
+      Total number of borrower clients
+    %td
+      =(@total_disbursed and @total_disbursed.length>0) ? @total_disbursed.client_count : 0
   %tr
     %td
       Total Amount Disbursed

@@ -1,0 +1,8 @@
+1:
+  :name: gold
+  :percentage: .12 
+  :amount: 100
+  :min_amount: 50
+  :max_amount: 100
+  :payable_on: loan_applied_on
+ 

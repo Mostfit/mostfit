@@ -123,7 +123,7 @@ module Misfit
         # more garbage
         return true if role == :admin
         return true if route[:controller] == "graph_data" or route[:controller] == "info"
-        
+        return true if route[:controller] == "users" and route[:action] == "change_password"
         @route = route
         @controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
         @model = route[:controller].singularize.to_sym

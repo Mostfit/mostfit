@@ -13,7 +13,7 @@
   for 
   = @date
 %p
-  = link_to "Download pdf >>", url(:day_sheet_with_format, :format => "pdf", :date => @date), :style => "float: left; margin-left: 25px", :class => "button"
+  = link_to "Download pdf >>", url(:day_sheet_with_format, :format => "pdf", :date => @date.strftime("%Y-%m-%d")), :style => "float: left; margin-left: 25px", :class => "button"
 %br
 %br
 - @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each do |center|

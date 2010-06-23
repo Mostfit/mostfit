@@ -1,0 +1,74 @@
+=partial :form
+%table.report.nojs
+  %tr.header
+    %th
+      Manager
+    %th
+      Centers
+    %th
+      Borrower clients
+    %th{:colspan => 3}
+      Loan
+    %th
+      Average Per Client
+    %th
+      Average Per Center
+  %tr.header
+    %th
+    %th
+    %th
+    %th
+      Applied
+    %th
+      Approved
+    %th
+      Disbursed
+    %th
+    %th
+  - length = 8
+  - org_total = []
+  - summable_columns = [0, 1, 2, 3, 4]
+  - average_columns  = [5, 6]
+  - @data.sort_by{|b,m| b.name}.each do |branch, managers|   
+    %tr.branch
+      %td{:colspan => length}
+        %b
+          =branch.name
+    - branch_total = Array.new(summable_columns.length, 0)
+    - managers.sort_by{|manager, data| manager.name}.each do |manager, data|
+      %tr.staff
+        %td.text
+          %b
+            =manager.name
+        - data.each_with_index do |value, i|
+          %td.number
+            =value.to_i
+            - if summable_columns.include?(i)
+              - branch_total[summable_columns.index(i)]+=value.to_f
+    -org_total.push([managers.length, *branch_total])
+    %tr.branch_total
+      %td
+        %b
+          Total (
+          =managers.length
+          )
+      - 0.upto(length-2) do |idx|
+        %td
+          - if summable_columns.include?(idx)
+            = branch_total[idx].to_currency
+          -elsif idx==5
+            = branch_total[1] and branch_total[1]>0 ? (branch_total[4]/branch_total[1]).to_i.to_currency : 0
+          -elsif idx==6
+            = branch_total[0] and branch_total[0]>0 ? (branch_total[4]/branch_total[0]).to_i.to_currency : 0
+  %tr.org_total
+    - org_total = org_total.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}}
+    - org_total.each do |ele|
+      %td.number
+        %b
+          =ele.to_currency
+    %td.number
+      %b
+        =org_total[2] and org_total[2]>0 ? (org_total[5]/org_total[2]).to_i.to_currency : 0
+    %td.number
+      %b
+        =org_total[1] and org_total[1]>0 ? (org_total[5]/org_total[1]).to_i.to_currency : 0

@@ -1,0 +1,14 @@
+%h1
+  Loan Utilization
+= error_messages_for @loan_utilization
+
+= form_for(@loan_utilization, :action => url(:loan_utilization, @loan_utilization)) do
+  %p
+    Name
+    =text_field(:name)
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:loan_utilization, @loan_utilization)
+|
+= link_to 'Back', url(:loan_utilizations)

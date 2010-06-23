@@ -65,8 +65,10 @@ describe Report do
           # give each one a loan of amount between 10K and 20K in multiples of 10
           (1..num_clients).each do |cl|
             Merb.logger.info "#{b}_#{day}_#{cl}"
-            client = instance_variable_set("@#{b}_#{day}_#{cl}",Client.new(:name => 'Ms C.L. Ient', :reference => "#{b}_#{day}_#{cl}"))
+            client = instance_variable_set("@#{b}_#{day}_#{cl}", Client.new(:name => 'Ms C.L. Ient', :reference => "#{b}_#{day}_#{cl}"))
             client.center  = center
+            client.created_by = @user
+            client.client_type = ClientType.first||ClientType.create(:type => "standard")
             client.date_joined = Date.today - 1
             client.save
             client.errors.each {|e| puts e}

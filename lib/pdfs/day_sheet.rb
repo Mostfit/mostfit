@@ -36,7 +36,7 @@ module Pdf
               actual_outstanding = (lh ? lh.actual_outstanding_principal : 0)
               principal_due      = [(lh ? lh.principal_due : 0), 0].max
               interest_due       = [(lh ? lh.interest_due : 0), 0].max
-              total_due          = [(lh ? (lh.principal_due+lh.interest_due): 0), 0].max
+              total_due          = [(lh ? (fee+lh.principal_due+lh.interest_due): 0), 0].max
               number_of_installments = loan.number_of_installments_before(@date)
               
               table.data.push({"on name" => client.name, "loan id" => loan.id, "amount" => loan.amount.to_currency, 
@@ -47,7 +47,7 @@ module Pdf
                                 "principal due" => principal_due.to_currency, 
                                 "interest due" => interest_due.to_currency,
                                 "fee"          => fee.to_currency,
-                                "total due" =>  total_due,
+                                "total due" =>  total_due.to_currency,
                                 "attendance" => ""
                               })
               group_amount       += loan.amount
@@ -64,7 +64,7 @@ module Pdf
           } #clients end
           table.data.push({"amount" => group_amount.to_currency, "outstanding" => group_outstanding.to_currency,
                             "principal due" => group_principal.to_currency, "interest due" => group_interest.to_currency,
-                            "fee" => tot_fee.to_currency, "total due" => group_due.to_currency                            
+                            "fee" => group_fee.to_currency, "total due" => group_due.to_currency                            
                           })
           tot_amount         += group_amount
           tot_outstanding    += group_outstanding
@@ -72,12 +72,12 @@ module Pdf
           tot_principal      += group_principal
           tot_interest       += group_interest
           tot_fee            += group_fee
-          total_due          += group_due
+          total_due          += (group_principal + group_interest + group_fee)
         } #groups end
         table.data.push({"amount" => tot_amount.to_currency, "outstanding" => tot_outstanding.to_currency,
                           "principal due" => tot_principal.to_currency,
                           "interest due" => tot_interest.to_currency, "fee" => tot_fee.to_currency,
-                          "total due" => total_due.to_currency
+                          "total due" => (tot_principal + tot_interest + tot_fee).to_currency
                         })
         
         table.column_order  = ["on name","loan id","amount","outstanding","status", "disbursed on", "installment","principal due","interest due","fee", "total due", "attendance"]
@@ -91,7 +91,7 @@ module Pdf
         table.header_gap = 10
         table.render_on(pdf)
       } #centers end
-      pdf.save_as("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf")
+      pdf.save_as("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
       return pdf
     end
   end

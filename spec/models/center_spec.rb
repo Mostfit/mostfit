@@ -3,9 +3,14 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe Center do
 
   before(:all) do
+    StaffMember.all.destroy!
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
     @manager.save
     @manager.should be_valid
+
+    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin, :active => true)
+    @user.should be_valid
+    @user.save
 
     @branch = Branch.new(:name => "Kerela branch")
     @branch.manager = @manager
@@ -42,19 +47,24 @@ describe Center do
   it "should be able to 'have' clients" do
     name = 'Ms C.L. Ient'
     ref  = 'XW000-2009.01.05'
-    @client = Client.new(:name => name, :reference => ref, :date_joined => Date.today)
-    @client.center  = @center
+    @user = User.create(:login => "branchmanager", :password => "branchmanager", :password_confirmation => "branchmanager", :role => :mis_manager)
+    @client = Client.new(:name => name, :reference => ref, :date_joined => Date.today, :client_type => ClientType.create(:type => "standard"))
+    @client.center     = @center
+    @client.created_by = @user
     @client.save
     @client.errors.each {|e| p e}
     @client.should be_valid
+    @client.save
     
     @center.clients << @client
     @center.should be_valid
     @center.clients.first.name.should eql(name)
     @center.clients.first.reference.should eql(ref)
 
-    client2 = Client.new(:name => 'Mr. T.A. Kesmoney', :reference => 'AN000THER_REF', :date_joined => Date.today)
+    client2 = Client.new(:name => 'Mr. T.A. Kesmoney', :reference => 'AN000THER_REF', :date_joined => Date.today,
+                         :client_type => ClientType.first, :created_by => @user)
     client2.center  = @center
+    client2.created_by = @user
     client2.save
     client2.should be_valid
 

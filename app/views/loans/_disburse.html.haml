@@ -54,3 +54,5 @@
   %tfoot
     %tr
       %td{:colspan => 10}
+
+= paginate loans_to_disburse if loans_to_disburse.respond_to?(:page)

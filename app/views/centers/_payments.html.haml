@@ -40,11 +40,13 @@
         - loan_row_count = 0
         - loans.find_all{|x| x.client_id==client.id and x.disbursal_date}.each do |loan|
           - lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
-          - loan_row_count += 1
+          - next if not lh
+          - next if lh.status==:repaid
+          - loan_row_count += 1          
           %tr{ :class => cycle('odd','') }
             - fee = 0
             %td
-              %b= link_to client.name, resource(branch, center, client)
+              %b= link_to client.name, resource(branch, center, client)            
             %td
               = link_to loan.id, url(:quick_link, "loans", loan.id)
             %td.numeric

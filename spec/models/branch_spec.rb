@@ -3,8 +3,10 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe Branch do
 
   before(:all) do
+    StaffMember.all.destroy!
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
     @manager.save
+    @manager.errors
     @manager.should be_valid
   end
 

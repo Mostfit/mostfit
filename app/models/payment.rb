@@ -7,7 +7,7 @@ class Payment
   before :valid?, :check_client
   # before :valid?, :add_loan_product_validations
   # after :valid?, :after_valid
-  before :valid?, :check_client
+  before :save, :put_fee
   attr_writer :total  # just to be used in the form
 
   PAYMENT_TYPES = [:principal, :interest, :fees]
@@ -24,13 +24,14 @@ class Payment
   property :verified_by_user_id, Integer, :nullable => true, :index => true
   property :loan_id,             Integer, :nullable => true, :index => true
   property :client_id,           Integer, :nullable => true, :index => true
+  property :fee_id,              Integer, :nullable => true, :index => true
 
   belongs_to :loan, :nullable => true
   belongs_to :client
+  belongs_to :fee
   belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
   belongs_to :received_by, :child_key => [:received_by_staff_id], :model => 'StaffMember'
   belongs_to :deleted_by,  :child_key => [:deleted_by_user_id],   :model => 'User'
-
 
   validates_present     :created_by, :received_by
   validates_with_method :loan_or_client_present?
@@ -40,17 +41,24 @@ class Payment
   validates_with_method :deleted_by,  :method => :properly_deleted?
   validates_with_method :deleted_at,  :method => :properly_deleted?
   validates_with_method :not_approved, :method => :not_approved, :on => [:destroy]
-#  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
+  validates_with_method :not_approved, :method => :not_paying_too_much?
+  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
   validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :principal,   :method => :is_positive?
   
   def self.from_csv(row, headers, loans)
-    obj = new(:received_by => StaffMember.first(:name => row[headers[:received_by_staff]]), :loan => loans[row[headers[:loan_serial_number]]], 
-              :amount => row[headers[:principal]], :type => :principal, :received_on => Date.parse(row[headers[:received_on]]), 
-              :created_by => User.first)
-    obj = new(:received_by => StaffMember.first(:name => row[headers[:received_by_staff]]), :loan => loans[row[headers[:loan_serial_number]]], 
-              :amount => row[headers[:interest]], :type => :interest, :received_on => Date.parse(row[headers[:received_on]]), 
-              :created_by => User.first)
+    if row[headers[:principal]]
+      obj = new(:received_by => StaffMember.first(:name => row[headers[:received_by_staff]]), :loan => loans[row[headers[:loan_serial_number]]], 
+                :amount => row[headers[:principal]], :type => :principal, :received_on => Date.parse(row[headers[:received_on]]), 
+                :created_by => User.first)
+      obj.save
+    end
+    
+    if row[headers[:interest]]
+      obj = new(:received_by => StaffMember.first(:name => row[headers[:received_by_staff]]), :loan => loans[row[headers[:loan_serial_number]]], 
+                :amount => row[headers[:interest]], :type => :interest, :received_on => Date.parse(row[headers[:received_on]]), 
+                :created_by => User.first)
+    end
     [obj.save, obj]
   end
 
@@ -188,7 +196,7 @@ class Payment
       elsif type == :fees
         a = loan.total_fees_payable_on(received_on) if loan
         a = client.total_fees_payable_on(received_on) if client and not loan
-      end
+      end      
       if (not a.blank?) and amount > a
         return [false, "#{type} is more than the total #{type} due"]
       end
@@ -203,6 +211,12 @@ class Payment
       end
     end
     true
+  end
+
+  def put_fee
+    if type==:fees and comment and not fee
+      self.fee = Fee.first(:name => comment)
+    end
   end
 
   def is_positive?

@@ -126,6 +126,7 @@
     %li#payment_schedule Payment Schedule
     %li#payments_made Payments made
     %li#audit Audits
+    %li#misc Miscellaneous
     %li#history History
 
   %div.tab
@@ -196,5 +197,7 @@
     =partial "payments/list"
   %div.tab 
     %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :model => "Loan", :id => @loan.id)}
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :loans, :action => "misc", :id => @loan.id)}
   %div.tab 
     %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}

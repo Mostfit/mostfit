@@ -1,0 +1,91 @@
+=partial :form
+%table.report
+  %tr.header
+    %th
+      Ref no.
+    %th
+      Member name
+    %th
+      Presence count
+    %th
+      Late count
+    %th
+      On leave count
+    %th
+      Absent count
+    %th
+      Proxy count
+  - center_id, branch_id = nil, nil
+  - length = 7
+  - org_total = []
+  -summable_columns = [0, 1, 2, 3, 4, 5]
+  -@data.each do |branch, centers|
+    -if centers.keys.length>0
+      -branch_total = []
+      %tr.branch
+        %td{:colspan => length}
+          %b
+            =branch.name
+      -centers.sort_by{|center, groups| center.name}.each do |center, groups|
+        -if groups.values.flatten.length>0
+          %tr.center
+            %td{:colspan => length}
+              %b
+                =center.name
+          - center_total = Array.new(summable_columns.length, 0)
+          -groups.sort_by{|groups, clients| groups}.each do |group, clients|
+            -group_total = Array.new(summable_columns.length, 0)
+            -if clients.length>0
+              %tr.group
+                %td{:colspan => length}
+                  %b=group
+              -clients.sort_by{|c, statuses| c.name}.each do |client, statuses|
+                -if statuses and statuses.size > 0
+                  %tr.client
+                    %td
+                      =client.reference
+                    %td
+                      =client.name
+                      - group_total[0]+=1
+                    - Attendance::ATTENDANCY_STATES.each_with_index do |st, counter|
+                      - i=counter+1
+                      %td
+                        = statuses[i]
+                        - group_total[i]+=statuses[i]||0
+              %tr.group_total
+                %td
+                  %b==Group total               
+                -0.upto(length-2).each do |col|
+                  %td
+                    -if summable_columns.include?(col)
+                      %b
+                        =group_total[summable_columns.index(col)]
+                -center_total.push(group_total)
+          %tr.center_total
+            %td
+              %b==Center total:
+            -branch_total.push(center_total.reject{|x| x.class!=Array}.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}})
+            -0.upto(length-2).each do |col|
+              %td
+                -if summable_columns.include?(col)
+                  %b
+                    =branch_total.last[summable_columns.index(col)]
+      %tr.branch_total
+        %td
+          %b==Branch total:
+        -branch_total = branch_total.reject{|x| x.class!=Array or (x.class==Array and x.length==0)}.transpose.collect{|x| x.reduce{|sum, x| sum+=x}}
+        - org_total << branch_total
+        -0.upto(length-2).each do |col|
+          %td
+            -if summable_columns.include?(col)
+              %b
+                =branch_total[summable_columns.index(col)]
+  %tr.org_total
+    %td
+      %b==Total:
+    -org_total = org_total.reject{|x| x.class!=Array or (x.class==Array and x.length==0)}.transpose.collect{|x| x.reduce{|sum, x| sum+=x}}
+    -0.upto(length-2).each do |col|
+      %td
+        -if summable_columns.include?(col)
+          %b
+            =org_total[summable_columns.index(col)]

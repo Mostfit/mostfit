@@ -70,9 +70,15 @@ class Dashboard < Application
   def loans
     case params[:id]
     when "borrowers"
-      vals = repository.adapter.query("select count(cl.id) count,cl.date_joined date from clients cl,centers c where cl.center_id=c.id GROUP BY date(cl.date_joined)")
+      vals = repository.adapter.query(%Q{
+                                         SELECT count(cl.id) count, DATE(cl.date_joined) date
+                                         FROM clients cl,centers c, loans l 
+                                         WHERE cl.center_id=c.id AND l.client_id=c.id
+                                         GROUP BY MONTH(cl.date_joined)
+                                      })
       graph = BarGraph.new("Growth in number of borrowers")
-      graph.data(vals.sort_by{|x| x.date})
+      graph.data_type = :individual
+      graph.data(vals.sort_by{|x| x.date}.map{|x| [x.count, x.date.strftime("%b %y")]})
       graph.x_axis.steps=5
       return graph.generate
     when "breakup"
@@ -100,10 +106,11 @@ class Dashboard < Application
   def clients
     case params[:id]
     when "growth"
-      dater =  Proc.new{|x| x.strftime('%Y-%m')}
+      dater =  Proc.new{|x| x.strftime('%Y-%b')}
       vals  = get_clients.aggregate(:all.count, :fields => [:date_joined]).group_by_function(dater)
       graph = BarGraph.new("Client growth per month")
       graph.data_type=:individual
+      graph.x_axis.steps=5
       graph.data(vals, :last, :first)
       return graph.generate
     when "cumulative"

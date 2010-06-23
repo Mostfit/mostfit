@@ -13,8 +13,8 @@ class Branch
   property :created_at,     DateTime
   property :creation_date,  Date, :default => Date.today
   property :area_id,        Integer, :nullable => true
-  belongs_to :manager, :child_key => [:manager_staff_id], :model => 'StaffMember'
-  belongs_to :area, :nullable => true
+  belongs_to :manager,      :child_key => [:manager_staff_id], :model => 'StaffMember'
+  belongs_to :area,         :nullable => true
   has n, :centers
   has n, :audit_trails, :auditable_type => "Branch", :child_key => ["auditable_id"]
 
@@ -26,7 +26,8 @@ class Branch
   validates_with_method :manager, :method => :manager_is_an_active_staff_member?
 
   def self.from_csv(row, headers)
-    obj = new(:code => row[headers[:code]], :name => row[headers[:name]], :address => row[headers[:address]], :manager_staff_id => StaffMember.first(:name => row[headers[:manager]]).id)
+    obj = new(:code => row[headers[:code]], :name => row[headers[:name]], :address => row[headers[:address]], 
+              :manager => StaffMember.first(:name => row[headers[:manager]]))
     [obj.save, obj]
   end
 

@@ -1,5 +1,6 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :loan_utilizations
   resources :bookmarks
   resources :audit_items
   resources :attendances
@@ -61,7 +62,6 @@ Merb::Router.prepare do
   match('/reports/graphs').to(:controller => 'reports', :action => 'graphs')
   match('/reports/:report_type(/:id)').to(:controller => 'reports', :action => 'show').name(:show_report)
   resources :reports
-
   match('/data_entry').to(:namespace => 'data_entry', :controller => 'index').name(:data_entry)
   namespace :data_entry, :name_prefix => 'enter' do  # for url(:enter_payment) and the likes
     match('/clients(/:action)(/:id)(.:format)').to(:controller => 'clients').name(:clients)
@@ -80,7 +80,7 @@ Merb::Router.prepare do
   match('/dashboard/clients/:id(/branch_id/:branch_id)(/center_id/:center_id)(/staff_member_id/:staff_member_id)').to(:action => "clients", :controller => 'dashboard').name(:dashboard_client_actions)
   match('/dashboard/clients/breakup(/group_by/:group_by)(/branch_id/:branch_id)(/center_id/:center_id)(/staff_member_id/:staff_member_id)').to(:id => "breakup", :action => "clients", :controller => 'dashboard').name(:dashboard_breakup_clients)
   match('/dashboard(/:action)').to(:controller => 'dashboard').name(:dashboard)
-
+  match('/change_password').to(:controller => "users", :action => 'change_password').name(:change_password)
   match('/graph_data/:action(/:id)').to(:controller => 'graph_data').name(:graph_data)
   match('/staff_members/:id/centers').to(:controller => 'staff_members', :action => 'show_centers').name(:show_staff_member_centers)
   match('/branches/:id/today').to(:controller => 'branches', :action => 'today').name(:branch_today)

@@ -53,10 +53,12 @@ class Report
                     else
                       nil
                     end
-    @late_by_days = if params and params[:late_by_days] and params[:late_by_days].to_i>0
-                      params[:late_by_days].to_i + 1
-                    else
-                      nil
-                    end
+    [:late_by_days, :absent_more_than].each{|key|
+      instance_variable_set("@#{key}", if params and params[key] and params[key].to_i>0
+                                         params[key].to_i
+                                       else
+                                         nil
+                                       end)
+    }
   end
 end
