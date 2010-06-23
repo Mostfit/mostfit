@@ -340,10 +340,9 @@ class Loan
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0].to_i, input[1].to_i
     end
-
     save_status = nil
+    payments = []
     Payment.transaction do |t|
-      payments = []
       if fees_paid > 0
         fee_payment = Payment.new(:loan => self, :created_by => user,
                                   :received_on => received_on, :received_by => received_by,
@@ -367,18 +366,16 @@ class Loan
         return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees},]        
       end
     end
-    
+
     if defer_update #i.e. bulk updating loans
       Merb.run_later do
         update_history
       end
     else
+      already_updated=false
       update_history  # update the history if we saved a payment
     end
     return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
-
-
-    
     # return the success boolean and the payment object itself for further processing
   end
 
@@ -1007,7 +1004,7 @@ class Loan
     [false, "The validation date, the validating staff member the loan should both be given"]
   end
   def is_client_active
-    unless client.active
+    unless client and client.active
       return [false, "This is client is no more active"]
     end
     return true
