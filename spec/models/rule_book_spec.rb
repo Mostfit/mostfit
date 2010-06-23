@@ -11,9 +11,9 @@ describe RuleBook do
     @account_type = AccountType.new(:name => 'Assets',:code => '20000')
     @account_type.save
     @account_type.should be_valid 
-   
+    
     @account = Account.new(:name => 'petty cash', :opening_balance => '0', :gl_code => '10001',
-                        :parent_id => @account, :account_type => @account_type)
+                           :account_type => @account_type)
     @account.save
     @account.should be_valid
     
@@ -34,6 +34,7 @@ describe RuleBook do
     @rule_book.should be_valid 
 
   end
+
   it "name should not be less than 3 charactor" do
     @rule_book.name = "xz"
     @rule_book.should_not be_valid 
@@ -41,8 +42,7 @@ describe RuleBook do
 
   it "credit account & debit account should not be same" do
     @rule_book.credit_account = @account
-    @rule_book.debit_account = @account
+    @rule_book.debit_account  = @account
     @rule_book.should_not be_valid
   end
-  
 end
