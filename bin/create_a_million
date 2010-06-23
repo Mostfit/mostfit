@@ -1,0 +1,23 @@
+require "rubygems"
+require "fastercsv"
+require "merb-core"
+Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
+names = FasterCSV.parse(File.read("db/names.csv")).flatten
+len = names.length
+
+user = User.first
+client_type = ClientType.first
+
+counter=0
+Branch.all(:id.gt => 6).each{|branch|
+  branch.centers.each{|center|
+    center.client_groups.each{|grp|
+      5.times{|x|
+        client = Client.new(:name => names[counter % len], :reference => "#{branch.code}#{center.code}#{grp.code}#{x}", :center => center, :created_by => user, 
+                            :created_by_staff => center.manager, :date_joined => Date.today-((rand()*100).to_i), :client_type => client_type, :client_group => grp)
+        client.save
+        counter+=1
+      }
+    }
+  }
+}
