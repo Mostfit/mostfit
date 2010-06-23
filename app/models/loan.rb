@@ -8,6 +8,7 @@ class Loan
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
   attr_accessor :interest_percentage
+  attr_accessor :already_updated
 
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false, :index => true
@@ -771,9 +772,11 @@ class Loan
   # for brute force iterations and caching => speed
 
   def update_history
+    return if already_updated
     return if history_disabled  # easy when doing mass db modifications (like with fixutes)
     clear_cache
     update_history_bulk_insert
+    already_updated=true
   end
 
   def calculate_history
@@ -861,6 +864,7 @@ class Loan
     sql += values.join(",") + ";"
     repository.adapter.execute(sql)
     Merb.logger.info "update_history_bulk_insert done in #{Time.now - t}"
+    return true
   end
 
   private
@@ -1006,6 +1010,7 @@ class Loan
     unless client.active
       return [false, "This is client is no more active"]
     end
+    return true
   end
 end
 
