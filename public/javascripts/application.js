@@ -491,7 +491,7 @@ $(document).ready(function(){
 	  val=$("#account_account_type_id").val();
 	  $.ajax({
 		  url: "/accounts?account_type_id="+val,
-		      success: function(data){$("#account_parent_account_id").html(data);}		  
+		      success: function(data){$("#account_parent_id").html(data);}		  
 	      });
       });
   attachReportingFormEvents("formdiv_1");
