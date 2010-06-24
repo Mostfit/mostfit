@@ -396,12 +396,12 @@ class Loan
     fs = fee_schedule
     pay_order = fs.keys.sort.map{|d| fs[d].keys}.flatten.uniq
     pay_order.each do |k|
-      if fp.has_key?(k.downcase)
-        p = Payment.new(:amount => [fp[k.downcase],amount].min, :type => :fees, :received_on => date, :comment => k,
+      if fp.has_key?(k)
+        p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k, :fee => k,
                         :received_by => received_by, :created_by => created_by, :client => client, :loan => self)
         if p.save
           amount -= p.amount
-          fp[k.downcase]  -= p.amount
+          fp[k]  -= p.amount
         else
           @errors << p.errors
         end
