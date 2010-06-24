@@ -153,6 +153,7 @@ class LoanHistory
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")    
     # these are the loan history lines which represent the last line before @date
+    return nil if ids.length == 0
     rows = repository.adapter.query(%Q{
       SELECT loan_id,max(date)
       FROM loan_history
