@@ -143,8 +143,6 @@ module DataEntry
       end
       if params[:paid][:client]
         params[:paid][:client].keys.each do |k|
-          debugger
-
           client = Client.get(k)
           x = client.pay_fees(params[:paid][:client][k.to_sym].to_i, @date, @staff, session.user)
           @errors << x unless x === true

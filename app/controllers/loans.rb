@@ -131,7 +131,6 @@ class Loans < Application
         loan.scheduled_first_payment_date = params[:loans][id][:scheduled_first_payment_date] if params[:loans][id][:scheduled_first_payment_date]
         loan.amount         = params[:loans][id][:amount]
         loan.disbursed_by   = StaffMember.get(params[:loans][id][:disbursed_by_staff_id])
-        loan.save
         @errors << loan.errors if not loan.save
       end
       if @errors.blank?
