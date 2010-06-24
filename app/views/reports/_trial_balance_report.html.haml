@@ -4,21 +4,29 @@
     %th
       Account Type
     %th
-      Account 
+      Account
+    %th
+      Opening Balance 
     %th
       Debit
     %th
       Credit
+    %th
+      Total Balance
  
   - length = 3
   - org_total = []
-  - debit_sum, credit_sum = 0 , 0
+  - debit_sum, credit_sum, opening_sum = 0 , 0 , 0
   - @data.each do |account|
     %tr
       %td
         = account.account_type.name
       %td
-        = account.name      
+        = account.name
+      %td
+        - opening_balance = account.opening_balance
+        - opening_sum += opening_balance
+        = opening_balance  
       %td
         - debit = (account.postings.sum(:amount, :amount.lte => 0)||0) * -1
         - debit_sum += debit
@@ -27,10 +35,16 @@
         - credit = account.postings.sum(:amount, :amount.gte => 0)||0
         - credit_sum += credit
         = credit
+      %td
+        = ((debit - credit) * -1) + opening_balance
   %tr
     %td
     %td
     %td
+      =opening_sum
+    %td
       =debit_sum
     %td
       =credit_sum
+    %td
+      =opening_sum + (credit_sum - debit_sum)
