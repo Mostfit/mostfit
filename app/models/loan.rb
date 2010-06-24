@@ -536,7 +536,7 @@ class Loan
         :fees                       => fees,
         :total_principal            => (principal_so_far),
         :total_interest             => (interest_so_far),
-        :total                      => (principal_so_far + interest_so_far + fees_so_far).round(2),
+        :total                      => (principal_so_far + interest_so_far).round(2),
         :balance                    => balance.round(2),
       }
     end
