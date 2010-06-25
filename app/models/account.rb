@@ -4,7 +4,7 @@ class Account
   property :id,                     Serial  
   property :name,                   String
   property :opening_balance,        Integer, :default => 0 
-  property :opening_balance_on_date, Date, :nullable => false
+  property :opening_balance_on_date, Date, :nullable => false, :default => Date.today
   property :gl_code,                String
   property :parent_id,              String
   belongs_to :account, :model => 'Account', :child_key => [:parent_id]
