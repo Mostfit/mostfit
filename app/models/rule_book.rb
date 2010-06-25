@@ -12,7 +12,7 @@ class RuleBook
 
   validates_present      :name
   validates_length       :name,     :minimum => 3
-  validates_with_method  :credit_account,   :method => :credit_account_is_not_same_as_debit_account?
+  validates_with_method  :debit_account,   :method => :credit_account_is_not_same_as_debit_account?
 
 
 
@@ -24,12 +24,13 @@ class RuleBook
       transaction_type = :disbursement
 #     branch  = obj.client.center.branch
     end
+
     rule = first(:action => transaction_type)
     [rule.credit_account, rule.debit_account]
   end
   
   def credit_account_is_not_same_as_debit_account?
-    return true if credit_account != debit_account
+    return true if credit_account_id != debit_account_id
     [false, "Credit and Debit account cannot be same"]
   end
   
