@@ -39,6 +39,7 @@ describe Loan do
     @client.center  = @center
     @client.date_joined = Date.parse('2006-01-01')
     @client.created_by_user_id = 1
+    @client.client_type_id = 1
     @client.save
     @client.errors.each {|e| puts e}
     @client.should be_valid
