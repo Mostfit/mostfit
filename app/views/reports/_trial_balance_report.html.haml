@@ -20,12 +20,15 @@
   - @data.each do |account|
     %tr
       %td
-        = account.account_type.name
+        - name = account.account_type.name
+        = name 
       %td
         = account.name
       %td
         - opening_balance = account.opening_balance
         - opening_sum += opening_balance
+        = account.opening_balance_on_date
+        %br
         = opening_balance  
       %td
         - debit = (account.postings.sum(:amount, :amount.lte => 0)||0) * -1
