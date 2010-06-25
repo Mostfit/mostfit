@@ -1,5 +1,5 @@
 class TrialBalanceReport < Report
-  attr_accessor :from_date, :to_date, :account, :account_id, :journal,:posting
+  attr_accessor :from_date, :to_date, :account, :account_id, :journal,:posting, :account_type_id
 
   def initialize(params,dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.min_date
@@ -17,7 +17,8 @@ class TrialBalanceReport < Report
   end
 
   def generate
-    Account.all
+  
+    Account.all(:order => [:account_type_id.asc])
   end
 end   
 
