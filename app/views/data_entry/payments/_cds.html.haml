@@ -34,6 +34,7 @@
           - loan_row_count = 0
           - loans.find_all{|l| l.client_id == client.id and l.disbursal_date}.each do |loan|
             - lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
+            - next if not lh
             - next if lh.status==:repaid
             - loan_row_count += 1
             %tr{ :class => cycle('odd','') }
