@@ -90,7 +90,7 @@ class LoanHistory
         SUM(actual_outstanding_total)        AS actual_outstanding_total
       FROM
       (select scheduled_outstanding_principal,scheduled_outstanding_total, actual_outstanding_principal, actual_outstanding_total from
-        (select loan_id, max(date) as date from loan_history where date <= '#{date.strftime('%Y-%m-%d')}' and loan_id in (#{loan_ids.join(', ')}) and status in (5,6) group by loan_id) as dt, 
+        (select loan_id, max(date) as date from loan_history where date <= '#{date.strftime('%Y-%m-%d')}' and loan_id in (#{loan_ids.join(', ')}) and status in (5,6,7,8) group by loan_id) as dt, 
         loan_history lh
       where lh.loan_id = dt.loan_id and lh.date = dt.date) as dt1;})
   end
@@ -149,7 +149,7 @@ class LoanHistory
     ids=repository.adapter.query(%Q{
                                  SELECT lh.loan_id loan_id, max(lh.date) date
                                  FROM loan_history lh
-                                 WHERE lh.status in (5,6) AND lh.date<='#{date.strftime('%Y-%m-%d')}' AND #{query}
+                                 WHERE lh.status in (5,6,7,8) AND lh.date<='#{date.strftime('%Y-%m-%d')}' AND #{query}
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")    
     # these are the loan history lines which represent the last line before @date
@@ -157,7 +157,7 @@ class LoanHistory
     rows = repository.adapter.query(%Q{
       SELECT loan_id,max(date)
       FROM loan_history
-      WHERE amount_in_default > 0 and status in (5,6) and (loan_id, date) in (#{ids})
+      WHERE amount_in_default > 0 and status in (5,6,7,8) and (loan_id, date) in (#{ids})
       GROUP BY loan_id})
     return nil if rows and rows.length==0
 
@@ -180,7 +180,7 @@ class LoanHistory
     ids=repository.adapter.query(%Q{
                                  SELECT lh.loan_id loan_id, max(lh.date) date
                                  FROM #{from}
-                                 WHERE lh.status in (5,6) AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' 
+                                 WHERE lh.status in (5,6,7,8) AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' 
                                  AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{extra}
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
@@ -197,7 +197,7 @@ class LoanHistory
         client_group_id,
         center_id
       FROM loan_history
-      WHERE (loan_id, date) in (#{ids}) 
+      WHERE (loan_id, date) in (#{ids}) AND status in (5,6)
       GROUP BY client_group_id;
     })
   end
@@ -221,8 +221,9 @@ class LoanHistory
 
     ids=repository.adapter.query(%Q{
                                  SELECT lh.loan_id loan_id, max(lh.date) date
-                                 FROM loan_history lh
-                                 WHERE lh.status in (5,6) AND #{query} AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' 
+                                 FROM loan_history lh, loans l
+                                 WHERE l.id=lh.loan_id AND l.deleted_at is NULL AND l.disbursal_date is NOT NULL
+                                 AND #{query} AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' 
                                  AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
