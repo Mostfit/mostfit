@@ -5,6 +5,7 @@ class TrialBalanceReport < Report
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.min_date
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
     @name      = "Trial Balance"
+  #  @page      = params[:page] ||0
     get_parameters(params, user)
   end
 
@@ -16,9 +17,9 @@ class TrialBalanceReport < Report
     "Trial Balance"
   end
 
-  def generate
+  def generate(param)
   
-    Account.all(:order => [:account_type_id.asc])
+    Account.paginate(:order => [:account_type_id.asc],:page =>param[:page],:per_page => 10) 
   end
 end   
 
