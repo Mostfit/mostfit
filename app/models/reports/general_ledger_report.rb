@@ -17,6 +17,8 @@ class GeneralLedgerReport < Report
   end
 
   def generate(params)
-    Journal.paginate(:order => [:date.desc], :page => params[:page], :per_page => 20)
+     params1 = {:date.gte => from_date, :date.lte => to_date, :order => [:date]}
+    
+    Journal.all(params1).paginate(:order => [:date.desc], :page => params[:page], :per_page => 10)
   end
 end   
