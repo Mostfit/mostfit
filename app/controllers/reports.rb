@@ -13,6 +13,7 @@ class Reports < Application
 
   def show(report_type, id)
     provides :pdf
+    report_type = params[:report_type] if report_type == "show" and params.key?(:report_type)
     klass = Kernel.const_get(report_type)
     @report = Report.get(id) if id
     class_key  =  klass.to_s.snake_case.to_sym
@@ -27,9 +28,12 @@ class Reports < Application
       elsif klass==LoanDisbursementRegister or klass==LoanSanctionRegister
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
-      elsif [LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, ClientAbsenteeismReport, LoanSizePerManagerReport, GeneralLedgerReport, TrialBalanceReport,BalanceSheet].include?(klass)
+      elsif [LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, ClientAbsenteeismReport, LoanSizePerManagerReport, TrialBalanceReport,BalanceSheet].include?(klass)
         @data  = @report.generate
         display @data
+      elsif klass==GeneralLedgerReport
+        @data  = @report.generate(params)
+        display @data        
       elsif klass==TargetReport
         @targets = @report.generate
         display [@targets]

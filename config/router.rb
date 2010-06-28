@@ -63,6 +63,7 @@ Merb::Router.prepare do
   match('/search(/:action)').to(:controller => 'searches')
   match('/searches(/:action)').to(:controller => 'searches')
   match('/reports/graphs').to(:controller => 'reports', :action => 'graphs')
+  match('/reports/show(/:id)').to(:controller => 'reports', :action => 'show')
   match('/reports/:report_type(/:id)').to(:controller => 'reports', :action => 'show').name(:show_report)
   resources :reports
   match('/data_entry').to(:namespace => 'data_entry', :controller => 'index').name(:data_entry)
