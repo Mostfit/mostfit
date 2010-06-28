@@ -28,10 +28,10 @@ class Reports < Application
       elsif klass==LoanDisbursementRegister or klass==LoanSanctionRegister
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
-      elsif [LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, ClientAbsenteeismReport, LoanSizePerManagerReport, TrialBalanceReport,BalanceSheet].include?(klass)
+      elsif [LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, ClientAbsenteeismReport, LoanSizePerManagerReport,BalanceSheet].include?(klass)
         @data  = @report.generate
         display @data
-      elsif klass==GeneralLedgerReport
+      elsif klass==GeneralLedgerReport or klass == TrialBalanceReport
         @data  = @report.generate(params)
         display @data        
       elsif klass==TargetReport
