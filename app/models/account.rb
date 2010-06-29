@@ -1,3 +1,5 @@
+
+
 class Account
   include DataMapper::Resource
   before :save, :convert_blank_to_nil
@@ -13,10 +15,10 @@ class Account
   
   property   :branch_id,               Integer, :nullable => true, :index => true
   belongs_to :branch,                  :model => 'Branch', :child_key => [:branch_id]
-
+  
   has n, :postings
   is :tree, :order => :name
-
+  
   validates_present   :name 
   validates_present   :gl_code
   validates_length    :name,     :minimum => 3
@@ -24,7 +26,7 @@ class Account
   validates_is_unique :name
   validates_is_unique :gl_code
   validates_is_number :opening_balance
-
+  
   
   def convert_blank_to_nil
     self.attributes.each{|k, v|
@@ -33,4 +35,6 @@ class Account
       end
     }
   end
+  
 end
+
