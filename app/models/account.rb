@@ -2,10 +2,10 @@ class Account
   include DataMapper::Resource
 
   property :id,                     Serial  
-  property :name,                   String
+  property :name,                   String, :index => true
   property :opening_balance,        Integer, :default => 0 
   property :opening_balance_on_date, Date, :nullable => false, :default => Date.today
-  property :gl_code,                String
+  property :gl_code,                String, :index => true
   property :parent_id,              String
   belongs_to :account, :model => 'Account', :child_key => [:parent_id]
   belongs_to :account_type
