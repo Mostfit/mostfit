@@ -1,4 +1,3 @@
-
 %table
   %tr
     %th
@@ -17,7 +16,10 @@
       %td
         = account.account_type.name
       %td
-        = link_to 'Edit', url(:edit_account,  account)
+        = link_to 'Edit', url(:edit_account, account)
+      %td
+        = link_to 'show', url(:account, account)
+
 = link_to 'New', url(:new_account) 
 | 
 = link_to 'Back', url(:account_types)

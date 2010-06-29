@@ -1,11 +1,16 @@
 
-%tabel
+%table
   %tr
     %td
-      %h2  Name
+      Name
     %td 
+      GL Code  
+  %tr
+    %td
       = @account.name
-  %br
+    %td 
+      = @account.gl_code
+%br
 = link_to 'Edit',  url(:edit_account,  @accounts)
 |
 = link_to 'Back', url(:accounts)
