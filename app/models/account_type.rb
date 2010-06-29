@@ -2,8 +2,8 @@ class AccountType
   include DataMapper::Resource
   
   property :id,   Serial
-  property :name, String
-  property :code, String 
+  property :name, String, :index => true 
+  property :code, String, :index => true  
   
   has n, :accounts
   validates_present :name
