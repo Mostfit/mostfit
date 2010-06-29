@@ -7,7 +7,7 @@ class Accounts < Application
       partial :accounts_selection
     else
       @accounts = Account.all
-      display @accounts
+      display @accounts, :layout => layout?
     end
   end
 

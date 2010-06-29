@@ -383,7 +383,8 @@ class Loan
   # the way to delete payments from the db
   def delete_payment(payment, user)
     return false unless payment.loan.id == self.id
-    if payment.update_attributes(:deleted_at => Time.now, :deleted_by_user_id => user.id)
+    payment.deleted_by = user
+    if payment.destroy
       update_history
       clear_cache
       return true

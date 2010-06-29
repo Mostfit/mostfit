@@ -3,7 +3,12 @@
     %td
       Account Type
     %td
-      = select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
+      =select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
+  %tr 
+    %td
+      Branch
+    %td
+      =select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
   %tr
     %td
       Parent Account

@@ -2,8 +2,6 @@ class AccountLoanObserver
   include DataMapper::Observer    
   observe Loan
   
-
-
   def self.make_posting_entries_on_update(obj)
     # This function will make entries to the posting database when save, update or delete event triggers  
     return false unless obj
@@ -27,9 +25,11 @@ class AccountLoanObserver
   end
   
   def self.forward_entry(obj)
-    Journal.transaction do |t|       
-      credit_account, debit_account = RuleBook.get_accounts(obj)
-      
+    credit_account, debit_account = RuleBook.get_accounts(obj)
+    # do not do accounting if no matching accounts
+    return unless (credit_account and debit_account)
+
+    Journal.transaction do |t|      
       journal = Journal.new(:comment => "Loan: #{obj.client.name} - #{obj.amount}", 
                             :date => obj.disbursal_date, :transaction_id => obj.id, :created_at => Time.now)
       journal_saved  = journal.save      

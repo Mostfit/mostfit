@@ -73,7 +73,7 @@
             %td
               %b==Center total:
             -branch_total.push(center_total.reject{|x| x.class!=Array}.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}})
-            -1.upto(length-2).each do |col|
+            -1.upto(length-1).each do |col|
               %td
                 -if summable_columns.include?(col)
                   %b
@@ -83,7 +83,7 @@
           %b==Branch total:
         -branch_total = branch_total.reject{|x| x.class!=Array or (x.class==Array and x.length==0)}.transpose.collect{|x| x.reduce{|sum, x| sum+=x}}
         -org_total << branch_total
-        -1.upto(length-2).each do |col|
+        -1.upto(length-1).each do |col|
           %td
             -if summable_columns.include?(col)
               %b
@@ -92,7 +92,7 @@
     %td
       %b==Total:
     -org_total = org_total.reject{|x| x.class!=Array or (x.class==Array and x.length==0)}.transpose.collect{|x| x.reduce{|sum, x| sum+=x}}
-    -1.upto(length-2).each do |col|
+    -1.upto(length-1).each do |col|
       %td
         -if summable_columns.include?(col)
           %b
