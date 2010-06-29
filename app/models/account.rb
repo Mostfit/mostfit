@@ -1,5 +1,7 @@
 class Account
   include DataMapper::Resource
+  before :save, :convert_blank_to_nil
+
 
   property :id,                     Serial  
   property :name,                   String, :index => true
@@ -9,17 +11,27 @@ class Account
   property :parent_id,              String
   belongs_to :account, :model => 'Account', :child_key => [:parent_id]
   belongs_to :account_type
-   
+  
+  property   :branch_id,               Integer, :nullable => true, :index => true
+  belongs_to :branch,                  :model => 'Branch', :child_key => [:branch_id]
+
   has n, :postings
   is :tree, :order => :name
 
-  validates_present :name 
-  validates_present :gl_code
-  validates_length  :name,     :minimum => 3
-  validates_length  :gl_code,  :minimum => 3  
+  validates_present   :name 
+  validates_present   :gl_code
+  validates_length    :name,     :minimum => 3
+  validates_length    :gl_code,  :minimum => 3  
+  validates_is_unique :name
   validates_is_unique :gl_code
   validates_is_number :opening_balance
+
+  
+  def convert_blank_to_nil
+    self.attributes.each{|k, v|
+      if v.is_a?(String) and v.empty? and self.class.send(k).type==Integer
+        self.send("#{k}=", nil)
+      end
+    }
+  end
 end
-
-
-

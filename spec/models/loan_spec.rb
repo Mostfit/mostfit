@@ -550,4 +550,11 @@ describe Loan do
     @loan2.clear_cache
     @loan2.payment_schedule.count.should == @loan.payment_schedule.count - 9
   end
-end
+
+  it "should do deletion of payment" do 
+    p = @loan.payments.last
+    p.deleted_by = @user
+    p.deleted_at = Time.now
+    p.save.should == true
+  end
+end;
