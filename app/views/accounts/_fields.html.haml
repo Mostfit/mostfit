@@ -13,7 +13,7 @@
     %td
       Parent Account
     %td 
-      =select :parent_id
+      =select :parent_id, :collection => (@parent_accounts||[]).map{|x| [x.id, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account"
 
   %tr  
     %td
