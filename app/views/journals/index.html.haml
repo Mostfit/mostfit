@@ -1,0 +1,16 @@
+%h1
+  Journals controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/journals/index.html.erb
+%table
+  %tr
+  - for journal in @journals
+    %tr
+      %td
+        = link_to 'Show', url(:journal, journal)
+      %td
+        = link_to 'Edit', url(:edit_journal,  journal)
+
+= link_to 'New', url(:new_journal)

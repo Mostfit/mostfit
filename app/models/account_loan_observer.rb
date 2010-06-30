@@ -28,55 +28,19 @@ class AccountLoanObserver
     credit_account, debit_account = RuleBook.get_accounts(obj)
     # do not do accounting if no matching accounts
     return unless (credit_account and debit_account)
-
-    Journal.transaction do |t|      
-      journal = Journal.new(:comment => "Loan: #{obj.client.name} - #{obj.amount}", 
-                            :date => obj.disbursal_date, :transaction_id => obj.id, :created_at => Time.now)
-      journal_saved  = journal.save      
-      
-      
-      post = Posting.new(:amount => obj.amount * -1, :journal_id => journal.id, :account => debit_account,
-                         :currency_id => 1)
-      debit_saved = post.save
-      
-      
-      post = Posting.new(:amount => obj.amount, :journal_id => journal.id, :account => credit_account,
-                         :currency_id => 1)
-      credit_saved = post.save
-      
-      # Rollback in case of any failure above.
-      if not (credit_saved and debit_saved and journal_saved)
-        t.rollback
-      end
-    end
+    journal = {:date => obj.disbursal_date, :transaction_id => obj.id.to_s, :currency => Currency.first, :amount => obj.amount}
+    journal[:comment] = "Loan: #{obj.client.name} - #{obj.amount}"
+    status, @journal = Journal.create_transaction(journal, debit_account, credit_account)
   end
-  
   
   def self.reverse_entry(obj)
-    Journal.transaction do |t|       
-      credit_account, debit_account = RuleBook.get_accounts(obj)
-      
-      journal = Journal.new(:comment => "Loan: #{obj.client.name} - #{obj.amount} - reverse entry", 
-                            :date => obj.disbursal_date, :transaction_id => obj.id, :created_at => Time.now)
-      journal_saved  = journal.save      
-      
-      
-      post = Posting.new(:amount => obj.amount, :journal_id => journal.id, :account => debit_account,
-                         :currency_id => 1)
-      debit_saved = post.save
-      
-      
-      post = Posting.new(:amount => obj.amount * -1, :journal_id => journal.id, :account => credit_account,
-                         :currency_id => 1)
-      credit_saved = post.save
-      
-      # Rollback in case of any failure above.
-      if not (credit_saved and debit_saved and journal_saved)
-        t.rollback
-      end
-    end
+    credit_account, debit_account = RuleBook.get_accounts(obj)
+    # do not do accounting if no matching accounts
+    return unless (credit_account and debit_account)
+    journal = {:date => obj.disbursal_date, :transaction_id => obj.id.to_s, :currency => Currency.first, :amount => (obj.amount * -1)}
+    journal[:comment] = "Loan: #{obj.client.name} - #{obj.amount} - reverse entry"
+    status, @journal = Journal.create_transaction(journal, debit_account, credit_account)
   end
-
   
   before :update do
     AccountLoanObserver.make_posting_entries_on_update(self)

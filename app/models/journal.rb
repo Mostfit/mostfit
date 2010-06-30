@@ -3,14 +3,46 @@ class Journal
   include DataMapper::Resource
  
   property :id,             Serial
-  property :comment,        String, :index => true  
-  property :transaction_id, Integer
-  property :date,           Date
-  property :created_at,     DateTime
+  property :comment,        String
+  property :transaction_id, String, :index => true  
+  property :date,           Date, :index => true  
+  property :created_at,     DateTime, :index => true  
   property :batch_id,       Integer, :nullable => true
   belongs_to :batch
   has n, :postings
+  
+  def validity_check
+    debit_account_posting, credit_account_posting = self.postings.sort_by{|x| x.amount}
+    return false if credit_account_posting.account_id == debit_account_posting.account_id    
+    return true
+  end
 
+
+  def self.create_transaction(journal_params, debit_account, credit_account)
+    status = false
+    journal = nil
+    transaction do |t|
+      journal = Journal.create(:comment => journal_params[:comment], :date =>    journal_params[:date]||Date.today,
+                               :transaction_id => journal_params[:transaction_id])
+
+      amount = journal_params[:amount] ? journal_params[:amount].to_i : 0
+
+      debit_post = Posting.create(:amount => amount * -1, :journal_id => journal.id, :account => debit_account, :currency => journal_params[:currency])
+
+      credit_post = Posting.create(:amount => amount, :journal_id => journal.id, :account => credit_account, :currency => journal_params[:currency])
+
+      # Rollback in case of both accounts being the same
+      if journal.validity_check
+        status = true
+      else
+        t.rollback
+        status = false
+      end
+    end
+
+    return [status, journal]
+  end
+  
 
   def self.xml_tally(hash, target) 
     x = Builder::XmlMarkup.new(:target => target, :indent => 1)
