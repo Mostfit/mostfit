@@ -162,6 +162,4 @@ describe Posting do
     @debit_posting.should_not == nil
     @credit_posting.should_not == nil
   end
-
 end
-

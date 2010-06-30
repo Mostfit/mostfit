@@ -29,7 +29,7 @@ class RuleBook
     if rule = first(:action => transaction_type, :branch => branch)
     elsif rule = first(:action => transaction_type, :branch => nil)
     else
-      raise NoRuleFoundError
+      raise "NoRuleFoundError"
     end
     [rule.credit_account, rule.debit_account]
   end
