@@ -6,7 +6,7 @@ class Accounts < Application
       @accounts = Account.all(:account_type_id => params[:account_type_id]).paginate(:page =>params[:page], :per_page => 5)
       partial :accounts_selection
     else
-      @accounts = Account.all.paginate(:page =>params[:page],:per_page => 5)
+      @accounts = Account.all(:parent_id => "")
       display @accounts, :layout => layout?
     end
   end
@@ -26,6 +26,9 @@ class Accounts < Application
   def edit(id)
     only_provides :html
     @account = Account.get(id)
+    if @account.account_type
+      @parent_accounts = (Account.all(:account_type => @account.account_type)-[@account])
+    end
     raise NotFound unless @account
     display @account
   end
@@ -44,7 +47,7 @@ class Accounts < Application
     @account = Account.get(id)
     raise NotFound unless @account
     if @account.update(account)
-       redirect resource(@account)
+       redirect resource(:accounts)
     else
       display @account, :edit
     end
