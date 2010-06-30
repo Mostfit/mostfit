@@ -349,17 +349,17 @@ class Loan
                                   :amount => fees_paid.round, :type => :fees)
         payments.push(fee_payment)
       end
-      if principal > 0
-        prin_payment = Payment.new(:loan => self, :created_by => user,
-                                   :received_on => received_on, :received_by => received_by,
-                                   :amount => principal.round, :type => :principal)        
-        payments.push(prin_payment)
-      end
       if interest > 0
         int_payment = Payment.new(:loan => self, :created_by => user,
                                   :received_on => received_on, :received_by => received_by,
                                   :amount => interest.round, :type => :interest)
         payments.push(int_payment)
+      end
+      if principal > 0
+        prin_payment = Payment.new(:loan => self, :created_by => user,
+                                   :received_on => received_on, :received_by => received_by,
+                                   :amount => principal.round, :type => :principal)        
+        payments.push(prin_payment)
       end
       if payments.collect{|payment| payment.save}.include?(false)
         t.rollback

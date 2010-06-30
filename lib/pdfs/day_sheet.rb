@@ -31,6 +31,7 @@ module Pdf
             loans.find_all{|l| l.client_id==client.id and l.disbursal_date}.each{|loan|
               lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
               next if not lh
+              next if not lh.status==:repaid              
               loan_row_count+=1
               fee = fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
               actual_outstanding = (lh ? lh.actual_outstanding_principal : 0)
@@ -40,15 +41,10 @@ module Pdf
               number_of_installments = loan.number_of_installments_before(@date)
               
               table.data.push({"on name" => client.name, "loan id" => loan.id, "amount" => loan.amount.to_currency, 
-                                "outstanding" => actual_outstanding.to_currency,
-                                "status" => lh.status.to_s,
-                                "disbursed on" => loan.disbursal_date.to_s, 
-                                "installment" =>  number_of_installments,
-                                "principal due" => principal_due.to_currency, 
-                                "interest due" => interest_due.to_currency,
-                                "fee"          => fee.to_currency,
-                                "total due" =>  total_due.to_currency,
-                                "attendance" => ""
+                                "outstanding" => actual_outstanding.to_currency, "status" => lh.status.to_s,                                
+                                "disbursed on" => loan.disbursal_date.to_s, "installment" =>  number_of_installments,
+                                "principal due" => principal_due.to_currency, "interest due" => interest_due.to_currency,
+                                "fee"          => fee.to_currency, "total due" =>  total_due.to_currency, "attendance" => ""
                               })
               group_amount       += loan.amount
               group_outstanding  += actual_outstanding
