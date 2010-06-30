@@ -1,4 +1,6 @@
+
 %h1 List of Accounts
+
 %table
   %tr
     %th
@@ -18,7 +20,8 @@
         = account.account_type.name
       %td
         = link_to 'Edit', url(:edit_account,  account)
-
+      %td
+        = link_to 'show', url(:account, account)
 = paginate @accounts
 
 = link_to 'New', url(:new_account) 
