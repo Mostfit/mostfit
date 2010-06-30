@@ -30,6 +30,7 @@
       %td
         = link_to 'Edit', url(:edit_rule_book,  rule_book)
 
+= paginate @rule_books
 = link_to 'New', url(:new_rule_book)
 |
 = link_to 'Back', url(:account_types)

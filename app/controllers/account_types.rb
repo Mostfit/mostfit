@@ -28,7 +28,7 @@ class AccountTypes < Application
   def create(account_type)
     @account_type = AccountType.new(account_type)
     if @account_type.save
-      redirect resource(@account_type), :message => {:notice => "AccountType was successfully created"}
+      redirect resource(:account_types), :message => {:notice => "AccountType was successfully created"}
     else
       message[:error] = "AccountType failed to be created"
       render :new
