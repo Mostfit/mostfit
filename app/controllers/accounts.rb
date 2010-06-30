@@ -3,10 +3,10 @@ class Accounts < Application
 
   def index
     if request.xhr? and params[:account_type_id]
-      @accounts = Account.all(:account_type_id => params[:account_type_id])
+      @accounts = Account.all(:account_type_id => params[:account_type_id]).paginate(:page =>params[:page], :per_page => 5)
       partial :accounts_selection
     else
-      @accounts = Account.all
+      @accounts = Account.all.paginate(:page =>params[:page],:per_page => 5)
       display @accounts, :layout => layout?
     end
   end
@@ -33,7 +33,7 @@ class Accounts < Application
   def create(account)
     @account = Account.new(account)
     if @account.save
-      redirect resource(@account), :message => {:notice => "Account was successfully created"}
+      redirect resource(:accounts), :message => {:notice => "Account was successfully created"}
     else
       message[:error] = "Account failed to be created"
       render :new
