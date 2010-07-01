@@ -8,7 +8,7 @@
       %td
         Journal Type
       %td
-        /=select :journal_type_id, :collection => JournalType.all.map{[x.id, x.name]}
+        =select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select Journal"
     %tr
       %td
         Credit account
