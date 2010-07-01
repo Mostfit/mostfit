@@ -45,7 +45,7 @@ class Journal
   
 
   def self.xml_tally(hash, target) 
-    x = Builder::XmlMarkup.new(:target => target, :indent => 1)
+    x = Builder::XmlMarkup.new(:target => target, :indent => 2)
     x.instruct!
     x.declare! :DOCTYPE, :html, :PUBLIC, "-//W3C//DTD XHTML 1.0 Strict//EN", "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
     x.ENVELOPE( "xmlns" => "http://www.w3.org/1999/xhtml" ) { 

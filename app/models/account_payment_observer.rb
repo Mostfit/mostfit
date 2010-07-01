@@ -4,7 +4,7 @@ class AccountPaymentObserver
   
   def self.make_posting_entries(obj)
     # This function will make entries to the posting database when save, update or delete envent triggers  
-    
+   
     credit_account, debit_account = RuleBook.get_accounts(obj)
     # do not do accounting if no matching accounts
     return unless (credit_account and debit_account)

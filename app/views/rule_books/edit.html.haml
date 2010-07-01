@@ -1,4 +1,4 @@
-- form_url   =  resource(:rule_books, {:return => params[:return]})
+- form_url   =  resource(@rule_book, {:return => params[:return]})
 = error_messages_for @rule_book
 = form_for(@rule_book, :action => form_url, :class => "form") do
   %fieldset

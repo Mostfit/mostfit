@@ -4,6 +4,7 @@ class AccountLoanObserver
   
   def self.make_posting_entries_on_update(obj)
     # This function will make entries to the posting database when save, update or delete event triggers  
+   
     return false unless obj
 
     original_attributes = obj.original_attributes.map{|k,v| {k.name => v}}.inject({}){|s,x| s+=x}
@@ -20,11 +21,12 @@ class AccountLoanObserver
     end
     
     if original_attributes[:amount] != attributes[:amount]
-      
+          
     end
   end
   
   def self.forward_entry(obj)
+   
     credit_account, debit_account = RuleBook.get_accounts(obj)
     # do not do accounting if no matching accounts
     return unless (credit_account and debit_account)
