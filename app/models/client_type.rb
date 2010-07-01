@@ -9,3 +9,7 @@ class ClientType
 
 
 end
+
+if ClientType.count==0
+  ClientType.create(:type => "Standard client")
+end
