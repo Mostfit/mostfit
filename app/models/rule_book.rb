@@ -18,14 +18,16 @@ class RuleBook
   validates_with_method  :action_not_chosen_twice_for_particular_branch
   
   def self.get_accounts(obj)
-    return false if $globals and $globals[:mfi_details] and not $globals[:mfi_details][:accounting_enabled]
-    if obj.class==Payment
+   #return false if $globals and $globals[:mfi_details] and not $globals[:mfi_details][:accounting_enabled]
+      if obj.class==Payment
       transaction_type = obj.type
-      branch  = obj.loan.client.center.branch 
-    elsif obj.class.superclass==Loan
+      branch  = obj.client.center.branch 
+      #TODO:hack alert! Write it better
+    elsif obj.class==Loan or obj.class.superclass==Loan or obj.class.superclass.superclass==Loan
       transaction_type = :disbursement
       branch  = obj.client.center.branch
     end
+    
     if rule = first(:action => transaction_type, :branch => branch)
     elsif rule = first(:action => transaction_type, :branch => nil)
     else
