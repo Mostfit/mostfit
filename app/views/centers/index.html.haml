@@ -28,6 +28,8 @@
   %p
     = link_to_with_rights 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit"
     = link_to_with_rights 'create a new center', resource(@branch, :centers, :new), :class => "add"
+  %br
+    = link_to_with_rights 'Create a new Journal', resource(@branch, :journals, :new), :class => "add"
 
   %div.tab_container
     %ul.tabs
