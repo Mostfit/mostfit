@@ -5,7 +5,7 @@ module Pdf
       pdf.select_font "Times-Roman"
       pdf.text "Day sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
       pdf.text("\n")
-      @centers.sort_by{|x| x.meeting_time_hours + x.meeting_time_hours}.each_with_index{|center, idx|
+      @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each_with_index{|center, idx|
         pdf.start_new_page if idx > 0
         pdf.text "Center: #{center.name}, Manager: #{@staff_member.name}, signature: ______________________", :font_size => 12, :justification => :left
         pdf.text("Center leader: #{center.leader.client.name}, signature: ______________________", :font_size => 12, :justification => :left) if center.leader
@@ -31,7 +31,7 @@ module Pdf
             loans.find_all{|l| l.client_id==client.id and l.disbursal_date}.each{|loan|
               lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
               next if not lh
-              next if not lh.status==:repaid              
+              next if LOANS_NOT_PAYABLE.include? lh.status
               loan_row_count+=1
               fee = fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
               actual_outstanding = (lh ? lh.actual_outstanding_principal : 0)
@@ -86,6 +86,33 @@ module Pdf
         table.title_font_size = 16
         table.header_gap = 10
         table.render_on(pdf)
+        
+        #draw table for scheduled disbursals
+        loans_to_disburse = center.clients.loans(:disbursal_date => @date)
+        if loans_to_disburse.count > 0
+          table = PDF::SimpleTable.new
+          table.data = []
+
+          loans_to_disburse.each do |loan|
+            table.data.push({"amount" => loan.amount.to_currency, "name" => loan.client.name,
+                              "group" => loan.client.client_group.name,
+                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date
+                            })
+          end
+          table.column_order  = ["name", "group", "amount", "loan product", "first payment"]
+          table.show_lines    = :all
+          table.shade_rows    = :none
+          table.show_headings = true          
+          table.shade_headings = true
+          table.orientation   = :left
+          table.position      = :center
+          table.title_font_size = 16
+          table.header_gap = 10
+          pdf.text("\n")
+          pdf.text "Disbursements today"
+          pdf.text("\n")
+          table.render_on(pdf)
+        end        
       } #centers end
       pdf.save_as("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
       return pdf
