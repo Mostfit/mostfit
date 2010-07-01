@@ -9,7 +9,9 @@ class Journal
   property :created_at,     DateTime, :index => true  
   property :batch_id,       Integer, :nullable => true
   belongs_to :batch
+  belongs_to :journal_type
   has n, :postings
+ 
   
   def validity_check
     debit_account_posting, credit_account_posting = self.postings.sort_by{|x| x.amount}
