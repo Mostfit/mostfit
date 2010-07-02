@@ -3,3 +3,7 @@
     %td Name
     %td 
       =text_field :name
+  %tr
+    %td Applicable to
+    %td 
+      =select :parent_model, :collection => ModelsWithDocuments.map{|x| [x.to_s, x.to_s]}
