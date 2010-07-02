@@ -29,7 +29,8 @@
   %tbody
     - histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
     - fees_applicable = Fee.due(loans.map{|x| x.id})
-    - fees_paid       = Payment.all(:received_on => @date, :type => :fees, :loan_id => loans.map{|x| x.id})
+    - fees_paid       = {}
+    - Payment.all(:received_on => @date, :type => :fees, :loan_id => loans.map{|x| x.id}, :fields => [:id, :amount]).map{|p| fees_paid[p.loan_id] =  p}
     - tot_amount, tot_outstanding, tot_installments, tot_principal_due, tot_principal_paid, tot_interest_due, tot_interest_paid, tot_fee_due, tot_fee_paid, tot_total_due, tot_total_paid = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     - clients.group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each do |group, client_grouped|
       %tr.group
@@ -41,7 +42,7 @@
         - loans.find_all{|x| x.client_id==client.id and x.disbursal_date}.each do |loan|
           - lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
           - next if not lh
-          - next if lh.status==:repaid
+          - next if LOANS_NOT_PAYABLE.include? lh.status
           - loan_row_count += 1          
           %tr{ :class => cycle('odd','') }
             - fee = 0

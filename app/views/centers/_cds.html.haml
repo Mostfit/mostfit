@@ -26,7 +26,7 @@
       - @center.clients.each do |client|
         - loan_row_count = 0
         - client.loans.each do |loan|
-          - next if [nil, :repaid, :pending].include? loan.status
+          - next if LOANS_NOT_PAYABLE.include? loan.status
           - lh = loan.history(:date => @date)[0]
           - loan_row_count += 1
           %tr{ :class => cycle('odd','') }
