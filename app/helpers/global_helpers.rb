@@ -176,7 +176,7 @@ module Merb
 
     def format_currency(i)
       # in case of our rupees we do not count with cents, if you want to have cents do that here
-      i.round(4).to_s + " INR"
+      i.round(2).to_s + " INR"
     end
 
     def plurial_nouns(freq)
