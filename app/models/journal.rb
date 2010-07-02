@@ -23,12 +23,14 @@ class Journal
   def self.create_transaction(journal_params, debit_account, credit_account)
     status = false
     journal = nil
+    debugger
     transaction do |t|
-      journal = Journal.create(:comment => journal_params[:comment], :date =>    journal_params[:date]||Date.today,
-                               :transaction_id => journal_params[:transaction_id])
+      journal = Journal.create(:comment => journal_params[:comment], :date =>journal_params[:date]||Date.today,
+                               :transaction_id => journal_params[:transaction_id],
+                               :journal_type_id => journal_params[:journal_type_id])
 
       amount = journal_params[:amount] ? journal_params[:amount].to_i : 0
-
+      
       debit_post = Posting.create(:amount => amount * -1, :journal_id => journal.id, :account => debit_account, :currency => journal_params[:currency])
 
       credit_post = Posting.create(:amount => amount, :journal_id => journal.id, :account => credit_account, :currency => journal_params[:currency])
@@ -67,7 +69,7 @@ class Journal
               x.VOUCHER{
                 x.DATE j.date
                 x.NARRATION j.comment
-                x.VOUCHERTYPENAME "Payment"
+                x.VOUCHERTYPENAME j.journal_type.name
                 x.VOUCHERNUMBER j.id
                 x.ALLLEDGERENTRIES_LIST{
                   x.LEDGERNAME credit_posting.account.name
