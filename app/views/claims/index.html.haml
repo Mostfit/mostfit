@@ -1,0 +1,24 @@
+%h1
+  Claims for
+  =@client.name
+%table
+  %tr
+    %td
+      %b Claim ID
+    %td
+      %b Claim Amount
+    %td
+      %b Submission date
+      
+  - for claim in @claims
+    %tr
+      %td
+        = claim.claim_id
+      %td
+        = claim.amount_of_claim
+      %td
+        = claim.claim_submission_date
+      %td
+        = link_to 'Update', resource(@client, claim, :edit)
+
+= link_to 'New', resource(@client, :claims, :new)

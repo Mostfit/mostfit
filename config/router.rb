@@ -30,6 +30,7 @@ Merb::Router.prepare do
   resources :clients do
     resources :insurance_policies
     resources :attendances
+    resources :claims
   end
   resources :client_groups do
     resources :grts

@@ -136,6 +136,7 @@ class Loans < Application
       if @errors.blank?
         redirect params[:return]||url(:data_entry),{:message => {:notice => "#{loans.size} loans disbursed. #{params[:loans].size - loans.size} loans not disbursed."}}
       else
+        @loans  ||= Loan.all(:id => loans.keys)
         render
       end
     end

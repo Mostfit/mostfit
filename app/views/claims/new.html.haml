@@ -1,0 +1,10 @@
+%h1 New Claim
+
+= error_messages_for @claim
+
+= form_for(@claim, :action => resource(@client, :claims) ) do
+  = partial :fields
+  %p
+    = submit "Create"
+
+= link_to 'Back', resource(@client, :claims)
