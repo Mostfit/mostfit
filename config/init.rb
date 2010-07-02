@@ -135,6 +135,26 @@ Merb::BootLoader.after_app_loads do
     Merb.logger.info("Couldn't create the 'INR' currency, Possibly unable to access the database.")
   end
   
+  VOUCHERS = ['Payment', 'Receipt', 'Journal']
+  
+  begin 
+    if JournalType.all.empty?
+      VOUCHERS.each do |x|
+        j = JournalType.new(:name => x )
+        if j.save
+          Merb.logger.info("The initial Voucher was created...")
+        else
+          Merb.logger.info("Conldn't create the Voucher.......")
+          u.errors.each do |e|
+            Merb.logger.info(e)
+          end
+        end
+      end
+    end
+  rescue
+    Merb.logger.info("Couldn't create the voucher, Possibly unable to access the database.")
+  end
+  
 #  Mime::Type.register 'application/pdf', :pdf
   if File.exists?(File.join(Merb.root, "config", "mfi.yml"))
     $globals ||= {}
