@@ -1,0 +1,24 @@
+1:
+  :name: Loan
+  :action: disbursement 
+  :credit_account_id: 1
+  :debit_account_id: 2
+  :branch_id: 1
+2:
+  :name: Principal
+  :action: principal
+  :credit_account_id: 3
+  :debit_account_id: 4
+  :branch_id: 1
+3:
+  :name: Interest
+  :action: interest
+  :credit_account_id: 1
+  :debit_account_id: 4
+  :branch_id: 1
+4:
+  :name: Fees
+  :action: fees
+  :credit_account_id: 2
+  :debit_account_id: 3
+  :branch_id: 1

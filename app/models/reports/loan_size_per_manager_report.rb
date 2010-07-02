@@ -9,11 +9,11 @@ class LoanSizePerManagerReport < Report
   end
 
   def name
-    "Average Loan Size per Center Manager Report"
+    "Average Loan Size Report"
   end
 
   def self.name
-    "Average Loan Size per Center Manager Report"
+    "Average Loan Size Report"
   end
 
   def generate
@@ -23,33 +23,53 @@ class LoanSizePerManagerReport < Report
       data[branch] = {}
     }
     StaffMember.all.each{|x| staff[x.id]=x}
+    @branch.each{|branch|
+      branch.centers.group_by{|c| c.manager}.each{|s, centers|
+        clients_count = Loan.all(:applied_by => s, :fields => [:id, :client_id]).map{|x| x.client_id}.uniq.length
+        data[branch][s] = [centers.count, clients_count, 0, 0, 0, 0, 0]
+      }
+    }
 
     disbursal_data.each{|x|
       next unless branch = @branch.find{|b| b.id==x.branch_id}
-      data[branch][staff[x.manager_id]] = []
-      data[branch][staff[x.manager_id]] = [x.center_count, x.client_count, 0, 0, x.amount, x.lavg, x.amount/x.center_count]
+      s = staff[x.manager_id]
+      if not data[branch][staff[x.manager_id]]
+        clients_count = Loan.all(:applied_by => s, :fields => [:id, :client_id]).map{|l| l.client_id}.uniq.length
+        data[branch][s] = [Center.all(:manager => s).count, clients_count, 0, 0, 0, 0, 0]
+      end
+      data[branch][s][2] = 0
+      data[branch][s][3] = 0
+      data[branch][s][4] = x.amount
     }
 
     approval_data.each{|x|
       next unless branch = @branch.find{|b| b.id==x.branch_id}
       unless data[branch][staff[x.manager_id]] 
         centers = staff[x.manager_id].centers
-        loans_count = centers.count > 0 ? centers.clients.loans.count : 0
-        data[branch][staff[x.manager_id]] = [centers.count, loans_count, 0, 0, 0, 0, 0]
+        clients_count = Loan.all(:applied_by => s, :fields => [:id, :client_id]).map{|l| l.client_id}.uniq.length
+        data[branch][staff[x.manager_id]] = [centers.count, clients_count, 0, 0, 0, 0, 0]
       end
       data[branch][staff[x.manager_id]][3]  += x.amount
-      avg = data[branch][staff[x.manager_id]][0]>0 ? x.amount/data[branch][staff[x.manager_id]][0] : 0
-      data[branch][staff[x.manager_id]][-1] += avg
     }
 
     applied_data.each{|x|
       next unless branch = @branch.find{|b| b.id==x.branch_id}
       unless data[branch][staff[x.manager_id]] 
         centers = staff[x.manager_id].centers
-        loans_count = centers.count > 0 ? centers.clients.loans.count : 0
-        data[branch][staff[x.manager_id]] = [centers.count, loans_count, 0, 0, 0, 0, 0]
+        clients_count = Loan.all(:applied_by => s, :fields => [:id, :client_id]).map{|l| l.client_id}.uniq.length
+        data[branch][staff[x.manager_id]] = [centers.count, clients_count, 0, 0, 0, 0, 0]
       end
       data[branch][staff[x.manager_id]][2] += x.amount
+    }
+    @branch.each{|branch|
+      branch.centers.each{|center|
+        next if data[branch] and data[branch][center.manager]
+        data[branch][center.manager] = [center.manager.centers.count, 0, 0, 0, 0, 0, 0]
+      }
+      data[branch].each{|s, d|
+        data[branch][s][5] = data[branch][s][1]>0 ? data[branch][s][4]/data[branch][s][1] : 0
+        data[branch][s][6] = data[branch][s][0]>0 ? data[branch][s][4]/data[branch][s][0] : 0
+      }
     }
     return data
   end

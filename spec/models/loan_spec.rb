@@ -35,10 +35,11 @@ describe Loan do
     @center.save
     @center.should be_valid
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => Time.now.to_s)
+    @client = Client.new(:name => 'Ms C.L. Ient', :reference => Time.now.to_s, :client_type => ClientType.create(:type => "Standard"))
     @client.center  = @center
     @client.date_joined = Date.parse('2006-01-01')
     @client.created_by_user_id = 1
+    @client.client_type_id = 1
     @client.save
     @client.errors.each {|e| puts e}
     @client.should be_valid
@@ -118,8 +119,9 @@ describe Loan do
     @loan.should_not be_valid
   end
   it "should not be valid without a proper amount" do
+    @loan.amount_applied_for = nil
     @loan.amount = nil
-    lambda {@loan.valid?}.should raise_error
+    @loan.should_not be_valid
     @loan.amount = -1
     @loan.should_not be_valid
     @loan.amount = 0
@@ -359,11 +361,14 @@ describe Loan do
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by   = @manager
     @loan.status.should == :outstanding
+    lambda{@loan.repay(@loan.total_to_be_received, @user, Date.today, @manager)}.should raise_error
+
+    @loan.save
+    @loan.history_disabled=false
+    @loan.update_history
     # no payments on unsaved (new_record? == true) loans:
-    lambda { @loan.repay(@loan.total_to_be_received, @user, Date.today, @manager) }.should raise_error
     @loan.save.should == true
     r = @loan.repay(@loan.total_to_be_received, @user, Date.today, @manager)
-    p r[1].errors unless r[0]
     r[0].should == true
     @loan.status.should == :repaid
     @loan.status(@loan.scheduled_disbursal_date - 1).should == :approved
@@ -422,20 +427,22 @@ describe Loan do
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @manager
     # @loan.id = nil
+    @loan.history_disabled=false
     7.times do |i|
       status = @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
-      status[1].errors.each {|e| puts e}
+      status[0].should be_true      
     end
+    @loan.update_history
     @loan.payments_hash.keys.sort.each_with_index do |k,i|
       case i
-        when 0 
-          k.should == @loan.scheduled_disbursal_date
-        else
-          k.should == @loan.scheduled_first_payment_date + (7*(i-1))
+      when 0
+        k.should == @loan.scheduled_disbursal_date
+      else
+        k.should == @loan.scheduled_first_payment_date + (7*(i-1))
       end
       if i >= 3
         ps = @loan.payments_hash[k]
-        ps[:total_principal].should == 40 * (i) unless i > 7
+        ps[:total_principal].to_i.should == 40 * (i) unless i > 7
         ps[:total_interest].should == (200/25) * (i) unless i > 7
       end
     end
@@ -449,11 +456,12 @@ describe Loan do
     @loan.get_status(@loan.scheduled_disbursal_date).should == :disbursed
     @loan.save
     @loan.errors.each {|e| puts e}
-    @loan.history_disabled = true
+    @loan.history_disabled=false
     7.times do |i|
       p = @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
-      p[1].errors.each {|e| puts e}
+      p[0].should be_true
     end
+    @loan.update_history
     hist = @loan.calculate_history
     os_prin = 1000
     os_tot = 1200
@@ -497,15 +505,11 @@ describe Loan do
     @loan.get_status(@loan.scheduled_disbursal_date).should == :disbursed
     @loan.save
     @loan.errors.each {|e| puts e}
-    @loan.history_disabled = true
+    @loan.history_disabled=false
     7.times do |i|
       p = @loan.repay(48, @user, @loan.scheduled_first_payment_date + (7*i), @manager)
       p[1].errors.each {|e| puts e}
     end
-    @loan.history_disabled = false
-    @loan.update_history_bulk_insert
-    lhs = LoanHistory.all(:loan_id => @loan.id, :order => [:date])
-    lhs.last.current.should == true
   end
 
   it ".installment_dates should correctly deal with holidays" do
@@ -530,6 +534,10 @@ describe Loan do
   it "should takeover properly" do
     @loan2 = Object.const_get("TakeOver#{@loan.class}").new
     @loan2.attributes = @loan.attributes
+    @loan_product.min_interest_rate = 0
+    @loan_product.min_amount = 0
+    @loan_product.save
+    @loan2.loan_product = @loan_product
     @loan2.original_amount = @loan.amount
     @loan2.original_disbursal_date = @loan.scheduled_disbursal_date
     @loan2.original_first_payment_date = @loan.scheduled_first_payment_date
@@ -537,9 +545,16 @@ describe Loan do
     @loan2.valid?; @loan2.errors.each{|e| puts e}
     @loan2.should be_valid
     @loan._show_cf; @loan2._show_cf
-    @loan2.payment_schedule.count.should == @loan.payment_schedule.count - 10
+    @loan2.payment_schedule.count.should == @loan.payment_schedule.count - 9
     @loan2.taken_over_on = Date.parse("2001-02-04")
     @loan2.clear_cache
-    @loan2.payment_schedule.count.should == @loan.payment_schedule.count - 10
+    @loan2.payment_schedule.count.should == @loan.payment_schedule.count - 9
   end
-end
+
+  it "should do deletion of payment" do 
+    p = @loan.payments.last
+    p.deleted_by = @user
+    p.deleted_at = Time.now
+    p.save.should == true
+  end
+end;

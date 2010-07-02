@@ -134,6 +134,7 @@ module DataEntry
           end
           @type = params[:payment][:type]
           style = params[:payment_style][k.to_sym].to_sym
+          next if amounts<=0          
           success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, false, style)
           @errors << @prin.errors if (@prin and not @prin.errors.blank?)
           @errors << @int.errors if (@int and not @int.errors.blank? )
@@ -142,8 +143,6 @@ module DataEntry
       end
       if params[:paid][:client]
         params[:paid][:client].keys.each do |k|
-          debugger
-
           client = Client.get(k)
           x = client.pay_fees(params[:paid][:client][k.to_sym].to_i, @date, @staff, session.user)
           @errors << x unless x === true

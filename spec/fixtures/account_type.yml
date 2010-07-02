@@ -1,0 +1,16 @@
+1:
+  :name: "ASSET"
+  :code: "AST"
+
+2:
+  :name: "LIABILITY"
+  :code: "LIA"
+
+3:
+  :name: "EXPENDITURE"
+  :code: "EXP"
+
+4:
+  :name: "INCOME"
+  :code: "INC"
+

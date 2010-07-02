@@ -34,5 +34,17 @@ namespace :mostfit do
                                  :comment => "principal for #{p.loan.id} received", :amount => p.principal)
     end
   end
+
+  desc "Make account entries for previous Loans and Payments"
+  task :recreate_accounts do
+    puts "Making account entries for Payments"
+    Payment.all.each do |p|
+      AccountPaymentObserver.make_posting_entries(p)
+    end
+    puts "Making account entries for Loans"
+    Loan.all(:disbursal_date.not => nil).each do |l|
+      AccountLoanObserver.make_posting_entries_on_update(l)
+    end
+  end
 end
 

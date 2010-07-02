@@ -3,12 +3,17 @@
     %td
       Account Type
     %td
-      = select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
+      =select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
+  %tr 
+    %td
+      Branch
+    %td
+      =select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
   %tr
     %td
       Parent Account
     %td 
-      =select :parent_account_id
+      =select :parent_id, :collection => (@parent_accounts||[]).map{|x| [x.id, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account"
 
   %tr  
     %td
@@ -25,5 +30,5 @@
       Opening Balance
     %td
       =text_field :opening_balance
-
-     
+    %td
+      =date_select_for @account, :opening_balance_on_date 

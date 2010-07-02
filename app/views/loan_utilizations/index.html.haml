@@ -1,0 +1,12 @@
+%h1
+  Loan Utilization Master
+%table
+  %tr
+  - for loan_utilization in @loan_utilizations
+    %tr
+      %td
+        = loan_utilization.name
+      %td
+        = link_to 'Edit', url(:edit_loan_utilization,  loan_utilization)
+
+= link_to 'New', url(:new_loan_utilization)

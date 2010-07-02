@@ -32,8 +32,9 @@
             =group ? group.name : "none"
         -clients_grouped.sort_by{|x| x.name}.each do |client|
           - loan_row_count = 0
-          - loans.find_all{|l| l.client_id == client.id and l.disbursal_date and l.status!=:repaid}.each do |loan|
+          - loans.find_all{|l| l.client_id == client.id and l.disbursal_date}.each do |loan|
             - lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
+            - next if lh.status==:repaid
             - loan_row_count += 1
             %tr{ :class => cycle('odd','') }
               %td.text
@@ -55,11 +56,11 @@
                 = ins
                 - tot_installments += ins
               %td.number
-                - p = lh.nil? ? 0 : lh.principal_due.to_i
+                - p = lh.nil? ? 0 : [lh.principal_due.to_i, 0].max
                 = p.to_currency
                 - tot_principal += p
               %td.number
-                - i = lh.nil? ? 0 : lh.interest_due.to_i
+                - i = lh.nil? ? 0 : [lh.interest_due.to_i,0].max
                 = i.to_currency
                 - tot_interest += i
               %td.number

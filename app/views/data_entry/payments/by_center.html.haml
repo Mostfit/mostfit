@@ -100,7 +100,7 @@
                 = "#{fp.keys}: #{fp.values}"
             %td.text
               - fee.each do |k,v|
-                ="#{k}: #{v}"
+                ="#{k.name}: #{v}"
             %td
               - klass = Loan.descendants.include?(obj.class) ? Loan : obj.class
               = text_field :name => "paid[#{klass.to_s.snake_case}][#{obj.id}]", :value => fee.values.inject(0){|s,x| s+=x}, :cols => "5", :style => "width:50px;" 

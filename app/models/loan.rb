@@ -8,6 +8,7 @@ class Loan
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
   attr_accessor :interest_percentage
+  attr_accessor :already_updated
 
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false, :index => true
@@ -50,6 +51,8 @@ class Loan
   property :original_first_payment_date,        Date
   property :taken_over_on,                      Date
   property :taken_over_on_installment_number,   Integer
+
+  property :loan_utilization_id,                Integer, :lazy => true, :nullable => true
   
 #  property :taken_over_on,                     Date
 #  property :taken_over_on_installment_number,  Integer 
@@ -66,6 +69,7 @@ class Loan
   belongs_to :written_off_by, :child_key => [:written_off_by_staff_id],   :model => 'StaffMember'
   belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
   belongs_to :created_by,     :child_key => [:created_by_user_id],        :model => 'User'
+  belongs_to :loan_utilization
   has n, :history,                                                        :model => 'LoanHistory'
   has n, :payments
   has n, :audit_trails,       :child_key => [:auditable_id], :auditable_type => "Loan"
@@ -101,6 +105,7 @@ class Loan
   validates_with_method  :scheduled_first_payment_date, :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :cheque_number,                :method => :check_validity_of_cheque_number
+  validates_with_method  :client_active,                :method => :is_client_active
 
   #product validations
 
@@ -140,14 +145,16 @@ class Loan
 
   def is_valid_loan_product(method)
     loan_attr    = self.send(method)
-    return [false, "No #{method} specified"] if loan_attr===""
+    return [false, "No #{method} specified"] if not loan_attr or loan_attr===""
     return [false, "No loan product chosen"] unless self.loan_product
     product = self.loan_product
     #Checking if the loan adheres to minimum and maximums of the loan product
     {:min => :minimum, :max => :maximum}.each{|k, v|
       product_attr = product.send("#{k}_#{method}")
-      product_attr = product_attr.to_f/100 if method==:interest_rate
-      loan_attr    = loan_attr.to_f        if method==:interest_rate
+      if method==:interest_rate
+        product_attr = product_attr.to_f/100
+        loan_attr    = loan_attr.to_f
+      end
 
       if k==:min and loan_attr and product_attr and  loan_attr < product_attr
         return [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
@@ -159,7 +166,9 @@ class Loan
     if product.respond_to?("#{method}_multiple")
       product_attr = product.send("#{method}_multiple")
       loan_attr = loan_attr*100 if method==:interest_rate
-      return  [false, "#{method.to_s.capitalize} should be in multiples of #{product_attr}"]  if not loan_attr or not loan_attr.remainder(product_attr)<=EPSILON
+      remainder = loan_attr.remainder(product_attr)
+      remainder = remainder/100 if method==:interest_rate
+      return  [false, "#{method.to_s.capitalize} should be in multiples of #{product_attr}"]  if not loan_attr or remainder > EPSILON
     end
     return true
   end
@@ -331,44 +340,50 @@ class Loan
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0].to_i, input[1].to_i
     end
-    if fees_paid > 0
-      fee_payment = Payment.new(:loan => self, :created_by => user,
-                                :received_on => received_on, :received_by => received_by,
-                                :amount => fees_paid.round, :type => :fees)
-      fee_saved = fee_payment.save
-    end
-    if principal > 0
-      prin_payment = Payment.new(:loan => self, :created_by => user,
-                                 :received_on => received_on, :received_by => received_by,
-                                 :amount => principal.round, :type => :principal)
-      prin_saved = prin_payment.save
-    end
-    if interest > 0
-      int_payment = Payment.new(:loan => self, :created_by => user,
-                                :received_on => received_on, :received_by => received_by,
-                                :amount => interest.round, :type => :interest)
-      int_saved = int_payment.save
-    end
-    save_status = (fee_saved or prin_saved or int_saved)
-    if save_status == true
-      if defer_update #i.e. bulk updating loans
-        Merb.run_later do
-          update_history
-        end
-      else
-        update_history  # update the history if we saved a payment
+    save_status = nil
+    payments = []
+    Payment.transaction do |t|
+      if fees_paid > 0
+        fee_payment = Payment.new(:loan => self, :created_by => user,
+                                  :received_on => received_on, :received_by => received_by,
+                                  :amount => fees_paid.round, :type => :fees)
+        payments.push(fee_payment)
       end
-      clear_cache
+      if principal > 0
+        prin_payment = Payment.new(:loan => self, :created_by => user,
+                                   :received_on => received_on, :received_by => received_by,
+                                   :amount => principal.round, :type => :principal)        
+        payments.push(prin_payment)
+      end
+      if interest > 0
+        int_payment = Payment.new(:loan => self, :created_by => user,
+                                  :received_on => received_on, :received_by => received_by,
+                                  :amount => interest.round, :type => :interest)
+        payments.push(int_payment)
+      end
+      if payments.collect{|payment| payment.save}.include?(false)
+        t.rollback
+        return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees},]        
+      end
     end
-    #payment.principal, payment.interest = nil, nil unless total.nil?  # remove calculated pr./int. values from the form
-    # Merb.logger.info "loan #{id}: #{received_on} => paid #{principal} + #{interest} | prin_paid #{principal_received_up_to(received_on)} | os_bal:#{actual_outstanding_principal_on(received_on)}"
-    [save_status, prin_payment, int_payment, fee_payment]  # return the success boolean and the payment object itself for further processing
+
+    if defer_update #i.e. bulk updating loans
+      Merb.run_later do
+        update_history
+      end
+    else
+      already_updated=false
+      update_history  # update the history if we saved a payment
+    end
+    return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
+    # return the success boolean and the payment object itself for further processing
   end
 
   # the way to delete payments from the db
   def delete_payment(payment, user)
     return false unless payment.loan.id == self.id
-    if payment.update_attributes(:deleted_at => Time.now, :deleted_by_user_id => user.id)
+    payment.deleted_by = user
+    if payment.destroy
       update_history
       clear_cache
       return true
@@ -382,12 +397,12 @@ class Loan
     fs = fee_schedule
     pay_order = fs.keys.sort.map{|d| fs[d].keys}.flatten.uniq
     pay_order.each do |k|
-      if fp.has_key?(k.downcase)
-        p = Payment.new(:amount => [fp[k.downcase],amount].min, :type => :fees, :received_on => date, :comment => k,
+      if fp.has_key?(k)
+        p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k, :fee => k,
                         :received_by => received_by, :created_by => created_by, :client => client, :loan => self)
         if p.save
           amount -= p.amount
-          fp[k.downcase]  -= p.amount
+          fp[k]  -= p.amount
         else
           @errors << p.errors
         end
@@ -522,7 +537,7 @@ class Loan
         :fees                       => fees,
         :total_principal            => (principal_so_far),
         :total_interest             => (interest_so_far),
-        :total                      => (principal_so_far + interest_so_far + fees_so_far).round(2),
+        :total                      => (principal_so_far + interest_so_far).round(2),
         :balance                    => balance.round(2),
       }
     end
@@ -755,9 +770,11 @@ class Loan
   # for brute force iterations and caching => speed
 
   def update_history
+    return if already_updated
     return if history_disabled  # easy when doing mass db modifications (like with fixutes)
     clear_cache
     update_history_bulk_insert
+    already_updated=true
   end
 
   def calculate_history
@@ -845,6 +862,7 @@ class Loan
     sql += values.join(",") + ";"
     repository.adapter.execute(sql)
     Merb.logger.info "update_history_bulk_insert done in #{Time.now - t}"
+    return true
   end
 
   private
@@ -986,7 +1004,12 @@ class Loan
     return true if (validated_on and validated_by) or (validated_on.blank? and validated_by.blank? and validation_comment.blank?)
     [false, "The validation date, the validating staff member the loan should both be given"]
   end
-        
+  def is_client_active
+    unless client and client.active
+      return [false, "This is client is no more active"]
+    end
+    return true
+  end
 end
 
 class DefaultLoan < Loan

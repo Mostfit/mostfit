@@ -41,7 +41,6 @@ Merb::BootLoader.before_app_loads do
     require 'dm-pagination/pagination_builder'
     require "pdf/writer"
     require "pdf/simpletable"
-    require "lib/logger.rb"
     require 'lib/string.rb'
     require 'lib/grapher.rb'
     require("lib/pdfs/day_sheet.rb")
@@ -120,21 +119,21 @@ Merb::BootLoader.after_app_loads do
   end
 
   begin 
-  if Currency.all.empty?
-     curr = Currency.new(:name => 'INR')
-    if curr.save
-      Merb.logger.info("The initial Currency 'INR' was created...")
-    else
-      Merb.logger.info("Conldn't create the 'INR' currency.......")
-       u.errors.each do |e|
-         Merb.logger.info(e)
+    if Currency.all.empty?
+      curr = Currency.new(:name => 'INR')
+      if curr.save
+        Merb.logger.info("The initial Currency 'INR' was created...")
+      else
+        Merb.logger.info("Conldn't create the 'INR' currency.......")
+        u.errors.each do |e|
+          Merb.logger.info(e)
         end
+      end
     end
-  end
     
-    rescue
-      Merb.logger.info("Couldn't create the 'INR' currency, Possibly unable to access the database.")
-    end
+  rescue
+    Merb.logger.info("Couldn't create the 'INR' currency, Possibly unable to access the database.")
+  end
   
 #  Mime::Type.register 'application/pdf', :pdf
   if File.exists?(File.join(Merb.root, "config", "mfi.yml"))

@@ -2,7 +2,7 @@ class RuleBooks < Application
   # provides :xml, :yaml, :js
 
   def index
-    @rule_books = RuleBook.all
+    @rule_books = RuleBook.all.paginate(:page =>params[:page],:per_page => 5)
     display @rule_books
   end
 
@@ -28,7 +28,7 @@ class RuleBooks < Application
   def create(rule_book)
     @rule_book = RuleBook.new(rule_book)
     if @rule_book.save
-      redirect resource(@rule_book), :message => {:notice => "RuleBook was successfully created"}
+      redirect resource(:rule_books), :message => {:notice => "RuleBook was successfully created"}
     else
       message[:error] = "RuleBook failed to be created"
       render :new

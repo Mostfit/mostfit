@@ -1,0 +1,41 @@
+%h1 New Journal Entry
+
+= error_messages_for @journal
+
+= form_for(@journal, :action => (@branch ? resource(@branch, :journals) : resource(:journals))) do
+  %table
+    %tr
+      %td
+        Journal Type
+      %td
+        =select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select Journal"
+    %tr
+      %td
+        Credit account
+      %td
+        =select :name => "credit_account[account_id]", :collection => Account.all(:branch => @branch).map{|x| [x.id, x.name]}
+    %tr
+      %td
+        Debit account
+      %td
+        =select :name => "debit_account[account_id]", :collection => Account.all(:branch => @branch).map{|x| [x.id, x.name]}
+    %tr
+      %td
+        Amount
+      %td
+        =text_field :name => "journal[amount]"
+    %tr
+      %td
+        Comment
+      %td
+        =text_field :comment
+    %tr
+      %td
+        TXN ID
+      %td
+        =text_field :transaction_id
+
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:journals)

@@ -2,7 +2,7 @@
   %tr.odd
     %td meeting at
     %td
-      - if @md
+      - if @date.weekday==@center.meeting_day
         %b== #{@date} #{@center.meeting_time}
       - else
         %i no meeting today

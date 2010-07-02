@@ -1,23 +1,23 @@
+%h1 List of Accounts
 
 %table
-  %tr
+  %tr 
+    %th
+      Account Type
     %th
       Account Name
     %th
       GL Code
-    %th
-      Account Type
-  %tr
-  - for account in @accounts
+  - @accounts.group_by{|x|  x.account_type}.each do |account_type, accounts|
     %tr
       %td
-        = account.name
-      %td
-        = account.gl_code
-      %td
-        = account.account_type.name
-      %td
-        = link_to 'Edit', url(:edit_account,  account)
+        %b
+          = account_type.name
+    - accounts.each do |account|
+      =  show_child_accounts(account)
+                  
 = link_to 'New', url(:new_account) 
 | 
 = link_to 'Back', url(:account_types)
+
+
