@@ -1,5 +1,4 @@
 class Document
-  ModelsWithDocuments = [Area, Region, Branch, Center, Client, Loan, ClientGroup, StaffMember, User, Mfi, Funder, InsuranceCompany, InsurancePolicy]
   include DataMapper::Resource
   include Paperclip::Resource
   
@@ -14,11 +13,12 @@ class Document
   property :document_type_id, Integer, :index => true
   property :description, Text, :nullable => true
   
-  belongs_to :document_type
+  belongs_to :document_type  
   has_attached_file :document,
       :url => "/uploads/:class/:id/:basename.:extension",
       :path => "#{Merb.root}/public/uploads/:class/:id/:basename.:extension" 
 
+  validates_present :document_type
   validates_is_unique :number, :scope => [:document_type_id, :parent_id, :parent_model]
 
   def parent
