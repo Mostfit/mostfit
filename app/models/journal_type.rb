@@ -1,5 +1,5 @@
 class JournalType 
- # *VOUCHERS['Payment', 'Receipt', 'Journal']
+
   include DataMapper::Resource
 
   property :id,         Serial
@@ -8,10 +8,10 @@ class JournalType
   has n, :journal
 end
   
-if JournalType.all.empty?
-  DEFAULT_JOURNAL_TYPES.each do |x|
-    JournalType.create(:name => x)
-  end
-end
+# if JournalType.all.empty?
+#   DEFAULT_JOURNAL_TYPES.each do |x|
+#     JournalType.create(:name => x)
+#   end
+
       
 
