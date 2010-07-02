@@ -10,6 +10,9 @@ class ClientType
 
 end
 
-if ClientType.count==0
-  ClientType.create(:type => "Standard client")
+begin
+  if ClientType.count==0
+    ClientType.create(:type => "Standard client")
+  end
+rescue
 end
