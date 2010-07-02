@@ -1,4 +1,4 @@
-module DataEntry  
+module DataEntry
   class Payments < DataEntry::Controller
     provides :html, :xml
     def record
@@ -127,6 +127,7 @@ module DataEntry
       if params[:paid][:loan]
         params[:paid][:loan].keys.each do |k|
           @loan = Loan.get(k.to_i)
+          @loan.history_disabled = true
           amounts = params[:paid][:loan][k.to_sym].to_i
           if params[:submit] == "Pay Fees" # dangerous!            
             @loan.pay_fees(amounts, @date, @staff, session.user)
@@ -136,6 +137,10 @@ module DataEntry
           style = params[:payment_style][k.to_sym].to_sym
           next if amounts<=0          
           success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, false, style)
+          if success
+            @loan.history_disabled = false
+            @loan.update_history
+          end
           @errors << @prin.errors if (@prin and not @prin.errors.blank?)
           @errors << @int.errors if (@int and not @int.errors.blank? )
           @errors << @fees.errors if (@fees and not @fees.errors.blank?)

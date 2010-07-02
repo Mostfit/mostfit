@@ -159,7 +159,6 @@ class Loans < Application
         params[:loans][id].delete("approved?")        
         params[:loans][id][:amount] = params[:loans][id][:amount_sanctioned]
         loan.update(params[:loans][id])
-        loan.save
         @errors << loan.errors unless loan.save
       end
       if @errors.blank?

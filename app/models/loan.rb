@@ -53,6 +53,7 @@ class Loan
   property :taken_over_on_installment_number,   Integer
 
   property :loan_utilization_id,                Integer, :lazy => true, :nullable => true
+  property :under_claim_settlement,             Date, :nullable => true
   
 #  property :taken_over_on,                     Date
 #  property :taken_over_on_installment_number,  Integer 
@@ -725,6 +726,7 @@ class Loan
     return :approved             if (approved_on and approved_on <= date) and not (disbursal_date and disbursal_date <= date)
     return :rejected             if (rejected_on and rejected_on <= date)
     return :written_off          if (written_off_on and written_off_on <= date)
+    return :claim_settlement     if under_claim_settlement and under_claim_settlement <= date
     total_received ||= total_received_up_to(date)
     principal_received ||= principal_received_up_to(date)
     return :disbursed          if (date == disbursal_date) and total_received < total_to_be_received
@@ -839,25 +841,18 @@ class Loan
     t = Time.now
     Merb.logger.error! "could not destroy the history" unless self.history.destroy!
     d0 = Date.parse('2000-01-03')
-    sql = %Q{ INSERT INTO loan_history(loan_id, date, status,
-                                       scheduled_outstanding_principal, scheduled_outstanding_total,
-                                       actual_outstanding_principal, actual_outstanding_total, current, 
-                                       amount_in_default, client_group_id, center_id, client_id, branch_id, 
-                                       days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid,
-                                       created_at)
+    sql = %Q{ INSERT INTO loan_history(loan_id, date, status, scheduled_outstanding_principal, scheduled_outstanding_total,
+                                       actual_outstanding_principal, actual_outstanding_total, current, amount_in_default, client_group_id, center_id, client_id, 
+                                       branch_id, days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid, created_at)
               VALUES }
     values = []
     calculate_history.each do |history|
       value = %Q{(#{id}, '#{history[:date].strftime('%Y-%m-%d')}', #{history[:status]}, #{history[:scheduled_outstanding_principal]},
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
-                          #{history[:actual_outstanding_total]},#{history[:current] ? 1 : 0},
-                          #{history[:amount_in_default]}, #{client.client_group_id || "NULL"}, 
-                          #{client.center.id},#{client.id},#{client.center.branch.id},
-                          #{history[:days_overdue]}, #{((history[:date] - d0) / 7).to_i + 1},
-                          #{history[:principal_due]},#{history[:interest_due]},
-                          #{history[:principal_paid]},#{history[:interest_paid]}, '#{DateTime.now.strftime("%Y-%m-%d %H:%M:%S")}')}
-
-
+                          #{history[:actual_outstanding_total]},#{history[:current] ? 1 : 0}, #{history[:amount_in_default]}, #{client.client_group_id || "NULL"}, 
+                          #{client.center.id},#{client.id},#{client.center.branch.id}, #{history[:days_overdue]}, #{((history[:date] - d0) / 7).to_i + 1},
+                          #{history[:principal_due]},#{history[:interest_due]}, #{history[:principal_paid]},#{history[:interest_paid]}, 
+                          '#{DateTime.now.strftime("%Y-%m-%d %H:%M:%S")}')}
      values << value
     end
     sql += values.join(",") + ";"
@@ -1006,7 +1001,7 @@ class Loan
     [false, "The validation date, the validating staff member the loan should both be given"]
   end
   def is_client_active
-    unless client and client.active
+    if client and not client.active and self.new?
       return [false, "This is client is no more active"]
     end
     return true
