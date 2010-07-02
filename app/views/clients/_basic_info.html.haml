@@ -30,12 +30,13 @@
     %td
       = text_field :name, :size => 40
       %br
-      %b 
-        Mark this user as:
-        %br
-      - Client.flags.each do |f|
-        = f
-        = check_box :name => "tags[#{f}]", :checked => @client.tags && @client.tags.include?(f)
+      - unless @client.new?
+        %b 
+          Mark this user as:
+          %br
+        - Client.flags.each do |f|
+          = f
+          = check_box :name => "tags[#{f}]", :checked => @client.tags && @client.tags.include?(f)
   %tr
     %td
       Client Type
@@ -56,12 +57,6 @@
       Date of birth:
     %td
       = date_select_for @client, :date_of_birth, :nullable => true, :min_date => Date.today-36500, :max_date => Date.today-1000
-  - unless @client.new?
-    %tr
-      %td
-        Date of death:
-      %td
-        = date_select_for @client, :deceased_on, :nullable => true
   %tr
     %td
       Date joined
@@ -95,6 +90,12 @@
         = check_box :active
         &nbsp;&nbsp;
         %span.greytext inactive member are not counted for attendancy
+    %tr#inactive_options{:style => @client.active ? "display: none" : "display: block"}
+      %td
+        Reason
+      %td
+        = select :inactive_reason, :collection => INACTIVE_REASONS.reject{|x| x.blank?}.map{|x| [x.to_s, x.to_s.camelcase(' ')]}
+     
   %tr
     %td
       Photo

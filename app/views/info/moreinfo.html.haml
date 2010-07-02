@@ -21,27 +21,49 @@
   -if @branches
     %tr
       %td
-        Number of Branches
+        Number of New Branches
       %td
-        =@branches.count
+        =@branches[:new].count
+    %tr
+      %td
+        Total number of Branches
+      %td
+        =@branches[:upto].count
   -if @centers and not @obj.class==Center
     %tr
       %td
-        Number of Centers
+        Number of New Centers
       %td
-        =@centers_count
-  -if @groups_count
+        =@centers_new_count
     %tr
       %td
-        Number of Groups
+        Total Number of Centers
       %td
-        =@groups_count
-  -if @clients_count
+        =@centers_upto_count
+  -if @groups_new_count
     %tr
       %td
-        Number of Clients
+        Number of New Groups
       %td
-        =@clients_count
+        =@groups_new_count
+  -if @groups_upto_count
+    %tr
+      %td
+        Total Number of Groups
+      %td
+        =@groups_upto_count
+  -if @clients_new_count
+    %tr
+      %td
+        Number of New Clients
+      %td
+        =@clients_new_count
+  -if @clients_upto_count
+    %tr
+      %td
+        Total Number of Clients
+      %td
+        =@clients_upto_count
   %tr
     %td
       New borrower clients added
@@ -101,11 +123,11 @@
       %td
         Number of center managers
       %td
-        =@centers.managers.count if @centers and @centers.length>0
+        =@centers[:upto].managers.count if @centers and @centers.length>0
   -if @centers and not @obj.class==StaffMember
     %tr
       %td
         Center Managers
       %td
         %ul
-          =@centers.managers.collect{|sm| "<li>#{link_to(sm.name, resource(sm))}</li>"}.join
+          =@centers[:upto].managers.collect{|sm| "<li>#{link_to(sm.name, resource(sm))}</li>"}.join

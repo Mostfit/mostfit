@@ -137,7 +137,7 @@
                   on
                   = loan.written_off_on
               - else
-                = loan.status.to_s
+                = loan.status.to_s.camelcase(' ')
                 %br/
                 %span.greytext
                   - if loan.payments.empty?
