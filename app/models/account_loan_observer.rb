@@ -32,6 +32,8 @@ class AccountLoanObserver
     return unless (credit_account and debit_account)
     journal = {:date => obj.disbursal_date, :transaction_id => obj.id.to_s, :currency => Currency.first, :amount => obj.amount}
     journal[:comment] = "Loan: #{obj.client.name} - #{obj.amount}"
+   
+    journal[:journal_type_id] = 1
     status, @journal = Journal.create_transaction(journal, debit_account, credit_account)
   end
   
@@ -41,6 +43,7 @@ class AccountLoanObserver
     return unless (credit_account and debit_account)
     journal = {:date => obj.disbursal_date, :transaction_id => obj.id.to_s, :currency => Currency.first, :amount => (obj.amount * -1)}
     journal[:comment] = "Loan: #{obj.client.name} - #{obj.amount} - reverse entry"
+    journal[:journal_type_id] = 1
     status, @journal = Journal.create_transaction(journal, debit_account, credit_account)
   end
   
