@@ -84,7 +84,7 @@
       %b Documents received
     %td
       -Claim.properties[:documents].type.flag_map.each do |k, doc|
-        =check_box :name => "claim[documents][#{doc.to_s}]", :checked => @claim.documents.include?(doc)
+        =check_box :name => "claim[documents][#{doc.to_s}]", :checked => (@claim.documents and @claim.documents.include?(doc))
         = doc
   %tr
     %td
