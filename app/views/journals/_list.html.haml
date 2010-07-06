@@ -1,0 +1,22 @@
+%table
+  %tr
+    %th
+      Date
+    %th 
+      Journal ID  
+    %th 
+      Amount
+    %th 
+      Comment  
+
+  -Journal.all(:posting => Posting.all(:account => Account.all(:branch => @branch)))
+    %tr
+      %td
+        = posting.journal.date
+      %td 
+        = posting.journal.id
+      %td 
+        -if posting.amount > 0   
+          = posting.amount
+      %td 
+        = posting.journal.comment
