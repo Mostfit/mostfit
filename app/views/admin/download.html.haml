@@ -1,0 +1,7 @@
+%h1 Database dumps
+%table
+  -@files.each do |file|
+    %tr
+      %td
+        = link_to(file, "/admin/download_dump?file=#{file}")
+  
