@@ -12,19 +12,5 @@
         = account_type.name
       %td
         = link_to account_type.code, url(:edit_account_type, account_type)
-%h1  Manage Book Keeping       
-%tr
-  %th
-    = link_to 'Manage Account Type',url(:new_account_type) 
-  %td
-    ||
-%tr
-  %th 
-    = link_to 'Manage Account', url(:accounts)
-  %td
-    || 
-%tr 
-  %th
-    = link_to 'Manage Accounting Rule', url(:rule_books)
-%br
-= link_to 'Back', url(:admin)
+
+= link_to 'Back', url(:accounts)

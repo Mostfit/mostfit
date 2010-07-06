@@ -26,7 +26,6 @@ class AccountLoanObserver
   end
   
   def self.forward_entry(obj)
-   
     credit_account, debit_account = RuleBook.get_accounts(obj)
     # do not do accounting if no matching accounts
     return unless (credit_account and debit_account)

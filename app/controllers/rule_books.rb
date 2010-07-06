@@ -39,7 +39,7 @@ class RuleBooks < Application
     @rule_book = RuleBook.get(id)
     raise NotFound unless @rule_book
     if @rule_book.update(rule_book)
-       redirect resource(@rule_book)
+       redirect resource(:rule_books)
     else
       display @rule_book, :edit
     end
