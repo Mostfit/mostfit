@@ -1,4 +1,4 @@
--{"branches" => ["name", {"manager" => true}], "clients" => ["name", {"center" => true}], "centers" => ["name", {"manager" => true}], "groups" => ["name", {"center" => true}], "loans" => ["client", {"amount" => false}]}.each do |model, functions|
+-{"branches" => ["name", {"manager" => true}], "clients" => ["name", {"center" => true}], "centers" => ["name", {"manager" => true}], "client_groups" => ["name", {"center" => true}], "loans" => ["client", {"amount" => false}]}.each do |model, functions|
   -objects = instance_variable_get("@#{model}")
   -if objects and objects.length>0
     %div{:style => "float: left; padding-right: 35px;"}

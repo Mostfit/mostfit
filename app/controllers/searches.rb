@@ -1,11 +1,11 @@
 class Searches < Application
   def index
     if params[:query] and params[:query].length>0
-      @branches = Branch.search(params[:query])
-      @clients  = Client.search(params[:query])
-      @centers  = Center.search(params[:query])
-      @loans    = Loan.search(params[:query])
-      @groups   = ClientGroup.search(params[:query])
+      @branches      = Branch.search(params[:query])
+      @clients       = Client.search(params[:query])
+      @centers       = Center.search(params[:query])
+      @loans         = Loan.search(params[:query])
+      @client_groups = ClientGroup.search(params[:query])
       display [@branches, @clients, @centers, @loans]
     else
       display "No results"

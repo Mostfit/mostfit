@@ -1,5 +1,6 @@
 %h1 
   == Clients for #{@client_group.name}
+  = link_to("[Edit]", resource(@client_group, :edit), :class => "edit")
 %h2 Clients
 %table.narrow
   %tr
