@@ -39,7 +39,7 @@ class AccountTypes < Application
     @account_type = AccountType.get(id)
     raise NotFound unless @account_type
     if @account_type.update(account_type)
-       redirect resource(@account_type)
+       redirect resource(:account_types)
     else
       display @account_type, :edit
     end

@@ -1,4 +1,4 @@
-- form_url   =  resource(:account_types, {:return => params[:return]})
+- form_url   =  resource(@account_type, {:return => params[:return]})
 = error_messages_for @account_type
 
 = form_for(@account_type, :action => form_url, :class => "form") do
