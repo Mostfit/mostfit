@@ -48,11 +48,12 @@ class Journal
   end
   
 
-  def self.xml_tally(hash, target) 
-    x = Builder::XmlMarkup.new(:target => target, :indent => 2)
-    x.instruct!
-    x.declare! :DOCTYPE, :html, :PUBLIC, "-//W3C//DTD XHTML 1.0 Strict//EN", "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
-    x.ENVELOPE( "xmlns" => "http://www.w3.org/1999/xhtml" ) { 
+  def self.xml_tally(hash) 
+    xml_file = '/tmp/chart_of_account.xml'
+    f = File.open(xml_file,'w')
+    
+    x = Builder::XmlMarkup.new(:indent => 1)
+    x.ENVELOPE{
       x.HEADER {    
         x.VERSION "1"
         x.TALLYREQUEST "Import"
@@ -61,7 +62,8 @@ class Journal
       }
       
       x.BODY { 
-        x.DESC
+        x.DESC{
+        }
         x.DATA{
           x.TALLYMESSAGE{
             Journal.all(hash).each do |j|
@@ -86,8 +88,8 @@ class Journal
           }
         }
       }
-      
     } 
-    
+    f.write(x)
+    f.close
   end 
 end
