@@ -1,15 +1,25 @@
 
 %table
   %tr
-    %td
+    %th
       Name
-    %td 
+    %th 
       GL Code  
+    %th 
+      Branch  
+   
   %tr
     %td
       = @account.name
     %td 
       = @account.gl_code
+    %td 
+      -unless @account.branch.nil?
+        = @account.branch.name
+      -else
+        = "No Branch"
+
+= partial "journals/list", :accounts => @accounts
 %br
 = link_to 'Edit',  url(:edit_account,  @accounts)
 |

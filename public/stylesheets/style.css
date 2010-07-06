@@ -626,13 +626,13 @@ h3.blocked{
 div.tab_container{
     border: 1px solid #CDD3FE;
 }
-ul.tabs{
+div.tab_container ul.tabs{
     margin-left: 0px;
     background-color: #CDD3FE;
     height: 45px;
     border-bottom: 3px solid #CDD3FE;
 }
-ul.tabs li{
+div.tab_container ul.tabs li{
     display: inline;
     padding: 5px;
     cursor: pointer;   
@@ -647,10 +647,29 @@ ul.tabs li{
     border: 1px solid #EDF3FE;
     font-weight: strong;
 }
-ul.tabs li.active{
+div.tab_container ul.tabs li.active{
     border-bottom: 3px solid white;
     background-color: white;
 }
+
+div.inner{
+    border: 0px;
+}
+div.inner ul{
+    margin-left: 0px;
+    height: 45px;
+}
+div.inner ul li{
+    display: inline;
+    padding: 5px;
+    cursor: pointer;   
+}
+div.inner ul li.active{
+    border-bottom: 3px solid white;
+    background-color: white;
+}
+
+
 table.comments{
     margin: 0px;
     width: 80%; 

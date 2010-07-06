@@ -11,6 +11,11 @@
       %td
         = account_type.name
       %td
-        = link_to account_type.code, url(:edit_account_type, account_type)
+        = account_type.code
+      %td
+        = link_to 'Edit', url(:edit_account_type, account_type)
 
+= link_to 'New', url(:new_account_type)
+|
 = link_to 'Back', url(:accounts)
+
