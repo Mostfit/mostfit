@@ -10,7 +10,7 @@ class Journals < Application
   def new
     only_provides :html
     @journal = Journal.new
-    display @journal
+    display @journal, :layout => layout?
   end
 
   def create(journal)

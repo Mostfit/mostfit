@@ -1,5 +1,6 @@
 class Accounts < Application
   # provides :xml, :yaml, :js
+  before :get_context
 
   def index
     if request.xhr? and params[:account_type_id]
@@ -61,6 +62,15 @@ class Accounts < Application
     else
       raise InternalServerError
     end
+  end
+
+  def branch
+    render :layout => layout?
+  end
+
+  private
+  def get_context
+    @branch = Branch.get(params[:branch_id]) if params.key?(:branch_id)
   end
 
 end # Accounts

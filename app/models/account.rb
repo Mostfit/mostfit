@@ -1,5 +1,3 @@
-
-
 class Account
   include DataMapper::Resource
   before :save, :convert_blank_to_nil
