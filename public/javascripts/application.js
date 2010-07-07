@@ -185,28 +185,6 @@ function create_remotes(){
 		});
 	    return false;
 	});
-    $("select.rules").change(function(eve){
-	    select = $(eve.currentTarget);
-	    select.after("<img id='spinner' src='/images/spinner.gif' />");
-	    id=select.attr("id");
-	    form  = select.parent();
-	    url   = "/rules/keys?model="+select.val();
-	    action = form.find("input[name='"+id+"_action']").val();
-	    $.ajax({
-		    type: "POST",
-		    url: url,
-		    success: function(data){
-			$("div.conditions").html(data);
-			$("#spinner").remove();
-		    },
-		    error: function(xhr, text, errorThrown){
-			txt = "<div class='error'>"+xhr.responseText+"</div>"
-			form.before(txt);
-			$("#spinner").remove();			
-		    }
-		});
-	    return false;	    
-	});
     $("form._remote_").submit(function(){
 	    form = $(this);
 	    $(form).after("<img id='spinner' src='/images/spinner.gif' />");
@@ -282,7 +260,43 @@ function attachReportingFormEvents(id){
 	      });
       });
 }
-
+function attachRulesSelector(select){
+    if(select.length==0)
+	return false;
+    $(select).change(function(eve){
+	    select = $(eve.currentTarget);
+	    select.after("<img id='spinner' src='/images/spinner.gif' />");
+	    maxid = $("div.conditions select").length;	    
+	    if(maxid>0)
+		id  = parseInt(select.attr("id").split("_")[1]);
+	    else
+		id  = 1;
+	    form  = select.parent();
+	    url   = "/rules/keys?model="+select.val()+"&select_id="+id;
+	    $.ajax({
+		    type: "POST",
+		    url: url,
+		    success: function(data){
+			if(maxid>0){
+			    j=id+1;
+			    while($("div.conditions #select_"+j).length>0){
+  			      $("div.conditions #select_"+j).remove();
+			      j=j+1;
+			    }
+			}
+			$("div.conditions").append(data);
+			$("#spinner").remove();
+			attachRulesSelector($("div.conditions select#select_"+(id+1)));
+		    },
+		    error: function(xhr, text, errorThrown){
+			txt = "<div class='error'>"+xhr.responseText+"</div>"
+			form.before(txt);
+			$("#spinner").remove();			
+		    }
+		});
+	    return false;	    
+	});
+}
 function confirm_for(things) {
   /* given a hash of ids and values, this function asks a confirmation to proceed if the values of the elements
    * are not the same as the provided values
@@ -525,5 +539,8 @@ $(document).ready(function(){
 	  addFloater(link);
 	  return(false);
       });  
+  if($("select.rules").length>0){
+      attachRulesSelector($("select.rules"));
+  }
 });
 

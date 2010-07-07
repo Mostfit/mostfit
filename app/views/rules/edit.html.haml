@@ -1,15 +1,10 @@
 %h1
-  Rules controller, edit action
-%p
-  Edit this file in
-  %tt
-    app/views/rules/edit.html.erb
+  =@rule.name
 = error_messages_for @rule
 
 = form_for(@rule, :action => url(:rule, @rule)) do
+  = partial :fields
   %p
     = submit "Update"
 
-= link_to 'Show', url(:rule, @rule)
-|
 = link_to 'Back', url(:rules)
