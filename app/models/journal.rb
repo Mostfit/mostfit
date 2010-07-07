@@ -49,7 +49,7 @@ class Journal
   
 
   def self.xml_tally(hash) 
-    xml_file = '/tmp/chart_of_account.xml'
+    xml_file = '/tmp/voucher.xml'
     f = File.open(xml_file,'w')
     
     x = Builder::XmlMarkup.new(:indent => 1)
