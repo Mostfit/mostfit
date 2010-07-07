@@ -5,7 +5,7 @@ class Journal
   property :id,             Serial
   property :comment,        String
   property :transaction_id, String, :index => true  
-  property :date,           Date, :index => true  
+  property :date,           DateTime, :index => true  
   property :created_at,     DateTime, :index => true  
   property :batch_id,       Integer, :nullable => true
   belongs_to :batch
@@ -25,7 +25,7 @@ class Journal
     journal = nil
     debugger
     transaction do |t|
-      journal = Journal.create(:comment => journal_params[:comment], :date =>journal_params[:date]||Date.today,
+      journal = Journal.create(:comment => journal_params[:comment], :date =>journal_params[:date]||Time.now,
                                :transaction_id => journal_params[:transaction_id],
                                :journal_type_id => journal_params[:journal_type_id])
 
