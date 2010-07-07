@@ -19,16 +19,10 @@ module Merb
         space+= "&nbsp;&nbsp;&nbsp;&nbsp;"
       }
       str+= "  <td>"
-      str+= "    #{space}#{account.name}"
+      str+= "    #{space}#{link_to(account.name, url(:account, account))} "
       str+= "  </td>"
       str+= "  <td>"
       str+= "    #{account.gl_code}"
-      str+= "  </td>"
-      str+= "  <td>"
-      str+= "    #{link_to('Edit', url(:edit_account,  account))}"
-      str+= "  </td>"
-      str+= "  <td>"
-      str+= "    #{link_to('show', url(:account, account))}"
       str+= "  </td>"
       str+= "</tr>"
       str
