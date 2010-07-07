@@ -9,14 +9,14 @@
     %th 
       Comment  
 
-  -Journal.all(:posting => Posting.all(:account => Account.all(:branch => @branch)))
+
+  -Account.all(:branch => @branch).postings.journals(:order => [ :date.desc ]).each do |journal|
     %tr
       %td
-        = posting.journal.date
+        = journal.date
       %td 
-        = posting.journal.id
+        = journal.id
       %td 
-        -if posting.amount > 0   
-          = posting.amount
+        = journal.postings.first.amount.abs
       %td 
-        = posting.journal.comment
+        = journal.comment
