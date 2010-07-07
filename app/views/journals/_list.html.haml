@@ -10,7 +10,7 @@
       Comment  
 
 
-  -Account.all(:branch => @branch).postings.journals(:order => [ :date.desc ]).each do |journal|
+  -Account.all(:branch => @branch).postings.journals(:order => [:date.desc], :order => [:id.desc]).each do |journal|
     %tr
       %td
         = journal.date
