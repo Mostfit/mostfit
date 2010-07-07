@@ -4,7 +4,7 @@ Merb::Router.prepare do
   resources :loan_utilizations
   resources :rule_books
   resources :account_types
-  resources :accounts
+  resources :accounts, :id => /\d+/
   resources :bookmarks
   resources :audit_items
   resources :attendances
