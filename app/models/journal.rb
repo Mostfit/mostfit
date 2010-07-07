@@ -47,9 +47,25 @@ class Journal
     return [status, journal]
   end
   
+  def self.for_branch(branch, offset=0, limit=25)
+    sql  = %Q{
+              SELECT j.id, j.date, j.comment, debit.amount, 
+              FROM accounts a, postings p, journals j
+              LEFT OUTER JOIN postings debit  ON debit.journal_id=j.id
+              LEFT OUTER JOIN postings credit ON credit.journal_id=j.id
+              WHERE a.branch_id=#{branch.id} AND a.id = p.account_id AND p.journal_id=j.id
+              GROUP BY j.id
+              ORDER BY j.date              
+              OFFSET #{offset}
+              LIMIT #{limit}
+              }
+    repository.adapter.query(sql)
 
-  def self.xml_tally(hash) 
-    xml_file = '/tmp/chart_of_account.xml'
+  end
+  
+
+  def self.xml_tally(hash={}) 
+    xml_file = '/tmp/voucher.xml'
     f = File.open(xml_file,'w')
     
     x = Builder::XmlMarkup.new(:indent => 1)
@@ -73,16 +89,16 @@ class Journal
                 x.NARRATION j.comment
                 x.VOUCHERTYPENAME j.journal_type.name
                 x.VOUCHERNUMBER j.id
-                x.ALLLEDGERENTRIES_LIST{
-                  x.LEDGERNAME credit_posting.account.name
-                  x.ISDEEMEDPOSITIVE "Yes"
-                  x.AMOUNT credit_posting.amount
-                }
-                x.ALLLEDGERENTRIES_LIST{
-                  x.LEDGERNAME debit_posting.account.name
-                  x.ISDEEMEDPOSITIVE "No"
-                  x.AMOUNT debit_posting.amount
-                }
+                x.tag! 'ALLLEDGERENTRIES.LIST' do
+                  x.LEDGERNAME(credit_posting.account.name)
+                  x.ISDEEMEDPOSITIVE("Yes")
+                  x.AMOUNT(credit_posting.amount)
+                end
+                x.tag! 'ALLLEDGERENTRIES.LIST' do
+                  x.LEDGERNAME(debit_posting.account.name)
+                  x.ISDEEMEDPOSITIVE("No")
+                  x.AMOUNT(debit_posting.amount)
+                end
               }
             end
           }

@@ -5,8 +5,8 @@
   |
   %a#new_entry{:href => "#new_entry", :onclick => "javascript: $('#new_journal_entry').toggle()"}
     New entry
-%div#journal_entries
-  = partial "journals/list", :accounts => Account.all(:branch => @branch)
 %div#new_journal_entry{:style => "display: none;"}
   = form_for(@journal, :action => resource(@branch, :journals)) do
     = partial "journals/fields", :branch => @branch
+%div#journal_entries
+  = partial "journals/list", :accounts => Account.all(:branch => @branch)
