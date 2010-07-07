@@ -3,6 +3,7 @@
 = error_messages_for @document_type
 = form_for(@document_type, :action => url(:document_type, @document_type)) do
   =partial :fields
+  = submit "Save"
 = link_to 'Show', url(:document_type, @document_type)
 |
 = link_to 'Back', url(:document_types)

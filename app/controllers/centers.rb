@@ -99,7 +99,7 @@ class Centers < Application
 
   def weeksheet
     @clients_grouped = get_grouped_clients
-    @clients = @center.clients(:active => true)
+    @clients = @center.clients
     partial "centers/weeksheet"
   end
 
@@ -128,7 +128,7 @@ class Centers < Application
   
   def get_grouped_clients
     clients = {}
-    @center.clients(:active => true).each{|c|
+    @center.clients.each{|c|
       group_name = c.client_group ? c.client_group.name : "No group"
       clients[group_name]||=[]
       clients[group_name] << c

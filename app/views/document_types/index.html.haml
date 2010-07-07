@@ -7,6 +7,8 @@
       %td
         =document_type.name
       %td
+        =document_type.parent_model
+      %td
         = link_to 'Edit', url(:edit_document_type,  document_type)
 
 = link_to 'New', url(:new_document_type)

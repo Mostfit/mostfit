@@ -6,16 +6,17 @@
   %table.narrow.form{ :style =>'width:50%' }
     %tr.odd
       %td{:rowspan => "15"}
-        = image_tag @client.picture.url(:thumb)
+        - if @client.picture.url=="/images/no_photo.jpg"
+          = image_tag @client.picture.url(:thumb)
+        - else
+          %a.enlarge_image{:href => @client.picture.url(:original)}
+            = image_tag @client.picture.url(:thumb)
       %td 
         name
       %td
         %b
           = @client.name
         == (id: #{@client.id}, ref: #{@client.reference})
-        (
-        =link_to('edit', params[:controller]=="data_entry/clients" ? url(:enter_clients, :action => 'edit', :id => @client) : resource(@branch, @center, @client, :edit))
-        )
     %tr
       %td spouse name
       %td
@@ -54,14 +55,17 @@
         == #{@client.total_fees_paid} / #{@client.total_fees_due}
         - if @client.fees_paid?
           %span.green Paid
-  -if @client.tags and @client.tags.include?(:insincere)
-    %h3.blocked
-      This client is insincere and is not elgible for a loan
-  -elsif not @client.active
-    %h3.blocked
-      This client is not active anymore
-  -else
-    %p
+  %p
+    =link_to('edit client details', params[:controller]=="data_entry/clients" ? url(:enter_clients, :action => 'edit', :id => @client) : resource(@branch, @center, @client, :edit), :class => "button")
+    -if @client.tags and @client.tags.include?(:insincere)
+      %h3.blocked
+        This client is insincere and is not elgible for a loan
+    -elsif not @client.active
+      %h3.blocked
+        This client is not active anymore. 
+        -if @client.inactive_reason=='death_of_client' or @client_inactive_reason=='death_of_spouse'
+          =link_to('Click here for claim processing', resource(@client, :claims))
+    -else
       = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
   
 %div.tab_container
@@ -133,7 +137,7 @@
                   on
                   = loan.written_off_on
               - else
-                = loan.status.to_s
+                = loan.status.to_s.camelcase(' ')
                 %br/
                 %span.greytext
                   - if loan.payments.empty?

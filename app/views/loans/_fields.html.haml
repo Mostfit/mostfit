@@ -63,6 +63,18 @@
       Funding Line
     %td
       = select_funding_line_for @loan, :funding_line
+  - if Funder.count==0 and session.user.role==:admin
+    %tr
+      %td{:colspan => 2}
+        %div.error
+          You do not have any funder created yet. Create them                 
+          =link_to("here", resource(:funders, :new))
+  - elsif FundingLine.count==0 and session.user.role==:admin
+    %tr
+      %td{:colspan => 2}
+        %div.error
+          You do not have any funding line created yet. Create them                 
+          =link_to("here", resource(:funders))
   %tr
     %td
       Application:

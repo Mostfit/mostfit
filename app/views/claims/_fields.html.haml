@@ -1,0 +1,123 @@
+%table
+  %tr
+    %td
+      %b Client name
+    %td
+      = @client.name
+  %tr
+    %td
+      %b Client spouse name
+    %td
+      = @client.spouse_name
+  %tr
+    %td
+      %b Branch
+    %td
+      = @client.center.branch.name
+  %tr
+    %td
+      %b Center
+    %td
+      = @client.center.name
+  %tr
+    %td
+      %b Group
+    %td
+      = @client.client_group.name
+  %tr
+    %td
+      %b Reference number
+    %td
+      = @client.reference
+  %tr
+    %td
+      %b Insurance details
+    %td
+      - if @client.insurance_policies.length>0
+        %table{:border => "1"}
+          %tr
+            %td
+              %b policy number
+            %td
+              %b valid from
+            %td
+              %b valid upto
+            %td
+              %b cover amount
+            %td
+              %b premium paid
+            %td
+              %b cover for
+            %td
+              %b status
+          -@client.insurance_policies.each do |policy|
+            %tr        
+              %td
+                =policy.policy_no
+              %td
+                =policy.date_from
+              %td
+                =policy.date_to
+              %td
+                =policy.sum_insured
+              %td
+                =policy.premium
+              %td
+                =policy.cover_for
+              %td
+                =policy.status
+      - else
+        No insurance policies attached to this client  
+  %tr
+    %td
+      %b Date of death
+    %td
+      =date_select_for @claim, :date_of_death
+  %tr
+    %td
+      %b Claim ID
+    %td
+      = @claim.claim_id
+      = hidden_field :claim_id, :value => @claim.claim_id  
+  %tr
+    %td
+      %b Documents received
+    %td
+      -Claim.properties[:documents].type.flag_map.each do |k, doc|
+        =check_box :name => "claim[documents][#{doc.to_s}]", :checked => (@claim.documents and @claim.documents.include?(doc))
+        = doc
+  %tr
+    %td
+      %b Stop Furture Installments
+    %td
+      = check_box :stop_further_installments  
+  %tr
+    %td
+      %b Refund all pricipal payments
+    %td
+      = check_box :refund_all_payments  
+  %tr
+    %td
+      %b Amount of claim
+    %td
+      = text_field :amount_of_claim
+  %tr
+    %td
+      %b Amount to be deducted
+    %td
+      = text_field :amount_to_be_deducted  
+  %tr
+    %td
+      %b Date of Submission to Insurance Company
+    %td
+      = date_select_for @claim, :claim_submission_date, :nullable => true
+  %tr
+    %td
+      %b Date of Receipt of claim from Insurance Company
+    %td
+      = date_select_for @claim, :receipt_of_claim_on, :nullable => true
+  %tr
+    %td
+      %b Date of Payment to Client
+    %td
+      = date_select_for @claim, :payment_to_client_on, :nullable => true

@@ -36,4 +36,22 @@ class Admin < Application
       render :edit
     end
   end
+
+  def download
+    @files = []
+    if File.exists?(File.join(Merb.root, DUMP_FOLDER))
+      (Dir.entries(File.join(Merb.root, DUMP_FOLDER)) - [".", ".."]).sort.reverse.each{|file|
+        @files << file
+      }
+    end
+    render
+  end
+
+  def download_dump(file)
+    if file and File.exists?(File.join(Merb.root, DUMP_FOLDER, file))
+      send_data(File.open(File.join(Merb.root, DUMP_FOLDER, file)), :filename => file, :type => "gzip")
+    end
+  end
 end
+
+

@@ -3,7 +3,7 @@
     %td
       Document type
     %td
-      =select :document_type_id, :collection => DocumentType.all.map{|x| [x.id, x.name]}, :prompt => "Choose the type of document"
+      =select :document_type_id, :collection => DocumentType.all(:parent_model => params[:parent_model]).map{|x| [x.id, x.name]}, :prompt => "Choose the type of document"
   %tr
     %td
       Issuing authority

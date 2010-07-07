@@ -40,7 +40,7 @@
       %td
         = check_box :name => "loans[#{loan.id}][approved?]"
       %td.text
-        = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => staff_members_allowed, :selected => client.center.manager.id.to_s
+        = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => staff_members_allowed, :selected => client.center.branch.manager.id.to_s
   %tfoot
     %tr
       %td{:colspan => 10}

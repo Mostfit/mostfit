@@ -1,5 +1,11 @@
 // Common JavaScript code across your application goes here.
 var lineNos=0;
+function addFloater(link){
+    $(link).after("<div class='floater'><img height='400' src="+link.attr('href')+"/><span class='close_button'>X</span></div>");	  
+    $(".close_button").click(function(button){
+	    $("div.floater").remove();
+	});
+}
 function spitLogs(){
     $.get("/logs/"+$("div.log_box").attr("id"), function(data){
 	    lines = data.split("\n");
@@ -488,7 +494,14 @@ $(document).ready(function(){
 	  }
 
       });
-  
+  $("#client_active").change(function(){
+	  $("#inactive_options").toggle();
+      });
   attachReportingFormEvents("formdiv_1");
+  $("a.enlarge_image").click(function(a){
+	  link=$(a.currentTarget);
+	  addFloater(link);
+	  return(false);
+      });  
 });
 

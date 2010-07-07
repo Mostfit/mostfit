@@ -615,7 +615,7 @@ table.moreinfo tr td:first-child{
     font-weight: bold;
 }
 h3.blocked{
-    width: 80%;
+    width: 60%;
     text-align: center;
     background-color: #eee;
     color: #E88E02;
@@ -770,4 +770,21 @@ table.tall th {
     background: lightyellow;
     padding: 10px;
     border: 1px solid orange;
+}
+.floater{
+    position: absolute;
+    border: 2px solid orange;    
+    padding: 10px;
+    background: #ccc;
+    z-index: 2;
+}
+.close_button{
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    background: orange;
+    color: white;
+    font-weight: bold;
+    font-size: 1.5em;
+    padding: 5px;
 }

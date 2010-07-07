@@ -8,7 +8,7 @@ class Client
   before :valid?, :parse_dates
   before :valid?, :convert_blank_to_nil
   before :valid?, :add_created_by_staff_member
-
+  
   property :id,              Serial
   property :reference,       String, :length => 100, :nullable => false, :index => true
   property :name,            String, :length => 100, :nullable => false, :index => true
@@ -16,6 +16,7 @@ class Client
   property :date_of_birth,   Date,   :index => true, :lazy => true
   property :address,         Text, :lazy => true
   property :active,          Boolean, :default => true, :nullable => false, :index => true
+  property :inactive_reason, Enum.send('[]', *INACTIVE_REASONS), :nullable => true, :index => true, :default => ''
   property :date_joined,     Date,    :index => true
   property :grt_pass_date,   Date,    :index => true, :nullable => true
   property :client_group_id, Integer, :index => true, :nullable => true
@@ -105,6 +106,7 @@ class Client
   has n, :payments
   has n, :insurance_policies
   has n, :attendances
+  has n, :claims
   validates_length :account_number, :max => 20
 
   belongs_to :center
@@ -256,6 +258,19 @@ class Client
     CenterLeader.create(:center => center, :client => self, :current => true, :date_assigned => Date.today)
   end
 
+  def check_client_deceased
+    if not self.active and not self.inactive_reason.blank? and [:death_of_client, :death_of_spouse].include?(self.inactive_reason.to_sym)
+      loans.each do |loan|
+        if loan.status==:outstanding or loan.status==:disbursed and self.claims.length>0 and claim=self.claims.last
+          if claim.stop_further_installments
+            loan.under_claim_settlement = claim.date_of_death
+            loan.save
+          end
+        end
+      end
+    end
+  end
+
   private
   def convert_blank_to_nil
     self.attributes.each{|k, v|
@@ -276,8 +291,10 @@ class Client
 
   def dates_make_sense
     return true if not grt_pass_date or not date_joined 
+    return [false, "Client cannot join this center before the center was created"] if center and center.creation_date > date_joined
     return [false, "GRT Pass Date cannot be before Date Joined"]  if grt_pass_date < date_joined
-    return [false, "Client cannot die before he became a client"] if deceased_on and (deceased_on < date_joined or deceased_on < grt_pass_date)    
+    return [false, "Client cannot die before he became a client"] if deceased_on and (deceased_on < date_joined or deceased_on < grt_pass_date)
     true
   end
 end
+

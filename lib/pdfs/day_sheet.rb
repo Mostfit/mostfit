@@ -5,7 +5,8 @@ module Pdf
       pdf.select_font "Times-Roman"
       pdf.text "Day sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
       pdf.text("\n")
-      @centers.sort_by{|x| x.meeting_time_hours + x.meeting_time_hours}.each_with_index{|center, idx|
+      days_absent = Attendance.all(:status => "absent", :center => @centers).aggregate(:client_id, :all.count).to_hash
+      @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each_with_index{|center, idx|
         pdf.start_new_page if idx > 0
         pdf.text "Center: #{center.name}, Manager: #{@staff_member.name}, signature: ______________________", :font_size => 12, :justification => :left
         pdf.text("Center leader: #{center.leader.client.name}, signature: ______________________", :font_size => 12, :justification => :left) if center.leader
@@ -23,7 +24,8 @@ module Pdf
         #grouping by client groups
         center.clients(:fields => [:id, :name]).group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each{|group, clients|
           group_amount, group_outstanding, group_installments, group_principal, group_interest, group_fee, group_due = 0, 0, 0, 0, 0, 0, 0
-          table.data.push({"disbursed on" => "#{group.name}"})
+          table.data.push({"disbursed" => "#{group.name}"})
+          #absent days
           #Grouped clients
           clients.sort_by{|x| x.name}.each{|client|
             # all the loans of a client
@@ -31,6 +33,7 @@ module Pdf
             loans.find_all{|l| l.client_id==client.id and l.disbursal_date}.each{|loan|
               lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
               next if not lh
+              next if LOANS_NOT_PAYABLE.include? lh.status
               loan_row_count+=1
               fee = fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
               actual_outstanding = (lh ? lh.actual_outstanding_principal : 0)
@@ -39,16 +42,11 @@ module Pdf
               total_due          = [(lh ? (fee+lh.principal_due+lh.interest_due): 0), 0].max
               number_of_installments = loan.number_of_installments_before(@date)
               
-              table.data.push({"on name" => client.name, "loan id" => loan.id, "amount" => loan.amount.to_currency, 
-                                "outstanding" => actual_outstanding.to_currency,
-                                "status" => lh.status.to_s,
-                                "disbursed on" => loan.disbursal_date.to_s, 
-                                "installment" =>  number_of_installments,
-                                "principal due" => principal_due.to_currency, 
-                                "interest due" => interest_due.to_currency,
-                                "fee"          => fee.to_currency,
-                                "total due" =>  total_due.to_currency,
-                                "attendance" => ""
+              table.data.push({"name" => client.name, "loan id" => loan.id, "amount" => loan.amount.to_currency, 
+                                "outstanding" => actual_outstanding.to_currency, "status" => lh.status.to_s,                                
+                                "disbursed" => loan.disbursal_date.to_s, "installment" =>  number_of_installments,
+                                "principal" => principal_due.to_currency, "interest" => interest_due.to_currency, "days absent" => days_absent[client.id]||0,
+                                "fee"          => fee.to_currency, "total due" =>  total_due.to_currency, "attendance" => ""
                               })
               group_amount       += loan.amount
               group_outstanding  += actual_outstanding
@@ -63,7 +61,7 @@ module Pdf
             end
           } #clients end
           table.data.push({"amount" => group_amount.to_currency, "outstanding" => group_outstanding.to_currency,
-                            "principal due" => group_principal.to_currency, "interest due" => group_interest.to_currency,
+                            "principal" => group_principal.to_currency, "interest" => group_interest.to_currency,
                             "fee" => group_fee.to_currency, "total due" => group_due.to_currency                            
                           })
           tot_amount         += group_amount
@@ -75,12 +73,13 @@ module Pdf
           total_due          += (group_principal + group_interest + group_fee)
         } #groups end
         table.data.push({"amount" => tot_amount.to_currency, "outstanding" => tot_outstanding.to_currency,
-                          "principal due" => tot_principal.to_currency,
-                          "interest due" => tot_interest.to_currency, "fee" => tot_fee.to_currency,
+                          "principal" => tot_principal.to_currency,
+                          "interest" => tot_interest.to_currency, "fee" => tot_fee.to_currency,
                           "total due" => (tot_principal + tot_interest + tot_fee).to_currency
                         })
         
-        table.column_order  = ["on name","loan id","amount","outstanding","status", "disbursed on", "installment","principal due","interest due","fee", "total due", "attendance"]
+        table.column_order  = ["name", "loan id" , "amount", "outstanding", "status", "disbursed", "installment", "principal", "interest",
+                               "fee", "total due", "days absent", "attendance"]
         table.show_lines    = :all
         table.show_headings = true
         table.shade_rows    = :none
@@ -90,6 +89,33 @@ module Pdf
         table.title_font_size = 16
         table.header_gap = 10
         table.render_on(pdf)
+        
+        #draw table for scheduled disbursals
+        loans_to_disburse = center.clients.loans(:disbursal_date => @date)
+        if loans_to_disburse.count > 0
+          table = PDF::SimpleTable.new
+          table.data = []
+
+          loans_to_disburse.each do |loan|
+            table.data.push({"amount" => loan.amount.to_currency, "name" => loan.client.name,
+                              "group" => loan.client.client_group.name,
+                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date
+                            })
+          end
+          table.column_order  = ["name", "group", "amount", "loan product", "first payment"]
+          table.show_lines    = :all
+          table.shade_rows    = :none
+          table.show_headings = true          
+          table.shade_headings = true
+          table.orientation   = :left
+          table.position      = :center
+          table.title_font_size = 16
+          table.header_gap = 10
+          pdf.text("\n")
+          pdf.text "Disbursements today"
+          pdf.text("\n")
+          table.render_on(pdf)
+        end        
       } #centers end
       pdf.save_as("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
       return pdf

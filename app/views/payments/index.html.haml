@@ -170,7 +170,7 @@
           %td
             %b= format_currency(scheduled_principal + scheduled_interest)
             %br/
-            %span.greytext== #{scheduled_principal.round} principal + #{scheduled_interest.round} interest
+            %span.greytext== #{scheduled_principal.round(2)} principal + #{scheduled_interest.round(2)} interest
           %td
             - if last_payment_date and (h[:date] <= last_payment_date or h[:date] <= Date.today)
               %b= format_currency h[:actual_outstanding_principal]
