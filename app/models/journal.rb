@@ -69,7 +69,7 @@ class Journal
             Journal.all(hash).each do |j|
               debit_posting, credit_posting = j.postings
               x.VOUCHER{
-                x.DATE j.date
+                x.DATE j.date.strftime("%Y%m%d")
                 x.NARRATION j.comment
                 x.VOUCHERTYPENAME j.journal_type.name
                 x.VOUCHERNUMBER j.id
