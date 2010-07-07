@@ -4,4 +4,4 @@
 
 = form_for(@journal, :action => (@branch ? resource(@branch, :journals) : resource(:journals))) do
   = partial :fields
-= link_to 'Back', (@branch ? resource(@branch) : url(:admin))
+= link_to 'Back', (@branch ? resource(@branch) : url(:accounts))
