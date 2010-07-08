@@ -25,9 +25,12 @@ class DataAccessObserver
           diff=diff.compact
         else
           diff = [attributes.select{|k, v| v and not v.blank? and not v==0}.to_hash]
-          diff.first[:discriminator] = diff.first[:discriminator].to_s if diff.first[:discriminator]
         end
-        diff.first[:discriminator] = diff.first[:discriminator].to_s if diff.length>0 and diff.find{|x| x.keys.include?(:discriminator)}
+
+        if diff.length>0 and diff.find{|x| x.keys.include?(:discriminator)}
+          index = diff.index(diff.find{|x| x.keys.include?(:discriminator)})
+          diff[index][:discriminator] = diff[index][:discriminator].map{|x| x.to_s if x}
+        end
         return if diff.length==0
         model = (/Loan$/.match(obj.class.to_s) ? "Loan" : obj.class.to_s)
         log = AuditTrail.new(:auditable_id => obj.id, :action => @action, :changes => diff.to_yaml, :type => :log,
@@ -35,6 +38,7 @@ class DataAccessObserver
         log.save
       end
     rescue Exception => e
+      p diff if diff
       Merb.logger.info(e.to_s)
       Merb.logger.info(e.backtrace.join("\n"))
     end
