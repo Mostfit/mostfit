@@ -6,8 +6,8 @@ class LoanProduct
   property :max_amount, Integer, :nullable => false, :index => true
   property :min_amount, Integer, :nullable => false, :index => true
   property :amount_multiple, Integer, :nullable => false, :index => true, :default => 1, :min => 1
-  property :max_interest_rate, Integer, :nullable => false, :index => true, :max => 100
-  property :min_interest_rate, Integer, :nullable => false, :index => true, :min => 0
+  property :max_interest_rate, Float, :nullable => false, :index => true, :max => 100
+  property :min_interest_rate, Float, :nullable => false, :index => true, :min => 0
   property :interest_rate_multiple, Float, :nullable => false, :index => true, :default => 1, :min => 0.01
   property :installment_frequency, Enum.send('[]', *([:any] + INSTALLMENT_FREQUENCIES)), :nullable => true, :index => true
 
@@ -30,7 +30,7 @@ class LoanProduct
 
   validates_with_method :min_is_less_than_max
   validates_is_unique   :name
-  validates_is_number   :max_amount, :min_amount, :max_interest_rate, :min_interest_rate
+  validates_is_number   :max_amount, :min_amount
   validates_with_method :check_loan_type_correctness
   
   
