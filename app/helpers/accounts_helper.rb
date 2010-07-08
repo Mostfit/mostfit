@@ -24,6 +24,9 @@ module Merb
       str+= "  <td>"
       str+= "    #{account.gl_code}"
       str+= "  </td>"
+      str+= "  <td>"
+      str+= "    #{account.branch.name if account.branch}"
+      str+= "  </td>"
       str+= "</tr>"
       str
     end

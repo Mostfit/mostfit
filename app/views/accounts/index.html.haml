@@ -21,6 +21,8 @@
       Account Name
     %th
       GL Code
+    %th
+      Branch
   - @accounts.group_by{|x|  x.account_type}.each do |account_type, accounts|
     %tr
       %td

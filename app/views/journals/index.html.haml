@@ -2,30 +2,31 @@
 %table
   %tr
     %th
+      ID
+    %th
       Date
-    %th 
-      Journal ID  
-    %th 
+    %th
       Amount
-    %th 
-      Comment  
+    %th
+      Type
+    %th
+      Comment
 
-
-  - for journal in @journals
+  - for journal in @journals.all(:order => [:id.desc])
  
     %tr
       %td
-        = journal.date.strftime("%Y/%m/%d")
-      %td 
         = journal.id
+      %td 
+        = journal.date.strftime("%Y/%m/%d")
       %td 
         = journal.postings.first.amount.abs
       %td 
+        = journal.type
+      %td 
         = journal.comment
+
 = paginate @journals
-
-
-
-
-
-
+= link_to 'New', url(:new_journal)
+|
+= link_to 'Back', (url(:accounts))
