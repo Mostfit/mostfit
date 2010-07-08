@@ -1,6 +1,5 @@
 class Rules < Application
   # provides :xml, :yaml, :js
-
   def index
     @rules = Rule.all
     display @rules
@@ -26,7 +25,7 @@ class Rules < Application
   end
 
   def create(rule)
-    debugger
+    rule = fix_conditions(rule)
     @rule = Rule.new(rule)
     if @rule.save
       redirect resource(@rule), :message => {:notice => "Rule was successfully created"}
@@ -37,6 +36,7 @@ class Rules < Application
   end
 
   def update(id, rule)
+    rule = fix_conditions(rule)
     @rule = Rule.get(id)
     raise NotFound unless @rule
     if @rule.update(rule)
@@ -57,30 +57,23 @@ class Rules < Application
   end
 
   def keys(model)
-    if Mostfit::Business::Rules.all_models.index(model.to_sym)
-      model = Kernel.const_get(model.camelcase)
-      choices = (model.properties.map{|x| x.name.to_s} + model.relationships.keys)
-      field   = :select
-    elsif Mostfit::Business::Rules.all_models.index(model.singularize.to_sym)
-      # it is an array. Choices are count, max, min etc
-      choices = ['count', 'value']
-      model = Kernel.const_get(model.singularize.camelcase)      
-      choices += model.relationships.keys
-      field   = :select
-    elsif ['count', 'max', 'min', 'value'].include?(model)      
-      field = :select
-      choices = ['<=', '>=', '=']
-    elsif ['<=', '>=', '='].include?(model)
-      field = :text_field
-    end
-
+    name, field, choices = Condition.get_field_choices_and_name(model)
     select_id = "select_#{params[:select_id].to_i+1}" if params[:select_id]
 
     if field==:select
-      render(select(:name => "rule[condition][]", :collection => choices, :class => "rules", :prompt => "select property", :id => select_id), :layout => false)
+      render(select(:name => name, :collection => choices, :class => "rules", :prompt => "select property", :id => select_id), :layout => false)
     else
-      render(text_field(:name => "rule[condition][]", :class => "rules"), :layout => false, :id => select_id)
+      render(text_field(:name => name, :class => "rules"), :layout => false, :id => select_id)
     end
+  end
+
+  def fix_conditions(rule)
+    # fix till wee need multiple conditions
+    rule[:conditions] = [rule[:conditions]]
+    rule[:conditions].each_with_index do |condition, idx|
+      rule[:conditions][idx][:keys] = rule[:conditions][idx][:keys].join(".")
+    end
+    rule
   end
   
 end # Rules

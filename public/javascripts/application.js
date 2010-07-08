@@ -267,10 +267,7 @@ function attachRulesSelector(select){
 	    select = $(eve.currentTarget);
 	    select.after("<img id='spinner' src='/images/spinner.gif' />");
 	    maxid = $("div.conditions select").length;	    
-	    if(maxid>0)
-		id  = parseInt(select.attr("id").split("_")[1]);
-	    else
-		id  = 1;
+	    id  = parseInt(select.attr("id").split("_")[1]);
 	    form  = select.parent();
 	    url   = "/rules/keys?model="+select.val()+"&select_id="+id;
 	    $.ajax({

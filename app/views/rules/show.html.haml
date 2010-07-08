@@ -16,7 +16,10 @@
     %td
       Condition
     %td
-      = @rule.condition
+      - @rule.conditions.each do |condition|
+        = condition.keys
+        = condition.comparator
+        = condition.value
   %tr
     %td
       Allow this condition?
