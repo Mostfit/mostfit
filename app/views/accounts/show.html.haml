@@ -12,8 +12,6 @@
 %p
   = link_to_with_rights 'edit this account\'s details ', resource(@account, :edit), :class => "edit"
 
-= partial "journals/list", :accounts => @accounts
+= partial "journals/list_account", :accounts => @accounts
 %br
 = link_to 'Back', url(:accounts)
-
-

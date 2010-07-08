@@ -1,4 +1,4 @@
-%h1 Journal Entries - Account Specific
+%h1 Journal Entries
 
 %table
   %tr
@@ -7,6 +7,10 @@
     %th
       Date
     %th
+      Debit Account
+    %th
+      Credit Account
+    %th
       Amount
     %th
       Type
@@ -14,11 +18,16 @@
       Comment
 
   - for journal in @journals.all(:order => [:id.desc])
+    - postings = journal.postings.sort_by{|x| x.amount}
     %tr
       %td
         = journal.id
       %td 
         = journal.date.strftime("%Y/%m/%d")
+      %td 
+        = postings.first.account.name
+      %td 
+        = postings.last.account.name
       %td 
         = journal.postings.first.amount.abs
       %td 

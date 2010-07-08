@@ -5,18 +5,25 @@
     %th 
       Journal ID  
     %th 
+      Debit Account
+    %th 
+      Credit Account
+    %th 
       Amount
     %th 
-      Comment  
-
-
-  -Account.all(:branch => @branch).postings.journals(:order => [:date.desc], :order => [:id.desc]).each do |journal|
+      Comment
+  - Account.all(:branch => @branch).postings.journals(:order => [:date.desc], :order => [:id.desc]).each do |journal|
+    - postings = journal.postings.sort_by{|x| x.amount}
     %tr
       %td
         = journal.date.strftime("%Y/%m/%d")
       %td 
         = journal.id
       %td 
-        = journal.postings.first.amount.abs
+        = journal.postings.first.account.name
+      %td 
+        = journal.postings.last.account.name
+      %td 
+        = postings.first.amount.abs
       %td 
         = journal.comment
