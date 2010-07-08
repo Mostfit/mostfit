@@ -23,7 +23,6 @@ class Journal
   def self.create_transaction(journal_params, debit_account, credit_account)
     status = false
     journal = nil
-    debugger
     transaction do |t|
       journal = Journal.create(:comment => journal_params[:comment], :date =>journal_params[:date]||Time.now,
                                :transaction_id => journal_params[:transaction_id],

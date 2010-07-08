@@ -2,11 +2,11 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Journal do
   before (:all) do
-    load_fixtures :account_type, :account
+    load_fixtures :account_type, :account, :currency, :journal_type
   end
   
   it "should create double entry transactions correctly" do
-    journal = {:date => Date.today, :transaction_id => "1100110", :currency => Currency.first, :amount => 1000}
+    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :amount => 1000, :journal_type_id => Journal.first.id}
     journal[:comment] = "some transaction"
     old_journal_count = Journal.count
     old_posting_count = Posting.count
@@ -26,7 +26,7 @@ describe Journal do
   end
 
   it "should not be valid if both accounts are same" do
-    journal = {:date => Date.today, :transaction_id => "1100110", :currency => Currency.first, :amount => 1000}
+    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :amount => 1000, :journal_type_id => Journal.first.id}
     journal[:comment] = "some transaction"
     old_journal_count = Journal.count
     debit_account = Account.first 
@@ -34,12 +34,10 @@ describe Journal do
     status, journal = Journal.create_transaction(journal, debit_account, credit_account)
     status.should be_false
     Journal.count.should == old_journal_count
-
   end
 
-
   it "should not be valid if amount is zero" do
-    journal = {:date => Date.today, :transaction_id => "1100110", :currency => Currency.first, :amount => 0}
+    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :amount => 0, :journal_type_id => Journal.first.id}
     journal[:comment] = "some transaction"
     old_journal_count = Journal.count
     debit_account = Account.first
@@ -48,5 +46,4 @@ describe Journal do
     status.should be_false
     Journal.count.should == old_journal_count
   end
-
 end
