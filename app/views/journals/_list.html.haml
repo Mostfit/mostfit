@@ -13,7 +13,7 @@
   -Account.all(:branch => @branch).postings.journals(:order => [:date.desc], :order => [:id.desc]).each do |journal|
     %tr
       %td
-        = journal.date
+        = journal.date.strftime("%Y/%m/%d")
       %td 
         = journal.id
       %td 
