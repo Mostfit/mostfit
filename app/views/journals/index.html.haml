@@ -13,7 +13,6 @@
       Comment
 
   - for journal in @journals.all(:order => [:id.desc])
- 
     %tr
       %td
         = journal.id
@@ -22,8 +21,8 @@
       %td 
         = journal.postings.first.amount.abs
       %td 
-        = journal.type
-      %td 
+        = journal.journal_type.name
+      %td
         = journal.comment
 
 = paginate @journals
