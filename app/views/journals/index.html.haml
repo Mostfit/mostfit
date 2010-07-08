@@ -1,12 +1,31 @@
-%h1
-  Journals
+%h1 Accountwise List of Journals 
 %table
   %tr
+    %th
+      Date
+    %th 
+      Journal ID  
+    %th 
+      Amount
+    %th 
+      Comment  
+
+
   - for journal in @journals
+ 
     %tr
       %td
-        = link_to 'Show', url(:journal, journal)
-      %td
-        = link_to 'Edit', url(:edit_journal,  journal)
+        = journal.date.strftime("%Y/%m/%d")
+      %td 
+        = journal.id
+      %td 
+        = journal.postings.first.amount.abs
+      %td 
+        = journal.comment
+= paginate @journals
 
-= link_to 'New', url(:new_journal)
+
+
+
+
+

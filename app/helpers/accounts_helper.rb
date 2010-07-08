@@ -19,7 +19,7 @@ module Merb
         space+= "&nbsp;&nbsp;&nbsp;&nbsp;"
       }
       str+= "  <td>"
-      str+= "    #{space}#{link_to(account.name, url(:account, account))} "
+      str+= "    #{space}#{link_to(account.name, url(:journals))} "
       str+= "  </td>"
       str+= "  <td>"
       str+= "    #{account.gl_code}"
