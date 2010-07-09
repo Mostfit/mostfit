@@ -90,12 +90,12 @@ class Journal
                 x.VOUCHERNUMBER j.id
                 x.tag! 'ALLLEDGERENTRIES.LIST' do
                   x.LEDGERNAME(credit_posting.account.name)
-                  x.ISDEEMEDPOSITIVE("Yes")
+                  x.ISDEEMEDPOSITIVE("No")
                   x.AMOUNT(credit_posting.amount)
                 end
                 x.tag! 'ALLLEDGERENTRIES.LIST' do
                   x.LEDGERNAME(debit_posting.account.name)
-                  x.ISDEEMEDPOSITIVE("No")
+                  x.ISDEEMEDPOSITIVE("Yes")
                   x.AMOUNT(debit_posting.amount)
                 end
               }
