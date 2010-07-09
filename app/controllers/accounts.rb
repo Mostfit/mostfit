@@ -7,7 +7,7 @@ class Accounts < Application
       @accounts = Account.all(:account_type_id => params[:account_type_id])
       partial :accounts_selection
     else
-      @accounts = Account.all(:parent_id => "")
+      @accounts = Account.all(:parent_id => "") + Account.all(:parent_id => nil)
       display @accounts, :layout => layout?
     end
   end
