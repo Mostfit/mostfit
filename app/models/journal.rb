@@ -24,7 +24,7 @@ class Journal
     status = false
     journal = nil
     transaction do |t|
-      journal = Journal.create(:comment => journal_params[:comment], :date =>journal_params[:date]||Time.now,
+      journal = Journal.create(:comment => journal_params[:comment], :date => journal_params[:date]||Time.now,
                                :transaction_id => journal_params[:transaction_id],
                                :journal_type_id => journal_params[:journal_type_id])
 
