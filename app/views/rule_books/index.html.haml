@@ -12,7 +12,7 @@
     %th
       Debit
   %tr
-  - for rule_book in @rule_books.all(:order => [:branch_id.asc])    
+  - for rule_book in @rule_books.all(:order => [:branch_id.asc, :action.desc])    
     %tr
       %td
         = rule_book.name

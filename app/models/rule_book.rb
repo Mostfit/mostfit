@@ -48,9 +48,13 @@ class RuleBook
       end
     }
   end
-
+  
   def action_not_chosen_twice_for_particular_branch
-    return true if RuleBook.first(:action => action, :branch_id => branch_id) == nil
-    [false, "This action has already been chosen for this branch"]
+    if self.new?
+      return [false, "Action has already been chosen for this branch"] if RuleBook.first(:action => action, :branch_id => branch_id)
+    else
+      return [false, "Action has already been chosen for this branch"] if RuleBook.first(:action => action, :branch_id => branch_id, :id.not => self.id)
+    end
+    return true 
   end
 end
