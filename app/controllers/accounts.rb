@@ -4,7 +4,7 @@ class Accounts < Application
 
   def index
     if request.xhr? and params[:account_type_id]
-      @accounts = Account.all(:account_type_id => params[:account_type_id]).paginate(:page =>params[:page], :per_page => 5)
+      @accounts = Account.all(:account_type_id => params[:account_type_id])
       partial :accounts_selection
     else
       @accounts = Account.all(:parent_id => "")
