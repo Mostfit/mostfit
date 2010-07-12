@@ -12,6 +12,8 @@
       Credit Account
     %th
       Amount
+    %th 
+      TXN ID
     %th
       Type
     %th
@@ -23,13 +25,15 @@
       %td
         = journal.id
       %td 
-        = journal.date.strftime("%Y/%m/%d")
+        = journal.created_at.strftime("%Y/%m/%d")
       %td 
         = postings.first.account.name
       %td 
         = postings.last.account.name
       %td 
         = journal.postings.first.amount.abs
+      %td 
+        = journal.transaction_id 
       %td 
         = journal.journal_type.name
       %td

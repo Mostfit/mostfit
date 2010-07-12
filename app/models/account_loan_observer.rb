@@ -5,16 +5,21 @@ class AccountLoanObserver
   def self.get_state(obj)
     #needed for deep copy!
     @old_obj = obj.original_attributes.map{|k,v| {k.name => (k.lazy? ? obj.send(k.name) : v)}}.inject({}){|s,x| s+=x}
+    @is_new = obj.new?
   end
 
   def self.make_posting_entries_on_update(obj)
     # This function will make entries to the posting database when save, update or delete event triggers  
     return false unless obj
-
-    return if not @old_obj[:amount] and not @old_obj[:disbursal_date]
-
     attributes = obj.attributes
     original_attributes = @old_obj
+    if @is_new 
+      #loan has just been created
+      self.forward_entry(obj) if not attributes[:disbursal_date].nil? and not attributes[:amount].nil? 
+      return
+    end  
+
+    return if not original_attributes.key?(:amount) and not original_attributes.key?(:disbursal_date)
 
     if original_attributes.key?(:disbursal_date) and original_attributes[:disbursal_date].nil? and attributes[:disbursal_date]
       #set
