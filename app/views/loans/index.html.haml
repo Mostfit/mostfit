@@ -63,7 +63,7 @@
     -elsif not @client.active
       %h3.blocked
         This client is not active anymore. 
-        -if @client.inactive_reason=='death_of_client' or @client_inactive_reason=='death_of_spouse'
+        -if @client.inactive_reason=='death_of_client' or @client.inactive_reason=='death_of_spouse'
           =link_to('Click here for claim processing', resource(@client, :claims))
     -else
       = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
