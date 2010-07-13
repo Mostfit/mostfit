@@ -100,32 +100,63 @@ describe Loan do
     @loan.client           = @client
     @loan.loan_product     = @loan_product
     @loan.errors.each {|e| puts e}
+    @loan.save
     @loan.should be_valid
-    AccountLoanObserver.get_state(@loan)
-    AccountLoanObserver.make_posting_entries_on_update(@loan)
-
+    
     @journal = Journal.first
     @journal.should be_valid
+    
+    #One journal entry when new loan is created and disbursed simultaneously
     Journal.count.should eql(1)
     Posting.count.should eql(2)
-
+    
+    #two journal entries for amount changed
+    old_amount = @loan.amount.to_f
     @loan.amount = 5500
     @loan.save
     @loan.should be_valid
-    Journal.count.should eql(3) #two journal entries for amount changed
+    Journal.count.should eql(3)  
+    Journal.get(Journal.count - 1).postings.first.amount.should eql(old_amount) 
+    Journal.get(Journal.count - 1).postings.last.amount.should eql(old_amount * -1) 
+    Journal.get(Journal.count).postings.first.amount.should eql(@loan.amount.to_f * -1) 
+    Journal.get(Journal.count).postings.last.amount.should eql(@loan.amount.to_f)
+    
+    #No journal entry when amount is unchanged
+    old_amount = @loan.amount.to_f
+    @loan.amount = old_amount
+    @loan.save
+    @loan.should be_valid
+    Journal.count.should eql(3) 
 
+    #two journal entries for disbursal date changed
+    old_disbursal_date = @loan.disbursal_date
     @loan.disbursal_date = Date.today + 5
     @loan.save
     @loan.should be_valid
-    Journal.count.should eql(5)  #two journal entries for disbursal date changed
+    Journal.count.should eql(5)  
+#    Journal.get(Journal.count - 1).date.should eql(old_disbursal_date) 
+#    Journal.get(Journal.count).date.should eql(@loan.disbursal_date)
 
+    #No journal entry when disbursal date is unchanged
+    old_disbursal_date = @loan.disbursal_date
+    @loan.disbursal_date = old_disbursal_date
+    @loan.save
+    @loan.should be_valid
+    Journal.count.should eql(5) 
+
+    #one journal entry for loan unset
     @loan.disbursal_date = nil
     @loan.disbursed_by = nil
     @loan.save
     @loan.should be_valid
-    Journal.count.should eql(6)  #one journal entries for loan unset
+    Journal.count.should eql(6)  
 
+    @loan.amount = nil
+    @loan.save
+    @loan.should_not be_valid
+    Journal.count.should eql(6)  
+
+    Posting.count.should eql(Journal.count * 2)
   end
-
 end
 
