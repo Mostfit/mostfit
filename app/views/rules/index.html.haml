@@ -2,6 +2,18 @@
   Rules
 %table
   %tr
+    %td
+      %b Name
+    %td
+      %b Applicable to
+    %td
+      %b On action
+    %td
+      %b Pre conditions
+    %td
+      %b Rules
+    %td
+      %b On match
   - for rule in @rules
     %tr
       %td
@@ -11,5 +23,12 @@
       %td
         = rule.on_action
       %td
-        = rule.permit
+        - rule.pre_conditions.each do |cond|
+          = "#{cond.keys} #{cond.comparator} #{cond.value}" 
+      %td
+        - rule.conditions.each do |cond|
+          = "#{cond.keys} #{cond.comparator} #{cond.value}"
+          %br
+      %td
+        = rule.permit ? 'Allow' : 'Disallow'
 = link_to 'New', url(:new_rule)

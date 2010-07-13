@@ -9,7 +9,7 @@ class Rule
   property :active,              Boolean, :default => false
 
   has n,   :conditions
-  has n,   :pre_conditions, :model => Condition
+  has n,   :pre_conditions, :model => Condition, :is_rule => false
 
   validates_present :name
   validates_present :model_name

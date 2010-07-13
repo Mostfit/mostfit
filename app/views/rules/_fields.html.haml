@@ -22,6 +22,22 @@
       = select(:on_action, :collection => Rule.properties[:on_action].type.flag_map.map{|k,v| [v.to_s, v.to_s]})
   %tr
     %td
+      %b Pre Condition
+    %td
+      %div.pre_conditions
+        - if @rule.pre_conditions and @rule.pre_conditions.length>0
+          - @rule.pre_conditions.each do |condition|
+            - keys = ([@rule.model_name] + condition.keys.split('.'))
+            - keys.each_with_index do |key, idx|
+              - name, field, choices = Condition.get_field_choices_and_name(key)
+              - if field == :select
+                - selected = keys.length==idx+1 ? condition.comparator.to_s : keys[idx+1]
+                = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :prompt => "select property", :id => "select_#{idx+1}")
+              - else
+                = text_field(:name => name, :class => "rules")               
+            = text_field(:name => "rule[pre_conditions][value]", :class => "rules", :value => condition.value)
+  %tr
+    %td
       %b Condition
     %td
       %div.conditions

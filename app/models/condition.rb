@@ -5,7 +5,9 @@ class Condition
   property :id,          Serial
   property :keys,        String
   property :comparator,  Enum.send('[]', *[:<, :<=, :==, :>, :>=])
-  property :value,       String  
+  property :value,       String
+  property :is_rule,     Boolean, :default => true  
+
   belongs_to :rule
 
   validates_present :keys
