@@ -344,6 +344,7 @@ class Loan
     save_status = nil
     payments = []
     Payment.transaction do |t|
+
       if fees_paid > 0
         fee_payment = Payment.new(:loan => self, :created_by => user,
                                   :received_on => received_on, :received_by => received_by,
@@ -362,10 +363,15 @@ class Loan
                                    :amount => principal.round, :type => :principal)        
         payments.push(prin_payment)
       end
+      # do not create accounting entries individually
+      payments.each{|p| p.override_create_observer = true}    
+
       if payments.collect{|payment| payment.save}.include?(false)
         t.rollback
         return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees},]        
       end
+
+      AccountPaymentObserver.single_voucher_entry(payments)
     end
 
     if defer_update #i.e. bulk updating loans

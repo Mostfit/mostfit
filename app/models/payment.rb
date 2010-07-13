@@ -8,7 +8,8 @@ class Payment
   # before :valid?, :add_loan_product_validations
   # after :valid?, :after_valid
   before :save, :put_fee
-  attr_writer :total  # just to be used in the form
+  attr_writer :total
+  attr_accessor :override_create_observer  # just to be used in the form
 
   PAYMENT_TYPES = [:principal, :interest, :fees]
   

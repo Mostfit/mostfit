@@ -7,7 +7,9 @@ class Account
   property :opening_balance,        Integer, :default => 0 
   property :opening_balance_on_date, Date, :nullable => false, :default => Date.today
   property :gl_code,                String, :index => true
-  property :parent_id,              String
+  property :parent_id,              Integer, :index => true
+  property :account_id,             Integer, :index => true
+
   belongs_to :account, :model => 'Account', :child_key => [:parent_id]
   belongs_to :account_type
   

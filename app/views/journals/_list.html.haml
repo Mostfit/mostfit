@@ -16,14 +16,19 @@
     - postings = journal.postings.sort_by{|x| x.amount}
     %tr
       %td
-        = journal.date.strftime("%Y/%m/%d")
+        = journal.date
       %td 
         = journal.id
+      - debit_postings, credit_postings = journal.postings.group_by{|x| x.amount>0}.values
       %td 
-        = postings.first.account.name
+        - debit_postings.each do |p|
+          = p.account.name
+          %br
       %td 
-        = postings.last.account.name
+        - credit_postings.each do |p|
+          = p.account.name
+          %br
       %td 
-        = postings.first.amount.abs
+        = postings.map{|x| x.amount>0 ? x.amount : 0}.inject(0){|s,x| s+=x}
       %td 
         = journal.comment

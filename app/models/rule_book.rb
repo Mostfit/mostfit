@@ -27,6 +27,20 @@ class RuleBook
     elsif obj.class==Loan or obj.class.superclass==Loan or obj.class.superclass.superclass==Loan
       transaction_type = :disbursement
       branch  = obj.client.center.branch
+    elsif obj.class==Array
+      # In case of objects being passed in a set then we give out hashes of credit and debit accounts with values being amount and keys being acocunt
+      client = obj.first.client_id > 0 ? obj.first.client : obj.first.loan.client
+      branch  = client.center.branch      
+      credit_accounts, debit_accounts  = {}, {}
+      obj.each{|p|        
+        rule = first(:action => p.type, :branch => branch) || first(:action => p.type, :branch => nil)
+        credit_accounts[rule.credit_account] ||= 0
+        credit_accounts[rule.credit_account] += p.amount
+
+        debit_accounts[rule.debit_account] ||= 0
+        debit_accounts[rule.debit_account] += p.amount
+      }
+      return [credit_accounts, debit_accounts]
     end
     
     if rule = first(:action => transaction_type, :branch => branch)

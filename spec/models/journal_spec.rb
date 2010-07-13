@@ -25,6 +25,25 @@ describe Journal do
     Posting.count.should == old_posting_count+2
   end
 
+  it "should create double entry transactions for multipl credit and debit accounts" do
+    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :journal_type_id => Journal.first.id}
+    journal[:comment] = "some transaction"
+    old_journal_count = Journal.count
+    old_posting_count = Posting.count
+    debit_accounts  = {Account.get(3) => 100}
+    debit_accounts += {Account.get(4) => 400}
+    credit_accounts = {Account.get(5) => 500}
+    status, journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)
+    status.should be_true
+    journal.should be_valid
+    journal.postings.count.should == 3
+    debits, credits = journal.postings.group_by{|x| x.amount>0}.values
+    debits.map{|x| x.amount}.inject(0){|s,x| s+=x}.should == -500
+    credits.map{|x| x.amount}.inject(0){|s,x| s+=x}.should == 500
+    Journal.count.should == old_journal_count+1
+    Posting.count.should == old_posting_count+3
+  end
+
   it "should not be valid if both accounts are same" do
     journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :amount => 1000, :journal_type_id => Journal.first.id}
     journal[:comment] = "some transaction"

@@ -1,6 +1,6 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
-describe Loan do
+describe LoanObserver do
   
   before(:all) do
     load_fixtures :account_type, :account, :currency, :journal_type, :rule_book
@@ -134,8 +134,8 @@ describe Loan do
     @loan.save
     @loan.should be_valid
     Journal.count.should eql(5)  
-#    Journal.get(Journal.count - 1).date.should eql(old_disbursal_date) 
-#    Journal.get(Journal.count).date.should eql(@loan.disbursal_date)
+    Journal.get(Journal.count - 1).date.strftime("%d-%m-%Y").should eql(old_disbursal_date.strftime("%d-%m-%Y")) 
+    Journal.get(Journal.count).date.strftime("%d-%m-%Y").should eql(@loan.disbursal_date.strftime("%d-%m-%Y"))
 
     #No journal entry when disbursal date is unchanged
     old_disbursal_date = @loan.disbursal_date
@@ -144,13 +144,14 @@ describe Loan do
     @loan.should be_valid
     Journal.count.should eql(5) 
 
-    #one journal entry for loan unset
+    #One journal entry for loan unset
     @loan.disbursal_date = nil
     @loan.disbursed_by = nil
     @loan.save
     @loan.should be_valid
     Journal.count.should eql(6)  
 
+    #No Journal entry when amount is set to nil 
     @loan.amount = nil
     @loan.save
     @loan.should_not be_valid
