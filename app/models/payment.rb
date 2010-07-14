@@ -172,7 +172,7 @@ class Payment
 
   def only_take_payments_on_disbursed_loans?
     if loan
-      return true if loan.get_status(received_on) == :outstanding
+      return true if loan.get_status(received_on) == :outstanding or loan.get_status(received_on) == :disbursed
       [false, "Payments cannot be made on loans that are written off, repaid or not (yet) disbursed. This loan is #{loan.get_status(received_on)}"]
     end
   end
