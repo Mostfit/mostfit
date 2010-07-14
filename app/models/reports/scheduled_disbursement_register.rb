@@ -35,7 +35,7 @@ class ScheduledDisbursementRegister < Report
     #0      1           2           3               4             5                 6
     #ref_no,client_name,spouse_name,loan_product_id,loan_sequence,disbursement_date,amount
     #1: Applied on
-    hash = {:scheduled_disbursal_date.gte => from_date, :scheduled_disbursal_date.lte => to_date, :disbursal_date => nil}
+    hash = {:scheduled_disbursal_date.gte => from_date, :scheduled_disbursal_date.lte => to_date, :disbursal_date => nil, :approved_on.not => nil}
     hash[:loan_product_id] = loan_product_id if loan_product_id
     Loan.all(hash).each{|l|
       client    = l.client
