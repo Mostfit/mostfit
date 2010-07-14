@@ -344,7 +344,6 @@ class Loan
     save_status = nil
     payments = []
     Payment.transaction do |t|
-
       if fees_paid > 0
         fee_payment = Payment.new(:loan => self, :created_by => user,
                                   :received_on => received_on, :received_by => received_by,

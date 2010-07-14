@@ -18,7 +18,7 @@ class RuleBook
   validates_with_method  :action_not_chosen_twice_for_particular_branch
   
   def self.get_accounts(obj)
-    #return false if $globals and $globals[:mfi_details] and not $globals[:mfi_details][:accounting_enabled]
+    return false if $globals and $globals[:mfi_details] and not $globals[:mfi_details][:accounting_enabled]
     if obj.class==Payment
       transaction_type = obj.type
       client = obj.client_id > 0 ? obj.client : obj.loan.client

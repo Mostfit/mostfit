@@ -23,6 +23,7 @@ class AccountPaymentObserver
     # This function will make entries to the posting database when save, update or delete envent triggers  
     credit_accounts, debit_accounts = RuleBook.get_accounts(payments)
     # do not do accounting if no matching accounts
+    return unless (credit_accounts and debit_accounts)
     return unless (credit_accounts.length>=0 and debit_accounts.length>=0)
     
     journal = {:date => obj.received_on, :transaction_id => obj.id.to_s, :currency => Currency.first}
