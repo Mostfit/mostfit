@@ -72,24 +72,64 @@ class ConsolidatedReport < Report
     repository.adapter.query("select l.id, l.client_id, l.amount FROM loans l, clients c WHERE #{query}").each{|l|
       loans[l.id] =  l
     }
-
-    Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id,:type,:loan_id,:amount,:client_id]).each{|p|
-      if p.loan_id and loans[p.loan_id] and clients.key?(loans[p.loan_id].client_id)
-        client = clients[loans[p.loan_id].client_id]
-      elsif clients.key?(p.client_id)
+    repository.adapter.query(%Q{
+                               SELECT  client_id, type ptype, SUM(amount) amount
+                               FROM payments 
+                               WHERE received_on >= '#{from_date.strftime('%Y-%m-%d')}' and received_on <= '#{to_date.strftime('%Y-%m-%d')}' AND loan_id is NULL
+                               AND deleted_at is NULL
+                               GROUP BY client_id, type
+                             }).each{|p|
+      if clients.key?(p.client_id)
         client = clients[p.client_id]
+      else
+        next
       end
-      next unless client
       center_id = client.center_id
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       if groups[branch_id][center_id]
-        groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
-        groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][3] += p.amount if p.type==:principal 
-        groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][4] += p.amount if p.type==:interest
-        groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][5] += p.amount if p.type==:fees
+        group_id = client.client_group_id ? client.client_group_id : 0
+        groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if group_id==0 and not groups[branch_id][center_id].key?(0)
+        if p.ptype==1
+          groups[branch_id][center_id][group_id][3] += p.amount.round(2).to_i
+        elsif p.ptype==2
+          groups[branch_id][center_id][group_id][4] += p.amount.round(2).to_i
+        elsif p.ptype==3
+          groups[branch_id][center_id][group_id][5] += p.amount.round(2).to_i
+        end
       end
     }
+
+    repository.adapter.query(%Q{
+                               SELECT  loan_id, type ptype, SUM(amount) amount
+                               FROM payments 
+                               WHERE received_on >= '#{from_date.strftime('%Y-%m-%d')}' and received_on <= '#{to_date.strftime('%Y-%m-%d')}' AND loan_id is NOT NULL
+                               AND deleted_at is NULL
+                               GROUP BY loan_id, type
+                             }).each{|p|
+      if loans.key?(p.loan_id) and clients.key?(loans[p.loan_id].client_id)
+        client = clients[loans[p.loan_id].client_id]
+      else
+        next
+      end
+      center_id = client.center_id
+      next if not centers.key?(center_id)
+      branch_id = centers[center_id].branch_id
+      if groups[branch_id][center_id]
+        group_id = client.client_group_id ? client.client_group_id : 0
+        groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if group_id==0 and not groups[branch_id][center_id].key?(0)
+        if p.ptype==1
+          groups[branch_id][center_id][group_id][3] += p.amount.round(2).to_i
+        elsif p.ptype==2
+          groups[branch_id][center_id][group_id][4] += p.amount.round(2).to_i
+        elsif p.ptype==3
+          groups[branch_id][center_id][group_id][5] += p.amount.round(2).to_i
+        end
+      end
+
+    }
+
+
     #1: Applied on
     hash = {:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :client_id], :client_id => clients.keys}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
@@ -130,3 +170,27 @@ class ConsolidatedReport < Report
     return [groups, centers, branches]
   end
 end
+
+
+    # Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id,:type,:loan_id,:amount,:client_id]).each{|p|
+    #   if p.loan_id and loans[p.loan_id] and clients.key?(loans[p.loan_id].client_id)
+    #     client = clients[loans[p.loan_id].client_id]
+    #   elsif clients.key?(p.client_id)
+    #     client = clients[p.client_id]
+    #   end
+    #   next unless client
+    #   center_id = client.center_id
+    #   next if not centers.key?(center_id)
+    #   branch_id = centers[center_id].branch_id
+    #   if groups[branch_id][center_id]
+    #     group_id = client.client_group_id ? client.client_group_id : 0
+    #     groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if group_id==0 and not groups[branch_id][center_id].key?(0)
+    #     if p.type==:principal
+    #       groups[branch_id][center_id][group_id][3] += p.amount
+    #     elsif p.type==:interest
+    #       groups[branch_id][center_id][group_id][4] += p.amount
+    #     elsif p.type==:fees
+    #       groups[branch_id][center_id][group_id][5] += p.amount
+    #     end
+    #   end
+    # }
