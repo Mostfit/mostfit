@@ -33,14 +33,14 @@ class ConsolidatedReport < Report
           groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, g.name]
           history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id} if histories
           if history
-            principal_scheduled = history.scheduled_outstanding_principal.to_i
-            total_scheduled     = history.scheduled_outstanding_total.to_i
+            principal_scheduled = history.scheduled_outstanding_principal
+            total_scheduled     = history.scheduled_outstanding_total
 
-            principal_actual    = history.actual_outstanding_principal.to_i
-            total_actual        = history.actual_outstanding_total.to_i
+            principal_actual    = history.actual_outstanding_principal
+            total_actual        = history.actual_outstanding_total
             
-            principal_advance   = history.advance_principal.to_i
-            total_advance       = history.advance_total.to_i
+            principal_advance   = history.advance_principal
+            total_advance       = history.advance_total
           else
             principal_scheduled, total_scheduled, principal_actual, total_actual, principal_advance, total_advance = 0, 0, 0, 0, 0, 0
           end
@@ -72,61 +72,27 @@ class ConsolidatedReport < Report
     repository.adapter.query("select l.id, l.client_id, l.amount FROM loans l, clients c WHERE #{query}").each{|l|
       loans[l.id] =  l
     }
-    repository.adapter.query(%Q{
-                               SELECT  client_id, type ptype, SUM(amount) amount
-                               FROM payments 
-                               WHERE received_on >= '#{from_date.strftime('%Y-%m-%d')}' and received_on <= '#{to_date.strftime('%Y-%m-%d')}' AND loan_id is NULL
-                               AND deleted_at is NULL
-                               GROUP BY client_id, type
-                             }).each{|p|
-      if clients.key?(p.client_id)
-        client = clients[p.client_id]
-      else
-        next
-      end
-      center_id = client.center_id
-      next if not centers.key?(center_id)
-      branch_id = centers[center_id].branch_id
-      if groups[branch_id][center_id]
-        group_id = client.client_group_id ? client.client_group_id : 0
-        groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if group_id==0 and not groups[branch_id][center_id].key?(0)
-        if p.ptype==1
-          groups[branch_id][center_id][group_id][3] += p.amount.round(2).to_i
-        elsif p.ptype==2
-          groups[branch_id][center_id][group_id][4] += p.amount.round(2).to_i
-        elsif p.ptype==3
-          groups[branch_id][center_id][group_id][5] += p.amount.round(2).to_i
-        end
-      end
-    }
 
     repository.adapter.query(%Q{
-                               SELECT  loan_id, type ptype, SUM(amount) amount
-                               FROM payments 
-                               WHERE received_on >= '#{from_date.strftime('%Y-%m-%d')}' and received_on <= '#{to_date.strftime('%Y-%m-%d')}' AND loan_id is NOT NULL
-                               AND deleted_at is NULL
-                               GROUP BY loan_id, type
+                               SELECT c.branch_id branch_id, c.id center_id, cl.client_group_id client_group_id, type ptype, SUM(amount) amount
+                               FROM payments p, clients cl, centers c
+                               WHERE p.received_on >= '#{from_date.strftime('%Y-%m-%d')}' and p.received_on <= '#{to_date.strftime('%Y-%m-%d')}'
+                               AND p.deleted_at is NULL AND p.client_id = cl.id AND cl.center_id=c.id AND c.id in (#{center_ids})
+                               GROUP BY branch_id, center_id, client_group_id, ptype
                              }).each{|p|
-      if loans.key?(p.loan_id) and clients.key?(loans[p.loan_id].client_id)
-        client = clients[loans[p.loan_id].client_id]
-      else
-        next
-      end
-      center_id = client.center_id
-      next if not centers.key?(center_id)
-      branch_id = centers[center_id].branch_id
-      if groups[branch_id][center_id]
-        group_id = client.client_group_id ? client.client_group_id : 0
-        groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if group_id==0 and not groups[branch_id][center_id].key?(0)
+      next if not centers.key?(p.center_id)
+
+      if groups[p.branch_id][p.center_id]
+        group_id = p.client_group_id ? p.client_group_id : 0
+        groups[p.branch_id][p.center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if group_id==0 and not groups[p.branch_id][p.center_id].key?(0)
         if p.ptype==1
-          groups[branch_id][center_id][group_id][3] += p.amount.round(2).to_i
+          groups[p.branch_id][p.center_id][group_id][3] += p.amount.round(2)
         elsif p.ptype==2
-          groups[branch_id][center_id][group_id][4] += p.amount.round(2).to_i
+          groups[p.branch_id][p.center_id][group_id][4] += p.amount.round(2)
         elsif p.ptype==3
-          groups[branch_id][center_id][group_id][5] += p.amount.round(2).to_i
+          groups[p.branch_id][p.center_id][group_id][5] += p.amount.round(2)
         end
       end
-
     }
 
 
