@@ -25,14 +25,16 @@ class QuaterConsolidatedReport < Report
 #    histories = LoanHistory.sum_outstanding_by_month(self.from_date, self.to_date, self.loan_product_id)
     @branch.each{|branch|
       data[branch]||= {}
-      (branch.creation_date.year..this_year).each{|y|
-        QUATERS.each{|quater, months|
-          year = (quater==4 ? y-1 : y)
+      (branch.creation_date.year..this_year).each{|year|
+        QUATERS.each{|q, months|
           months.each{|month|
             month_number = MONTHS.index(month) + 1
+            quater = get_quater(month_number)
+            y = (quater==4 ? year+1 : year)
             # we do not generate report for the ongoing month
-            next if year==this_year and month_number >= this_month
-            histories = LoanHistory.sum_outstanding_by_month(month_number, year, branch, self.loan_product_id)
+            next if year>=this_year and month_number >= this_month
+            next if Date.today < Date.new(y, month_number, 1)
+            histories = LoanHistory.sum_outstanding_by_month(month_number, y, branch, self.loan_product_id)
             next if not histories
             data[branch][year]||= {}
             data[branch][year][quater]||= {}
@@ -69,18 +71,19 @@ class QuaterConsolidatedReport < Report
         }
       }
     }
+    branch_ids  = @branch.length>0 ? @branch.map{|x| x.id}.join(",") : "NULL"
     # payments
     repository.adapter.query(%Q{
                                SELECT c.branch_id branch_id, year(received_on) year, month(received_on) month, p.type ptype, SUM(amount) amount
                                FROM payments p, clients cl, centers c
                                WHERE p.received_on >= '#{from_date.strftime('%Y-%m-%d')}' and p.received_on <= '#{to_date.strftime('%Y-%m-%d')}'
-                               AND p.deleted_at is NULL AND p.client_id = cl.id AND cl.center_id=c.id
+                               AND p.deleted_at is NULL AND p.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids})
                                GROUP BY branch_id, year, month, ptype
                              }).each{|p|
       branch = @branch.find{|x| x.id == p.branch_id}
       month  = MONTHS[p.month-1]
       quater = get_quater(p.month)
-      year =   p.year
+      year   = (quater==4 ? p.year-1 : p.year)
 
       data[branch][year]||= {}
       data[branch][year][quater]||= {}
@@ -102,19 +105,20 @@ class QuaterConsolidatedReport < Report
                                SELECT c.branch_id branch_id, year(disbursal_date) year, month(disbursal_date) month, SUM(l.amount) amount
                                FROM loans l, clients cl, centers c
                                WHERE l.disbursal_date >= '#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <= '#{to_date.strftime('%Y-%m-%d')}'
-                               AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id
+                               AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids})
                                GROUP BY branch_id, month, year
                              }).each{|l|
       branch = @branch.find{|x| x.id == l.branch_id}
       month  = MONTHS[l.month-1]
       quater = get_quater(l.month)
+      year   = (quater==4 ? l.year-1 : l.year)
 
-      data[branch][l.year]||= {}
-      data[branch][l.year][quater]||= {}
-      data[branch][l.year][quater][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data[branch][year]||= {}
+      data[branch][year][quater]||= {}
+      data[branch][year][quater][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-      if data[branch][l.year][quater][month]
-        data[branch][l.year][quater][month][2] += l.amount.round(2)
+      if data[branch][year][quater][month]
+        data[branch][year][quater][month][2] += l.amount.round(2)
       end
     }
 
@@ -123,19 +127,20 @@ class QuaterConsolidatedReport < Report
                                SELECT c.branch_id branch_id, year(approved_on) year, month(approved_on) month, SUM(l.amount) amount
                                FROM loans l, clients cl, centers c
                                WHERE l.approved_on >= '#{from_date.strftime('%Y-%m-%d')}' and l.approved_on <= '#{to_date.strftime('%Y-%m-%d')}'
-                               AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id
+                               AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids})
                                GROUP BY branch_id, month, year
                              }).each{|l|
       branch = @branch.find{|x| x.id == l.branch_id}
       month  = MONTHS[l.month-1]
       quater = get_quater(l.month)
+      year   = (quater==4 ? l.year-1 : l.year)
 
-      data[branch][l.year]||= {}
-      data[branch][l.year][quater]||= {}
-      data[branch][l.year][quater][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data[branch][year]||= {}
+      data[branch][year][quater]||= {}
+      data[branch][year][quater][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       
-      if data[branch][l.year][quater][month]
-        data[branch][l.year][quater][month][1] += l.amount.round(2)
+      if data[branch][year][quater][month]
+        data[branch][year][quater][month][1] += l.amount.round(2)
       end
     }
 
@@ -144,19 +149,20 @@ class QuaterConsolidatedReport < Report
                                SELECT c.branch_id branch_id, year(applied_on) year, month(applied_on) month, SUM(l.amount) amount
                                FROM loans l, clients cl, centers c
                                WHERE l.applied_on >= '#{from_date.strftime('%Y-%m-%d')}' and l.applied_on <= '#{to_date.strftime('%Y-%m-%d')}'
-                               AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id
+                               AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids})
                                GROUP BY branch_id, month, year
                              }).each{|l|
       branch = @branch.find{|x| x.id == l.branch_id}
       month  = MONTHS[l.month-1]
       quater = get_quater(l.month)
+      year   = (quater==4 ? l.year-1 : l.year)
       
-      data[branch][l.year]||= {}
-      data[branch][l.year][quater]||= {}
-      data[branch][l.year][quater][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data[branch][year]||= {}
+      data[branch][year][quater]||= {}
+      data[branch][year][quater][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-      if data[branch][l.year][quater][month]
-        data[branch][l.year][quater][month][0] += l.amount.round(2)
+      if data[branch][year][quater][month]
+        data[branch][year][quater][month][0] += l.amount.round(2)
       end
     }
     

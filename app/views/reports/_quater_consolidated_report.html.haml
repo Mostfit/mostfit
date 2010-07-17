@@ -63,10 +63,11 @@
           %tr.center#quater
             %td{:colspan => length+1}
               %b
-                =year
-          -quaters.sort_by{|quater, months| 4-quater==0 ? 4-quater : quater}.each do |quater, months|
+                ="#{year} - #{year+1}"
+          -quaters.sort_by{|quater, months| quater}.each do |quater, months|
             %tr.group#quater
               %td{:colspan => length+1}
+                Quater
                 =quater
               -quater_total = Array.new(length, 0)
               -months.sort_by{|month, data| QuaterConsolidatedReport::MONTHS.index(month)}.each do |month, data|
