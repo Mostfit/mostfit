@@ -32,6 +32,7 @@ describe Fee do
     @center.manager = @manager
     @center.branch  = @branch
     @center.code = "CE"
+    @center.creation_date = Date.parse('2006-01-01')
     @center.save
     @center.errors.each {|e| puts e}
     @center.should be_valid
@@ -240,7 +241,7 @@ describe Fee do
     @fee2 = Fee.new(:name => "grt Fee", :amount => 10, :payable_on => :client_grt_pass_date)
     @fee2.save
     @client.grt_pass_date = Date.today
-    @client.pay_fees(5, Date.today, @manager, @user)
+    @client.pay_fees(5, Date.today, @manager, @user)    
     @client.fees_payable_on.should == {@fee1 => 20 - 5, @fee2 => 10}
   end
 end

@@ -22,4 +22,4 @@
       %td
         =trail.created_at.strftime("%d-%m-%Y %H:%M")
       %td
-        =trail.user.login
+        =trail.user ? trail.user.login : "admin"
