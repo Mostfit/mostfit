@@ -136,8 +136,14 @@ class Client
   validates_with_method :dates_make_sense
 
   def self.from_csv(row, headers)
-    center         = Center.first(:name => row[headers[:center]].strip) if row[headers[:center]].strip
-    next unless center
+    if center_attr = row[headers[:center]].strip
+      if center   = Center.first(:name => center_attr)
+      elsif center   = Center.first(:code => center_attr)
+      elsif /\d+/.match(center_attr)
+        center   = Center.get(center_attr)
+      end
+    end
+    return unless center
     branch         = center.branch
     #creating group either on group ccode(if a group sheet is present groups should be already in place) or based on group name
     if headers[:group_code] and row[headers[:group_code]]
@@ -291,7 +297,7 @@ class Client
 
   def dates_make_sense
     return true if not grt_pass_date or not date_joined 
-    return [false, "Client cannot join this center before the center was created"] if center and center.creation_date > date_joined
+    return [false, "Client cannot join this center before the center was created"] if center and center.creation_date and center.creation_date > date_joined
     return [false, "GRT Pass Date cannot be before Date Joined"]  if grt_pass_date < date_joined
     return [false, "Client cannot die before he became a client"] if deceased_on and (deceased_on < date_joined or deceased_on < grt_pass_date)
     true
