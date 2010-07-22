@@ -33,7 +33,7 @@
       %td.text
         = loan.scheduled_disbursal_date
       %td.text
-        = date_select("loans[#{loan.id}][disbursal_date]", Date.today, {:min_date => loan.scheduled_disbursal_date})
+        = date_select("loans[#{loan.id}][disbursal_date]", loan.disbursal_date||loan.scheduled_disbursal_date, {:min_date => loan.scheduled_disbursal_date})
       %td.text
         - late =  @date - loan.scheduled_disbursal_date
         - if late > 0

@@ -202,6 +202,66 @@ class LoanHistory
     })
   end
 
+  def self.sum_outstanding_by_center(from_date, to_date, loan_product_id=nil)
+    extra, from = "", "loan_history lh"
+    if loan_product_id and loan_product_id.to_i>0
+      extra = "AND lh.loan_id=l.id AND l.loan_product_id=#{loan_product_id}"
+      from += ", loans l"
+    end
+    ids=repository.adapter.query(%Q{
+                                 SELECT lh.loan_id loan_id, max(lh.date) date
+                                 FROM #{from}
+                                 WHERE lh.status in (5,6,7,8) AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' 
+                                 AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{extra}
+                                 GROUP BY lh.loan_id
+                                 }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
+    return false if ids.length==0
+    
+    repository.adapter.query(%Q{
+      SELECT 
+        SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
+        SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
+        SUM(actual_outstanding_principal)    AS actual_outstanding_principal,
+        SUM(actual_outstanding_total)        AS actual_outstanding_total,
+        SUM(if(actual_outstanding_principal<scheduled_outstanding_principal,  scheduled_outstanding_principal-actual_outstanding_principal,0)) AS advance_principal,
+        SUM(if(actual_outstanding_total<scheduled_outstanding_total,          scheduled_outstanding_total-actual_outstanding_total,0))         AS advance_total,
+        center_id
+      FROM loan_history
+      WHERE (loan_id, date) in (#{ids}) AND status in (5,6)
+      GROUP BY center_id;
+    })
+  end
+
+  def self.sum_outstanding_by_month(month, year, branch, loan_product_id=nil)
+    date = Date.new(year, month, -1)
+    extra, from = "", "loan_history lh"
+    if loan_product_id and loan_product_id.to_i>0
+      extra = "AND lh.loan_id=l.id AND l.loan_product_id=#{loan_product_id}"
+      from += ", loans l"
+    end
+    ids=repository.adapter.query(%Q{
+                                 SELECT lh.loan_id loan_id, max(lh.date) date
+                                 FROM #{from}
+                                 WHERE lh.branch_id=#{branch.id} AND lh.status in (5,6,7,8)
+                                 AND lh.date<='#{date.strftime('%Y-%m-%d')}' #{extra}
+                                 GROUP BY lh.loan_id
+                                 }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
+    return false if ids.length==0
+    
+    repository.adapter.query(%Q{
+      SELECT 
+        SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
+        SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
+        SUM(actual_outstanding_principal)    AS actual_outstanding_principal,
+        SUM(actual_outstanding_total)        AS actual_outstanding_total,
+        SUM(if(actual_outstanding_principal<scheduled_outstanding_principal,  scheduled_outstanding_principal-actual_outstanding_principal,0)) AS advance_principal,
+        SUM(if(actual_outstanding_total<scheduled_outstanding_total,          scheduled_outstanding_total-actual_outstanding_total,0))         AS advance_total,
+        branch_id
+      FROM loan_history
+      WHERE (loan_id, date) in (#{ids}) AND status in (5,6)
+      GROUP BY branch_id;
+    })
+  end
 
   def self.sum_outstanding_for(obj, from_date=Date.today-7, to_date=Date.today)
     if [Branch, Center, ClientGroup].include?(obj.class)

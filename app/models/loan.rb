@@ -1113,7 +1113,7 @@ class BulletLoan < Loan
   before :save, :set_installments_to_1
   
   def scheduled_interest_for_installment(number = 1)
-    amount * interest_rate * (disbursal_date || scheduled_disbursal_date).days360(scheduled_first_payment_date)/360
+    amount * interest_rate
   end
   
   def scheduled_principal_for_installment(number = 1)
