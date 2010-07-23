@@ -518,5 +518,7 @@ $(document).ready(function(){
 	  addFloater(link);
 	  return(false);
       });  
+
+//      $(".datepicker").datepicker();
 });
 

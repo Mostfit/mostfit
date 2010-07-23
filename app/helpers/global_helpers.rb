@@ -113,6 +113,39 @@ module Merb
     end
 
     def date_select_html (attrs, obj = nil, col = nil)
+      str = "<input type='text' name=\"#{attrs[:name]}\" id=\"#{attrs[:id]}\"  nullable=\"#{attrs[:nullable]}\">"
+      str += "<div type='text' class='datepicker' id=\"#{attrs[:id]}_div\"  ></div>"
+      str += "<script type=\"text/javascript\">"
+      #TODO min date, max date, show button
+      str += "$( \"##{attrs[:id]}_div\" ).datepicker({ altField: '##{attrs[:id]}'});\n"
+      str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"dateFormat\", '#{change_our_dateformat_to_datepicker_dateformat($globals[:mfi_details][:date_format])}');\n"
+      str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"altFormat\", '#{change_our_dateformat_to_datepicker_dateformat($globals[:mfi_details][:date_format])}');\n"
+      str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"minDate\", '#{attrs[:min_date]}');\n"
+      str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"maxDate\", '#{attrs[:max_date]}');\n"
+      str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"showOn\", 'focus');\n"
+      str += "$( \"##{attrs[:id]}_div\" ).datepicker(\"setDate\", \"#{attrs[:date]}\" );\n"
+#      str += "alert($(\"##{attrs[:id]}_div\" ).datepicker({ 'option' , 'dateFormat'}) );\n"
+#      str += "alert('Actual Date:#{attrs[:date]} Date Set:$( \"##{attrs[:id]}_div\" ).datepicker(\"getDate\" )');\n"
+#      str += "alert('#{$globals[:mfi_details][:date_format]}');"
+      str += "</script>"
+     #showOn: 'focus'
+      return str
+    end
+
+    def change_our_dateformat_to_datepicker_dateformat(ourDateFormat)
+      s = ourDateFormat.dup
+      s.gsub!("%Y","yy")
+      s.gsub!("%y","y")
+      s.gsub!("%m","mm")
+      s.gsub!("%d","dd")
+      s.gsub!("%B","MM")
+      s.gsub!("%A","DD")
+#      s.gsub!("/","-")
+      return s
+    end
+
+    #old func it shows textbox
+    def date_select_old_html (attrs, obj = nil, col = nil)
       date = attrs[:date]
       nullable = attrs[:nullable]
       day_attrs = attrs.merge(
