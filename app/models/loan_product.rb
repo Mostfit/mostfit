@@ -8,7 +8,7 @@ class LoanProduct
   property :amount_multiple, Integer, :nullable => false, :index => true, :default => 1, :min => 1
   property :max_interest_rate, Float, :nullable => false, :index => true, :max => 100
   property :min_interest_rate, Float, :nullable => false, :index => true, :min => 0
-  property :interest_rate_multiple, Float, :nullable => false, :index => true, :default => 1, :min => 0.01
+  property :interest_rate_multiple, Float, :nullable => false, :index => true, :default => 0.1, :min => 0.01
   property :installment_frequency, Enum.send('[]', *([:any] + INSTALLMENT_FREQUENCIES)), :nullable => true, :index => true
 
   property :max_number_of_installments, Integer, :nullable => false, :index => true, :max => 1000
@@ -33,11 +33,11 @@ class LoanProduct
   validates_is_number   :max_amount, :min_amount
   validates_with_method :check_loan_type_correctness
   
-  
-
   def self.from_csv(row, headers)
+    min_interest = row[headers[:min_interest_rate]].to_f < 1 ? row[headers[:min_interest_rate]].to_f*100 : row[headers[:min_interest_rate]]
+    max_interest = row[headers[:max_interest_rate]].to_f < 1 ? row[headers[:max_interest_rate]].to_f*100 : row[headers[:max_interest_rate]]
     obj = new(:name => row[headers[:name]], :min_amount => row[headers[:min_amount]], :max_amount => row[headers[:max_amount]], 
-              :min_interest_rate => row[headers[:min_interest_rate]], :max_interest_rate => row[headers[:max_interest_rate]], 
+              :min_interest_rate => min_interest, :max_interest_rate => max_interest, 
               :min_number_of_installments => row[headers[:min_number_of_installments]], :max_number_of_installments => row[headers[:max_number_of_installments]], 
               :installment_frequency => row[headers[:installment_frequency]].downcase.to_sym,
               :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]), :loan_type => row[headers[:loan_type]])
