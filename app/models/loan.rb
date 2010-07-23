@@ -123,11 +123,8 @@ class Loan
   end
 
   def self.from_csv(row, headers, funding_lines)
-    if row[headers[:interest_rate]].to_f>1
-      interest_rate = row[headers[:interest_rate]].to_f/100
-    else
-      interest_rate = row[headers[:interest_rate]].to_f/100
-    end
+    interest_rate = (row[headers[:interest_rate]].to_f>1 ? row[headers[:interest_rate]].to_f/100 : row[headers[:interest_rate]].to_f)
+
     obj = new(:loan_product_id => LoanProduct.first(:name => row[headers[:product]]).id, :amount => row[headers[:amount]],
               :interest_rate => interest_rate,
               :installment_frequency => row[headers[:installment_frequency]].downcase, :number_of_installments => row[headers[:number_of_installments]],
