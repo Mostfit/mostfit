@@ -35,7 +35,8 @@ class Center
     branch       = Branch.first(:name => row[headers[:branch_name]])
     staff_member = StaffMember.first(:name => row[headers[:staff_name]])
     obj = new(:name => row[headers[:center_name]], :meeting_day => row[headers[:meeting_day]].downcase.to_s.to_sym, :code => row[headers[:code]],
-              :meeting_time_hours => hour, :meeting_time_minutes => minute, :branch_id => branch.id, :manager_staff_id => staff_member.id) 
+              :meeting_time_hours => hour, :meeting_time_minutes => minute, :branch_id => branch.id, :manager_staff_id => staff_member.id,
+              :creation_date => row[headers[:creation_date]])
     [obj.save, obj]
   end
 

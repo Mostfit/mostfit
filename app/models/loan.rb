@@ -123,9 +123,11 @@ class Loan
   end
 
   def self.from_csv(row, headers, funding_lines)
+    interest_rate = (row[headers[:interest_rate]].to_f>1 ? row[headers[:interest_rate]].to_f/100 : row[headers[:interest_rate]].to_f)
+
     obj = new(:loan_product_id => LoanProduct.first(:name => row[headers[:product]]).id, :amount => row[headers[:amount]],
-              :interest_rate => row[headers[:interest_rate]].to_f/100,
-              :installment_frequency => row[headers[:installment_frequency]], :number_of_installments => row[headers[:number_of_installments]],
+              :interest_rate => interest_rate,
+              :installment_frequency => row[headers[:installment_frequency]].downcase, :number_of_installments => row[headers[:number_of_installments]],
               :scheduled_disbursal_date => Date.parse(row[headers[:scheduled_disbursal_date]]),
               :scheduled_first_payment_date => Date.parse(row[headers[:scheduled_first_payment_date]]),
               :applied_on => Date.parse(row[headers[:applied_on]]), :approved_on => Date.parse(row[headers[:approved_on]]),
@@ -138,7 +140,6 @@ class Loan
     obj.history_disabled=true
     [obj.save, obj]
   end
-
 
   def is_valid_loan_product_amount; is_valid_loan_product(:amount); end
   def is_valid_loan_product_interest_rate; is_valid_loan_product(:interest_rate); end
