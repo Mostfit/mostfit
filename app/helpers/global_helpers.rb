@@ -216,8 +216,8 @@ module Merb
     def paginate(pagination, *args, &block)
       DmPagination::PaginationBuilder.new(self, pagination, *args, &block)
     end
-    def chart(url, width=430, height=200)
-      id = (rand()*100000).to_i + 100
+    def chart(url, width=430, height=200, id=nil)
+      id||= (rand()*100000).to_i + 100
       "<div id='flashcontent_#{id}'></div>
       <script type='text/javascript'> 
       swfobject.embedSWF('/open-flash-chart.swf', \"flashcontent_#{id}\", #{width}, #{height}, '9.0.0', 'expressInstall.swf',
