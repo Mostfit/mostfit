@@ -34,7 +34,7 @@
   %label{:for => "area"}
     Area
   = select :area_id, :collection => Area.all.map{|a| [a.id.to_s, a.name]}, :prompt => "---"
-  %span.greytext pick the staff member that manages this branch
+  %span.greytext Pick the aread to which this branch belongs to
     
 %button{:type => "submit", :class => "add"}
   = submit_text
