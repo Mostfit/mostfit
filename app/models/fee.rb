@@ -86,8 +86,8 @@ class Fee
     loan_ids.each{|lid|
       applicable = fees_applicable.find{|x| x.loan_id==lid}
       next if not applicable
-      paid      = fees_paid.find{|x| x.loan_id==lid}
-      paid      = paid ? paid.amount.to_i : 0
+      paid      = fees_paid.find_all{|x| x.loan_id==lid}
+      paid      = (paid and paid.length>0) ? paid.map{|x| x.amount.to_i}.inject(0){|s,x| s+=x} : 0
       fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable.to_i : 0), paid, (applicable ? applicable.fees_applicable : 0) - paid)
     }
     fees

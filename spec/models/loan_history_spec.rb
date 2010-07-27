@@ -33,8 +33,10 @@ describe LoanHistory do
     @center.code = "cen"
     @center.save
     @center.should be_valid
+    ClientType.create(:type => "Standard")
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => Date.parse('2000-01-01'))
+    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => Date.parse('2000-01-01'), 
+                         :client_type => ClientType.first, :created_by => User.first)
     @client.center  = @center
     @client.save
     @client.errors.each{|e| puts e}
