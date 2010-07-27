@@ -116,7 +116,7 @@ module Merb
       str = "<input type='text' name=\"#{attrs[:name]}\" id=\"#{attrs[:id]}\"  nullable=\"#{attrs[:nullable]}\">"
       str += "<div type='text' class='datepicker' id=\"#{attrs[:id]}_div\"  ></div>"
       str += "<script type=\"text/javascript\">"
-      #TODO min date, max date, show button
+      #TODO show button
       str += "$( \"##{attrs[:id]}_div\" ).datepicker({ altField: '##{attrs[:id]}'});\n"
       str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"dateFormat\", '#{change_our_dateformat_to_datepicker_dateformat($globals[:mfi_details][:date_format])}');\n"
       str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"altFormat\", '#{change_our_dateformat_to_datepicker_dateformat($globals[:mfi_details][:date_format])}');\n"
