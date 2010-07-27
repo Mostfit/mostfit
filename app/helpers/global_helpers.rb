@@ -113,26 +113,27 @@ module Merb
     end
 
     def date_select_html (attrs, obj = nil, col = nil)
-      str = "<input type='text' name=\"#{attrs[:name]}\" id=\"#{attrs[:id]}\"  nullable=\"#{attrs[:nullable]}\">"
-      str += "<div type='text' class='datepicker' id=\"#{attrs[:id]}_div\"  ></div>"
-      str += "<script type=\"text/javascript\">"
       #TODO min date, max date, show button
-      str += "$( \"##{attrs[:id]}_div\" ).datepicker({ altField: '##{attrs[:id]}'});\n"
-      str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"dateFormat\", '#{change_our_dateformat_to_datepicker_dateformat($globals[:mfi_details][:date_format])}');\n"
-      str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"altFormat\", '#{change_our_dateformat_to_datepicker_dateformat($globals[:mfi_details][:date_format])}');\n"
-      str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"minDate\", '#{attrs[:min_date]}');\n"
-      str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"maxDate\", '#{attrs[:max_date]}');\n"
-      str += "$( \"##{attrs[:id]}_div\" ).datepicker( \"option\", \"showOn\", 'focus');\n"
-      str += "$( \"##{attrs[:id]}_div\" ).datepicker(\"setDate\", \"#{attrs[:date]}\" );\n"
-#      str += "alert($(\"##{attrs[:id]}_div\" ).datepicker({ 'option' , 'dateFormat'}) );\n"
-#      str += "alert('Actual Date:#{attrs[:date]} Date Set:$( \"##{attrs[:id]}_div\" ).datepicker(\"getDate\" )');\n"
-#      str += "alert('#{$globals[:mfi_details][:date_format]}');"
-      str += "</script>"
-     #showOn: 'focus'
+      str = %Q{
+        <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}">
+        <script type="text/javascript">
+          $(function(){
+            $("##{attrs[:id]}").datepicker({altField: '##{attrs[:id]}', buttonImage: "/images/calendar.png", changeYear: true, buttonImageOnly: true,
+                                            yearRange: '#{attrs[:min_date].year}:#{attrs[:max_date].year}',
+                                            dateFormat: '#{datepicker_dateformat}', altFormat: '#{datepicker_dateformat}', minDate: '#{attrs[:min_date]}',
+                                            maxDate: '#{attrs[:max_date]}', showOn: 'both', setDate: "#{attrs[:date]}" });
+          });
+       </script>
+      }
       return str
     end
 
-    def change_our_dateformat_to_datepicker_dateformat(ourDateFormat)
+    def datepicker_dateformat
+      if $globals and $globals[:mfi_details] and $globals[:mfi_details][:date_format]
+        ourDateFormat = $globals[:mfi_details][:date_format]
+      else
+        ourDateFormat = "%Y-%m-%d"
+      end
       s = ourDateFormat.dup
       s.gsub!("%Y","yy")
       s.gsub!("%y","y")
@@ -140,7 +141,6 @@ module Merb
       s.gsub!("%d","dd")
       s.gsub!("%B","MM")
       s.gsub!("%A","DD")
-#      s.gsub!("/","-")
       return s
     end
 
