@@ -9,24 +9,29 @@
     %th 
       Credit Account
     %th 
+      Break up
+    %th 
       Amount
     %th 
       TXN ID
     %th 
       Comment
   - @account.postings.journals(:order => [:date.desc], :order => [:id.desc]).each do |journal|
-    - postings = journal.postings.sort_by{|x| x.amount}
+    - postings = journal.postings.group_by{|x| x.amount>0 ? :credit : :debit}
     %tr
       %td
         = journal.created_at.strftime("%Y/%m/%d")
       %td 
         = journal.id
       %td 
-        = postings.first.account.name
+        = postings[:debit].collect{|p| p.account.name}.join("<br/>")
       %td 
-        = postings.last.account.name
+        = "<br>"*postings[:debit].length
+        = postings[:credit].collect{|p| p.account.name}.join("<br/>")
       %td 
-        = postings.first.amount.abs
+        = (postings[:debit] + postings[:credit]).collect{|p| p.amount.abs}.join("<br/>")
+      %td 
+        = postings[:credit].collect{|p| p.amount.abs}.inject(0){|s,x| s+=x}
       %td 
         = journal.transaction_id 
       %td 
