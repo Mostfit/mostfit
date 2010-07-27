@@ -18,14 +18,13 @@
         Number of Areas
       %td
         =@areas.count
-    %tr
-      %td
-        &nbsp;
-      %td
-        %b New
-      %td
-        %b Total
-
+  %tr
+    %td
+      &nbsp;
+    %td
+      %b New
+    %td
+      %b Total
   -if @branches
     %tr
       %td
@@ -42,32 +41,32 @@
         =@centers_new_count
       %td
         =@centers_upto_count
-    %tr
-      %td
-        Number of New Groups
-      %td
-        -if @groups_new_count then
-          =@groups_new_count
-        -else
-          =0
-      %td
-        -if @groups_upto_count
-          =@groups_upto_count
-        -else
-          =0
-    %tr
-      %td
-        Number of Clients
-      %td
-        -if @clients_new_count
-          =@clients_new_count
-        -else
-          =0
-      %td
-        -if @clients_upto_count
-          =@clients_upto_count
-        -else
-          =0
+  %tr
+    %td
+      Number of Groups
+    %td
+      -if @groups_new_count then
+        =@groups_new_count
+      -else
+        =0
+    %td
+      -if @groups_upto_count
+        =@groups_upto_count
+      -else
+        =0
+  %tr
+    %td
+      Number of Clients
+    %td
+      -if @clients_new_count
+        =@clients_new_count
+      -else
+        =0
+    %td
+      -if @clients_upto_count
+        =@clients_upto_count
+      -else
+        =0
   %tr
     %td
       borrower clients
@@ -75,6 +74,13 @@
       =(@loan_disbursed and @loan_disbursed.length>0) ? @loan_disbursed.client_count : 0
     %td
       =(@total_disbursed and @total_disbursed.length>0) ? @total_disbursed.client_count : 0
+  %tr
+    %td
+      Number of Loans
+    %td
+      =(@loan_disbursed) ? @loan_disbursed.loan_count : 0
+    %td
+      =(@total_disbursed) ? @total_disbursed.loan_count : 0
   %tr
     %td
       Total Amount Disbursed
@@ -98,14 +104,13 @@
   %tr
     %td
       Fee Received
-    %td
-      %table        
-        -@fees.each do |fee, amount|
-          %tr
-            %td
-              =fee
-            %td
-              =amount
+  -@fees.each do |fee, amount|
+    %tr
+      %td
+      %td
+        %b=fee
+      %td
+        =amount
   %tr
     %td
       Total Principal Overdue
