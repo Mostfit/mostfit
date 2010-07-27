@@ -46,8 +46,8 @@
       %td
         fees applicable
       %td
-        - @client.fees.each do |f|
-          = f.description
+        - @client.fee_schedule.each do |date, fee|
+          = fee.description
     %tr
       %td
         fees paid

@@ -1,0 +1,5 @@
+%h1
+  Month on month
+  =branch.name if branch
+  %div
+    =chart(url(:dashboard, :action => 'centers',  :scope_unit => 'months'), 800, 300, "centers_growth") 

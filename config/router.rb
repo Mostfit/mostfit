@@ -54,6 +54,7 @@ Merb::Router.prepare do
   resources :funders do    resources :funding_lines
   end
 
+  match('/dashboard/centers/:report_type/:branch_id').to(:controller => 'dashboard', :action => "centers", :branch_id => ":branch_id", :report_type => ":report_type").name(:dashboard_centers)
   match('/design').to(:controller => 'loan_products', :action => 'design').name(:design_loan_product)
   match('/centers/:id/groups(/:group_id).:format').to(:controller => 'centers', :action => 'groups')
 
@@ -78,8 +79,8 @@ Merb::Router.prepare do
 
   match('/admin(/:action)').to(:controller => 'admin').name(:admin)
   match('/admin(/:action/:id)').to(:controller => 'admin').name(:admin)
+  match('/dashboard/clients/:id(/group_by/:group_by)(/branch_id/:branch_id)(/center_id/:center_id)(/staff_member_id/:staff_member_id)').to(:id => ":id", :action => "clients", :controller => 'dashboard').name(:dashboard_breakup_clients)
   match('/dashboard/clients/:id(/branch_id/:branch_id)(/center_id/:center_id)(/staff_member_id/:staff_member_id)').to(:action => "clients", :controller => 'dashboard').name(:dashboard_client_actions)
-  match('/dashboard/clients/breakup(/group_by/:group_by)(/branch_id/:branch_id)(/center_id/:center_id)(/staff_member_id/:staff_member_id)').to(:id => "breakup", :action => "clients", :controller => 'dashboard').name(:dashboard_breakup_clients)
   match('/dashboard(/:action)').to(:controller => 'dashboard').name(:dashboard)
   match('/change_password').to(:controller => "users", :action => 'change_password').name(:change_password)
   match('/graph_data/:action(/:id)').to(:controller => 'graph_data').name(:graph_data)
