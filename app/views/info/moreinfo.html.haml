@@ -83,42 +83,52 @@
       =(@total_disbursed) ? @total_disbursed.loan_count : 0
   %tr
     %td
-      Total Amount Disbursed
+      Amount Disbursed
     %td
       =(@loan_disbursed and @loan_disbursed.amount) ? @loan_disbursed.amount.to_currency : 0
-  %tr
     %td
-      Total Amount Outstanding
-    %td
-      =(@loan_data and @loan_data.length>0 and @loan_data.first.actual_outstanding_principal) ? @loan_data[0].actual_outstanding_principal.to_currency : "-"
+      =(@total_disbursed and @total_disbursed.amount) ? @total_disbursed.amount.to_currency : 0
   %tr
     %td
       Principal Received
     %td
       =(@payments and @payments[:principal]) ? @payments[:principal].to_currency : "0"
+    %td
+      =(@total_payments and @total_payments[:principal]) ? @total_payments[:principal].to_currency : "0"
   %tr
     %td
       Interest Received
     %td
       =(@payments and @payments[:interest]) ? @payments[:interest].to_currency : "0"
+    %td
+      =(@total_payments and @total_payments[:interest]) ? @total_payments[:interest].to_currency : "0"
   %tr
     %td
       Fee Received
   -@fees.each do |fee, amount|
     %tr
       %td
-      %td
         %b=fee
       %td
         =amount
+      %td
+        =@total_fees[fee]
+  %tr
+    %td
+      Amount Outstanding
+    %td
+    %td
+      =(@loan_data and @loan_data.length>0 and @loan_data.first.actual_outstanding_principal) ? @loan_data[0].actual_outstanding_principal.to_currency : "-"
   %tr
     %td
       Total Principal Overdue
+    %td 
     %td
       =(@defaulted and @defaulted.principal_due) ? @defaulted.principal_due.to_currency : 0
   %tr
     %td
       Total Interest Overdue
+    %td
     %td
       -if @defaulted and @defaulted.total_due and @defaulted.principal_due
         =(@defaulted.total_due.to_i-@defaulted.principal_due.to_i).to_currency
