@@ -119,7 +119,9 @@ private
     @clients_upto_count = (@centers_upto_count>0) ? @clients[:upto].count : 0
 
     @payments        = Payment.collected_for(obj, @from_date, @to_date)
+    @total_payments  = Payment.collected_for(obj, Date.min_date, @to_date)
     @fees            = Fee.collected_for(obj, @from_date, @to_date)
+    @total_fees      = Fee.collected_for(obj, Date.min_date, @to_date)
     @total_disbursed = LoanHistory.amount_disbursed_for(obj, Date.min_date, @to_date)
     @loan_disbursed  = LoanHistory.amount_disbursed_for(obj, @from_date, @to_date)
     @loan_data       = LoanHistory.sum_outstanding_for(obj, @from_date, @to_date)
