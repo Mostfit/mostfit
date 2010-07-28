@@ -33,7 +33,7 @@
       =chart(url(:action => 'branch', :id => 'centers', :quantity => "clients_average"), 400, 270)
 
   .tab
-    = partial :form
+    = partial :form, :action => "/dashboard#centers"
     %h1
       Month on month
       =@branch.name if @branch
@@ -45,7 +45,7 @@
     %div
       =chart(url(:dashboard_centers, :branch_id => (@branch ? @branch.id : 'all'),  :report_type => 'growth', :time_period => params[:time_period]), 800, 300) 
   .tab
-    =partial :form
+    =partial :form, :action => "/dashboard#clients"
     - seg = [["branch_id", params[:branch_id]], ["center_id", params[:center_id]], ["staff_member_id", params[:staff_member_id]]].map{|k,v| "#{k}/#{v}" if not v.blank?}.compact.join("/")
     - seg+= "?time_period=#{params[:time_period]}" if params[:time_period]
     %div
@@ -60,7 +60,7 @@
       = chart("/dashboard/clients/profile/group_by/age/#{seg}", 450, 270)
       = chart("/dashboard/clients/profile/group_by/member_since/#{seg}", 450, 270)
   .tab
-    =partial :form
+    =partial :form, :action => "/dashboard#loans"
     %div
       = chart(url(:action => 'loans', :id => 'growth', :time_period => params[:time_period]), 450, 270)
       = chart(url(:action => 'loans', :id => 'cumulative', :time_period => params[:time_period]), 450, 270)
