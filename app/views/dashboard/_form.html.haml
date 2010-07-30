@@ -1,15 +1,15 @@
-%form{:name => "dashborad_form"}
+%form{:name => "dashborad_form", :method => "POST", :action => action}
   %table
     %tr
+      %td
+        Time Period: 
+        =select(:time_period , :collection => [[:monthly, "Monthly"], [:quarterly, "Quarterly"], [:yearly, "Yearly"]], :include_blank => false)
       %td
         - branch_id = (params[:branch_id]) ? params[:branch_id] : nil
         - center_id = (params[:center_id]) ? params[:center_id] : nil
         - staff_member_id = (params[:staff_member_id]) ? params[:staff_member_id] : nil
         Branch: 
         =select(:branch_id , :collection => get_accessible_branches, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id)
-      %td
-        Center:          
-        =select(:center_id , :collection => get_accessible_centers(branch_id), :include_blank => true, :selected => center_id)
       %td
         Staff member:
         =select(:staff_member_id , :collection => get_accessible_staff_members, :include_blank => true, :selected => staff_member_id)

@@ -11,6 +11,8 @@ module DateParser
         next
       elsif value.class == Mash
         send("#{col.to_s}=".to_sym, parse_date(value))
+      elsif value.class == String
+        send("#{col.to_s}=".to_sym, parse_date(value))
       else
         raise "Unknown input type for #{col.to_s}, #{value.class}"
       end
@@ -19,7 +21,7 @@ module DateParser
 
   # function for parsing individual date values, takes a Mash or a string date, outputs a Date or nil
   def parse_date(value)
-    return Date.parse(value) if value.is_a? String
+    return Date.parse(value) if value.is_a? String and not value.blank?    
     args = [value[:year].to_i, value[:month].to_i, value[:day].to_i]
     return nil if args.include? 0
     begin

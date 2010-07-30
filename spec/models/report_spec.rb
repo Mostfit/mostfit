@@ -138,8 +138,11 @@ describe Report do
     Branch.client_count_by_loan_cycle(1,@date).should == {1 => 3, 2 => 3}
     #Branch.client_count_by_loan_cycle(2,@date).should == {}
     # add a dummy client and check
-    c = Client.new(:center => Center.get(1), :name => "delete me", :reference => "dummy1", :date_joined => "2008-01-01")
-    c.save
+    c = Client.new(:center => Center.get(1), :name => "delete me", :reference => "dummy1", :date_joined => "2008-01-01", 
+                   :client_type => ClientType.first, :created_by => User.first)
+    unless c.save
+      p c.errors
+    end
     c.should be_valid
     Branch.client_count(@date).should == {1 => 4, 2 => 3}
     Branch.active_client_count(@date).should == {1 => 3, 2 => 3}
@@ -186,7 +189,7 @@ describe Report do
     end
     # TODO get the code working for loan cycles 2 and above
     # Branch.client_count_by_loan_cycle(2,@date).should == {1 => 3, 2=>2}
-    Branch.clients_added_between_such_and_such_date_count(Date.today - 1, Date.today).should == {1=>3,2=>3}
+    Branch.clients_added_between_such_and_such_date_count(Date.today - 10, Date.today).should == {1=>3,2=>3}
     Branch.clients_added_between_such_and_such_date_count('2008-01-02',Date.today - 2).should == {}
     Branch.clients_added_between_such_and_such_date_count('2008-01-01',Date.today - 2).should == {1 => 1}
     Branch.clients_added_between_such_and_such_date_count(Date.today,'2012-01-01').should == {}

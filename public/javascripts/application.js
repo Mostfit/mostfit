@@ -316,11 +316,26 @@ $(document).ready(function(){
 	//Handling reports
 	if($("table.report").length>0 && !$("table.report").hasClass("nojs")){
 	    showTableTrs();
-	    $("table.report").before("<a class='expand_all'>Expand all</a>");
-	    $("table.report tr.branch td").append("<a id='center' class='expand'>Expand centers</a>");
-	    $("table.report tr.center td").append("<a id='group' class='expand'>Expand groups</a>");
-	    if($("table.report tr.date").length>0)
-		$("table.report tr.group td").append("<a id='date' class='expand'>Expand dates</a>");
+	    var table = $("table.report");
+	    table.before("<a class='expand_all'>Expand all</a>");
+	    if(table.find("tr.branch td")){
+		if(table.find("tr.branch").attr("id"))
+		    name=table.find("tr.branch").attr("id");
+		else
+		    name='center';
+		table.find("tr.branch td").append("<a id='center' class='expand'>Expand "+name+"s</a>");
+	    }
+	    if(table.find("tr.center td")){
+		if(table.find("tr.center").attr("id"))
+		    name=table.find("tr.center").attr("id");
+		else
+		    name='group';
+		table.find("tr.center td").append("<a id='group' class='expand'>Expand "+name+"s</a>");
+	    }
+	    if(table.find("tr.date").length>0)
+	       table.find("tr.group td").append("<a id='date' class='expand'>Expand dates</a>");
+	    if(table.find("tr.manager").length>0)
+	       table.find("tr.manager td").append("<a id='managed' class='expand'>Expand centers</a>");
 	    if($("table.report tr.loan").length>0)
 		$("table.report tr.group td").append("<a id='loan' class='expand'>Expand loans</a>");
 	    if($("table.report tr.client").length>0)
@@ -503,5 +518,7 @@ $(document).ready(function(){
 	  addFloater(link);
 	  return(false);
       });  
+
+//      $(".datepicker").datepicker();
 });
 

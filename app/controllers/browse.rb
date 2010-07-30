@@ -18,4 +18,5 @@ class Browse < Application
     @branch =  @centers.branch[0]
     render :template => 'centers/index'
   end
+
 end

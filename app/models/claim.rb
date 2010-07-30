@@ -30,6 +30,7 @@ class Claim
 #  validates_with_method :payment_to_client_on, :payment_to_client_after_receipt
   validates_with_method :amount_to_be_paid_to_client, :payment_to_client_not_more_than_claim
   validates_with_method :amount_to_be_paid_to_client, :payment_to_be_deducted_not_more_than_claim
+  validates_with_method :date_of_death, :date_of_death_cannot_be_in_future
 
   validates_with_method :date_of_death, :date_of_death_not_more_than_claim_submission
   validates_with_method :date_of_death, :date_of_death_not_more_than_receipt_of_claim_on
@@ -42,6 +43,13 @@ class Claim
       self.claim_id += client.id.to_s
     end
     self.claim_id
+  end
+
+  def date_of_death_cannot_be_in_future
+    if date_of_death and date_of_death.class==Date and date_of_death>Date.today
+      return [false, "Date of death cannot be in future"]
+    end
+    return true
   end
 
   def client_marked_inactive
