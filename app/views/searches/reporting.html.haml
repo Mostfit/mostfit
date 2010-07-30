@@ -18,7 +18,7 @@
               - #puts "precedence is #{@precedence[model][key]}"
               - @arr[(@precedence[model][key]).to_i-1] =  [model, key]
         -@arr.delete(nil)
-        -debugger
+        -#debugger
         -@arr.each do |model, key|
           %th
             -if model==klass
