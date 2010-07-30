@@ -1,9 +1,14 @@
+- seg = "/" + ["branch_id", "center_id", "staff_member_id"].map{|k| "#{k}/#{params[k]}" if params[k] and not params[k].blank?}.compact.join("/")
+- seg+= "?time_period=#{params[:time_period]}" if params[:time_period]
+
 .tab_container
   %ul.tabs
     %li#branch Branch
     %li#centers Center
     %li#clients Client
     %li#loan Loan
+    %li#repayments Repayment
+    %li#key_ratios Key Ratio
   .tab
     %div
       =chart(url(:action => 'branch', :id => 'centers', :quantity => "count"), 400, 270)
@@ -18,36 +23,22 @@
       =chart(url(:action => 'branch', :id => 'loan', :quantity => "sum"), 400, 270)
     %br
     %div
-      =chart(url(:action => 'branch', :id => 'clients', :quantity => "per_staff"), 400, 270)
-      =chart(url(:action => 'branch', :id => 'loan',    :quantity => "per_staff"), 400, 270)
-    %br
-    %div
       =chart(url(:action => 'branch', :id => 'loan_history', :report_type => "outstanding_principal"), 400, 270)
       =chart(url(:action => 'branch', :id => 'loan_history', :report_type => "outstanding_total"), 400, 270)
-    %br
-    %div
-      =chart(url(:action => 'branch', :id => 'loan', :quantity => "avg"), 400, 270)
-      =chart(url(:action => 'branch', :id => 'loan_history', :report_type => "average_outstanding_loan_size"), 400, 270)
-    %br
-    %div
-      =chart(url(:action => 'branch', :id => 'centers', :quantity => "clients_average"), 400, 270)
-
   .tab
     = partial :form, :action => "/dashboard#centers"
     %h1
       Month on month
       =@branch.name if @branch
     %div
-      =chart(url(:dashboard_centers, :branch_id => (@branch ? @branch.id : 'all'), :report_type => 'mom', :time_period => params[:time_period]), 800, 300, "centers_growth")
+      =chart("/dashboard/centers/growth#{seg}", 800, 300, "centers_growth")
     %h1 
       Growth
       ="for #{@branch.name}" if @branch
     %div
-      =chart(url(:dashboard_centers, :branch_id => (@branch ? @branch.id : 'all'),  :report_type => 'growth', :time_period => params[:time_period]), 800, 300) 
+      =chart("/dashboard/centers/cumulative#{seg}", 800, 300) 
   .tab
     =partial :form, :action => "/dashboard#clients"
-    - seg = [["branch_id", params[:branch_id]], ["center_id", params[:center_id]], ["staff_member_id", params[:staff_member_id]]].map{|k,v| "#{k}/#{v}" if not v.blank?}.compact.join("/")
-    - seg+= "?time_period=#{params[:time_period]}" if params[:time_period]
     %div
       = chart("/dashboard/clients/cumulative/#{seg}", 450, 270)
       = chart("/dashboard/clients/growth/#{seg}", 450, 270)
@@ -60,16 +51,45 @@
       = chart("/dashboard/clients/profile/group_by/age/#{seg}", 450, 270)
       = chart("/dashboard/clients/profile/group_by/member_since/#{seg}", 450, 270)
   .tab
-    =partial :form, :action => "/dashboard#loans"
+    =partial :form, :action => "/dashboard#loan"
     %div
-      = chart(url(:action => 'loans', :id => 'growth', :time_period => params[:time_period]), 450, 270)
-      = chart(url(:action => 'loans', :id => 'cumulative', :time_period => params[:time_period]), 450, 270)
+      = chart("/dashboard/loans/disbursements/#{seg}", 450, 270)
+      = chart("/dashboard/loans/outstanding/#{seg}", 450, 270)
+    %div
+      = chart("/dashboard/loans/growth/#{seg}", 450, 270)
+      = chart("/dashboard/loans/cumulative/#{seg}", 450, 270)
+    %br
+    - sep = seg.include?("?") ? "&" : "?"
+    %div
+      = chart("/dashboard/loans/aging/#{seg}", 450, 270)
+      = chart(url(:dashboard_actions, :action => "loans", :id => "breakup", :branch_id => (@branch ? @branch.id : "all"), :by => "loan_product", :time_period => params[:time_period]||"mom", :staff_member_id => (@staff_member ? @staff_member.id : "all")), 450, 270)
     %br
     %div
-      = chart(url(:action => 'loans', :id => 'aging'), 450, 270)
-      = chart(url(:action => 'loans', :id => 'breakup', :by => 'loan_product'), 450, 270)
+      = chart(url(:dashboard_actions, :action => "loans", :id => "breakup", :branch_id => (@branch ? @branch.id : "all"), :by => "occupation", :time_period => params[:time_period]||"mom", :staff_member_id => (@staff_member ? @staff_member.id : "all")), 900, 350)
+  .tab
+    =partial :form, :action => "/dashboard#repayments"
+    %div
+      = chart("/dashboard/payments/principal/#{seg}", 450, 270)
+      = chart("/dashboard/payments/interest/#{seg}", 450, 270)
     %br
     %div
-      = chart(url(:action => 'loans', :id => 'breakup', :by => 'occupation'), 800, 600)
-
-
+      = chart("/dashboard/payments/fees/#{seg}", 450, 270)
+      = chart("/dashboard/payments/total/#{seg}", 450, 270)
+    %br
+    %div
+      = chart("/dashboard/payments/amounts/#{seg}", 450, 270)
+  .tab
+    %br
+    %div
+      =chart(url(:action => 'loans', :id => 'yield'), 400, 270)
+      =chart(url(:action => 'loans', :id => 'portfolio_at_risk'), 400, 270)
+    %div
+      =chart(url(:action => 'branch', :id => 'loan', :quantity => "avg"), 400, 270)
+      =chart(url(:action => 'branch', :id => 'loan_history', :report_type => "average_outstanding_loan_amount_size"), 400, 270)
+    %br
+    %div
+      =chart(url(:action => 'branch', :id => 'clients', :quantity => "per_staff"), 400, 270)
+      =chart(url(:action => 'branch', :id => 'loan',    :quantity => "per_staff"), 400, 270)
+    %br
+    %div
+      =chart(url(:action => 'branch', :id => 'centers', :quantity => "clients_average"), 400, 270)

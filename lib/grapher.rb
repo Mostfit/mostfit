@@ -38,7 +38,7 @@ module Grapher
     end
     
     def generate
-      @y_axis.smoothen(@elements[:values]) if @y_axis
+      @y_axis.smoothen(@elements[:values]) if @y_axis and @elements[:values].length>0
       return {
         :elements => [@elements], :x_axis => (@x_axis ? @x_axis.generate : ""), :y_axis => (@y_axis ? @y_axis.generate : ""), 
         :title => (@title ? @title.generate : "")

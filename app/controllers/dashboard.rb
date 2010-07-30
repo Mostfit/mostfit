@@ -1,5 +1,6 @@
 class Dashboard < Application
   include Grapher
+  PAYMENT_TYPES = {"principal" => 1, "interest" => 2, "fees" => 3}
   before :get_context
   before :display_from_cache, :exclude => [:index]
   after  :store_to_cache, :exclude => [:index]
@@ -77,12 +78,12 @@ class Dashboard < Application
       graph.data(vals.map{|x| [x.quantity.to_i, x.name]})
       return graph.generate
     when "loan_history"
-      graph = BarGraph.new("#{params[:report_type].camelcase(' ')}")
+      graph = BarGraph.new("#{params[:report_type].split('_').join(' ').capitalize}")
       vals  = LoanHistory.sum_outstanding_grouped_by(Date.today, :branch)
       graph.data_type = :individual
       if params[:report_type]=="outstanding_principal" or params[:report_type]=="outstanding_total"
         graph.data(vals.map{|x| [x.send("actual_#{params[:report_type]}").to_i, Branch.get(x.branch_id).name]})
-      elsif params[:report_type]=="average_outstanding_loan_size"
+      elsif params[:report_type]=="average_outstanding_loan_amount_size"
         graph.data(vals.map{|x| [((x.actual_outstanding_principal||0)/x.loan_count).to_i, Branch.get(x.branch_id).name]})
       end
       return graph.generate
@@ -98,20 +99,22 @@ class Dashboard < Application
   end
 
   def centers
+    growth_type = ((params[:id] and params[:id]=="growth") ? "Total" : "New")
+
     if @branch
-      graph = BarGraph.new("Growth of centers in #{@branch.name}")
+      graph = BarGraph.new("#{growth_type} centers in #{@branch.name}")
       vals  = Center.all(:creation_date.not => nil, :branch => @branch, :creation_date.lte => Date.today).aggregate(:all.count, :creation_date)
+    elsif @staff_member
+      graph = BarGraph.new("#{growth_type} centers managed by #{@staff_member.name}")
+      vals  = Center.all(:creation_date.not => nil, :manager => @staff_member, :creation_date.lte => Date.today).aggregate(:all.count, :creation_date)      
     else
-      graph = BarGraph.new("Growth of centers")
+      graph = BarGraph.new("#{growth_type} centers")
       vals  = Center.all(:creation_date.not => nil, :creation_date.lte => Date.today).aggregate(:all.count, :creation_date)
     end
 
-    if params[:report_type] and params[:report_type]=="growth"
-      graph.title.text = graph.title.text + " cummulative (#{get_period_text})"
-    else
-      graph.title.text = graph.title.text + get_period_text
-      graph.data_type = :individual 
-    end
+    
+    graph.title.text = graph.title.text + " (#{get_period_text})"
+    graph.data_type  = (growth_type == "New" ? :individual : :cumulative)
 
     data    = vals.map{|c, d| {Date.new(d.year, d.month, 1) => c}}.inject({}){|s,x| s+=x}.to_a.sort_by{|d, c| d}
     data    = group_dates(data)
@@ -163,13 +166,17 @@ class Dashboard < Application
   end
 
   def loans
+    conditions = []
+    conditions << " AND c.branch_id=#{params[:branch_id].to_i}"                  if params[:branch_id] and params[:branch_id].to_i > 0
+    conditions << " AND l.disbursed_by_staff_id=#{params[:staff_member_id].to_i}" if params[:staff_member_id] and params[:staff_member_id].to_i > 0
     case params[:id]
     when "growth", "cumulative"
       vals = repository.adapter.query(%Q{
                                          SELECT count(cl.id) count, DATE(cl.date_joined) date
-                                         FROM clients cl,centers c, loans l 
-                                         WHERE cl.center_id=c.id AND l.client_id=c.id AND cl.deleted_at is NULL AND cl.date_joined<=CURRENT_DATE()
-                                         GROUP BY MONTH(cl.date_joined)
+                                         FROM clients cl, centers c, loans l 
+                                         WHERE cl.center_id=c.id AND l.client_id=cl.id AND cl.deleted_at is NULL AND cl.date_joined<=CURRENT_DATE()
+                                               AND l.disbursal_date is NOT NULL AND l.deleted_at is NULL #{conditions}
+                                         GROUP BY MONTH(l.disbursal_date)
                                       }).map{|r| [r.date, r.count]}
       if params[:id]=="growth"
         graph = BarGraph.new("Number of borrowers added #{get_period_text}")
@@ -180,10 +187,66 @@ class Dashboard < Application
       graph.data(group_dates(vals), :last, :first)
       graph.x_axis.steps = get_axis
       return graph.generate
+    when "disbursements"
+      vals = repository.adapter.query(%Q{
+                                         SELECT SUM(l.amount) amount, DATE(cl.date_joined) date
+                                         FROM clients cl,centers c, loans l 
+                                         WHERE cl.center_id=c.id AND l.client_id=cl.id AND cl.deleted_at is NULL AND cl.date_joined<=CURRENT_DATE()
+                                               AND l.disbursal_date is NOT NULL AND l.deleted_at is NULL #{conditions}
+                                         GROUP BY MONTH(cl.date_joined)
+                                      }).map{|r| [r.date, r.amount.to_i]}
+      graph = BarGraph.new("Amount disbursed (#{get_period_text})")
+      graph.data_type = :individual
+      graph.data(group_dates(vals), :last, :first)
+      graph.x_axis.steps = get_axis
+      return graph.generate
+    when "outstanding"
+      if params[:branch_id] and params[:branch_id].to_i > 0
+        condition = "AND lh.branch_id=#{params[:branch_id]}"
+        min_date  = Branch.get(params[:branch_id]).creation_date
+      else
+        min_date  = Loan.min(:disbursal_date)
+      end
+      data = []
+      (min_date.year..Date.today.year).each{|year|
+        1.upto(12){|month|
+          date = Date.new(year, month, -1)
+          next if date < min_date
+          next if date > Date.today
+          outstanding = repository.adapter.query(%Q{
+                                     SELECT sum(outstanding) outstanding 
+                                     FROM (SELECT min(actual_outstanding_principal) outstanding, max(date) date, loan_id, status 
+                                           FROM loan_history lh, loans l 
+                                           WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND l.disbursal_date is NOT NULL AND lh.status in (5,6,7,8)
+                                                 AND lh.date<='#{date.strftime('%Y-%m-%d')}' #{condition} GROUP BY loan_id) as ts WHERE ts.status in (5,6)
+                                  })[0].to_i
+          next if outstanding==0
+          data << [date, outstanding]
+        }
+      }
+
+      graph = BarGraph.new("Amount outstanding (#{get_period_text})")
+      graph.data_type = :individual
+      graph.data(group_dates(data), :last, :first)
+      graph.x_axis.steps = get_axis
+      return graph.generate
+      
     when "breakup"
       graph  = BarGraph.new("Loan breakup by #{params[:by].camelcase(' ')}")
       by     = params[:by].to_sym
-      data   = group_by_values(Loan, Loan.all, by, {:allow_blank => true})
+      master = Kernel.const_get(params[:by].camelcase('')).all.map{|x| [x.id, x.name]}.to_hash
+      return false unless by==:loan_product or by==:occupation
+      by_col = "#{params[:by]}_id"
+      data   = repository.adapter.query(%Q{
+                                         SELECT COUNT(l.id) count, l.#{by_col} col
+                                         FROM clients cl,centers c, loans l
+                                         WHERE cl.center_id=c.id AND l.client_id=cl.id AND cl.deleted_at is NULL AND cl.date_joined<=CURRENT_DATE()
+                                               AND l.disbursal_date is NOT NULL AND l.deleted_at is NULL #{conditions}
+                                         GROUP BY l.#{by_col}
+                                      }).map{|r| 
+        [r.count, (master.key?(r.col.to_i) ? master[r.col.to_i] : "NA")]
+      }
+      #group_by_values(Loan, Loan.all, by, {:allow_blank => true})
       data   = data.sort_by{|c, o| c}.reverse
       graph.data_type = :individual
       graph.data(data, :first, :last)
@@ -203,9 +266,67 @@ class Dashboard < Application
       graph.data_type=:individual
       graph.data(vals)
       return graph.generate      
+    when "yield"
+      graph = BarGraph.new("Yield on portfolio")
+      vals  = LoanHistory.sum_outstanding_grouped_by(Date.today, :branch)
+      graph.data_type = :individual
+      graph.data(vals.map{|x| 
+                   branch=Branch.get(x.branch_id)
+                   [
+                    100 * (Payment.collected_for(branch,Date.min_date,Date.max_date,[2,3]).values.inject(0){|s,a| s+=a}).round(2)/(x.actual_outstanding_principal||0).to_f,
+                    branch.name
+                   ]
+                 })
+      return graph.generate
+    when "portfolio_at_risk"
+      graph = BarGraph.new("Portfolio at risk")
+      vals  = LoanHistory.sum_outstanding_grouped_by(Date.today, :branch)
+      graph.data_type = :individual
+      graph.data(vals.map{|x|
+                   branch=Branch.get(x.branch_id)
+                   [(100*(LoanHistory.defaulted_loan_info_for(branch).principal_due/(x.actual_outstanding_principal||0)).to_f).round(2), branch.name]
+                 })
+      return graph.generate
     end
   end
 
+  def payments
+    conditions = []
+    conditions << " AND branch_id=#{params[:branch_id].to_i}"                  if params[:branch_id] and params[:branch_id].to_i > 0
+    conditions << " AND received_by_staff_id=#{params[:staff_member_id].to_i}" if params[:staff_member_id] and params[:staff_member_id].to_i > 0
+
+    case params[:id]
+    when "principal", "interest", "fees", "total"
+      types = PAYMENT_TYPES.key?(params[:id]) ? [PAYMENT_TYPES[params[:id]]] : PAYMENT_TYPES.values
+      vals = repository.adapter.query(%Q{
+                                         SELECT SUM(p.amount) amount, DATE(p.received_on) date
+                                         FROM payments p, clients cl, centers c
+                                         WHERE p.deleted_at is null AND p.type in (#{types.join(', ')}) AND p.client_id = cl.id AND cl.center_id = c.id #{conditions}
+                                         GROUP BY MONTH(p.received_on)
+                                      }).map{|r| [r.date, r.amount.round]}
+      graph = BarGraph.new("Repayment of #{params[:id]} (#{get_period_text})")
+      graph.data_type = :individual
+      graph.data(group_dates(vals), :last, :first)
+      graph.x_axis.steps = get_axis
+      return graph.generate
+    when "amounts"
+      vals = repository.adapter.query(%Q{
+                                         SELECT amount, count(*) count 
+                                         FROM (
+                                               SELECT SUM(amount) amount, received_on, count(*) count
+                                               FROM payments p, clients cl, centers c
+                                               WHERE p.deleted_at is null AND p.amount>0 AND p.client_id=cl.id AND cl.center_id=c.id #{conditions} 
+                                               GROUP BY p.received_on, p.client_id) as ts 
+                                         GROUP BY amount ORDER BY count DESC LIMIT 10
+                                      }).map{|r| [r.count, r.amount.round]}
+      
+      graph = BarGraph.new("Repayment denominations")
+      graph.data_type = :individual
+      graph.data(vals, :first, :last)
+      graph.x_axis.steps = get_axis
+      return graph.generate      
+    end
+  end
 
   private
   def group_by_values(model, collection, group_by, opts = {})
