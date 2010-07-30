@@ -57,6 +57,7 @@ class Searches < Application
       @objects = @search.process
       @model   = @objects.first.class
       @fields  = params[:fields]
+      @precedence = params[:precedence]
       render :reporting
     end
   end

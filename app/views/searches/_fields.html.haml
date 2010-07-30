@@ -1,13 +1,18 @@
--@properties.each do |model, properties|
-  %h2
-    = model
-  %table
-    - properties.each do |property|
-      %tr
-        %td
-          =check_box(:name => "fields[#{model}][#{property.to_s}]")
-        %td
-          = property.to_s.camelcase(' ')
-  
+%table#customtable
+  %tr
+    -@properties.each do |model, properties|
+      %td
+        %h2
+          = model
+        %table
+          - properties.each do |property|
+            %tr
+              %td
+                =check_box(:name => "fields[#{model}][#{property.to_s}]")
+              %td
+                = property.to_s.camelcase(' ')
+              %td
+                =select(:name => "precedence[#{model}][#{property.to_s}]", :collection => %w(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20), :style => "display:none")
+
 %p
   =submit "Go"

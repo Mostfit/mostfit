@@ -24,6 +24,6 @@
   %td
     = select :name => "operator[#{@counter}]", :id => "operator_#{@counter}", :collection => [], :prompt => "choose operator"
   %td
-    %span{:id => "value_#{@counter}"}
+    %span{:id => "span_#{@counter}"}
   %td
     = select :name => "more[#{@counter}]", :id => "more_#{@counter}", :class => "more", :collection => ["and", "or", "not", "chain"], :prompt => "Add more conditions"
