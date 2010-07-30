@@ -113,16 +113,17 @@ module Merb
     end
 
     def date_select_html (attrs, obj = nil, col = nil)
-      #TODO min date, max date, show button
       str = %Q{
         <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}">
         <script type="text/javascript">
           $(function(){
-            $("##{attrs[:id]}").datepicker({altField: '##{attrs[:id]}', buttonImage: "/images/calendar.png", changeYear: true, buttonImageOnly: true,
+            $("##{attrs[:id]}").datepicker('destroy').datepicker({altField: '##{attrs[:id]}', buttonImage: "/images/calendar.png", changeYear: true, buttonImageOnly: true,
                                             yearRange: '#{attrs[:min_date].year}:#{attrs[:max_date].year}',
                                             dateFormat: '#{datepicker_dateformat}', altFormat: '#{datepicker_dateformat}', minDate: '#{attrs[:min_date]}',
-                                            maxDate: '#{attrs[:max_date]}', showOn: 'both', setDate: "#{attrs[:date]}" });
+                                            maxDate: '#{attrs[:max_date]}', showOn: 'both', setDate: "#{attrs[:date]}" })
           });
+            $("##{attrs[:id]}").datepicker('option', 'altField', '#value_1')
+
        </script>
       }
       return str
