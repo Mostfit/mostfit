@@ -96,8 +96,7 @@
             %td.text
               = obj.total_fees_due
             %td.text
-              - obj.fees_paid.values.each do |fp|
-                = "#{fp.keys}: #{fp.values}"
+              = obj.total_fees_paid
             %td.text
               - fee.each do |k,v|
                 ="#{k.name}: #{v}"
