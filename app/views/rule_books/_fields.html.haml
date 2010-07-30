@@ -16,15 +16,27 @@
     %td
       - options = (RuleBook::ACTIONS.map { |x| [x.to_s, x.to_s.capitalize] })
       =select :action, :collection => options, :prompt => "Select action"
-
   %tr
     %td
-      Credit Account Name
+      Fee Type: 
     %td
-      =select :credit_account_id, :collection => Account.all.map{ |x| [x.id ,x.name]}, :prompt => "Select credit Account"
+      = select :fee_id, :collection => Fee.all.map{ |x| [x.id, x.name]}, :prompt => "Select fee type"  
+  %tr
+    %td
+      Credit Accounts
+    %td
+      =select :name => "rule_book[credit_accounts][]", :collection => Account.all.map{ |x| [x.id ,x.name]}, :prompt => "Select credit account 1"
+      %br
+      =select :name => "rule_book[credit_accounts][]", :collection => Account.all.map{ |x| [x.id ,x.name]}, :prompt => "Select credit account 2"
+      %br
+      =select :name => "rule_book[credit_accounts][]", :collection => Account.all.map{ |x| [x.id ,x.name]}, :prompt => "Select credit account 3"
   %tr
     %td
       Debit Account Name 
     %td
-      =select :debit_account_id, :collection => Account.all.map{ |x| [x.id, x.name]}, :prompt => "Select debit Account"
+      =select :name => "rule_book[debit_accounts][]", :collection => Account.all.map{ |x| [x.id, x.name]}, :prompt => "Select debit Account"
+      %br
+      =select :name => "rule_book[debit_accounts][]", :collection => Account.all.map{ |x| [x.id, x.name]}, :prompt => "Select debit Account"
+      %br
+      =select :name => "rule_book[debit_accounts][]", :collection => Account.all.map{ |x| [x.id, x.name]}, :prompt => "Select debit Account"
  

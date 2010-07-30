@@ -8,9 +8,9 @@
     %th 
       Action
     %th
-      Credit
+      Credit accounts
     %th
-      Debit
+      Debit accounts
   %tr
   - for rule_book in @rule_books.all(:order => [:branch_id.asc, :action.desc])    
     %tr
@@ -24,9 +24,11 @@
       %td 
         = rule_book.action
       %td 
-        = rule_book.credit_account.name
+        - rule_book.credit_accounts.each do |credit_account|
+          =credit_account.name
       %td
-        = rule_book.debit_account.name
+        - rule_book.debit_accounts.each do |debit_account|
+          =debit_account.name
       %td
         = link_to 'Edit', url(:edit_rule_book,  rule_book)
 
