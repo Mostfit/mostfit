@@ -28,13 +28,11 @@
   .tab
     = partial :form, :action => "/dashboard#centers"
     %h1
-      Month on month
       =@branch.name if @branch
     %div
       =chart("/dashboard/centers/growth#{seg}", 800, 300, "centers_growth")
-    %h1 
-      Growth
-      ="for #{@branch.name}" if @branch
+    %h1
+      ="#{@branch.name}" if @branch
     %div
       =chart("/dashboard/centers/cumulative#{seg}", 800, 300) 
   .tab
