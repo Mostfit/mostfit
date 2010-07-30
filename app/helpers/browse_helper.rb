@@ -25,8 +25,6 @@ module Merb
           x.gsub(/(\d+\,)/, '400,')
         end
       }
-      p @@charts
     end
-
   end
 end # Merb
