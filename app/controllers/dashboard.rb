@@ -304,7 +304,7 @@ class Dashboard < Application
                                          FROM payments p, clients cl, centers c
                                          WHERE p.deleted_at is null AND p.type in (#{types.join(', ')}) AND p.client_id = cl.id AND cl.center_id = c.id #{conditions}
                                          GROUP BY MONTH(p.received_on)
-                                      }).map{|r| [r.date, r.amount.round]}
+                                      }).map{|r| [r.date, r.amount.to_i]}
       graph = BarGraph.new("Repayment of #{params[:id]} (#{get_period_text})")
       graph.data_type = :individual
       graph.data(group_dates(vals), :last, :first)
