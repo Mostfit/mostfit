@@ -122,7 +122,6 @@ module Merb
                                             dateFormat: '#{datepicker_dateformat}', altFormat: '#{datepicker_dateformat}', minDate: '#{attrs[:min_date]}',
                                             maxDate: '#{attrs[:max_date]}', showOn: 'both', setDate: "#{attrs[:date]}" })
           });
-            $("##{attrs[:id]}").datepicker('option', 'altField', '#value_1')
 
        </script>
       }
