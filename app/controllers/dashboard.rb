@@ -257,6 +257,7 @@ class Dashboard < Application
       Loan.all(:disbursal_date.not => nil, :disbursal_date.lte => Date.today).each{|l|
         age = (100*(Date.today-l.disbursal_date)/(l.number_of_installments * l.installment_frequency_in_days)/10).ceil
         next if age>10
+        next unless ages[age]
         ages[age]+=1
       }
       vals = []
