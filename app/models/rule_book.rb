@@ -7,9 +7,13 @@ class RuleBook
   property :name,   String
   property :action, Enum.send('[]',*ACTIONS)
 
-  belongs_to :credit_account, Account
-  belongs_to :debit_account,  Account
+  has n, :credit_account_rules
+  has n, :debit_account_rules
+  has n, :credit_accounts, Account, :through => :credit_account_rules
+  has n, :debit_accounts,  Account, :through => :debit_account_rules
+
   belongs_to :branch,         Branch, :nullable => true
+  belongs_to :fee,            Fee, :nullable => true
 
   validates_present      :name
   validates_is_unique    :name
@@ -20,9 +24,12 @@ class RuleBook
   def self.get_accounts(obj)
     return false if $globals and $globals[:mfi_details] and not $globals[:mfi_details][:accounting_enabled]
     if obj.class==Payment
+      debugger
       transaction_type = obj.type
       client = obj.client_id > 0 ? obj.client : obj.loan.client
       branch  = client.center.branch
+      fee     = obj.fee
+
       #TODO:hack alert! Write it better
     elsif obj.class==Loan or obj.class.superclass==Loan or obj.class.superclass.superclass==Loan
       transaction_type = :disbursement
@@ -32,7 +39,7 @@ class RuleBook
       client = obj.first.client_id > 0 ? obj.first.client : obj.first.loan.client
       branch  = client.center.branch      
       credit_accounts, debit_accounts  = {}, {}
-      obj.each{|p|        
+      obj.each{|p|  
         rule = first(:action => p.type, :branch => branch) || first(:action => p.type, :branch => nil)
         credit_accounts[rule.credit_account] ||= 0
         credit_accounts[rule.credit_account] += p.amount
@@ -43,8 +50,10 @@ class RuleBook
       return [credit_accounts, debit_accounts]
     end
     
-    if rule = first(:action => transaction_type, :branch => branch)
-    elsif rule = first(:action => transaction_type, :branch => nil)
+    if rule = first(:action => transaction_type, :branch => branch, :fee => fee)
+    elsif rule = first(:action => transaction_type, :branch => nil, :fee => nil)
+    elsif rule = first(:action => transaction_type, :branch => nil, :fee => fee)
+    elsif rule = first(:action => transaction_type, :branch => branch, :fee => nil)
     else
       raise "NoRuleFoundError"
     end
@@ -52,7 +61,7 @@ class RuleBook
   end
   
   def credit_account_is_not_same_as_debit_account?
-    return true if credit_account_id != debit_account_id
+    return true if (credit_accounts.map{|x| x.id} & debit_accounts.map{|x| x.id}).length==0
     [false, "Credit and Debit account cannot be same"]
   end
 

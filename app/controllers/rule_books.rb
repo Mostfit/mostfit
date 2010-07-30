@@ -26,6 +26,8 @@ class RuleBooks < Application
   end
 
   def create(rule_book)
+    debugger
+    rule_book = set_credit_and_debit_accounts(rule_book)
     @rule_book = RuleBook.new(rule_book)
     if @rule_book.save
       redirect resource(:rule_books), :message => {:notice => "RuleBook was successfully created"}
@@ -36,6 +38,8 @@ class RuleBooks < Application
   end
 
   def update(id, rule_book)
+    debugger
+    rule_book = set_credit_and_debit_accounts(rule_book)
     @rule_book = RuleBook.get(id)
     raise NotFound unless @rule_book
     if @rule_book.update(rule_book)
@@ -53,6 +57,17 @@ class RuleBooks < Application
     else
       raise InternalServerError
     end
+  end
+
+private
+  def set_credit_and_debit_accounts(rule_book)
+    if rule_book[:credit_accounts]
+      rule_book[:credit_accounts] = rule_book[:credit_accounts].map{|ca| Account.get(ca)}.compact
+    end
+    if rule_book[:debit_accounts]
+      rule_book[:debit_accounts]  = rule_book[:debit_accounts].map{|ca| Account.get(ca)}.compact
+    end
+    rule_book
   end
 
 end # RuleBooks

@@ -15,7 +15,12 @@ class Account
   
   property   :branch_id,               Integer, :nullable => true, :index => true
   belongs_to :branch,                  :model => 'Branch', :child_key => [:branch_id]
-  
+
+  has n, :credit_account_rules
+  has n, :debit_account_rules
+#  has n, :credit_accounts,  RuleBook, :through => :credit_accounts_rules
+#  has n, :debit_accounts, RuleBook, :through => :debit_accounts_rules
+
   has n, :postings
   is :tree, :order => :name
   
