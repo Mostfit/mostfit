@@ -73,7 +73,8 @@ class Dashboard < Application
 
       vals = repository.adapter.query(%Q{SELECT #{column} quantity, b.name name
                                        FROM loans l, clients cl, centers c, branches b
-                                       WHERE l.disbursal_date is not NULL and l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
+                                       WHERE l.disbursal_date is not NULL and l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id 
+                                       GROUP BY b.id;})
       graph.data_type = :individual
       graph.data(vals.map{|x| [x.quantity.to_i, x.name]})
       return graph.generate
