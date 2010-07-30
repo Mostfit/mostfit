@@ -319,7 +319,7 @@ class Dashboard < Application
                                                WHERE p.deleted_at is null AND p.amount>0 AND p.client_id=cl.id AND cl.center_id=c.id #{conditions} 
                                                GROUP BY p.received_on, p.client_id) as ts 
                                          GROUP BY amount ORDER BY count DESC LIMIT 10
-                                      }).map{|r| [r.count, r.amount.round]}
+                                      }).map{|r| [r.count, r.amount.to_i]}
       
       graph = BarGraph.new("Repayment denominations")
       graph.data_type = :individual
