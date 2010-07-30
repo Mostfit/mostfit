@@ -153,7 +153,7 @@ class Dashboard < Application
         title = "Member since (in months)"
         ages  = get_clients.all(:date_joined.lte => Date.today, :fields => [:id, :date_joined]).map{|x| (today-x.date_joined).to_i/30}
         title = "Member since (in months/years)"
-        data  = ages.find_all{|x| x<12}.map{|x| x/3}.group_by{|x| x}.map{|quater, arr| [arr.length, "#{quater*3+1} - #{quater*3+3} months"]}
+        data  = ages.find_all{|x| x<12}.map{|x| x/3}.group_by{|x| x}.map{|quarter, arr| [arr.length, "#{quarter*3+1} - #{quarter*3+3} months"]}
         years = ages.find_all{|x| x>=12}.map{|x| x/12}
         data += years.uniq.sort.map{|x| [years.count(x), "#{x} years"]}
       end
@@ -428,7 +428,7 @@ class Dashboard < Application
     @staff_member = StaffMember.get(params[:staff_member_id]) if params[:staff_member_id] and not params[:staff_member_id].nil?
   end
 
-  def quater(date)
+  def quarter(date)
     if date.month<=3
       return "#{date.year-1}-#{date.year} Q4"
     elsif date.month>3 and date.month<7
@@ -452,8 +452,8 @@ class Dashboard < Application
   def group_dates(data)
     if not params[:time_period] or params[:time_period]=="monthly"
       return data.sort_by{|d, c| d}.map{|d, c| [d.strftime("%Y %b"), c]}
-    elsif params[:time_period]=="quaterly"
-      return data.group_by{|d, c| quater(d)}.map{|k, v| [k, v.map{|x| x[1]}.inject(0){|s,x| s+=x}]}.sort_by{|d, c| d}
+    elsif params[:time_period]=="quarterly"
+      return data.group_by{|d, c| quarter(d)}.map{|k, v| [k, v.map{|x| x[1]}.inject(0){|s,x| s+=x}]}.sort_by{|d, c| d}
     elsif params[:time_period]=="yearly"
       return data.group_by{|d, c| year(d)}.map{|d, c| [d, c.map{|d, c| c}.inject(0){|s, x| s+=x}]}.sort_by{|d, c| d}
     end
@@ -462,7 +462,7 @@ class Dashboard < Application
   def get_axis
     if not params[:time_period] or params[:time_period]=="monthly"
       return 3
-    elsif params[:time_period]=="quaterly"
+    elsif params[:time_period]=="quarterly"
       return 2
     elsif params[:time_period]=="yearly"
       return 1
@@ -472,8 +472,8 @@ class Dashboard < Application
   def get_period_text
     if not params[:time_period] or params[:time_period]=="monthly"
       "month on month"
-    elsif params[:time_period]=="quaterly"
-      "quater on quater"
+    elsif params[:time_period]=="quarterly"
+      "quarter on quarter"
     elsif params[:time_period]=="yearly"
       "year on year"
     end    

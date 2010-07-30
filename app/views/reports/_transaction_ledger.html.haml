@@ -38,7 +38,7 @@
             %td{:colspan => length}
               %b
                 =@centers[center_id].name
-          - center_total = Array.new(length-1, 0)
+          - center_total = Array.new(length-2, 0)
           -groups.sort_by{|x| @groups[x[0]].name}.each do |group_id, clients|
             -if groups_available.include?(group_id)
               -group_total = Array.new(length-2, 0)
@@ -46,7 +46,7 @@
                 %td{:colspan => length}
                   %b=@groups[group_id].name
               -@payments.keys.sort.each do |date|
-                -date_total = Array.new(length-1, 0)
+                -date_total = Array.new(length-2, 0)
                 -if @payments[date] and @payments[date][group_id] and @payments[date][group_id].keys.length>0
                   -@payments[date][group_id].keys.sort_by{|x| clients.find{|c| c.id==x}.name}.each do |client_id|
                     -itr=@payments[date][group_id][client_id].collect{|x| x.length}.max
@@ -57,18 +57,15 @@
                         %td.align_left
                           =clients.find{|x| x.id==client_id}.name
                         -sum=0
-                        -center_total[0]+= 1
-                        -group_total[0] += 1
-                        -date_total[0]  += 1
                         -@payments[date][group_id][client_id].each_with_index do |e, col|
                           %td
                             -if e[i]
                               =e[i]
                               -e_val = e[i]
                               -sum += e_val if col>0
-                              -center_total[col+1]+= e_val
-                              -group_total[col+1] += e_val
-                              -date_total[col+1]  += e_val
+                              -center_total[col]+= e_val
+                              -group_total[col] += e_val
+                              -date_total[col]  += e_val
                             -else
                               0
                         %td
@@ -80,12 +77,14 @@
                     %td
                       %b
                         Date total
+                    %td
                     -date_total.each do |ele|
                       %td
                         %b=ele
               %tr.group_total
                 %td
                   %b==Group total
+                %td
                 -group_total.each do |ele|
                   %td
                     %b
@@ -94,6 +93,7 @@
             %td
               %b==Center total:
               -branch_total.push(center_total)
+            %td
             -center_total.each do |ele|
               %td
                 %b
@@ -104,6 +104,7 @@
           %td
             %b==Branch total:
           - org_total << branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
+          %td
           -org_total.last.each do |ele|
             %td
               %b
@@ -111,6 +112,7 @@
   %tr.org_total
     %td
       %b==Total:
+    %td
     -org_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
       %td
         %b
