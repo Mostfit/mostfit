@@ -107,7 +107,7 @@ class ConsolidatedReport < Report
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
-      groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][0] += l.amount
+      groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][0] += l.amount_applied_for
     }
 
     #2: Approved on
@@ -119,7 +119,7 @@ class ConsolidatedReport < Report
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
-      groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][1] += l.amount
+      groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][1] += l.amount_sanctioned
     }
 
     #3: Disbursal date

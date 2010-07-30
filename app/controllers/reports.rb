@@ -1,4 +1,5 @@
 class Reports < Application
+  include DateParser
   Types = [
            DailyReport, ConsolidatedReport, StaffConsolidatedReport, QuaterConsolidatedReport, TransactionLedger, ProjectedReport, 
            LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, 
@@ -107,7 +108,7 @@ class Reports < Application
   def get_date(params, col)
     if params and params.key?(col)
       date_hash = params[col]
-      return Date.parse(date_hash[:year] + "-" + date_hash[:month] + "-" + date_hash[:day])
+      return Date.parse(date_hash)
     end
   end
   

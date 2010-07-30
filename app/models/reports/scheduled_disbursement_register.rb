@@ -48,7 +48,7 @@ class ScheduledDisbursementRegister < Report
         groups[0]=ClientGroup.new(:name => "No group", :id => 0)
       end
       loans[branch_id][center_id][l.client.client_group_id||0].push([client.reference, client.name, client.spouse_name, 
-                                                                     l.loan_product_id, l.cycle_number, l.disbursal_date, l.amount])
+                                                                     l.loan_product_id, l.cycle_number, l.scheduled_disbursal_date, l.amount])
     }
     return [groups, centers, branches, loans, loan_products]
   end

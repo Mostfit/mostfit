@@ -1,9 +1,9 @@
-%form{:name => "dashborad_form"}
+%form{:name => "dashborad_form", :method => "POST", :action => action}
   %table
     %tr
       %td
         Time Period: 
-        =select(:time_period , :collection => [[:monthly, "Monthly"], [:quaterly, "Quaterly"], [:yearly, "Yearly"]], :include_blank => false)
+        =select(:time_period , :collection => [[:monthly, "Monthly"], [:quarterly, "Quarterly"], [:yearly, "Yearly"]], :include_blank => false)
       %td
         - branch_id = (params[:branch_id]) ? params[:branch_id] : nil
         - center_id = (params[:center_id]) ? params[:center_id] : nil
