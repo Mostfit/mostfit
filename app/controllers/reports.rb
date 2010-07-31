@@ -1,7 +1,7 @@
 class Reports < Application
   include DateParser
   Types = [
-           DailyReport, ConsolidatedReport, StaffConsolidatedReport, QuaterConsolidatedReport, TransactionLedger, ProjectedReport, 
+           DailyReport, WeeklyReport, ConsolidatedReport, StaffConsolidatedReport, QuaterConsolidatedReport, TransactionLedger, ProjectedReport, 
            LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, 
            TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, LoanSanctionRegister, ClientAbsenteeismReport, 
            LoanSizePerManagerReport
@@ -27,16 +27,13 @@ class Reports < Application
       if klass==TransactionLedger
         @groups, @centers, @branches, @payments, @clients = @report.generate
         display [@groups, @centers, @branches, @payments, @clients]
-      elsif [LoanDisbursementRegister, LoanSanctionRegister, ScheduledDisbursementRegister].include?(klass)
+      elsif [LoanSanctionRegister, ScheduledDisbursementRegister].include?(klass)
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
       elsif [LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, StaffConsolidatedReport, 
-             QuaterConsolidatedReport, ClientAbsenteeismReport, LoanSizePerManagerReport].include?(klass)
+             QuaterConsolidatedReport, ClientAbsenteeismReport, LoanSizePerManagerReport, TargetReport, LoanDisbursementRegister].include?(klass)
         @data  = @report.generate
         display @data
-      elsif klass==TargetReport
-        @targets = @report.generate
-        display [@targets]
       else
         @groups, @centers, @branches = @report.generate
         display [@groups, @centers, @branches]
