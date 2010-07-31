@@ -50,7 +50,7 @@
   - center_id, branch_id = nil, nil
   - length = 16
   - org_total = []
-  -@data.each do |branch, purposes|
+  -@data.sort_by{|branch, x| branch.name}.each do |branch, purposes|
     -if purposes.keys.length>0
       -branch_total = []
       %tr.branch#purpose
