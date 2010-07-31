@@ -9,7 +9,7 @@ class ClientAbsenteeismReport < Report
   end
 
   def name
-    "Client absenteeism as on #{@date}"
+    "Client absenteeism as on #{@to_date}"
   end
 
   def self.name
