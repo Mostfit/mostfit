@@ -61,4 +61,80 @@ class Report
                                        end)
     }
   end
+
+  def group_loans(by, columns, conditions = {})
+    by_query = if by.class == String
+                 by
+               elsif by.class==Symbol
+                 "l.#{by}"
+               elsif by.class==Array
+                 by.join(",")
+               end
+    condition, select = process_conditions(conditions)
+    repository.adapter.query(%Q{
+       SELECT #{[by, columns, select].flatten.reject{|x| x.blank?}.join(', ')}
+       FROM branches b, centers c, clients cl, loans l
+       WHERE b.id=c.branch_id AND c.id=cl.center_id AND cl.id=l.client_id AND l.deleted_at is NULL AND cl.deleted_at is NULL
+             #{condition}
+       GROUP BY #{by_query}
+    })    
+  end
+
+  private
+  def process_conditions(conditions)
+    selects = []
+    conditions = conditions.map{|query, value|
+      key      = get_key(query)
+      operator = get_operator(query)
+      value    = get_value(value)
+      next if not key
+      "#{key}#{operator}#{value}"
+    }
+    query = ""
+    query = " AND " + conditions.join(' AND ') if conditions.length>0
+    [query, selects.join(', ')]
+  end
+
+  def get_key(query)
+    if query.class==DataMapper::Query::Operator
+      return query.target
+    elsif query.class==String
+      return query
+    elsif query.class==Symbol and query==:fields
+      return nil
+    else
+      return query
+    end    
+  end
+  
+  def get_operator(query)
+    if query.respond_to?(:operator)
+      case query.operator
+      when :lte
+        "<="
+      when :gte
+        ">="
+      when :gt
+        ">"
+      when :lt
+        "<"
+      when :eq
+        "="
+      else
+        "="
+      end
+    else
+      "="
+    end
+  end
+
+  def get_value(val)
+    if val.class==Date
+      "'#{val.strftime("%Y-%m-%d")}'"
+    elsif val.class==Array
+      val.join(",")
+    else
+      val
+    end    
+  end
 end

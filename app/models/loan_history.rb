@@ -249,19 +249,29 @@ class LoanHistory
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
     return false if ids.length==0
     
+    if group_by.class==String
+      group_by = group_by+"_id"
+    elsif group_by.class==Array
+      group_by = group_by.map{|x| x+"_id"}.join(", ")
+    elsif group_by.class==Symbol
+      group_by = "#{group_by}_id"
+    else
+      return
+    end
+
     repository.adapter.query(%Q{
       SELECT 
-        SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
-        SUM(scheduled_outstanding_total)     AS scheduled_outstanding_total,
-        SUM(actual_outstanding_principal)    AS actual_outstanding_principal,
-        SUM(actual_outstanding_total)        AS actual_outstanding_total,
-        SUM(if(actual_outstanding_principal<scheduled_outstanding_principal,  scheduled_outstanding_principal-actual_outstanding_principal,0)) AS advance_principal,
-        SUM(if(actual_outstanding_total<scheduled_outstanding_total,          scheduled_outstanding_total-actual_outstanding_total,0))         AS advance_total,
-        COUNT(loan_id) loan_count,
-        #{group_by}_id
-      FROM loan_history
-      WHERE (loan_id, date) in (#{ids}) AND status in (5,6)
-      GROUP BY #{group_by}_id;
+        SUM(lh.scheduled_outstanding_principal) AS scheduled_outstanding_principal,
+        SUM(lh.scheduled_outstanding_total)     AS scheduled_outstanding_total,
+        SUM(lh.actual_outstanding_principal)    AS actual_outstanding_principal,
+        SUM(lh.actual_outstanding_total)        AS actual_outstanding_total,
+        SUM(if(lh.actual_outstanding_principal<lh.scheduled_outstanding_principal, lh.scheduled_outstanding_principal-lh.actual_outstanding_principal,0)) AS advance_principal,
+        SUM(if(lh.actual_outstanding_total<lh.scheduled_outstanding_total,         lh.scheduled_outstanding_total-lh.actual_outstanding_total,0))         AS advance_total,
+        COUNT(lh.loan_id) loan_count,
+        #{group_by}
+      FROM loan_history lh, loans l
+      WHERE (lh.loan_id, lh.date) in (#{ids}) AND lh.status in (5,6) AND lh.loan_id=l.id AND l.deleted_at is NULL
+      GROUP BY #{group_by};
     })
   end
 
