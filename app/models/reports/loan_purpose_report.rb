@@ -59,7 +59,7 @@ class LoanPurposeReport < Report
                                WHERE p.received_on >= '#{from_date.strftime('%Y-%m-%d')}' and p.received_on <= '#{to_date.strftime('%Y-%m-%d')}'
                                AND p.deleted_at is NULL AND p.loan_id=l.id AND l.client_id=cl.id AND cl.center_id=c.id 
                                AND cl.deleted_at is NULL AND c.branch_id in (#{branches.keys.join(',')})
-                               GROUP BY l.occupation_id, p.type
+                               GROUP BY l.occupation_id, c.branch_id, p.type
                              }).group_by{|x| x.branch_id}
     payments.each{|branch_id, loan_purposes| 
       if branch = branches[branch_id]
