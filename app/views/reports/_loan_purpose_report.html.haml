@@ -53,12 +53,12 @@
   -@data.each do |branch, purposes|
     -if purposes.keys.length>0
       -branch_total = []
-      %tr.branch#manager
+      %tr.branch#purpose
         %td{:colspan => length+1}
           %b
             =branch.name
       -purposes.sort_by{|purpose, data| (purpose ? purpose.name : "NA")}.each do |purpose, data|
-        %tr
+        %tr.purpose
           %td
             %b
               =purpose ? purpose.name : "NA"
