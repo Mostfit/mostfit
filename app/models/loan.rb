@@ -732,6 +732,8 @@ class Loan
       @status =  :repaid
     elsif total_principal_to_be_received<=principal_received and scheduled_interest_up_to(date)<=interest_received_up_to(Date.today)
       @status =  :repaid
+    elsif amount<=principal_received
+      @status =  :repaid
     else
       @status =  :outstanding
     end
