@@ -6,11 +6,12 @@ class RuleBook
   property :id,     Serial
   property :name,   String
   property :action, Enum.send('[]',*ACTIONS)
+  property :fee_id, Integer, :nullable => true
 
   has n, :credit_account_rules
   has n, :debit_account_rules
-  has n, :credit_accounts, Account, :through => :credit_account_rules
-  has n, :debit_accounts,  Account, :through => :debit_account_rules
+  has n, :credit_accounts, :model => 'Account', :through => :credit_account_rules
+  has n, :debit_accounts,  :model => 'Account', :through => :debit_account_rules
 
   belongs_to :branch,         Branch, :nullable => true
   belongs_to :fee,            Fee, :nullable => true
@@ -20,16 +21,15 @@ class RuleBook
   validates_length       :name,     :minimum => 3
   validates_with_method  :debit_account,   :method => :credit_account_is_not_same_as_debit_account?
   validates_with_method  :action_not_chosen_twice_for_particular_branch
+  validates_with_method  :percentage_should_be_100
   
   def self.get_accounts(obj)
     return false if $globals and $globals[:mfi_details] and not $globals[:mfi_details][:accounting_enabled]
     if obj.class==Payment
-      debugger
       transaction_type = obj.type
       client = obj.client_id > 0 ? obj.client : obj.loan.client
       branch  = client.center.branch
       fee     = obj.fee
-
       #TODO:hack alert! Write it better
     elsif obj.class==Loan or obj.class.superclass==Loan or obj.class.superclass.superclass==Loan
       transaction_type = :disbursement
@@ -40,12 +40,20 @@ class RuleBook
       branch  = client.center.branch      
       credit_accounts, debit_accounts  = {}, {}
       obj.each{|p|  
-        rule = first(:action => p.type, :branch => branch) || first(:action => p.type, :branch => nil)
-        credit_accounts[rule.credit_account] ||= 0
-        credit_accounts[rule.credit_account] += p.amount
+        rule = if p.type==:fees
+                 first(:action => p.type, :branch => branch, :fee => p.fee) || first(:action => p.type, :branch => nil, :fee => p.fee)
+               else
+                 first(:action => p.type, :branch => branch) || first(:action => p.type, :branch => nil)
+               end
+        rule.credit_account_rules.each{|car|
+          credit_accounts[car.account] ||= 0
+          credit_accounts[car.account] += (p.amount * (car.percentage))
+        }
 
-        debit_accounts[rule.debit_account] ||= 0
-        debit_accounts[rule.debit_account] += p.amount
+        rule.credit_account_rules.each{|dar|        
+          debit_accounts[car.account] ||= 0
+          debit_accounts[dar.account] += (p.amount * (dar.percentage))
+        }
       }
       return [credit_accounts, debit_accounts]
     end
@@ -57,9 +65,27 @@ class RuleBook
     else
       raise "NoRuleFoundError"
     end
-    [rule.credit_account, rule.debit_account]
+
+    credit_accounts, debit_accounts  = {}, {}
+    rule.credit_account_rules.each{|car|
+      credit_accounts[car.account] ||= 0
+      credit_accounts[car.account] += (obj.amount * (car.percentage))
+    }
+
+    rule.credit_account_rules.each{|dar|        
+      debit_accounts[car.account] ||= 0
+      debit_accounts[dar.account] += (obj.amount * (dar.percentage))
+    }    
+    
+    [credit_accounts, debit_accounts]
   end
   
+  def percentage_should_be_100
+    return [false, "Credit account split is not 100%"] if credit_account_rules.map{|a| a.percentage}.inject(0){|s,x| s+=x||0}!=100
+    return [false, "Debit account split is not 100%"]  if debit_account_rules.map{|a| a.percentage}.inject(0){|s,x| s+=x||0}!=100
+    return true
+  end
+
   def credit_account_is_not_same_as_debit_account?
     return true if (credit_accounts.map{|x| x.id} & debit_accounts.map{|x| x.id}).length==0
     [false, "Credit and Debit account cannot be same"]
@@ -74,8 +100,10 @@ class RuleBook
   end
   
   def action_not_chosen_twice_for_particular_branch
-    if self.new?
-      return [false, "Action has already been chosen for this branch"] if RuleBook.first(:action => action, :branch_id => branch_id)
+    if self.fee and self.new?
+      return [false, "Fee action has already been chosen for this branch"] if RuleBook.first(:fee => fee, :action => action, :branch_id => branch_id)
+    elsif self.fee and not self.new?
+      return [false, "Fee action has already been chosen for this branch"] if RuleBook.first(:fee => fee, :action => action, :branch_id => branch_id, :id.not => self.id)
     else
       return [false, "Action has already been chosen for this branch"] if RuleBook.first(:action => action, :branch_id => branch_id, :id.not => self.id)
     end

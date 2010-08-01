@@ -506,5 +506,19 @@ $(document).ready(function(){
 	  addFloater(link);
 	  return(false);
       });  
+
+  if($("#rule_book_action").length>0){
+      function showHideFees(){
+	  if($("#rule_book_action").val()==="fees")
+	      $("#fees_row").show();
+	  else
+	      $("#fees_row").hide();
+      }
+      showHideFees();
+      $("#rule_book_action").change(function(){
+	      showHideFees();
+	  });
+  }
+
 });
 
