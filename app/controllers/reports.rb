@@ -1,7 +1,7 @@
 class Reports < Application
   include DateParser
   Types = [
-           DailyReport, WeeklyReport, ConsolidatedReport, StaffConsolidatedReport, QuaterConsolidatedReport, TransactionLedger, ProjectedReport, 
+           DailyReport, ConsolidatedReport, StaffConsolidatedReport, QuaterConsolidatedReport, TransactionLedger, ProjectedReport, 
            LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, 
            TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, LoanSanctionRegister, ClientAbsenteeismReport, 
            LoanSizePerManagerReport

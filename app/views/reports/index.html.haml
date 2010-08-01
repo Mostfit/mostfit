@@ -6,7 +6,10 @@
     %tr
       %th
         Please choose a Report Type
-        
+  %tr
+    %td
+      %h3
+        =link_to("Weekly Reports", url(:show_report, :report_type => "WeeklyReport"))
   -Reports::Types.each do |report|
     %tr
       %td
