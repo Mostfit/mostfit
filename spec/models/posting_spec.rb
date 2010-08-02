@@ -2,8 +2,32 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Posting do
   before (:all) do
-    load_fixtures :account_type, :account, :rule_book  
+    load_fixtures :account_type, :account 
     Payment.all.destroy! if Payment.all.count > 0
+    Journal.all.destroy!
+    @rule_book_1 =  RuleBook.new(:name => "Loan", :action => :disbursement, :branch_id => 1)
+    @rule_book_1.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(2), :percentage => 100)
+    @rule_book_1.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(1), :percentage => 100)
+    @rule_book_1.save
+    @rule_book_1.should be_valid
+
+    @rule_book_2 =  RuleBook.new(:name => "Principal", :action => :principal, :branch_id => 1)
+    @rule_book_2.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(3), :percentage => 100)
+    @rule_book_2.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(4), :percentage => 100)
+    @rule_book_2.save
+    @rule_book_2.should be_valid
+
+    @rule_book_3 =  RuleBook.new(:name => "Interest", :action => :interest, :branch_id => 1)
+    @rule_book_3.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(1), :percentage => 100)
+    @rule_book_3.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(4), :percentage => 100)
+    @rule_book_3.save
+    @rule_book_3.should be_valid
+
+    @rule_book_4 =  RuleBook.new(:name => "Fees", :action => :fees, :branch_id => 1)
+    @rule_book_4.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(2), :percentage => 100)
+    @rule_book_4.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(3), :percentage => 100)
+    @rule_book_4.save
+    @rule_book_4.should be_valid
 
     @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @user.save
@@ -66,17 +90,14 @@ describe Posting do
     @loan_product.errors.each {|e| puts e}
     @loan_product.should be_valid
 
-    @loan = DefaultLoan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, 
-                     :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
+    @loan = DefaultLoan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :funding_line => @funding_line,
+                            :scheduled_first_payment_date => Date.parse("2000-12-06"), :applied_on => Date.parse("2000-02-01"), :client => @client,
+                            :scheduled_disbursal_date => Date.parse("2000-06-13"), :loan_product => @loan_product)
     @loan.history_disabled = true
     @loan.applied_by       = @manager
-    @loan.funding_line     = @funding_line
-    @loan.client           = @client
-    @loan.loan_product     = @loan_product
-    @loan.valid?
+    @loan.should be_valid
     @loan.save
     @loan.errors.each {|e| puts e}
-    @loan.should be_valid
     @loan.approved_on = "2000-02-03"
     @loan.approved_by = @manager
     @loan.should be_valid
@@ -86,20 +107,11 @@ describe Posting do
     @loan.save
     @loan.errors
     @loan.should be_valid
-
   end
   
   before(:each) do
-    @user.active = true
-    @manager.active = true
-    @payment = Payment.new(:amount =>1000,:type => :principal,:received_on=>"2000-04-05")
-    @payment.created_by=@user
-    @payment.received_by=@manager
-    @payment.loan=@loan
-    @payment.valid?
-    @payment.save
-    @payment.errors.each {|e| puts e}
-    @payment.should be_valid
+    status, *payments = @loan.repay(120, @user, Date.parse("2000-04-05"), @manager)
+    @payment = payments.first
   end
 
   it "should not be valid if book keeping entry are not made on loan disbursal" do

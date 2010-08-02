@@ -10,8 +10,8 @@ describe Journal do
     journal[:comment] = "some transaction"
     old_journal_count = Journal.count
     old_posting_count = Posting.count
-    debit_account = Account.first 
-    credit_account = Account.last
+    debit_account     = Account.first 
+    credit_account    = Account.last
     status, journal = Journal.create_transaction(journal, debit_account, credit_account)
     status.should be_true
     journal.should be_valid

@@ -24,7 +24,7 @@ class RuleBook
   validates_with_method  :percentage_should_be_100
   
   def self.get_accounts(obj)
-    return false if $globals and $globals[:mfi_details] and not $globals[:mfi_details][:accounting_enabled]
+    return false if ($globals and $globals[:mfi_details] and not $globals[:mfi_details][:accounting_enabled])
     if obj.class==Payment
       transaction_type = obj.type
       client = obj.client_id > 0 ? obj.client : obj.loan.client
@@ -46,13 +46,13 @@ class RuleBook
                  first(:action => p.type, :branch => branch) || first(:action => p.type, :branch => nil)
                end
         rule.credit_account_rules.each{|car|
-          credit_accounts[car.account] ||= 0
-          credit_accounts[car.account] += (p.amount * (car.percentage))
+          credit_accounts[car.credit_account] ||= 0
+          credit_accounts[car.credit_account] += (p.amount * (car.percentage)/100)
         }
 
-        rule.credit_account_rules.each{|dar|        
-          debit_accounts[car.account] ||= 0
-          debit_accounts[dar.account] += (p.amount * (dar.percentage))
+        rule.debit_account_rules.each{|dar|
+          debit_accounts[dar.debit_account] ||= 0
+          debit_accounts[dar.debit_account] += (p.amount * (dar.percentage)/100)
         }
       }
       return [credit_accounts, debit_accounts]
@@ -68,15 +68,14 @@ class RuleBook
 
     credit_accounts, debit_accounts  = {}, {}
     rule.credit_account_rules.each{|car|
-      credit_accounts[car.account] ||= 0
-      credit_accounts[car.account] += (obj.amount * (car.percentage))
+      credit_accounts[car.credit_account] ||= 0
+      credit_accounts[car.credit_account] += (obj.amount * (car.percentage)/100)
     }
 
-    rule.credit_account_rules.each{|dar|        
-      debit_accounts[car.account] ||= 0
-      debit_accounts[dar.account] += (obj.amount * (dar.percentage))
+    rule.debit_account_rules.each{|dar|        
+      debit_accounts[dar.debit_account] ||= 0
+      debit_accounts[dar.debit_account] += (obj.amount * (dar.percentage)/100)
     }    
-    
     [credit_accounts, debit_accounts]
   end
   
