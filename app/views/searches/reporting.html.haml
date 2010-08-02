@@ -10,15 +10,21 @@
     %table
       %tr
         -@arr = Array.new;
+        -debugger
         -@precedence.each do |model, prop|
-          - keys = prop.keys
-          - keys.each do |key|
+          -keys = prop.keys
+          -keys.each do |key|
           - #puts @fields[model][key]
-            - if(@fields[model][key] != nil)
+            -if(@fields[model][key] != nil)
               - #puts "precedence is #{@precedence[model][key]}"
-              - @arr[(@precedence[model][key]).to_i-1] =  [model, key]
+              -if(@arr[(@precedence[model][key]).to_i-1] == nil)
+                -@arr[(@precedence[model][key]).to_i-1] = [ [model, key] ]
+              -else
+                -@arr[(@precedence[model][key]).to_i-1].push([model, key])
         -@arr.delete(nil)
-        -#debugger
+        -@arr.flatten!(1) #flattens array once (this scheme is needed to handle
+        - #the case when a user enters same precedence for the two items
+        -debugger
         -@arr.each do |model, key|
           %th
             -if model==klass
