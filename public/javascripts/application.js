@@ -379,14 +379,14 @@ $(document).ready(function(){
 		    name=table.find("tr.branch").attr("id");
 		else
 		    name='center';
-		table.find("tr.branch td").append("<a id='center' class='expand'>Expand "+name+"s</a>");
+		table.find("tr.branch td").append("<a id='"+name+"' class='expand'>Expand "+name+"s</a>");
 	    }
 	    if(table.find("tr.center td")){
 		if(table.find("tr.center").attr("id"))
 		    name=table.find("tr.center").attr("id");
 		else
 		    name='group';
-		table.find("tr.center td").append("<a id='group' class='expand'>Expand "+name+"s</a>");
+		table.find("tr.center td").append("<a id='"+name+"' class='expand'>Expand "+name+"s</a>");
 	    }
 	    if(table.find("tr.date").length>0)
 	       table.find("tr.group td").append("<a id='date' class='expand'>Expand dates</a>");
