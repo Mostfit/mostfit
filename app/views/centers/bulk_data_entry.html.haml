@@ -1,0 +1,56 @@
+%form._remote_{:action => url(:action => "bulk_data_entry", :id => @center.id, :branch_id => @branch.id, :model => @model.to_s, :field_name => params[:field_name]), :method => :post}
+  %input{:name => "_target_", :type => "hidden", :value => "bulkDataEntryNotice"}
+  %table.report.nojs
+    %thead
+      %tr
+        %th ID
+        %th Reference
+        %th Name
+        %th 
+          - if @model==Client
+            Spouse name
+          - else
+            Loan
+        %th 
+          =@field.to_s.camelcase(' ')
+    %tbody
+    - loans = @clients.loans(:disbursal_date.not => nil).group_by{|x| x.client} if @model==Loan
+    - @clients.group_by{|c| c.client_group}.each do |group, clients|
+      %tr.group
+        %td{:colspan => 5}
+          - if group
+            = group.name
+          -else
+            Not attached to any group
+      - clients.each do |client|
+        - if @model == Loan
+          - if loans.key?(client)     
+            - loans[client].each do |loan|
+              %tr{:class => cycle('odd','')}
+                %td
+                  = loan.id
+                %td
+                  = client.reference
+                %td
+                  = link_to client.name, resource(@branch, @center, client)
+                %td
+                  = loan.amount
+                  (disbursed on
+                  = loan.disbursal_date
+                  )
+                %td
+                  = display_field_form(@model, @field, loan)
+        - else        
+          %tr{:class => cycle('odd','')}
+            %td
+              = client.id
+            %td
+              = client.reference
+            %td
+              = link_to client.name, resource(@branch, @center, client)
+            %td
+              = client.spouse_name
+            %td
+              = display_field_form(@model, @field, client)
+  =submit("Save")   
+%div#bulkDataEntryNotice

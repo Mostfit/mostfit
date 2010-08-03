@@ -37,10 +37,10 @@ Merb::Router.prepare do
     resources :cgts
   end
   resources :loans, :id => %r(\d+)
-  resources :centers
+  resources :centers, :id => %r(\d+)
   resources :payments
   resources :branches  do
-    resources :centers  do
+    resources :centers, :id => %r(\d+)  do
       resources :client_groups
       resources :clients do
         resources :payments

@@ -162,6 +162,43 @@ function dateFromAge(ageYear, ageMonth, ageDay){
     }
     return birthDate;
 }
+function attachFormRemoteTo(form){
+    if(form.length==0)
+	return(false);
+    $(form).submit(function(){
+	    $(form).after("<img id='spinner' src='/images/spinner.gif' />");
+	    $.ajax({
+		    type: form.attr("method"),
+			url: form.attr("action"),
+			data: form.serialize(),
+			success: function(data){
+			if(form.find("input[name='_target_']").length>0){
+			    id=form.find("input[name='_target_']").attr("value");
+			    $("#"+id).html(data);
+			    attachFormRemoteTo($("#"+id).find("form._remote_"));
+			}else if(form.find("table").length>0){
+			    form.find("table").html(data);
+			    attachFormRemoteTo(form.find("table form._remote_"));
+			}else if(form.find("div").length>0){
+			    form.find("div").html(data);
+			    attachFormRemoteTo(form.find("div").find("form._remote_"));
+			}else{
+			    form.append(data);
+			    attachFormRemoteTo(form.find("form._remote_"));
+			}
+			$("#spinner").remove();
+		    },
+			error: function(xhr, text, errorThrown){
+			$("div.error").remove();
+			txt = "<div class='error'>"+xhr.responseText+"</div>"
+			    form.before(txt);
+			$("#spinner").remove();			
+		    }
+		});
+	    return false;
+	});
+}
+
 function create_remotes(){
     $("a._remote_").click(function(){
 	    href=$(this).attr("href");
@@ -200,7 +237,7 @@ function create_remotes(){
 		    success: function(data){
 			$(a).after(data);
 			$(a).remove();
-      attachCustomTableEvents();
+			attachCustomTableEvents();
 		    },
 		    error: function(xhr, text, errorThrown){
 			txt = "<div class='error'>"+xhr.responseText+"</div>"
@@ -209,33 +246,8 @@ function create_remotes(){
 		});
 	    return false;
 	});
-
-    $("form._remote_").submit(function(){
-	    form = $(this);
-	    $(form).after("<img id='spinner' src='/images/spinner.gif' />");
-	    $.ajax({
-		    type: form.attr("method"),
-		    url: form.attr("action"),
-		    data: form.serialize(),
-		    success: function(data){
-			if(form.find("div").length>0)
-			    form.find("div").html(data);
-			else if(form.find("table").length>0){
-			    form.find("table").html(data);
-			}else if(form.find("input[name='_target_']").length>0){
-			    id=form.find("input[name='_target_']").attr("value");
-			    $("#"+id).html(data);
-			}
-			$("#spinner").remove();
-		    },
-		    error: function(xhr, text, errorThrown){
-			$("div.error").remove();
-			txt = "<div class='error'>"+xhr.responseText+"</div>"
-			form.before(txt);
-			$("#spinner").remove();			
-		    }
-		});
-	    return false;
+    $("form._remote_").each(function(idx, form){
+	    attachFormRemoteTo($(form));
 	});
 }
 function attachReportingFormEvents(id){
