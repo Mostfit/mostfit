@@ -339,6 +339,18 @@ module Merb
       staff_members.sort_by{|x| x.name}.map{|x| [x.id, x.name]}
     end
 
+    def select_mass_entry_field(attrs)
+      collection = []
+      MASS_ENTRY_FIELDS.keys.each do |model|
+        collection << ['', model.to_s.camelcase(' ')]
+        MASS_ENTRY_FIELDS[model].sort_by{|x| x.to_s}.each{|k| collection << ["#{model}[#{k.to_s}]", "!!!!!!#{k.to_s.camelcase(' ')}"] }
+      end
+      select(
+             :collection   => collection,
+             :name         => "#{attrs[:name]}",
+             :id           => "#{attrs[:id]||'select_mass_entry'}",
+             :prompt       => (attrs[:prompt] or "&lt;select a field&gt;")).gsub("!!!", "&nbsp;")
+    end
 
     private
     def staff_members_collection(allow_unsigned=false)
