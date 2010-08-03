@@ -19,6 +19,6 @@ MASS_ENTRY_FIELDS = {
               :not_irrigated_land_leased_fertile, :not_irrigated_land_shared_fertile, :not_irrigated_land_own_semifertile, 
               :not_irrigated_land_leased_semifertile, :not_irrigated_land_shared_semifertile, :not_irrigated_land_own_wasteland, 
               :not_irrigated_land_leased_wasteland, :not_irrigated_land_shared_wasteland, :caste, :religion, :occupation, 
-              :client_type, :client_group, :verified_by], 
+              :client_type], 
   :loan => [:loan_utilization, :purpose]
 }
