@@ -114,7 +114,7 @@ module Merb
 
     def date_select_html (attrs, obj = nil, col = nil)
       str = %Q{
-        <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}">
+        <input type='text' disabled="disabled" name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}">
         <script type="text/javascript">
           $(function(){
             $("##{attrs[:id]}").datepicker('destroy').datepicker({altField: '##{attrs[:id]}', buttonImage: "/images/calendar.png", changeYear: true, buttonImageOnly: true,
