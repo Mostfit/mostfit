@@ -81,7 +81,7 @@ class Info < Application
     @loans_created_by_admin = User.all(:role => :admin).audit_trails(:action => :create, :auditable_type => "Loan").count(:auditable_id)
     @loans_edited_by_admin  = User.all(:role => :admin).audit_trails(:action => :update, :auditable_type => "Loan").count(:auditable_id)
     @loans_deleted_by_admin = User.all(:role => :admin).audit_trails(:action => :destroy,:auditable_type => "Loan").count(:auditable_id)
-    @clients_without_insurance = (@client_ids - InsurancePolicy.all(:fields => [:client_id]).map{|x| x.client_id}).length
+    @clients_without_insurance = (@client_ids - InsurancePolicy.all(:fields => [:id, :client_id]).map{|x| x.client_id}).length
     render :file => 'info/exceptions', :layout => false
   end
 
