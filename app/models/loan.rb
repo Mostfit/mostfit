@@ -1060,10 +1060,6 @@ class EquatedWeekly < Loan
   include ExcelFormula
   # property :purpose,  String
 
-  def self.description
-    "50 Weeks, 18%, [6000-10000]"
-  end
-
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
@@ -1086,7 +1082,7 @@ private
     payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
     1.upto(number_of_installments){|installment|
       @reducing_schedule[installment] = {}
-      @reducing_schedule[installment][:interest_payable]  = (balance * interest_rate / 52).round(2)
+      @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / 52).round(2)
       @reducing_schedule[installment][:principal_payable] = (payment - @reducing_schedule[installment][:interest_payable]).round(2)
       balance = balance - @reducing_schedule[installment][:principal_payable]
     }
