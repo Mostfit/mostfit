@@ -1060,12 +1060,6 @@ class EquatedWeekly < Loan
   include ExcelFormula
   # property :purpose,  String
 
-  attr_accessor :defaults
-
-  def defaults
-    {:interest_rate => 0.18, :installment_frequency => :weekly, :number_of_installments => 50}
-  end
-
   def self.description
     "50 Weeks, 18%, [6000-10000]"
   end
@@ -1074,35 +1068,43 @@ class EquatedWeekly < Loan
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
     raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > number_of_installments
-    payment             = pmt(interest_rate/number_of_installments, number_of_installments, amount, 0, 0)
-    principal_payable   = 0
-    balance             = amount
-
-    1.upto(number){|installment|
-      interest_payable  = balance * interest_rate / number_of_installments
-      principal_payable = payment - interest_payable
-      balance           = balance - principal_payable
-    }
-    return number==number_of_installments ? balance.ceil : principal_payable.to_i
+    return reducing_schedule[number][:principal_payable]
   end
 
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
     raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
-    payment             = pmt(interest_rate/number_of_installments, number_of_installments, amount, 0, 0)
-    interest_payable    = 0
-    balance             = amount
-
-    1.upto(number){|installment|
-      interest_payable  = balance * interest_rate / number_of_installments
-      principal_payable = payment - interest_payable
-      balance           = balance - principal_payable
-    }
-    return interest_payable.to_i
+    return reducing_schedule[number][:interest_payable]
   end
 
+private
+  def reducing_schedule
+    return @reducing_schedule if @reducing_schedule
+    @reducing_schedule = {}    
+    balance = amount
+    payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
+    1.upto(number_of_installments){|installment|
+      @reducing_schedule[installment] = {}
+      @reducing_schedule[installment][:interest_payable]  = (balance * interest_rate / 52).round(2)
+      @reducing_schedule[installment][:principal_payable] = (payment - @reducing_schedule[installment][:interest_payable]).round(2)
+      balance = balance - @reducing_schedule[installment][:principal_payable]
+    }
+    return @reducing_schedule
+  end
 
+  def get_divider
+    case installment_frequency
+    when :weekly
+      52
+    when :bi_weekly
+      26
+    when :monthly
+      12
+    when :daily
+      360
+    end    
+  end
 end
 
 
@@ -1289,7 +1291,6 @@ Loan.descendants.to_a.each do |c|
       self.amount = original_amount
       # generate the payments_schedule
       clear_cache
-      debugger
       _show_cf
       self.disbursal_date = _disbursal_date
       self.scheduled_disbursal_date = _scheduled_disbursal_date
