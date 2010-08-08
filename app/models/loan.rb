@@ -786,7 +786,9 @@ class Loan
     # Crazy heisenbug is fixed by prefetching payments hash
     payments_hash
     t = Time.now; @history_array = []
-    dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on,scheduled_first_payment_date].map{|d| d.holiday_bump if d.is_a?(Date)} + payment_dates + installment_dates).compact.uniq.sort
+    dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on, scheduled_first_payment_date].map{|d|
+               d.holiday_bump if d.is_a?(Date)
+             } + payment_dates + installment_dates).compact.uniq.sort
     last_paid_date = nil
     
     repayed=false
@@ -820,7 +822,7 @@ class Loan
         :current                             => current,
         :principal_due                       => principal_due, 
         :interest_due                        => interest_due,
-        :principal_paid                      => prin, 
+        :principal_paid                      => prin,
         :interest_paid                       => int
       }
     end

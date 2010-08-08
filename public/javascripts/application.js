@@ -1,10 +1,10 @@
 // Common JavaScript code across your application goes here.
 var lineNos=0;
 function addFloater(link){
-    $(link).after("<div class='floater'><img height='400' src="+link.attr('href')+"/><span class='close_button'>X</span></div>");	  
+    $(link).after("<div class='floater'><img height='400' src="+link.attr('href')+"/><span class='close_button'>X</span></div>");
     $(".close_button").click(function(button){
-	    $("div.floater").remove();
-	});
+      $("div.floater").remove();
+    });
 }
 function spitLogs(){
     $.get("/logs/"+$("div.log_box").attr("id"), function(data){
@@ -163,40 +163,52 @@ function dateFromAge(ageYear, ageMonth, ageDay){
     return birthDate;
 }
 function attachFormRemoteTo(form){
-    if(form.length==0)
-	return(false);
-    $(form).submit(function(){
-	    $(form).after("<img id='spinner' src='/images/spinner.gif' />");
-	    $.ajax({
-		    type: form.attr("method"),
-			url: form.attr("action"),
-			data: form.serialize(),
-			success: function(data){
-			if(form.find("input[name='_target_']").length>0){
-			    id=form.find("input[name='_target_']").attr("value");
-			    $("#"+id).html(data);
-			    attachFormRemoteTo($("#"+id).find("form._remote_"));
-			}else if(form.find("table").length>0){
-			    form.find("table").html(data);
-			    attachFormRemoteTo(form.find("table form._remote_"));
-			}else if(form.find("div").length>0){
-			    form.find("div").html(data);
-			    attachFormRemoteTo(form.find("div").find("form._remote_"));
-			}else{
-			    form.append(data);
-			    attachFormRemoteTo(form.find("form._remote_"));
-			}
-			$("#spinner").remove();
-		    },
-			error: function(xhr, text, errorThrown){
-			$("div.error").remove();
-			txt = "<div class='error'>"+xhr.responseText+"</div>"
-			    form.before(txt);
-			$("#spinner").remove();			
-		    }
-		});
-	    return false;
-	});
+  if(form.length==0)
+    return(false);
+  $(form).submit(function(){
+		   $(form).find("input[type='submit']").attr("disabled", true);
+		   $(form).after("<img id='spinner' src='/images/spinner.gif' />");
+		   $.ajax({
+			    type: form.attr("method"),
+			    url: form.attr("action"),
+			    data: form.serialize(),
+			    success: function(data, status, xmlObj){
+			      console.log(status);
+			      console.log(xmlObj);
+			      console.log(data.redirect);
+			      if(data.redirect){
+				window.location.href = data.redirect;
+			      }else if(form.find("input[name='_target_']").length>0){
+				id=form.find("input[name='_target_']").attr("value");
+				$("#"+id).html(data);
+				attachFormRemoteTo($("#"+id).find("form._remote_"));
+			      }else if(form.find("table").length>0){
+				form.find("table").html(data);
+				attachFormRemoteTo(form.find("table form._remote_"));
+			      }else if(form.find("div").length>0){
+				form.find("div").html(data);
+				attachFormRemoteTo(form.find("div").find("form._remote_"));
+			      }else{
+				form.append(data);
+				attachFormRemoteTo(form.find("form._remote_"));
+			      }
+			      $("#spinner").remove();
+			      $(form).find("input[type='submit']").attr("disabled", "");
+			    },
+			    error: function(xhr, text, errorThrown){
+			      if(xhr.status=="302"){
+				window.location.href = text;
+			      }else{
+				$("div.error").remove();
+				txt = "<div class='error'>"+xhr.responseText+"</div>"
+				form.before(txt);
+				$("#spinner").remove();
+				$(form).find("input[type='submit']").attr("disabled", "");
+			      }
+			    }
+			  });
+		   return false;
+		 });
 }
 
 function create_remotes(){
@@ -268,7 +280,7 @@ function attachReportingFormEvents(id){
 			url: "/search/get?counter="+counter+"&"+$("#reporting_form").serialize(),
 			success: function(data){
                               if(nextType==="span"){
-				  $("#reporting_form span#"+nextType+'_'+counter).html(data);				  
+				  $("#reporting_form span#"+nextType+'_'+counter).html(data);
 			      }else{
 				  $("#reporting_form select#"+nextType+'_'+counter).html("");
 				  $("#reporting_form select#"+nextType+'_'+counter).append(data);
@@ -565,13 +577,13 @@ $(document).ready(function(){
   $("#bookmark_form input:checkbox").click(function(){
 	  if($(this).attr("value")==="all" && $(this).attr("checked")===true){
 	      $("#bookmark_form input:checkbox").each(function(){
-		      $(this).attr("checked", "true");		      
+		      $(this).attr("checked", "true");
 		  });
 	      $("#bookmark_form input[value='none']").attr("checked", "");
 	  }
 	  if($(this).attr("value")==="none" && $(this).attr("checked")===true){
 	      $("#bookmark_form input:checkbox").each(function(){
-		      $(this).attr("checked", "");		      
+		      $(this).attr("checked", "");
 		  });
 	      $("#bookmark_form input[value='none']").attr("checked", "true");
 	  }
@@ -585,7 +597,7 @@ $(document).ready(function(){
 	  link=$(a.currentTarget);
 	  addFloater(link);
 	  return(false);
-      });  
+      });
 
 //      $(".datepicker").datepicker();
 });
