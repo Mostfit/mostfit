@@ -398,24 +398,33 @@ $(document).ready(function(){
 	    showTableTrs();
 	    var table = $("table.report");
 	    table.before("<a class='expand_all'>Expand all</a>");
+	    //level 2
 	    if(table.find("tr.branch td")){
 		if(table.find("tr.branch").attr("id"))
-		    name=table.find("tr.branch").attr("id");
+		  level2_name=table.find("tr.branch").attr("id");
 		else
-		    name='center';
-		table.find("tr.branch td").append("<a id='"+name+"' class='expand'>Expand "+name+"s</a>");
+		  level2_name='center';
+		if(table.find("tr." + level2_name).length>0)
+		  table.find("tr.branch td").append("<a id='"+level2_name+"' class='expand'>Expand "+level2_name+"s</a>");
+	      //level 3
+	      if(table.find("tr." + level2_name + " td")){
+		  if(table.find("tr." + level2_name).attr("id"))
+		    level3_name=table.find("tr."+level2_name).attr("id");
+		  else
+		    level3_name='group';
+		  if(table.find("tr." + level3_name).length>0)
+		    table.find("tr."+ level2_name + " td").append("<a id='"+level3_name+"' class='expand'>Expand "+level3_name+"s</a>");
+		  //level 4
+		  if(table.find("tr." + level3_name + " td").length>0){
+		    if(table.find("tr." + level3_name).attr("id"))
+		      level4_name=table.find("tr."+level3_name).attr("id");
+		    else
+		      level4_name='date';
+		    if(table.find("tr." + level4_name).length>0)
+		      table.find("tr."+ level3_name + " td").append("<a id='"+level4_name+"' class='expand'>Expand "+level4_name+"s</a>");
+		  }
+		}
 	    }
-	    if(table.find("tr.center td")){
-		if(table.find("tr.center").attr("id"))
-		    name=table.find("tr.center").attr("id");
-		else
-		    name='group';
-		table.find("tr.center td").append("<a id='"+name+"' class='expand'>Expand "+name+"s</a>");
-	    }
-	    if(table.find("tr.date").length>0)
-	       table.find("tr.group td").append("<a id='date' class='expand'>Expand dates</a>");
-	    if(table.find("tr.manager").length>0)
-	       table.find("tr.manager td").append("<a id='managed' class='expand'>Expand centers</a>");
 	    if($("table.report tr.loan").length>0)
 		$("table.report tr.group td").append("<a id='loan' class='expand'>Expand loans</a>");
 	    if($("table.report tr.client").length>0)

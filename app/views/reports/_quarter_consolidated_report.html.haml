@@ -57,37 +57,37 @@
         %td{:colspan => length+1}
           %b
             =branch.name
-      -years.sort_by{|year, quaters| year}.each do |year, quaters|
+      -years.sort_by{|year, quarters| year}.each do |year, quarters|
         -year_total = []
-        -if quaters.keys.length>0
-          %tr.center#quater
+        -if quarters.keys.length>0
+          %tr.year#quarter
             %td{:colspan => length+1}
               %b
                 ="#{year} - #{year+1}"
-          -quaters.sort_by{|quater, months| quater}.each do |quater, months|
-            %tr.group#quater
+          -quarters.sort_by{|quarter, months| quarter}.each do |quarter, months|
+            %tr.quarter#month
               %td{:colspan => length+1}
-                Quater
-                =quater
-              -quater_total = Array.new(length, 0)
-              -months.sort_by{|month, data| QuaterConsolidatedReport::MONTHS.index(month)}.each do |month, data|
-                %tr.date#month
+                Quarter
+                =quarter
+              -quarter_total = Array.new(length, 0)
+              -months.sort_by{|month, data| QuarterConsolidatedReport::MONTHS.index(month)}.each do |month, data|
+                %tr.month
                   %td
                     =month.to_s.capitalize
                   -data.each_with_index do |ele, idx|
                     - ele = (data[3]+data[4]+data[5]) if idx==6
                     %td
                       =ele.to_i
-                      -idx>6 ? quater_total[idx]=ele : quater_total[idx]+=ele
-            %tr.group_total
+                      -idx>6 ? quarter_total[idx]=ele : quarter_total[idx]+=ele
+            %tr.quarter_total
               %td
-                %b==Quater total:
-                -year_total.push(quater_total)
-              -quater_total.each do |ele|
+                %b==Quarter total:
+                -year_total.push(quarter_total)
+              -quarter_total.each do |ele|
                 %td
                   %b
                     =ele.to_i
-        %tr.center_total
+        %tr.year_total
           %td
             %b==Year total:
           - year_total = year_total[0..-2].map{|x| x[0..6]+Array.new(x.length-7,0)} + [year_total[-1]] if year_total.length>0

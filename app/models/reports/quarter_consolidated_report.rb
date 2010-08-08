@@ -1,6 +1,6 @@
-class QuaterConsolidatedReport < Report
+class QuarterConsolidatedReport < Report
   attr_accessor :from_date, :to_date, :branch, :branch_id, :loan_product_id
-  QUATERS = {1 => [:april, :may, :june], 2 => [:july, :august, :september], 3 => [:october, :november, :december], 4 => [:january, :february, :march]}
+  QUARTERS = {1 => [:april, :may, :june], 2 => [:july, :august, :september], 3 => [:october, :november, :december], 4 => [:january, :february, :march]}
   MONTHS  = [:january, :february, :march, :april, :may, :june, :july, :august, :september, :october, :november, :december]
 
   def initialize(params, dates, user)
@@ -11,11 +11,11 @@ class QuaterConsolidatedReport < Report
   end
   
   def name
-    "Quater wise Consolidated Report from #{@from_date} to #{@to_date}"
+    "Quarter wise Consolidated Report from #{@from_date} to #{@to_date}"
   end
   
   def self.name
-    "Quater wise Consolidated report"
+    "Quarter wise Consolidated report"
   end
   
   def generate
@@ -26,22 +26,22 @@ class QuaterConsolidatedReport < Report
     @branch.each{|branch|
       data[branch]||= {}
       (branch.creation_date.year..this_year).each{|year|
-        QUATERS.each{|q, months|
+        QUARTERS.each{|q, months|
           months.each{|month|
             month_number = MONTHS.index(month) + 1
-            quater = get_quater(month_number)
-            y = (quater==4 ? year+1 : year)
+            quarter = get_quarter(month_number)
+            y = (quarter==4 ? year+1 : year)
             # we do not generate report for the ongoing month
             next if year>=this_year and month_number >= this_month
             next if Date.today < Date.new(y, month_number, 1)
             histories = LoanHistory.sum_outstanding_by_month(month_number, y, branch, self.loan_product_id)
             next if not histories
             data[branch][year]||= {}
-            data[branch][year][quater]||= {}
+            data[branch][year][quarter]||= {}
             
             #0        1          2                3              4          5     6                  7       8    9,10,11     12,13,14   15
             #applied, sanctioned,disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults, name      
-            data[branch][year][quater][month] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            data[branch][year][quarter][month] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
             if histories and history = histories.first
               principal_scheduled = history.scheduled_outstanding_principal
@@ -56,17 +56,17 @@ class QuaterConsolidatedReport < Report
               principal_scheduled, total_scheduled, principal_actual, total_actual, principal_advance, total_advance = 0, 0, 0, 0, 0, 0
             end
             
-            data[branch][year][quater][month][7] += principal_actual
-            data[branch][year][quater][month][9] += total_actual
-            data[branch][year][quater][month][8] += total_actual - principal_actual
+            data[branch][year][quarter][month][7] += principal_actual
+            data[branch][year][quarter][month][9] += total_actual
+            data[branch][year][quarter][month][8] += total_actual - principal_actual
           
-            data[branch][year][quater][month][10]  += (principal_actual > principal_scheduled ? principal_actual-principal_scheduled : 0)
-            data[branch][year][quater][month][11] += ((total_actual-principal_actual) > (total_scheduled-principal_scheduled) ? (total_actual-principal_actual - (total_scheduled-principal_scheduled)) : 0)
-            data[branch][year][quater][month][12] += total_actual > total_scheduled ? total_actual - total_scheduled : 0
+            data[branch][year][quarter][month][10]  += (principal_actual > principal_scheduled ? principal_actual-principal_scheduled : 0)
+            data[branch][year][quarter][month][11] += ((total_actual-principal_actual) > (total_scheduled-principal_scheduled) ? (total_actual-principal_actual - (total_scheduled-principal_scheduled)) : 0)
+            data[branch][year][quarter][month][12] += total_actual > total_scheduled ? total_actual - total_scheduled : 0
             
-            data[branch][year][quater][month][13]  += principal_advance
-            data[branch][year][quater][month][15] += total_advance
-            data[branch][year][quater][month][14] += (total_advance - principal_advance)
+            data[branch][year][quarter][month][13]  += principal_advance
+            data[branch][year][quarter][month][15] += total_advance
+            data[branch][year][quarter][month][14] += (total_advance - principal_advance)
           }
         }
       }
@@ -82,20 +82,20 @@ class QuaterConsolidatedReport < Report
                              }).each{|p|
       branch = @branch.find{|x| x.id == p.branch_id}
       month  = MONTHS[p.month-1]
-      quater = get_quater(p.month)
-      year   = (quater==4 ? p.year-1 : p.year)
+      quarter = get_quarter(p.month)
+      year   = (quarter==4 ? p.year-1 : p.year)
 
       data[branch][year]||= {}
-      data[branch][year][quater]||= {}
-      data[branch][year][quater][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data[branch][year][quarter]||= {}
+      data[branch][year][quarter][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-      if data[branch][year][quater][month]
+      if data[branch][year][quarter][month]
         if p.ptype==1
-          data[branch][year][quater][month][3] += p.amount.round(2)
+          data[branch][year][quarter][month][3] += p.amount.round(2)
         elsif p.ptype==2
-          data[branch][year][quater][month][4] += p.amount.round(2)
+          data[branch][year][quarter][month][4] += p.amount.round(2)
         elsif p.ptype==3
-          data[branch][year][quater][month][5] += p.amount.round(2)
+          data[branch][year][quarter][month][5] += p.amount.round(2)
         end
       end
     }
@@ -110,15 +110,15 @@ class QuaterConsolidatedReport < Report
                              }).each{|l|
       branch = @branch.find{|x| x.id == l.branch_id}
       month  = MONTHS[l.month-1]
-      quater = get_quater(l.month)
-      year   = (quater==4 ? l.year-1 : l.year)
+      quarter = get_quarter(l.month)
+      year   = (quarter==4 ? l.year-1 : l.year)
 
       data[branch][year]||= {}
-      data[branch][year][quater]||= {}
-      data[branch][year][quater][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data[branch][year][quarter]||= {}
+      data[branch][year][quarter][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-      if data[branch][year][quater][month]
-        data[branch][year][quater][month][2] += l.amount.round(2)
+      if data[branch][year][quarter][month]
+        data[branch][year][quarter][month][2] += l.amount.round(2)
       end
     }
 
@@ -132,15 +132,15 @@ class QuaterConsolidatedReport < Report
                              }).each{|l|
       branch = @branch.find{|x| x.id == l.branch_id}
       month  = MONTHS[l.month-1]
-      quater = get_quater(l.month)
-      year   = (quater==4 ? l.year-1 : l.year)
+      quarter = get_quarter(l.month)
+      year   = (quarter==4 ? l.year-1 : l.year)
 
       data[branch][year]||= {}
-      data[branch][year][quater]||= {}
-      data[branch][year][quater][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data[branch][year][quarter]||= {}
+      data[branch][year][quarter][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       
-      if data[branch][year][quater][month]
-        data[branch][year][quater][month][1] += l.amount.round(2)
+      if data[branch][year][quarter][month]
+        data[branch][year][quarter][month][1] += l.amount.round(2)
       end
     }
 
@@ -154,15 +154,15 @@ class QuaterConsolidatedReport < Report
                              }).each{|l|
       branch = @branch.find{|x| x.id == l.branch_id}
       month  = MONTHS[l.month-1]
-      quater = get_quater(l.month)
-      year   = (quater==4 ? l.year-1 : l.year)
+      quarter = get_quarter(l.month)
+      year   = (quarter==4 ? l.year-1 : l.year)
       
       data[branch][year]||= {}
-      data[branch][year][quater]||= {}
-      data[branch][year][quater][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data[branch][year][quarter]||= {}
+      data[branch][year][quarter][month] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-      if data[branch][year][quater][month]
-        data[branch][year][quater][month][0] += l.amount.round(2)
+      if data[branch][year][quarter][month]
+        data[branch][year][quarter][month][0] += l.amount.round(2)
       end
     }
     
@@ -170,7 +170,7 @@ class QuaterConsolidatedReport < Report
   end
 
   private
-  def get_quater(month)
+  def get_quarter(month)
     (month-1)/3 > 0 ? (month-1)/3 : 4
   end
 

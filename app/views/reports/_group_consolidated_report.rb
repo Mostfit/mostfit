@@ -2,7 +2,7 @@
 %table.report
   %tr.header
     %th
-      Staff
+      Group
     %th{:colspan => "3"}
       Loan amount
     %th{:colspan => "4"}
@@ -50,41 +50,41 @@
   - center_id, branch_id = nil, nil
   - length = 16
   - org_total = []
-  -@data.sort_by{|branch, x| branch.name}.each do |branch, staff_members|
-    -if staff_members.keys.length>0
+  -@groups.sort_by{|group_id, x| @branches[group_id].name}.each do |group_id, centers|
+    -if centers.keys.length>0
       -branch_total = []
-      %tr.branch#manager
+      %tr.branch
         %td{:colspan => length+1}
           %b
-            =branch.name
-      -staff_members.sort_by{|staff_member, centers| staff_member.name}.each do |staff_member, centers|
-        -if centers.keys.length>0
-          %tr.manager#center
+            =@branches[group_id].name
+      -centers.sort_by{|center_id, groups| @centers[center_id].name}.each do |center_id, groups|
+        -if groups.keys.length>0
+          %tr.center
             %td{:colspan => length+1}
               %b
-                =staff_member.name
-          -staff_total = Array.new(length, 0)
-          -centers.sort_by{|center, data| center.name}.each do |center, data_rows|
-            %tr.center
+                =@centers[center_id].name
+          - center_total = Array.new(length, 0)
+          -groups.sort_by{|group_id, group| group[-1]}.each do |group_id, group|
+            %tr.group
               %td
-                =center.name
-              -data_rows.each_with_index do |row, idx|
+                =group[-1]
+              -group[0..-2].each_with_index do |g, idx|
                 -if idx==6
                   %td
-                    = (data_rows[3] + data_rows[4] + data_rows[5]).to_i
-                    - staff_total[6]+=(data_rows[3]+data_rows[4]+data_rows[5]).to_i
+                    = (group[3]+group[4]+group[5]).to_i
+                    -center_total[6]+=(group[3]+group[4]+group[5])
                 -else
                   %td
-                    =row.to_i
-                    -staff_total[idx]+=row.to_i
-          %tr.manager_total
+                    =g.to_i
+                    -center_total[idx]+=g
+          %tr.center_total
             %td
-              %b==Staff total:
-              -branch_total.push(staff_total)
-            -staff_total.each do |ele|
+              %b==Center total:
+              -branch_total.push(center_total)
+            -center_total.each do |ele|
               %td
                 %b
-                  =ele
+                  =ele.to_i
       %tr.branch_total
         %td
           %b==Branch total:
@@ -92,12 +92,12 @@
         - org_total.last.each do |ele|
           %td
             %b
-              =ele
+              =ele.to_i
   %tr.org_total
     %td
       %b==Total
     -org_total.find_all{|x| x.length==length}.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
       %td
         %b
-          =ele
+          =ele.to_i
 
