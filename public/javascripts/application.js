@@ -173,9 +173,6 @@ function attachFormRemoteTo(form){
 			    url: form.attr("action"),
 			    data: form.serialize(),
 			    success: function(data, status, xmlObj){
-			      console.log(status);
-			      console.log(xmlObj);
-			      console.log(data.redirect);
 			      if(data.redirect){
 				window.location.href = data.redirect;
 			      }else if(form.find("input[name='_target_']").length>0){
@@ -361,7 +358,6 @@ function confirm_for(things) {
 
 $(document).ready(function(){
 	create_remotes();
-	$('form').highlight();
 	//Handling targets form
 	$("select#target_attached_to").change(function(){
 		$.ajax({

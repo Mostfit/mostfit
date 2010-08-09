@@ -33,7 +33,11 @@ module DataEntry
         if @errors.blank?
           notice = 'All payments made succesfully'
           return_url = params[:return]||url(:data_entry)
-          redirect(return_url, :message => {:notice => notice})
+          if(request.xhr?)
+            render("<div class='notice'>#{notice}<div>", :layout => layout?)
+          else
+            redirect(return_url, :message => {:notice => notice})
+          end
         elsif params[:format] and params[:format]=="xml"
           display("")
         else 
