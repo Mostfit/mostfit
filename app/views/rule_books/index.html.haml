@@ -1,0 +1,40 @@
+%table
+  %h1 List of Accounting Rules
+  %tr
+    %th 
+      Rule Name 
+    %th
+      Branch
+    %th 
+      Action
+    %th
+      Credit accounts
+    %th
+      Debit accounts
+  %tr
+  - for rule_book in @rule_books.all(:order => [:branch_id.asc, :action.desc])    
+    %tr
+      %td
+        = rule_book.name
+      %td
+        - branch_name = "No Branch"
+        - if rule_book.branch != nil
+          - branch_name = rule_book.branch.name
+        = branch_name
+      %td 
+        = rule_book.action
+      %td 
+        - rule_book.credit_accounts.map do |credit_account|
+          =credit_account.name
+          %br
+      %td
+        - rule_book.debit_accounts.each do |debit_account|
+          =debit_account.name
+          %br
+      %td
+        = link_to 'Edit', url(:edit_rule_book,  rule_book)
+
+= paginate @rule_books
+= link_to 'New', url(:new_rule_book)
+|
+= link_to 'Back', url(:accounts)

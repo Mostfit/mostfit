@@ -1,0 +1,22 @@
+=partial :form
+%table.report
+  %tr.header
+    %th
+      Account Type
+    %th
+      Account
+    %th
+      Total Balance
+  - @data.each do |account_type|
+    %tr
+      %td
+        = account_type.name
+      %td
+        
+      %td
+        = account_type.accounts.postings.sum(:amount)
+
+
+ 
+ 
+ 

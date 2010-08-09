@@ -16,6 +16,7 @@ class Reports < Application
 
   def show(report_type, id)
     provides :pdf
+    report_type = params[:report_type] if report_type == "show" and params.key?(:report_type)
     klass = Kernel.const_get(report_type)
     @report = Report.get(id) if id
     class_key  =  klass.to_s.snake_case.to_sym

@@ -39,6 +39,7 @@ describe Loan do
     @client.center  = @center
     @client.date_joined = Date.parse('2006-01-01')
     @client.created_by_user_id = 1
+    @client.client_type_id = 1
     @client.save
     @client.errors.each {|e| puts e}
     @client.should be_valid
@@ -549,4 +550,11 @@ describe Loan do
     @loan2.clear_cache
     @loan2.payment_schedule.count.should == @loan.payment_schedule.count - 9
   end
-end
+
+  it "should do deletion of payment" do 
+    p = @loan.payments.last
+    p.deleted_by = @user
+    p.deleted_at = Time.now
+    p.save.should == true
+  end
+end;

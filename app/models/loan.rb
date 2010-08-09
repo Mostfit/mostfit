@@ -363,10 +363,15 @@ class Loan
                                    :amount => principal.round, :type => :principal)        
         payments.push(prin_payment)
       end
+      # do not create accounting entries individually
+      payments.each{|p| p.override_create_observer = true}    
+
       if payments.collect{|payment| payment.save}.include?(false)
         t.rollback
         return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees},]        
       end
+
+      AccountPaymentObserver.single_voucher_entry(payments)
     end
 
     if defer_update #i.e. bulk updating loans
@@ -384,7 +389,8 @@ class Loan
   # the way to delete payments from the db
   def delete_payment(payment, user)
     return false unless payment.loan.id == self.id
-    if payment.update_attributes(:deleted_at => Time.now, :deleted_by_user_id => user.id)
+    payment.deleted_by = user
+    if payment.destroy
       update_history
       clear_cache
       return true

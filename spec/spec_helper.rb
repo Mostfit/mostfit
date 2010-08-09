@@ -34,7 +34,7 @@ def load_fixtures(*files)
       k = klass::new(entry)
       k.history_disabled = true if k.class == Loan  # do not update the hisotry for loans
       k.client_type = ClientType.first if k.class==Client
-      unless k.save
+      unless k.save        
         puts "Validation errors saving a #{klass} (##{k.id}):"
         p k.errors
       end

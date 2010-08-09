@@ -1,0 +1,44 @@
+%h1 Journal Entries
+
+%table
+  %tr
+    %th
+      ID
+    %th
+      Date
+    %th
+      Debit Account
+    %th
+      Credit Account
+    %th
+      Amount
+    %th 
+      TXN ID
+    %th
+      Type
+    %th
+      Comment
+
+  - for journal in @journals.all(:order => [:id.desc])
+    - postings = journal.postings.sort_by{|x| x.amount}
+    %tr
+      %td
+        = journal.id
+      %td 
+        = journal.created_at.strftime("%Y/%m/%d")
+      %td 
+        = postings.first.account.name
+      %td 
+        = postings.last.account.name
+      %td 
+        = journal.postings.first.amount.abs
+      %td 
+        = journal.transaction_id 
+      %td 
+        = journal.journal_type.name
+      %td
+        = journal.comment
+
+= paginate @journals
+
+= link_to 'Back', (url(:accounts))

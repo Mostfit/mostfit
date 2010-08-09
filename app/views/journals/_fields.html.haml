@@ -1,0 +1,35 @@
+%table
+  %tr
+    %td
+      Journal Type
+    %td
+      =select :name => "journal[journal_type_id]", :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select Journal"
+  %tr
+    %td
+      Credit account
+    %td
+      =select :name => "credit_account[account_id]", :collection => Account.all(:branch => @branch).map{|x| [x.id, x.name]} if @branch
+      =select :name => "credit_account[account_id]", :collection => Account.all.map{|x| [x.id, x.name]} if @branch.nil?
+  %tr
+    %td
+      Debit account
+    %td
+      =select :name => "debit_account[account_id]", :collection => Account.all(:branch => @branch).map{|x| [x.id, x.name]} if @branch
+      =select :name => "debit_account[account_id]", :collection => Account.all.map{|x| [x.id, x.name]} if @branch.nil?
+  %tr
+    %td
+      Amount
+    %td
+      =text_field :name => "journal[amount]"
+  %tr
+    %td
+      Comment
+    %td
+      =text_field :name => "journal[comment]"
+  %tr
+    %td
+      Transaction ID
+    %td
+      =text_field :name => "journal[transaction_id]"
+%p
+  = submit "Create"

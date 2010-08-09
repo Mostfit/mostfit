@@ -18,7 +18,6 @@ function spitLogs(){
 	    }
 	});
 }
-
 function fillOptions(id, select){
     $.ajax({
 	    type: "GET",
@@ -594,8 +593,12 @@ $(document).ready(function(){
 	  }
 
       });
-  $("#client_active").change(function(){
-	  $("#inactive_options").toggle();
+  $("#account_account_type_id").change(function(select){
+	  val=$("#account_account_type_id").val();
+	  $.ajax({
+		  url: "/accounts?account_type_id="+val,
+		      success: function(data){$("#account_parent_id").html(data);}
+	      });
       });
   attachReportingFormEvents("formdiv_1");
   $("a.enlarge_image").click(function(a){
@@ -603,7 +606,17 @@ $(document).ready(function(){
 	  addFloater(link);
 	  return(false);
       });
-
-//      $(".datepicker").datepicker();
+  if($("#rule_book_action").length>0){
+      function showHideFees(){
+	  if($("#rule_book_action").val()==="fees")
+	      $("#fees_row").show();
+	  else
+	      $("#fees_row").hide();
+      }
+      showHideFees();
+      $("#rule_book_action").change(function(){
+	      showHideFees();
+	  });
+  }
 });
 

@@ -1,0 +1,42 @@
+=partial :form
+%table.report.nojs
+  %tr.header
+    %th
+      Date
+    %th
+      Discription
+    %th
+      Account
+    %th
+      Debit
+    %th
+      Credit
+ 
+  - length = 5
+  - org_total = []
+  - time_format = $globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y"
+  - time_format += " %H:%M"
+  - accounts = {}
+  - Account.all.each{|acc|  accounts[acc.id] = acc}
+  - @data.each do |journal|
+    %tr
+      %td
+        = journal.date.strftime(time_format)
+      %td
+        = journal.comment
+      %td
+        = journal.postings.sort_by{|x| x.amount}.map{|p| accounts[p.account_id].name}.join("<br/>")
+        - debit, credit = journal.postings.map{|p| p.amount}.sort
+      %td
+        =debit * -1
+      %td
+        %br
+        =credit
+  %tr
+    %td
+    %td
+    %td
+    %td 
+    %td
+    
+= paginate @data

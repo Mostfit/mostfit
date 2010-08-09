@@ -1,0 +1,21 @@
+%h1 List of Account Types
+%table
+  %tr
+    %th
+      Account Type
+    %th
+      GL Code
+  %tr
+  - for account_type in @account_types
+    %tr
+      %td
+        = account_type.name
+      %td
+        = account_type.code
+      %td
+        = link_to 'Edit', url(:edit_account_type, account_type)
+
+= link_to 'New', url(:new_account_type)
+|
+= link_to 'Back', url(:accounts)
+

@@ -1,3 +1,4 @@
+DEFAULT_JOURNAL_TYPES = ['Payment','Receipt','Journal']
 INSTALLMENT_FREQUENCIES = [:daily, :weekly, :biweekly, :monthly]
 STATUSES = [:applied_in_future, :pending_approval, :rejected, :approved, :disbursed, :outstanding, :repaid, :written_off, :claim_settlement]
 EPSILON  = 0.001
