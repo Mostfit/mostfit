@@ -1,21 +1,85 @@
 =partial :form
-%table.report.nojs
+%table.report
   %tr.header
     %th
-      S. No.
-    %th
       Purpose
+    %th{:colspan => "3"}
+      Loan amount
+    %th{:colspan => "4"}
+      Payment
+    %th{:colspan => "3"}
+      Balance outstanding
+    %th{:colspan => "3"}
+      Balance Overdue
+    %th{:colspan => "3"}
+      Advance payment
+  %tr.header
     %th
-      Number of loans
     %th
-      Amount disbursed
-  - @data.each_with_index do |row, idx|
-    %tr
+      Applied
+    %th
+      Sanctioned
+    %th
+      Disbursed
+    %th
+      Principal
+    %th
+      Interest
+    %th
+      Fee
+    %th
+      Total
+    %th
+      Principal
+    %th
+      Interest
+    %th
+      Total
+    %th
+      Principal
+    %th
+      Interest
+    %th
+      Total
+    %th
+      Principal
+    %th
+      Interest
+    %th
+      Total
+  - center_id, branch_id = nil, nil
+  - length = 16
+  - org_total = []
+  -@data.sort_by{|branch, x| branch.name}.each do |branch, purposes|
+    -if purposes.keys.length>0
+      -branch_total = []
+      %tr.branch#purpose
+        %td{:colspan => length+1}
+          %b
+            =branch.name
+      -purposes.sort_by{|purpose, data| (purpose ? purpose.name : "NA")}.each do |purpose, data|
+        %tr.purpose
+          %td
+            %b
+              =purpose ? purpose.name : "NA"
+          - purpose_total = []
+          -data.each_with_index do |ele, idx|
+            %td
+              =ele.to_i
+          - branch_total << data
+      %tr.branch_total
+        %td
+          %b==Branch total:
+        - org_total << branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
+        - org_total.last.each do |ele|
+          %td
+            %b
+              =ele.to_i
+  %tr.org_total
+    %td
+      %b==Total
+    -org_total.find_all{|x| x.length==length}.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
       %td
-        = idx+1
-      %td
-        = row[:purpose]||"None"
-      %td
-        = row[:count]
-      %td
-        = row[:amount].to_currency
+        %b
+          =ele.to_i
+

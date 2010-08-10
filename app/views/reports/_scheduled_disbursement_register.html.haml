@@ -1,0 +1,85 @@
+=partial :form
+%table.report
+  %tr.header
+    %th
+      Ref no.
+    %th
+      Member name
+    %th
+      Spouse name
+    %th
+      Loan product
+    %th
+      Loan sequence
+    %th
+      Scheduled Disbursment date
+    %th
+      Amount
+  - center_id, branch_id = nil, nil
+  - length = 7
+  - org_total = []
+  -summable_columns = [1,6]
+  -@loans.each do |branch_id, centers|
+    -if centers.keys.length>0
+      -branch_total = []
+      %tr.branch
+        %td{:colspan => length}
+          %b
+            =@branches[branch_id].name
+      -centers.sort_by{|center_id, groups| @centers[center_id].name}.each do |center_id, groups|
+        -if groups.values.flatten.length>0
+          %tr.center
+            %td{:colspan => length}
+              %b
+                =@centers[center_id].name
+          - center_total = Array.new(summable_columns.length, 0)
+          -groups.sort_by{|x| @groups[x[0]].name}.each do |group_id, loans|
+            -group_total = Array.new(summable_columns.length, 0)
+            -if loans.length>0
+              %tr.group
+                %td{:colspan => length}
+                  %b=@groups[group_id].name
+              -loans.sort_by{|x| x[0]}.each do |loan|
+                %tr.loan                  
+                  -loan.each_with_index do |ele, i|
+                    %td
+                      =(i==3 ? @loan_products[ele].name : ele)                         
+                      -group_total[summable_columns.index(i)]+=(i==1 ? 1 : ele) if summable_columns.include?(i) 
+              %tr.group_total
+                %td
+                  %b==Group total               
+                -1.upto(length-1).each do |col|
+                  %td
+                    -if summable_columns.include?(col)
+                      %b
+                        =group_total[summable_columns.index(col)]
+                -center_total.push(group_total)
+          %tr.center_total
+            %td
+              %b==Center total:
+            -branch_total.push(center_total.reject{|x| x.class!=Array}.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}})
+            -1.upto(length-1).each do |col|
+              %td
+                -if summable_columns.include?(col)
+                  %b
+                    =branch_total.last[summable_columns.index(col)]
+      %tr.branch_total
+        %td
+          %b==Branch total:
+        -branch_total = branch_total.reject{|x| x.class!=Array or (x.class==Array and x.length==0)}.transpose.collect{|x| x.reduce{|sum, x| sum+=x}}
+        - org_total << branch_total
+        -1.upto(length-1).each do |col|
+          %td
+            -if summable_columns.include?(col)
+              %b
+                =branch_total[summable_columns.index(col)]
+  %tr.org_total
+    %td
+      %b==Total:
+    -org_total = org_total.reject{|x| x.class!=Array or (x.class==Array and x.length==0)}.transpose.collect{|x| x.reduce{|sum, x| sum+=x}}
+    -1.upto(length-1).each do |col|
+      %td
+        -if summable_columns.include?(col)
+          %b
+            =org_total[summable_columns.index(col)]
+      

@@ -22,6 +22,6 @@ class Document
   validates_is_unique :number, :scope => [:document_type_id, :parent_id, :parent_model]
 
   def parent
-    parent_model.get(parent_id)
+    Kernel.const_get(parent_model).get(parent_id)
   end
 end

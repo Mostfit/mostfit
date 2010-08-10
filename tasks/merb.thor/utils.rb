@@ -1,6 +1,6 @@
 class String
   def /(other)
-    (Pathname.new(self) + other).to_s
+    (self + "/"+ other).to_s
   end
 end
 

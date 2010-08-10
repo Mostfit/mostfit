@@ -57,6 +57,18 @@ class Searches < Application
       @objects = @search.process
       @model   = @objects.first.class
       @fields  = params[:fields]
+      if params[:precedence]
+        @precedence = params[:precedence]
+      else
+        @precedence = Marshal.load(Marshal.dump(@fields))
+        counter = 1
+        @precedence.each{|model, properties|
+          properties.each{|k, v|
+            properties[k] = counter
+            counter+=1
+          }
+        }
+      end
       render :reporting
     end
   end

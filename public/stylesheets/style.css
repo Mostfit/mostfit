@@ -566,6 +566,13 @@ table.report tr.center{
     font-size: 1em; 
     background-color: #ddd;
 }
+table.report tr.manager{
+    border: 1px solid;
+    border-color: #ccc;
+    text-align: center;
+    font-size: 1em; 
+    background-color: #ccc;
+}
 table.report tr.group_total td:first-child{
     text-align: center; 
     background-color: #eee;    

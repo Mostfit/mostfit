@@ -72,10 +72,9 @@
                 = text_field :name => "paid[loan][#{loan.id}]", :value => [a,0].max, :cols => "5", :style => "width:50px;" 
               %td 
                 = select :name => "payment_style[#{loan.id}]", :collection => [["prorata","pro rata"],["normal","fees=>int=>prin"]]
-              - if loan_row_count == 1
-                %td
-                  - att = atts[client.id]
-                  = select :name => "attendance[#{client.id}]", :collection => Attendance.attendancy_states, :value_method => :to_s, :selected => (att ? att.status.to_s : "present")
+              %td
+                - att = atts[client.id]
+                = select :name => "attendance[#{client.id}]", :collection => Attendance.attendancy_states, :value_method => :to_s, :selected => (att ? att.status.to_s : "present")
           - if loan_row_count == 0
             %tr{ :class => cycle('odd','') }
               %td.text

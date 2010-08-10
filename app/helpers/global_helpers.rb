@@ -113,6 +113,39 @@ module Merb
     end
 
     def date_select_html (attrs, obj = nil, col = nil)
+      str = %Q{
+        <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}">
+        <script type="text/javascript">
+          $(function(){
+            $("##{attrs[:id]}").datepicker('destroy').datepicker({altField: '##{attrs[:id]}', buttonImage: "/images/calendar.png", changeYear: true, buttonImageOnly: true,
+                                            yearRange: '#{attrs[:min_date].year}:#{attrs[:max_date].year}',
+                                            dateFormat: '#{datepicker_dateformat}', altFormat: '#{datepicker_dateformat}', minDate: '#{attrs[:min_date]}',
+                                            maxDate: '#{attrs[:max_date]}', showOn: 'both', setDate: "#{attrs[:date]}" })
+          });
+
+       </script>
+      }
+      return str
+    end
+
+    def datepicker_dateformat
+      if $globals and $globals[:mfi_details] and $globals[:mfi_details][:date_format]
+        ourDateFormat = $globals[:mfi_details][:date_format]
+      else
+        ourDateFormat = "%Y-%m-%d"
+      end
+      s = ourDateFormat.dup
+      s.gsub!("%Y","yy")
+      s.gsub!("%y","y")
+      s.gsub!("%m","mm")
+      s.gsub!("%d","dd")
+      s.gsub!("%B","MM")
+      s.gsub!("%A","DD")
+      return s
+    end
+
+    #old func it shows textbox
+    def date_select_old_html (attrs, obj = nil, col = nil)
       date = attrs[:date]
       nullable = attrs[:nullable]
       day_attrs = attrs.merge(
@@ -216,8 +249,8 @@ module Merb
     def paginate(pagination, *args, &block)
       DmPagination::PaginationBuilder.new(self, pagination, *args, &block)
     end
-    def chart(url, width=430, height=200)
-      id = (rand()*100000).to_i + 100
+    def chart(url, width=430, height=200, id=nil)
+      id||= (rand()*100000).to_i + 100
       "<div id='flashcontent_#{id}'></div>
       <script type='text/javascript'> 
       swfobject.embedSWF('/open-flash-chart.swf', \"flashcontent_#{id}\", #{width}, #{height}, '9.0.0', 'expressInstall.swf',

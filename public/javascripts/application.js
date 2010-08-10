@@ -180,11 +180,36 @@ function create_remotes(){
 		    },
 		    error: function(xhr, text, errorThrown){
 			txt = "<div class='error'>"+xhr.responseText+"</div>"
-			$(a).after(txt);			
+			$(a).after(txt);
 		    }
 		});
 	    return false;
 	});
+
+    $("a._customreports_").click(function(){
+	    href=$(this).attr("href");
+	    method="GET"
+	    if($(this).hasClass("self")){
+		href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+                method="POST"
+	    }
+	    a=$(this);
+	    $.ajax({
+		    type: "POST",
+		    url: href,
+		    success: function(data){
+			$(a).after(data);
+			$(a).remove();
+      attachCustomTableEvents();
+		    },
+		    error: function(xhr, text, errorThrown){
+			txt = "<div class='error'>"+xhr.responseText+"</div>"
+			$(a).after(txt);
+		    }
+		});
+	    return false;
+	});
+
     $("form._remote_").submit(function(){
 	    form = $(this);
 	    $(form).after("<img id='spinner' src='/images/spinner.gif' />");
@@ -217,7 +242,7 @@ function attachReportingFormEvents(id){
     $("#reporting_form tr#"+id+" select").change(function(){
 	  if($(this).attr("class")=="more")
 	      return;
-	  var types = ["model", "property", "operator", "value"];
+	  var types = ["model", "property", "operator", "span"];
 	  id = $(this).attr("id");
 	  name = $(this).attr("name").split(/\[/)[0];
 	  counter = $(this).attr("name").split(/\[/)[1].split("]")[0];
@@ -230,7 +255,7 @@ function attachReportingFormEvents(id){
 		  $.ajax({
 			url: "/search/get?counter="+counter+"&"+$("#reporting_form").serialize(),
 			success: function(data){
-                              if(nextType==="value"){
+                              if(nextType==="span"){
 				  $("#reporting_form span#"+nextType+'_'+counter).html(data);				  
 			      }else{
 				  $("#reporting_form select#"+nextType+'_'+counter).html("");
@@ -260,6 +285,7 @@ function attachReportingFormEvents(id){
 	      });
       });
 }
+<<<<<<< .merge_file_rdr0M9
 function attachRulesSelector(select){
     if(select.length==0)
 	return false;
@@ -294,6 +320,40 @@ function attachRulesSelector(select){
 	    return false;	    
 	});
 }
+=======
+
+total_cols = 0;
+MAX_COLS = 20;
+function attachCustomTableEvents(){
+  $("#reporting_form #customtable .checkbox").click(function() {
+      var type = $(this);
+//      selected_field = $("#"+this.id + "_precedence_"); //#reporting_form #customtable @"+type.attr("name")+"[precedence]");
+      selected_field = window.document.getElementById(this.id.replace("fields","precedence"));
+      if(selected_field == null)
+        return;
+      if(total_cols >= MAX_COLS)
+        return;
+      //alert(selected_field.style.display);
+      if(selected_field.style.display == "none") {
+        selected_field.style.display = "";
+        selected_field.selectedIndex = total_cols;
+        total_cols++;
+      }
+      else {
+        selected_field.style.display = "none";
+        total_cols--;
+      }
+
+      //alert(selected_field.attr("id"));
+      //selected_field.toggle();
+
+
+//      window.document.getElementByName(type.name+"_precedence").innerText("Hello")
+
+      });
+}
+
+>>>>>>> .merge_file_DV9tlb
 function confirm_for(things) {
   /* given a hash of ids and values, this function asks a confirmation to proceed if the values of the elements
    * are not the same as the provided values
@@ -349,11 +409,26 @@ $(document).ready(function(){
 	//Handling reports
 	if($("table.report").length>0 && !$("table.report").hasClass("nojs")){
 	    showTableTrs();
-	    $("table.report").before("<a class='expand_all'>Expand all</a>");
-	    $("table.report tr.branch td").append("<a id='center' class='expand'>Expand centers</a>");
-	    $("table.report tr.center td").append("<a id='group' class='expand'>Expand groups</a>");
-	    if($("table.report tr.date").length>0)
-		$("table.report tr.group td").append("<a id='date' class='expand'>Expand dates</a>");
+	    var table = $("table.report");
+	    table.before("<a class='expand_all'>Expand all</a>");
+	    if(table.find("tr.branch td")){
+		if(table.find("tr.branch").attr("id"))
+		    name=table.find("tr.branch").attr("id");
+		else
+		    name='center';
+		table.find("tr.branch td").append("<a id='"+name+"' class='expand'>Expand "+name+"s</a>");
+	    }
+	    if(table.find("tr.center td")){
+		if(table.find("tr.center").attr("id"))
+		    name=table.find("tr.center").attr("id");
+		else
+		    name='group';
+		table.find("tr.center td").append("<a id='"+name+"' class='expand'>Expand "+name+"s</a>");
+	    }
+	    if(table.find("tr.date").length>0)
+	       table.find("tr.group td").append("<a id='date' class='expand'>Expand dates</a>");
+	    if(table.find("tr.manager").length>0)
+	       table.find("tr.manager td").append("<a id='managed' class='expand'>Expand centers</a>");
 	    if($("table.report tr.loan").length>0)
 		$("table.report tr.group td").append("<a id='loan' class='expand'>Expand loans</a>");
 	    if($("table.report tr.client").length>0)
@@ -536,8 +611,13 @@ $(document).ready(function(){
 	  addFloater(link);
 	  return(false);
       });  
+<<<<<<< .merge_file_rdr0M9
   if($("select.rules").length>0){
       attachRulesSelector($("select.rules"));
   }
+=======
+
+//      $(".datepicker").datepicker();
+>>>>>>> .merge_file_DV9tlb
 });
 

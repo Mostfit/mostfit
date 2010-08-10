@@ -25,7 +25,7 @@
   - if StaffMember.count==0 and session.user.role==:admin
     %div.error
       You do not have any staff members data yet. Create them 
-      =link_to("here", resource(:staff_members, :new))
+      =link_to("here", resource(:staff_members, :new), :target => "_blank")
   %label{:for => "managed_by"}
     Managed by:
   = select_staff_member_for @branch, :manager
@@ -34,7 +34,7 @@
   %label{:for => "area"}
     Area
   = select :area_id, :collection => Area.all.map{|a| [a.id.to_s, a.name]}, :prompt => "---"
-  %span.greytext pick the staff member that manages this branch
+  %span.greytext Pick the aread to which this branch belongs to
     
 %button{:type => "submit", :class => "add"}
   = submit_text

@@ -7,7 +7,7 @@ class DelinquentLoanReport < Report
   end
 
   def name
-    "Delinquent Loans as on"
+    "Delinquent Loans"
   end
 
   def self.name
@@ -29,10 +29,8 @@ class DelinquentLoanReport < Report
 
     if lids.length>0
       principals = Payment.all(:loan_id => lids, :type => :principal).aggregate(:client_id, :amount.sum).to_hash
-      
-      interests = Payment.all(:loan_id => lids, :type => :interest).aggregate(:client_id, :amount.sum).to_hash
-      
-      fees      = Payment.all(:loan_id => lids, :type => :fees).aggregate(:client_id, :amount.sum).to_hash
+      interests  = Payment.all(:loan_id => lids, :type => :interest).aggregate(:client_id, :amount.sum).to_hash
+      fees       = Payment.all(:loan_id => lids, :type => :fees).aggregate(:client_id, :amount.sum).to_hash
     else 
       principals, interests, fees = {}, {}, {}
     end

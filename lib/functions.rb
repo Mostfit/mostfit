@@ -89,6 +89,17 @@ end
 module Misfit
   module Config
     attr_accessor :hols
+    
+    def self.compile_nomentculature
+      if($globals && $globals[:mfi_details] && $globals[:mfi_details][:center_manager] and not $globals[:mfi_details][:center_manager].blank?)
+        name = $globals[:mfi_details][:center_manager]
+      else
+        name = "manager"
+      end
+      define_method :center_manager do
+        name
+      end
+    end
 
     def self.holidays
       @hols ||= Holiday.all.map{|h| [h.date, h]}.to_hash

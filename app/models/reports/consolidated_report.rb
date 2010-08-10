@@ -33,14 +33,14 @@ class ConsolidatedReport < Report
           groups[b.id][c.id][g.id] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, g.name]
           history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id} if histories
           if history
-            principal_scheduled = history.scheduled_outstanding_principal.to_i
-            total_scheduled     = history.scheduled_outstanding_total.to_i
+            principal_scheduled = history.scheduled_outstanding_principal
+            total_scheduled     = history.scheduled_outstanding_total
 
-            principal_actual    = history.actual_outstanding_principal.to_i
-            total_actual        = history.actual_outstanding_total.to_i
+            principal_actual    = history.actual_outstanding_principal
+            total_actual        = history.actual_outstanding_total
             
-            principal_advance   = history.advance_principal.to_i
-            total_advance       = history.advance_total.to_i
+            principal_advance   = history.advance_principal
+            total_advance       = history.advance_total
           else
             principal_scheduled, total_scheduled, principal_actual, total_actual, principal_advance, total_advance = 0, 0, 0, 0, 0, 0
           end
@@ -73,23 +73,29 @@ class ConsolidatedReport < Report
       loans[l.id] =  l
     }
 
-    Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id,:type,:loan_id,:amount,:client_id]).each{|p|
-      if p.loan_id and loans[p.loan_id] and clients.key?(loans[p.loan_id].client_id)
-        client = clients[loans[p.loan_id].client_id]
-      elsif clients.key?(p.client_id)
-        client = clients[p.client_id]
-      end
-      next unless client
-      center_id = client.center_id
-      next if not centers.key?(center_id)
-      branch_id = centers[center_id].branch_id
-      if groups[branch_id][center_id]
-        groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
-        groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][3] += p.amount if p.type==:principal 
-        groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][4] += p.amount if p.type==:interest
-        groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][5] += p.amount if p.type==:fees
+    repository.adapter.query(%Q{
+                               SELECT c.branch_id branch_id, c.id center_id, cl.client_group_id client_group_id, type ptype, SUM(amount) amount
+                               FROM payments p, clients cl, centers c
+                               WHERE p.received_on >= '#{from_date.strftime('%Y-%m-%d')}' and p.received_on <= '#{to_date.strftime('%Y-%m-%d')}'
+                               AND p.deleted_at is NULL AND p.client_id = cl.id AND cl.center_id=c.id AND c.id in (#{center_ids})
+                               GROUP BY branch_id, center_id, client_group_id, ptype
+                             }).each{|p|
+      next if not centers.key?(p.center_id)
+
+      if groups[p.branch_id][p.center_id]
+        group_id = p.client_group_id ? p.client_group_id : 0
+        groups[p.branch_id][p.center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if group_id==0 and not groups[p.branch_id][p.center_id].key?(0)
+        if p.ptype==1
+          groups[p.branch_id][p.center_id][group_id][3] += p.amount.round(2)
+        elsif p.ptype==2
+          groups[p.branch_id][p.center_id][group_id][4] += p.amount.round(2)
+        elsif p.ptype==3
+          groups[p.branch_id][p.center_id][group_id][5] += p.amount.round(2)
+        end
       end
     }
+
+
     #1: Applied on
     hash = {:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :client_id], :client_id => clients.keys}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
@@ -101,7 +107,7 @@ class ConsolidatedReport < Report
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
-      groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][0] += l.amount
+      groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][0] += l.amount_applied_for||l.amount
     }
 
     #2: Approved on
@@ -113,7 +119,7 @@ class ConsolidatedReport < Report
       next if not centers.key?(center_id)
       branch_id = centers[center_id].branch_id
       groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if not client.client_group_id and not groups[branch_id][center_id][0]
-      groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][1] += l.amount
+      groups[branch_id][center_id][client.client_group_id ? client.client_group_id : 0][1] += l.amount_sanctioned||l.amount
     }
 
     #3: Disbursal date
@@ -130,3 +136,27 @@ class ConsolidatedReport < Report
     return [groups, centers, branches]
   end
 end
+
+
+    # Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id,:type,:loan_id,:amount,:client_id]).each{|p|
+    #   if p.loan_id and loans[p.loan_id] and clients.key?(loans[p.loan_id].client_id)
+    #     client = clients[loans[p.loan_id].client_id]
+    #   elsif clients.key?(p.client_id)
+    #     client = clients[p.client_id]
+    #   end
+    #   next unless client
+    #   center_id = client.center_id
+    #   next if not centers.key?(center_id)
+    #   branch_id = centers[center_id].branch_id
+    #   if groups[branch_id][center_id]
+    #     group_id = client.client_group_id ? client.client_group_id : 0
+    #     groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if group_id==0 and not groups[branch_id][center_id].key?(0)
+    #     if p.type==:principal
+    #       groups[branch_id][center_id][group_id][3] += p.amount
+    #     elsif p.type==:interest
+    #       groups[branch_id][center_id][group_id][4] += p.amount
+    #     elsif p.type==:fees
+    #       groups[branch_id][center_id][group_id][5] += p.amount
+    #     end
+    #   end
+    # }

@@ -35,7 +35,6 @@
                 = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :prompt => "select property", :id => "select_#{idx+1}")
               - else
                 = text_field(:name => name, :class => "rules")               
-            = text_field(:name => "rule[pre_conditions][value]", :class => "rules", :value => condition.value)
   %tr
     %td
       %b Condition

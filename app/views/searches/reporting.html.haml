@@ -9,56 +9,70 @@
       = klass.camelcase
     %table
       %tr
-        -@fields.each do |model, props|
-          - keys = props.keys
-          - keys.each do |key|
-            %th
-              -if model==klass
-                =key.camelcase(' ')
+        -@arr = Array.new;
+        -debugger
+        -@precedence.each do |model, prop|
+          -keys = prop.keys
+          -keys.each do |key|
+          - #puts @fields[model][key]
+            -if(@fields[model][key] != nil)
+              - #puts "precedence is #{@precedence[model][key]}"
+              -if(@arr[(@precedence[model][key]).to_i-1] == nil)
+                -@arr[(@precedence[model][key]).to_i-1] = [ [model, key] ]
               -else
-                = model+' '+key.camelcase(' ')     
+                -@arr[(@precedence[model][key]).to_i-1].push([model, key])
+        -@arr.delete(nil)
+        -@arr.flatten!(1) #flattens array once (this scheme is needed to handle
+        - #the case when a user enters same precedence for the two items
+        -debugger
+        -@arr.each do |model, key|
+          %th
+            -if model==klass
+              =key.camelcase(' ')
+            -else
+              = model+' '+key.camelcase(' ')     
+            
       -@objects.each do |obj|
         %tr
-          -@fields.each do |model, props|
-            - keys = props.keys
-            - keys.each do |key|
-              -if model==klass
-                -if relations.find{|k,v| v==key} and obj.respond_to?(key) and child_obj = obj.send(key)
-                  %td
-                    =child_obj.respond_to?(:name) ? child_obj.name : child_obj
-                -elsif obj.respond_to?(key)
-                  %td
-                    =obj.send(key)
-                -else
-                  %td
-                    =obj
-              -elsif obj.respond_to?(model)
-                -nested_obj=obj.send(model)
+          -@arr.each do |model, key|
+            -#debugger
+            -if model==klass
+              -if relations.find{|k,v| v==key} and obj.respond_to?(key) and child_obj = obj.send(key)
+                %td
+                  =child_obj.respond_to?(:name) ? child_obj.name : child_obj
+              -elsif obj.respond_to?(key)
+                %td
+                  =obj.send(key)
+              -else
+                %td
+                  =obj
+            -elsif obj.respond_to?(model)
+              -nested_obj=obj.send(model)
+              %td
+                - if nested_obj.respond_to?(key)
+                  = nested_obj.send(key)
+                - else 
+                  =nested_obj.respond_to?(:name) ? nested_obj.name : nested_obj
+            -else
+              - path = get_path(model_names, model, klass)
+              - nested_obj= obj
+              - while(func=path.pop)
+                - nested_obj = nested_obj.send(func)
+              - if nested_obj
                 %td
                   - if nested_obj.respond_to?(key)
-                    = nested_obj.send(key)
-                  - else 
-                    =nested_obj.respond_to?(:name) ? nested_obj.name : nested_obj
-              -else
-                - path = get_path(model_names, model, klass)
-                - nested_obj= obj
-                - while(func=path.pop)
-                  - nested_obj = nested_obj.send(func)
-                - if nested_obj
-                  %td
-                    - if nested_obj.respond_to?(key)
-                      - val = nested_obj.send(key) 
-                      - if not models.include?(val.class)
-                        =val
-                      -elsif val.respond_to?(:name)
-                        =val.name
-                      -else
-                        =val.to_s
-                    - elsif nested_obj.respond_to?(:name)
-                      = nested_obj.name
-                    - elsif nested_obj.respond_to?(:to_s)
-                      = nested_obj.to_s
-                    - else
-                      =nested_obj
+                    - val = nested_obj.send(key) 
+                    - if not models.include?(val.class)
+                      =val
+                    -elsif val.respond_to?(:name)
+                      =val.name
+                    -else
+                      =val.to_s
+                  - elsif nested_obj.respond_to?(:name)
+                    = nested_obj.name
+                  - elsif nested_obj.respond_to?(:to_s)
+                    = nested_obj.to_s
+                  - else
+                    =nested_obj
 -else
   No records

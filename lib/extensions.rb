@@ -31,11 +31,11 @@ module Misfit
         center_ids = ["NULL"] if center_ids.length==0
         center_ids = center_ids.join(',')
         client_ids = repository.adapter.query(%Q{SELECT c.id FROM clients c WHERE c.center_id IN (#{center_ids})})
-        @data = repository.adapter.query(%Q{SELECT c.id as id, c.name name, SUM(principal_due) pd, SUM(interest_due) intd, 
-                                                   SUM(principal_paid) pp, SUM(`interest_paid`) intp
-                                        FROM loan_history, centers c
-                                        WHERE center_id IN (#{center_ids}) AND date='#{@date.strftime('%Y-%m-%d')}' AND c.id=loan_history.center_id
-                                        GROUP BY center_id ORDER BY c.name})
+        @data = repository.adapter.query(%Q{SELECT c.id as id, c.branch_id as branch_id, c.name name, SUM(lh.principal_due) pd, SUM(lh.interest_due) intd, 
+                                                   SUM(lh.principal_paid) pp, SUM(lh.interest_paid) intp
+                                        FROM loan_history lh, centers c
+                                        WHERE lh.center_id IN (#{center_ids}) AND lh.date='#{@date.strftime('%Y-%m-%d')}' AND c.id=lh.center_id
+                                        GROUP BY lh.center_id ORDER BY c.name}).group_by{|x| x.branch_id}
         @disbursals = Loan.all(:client_id => client_ids, :scheduled_disbursal_date => @date)
         render :template => 'dashboard/today'
       end

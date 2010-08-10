@@ -34,7 +34,7 @@
       %td.text
         = link_to client.center.name, url(:quick_link, "centers", client.center.id)
       %td.text
-        = date_select("loans[#{loan.id}][approved_on]")
+        = date_select("loans[#{loan.id}][approved_on]", @date||loan.applied_on)
       %td.text
         = loan.status
       %td
