@@ -887,13 +887,14 @@ class Loan
     #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
     i = used = prin = int = 0.0
     d = received_on
-    while used < total.to_f
+    total = total.to_f
+    while used < total
       prin -= principal_overpaid_on(d)
       int  -= interest_overpaid_on(d)
       used  = (prin + int)
       d = shift_date_by_installments(d, 1)
     end
-    interest = total * int/(prin + int)
+    interest  = total * int/(prin + int)
     principal = total * prin/(prin + int)
     [interest, principal]
   end

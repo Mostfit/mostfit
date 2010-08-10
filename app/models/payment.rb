@@ -14,7 +14,7 @@ class Payment
   PAYMENT_TYPES = [:principal, :interest, :fees]
   
   property :id,                  Serial
-  property :amount,              Integer, :nullable => false, :index => true
+  property :amount,              Float, :nullable => false, :index => true
   property :type,                Enum.send('[]',*PAYMENT_TYPES), :index => true
   property :comment,             String, :length => 50
   property :received_on,         Date,    :nullable => false, :index => true

@@ -42,7 +42,7 @@
   %h1 Approvals
   - @loans_to_approve = @clients.loans(:approved_on => nil)
   - if @loans_to_approve.size > 0
-    = form_for(@loan, :action => url(:loan_actions, 'approve', :return => resource(@branch, @center))) do
+    = form_for(@loan, :action => url(:loan_actions, 'approve', :return => resource(@branch, @center)), :class => "_disable_button_") do
       = partial "loans/approve"
       = submit 'Approve these loans'
   - else
@@ -52,7 +52,7 @@
   - date_with_holiday = [@date, @date.holidays_shifted_today].max
   - @loans_to_disburse = @clients.loans(:scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil)
   - if @loans_to_disburse.size > 0
-    = form_for(@loan, :action => url(:loan_actions, :action => 'disburse', :return => resource(@branch, @center))) do
+    = form_for(@loan, :action => url(:loan_actions, :action => 'disburse', :return => resource(@branch, @center)), :class => "_disable_button_") do
       = partial "loans/disburse", {:loans_to_disburse => @loans_to_disburse, :date => @date}
       = submit 'Disburse these loans'
   - else
@@ -63,8 +63,9 @@
   - @fee_paying_clients = @clients.collect{|x| {x => x.fees_payable_on(Date.today)}}.inject({}){|s,x| s+=x}
   - @fee_paying_things = @fee_paying_clients + @fee_paying_loans
   - unless @fee_paying_things.values.inject({}){|s,x| s+=x}.length==0
-    = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "javascript: return confirm_for({'received_by': #{@center.manager.id};") do
+    = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "javascript: return confirm_for({'received_by': #{@center.manager.id};", :class => "_disable_button_") do
       = hidden_field :name => :for_date, :value => @date
+      = hidden_field :name => :payment_type, :value => "fees"
       Fees collected by
       = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'fees_received_by'
       %table.report.nojs{:style => "width:100%"}
@@ -108,7 +109,7 @@
     No fees due today
     
   %h1 Payments
-  = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "if ($('#payments_received_by').val() != '#{@center.manager.id}') {return(confirm('Payment receiver is not center manager. Proceed with payments?'))};", :class => "_remote_") do
+  = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "if ($('#payments_received_by').val() != '#{@center.manager.id}'){return(confirm('Payment receiver is not center manager. Proceed with payments?'));};", :class => "_disable_button_") do
     = hidden_field :name => 'for_date', :value => @date
     = hidden_field :name => 'center_id', :value => @center.id
     = partial :cds

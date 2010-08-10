@@ -618,5 +618,8 @@ $(document).ready(function(){
 	      showHideFees();
 	  });
   }
+  $("form._disable_button_").submit(function(form){
+				       $(form.currentTarget).find("input[type='submit']").attr('disabled', true);
+				     });
 });
 
