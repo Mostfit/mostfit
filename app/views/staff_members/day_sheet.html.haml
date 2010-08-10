@@ -25,7 +25,7 @@
     = "#{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}"
   = partial "centers/payments", {:clients => center.clients, :branch => center.branch, :center => center, :date => @date, :loans => center.loans}
   - clients = center.clients
-  - loans_to_disburse = clients.loans(:disbursal_date => @date)
+  - loans_to_disburse = clients.loans(:scheduled_disbursal_date => @date)
   - if clients.count > 0 and loans_to_disburse.count > 0
     - tot_disbursement = 0
     %table.narrow.form{ :width => '100%' }
