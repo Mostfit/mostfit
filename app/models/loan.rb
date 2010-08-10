@@ -331,8 +331,8 @@ class Loan
       if style == :normal
         total        = input
         total_fees_due_on_date = total_fees_payable_on(received_on)
-        fees_paid = [total, total_fees_due_on_date].min
-        total = input - fees_paid
+        fees_paid    = [total, total_fees_due_on_date].min
+        total        = input - fees_paid
         interest_due = [(-interest_overpaid_on(received_on)), 0].max
         interest     = [interest_due, total].min  # never more than total
         principal    = total - interest
@@ -340,7 +340,7 @@ class Loan
         interest, principal = pay_prorata(input, received_on)
       end
     elsif input.is_a? Array  # in case principal and interest are specified separately
-      principal, interest = input[0].to_i, input[1].to_i
+      principal, interest = input[0], input[1]
     end
     save_status = nil
     payments = []
@@ -348,19 +348,19 @@ class Loan
       if fees_paid > 0
         fee_payment = Payment.new(:loan => self, :created_by => user,
                                   :received_on => received_on, :received_by => received_by,
-                                  :amount => fees_paid.round, :type => :fees)
+                                  :amount => fees_paid.round(2), :type => :fees)
         payments.push(fee_payment)
       end
       if interest > 0
         int_payment = Payment.new(:loan => self, :created_by => user,
                                   :received_on => received_on, :received_by => received_by,
-                                  :amount => interest.round, :type => :interest)
+                                  :amount => interest.round(2), :type => :interest)
         payments.push(int_payment)
       end
       if principal > 0
         prin_payment = Payment.new(:loan => self, :created_by => user,
                                    :received_on => received_on, :received_by => received_by,
-                                   :amount => principal.round, :type => :principal)        
+                                   :amount => principal.round(2), :type => :principal)        
         payments.push(prin_payment)
       end
       # do not create accounting entries individually
