@@ -181,28 +181,35 @@ a {
 <div class="results">
 <div class="example_group">
   <dl>
-  <dt id="example_group_1">Controllers </dt>
-    <script type="text/javascript">makeRed('rspec-header');</script>
-    <script type="text/javascript">makeRed('example_group_1');</script>
-    <script type="text/javascript">moveProgressBar('0.0');</script>
-    <dd class="spec failed">
-      <span class="failed_spec_name">before(:all)</span>
-      <div class="failure" id="failure_1">
-        <div class="message"><pre>exit</pre></div>
-        <div class="backtrace"><pre>./spec/controllers/users_spec.rb:6:in `load_fixtures'
-./spec/controllers/users_spec.rb:25:</pre></div>
-    <pre class="ruby"><code><span class="linenum">4</span>
-<span class="linenum">5</span>def load_fixtures(*files)
-<span class="offending"><span class="linenum">6</span>  DataMapper.auto_migrate! if Merb.orm == :datamapper</span>
-<span class="linenum">7</span>  files.each do |name|
-<span class="linenum">8</span>    klass = Kernel::const_get(name.to_s.singularize.camel_case)
-<span class="linenum">9</span><span class="comment"># gem install syntax to get syntax highlighting</span></code></pre>
-      </div>
-    </dd>
+  <dt id="example_group_1">Rules</dt>
+    <script type="text/javascript">moveProgressBar('8.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should handle a basic condition</span></dd>
+    <script type="text/javascript">moveProgressBar('16.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should handle a basic condition</span></dd>
+    <script type="text/javascript">moveProgressBar('25.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should handle a basic condition</span></dd>
+    <script type="text/javascript">moveProgressBar('33.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should handle a basic condition</span></dd>
+    <script type="text/javascript">moveProgressBar('41.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should handle a basic condition</span></dd>
+    <script type="text/javascript">moveProgressBar('50.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should handle a complex condition</span></dd>
+    <script type="text/javascript">moveProgressBar('58.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be able to add a new Rule</span></dd>
+    <script type="text/javascript">moveProgressBar('66.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be able to handle rule on branch (model)</span></dd>
+    <script type="text/javascript">moveProgressBar('75.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be able to remove a rule</span></dd>
+    <script type="text/javascript">moveProgressBar('83.3');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should be able to handle rules on center model</span></dd>
+    <script type="text/javascript">moveProgressBar('91.6');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should handle rule on Area model</span></dd>
+    <script type="text/javascript">moveProgressBar('100.0');</script>
+    <dd class="spec passed"><span class="passed_spec_name">should handle rule on Region model</span></dd>
   </dl>
 </div>
-<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>3.592053 seconds</strong>";</script>
-<script type="text/javascript">document.getElementById('totals').innerHTML = "0 examples, 1 failure";</script>
+<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>12.702362 seconds</strong>";</script>
+<script type="text/javascript">document.getElementById('totals').innerHTML = "12 examples, 0 failures";</script>
 </div>
 </div>
 </body>

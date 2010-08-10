@@ -1,13 +1,18 @@
 
-Controllers 
-- before(:all) (FAILED - 1)
+Rules
+- should handle a basic condition
+- should handle a basic condition
+- should handle a basic condition
+- should handle a basic condition
+- should handle a basic condition
+- should handle a complex condition
+- should be able to add a new Rule
+- should be able to handle rule on branch (model)
+- should be able to remove a rule
+- should be able to handle rules on center model
+- should handle rule on Area model
+- should handle rule on Region model
 
-1)
-SystemExit in 'Controllers  before(:all)'
-exit
-./spec/controllers/users_spec.rb:6:in `load_fixtures'
-./spec/controllers/users_spec.rb:25:
+Finished in 12.702362 seconds
 
-Finished in 3.592053 seconds
-
-0 examples, 1 failure
+12 examples, 0 failures
