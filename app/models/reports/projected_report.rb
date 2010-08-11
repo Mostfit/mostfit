@@ -57,13 +57,13 @@ class ProjectedReport < Report
       }
     }
     #1: Applied on
-    hash_sch= {:scheduled_disbursal_date.gte => from_date, :scheduled_disbursal_date.lte => to_date}
+    hash_sch= {:scheduled_disbursal_date.gte => from_date, :scheduled_disbursal_date.lte => to_date, :rejected_on => nil}
     hash_sch[:loan_product_id] = loan_product_id if loan_product_id
 
     hash_act= {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date}
     hash_act[:loan_product_id] = loan_product_id if loan_product_id
 
-    (Loan.all(hash_sch) + Loan.all(hash_act)).each{|l|
+    (Loan.all(hash_sch) + Loan.all(hash_act)).uniq.each{|l|
       client    = l.client
       center_id = client.center_id
       next if not centers.key?(center_id)

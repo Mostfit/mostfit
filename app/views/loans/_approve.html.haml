@@ -16,7 +16,7 @@
       %th
         Status
       %th
-        Approved?
+        Selected
       %th
         Approved By
   - staff_members_allowed = staff_members_collection
@@ -34,9 +34,9 @@
       %td.text
         = link_to client.center.name, url(:quick_link, "centers", client.center.id)
       %td.text
-        = date_select("loans[#{loan.id}][approved_on]", @date||loan.applied_on)
+        = date_select("loans[#{loan.id}][approved_on]", @date||loan.applied_on, :id => "loans_#{loan.id}_approved_on")
       %td.text
-        = loan.status
+        = loan.status.to_s.camelcase(' ')
       %td
         = check_box :name => "loans[#{loan.id}][approved?]"
       %td.text
@@ -46,3 +46,4 @@
       %td{:colspan => 10}
   
 = paginate @loans_to_approve if @loans_to_approve.respond_to?(:page)
+ 

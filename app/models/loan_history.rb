@@ -10,19 +10,19 @@ class LoanHistory
                                                 # during reporting. I put it here to save an extra write to the db during 
                                                 # update_history_now
 
-  property :amount_in_default,          Integer # less normalisation = faster queries
+  property :amount_in_default,          Float # less normalisation = faster queries
   property :days_overdue,               Integer
   property :week_id,                    Integer # good for aggregating.
 
   # some properties for similarly named methods of a loan:
-  property :scheduled_outstanding_total,     Integer, :nullable => false, :index => true
-  property :scheduled_outstanding_principal, Integer, :nullable => false, :index => true
-  property :actual_outstanding_total,        Integer, :nullable => false, :index => true
-  property :actual_outstanding_principal,    Integer, :nullable => false, :index => true
-  property :principal_due,                   Integer, :nullable => false, :index => true
-  property :interest_due,                    Integer, :nullable => false, :index => true
-  property :principal_paid,                  Integer, :nullable => false, :index => true
-  property :interest_paid,                   Integer, :nullable => false, :index => true
+  property :scheduled_outstanding_total,     Float, :nullable => false, :index => true
+  property :scheduled_outstanding_principal, Float, :nullable => false, :index => true
+  property :actual_outstanding_total,        Float, :nullable => false, :index => true
+  property :actual_outstanding_principal,    Float, :nullable => false, :index => true
+  property :principal_due,                   Float, :nullable => false, :index => true
+  property :interest_due,                    Float, :nullable => false, :index => true
+  property :principal_paid,                  Float, :nullable => false, :index => true
+  property :interest_paid,                   Float, :nullable => false, :index => true
 
   property :status,                          Enum.send('[]', *STATUSES)
 

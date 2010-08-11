@@ -97,7 +97,7 @@ class ConsolidatedReport < Report
     }
 
     #2: Approved on
-    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id, :approved_by_staff_id]}
+    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id, :approved_by_staff_id], :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
     Loan.all(hash).each{|l|
       next if not clients.key?(l.client_id)
@@ -111,7 +111,7 @@ class ConsolidatedReport < Report
     }
 
     #3: Disbursal date
-    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id, :disbursed_by_staff_id]}
+    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id, :disbursed_by_staff_id], :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
     Loan.all(hash).each{|l|
       next if not clients.key?(l.client_id)

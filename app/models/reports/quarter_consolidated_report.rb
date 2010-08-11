@@ -105,7 +105,7 @@ class QuarterConsolidatedReport < Report
                                SELECT c.branch_id branch_id, year(disbursal_date) year, month(disbursal_date) month, SUM(l.amount) amount
                                FROM loans l, clients cl, centers c
                                WHERE l.disbursal_date >= '#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <= '#{to_date.strftime('%Y-%m-%d')}'
-                               AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids})
+                               AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids}) AND rejected_on is NULL
                                GROUP BY branch_id, month, year
                              }).each{|l|
       branch = @branch.find{|x| x.id == l.branch_id}
@@ -127,7 +127,7 @@ class QuarterConsolidatedReport < Report
                                SELECT c.branch_id branch_id, year(approved_on) year, month(approved_on) month, SUM(l.amount) amount
                                FROM loans l, clients cl, centers c
                                WHERE l.approved_on >= '#{from_date.strftime('%Y-%m-%d')}' and l.approved_on <= '#{to_date.strftime('%Y-%m-%d')}'
-                               AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids})
+                               AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids}) AND rejected_on is NULL
                                GROUP BY branch_id, month, year
                              }).each{|l|
       branch = @branch.find{|x| x.id == l.branch_id}

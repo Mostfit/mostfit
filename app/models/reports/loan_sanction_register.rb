@@ -35,7 +35,7 @@ class LoanSanctionRegister < Report
     #0      1           2           3               4             5                 6
     #ref_no,client_name,spouse_name,loan_product_id,loan_sequence,approval_date,   amount
     #1: Applied on
-    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date}
+    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :rejected_on => nil}
     hash[:loan_product_id] = loan_product_id if loan_product_id
     Loan.all(hash).each{|l|
       client    = l.client

@@ -135,7 +135,7 @@ module DataEntry
           @loan = Loan.get(k.to_i)
           @loan.history_disabled = true
           amounts = params[:paid][:loan][k.to_sym].to_i
-          if params[:submit] == "Pay Fees" # dangerous!            
+          if params.key?(:payment_type) and params[:payment_type] == "fees"
             @loan.pay_fees(amounts, @date, @staff, session.user)
             next
           end

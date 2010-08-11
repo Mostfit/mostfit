@@ -618,5 +618,19 @@ $(document).ready(function(){
 	      showHideFees();
 	  });
   }
+  $("form._disable_button_").submit(function(form){
+    $(form.currentTarget).find("input[type='submit']").attr('disabled', true);
+    return(true);
+  });
+  $("a._rejection_button_").click(function(a){
+    if(confirm('Do you really want to reject these loans?')){
+      form = $($(a.currentTarget).parent()[0]);
+      form.attr("action", $(a.currentTarget).attr("href"));
+      form.submit();
+      return false;
+    }else{
+      return false;
+    }
+  });
 });
 
