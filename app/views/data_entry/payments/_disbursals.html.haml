@@ -38,7 +38,7 @@
         %td
           = text_field "loans[#{loan.id}][cheque_number]".to_sym, :size => 8, :value => loan.cheque_number
         %td
-          = date_select "loans[#{loan.id}][disbursal_date]"
+          = date_select "loans[#{loan.id}][disbursal_date]", loan.scheduled_disbursal_date, :id => "loans_#{loan.id}_disbursal_date"
         %td
           = select :name => "loans[#{loan.id}][disbursed_by_staff_id]", :collection => [["","---"]] + staff_members, :selected => loan.client.center.manager.id.to_s
 

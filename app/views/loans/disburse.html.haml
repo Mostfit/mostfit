@@ -10,5 +10,8 @@
   = form_for(@loan, :action => url(:loan_actions, :action => "disburse")) do
     = partial :disburse, {:loans_to_disburse => @loans}
     = submit 'Disburse these loans'
+    or
+    %a{:href => "#{url(:loan_actions, 'reject')}", :class => "_rejection_button_"}
+      Reject selected loans
 - else
   No disbursals today

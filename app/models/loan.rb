@@ -730,7 +730,8 @@ class Loan
     return :pending_approval     if applied_on <= date and
                                  not (approved_on and approved_on <= date) and
                                  not (rejected_on and rejected_on <= date)
-    return :approved             if (approved_on and approved_on <= date) and not (disbursal_date and disbursal_date <= date)
+    return :approved             if (approved_on and approved_on <= date) and not (disbursal_date and disbursal_date <= date) and 
+                                 not (rejected_on and rejected_on <= date)
     return :rejected             if (rejected_on and rejected_on <= date)
     return :written_off          if (written_off_on and written_off_on <= date)
     return :claim_settlement     if under_claim_settlement and under_claim_settlement <= date

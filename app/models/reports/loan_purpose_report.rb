@@ -95,7 +95,7 @@ class LoanPurposeReport < Report
     }
     
     #2: Approved on
-    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date}
+    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
     group_loans(["l.occupation_id", "c.branch_id"], "sum(if(amount_sanctioned>0, amount_sanctioned, amount)) amount", hash).group_by{|x| x.branch_id}.each{|branch_id, loan_purposes|
       next unless branches.key?(branch_id)
@@ -108,7 +108,7 @@ class LoanPurposeReport < Report
       }
     }
     #3: Disbursal date
-    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date}
+    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
     group_loans(["l.occupation_id", "c.branch_id"], "sum(amount) amount", hash).group_by{|x| x.branch_id}.each{|branch_id, loan_purposes|
       next unless branches.key?(branch_id)

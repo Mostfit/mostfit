@@ -1,5 +1,5 @@
 class Loans < Application
-  before :get_context, :exclude => ['redirect_to_show', 'approve', 'disburse']
+  before :get_context, :exclude => ['redirect_to_show', 'approve', 'disburse', 'reject']
   provides :xml, :yaml, :js
 
   def index
@@ -110,7 +110,7 @@ class Loans < Application
   def disburse
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
     if request.method == :get
-      @loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil).paginate(:page => params[:page], :per_page => 10)
+      @loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil).paginate(:page => params[:page], :per_page => 10)
       render
     else
       @errors = []
@@ -147,7 +147,7 @@ class Loans < Application
       if params[:center_id]
         @loans_to_approve = @loan.all("client.center" => Center.get(params[:center_id]))
       else
-        @loans_to_approve = Loan.all(:approved_on => nil).paginate(:page => params[:page], :per_page => 10)
+        @loans_to_approve = Loan.all(:approved_on => nil, :rejected_on => nil).paginate(:page => params[:page], :per_page => 10)
       end
       @loans_to_approve.each {|l| l.clear_cache}
       @clients =  @loans_to_approve.clients
@@ -164,6 +164,27 @@ class Loans < Application
       end
       if @errors.blank?
         redirect(params[:return]||"/data_entry", :message => {:notice => 'loans approved'})
+      else
+        @loans_to_approve = Loan.all(:id.in => @loans.keys)
+        @clients =  @loans_to_approve.clients
+        render
+      end
+    end
+  end
+
+  def reject
+    if request.method == :post
+      @errors = []
+      @loans = params[:loans].select{|k,v| v[:approved?] == "on" or v[:disbursed?] == "on"}.to_hash
+      @loans.keys.each do |id|
+        loan = Loan.get(id)
+        params[:loans][id].delete("approved?")        
+        loan.rejected_on = Date.today
+        loan.rejected_by_staff_id = params[:loans][id][:approved_by_staff_id]||params[:loans][id][:disbursed_by_staff_id]
+        @errors << loan.errors unless loan.save
+      end
+      if @errors.blank?
+        redirect(params[:return]||"/data_entry", :message => {:notice => 'loans rejected'})
       else
         @loans_to_approve = Loan.all(:id.in => @loans.keys)
         @clients =  @loans_to_approve.clients

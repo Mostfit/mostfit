@@ -13,7 +13,10 @@
   = form_for(@loan, :action => url(:loan_actions, :action => "approve")) do
     = hidden_field :name => :id, :value => @center.id
     = partial :approve
-    = submit 'Approve these loans'
+    = submit 'Approve selected loans'
+    or
+    %a{:href => "#{url(:loan_actions, 'reject')}", :class => "_rejection_button_"}
+      Reject selected loans
 - else
   Nothing to approve
 

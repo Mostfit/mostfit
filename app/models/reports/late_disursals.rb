@@ -17,9 +17,9 @@ class LateDisbursalsReport < Report
 
   def generate
     if loan_product_id
-      loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :loan_product_id => loan_product_id) || Loan.all(:approved_on => nil, :loan_product_id => loan_product_id)
+      loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :loan_product_id => loan_product_id) || Loan.all(:approved_on => nil, :loan_product_id => loan_product_id, :rejected_on => nil)
     else
-      loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil) || Loan.all(:approved_on => nil)
+      loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :rejected_on => nil) || Loan.all(:approved_on => nil, :rejected_on => nil)
     end
     r = { }
     @branch.each do |b|
