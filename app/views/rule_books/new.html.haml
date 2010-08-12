@@ -1,0 +1,12 @@
+
+- form_url   =  resource(:rule_books, {:return => params[:return]})
+
+= error_messages_for @rule_book
+
+= form_for(@rule_book, :action => form_url, :class => "form") do
+  %fieldset
+    %h1 Create a Rule
+    = partial "rule_books/fields"
+    = submit "Create"
+    = link_to "Cancel", url(:rule_books)
+

@@ -566,6 +566,13 @@ table.report tr.center{
     font-size: 1em; 
     background-color: #ddd;
 }
+table.report tr.year{
+    border: 1px solid;
+    border-color: #ccc;
+    text-align: center;
+    font-size: 1em; 
+    background-color: #ddd;
+}
 table.report tr.manager{
     border: 1px solid;
     border-color: #ccc;
@@ -573,11 +580,22 @@ table.report tr.manager{
     font-size: 1em; 
     background-color: #ccc;
 }
+table.report tr.quarter{
+    border: 1px solid;
+    border-color: #eee;
+    text-align: center;
+    font-size: 1em; 
+    background-color: #eee;
+}
 table.report tr.group_total td:first-child{
     text-align: center; 
     background-color: #eee;    
 }
 table.report tr.center_total td:first-child{
+    text-align: center; 
+    background-color: #ddd;
+}
+table.report tr.year_total td:first-child{
     text-align: center; 
     background-color: #ddd;
 }
@@ -633,13 +651,13 @@ h3.blocked{
 div.tab_container{
     border: 1px solid #CDD3FE;
 }
-ul.tabs{
+div.tab_container ul.tabs{
     margin-left: 0px;
     background-color: #CDD3FE;
     height: 45px;
     border-bottom: 3px solid #CDD3FE;
 }
-ul.tabs li{
+div.tab_container ul.tabs li{
     display: inline;
     padding: 5px;
     cursor: pointer;   
@@ -654,10 +672,29 @@ ul.tabs li{
     border: 1px solid #EDF3FE;
     font-weight: strong;
 }
-ul.tabs li.active{
+div.tab_container ul.tabs li.active{
     border-bottom: 3px solid white;
     background-color: white;
 }
+
+div.inner{
+    border: 0px;
+}
+div.inner ul{
+    margin-left: 0px;
+    height: 45px;
+}
+div.inner ul li{
+    display: inline;
+    padding: 5px;
+    cursor: pointer;   
+}
+div.inner ul li.active{
+    border-bottom: 3px solid white;
+    background-color: white;
+}
+
+
 table.comments{
     margin: 0px;
     width: 80%; 

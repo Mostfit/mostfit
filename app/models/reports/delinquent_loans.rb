@@ -21,7 +21,7 @@ class DelinquentLoanReport < Report
       clients[c.center_id]||=[]
       clients[c.center_id] << c
     }
-    Loan.all(:client => clients.values.flatten).each{|l|
+    Loan.all(:client => clients.values.flatten, :disbursal_date.not => nil).each{|l|
       loans[l.client_id] = l
       lids << l.id
     }

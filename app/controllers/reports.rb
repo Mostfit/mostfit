@@ -1,10 +1,10 @@
 class Reports < Application
   include DateParser
   Types = [
-           DailyReport, ConsolidatedReport, StaffConsolidatedReport, QuaterConsolidatedReport, TransactionLedger, ProjectedReport, 
-           LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, 
+           DailyReport, ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, TransactionLedger, ProjectedReport, 
+           LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, LoanSizePerManagerReport,
            TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, LoanSanctionRegister, ClientAbsenteeismReport, 
-           LoanSizePerManagerReport
+           BalanceSheet, GeneralLedgerReport, TrialBalanceReport
           ]
   layout :determine_layout 
 
@@ -16,6 +16,7 @@ class Reports < Application
 
   def show(report_type, id)
     provides :pdf
+    report_type = params[:report_type] if report_type == "show" and params.key?(:report_type)
     klass = Kernel.const_get(report_type)
     @report = Report.get(id) if id
     class_key  =  klass.to_s.snake_case.to_sym
@@ -27,16 +28,18 @@ class Reports < Application
       if klass==TransactionLedger
         @groups, @centers, @branches, @payments, @clients = @report.generate
         display [@groups, @centers, @branches, @payments, @clients]
-      elsif [LoanDisbursementRegister, LoanSanctionRegister, ScheduledDisbursementRegister].include?(klass)
+      elsif [LoanSanctionRegister, ScheduledDisbursementRegister].include?(klass)
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
-      elsif [LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, StaffConsolidatedReport, 
-             QuaterConsolidatedReport, ClientAbsenteeismReport, LoanSizePerManagerReport].include?(klass)
+      elsif [ConsolidatedReport, LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, StaffConsolidatedReport, 
+             QuarterConsolidatedReport, ClientAbsenteeismReport, LoanSizePerManagerReport, TargetReport, LoanDisbursementRegister, ProjectedReport, 
+             GroupConsolidatedReport
+            ].include?(klass)
         @data  = @report.generate
         display @data
-      elsif klass==TargetReport
-        @targets = @report.generate
-        display [@targets]
+      elsif [BalanceSheet, GeneralLedgerReport, TrialBalanceReport].include?(klass)
+        @data  = @report.generate(params)
+        display @data        
       else
         @groups, @centers, @branches = @report.generate
         display [@groups, @centers, @branches]

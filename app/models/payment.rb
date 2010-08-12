@@ -8,12 +8,13 @@ class Payment
   # before :valid?, :add_loan_product_validations
   # after :valid?, :after_valid
   before :save, :put_fee
-  attr_writer :total  # just to be used in the form
+  attr_writer :total
+  attr_accessor :override_create_observer  # just to be used in the form
 
   PAYMENT_TYPES = [:principal, :interest, :fees]
   
   property :id,                  Serial
-  property :amount,              Integer, :nullable => false, :index => true
+  property :amount,              Float, :nullable => false, :index => true
   property :type,                Enum.send('[]',*PAYMENT_TYPES), :index => true
   property :comment,             String, :length => 50
   property :received_on,         Date,    :nullable => false, :index => true

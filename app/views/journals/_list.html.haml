@@ -1,0 +1,34 @@
+%table
+  %tr
+    %th
+      Date
+    %th 
+      Journal ID  
+    %th 
+      Debit Account
+    %th 
+      Credit Account
+    %th 
+      Amount
+    %th 
+      Comment
+  - Account.all(:branch => @branch).postings.journals(:order => [:date.desc], :order => [:id.desc]).each do |journal|
+    - postings = journal.postings.sort_by{|x| x.amount}
+    %tr
+      %td
+        = journal.date
+      %td 
+        = journal.id
+      - debit_postings, credit_postings = journal.postings.group_by{|x| x.amount>0}.values
+      %td 
+        - debit_postings.each do |p|
+          = p.account.name
+          %br
+      %td 
+        - credit_postings.each do |p|
+          = p.account.name
+          %br
+      %td 
+        = postings.map{|x| x.amount>0 ? x.amount : 0}.inject(0){|s,x| s+=x}
+      %td 
+        = journal.comment

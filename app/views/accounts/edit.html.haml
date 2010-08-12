@@ -1,0 +1,12 @@
+- form_url   =  resource(@account, {:return => params[:return]})
+=error_messages_for @account
+
+= form_for(@account, :action => form_url, :class => "form" ) do
+  %h1 Edit a Account
+  %fieldset
+    = partial "accounts/fields"
+    = submit "Update"
+
+= link_to 'Show', url(:account, @account)
+|
+= link_to 'Back', url(:account, @account)

@@ -31,7 +31,13 @@ module DataEntry
         bulk_payments_and_disbursals
         mark_attendance
         if @errors.blank?
-          redirect(params[:return]||url(:data_entry), :message => {:notice => 'All payments made succesfully'})
+          notice = 'All payments made succesfully'
+          return_url = params[:return]||url(:data_entry)
+          if(request.xhr?)
+            render("<div class='notice'>#{notice}<div>", :layout => layout?)
+          else
+            redirect(return_url, :message => {:notice => notice})
+          end
         elsif params[:format] and params[:format]=="xml"
           display("")
         else 
@@ -129,7 +135,7 @@ module DataEntry
           @loan = Loan.get(k.to_i)
           @loan.history_disabled = true
           amounts = params[:paid][:loan][k.to_sym].to_i
-          if params[:submit] == "Pay Fees" # dangerous!            
+          if params.key?(:payment_type) and params[:payment_type] == "fees"
             @loan.pay_fees(amounts, @date, @staff, session.user)
             next
           end

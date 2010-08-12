@@ -92,7 +92,7 @@ module Pdf
         
         #draw table for scheduled disbursals
         loans_to_disburse = center.clients.loans(:disbursal_date => @date)
-        if loans_to_disburse.count > 0
+        if center.clients.count>0 and loans_to_disburse.count > 0
           table = PDF::SimpleTable.new
           table.data = []
 
@@ -107,7 +107,7 @@ module Pdf
           table.shade_rows    = :none
           table.show_headings = true          
           table.shade_headings = true
-          table.orientation   = :left
+          table.orientation   = :center
           table.position      = :center
           table.title_font_size = 16
           table.header_gap = 10

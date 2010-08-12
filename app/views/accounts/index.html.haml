@@ -1,0 +1,37 @@
+%h1  Manage Book Keeping
+%div
+  = link_to 'Manage Account Type',url(:account_types) 
+  |
+  = link_to 'New Account', url(:new_account)
+  |
+  = link_to 'Manage Accounting Rule', url(:rule_books)
+  |
+  = link_to_with_rights 'Create a new Journal', resource(:journals, :new)
+  | 
+  = link_to_with_rights 'View Recent Journal Entries', resource(:journals)
+
+
+
+
+
+%h1 List of Account
+%table
+  %tr 
+    %th
+      Account Type
+    %th
+      Account Name
+    %th
+      GL Code
+    %th
+      Branch
+  - @accounts.group_by{|x|  x.account_type}.each do |account_type, accounts|
+    %tr
+      %td
+        %b
+          = account_type.name
+    - accounts.each do |account|
+      =  show_child_accounts(account)
+
+
+= link_to 'Back', url(:admin)

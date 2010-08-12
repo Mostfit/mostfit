@@ -21,9 +21,11 @@
         Interest (%)
       %th
         Validity
-
   %tr
-  - for loan_product in @loan_products
+    %td{:colspan => 5, :style => 'background-color: #eee; text-align: center'}
+      %b Current products
+  %tr
+  - @loan_products.find_all{|x| x.valid_upto >= Date.today}.each do |loan_product|
     %tr{:class => cycle('odd','')}
       %td
         = link_to loan_product.name, url(:loan_product, loan_product) 
@@ -35,3 +37,37 @@
         = loan_product.min_interest_rate!=loan_product.max_interest_rate ? "#{loan_product.min_interest_rate} - #{loan_product.max_interest_rate}" : loan_product.min_interest_rate
       %td
         = loan_product.valid_from!=loan_product.valid_upto ? "#{loan_product.valid_from} to #{loan_product.valid_upto}" : loan_product.valid_upto
+  - if @loan_products.find_all{|x| x.valid_from > Date.today}.length>0
+    %tr
+      %td{:colspan => 5, :style => 'background-color: #eee; text-align: center'}
+        %b Future products
+    %tr
+      - @loan_products.find_all{|x| x.valid_from > Date.today}.each do |loan_product|
+        %tr{:class => cycle('odd','')}
+          %td
+            = link_to loan_product.name, url(:loan_product, loan_product) 
+          %td
+            = loan_product.loan_type
+          %td
+            = loan_product.min_amount!=loan_product.max_amount ? "#{loan_product.min_amount} - #{loan_product.max_amount}" : loan_product.min_amount
+          %td
+            = loan_product.min_interest_rate!=loan_product.max_interest_rate ? "#{loan_product.min_interest_rate} - #{loan_product.max_interest_rate}" : loan_product.min_interest_rate
+          %td
+            = loan_product.valid_from!=loan_product.valid_upto ? "#{loan_product.valid_from} to #{loan_product.valid_upto}" : loan_product.valid_upto
+  - if @loan_products.find_all{|x| x.valid_upto < Date.today}.length>0
+    %tr
+      %td{:colspan => 5, :style => 'background-color: #eee; text-align: center'}
+        %b Expired products
+    %tr
+      - @loan_products.find_all{|x| x.valid_upto < Date.today}.each do |loan_product|
+        %tr{:class => cycle('odd','')}
+          %td
+            = link_to loan_product.name, url(:loan_product, loan_product) 
+          %td
+            = loan_product.loan_type
+          %td
+            = loan_product.min_amount!=loan_product.max_amount ? "#{loan_product.min_amount} - #{loan_product.max_amount}" : loan_product.min_amount
+          %td
+            = loan_product.min_interest_rate!=loan_product.max_interest_rate ? "#{loan_product.min_interest_rate} - #{loan_product.max_interest_rate}" : loan_product.min_interest_rate
+          %td
+            = loan_product.valid_from!=loan_product.valid_upto ? "#{loan_product.valid_from} to #{loan_product.valid_upto}" : loan_product.valid_upto

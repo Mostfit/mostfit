@@ -1,0 +1,16 @@
+1:
+  :debit_account_id: 1
+  :rule_book_id: 1
+  :percentage: 100
+2:
+  :debit_account_id: 3
+  :rule_book_id: 2
+  :percentage: 100
+3:
+  :debit_account_id: 1
+  :rule_book_id: 3
+  :percentage: 100
+4:
+  :rule_book_id: 4
+  :debit_account_id: 2
+  :percentage: 100

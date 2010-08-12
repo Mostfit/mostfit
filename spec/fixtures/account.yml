@@ -1,0 +1,35 @@
+1:
+  :name: Cash Account
+  :opening_balance: 0
+  :gl_code: 1001
+  :account_type_id: 1 
+  :branch_id: 1
+  :opening_balance_on_date: "2010-02-03" 
+2:
+  :name:  Income
+  :opening_balance: 0
+  :gl_code: 1002
+  :account_type_id: 3
+  :branch_id: 2
+  :opening_balance_on_date: "2010-02-03" 
+3:
+  :name: Principal Repayed
+  :opening_balance: 0
+  :gl_code: 1003
+  :account_type_id: 1
+  :branch_id: 2
+  :opening_balance_on_date: "2010-02-03" 
+4:
+  :name: Interest Repayed
+  :opening_balance: 0
+  :gl_code: 1004
+  :account_type_id: 1
+  :branch_id: 2
+  :opening_balance_on_date: "2010-02-03" 
+5:
+  :name: Loans Made
+  :opening_balance: 0
+  :gl_code: 1005
+  :account_type_id: 2
+  :branch_id: 1
+  :opening_balance_on_date: "2010-02-03" 

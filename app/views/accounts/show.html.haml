@@ -1,0 +1,17 @@
+%h1== Account: <i>#{@account.name}</i>
+%table.narrow.form{ :style => "width: 40%;" }
+  %tr.odd
+    %td GL Code : 
+    %td
+      %b= @account.gl_code
+  -unless @account.branch.nil?
+    %tr.odd
+      %td Branch : 
+      %td
+        %b= @account.branch.name
+%p
+  = link_to_with_rights 'edit this account\'s details ', resource(@account, :edit), :class => "edit"
+
+= partial "journals/list_account", :accounts => @accounts
+%br
+= link_to 'Back', url(:accounts)

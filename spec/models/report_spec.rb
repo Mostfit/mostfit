@@ -51,7 +51,7 @@ describe Report do
         branch.save
         branch.should be_valid
         # and seven centres in each, one for each day
-        [:monday].each_with_index do |day,cwday|                               
+        [:monday, :tuesday].each_with_index do |day,cwday|                               
           center = instance_variable_set("@#{b}_#{day}",Center.new(:name => day.to_s))
           center.manager = @manager
           center.branch = branch
@@ -102,9 +102,10 @@ describe Report do
     end
   end
   
-  it "should have 2 * 7 centers and centers * 3 clients" do
-#    Center.all.count.should == 2 * 7
-#    Client.all.count.should == 2 * 7 * 3
+  it "should have 2 * 6 centers and centers * 3 clients" do
+    Center.all.count.should == 2 * 2
+    Client.all.count.should == 2 * 2 * 3
+    Loan.all.count.should == 2 * 2 * 3
   end
 
   
@@ -132,10 +133,10 @@ describe Report do
 
   it "should have correct number of clients" do
     @date = Loan.all.min(:scheduled_first_payment_date)
-    Branch.client_count(@date).should == {1 => 3, 2 => 3}
-    Branch.active_client_count(@date).should == {1 => 3, 2 => 3}
+    Branch.client_count(@date).should == {1 => 6, 2 => 6}
+    Branch.active_client_count(@date).should == {1 => 6, 2 => 6}
     Branch.dormant_client_count(@date).should == {1 => 0, 2 => 0}
-    Branch.client_count_by_loan_cycle(1,@date).should == {1 => 3, 2 => 3}
+    Branch.client_count_by_loan_cycle(1,@date).should == {1 => 6, 2 => 6}
     #Branch.client_count_by_loan_cycle(2,@date).should == {}
     # add a dummy client and check
     c = Client.new(:center => Center.get(1), :name => "delete me", :reference => "dummy1", :date_joined => "2008-01-01", 
@@ -144,8 +145,8 @@ describe Report do
       p c.errors
     end
     c.should be_valid
-    Branch.client_count(@date).should == {1 => 4, 2 => 3}
-    Branch.active_client_count(@date).should == {1 => 3, 2 => 3}
+    Branch.client_count(@date).should == {1 => 7, 2 => 6}
+    Branch.active_client_count(@date).should == {1 => 6, 2 => 6}
     Branch.dormant_client_count(@date).should == {1 => 1, 2 => 0}
   end
 
@@ -178,7 +179,7 @@ describe Report do
         date = loan.date_for_installment(i)
         _p = loan.scheduled_principal_for_installment(i)
         _i = loan.scheduled_interest_for_installment(i)
-        paid = loan.repay([_p,_i],@user,date,@manager)
+        paid = loan.repay([_p,_i],@user,date,@manager)        
         paid[1].errors.each {|e| puts e}
         total += _p
       end
@@ -189,52 +190,52 @@ describe Report do
     end
     # TODO get the code working for loan cycles 2 and above
     # Branch.client_count_by_loan_cycle(2,@date).should == {1 => 3, 2=>2}
-    Branch.clients_added_between_such_and_such_date_count(Date.today - 10, Date.today).should == {1=>3,2=>3}
+    Branch.clients_added_between_such_and_such_date_count(Date.today - 10, Date.today).should == {1=> 6, 2=> 6}
     Branch.clients_added_between_such_and_such_date_count('2008-01-02',Date.today - 2).should == {}
     Branch.clients_added_between_such_and_such_date_count('2008-01-01',Date.today - 2).should == {1 => 1}
     Branch.clients_added_between_such_and_such_date_count(Date.today,'2012-01-01').should == {}
     Client.get(7).destroy
-    Branch.clients_deleted_between_such_and_such_date_count(Date.today, Date.today + 1).should == {1=>1}
+    Branch.clients_deleted_between_such_and_such_date_count(Date.today, Date.today + 1).should == {2=>1}
     Branch.clients_deleted_between_such_and_such_date_count(Date.today + 1, Date.today + 2).should == {}
   end
 
   it "should return correct repaid loan count" do
-    l = Loan.get(7)
+    l = Loan.get(13)
     date = l.scheduled_maturity_date
-    Branch.loans_repaid_between_such_and_such_date(date-3,date+3,"count").should == {1=>3, 2=>2}
-    Branch.loans_repaid_between_such_and_such_date(date+1,date+100,"count").should == {}
+    Branch.loans_repaid_between_such_and_such_date(date-3,date+3,"count").should == {1=>5}
+    Branch.loans_repaid_between_such_and_such_date(date+1,date+100,"count").should == {1=>2}
     Branch.loans_repaid_between_such_and_such_date(date-100,date-1,"count").should == {}
   end
 
   it "should return correct repaid loan amount" do
-    l = Loan.get(7)
+    l = Loan.get(13)
     date = l.scheduled_maturity_date
-    Branch.loans_repaid_between_such_and_such_date(date-3,date+3,"sum").should == {1=>30000, 2=>20000}
-    Branch.loans_repaid_between_such_and_such_date(date+1,date+100,"sum").should == {}
+    Branch.loans_repaid_between_such_and_such_date(date-3,date+3,"sum").should == {1=>50000}
+    Branch.loans_repaid_between_such_and_such_date(date+1,date+100,"sum").should == {1=>20000}
     Branch.loans_repaid_between_such_and_such_date(date-100,date-1,"sum").should == {}
   end
 
   it "should return correct disbursed loan count" do
     l = Loan.get(1)
     date = l.scheduled_disbursal_date
-    Branch.loans_disbursed_between_such_and_such_date(date-3,date+3,"count").should == {1=>3, 2=>3}
-    Branch.loans_disbursed_between_such_and_such_date(date+1,date+100,"count").should == {}
+    Branch.loans_disbursed_between_such_and_such_date(date-3,date+3,"count").should == {1=>6, 2=>6}
+    Branch.loans_disbursed_between_such_and_such_date(date+1,date+100,"count").should == {1=>3,2=>3}
     Branch.loans_disbursed_between_such_and_such_date(date-100,date-1,"count").should == {}
   end
 
   it "should return correct disbursed loan amount" do
     l = Loan.get(1)
     date = l.scheduled_disbursal_date
-    Branch.loans_disbursed_between_such_and_such_date(date,date+3,"sum").should == {1=>6000, 2=>6000}
-    Branch.loans_disbursed_between_such_and_such_date(date+1,date+100,"sum").should == {}
+    Branch.loans_disbursed_between_such_and_such_date(date,date+3,"sum").should == {1=>12000, 2=>12000}
+    Branch.loans_disbursed_between_such_and_such_date(date+1,date+100,"sum").should == {1=>6000, 2=>6000}
     Branch.loans_disbursed_between_such_and_such_date(date-100,date-1,"sum").should == {}
   end
 
   it "should give correct principal due" do
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    Branch.principal_due_between_such_and_such_date(date, date + 6).should == {1=>0, 2=>0}
-    Branch.principal_due_between_such_and_such_date(date + 7, date + 13).should == {1=>(20 + 40 + 60), 2=> (20 + 40 + 60)}
+    Branch.principal_due_between_such_and_such_date(date, date + 6).should == {1=>120, 2=>120}
+    Branch.principal_due_between_such_and_such_date(date + 7, date + 13).should == {1=>360, 2=>360}
   end
 
   it "should give correct principal received" do
@@ -247,8 +248,8 @@ describe Report do
   it "should give correct interest due" do
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    Branch.interest_due_between_such_and_such_date(date, date + 6).should == {1=>0, 2=>0}
-    Branch.interest_due_between_such_and_such_date(date + 7, date + 13).should == {1=>(2 + 4 + 6), 2=> (2 + 4 + 6)}
+    Branch.interest_due_between_such_and_such_date(date, date + 6).should == {1=>12, 2=>12}
+    Branch.interest_due_between_such_and_such_date(date + 7, date + 13).should == {1=>36, 2=>36}
   end
 
   it "should give correct interest received" do
@@ -262,20 +263,20 @@ describe Report do
     #TODO check the "repaid" loans as well
     l = Loan.get 1
     date = l.scheduled_first_payment_date - 1
-    Branch.principal_outstanding(date).should == {1 => 6000, 2 => 6000}
+    Branch.principal_outstanding(date).should == {1 => 12000, 2 => 12000}
     date = date + 2
-    Branch.principal_outstanding(date).should == {1 => 5880, 2 => 5880}
+    Branch.principal_outstanding(date).should == {1 => 11880, 2 => 11880}
     date = date + 15
-    Branch.principal_outstanding(date).should == {1 => 5880, 2 => 5880}
+    Branch.principal_outstanding(date).should == {1 => 11880, 2 => 11880}
   end
 
   it "should give correct scheduled principal outstanding" do
     #TODO check the "repaid" loans as well
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    Branch.scheduled_principal_outstanding(date - 1).should == {1 => 6000, 2 => 6000}
-    Branch.scheduled_principal_outstanding(date + 1).should == {1 => 6000 - (20 + 40 + 60), 2 => 6000 - (20 + 40 + 60)}
-    Branch.scheduled_principal_outstanding(date + 8).should == {1 => 6000 - (40 + 80 + 120), 2 => 6000 - (40 + 80 + 120)}
+    Branch.scheduled_principal_outstanding(date - 1).should == {1 => 12000, 2 => 12000}
+    Branch.scheduled_principal_outstanding(date + 1).should == {1 => 12000 - (20 + 40 + 60), 2 => 12000 - (20 + 40 + 60)}
+    Branch.scheduled_principal_outstanding(date + 8).should == {1 => 12000 - (40 + 80 + 120 + 120), 2 => 12000 - (40 + 80 + 120 + 120)}
   end
 
 
@@ -283,9 +284,9 @@ describe Report do
     #TODO check the "repaid" loans as well
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    Branch.total_outstanding(date - 1).should == {1 => 6600, 2 => 6600}
-    Branch.total_outstanding(date + 1).should == {1 => 6600 - (22 + 44 + 66), 2 => 6600 - (22 + 44 + 66)}
-    Branch.total_outstanding(date + 1).should == {1 => 6600 - (22 + 44 + 66), 2 => 6600 - (22 + 44 + 66)}
+    Branch.total_outstanding(date - 1).should == {1 => 13200, 2 => 13200}
+    Branch.total_outstanding(date + 1).should == {1 => 13200 - (22 + 44 + 66), 2 => 13200 - (22 + 44 + 66)}
+    Branch.total_outstanding(date + 1).should == {1 => 13200 - (22 + 44 + 66), 2 => 13200 - (22 + 44 + 66)}
   end
 
 
@@ -293,9 +294,9 @@ describe Report do
     #TODO check the "repaid" loans as well
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    Branch.scheduled_total_outstanding(date - 1).should == {1 => 6600, 2 => 6600}
-    Branch.scheduled_total_outstanding(date + 1).should == {1 => 6600 - (22 + 44 + 66), 2 => 6600 - (22 + 44 + 66)}
-    Branch.scheduled_total_outstanding(date + 8).should == {1 => 6600 - (44 + 88 + 132), 2 => 6600 - (44 + 88 + 132)}
+    Branch.scheduled_total_outstanding(date - 1).should == {1 => 13200, 2 => 13200}
+    Branch.scheduled_total_outstanding(date + 1).should == {1 => 13200 - (22 + 44 + 66), 2 => 13200 - (22 + 44 + 66)}
+    Branch.scheduled_total_outstanding(date + 8).should == {1 => 13200 - (44 + 88 + 132+132), 2 => 13200 - (44 + 88 + 132+132)}
   end
 
   

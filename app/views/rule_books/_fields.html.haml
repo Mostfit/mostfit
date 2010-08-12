@@ -1,0 +1,64 @@
+%table
+  %tr
+    %td 
+      Rule Name
+    %td
+      =text_field :name
+  %tr 
+    %td
+      Branch
+    %td
+      =select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
+
+  %tr
+    %td
+      Action
+    %td
+      - options = (RuleBook::ACTIONS.map { |x| [x.to_s, x.to_s.capitalize] })
+      =select :action, :collection => options, :prompt => "Select action"
+  %tr#fees_row
+    %td
+      Fee Type: 
+    %td
+      = select :fee_id, :collection => Fee.all.map{ |x| [x.id, x.name]}, :prompt => "Select fee type"  
+  %tr
+    %td
+      Credit Accounts     
+    %td
+      Accounts
+      %br
+      - accounts = Account.all.map{ |x| [x.id ,x.name]}
+      - credit_accounts = @rule_book.credit_accounts
+      - 3.times do |idx|
+        - selected_val = (credit_accounts[idx] ? credit_accounts[idx].id.to_s : "")
+        =select(:name => "rule_book[credit_accounts][#{idx+1}][account_id]", :collection => accounts, :prompt => "Select credit account #{idx}", :selected => selected_val)
+        %br
+    %td
+      Percentage split
+      %br
+      - credit_account_rules = @rule_book.credit_account_rules
+      - 3.times do |idx|
+        - split_val = (credit_account_rules[idx] ? credit_account_rules[idx].percentage.to_s : "0")
+        - split_val = "100" if @rule_book.new? and idx==0
+        =text_field(:name => "rule_book[credit_accounts][#{idx+1}][percentage]", :size => 3, :value => split_val)
+        %br
+  %tr
+    %td
+      Debit Account Name 
+    %td
+      - debit_accounts = @rule_book.debit_accounts
+      - 3.times do |idx|
+        - selected_val = (debit_accounts[idx] ? debit_accounts[idx].id.to_s : "")
+        =select :name => "rule_book[debit_accounts][#{idx+1}][account_id]", :collection => accounts, :prompt => "Select debit Account", :selected => selected_val
+        %br
+    %td
+      Percentage split
+      %br
+      - debit_account_rules = @rule_book.debit_account_rules
+      - 3.times do |idx|
+        - split_val = (debit_account_rules[idx] ? debit_account_rules[idx].percentage.to_s : "0")
+        - split_val = "100" if @rule_book.new? and idx==0
+        =text_field(:name => "rule_book[debit_accounts][#{idx+1}][percentage]", :size => 3, :value => split_val)
+        %br
+
+ 

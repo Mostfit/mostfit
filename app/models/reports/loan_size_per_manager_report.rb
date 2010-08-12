@@ -80,7 +80,7 @@ class LoanSizePerManagerReport < Report
                                SELECT st.id manager_id, st.name name, COUNT(DISTINCT(c.id)) center_count, COUNT(DISTINCT(cl.id)) client_count, 
                                SUM(l.amount) amount, AVG(l.amount) lavg, c.branch_id branch_id
                                FROM  centers c, clients cl, loans l, staff_members st
-                               WHERE  st.id=l.disbursed_by_staff_id AND l.disbursal_date IS NOT NULL
+                               WHERE  st.id=l.disbursed_by_staff_id AND l.disbursal_date IS NOT NULL AND rejected_on is NULL
                                AND l.disbursal_date>='#{@from_date.strftime('%Y-%m-%d')}' AND l.disbursal_date<='#{@to_date.strftime('%Y-%m-%d')}'
                                AND l.deleted_at IS NULL AND l.client_id=cl.id AND cl.deleted_at IS NULL AND cl.center_id=c.id
                                GROUP BY st.id
@@ -91,7 +91,7 @@ class LoanSizePerManagerReport < Report
     repository.adapter.query(%Q{
                                SELECT st.id manager_id, st.name name, SUM(l.amount) amount, c.branch_id branch_id
                                FROM  centers c, clients cl, loans l, staff_members st
-                               WHERE  st.id=l.approved_by_staff_id AND l.approved_on IS NOT NULL
+                               WHERE  st.id=l.approved_by_staff_id AND l.approved_on IS NOT NULL AND rejected_on is NULL
                                AND l.approved_on>='#{@from_date.strftime('%Y-%m-%d')}' AND l.approved_on<='#{@to_date.strftime('%Y-%m-%d')}'
                                AND l.deleted_at IS NULL AND l.client_id=cl.id AND cl.deleted_at IS NULL AND cl.center_id=c.id
                                GROUP BY st.id

@@ -65,10 +65,17 @@ class StaffConsolidatedReport < Report
       clients[c.id] = c
     }
     
+    extra_condition = ""
+    froms = "payments p, clients cl, centers c"
+    if self.loan_product_id
+      froms+= ", loans l"
+      extra_condition = " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
+    end
+
     repository.adapter.query(%Q{
-                               SELECT p.received_by_staff_id staff_id, c.id center_id, c.branch_id branch_id, type ptype, SUM(amount) amount
-                               FROM clients cl, centers c, payments p
-                               WHERE p.received_on >= '#{from_date.strftime('%Y-%m-%d')}' and p.received_on <= '#{to_date.strftime('%Y-%m-%d')}'
+                               SELECT p.received_by_staff_id staff_id, c.id center_id, c.branch_id branch_id, type ptype, SUM(p.amount) amount
+                               FROM #{froms}
+                               WHERE p.received_on >= '#{from_date.strftime('%Y-%m-%d')}' and p.received_on <= '#{to_date.strftime('%Y-%m-%d')}' #{extra_condition}
                                AND p.deleted_at is NULL AND p.client_id=cl.id AND cl.center_id=c.id AND cl.deleted_at is NULL AND c.id in (#{center_ids})
                                GROUP BY staff_id, center_id, p.type
                              }).each{|p|      
@@ -99,11 +106,11 @@ class StaffConsolidatedReport < Report
 
       data[branch][st] ||= {}
       data[branch][st][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][st][center][0] += l.amount
+      data[branch][st][center][0] += l.amount_applied_for||l.amount
     }
 
     #2: Approved on
-    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id, :approved_by_staff_id]}
+    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id, :approved_by_staff_id], :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
     Loan.all(hash).each{|l|
       next if not clients.key?(l.client_id)
@@ -115,11 +122,11 @@ class StaffConsolidatedReport < Report
 
       data[branch][st] ||= {}
       data[branch][st][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][st][center][1] += l.amount
+      data[branch][st][center][1] += l.amount_sanctioned||l.amount
     }
 
     #3: Disbursal date
-    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id, :disbursed_by_staff_id]}
+    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id, :disbursed_by_staff_id], :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
     Loan.all(hash).each{|l|
       next if not clients.key?(l.client_id)

@@ -59,13 +59,13 @@
             =branch.name
       -staff_members.sort_by{|staff_member, centers| staff_member.name}.each do |staff_member, centers|
         -if centers.keys.length>0
-          %tr.center#center
+          %tr.manager#center
             %td{:colspan => length+1}
               %b
                 =staff_member.name
           -staff_total = Array.new(length, 0)
           -centers.sort_by{|center, data| center.name}.each do |center, data_rows|
-            %tr.group
+            %tr.center
               %td
                 =center.name
               -data_rows.each_with_index do |row, idx|
@@ -77,7 +77,7 @@
                   %td
                     =row.to_i
                     -staff_total[idx]+=row.to_i
-          %tr.center_total
+          %tr.manager_total
             %td
               %b==Staff total:
               -branch_total.push(staff_total)

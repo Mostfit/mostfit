@@ -146,7 +146,9 @@ class Dashboard < Application
       if params[:group_by]=="age"
         title = "Client age profile (in years)"
         year  = Date.today.year
-        ages = get_clients.all(:date_of_birth.not => nil, :date_of_birth.lte => Date.today, :fields => [:id, :date_of_birth]).map{|cl| year-cl.date_of_birth.year}.map{|x| (x/10)*10}
+        ages = get_clients.all(:date_of_birth.not => nil, :date_of_birth.lte => Date.today, :fields => [:id, :date_of_birth]).map{|cl| 
+          year-cl.date_of_birth.year
+        }.map{|x| (x/10)*10}
         data = ages.uniq.sort.map{|x| [ages.count(x), "#{x} - #{x+10}"]}
       else
         today = Date.today
@@ -173,11 +175,11 @@ class Dashboard < Application
     case params[:id]
     when "growth", "cumulative"
       vals = repository.adapter.query(%Q{
-                                         SELECT count(cl.id) count, DATE(cl.date_joined) date
+                                         SELECT count(cl.id) count, DATE(l.disbursal_date) date
                                          FROM clients cl, centers c, loans l 
                                          WHERE cl.center_id=c.id AND l.client_id=cl.id AND cl.deleted_at is NULL AND cl.date_joined<=CURRENT_DATE()
                                                AND l.disbursal_date is NOT NULL AND l.deleted_at is NULL #{conditions}
-                                         GROUP BY MONTH(l.disbursal_date)
+                                         GROUP BY l.disbursal_date
                                       }).map{|r| [r.date, r.count]}
       if params[:id]=="growth"
         graph = BarGraph.new("Number of borrowers added #{get_period_text}")
@@ -190,11 +192,11 @@ class Dashboard < Application
       return graph.generate
     when "disbursements"
       vals = repository.adapter.query(%Q{
-                                         SELECT SUM(l.amount) amount, DATE(cl.date_joined) date
+                                         SELECT SUM(l.amount) amount, DATE(l.disbursal_date) date
                                          FROM clients cl,centers c, loans l 
                                          WHERE cl.center_id=c.id AND l.client_id=cl.id AND cl.deleted_at is NULL AND cl.date_joined<=CURRENT_DATE()
                                                AND l.disbursal_date is NOT NULL AND l.deleted_at is NULL #{conditions}
-                                         GROUP BY MONTH(cl.date_joined)
+                                         GROUP BY DATE(l.disbursal_date)
                                       }).map{|r| [r.date, r.amount.to_i]}
       graph = BarGraph.new("Amount disbursed (#{get_period_text})")
       graph.data_type = :individual
@@ -230,8 +232,7 @@ class Dashboard < Application
       graph.data_type = :individual
       graph.data(group_dates(data), :last, :first)
       graph.x_axis.steps = get_axis
-      return graph.generate
-      
+      return graph.generate      
     when "breakup"
       graph  = BarGraph.new("Loan breakup by #{params[:by].camelcase(' ')}")
       by     = params[:by].to_sym
@@ -452,7 +453,7 @@ class Dashboard < Application
 
   def group_dates(data)
     if not params[:time_period] or params[:time_period]=="monthly"
-      return data.sort_by{|d, c| d}.map{|d, c| [d.strftime("%Y %b"), c]}
+      return data.group_by{|d, c| Date.new(d.year, d.month, 1)}.map{|k, v| [k, v.map{|x| x[1]}.inject(0){|s,x| s+=x}]}.sort_by{|d, c| d}.map{|k, v| [k.strftime("%Y %b"), v]}
     elsif params[:time_period]=="quarterly"
       return data.group_by{|d, c| quarter(d)}.map{|k, v| [k, v.map{|x| x[1]}.inject(0){|s,x| s+=x}]}.sort_by{|d, c| d}
     elsif params[:time_period]=="yearly"

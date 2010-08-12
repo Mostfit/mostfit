@@ -22,6 +22,7 @@ class Mfi
   property :color, String, :nullable => true
   property :logo_name,  String, :nullable => true
   property :date_format, Enum.send('[]', *DateFormats), :nullable => true, :index => true
+  property :accounting_enabled, Boolean, :default => false, :index => true
 
   property :main_text, Text, :nullable => true, :lazy => true
   validates_length :name, :min => 3, :max => 20

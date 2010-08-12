@@ -16,7 +16,7 @@ class Centers < Application
     @center = Center.get(id)
     raise NotFound unless @center
     @branch  =  @center.branch if not @branch
-    @clients = get_grouped_clients
+    @clients =  grouped_clients
     display [@center, @clients, @date], 'clients/index'
   end
 
@@ -26,6 +26,53 @@ class Centers < Application
     @clients = @center.clients
     @loans = @clients.loans
     display [@center, @clients, @loans], 'clients/today'
+  end
+
+  def bulk_data_entry(id)
+    only_provides :html
+    @center = Center.get(id)
+    raise NotFound unless @center
+    @clients = @center.clients
+    raise NotFound unless params[:field_name]
+    match, model_name, field = /(\w+)\[(\w+)\]/.match(params[:field_name]).to_a
+    return unless model_name and field
+    @model            = Kernel.const_get(model_name.camelcase) 
+    @field            = field.to_sym
+    raise NotAllowed unless (MASS_ENTRY_FIELDS[model_name.to_sym] and MASS_ENTRY_FIELDS[model_name.to_sym].include?(@field))
+    @field            = :occupation if @model == Loan and @field==:purpose
+    if request.method==:get
+      render :layout => layout?
+    elsif request.method==:post
+      model = Kernel.const_get(params["model"])
+      column = if property = model.properties.find{|x| x.name == @field}
+                 property.name
+               elsif model.relationships[@field]
+                 model.relationships[@field].child_key.first.name
+               end
+      raise NotAllowed unless column
+      saved = []
+      params[params["model"].snake_case].each{|id, attr|
+        if id and not id.blank? and attr.length>0
+          attr.each{|col, val|         
+            next if val.blank?
+            val = val.to_i if /^\d+$/.match(val)
+            obj = model.get(id)     
+            next if obj.send(column) == val
+            obj.history_disabled=true if model==Loan
+            obj.send("#{column}=", val)
+            saved << obj.save
+          }
+        end
+      }
+      saved = saved.uniq
+      if saved == [true]
+        return("<div class='notice'>Saved successfully</div>")
+      elsif saved.include?(true) and saved.include?(false)
+        return("<div class='notice'>Saved with some errors</div>")
+      else
+        return("<div class='error'>Sorry! Not able to save</div>")
+      end
+    end
   end
 
   def new
@@ -98,7 +145,7 @@ class Centers < Application
   end
 
   def weeksheet
-    @clients_grouped = get_grouped_clients
+    @clients_grouped = grouped_clients
     @clients = @center.clients
     partial "centers/weeksheet"
   end
@@ -126,7 +173,7 @@ class Centers < Application
     end
   end
   
-  def get_grouped_clients
+  def grouped_clients
     clients = {}
     @center.clients.each{|c|
       group_name = c.client_group ? c.client_group.name : "No group"

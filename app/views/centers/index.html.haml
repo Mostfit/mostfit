@@ -29,6 +29,7 @@
     = link_to_with_rights 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit"
     = link_to_with_rights 'create a new center', resource(@branch, :centers, :new), :class => "add"
 
+
   %div.tab_container
     %ul.tabs
       %li#centers
@@ -45,6 +46,8 @@
         Audits
       %li#history
         History
+      %li#accounting
+        Accounting
     %div.tab
       %h2== Centers of the #{@branch.name} branch    
       =partial "centers/list"
@@ -63,3 +66,5 @@
       %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :id => @branch.id, :model => "Branch")}
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => "/accounts/branch?branch_id=#{@branch.id}"}

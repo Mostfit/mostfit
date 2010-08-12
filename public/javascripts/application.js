@@ -1,10 +1,10 @@
 // Common JavaScript code across your application goes here.
 var lineNos=0;
 function addFloater(link){
-    $(link).after("<div class='floater'><img height='400' src="+link.attr('href')+"/><span class='close_button'>X</span></div>");	  
+    $(link).after("<div class='floater'><img height='400' src="+link.attr('href')+"/><span class='close_button'>X</span></div>");
     $(".close_button").click(function(button){
-	    $("div.floater").remove();
-	});
+      $("div.floater").remove();
+    });
 }
 function spitLogs(){
     $.get("/logs/"+$("div.log_box").attr("id"), function(data){
@@ -18,7 +18,6 @@ function spitLogs(){
 	    }
 	});
 }
-
 function fillOptions(id, select){
     $.ajax({
 	    type: "GET",
@@ -162,6 +161,52 @@ function dateFromAge(ageYear, ageMonth, ageDay){
     }
     return birthDate;
 }
+function attachFormRemoteTo(form){
+  if(form.length==0)
+    return(false);
+  $(form).submit(function(){
+		   $(form).find("input[type='submit']").attr("disabled", true);
+		   $(form).after("<img id='spinner' src='/images/spinner.gif' />");
+		   $.ajax({
+			    type: form.attr("method"),
+			    url: form.attr("action"),
+			    data: form.serialize(),
+			    success: function(data, status, xmlObj){
+			      if(data.redirect){
+				window.location.href = data.redirect;
+			      }else if(form.find("input[name='_target_']").length>0){
+				id=form.find("input[name='_target_']").attr("value");
+				$("#"+id).html(data);
+				attachFormRemoteTo($("#"+id).find("form._remote_"));
+			      }else if(form.find("table").length>0){
+				form.find("table").html(data);
+				attachFormRemoteTo(form.find("table form._remote_"));
+			      }else if(form.find("div").length>0){
+				form.find("div").html(data);
+				attachFormRemoteTo(form.find("div").find("form._remote_"));
+			      }else{
+				form.append(data);
+				attachFormRemoteTo(form.find("form._remote_"));
+			      }
+			      $("#spinner").remove();
+			      $(form).find("input[type='submit']").attr("disabled", "");
+			    },
+			    error: function(xhr, text, errorThrown){
+			      if(xhr.status=="302"){
+				window.location.href = text;
+			      }else{
+				$("div.error").remove();
+				txt = "<div class='error'>"+xhr.responseText+"</div>"
+				form.before(txt);
+				$("#spinner").remove();
+				$(form).find("input[type='submit']").attr("disabled", "");
+			      }
+			    }
+			  });
+		   return false;
+		 });
+}
+
 function create_remotes(){
     $("a._remote_").click(function(){
 	    href=$(this).attr("href");
@@ -200,7 +245,7 @@ function create_remotes(){
 		    success: function(data){
 			$(a).after(data);
 			$(a).remove();
-      attachCustomTableEvents();
+			attachCustomTableEvents();
 		    },
 		    error: function(xhr, text, errorThrown){
 			txt = "<div class='error'>"+xhr.responseText+"</div>"
@@ -209,33 +254,8 @@ function create_remotes(){
 		});
 	    return false;
 	});
-
-    $("form._remote_").submit(function(){
-	    form = $(this);
-	    $(form).after("<img id='spinner' src='/images/spinner.gif' />");
-	    $.ajax({
-		    type: form.attr("method"),
-		    url: form.attr("action"),
-		    data: form.serialize(),
-		    success: function(data){
-			if(form.find("div").length>0)
-			    form.find("div").html(data);
-			else if(form.find("table").length>0){
-			    form.find("table").html(data);
-			}else if(form.find("input[name='_target_']").length>0){
-			    id=form.find("input[name='_target_']").attr("value");
-			    $("#"+id).html(data);
-			}
-			$("#spinner").remove();
-		    },
-		    error: function(xhr, text, errorThrown){
-			$("div.error").remove();
-			txt = "<div class='error'>"+xhr.responseText+"</div>"
-			form.before(txt);
-			$("#spinner").remove();			
-		    }
-		});
-	    return false;
+    $("form._remote_").each(function(idx, form){
+	    attachFormRemoteTo($(form));
 	});
 }
 function attachReportingFormEvents(id){
@@ -256,7 +276,7 @@ function attachReportingFormEvents(id){
 			url: "/search/get?counter="+counter+"&"+$("#reporting_form").serialize(),
 			success: function(data){
                               if(nextType==="span"){
-				  $("#reporting_form span#"+nextType+'_'+counter).html(data);				  
+				  $("#reporting_form span#"+nextType+'_'+counter).html(data);
 			      }else{
 				  $("#reporting_form select#"+nextType+'_'+counter).html("");
 				  $("#reporting_form select#"+nextType+'_'+counter).append(data);
@@ -337,7 +357,6 @@ function confirm_for(things) {
 
 $(document).ready(function(){
 	create_remotes();
-	$('form').highlight();
 	//Handling targets form
 	$("select#target_attached_to").change(function(){
 		$.ajax({
@@ -374,24 +393,33 @@ $(document).ready(function(){
 	    showTableTrs();
 	    var table = $("table.report");
 	    table.before("<a class='expand_all'>Expand all</a>");
+	    //level 2
 	    if(table.find("tr.branch td")){
 		if(table.find("tr.branch").attr("id"))
-		    name=table.find("tr.branch").attr("id");
+		  level2_name=table.find("tr.branch").attr("id");
 		else
-		    name='center';
-		table.find("tr.branch td").append("<a id='"+name+"' class='expand'>Expand "+name+"s</a>");
+		  level2_name='center';
+		if(table.find("tr." + level2_name).length>0)
+		  table.find("tr.branch td").append("<a id='"+level2_name+"' class='expand'>Expand "+level2_name+"s</a>");
+	      //level 3
+	      if(table.find("tr." + level2_name + " td")){
+		  if(table.find("tr." + level2_name).attr("id"))
+		    level3_name=table.find("tr."+level2_name).attr("id");
+		  else
+		    level3_name='group';
+		  if(table.find("tr." + level3_name).length>0)
+		    table.find("tr."+ level2_name + " td").append("<a id='"+level3_name+"' class='expand'>Expand "+level3_name+"s</a>");
+		  //level 4
+		  if(table.find("tr." + level3_name + " td").length>0){
+		    if(table.find("tr." + level3_name).attr("id"))
+		      level4_name=table.find("tr."+level3_name).attr("id");
+		    else
+		      level4_name='date';
+		    if(table.find("tr." + level4_name).length>0)
+		      table.find("tr."+ level3_name + " td").append("<a id='"+level4_name+"' class='expand'>Expand "+level4_name+"s</a>");
+		  }
+		}
 	    }
-	    if(table.find("tr.center td")){
-		if(table.find("tr.center").attr("id"))
-		    name=table.find("tr.center").attr("id");
-		else
-		    name='group';
-		table.find("tr.center td").append("<a id='"+name+"' class='expand'>Expand "+name+"s</a>");
-	    }
-	    if(table.find("tr.date").length>0)
-	       table.find("tr.group td").append("<a id='date' class='expand'>Expand dates</a>");
-	    if(table.find("tr.manager").length>0)
-	       table.find("tr.manager td").append("<a id='managed' class='expand'>Expand centers</a>");
 	    if($("table.report tr.loan").length>0)
 		$("table.report tr.group td").append("<a id='loan' class='expand'>Expand loans</a>");
 	    if($("table.report tr.client").length>0)
@@ -553,28 +581,56 @@ $(document).ready(function(){
   $("#bookmark_form input:checkbox").click(function(){
 	  if($(this).attr("value")==="all" && $(this).attr("checked")===true){
 	      $("#bookmark_form input:checkbox").each(function(){
-		      $(this).attr("checked", "true");		      
+		      $(this).attr("checked", "true");
 		  });
 	      $("#bookmark_form input[value='none']").attr("checked", "");
 	  }
 	  if($(this).attr("value")==="none" && $(this).attr("checked")===true){
 	      $("#bookmark_form input:checkbox").each(function(){
-		      $(this).attr("checked", "");		      
+		      $(this).attr("checked", "");
 		  });
 	      $("#bookmark_form input[value='none']").attr("checked", "true");
 	  }
 
       });
-  $("#client_active").change(function(){
-	  $("#inactive_options").toggle();
+  $("#account_account_type_id").change(function(select){
+	  val=$("#account_account_type_id").val();
+	  $.ajax({
+		  url: "/accounts?account_type_id="+val,
+		      success: function(data){$("#account_parent_id").html(data);}
+	      });
       });
   attachReportingFormEvents("formdiv_1");
   $("a.enlarge_image").click(function(a){
 	  link=$(a.currentTarget);
 	  addFloater(link);
 	  return(false);
-      });  
-
-//      $(".datepicker").datepicker();
+      });
+  if($("#rule_book_action").length>0){
+      function showHideFees(){
+	  if($("#rule_book_action").val()==="fees")
+	      $("#fees_row").show();
+	  else
+	      $("#fees_row").hide();
+      }
+      showHideFees();
+      $("#rule_book_action").change(function(){
+	      showHideFees();
+	  });
+  }
+  $("form._disable_button_").submit(function(form){
+    $(form.currentTarget).find("input[type='submit']").attr('disabled', true);
+    return(true);
+  });
+  $("a._rejection_button_").click(function(a){
+    if(confirm('Do you really want to reject these loans?')){
+      form = $($(a.currentTarget).parent()[0]);
+      form.attr("action", $(a.currentTarget).attr("href"));
+      form.submit();
+      return false;
+    }else{
+      return false;
+    }
+  });
 });
 

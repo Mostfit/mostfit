@@ -28,7 +28,7 @@
         = Branch.get(branch_id).name
     - branch_prin_due = branch_prin_paid = branch_int_due = branch_int_paid = branch_scheduled_disbursal = branch_disbursal  = 0
     -centers.each do |center|
-      %tr.center_total{:class => cycle('odd','even')}
+      %tr.center{:class => cycle('odd','even')}
         %td
           = link_to center.name, url(:quick_link, "centers", center.id) + "#weeksheet"
         %td.numeric

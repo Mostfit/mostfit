@@ -19,7 +19,7 @@
       Percentage complete
     %th
       Status
-  - @targets.each do |target|
+  - @data.each do |target|
     %tr
       %td
         =target.created_at.strftime($globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y")
