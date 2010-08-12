@@ -73,11 +73,18 @@ class QuarterConsolidatedReport < Report
     }
     branch_ids  = @branch.length>0 ? @branch.map{|x| x.id}.join(",") : "NULL"
     # payments
+    extra_condition = ""
+    froms = "payments p, clients cl, centers c"
+    if self.loan_product_id
+      froms+= ", loans l"
+      extra_condition = " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
+    end
+
     repository.adapter.query(%Q{
-                               SELECT c.branch_id branch_id, year(received_on) year, month(received_on) month, p.type ptype, SUM(amount) amount
-                               FROM payments p, clients cl, centers c
+                               SELECT c.branch_id branch_id, year(received_on) year, month(received_on) month, p.type ptype, SUM(p.amount) amount
+                               FROM #{froms}
                                WHERE p.received_on >= '#{from_date.strftime('%Y-%m-%d')}' and p.received_on <= '#{to_date.strftime('%Y-%m-%d')}'
-                               AND p.deleted_at is NULL AND p.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids})
+                               AND p.deleted_at is NULL AND p.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids}) #{extra_condition}
                                GROUP BY branch_id, year, month, ptype
                              }).each{|p|
       branch = @branch.find{|x| x.id == p.branch_id}
@@ -99,12 +106,14 @@ class QuarterConsolidatedReport < Report
         end
       end
     }
+    
+    product_cond = "AND l.loan_product_id=#{self.loan_product_id}"
 
     # loans disbursed
     repository.adapter.query(%Q{
                                SELECT c.branch_id branch_id, year(disbursal_date) year, month(disbursal_date) month, SUM(l.amount) amount
                                FROM loans l, clients cl, centers c
-                               WHERE l.disbursal_date >= '#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <= '#{to_date.strftime('%Y-%m-%d')}'
+                               WHERE l.disbursal_date >= '#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <= '#{to_date.strftime('%Y-%m-%d')}' #{product_cond}
                                AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids}) AND rejected_on is NULL
                                GROUP BY branch_id, month, year
                              }).each{|l|
@@ -124,9 +133,10 @@ class QuarterConsolidatedReport < Report
 
     # loans approved
     repository.adapter.query(%Q{
-                               SELECT c.branch_id branch_id, year(approved_on) year, month(approved_on) month, SUM(l.amount) amount
+                               SELECT c.branch_id branch_id, year(approved_on) year, month(approved_on) month, 
+                               SUM(if(l.amount_sanctioned>0, l.amount_sanctioned, l.amount)) amount
                                FROM loans l, clients cl, centers c
-                               WHERE l.approved_on >= '#{from_date.strftime('%Y-%m-%d')}' and l.approved_on <= '#{to_date.strftime('%Y-%m-%d')}'
+                               WHERE l.approved_on >= '#{from_date.strftime('%Y-%m-%d')}' and l.approved_on <= '#{to_date.strftime('%Y-%m-%d')}' #{product_cond}
                                AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids}) AND rejected_on is NULL
                                GROUP BY branch_id, month, year
                              }).each{|l|
@@ -146,9 +156,10 @@ class QuarterConsolidatedReport < Report
 
     # loans applied
     repository.adapter.query(%Q{
-                               SELECT c.branch_id branch_id, year(applied_on) year, month(applied_on) month, SUM(l.amount) amount
+                               SELECT c.branch_id branch_id, year(applied_on) year, month(applied_on) month, 
+                               SUM(if(l.amount_applied_for>0, l.amount_applied_for, l.amount)) amount
                                FROM loans l, clients cl, centers c
-                               WHERE l.applied_on >= '#{from_date.strftime('%Y-%m-%d')}' and l.applied_on <= '#{to_date.strftime('%Y-%m-%d')}'
+                               WHERE l.applied_on >= '#{from_date.strftime('%Y-%m-%d')}' and l.applied_on <= '#{to_date.strftime('%Y-%m-%d')}' #{product_cond}
                                AND   l.deleted_at is NULL AND l.client_id = cl.id AND cl.center_id=c.id AND c.branch_id in (#{branch_ids})
                                GROUP BY branch_id, month, year
                              }).each{|l|

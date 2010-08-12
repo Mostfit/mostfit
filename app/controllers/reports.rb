@@ -33,6 +33,7 @@ class Reports < Application
         display [@groups, @centers, @branches, @loans, @loan_products]
       elsif [ConsolidatedReport, LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, StaffConsolidatedReport, 
              QuarterConsolidatedReport, ClientAbsenteeismReport, LoanSizePerManagerReport, TargetReport, LoanDisbursementRegister, ProjectedReport, 
+             GroupConsolidatedReport
             ].include?(klass)
         @data  = @report.generate
         display @data

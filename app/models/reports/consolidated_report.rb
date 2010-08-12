@@ -62,11 +62,18 @@ class ConsolidatedReport < Report
       clients[c.id] = c
     }
     
+    extra_condition = ""
+    froms = "payments p, clients cl, centers c"
+    if self.loan_product_id
+      froms+= ", loans l"
+      extra_condition = " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
+    end
+
     repository.adapter.query(%Q{
-                               SELECT p.received_by_staff_id staff_id, c.id center_id, c.branch_id branch_id, type ptype, SUM(amount) amount
-                               FROM clients cl, centers c, payments p
-                               WHERE p.received_on >= '#{from_date.strftime('%Y-%m-%d')}' and p.received_on <= '#{to_date.strftime('%Y-%m-%d')}'
-                               AND p.deleted_at is NULL AND p.client_id=cl.id AND cl.center_id=c.id AND cl.deleted_at is NULL AND c.id in (#{center_ids})
+                               SELECT p.received_by_staff_id staff_id, c.id center_id, c.branch_id branch_id, type ptype, SUM(p.amount) amount
+                               FROM #{froms}
+                               WHERE p.received_on >='#{from_date.strftime('%Y-%m-%d')}' and p.received_on <= '#{to_date.strftime('%Y-%m-%d')}'AND p.deleted_at is NULL
+                               AND p.client_id=cl.id AND cl.center_id=c.id AND cl.deleted_at is NULL AND c.id in (#{center_ids})#{extra_condition}
                                GROUP BY center_id, p.type
                              }).each{|p|      
       if branch = branches[p.branch_id] and center = centers[p.center_id]
@@ -93,7 +100,7 @@ class ConsolidatedReport < Report
       branch = branches[center.branch_id]
 
       data[branch][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][center][0] += l.amount
+      data[branch][center][0] += l.amount_applied_for||l.amount
     }
 
     #2: Approved on
@@ -107,7 +114,7 @@ class ConsolidatedReport < Report
       branch = branches[center.branch_id]
 
       data[branch][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][center][1] += l.amount
+      data[branch][center][1] += l.amount_sanctioned||l.amount
     }
 
     #3: Disbursal date
