@@ -107,7 +107,7 @@ class QuarterConsolidatedReport < Report
       end
     }
     
-    product_cond = "AND l.loan_product_id=#{self.loan_product_id}"
+    product_cond = "AND l.loan_product_id=#{self.loan_product_id}" if self.loan_product_id
 
     # loans disbursed
     repository.adapter.query(%Q{
