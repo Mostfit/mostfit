@@ -2,9 +2,9 @@ class Reports < Application
   include DateParser
   Types = [
            DailyReport, ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, TransactionLedger, ProjectedReport, 
-           LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, 
+           LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, LoanSizePerManagerReport,
            TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, LoanSanctionRegister, ClientAbsenteeismReport, 
-           LoanSizePerManagerReport
+           BalanceSheet, GeneralLedgerReport, TrialBalanceReport
           ]
   layout :determine_layout 
 
@@ -32,9 +32,13 @@ class Reports < Application
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
       elsif [ConsolidatedReport, LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, StaffConsolidatedReport, 
-             QuarterConsolidatedReport, ClientAbsenteeismReport, LoanSizePerManagerReport, TargetReport, LoanDisbursementRegister].include?(klass)
+             QuarterConsolidatedReport, ClientAbsenteeismReport, LoanSizePerManagerReport, TargetReport, LoanDisbursementRegister, ProjectedReport, 
+            ].include?(klass)
         @data  = @report.generate
         display @data
+      elsif [BalanceSheet, GeneralLedgerReport, TrialBalanceReport].include?(klass)
+        @data  = @report.generate(params)
+        display @data        
       else
         @groups, @centers, @branches = @report.generate
         display [@groups, @centers, @branches]

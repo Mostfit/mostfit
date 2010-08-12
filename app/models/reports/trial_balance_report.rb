@@ -17,9 +17,8 @@ class TrialBalanceReport < Report
     "Trial Balance"
   end
 
-  def generate(param)
-  
-    Account.paginate(:order => [:account_type_id.asc],:page =>param[:page],:per_page => 10) 
+  def generate(param)  
+    Account.all(:order => [:account_type_id.asc])
   end
 end   
 
