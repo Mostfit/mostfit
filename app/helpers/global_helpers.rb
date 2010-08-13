@@ -273,7 +273,7 @@ module Merb
         next unless change
         change.map{|k, v|
           str="<tr><td>#{k.humanize}</td><td>"
-          str+=if action==:update
+          str+=if action==:update and v.class==Array
                  "changed from #{v.first}</td><td>to #{v.last}"
                elsif action==:create and v.class==Array
                  "#{v}"
