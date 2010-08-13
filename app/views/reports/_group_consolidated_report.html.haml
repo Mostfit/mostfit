@@ -64,7 +64,7 @@
               %b
                 =center.name
           - center_total = Array.new(length, 0)
-          -groups.sort_by{|group, data| group.name}.each do |group, data|
+          -groups.sort_by{|group, data| group ? group.name : " no group"}.each do |group, data|
             %tr.group
               %td
                 =group ? group.name : "no group"
