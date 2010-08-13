@@ -287,7 +287,12 @@ class Dashboard < Application
       graph.data_type = :individual
       graph.data(vals.map{|x|
                    branch=Branch.get(x.branch_id)
-                   [(100*(LoanHistory.defaulted_loan_info_for(branch).principal_due/(x.actual_outstanding_principal||0)).to_f).round(2), branch.name]
+                   principal_overdue = if history = LoanHistory.defaulted_loan_info_for(branch)
+                                         history.principal_due
+                                       else
+                                         0
+                                       end
+                   [(100*(principal_overdue/(x.actual_outstanding_principal||0)).to_f).round(2), branch.name]
                  })
       return graph.generate
     end
