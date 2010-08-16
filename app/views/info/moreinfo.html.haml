@@ -140,6 +140,7 @@
         Number of center managers
       %td
         =@centers[:upto].managers.count if @centers and @centers.length>0
+%table.moreinfo
   -if @centers and not @obj.class==StaffMember
     %tr
       %td
