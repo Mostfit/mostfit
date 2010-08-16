@@ -890,8 +890,8 @@ class Loan
     d = received_on
     total = total.to_f
     while used < total
-      prin -= principal_overpaid_on(d)
-      int  -= interest_overpaid_on(d)
+      prin -= principal_overpaid_on(d).round(2)
+      int  -= interest_overpaid_on(d).round(2)
       used  = (prin + int)
       d = shift_date_by_installments(d, 1)
     end

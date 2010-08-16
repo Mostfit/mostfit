@@ -249,11 +249,12 @@ class Client
   def check_client_deceased
     if not self.active and not self.inactive_reason.blank? and [:death_of_client, :death_of_spouse].include?(self.inactive_reason.to_sym)
       loans.each do |loan|
-        if (loan.status==:outstanding or loan.status==:disbursed) and self.claims.length>0 and claim=self.claims.last
+        if (loan.status==:outstanding or loan.status==:disbursed or loan.status==:claim_settlement) and self.claims.length>0 and claim=self.claims.last
           if claim.stop_further_installments
             last_payment_date = loan.payments.aggregate(:received_on.max)
+            #set date of stopping payments/claim settlement one ahead of date of last payment
             if last_payment_date and (last_payment_date > claim.date_of_death) 
-              loan.under_claim_settlement = last_payment_date 
+              loan.under_claim_settlement = last_payment_date + 1
             elsif claim.date_of_death
               loan.under_claim_settlement = claim.date_of_death
             else

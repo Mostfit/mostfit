@@ -173,16 +173,15 @@ class LoanHistory
 
   # TODO: subsitute the body of this function with sum_outstanding_grouped_by
   def self.sum_outstanding_by_group(from_date, to_date, loan_product_id=nil)
-    extra, from = "", "loan_history lh"
+    extra, from = "", "loan_history lh, loans l"
     if loan_product_id and loan_product_id.to_i>0
-      extra = "AND lh.loan_id=l.id AND l.loan_product_id=#{loan_product_id}"
-      from += ", loans l"
+      extra = "AND l.loan_product_id=#{loan_product_id}"
     end
     ids=repository.adapter.query(%Q{
                                  SELECT lh.loan_id loan_id, max(lh.date) date
                                  FROM #{from}
                                  WHERE lh.status in (5,6,7,8) AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' 
-                                 AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{extra}
+                                 AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' AND lh.loan_id=l.id AND l.deleted_at is NULL #{extra}
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
     return false if ids.length==0
@@ -205,16 +204,15 @@ class LoanHistory
 
   # TODO: subsitute the body of this function with sum_outstanding_grouped_by
   def self.sum_outstanding_by_center(from_date, to_date, loan_product_id=nil)
-    extra, from = "", "loan_history lh"
+    extra, from = "", "loan_history lh, loans l"
     if loan_product_id and loan_product_id.to_i>0
-      extra = "AND lh.loan_id=l.id AND l.loan_product_id=#{loan_product_id}"
-      from += ", loans l"
+      extra = "AND l.loan_product_id=#{loan_product_id}"
     end
     ids=repository.adapter.query(%Q{
                                  SELECT lh.loan_id loan_id, max(lh.date) date
                                  FROM #{from}
                                  WHERE lh.status in (5,6,7,8) AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' 
-                                 AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{extra}
+                                 AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' AND lh.loan_id=l.id AND l.deleted_at is NULL #{extra}
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
     return false if ids.length==0
@@ -235,16 +233,15 @@ class LoanHistory
   end
 
   def self.sum_outstanding_grouped_by(to_date, group_by, loan_product_id=nil)
-    extra, from = "", "loan_history lh"
+    extra, from = "", "loan_history lh, loans l"
     if loan_product_id and loan_product_id.to_i>0
-      extra = "AND lh.loan_id=l.id AND l.loan_product_id=#{loan_product_id}"
-      from += ", loans l"
+      extra = "AND l.loan_product_id=#{loan_product_id}"
     end
     ids=repository.adapter.query(%Q{
                                  SELECT lh.loan_id loan_id, max(lh.date) date
                                  FROM #{from}
                                  WHERE lh.status in (5,6,7,8)
-                                 AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{extra}
+                                 AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' AND lh.loan_id=l.id AND l.deleted_at is NULL #{extra}
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
     return false if ids.length==0
@@ -252,7 +249,7 @@ class LoanHistory
     if group_by.class==String
       group_by = group_by+"_id"
     elsif group_by.class==Array
-      group_by = group_by.map{|x| x+"_id"}.join(", ")
+      group_by = group_by.map{|x| "#{x}_id"}.join(", ")
     elsif group_by.class==Symbol
       group_by = "#{group_by}_id"
     else
@@ -278,16 +275,15 @@ class LoanHistory
   # TODO: subsitute the body of this function with sum_outstanding_grouped_by
   def self.sum_outstanding_by_month(month, year, branch, loan_product_id=nil)
     date = Date.new(year, month, -1)
-    extra, from = "", "loan_history lh"
+    extra, from = "", "loan_history lh, loans l"
     if loan_product_id and loan_product_id.to_i>0
       extra = "AND lh.loan_id=l.id AND l.loan_product_id=#{loan_product_id}"
-      from += ", loans l"
     end
     ids=repository.adapter.query(%Q{
                                  SELECT lh.loan_id loan_id, max(lh.date) date
                                  FROM #{from}
                                  WHERE lh.branch_id=#{branch.id} AND lh.status in (5,6,7,8)
-                                 AND lh.date<='#{date.strftime('%Y-%m-%d')}' #{extra}
+                                 AND lh.date<='#{date.strftime('%Y-%m-%d')}' AND lh.loan_id=l.id AND l.deleted_at is NULL #{extra}
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
     return false if ids.length==0

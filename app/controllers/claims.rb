@@ -63,6 +63,7 @@ class Claims < Application
   end
 
   private
+  include DateParser
   def get_client
     if params[:client_id]
       @client = Client.get(params[:client_id])
