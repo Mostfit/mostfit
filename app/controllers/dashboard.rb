@@ -204,12 +204,19 @@ class Dashboard < Application
       graph.x_axis.steps = get_axis
       return graph.generate
     when "outstanding"
+      condition = ""
       if params[:branch_id] and params[:branch_id].to_i > 0
-        condition = "AND lh.branch_id=#{params[:branch_id]}"
+        condition += "AND lh.branch_id=#{params[:branch_id]}"
         min_date  = Branch.get(params[:branch_id]).creation_date
       else
         min_date  = Loan.min(:disbursal_date)
       end
+      
+      if params[:staff_member_id] and params[:staff_member_id].to_i > 0
+        center_ids = StaffMember.get(params[:staff_member_id]).centers.map{|x| x.id}
+        condition += " AND lh.center_id in (#{center_ids.length==0 ? 'NULL' : center_ids.join(', ')})"
+      end
+
       data = []
       (min_date.year..Date.today.year).each{|year|
         1.upto(12){|month|
