@@ -120,8 +120,8 @@ class Claim
     self.attributes.each{|k, v|
       if v.is_a?(String) and v.empty? and [Float, Integer].include?(self.class.send(k).type)
         self.send("#{k}=", nil)
-      elsif v.is_a?(Mash) and [Date].include?(self.class.send(k).type)
-        self.send("#{k}=", nil) if v[:month] and v[:month].blank? and v[:day] and v[:day].blank? and v[:year] and v[:year].blank?
+      elsif [Date].include?(self.class.send(k).type)
+        self.send("#{k}=", nil) if v.blank? or (v.class==String and v[:month] and v[:month].blank? and v[:day] and v[:day].blank? and v[:year] and v[:year].blank?)
       end
     }
   end
