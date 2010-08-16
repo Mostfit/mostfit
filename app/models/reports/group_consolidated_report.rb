@@ -18,7 +18,7 @@ class GroupConsolidatedReport < Report
   
   def generate
     branches, centers, data, clients, loans, groups = {}, {}, {}, {}, {}, {}
-    histories = LoanHistory.sum_outstanding_by_group(self.from_date, self.to_date, self.loan_product_id)
+    histories = LoanHistory.sum_outstanding_grouped_by(self.to_date, [:center, :client_group], self.loan_product_id)
     @branch.each{|b|
       data[b]||= {}
       branches[b.id] = b
@@ -108,7 +108,7 @@ class GroupConsolidatedReport < Report
 
 
     #1: Applied on
-    hash = {:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :client_id]}
+    hash = {:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :amount_applied_for, :client_id]}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
 
     Loan.all(hash).each{|l|
@@ -122,7 +122,7 @@ class GroupConsolidatedReport < Report
     }
 
     #2: Approved on
-    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id], :rejected_on => nil}
+    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :amount_sanctioned, :client_id], :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
     Loan.all(hash).each{|l|
       client    = clients[l.client_id]

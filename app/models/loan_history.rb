@@ -249,7 +249,7 @@ class LoanHistory
     if group_by.class==String
       group_by = group_by+"_id"
     elsif group_by.class==Array
-      group_by = group_by.map{|x| x+"_id"}.join(", ")
+      group_by = group_by.map{|x| "#{x}_id"}.join(", ")
     elsif group_by.class==Symbol
       group_by = "#{group_by}_id"
     else

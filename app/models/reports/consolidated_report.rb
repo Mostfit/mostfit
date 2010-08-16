@@ -18,7 +18,7 @@ class ConsolidatedReport < Report
   
   def generate
     branches, centers, data, clients, loans = {}, {}, {}, {}, {}
-    histories = LoanHistory.sum_outstanding_by_center(self.from_date, self.to_date, self.loan_product_id)
+    histories = LoanHistory.sum_outstanding_grouped_by(self.to_date, :center, self.loan_product_id)
     @branch.each{|b|
       data[b]||= {}
       branches[b.id] = b
