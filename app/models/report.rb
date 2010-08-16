@@ -87,6 +87,7 @@ class Report
       key      = get_key(query)
       operator = get_operator(query)
       value    = get_value(value)
+      operator = " is " if value=="NULL" and operator=="="
       next if not key
       "#{key}#{operator}#{value}"
     }
@@ -133,6 +134,8 @@ class Report
       "'#{val.strftime("%Y-%m-%d")}'"
     elsif val.class==Array
       val.join(",")
+    elsif val.nil?
+      "NULL"
     else
       val
     end    

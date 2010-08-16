@@ -90,45 +90,51 @@ class ConsolidatedReport < Report
 
 
     #1: Applied on
-    hash = {:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :client_id, :applied_by_staff_id]}
+    hash = {:applied_on.gte => from_date, :applied_on.lte => to_date}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
-    Loan.all(hash).each{|l|
-      next if not clients.key?(l.client_id)
-      center_id = clients[l.client_id].center_id
-      next if not centers.key?(center_id)
-      center = centers[center_id]
-      branch = branches[center.branch_id]
-
-      data[branch][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][center][0] += l.amount_applied_for||l.amount
+    group_loans("c.branch_id, cl.center_id", "sum(if(amount_applied_for>0, amount_applied_for, amount)) amount", hash).group_by{|x| 
+      x.branch_id
+    }.each{|branch_id, center_rows| 
+      next if not branches.key?(branch_id)
+      branch = branches[branch_id]
+      center_rows.group_by{|x| x.center_id}.each{|center_id, row|        
+        next if not centers.key?(center_id)
+        center = centers[center_id]
+        data[branch][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        data[branch][center][0] += row[0].amount
+      }
     }
 
     #2: Approved on
-    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id, :approved_by_staff_id], :rejected_on => nil}
+    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
-    Loan.all(hash).each{|l|
-      next if not clients.key?(l.client_id)
-      center_id = clients[l.client_id].center_id
-      next if not centers.key?(center_id)
-      center = centers[center_id]
-      branch = branches[center.branch_id]
-
-      data[branch][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][center][1] += l.amount_sanctioned||l.amount
+    group_loans("c.branch_id, cl.center_id", "sum(if(amount_sanctioned > 0, amount_sanctioned, amount)) amount", hash).group_by{|x| 
+      x.branch_id
+    }.each{|branch_id, center_rows| 
+      next if not branches.key?(branch_id)
+      branch = branches[branch_id]
+      center_rows.group_by{|x| x.center_id}.each{|center_id, row|
+        next if not centers.key?(center_id)
+        center = centers[center_id]
+        data[branch][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        data[branch][center][1] += row[0].amount
+      }
     }
 
     #3: Disbursal date
-    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id, :disbursed_by_staff_id], :rejected_on => nil}
+    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
-    Loan.all(hash).each{|l|
-      next if not clients.key?(l.client_id)
-      center_id = clients[l.client_id].center_id
-      next if not centers.key?(center_id)
-      center = centers[center_id]
-      branch = branches[center.branch_id]
-
-      data[branch][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][center][2] += l.amount
+    group_loans("c.branch_id, cl.center_id", "sum(amount) amount", hash).group_by{|x| 
+      x.branch_id
+    }.each{|branch_id, center_rows| 
+      next if not branches.key?(branch_id)
+      branch = branches[branch_id]
+      center_rows.group_by{|x| x.center_id}.each{|center_id, row|        
+        next if not centers.key?(center_id)
+        center = centers[center_id]
+        data[branch][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        data[branch][center][2] += row[0].amount
+      }
     }
     return data
   end
