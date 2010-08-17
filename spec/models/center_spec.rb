@@ -53,6 +53,15 @@ describe Center do
     @center.should be_valid
   end
  
+  it "meeting date change should happen on the date specified" do
+    @center.meeting_day_change_date = Date.today - 50
+    @center.meeting_day = :tuesday
+    @center.save
+    @center =  Center.get(@center.id)
+    @center.meeting_day_for(Date.today-49).should eql(:tuesday)
+    @center.meeting_day_for(Date.today-51).should eql(:monday)
+  end
+
   it "should not be valid with a name shorter than 3 characters" do
     @center.name = "ok"
     @center.should_not be_valid

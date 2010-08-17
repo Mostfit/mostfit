@@ -1,6 +1,7 @@
 class Center
   include DataMapper::Resource
-
+  attr_accessor :meeting_day_change_date
+  
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   after :save, :handle_meeting_date_change
 
@@ -158,13 +159,14 @@ class Center
   end
 
   def handle_meeting_date_change
+    date = meeting_day_change_date||Date.today
     if not CenterMeetingDay.first(:center => self)
-      CenterMeetingDay.create(:center => self, :valid_from => creation_date, :meeting_day => self.meeting_day)
-    elsif self.meeting_day != self.meeting_day_for(Date.today)
-      cm = CenterMeetingDay.first(:center => self, :valid_from.lte => Date.today, :valid_upto.gte => Date.today)
-      cm.valid_upto = Date.today - 1
+      CenterMeetingDay.create(:center => self, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
+    elsif self.meeting_day != self.meeting_day_for(date)
+      cm = CenterMeetingDay.first(:center => self, :valid_from.lte => date, :valid_upto.gte => date)
+      cm.valid_upto = date - 1
       cm.save
-      CenterMeetingDay.create(:center => self, :valid_from => Date.today, :meeting_day => self.meeting_day)
+      CenterMeetingDay.create(:center => self, :valid_from => date, :meeting_day => self.meeting_day)
     end
   end
   
