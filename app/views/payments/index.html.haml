@@ -89,7 +89,7 @@
           - else
             = difference_in_days(@loan.scheduled_first_payment_date, actual_first_payment, ['days earlier', 'days later'])
             then scheduled
-            == (#{@loan.scheduled_disbursal_date})
+            == (#{@loan.scheduled_first_payment_date})
       - if @loan.class.to_s.match(/^TakeOver/)
         %br
         %i 

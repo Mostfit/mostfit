@@ -32,6 +32,8 @@ describe Loan do
     @center.manager = @manager
     @center.branch  = @branch
     @center.code = "cen"
+    @center.creation_date = Date.new(2000, 1, 1)
+    @center.meeting_day = :wednesday
     @center.save
     @center.should be_valid
 
@@ -544,7 +546,7 @@ describe Loan do
     @loan2.taken_over_on_installment_number = 10
     @loan2.valid?; @loan2.errors.each{|e| puts e}
     @loan2.should be_valid
-    @loan._show_cf; @loan2._show_cf
+#    @loan._show_cf; @loan2._show_cf
     @loan2.payment_schedule.count.should == @loan.payment_schedule.count - 9
     @loan2.taken_over_on = Date.parse("2001-02-04")
     @loan2.clear_cache
@@ -552,9 +554,26 @@ describe Loan do
   end
 
   it "should do deletion of payment" do 
-    p = @loan.payments.last
-    p.deleted_by = @user
-    p.deleted_at = Time.now
-    p.save.should == true
   end
-end;
+
+  it "should change with center meeting date change" do
+    old_dates = @loan.installment_dates
+    @loan_product.loan_validation_methods = "scheduled_dates_must_be_center_meeting_days"
+    @loan_product.save
+    @loan.scheduled_disbursal_date = Date.new(2000, 06, 14)
+    @loan.save
+    @loan.should be_valid
+
+    @center.meeting_day_change_date = Date.new(2001, 02, 1)
+    @center.meeting_day = :thursday
+    @center.save
+    @center = Center.get(@center.id)
+    @center.meeting_day_for(Date.new(2001, 01, 31)).should eql(:wednesday)
+    @center.meeting_day_for(Date.new(2001, 02, 2)).should eql(:thursday)
+
+    @loan = Loan.get(@loan.id)
+    new_dates =  @loan.installment_dates
+    (old_dates.find_all{|x| x<=Date.new(2001, 01, 31)} - new_dates.find_all{|x| x<=Date.new(2001, 01, 31)}).length.should eql(0)
+    (old_dates.find_all{|x| x>Date.new(2001, 01, 31)} - new_dates.find_all{|x| x>Date.new(2001, 01, 31)}.map{|x| x-1}).length.should eql(0)
+  end
+end

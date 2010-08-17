@@ -24,6 +24,8 @@ describe Center do
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
     @center.branch = @branch
+    @center.creation_date = Date.today - 100
+    @center.meeting_day = :monday
     @center.code = "center"
     @center.save
     @center.should be_valid
@@ -38,7 +40,28 @@ describe Center do
     @center.name = nil
     @center.should_not be_valid
   end
+
+  it "center should have meeting_days" do
+    @center.center_meeting_days.length.should eql(1)
+    @center.should be_valid
+  end
+
+  it "center should have meeting date change should create a new center_meeting_day entry" do
+    @center.meeting_day = :tuesday
+    @center.save
+    @center.center_meeting_days.length.should eql(2)
+    @center.should be_valid
+  end
  
+  it "meeting date change should happen on the date specified" do
+    @center.meeting_day_change_date = Date.today - 50
+    @center.meeting_day = :tuesday
+    @center.save
+    @center =  Center.get(@center.id)
+    @center.meeting_day_for(Date.today-49).should eql(:tuesday)
+    @center.meeting_day_for(Date.today-51).should eql(:monday)
+  end
+
   it "should not be valid with a name shorter than 3 characters" do
     @center.name = "ok"
     @center.should_not be_valid

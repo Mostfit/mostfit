@@ -1,0 +1,36 @@
+require "rubygems"
+require "fastercsv"
+require "merb-core"
+Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
+
+CenterMeetingDay.all.destroy!
+
+AuditTrail.all(:auditable_type => "Center", :action => :create).each{|at| 
+  at.changes.each{|change|
+    change.each{|key, value|
+      next unless key==:meeting_day
+      present_value = value.is_a?(Fixnum) ? Center::DAYS.index(value.is_a?(Fixnum)) : value
+      center = Center.get(at.auditable_id)
+      next unless center
+      value  = value.is_a?(Symbol) ? value : value.last
+      CenterMeetingDay.create(:center => center, :meeting_day => value, :valid_from => center.creation_date)
+    }
+  }
+}
+
+AuditTrail.all(:auditable_type => "Center", :action => :update).each{|at| 
+  at.changes.each{|change|
+    change.each{|key, values|
+      next unless key==:meeting_day
+      past_value    = values.first.is_a?(Fixnum) ? Center::DAYS.index(values.first.is_a?(Fixnum)) : values.first
+      present_value = values.last.is_a?(Fixnum) ? Center::DAYS.index(values.last.is_a?(Fixnum)) : values.last
+      center = Center.get(at.auditable_id)
+      next unless center
+      p CenterMeetingDay.all(:center => center)
+      oldrow = CenterMeetingDay.first(:center => center, :valid_from.lte => at.created_at, :valid_upto.gte => at.created_at)
+      oldrow.valid_upto = at.created_at.to_date - 1
+      oldrow.save
+      CenterMeetingDay.create(:center => center, :meeting_day => present_value, :valid_from => at.created_at.to_date)
+    }
+  }
+}

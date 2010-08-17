@@ -283,8 +283,10 @@ class Loan
         raise ArgumentError.new("Strange period you got..")
     end
     if cl=self.client(:fields => [:id, :center_id]) and cen=cl.center and cen.meeting_day != :none and ensure_meeting_day
-      next_meeting_day = cen.next_meeting_date_from(new_date)
-      new_date = next_meeting_day unless new_date.weekday == cen.meeting_day
+      unless new_date.weekday == cen.meeting_day_for(new_date)
+        next_meeting_day = cen.next_meeting_date_from(new_date)
+        new_date = next_meeting_day
+      end
       #new_date - new_date.cwday + Center.meeting_days.index(client.center.meeting_day)
     end
     new_date.holiday_bump
@@ -767,7 +769,9 @@ class Loan
   end
   # the installment dates
   def installment_dates
-    (0..(number_of_installments-1)).to_a.map { |x| shift_date_by_installments(scheduled_first_payment_date, x, [:weekly, :biweekly].include?(installment_frequency)) }
+    (0..(number_of_installments-1)).to_a.map {|x| 
+      shift_date_by_installments(scheduled_first_payment_date, x, [:weekly, :biweekly].include?(installment_frequency))
+    }
   end
 
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
