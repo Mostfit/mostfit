@@ -2,7 +2,8 @@ class Center
   include DataMapper::Resource
 
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
-  
+  after :save, :handle_meeting_date_change
+
   property :id,                   Serial
   property :name,                 String, :length => 100, :nullable => false, :index => true
   property :code,                 String, :length => 12, :nullable => true, :index => true
@@ -20,6 +21,7 @@ class Center
   has n, :clients
   has n, :client_groups
   has n, :loan_history
+  has n, :center_meeting_days
   
   validates_is_unique   :code, :scope => :branch_id
   validates_length      :code, :min => 1, :max => 12
@@ -77,15 +79,28 @@ class Center
     result
   end
 
+  def meeting_day_for(date)
+    @meeting_days ||= self.center_meeting_days(:order => [:valid_from])
+    if @meeting_days.length==0
+      meeting_day
+    elsif date_row = @meeting_days.find{|md| md.valid_from <= date and md.valid_upto >= date} 
+      date_row.meeting_day
+    elsif @meeting_days[0].valid_from > date
+      @meeting_days[0].meeting_day
+    else
+      @meeting_days[-1].meeting_day
+    end
+  end
+
   def next_meeting_date_from(date)
-    meeting_wday = Center.meeting_days.index(meeting_day)
+    meeting_wday = Center.meeting_days.index(meeting_day_for(date))
     next_meeting_date = date - date.wday + meeting_wday
     next_meeting_date += 7 if next_meeting_date <= date
     next_meeting_date.holiday_bump
   end
 
   def previous_meeting_date_from(date)
-    meeting_wday = Center.meeting_days.index(meeting_day)
+    meeting_wday = Center.meeting_days.index(meeting_day_for(date))
     previous_meeting_date = date - date.wday + meeting_wday
     previous_meeting_date -= 7 if previous_meeting_date >= date
     previous_meeting_date.holiday_bump
@@ -141,4 +156,16 @@ class Center
     return true if manager and manager.active
     [false, "Receiving staff member is currently not active"]
   end
+
+  def handle_meeting_date_change
+    if not CenterMeetingDay.first(:center => self)
+      CenterMeetingDay.create(:center => self, :valid_from => creation_date, :meeting_day => self.meeting_day)
+    elsif self.meeting_day != self.meeting_day_for(Date.today)
+      cm = CenterMeetingDay.first(:center => self, :valid_from.lte => Date.today, :valid_upto.gte => Date.today)
+      cm.valid_upto = Date.today - 1
+      cm.save
+      CenterMeetingDay.create(:center => self, :valid_from => Date.today, :meeting_day => self.meeting_day)
+    end
+  end
+  
 end
