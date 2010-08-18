@@ -36,24 +36,20 @@ class Rules < Application
     end
   end
 
-  #TODO:change this one after completing create
   def update(id, rule)
     rule = fix_conditions(rule)
-    message[:error] = "Update is not working yet"
-    render :new
-    #use to code below to make update
-#    @rule = Rule.get(id)
-#    raise NotFound unless @rule
-#    if @rule.update(rule)
-#       redirect resource(@rule)
-#    else
-#      display @rule, :edit
-#    end
+    @rule = Rule.get(id)
+    raise NotFound unless @rule
+    if @rule.update(rule)
+       redirect resource(@rule)
+    else
+      display @rule, :edit
+    end
   end
 
-  #TODO: remove rule from rules engine before destroying
   def destroy(id)
     @rule = Rule.get(id)
+		@rule.remove_rule
     raise NotFound unless @rule
     if @rule.destroy
       redirect resource(:rules)

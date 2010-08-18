@@ -34,7 +34,9 @@
         - if @rule.condition and Marshal.restore(@rule.condition)
           - id = 1
           - Marshal.restore(@rule.condition).to_a.each do |condition_id, cond|
-            %div{:class => "condition", :id => "condition#{condition_id}"}
+            %div{:class => "condition", :id => "c#{condition_id}"}
+              - debugger
+              - condition_id = condition_id.to_i
               - keys = [@rule.model_name] + cond[:keys]
               - model = nil
               - keys.each_with_index do |key, idx|
@@ -46,17 +48,17 @@
                   = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :prompt => "select property", :id => "select_#{id}")
                   - id+=1
                 - else
-                  - #debugger
                   - model = Kernel.const_get(keys[idx-1].singularize.camelcase)
                   - if model == nil
                     model is error
-                  - collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal", "equal to"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not", "not equal to"]]
-                  - collection2 = [["equal", "equal"], ["not", "not equal"]]
+                  - collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal to"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal to"]]
+                  - collection2 = [["equal2", "equal"], ["not2", "not equal"]]
+                  - debugger
                   - select1 = select(:id => "selectcomparator_#{id}", :name => "rule[condition][#{condition_id}][comparator]", :collection => collection1, :selected=>cond[:comprator])
                   - select2 = select(:id => "selectcomparator_#{id}", :name => "rule[condition][#{condition_id}][comparator][]", :collection => collection2, :selected=>cond[:comprator])
-                  - if collection1.flatten.include?(cond[:comparator])
+                  - if collection1.flatten.include?(cond[:comparator][0])
                     = select1
-                  - elsif collection2.flatten.include?(cond[:comparator])
+                  - elsif collection2.flatten.include?(cond[:comparator][0])
                     = select2
                   - else
                     = text_field(:id => "textfield_#{id}", :name => name, :class => "rules", :value=>cond[:comparator])
