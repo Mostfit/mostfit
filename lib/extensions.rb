@@ -95,10 +95,14 @@ module Misfit
           center = Center.get(id)
           return true if center.manager == staff_member
           return center.branch.manager == staff_member
+       elsif model == ClientGroup
+          center   = model.get(id).center
+          return true if center.manager == staff_member
+          return center.branch.manager == staff_member
         elsif model.respond_to?(:relationships) and model.relationships.include?(:manager)
           o = model.get(id)
           return true if o.manager == staff_member
-        elsif [Comment, Document, InsurancePolicy, InsuranceCompany].include?(model)
+        elsif [Comment, Document, InsurancePolicy, InsuranceCompany, Cgt, Grt].include?(model)
           reutrn true
         else
           return false
@@ -165,7 +169,12 @@ module Misfit
           if params and params[:loan_id]
             l = Loan.get(params[:loan_id])
             return ((l.client.center.manager == staff_member or l.client.center.branch.manager == staff_member))
-          end                     
+          end
+          
+          if params and params[:client_group_id] and ["cgts", "grts"].include?(@controller)
+            cg = ClientGroup.get(params[:client_group_id])
+            return ((cg.center.manager == staff_member or cg.center.branch.manager == staff_member))
+          end
         end
         r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
       end
