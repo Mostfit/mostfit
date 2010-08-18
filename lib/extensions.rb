@@ -128,10 +128,23 @@ module Misfit
         return true if role == :admin
         return true if route[:controller] == "graph_data" or route[:controller] == "info"
         return true if route[:controller] == "users" and route[:action] == "change_password"
+
         @route = route
         @controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
         @model = route[:controller].singularize.to_sym
         @action = route[:action]
+
+        #read only stuff
+        if role == :read_only 
+          if CUD_Actions.include?(@action)
+            return false 
+          elsif @controller.include?("data_entry")
+            return false
+          else
+            return true
+          end
+        end
+        
         return true if @action == "redirect_to_show"
         if @controller=="documents" and CUD_Actions.include?(@action)
           return true  if params[:parent_model]=="Client"
@@ -142,7 +155,6 @@ module Misfit
         end
         r = (access_rights[@action.to_s.to_sym] or access_rights[:all])
         return false if @action == "approve" and role == :data_entry
-        return false if role == :read_only and CUD_Actions.include?(@action) 
         return false if r.nil?
         if staff_member
           # Only allow branch managers to edit or create a new staff member, branch or a center
