@@ -43,7 +43,7 @@ Merb::Router.prepare do
   resources :loans, :id => %r(\d+)
   resources :centers, :id => %r(\d+)
   resources :payments
-  resources :branches  do    
+  resources :branches, :id => %r(\d+)  do    
     resources :journals
     resources :centers, :id => %r(\d+)  do
       resources :client_groups

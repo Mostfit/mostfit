@@ -33,15 +33,16 @@
             Absent by more than:
             =text_field(:absent_more_than, :size => 3)
             days
+    %table{:style => "padding-top: 0px;"}
       %tr
         - if @report.respond_to?(:branch_id)
           %td
             Branch: 
-            =select(:branch_id , :collection => get_accessible_branches, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id)
+            =select(:branch_id , :collection => get_accessible_branches, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id, :id => "branch_selector")
         - if @report.respond_to?(:center_id)
           %td
             Center:          
-            =select(:center_id , :collection => get_accessible_centers(branch_id), :include_blank => true, :selected => center_id)
+            =select(:center_id , :collection => get_accessible_centers(branch_id), :include_blank => true, :selected => center_id, :id => "center_selector")
         - if @report.respond_to?(:staff_member_id)
           %td
             Staff member:

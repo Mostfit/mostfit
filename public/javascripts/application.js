@@ -311,13 +311,11 @@ MAX_COLS = 20;
 function attachCustomTableEvents(){
   $("#reporting_form #customtable .checkbox").click(function() {
       var type = $(this);
-//      selected_field = $("#"+this.id + "_precedence_"); //#reporting_form #customtable @"+type.attr("name")+"[precedence]");
       selected_field = window.document.getElementById(this.id.replace("fields","precedence"));
       if(selected_field == null)
         return;
       if(total_cols >= MAX_COLS)
         return;
-      //alert(selected_field.style.display);
       if(selected_field.style.display == "none") {
         selected_field.style.display = "";
         selected_field.selectedIndex = total_cols;
@@ -327,13 +325,6 @@ function attachCustomTableEvents(){
         selected_field.style.display = "none";
         total_cols--;
       }
-
-      //alert(selected_field.attr("id"));
-      //selected_field.toggle();
-
-
-//      window.document.getElementByName(type.name+"_precedence").innerText("Hello")
-
       });
 }
 
@@ -354,9 +345,22 @@ function confirm_for(things) {
   }
 }
 
+function fillCenters(){
+  $("#branch_selector").change(function(){
+    $.ajax({
+      type: "GET",
+      url: "/branches/centers/"+$("#branch_selector").val(),
+      success: function(data){
+	$("#center_selector").html(data);
+      }
+    });
+  });
+}
+
 
 $(document).ready(function(){
 	create_remotes();
+	fillCenters();
 	//Handling targets form
 	$("select#target_attached_to").change(function(){
 		$.ajax({
