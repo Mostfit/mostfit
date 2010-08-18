@@ -8,19 +8,37 @@ class Rule
 
   property :active,              Boolean, :default => false
 
-  has n,   :conditions
-  has n,   :pre_conditions, :model => Condition, :is_rule => false
+  property :condition,		 Text, :length => 5000
+  property :precondition,	 Text
+
+#delete this
+# has n,   :conditions
+# has n,   :pre_conditions, :model => Condition, :is_rule => false
 
   validates_present :name
   validates_present :model_name
   validates_present :permit
   validates_present :on_action
   validates_present :active
+  validates_present :condition #precondition can be null (condition should not be null)
   validates_is_unique :name
-  
-  def atleast_one_conditio
-    return [false, "there are no conditions"] if self.conditions.count==0
-    return true
+  validates_with_method :apply_rule
+
+  def apply_rule
+		puts "Applying Rule #{@name}"
+    h = {:name => @name, :on_action => @on_action, :model_name => @model_name, 
+	    :permit => @permit, :condition => @condition, :precondition => @precondition}
+		Mostfit::Business::Rules.apply_rule h
   end
+
+  def remove_rule
+ 		h = {:name => @name, :model_name => @model_name}
+	  Mostfot::Business::Rules.remove_rule h
+	end
+  
+#  def atleast_one_condition
+#    return [false, "there are no conditions"] if self.conditions.count==0
+#    return true
+#  end
 
 end

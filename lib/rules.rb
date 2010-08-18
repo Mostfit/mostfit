@@ -61,28 +61,28 @@ module Mostfit
       private_class_method :initialize #to prevent direct object creation
     end
 
-    class Condition
+    class ComplexCondition
       attr_accessor :is_basic_condition , :basic_condition #makes sense only if its a basic condition
       attr_accessor :operator #makes sense only if its not a basic condition
       attr_accessor :condition1, :condition2 #makes sense only if its not a basic condition
 
       def self.get_condition(arr)
         if(arr[0] == :not) then
-          c = Condition.new
+          c = ComplexCondition.new
           c.operator = :not
-          c.condition1 = Condition.get_condition(arr[1])
+          c.condition1 = ComplexCondition.get_condition(arr[1])
           c.condition2 = nil
           c.is_basic_condition = false
           return c
         elsif((arr[0] == :and) || (arr[0] == :or)) then
-          c = Condition.new
+          c = ComplexCondition.new
           c.operator = arr[0]
-          c.condition1 = Condition.get_condition(arr[1])
-          c.condition2 = Condition.get_condition(arr[2])
+          c.condition1 = ComplexCondition.get_condition(arr[1])
+          c.condition2 = ComplexCondition.get_condition(arr[2])
           c.is_basic_condition = false
           return c
         else
-          c = Condition.new
+          c = ComplexCondition.new
           c.is_basic_condition = true
           c.basic_condition = BasicCondition.get_basic_condition(arr)
           return c
@@ -117,7 +117,9 @@ module Mostfit
       REJECT_REGEX = /^(Merb|merb)::*/
       
       def self.deploy #apply the business rules
-        load(File.join(Merb.root, "config", "rules.rb"))
+        #debugger
+        Rule.all.each {|r| r.apply_rule}
+#        load(File.join(Merb.root, "config", "rules.rb"))
       end
 
       def initialize
@@ -139,14 +141,59 @@ module Mostfit
         self.new.instance_eval(&blk)
       end
 
+			def self.apply_rule(rule)
+		    condition1 = Array.new
+				precondition1 = Array.new
+				#generating polish notation in condition1
+        if rule[:condition] != nil
+  		    Marshal.restore(rule[:condition]).to_a.reverse!.each do |idx, cond|
+  					if cond[:comparator] == nil or cond[:comparator].length ==0 or cond[:value] == nil or cond[:value].length == 0
+  									return nil
+  					end
+  		      if cond[:linking_operator] != ""
+  						condition1[2] = condition1.dup
+  			  	  condition1[0] = cond[:linking_operator]
+  						if condition1[0] == nil or condition1.length == 0
+  										return nil
+  						end
+  			      condition1[1] = [ cond[:keys].join("."), cond[:comparator], cond[:value]]
+  					elsif
+  						condition1 = [ cond[:keys].join("."), cond[:comparator], cond[:value]]
+  		      end
+  		    end
+        end
+        if rule[:precondition] != nil
+  		    Marshal.restore(rule[:precondition]).to_a.reverse!.each do |idx, cond|
+  		      if cond[:linking_operator] != ""
+  						precondition1[2] = precondition1.dup
+  			  	  precondition1[0] = cond[:linking_operator]
+  			      precondition1[1] = [ cond[:keys].join("."), cond[:comparator], cond[:value]]
+  					elsif
+  						precondition1 = [ cond[:keys].join("."), cond[:comparator], cond[:value]]
+  		      end
+  		    end
+        end
+		    h = {:name => rule[:name], :on_action => rule[:on_action], :model_name => rule[:model_name], 
+			    :permit => rule[:permit], :condition => condition1, :precondition => precondition1}
+				self.add h
+			end
+
       def self.add(hash)
-        hash[:model].send(:define_method, hash[:name]) do
+        if(hash[:model_name].class != Class)
+          hash[:model_name] = Kernel.const_get(hash[:model_name].camelcase)
+        end
+        hash[:model_name].send(:define_method, hash[:name]) do
           puts "#{hash[:name]} called"
-          if hash.key?(:precondition) #result = not precondition OR (precondition AND condition)
+          if hash.key?(:permit)
+            if(hash[:permit] == "false")
+              hash[:condition] = [:not, [hash[:condition] ]]
+            end
+          end
+          if hash.key?(:precondition) and hash[:precondition].length != 0 #result = not precondition OR (precondition AND condition)
             hash[:condition] = [:or, [:not, hash[:precondition]], 
               [:and, hash[:precondition], hash[:condition]] ]
           end
-          c = Condition.get_condition(hash[:condition])
+          c = ComplexCondition.get_condition(hash[:condition])
           #puts c.to_s
           if c.check_condition(self) then
             return true
@@ -155,13 +202,17 @@ module Mostfit
             return [false, "#{hash[:name]} violated"]
           end
         end
-        hash[:model].validates_with_method(hash[:name])
+        hash[:model_name].validates_with_method(hash[:name])
+      end
+
+      def self.remove_rule(hash)
+        self.remove(hash)
       end
 
       #to remove a validation
       def self.remove(hash)
-        if hash[:model].new.respond_to?(hash[:name])
-          hash[:model].send(:define_method, hash[:name]) do
+        if hash[:model_name].new.respond_to?(hash[:name])
+          hash[:model_name].send(:define_method, hash[:name]) do
             return true #overwrite the old function
           end
         end
@@ -171,7 +222,7 @@ module Mostfit
       def allow(hash)
         
         validator = get_condition(hash)
-        hash[:model].send(:define_method, hash[:name]) do
+        hash[:model_name].send(:define_method, hash[:name]) do
           if hash.key?(:precondition)
             return true if hash[:precondition] and validator.call(self)
           else
@@ -179,14 +230,14 @@ module Mostfit
           end
           return [false, "#{hash[:name]} violated"]
         end
-        hash[:model].validates_with_method(hash[:name])
+        hash[:model_name].validates_with_method(hash[:name])
       end
 
       #deprecated      
       def reject(hash)
         #TODO
 #        validator = get_condition(hash)
-#        hash[:model].send(:define_method, hash[:name]) do
+#        hash[:model_name].send(:define_method, hash[:name]) do
 #          if hash.key?(:precondition)
 #            return [false, "#{hash[:name]} violated"] if hash[:precondition] and validator.call(self)
 #          else
@@ -194,7 +245,7 @@ module Mostfit
 #          end
 #          return true
 #        end
-#        hash[:model].validates_with_method(hash[:name], :when => hash[:on])
+#        hash[:model_name].validates_with_method(hash[:name], :when => hash[:on_action])
       end
       
       def self.rules
@@ -216,8 +267,6 @@ module Mostfit
               s.send(x)
             }.send(condition[1], condition[2])
           }
-        #elsif hash[:condition].class==Hash
-        #  validator = hash[:condition].to_a.join(" => ")
         end
         validator
       end

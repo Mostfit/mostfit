@@ -23,11 +23,13 @@
       %td
         = rule.on_action
       %td
-        - rule.pre_conditions.each do |cond|
-          = "#{cond.keys} #{cond.comparator} #{cond.value}" 
+        - if Marshal.restore(rule.precondition)
+          - Marshal.restore(rule.precondition).each do |key, cond|
+            = "#{cond[:keys]} #{cond[:comparator]} #{cond[:value]}" 
       %td
-        - rule.conditions.each do |cond|
-          = "#{cond.keys} #{cond.comparator} #{cond.value}"
+        - if Marshal.restore(rule.condition)
+          - Marshal.restore(rule.condition).each do |key, cond|
+            = "#{cond[:keys]} #{cond[:comparator]} #{cond[:value]}"
           %br
       %td
         = rule.permit ? 'Allow' : 'Disallow'

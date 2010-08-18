@@ -24,30 +24,56 @@
     %td
       %b Pre Condition
     %td
-      %div.pre_conditions
-        - if @rule.pre_conditions and @rule.pre_conditions.length>0
-          - @rule.pre_conditions.each do |condition|
-            - keys = ([@rule.model_name] + condition.keys.split('.'))
-            - keys.each_with_index do |key, idx|
-              - name, field, choices = Condition.get_field_choices_and_name(key)
-              - if field == :select
-                - selected = keys.length==idx+1 ? condition.comparator.to_s : keys[idx+1]
-                = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :prompt => "select property", :id => "select_#{idx+1}")
-              - else
-                = text_field(:name => name, :class => "rules")               
+      TODO
   %tr
     %td
       %b Condition
-    %td
+    %td#conditions_container
       %div.conditions
-        - if @rule.conditions and @rule.conditions.length>0
-          - @rule.conditions.each do |condition|
-            - keys = ([@rule.model_name] + condition.keys.split('.'))
-            - keys.each_with_index do |key, idx|
-              - name, field, choices = Condition.get_field_choices_and_name(key)
-              - if field == :select
-                - selected = keys.length==idx+1 ? condition.comparator.to_s : keys[idx+1]
-                = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :prompt => "select property", :id => "select_#{idx+1}")
+        /TODO attach change events to all select boxes
+        - if @rule.condition and Marshal.restore(@rule.condition)
+          - id = 1
+          - Marshal.restore(@rule.condition).to_a.each do |condition_id, cond|
+            %div{:class => "condition", :id => "condition#{condition_id}"}
+              - keys = [@rule.model_name] + cond[:keys]
+              - model = nil
+              - keys.each_with_index do |key, idx|
+                - name, field, choices = Condition.get_field_choices_and_name(key)
+                - model, key_type = Condition.get_model(key)
+                - if model #field == :select
+                  - name = "rule[condition][#{condition_id}][keys][]"
+                  - selected = (keys.length==idx+1) ? cond[:comparator].to_s : keys[idx+1]
+                  = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :prompt => "select property", :id => "select_#{id}")
+                  - id+=1
+                - else
+                  - #debugger
+                  - model = Kernel.const_get(keys[idx-1].singularize.camelcase)
+                  - if model == nil
+                    model is error
+                  - collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal", "equal to"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not", "not equal to"]]
+                  - collection2 = [["equal", "equal"], ["not", "not equal"]]
+                  - select1 = select(:id => "selectcomparator_#{id}", :name => "rule[condition][#{condition_id}][comparator]", :collection => collection1, :selected=>cond[:comprator])
+                  - select2 = select(:id => "selectcomparator_#{id}", :name => "rule[condition][#{condition_id}][comparator][]", :collection => collection2, :selected=>cond[:comprator])
+                  - if collection1.flatten.include?(cond[:comparator])
+                    = select1
+                  - elsif collection2.flatten.include?(cond[:comparator])
+                    = select2
+                  - else
+                    = text_field(:id => "textfield_#{id}", :name => name, :class => "rules", :value=>cond[:comparator])
+                  - id+=1
+
+              - name = "rule[condition][#{condition_id}][value]"
+              - property = model.properties.find{|p| p.name.to_s==keys.last} || model.relationships[keys.last]
+              - if property.type==Date or property.type==DateTime
+                =date_select(name , cond[:value], :id => "date_#{id}")
+              - elsif property.class==DataMapper::Associations::ManyToOne::Relationship
+                =select(:id => "selectvalue_#{id}", :name => name, :collection => property.parent_model.all, :value_method => :id, :text_method => :name, :prompt => "Choose #{property.name}")
               - else
-                = text_field(:name => name, :class => "rules")               
-            = text_field(:name => "rule[conditions][value]", :class => "rules", :value => condition.value)
+                =text_field(:id => "textfield_#{id}", :name => name, :class => "rules", :value => cond[:value]) 
+              - id+=1
+              = select(:id => "selectmore_#{id}", :name => "rule[condition][#{condition_id}][linking_operator]", :selected => cond[:linking_operator], :collection => [["and", "and"], ["or", "or"]])
+            TODO displaying rules
+        - else #new rule
+          %div.condition#c1
+            = select(:name =>"rule[condition][1][keys][]", :prompt => "choose \"applicable for\"", :class => "rules", :id => "select_1")
+

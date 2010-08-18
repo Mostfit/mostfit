@@ -14,12 +14,22 @@
       %b= @rule.on_action
   %tr
     %td
+      Pre-condition
+    %td
+      - if Marshal.restore(@rule.precondition)
+        - Marshal.restore(@rule.precondition).each do |key, value|
+          = value[:keys]
+          = value[:comparator]
+          = value[:value]  %tr
+  %tr
+    %td
       Condition
     %td
-      - @rule.conditions.each do |condition|
-        = condition.keys
-        = condition.comparator
-        = condition.value
+      - if Marshal.restore(@rule.condition)
+        - Marshal.restore(@rule.condition).each do |key, value|
+          = value[:keys]
+          = value[:comparator]
+          = value[:value]
   %tr
     %td
       Allow this condition?
