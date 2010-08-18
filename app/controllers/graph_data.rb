@@ -60,9 +60,14 @@ class GraphData < Application
 
   def center(id)
     @center    = Center.get(id)
-    start_date = @center.clients.loans.min(:scheduled_disbursal_date)
-    end_date   = Date.today  # (@client.loans.map { |l| l.last_loan_history_date }).max
-    loan_ids   = @center.clients.loans.all(:fields => [:id]).map { |x| x.id }
+    end_date   = Date.today
+    if @center.clients.count>0
+      start_date = @center.clients.loans.min(:scheduled_disbursal_date)
+      loan_ids   = @center.clients.loans.all(:fields => [:id]).map { |x| x.id }
+    else
+      start_date = @center.creation_date
+      loan_ids   = []
+    end
     common_aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
