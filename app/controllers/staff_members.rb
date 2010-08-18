@@ -6,11 +6,10 @@ class StaffMembers < Application
   def index
     per_page = 25
     @date = params[:date] ? parse_date(params[:date]) : Date.today
-
+    @branch = Branch.get(params[:branch_id]) if params[:branch_id]
     hash = get_staff_members_hash
     @staff_members = StaffMember.all(hash).paginate(:page => params[:page], :per_page => per_page)
     set_staff_member_counts
-
     display @staff_members
   end
 
@@ -164,7 +163,12 @@ class StaffMembers < Application
       if klass==Branch or klass==Center
         aggregate_by   = :manager_staff_id
         overall_cond   = {:creation_date.lte => @date}
-        thismonth_cond = {:creation_date.lte => @date, :creation_date.gte => first_of_this_month}
+        thismonth_cond = {:creation_date.lte => @date, :creation_date.gte => first_of_this_month}        
+        if @branch
+          sym = (klass==Branch ? :id : :branch_id)
+          overall_cond[sym]   = @branch.id
+          thismonth_cond[sym] = @branch.id
+        end
       else
         name           = (type.to_s.split('_')-["loans"]).join("_")
         aggregate_by   = (name + "_by_staff_id").to_sym
