@@ -1,5 +1,6 @@
 class Center
   include DataMapper::Resource
+  include DateParser
   attr_accessor :meeting_day_change_date
   
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
@@ -159,7 +160,7 @@ class Center
   end
 
   def handle_meeting_date_change
-    meeting_day_change_date = parse_date(meeting_day_change_date) if self.meeting_day_change_date and not self.meeting_day_change_date.blank?
+    self.meeting_day_change_date = parse_date(self.meeting_day_change_date) if self.meeting_day_change_date.class==String and not self.meeting_day_change_date.blank?
     date = self.meeting_day_change_date||Date.today
     if not CenterMeetingDay.first(:center => self)
       CenterMeetingDay.create(:center => self, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
