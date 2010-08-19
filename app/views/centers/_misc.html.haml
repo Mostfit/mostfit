@@ -1,0 +1,18 @@
+%h2
+  Meeting day changes
+%table.report.nojs{:style => "width: 40%"}
+  %tr.header
+    %th
+      Valid from
+    %th
+      Valid upto
+    %th
+      Meeting day
+  - @meeting_days.each do |day|
+    %tr
+      %td
+        = day.valid_from
+      %td
+        = day.valid_upto
+      %td
+        = day.meeting_day

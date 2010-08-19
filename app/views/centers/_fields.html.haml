@@ -22,7 +22,7 @@
 %p
   %label{:for =>"meeting day"}Meeting every:
   - options = [['none', '<none>']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
-  = select :meeting_day, :collection => options, :onchange => "$('#hidden').css('display', 'block')"
+  = select :meeting_day, :collection => options, :onchange => "$('#hidden').css('display', 'block'Z)"
   &nbsp;&nbsp;on&nbsp;&nbsp;
   = text_field :meeting_time_hours,   :size => 2
   %b :
