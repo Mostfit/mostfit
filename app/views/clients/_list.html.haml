@@ -1,5 +1,5 @@
 %h2== Clients of the #{@center.name} center
-- if @clients.blank?
+- if @clients.blank? and @center.client_groups.length==0
   %p
     %i== No clients for the #{@branch.name} branch yet.
 - else
@@ -45,7 +45,17 @@
           = link_to 'edit', resource(@branch, @center, client, :edit)
           &nbsp;|&nbsp;
           = link_to 'new loan', resource(@branch, @center, client, :loans, :new)
-
+    - @center.client_groups.find_all{|cg| cg.clients.count==0}.each do |client_group|
+      %tr.group
+        %td{:colspan => 5}
+          %b
+            = link_to client_group.name, resource(client_group)
+            (
+            =link_to('edit', resource(@branch, @center, client_group, :edit))
+            )
+      %tr
+        %td{:colspan => 5}
+          %i No clients yet in this group
     %tfoot
       %tr
         %td{ :colspan => 7 }

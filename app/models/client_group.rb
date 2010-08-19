@@ -26,7 +26,7 @@ class ClientGroup
   # or do we need a state machine?
 
   def client_should_be_migratable
-    if self.clients.count>0 and self.dirty_attributes.find{|k,v| k.name==:center_id}
+    if not self.new? and self.clients.count>0 and self.dirty_attributes.find{|k,v| k.name==:center_id}
       errors = []
       self.clients.map{|client|
         client.center = self.center
