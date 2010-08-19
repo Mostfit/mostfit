@@ -129,7 +129,7 @@
       %td
         = text_field :taken_over_on_installment_number, :size => 5
         %span.greytext number of installments already paid
-  -if not @loan.new? and session.user.role==:admin
+  -if not @loan.new? and [:admin, :mis_manager].include?(session.user.role)
     %tr
       %td
         Approved Amount:
