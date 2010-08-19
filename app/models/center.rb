@@ -159,6 +159,7 @@ class Center
   end
 
   def handle_meeting_date_change
+    meeting_day_change_date = parse_date(meeting_day_change_date) if meeting_day_change_date and not meeting_day_change_date.blank?
     date = meeting_day_change_date||Date.today
     if not CenterMeetingDay.first(:center => self)
       CenterMeetingDay.create(:center => self, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
