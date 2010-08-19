@@ -87,44 +87,49 @@ class Rules < Application
 
   def get
 		id = params[:id].to_i
+    type = params[:type]
+    if type != "precondition"
+      type = "condition" #this step sanitizes "type", now this ensures that type is either "precondition" or "condition" and prevents XSS attacks since we will reflect back type to user
+    end
+
     model, key_type = Condition.get_model(params[:for])
     condition_id = params[:condition_id]
 		if model #field == :select
 		#debugger
       name, field, choices = Condition.get_field_choices_and_name(params[:for])
-      name = "rule[condition][#{condition_id}][keys][]"
-			return render(select(:name => name, :id => "select_#{id}", :class => "rules", :collection => choices), :layout => false)
+      name = "rule[#{type}][#{condition_id}][keys][]"
+			return render(select(:name => name, :id => "#{type}_select_#{id}", :class => "rules", :collection => choices), :layout => false)
 		else
 			model = Kernel.const_get(params["prev_field".to_sym].singularize.camelcase)
 			if model == nil
 				return "nil1"
       end
 	    property = model.properties.find{|p| p.name.to_s==params[:for]} || model.relationships[params[:for]]
-      name = "rule[condition][#{condition_id}][value]"
+      name = "rule[#{type}][#{condition_id}][value]"
 
 			collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal to"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal to"]]
 			collection2 = [["equal2", "equal"], ["not2", "not equal"]]
-      select1 = select(:id => "selectcomparator_#{id}", :name => "rule[condition][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection1)
-      select2 = select(:id => "selectcomparator_#{id}", :name => "rule[condition][#{condition_id}][comparator][]", :prompt => "Choose operator", :collection => collection2)
-      select3 = select(:id => "selectmore_#{id+2}", :name => "rule[condition][#{condition_id}][linking_operator]", :prompt => "Add more condition", 
+      select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection1)
+      select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator][]", :prompt => "Choose operator", :collection => collection2)
+      select3 = select(:id => "#{type}_selectmore_#{id+2}", :name => "rule[#{type}][#{condition_id}][linking_operator]", :prompt => "Add more condition", 
                        :collection => [["and", "and"], ["or", "or"]])
 
 	    if property.type==Date or property.type==DateTime
-		    return select1+date_select(name , Date.today, :id => "date_#{id+1}")+select3
+		    return select1+date_select(name , Date.today, :id => "#{type}_date_#{id+1}")+select3
     	elsif [DataMapper::Types::Serial, Integer, Float].include?(property.type)
-	      return select1+text_field(:id => "textfield_#{id+1}", :name => name)+select3
+	      return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+select3
     	elsif [String, DataMapper::Types::Text].include?(property.type)
-	      return select2+text_field(:id => "textfield_#{id+1}", :name => name)+select3
+	      return select2+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+select3
   	  elsif property.class==DataMapper::Associations::ManyToOne::Relationship
         return select2+
-          select(:id => "selectvalue_#{id+1}", :name => name, :collection => property.parent_model.all, :value_method => :id, :text_method => :name, :prompt => "Choose #{property.name}")+
+          select(:id => "#{type}_selectvalue_#{id+1}", :name => name, :collection => property.parent_model.all, :value_method => :id, :text_method => :name, :prompt => "Choose #{property.name}")+
           select3
           
 	    elsif property.type==DataMapper::Types::Boolean
-  	    return select2+select(:id => "selectboolean_#{id+1}", :name => name, 
+  	    return select2+select(:id => "#{type}_selectboolean_#{id+1}", :name => name, 
                     :collection => [["true", "yes"], ["false", "no"]], :prompt => "Choose #{property.name}")+select3
 	    elsif property.type.class==Class
-	      return select2+text_field(:id => "textfield_#{id+1}", :name => name)+select3
+	      return select2+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+select3
       end
   
 		end

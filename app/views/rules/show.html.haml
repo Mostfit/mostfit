@@ -20,7 +20,8 @@
         - Marshal.restore(@rule.precondition).each do |key, value|
           = value[:keys]
           = value[:comparator]
-          = value[:value]  %tr
+          = value[:value] 
+          = value[:linking_operator]
   %tr
     %td
       Condition
@@ -30,6 +31,7 @@
           = value[:keys]
           = value[:comparator]
           = value[:value]
+          = value[:linking_operator]
   %tr
     %td
       Allow this condition?
