@@ -60,6 +60,14 @@ class Branch
       Branch.all(:conditions => ["code=? or name like ?", q, q+'%'])
     end
   end
+  
+  def client_ids
+    repository.adapter.query(%Q{
+                                SELECT cl.id clid
+                                FROM branches b, centers c, clients cl
+                                WHERE b.id=#{self.id} AND b.id=c.branch_id AND c.id=cl.center_id AND cl.deleted_at is NULL
+                             })    
+  end
 
   private
   def manager_is_an_active_staff_member?
