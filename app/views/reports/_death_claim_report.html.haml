@@ -1,0 +1,84 @@
+=partial :form
+%table.report.nojs
+  %tr.header
+    %th{:width => '20%'}
+      Date
+    %th{:width => '20%'}
+      Client
+    %th{:width => '10%'}
+      Death of
+    %th{:width => '10%'}
+      Date of Death
+    %th{:width => '10%'}
+      Date of Claim
+    %th{:width => '10%'}
+      Pending Documents
+    %th
+      Disbursed
+   
+    %th{:colspan => "4"}
+      Payment
+    %th{:width => '10%'}
+      Balance Outstanding
+  %tr.header
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+      Principal
+    %th
+      Interest
+    %th
+      Fee
+    %th
+      Total
+  - center_id, branch_id = nil, nil
+  - length = 12
+  - groups_available = @payments.values.collect{|x| x.keys}.flatten.uniq
+  - org_total = []
+ 
+  -@clients.each do |branch_id, centers|
+    -if centers.keys.length>0 
+      -centers.sort_by{|center_id, groups| @centers[center_id].name}.each do |center_id, groups|
+        -if groups.keys.length>0 and (groups.keys & groups_available).length>0
+          %tr.center
+          
+          -groups.sort_by{|x| @groups[x[0]].name}.each do |group_id, clients|
+            -if groups_available.include?(group_id)
+        
+              -@payments.keys.sort.each do |date|
+          
+                -if @payments[date] and @payments[date][group_id] and @payments[date][group_id].keys.length>0
+                  -@payments[date][group_id].keys.sort_by{|x| clients.find{|c| c.id==x}.name}.each do |client_id|
+                    -itr=@payments[date][group_id][client_id].collect{|x| x.length}.max
+                    -itr.times do |i|
+                      %tr.date
+                        %td.align_left
+                          = date
+                        %td.align_left
+                          =clients.find{|x| x.id==client_id}.name
+                        -sum=0
+           
+                        %td
+                        %td
+                        %td
+                        %td
+		        
+                        -@payments[date][group_id][client_id].each_with_index do |e, col|
+                          %td
+                            -if e[i]
+                              =e[i]
+                              -e_val = e[i]
+                              -sum += e_val if col>0
+          
+                            -else
+                              0
+                        %td
+                          =sum
+          
+                 
+ 
