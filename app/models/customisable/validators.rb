@@ -50,10 +50,14 @@ module Misfit
       return [false, "Not client defined"] if not client
       center = client.center
       failed = []
+      correct_weekday = nil 
       ["scheduled_first_payment_date", "scheduled_disbursal_date"].each do |d|
-        failed << d if not date = instance_eval(d) or not date.weekday == center.meeting_day_for(date)
+        if not date = instance_eval(d) or not date.weekday == center.meeting_day_for(date)
+          failed << d 
+          correct_weekday = center.meeting_day_for(date)
+        end
       end
-      return [false, "#{failed.join(",")} must be #{center.meeting_day_for(date)}"]      unless failed.blank?
+      return [false, "#{failed.join(",")} must be #{correct_weekday}"]      unless failed.blank?
       return true
     end
 
