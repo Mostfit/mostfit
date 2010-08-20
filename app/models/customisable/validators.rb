@@ -48,10 +48,10 @@ module Misfit
 
     def scheduled_dates_must_be_center_meeting_days
       return [false, "Not client defined"] if not client
-      meeting_day = client.center.meeting_day
+      center = client.center
       failed = []
       ["scheduled_first_payment_date", "scheduled_disbursal_date"].each do |d|
-        failed << d if not instance_eval(d) or not instance_eval(d).weekday == meeting_day
+        failed << d if not date = instance_eval(d) or not date.weekday == center.meeting_day_for(date)
       end
       return [false, "#{failed.join(",")} must be #{meeting_day}"]      unless failed.blank?
       return true
