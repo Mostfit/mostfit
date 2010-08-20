@@ -22,13 +22,17 @@
 %p
   %label{:for =>"meeting day"}Meeting every:
   - options = [['none', '<none>']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
-  = select :meeting_day, :collection => options
+  = select :meeting_day, :collection => options, :onchange => "$('#hidden').css('display', 'block')"
   &nbsp;&nbsp;on&nbsp;&nbsp;
   = text_field :meeting_time_hours,   :size => 2
   %b :
   = text_field :meeting_time_minutes, :size => 2
   &nbsp;&nbsp;
   %span.greytext time is in a 24 hour format
+  %div#hidden{:style => "display: none"}
+    - unless @center.new?
+      change effective from:  
+      = date_select_for @center, :meeting_day_change_date
 %p
   %label{:for =>""}Managed by:
   = select_staff_member_for @center, :manager

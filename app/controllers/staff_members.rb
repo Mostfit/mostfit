@@ -6,11 +6,10 @@ class StaffMembers < Application
   def index
     per_page = 25
     @date = params[:date] ? parse_date(params[:date]) : Date.today
-
+    @branch = Branch.get(params[:branch_id]) if params[:branch_id]
     hash = get_staff_members_hash
     @staff_members = StaffMember.all(hash).paginate(:page => params[:page], :per_page => per_page)
     set_staff_member_counts
-
     display @staff_members
   end
 
@@ -156,7 +155,7 @@ class StaffMembers < Application
   def set_staff_member_counts
     first_of_this_month = Date.new(@date.year, @date.month, 1)
     end_of_this_month   = @date
-
+    client_ids = @branch.client_ids if @branch
     { 
       :branch_managers => Branch, :center_managers => Center, :applied_loans => Loan, :approved_loans => Loan, 
       :rejected_loans  => Loan, :disbursed_loans => Loan, :written_off_loans => Loan
@@ -164,13 +163,23 @@ class StaffMembers < Application
       if klass==Branch or klass==Center
         aggregate_by   = :manager_staff_id
         overall_cond   = {:creation_date.lte => @date}
-        thismonth_cond = {:creation_date.lte => @date, :creation_date.gte => first_of_this_month}
+        thismonth_cond = {:creation_date.lte => @date, :creation_date.gte => first_of_this_month}        
+        if @branch
+          sym = (klass==Branch ? :id : :branch_id)
+          overall_cond[sym]   = @branch.id
+          thismonth_cond[sym] = @branch.id
+        end
       else
         name           = (type.to_s.split('_')-["loans"]).join("_")
         aggregate_by   = (name + "_by_staff_id").to_sym
         date_key       = name=="disbursed" ? :disbursal_date : (name+"_on").to_sym
         overall_cond   = {date_key.lte => @date}
         thismonth_cond = {date_key.lte => @date, date_key.gte => first_of_this_month}
+        if @branch
+          branch_cond     = {:client_id => client_ids}
+          overall_cond   += branch_cond
+          thismonth_cond += branch_cond
+        end
       end
       
       instance_variable_set("@#{type}_overall",   klass.all(overall_cond).aggregate(aggregate_by, :all.count))

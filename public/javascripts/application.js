@@ -164,7 +164,8 @@ function dateFromAge(ageYear, ageMonth, ageDay){
 function attachFormRemoteTo(form){
   if(form.length==0)
     return(false);
-  $(form).submit(function(){
+  $(form).submit(function(f){
+		   form=$(f.currentTarget);
 		   $(form).find("input[type='submit']").attr("disabled", true);
 		   $(form).after("<img id='spinner' src='/images/spinner.gif' />");
 		   $.ajax({
@@ -209,27 +210,28 @@ function attachFormRemoteTo(form){
 
 function create_remotes(){
     $("a._remote_").click(function(){
-	    href=$(this).attr("href");
-	    method="GET"
-	    if($(this).hasClass("self")){
-		href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
-                method="POST"
-	    }
-	    a=$(this);
-	    $.ajax({
-		    type: "POST",
-		    url: href,
-		    success: function(data){
-			$(a).after(data);
-			$(a).remove();
-		    },
-		    error: function(xhr, text, errorThrown){
-			txt = "<div class='error'>"+xhr.responseText+"</div>"
-			$(a).after(txt);
-		    }
-		});
-	    return false;
-	});
+      $(this).unbind();
+      href=$(this).attr("href");
+      method="GET"
+      if($(this).hasClass("self")){
+	href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+        method="POST"
+      }
+      a=$(this);
+      $.ajax({
+	type: "POST",
+	url: href,
+	success: function(data){
+	  $(a).after(data);
+	  $(a).remove();
+	},
+	error: function(xhr, text, errorThrown){
+	  txt = "<div class='error'>"+xhr.responseText+"</div>"
+	  $(a).after(txt);
+	}
+      });
+      return false;
+    });
 
     $("a._customreports_").click(function(){
 	    href=$(this).attr("href");
@@ -255,7 +257,8 @@ function create_remotes(){
 	    return false;
 	});
     $("form._remote_").each(function(idx, form){
-	    attachFormRemoteTo($(form));
+			      $(form).unbind();
+			      attachFormRemoteTo($(form));
 	});
 }
 function attachReportingFormEvents(id){
@@ -311,13 +314,11 @@ MAX_COLS = 20;
 function attachCustomTableEvents(){
   $("#reporting_form #customtable .checkbox").click(function() {
       var type = $(this);
-//      selected_field = $("#"+this.id + "_precedence_"); //#reporting_form #customtable @"+type.attr("name")+"[precedence]");
       selected_field = window.document.getElementById(this.id.replace("fields","precedence"));
       if(selected_field == null)
         return;
       if(total_cols >= MAX_COLS)
         return;
-      //alert(selected_field.style.display);
       if(selected_field.style.display == "none") {
         selected_field.style.display = "";
         selected_field.selectedIndex = total_cols;
@@ -327,13 +328,6 @@ function attachCustomTableEvents(){
         selected_field.style.display = "none";
         total_cols--;
       }
-
-      //alert(selected_field.attr("id"));
-      //selected_field.toggle();
-
-
-//      window.document.getElementByName(type.name+"_precedence").innerText("Hello")
-
       });
 }
 
@@ -354,9 +348,22 @@ function confirm_for(things) {
   }
 }
 
+function fillCenters(){
+  $("#branch_selector").change(function(){
+    $.ajax({
+      type: "GET",
+      url: "/branches/centers/"+$("#branch_selector").val(),
+      success: function(data){
+	$("#center_selector").html(data);
+      }
+    });
+  });
+}
+
 
 $(document).ready(function(){
 	create_remotes();
+	fillCenters();
 	//Handling targets form
 	$("select#target_attached_to").change(function(){
 		$.ajax({

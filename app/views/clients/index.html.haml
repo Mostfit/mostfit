@@ -55,6 +55,8 @@
       Data Entry
     %li#history
       History
+    %li#miscellaneous
+      Miscellaneous
   %div.tab    
     =partial "clients/list", :center_leader => leader
   %div.tab    
@@ -75,3 +77,5 @@
     %div#bulk_form
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :centers, :id => @center.id, :action => :misc)}

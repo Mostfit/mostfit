@@ -1,10 +1,8 @@
 %div{:style => "float: right"}
-  %b Branch selector
   =form(:method => :get, :action => url(:staff_members)) do 
+    %b Branch selector
     = select :branch_id, :collection => get_accessible_branches, :text_method => :name, :value_method => :id, :prompt => "All branches"
-    = submit "Go"
-  =form_for(@staff_member, :action => url(:staff_members), :method => :get, :style => "float: left; background: #fbf8f1; padding: 10px; border: solid 1px lightgrey") do
-    Change date
+    %b Change date
     = date_select "date", @date
     =submit "Go"
 

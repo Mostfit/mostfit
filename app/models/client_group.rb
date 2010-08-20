@@ -15,7 +15,8 @@ class ClientGroup
   has n, :clients
   belongs_to :center
   belongs_to :created_by_staff,  :child_key => [:created_by_staff_member_id], :model => 'StaffMember'
-  validates_is_unique :name, :scope => :center_id  
+  validates_is_unique :name, :scope => :center_id
+  validates_with_method :client_should_be_migratable
 
   has n, :cgts
   has n, :grts
@@ -24,14 +25,26 @@ class ClientGroup
   # has n, :cgts        has n, :grts
   # or do we need a state machine?
 
+  def client_should_be_migratable
+    if not self.new? and self.clients.count>0 and self.dirty_attributes.find{|k,v| k.name==:center_id}
+      errors = []
+      self.clients.map{|client|
+        client.center = self.center
+        errors << "<li>#{client.name} - #{client.errors.to_a.to_s}</li>" unless client.valid?
+      }
+      return [false, "<ul>#{errors}</ul>"] if errors.length>0
+    end
+    return true
+  end
 
   def sync_clients
     Client.all(:client_group_id => self.id).each{|client|
       client.center = self.center
-      client.save
-    }
-    Client.all(:client_group_id => self.id).loans.each{|l|
-      l.update_history
+      if client.save    
+        client.loans.each{|l|
+          l.update_history
+        }
+      end
     }
   end
 

@@ -18,7 +18,7 @@
     %td
       Date of issue
     %td
-      =date_select_for @document, :date_of_issue
+      =date_select_for @document, :date_of_issue, :min_date => Date.new(1950, 1, 1)
   %tr
     %td
       Valid Date

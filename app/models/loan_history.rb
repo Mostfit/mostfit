@@ -82,6 +82,7 @@ class LoanHistory
   end
 
   def self.sum_outstanding_for_loans(date, loan_ids)
+    loan_ids = loan_ids.length > 0 ? loan_ids.join(', ') : "NULL"
     repository.adapter.query(%Q{
       SELECT
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
@@ -90,7 +91,7 @@ class LoanHistory
         SUM(actual_outstanding_total)        AS actual_outstanding_total
       FROM
       (select scheduled_outstanding_principal,scheduled_outstanding_total, actual_outstanding_principal, actual_outstanding_total from
-        (select loan_id, max(date) as date from loan_history where date <= '#{date.strftime('%Y-%m-%d')}' and loan_id in (#{loan_ids.join(', ')}) and status in (5,6,7,8) group by loan_id) as dt, 
+        (select loan_id, max(date) as date from loan_history where date <= '#{date.strftime('%Y-%m-%d')}' and loan_id in (#{loan_ids}) and status in (5,6,7,8) group by loan_id) as dt, 
         loan_history lh
       where lh.loan_id = dt.loan_id and lh.date = dt.date) as dt1;})
   end
