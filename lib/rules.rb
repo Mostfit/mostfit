@@ -11,16 +11,17 @@ module Mostfit
         else
           a = BasicCondition.new
           a.appliesOn = "DEFAULT" #wierd default to see if something fails
-          a.operator = :-
+          a.operator = :ILLEGAL_OPERATOR
           a.compareWith = -1
+          debugger
 
           a.appliesOn = arr[0]
-          a.operator = :<  if arr[1] == :less_than
-          a.operator = :<= if arr[1] == :less_than_equal
-          a.operator = :>  if arr[1] == :greater_than
-          a.operator = :>= if arr[1] == :greater_than_equal
-          a.operator = :== if arr[1] == :equal
-          a.operator = "!=".to_sym if arr[1] == :not
+          a.operator = :<  if arr[1] == "less_than"
+          a.operator = :<= if arr[1] == "less_than_equal"
+          a.operator = :>  if arr[1] == "greater_than"
+          a.operator = :>= if arr[1] == "greater_than_equal"
+          a.operator = :== if (arr[1] == "equal1") or (arr[1] == "equal2")
+          a.operator = "!=".to_sym if (arr[1] == "not1") or (arr[1] == "not2")
           a.compareWith = arr[2]
 
           a.validator = Proc.new{|obj|
@@ -117,7 +118,6 @@ module Mostfit
       REJECT_REGEX = /^(Merb|merb)::*/
       
       def self.deploy #apply the business rules
-        #debugger
         Rule.all.each {|r| r.apply_rule}
 #        load(File.join(Merb.root, "config", "rules.rb"))
       end
@@ -156,9 +156,9 @@ module Mostfit
   						if condition1[0] == nil or condition1.length == 0
   										return nil
   						end
-  			      condition1[1] = [ cond[:keys].join("."), cond[:comparator], cond[:value]]
+  			      condition1[1] = [ cond[:keys].join("."), cond[:comparator].to_s, cond[:value]]
   					elsif
-  						condition1 = [ cond[:keys].join("."), cond[:comparator], cond[:value]]
+  						condition1 = [ cond[:keys].join("."), cond[:comparator].to_s, cond[:value]]
   		      end
   		    end
         end
@@ -178,6 +178,8 @@ module Mostfit
 				self.add h
 			end
 
+      #should not be called directly
+      #only apply_rule should call this func
       def self.add(hash)
         if(hash[:model_name].class != Class)
           hash[:model_name] = Kernel.const_get(hash[:model_name].camelcase)
@@ -216,6 +218,7 @@ module Mostfit
             return true #overwrite the old function
           end
         end
+        return true
       end
 
       #deprecated

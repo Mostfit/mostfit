@@ -37,6 +37,7 @@
         - if obj and Marshal.restore(obj)
           - id = 1
           - Marshal.restore(obj).to_a.each do |condition_id, cond|
+            - debugger
             %div{:class => type, :id => "c#{condition_id}"}
               - condition_id = condition_id.to_i
               - keys = [@rule.model_name] + cond[:keys]

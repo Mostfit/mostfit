@@ -49,9 +49,8 @@ class Rules < Application
 
   def destroy(id)
     @rule = Rule.get(id)
-		@rule.remove_rule
     raise NotFound unless @rule
-    if @rule.destroy
+    if @rule.remove_rule and @rule.destroy
       redirect resource(:rules)
     else
       raise InternalServerError
@@ -70,7 +69,10 @@ class Rules < Application
   end
 
   def fix_conditions(rule)
-    if rule[:precondition] == nil then rule[:precondition] = "" end
+    if rule[:precondition] == nil then rule[:precondition] = ""
+    elsif rule[:precondition]["1"]["value"] == nil then rule[:precondition] = ""
+    elsif rule[:precondition]["1"]["keys"] == nil or rule[:precondition]["1"]["keys"].to_s.length == 0 then rule[:precondition] = "" end
+    
     rule[:condition] = Marshal.dump(rule[:condition])
     rule[:precondition] = Marshal.dump(rule[:precondition])
     return rule
@@ -110,7 +112,7 @@ class Rules < Application
 			collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal to"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal to"]]
 			collection2 = [["equal2", "equal"], ["not2", "not equal"]]
       select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection1)
-      select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator][]", :prompt => "Choose operator", :collection => collection2)
+      select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection2)
       select3 = select(:id => "#{type}_selectmore_#{id+2}", :name => "rule[#{type}][#{condition_id}][linking_operator]", :prompt => "Add more condition", 
                        :collection => [["and", "and"], ["or", "or"]])
 

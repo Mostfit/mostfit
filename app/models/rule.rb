@@ -26,8 +26,14 @@ class Rule
 
   def apply_rule
 		puts "Applying Rule #{@name}"
+    puts self.condition
     h = {:name => @name, :on_action => @on_action, :model_name => @model_name, 
 	    :permit => @permit, :condition => @condition, :precondition => @precondition}
+    if h[:condition] == nil
+      puts "condition is nil"
+      debugger
+      return false
+    end
 		Mostfit::Business::Rules.apply_rule h
   end
 
