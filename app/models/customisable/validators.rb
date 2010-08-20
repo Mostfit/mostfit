@@ -53,7 +53,7 @@ module Misfit
       ["scheduled_first_payment_date", "scheduled_disbursal_date"].each do |d|
         failed << d if not date = instance_eval(d) or not date.weekday == center.meeting_day_for(date)
       end
-      return [false, "#{failed.join(",")} must be #{meeting_day}"]      unless failed.blank?
+      return [false, "#{failed.join(",")} must be #{center.meeting_day_for(date)}"]      unless failed.blank?
       return true
     end
 
