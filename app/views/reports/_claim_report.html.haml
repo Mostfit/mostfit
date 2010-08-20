@@ -1,0 +1,45 @@
+=partial :form
+%table.report.nojs
+  %tr.header
+    %th{:width => '20%'}
+      Client
+    %th{:width => '10%'}
+      Death of
+    %th{:width => '10%'}
+      Date of Death
+    %th{:width => '10%'}
+      Date of Claim
+    %th{:width => '10%'}
+      Pending Documents
+    %th{:width => '10%'}
+      Disbursed
+    %th{:width => '10%'}
+      Payment
+    %th{:width => '10%'}
+      Balance Outstanding
+ 
+ 
+  - @data.each do |claim| 
+    %tr 
+      %td
+        = claim.client.name
+      %td
+        = claim.client.inactive_reason
+      %td
+        = claim.date_of_death
+       
+      %td
+        = claim.claim_submission_date
+      %td
+        -doc = claim.documents
+        - doc.each do |x|
+          = x
+      %td
+        - claim_amount = claim.amount_of_claim
+        = claim_amount
+      %td
+        - amount_deducted  = claim.amount_to_be_deducted
+        - payment = claim_amount - amount_deducted
+        = payment
+      %td
+        = claim_amount - payment
