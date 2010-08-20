@@ -24,6 +24,13 @@ class Rule
   validates_is_unique :name
   validates_with_method :apply_rule
 
+  after :destroy do
+    debugger
+ 		h = {:name => @name, :model_name => @model_name}
+    puts "Removed Rule"
+	  Mostfit::Business::Rules.remove_rule h
+  end
+
   def apply_rule
 		puts "Applying Rule #{@name}"
     puts self.condition
@@ -37,11 +44,6 @@ class Rule
 		Mostfit::Business::Rules.apply_rule h
   end
 
-  def remove_rule
- 		h = {:name => @name, :model_name => @model_name}
-	  Mostfot::Business::Rules.remove_rule h
-	end
-  
 #  def atleast_one_condition
 #    return [false, "there are no conditions"] if self.conditions.count==0
 #    return true

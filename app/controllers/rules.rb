@@ -50,7 +50,7 @@ class Rules < Application
   def destroy(id)
     @rule = Rule.get(id)
     raise NotFound unless @rule
-    if @rule.remove_rule and @rule.destroy
+    if @rule.destroy
       redirect resource(:rules)
     else
       raise InternalServerError

@@ -13,7 +13,6 @@ module Mostfit
           a.appliesOn = "DEFAULT" #wierd default to see if something fails
           a.operator = :ILLEGAL_OPERATOR
           a.compareWith = -1
-          debugger
 
           a.appliesOn = arr[0]
           a.operator = :<  if arr[1] == "less_than"
@@ -213,6 +212,9 @@ module Mostfit
 
       #to remove a validation
       def self.remove(hash)
+        if(hash[:model_name].class != Class)
+          hash[:model_name] = Kernel.const_get(hash[:model_name].camelcase)
+        end
         if hash[:model_name].new.respond_to?(hash[:name])
           hash[:model_name].send(:define_method, hash[:name]) do
             return true #overwrite the old function
@@ -238,7 +240,6 @@ module Mostfit
 
       #deprecated      
       def reject(hash)
-        #TODO
 #        validator = get_condition(hash)
 #        hash[:model_name].send(:define_method, hash[:name]) do
 #          if hash.key?(:precondition)
