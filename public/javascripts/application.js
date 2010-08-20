@@ -164,7 +164,8 @@ function dateFromAge(ageYear, ageMonth, ageDay){
 function attachFormRemoteTo(form){
   if(form.length==0)
     return(false);
-  $(form).submit(function(){
+  $(form).submit(function(f){
+		   form=$(f.currentTarget);
 		   $(form).find("input[type='submit']").attr("disabled", true);
 		   $(form).after("<img id='spinner' src='/images/spinner.gif' />");
 		   $.ajax({
@@ -209,27 +210,28 @@ function attachFormRemoteTo(form){
 
 function create_remotes(){
     $("a._remote_").click(function(){
-	    href=$(this).attr("href");
-	    method="GET"
-	    if($(this).hasClass("self")){
-		href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
-                method="POST"
-	    }
-	    a=$(this);
-	    $.ajax({
-		    type: "POST",
-		    url: href,
-		    success: function(data){
-			$(a).after(data);
-			$(a).remove();
-		    },
-		    error: function(xhr, text, errorThrown){
-			txt = "<div class='error'>"+xhr.responseText+"</div>"
-			$(a).after(txt);
-		    }
-		});
-	    return false;
-	});
+      $(this).unbind();
+      href=$(this).attr("href");
+      method="GET"
+      if($(this).hasClass("self")){
+	href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+        method="POST"
+      }
+      a=$(this);
+      $.ajax({
+	type: "POST",
+	url: href,
+	success: function(data){
+	  $(a).after(data);
+	  $(a).remove();
+	},
+	error: function(xhr, text, errorThrown){
+	  txt = "<div class='error'>"+xhr.responseText+"</div>"
+	  $(a).after(txt);
+	}
+      });
+      return false;
+    });
 
     $("a._customreports_").click(function(){
 	    href=$(this).attr("href");
@@ -255,7 +257,8 @@ function create_remotes(){
 	    return false;
 	});
     $("form._remote_").each(function(idx, form){
-	    attachFormRemoteTo($(form));
+			      $(form).unbind();
+			      attachFormRemoteTo($(form));
 	});
 }
 function attachReportingFormEvents(id){

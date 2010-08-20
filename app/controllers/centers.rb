@@ -149,6 +149,13 @@ class Centers < Application
     @clients = @center.clients
     partial "centers/weeksheet"
   end
+  
+  def misc
+    @center =  Center.get(params[:id])
+    raise NotFound unless @center
+    @meeting_days  =  @center.center_meeting_days
+    partial "centers/misc"
+  end
 
   private
   include DateParser  # for the parse_date method used somewhere here..

@@ -155,7 +155,7 @@ class StaffMembers < Application
   def set_staff_member_counts
     first_of_this_month = Date.new(@date.year, @date.month, 1)
     end_of_this_month   = @date
-
+    client_ids = @branch.client_ids if @branch
     { 
       :branch_managers => Branch, :center_managers => Center, :applied_loans => Loan, :approved_loans => Loan, 
       :rejected_loans  => Loan, :disbursed_loans => Loan, :written_off_loans => Loan
@@ -175,6 +175,11 @@ class StaffMembers < Application
         date_key       = name=="disbursed" ? :disbursal_date : (name+"_on").to_sym
         overall_cond   = {date_key.lte => @date}
         thismonth_cond = {date_key.lte => @date, date_key.gte => first_of_this_month}
+        if @branch
+          branch_cond     = {:client_id => client_ids}
+          overall_cond   += branch_cond
+          thismonth_cond += branch_cond
+        end
       end
       
       instance_variable_set("@#{type}_overall",   klass.all(overall_cond).aggregate(aggregate_by, :all.count))
