@@ -8,6 +8,8 @@
       Valid upto
     %th
       Meeting day
+    %th
+      
   - @meeting_days.each do |day|
     %tr
       %td
@@ -16,3 +18,5 @@
         = day.valid_upto
       %td
         = day.meeting_day
+      %td
+        = link_to("[X]", url(:controller => "application", :action => "delete", :id => day.id, :model => "center_meeting_days", :return => "/branches/#{@center.branch.id}/centers/#{@center.id}#miscellaneous"), :class => :delete)

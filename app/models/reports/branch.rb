@@ -18,15 +18,16 @@ module Reporting
       query_as_hash(%Q{
           SELECT b.id, COUNT(cl.id) as count
           FROM clients cl, centers c, branches b
-          WHERE cl.center_id = c.id AND c.branch_id = b.id and cl.date_joined < '#{date.strftime('%Y-%m-%d')}' AND deleted_at is NULL
+          WHERE cl.center_id = c.id AND c.branch_id = b.id and cl.date_joined <= '#{date.strftime('%Y-%m-%d')}' AND deleted_at is NULL
           GROUP BY b.id})            
     end
 
     def loan_count(date = Date.today)
       query_as_hash(%Q{
-          SELECT b.id,COUNT(*) 
+          SELECT b.id, COUNT(l.id) 
           FROM loans l, clients cl, centers c, branches b
           WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id AND l.disbursal_date <='#{date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
+                AND cl.deleted_at is NULL
           GROUP BY b.id})
     end
 
@@ -34,11 +35,11 @@ module Reporting
       ids = repository.adapter.query(%Q{
                   SELECT loan_id, max(date) date
                   FROM loan_history 
-                  WHERE date < '#{date.strftime('%Y-%m-%d')}' AND status in (5,6,7,8,9)
+                  WHERE date <= '#{date.strftime('%Y-%m-%d')}' AND status in (5,6,7,8,9)
                   GROUP BY loan_id}).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
       return false if ids.length==0     
       query_as_hash(%Q{
-        SELECT branch_id, count(client_id)
+        SELECT branch_id, count(DISTINCT(client_id))
         FROM loan_history lh
         WHERE (loan_id, date) in (#{ids}) AND status in (5,6)
         GROUP BY branch_id
@@ -60,7 +61,7 @@ module Reporting
                   FROM loan_history 
                   WHERE (loan_id, date) IN (
                       #{get_latest_loan_history_row_before(date).map{|lh| "(#{lh.loan_id}, '#{lh.date.strftime('%Y-%m-%d')}')"}.join(",")}
-                  )
+                  ) AND status in (5, 6, 7, 8, 9)
                   GROUP BY CONCAT(client_id,'_',status)) AS dt1 
                GROUP BY client_id
                HAVING num_loans = #{loan_cycle}) 
@@ -99,6 +100,7 @@ module Reporting
          FROM loans l, loan_history lh
          WHERE l.id = lh.loan_id 
                AND  lh.status = #{STATUSES.index(:repaid) + 1}  AND lh.date BETWEEN '#{start_date.strftime('%Y-%m-%d')}' AND '#{end_date.strftime('%Y-%m-%d')}'
+               AND  l.deleted_at is NULL
          GROUP BY lh.branch_id})
     end
 
@@ -110,22 +112,34 @@ module Reporting
          SELECT lh.branch_id, #{what}(l.amount)
          FROM loans l, loan_history lh
          WHERE l.id = lh.loan_id 
-               AND  lh.status = #{STATUSES.index(:disbursed) + 1} AND  l.disbursal_date BETWEEN '#{start_date.strftime('%Y-%m-%d')}' AND '#{end_date.strftime('%Y-%m-%d')}'
+               AND  lh.status = #{STATUSES.index(:disbursed) + 1} AND  l.disbursal_date BETWEEN '#{start_date.strftime('%Y-%m-%d')}' AND '#{end_date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
          GROUP BY lh.branch_id})
     end
 
-    [:principal, :interest].each do |payment_type|
-      [:due, :received].each do |query_type|
-        key = query_type==:received ? 'paid' : 'due'
-        col_key = "#{payment_type}_#{key}".to_sym
-        define_method("#{payment_type}_#{query_type}_between_such_and_such_date") do |start_date, end_date|
-          LoanHistory.all(:date.gte => start_date, :date.lte => end_date).aggregate(:branch_id, col_key.send(:sum)).to_hash
-        end
+    [:principal, :interest, :fees].each_with_index do |payment_type, ptype|
+      query_type = :received
+      define_method("#{payment_type}_#{query_type}_between_such_and_such_date") do |start_date, end_date|
+        repository.adapter.query(%Q{SELECT branch_id, sum(amount) amount FROM payments p, clients cl, centers c, branches b 
+                                      WHERE b.id=c.branch_id AND cl.center_id=c.id AND p.client_id=cl.id AND p.deleted_at is NULL AND cl.deleted_at is NULL 
+                                            AND p.type=#{ptype+1} AND p.received_on>='#{start_date.strftime('%Y-%m-%d')}' 
+                                            AND p.received_on<='#{end_date.strftime('%Y-%m-%d')}' 
+                                      GROUP BY b.id;}).group_by{|x| x[0]}.map{|b, a| 
+          {b => a[0].amount.to_i}
+        }.inject({}){|s,x| s+=x}
       end
+    end
+
+    def principal_due_between_such_and_such_date(start_date, end_date)
+      get_latest_before(:scheduled_outstanding_principal, start_date) - get_latest_before(:scheduled_outstanding_principal, end_date) - loans_disbursed_between_such_and_such_date(start_date, end_date, "sum")
+    end
+
+    def interest_due_between_such_and_such_date(start_date, end_date)
+      get_latest_before(:scheduled_outstanding_total, start_date) - get_latest_before(:scheduled_outstanding_principal, start_date) - get_latest_before(:scheduled_outstanding_total, end_date) + get_latest_before(:scheduled_outstanding_principal, end_date)
     end
 
     def principal_outstanding(date = Date.today)
       date = Date.parse(date) unless date.is_a? Date
+      LoanHistory.sum_outstanding_grouped_by(date, :branch).find{|x| x.branch_id==3}
       get_latest_before(:actual_outstanding_principal, date)
     end
 
@@ -162,10 +176,9 @@ module Reporting
     end
 
     def get_latest_before(column, date = Date.today, group_by = nil)
-      date = Date.parse(date) unless date.is_a? Date
-      condition = get_latest_loan_history_row_before(date).map{|lh| "(#{lh.loan_id}, '#{lh.date.strftime('%Y-%m-%d')}')"}.join(",")
-      sql = %Q{ SELECT branch_id, SUM(#{column.to_s}) as #{column} FROM loan_history WHERE (loan_id, date) IN (#{condition}) GROUP BY branch_id}
-      query_as_hash(sql)
+      date     = Date.parse(date) unless date.is_a? Date
+      @os_data = LoanHistory.sum_outstanding_grouped_by(date, :branch).group_by{|x| x.branch_id}
+      @os_data.map{|b, d| {b, d.first.send(column).to_i}}.inject({}){|s,x| s+=x}
     end
 
     def method_missing(name, params)
