@@ -1,5 +1,5 @@
 class ClaimReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id
+  attr_accessor :from_date, :to_date
 
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today
@@ -13,8 +13,7 @@ class ClaimReport < Report
   end
 
   def generate(params)
-   
-    Claim.all
- 
- end
+    params1 = {:claim_submission_date.gte => from_date, :claim_submission_date.lte => to_date, :order => [:claim_submission_date]}
+    Claim.all(params1).paginate(:order => [:claim_submission_date.desc], :page => params[:page], :per_page =>10)
+  end
 end
