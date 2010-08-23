@@ -1,8 +1,8 @@
 class Reports < Application
   include DateParser
   Types = [
-           DailyReport, ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, TransactionLedger, ProjectedReport,ClaimReport, 
-           LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, LoanSizePerManagerReport,
+           DailyReport, ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, TransactionLedger, ProjectedReport,
+           LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, LoanSizePerManagerReport, ClaimReport, 
            TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, LoanSanctionRegister, ClientAbsenteeismReport, 
            BalanceSheet, GeneralLedgerReport, TrialBalanceReport
           ]
@@ -37,7 +37,7 @@ class Reports < Application
             ].include?(klass)
         @data  = @report.generate
         display @data
-      elsif [BalanceSheet, GeneralLedgerReport, TrialBalanceReport,ClaimReport].include?(klass)
+      elsif [BalanceSheet, GeneralLedgerReport, TrialBalanceReport, ClaimReport].include?(klass)
         @data  = @report.generate(params)
         display @data        
       else
