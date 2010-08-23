@@ -78,15 +78,6 @@ class Rules < Application
     return rule
   end
 
-#  def fix_conditions(rule)
-#    # fix till wee need multiple conditions
-#    rule[:conditions] = [rule[:conditions]]
-#    rule[:conditions].each_with_index do |condition, idx|
-#      rule[:conditions][idx][:keys] = rule[:conditions][idx][:keys].join(".")
-#    end
-#    rule
-#  end
-
   def get
 		id = params[:id].to_i
     type = params[:type]

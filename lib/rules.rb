@@ -170,11 +170,9 @@ module Mostfit
   						if condition1[0] == nil or condition1.length == 0
   										return nil
   						end
-              debugger
   			      condition1[1] = [ cond[:keys].join("."), cond[:comparator].to_s,
                       get_value_obj(cond[:value], cond[:valuetype])]
   					elsif
-              debugger
   						condition1 = [ cond[:keys].join("."), cond[:comparator].to_s,
                      get_value_obj(cond[:value], cond[:valuetype])]
   		      end
@@ -242,36 +240,6 @@ module Mostfit
         return true
       end
 
-
-      #deprecated
-      def allow(hash)
-        
-        validator = get_condition(hash)
-        hash[:model_name].send(:define_method, hash[:name]) do
-          if hash.key?(:precondition)
-            return true if hash[:precondition] and validator.call(self)
-          else
-            return true if validator.call(self)
-          end
-          return [false, "#{hash[:name]} violated"]
-        end
-        hash[:model_name].validates_with_method(hash[:name])
-      end
-
-      #deprecated      
-      def reject(hash)
-#        validator = get_condition(hash)
-#        hash[:model_name].send(:define_method, hash[:name]) do
-#          if hash.key?(:precondition)
-#            return [false, "#{hash[:name]} violated"] if hash[:precondition] and validator.call(self)
-#          else
-#            return [false, "#{hash[:name]} violated"] if hash[:precondition] and validator.call(self)
-#          end
-#          return true
-#        end
-#        hash[:model_name].validates_with_method(hash[:name], :when => hash[:on_action])
-      end
-      
       def self.rules
         @@rules
       end
