@@ -54,10 +54,10 @@ class Fee
     payables = Fee.properties[:payable_on].type.flag_map
     applicables = repository.adapter.query(%Q{
                                 SELECT l.id loan_id, l.client_id client_id, 
-                                       if(f.amount>0, convert(f.amount, decimal), convert(l.amount*f.percentage, decimal)) fees_applicable, 
+                                       SUM(if(f.amount>0, convert(f.amount, decimal), convert(l.amount*f.percentage, decimal))) fees_applicable, 
                                        f.payable_on payable_on                                       
                                 FROM loan_products lp, fee_loan_products flp, fees f, loans l 
-                                WHERE flp.fee_id=f.id AND flp.loan_product_id=lp.id AND lp.id=l.loan_product_id AND l.id IN (#{loan_ids});})
+                                WHERE flp.fee_id=f.id AND flp.loan_product_id=lp.id AND lp.id=l.loan_product_id AND l.id IN (#{loan_ids}) GROUP BY l.id;})
     fees = []
     applicables.each{|fee|
       if payables[fee.payable_on]==:loan_installment_dates
@@ -74,9 +74,9 @@ class Fee
     client_ids = Loan.all(:fields => [:id, :client_id], :id => loan_ids).map{|x| x.client_id}.uniq
     client_ids = client_ids.length>0 ? client_ids.join(",") : "NULL"
     repository.adapter.query(%Q{
-                                SELECT loan_id, client_id, amount
+                                SELECT loan_id, client_id, SUM(amount) amount
                                 FROM payments p
-                                WHERE p.client_id IN (#{client_ids}) AND p.type=3 AND deleted_at is NULL;})
+                                WHERE p.client_id IN (#{client_ids}) AND p.type=3 AND deleted_at is NULL GROUP BY p.loan_id;})
   end
 
   def self.due(loan_ids)
