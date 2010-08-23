@@ -161,20 +161,25 @@ class Center
 
   def handle_meeting_date_change
     self.meeting_day_change_date = parse_date(self.meeting_day_change_date) if self.meeting_day_change_date.class==String and not self.meeting_day_change_date.blank?
+    return unless self.meeting_day_change_date
+
     date = self.meeting_day_change_date||Date.today
     if not CenterMeetingDay.first(:center => self)
       CenterMeetingDay.create(:center => self, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
     elsif self.meeting_day != self.meeting_day_for(date)
-      cm = CenterMeetingDay.first(:center => self, :valid_from.lte => date, :valid_upto.gte => date)
-      cm.valid_upto = date - 1
-      cm.save
-      if CenterMeetingDay.first(:center => self, :valid_from => date, :meeting_day => self.meeting_day)
-        next_cm = CenterMeetingDay.first(:center => self, :valid_from.lte => date, :valid_upto.gte => date)
-        next_cm.valid_upto = date - 1
-        next_cm.save        
-      else
-        CenterMeetingDay.create(:center => self, :valid_from => date, :meeting_day => self.meeting_day)
+      if prev_cm = CenterMeetingDay.first(:center => self, :valid_from.lte => date, :order => [:valid_from.desc])
+        # previous CMD should be valid upto date - 1
+        prev_cm.valid_upto = date - 1
+        prev_cm.save
       end
+
+      # next CMD's valid from date should be valid upto limit for this CMD
+      if next_cm = CenterMeetingDay.first(:center => self, :valid_from.gt => date, :order => [:valid_from])
+        valid_upto = next_cm.valid_from - 1
+      else
+        valid_upto = Date.new(2100, 12, 31)
+      end
+      CenterMeetingDay.create(:center => self, :valid_from => date, :meeting_day => self.meeting_day, :valid_upto => valid_upto)
     end
   end
   

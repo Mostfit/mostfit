@@ -153,7 +153,7 @@ class Centers < Application
   def misc
     @center =  Center.get(params[:id])
     raise NotFound unless @center
-    @meeting_days  =  @center.center_meeting_days
+    @meeting_days  =  @center.center_meeting_days(:order => [:valid_from])
     partial "centers/misc"
   end
 

@@ -8,6 +8,9 @@ class CenterMeetingDay
   property :valid_from,  Date, :nullable => false
   property :valid_upto,  Date, :nullable => false, :default => Date.new(2100, 12, 31) # a date far in future
   belongs_to :center
+  
+  after :destroy, :fix_dates
+
 
   validates_with_method :valid_from_is_lesser_than_valid_upto
   
@@ -16,5 +19,23 @@ class CenterMeetingDay
       return [false, "Valid from date cannot be before than valid upto date"] if self.valid_from > self.valid_upto
       return true    
     end
+  end
+
+  def fix_dates
+    cmds = CenterMeetingDay.all(:order => [:valid_from], :center_id => self.center_id)
+    cmds.each_with_index{|cmd, idx|
+      cmd.valid_upto=Date.new(2100, 12, 31) if cmds.length - 1 == idx
+      
+      if idx==0
+        if cmd.valid_from>cmd.center.creation_date
+          cmd.valid_from=cmd.center.creation_date
+        end
+      else
+        if cmds[idx-1].valid_upto+1 != cmd.valid_from
+          cmd.valid_from = cmds[idx-1].valid_upto+1
+        end
+      end
+      cmd.save
+    }
   end
 end

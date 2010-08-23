@@ -1,4 +1,4 @@
-%table
+%table.report.nojs
   %tr
     %th
       Particulars
@@ -10,13 +10,13 @@
       Total
     - Marshal.load(@report.report).each do |r|
       %tr
-        %th
-          = r.keys[0]
+        %td.text{:width => "20%"}
+          %b= r.keys[0].capitalize
         - branches.each do |branch|
           %td
             = r[r.keys[0]][branch.id].to_i || "-"
         %td
           - sum = 0.0
-          = r[r.keys[0]].values.map{|x| x.to_i}.inject(0) {|sum, item| sum+item} || "-"
+          %b= r[r.keys[0]].values.map{|x| x.to_i}.inject(0) {|sum, item| sum+item} || "-"
 
 

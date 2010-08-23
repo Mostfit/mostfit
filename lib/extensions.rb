@@ -140,6 +140,8 @@ module Misfit
             return false 
           elsif @controller.include?("data_entry")
             return false
+          elsif @controller=="users"
+            return false
           else
             return true
           end
