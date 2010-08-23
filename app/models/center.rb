@@ -181,6 +181,11 @@ class Center
       end
       CenterMeetingDay.create(:center => self, :valid_from => date, :meeting_day => self.meeting_day, :valid_upto => valid_upto)
     end
+    self.clients.loans.each{|l|
+      if [:outstanding, :disbursed].include?(l.status)
+        l.update_history
+      end
+    }
   end
   
 end
