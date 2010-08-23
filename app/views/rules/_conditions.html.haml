@@ -1,0 +1,74 @@
+/this partial is called by _fields and with parameter type set to "condition" or "precondition"
+- obj = nil
+- div_prefix = nil
+- if type == "condition"
+  - obj = @rule.condition
+  - div_prefix = "c"
+- else
+  - obj = @rule.precondition
+  - div_prefix = "p"
+- if obj and Marshal.restore(obj)
+  - id = 1
+  - Marshal.restore(obj).to_a.each do |condition_id, cond|
+    %div{:class => type, :id => "#{div_prefix}#{condition_id}"} 
+      - condition_id = condition_id.to_i
+      - keys = [@rule.model_name] + cond[:keys]
+      - model = nil
+      - keys.each_with_index do |key, idx|
+        - name, field, choices = Condition.get_field_choices_and_name(key)
+        - model, key_type = Condition.get_model(key)
+        - if model #field == :select
+          - name = "rule[#{type}][#{condition_id}][keys][]"
+          - selected = (keys.length==idx+1) ? cond[:comparator].to_s : keys[idx+1]
+          = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :id => "#{type}_select_#{id}")
+          :javascript
+            attachRulesFormEvents("#{type}", #{id});
+          - id+=1
+        - else
+          - model = Kernel.const_get(keys[idx-1].singularize.camelcase)
+          - if model == nil
+            error in model
+          - collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal to"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal to"]]
+          - collection2 = [["equal2", "equal"], ["not2", "not equal"]]
+          - select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :collection => collection1, :selected=>cond[:comprator])
+          - select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator][]", :collection => collection2, :selected=>cond[:comprator])
+          - if collection1.flatten.include?(cond[:comparator].to_s)
+            = select1
+          - elsif collection2.flatten.include?(cond[:comparator].to_s)
+            = select2
+          - else
+            = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value=>cond[:comparator])
+          - id+=1
+
+      - name = "rule[#{type}][#{condition_id}][value]"
+      - type_name = "rule[#{type}][#{condition_id}][valuetype]" #will be either "string", "date" or "int"
+      - property = model.properties.find{|p| p.name.to_s==keys.last} || model.relationships[keys.last]
+      - if property.type==Date or property.type==DateTime
+        =date_select(name , cond[:value], :id => "#{type}_date_#{id}")
+        =hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id}", :name => type_name, :value => "date")
+      - elsif [DataMapper::Types::Serial, Integer].include?(property.type)
+        =text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value => cond[:value]) 
+        =hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id}", :name => type_name, :value => "float")
+      - elsif property.type==Float
+        =text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value => cond[:value]) 
+        =hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id}", :name => type_name, :value => "float")
+      - elsif property.class==DataMapper::Associations::ManyToOne::Relationship
+        =select(:id => "#{type}_selectvalue_#{id}", :name => name, :collection => property.parent_model.all, :value_method => :id, :text_method => :name, :prompt => "Choose #{property.name}")
+      - else
+        =text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value => cond[:value]) 
+
+      - id+=1
+      = select(:id => "#{type}_selectmore_#{id}", :name => "rule[#{type}][#{condition_id}][linking_operator]", :selected => cond[:linking_operator], :collection => [["", ""], ["and", "and"], ["or", "or"]])
+      :javascript
+        attachRulesFormEventsForSelectMoreField("#{type}", #{id}, #{condition_id});
+      - id+=1
+      %a{:onclick =>"javascript:this.parentNode.innerHTML=''"}
+        Remove
+- else #new rule
+  - if type == "condition"
+    %div.condition#c1
+      = select(:name =>"rule[#{type}][1][keys][]", :prompt => "choose \"applicable for\"", :class => "rules", :id => "#{type}_select_1")
+  - else
+    %div.precondition#p1
+      = select(:name =>"rule[#{type}][1][keys][]", :prompt => "choose \"applicable for\"", :class => "rules", :id => "#{type}_select_1")
+

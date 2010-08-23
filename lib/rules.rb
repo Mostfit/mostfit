@@ -15,6 +15,9 @@ module Mostfit
           a.compareWith = -1
 
           a.appliesOn = arr[0]
+          if arr[1].class == Symbol
+            arr[1] = arr[1].to_s #converts :less_than to "less_than"
+          end
           a.operator = :<  if arr[1] == "less_than"
           a.operator = :<= if arr[1] == "less_than_equal"
           a.operator = :>  if arr[1] == "greater_than"
@@ -140,6 +143,18 @@ module Mostfit
         self.new.instance_eval(&blk)
       end
 
+      def self.get_value_obj(obj, type)
+        if type == "date"
+          return Date.parse(obj)
+        elsif type== "int"
+          return obj.to_i
+        elsif type== "float"
+          return obj.to_f
+        else
+          return obj
+        end
+      end
+
 			def self.apply_rule(rule)
 		    condition1 = Array.new
 				precondition1 = Array.new
@@ -155,9 +170,13 @@ module Mostfit
   						if condition1[0] == nil or condition1.length == 0
   										return nil
   						end
-  			      condition1[1] = [ cond[:keys].join("."), cond[:comparator].to_s, cond[:value]]
+              debugger
+  			      condition1[1] = [ cond[:keys].join("."), cond[:comparator].to_s,
+                      get_value_obj(cond[:value], cond[:valuetype])]
   					elsif
-  						condition1 = [ cond[:keys].join("."), cond[:comparator].to_s, cond[:value]]
+              debugger
+  						condition1 = [ cond[:keys].join("."), cond[:comparator].to_s,
+                     get_value_obj(cond[:value], cond[:valuetype])]
   		      end
   		    end
         end
@@ -222,6 +241,7 @@ module Mostfit
         end
         return true
       end
+
 
       #deprecated
       def allow(hash)

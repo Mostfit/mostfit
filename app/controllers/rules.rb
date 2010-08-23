@@ -108,6 +108,7 @@ class Rules < Application
       end
 	    property = model.properties.find{|p| p.name.to_s==params[:for]} || model.relationships[params[:for]]
       name = "rule[#{type}][#{condition_id}][value]"
+      type_name = "rule[#{type}][#{condition_id}][valuetype]" #will be either "string", "date" or "int"
 
 			collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal to"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal to"]]
 			collection2 = [["equal2", "equal"], ["not2", "not equal"]]
@@ -117,8 +118,17 @@ class Rules < Application
                        :collection => [["and", "and"], ["or", "or"]])
 
 	    if property.type==Date or property.type==DateTime
-		    return select1+date_select(name , Date.today, :id => "#{type}_date_#{id+1}")+select3
-    	elsif [DataMapper::Types::Serial, Integer, Float].include?(property.type)
+        hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id+1}", :name => type_name, 
+                                        :value => "date")
+		    return select1+date_select(name , Date.today, :id => "#{type}_date_#{id+1}")+
+          hidden_valuetype+select3
+    	elsif [DataMapper::Types::Serial, Integer].include?(property.type)
+        hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id+1}", :name => type_name, 
+                                        :value => "int")
+	      return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+select3
+    	elsif Float == property.type
+        hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id+1}", :name => type_name, 
+                                        :value => "float")
 	      return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+select3
     	elsif [String, DataMapper::Types::Text].include?(property.type)
 	      return select2+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+select3

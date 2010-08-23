@@ -25,7 +25,6 @@ class Rule
   validates_with_method :apply_rule
 
   after :destroy do
-    debugger
  		h = {:name => @name, :model_name => @model_name}
     puts "Removed Rule"
 	  Mostfit::Business::Rules.remove_rule h
@@ -38,7 +37,6 @@ class Rule
 	    :permit => @permit, :condition => @condition, :precondition => @precondition}
     if h[:condition] == nil
       puts "condition is nil"
-      debugger
       return false
     end
 		Mostfit::Business::Rules.apply_rule h
