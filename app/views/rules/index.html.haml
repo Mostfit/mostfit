@@ -26,12 +26,12 @@
         - if Marshal.restore(rule.precondition)
           - Marshal.restore(rule.precondition).each do |key, cond|
             /TODO do something better make this a function in rules and just call that function
-            = "#{cond[:keys]} #{cond[:comparator]} #{cond[:value]} #{cond[:linking_operator]}" 
+            = "#{cond[:keys].join(".")} #{Merb::GlobalHelpers::pretty_name_of_comparator(cond[:comparator])} #{cond[:value]} #{cond[:linking_operator]}" 
             %br
       %td
         - if Marshal.restore(rule.condition)
           - Marshal.restore(rule.condition).each do |key, cond|
-            = "#{cond[:keys]} #{cond[:comparator]} #{cond[:value]} #{cond[:linking_operator]}"
+            = "#{cond[:keys].join(".")} #{Merb::GlobalHelpers::pretty_name_of_comparator(cond[:comparator])} #{cond[:value]} #{cond[:linking_operator]}"
             %br
       %td
         = rule.permit ? 'Allow' : 'Disallow'

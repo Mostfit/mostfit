@@ -20,7 +20,7 @@
     %td
       %b On action
     %td
-      = select(:on_action, :collection => Rule.properties[:on_action].type.flag_map.map{|k,v| [v.to_s, v.to_s]})
+      = select :on_action, :collection => Rule.properties[:on_action].type.flag_map.map{|k,v| [v.to_s, v.to_s]}, :prompt => "Select Action"
   %tr
     %td
 

@@ -383,5 +383,20 @@ module Merb
       #catch all
       return join_segments(prefix, controller_name, postfix)
     end    
+
+    def self.pretty_name_of_comparator(comparator)
+      if comparator == "less_than" then return "<"
+      elsif comparator == "less_than_equal" then return "<="
+      elsif comparator == "greater_than" then return ">"
+      elsif comparator == "greater_than_equal" then return ">="
+      elsif comparator == "equal" then return "="
+      elsif comparator == "equal1" then return "="
+      elsif comparator == "equal2" then return "="
+      elsif comparator == "not" then return "!="
+      elsif comparator == "not1" then return "!="
+      elsif comparator == "not2" then return "!="
+      end
+    end
+
   end
 end

@@ -18,8 +18,8 @@
     %td
       - if Marshal.restore(@rule.precondition)
         - Marshal.restore(@rule.precondition).each do |key, value|
-          = value[:keys]
-          = value[:comparator]
+          = value[:keys].join(".")
+          = Merb::GlobalHelpers::pretty_name_of_comparator(value[:comparator])
           = value[:value] 
           = value[:linking_operator]
   %tr
@@ -28,8 +28,8 @@
     %td
       - if Marshal.restore(@rule.condition)
         - Marshal.restore(@rule.condition).each do |key, value|
-          = value[:keys]
-          = value[:comparator]
+          = value[:keys].join(".")
+          = Merb::GlobalHelpers::pretty_name_of_comparator(value[:comparator])
           = value[:value]
           = value[:linking_operator]
   %tr

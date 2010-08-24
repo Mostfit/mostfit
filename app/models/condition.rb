@@ -41,13 +41,13 @@ class Condition
     if model
       field   = :select
       name  = "rule[conditions][keys][]"
-    elsif ['count', 'max', 'min', 'value'].include?(key_name)     
-      field = :select
-      choices = ['<=', '>=', '=']
-      name  = "rule[conditions][comparator]"
-    elsif ['<=', '>=', '='].include?(key_name)
-      field = :text_field
-      name  = "rule[conditions][value]"
+#    elsif ['count', 'max', 'min', 'value'].include?(key_name)     
+#      field = :select
+#      choices = ['<=', '>=', '=']
+#      name  = "rule[conditions][comparator]"
+#    elsif ['<=', '>=', '='].include?(key_name)
+#      field = :text_field
+#      name  = "rule[conditions][value]"
     end    
     return [name, field, choices]
   end
