@@ -53,20 +53,11 @@ module Reporting
     def client_count_by_loan_cycle(loan_cycle, date=Date.today)
       # this simply counts the number of loans for a given client without taking into account the status of those loans.
       query_as_hash(%Q{
-            SELECT branch_id, COUNT(client_id) 
-            FROM (
-               SELECT client_id, count(*) AS num_loans, branch_id, center_id 
-               FROM (
-                  SELECT loan_id, client_id, center_id, branch_id,date, status,concat(client_id,'_',status) 
-                  FROM loan_history 
-                  WHERE (loan_id, date) IN (
-                      #{get_latest_loan_history_row_before(date).map{|lh| "(#{lh.loan_id}, '#{lh.date.strftime('%Y-%m-%d')}')"}.join(",")}
-                  ) AND status in (5, 6, 7, 8, 9)
-                  GROUP BY CONCAT(client_id,'_',status)) AS dt1 
-               GROUP BY client_id
-               HAVING num_loans = #{loan_cycle}) 
-               AS dt2 
-               GROUP BY branch_id})
+            SELECT b.id, COUNT(l.id) 
+            FROM branches b, centers c, clients cl, loans l
+            WHERE b.id=c.branch_id AND cl.center_id=c.id AND cl.deleted_at is NULL AND cl.id=l.client_id AND l.deleted_at is NULL
+                  AND l.disbursal_date<='#{date.strftime('%Y-%m-%d')}' AND cycle_number='#{loan_cycle}'
+            GROUP BY b.id})
     end
 
     def clients_added_between_such_and_such_date_count(start_date, end_date)
