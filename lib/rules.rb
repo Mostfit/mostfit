@@ -120,7 +120,9 @@ module Mostfit
       REJECT_REGEX = /^(Merb|merb)::*/
       
       def self.deploy #apply the business rules
-        Rule.all.each {|r| r.apply_rule}
+        Rule.all.each do |r|
+          r.apply_rule
+        end
 #        load(File.join(Merb.root, "config", "rules.rb"))
       end
 
@@ -156,6 +158,7 @@ module Mostfit
       end
 
 			def self.apply_rule(rule)
+        debugger
 		    condition1 = Array.new
 				precondition1 = Array.new
 				#generating polish notation in condition1

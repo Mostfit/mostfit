@@ -31,7 +31,11 @@ class Rule
   end
 
   def apply_rule
-		#puts "Applying Rule #{@name}"
+    debugger
+		puts "Applying Rule #{@name}"
+    puts "condition#{condition}" #DO not remove this statement, if this is removed
+    # due to some bug in data-mapper, condition is not loaded and it remains nil
+    # the rule is never applied
     h = {:name => @name, :on_action => @on_action, :model_name => @model_name, 
 	    :permit => @permit, :condition => @condition, :precondition => @precondition}
     if h[:condition] == nil

@@ -101,7 +101,7 @@ class Rules < Application
       name = "rule[#{type}][#{condition_id}][value]"
       type_name = "rule[#{type}][#{condition_id}][valuetype]" #will be either "string", "date" or "int"
 
-			collection1 = [["less_than", "<"], ["less_than_equal", "<="], ["equal1", "="], ["greater_than", ">"], ["greater_than_equal", ">="], ["not1", "!="]]
+			collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal"]]
 			collection2 = [["equal2", "equal"], ["not2", "not equal"]]
       select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection1)
       select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection2)
@@ -116,11 +116,11 @@ class Rules < Application
     	elsif [DataMapper::Types::Serial, Integer].include?(property.type) or ['count', 'max', 'min', 'value'].include?(params[:for])
         hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id+1}", :name => type_name, 
                                         :value => "int")
-	      return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+select3
+	      return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+hidden_valuetype+select3
     	elsif Float == property.type
         hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id+1}", :name => type_name, 
                                         :value => "float")
-	      return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+select3
+	      return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+hidden_valuetype+select3
     	elsif [String, DataMapper::Types::Text].include?(property.type)
 	      return select2+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+select3
   	  elsif property.class==DataMapper::Associations::ManyToOne::Relationship

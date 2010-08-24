@@ -395,6 +395,7 @@ module Merb
       elsif comparator == "not" then return "!="
       elsif comparator == "not1" then return "!="
       elsif comparator == "not2" then return "!="
+      else return comparator
       end
     end
 
