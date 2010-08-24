@@ -25,11 +25,20 @@ module Grapher
         value_method = :first
         label_method = :last
       end
+      
+      if @data_type==:percentage
+        total = 0
+        values_and_labels.each{|row|
+          total += row.send(value_method)
+        }
+      end
 
       values_and_labels.each{|row|
         if @data_type==:cumulative
           count+=row.send(value_method)
           values(count)
+        elsif @data_type==:percentage
+          values(row.send(value_method).to_f*100/total)
         else
           values(row.send(value_method))
         end

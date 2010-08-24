@@ -264,16 +264,17 @@ class Dashboard < Application
       ages = {1 => 0, 2 => 0, 3 => 0, 4  => 0, 5 => 0, 6 => 0, 7 => 0, 8 => 0, 9 => 0, 10 => 0}
       Loan.all(:disbursal_date.not => nil, :disbursal_date.lte => Date.today).each{|l|
         age = (100*(Date.today-l.disbursal_date)/(l.number_of_installments * l.installment_frequency_in_days)/10).ceil
-        next if age>10
+        age = 10 if age>10
         next unless ages[age]
         ages[age]+=1
       }
       vals = []
+      
       ages.to_a.sort_by{|x| x[0]}.each{|key, count|
         vals.push([count, "#{(key-1)*10} to #{key*10} %"])
       }      
-      graph = BarGraph.new("Aging analysis")
-      graph.data_type=:individual
+      graph = BarGraph.new("Ageing analysis")
+      graph.data_type = :individual
       graph.data(vals)
       return graph.generate      
     when "yield"
