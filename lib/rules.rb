@@ -22,8 +22,8 @@ module Mostfit
           a.operator = :<= if arr[1] == "less_than_equal"
           a.operator = :>  if arr[1] == "greater_than"
           a.operator = :>= if arr[1] == "greater_than_equal"
-          a.operator = :== if (arr[1] == "equal1") or (arr[1] == "equal2")
-          a.operator = "!=".to_sym if (arr[1] == "not1") or (arr[1] == "not2")
+          a.operator = :== if (arr[1] == "equal1") or (arr[1] == "equal2") or (arr[1] == "equal")
+          a.operator = "!=".to_sym if (arr[1] == "not1") or (arr[1] == "not2") or (arr[1] == "not")
           a.compareWith = arr[2]
 
           a.validator = Proc.new{|obj|

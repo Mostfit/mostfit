@@ -26,17 +26,15 @@ class Rule
 
   after :destroy do
  		h = {:name => @name, :model_name => @model_name}
-    puts "Removed Rule"
+    #puts "Removed Rule"
 	  Mostfit::Business::Rules.remove_rule h
   end
 
   def apply_rule
-		puts "Applying Rule #{@name}"
-    puts self.condition
+		#puts "Applying Rule #{@name}"
     h = {:name => @name, :on_action => @on_action, :model_name => @model_name, 
 	    :permit => @permit, :condition => @condition, :precondition => @precondition}
     if h[:condition] == nil
-      puts "condition is nil"
       return false
     end
 		Mostfit::Business::Rules.apply_rule h
