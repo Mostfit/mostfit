@@ -8,8 +8,8 @@ class Rule
 
   property :active,              Boolean, :default => false
 
-  property :condition,		 Text, :length => 5000
-  property :precondition,	 Text
+  property :condition,		 Text, :length => 5000, :lazy => false
+  property :precondition,	 Text, :length => 5000, :lazy => false
 
 #delete this
 # has n,   :conditions
@@ -32,10 +32,7 @@ class Rule
 
   def apply_rule
     #debugger
-		puts "Applying Rule #{@name}"
-    puts "condition#{self.condition}" #DO not remove this statement, if this is removed
-    # due to some bug in data-mapper, condition is not loaded and it remains nil
-    # the rule is never applied
+		#puts "Applying Rule #{@name}"
     h = {:name => @name, :on_action => @on_action, :model_name => @model_name, 
 	    :permit => @permit, :condition => @condition, :precondition => @precondition}
     if h[:condition] == nil

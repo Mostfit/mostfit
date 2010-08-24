@@ -158,6 +158,7 @@ module Mostfit
       end
 
 			def self.apply_rule(rule)
+        debugger
 		    condition1 = Array.new
 				precondition1 = Array.new
 				#generating polish notation in condition1
