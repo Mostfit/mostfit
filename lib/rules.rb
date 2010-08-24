@@ -120,8 +120,13 @@ module Mostfit
       REJECT_REGEX = /^(Merb|merb)::*/
       
       def self.deploy #apply the business rules
-        Rule.all.each do |r|
-          r.apply_rule
+        debugger
+        begin 
+          Rule.all.each do |r|
+            r.apply_rule
+          end
+        rescue #TODO find a better way of handling situation when rules table is missing
+          puts "Rules Engine not deployed. continuing"
         end
 #        load(File.join(Merb.root, "config", "rules.rb"))
       end
