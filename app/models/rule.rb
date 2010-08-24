@@ -31,9 +31,9 @@ class Rule
   end
 
   def apply_rule
-    debugger
+    #debugger
 		puts "Applying Rule #{@name}"
-    puts "condition#{condition}" #DO not remove this statement, if this is removed
+    puts "condition#{self.condition}" #DO not remove this statement, if this is removed
     # due to some bug in data-mapper, condition is not loaded and it remains nil
     # the rule is never applied
     h = {:name => @name, :on_action => @on_action, :model_name => @model_name, 
