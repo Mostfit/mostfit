@@ -5,11 +5,16 @@ class Centers < Application
 
   def index    
     redirect resource(@branch) if @branch
-    hash = {:order => [:meeting_day]}
+    hash = {:order => [:meeting_day, :meeting_time_hours]}
     hash[:manager] = session.user.staff_member if session.user.role == :staff_member
     hash[:branch] = @branch if @branch
     @centers = Center.all(hash).paginate(:per_page => 15, :page => params[:page] || 1)
     display @centers
+  end
+
+  def list
+    @centers = @branch.centers_with_paginate({:meeting_day => params[:meeting_day]}, session.user)
+    partial "centers/list", :layout => layout?
   end
 
   def show(id)

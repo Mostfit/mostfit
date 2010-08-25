@@ -32,13 +32,20 @@ class Branch
   end
 
   def centers_with_paginate(params, user)
-    hash = {:order => [:meeting_day]}
+    hash = {:order => [:meeting_day, :meeting_time_hours]}
     # This the logged in person is a staff member and he is not a branch manager
     if user.role == :staff_member and user.staff_member.branches.length==0
       hash[:manager] = user.staff_member
     end
     hash[:branch] = self    
-    Center.all(hash).paginate(:page => params[:page], :per_page => 15)
+
+    if params[:meeting_day] and Center::DAYS.include?(params[:meeting_day].to_sym)
+      hash[:meeting_day]= params[:meeting_day].to_sym
+    else
+      hash[:meeting_day]=Date.today.weekday
+    end
+
+    Center.all(hash)
   end
 
   def client_groups(hash={})
