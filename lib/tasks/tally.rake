@@ -1,6 +1,6 @@
 require "rubygems"
 require 'iconv'
-require 'hpricot'
+require 'nokogiri'
 
 # Add the local gems dir if found within the app root; any dependencies loaded
 # hereafter will try to load from the local gems before loading system gems.
@@ -17,7 +17,6 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 namespace :mostfit do
   namespace :tally do
     def get_account_type(name)
-      name = name.downcase
       if name.include?("assets") or name.include?("investment") or name.include?("capital account") 
         AccountType.first(:name => "Assets")
       elsif name.include?("expense") or name.include?("purchase") or name.include?("expenditure") or name.include?("salary")
@@ -32,29 +31,33 @@ namespace :mostfit do
     end
     desc "Create accounts from tally XML dump"    
     task :coa_import do
-      doc = Hpricot(Iconv.iconv("LATIN1", "UTF-16", File.read(ARGV[1]))[0])
-      
+      str  = Iconv.iconv("LATIN1", "UTF-16", File.read(ARGV[1]))[0].downcase
+      doc = Nokogiri(str)
       accounts = {}
-      (doc/"envelope/body/importdata/requestdata/tallymessage/group").each{|x| 
-        a = x.attributes["NAME"]
-        if (x/"parent").inner_text.length==0
+      (doc.xpath("envelope/body/importdata/requestdata/tallymessage/group")).each{|x| 
+        a = x.attributes["name"].value
+        if (x.xpath("parent")).inner_text.length==0
           Account.create(:name => a, :gl_code => a, :account_type => get_account_type(a))
-        else          
-          parent = Account.first(:name => (x/"parent").inner_text)
+        else
+          parent_name = x.xpath("parent").children.inner_text
+          parent = Account.first(:name => parent_name)
           Account.create(:name => a, :gl_code => a, :parent => parent, :account_type => parent.account_type)
         end
       }
       
-      (doc/"envelope/body/importdata/requestdata/tallymessage/ledger").each{|x| 
-        if (x/"parent").inner_text.length==0
-          Account.create(:name => x.attributes["NAME"], :gl_code => x.attributes["NAME"], :account_type => get_account_type(x.attributes["NAME"]))
+      (doc.xpath("envelope/body/importdata/requestdata/tallymessage/ledger")).each{|x| 
+        if (x.xpath("parent")).inner_text.length==0
+          name  = x.attributes["name"].value
+          Account.create(:name => name, :gl_code => name, :account_type => get_account_type(name))
         else
-          parent = Account.first(:name => (x/"parent").inner_text)
+          parent_name = x.xpath("parent").children.inner_text
+          parent = Account.first(:name => parent_name)
           if not parent
             p x
-            p (x/"parent").inner_text
+            p x.xpath("parent")
           end
-          Account.create(:parent => parent, :name => x.attributes["NAME"], :gl_code => x.attributes["NAME"],
+          name  = x.attributes["name"].value
+          Account.create(:parent => parent, :name => name, :gl_code => name,
                          :account_type => parent.account_type)
         end
       }      
