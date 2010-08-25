@@ -30,6 +30,13 @@ class Rule
 	  Mostfit::Business::Rules.remove_rule h
   end
 
+  after :update do
+ 		h = {:name => @name, :model_name => @model_name}
+    #puts "Removed Rule"
+	  Mostfit::Business::Rules.remove_rule h
+    self.apply_rule #remove and re-apply rule
+  end
+
   def apply_rule
     #debugger
 		#puts "Applying Rule #{@name}"
@@ -40,10 +47,5 @@ class Rule
     end
 		Mostfit::Business::Rules.apply_rule h
   end
-
-#  def atleast_one_condition
-#    return [false, "there are no conditions"] if self.conditions.count==0
-#    return true
-#  end
 
 end

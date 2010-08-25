@@ -235,6 +235,7 @@ module Mostfit
         self.remove(hash)
       end
 
+      #not to be called directly, call remove_rule instead
       #to remove a validation
       def self.remove(hash)
         if(hash[:model_name].class != Class)
