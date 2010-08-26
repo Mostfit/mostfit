@@ -48,3 +48,5 @@
   %ul
     %li
       = link_to_with_rights 'Upload data', url(:controller => 'admin', :action => "upload"), :class => 'edit'
+    %li
+      = link_to_with_rights 'Download data', url(:controller => 'admin', :action => "download"), :class => 'edit'

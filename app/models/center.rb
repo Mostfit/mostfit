@@ -165,12 +165,12 @@ class Center
 
     date = self.meeting_day_change_date||Date.today
     if not CenterMeetingDay.first(:center => self)
-      CenterMeetingDay.create(:center => self, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
+      CenterMeetingDay.create(:center_id => self.id, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
     elsif self.meeting_day != self.meeting_day_for(date)
-      if prev_cm = CenterMeetingDay.first(:center => self, :valid_from.lte => date, :order => [:valid_from.desc])
+      if prev_cm = CenterMeetingDay.first(:center_id => self.id, :valid_from.lte => date, :order => [:valid_from.desc])
         # previous CMD should be valid upto date - 1
         prev_cm.valid_upto = date - 1
-        prev_cm.save
+        prev_cm.save!
       end
 
       # next CMD's valid from date should be valid upto limit for this CMD
@@ -179,13 +179,13 @@ class Center
       else
         valid_upto = Date.new(2100, 12, 31)
       end
-      CenterMeetingDay.create(:center => self, :valid_from => date, :meeting_day => self.meeting_day, :valid_upto => valid_upto)
+      CenterMeetingDay.create!(:center_id => self.id, :valid_from => date, :meeting_day => self.meeting_day, :valid_upto => valid_upto)
     end
     self.clients.loans.each{|l|
       if [:outstanding, :disbursed].include?(l.status)
         l.update_history
       end
     }
-  end
-  
+    return true
+  end  
 end
