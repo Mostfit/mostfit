@@ -1,3 +1,4 @@
+
 %h2
   Meeting day changes
 %table.report.nojs{:style => "width: 40%"}
@@ -19,4 +20,4 @@
       %td
         = day.meeting_day
       %td
-        = link_to("[X]", url(:controller => "application", :action => "delete", :id => day.id, :model => "center_meeting_days", :return => "/branches/#{@center.branch.id}/centers/#{@center.id}#miscellaneous"), :class => :delete)
+        = link_to("[x]", url(:controller => "application", :action => "delete", :id => day.id, :model => "center_meeting_days", :return => "/branches/#{@center.branch.id}/centers/#{@center.id}"))
