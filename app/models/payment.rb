@@ -198,7 +198,7 @@ class Payment
         a = loan.total_fees_payable_on(received_on) if loan
         a = client.total_fees_payable_on(received_on) if client and not loan
       end      
-      if (not a.blank?) and amount > a
+      if (not a.blank?) and amount - a > 0.01
         return [false, "#{type} is more than the total #{type} due"]
       end
     end

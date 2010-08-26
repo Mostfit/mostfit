@@ -1,9 +1,15 @@
 class ClientGroups < Application
   # provides :xml, :yaml, :js
-  before :get_context, :only => ['edit', 'update']
+  before :get_context, :only => ['edit', 'update', 'index']
 
   def index
-    @client_groups = ClientGroup.all
+    if @center
+      @client_groups = @center.client_groups
+    elsif @branch
+      @client_groups = @branch.center.client_groups
+    else
+      @client_groups = ClientGroup.all
+    end
     display @client_groups
   end
 

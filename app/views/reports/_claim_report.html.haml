@@ -31,15 +31,51 @@
       %td
         = claim.claim_submission_date
       %td
+        -list = ['death_certificate','center_declaration_form','kyc_document']
         -doc = claim.documents
-        - doc.each do |x|
-          = x
+        - doc.each do |x| 
+          - if doc.length == 1
+            - if x.to_s == list[0] 
+              = list[1]
+              = list[2]
+            - elsif x.to_s == list[1]
+              = list[0]
+              = list[2]
+            - elsif x.to_s == list[2]
+              = list[0]
+              = list[1]
+          - elsif doc.length == 2
+            - if x.to_s == list[0] and list[1]
+              = list[2]
+            - elsif x.to_s == list[1] and list[2]
+              = list[0]
+            - elsif x.to_s == list[0] and list[2]
+              = list[1]
+          - elsif doc.length == 3  
+            - if x.to_s == list[0] and list[1] and list[2]
+              = "all document submited"
+        -if claim.documents.length == 0
+          = list[0]
+          = list[1]
+          = list[2]
       %td
-        - claim_amount = claim.amount_of_claim
-        = claim_amount
+        - l = claim.client.loans
+        - l.each do |x|
+        - amount_disbursed = x.amount
+          = amount_disbursed
+          %br
       %td
-        - amount_deducted  = claim.amount_to_be_deducted
-        - payment = claim_amount - amount_deducted
-        = payment
+        - l = claim.client.loans
+        - l.each do |x|
+        - amount_disbursed = x.amount
+        - amount_paid = x.principal_received_up_to(Date.today).to_f
+          = amount_paid
+          %br
       %td
-        = claim_amount - payment
+        - l = claim.client.loans
+        - l.each do |x|
+        - amount_disbursed = x.amount
+        - amount_paid = x.principal_received_up_to(Date.today).to_f
+          = amount_disbursed - amount_paid
+          %br
+= paginate @data

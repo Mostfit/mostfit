@@ -352,6 +352,17 @@ module Merb
              :prompt       => (attrs[:prompt] or "&lt;select a field&gt;")).gsub("!!!", "&nbsp;")
     end
 
+    def paginate_on_weekdays(branch, selected=Date.today.weekday)      
+      Center::DAYS.map{|wday|
+        weekday = (wday==:none ? "Not defined" : wday.to_s)
+        if selected==wday
+          "<strong>#{weekday}</strong>"
+        else
+          link_to(weekday, url(:controller => "centers", :action => "list", :branch_id => branch, :meeting_day => wday.to_s), :id => "centers_list", :class => "_remote_")
+        end
+      }.join(' | ')
+    end
+
     private
     def staff_members_collection(allow_unsigned=false)
       if session.user.staff_member

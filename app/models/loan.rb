@@ -344,9 +344,11 @@ class Loan
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0], input[1]
     end
+
     save_status = nil
     payments = []
     Payment.transaction do |t|
+      self.history_disabled=true
       if fees_paid > 0
         fee_payment = Payment.new(:loan => self, :created_by => user,
                                   :received_on => received_on, :received_by => received_by,
@@ -381,6 +383,7 @@ class Loan
         update_history
       end
     else
+      self.history_disabled=false
       already_updated=false
       update_history  # update the history if we saved a payment
     end

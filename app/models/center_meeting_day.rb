@@ -37,5 +37,11 @@ class CenterMeetingDay
       end
       cmd.save
     }
+    # fix center meeting day
+    cen = Center.get(self.center_id)
+    if cen.meeting_day != cen.meeting_day_for(Date.today)
+      cen.meeting_day  = cen.meeting_day_for(Date.today)
+      cen.save
+    end
   end
 end
