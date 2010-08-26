@@ -1,0 +1,34 @@
+- #debugger
+/TODO printer friendly version
+%b
+  Total Duplicates = 
+  = @data.count
+%br
+
+%table
+  %tr
+    %th
+      Client ID1
+    %th
+      Client ID2
+    %th
+      Issues
+
+  - @data.each do |x|
+    %tr
+      %td
+        %a{:href => url(:controller => "data_entry/clients", :action => "edit", :client_id => x[0])}
+          = x[0]
+      %td
+        %a{:href => url(:controller => "data_entry/clients", :action => "edit", :client_id => x[1])}
+          = x[1]
+      - if (x[2] & DuplicateClientsReport::SAME_NAME) != 0
+        %td
+          Same Name
+      - if (x[2] & DuplicateClientsReport::SAME_SPOUSE_NAME) != 0
+        %td
+          Same Spouse Name
+      - if (x[2] & DuplicateClientsReport::SAME_ACCOUNT_NUMBER) != 0
+        %td
+          Same (Bank) Account Number
+
