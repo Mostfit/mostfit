@@ -304,7 +304,7 @@ class LoanHistory
     })
   end
 
-  def self.sum_outstanding_for(obj, from_date=Date.today-7, to_date=Date.today)
+  def self.sum_outstanding_for(obj, to_date=Date.today)
     if [Branch, Center, ClientGroup].include?(obj.class)
       q = "#{obj.class.name.snake_case}_id"
       query = "#{q}=#{obj.id}"
@@ -323,8 +323,8 @@ class LoanHistory
     ids=repository.adapter.query(%Q{
                                  SELECT lh.loan_id loan_id, max(lh.date) date
                                  FROM loan_history lh, loans l
-                                 WHERE l.id=lh.loan_id AND l.deleted_at is NULL AND l.disbursal_date is NOT NULL
-                                 AND #{query} AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' 
+                                 WHERE l.id=lh.loan_id AND l.deleted_at is NULL AND l.disbursal_date is NOT NULL AND status in (5,6,7,8)
+                                 AND #{query}
                                  AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
@@ -345,7 +345,7 @@ class LoanHistory
     repository.adapter.query(%Q{
       SELECT #{select}
       FROM loan_history
-      WHERE (loan_id, date) in (#{ids})
+      WHERE (loan_id, date) in (#{ids}) AND status in (5,6)
       GROUP BY #{q}
     })
   end
