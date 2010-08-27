@@ -14,6 +14,14 @@ module Reporting
       o
     end
 
+    def center_count(start_date=Date.min_date, end_date = Date.today)
+      query_as_hash(%Q{
+          SELECT b.id, COUNT(c.id) as count
+          FROM centers c, branches b
+          WHERE c.branch_id = b.id and c.creation_date <= '#{end_date.strftime('%Y-%m-%d')}' and c.creation_date >= '#{start_date.strftime('%Y-%m-%d')}'
+          GROUP BY b.id})            
+    end
+
     def client_count(date = Date.today)
       query_as_hash(%Q{
           SELECT b.id, COUNT(cl.id) as count
@@ -25,6 +33,15 @@ module Reporting
     def loan_count(date = Date.today)
       query_as_hash(%Q{
           SELECT b.id, COUNT(l.id) 
+          FROM loans l, clients cl, centers c, branches b
+          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id AND l.disbursal_date <='#{date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
+                AND cl.deleted_at is NULL
+          GROUP BY b.id})
+    end
+
+    def loan_amount(date = Date.today)
+      query_as_hash(%Q{
+          SELECT b.id, SUM(l.amount) 
           FROM loans l, clients cl, centers c, branches b
           WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id AND l.disbursal_date <='#{date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
                 AND cl.deleted_at is NULL
@@ -60,7 +77,7 @@ module Reporting
             GROUP BY b.id})
     end
 
-    def clients_added_between_such_and_such_date_count(start_date, end_date)
+    def clients_added_between(start_date, end_date)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
       query_as_hash(%Q{
@@ -71,7 +88,7 @@ module Reporting
         GROUP BY b.id})
     end
 
-    def clients_deleted_between_such_and_such_date_count(start_date, end_date)
+    def clients_deleted_between(start_date, end_date)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
       query_as_hash(%Q{
@@ -82,7 +99,7 @@ module Reporting
         GROUP BY b.id})
     end
 
-    def loans_repaid_between_such_and_such_date(start_date, end_date, what)
+    def loans_repaid_between(start_date, end_date, what)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
       return unless what.downcase == "sum" or what.downcase == "count"
@@ -95,7 +112,7 @@ module Reporting
          GROUP BY lh.branch_id})
     end
 
-    def loans_disbursed_between_such_and_such_date(start_date, end_date, what)
+    def loans_disbursed_between(start_date, end_date, what)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
       return unless what.downcase == "sum" or what.downcase == "count"
@@ -107,9 +124,33 @@ module Reporting
          GROUP BY lh.branch_id})
     end
 
+    def loans_applied_between(start_date, end_date, what)
+      start_date = Date.parse(start_date) unless start_date.is_a? Date
+      end_date = Date.parse(end_date) unless end_date.is_a? Date
+      return unless what.downcase == "sum" or what.downcase == "count"
+        query_as_hash(%Q{
+         SELECT c.branch_id branch_id, #{what}(l.amount)
+         FROM loans l, clients cl, centers c
+         WHERE l.client_id = cl.id AND cl.center_id=c.id AND l.applied_on BETWEEN '#{start_date.strftime('%Y-%m-%d')}' AND '#{end_date.strftime('%Y-%m-%d')}' 
+               AND l.deleted_at is NULL
+         GROUP BY c.branch_id})
+    end
+
+    def loans_approved_between(start_date, end_date, what)
+      start_date = Date.parse(start_date) unless start_date.is_a? Date
+      end_date = Date.parse(end_date) unless end_date.is_a? Date
+      return unless what.downcase == "sum" or what.downcase == "count"
+        query_as_hash(%Q{
+         SELECT c.branch_id branch_id, #{what}(l.amount)
+         FROM loans l, clients cl, centers c
+         WHERE l.client_id = cl.id AND cl.center_id=c.id AND l.approved_on BETWEEN '#{start_date.strftime('%Y-%m-%d')}' AND '#{end_date.strftime('%Y-%m-%d')}' 
+               AND l.deleted_at is NULL
+         GROUP BY c.branch_id})
+    end
+
     [:principal, :interest, :fees].each_with_index do |payment_type, ptype|
       query_type = :received
-      define_method("#{payment_type}_#{query_type}_between_such_and_such_date") do |start_date, end_date|
+      define_method("#{payment_type}_#{query_type}_between") do |start_date, end_date|
         repository.adapter.query(%Q{SELECT branch_id, sum(amount) amount FROM payments p, clients cl, centers c, branches b 
                                       WHERE b.id=c.branch_id AND cl.center_id=c.id AND p.client_id=cl.id AND p.deleted_at is NULL AND cl.deleted_at is NULL 
                                             AND p.type=#{ptype+1} AND p.received_on>='#{start_date.strftime('%Y-%m-%d')}' 
@@ -120,12 +161,12 @@ module Reporting
       end
     end
 
-    def principal_due_between_such_and_such_date(start_date, end_date)
-      get_latest_before(:scheduled_outstanding_principal, start_date) - get_latest_before(:scheduled_outstanding_principal, end_date) - loans_disbursed_between_such_and_such_date(start_date, end_date, "sum")
+    def principal_due_between(start_date, end_date)
+      get_latest_before(:scheduled_outstanding_principal, start_date) - get_latest_before(:scheduled_outstanding_principal, end_date) + loans_disbursed_between(start_date, end_date, "sum")
     end
 
-    def interest_due_between_such_and_such_date(start_date, end_date)
-      get_latest_before(:scheduled_outstanding_total, start_date) - get_latest_before(:scheduled_outstanding_principal, start_date) - get_latest_before(:scheduled_outstanding_total, end_date) + get_latest_before(:scheduled_outstanding_principal, end_date)
+    def interest_due_between(start_date, end_date)
+      get_latest_before(:scheduled_outstanding_total, start_date) - get_latest_before(:scheduled_outstanding_principal, start_date) - get_latest_before(:actual_outstanding_total, end_date) + get_latest_before(:actual_outstanding_principal, end_date)
     end
 
     def principal_outstanding(date = Date.today)
@@ -153,17 +194,36 @@ module Reporting
       query_as_hash("select branch_id, count(distinct(manager_staff_id)) from centers group by branch_id ;")
     end
 
-    def avg_outstanding_balance
-      query_as_hash("select branch_id, avg(actual_outstanding_principal) from loan_history where current = true group by branch_id;")
+    def avg_outstanding_balance(date)
+      query_as_hash("select branch_id, avg(actual_outstanding_principal) amount from loan_history lh, loans l WHERE lh.date<='#{date.strftime('%Y-%m-%d')}' AND lh.loan_id=l.id AND lh.status in (5,6) AND l.deleted_at is NULL GROUP BY lh.branch_id;")
     end
 
-    def overdue_by(min, max)
-      repository.adapter.query("SELECT branch_id, SUM(amount_in_default) FROM loan_history WHERE current = true AND days_overdue BETWEEN #{min} and #{max} GROUP BY branch_id").map {|x| [x[0],x[1].to_f]}.to_hash
+    def principal_overdue_by(days, date=Date.today)
+      Branch.all.map{|b| 
+        due = LoanHistory.defaulted_loan_info_for(b, date, days)
+        if due
+          [b.id, due.principal_due.to_i]
+        else
+          [b.id, 0]
+        end
+       }.to_hash
+    end
+
+    def overpaid_principal_between(start_date=Date.today, end_date=Date.today)
+      LoanHistory.sum_advance_payment(start_date, end_date, :branch).group_by{|x| x.branch_id}.map{|bid, d| 
+        {bid, d.first.advance_principal.to_i}
+      }.inject({}){|s,x| s+=x}      
+    end
+
+    def overpaid_total_between(start_date=Date.today, end_date=Date.today)
+      LoanHistory.sum_advance_payment(start_date, end_date, :branch).group_by{|x| x.branch_id}.map{|bid, d| 
+        {bid, d.first.advance_total.to_i}
+      }.inject({}){|s,x| s+=x}      
     end
 
     def get_latest_loan_history_row_before(date = Date.today)
       date = Date.parse(date) unless date.is_a? Date
-      repository.adapter.query("select loan_id, max(date) date from loan_history where date < '#{date.strftime('%Y-%m-%d')}' group by loan_id")
+      repository.adapter.query("select loan_id, max(date) date from loan_history where date <= '#{date.strftime('%Y-%m-%d')}' group by loan_id")
     end
 
     def get_latest_before(column, date = Date.today, group_by = nil)

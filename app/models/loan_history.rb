@@ -119,7 +119,7 @@ class LoanHistory
          AND date <= '#{date.strftime("%Y-%m-%d")}') as dt WHERE pdiff>0 AND tdiff>0  GROUP BY #{group_by}_id;})
   end
   
-  def self.defaulted_loan_info_for(obj, date=Date.today, type=:aggregate)
+  def self.defaulted_loan_info_for(obj, date=Date.today, days=nil, type=:aggregate)
     if obj.class==Branch
       query = "branch_id=#{obj.id}"
     elsif obj.class==Center
@@ -135,7 +135,9 @@ class LoanHistory
       ids = (ids.length==0 ? "NULL" : ids.join(","))
       query = "loan_id in (#{ids})"
     end
-    
+
+    query+=" AND days_overdue<=#{days}" if days
+
     # either we list or we aggregate depending on type
     if type==:listing
       select = %Q{
@@ -200,6 +202,28 @@ class LoanHistory
       FROM loan_history
       WHERE (loan_id, date) in (#{ids}) AND status in (5,6)
       GROUP BY client_group_id;
+    })
+  end
+
+  def self.sum_advance_payment(from_date, to_date, group_by)
+    ids=repository.adapter.query(%Q{
+                                 SELECT lh.loan_id loan_id, max(lh.date) date
+                                 FROM  loans l, loan_history lh
+                                 WHERE lh.status in (5,6,7,8)
+                                 AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' AND lh.loan_id=l.id AND l.deleted_at is NULL
+                                 GROUP BY lh.loan_id
+                                 }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
+    return false if ids.length==0
+    
+    repository.adapter.query(%Q{
+      SELECT 
+        SUM(scheduled_outstanding_principal-actual_outstanding_principal) AS advance_principal,
+        SUM(scheduled_outstanding_total-actual_outstanding_total)         AS advance_total,
+        #{group_by}_id
+      FROM loan_history
+      WHERE (loan_id, date) in (#{ids}) AND status in (5,6) AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}'
+            AND scheduled_outstanding_principal>actual_outstanding_principal AND scheduled_outstanding_total>actual_outstanding_total
+      GROUP BY #{group_by}_id;
     })
   end
 
