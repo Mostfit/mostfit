@@ -1,6 +1,7 @@
 - #debugger
 /TODO printer friendly version
 %b
+  - @data = Marshal.restore(@report.report)
   Total Duplicates = 
   = @data.count
 %br
@@ -12,9 +13,10 @@
     %th
       Client ID2
     %th
-      Issues
+      Issue(s)
+  -debugger
 
-  - @data.each do |x|
+  - Marshal.restore(@report.report).each do |x|
     %tr
       %td
         %a{:href => url(:controller => "data_entry/clients", :action => "edit", :client_id => x[0])}

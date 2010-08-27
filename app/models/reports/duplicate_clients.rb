@@ -57,6 +57,8 @@ class DuplicateClientsReport < Report
   end
 
   def generate2
+    t0 = Time.now
+    @report = []
     data = [] #account number can be nil, others cannot be 
     name_and_id = Hash.new
     spouse_name_and_id = Hash.new
@@ -112,15 +114,20 @@ class DuplicateClientsReport < Report
       end
     end
 
-    arr = [] #this will the arr to be returned consisting of ID1, ID2 and issue
+    arr = [] #each element will be an array consisting of ID1, ID2 and issue
     duplicates.each do |key,value|
       arr.push([key[0], key[1], value])
     end
     arr.sort! { |a,b| 
       b[2] <=> a[2]} #this sorts array in desecending order
-    return arr
+    @report = arr.dup
+    self.raw = @report
+    self.report = Marshal.dump(@report)
+    self.generation_time = Time.now - t0
+    self.save
   end
 
+# delete this
 #  def soundex2(string)
 #    copy = string.upcase.tr '^A-Z', ''
 #    return "" if copy.empty?
