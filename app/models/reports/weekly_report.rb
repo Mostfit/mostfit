@@ -45,8 +45,6 @@ class WeeklyReport < Report
     @report << {"Principal received last week" => Branch.principal_received_between(start_date, end_date) }
     @report << {"Interest received last week" => Branch.interest_received_between(start_date, end_date)}
 
-    @report << {"Principal due last week" => Branch.principal_due_between(start_date, end_date) }
-
     @report << {"Principal amount outstanding" => Branch.principal_outstanding(end_date)}
     @report << {"Total amount outstanding" => Branch.total_outstanding(end_date)}
 
@@ -60,7 +58,6 @@ class WeeklyReport < Report
     @report << {"Average os bal per loanee" => Branch.avg_outstanding_balance(end_date)}
     @report << {"Number of staff members" => Branch.center_managers(end_date)}
     @report << {"Number of center managers" => Branch.center_managers(end_date)}
-    @report << {"Average clients / staff" => Branch.avg_client_count_per_center_managers([[end_date], [end_date]])}
     @report << {"Average clients / staff" => Branch.avg_client_count_per_center_managers([[end_date], [end_date]])}
     @report << {"Average balance / CM" => Branch.avg_principal_outstanding_per_center_managers([[end_date],[end_date]])}
     @report << {"Average borrowers / CM" => Branch.avg_active_client_count_per_center_managers([[end_date], [end_date]])}
