@@ -124,7 +124,7 @@ private
     @total_fees      = Fee.collected_for(obj, Date.min_date, @to_date)
     @total_disbursed = LoanHistory.amount_disbursed_for(obj, Date.min_date, @to_date)
     @loan_disbursed  = LoanHistory.amount_disbursed_for(obj, @from_date, @to_date)
-    @loan_data       = LoanHistory.sum_outstanding_for(obj, @from_date, @to_date)
+    @loan_data       = LoanHistory.sum_outstanding_for(obj, @to_date)
     @defaulted       = LoanHistory.defaulted_loan_info_for(obj, @to_date)
   end
 end
