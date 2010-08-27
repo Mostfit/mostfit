@@ -34,7 +34,7 @@ class StaffMembers < Application
     @payments      = Payment.collected_for(@center, @from_date, @to_date)
     @fees          = Fee.collected_for(@center, @from_date, @to_date)
     @loan_disbursed= LoanHistory.amount_disbursed_for(@center, @from_date, @to_date)
-    @loan_data     = LoanHistory.sum_outstanding_for(@center, @from_date, @to_date)
+    @loan_data     = LoanHistory.sum_outstanding_for(@center, @to_date)
     @defaulted     = LoanHistory.defaulted_loan_info_for(@center, @to_date)
     render :file => 'branches/moreinfo', :layout => false
   end
@@ -64,11 +64,9 @@ class StaffMembers < Application
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
     @date      = params[:date] ? parse_date(params[:date]) : Date.today
-    @date     = @date.holiday_bump
-    days       = []
-    days      << Center.meeting_days[@date.cwday]
-    days      << Center.meeting_days[@date.holidays_shifted_today.cwday]
-    @centers   = @staff_member.centers.all(:meeting_day => days.uniq).sort_by{|x| x.name}
+    @date      = @date.holiday_bump
+    center_ids = LoanHistory.all(:date => [@date, @date.holidays_shifted_today].uniq, :fields => [:loan_id, :date, :center_id], :status => [:disbursed, :outstanding]).map{|x| x.center_id}.uniq
+    @centers   = @staff_member.centers(:id => center_ids).sort_by{|x| x.name}
     if params[:format] == "pdf"
       generate_pdf
       send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf"),

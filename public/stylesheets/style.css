@@ -635,7 +635,6 @@ a.lessinfo{
 }
 table.moreinfo{
     background: #eee;    
-    width: 50%;
 }
 table.moreinfo tr td:first-child{
     font-weight: bold;
