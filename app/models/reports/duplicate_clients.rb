@@ -72,7 +72,7 @@ class DuplicateClientsReport < Report
 
     i=0
     clients.each do |c|
-#      if i>100
+#      if i>4000
 #        break
 #        end
 #      i+=1
@@ -87,12 +87,11 @@ class DuplicateClientsReport < Report
       while j<last
         id2 = name_and_id[name_firstchar][j][:id]
         if name_and_id[name_firstchar][j][:rest] == name_rest
-        # debugger
           if c.date_of_birth == nil
-            duplicates[ [c.id, id2] ] = SAME_NAME
-            details_of_duplicates[c.id] = {:name => c.name, :spouse_name=>c.spouse_name, :center_name => c.center.name, :branch_name => c.center.branch.name, :dob => c.date_of_birth.to_s}
-            c2 = clients.get(id2)
-            details_of_duplicates[c2.id] = {:name => c2.name, :spouse_name=>c2.spouse_name, :center_name => c2.center.name, :branch_name => c2.center.branch.name, :dob => c2.date_of_birth.to_s}
+#            duplicates[ [c.id, id2] ] = SAME_NAME
+#            details_of_duplicates[c.id] = {:name => c.name, :spouse_name=>c.spouse_name, :center_name => c.center.name, :branch_name => c.center.branch.name, :dob => c.date_of_birth.to_s}
+#            c2 = clients.get(id2)
+#            details_of_duplicates[c2.id] = {:name => c2.name, :spouse_name=>c2.spouse_name, :center_name => c2.center.name, :branch_name => c2.center.branch.name, :dob => c2.date_of_birth.to_s}
           elsif (clients.get(id2).date_of_birth != nil) and (c.date_of_birth == clients.get(id2).date_of_birth)
             duplicates[ [c.id, id2] ] = SAME_NAME_AND_DOB
             details_of_duplicates[c.id] = {:name => c.name, :spouse_name=>c.spouse_name, :center_name => c.center.name, :branch_name => c.center.branch.name, :dob => c.date_of_birth.to_s}
@@ -116,10 +115,10 @@ class DuplicateClientsReport < Report
           id2 = spouse_name_and_id[spouse_name_firstchar][j][:id]
           if spouse_name_and_id[spouse_name_firstchar][j][:rest] == name_rest
             if c.date_of_birth == nil
-              duplicates[ [c.id, id2] ] = SAME_SPOUSE_NAME | duplicates[ [c.id, id2] ].to_i
-              details_of_duplicates[c.id] = {:name => c.name, :spouse_name=>c.spouse_name, :center_name => c.center.name, :branch_name => c.center.branch.name, :dob => c.date_of_birth.to_s}
-              c2 = clients.get(id2)
-              details_of_duplicates[c2.id] = {:name => c2.name, :spouse_name=>c2.spouse_name, :center_name => c2.center.name, :branch_name => c2.center.branch.name, :dob => c2.date_of_birth.to_s}
+#              duplicates[ [c.id, id2] ] = SAME_SPOUSE_NAME | duplicates[ [c.id, id2] ].to_i
+#              details_of_duplicates[c.id] = {:name => c.name, :spouse_name=>c.spouse_name, :center_name => c.center.name, :branch_name => c.center.branch.name, :dob => c.date_of_birth.to_s}
+#              c2 = clients.get(id2)
+#              details_of_duplicates[c2.id] = {:name => c2.name, :spouse_name=>c2.spouse_name, :center_name => c2.center.name, :branch_name => c2.center.branch.name, :dob => c2.date_of_birth.to_s}
             elsif (clients.get(id2).date_of_birth != nil) and (c.date_of_birth == clients.get(id2).date_of_birth)
               duplicates[ [c.id, id2] ] = SAME_SPOUSE_NAME_AND_DOB | duplicates[ [c.id, id2] ].to_i
               details_of_duplicates[c.id] = {:name => c.name, :spouse_name=>c.spouse_name, :center_name => c.center.name, :branch_name => c.center.branch.name, :dob => c.date_of_birth.to_s}
