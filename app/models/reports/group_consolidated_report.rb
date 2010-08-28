@@ -19,6 +19,10 @@ class GroupConsolidatedReport < Report
   def generate
     branches, centers, data, clients, loans, groups = {}, {}, {}, {}, {}, {}
     histories = LoanHistory.sum_outstanding_grouped_by(self.to_date, [:center, :client_group], self.loan_product_id)
+    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, :client_group)||[]
+    balances  = LoanHistory.advance_balance(self.to_date, :client_group)||[]
+    old_balances = LoanHistory.advance_balance(self.from_date-1, :client_group)||[]
+
     @branch.each{|b|
       data[b]||= {}
       branches[b.id] = b
@@ -32,17 +36,18 @@ class GroupConsolidatedReport < Report
           #amount_applied,amount_sanctioned,amount_disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults, name
           data[b][c][g] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
           history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id} if histories
+          advance  = advances.find{|x|  x.client_group_id==g.id}
+          balance  = balances.find{|x|  x.client_group_id==g.id}
+          old_balance = old_balances.find{|x|  x.client_group_id==g.id}
+
           if history
             principal_scheduled = history.scheduled_outstanding_principal
             total_scheduled     = history.scheduled_outstanding_total
 
             principal_actual    = history.actual_outstanding_principal
             total_actual        = history.actual_outstanding_total
-            
-            principal_advance   = history.advance_principal
-            total_advance       = history.advance_total
           else
-            principal_scheduled, total_scheduled, principal_actual, total_actual, principal_advance, total_advance = 0, 0, 0, 0, 0, 0
+            principal_scheduled, total_scheduled, principal_actual, total_actual = 0, 0, 0, 0
           end
 
           data[b][c][g][7] += principal_actual
@@ -52,9 +57,13 @@ class GroupConsolidatedReport < Report
           data[b][c][g][11]+= ((total_actual-principal_actual) > (total_scheduled-principal_scheduled) ? (total_actual-principal_actual - (total_scheduled-principal_scheduled)) : 0)
           data[b][c][g][12] += total_actual > total_scheduled ? total_actual - total_scheduled : 0
 
-          data[b][c][g][13]  += principal_advance
-          data[b][c][g][15] += total_advance
-          data[b][c][g][14] += (total_advance - principal_advance)
+          advance_total = advance ? advance.advance_total : 0
+          balance_total = balance ? balance.balance_total : 0
+          old_balance_total = old_balance ? old_balance.balance_total : 0
+        
+          data[b][c][g][13]  += advance_total
+          data[b][c][g][15]  += balance_total
+          data[b][c][g][14]  += advance_total - balance_total + old_balance_total
         }
       }
     }
