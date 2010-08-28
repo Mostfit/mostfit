@@ -10,7 +10,6 @@
     %table
       %tr
         -@arr = Array.new;
-        -debugger
         -@precedence.each do |model, prop|
           -keys = prop.keys
           -keys.each do |key|
@@ -24,7 +23,6 @@
         -@arr.delete(nil)
         -@arr.flatten!(1) #flattens array once (this scheme is needed to handle
         - #the case when a user enters same precedence for the two items
-        -debugger
         -@arr.each do |model, key|
           %th
             -if model==klass

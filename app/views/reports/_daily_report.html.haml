@@ -42,40 +42,41 @@
     %th
       Total
     %th
-      Principal
+      Collected
     %th
-      Interest
+      Adjusted
     %th
-      Total
+      Balance
   - center_id, branch_id = nil, nil
   - org_total = []
   - length = 16
-  -@groups.each do |group_id, centers|
+  -@data.sort_by{|branch, centers| branch.name}.each do |branch, centers|
     -if centers.keys.length>0
       -branch_total = []
       %tr.branch
         %td{:colspan => length+1}
           %b
-            =@branches[group_id].name
-      -centers.each do |center_id, groups|
+            =branch.name
+      -centers.sort_by{|center, groups| center.name}.each do |center, groups|
         -if groups.keys.length>0
           %tr.center
             %td{:colspan => length+1}
               %b
-                =@centers[center_id].name
-          - center_total = Array.new(groups.values.first.length-1, 0)
-          -groups.each do |group_id, group|
+                =center.name
+          - center_total = Array.new(length, 0)
+          -groups.sort_by{|group, data| group ? group.name : " no group"}.each do |group, data|
             %tr.group
               %td
-                =group[-1]
-              -group[0..-2].each_with_index do |g, idx|
+                =group ? group.name : "no group"
+              -data.each_with_index do |g, idx|
                 -if idx==6
                   %td
-                    =center_total[6]+=group[3]+group[4]+group[5]
+                    = (data[3]+data[4]+data[5]).to_i
+                    -center_total[6]+=(data[3]+data[4]+data[5]).to_i
                 -else
                   %td
-                    =g
-                    -center_total[idx]+=g
+                    =g.to_i
+                    -center_total[idx]+=g.to_i
           %tr.center_total
             %td
               %b==Center total:
