@@ -11,7 +11,7 @@
 
 %table.narrow.form{ :style => 'width : 50%' }
   %tr.odd
-    %td{ :width => '30%' } amount disbursed
+    %td{ :width => '30%' } Amount disbursed
     %td
       -if @loan.disbursal_date
         == <b>#{@loan.amount}</b> @
@@ -19,7 +19,7 @@
       -else
         Not disbursed yet
   %tr
-    %td{ :width => '30%' } amount sanctioned
+    %td{ :width => '30%' } Amount sanctioned
     %td
       -if @loan.approved_on
         == <b>#{@loan.amount_sanctioned}</b> @
@@ -27,28 +27,28 @@
       -else
         Not approved yet
   %tr
-    %td{ :width => '30%' } amount applied
+    %td{ :width => '30%' } Amount applied
     %td
       == <b>#{@loan.amount_applied_for}</b> @
       %b= format("%.2f%", @loan.interest_rate*100)
   %tr
-    %td type
+    %td Type
     %td= @loan.discriminator
   %tr.odd
-    %td installments
+    %td Installments
     %td
       = @loan.number_of_installments
       = @loan.installment_frequency
       == (#{@loan.number_of_installments_before(Date.today)} past installments)
   %tr
-    %td application
+    %td Application
     %td
       on
       = @loan.applied_on
       by
       %b= link_to @loan.applied_by.name, resource(@loan.applied_by)
   %tr.odd
-    %td approval
+    %td Approval
     %td
       - if @loan.approved_on
         on
@@ -58,7 +58,7 @@
       - else
         %i approval is pending
   %tr
-    %td disbursed
+    %td Disbursed
     %td
       - if @loan.disbursal_date
         on
@@ -74,7 +74,7 @@
           original loan disbursed on
           = @loan.original_disbursal_date
   %tr.odd
-    %td first payment
+    %td First payment
     %td
       - if @loan.payments.empty?
         = @loan.scheduled_first_payment_date
@@ -93,26 +93,24 @@
       - if @loan.class.to_s.match(/^TakeOver/)
         %br
         %i 
-          original first payment date
+          Original first payment date
           = @loan.original_first_payment_date
 
   %tr
     %td
-      fees applicable
+      Fees applicable
     %td
       - @loan.loan_product.fees.each do |f|
         = f.description
   %tr
     %td
-      fees paid
+      Fees paid
     %td
       == #{@loan.total_fees_paid} / #{@loan.total_fees_due}
       - if @loan.fees_paid?
         %span.green Paid
-
-
   %tr
-    %td status
+    %td Status
     %td
       %b= @loan.status.to_s.gsub('_', ' ')
       - if @loan.status == :written_off

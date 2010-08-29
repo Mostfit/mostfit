@@ -16,12 +16,12 @@
     %thead
       %tr
         %th
-        %th id
-        %th name
-        %th manager
-        %th meeting
-        %th clients
-        %th edit
+        %th ID
+        %th Name
+        %th Manager
+        %th Meeting
+        %th Clients
+        %th Edit
     %tbody
     - clients_count = Client.all(:center => @centers).aggregate(:center_id, :id.count).to_hash
     - @centers.each do |center|
