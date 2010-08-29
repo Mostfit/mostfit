@@ -25,6 +25,10 @@
     %tr
       %td Landmark
       %td=@branch.landmark
+    %tr
+      %td Area
+      - area = @branch.area
+      %td=link_to(area.name, resource(area)) if area
   %p
     = link_to_with_rights 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit"
     = link_to_with_rights 'create a new center', resource(@branch, :centers, :new), :class => "add"

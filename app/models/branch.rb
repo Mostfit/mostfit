@@ -32,10 +32,12 @@ class Branch
   end
 
   def centers_with_paginate(params, user)
-    hash = {:order => [:meeting_day, :meeting_time_hours]}
+    hash = {:order => [:meeting_day, :meeting_time_hours, :meeting_time_minutes]}
     # This the logged in person is a staff member and he is not a branch manager
-    if user.role == :staff_member and user.staff_member.branches.length==0
-      hash[:manager] = user.staff_member
+    if staff = user.staff_member and not staff==self.manager
+      if not staff.branches.include?(self) and not staff.areas.branches.include?(self) and not staff.regions.areas.branches.include?(self)
+        hash[:manager] = user.staff_member
+      end
     end
     hash[:branch] = self    
 
