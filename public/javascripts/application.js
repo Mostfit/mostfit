@@ -472,6 +472,13 @@ $(document).ready(function(){
 			$(this).parent().parent().nextUntil("tr.branch_total").hide();
 		    setToggleText();
 		});
+	    $('.report').floatHeader({
+	      fadeIn: 250,
+	      fadeOut: 250,
+	      forceClass: true,
+	      recalculate: true,
+	      markerClass: 'header'
+	    });
 	}
 	if($("a.moreinfo").length>0){
 	    $("a.moreinfo").click(function(){
