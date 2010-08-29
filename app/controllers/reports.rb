@@ -2,8 +2,8 @@ class Reports < Application
   include DateParser
   Types = [
            DailyReport, ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, TransactionLedger, ProjectedReport,
-           LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, LoanSizePerManagerReport, ClaimReport, 
-           TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, LoanSanctionRegister, ClientAbsenteeismReport, 
+           LoanSanctionRegister, LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, LoanSizePerManagerReport, ClaimReport, 
+           TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, ClientAbsenteeismReport, 
            BalanceSheet, GeneralLedgerReport, TrialBalanceReport, DuplicateClientsReport
           ]
   layout :determine_layout 
@@ -30,14 +30,16 @@ class Reports < Application
       if klass == TransactionLedger
         @groups, @centers, @branches, @payments, @clients = @report.generate
         display [@groups, @centers, @branches, @payments, @clients]
-      elsif [LoanSanctionRegister, ScheduledDisbursementRegister].include?(klass)
+      elsif [ScheduledDisbursementRegister].include?(klass)
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
-      elsif [BalanceSheet, GeneralLedgerReport, TrialBalanceReport, ClaimReport].include?(klass)
-        @data  = @report.generate(params)
-        display @data        
-      else
-        @data = @report.generate
+      else        
+        case @report.method(:generate).arity
+        when 0
+          @data = @report.generate
+        when 1
+          @data = @report.generate(params)
+        end
         display @data
       end
     elsif id.nil?
