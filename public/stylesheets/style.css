@@ -852,3 +852,19 @@ a.expand_collapsed{
     background: url("/images/elements/closed.gif") no-repeat 0% 50%;
     background-color: #F4F4F4;
 }
+.totalinfo{
+    border: 2px solid #75B516;
+    border-radius: 10px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+.totalinfo table tr{
+    width: 100%;
+}
+.totalinfo table tr:nth-child(odd){
+    width: 100%;
+    background: #DEDEDE;
+}
+.totalinfo table tr td:first-child{ 
+    font-weight: bold;
+}

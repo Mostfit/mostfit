@@ -355,8 +355,11 @@ class LoanHistory
       ids = (ids.length==0 ? "NULL" : ids.join(","))
       query="loan_id in (#{ids})"
       q = "branch_id"
+    elsif obj==Mfi
+      query="1"
     end
-
+    group_by = q ? "GROUP BY #{q}" : " LIMIT 1"
+    q = ", #{q}" if q
     ids=repository.adapter.query(%Q{
                                  SELECT lh.loan_id loan_id, max(lh.date) date
                                  FROM loan_history lh, loans l
@@ -375,15 +378,15 @@ class LoanHistory
         SUM(if(actual_outstanding_principal<0, actual_outstanding_principal,0))    AS advance_principal,
         SUM(if(actual_outstanding_total<0,     actual_outstanding_total,0))        AS advacne_total,
         COUNT(DISTINCT(loan_id))             AS loans_count,
-        COUNT(DISTINCT(client_id))           AS clients_count,
-        branch_id
+        COUNT(DISTINCT(client_id))           AS clients_count
+        #{q}
     }
 
     repository.adapter.query(%Q{
       SELECT #{select}
       FROM loan_history
       WHERE (loan_id, date) in (#{ids}) AND status in (5,6)
-      GROUP BY #{q}
+      #{group_by}
     })
   end
 

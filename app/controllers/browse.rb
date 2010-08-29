@@ -1,6 +1,8 @@
 class Browse < Application
   before :before
-
+  before :display_from_cache, :only => [:hq_tab]
+  after  :store_to_cache,     :only => [:hq_tab]
+  
   def index
     render :template => @template
   end
@@ -18,5 +20,10 @@ class Browse < Application
     @branch =  @centers.branch[0]
     render :template => 'centers/index'
   end
+
+  def hq_tab
+    partial :totalinfo
+  end
+
 
 end

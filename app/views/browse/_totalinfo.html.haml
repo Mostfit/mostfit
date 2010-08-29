@@ -1,0 +1,80 @@
+%div.totalinfo
+  %h1
+    Company info
+  - lh = LoanHistory.sum_outstanding_for(Mfi)
+  - lh = lh ? lh.first : nil
+  %table
+    %tr
+      %td
+        Regions
+      %td{:colspan => 3}
+        = Region.count
+    %tr
+      %td
+        Areas
+      %td{:colspan => 3}
+        = Area.count
+    %tr
+      %td
+        Branches
+      %td{:colspan => 3}
+        = Branch.count
+    %tr
+      %td
+        Centers
+      %td{:colspan => 3}
+        = Center.count
+    %tr
+      %td
+        Clients
+      %td{:colspan => 3}
+        = Client.count
+    %tr
+      %td
+        Active clients
+      %td{:colspan => 3}
+        = lh.clients_count if lh
+    %tr
+      %td
+        Number of loans
+      %td{:colspan => 3}
+        = (l = Loan.all(:disbursal_date.not => nil).count)
+    %tr
+      %td
+        Number of closed/repaid loans
+      %td{:colspan => 3}
+        = (l - lh.loans_count) if lh
+    %tr
+      %td
+        Amount of loans disbursed
+      %td{:colspan => 3}
+        = Loan.all(:disbursal_date.not => nil).aggregate(:amount.sum).to_currency
+    %tr
+      %td
+        Amount outstanding
+      %td{:colspan => 3}
+        = lh.actual_outstanding_principal.to_currency if lh
+    %tr
+      %td
+        Total repayments
+      %td
+        Principal
+      %td
+        Interest
+      %td
+        Fees
+    %tr
+      %td
+      %td
+        = Payment.all(:type => :principal).aggregate(:amount.sum).to_currency
+      %td
+        = Payment.all(:type => :interest).aggregate(:amount.sum).to_currency
+      %td
+        = Payment.all(:type => :fees).aggregate(:amount.sum).to_currency
+    %tr
+      %td
+        Staff count
+      %td{:colspan => 3}
+        = StaffMember.all(:active => true).count
+  %span.greytext{:style => "float: right"}
+    as of yesterday
