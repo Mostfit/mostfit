@@ -9,11 +9,11 @@ module Misfit
 
       def before
         if session.user.staff_member
-          @staff_member = session.user.staff_member
-          if branch = Branch.all(:manager => @staff_member)
+          @staff ||= session.user.staff_member
+          if branch = Branch.all(:manager => @staff)
             true
           else
-            @centers = Center.all(:manager => @staff_member)
+            @centers = Center.all(:manager => @staff)
             @template = 'browse/for_staff_member'
           end
         end
@@ -49,7 +49,6 @@ module Misfit
       def self.included(base)
         Merb.logger.info "Included Misfit::Extensions::User by #{base}"
         base.class_eval do
-          alias :old_can_access? :can_access?
           alias :can_access? :_can_access?
 
           #congratulations you have over-ridden the base methods
@@ -58,11 +57,11 @@ module Misfit
       end
 
       def can_approve?(obj)        
-        if staff_member
+        if @staff or @staff ||= staff_member
           if obj.class==Client
-            return (obj.center.branch.manager == staff_member)
+            return (obj.center.branch.manager == @staff)
           elsif obj.class==Loan or Loan.descendants.map{|x| x}.include?(obj.class)
-            return (obj.client.center.branch.manager == staff_member)
+            return (obj.client.center.branch.manager == @staff)
           end
           retrun false
         end
@@ -72,36 +71,43 @@ module Misfit
 
       def additional_checks
         id = @route[:id].to_i
-        staff_member = self.staff_member
         model = Kernel.const_get(@model.to_s.split("/")[-1].camelcase)
         if model == Loan
           l = Loan.get(id)
-          return ((l.client.center.manager == staff_member) or (l.client.center.branch.manager == staff_member))
+          return ((l.client.center.manager == @staff) or (l.client.center.branch.manager == @staff))
         elsif model == StaffMember
           #Trying to check his own profile? Allowed!
-          return true if staff_member.id==id
+          return(true) if @staff.id==id
           st = StaffMember.get(id)
           #Allow access to this staff member if it is his branch manager
           # do not allow a staff member any other staff member access
-          return false if staff_member.branches.length==0
-          return(st.centers.branches.manager.include?(staff_member))
+          return false if @staff.branches.length==0 and @staff.areas.length==0 and @staff.regions.length==0 
+          # Only allow branch managers to edit or create a new staff member
+          branch = st.centers.branches.first
+          return(branch.manager==@staff or branch.area.manager==@staff or branch.area.region.manager==@staff)
         elsif model == Client
           c = Client.get(id)
-          return ((c.center.manager == staff_member) or (c.center.branch.manager == staff_member))
+          return ((c.center.manager == @staff) or (c.center.branch.manager == @staff))
         elsif model == Branch
           branch = Branch.get(id)
-          return ((branch.manager == staff_member) or (branch.centers.manager.include?(staff_member)))
+          if [:delete].include?(@action.to_sym)
+            return (@staff.areas.length>0 or @staff.regions.length>0)
+          elsif @action.to_sym==:edit
+            return branch.manager == @staff
+          else
+            return((branch.manager == @staff) or (branch.centers.manager.include?(@staff)))
+          end
        elsif model == Center
           center = Center.get(id)
-          return true if center.manager == staff_member
-          return center.branch.manager == staff_member
+          return true if center.manager == @staff
+          return center.branch.manager == @staff
        elsif model == ClientGroup
           center   = model.get(id).center
-          return true if center.manager == staff_member
-          return center.branch.manager == staff_member
+          return true if center.manager == @staff
+          return center.branch.manager == @staff
         elsif model.respond_to?(:relationships) and model.relationships.include?(:manager)
           o = model.get(id)
-          return true if o.manager == staff_member
+          return true if o.manager == @staff
         elsif [Comment, Document, InsurancePolicy, InsuranceCompany, Cgt, Grt].include?(model)
           reutrn true
         else
@@ -110,40 +116,38 @@ module Misfit
       end
 
       def is_manager_of?(obj)
-        staff = self.staff_member      
+        @staff ||= self.staff_member      
         return true if obj and obj.new?
-        if obj.class==Client and not (obj.center.manager==staff or obj.center.branch.manager==staff)
+        if obj.class==Client and not (obj.center.manager==@staff or obj.center.branch.manager==@staff)
           return false
-        elsif obj.class==Center and not (obj.manager==staff or obj.branch.manager==staff)
+        elsif obj.class==Center and not (obj.manager==@staff or obj.branch.manager==@staff)
           return false
-        elsif obj.class==Loan   and not (obj.client.center.manager==staff or obj.client.center.branch.manager==staff)
+        elsif obj.class==Loan   and not (obj.client.center.manager==@staff or obj.client.center.branch.manager==@staff)
           return false
         end
         return true
       end
 
       
-      def _can_access?(route,params = nil)
+      def _can_access?(route,params = nil)        
         # more garbage
         return true if role == :admin
-        return true if route[:controller] == "graph_data" or route[:controller] == "info"
+        return true if [:graph_data, :info, :dashboard].include?(route[:controller].to_sym) and self.role!=:data_entry
         return true if route[:controller] == "users" and route[:action] == "change_password"
 
         @route = route
         @controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
         @model = route[:controller].singularize.to_sym
         @action = route[:action]
-
+        @staff ||= self.staff_member
         #read only stuff
         if role == :read_only 
           if CUD_Actions.include?(@action)
-            return false 
-          elsif @controller.include?("data_entry")
             return false
-          elsif @controller=="users"
-            return false
-          else
+          elsif @controller=="admin" and @action=="index"
             return true
+          else
+            return access_rights[:all].include?(@controller.to_sym)
           end
         end
         
@@ -152,42 +156,48 @@ module Misfit
           return true  if params[:parent_model]=="Client"
           return false if params[:parent_model]=="Mfi"    and (role!=:admin or role!=:mis_manager)
           return true  if params[:parent_model]=="Center" and (role==:staff_member or role==:mis_manager or role==:admin)
-          return true  if params[:parent_model]=="Branch" and (role==:staff_member and Branch.get(params[:parent_id]).manager==staff_member)
+          return true  if params[:parent_model]=="Branch" and (role==:staff_member and Branch.get(params[:parent_id]).manager==@staff)
           return false
         end
         r = (access_rights[@action.to_s.to_sym] or access_rights[:all])
         return false if @action == "approve" and role == :data_entry
         return false if r.nil?
-        if staff_member
-          # Only allow branch managers to edit or create a new staff member, branch or a center
-          if ["staff_members", "branches", "centers"].include?(@controller) and CUD_Actions.include?(@action)
-            return staff_member.branches.length>0
-          end
-
+        if @staff
           return additional_checks if @route.has_key?(:id) and @route[:id]
+          if ["staff_members", "branches"].include?(@controller)
+            if not CUD_Actions.include?(@action)
+              return true
+            elsif (@staff.areas.length>0 or @staff.regions.length>0 or @staff.branches.length>0)
+              # allowing area, region and branch managers to create staff members
+              return true
+            else
+              return false
+            end
+          end
+          
           if params and params[:branch_id] and not params[:branch_id].blank?
             b = Branch.get(params[:branch_id])
-            return (b.manager == staff_member or b.centers.managers.include?(staff_member))
+            return (b.manager == @staff or b.centers.managers.include?(@staff))
           end
-
+          
           if params and params[:center_id]
             c = Center.get(params[:center_id])
-            return ((c.manager == staff_member or c.branch.manager == staff_member))
+            return ((c.manager == @staff or c.branch.manager == @staff))
           end
 
           if params and params[:client_id]
             c = Client.get(params[:client_id])
-            return ((c.center.manager == staff_member or c.center.branch.manager == staff_member))
+            return ((c.center.manager == @staff or c.center.branch.manager == @staff))
           end
           
           if params and params[:loan_id]
             l = Loan.get(params[:loan_id])
-            return ((l.client.center.manager == staff_member or l.client.center.branch.manager == staff_member))
+            return ((l.client.center.manager == @staff or l.client.center.branch.manager == @staff))
           end
           
           if params and params[:client_group_id] and ["cgts", "grts"].include?(@controller)
             cg = ClientGroup.get(params[:client_group_id])
-            return ((cg.center.manager == staff_member or cg.center.branch.manager == staff_member))
+            return ((cg.center.manager == @staff or cg.center.branch.manager == @staff))
           end
         end
         r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)

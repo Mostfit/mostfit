@@ -3,7 +3,7 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 describe "Controllers "  do
   before(:all) do
-    load_fixtures :users, :client_types, :staff_members, :branches, :centers, :clients, :loan_products #, :loans  #, :payments
+    load_fixtures :users, :client_types, :staff_members, :branches, :centers, :clients, :loan_products, :funders, :funding_lines #, :loans  #, :payments
     
     User.all(:login.not => 'admin').destroy!
     @u_data_entry = User.new(:login => 'data', :password => 'entry1', :password_confirmation => 'entry1', :role => :data_entry)
@@ -77,7 +77,7 @@ describe "Controllers "  do
       request(url(:edit_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).body.to_s.should =~ /Not Privileged/ 
       request(url(:delete_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).body.to_s.should =~ /Not Privileged/ 
     else
-      p @loan.errors
+      @loan.errors
     end
 
     @user = User.get(1)
@@ -103,11 +103,10 @@ describe "Controllers "  do
     response = request(url(:new_user)).body.to_s.should =~ /Not Privileged/
     request(url(:edit_user, @user.id)).body.to_s.should =~ /Not Privileged/
     request(url(:delete_user, @user.id)).body.to_s.should =~ /Not Privileged/
-
+    request(resource(:staff_members, :new)).body.to_s.should  =~ /Not Privileged/
     
     @staff = User.first(:login => 'center').staff_member
     @other_staff = (StaffMember.all-[@staff]).first
-    request(url(:new_staff_member)).body.to_s.should  =~ /Not Privileged/
     request(url(:edit_staff_member, @other_staff.id)).body.to_s.should =~ /Not Privileged/
 #    request(url(:delete_staff_member, @staff.id)).body.to_s.should =~ /Not Privileged/                                                                     
     @branch = @staff.centers.branches.first
@@ -116,8 +115,8 @@ describe "Controllers "  do
 
     
     @center = @staff.centers.first
-    request(resource(@branch, :centers, :new)).should_not be_successful
-    request(resource(@branch, @center, :edit)).should_not be_successful
+    request(resource(@branch, :centers, :new)).should be_successful
+    request(resource(@branch, @center, :edit)).should be_successful
 #    request(url(:delete_branch_center, @branch.id, @center.id)).should be_successful                                                                       
 
     @client = @center.clients.first
@@ -134,7 +133,7 @@ describe "Controllers "  do
       request(url(:edit_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).should be_successful
       #    request(url(:delete_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).should be_successful                               
     else
-      p @loan.errors
+      @loan.errors
     end
   end
 
@@ -190,7 +189,7 @@ describe "Controllers "  do
       request(url(:edit_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).should be_successful
       #    request(url(:delete_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).should be_successful                               
     else
-      p @loan.errors
+      @loan.errors
     end
   end
 
@@ -229,7 +228,7 @@ describe "Controllers "  do
       request(url(:edit_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).body.to_s.should =~ /Not Privileged/ 
       request(url(:delete_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).body.to_s.should =~ /Not Privileged/ 
     else
-      p @loan.errors
+      @loan.errors
     end
 
     @user = User.get(1)
@@ -285,7 +284,7 @@ describe "Controllers "  do
       request(url(:edit_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).should be_successful
       #    request(url(:delete_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).should be_successful 
     else
-      p @loan.errors
+      @loan.errors
     end
   end
 
@@ -337,7 +336,7 @@ describe "Controllers "  do
       request(url(:edit_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).should be_successful
       #    request(url(:delete_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).should be_successful 
     else
-      p @loan.errors
+      @loan.errors
     end
   end
 end
