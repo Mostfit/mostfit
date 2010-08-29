@@ -177,7 +177,11 @@ module Misfit
           
           if params and params[:branch_id] and not params[:branch_id].blank?
             b = Branch.get(params[:branch_id])
-            return (b.manager == @staff or b.centers.managers.include?(@staff))
+            if CUD_Actions.include?(@action)
+              return(b.manager == @staff)
+            else
+              return(b.manager == @staff or b.centers.managers.include?(@staff))
+            end
           end
           
           if params and params[:center_id]

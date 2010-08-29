@@ -115,12 +115,12 @@ describe "Controllers "  do
 
     
     @center = @staff.centers.first
-    request(resource(@branch, :centers, :new)).should be_successful
+    request(resource(@branch, :centers, :new)).should_not be_successful
     request(resource(@branch, @center, :edit)).should be_successful
 #    request(url(:delete_branch_center, @branch.id, @center.id)).should be_successful                                                                       
 
     @client = @center.clients.first
-    request(resource(@branch, @center, :clients, :new)).should be_successful
+    request(resource(@branch, @center, :clients, :new)).should_not be_successful
     request(resource(@branch, @center, @client, :edit)).should be_successful
 #    request(url(:delete_branch_center_client, @branch.id, @center.id, @client.id)).should be_successful                                                    
     @loan_product = LoanProduct.get(2)
