@@ -30,9 +30,6 @@ class Reports < Application
       if klass == TransactionLedger
         @groups, @centers, @branches, @payments, @clients = @report.generate
         display [@groups, @centers, @branches, @payments, @clients]
-      elsif [ScheduledDisbursementRegister].include?(klass)
-        @groups, @centers, @branches, @loans, @loan_products = @report.generate
-        display [@groups, @centers, @branches, @loans, @loan_products]
       else        
         case @report.method(:generate).arity
         when 0
