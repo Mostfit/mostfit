@@ -836,3 +836,16 @@ table.tall th {
     font-size: 1.5em;
     padding: 5px;
 }
+.collapsed{
+    display: none;
+    border: 1px solid orange;
+}
+a.expand_collapsed{
+    color: white;
+    margin: 0px;
+    padding: 5px;
+    padding-left: 15px;
+    text-align: center;
+    background: url("/images/elements/closed.gif") no-repeat 0% 50%;
+    background-color: #F4F4F4;
+}

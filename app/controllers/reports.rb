@@ -27,7 +27,9 @@ class Reports < Application
     elsif Reports::Types.include?(klass)
       #Generating report
       @report   = klass.new(params[class_key], dates, session.user)
-      if klass == TransactionLedger
+      if not params[:submit]
+        render :form
+      elsif klass == TransactionLedger
         @groups, @centers, @branches, @payments, @clients = @report.generate
         display [@groups, @centers, @branches, @payments, @clients]
       else        
