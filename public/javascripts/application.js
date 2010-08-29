@@ -647,5 +647,9 @@ $(document).ready(function(){
       return false;
     }
   });
+
+  $("#client_active").change(function(){
+    $("#inactive_options").toggle();
+  });
 });
 
