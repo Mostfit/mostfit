@@ -1,18 +1,22 @@
 %b
-  - details_of_duplicates = @data[1]
-  - @data = @data[0]
   Total Duplicates = 
-  = @data.count
+  - @data = Marshal.load(@report.report)
+  - cids=[]
+  - @data.inject({}){|s,x| s+=x}.values.flatten.each_with_index{|x,idx| cids << x if idx%5==0}
+  - clients = Client.all(:id => cids, :fields => [:id, :center_id])
+  = clients.length/2
 %br
 
 %table.report.nojs
   %tr
     %th
-      Issue(s)
+      ID
     %th
       Name
     %th
       Spouse Name
+    %th
+      Date of birth
     %th
       Center Name
     %th
@@ -20,38 +24,49 @@
     %th
       Other Details
 
-  - @data.each do |x|
-    %tr
-      %td
-        %a{:href => url(:controller => "data_entry/clients", :action => "edit", :client_id => x[0])}
-          = x[0]
-      %td
-        %a{:href => url(:controller => "data_entry/clients", :action => "edit", :client_id => x[1])}
-          = x[1]
-      %td
-        - if (x[2] & DuplicateClientsReport::SAME_NAME_AND_DOB) != 0
-          Similar Name and Same Date of Birth(DOB)
-        - if (x[2] & DuplicateClientsReport::SAME_SPOUSE_NAME_AND_DOB) != 0
-          Similar Spouse Name and Same Date of Birth(DOB)
-        - if (x[2] & DuplicateClientsReport::SAME_NAME) != 0          
-          Similar Name (and Date of Birth not provided)
-        - if (x[2] & DuplicateClientsReport::SAME_SPOUSE_NAME_AND_DOB) != 0
-          Similar Spouse Name (and Date of Birth not provided)
-        - if (x[2] & DuplicateClientsReport::SAME_ACCOUNT_NUMBER) != 0
-          Same (Bank) Account Number
-      - id1 = x[0]
-      - id2 = x[1]
-      %td
-        = "#{details_of_duplicates[id1][:name]} <br> #{details_of_duplicates[id2][:name]}"
-      %td
-        = "#{details_of_duplicates[id1][:spouse_name]} <br> #{details_of_duplicates[id2][:spouse_name]}"
-      %td
-        = "#{details_of_duplicates[id1][:center_name]} <br> #{details_of_duplicates[id2][:center_name]}"
-      %td
-        = "#{details_of_duplicates[id1][:branch_name]} <br> #{details_of_duplicates[id2][:branch_name]}"
-      %td
-        - if ((x[2] & DuplicateClientsReport::SAME_NAME_AND_DOB) != 0) or ((x[2] & DuplicateClientsReport::SAME_SPOUSE_NAME_AND_DOB) != 0)
-          = "DOB:#{details_of_duplicates[id1][:dob]} <br> DOB:#{details_of_duplicates[id2][:dob]}"
-        - if ((x[2] & DuplicateClientsReport::SAME_ACCOUNT_NUMBER) != 0)
-          = "Common A/C Number:#{details_of_duplicates[id1][:account_number]}"
-
+  - @data.each do |reasons|
+    - reasons.each do |reason, dups|
+      - next if dups.length==0
+      %tr.branch
+        %td{:colspan => "7"}
+          %b
+            =reason.to_s.camelcase(' ').gsub("Same", "Same/Similar").gsub("Dob", "Date of Birth")
+      - case_number = 1
+      - dups.each do |dup1, dup2|
+        %tr.center
+          %td{:colspan => "7"}
+            %b= "Case #{case_number}"
+            - case_number += 1
+        -client1 = clients.find{|x| x.id==dup1[0]}
+        -client2 = clients.find{|x| x.id==dup2[0]}
+        %tr
+          %td
+            =link_to(dup1[0], resource(client1))
+          %td
+            =dup1[1]
+          %td
+            =dup1[2]
+          %td
+            =dup1[3]
+          %td
+            =client1.center.name
+          %td
+            =client1.center.branch.name
+          %td
+            =dup1[4]
+        %tr
+          %td
+            =link_to(dup2[0], resource(client2))
+          %td
+            =dup2[1]
+          %td
+            =dup2[2]
+          %td
+            =dup2[3]
+          %td
+            =client2.center.name
+          %td
+            =client2.center.branch.name
+          %td
+            =dup1[4]
+          
