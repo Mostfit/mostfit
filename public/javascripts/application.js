@@ -472,6 +472,13 @@ $(document).ready(function(){
 			$(this).parent().parent().nextUntil("tr.branch_total").hide();
 		    setToggleText();
 		});
+	    $('.report').floatHeader({
+	      fadeIn: 250,
+	      fadeOut: 250,
+	      forceClass: true,
+	      recalculate: true,
+	      markerClass: 'header'
+	    });
 	}
 	if($("a.moreinfo").length>0){
 	    $("a.moreinfo").click(function(){
@@ -645,6 +652,18 @@ $(document).ready(function(){
       return false;
     }else{
       return false;
+    }
+  });
+
+  $("#client_active").change(function(){
+    $("#inactive_options").toggle();
+  });
+  $("a.expand_collapsed").click(function(a){
+    $(".collapsed").toggle();
+    if($(a.currentTarget).css("background-image").indexOf("closed.gif")>0){
+      $(a.currentTarget).css("background-image", "url(/images/elements/open.gif)");
+    }else{
+      $(a.currentTarget).css("background-image", "url(/images/elements/closed.gif)");
     }
   });
 });

@@ -26,4 +26,4 @@
     %td
       Is a staff member?
     %td
-      = select :staff_member, :collection => [["","---"]] + StaffMember.all.map{|s| [s.id.to_s, s.name]}
+      = select :staff_member, :collection => [["","---"]] + StaffMember.all.map{|s| [s.id.to_s, s.name]}, :selected => (@user.staff_member ? @user.staff_member.id.to_s : "")

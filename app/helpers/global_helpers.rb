@@ -40,14 +40,14 @@ module Merb
       base + "/loans/#{loan.id}/" + action.to_s + (opts.length>0 ? "?#{opts.inject([]){|s,x| s << "#{x[0]}=#{x[1]}"}.join("&")}" : '')
     end
 
-    def select_staff_member_for(obj, col, attrs = {}, allow_unsigned=false)
+    def select_staff_member_for(obj, col, attrs = {}, allow_unassigned=false)
       id_col = "#{col.to_s}_staff_id".to_sym
       selected = ((obj.send(id_col) and obj.send(id_col)!="") ? obj.send(id_col).to_s : attrs[:selected] || "0")
       select(col,
-      :collection   => staff_members_collection,
-      :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
-      :id           => attrs[:id] || "#{obj.class.to_s.snake_case}_#{id_col}",
-      :selected     => selected)
+             :collection   => staff_members_collection(allow_unassigned),
+             :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
+             :id           => attrs[:id] || "#{obj.class.to_s.snake_case}_#{id_col}",
+             :selected     => selected)
     end
 
     def select_center_for(obj, col, attrs = {})
@@ -315,8 +315,8 @@ module Merb
     end
     
     def get_accessible_centers(branch_id)
-      centers = if session.user.staff_member
-                  [session.user.staff_member.centers, session.user.staff_member.branches.centers].flatten
+      centers = if st = session.user.staff_member
+                  [st.centers, st.branches.centers].flatten
                 elsif branch_id and not branch_id.blank?
                   Center.all(:branch_id => branch_id, :order => [:name])
                 else 
@@ -364,15 +364,16 @@ module Merb
     end
 
     private
-    def staff_members_collection(allow_unsigned=false)
+    def staff_members_collection(allow_unassigned=false)
       if session.user.staff_member
         staff = session.user.staff_member
         bms  = staff.branches.collect{|x| x.manager}
         cms  = staff.branches.centers.collect{|x| x.manager}               
         managers = [bms, cms, staff].flatten.uniq
-        [["0", "<Select a staff member"]] + managers.map{|x| [x.id, x.name]}
+        managers+= (StaffMember.all(:active => true) - Branch.all.managers - Center.all.managers - Region.all.managers - Area.all.managers) if allow_unassigned
+        [["0", "<Select a staff member"]] + managers.sort_by{|x| x.name}.map{|x| [x.id, x.name]}
       else
-        [["0", "<Select a staff member"]] + StaffMember.all(:active => true).map{|x| [x.id, x.name]}
+        [["0", "<Select a staff member"]] + StaffMember.all(:active => true).sort_by{|x| x.name}.map{|x| [x.id, x.name]}
       end
     end
     
