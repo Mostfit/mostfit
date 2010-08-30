@@ -11,11 +11,12 @@
     %thead
       %tr
         %th
-        %th id
-        %th name
-        %th manager
-        %th centers
-        %th edit | delete
+        %th ID
+        %th Name
+        %th Manager
+        %th Area
+        %th Centers
+        %th Edit | Delete
     %tbody
     - for branch in @branches
       %tr{ :class => cycle('odd','') }
@@ -26,6 +27,8 @@
           %b= link_to branch.name, resource(branch)
         %td
           = link_to branch.manager.name, resource(branch.manager)
+        %td
+          = link_to branch.area.name, resource(branch.area) if branch.area
         %td
           %b= branch.centers.size
           == (#{link_to 'view', resource(branch, :centers)})

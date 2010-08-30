@@ -218,12 +218,44 @@ function create_remotes(){
         method="POST"
       }
       a=$(this);
+      a.after("<img id='spinner' src='/images/spinner.gif'/>");
+      $.ajax({
+	type: method,
+	url: href,
+	success: function(data){
+	  if($(a).attr("id") && $("#"+$(a).attr("id")).length>0){
+	    $("#"+$(a).attr("id")).html(data);
+	    create_remotes();
+	  }else{
+	    $(a).after(data);
+	    $(a).remove();
+	    $("#spinner").remove();
+	  }
+	},
+	error: function(xhr, text, errorThrown){
+	  txt = "<div class='error'>"+xhr.responseText+"</div>"
+	  $(a).after(txt);
+	  $("#spinner").remove();
+	}
+      });
+      return false;
+    });
+
+    $("a._customreports_").click(function(){
+      href=$(this).attr("href");
+      method="GET"
+      if($(this).hasClass("self")){
+	href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+        method="POST"
+      }
+      a=$(this);
       $.ajax({
 	type: "POST",
 	url: href,
 	success: function(data){
 	  $(a).after(data);
 	  $(a).remove();
+	  attachCustomTableEvents();
 	},
 	error: function(xhr, text, errorThrown){
 	  txt = "<div class='error'>"+xhr.responseText+"</div>"
@@ -232,34 +264,10 @@ function create_remotes(){
       });
       return false;
     });
-
-    $("a._customreports_").click(function(){
-	    href=$(this).attr("href");
-	    method="GET"
-	    if($(this).hasClass("self")){
-		href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
-                method="POST"
-	    }
-	    a=$(this);
-	    $.ajax({
-		    type: "POST",
-		    url: href,
-		    success: function(data){
-			$(a).after(data);
-			$(a).remove();
-			attachCustomTableEvents();
-		    },
-		    error: function(xhr, text, errorThrown){
-			txt = "<div class='error'>"+xhr.responseText+"</div>"
-			$(a).after(txt);
-		    }
-		});
-	    return false;
-	});
     $("form._remote_").each(function(idx, form){
-			      $(form).unbind();
-			      attachFormRemoteTo($(form));
-	});
+      $(form).unbind();
+      attachFormRemoteTo($(form));
+    });
 }
 function attachReportingFormEvents(id){
     $("#reporting_form tr#"+id+" select").change(function(){
@@ -464,6 +472,13 @@ $(document).ready(function(){
 			$(this).parent().parent().nextUntil("tr.branch_total").hide();
 		    setToggleText();
 		});
+	    $('.report').floatHeader({
+	      fadeIn: 250,
+	      fadeOut: 250,
+	      forceClass: true,
+	      recalculate: true,
+	      markerClass: 'header'
+	    });
 	}
 	if($("a.moreinfo").length>0){
 	    $("a.moreinfo").click(function(){
@@ -637,6 +652,18 @@ $(document).ready(function(){
       return false;
     }else{
       return false;
+    }
+  });
+
+  $("#client_active").change(function(){
+    $("#inactive_options").toggle();
+  });
+  $("a.expand_collapsed").click(function(a){
+    $(".collapsed").toggle();
+    if($(a.currentTarget).css("background-image").indexOf("closed.gif")>0){
+      $(a.currentTarget).css("background-image", "url(/images/elements/open.gif)");
+    }else{
+      $(a.currentTarget).css("background-image", "url(/images/elements/closed.gif)");
     }
   });
 });

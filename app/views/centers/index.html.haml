@@ -6,12 +6,12 @@
   %h1== Branch: <i>#{@branch.name}</i>
   %table.narrow.form{ :style => "width: 40%;" }
     %tr.odd
-      %td name
+      %td Name
       %td
         %b= @branch.name
         == (code: #{@branch.code}, id: #{@branch.id})
     %tr
-      %td manager
+      %td Manager
       %td= link_to @branch.manager.name, resource(@branch.manager)
     %tr
       %td No. of centers
@@ -25,10 +25,13 @@
     %tr
       %td Landmark
       %td=@branch.landmark
+    %tr
+      %td Area
+      - area = @branch.area
+      %td=link_to(area.name, resource(area)) if area
   %p
     = link_to_with_rights 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit"
     = link_to_with_rights 'create a new center', resource(@branch, :centers, :new), :class => "add"
-
 
   %div.tab_container
     %ul.tabs
@@ -49,8 +52,8 @@
       %li#accounting
         Accounting
     %div.tab
-      %h2== Centers of the #{@branch.name} branch    
-      =partial "centers/list"
+      %div#centers_list
+        =partial "centers/list"
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@branch.id}?for=branch"}
     %div.tab

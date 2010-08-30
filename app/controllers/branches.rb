@@ -10,8 +10,8 @@ class Branches < Application
   def show(id)
     @branch = Branch.get(id)
     raise NotFound unless @branch
-    @centers = @branch.centers_with_paginate({:page => params[:page]}, session.user)
-    display [@branch, @centers], 'centers/index'
+    @centers = @branch.centers_with_paginate({:meeting_day => params[:meeting_day]}, session.user)
+    display [@branch, @centers], 'centers/index', :layout => layout?
   end
   
   def today(id)

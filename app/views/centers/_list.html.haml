@@ -1,18 +1,30 @@
+%h2
+  Centers meeting on 
+  =params[:meeting_day]||Date.today.weekday
+%p{:style => "margin-left: 15px;"}
+  %b Select center meeting day: &nbsp; 
+  = paginate_on_weekdays(@branch, (params.key?(:meeting_day) ? params[:meeting_day].to_sym : Date.today.weekday))
 - if @centers.blank?
-  %p
-    %i No centers have been created yet.
+  - if @branch.centers.count==0
+    %p
+      %i No centers have been created yet.
+  - else
+    %p
+      %i No centers meet on this day.    
 - else
   %table.narrow.form{ :width => '100%' }
     %thead
       %tr
         %th
-        %th id
-        %th name
-        %th manager
-        %th meeting
-        %th edit
+        %th ID
+        %th Name
+        %th Manager
+        %th Meeting
+        %th Clients
+        %th Edit
     %tbody
-    - for center in @centers
+    - clients_count = Client.all(:center => @centers).aggregate(:center_id, :id.count).to_hash
+    - @centers.each do |center|
       %tr{ :class => cycle('odd',''), :style => center.meeting_day == Date.today.weekday ?  'background: lightgreen;' : ''  }
         %td &nbsp;
         %td
@@ -25,6 +37,8 @@
           - if center.meeting_day
             == #{center.meeting_day.to_s.capitalize}#{(center.meeting_time_hours and center.meeting_time_minutes) ? ", #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}" : ''}
         %td
+          = clients_count[center.id] if clients_count.key?(center.id)
+        %td
           = link_to 'edit', resource(@branch, center, :edit)
           - if @branch 
             &nbsp;|&nbsp;
@@ -33,4 +47,3 @@
     %tfoot
       %tr
         %td{ :colspan => 7 }
-  = paginate @centers

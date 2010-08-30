@@ -12,20 +12,20 @@
           %a.enlarge_image{:href => @client.picture.url(:original)}
             = image_tag @client.picture.url(:thumb)
       %td 
-        name
+        Name
       %td
         %b
           = @client.name
         == (id: #{@client.id}, ref: #{@client.reference})
     %tr
-      %td spouse name
+      %td Spouse name
       %td
         = @client.spouse_name
     %tr.odd
-      %td manager
+      %td Manager
       %td= link_to @center.manager.name, resource(@center.manager)
     %tr
-      %td at center
+      %td At center
       %td
         = link_to @center.name, resource(@branch, @center)
         == (of branch #{link_to @branch.name, resource(@branch)})
@@ -34,7 +34,7 @@
           center managed by:
           = link_to @center.branch.manager.name, resource(@center.manager)
     %tr
-      %td group name
+      %tdGroup name
       %td
         -if @client.client_group
           =@client.client_group.name
@@ -44,14 +44,14 @@
           to change)
     %tr
       %td
-        fees applicable
+        Fees applicable
       %td
         - @client.fee_schedule.each do |date, fees|
           - fees.each do |fee, amount|
             = fee.description
     %tr
       %td
-        fees paid
+        Fees paid
       %td
         == #{@client.total_fees_paid} / #{@client.total_fees_due}
         - if @client.fees_paid?

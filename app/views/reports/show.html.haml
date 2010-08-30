@@ -7,9 +7,9 @@
     = link_to "#{report.name}", url(:show_report, params[:report_type], report.id)
     %br
 - else
-  %h1
-    =@report.name
   - if not params[:layout] 
     = link_to("Printer friendly version", get_printer_url, {:style => "float: right;", :target => "_BLANK"})
+  %h1
+    =@report.name
   = partial "#{params[:report_type].snake_case.gsub(" ","_")}".to_sym
 

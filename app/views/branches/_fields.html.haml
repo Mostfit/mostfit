@@ -28,7 +28,7 @@
       =link_to("here", resource(:staff_members, :new), :target => "_blank")
   %label{:for => "managed_by"}
     Managed by:
-  = select_staff_member_for @branch, :manager
+  = select_staff_member_for @branch, :manager, {}, true
   %span.greytext pick the staff member that manages this branch
 %p
   %label{:for => "area"}

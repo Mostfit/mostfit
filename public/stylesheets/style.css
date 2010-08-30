@@ -533,6 +533,9 @@ table.report th{
     padding-left: 2px;
     padding-right: 2px;
 }
+table.report th:first-child{
+    width: 20%;
+}
 table.report tbody{
 }
 table.report td{
@@ -635,7 +638,6 @@ a.lessinfo{
 }
 table.moreinfo{
     background: #eee;    
-    width: 50%;
 }
 table.moreinfo tr td:first-child{
     font-weight: bold;
@@ -816,6 +818,10 @@ table.tall th {
     padding: 10px;
     border: 1px solid orange;
 }
+.floating{
+    float: left;
+    padding: 10px;
+}
 .floater{
     position: absolute;
     border: 2px solid orange;    
@@ -832,4 +838,44 @@ table.tall th {
     font-weight: bold;
     font-size: 1.5em;
     padding: 5px;
+}
+.collapsed{
+    display: none;
+    border: 1px solid orange;
+}
+a.expand_collapsed{
+    color: white;
+    margin: 0px;
+    padding: 5px;
+    padding-left: 15px;
+    text-align: center;
+    background: url("/images/elements/closed.gif") no-repeat 0% 50%;
+    background-color: #F4F4F4;
+}
+.totalinfo{
+    border: 2px solid #3456a4;
+    background: #fff;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+.totalinfo h1{
+    background: #3456a4;
+    padding: 10px;
+    border-radius: 5px 5px 0 0;
+    -moz-border-radius: 5px 5px 0 0;
+    margin: 0px;
+    color: white;
+    text-align: center;
+}
+.totalinfo table tr{
+    width: 100%;
+}
+.totalinfo table tr:nth-child(odd){
+    width: 100%;
+    background: #eee;
+}
+.totalinfo table tr td:first-child{ 
+    font-weight: bold;
 }

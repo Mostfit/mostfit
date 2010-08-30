@@ -1,0 +1,8 @@
+cids = repository.adapter.query("select count(*) c, client_id FROM loans WHERE 1 GROUP BY client_id HAVING c>1").map{|x| x.client_id}
+cids.each{|cid|
+  loans = Client.get(cid).loans
+  loans.each{|loan| 
+    loan.update_cycle_number
+    loan.save!
+  }
+}

@@ -1,37 +1,52 @@
 - if session.user.can_access?({:controller => "admin", :action => "index"})
   %h1 Administration
+  %h2 Manage organization profile and calendar
   %ul
     %li
-      = link_to_with_rights 'Manage Users', resource(:users), :class => 'edit'
+      = link_to_with_rights 'Profile and system-wide policies', url(:controller => "admin", :action => "edit"), :class => 'edit'
     %li
-      = link_to_with_rights 'Manage loan products', resource(:loan_products), :class => 'edit'
+      = link_to_with_rights 'Holidays', url(:controller => 'holidays', :action => "index"), :class => 'edit'
+  %h2 Manage geographical locations
+  %ul
     %li
-      = link_to_with_rights 'Manage fees', resource(:fees), :class => 'edit'
+      = link_to_with_rights 'Regions', resource(:regions), :class => 'edit'
     %li
-      = link_to_with_rights 'Manage Client Types', resource(:client_types), :class => 'edit'
+      = link_to_with_rights 'Areas', resource(:areas), :class => 'edit'
+  %h2 Manage staff, users, and roles
+  %ul
     %li
-      = link_to_with_rights 'Manage Targets', resource(:targets), :class => 'edit'
+      = link_to_with_rights 'Staff Members', resource(:staff_members), :class => 'edit'
     %li
-      = link_to_with_rights 'Manage Audits', resource(:audit_items), :class => 'edit'
+      = link_to_with_rights 'Users and roles', resource(:users), :class => 'edit'
+  %h2 Manage financial products, funds, and accounting
+  %ul
     %li
-      = link_to_with_rights 'Manage Staff Members', resource(:staff_members), :class => 'edit'
+      = link_to_with_rights 'Funders and funding lines', resource(:funders), :class => 'edit'
     %li
-      = link_to_with_rights 'Manage Holidays', url(:controller => 'holidays', :action => "index"), :class => 'edit'
+      = link_to_with_rights 'Fees', resource(:fees), :class => 'edit'
     %li
-      = link_to_with_rights 'Manage Funders', resource(:funders), :class => 'edit'
+      = link_to_with_rights 'Loan products', resource(:loan_products), :class => 'edit'
     %li
-      = link_to_with_rights 'Manage Regions', resource(:regions), :class => 'edit'
+      = link_to_with_rights 'Book Keeping', resource(:accounts), :class => 'edit'
+  %h2 Manage commonly-used lists (masters)
+  %ul
     %li
-      = link_to_with_rights 'Manage Areas', resource(:areas), :class => 'edit'
+      = link_to_with_rights 'Client Types', resource(:client_types), :class => 'edit'
     %li
-      = link_to_with_rights 'Manage Occupations', resource(:occupations), :class => 'edit'
+      = link_to_with_rights 'Occupations', resource(:occupations), :class => 'edit'
     %li
-      = link_to_with_rights 'Manage Loan Utilizations', resource(:loan_utilizations), :class => 'edit'
+      = link_to_with_rights 'Loan Utilizations', resource(:loan_utilizations), :class => 'edit'
     %li
-      = link_to_with_rights 'Manage document types', resource(:document_types), :class => 'edit'
+      = link_to_with_rights 'Document Types', resource(:document_types), :class => 'edit'
+  %h2 Assign targets, perform audits
+  %ul
     %li
-      = link_to_with_rights 'Edit Details', url(:controller => "admin", :action => "edit"), :class => 'edit'
+      = link_to_with_rights 'Assign and view Targets', resource(:targets), :class => 'edit'
+    %li
+      = link_to_with_rights 'Perform Audits', resource(:audit_items), :class => 'edit'
+  %h2 Migrate data
+  %ul
     %li
       = link_to_with_rights 'Upload data', url(:controller => 'admin', :action => "upload"), :class => 'edit'
     %li
-      = link_to_with_rights 'Book Keeping', resource(:accounts), :class => 'edit'
+      = link_to_with_rights 'Download data', url(:controller => 'admin', :action => "download"), :class => 'edit'

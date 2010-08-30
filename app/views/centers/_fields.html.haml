@@ -35,9 +35,12 @@
       = date_select_for @center, :meeting_day_change_date
 %p
   %label{:for =>""}Managed by:
-  = select_staff_member_for @center, :manager
-  %br/
-  %span.greytext pick the staff member that manages this center
+  - if not @center.new? and session.user.staff_member==@center.manager
+    = @center.manager.name
+  - else
+    = select_staff_member_for @center, :manager, {}, true
+    %br/
+    %span.greytext pick the staff member that manages this center
 %p
   %label{:for =>""}Address:
   = text_area :address, :rows => 6, :cols => 38

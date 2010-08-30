@@ -2,9 +2,9 @@ class Reports < Application
   include DateParser
   Types = [
            DailyReport, ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, TransactionLedger, ProjectedReport,
-           LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, LoanSizePerManagerReport, ClaimReport, 
-           TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, LoanSanctionRegister, ClientAbsenteeismReport, 
-           LoanSizePerManagerReport,TrialBalanceReport,GeneralLedgerReport
+           LoanSanctionRegister, LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, LoanSizePerManagerReport, ClaimReport, 
+           TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, ClientAbsenteeismReport, 
+           GeneralLedgerReport, TrialBalanceReport, DuplicateClientsReport
           ]
   layout :determine_layout 
 
@@ -22,10 +22,14 @@ class Reports < Application
     class_key  =  klass.to_s.snake_case.to_sym
     dates = get_dates(class_key)
 
-    if Reports::Types.include?(klass)
+    if @report
+      display @report
+    elsif Reports::Types.include?(klass)
       #Generating report
       @report   = klass.new(params[class_key], dates, session.user)
-      if klass == TransactionLedger
+      if not params[:submit]
+        render :form
+      elsif klass == TransactionLedger
         @groups, @centers, @branches, @payments, @clients = @report.generate
         display [@groups, @centers, @branches, @payments, @clients]
       elsif [LoanSanctionRegister, ScheduledDisbursementRegister].include?(klass)
@@ -41,17 +45,21 @@ class Reports < Application
       elsif [GeneralLedgerReport, TrialBalanceReport, ClaimReport].include?(klass)
         @data  = @report.generate(params)
         display @data        
-      else
-        @groups, @centers, @branches = @report.generate
-        display [@groups, @centers, @branches]
+      else        
+        case @report.method(:generate).arity
+        when 0
+          @data = @report.generate
+        when 1
+          @data = @report.generate(params)
+        end
+        display @data
+
       end
     elsif id.nil?
       @reports = klass.all
       display @reports
     elsif id and params[:format] == "pdf"
       send_data(@report.get_pdf.generate, :filename => 'report.pdf')
-    else
-      display @report
     end
   end
   
