@@ -10,21 +10,41 @@
     %li#repayments Repayment
     %li#key_ratios Key Ratio
   .tab
-    %div
-      =chart(url(:action => 'branch', :id => 'centers', :quantity => "count"), 400, 270)
-      =chart(url(:action => 'branch', :id => 'centers', :quantity => "staff_members"), 400, 270)
-    %br
-    %div
-      =chart(url(:action => 'branch', :id => 'clients', :quantity => "count"), 400, 270)
-      =chart(url(:action => 'branch', :id => 'clients', :quantity => "borrowers"), 400, 270)
-    %br
-    %div
-      =chart(url(:action => 'branch', :id => 'loan', :quantity => "count"), 400, 270)
-      =chart(url(:action => 'branch', :id => 'loan', :quantity => "sum"), 400, 270)
-    %br
-    %div
-      =chart(url(:action => 'branch', :id => 'loan_history', :report_type => "outstanding_principal"), 400, 270)
-      =chart(url(:action => 'branch', :id => 'loan_history', :report_type => "outstanding_total"), 400, 270)
+    %div.graphContainer
+      %div.listContainer
+        %ul#branch
+          %li.selected
+            Center count
+          %li
+            Staff count
+          %li
+            Client count
+          %li
+            Borrower clients
+          %li
+            Loan count
+          %li
+            Amount disbursed 
+          %li
+            Outstanding principal
+          %li
+            Outstanding total
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'centers', :quantity => "count"), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'centers', :quantity => "staff_members"), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'clients', :quantity => "count"), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'clients', :quantity => "borrowers"), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'loan', :quantity => "count"), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'loan', :quantity => "sum"), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'loan_history', :report_type => "outstanding_principal"), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'loan_history', :report_type => "outstanding_total"), 600, 370)
   .tab
     = partial :form, :action => "/dashboard#centers"
     %h1
@@ -37,57 +57,121 @@
       =chart("/dashboard/centers/cumulative#{seg}", 800, 300) 
   .tab
     =partial :form, :action => "/dashboard#clients"
-    %div
-      = chart("/dashboard/clients/cumulative/#{seg}", 450, 270)
-      = chart("/dashboard/clients/growth/#{seg}", 450, 270)
-    %br
-    %div
-      = chart("/dashboard/clients/breakup/group_by/religion/#{seg}", 450, 270)
-      = chart("/dashboard/clients/breakup/group_by/caste/#{seg}", 450, 270)
-    %br
-    %div
-      = chart("/dashboard/clients/profile/group_by/age/#{seg}", 450, 270)
-      = chart("/dashboard/clients/profile/group_by/member_since/#{seg}", 450, 270)
+    %div.graphContainer
+      %div.listContainer
+        %ul#clients
+          %li.selected
+            Client growth
+          %li
+            Cumulative growth
+          %li
+            Region wise breakup
+          %li
+            Caste wise breakup
+          %li
+            Age profile
+          %li
+            Member since
+      %div.graphs
+        = chart("/dashboard/clients/cumulative/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/clients/growth/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/clients/breakup/group_by/religion/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/clients/breakup/group_by/caste/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/clients/profile/group_by/age/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/clients/profile/group_by/member_since/#{seg}", 600, 370)
   .tab
     =partial :form, :action => "/dashboard#loan"
-    %div
-      = chart("/dashboard/loans/disbursements/#{seg}", 450, 270)
-      = chart("/dashboard/loans/outstanding/#{seg}", 450, 270)
-    %div
-      = chart("/dashboard/loans/growth/#{seg}", 450, 270)
-      = chart("/dashboard/loans/cumulative/#{seg}", 450, 270)
-    %br
-    - sep = seg.include?("?") ? "&" : "?"
-    %div
-      = chart("/dashboard/loans/aging/#{seg}", 450, 270)
-      = chart(url(:dashboard_actions, :action => "loans", :id => "breakup", :branch_id => (@branch ? @branch.id : "all"), :by => "loan_product", :time_period => params[:time_period]||"mom", :staff_member_id => (@staff_member ? @staff_member.id : "all")), 450, 270)
-    %br
-    %div
-      = chart(url(:dashboard_actions, :action => "loans", :id => "breakup", :branch_id => (@branch ? @branch.id : "all"), :by => "occupation", :time_period => params[:time_period]||"mom", :staff_member_id => (@staff_member ? @staff_member.id : "all")), 900, 350)
+    %div.graphContainer
+      %div.listContainer
+        %ul#loans
+          %li.selected
+            Amount disbursed
+          %li
+            Amount outstanding
+          %li
+            Number of borrowers added
+          %li
+            Cumulative growth in borrowers
+          %li
+            Ageing analysis
+          %li
+            Breakup by product
+          %li
+            Breakup by occupation
+      %div.graphs
+        = chart("/dashboard/loans/disbursements/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/loans/outstanding/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/loans/growth/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/loans/cumulative/#{seg}", 600, 370)
+      - sep = seg.include?("?") ? "&" : "?"
+      %div.graphs
+        = chart("/dashboard/loans/aging/#{seg}", 600, 370)
+      %div.graphs        
+        = chart(url(:dashboard_actions, :action => "loans", :id => "breakup", :branch_id => (@branch ? @branch.id : "all"), :by => "loan_product", :time_period => params[:time_period]||"mom", :staff_member_id => (@staff_member ? @staff_member.id : "all")), 600, 370)
+      %div.graphs
+        = chart(url(:dashboard_actions, :action => "loans", :id => "breakup", :branch_id => (@branch ? @branch.id : "all"), :by => "occupation", :time_period => params[:time_period]||"mom", :staff_member_id => (@staff_member ? @staff_member.id : "all")), 700, 370)
   .tab
     =partial :form, :action => "/dashboard#repayments"
-    %div
-      = chart("/dashboard/payments/principal/#{seg}", 450, 270)
-      = chart("/dashboard/payments/interest/#{seg}", 450, 270)
-    %br
-    %div
-      = chart("/dashboard/payments/fees/#{seg}", 450, 270)
-      = chart("/dashboard/payments/total/#{seg}", 450, 270)
-    %br
-    %div
-      = chart("/dashboard/payments/amounts/#{seg}", 450, 270)
+    %div.graphContainer
+      %div.listContainer
+        %ul#repayments
+          %li.selected
+            Principal repayments
+          %li
+            Interest repayments
+          %li
+            Fees repayments
+          %li
+            Total repayments
+          %li
+            Repayment denominations
+      %div.graphs
+        = chart("/dashboard/payments/principal/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/payments/interest/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/payments/fees/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/payments/total/#{seg}", 600, 370)
+      %div.graphs
+        = chart("/dashboard/payments/amounts/#{seg}", 600, 370)
   .tab
-    %br
-    %div
-      =chart(url(:action => 'loans', :id => 'yield'), 400, 270)
-      =chart(url(:action => 'loans', :id => 'portfolio_at_risk'), 400, 270)
-    %div
-      =chart(url(:action => 'branch', :id => 'loan', :quantity => "avg"), 400, 270)
-      =chart(url(:action => 'branch', :id => 'loan_history', :report_type => "average_outstanding_loan_amount_size"), 400, 270)
-    %br
-    %div
-      =chart(url(:action => 'branch', :id => 'clients', :quantity => "per_staff"), 400, 270)
-      =chart(url(:action => 'branch', :id => 'loan',    :quantity => "per_staff"), 400, 270)
-    %br
-    %div
-      =chart(url(:action => 'branch', :id => 'centers', :quantity => "clients_average"), 400, 270)
+    %div.graphContainer
+      %div.listContainer
+        %ul#keyratio
+          %li.selected
+            Yield on portfolio
+          %li
+            Portfolio at risk
+          %li
+            Average loan amount
+          %li
+            Average loan outstanding
+          %li
+            Clients per staff
+          %li
+            Loans per staff
+          %li
+            Loans per staff
+      %div.graphs
+        =chart(url(:action => 'loans', :id => 'yield'), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'loans', :id => 'portfolio_at_risk'), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'loan', :quantity => "avg"), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'loan_history', :report_type => "average_outstanding_loan_amount_size"), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'clients', :quantity => "per_staff"), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'loan',    :quantity => "per_staff"), 600, 370)
+      %div.graphs
+        =chart(url(:action => 'branch', :id => 'centers', :quantity => "clients_average"), 600, 370)
