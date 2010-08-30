@@ -5,12 +5,20 @@
   = @data.count
 %br
 
-%table
+%table.report.nojs
   %tr
     %th
       Issue(s)
     %th
-      Details
+      Name
+    %th
+      Spouse Name
+    %th
+      Center Name
+    %th
+      Branch Name
+    %th
+      Other Details
 
   - @data.each do |x|
     %tr
@@ -22,24 +30,28 @@
           = x[1]
       %td
         - if (x[2] & DuplicateClientsReport::SAME_NAME_AND_DOB) != 0
-          Similar Name and Same Date of Birth
+          Similar Name and Same Date of Birth(DOB)
         - if (x[2] & DuplicateClientsReport::SAME_SPOUSE_NAME_AND_DOB) != 0
-          Similar Spouse Name and Same Date of Birth
+          Similar Spouse Name and Same Date of Birth(DOB)
         - if (x[2] & DuplicateClientsReport::SAME_NAME) != 0          
           Similar Name (and Date of Birth not provided)
         - if (x[2] & DuplicateClientsReport::SAME_SPOUSE_NAME_AND_DOB) != 0
           Similar Spouse Name (and Date of Birth not provided)
         - if (x[2] & DuplicateClientsReport::SAME_ACCOUNT_NUMBER) != 0
           Same (Bank) Account Number
+      - id1 = x[0]
+      - id2 = x[1]
       %td
-        - id1 = x[0]
-        = "Client ID:#{id1} <b>Name:</b>#{details_of_duplicates[id1][:name]} <b>Spouse Name:</b>#{details_of_duplicates[id1][:spouse_name]}<br> <b>Center Name:</b>#{details_of_duplicates[id1][:center_name]} <b>Branch Name:</b>#{details_of_duplicates[id1][:branch_name]}"
+        = "#{details_of_duplicates[id1][:name]} <br> #{details_of_duplicates[id2][:name]}"
+      %td
+        = "#{details_of_duplicates[id1][:spouse_name]} <br> #{details_of_duplicates[id2][:spouse_name]}"
+      %td
+        = "#{details_of_duplicates[id1][:center_name]} <br> #{details_of_duplicates[id2][:center_name]}"
+      %td
+        = "#{details_of_duplicates[id1][:branch_name]} <br> #{details_of_duplicates[id2][:branch_name]}"
+      %td
         - if ((x[2] & DuplicateClientsReport::SAME_NAME_AND_DOB) != 0) or ((x[2] & DuplicateClientsReport::SAME_SPOUSE_NAME_AND_DOB) != 0)
-          = "<br><b>Date of Birth:</b> #{details_of_duplicates[id1][:dob]}"
-        %br
-        - id2 = x[1]
-        = "Client ID:#{id2} <b>Name:</b>#{details_of_duplicates[id2][:name]} <b>Spouse Name:</b>#{details_of_duplicates[id2][:spouse_name]}<br> <b>Center Name:</b>#{details_of_duplicates[id2][:center_name]} <b>Branch Name:</b>#{details_of_duplicates[id2][:branch_name]}"
-        - if ((x[2] & DuplicateClientsReport::SAME_NAME_AND_DOB) != 0) or ((x[2] & DuplicateClientsReport::SAME_SPOUSE_NAME_AND_DOB) != 0)
-          = "<br><b>Date of Birth:</b> #{details_of_duplicates[id2][:dob]}"
-        
+          = "DOB:#{details_of_duplicates[id1][:dob]} <br> DOB:#{details_of_duplicates[id2][:dob]}"
+        - if ((x[2] & DuplicateClientsReport::SAME_ACCOUNT_NUMBER) != 0)
+          = "Common A/C Number:#{details_of_duplicates[id1][:account_number]}"
 
