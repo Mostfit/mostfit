@@ -16,24 +16,21 @@
     %th{:width => '10%'}
       Repayment
     %th{:width => '10%'}
-      Balance Outstanding
- 
- 
+      Balance Outstanding 
   - @data.each do |claim| 
     %tr 
       %td
         = claim.client.name
       %td
-        = claim.client.inactive_reason
+        = claim.client.inactive_reason.to_s.camelcase(' ')
       %td
-        = claim.date_of_death
-       
+        = claim.date_of_death       
       %td
         = claim.claim_submission_date
       %td
         -documents = CLAIM_DOCUMENTS - claim.documents
         - documents.each do |doc| 
-          = doc
+          = doc.to_s.camelcase(' ')
           %br
       %td
         - loan = claim.client.loans
@@ -50,4 +47,4 @@
         - loan.each do |l|
           = l.amount - l.principal_received_up_to(Date.today).to_f
           %br
-= paginate @data
+

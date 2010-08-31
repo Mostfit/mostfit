@@ -12,8 +12,8 @@ class ClaimReport < Report
     "Claim Report "
   end
 
-  def generate(params)
-    params1 = {:claim_submission_date.gte => from_date, :claim_submission_date.lte => to_date, :order => [:claim_submission_date]}
-    Claim.all(params1).paginate(:order => [:claim_submission_date.desc], :page => params[:page], :per_page =>10)
+  def generate
+    params = {:claim_submission_date.gte => from_date, :claim_submission_date.lte => to_date, :order => [:claim_submission_date]}
+    Claim.all(params) + Claim.all(:claim_submission_date => nil, :order => [:claim_submission_date])
   end
 end
