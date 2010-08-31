@@ -32,6 +32,9 @@
       == <b>#{@loan.amount_applied_for}</b> @
       %b= format("%.2f%", @loan.interest_rate*100)
   %tr
+    %td Product
+    %td= @loan.loan_product.name
+  %tr
     %td Type
     %td= @loan.discriminator
   %tr.odd
