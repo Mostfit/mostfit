@@ -18,4 +18,8 @@
   %tr
     %td
       %h3
+        =link_to("Duplicate Clients Report", url(:show_report, :report_type => "DuplicateClientsReport"))
+  %tr
+    %td
+      %h3
         =link_to("Custom reports", resource(:bookmarks, :type => "custom_reports"))      

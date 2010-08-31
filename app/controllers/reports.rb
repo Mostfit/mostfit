@@ -4,7 +4,7 @@ class Reports < Application
            DailyReport, ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, TransactionLedger, ProjectedReport,
            LoanSanctionRegister, LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, LoanSizePerManagerReport, ClaimReport, 
            TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, ClientAbsenteeismReport, 
-           GeneralLedgerReport, TrialBalanceReport, DuplicateClientsReport
+           GeneralLedgerReport, TrialBalanceReport
           ]
   layout :determine_layout 
 
@@ -35,7 +35,6 @@ class Reports < Application
       elsif [LoanSanctionRegister, ScheduledDisbursementRegister].include?(klass)
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
-
       elsif [ConsolidatedReport, LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, StaffConsolidatedReport,
              QuarterConsolidatedReport, ClientAbsenteeismReport, LoanSizePerManagerReport, TargetReport, LoanDisbursementRegister, ProjectedReport,
              GroupConsolidatedReport
@@ -56,7 +55,10 @@ class Reports < Application
 
       end
     elsif id.nil?
-      @reports = klass.all
+      @reports = klass.all(:order => [:created_at.desc])
+      if klass==DuplicateClientsReport and (DuplicateClientsReport.count==0 or (Date.today - DuplicateClientsReport.all.aggregate(:created_at).max).to_i>6)
+        DuplicateClientsReport.new.generate
+      end
       display @reports
     elsif id and params[:format] == "pdf"
       send_data(@report.get_pdf.generate, :filename => 'report.pdf')
