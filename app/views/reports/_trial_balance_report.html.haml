@@ -32,22 +32,24 @@
       %td
         - debit = (account.postings.sum(:amount, :amount.lte => 0)||0) * -1
         - debit_sum += debit
-        = debit
+        = debit.round(2)
       %td
         - credit = account.postings.sum(:amount, :amount.gte => 0)||0
         - credit_sum += credit
-        = credit
+        = credit.round(2)
       %td
-        = ((debit - credit) * -1) + opening_balance
+        = ((debit - credit).round(2) * -1) + opening_balance
+
   %tr
     %td
     %td
     %td
-      =opening_sum
+      =opening_sum.round(2)
     %td
-      =debit_sum
+      =debit_sum.round(2)
     %td
-      =credit_sum
+      =credit_sum.round(2)
     %td
-      =opening_sum + (credit_sum - debit_sum)
+      =(opening_sum + (credit_sum - debit_sum)).round(2)
+
 

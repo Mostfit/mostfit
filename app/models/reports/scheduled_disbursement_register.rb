@@ -17,18 +17,18 @@ class ScheduledDisbursementRegister < Report
   end
   
   def generate
-    branches, centers, groups, loans, loan_products = {}, {}, {}, {}, {}
+    branches, centers, groups, data = {}, {}, {}, {}
     @branch.each{|b|
-      loans[b.id]||= {}
+      data[b]||= {}
       branches[b.id] = b
       
       b.centers.each{|c|
         next if @center and not @center.find{|x| x.id==c.id}
-        loans[b.id][c.id]||= {}
+        data[b][c]||= {}
         centers[c.id]        = c
-        c.client_groups.sort_by{|x| x.name}.each{|g|
+        c.client_groups.each{|g|
           groups[g.id] = g
-          loans[b.id][c.id][g.id] ||= []
+          data[b][c][g] ||= []
         }
       }
     }
@@ -41,15 +41,13 @@ class ScheduledDisbursementRegister < Report
       client    = l.client
       center_id = client.center_id      
       next if not centers.key?(center_id)
-      loan_products[l.loan_product_id] = l.loan_product if not loan_products.key?(l.loan_product_id)
-      branch_id = centers[center_id].branch_id
-      if not l.client.client_group_id
-        loans[branch_id][center_id][0] ||= []
-        groups[0]=ClientGroup.new(:name => "No group", :id => 0)
-      end
-      loans[branch_id][center_id][l.client.client_group_id||0].push([client.reference, client.name, client.spouse_name, 
-                                                                     l.loan_product_id, l.cycle_number, l.scheduled_disbursal_date, l.amount])
+      center    = centers[center_id]
+      branch    = branches[center.branch_id]
+      group     = l.client.client_group
+      data[branch][center][group]||=[]
+      data[branch][center][group].push([client.reference, client.name, client.spouse_name, 
+                                        l.loan_product_id, l.cycle_number, l.scheduled_disbursal_date, l.amount])
     }
-    return [groups, centers, branches, loans, loan_products]
+    return data
   end
 end

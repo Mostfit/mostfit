@@ -1,3 +1,4 @@
+
 // Common JavaScript code across your application goes here.
 var lineNos=0;
 function addFloater(link){
@@ -83,7 +84,11 @@ function showThis(li, idx){
 	);
 	remote.remove();
     }
+  if(window.location.hash.length>0 && window.location.hash.indexOf($(li).attr("id"))>0 && window.location.hash!=$(li).attr("id")){
+    window.location.hash=window.location.hash;
+  }else{
     window.location.hash=$(li).attr("id");
+  }
 }
 function showTableTrs(){
     $("table.report tr").hide();
@@ -389,12 +394,14 @@ $(document).ready(function(){
 	if($("div.tab_container").length>0){
 	    $("div.tab_container ul.tabs li:first").addClass("active");
 	    $("div.tab_container ul.tabs li").each(function(idx, li){
-		    $("div.tab_container div.tab").hide();
-		    $(li).click(function(){
-			    showThis($(this), idx);
-			});
-		});
-	    li = $("div.tab_container ul.tabs li"+window.location.hash);
+						     $("div.tab_container div.tab").hide();
+						     $(li).click(function(){
+								   showThis($(this), idx);
+								   $(".graphContainer:visible .graphs:first").toggle();
+								 });
+						     });
+	    id = window.location.hash.split("/")[0];
+	    li = $("div.tab_container ul.tabs li"+id);
 	    if(window.location.hash.length>0 && li.length>0){
 		idx = li.index();
 		showThis(li, idx);
@@ -472,6 +479,13 @@ $(document).ready(function(){
 			$(this).parent().parent().nextUntil("tr.branch_total").hide();
 		    setToggleText();
 		});
+	    $('.report').floatHeader({
+	      fadeIn: 250,
+	      fadeOut: 250,
+	      forceClass: true,
+	      recalculate: true,
+	      markerClass: 'header'
+	    });
 	}
 	if($("a.moreinfo").length>0){
 	    $("a.moreinfo").click(function(){
@@ -651,5 +665,43 @@ $(document).ready(function(){
   $("#client_active").change(function(){
     $("#inactive_options").toggle();
   });
+  $("a.expand_collapsed").click(function(a){
+    $(".collapsed").toggle();
+    if($(a.currentTarget).css("background-image").indexOf("closed.gif")>0){
+      $(a.currentTarget).css("background-image", "url(/images/elements/open.gif)");
+    }else{
+      $(a.currentTarget).css("background-image", "url(/images/elements/closed.gif)");
+    }
+  });
+  if($(".graphContainer").length>0){
+    $(".graphContainer .graphs:first").toggle();
+    $(".graphContainer .listContainer ul li").click(function(liClicked){
+						      li=liClicked.currentTarget;
+						      container=$(li).parent().parent().parent();
+						      container.find("li.selected").removeClass("selected");
+						      idx=$(li).index();
+						      if(window.location.hash.split("/")[0].length>0){
+							id=window.location.hash.split("/")[0];
+						      }else{
+							id="#"+$(li).parent().attr("id");
+						      }
+						      window.location.hash=id+"/"+(idx+1);
+						      $(".graphContainer:visible").siblings().attr("action", "/dashboard"+window.location.hash);
+						      $(container).find(".graphs").hide();
+						      $($(container).find(".graphs")[idx]).show();
+						      $(li).addClass("selected");
+						    });
+    if(window.location.hash.length>0){
+      container=$(".graphContainer:visible");
+      if(window.location.hash.indexOf("/")>0)
+	idx=parseInt(window.location.hash.split("/")[1])-1;
+      else
+	idx=0;
+      container.find("li.selected").removeClass("selected");
+      $($(container).find(".listContainer ul li")[idx]).addClass("selected");
+      $(container).find(".graphs").hide();
+      $($(container).find(".graphs")[idx]).show();
+    }
+  }
 });
 

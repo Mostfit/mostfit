@@ -22,7 +22,6 @@ class QuarterConsolidatedReport < Report
     data = {}
     this_year = Date.today.year
     this_month = Date.today.month
-#    histories = LoanHistory.sum_outstanding_by_month(self.from_date, self.to_date, self.loan_product_id)
     @branch.each{|branch|
       data[branch]||= {}
       (branch.creation_date.year..this_year).each{|year|
@@ -36,6 +35,11 @@ class QuarterConsolidatedReport < Report
             next if Date.today < Date.new(y, month_number, 1)
             histories = LoanHistory.sum_outstanding_by_month(month_number, y, branch, self.loan_product_id)
             next if not histories
+            month_start_date    = Date.new(y, month_number, 1)
+            month_end_date      = Date.new(y, month_number, -1)
+            advances            = LoanHistory.sum_advance_payment(month_start_date, month_end_date, :branch)||[]
+            old_balances        = LoanHistory.advance_balance(month_start_date-1, :branch)||[]
+
             data[branch][year]||= {}
             data[branch][year][quarter]||= {}
             
@@ -50,10 +54,9 @@ class QuarterConsolidatedReport < Report
               principal_actual    = history.actual_outstanding_principal
               total_actual        = history.actual_outstanding_total
               
-              principal_advance   = history.advance_principal
               total_advance       = history.advance_total
             else
-              principal_scheduled, total_scheduled, principal_actual, total_actual, principal_advance, total_advance = 0, 0, 0, 0, 0, 0
+              principal_scheduled, total_scheduled, principal_actual, total_actual, total_advance = 0, 0, 0, 0, 0
             end
             
             data[branch][year][quarter][month][7] += principal_actual
@@ -64,9 +67,14 @@ class QuarterConsolidatedReport < Report
             data[branch][year][quarter][month][11] += ((total_actual-principal_actual) > (total_scheduled-principal_scheduled) ? (total_actual-principal_actual - (total_scheduled-principal_scheduled)) : 0)
             data[branch][year][quarter][month][12] += total_actual > total_scheduled ? total_actual - total_scheduled : 0
             
-            data[branch][year][quarter][month][13]  += principal_advance
+            advance  = advances.find{|x|  x.branch_id==branch.id}
+            old_balance = old_balances.find{|x|  x.branch_id==branch.id}
+            advance_total = advance ? advance.advance_total : 0
+            old_balance_total = old_balance ? old_balance.balance_total : 0
+        
+            data[branch][year][quarter][month][13]  += advance_total
+            data[branch][year][quarter][month][14]  += advance_total - total_advance + old_balance_total
             data[branch][year][quarter][month][15] += total_advance
-            data[branch][year][quarter][month][14] += (total_advance - principal_advance)
           }
         }
       }
