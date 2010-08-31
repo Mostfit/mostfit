@@ -1,8 +1,8 @@
-%h1 Register a payment
+%h1 Register a repayment
 
 = error_messages_for @payment
 
 = form_for(@payment, :action => url_for_loan(@loan, 'payments')) do
-  = partial :fields, :submit_text => "Register payment", :cancel_link => url_for_loan(@loan, 'payments')
+  = partial :fields, :submit_text => "Register repayment", :cancel_link => url_for_loan(@loan, 'payments')
 
 = link_to 'Back', url_for_loan(@loan, 'payments')

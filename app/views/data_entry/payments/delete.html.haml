@@ -1,10 +1,10 @@
-%h1 Delete a payment
+%h1 Delete a repayment
 
 = error_messages_for @client
 
 - if @payment and not @payment.new_record?
 
-  %p== Are you sure you want to delete payment '#{@payment.id}'?
+  %p== Are you sure you want to delete repayment '#{@payment.id}'?
   = form_for(@payment, :action => url(:enter_payments, :action => 'destroy'), :method => :get) do
     = hidden_field :id, :value => @payment.id
     = submit "Delete it!"
@@ -13,7 +13,7 @@
 
 
 - elsif @loan
-  %p Please select the payment you want to delete...
+  %p Please select the repayment you want to delete...
   %table.narrow.form{ :width => '100%' }
     %thead
       %tr
@@ -47,7 +47,7 @@
 
 - else
   %p
-    Please select a loan that you want to delete a payment for by entering its loan ID.
+    Please select a loan that you want to delete a repayment for by entering its loan ID.
 
   %table.form
     = form(:action => url(:enter_payments, :action => 'delete'), :method => :get) do

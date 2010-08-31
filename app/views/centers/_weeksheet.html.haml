@@ -10,7 +10,7 @@
   %h2 Disbursals
   - date_with_holiday = [@date, @date.holidays_shifted_today].max
   =partial "centers/disbursals", {:loans_to_disburse => Loan.all(:client_id => @clients.map{|x| x.id}, :scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil), :center => @center, :branch => @center.branch, :date => @date}
-  %h2 Payments
+  %h2 Repayments
   =partial "centers/payments", {:loans => Loan.all(:client_id => @clients.map{|x| x.id}), :clients => @clients_grouped, :branch => @center.branch, :center => @center, :date => @date}
 - else
   %i This day is not a meeting day

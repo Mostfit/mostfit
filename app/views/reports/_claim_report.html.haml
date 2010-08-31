@@ -14,7 +14,7 @@
     %th{:width => '10%'}
       Disbursed
     %th{:width => '10%'}
-      Payment
+      Repayment
     %th{:width => '10%'}
       Balance Outstanding
  
@@ -31,51 +31,23 @@
       %td
         = claim.claim_submission_date
       %td
-        -list = ['death_certificate','center_declaration_form','kyc_document']
-        -doc = claim.documents
-        - doc.each do |x| 
-          - if doc.length == 1
-            - if x.to_s == list[0] 
-              = list[1]
-              = list[2]
-            - elsif x.to_s == list[1]
-              = list[0]
-              = list[2]
-            - elsif x.to_s == list[2]
-              = list[0]
-              = list[1]
-          - elsif doc.length == 2
-            - if x.to_s == list[0] and list[1]
-              = list[2]
-            - elsif x.to_s == list[1] and list[2]
-              = list[0]
-            - elsif x.to_s == list[0] and list[2]
-              = list[1]
-          - elsif doc.length == 3  
-            - if x.to_s == list[0] and list[1] and list[2]
-              = "all document submited"
-        -if claim.documents.length == 0
-          = list[0]
-          = list[1]
-          = list[2]
-      %td
-        - l = claim.client.loans
-        - l.each do |x|
-        - amount_disbursed = x.amount
-          = amount_disbursed
+        -documents = CLAIM_DOCUMENTS - claim.documents
+        - documents.each do |doc| 
+          = doc
           %br
       %td
-        - l = claim.client.loans
-        - l.each do |x|
-        - amount_disbursed = x.amount
-        - amount_paid = x.principal_received_up_to(Date.today).to_f
-          = amount_paid
+        - loan = claim.client.loans
+        - loan.each do |l|
+          = l.amount
           %br
       %td
-        - l = claim.client.loans
-        - l.each do |x|
-        - amount_disbursed = x.amount
-        - amount_paid = x.principal_received_up_to(Date.today).to_f
-          = amount_disbursed - amount_paid
+        - loan = claim.client.loans
+        - loan.each do |l|
+          = l.principal_received_up_to(Date.today).to_f
+          %br
+      %td
+        - loan = claim.client.loans
+        - loan.each do |l|
+          = l.amount - l.principal_received_up_to(Date.today).to_f
           %br
 = paginate @data

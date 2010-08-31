@@ -18,13 +18,13 @@
         %h3{:style => "border-bottom: dotted 1px #999"} 
           = plural.capitalize
         - if thing == :payment
-          = link_to "Record a payment", url("enter_#{plural}".to_sym, :action => 'record'), :class => 'add_small'
+          = link_to "Record a repayment", url("enter_#{plural}".to_sym, :action => 'record'), :class => 'add_small'
           %br
           = link_to "By Center", url("enter_#{plural}".to_sym, :action => 'by_center'), :class => 'add_small'
           %br
           = link_to "By Staff Member", url("enter_#{plural}".to_sym, :action => 'by_staff_member'), :class => 'add_small'
           %br
-          = link_to "Delete a payment", url("enter_#{plural}".to_sym, :action => 'delete'), :class => 'add_small'
+          = link_to "Delete a repayment", url("enter_#{plural}".to_sym, :action => 'delete'), :class => 'add_small'
         -else
           = link_to_with_rights "Add new #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'new'), :class => 'add_small'
           %br
