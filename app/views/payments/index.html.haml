@@ -74,7 +74,7 @@
           original loan disbursed on
           = @loan.original_disbursal_date
   %tr.odd
-    %td First payment
+    %td First repayment
     %td
       - if @loan.payments.empty?
         = @loan.scheduled_first_payment_date
@@ -121,23 +121,23 @@
 
 %div.tab_container
   %ul.tabs
-    %li#payment_schedule Payment Schedule
-    %li#payments_made Payments made
+    %li#repayment_schedule Repayment Schedule
+    %li#repayments_made Repayments made
     %li#audit Audits
     %li#misc Miscellaneous
     %li#history History
 
   %div.tab
-    %h2== Payment schedule
+    %h2== Repayment schedule
     %table.narrow.form{ :width => '100%' }
       %thead
         %tr
           %th
           %th date due
           %th scheduled balance
-          %th scheduled payment
+          %th scheduled repayment
           %th actual balance
-          %th actual payments
+          %th actual repayments
           %th difference
       %tbody
       - first, passed = true, false  # these are for printing the "today" row
