@@ -879,3 +879,58 @@ a.expand_collapsed{
 .totalinfo table tr td:first-child{ 
     font-weight: bold;
 }
+.graphContainer{
+    width: 95%;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: 2px solid grey;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    height: 500px;
+}
+.graphContainer .graphs{
+    margin-left: 150px;
+}
+.graphContainer .listContainer{
+    list-style-type: none;
+    border-top-left-radius: 10px;
+    -moz-border-left-top-radius: 10px;
+    border-bottom-left-radius: 10px;
+    -moz-border-left-bottom-radius: 10px;
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    width: 230px;
+    float: left;
+    height: 500px;
+    background-color: #E4E4E4;
+}
+.graphContainer .listContainer ul{
+    margin-top: 25px;
+    font-size: 1.1em;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-left: 0px;
+}
+.graphContainer .listContainer ul li{
+    padding: 5px;
+    margin-left: 10px;
+    width: 80%;
+    cursor: pointer;
+    margin-bottom: 2px;
+}
+.graphContainer .listContainer ul li.selected{
+    border: 2px solid grey;
+    border-radius: 8px;
+    -moz-border-radius: 8px;
+    background-color: #fff;
+    color: black;
+    pointer: arrow;
+}
+.graphContainer .graphs{
+    position: relative;
+    left: 15px;
+    top: 20px;
+    display: none;
+}

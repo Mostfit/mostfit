@@ -4,7 +4,7 @@ class Reports < Application
            DailyReport, ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, TransactionLedger, ProjectedReport,
            LoanSanctionRegister, LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, LoanSizePerManagerReport, ClaimReport, 
            TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, ClientAbsenteeismReport, 
-           BalanceSheet, GeneralLedgerReport, TrialBalanceReport, DuplicateClientsReport
+           GeneralLedgerReport, TrialBalanceReport
           ]
   layout :determine_layout 
 
@@ -32,6 +32,18 @@ class Reports < Application
       elsif klass == TransactionLedger
         @groups, @centers, @branches, @payments, @clients = @report.generate
         display [@groups, @centers, @branches, @payments, @clients]
+      elsif [LoanSanctionRegister, ScheduledDisbursementRegister].include?(klass)
+        @groups, @centers, @branches, @loans, @loan_products = @report.generate
+        display [@groups, @centers, @branches, @loans, @loan_products]
+      elsif [ConsolidatedReport, LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, StaffConsolidatedReport,
+             QuarterConsolidatedReport, ClientAbsenteeismReport, LoanSizePerManagerReport, TargetReport, LoanDisbursementRegister, ProjectedReport,
+             GroupConsolidatedReport
+            ].include?(klass)
+        @data  = @report.generate
+        display @data
+      elsif [GeneralLedgerReport, TrialBalanceReport, ClaimReport].include?(klass)
+        @data  = @report.generate(params)
+        display @data        
       else        
         case @report.method(:generate).arity
         when 0
@@ -40,9 +52,13 @@ class Reports < Application
           @data = @report.generate(params)
         end
         display @data
+
       end
     elsif id.nil?
-      @reports = klass.all
+      @reports = klass.all(:order => [:created_at.desc])
+      if klass==DuplicateClientsReport and (DuplicateClientsReport.count==0 or (Date.today - DuplicateClientsReport.all.aggregate(:created_at).max).to_i>6)
+        DuplicateClientsReport.new.generate
+      end
       display @reports
     elsif id and params[:format] == "pdf"
       send_data(@report.get_pdf.generate, :filename => 'report.pdf')
