@@ -25,7 +25,7 @@
         = user.role.to_s.humanize
       %td
         = (link_to user.staff_member.name, resource(user.staff_member)) if user.staff_member
-      - if session.user.id == 1  # only show to admin
+      - if session.user.role == :admin  # only show to admin
         %td
           = link_to 'edit', resource(user, :edit)
           = '&nbsp;|&nbsp;' + link_to('delete', resource(user, :delete)) unless user.id == 1  # do not show for admin
