@@ -17,7 +17,7 @@ class DailyReport < Report
   
   def generate
     branches, centers, data, clients, loans, groups = {}, {}, {}, {}, {}, {}
-    histories = LoanHistory.sum_outstanding_by_group(self.date-7, self.date, self.loan_product_id)
+    histories = LoanHistory.sum_outstanding_grouped_by(self.date, [:center, :client_group], self.loan_product_id)
     advances  = LoanHistory.sum_advance_payment(self.date, self.date, :client_group)||[]
     balances  = LoanHistory.advance_balance(self.date, :client_group)||[]
     old_balances = LoanHistory.advance_balance(self.date-1, :client_group)||[]
@@ -36,7 +36,7 @@ class DailyReport < Report
           history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id} if histories
           advance  = advances.find{|x|  x.client_group_id==g.id}
           balance  = balances.find{|x|  x.client_group_id==g.id}
-          old_balance = old_balances.find{|x|  x.client_group_id==g.id}
+          old_balance = old_balances.find{|x| x.client_group_id==g.id}
 
           if history
             principal_scheduled = history.scheduled_outstanding_principal.to_i

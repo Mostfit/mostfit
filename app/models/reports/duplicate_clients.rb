@@ -2,11 +2,11 @@ class DuplicateClientsReport < Report
   attr_accessor :date
   SDX1, SDX2 = 'AEHIOUWYBFPVCGJKQSXZDTLMNR', '00000000111122222222334556'
   def initialize
-    @date = Date.today
+    self.date = Date.today
   end
 
   def name
-    "Duplicate clients as of #{@date}"
+    "Duplicate clients as of #{self.start_date}"
   end
 
   def soundex1(string)
@@ -75,6 +75,7 @@ class DuplicateClientsReport < Report
         }
       }
     }
+    self.start_date = Date.today
     self.report = Marshal.dump(self.raw)
     self.generation_time = Time.now - t0
     self.save

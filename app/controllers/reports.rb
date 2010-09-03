@@ -35,15 +35,6 @@ class Reports < Application
       elsif [LoanSanctionRegister, ScheduledDisbursementRegister].include?(klass)
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
-      elsif [ConsolidatedReport, LateDisbursalsReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, StaffConsolidatedReport,
-             QuarterConsolidatedReport, ClientAbsenteeismReport, LoanSizePerManagerReport, TargetReport, LoanDisbursementRegister, ProjectedReport,
-             GroupConsolidatedReport
-            ].include?(klass)
-        @data  = @report.generate
-        display @data
-      elsif [GeneralLedgerReport, TrialBalanceReport, ClaimReport].include?(klass)
-        @data  = @report.generate(params)
-        display @data        
       else        
         case @report.method(:generate).arity
         when 0
@@ -52,7 +43,6 @@ class Reports < Application
           @data = @report.generate(params)
         end
         display @data
-
       end
     elsif id.nil?
       @reports = klass.all(:order => [:created_at.desc])

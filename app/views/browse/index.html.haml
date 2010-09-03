@@ -1,9 +1,9 @@
 %div{:style => "margin-right: 30px; float: right;"}
-  = random_chart
-  %br
   %div.result
   %script
     $.get("/browse/hq_tab", function(data){$('.result').html(data);})
+  = random_chart
+  %br
 
 %h1 Browse
 %h3

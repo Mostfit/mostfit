@@ -114,19 +114,19 @@
   - else
     No fees due today
     
-  %h1 Payments
+  %h1 Repayments
   = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "if ($('#payments_received_by').val() != '#{@center.manager.id}'){return(confirm('Payment receiver is not center manager. Proceed with payments?'));};", :class => "_disable_button_") do
     = hidden_field :name => 'for_date', :value => @date
     = hidden_field :name => 'center_id', :value => @center.id
     = partial :cds
-    = submit 'Make Payments'
+    = submit 'Make Repayments'
 - else
-  Choose a center to record a payment for
+  Choose a center to record a repayment for
   = form_for(@payment, :action => url(:enter_payments, :action => 'by_center'), :method => :get) do
     %table
       %tr
         %th
-          Centers paying today
+          Centers repaying today
         %td
           = select :name => 'center_id', :collection => centers_paying_today_collection(@date)
       %tr

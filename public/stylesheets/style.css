@@ -853,6 +853,7 @@ a.expand_collapsed{
     background-color: #F4F4F4;
 }
 .totalinfo{
+    width: 420px;
     border: 2px solid #3456a4;
     background: #fff;
     border-radius: 10px;

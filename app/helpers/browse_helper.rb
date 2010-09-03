@@ -20,9 +20,9 @@ module Merb
         x.strip.gsub(/^=/, "")
       }.map{|x| 
         if x.include?("url(") and not x.include?("dashboard") and not x.include?(":controller")
-          x.gsub("url(", "url(:controller => 'dashboard',").gsub(/(\d+\,\s?\d+)/, '400, 270')
+          x.gsub("url(", "url(:controller => 'dashboard',").gsub(/(\d+\,\s?\d+)/, '450, 300')
         else
-          x.gsub(/(\d+\,)/, '400,')
+          x.gsub(/(\d+\,)/, '450,')
         end
       }
     end

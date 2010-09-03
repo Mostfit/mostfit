@@ -1,7 +1,7 @@
-%h2== Payments &mdash; (#{link_to 'new', url_for_loan(@loan, 'payments/new')})
+%h2== Repayments &mdash; (#{link_to 'new', url_for_loan(@loan, 'payments/new')})
 - if @payments.blank?
   %p
-    %i No payments have been made so far.
+    %i No repayments have been made so far.
 - else
   %table.narrow.form{ :width => '100%' }
     %thead
@@ -34,4 +34,4 @@
       %tr
         %td{ :colspan => 8 }
 
-%p= link_to 'new payment >>', url_for_loan(@loan, 'payments/new'), :class => "button"
+%p= link_to 'new repayment >>', url_for_loan(@loan, 'payments/new'), :class => "button"

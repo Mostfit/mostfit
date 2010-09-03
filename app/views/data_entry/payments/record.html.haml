@@ -1,15 +1,15 @@
-%h1 Record a new payment
+%h1 Record a new repayment
 
 = error_messages_for @loan
 = error_messages_for @payment
 - if @loan
   = form_for(@payment, :action => url(:enter_payments, :action => 'create')) do
     = hidden_field :loan_id, :value => @loan.id
-    = partial 'payments/fields', :submit_text => "Record payment", :cancel_link => url(:data_entry)
+    = partial 'payments/fields', :submit_text => "Record repayment", :cancel_link => url(:data_entry)
 
 - else
   %p
-    Please select a loan that you want to record a payment for by entering its loan ID.
+    Please select a loan that you want to record a repayment for by entering its loan ID.
 
   %table.form
     = form(:action => url(:enter_payments, :action => 'record')) do
