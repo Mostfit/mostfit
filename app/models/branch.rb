@@ -38,6 +38,8 @@ class Branch
       if not staff.branches.include?(self) and not staff.areas.branches.include?(self) and not staff.regions.areas.branches.include?(self)
         hash[:manager] = user.staff_member
       end
+    elsif user.role == :funder and funding_lines = Funder.first(:user_id => user.id).funding_lines
+      hash[:id] = LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}})
     end
     hash[:branch] = self    
 

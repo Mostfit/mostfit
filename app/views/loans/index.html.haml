@@ -148,7 +148,7 @@
                     = loan.payments.last(:order => [:received_on]).received_on
                   
             %td
-              = link_to 'view details', url_for_loan(loan, 'payments')
+              = link_to 'view details', url_for_loan(loan)
               &nbsp;|&nbsp;
               = link_to 'edit', url_for_loan(loan, 'edit')
               &nbsp;|&nbsp;

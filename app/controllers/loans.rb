@@ -3,7 +3,7 @@ class Loans < Application
   provides :xml, :yaml, :js
 
   def index
-    @loans = @client.loans
+    @loans = @loans || @client.loans
     display @loans
   end
 
@@ -49,7 +49,7 @@ class Loans < Application
       end
     else
       @loan.interest_rate *= 100
-      render :new  # error messages will be shown
+      render :new # error messages will be shown
     end
   end
 

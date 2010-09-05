@@ -20,6 +20,7 @@ class Users < Application
 
   def create(user)
     params[:user][:staff_member] = StaffMember.get(params[:user][:staff_member]) if params[:user][:staff_member]
+    params[:user][:funder]       = Funder.get(params[:user][:funder]) if params[:user][:funder]
     @user = User.new(user)
     if @user.save
       redirect resource(:users), :message => {:notice => "Successfully created user '#{@user.login}'"}
@@ -32,6 +33,7 @@ class Users < Application
   def update(id, user)
     @user = User.get(id)
     params[:user][:staff_member] = StaffMember.get(params[:user][:staff_member]) if params[:user][:staff_member]
+    params[:user][:funder]       = Funder.get(params[:user][:funder]) if params[:user][:funder]
     raise NotFound unless @user
     if @user.update_attributes(user)
       redirect resource(:users), :message => {:notice => "User '#{@user.login}' has been modified"}

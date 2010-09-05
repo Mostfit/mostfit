@@ -32,7 +32,7 @@ class Reports < Application
       elsif klass == TransactionLedger
         @groups, @centers, @branches, @payments, @clients = @report.generate
         display [@groups, @centers, @branches, @payments, @clients]
-      elsif [LoanSanctionRegister, ScheduledDisbursementRegister].include?(klass)
+      elsif [LoanSanctionRegister].include?(klass)
         @groups, @centers, @branches, @loans, @loan_products = @report.generate
         display [@groups, @centers, @branches, @loans, @loan_products]
       else        

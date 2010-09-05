@@ -45,7 +45,7 @@
           = link_to 'edit', resource(@branch, @center, client, :edit)
           &nbsp;|&nbsp;
           = link_to 'new loan', resource(@branch, @center, client, :loans, :new)
-    - @center.client_groups.find_all{|cg| cg.clients.count==0}.each do |client_group|
+    - ClientGroup.all(:center => @center).reject{|cg| cg.clients.count!=0}.each do |client_group|
       %tr.group
         %td{:colspan => 5}
           %b

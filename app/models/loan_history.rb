@@ -34,7 +34,10 @@ class LoanHistory
   
   validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
-
+  @@selects = {Branch => "b.id", Center => "c.id", Client => "cl.id", Loan => "l.id", Area => "a.id", Region => "r.id", ClientGroup => "cg.id"}
+  @@tables = ["regions r", "areas a", "branches b", "centers c", "client_groups cg", "clients cl", "loans l"]
+  @@models = [Region, Area, Branch, Center, ClientGroup, Client, Loan]
+  @@optionals = [ClientGroup]
   # __DEPRECATED__ the prefered way to make history and future.
   # HISTORY IS NOW WRITTEN BY THE LOAN MODEL USING update_history_bulk_insert
   def self.add_group
@@ -440,43 +443,77 @@ class LoanHistory
     repository.adapter.query(query).first
   end
 
-  def self.borrower_clients_count_in(obj)
-    froms = ["clients cl", "loans l"]
-    conditions = ["cl.id=l.client_id", "l.deleted_at is NULL"]
+  def self.borrower_clients_count_in(obj, hash={})
+    klass, obj = get_class_of(obj)
 
-    klass = (obj.class == Array or obj.class==DataMapper::Associations::OneToMany::Collection) ? obj.first.class : obj.class
-    obj   = (obj.class == Array or obj.class==DataMapper::Associations::OneToMany::Collection) ? obj : [obj]
+    froms = build_froms(klass)
+    conditions  = build_conditions(klass, obj, hash)
+    repository.adapter.query("SELECT count(*) FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
+  end
+
+  def self.parents_where_loans_of(klass, hash)    
+    selects    = build_selects(klass)
+    froms      = build_froms(klass)    
+    conditions = build_conditions(klass, klass.all, hash)
+    repository.adapter.query("SELECT #{selects} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
+  end
+  
+  private
+  def self.get_class_of(obj)
+    if [Array, DataMapper::Associations::OneToMany::Collection, DataMapper::Collection].include?(obj.class)
+      klass = obj.first.class 
+    else
+      klass = obj.class
+      obj   = [obj]
+    end
+    [klass, obj]
+  end
+  
+  def self.build_selects(klass)
+    "distinct(#{@@selects[klass]})"
+  end
+    
+  def self.build_froms(klass)
+    froms  = []    
+    return false unless @@models.include?(klass)
+    idx    = @@models.index(klass)
+    @@tables[idx..-1].each{|table|
+      froms << table
+    }
+    froms
+  end
+
+  def self.build_conditions(klass, obj, hash)
+    conditions =  ["cl.id=l.client_id", "l.deleted_at is NULL"]
+    if hash.length>0
+      conditions += hash[:loan].map{|k, v| "l.#{k}=#{v}"} if hash.key?(:loan)
+      conditions += hash[:client].map{|k, v| "cl.#{k}=#{v}"} if hash.key?(:client)
+      conditions += hash[:center].map{|k, v| "c.#{k}=#{v}"} if hash.key?(:center)
+      conditions += hash[:branch].map{|k, v| "b.#{k}=#{v}"} if hash.key?(:branch)
+    end
 
     if klass==Branch
-      froms << "centers c" 
-      froms << "branches b"
       conditions << "b.id in (#{obj.map{|x| x.id}.join(',')})"
       conditions << "cl.center_id=c.id"
       conditions << "c.branch_id=b.id"
     elsif klass==Center
-      froms << "centers c"
       conditions << "cl.center_id=c.id"
       conditions << "c.id in (#{obj.map{|x| x.id}.join(',')})"
+    elsif klass==ClientGroup
+      conditions << "cl.client_group_id=cg.id"
+      conditions << "cg.id in (#{obj.map{|x| x.id}.join(',')})"
     elsif klass==Area
-      froms << "centers c"
-      froms << "branches b"
-      froms << "areas a"
       conditions << "a.id in (#{obj.map{|x| x.id}.join(',')})"
       conditions << "a.id=b.area_id"
       conditions << "c.branch_id=b.id"
       conditions << "cl.center_id=c.id"
     elsif klass==Region
-      froms << "centers c"
-      froms << "branches b"
-      froms << "areas a"
-      froms << "regions r"
       conditions << "r.id in (#{obj.map{|x| x.id}.join(',')})"
       conditions << "r.id=a.region_id"
       conditions << "a.id=b.area_id"
       conditions << "c.branch_id=b.id"
       conditions << "cl.center_id=c.id"
     end
-
-    repository.adapter.query("SELECT count(*) FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
+    conditions
   end
 end

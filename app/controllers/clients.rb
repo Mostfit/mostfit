@@ -13,7 +13,7 @@ class Clients < Application
     raise NotFound unless @client
     
     if @center
-      @loans = @client.loans
+      @loans = @loans || @client.loans
       display [@client, @loans], 'loans/index'
     else
       redirect_to_show(params[:id])

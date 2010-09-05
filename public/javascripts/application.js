@@ -702,5 +702,18 @@ $(document).ready(function(){
       $($(container).find(".graphs")[idx]).show();
     }
   }
+
+  $("table#user_form select#user_role").change(function(select){
+    if($(select.currentTarget).val()==="funder"){
+      $("#user_form .staff_member").hide();
+      $("#user_form .funder").show();
+      $("#user_form #user_staff_member").val("");
+    }
+    if($(select.currentTarget).val()==="staff_member"){
+      $("#user_form .staff_member").show();
+      $("#user_form .funder").hide();
+      $("#user_form #user_funder").val("");
+    }
+  });
 });
 
