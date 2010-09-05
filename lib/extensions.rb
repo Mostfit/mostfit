@@ -83,7 +83,7 @@ module Misfit
         elsif [Branch, Center, ClientGroup, Client, Loan].include?(model) and id>0 
           return(@funder.send(model.to_s.snake_case.pluralize, {:id => id}).length>0)
         elsif [Branch, Center, ClientGroup, Client, Loan].include?(model) and id==0
-          return(@funder.send(model.to_s.downcase.pluralize).count>0)
+          return(@funder.send(model.to_s.downcase.pluralize).length>0)
         end
         return false
       end
