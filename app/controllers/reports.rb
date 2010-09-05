@@ -45,7 +45,7 @@ class Reports < Application
         display @data
       end
     elsif id.nil?
-      @reports = klass.all(:order => [:created_at.desc])
+      @reports = klass.all(:order => [:start_date.desc])
       if klass==DuplicateClientsReport and (DuplicateClientsReport.count==0 or (Date.today - DuplicateClientsReport.all.aggregate(:created_at).max).to_i>6)
         DuplicateClientsReport.new.generate
       end
