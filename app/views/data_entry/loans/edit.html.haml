@@ -9,7 +9,7 @@
     Please enter the loan ID of the loan you want to edit.
 
   %table.form
-    = form_for(@loan, :action => url(:enter_loans, :action => 'edit')) do
+    = form_for(@loan, :action => url(:enter_loans, :action => 'edit', :return => "/data_entry")) do
       %tr
         %td &nbsp;
       %tr

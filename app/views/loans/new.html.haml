@@ -22,7 +22,7 @@
       =link_to("There are no loan products available. Create one now", resource(:loan_products, :new)) 
   = link_to 'cancel', resource(@branch, @center, @client, :loans)
 - else
-  = form_for(@loan, :action => resource(@branch, @center, @client, :loans), :onsubmit => "javascript: return confirm_for(o);") do
+  = form_for(@loan, :action => resource(@branch, @center, @client, :loans, {:return => params[:return]}), :onsubmit => "javascript: return confirm_for(o);") do
     - if @loan.fields_partial.blank?
       = partial :fields, :submit_text => "Create loan for #{@client.name}", :cancel_link => resource(@branch, @center, @client, :loans)
     - else
