@@ -486,10 +486,10 @@ class LoanHistory
   def self.build_conditions(klass, obj, hash)
     conditions =  ["cl.id=l.client_id", "l.deleted_at is NULL"]
     if hash.length>0
-      conditions += hash[:loan].map{|k, v| "l.#{k}=#{v}"} if hash.key?(:loan)
-      conditions += hash[:client].map{|k, v| "cl.#{k}=#{v}"} if hash.key?(:client)
-      conditions += hash[:center].map{|k, v| "c.#{k}=#{v}"} if hash.key?(:center)
-      conditions += hash[:branch].map{|k, v| "b.#{k}=#{v}"} if hash.key?(:branch)
+      conditions += hash[:loan].map{|k, v|   v.is_a?(Array) ? "l.#{k} in (#{v.join(',')})"  : "l.#{k}=#{v}"} if hash.key?(:loan)
+      conditions += hash[:client].map{|k, v| v.is_a?(Array) ? "cl.#{k} in (#{v.join(',')})" : "cl.#{k}=#{v}"} if hash.key?(:client)
+      conditions += hash[:center].map{|k, v| v.is_a?(Array) ? "c.#{k} in (#{v.join(',')})"  : "c.#{k}=#{v}"} if hash.key?(:center)
+      conditions += hash[:branch].map{|k, v| v.is_a?(Array) ? "b.#{k} in (#{v.join(',')})"  : "b.#{k}=#{v}"} if hash.key?(:branch)
     end
 
     if klass==Branch
