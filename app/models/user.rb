@@ -12,7 +12,7 @@ class User
 
   # permissions
   # to add to this, only add at the back of the array
-  ROLES = [:data_entry, :mis_manager, :admin, :read_only, :staff_member]
+  ROLES = [:data_entry, :mis_manager, :admin, :read_only, :staff_member, :funder]
   property :role, Enum.send('[]', *ROLES), :nullable => false
 
   # it gets                                   
@@ -25,7 +25,7 @@ class User
   validates_is_unique :login
   validates_length :password, :min => 6  
   has 1, :staff_member
-
+  has 1, :funder
 
   has n, :payments_created, :child_key => [:created_by_user_id], :model => 'Payment'
   has n, :payments_deleted, :child_key => [:deleted_by_user_id], :model => 'Payment'

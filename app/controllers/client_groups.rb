@@ -16,8 +16,8 @@ class ClientGroups < Application
   def show(id)
     @client_group = ClientGroup.get(id)
     raise NotFound unless @client_group
-    @cgts = @client_group.cgts
-    @grts = @client_group.grts
+    @cgts = Cgt.all(:client_group => @client_group)
+    @grts = Grt.all(:client_group => @client_group)
     display @client_group
   end
 

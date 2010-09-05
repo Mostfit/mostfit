@@ -9,7 +9,7 @@
         id
       %th
         Name
-  - @client_group.clients.each do |client|
+  - Client.all(:client_group => @client_group).each do |client|
     %tr{:class => cycle('odd','even')}
       %td
         = client.id
