@@ -1,4 +1,4 @@
-%table{:width => "100%"}
+%table.report.nojs{:width => "100%"}
   %tr    
     %th
       Type
@@ -13,7 +13,8 @@
     %th
       Description
     %th
-      Preview
+      Attachments
+    %th
   - for document in @documents
     %tr
       %td
@@ -27,14 +28,30 @@
       %td
         = document.issuing_authority
       %td
-        = document.description
+        = document.description      
       %td
         -if /^image\//.match(document.document_content_type)
-          =image_tag(document.document.url, :height => 50)
+          =link_to(image_tag(document.document.url, :height => 50), document.document.url, :target => "BLANK")
         -else
-          Not available
-      %td
-        = link_to 'download', document.document.url, :target => "BLANK"
+          = link_to('download page 1', document.document.url, :target => "BLANK")
+        - if document.document_2_file_name
+          %hr
+            -if(/^image\//.match(document.document_content_type))
+              = link_to(image_tag(document.document_2.url, :height => 50), document.document_2.url, :target => "BLANK")
+            -else
+              = link_to('download page 2', document.document_2.url, :target => "BLANK")
+        - if document.document_3_file_name
+          %hr
+            -if /^image\//.match(document.document_3_content_type)
+              = link_to(image_tag(document.document_3.url, :height => 50), document.document_3.url, :target => "BLANK")
+            -else
+              = link_to('download page 3', document.document_3.url, :target => "BLANK")
+        - if document.document_4_file_name
+          %hr
+          -if /^image\//.match(document.document_4_content_type)
+            = image_tag(document.document_4.url, :height => 50)
+          -else
+            = link_to 'download page 4', document.document_4.url, :target => "BLANK"
       %td
         = link_to_with_rights('Edit', url(:action => :edit, :id => document, :parent_id => @parent.id, :parent_model => @parent.class), :class => (request.xhr? ? "_remote_" : ""))
 =link_to("New", resource(:documents, :new, {:parent_id => @parent.id, :parent_model => @parent.class}), :class => (request.xhr? ? "_remote_ add" : "add"))

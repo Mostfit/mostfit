@@ -17,6 +17,15 @@ class Document
   has_attached_file :document,
       :url => "/uploads/:class/:id/:basename.:extension",
       :path => "#{Merb.root}/public/uploads/:class/:id/:basename.:extension" 
+  has_attached_file :document_2,
+      :url => "/uploads/:class/:id/2/:basename.:extension",
+      :path => "#{Merb.root}/public/uploads/:class/:id/2/:basename.:extension" 
+  has_attached_file :document_3,
+      :url => "/uploads/:class/:id/3/:basename.:extension",
+      :path => "#{Merb.root}/public/uploads/:class/:id/3/:basename.:extension" 
+  has_attached_file :document_4,
+      :url => "/uploads/:class/:id/4/:basename.:extension",
+      :path => "#{Merb.root}/public/uploads/:class/:id/4/:basename.:extension" 
 
   validates_present :document_type
   validates_is_unique :number, :scope => [:document_type_id, :parent_id, :parent_model]

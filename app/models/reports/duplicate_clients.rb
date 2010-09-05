@@ -6,7 +6,7 @@ class DuplicateClientsReport < Report
   end
 
   def name
-    "Duplicate clients as of #{self.date}"
+    "Duplicate clients as of #{self.start_date}"
   end
 
   def soundex1(string)
@@ -75,6 +75,7 @@ class DuplicateClientsReport < Report
         }
       }
     }
+    self.start_date = Date.today
     self.report = Marshal.dump(self.raw)
     self.generation_time = Time.now - t0
     self.save
