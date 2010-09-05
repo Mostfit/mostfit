@@ -41,6 +41,7 @@ class Payments < Application
       @payment.client = @client if @client
       @payment.created_by = session.user
       success = @payment.save
+      @loan.update_history if success
     end
     
     if success  # true if saved

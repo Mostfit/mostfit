@@ -82,6 +82,7 @@ module DataEntry
         payment[:created_by] = session.user
         @payment = Payment.new(payment)
         succes = @payment.save
+        @loan.update_history if succes
       end
       if succes  # true if saved
         if params[:format]=='xml'
