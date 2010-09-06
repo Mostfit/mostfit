@@ -82,16 +82,14 @@ class StaffMembers < Application
     raise NotFound unless @staff_member
     @date = params[:date] ? parse_date(params[:date]): Date.today
     @date = @date.holiday_bump
-    center_ids = Loan.all(
-            :scheduled_disbursal_date.gte => @date,
-            :scheduled_disbursal_date.lte => @date
-    ).map{|x| x.client.center_id}.uniq
+    center_ids = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil).map{|x| x.client.center_id}.uniq
     @centers = @staff_member.centers(:id => center_ids).sort_by{|x| x.name}
     #debugger
     if params[:format] == "pdf"
+      #some problem not working as of now
       generate_pdf
-      send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id} #{@date.strftime('%Y_%m_%d')}.pdf"), 
-      :filename => "#{Merb.root}/public/pdfs/staff_#{@staff_member.id} #{@date.strftime('%Y_%m_%d')}.pdf")
+      send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf"), 
+      :filename => "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
     else
       display @centers
     end
