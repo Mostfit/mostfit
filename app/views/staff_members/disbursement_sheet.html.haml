@@ -1,0 +1,72 @@
+%div{:style => "width:30%; float: right; padding: 10px; border: solid 1px lightgrey"}
+  =form_for(@staff_member, :action => url(:disbursement_sheet, @staff_member), :method => :get) do
+    Change date
+    = date_select "date", @date
+    =submit "Go"
+    - all_centers = @staff_member.centers
+    -if all_centers.length>0
+      = link_to 'previous day', url(:disbursement_sheet, :date => Loan.all(:scheduled_disbursal_date.lt => @date).max(:scheduled_disbursal_date))
+      = link_to 'next day', url(:disbursement_sheet, :date => Loan.all(:scheduled_disbursal_date.gt => @date).min(:scheduled_disbursal_date)), :style => "padding-left: 120px;"
+%h1 
+  Daily Disbursement Sheet for 
+  = @staff_member.name
+  for 
+  = @date
+%p
+  - if @centers.count > 0
+    = link_to "Download pdf >>", url(:disbursement_sheet_with_format, :format => "pdf", :date => @date.strftime("%Y-%m-%d")), :style => "float: left; margin-left: 25px", :class => "button"
+  - else
+    %b
+      This Staff Manager has no disbursement today.
+%br
+%br
+- @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each do |center|
+  %h2
+    = center.name
+    (
+    = center.code
+    ) at 
+    = "#{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}"
+  = #partial "centers/payments", {:clients => center.clients, :branch => center.branch, :center => center, :date => @date, :loans => center.loans}
+  - clients = center.clients
+  - loans_to_disburse = clients.loans(:scheduled_disbursal_date => @date)
+  - if clients.count > 0 and loans_to_disburse.count > 0
+    - tot_disbursement = 0
+    %table.report.nojs{ :width => '100%' }
+      %tr
+        %thead
+          %th
+            Client Name
+          %th
+            Spouse Name
+          %th
+            Loan Product
+          %th
+            Amount
+          %th
+            First Payment
+      - loans_to_disburse.each do |loan|
+        - tot_disbursement += loan.amount
+        %tr
+          %td 
+            = loan.client.name
+          %td
+            = loan.client.spouse_name
+          %td
+            %b
+              = loan.type
+          %td 
+            = loan.amount
+          %td
+            = loan.scheduled_first_payment_date
+      %tr{ :style => 'border-bottom: 2px solid;font-weight: bold;border-top: solid 1px #aaa;' }
+        %td{ :colspan => 3 }
+          Total Disbursement
+        %td
+          = tot_disbursement
+      %tfoot    
+        %tr
+          %td{ :colspan => 5 }
+  - else
+    No disbursements today
+  %hr
