@@ -49,15 +49,22 @@ class Fee
     return [[min_amount || 0 , (percentage ? percentage * loan.amount : 0)].max, max_amount || (1.0/0)].min
   end
   
-  def self.applicable(loan_ids)    
-    loan_ids = loan_ids.length>0 ? loan_ids.join(",") : "NULL"
+  def self.applicable(loan_ids, hash = {})
+    if loan_ids == :all
+      query    = " AND l.disbursal_date is not NULL"
+      query   += " AND l.disbursal_date<='#{hash[:date].strftime('%Y-%m-%d')}'" if hash[:date]
+    else
+      loan_ids = loan_ids.length>0 ? loan_ids.join(",") : "NULL"
+      query    = "AND l.id IN (#{loan_ids})"
+    end
+
     payables = Fee.properties[:payable_on].type.flag_map
     applicables = repository.adapter.query(%Q{
                                 SELECT l.id loan_id, l.client_id client_id, 
                                        SUM(if(f.amount>0, convert(f.amount, decimal), convert(l.amount*f.percentage, decimal))) fees_applicable, 
                                        f.payable_on payable_on                                       
                                 FROM loan_products lp, fee_loan_products flp, fees f, loans l 
-                                WHERE flp.fee_id=f.id AND flp.loan_product_id=lp.id AND lp.id=l.loan_product_id AND l.id IN (#{loan_ids}) GROUP BY l.id;})
+                                WHERE flp.fee_id=f.id AND flp.loan_product_id=lp.id AND lp.id=l.loan_product_id #{query} GROUP BY l.id;})
     fees = []
     applicables.each{|fee|
       if payables[fee.payable_on]==:loan_installment_dates
@@ -91,6 +98,12 @@ class Fee
       fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable.to_i : 0), paid, (applicable ? applicable.fees_applicable : 0) - paid)
     }
     fees
+  end
+
+  def self.overdue(date=Date.today)
+    fees = self.applicable(:all, :date => date).map{|app| [app.loan_id, app.fees_applicable.to_i]}.to_hash
+    paid = Payment.all(:type => :fees, :loan_id.not => nil, :received_on.lte => date).aggregate(:loan_id, :amount.sum).to_hash
+    (fees - paid).reject{|lid, a| a<=0}
   end
 
    # faster compilation of fee collected for/by a given obj. This obj can be a branch, center, area, region or staff member
