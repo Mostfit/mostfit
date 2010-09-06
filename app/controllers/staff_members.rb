@@ -87,9 +87,9 @@ class StaffMembers < Application
     #debugger
     if params[:format] == "pdf"
       #some problem not working as of now
-      generate_pdf
-      send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf"), 
-      :filename => "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
+      filename = "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_disbursement_#{@date.strftime('%Y_%m_%d')}.pdf"
+      generate_disbursement_pdf(filename)
+      send_data(File.read(filename), :filename => filename)
     else
       display @centers
     end

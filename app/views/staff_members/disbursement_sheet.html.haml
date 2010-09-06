@@ -14,7 +14,7 @@
   = @date
 %p
   - if @centers.count > 0
-    = link_to "Download pdf >>", url(:day_sheet_with_format, :format => "pdf", :date => @date.strftime("%Y-%m-%d")), :style => "float: left; margin-left: 25px", :class => "button" #since day sheet contains disbursement as well as collection so print it
+    = link_to "Download pdf >>", url(:disbursement_sheet_with_format, :format => "pdf", :date => @date.strftime("%Y-%m-%d")), :style => "float: left; margin-left: 25px", :class => "button" #since day sheet contains disbursement as well as collection so print it
   - else
     %b
       This Staff Manager has no disbursement today.
