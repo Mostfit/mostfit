@@ -3,7 +3,7 @@ module Pdf
     def generate_pdf
       pdf = PDF::Writer.new(:orientation => :landscape)
       pdf.select_font "Times-Roman"
-      pdf.text "Day sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
+      pdf.text "Daily Collection Sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
       pdf.text("\n")
       days_absent = Attendance.all(:status => "absent", :center => @centers).aggregate(:client_id, :all.count).to_hash
       @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each_with_index{|center, idx|
