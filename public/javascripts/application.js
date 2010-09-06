@@ -307,11 +307,12 @@ function attachRulesFormEvents(type, id) {//type = {"condition", "precondition"}
   if(id == 0) {
     $("#select_0"/*name of the model*/).change(function() {
 	  	  $.ajax({
-		  	url: "/search/get?counter=1"+"&type="+type+"&"+"model[1]="+document.getElementById("select_0").value,
+		  	url: "/rules/get?id=1"+"&type="+type+"&for="+document.getElementById("select_0").value+"&condition_id=1",
 			  success: function(data){
             //alert("line 291");
-            $("#"+type+"_select_1").html(data);
+            $("#"+type+"_select_1").replaceWith(data);
             cleanUpFields(type,1);
+            attachRulesFormEvents(type,1);
 			    }
   		    });
         });
