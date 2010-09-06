@@ -91,7 +91,7 @@ module Pdf
         table.render_on(pdf)
         
         #draw table for scheduled disbursals
-        loans_to_disburse = center.clients.loans(:disbursal_date => @date)
+        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => @date)
         if center.clients.count>0 and loans_to_disburse.count > 0
           table = PDF::SimpleTable.new
           table.data = []
@@ -212,7 +212,7 @@ module Pdf
 #        table.render_on(pdf)
 #        
         #draw table for scheduled disbursals
-        loans_to_disburse = center.clients.loans(:disbursal_date => @date)
+        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => @date)
         if center.clients.count>0 and loans_to_disburse.count > 0
           table = PDF::SimpleTable.new
           table.data = []
