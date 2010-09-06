@@ -77,7 +77,7 @@
     %li#trail History
     %li#documents Documents
     %li#insurance Insurance
-    %li#payments Payments
+    %li#payments Repayments
     %li#attendance Attendance
   %div.tab
     %h2== Loans for client <i>#{@client.name}</i>
@@ -144,7 +144,7 @@
                   - if loan.payments.empty?
                     nothing repaid yet
                   - else
-                    last payment on
+                    last repayment on
                     = loan.payments.last(:order => [:received_on]).received_on
                   
             %td
@@ -152,7 +152,7 @@
               &nbsp;|&nbsp;
               = link_to 'edit', url_for_loan(loan, 'edit')
               &nbsp;|&nbsp;
-              = link_to 'record payment', url_for_loan(loan, "payments/new")
+              = link_to 'record repayment', url_for_loan(loan, "payments/new")
     
         %tfoot
           %tr
