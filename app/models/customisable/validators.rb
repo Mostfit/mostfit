@@ -21,9 +21,24 @@ module Misfit
       end
     end
 
-    def other_validation
-      return [false, "other validation failed"]
+    def fees_applicable_to_loan_paid_before_first_payment?
+      if self.loan and (type==:principal or type==:interest) and loan.payments(:type => [:principal, :interest]).count==0
+        if not loan.fees_paid?
+          return [false, "All fees applicable to this loan are not paid yet"] 
+        end
+      end
+      return true
     end
+
+    def fees_applicable_to_client_paid_before_first_payment?
+      if self.loan and (type==:principal or type==:interest) and loan.payments(:type => [:principal, :interest]).count==0
+        if not loan.client.fees_paid?
+          return [false, "All fees applicable to this client are not paid yet"]
+        end
+      end
+      return true
+    end
+
   end    #PaymentValidators
 
   module LoanValidators
@@ -65,6 +80,13 @@ module Misfit
       return [false, "Client does not have an insurance"] if client.insurance_policies.nil? or client.insurance_policies.length==0
       return [false, "Insurance is not valid anymore"]    if client.insurance_policies.sort_by{|x| x.date_to}.last.date_to <= self.applied_on
       return [false, "Insurance is not active"]           if not client.insurance_policies.collect{|x| x.status}.include?(:active)
+      return true
+    end
+
+    def client_fee_should_be_paid
+      if self.new? and not client.fees_paid?
+        return [false, "All fees applicable to this client are not paid yet"]
+      end
       return true
     end
 

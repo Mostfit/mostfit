@@ -81,7 +81,17 @@ module DataEntry
       else
         payment[:created_by] = session.user
         @payment = Payment.new(payment)
+        if payment[:type]=="fees" and @payment.received_on
+          obj = @loan || @client
+          if fee = obj.fees_payable_on[@payment.received_on]
+            @payment.fee = fee
+          else
+            fees = obj.fee_schedule.reject{|d, f| d>@payment.received_on}.values.collect{|x| x.keys}.flatten - obj.fee_payments.values.collect{|x| x.keys}.flatten
+            @payment.fee = fees.first if fees and fees.length>0
+          end
+        end
         succes = @payment.save
+        @loan.update_history if succes
       end
       if succes  # true if saved
         if params[:format]=='xml'

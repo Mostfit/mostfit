@@ -70,7 +70,7 @@ class Loans < Application
     @loan = klass.get(id)
     raise NotFound unless @loan
     disallow_updation_of_verified_loans
-    @loan.update_attributes(attrs)
+    @loan.attributes = attrs
     @loan_product = @loan.loan_product
 
     if @loan.save or @loan.errors.length==0

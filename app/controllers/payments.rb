@@ -24,11 +24,11 @@ class Payments < Application
   end
 
   def create(payment)
-    raise NotFound unless @loan
+    raise NotFound unless (@loan or @client)
       
     amounts = payment[:amount].to_i
     receiving_staff = StaffMember.get(payment[:received_by_staff_id])
-    if payment[:type] == "total"
+    if payment[:type] == "total" and @loan
     # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
       success, @prin, @int, @fees = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff, false, params[:style].to_sym)
       @payment = Payment.new
@@ -40,11 +40,22 @@ class Payments < Application
       @payment.loan = @loan if @loan
       @payment.client = @client if @client
       @payment.created_by = session.user
+      @payment.received_on = payment[:received_on]
+      if payment[:type]=="fees" and @payment.received_on
+        obj = @loan || @client
+        if fee = obj.fees_payable_on[@payment.received_on]
+          @payment.fee = fee
+        else
+          fees = obj.fee_schedule.reject{|d, f| d>@payment.received_on}.values.collect{|x| x.keys}.flatten - obj.fee_payments.values.collect{|x| x.keys}.flatten
+          @payment.fee = fees.first if fees and fees.length>0
+        end
+      end
       success = @payment.save
+      @loan.update_history if success and @loan
     end
     
     if success  # true if saved
-      redirect url_for_loan(@loan), :message => {:notice => "Payment of ##{@payment.id} has been registered"}
+      redirect url_for_loan(@loan||@client), :message => {:notice => "Payment of ##{@payment.id} has been registered"}
     else
       render :new
     end
