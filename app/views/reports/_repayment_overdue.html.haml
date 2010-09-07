@@ -42,12 +42,12 @@
               %tr.group
                 %td
                   = client
-                - loan.each_with_index do |d, idx|
+                - loan[1..-1].each_with_index do |d, idx|
                   %td
                     = d.to_currency
-                - center_total << [loan[0], loan[1], loan[2], loan[3].to_i, (loan[1] + loan[2] + loan[3]).to_i]
+                - center_total << [loan[1], loan[2], loan[3], loan[4].to_i, (loan[2] + loan[3] + loan[4]).to_i]
                 %td
-                  = (loan[1] + loan[2] + loan[3]).to_currency
+                  = (loan[2] + loan[3] + loan[4]).to_currency
           %tr.center_total
             %td
               %b==Center total:
