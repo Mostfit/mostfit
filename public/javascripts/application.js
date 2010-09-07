@@ -480,7 +480,6 @@ $(document).ready(function(){
 		});
 	  }
 	if($("table.report").length>0){
-	  alert("applying freeze");
 	  $('.report').floatHeader({
 	    fadeIn: 250,
 	    fadeOut: 250,
