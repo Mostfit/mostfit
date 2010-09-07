@@ -19,8 +19,8 @@ class RepaymentOverdue < Report
 
   def generate
     data, clients, loans, hash = {}, {}, {}, {}
-    hash[:branch_id] = @branch_id if @branch_id
-    hash[:center_id] = @center_id if @center_id    
+    hash[:branch_id] = @branch.map{|x| x.id}
+    hash[:center_id] = @center.map{|x| x.id}
     hash[:loan_product_id] = self.loan_product_id  if self.loan_product_id        
     histories = LoanHistory.defaulted_loan_info_by(:loan, @date, hash, ["branch_id", "center_id", "client_id"])
 
@@ -41,7 +41,7 @@ class RepaymentOverdue < Report
     
     fees_due = Fee.overdue(@date)
     fees_due_loans = Loan.all(:id => fees_due.keys) if fees_due.length>0
-    debugger
+
     fees_due.each{|loan_id, amount|
       next unless loans.key?(loan_id)
       client = fees_due_loans.find{|x| x.id==loan_id}.client

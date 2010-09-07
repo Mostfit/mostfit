@@ -120,7 +120,7 @@ class LoanHistory
                 #{selects.uniq.join(',')}
          FROM loan_history 
          WHERE actual_outstanding_principal > scheduled_outstanding_principal AND actual_outstanding_total > scheduled_outstanding_total
-               AND (loan_id, date) in (#{ids})
+               AND (loan_id, date) in (#{ids}) AND status in (5,6)
          GROUP BY #{group_by}_id;})
   end
   
@@ -157,21 +157,16 @@ class LoanHistory
                };
     end
       
-    rows=repository.adapter.query(%Q{
-                                 SELECT lh.loan_id loan_id, max(lh.date) date
-                                 FROM loan_history lh
-                                 WHERE lh.status in (5,6,7,8) AND lh.date<='#{date.strftime('%Y-%m-%d')}' AND #{query}
-                                 GROUP BY lh.loan_id
-                                 }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")    
+    rows = get_latest_rows_of_loans(date, query)
     # these are the loan history lines which represent the last line before @date
     return nil if rows.length == 0
 
     # These are the lines from the loan history
     query = %Q{
       SELECT #{select}
-      FROM loan_history lh, loans l
-      WHERE lh.loan_id=l.id AND (lh.loan_id, lh.date) IN (#{rows}) AND lh.status in (5,6)
-            AND l.deleted_at is NULL}
+      FROM loan_history lh
+      WHERE (lh.loan_id, lh.date) IN (#{rows}) AND lh.status in (5,6) 
+            AND actual_outstanding_principal > scheduled_outstanding_principal AND actual_outstanding_total > scheduled_outstanding_total}
     type==:listing ? repository.adapter.query(query) : repository.adapter.query(query).first
   end
 
