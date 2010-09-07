@@ -145,7 +145,7 @@ module Pdf
                               "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date
                             })
           end
-          table.column_order  = ["name", "group", "amount", "loan product", "first payment"]
+          table.column_order  = ["name", "group", "amount", "loan product", "first payment", "attendance"]
           table.show_lines    = :all
           table.shade_rows    = :none
           table.show_headings = true          
