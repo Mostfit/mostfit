@@ -1,11 +1,15 @@
 class Reports < Application
   include DateParser
-  Types = [
-           DailyReport, ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, TransactionLedger, ProjectedReport,
-           LoanSanctionRegister, LoanDisbursementRegister, ScheduledDisbursementRegister, LateDisbursalsReport, LoanSizePerManagerReport, ClaimReport, 
-           TargetReport, LoanPurposeReport, ClientOccupationReport, DelinquentLoanReport, ParByCenterReport, ClientAbsenteeismReport, 
-           GeneralLedgerReport, TrialBalanceReport
-          ]
+  Types = {
+    :periodic     => [DailyReport, WeeklyReport], 
+    :consolidated => [ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport], 
+    :registers    => [TransactionLedger, LoanSanctionRegister, LoanDisbursementRegister, ScheduledDisbursementRegister, ClaimReport], 
+    :targets_and_projections  => [ProjectedReport, TargetReport],
+    :statistics   => [LoanSizePerManagerReport, LoanPurposeReport, ClientOccupationReport], 
+    :exceptions   => [RepaymentOverdue, LateDisbursalsReport, DelinquentLoanReport, ParByCenterReport, ClientAbsenteeismReport, DuplicateClientsReport],
+    :accounting   => [GeneralLedgerReport, TrialBalanceReport]
+  }
+  Order = [:periodic, :consolidated, :registers, :targets_and_projections, :statistics, :exceptions, :accounting]
   layout :determine_layout 
 
   # provides :xml, :yaml, :js
@@ -24,7 +28,7 @@ class Reports < Application
 
     if @report
       display @report
-    elsif Reports::Types.include?(klass)
+    elsif Reports::Types.values.flatten.include?(klass) and not klass==WeeklyReport and not klass==DuplicateClientsReport
       #Generating report
       @report   = klass.new(params[class_key], dates, session.user)
       if not params[:submit]
@@ -32,9 +36,6 @@ class Reports < Application
       elsif klass == TransactionLedger
         @groups, @centers, @branches, @payments, @clients = @report.generate
         display [@groups, @centers, @branches, @payments, @clients]
-      elsif [LoanSanctionRegister].include?(klass)
-        @groups, @centers, @branches, @loans, @loan_products = @report.generate
-        display [@groups, @centers, @branches, @loans, @loan_products]
       else        
         case @report.method(:generate).arity
         when 0

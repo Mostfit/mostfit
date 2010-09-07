@@ -109,17 +109,19 @@ class LoanHistory
                WHERE actual_outstanding_principal != scheduled_outstanding_principal and date < now()) as dt group by loan_id having diff < #{days}) as dt1;})
   end
 
-  def self.defaulted_loan_info_by(group_by, date = Date.today, query ={})
+  def self.defaulted_loan_info_by(group_by, date = Date.today, query={}, selects=[])
     # this does not work as expected if the loan is repaid and goes back into default within the days we are looking at it.
+    selects << "#{group_by}_id"
+    ids  = get_latest_rows_of_loans(date, query)
+    return false if ids.length==0
     repository.adapter.query(%Q{
-         SELECT sum(pdiff) principal, sum(tdiff) total FROM
-         (SELECT actual_outstanding_principal - scheduled_outstanding_principal as pdiff, 
-                actual_outstanding_total - scheduled_outstanding_total as tdiff,
-                #{group_by}_id
+         SELECT actual_outstanding_principal - scheduled_outstanding_principal as pdiff, 
+                actual_outstanding_total - scheduled_outstanding_total as tdiff, 
+                #{selects.uniq.join(',')}
          FROM loan_history 
-         WHERE actual_outstanding_principal != scheduled_outstanding_principal 
-         AND current=1
-         AND date <= '#{date.strftime("%Y-%m-%d")}') as dt WHERE pdiff>0 AND tdiff>0  GROUP BY #{group_by}_id;})
+         WHERE actual_outstanding_principal > scheduled_outstanding_principal AND actual_outstanding_total > scheduled_outstanding_total
+               AND (loan_id, date) in (#{ids}) AND status in (5,6)
+         GROUP BY #{group_by}_id;})
   end
   
   def self.defaulted_loan_info_for(obj, date=Date.today, days=nil, type=:aggregate)
@@ -137,15 +139,17 @@ class LoanHistory
       ids = Loan.all(:fields => [:id], :disbursed_by_staff_id => obj.id).map{|x| x.id}
       ids = (ids.length==0 ? "NULL" : ids.join(","))
       query = "loan_id in (#{ids})"
+    elsif obj == Mfi
+      query = "1"
     end
 
     query+=" AND days_overdue<=#{days}" if days
 
     # either we list or we aggregate depending on type
     if type==:listing
-      select = %Q{
-                   loan_id, branch_id, center_id, client_group_id, client_id, amount_in_default, days_overdue as late_by, 
-                   actual_outstanding_total-scheduled_outstanding_total total_due, actual_outstanding_principal-scheduled_outstanding_principal principal_due
+      select=%Q{
+                 lh.loan_id, lh.branch_id, lh.center_id, lh.client_group_id, lh.client_id, lh.amount_in_default, lh.days_overdue as late_by, 
+                 lh.actual_outstanding_total-lh.scheduled_outstanding_total total_due, lh.actual_outstanding_principal-lh.scheduled_outstanding_principal principal_due
                };
     else
       select = %Q{
@@ -153,28 +157,17 @@ class LoanHistory
                };
     end
       
-    ids=repository.adapter.query(%Q{
-                                 SELECT lh.loan_id loan_id, max(lh.date) date
-                                 FROM loan_history lh
-                                 WHERE lh.status in (5,6,7,8) AND lh.date<='#{date.strftime('%Y-%m-%d')}' AND #{query}
-                                 GROUP BY lh.loan_id
-                                 }).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")    
+    rows = get_latest_rows_of_loans(date, query)
     # these are the loan history lines which represent the last line before @date
-    return nil if ids.length == 0
-    rows = repository.adapter.query(%Q{
-      SELECT loan_id,max(date)
-      FROM loan_history
-      WHERE amount_in_default > 0 and status in (5,6,7,8) and (loan_id, date) in (#{ids})
-      GROUP BY loan_id})
-    return nil if rows and rows.length==0
+    return nil if rows.length == 0
 
     # These are the lines from the loan history
     query = %Q{
       SELECT #{select}
-      FROM loan_history
-      WHERE (loan_id,date) IN (#{rows.map{|x| "(#{x[0]}, '#{x[1].strftime("%Y-%m-%d")}')"}.join(',')})
-      ORDER BY branch_id, center_id}
-    repository.adapter.query(query).first
+      FROM loan_history lh
+      WHERE (lh.loan_id, lh.date) IN (#{rows}) AND lh.status in (5,6) 
+            AND actual_outstanding_principal > scheduled_outstanding_principal AND actual_outstanding_total > scheduled_outstanding_total}
+    type==:listing ? repository.adapter.query(query) : repository.adapter.query(query).first
   end
 
   # TODO: subsitute the body of this function with sum_outstanding_grouped_by
@@ -516,4 +509,24 @@ class LoanHistory
     end
     conditions
   end
+
+  private
+  def self.get_latest_rows_of_loans(date = Date.today, query="1")
+    query = query.to_a.map{|k, v| 
+      if v.is_a?(Array)
+        "lh.#{k} in (#{v.join(", ")})"
+      else
+        "lh.#{k}=#{v}"
+      end
+    }.join(" AND ") if query.is_a?(Hash)
+    query = "1" if query == ""
+    repository.adapter.query(%Q{
+                                 SELECT lh.loan_id loan_id, max(lh.date) mdate
+                                 FROM loan_history lh, loans l
+                                 WHERE lh.status in (5,6,7,8) AND lh.date<='#{date.strftime('%Y-%m-%d')}' AND l.id=lh.loan_id AND l.deleted_at is NULL 
+                                       AND #{query}
+                                 GROUP BY lh.loan_id
+                                 }).collect{|x| "(#{x.loan_id}, '#{x.mdate.strftime('%Y-%m-%d')}')"}.join(",")    
+  end
+
 end
