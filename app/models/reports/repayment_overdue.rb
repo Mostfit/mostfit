@@ -45,7 +45,7 @@ class RepaymentOverdue < Report
       client = fees_due_loans.find{|x| x.id==loan_id}.client
       center = client.center
       branch = center.branch
-      if data[branch][center][client.name]
+      if data[branch][center][client.name] and data[branch][center][client.name].length>0
         data[branch][center][client.name][3]+=amount
       else
         data[branch][center][client.name] = [[loans[loan_id], 0, 0 , amount]]
