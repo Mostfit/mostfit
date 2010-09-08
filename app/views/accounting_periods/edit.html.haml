@@ -1,0 +1,15 @@
+%h1
+  AccountingPeriods controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/accounting_periods/edit.html.erb
+= error_messages_for @accounting_period
+
+= form_for(@accounting_period, :action => url(:accounting_period, @accounting_period)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:accounting_period, @accounting_period)
+|
+= link_to 'Back', url(:accounting_periods)

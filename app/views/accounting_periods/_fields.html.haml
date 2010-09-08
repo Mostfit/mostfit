@@ -1,0 +1,10 @@
+%table.form
+  %tr
+    %td
+      Begin date 
+    %td
+      = date_select_for @accounting_period, :begin_date, :nullable => false, :min_date => Date.today-365, :max_date => Date.today+365
+    %td
+      End date 
+    %td
+      = date_select_for @accounting_period, :end_date, :nullable => false, :min_date => Date.today-365, :max_date => Date.today+(2*365)

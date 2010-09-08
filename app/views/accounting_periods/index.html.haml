@@ -1,0 +1,16 @@
+%h1
+  AccountingPeriods controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/accounting_periods/index.html.erb
+%table
+  %tr
+  - for accounting_period in @accounting_periods
+    %tr
+      %td
+        = link_to 'Show', url(:accounting_period, accounting_period)
+      %td
+        = link_to 'Edit', url(:edit_accounting_period,  accounting_period)
+
+= link_to 'New', url(:new_accounting_period)
