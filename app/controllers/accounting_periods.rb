@@ -2,7 +2,7 @@ class AccountingPeriods < Application
   # provides :xml, :yaml, :js
 
   def index
-    @accounting_periods = AccountingPeriod.all
+    @accounting_periods = AccountingPeriod.all(:order => [:begin_date.asc])
     display @accounting_periods
   end
 
@@ -27,9 +27,9 @@ class AccountingPeriods < Application
 
   def create(accounting_period)
     @accounting_period = AccountingPeriod.new(accounting_period)
-    @accounting_period.created_by_user_id = session.user
+    @accounting_period.created_by_user_id = session.user.id
     if @accounting_period.save
-      redirect resource(@accounting_period), :message => {:notice => "AccountingPeriod was successfully created"}
+      redirect resource(:accounting_periods), :message => {:notice => "AccountingPeriod was successfully created"}
     else
       message[:error] = "AccountingPeriod failed to be created"
       render :new
@@ -40,7 +40,7 @@ class AccountingPeriods < Application
     @accounting_period = AccountingPeriod.get(id)
     raise NotFound unless @accounting_period
     if @accounting_period.update(accounting_period)
-       redirect resource(@accounting_period)
+       redirect resource(:accounting_periods)
     else
       display @accounting_period, :edit
     end

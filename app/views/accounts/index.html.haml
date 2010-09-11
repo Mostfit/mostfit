@@ -1,14 +1,16 @@
 %h1  Manage Book Keeping
 %div
-  = link_to 'Manage Account Type',url(:account_types) 
+  = link_to 'Manage Accounting Periods', url(:accounting_periods)
+  |
+  = link_to 'Manage Account Type', url(:account_types)
   |
   = link_to 'New Account', url(:new_account)
   |
   = link_to 'Manage Accounting Rule', url(:rule_books)
   |
-  = link_to_with_rights 'Create a new Journal', resource(:journals, :new)
+  = link_to_with_rights 'Create a new voucher', resource(:journals, :new)
   | 
-  = link_to_with_rights 'View Recent Journal Entries', resource(:journals)
+  = link_to_with_rights 'View recent journal entries', resource(:journals)
 
 
 
