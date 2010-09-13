@@ -57,16 +57,16 @@
                 = ins
                 - tot_installments += ins
               %td.number
-                - p = lh.nil? ? 0 : [lh.principal_due, 0].max.round(2)
-                = p.to_currency
+                - p = lh.nil? ? 0 : [lh.principal_due, 0].max
+                = p.round(2)
                 - tot_principal += p
               %td.number
-                - i = lh.nil? ? 0 : [lh.interest_due,0].max.round(2)
-                = i.to_currency
+                - i = lh.nil? ? 0 : [lh.interest_due,0].max
+                = i.round(2)
                 - tot_interest += i
               %td.number
                 - a = p + i
-                = a.to_currency
+                = a.round(2)
                 - tot_total += a
               %td.number
                 = text_field :name => "paid[loan][#{loan.id}]", :value => [a,0].max.round(2), :cols => "5", :style => "width:50px;" 
