@@ -52,7 +52,7 @@
           %td
             =loan.created_by_user_id and loan.created_by_user_id>0 ? client.created_by.login : "-"
           %td
-            =loan.created_at ? loan.created_at.strftime($globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y") : ""
+            =loan.created_at ? loan.created_at.strftime(Mfi.first.date_format || "%d-%m-%Y") : ""
           %td
             =check_box(:name => "loans[#{loan.id}][]", :class => "loan_approval_box", :value => 1)
       %tr

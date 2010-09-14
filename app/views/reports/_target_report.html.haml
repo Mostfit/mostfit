@@ -22,7 +22,7 @@
   - @data.each do |target|
     %tr
       %td
-        =target.created_at.strftime($globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y")
+        =target.created_at.strftime(Mfi.first.date_format || "%d-%m-%Y")
       %td
         =target.type.to_s.camelcase(' ')
       %td

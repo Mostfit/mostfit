@@ -23,7 +23,7 @@ class Admin < Application
   end
   
   def edit
-    @mfi  = Mfi.new($globals ? $globals[:mfi_details] : {})
+    @mfi  = Mfi.first
     render
   end
   

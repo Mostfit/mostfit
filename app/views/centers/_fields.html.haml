@@ -32,7 +32,7 @@
   %div#hidden{:style => "display: none"}
     - unless @center.new?
       change effective from:  
-      = date_select_for @center, :meeting_day_change_date
+      = date_select_for @center, :meeting_day_change_date, :min_date => @center.creation_date||Date.min_date, :max_date => Date.max_date
 %p
   %label{:for =>""}Managed by:
   - if not @center.new? and session.user.staff_member==@center.manager

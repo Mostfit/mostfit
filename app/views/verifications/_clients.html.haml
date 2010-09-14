@@ -43,7 +43,7 @@
           %td
             =client.created_by_user_id>0 ? client.created_by.login : "-"
           %td
-            =client.created_at ? client.created_at.strftime($globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y") : ""
+            =client.created_at ? client.created_at.strftime(Mfi.first.date_format || "%d-%m-%Y") : ""
           %td
             =check_box(:name => "clients[#{client.id}][]", :class => "client_approval_box", :value => 1)
       %tr

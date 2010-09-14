@@ -10,11 +10,15 @@
 
   - if not @errors.blank?
     .error
-      - @errors.each do |error|
-        == Loan <b>#{error.resource.class == Payment ? error.resource.loan.id : error.resource.id} :</b>
-        = error.values.join("*")
-        %br
-
+      - if @errors.is_a?(Hash)
+        - @errors.each do |error|
+          == Loan <b>#{error.resource.class == Payment ? error.resource.loan.id : error.resource.id} :</b>
+          = error.values.join("*")
+          %br
+      - else
+        - @errors.each do |error|
+          = error
+          %br        
   %a{ :name => 'weeksheet' }
   %table.narrow.form{:style => "width: 100%"}
     %tr.odd

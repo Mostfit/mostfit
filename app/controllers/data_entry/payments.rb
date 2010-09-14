@@ -28,8 +28,13 @@ module DataEntry
       end
 
       if request.method == :post
-        bulk_payments_and_disbursals
-        mark_attendance
+        if Date.min_transaction_date > @date or Date.max_transaction_date < @date
+          @errors = ["Transactions attempted are outside allowed dates"]
+        else
+          bulk_payments_and_disbursals
+          mark_attendance
+        end
+
         if @errors.blank?
           notice = 'All payments made succesfully'
           return_url = params[:return]||url(:data_entry)

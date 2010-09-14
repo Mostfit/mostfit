@@ -1,6 +1,6 @@
 - demo_uri = url(:branches)
--if $globals and $globals[:mfi_details] and $globals[:mfi_details][:main_text] and $globals[:mfi_details][:main_text].strip.length>5
-  =$globals[:mfi_details][:main_text]
+-if Mfi.first.main_text.length>3
+  =Mfi.first.main_text
 - else
   %div{ :style => 'float: right; text-align: center;' }
     %a{ :href => 'http://intellecap.net', :title => 'respect to the sole patron of mostfit' }
