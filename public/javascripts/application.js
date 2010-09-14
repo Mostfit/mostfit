@@ -407,7 +407,7 @@ function createVariableSelectionDiv(type, id, condition_id, variable_id) {
   //id will be the id of new select field to be inserted
   div_id = type[0]+condition_id+"v"+variable_id;
   if($("#"+div_id).length == 0) {//div does not exist
-    alert("creating new div:"+div_id);
+    //alert("creating new div:"+div_id);
     div1 = document.createElement('div');
     div1.id = div_id;
     last_accessed_id = id;
@@ -417,6 +417,10 @@ function createVariableSelectionDiv(type, id, condition_id, variable_id) {
     div1.innerHTML = "";
     div1.appendChild(new_select);
     div1.innerHTML += "<a onClick=\"javascript:this.parentNode.style.display='none';fillVariableField('"+type+"',"+condition_id+", "+variable_id+");\"><b>Done</b></a>";
+    if(variable_id > 1)
+      div1.innerHTML+= " or ";
+      //alert("<a onClick=\"javascript:\$('#'+'"+type+"_"+condition_id+"_variable_"+variable_id+"').attr('value','nil');\">Set it Nil</a>");
+       div1.innerHTML += "<a onClick=\"javascript:\$('#'+'"+type+"_"+condition_id+"_variable_"+variable_id+"').attr('value','nil');\">Set it Nil</a>";     
     div1.style.display = "none";
     document.getElementById(type[0]+condition_id).appendChild(div1);
 
@@ -466,7 +470,7 @@ function fillVariableField(type, condition_id, variable_id) {
       "&variable_id="+variable_id+
       "&return_only_models=false"
   ,success: function(data) {
-      alert("cleaning up from"+id);
+      //alert("cleaning up from"+id);
       //alert("11#"+type+"_"+condition_id+"_variable_"+(Number(variable_id)+1));
       cleanUpFields(type,id);
       $("#"+type+"_"+condition_id+"_variable_"+(Number(variable_id)+1)).remove();
