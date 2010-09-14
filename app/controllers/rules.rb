@@ -87,11 +87,21 @@ class Rules < Application
 
     model, key_type = Condition.get_model(params[:for])
     condition_id = params[:condition_id]
+    variable_id = params[:variable_id]
+    return_only_models = params[:return_only_models]
+    if (variable_id == nil) or (condition_id == nil) or (return_only_models == nil)
+      return "problem 001"
+    end
+    condition_id = condition_id.to_i
+    variable_id = variable_id.to_i
+
 		if model #field == :select
 		#debugger
       name, field, choices = Condition.get_field_choices_and_name(params[:for])
-      name = "rule[#{type}][#{condition_id}][keys][]"
+      name = "rule[#{type}][#{condition_id}][variable][#{variable_id}][keys][]"
 			return render(select(:name => name, :id => "#{type}_select_#{id}", :class => "rules", :collection => choices), :layout => false)
+    elsif return_only_models == "true"
+      return "" #this is the situation when someone is when editing a variable
 		else
 			model = Kernel.const_get(params["prev_field".to_sym].singularize.camelcase)
 			if model == nil
@@ -103,24 +113,41 @@ class Rules < Application
 
 			collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal"]]
 			collection2 = [["equal2", "equal"], ["not2", "not equal"]]
+      collection4 = [["plus", "plus"], ["minus", "minus"]]
+      collection5 = [["minus", "minus"]] #specifically for dates
       select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection1)
       select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection2)
       select3 = select(:id => "#{type}_selectmore_#{id+2}", :name => "rule[#{type}][#{condition_id}][linking_operator]", :prompt => "Add more condition", 
                        :collection => [["and", "and"], ["or", "or"]])
+      select4 = select(:id => "#{type}_selectbinaryoperator_#{id}", :name => "rule[#{type}][#{condition_id}][binaryoperator]", :prompt => "Choose operator", :collection => collection4)
+      select5 = select(:id => "#{type}_selectbinaryoperator_#{id}", :name => "rule[#{type}][#{condition_id}][binaryoperator]", :prompt => "Choose operator", :collection => collection5)
+      next_textfield = text_field(:name => "rule[#{type}][#{condition_id}][variable][#{variable_id+1}][complete]", :value => "Variable 2", :class => "rules", :id => "#{type}_#{condition_id}_variable_#{variable_id+1}")
 
 	    if property.type==Date or property.type==DateTime
         hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id+1}", :name => type_name, 
                                         :value => "date")
-		    return select1+date_select(name , Date.today, :id => "#{type}_date_#{id+1}")+
+        if(variable_id == 1)
+  		    return select5+next_textfield
+        else
+  		    return select1+date_select(name , Date.today, :id => "#{type}_date_#{id+1}")+
           hidden_valuetype+select3
+        end
     	elsif [DataMapper::Types::Serial, Integer].include?(property.type) or ['count', 'max', 'min', 'value'].include?(params[:for])
         hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id+1}", :name => type_name, 
                                         :value => "int")
-	      return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+hidden_valuetype+select3
+        if(variable_id == 1)
+  		    return select4+next_textfield
+        else
+  	      return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+hidden_valuetype+select3
+        end
     	elsif Float == property.type
         hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id+1}", :name => type_name, 
                                         :value => "float")
-	      return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+hidden_valuetype+select3
+        if(variable_id == 1)
+  		    return select4+next_textfield
+        else
+  	      return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+hidden_valuetype+select3
+        end
     	elsif [String, DataMapper::Types::Text].include?(property.type)
 	      return select2+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+select3
   	  elsif property.class==DataMapper::Associations::ManyToOne::Relationship

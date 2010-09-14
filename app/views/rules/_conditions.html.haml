@@ -67,11 +67,17 @@
           Remove
 - else #new rule
   - if type == "condition"
-    %div.condition#c1
-      = select(:name =>"rule[#{type}][1][keys][]", :prompt => "choose \"applicable for\"", :class => "rules", :id => "#{type}_select_1")
+    %div.abstract_condition#c1
+      = text_field(:name => "rule[#{type}][1][variable][1][complete]", :value => "Variable 1", :class => "rules", :id => "#{type}_1_variable_1") #this holds the actual variable name like center.branch.count etc.
+      %div.condition#c1v1{:style => "display:none"}
+        - #c1v1 implies condition1 variable1
+        = select(:name =>"rule[#{type}][1][variable][1][keys][]", :prompt => "choose \"applicable for\"", :class => "rules", :id => "#{type}_select_1")
+        %a{:onclick => "javascript:this.parentNode.style.display='none';fillVariableField('condition',1,1);"}
+          %b Done
   - else
     %div.precondition#p1
-      = select(:name =>"rule[#{type}][1][keys][]", :prompt => "choose \"applicable for\"", :class => "rules", :id => "#{type}_select_1")
+      TODO
+      = #select(:name =>"rule[#{type}][1][keys][]", :prompt => "choose \"applicable for\"", :class => "rules", :id => "#{type}_select_1")
       %a{:onclick =>"javascript:this.parentNode.innerHTML=''"}
         Remove
 

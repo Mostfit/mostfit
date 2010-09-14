@@ -186,6 +186,7 @@ module Mostfit
   		      end
   		    end
         end
+        #generating polish notation in condition 2
         if rule[:precondition] != nil
   		    Marshal.restore(rule[:precondition]).to_a.reverse!.each do |idx, cond|
   		      if cond[:linking_operator] != ""
