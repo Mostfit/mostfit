@@ -103,11 +103,11 @@ module Misfit
                                  Date.new(2000, 01, 01)
                                end
             
-            max_allowed_date = Date.today + 1000
+            max_allowed_date = Date.today + mfi.number_of_future_days
             
-            max_allowed_transaction_date =             
+            max_allowed_transaction_date =
               if mfi.number_of_future_days
-                Date.today + mfi.number_of_future_days
+                Date.today + mfi.number_of_future_transaction_days
               else              
                 Date.today+1000
               end
