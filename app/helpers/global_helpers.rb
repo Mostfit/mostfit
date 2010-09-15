@@ -108,7 +108,7 @@ module Merb
       date = Date.today if date.blank? and not nullable
       date = nil        if date.blank? and nullable
       attrs.merge!(:date => date)
-      if TRANSACTION_MODELS.include?(klass) or TRANSACTION_MODELS.include?(klass.superclass)
+      if TRANSACTION_MODELS.include?(klass) or TRANSACTION_MODELS.include?(klass.superclass) or TRANSACTION_MODELS.include?(klass.superclass.superclass)
         attrs.merge!(:min_date => attrs[:min_date]||Date.min_transaction_date)
         attrs.merge!(:max_date => attrs[:max_date]||Date.max_transaction_date)
       else
