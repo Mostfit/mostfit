@@ -38,3 +38,6 @@ public/graph_data
 public/dashboard
 scripts
 public/browse
+spec/spec_failing_examples.txt
+spec/spec_full_report.txt
+spec/spec_report.html
