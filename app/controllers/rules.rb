@@ -89,13 +89,16 @@ class Rules < Application
     condition_id = params[:condition_id]
     variable_id = params[:variable_id]
     return_only_models = params[:return_only_models]
+    single_variable_mode = params[:single_variable_mode] #if this is 1, then we are in single veriable mode (this can be absent in which case, we assume more than one variables) - this ugly field is needed only for date since date - date should return int_selector while date - nil returns date_selector
     if (variable_id == nil) or (condition_id == nil) or (return_only_models == nil)
       return "problem 001"
     end
     condition_id = condition_id.to_i
     variable_id = variable_id.to_i
+    if single_variable_mode == nil then single_variable_mode = 0 end
+    single_variable_mode = single_variable_mode.to_i
 
-		if model #field == :select
+		if model
 		#debugger
       name, field, choices = Condition.get_field_choices_and_name(params[:for])
       name = "rule[#{type}][#{condition_id}][variable][#{variable_id}][keys][]"
@@ -128,9 +131,11 @@ class Rules < Application
                                         :value => "date")
         if(variable_id == 1)
   		    return select5+next_textfield
-        else
+        elsif single_variable_mode == 1
   		    return select1+date_select(name , Date.today, :id => "#{type}_date_#{id+1}")+
           hidden_valuetype+select3
+        elsif(variable_id>1)
+  		    return select1+text_field(:id => "#{type}_textfield_#{id+1}", :name => name)+hidden_valuetype+select3
         end
     	elsif [DataMapper::Types::Serial, Integer].include?(property.type) or ['count', 'max', 'min', 'value'].include?(params[:for])
         hidden_valuetype = hidden_field(:id => "#{type}_hidden_#{id+1}", :name => type_name, 

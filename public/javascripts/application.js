@@ -345,7 +345,6 @@ function attachRulesFormEvents(type, id) {//type = {"condition", "precondition"}
           $("#"+type+"_select_"+id).after(data);
           if(data.indexOf("<select") != -1) {
             attachRulesFormEvents(type,Number(id)+1);
-            last_accessed_id = Number(id)+1;
           }
           if(data.indexOf("selectmore_") != -1) 
             attachRulesFormEventsForSelectMoreField(type, Number(id)+3, condition_id);
@@ -410,24 +409,24 @@ function createVariableSelectionDiv(type, id, condition_id, variable_id) {
     //alert("creating new div:"+div_id);
     div1 = document.createElement('div');
     div1.id = div_id;
-    last_accessed_id = id;
     new_select = document.getElementById(type+"_select_1").cloneNode(true);
     new_select.id = type+"_select_"+(id);
     new_select.name = "rule["+type+"]["+condition_id+"][variable]["+variable_id+"][keys][]";
-    div1.innerHTML = "";
+    if(variable_id>1) {
+      nilOption = document.createElement("option");
+      nilOption.value = "nil";
+      nilOption.appendChild(document.createTextNode("nil"));
+      new_select.appendChild(nilOption);
+    }
+    div1.innerHTML = "<b>Condition "+condition_id+" Variable "+variable_id+"</b>";
     div1.appendChild(new_select);
     div1.innerHTML += "<a onClick=\"javascript:this.parentNode.style.display='none';fillVariableField('"+type+"',"+condition_id+", "+variable_id+");\"><b>Done</b></a>";
-    if(variable_id > 1)
+/*    if(variable_id > 1)
       div1.innerHTML+= " or ";
-      //alert("<a onClick=\"javascript:\$('#'+'"+type+"_"+condition_id+"_variable_"+variable_id+"').attr('value','nil');\">Set it Nil</a>");
        div1.innerHTML += "<a onClick=\"javascript:\$('#'+'"+type+"_"+condition_id+"_variable_"+variable_id+"').attr('value','nil');\">Set it Nil</a>";     
+*/
     div1.style.display = "none";
     document.getElementById(type[0]+condition_id).appendChild(div1);
-
-//    str = "<select name='rule["+type+"]["+condition_id+"][variable]["+variable_id+"][keys][]' class='rules' id='"+type+"_select_"+id+"'>"
-//    str += "<option
-    
-    //div.innerHTML = str;
   }
 }
 
@@ -443,7 +442,6 @@ function attachRulesFormEventsForVariableField(type, condition_id, variable_id) 
 }
 
 //for rules engine
-last_accessed_id = 1;//id of last select field added
 function fillVariableField(type, condition_id, variable_id) {
   children = $(("#"+type[0])+condition_id+"v"+variable_id+" select")
   str = children[0].value;
@@ -455,19 +453,25 @@ function fillVariableField(type, condition_id, variable_id) {
   last_accessed_id = children[children.length-1].id;//id of the last children
   //alert("445:"+last_accessed_id);
   id = Number(last_accessed_id.substring(last_accessed_id.indexOf("_select_")+"_select_".length));//this extracts out the id number at the end
+  for_field = document.getElementById(type+"_select_"+id);
+  for_field_value = for_field.value;
   prev_field = document.getElementById(type+"_select_"+(id-1));
   if(prev_field == null)//this happens for first select of every extra condition
     prev_field = document.getElementById("select_0");
-  //alert("next id to be added:"+(id+1));
+  single_variable_mode = 0;
+  if(for_field_value == "nil" ) {//this handles the case when second variable has been selected to be nil, in that case, we will try to return the value of two fields prior to this (since between these two there is a select field wil binarycomparator) 
+    for_field_value = document.getElementById(type+"_select_"+(id-2)).value;
+    single_variable_mode = 1;
+  }
   
-  //type, id, prev_field, condition_id, variable_id
 
   $.ajax({
-  url: "/rules/get?for="+document.getElementById(type+"_select_"+id).value+
+  url: "/rules/get?for="+for_field_value+
       "&type="+type+
       "&id="+(Number(id)+1)+"&prev_field="+prev_field.value+
       "&condition_id="+condition_id+/*name of div boxes are c1v1, c2v1 ... where the firstnumber refers to condition_id and second to variable number local to that condition*/
       "&variable_id="+variable_id+
+      "&single_variable_mode="+single_variable_mode+
       "&return_only_models=false"
   ,success: function(data) {
       //alert("cleaning up from"+id);
@@ -483,6 +487,7 @@ function fillVariableField(type, condition_id, variable_id) {
       if(data.indexOf("_variable_") != -1) {
         createVariableSelectionDiv(type, id+2, condition_id, Number(variable_id)+1);
         attachRulesFormEventsForVariableField(type, condition_id, Number(variable_id)+1);
+        attachRulesFormEvents(type, id+2);
       }
       //alert(data);
       return true;
