@@ -2,7 +2,7 @@ module Merb
   module GlobalHelpers
     CRUD_ACTIONS = ["list", "index", "show", "edit", "new"]
     MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-    TRANSACTION_MODELS = [Branch, Center, Cgt, Grt, ClientGroup, Client, Loan, Payment]
+    TRANSACTION_MODELS = [Branch, Center, ClientGroup, Client, Loan, Payment]
     
     def page_title
       begin
