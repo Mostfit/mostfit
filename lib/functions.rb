@@ -59,18 +59,13 @@ class Date
     360 * (y2-y1) + 30 * (m2-m1) + (d2-d1)
   end
 
-  def self.min_date
-    if $globals && $globals[:mfi_details] && $globals[:mfi_details][:in_operation_since] and not $globals[:mfi_details][:in_operation_since].blank?
-      $globals[:mfi_details][:in_operation_since]
-    else
-      Date.parse("2000-01-01")
-    end
-  end
+  # def self.min_date
+  #   Mfi.first.in_operation_since||Date.new(2000, 01, 01)
+  # end
 
-
-  def self.max_date
-    today+1000
-  end
+  # def self.max_date
+  #   today+1000
+  # end
 
   private
   def was_yesterday_holiday_shifted_today?
@@ -91,11 +86,12 @@ module Misfit
     attr_accessor :hols
     
     def self.compile_nomentculature
-      if($globals && $globals[:mfi_details] && $globals[:mfi_details][:center_manager] and not $globals[:mfi_details][:center_manager].blank?)
-        name = $globals[:mfi_details][:center_manager]
+      if Mfi.first.center_manager
+        name = Mfi.first.center_manager
       else
         name = "manager"
       end
+
       define_method :center_manager do
         name
       end

@@ -39,6 +39,9 @@ module Misfit
       },
       :staff_member => {
         :all => [:center, :client, :loan, :payment, :document, :client_group, :group, :comment, :insurance_company, :staff_member]
+      },
+      :funder => {
+        :all => []
       }
     }
 
@@ -46,7 +49,8 @@ module Misfit
       :admin => all_controllers,
       :mis_manager => all_controllers_except([:users, :admin]),
       :data_entry => {
-        :all => [:search, :comments, :documents, :"data_entry/payments",:"data_entry/clients",:"data_entry/loans", :"data_entry/index"]
+        :all => [:search, :comments, :documents, :"data_entry/client_groups", :"data_entry/payments", :"data_entry/clients",:"data_entry/loans", :"data_entry/index", 
+                :clients, :loans, :client_groups]
       },
       :read_only => {
         :all => [:searches, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :insurance_policies, 
@@ -56,6 +60,10 @@ module Misfit
         :all => [:documents, :searches, :browse, :branches, :centers, :payments, :clients, :client_groups, :groups, :audit_trails, :comments, :insurance_policies, 
                  :reports, :"data_entry/centers", :"data_entry/client_groups", :"data_entry/payments", :"data_entry/clients", :staff_members, :audit_items,
                  :"data_entry/loans", :"data_entry/index", :insurance_companies, :info]
+      },
+      :funder => {
+        :all => [:searches, :browse, :branches, :centers, :client_groups, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :areas, 
+                 :audit_trails, :documents, :attendances]
       }
     }
 
@@ -69,28 +77,60 @@ module Misfit
     
     module DateFormat
       def self.compile
-        if $globals and $globals[:mfi_details] and format=$globals[:mfi_details][:date_format] and Mfi::DateFormats.include?(format)
+        if format = Mfi.first.date_format and Mfi::DateFormats.include?(format)
           Date.class_eval do
-            def to_s
-              self.strftime($globals[:mfi_details][:date_format])
+            format = Mfi.first.date_format
+            define_method :to_s do
+              self.strftime(format)
             end
           end
-          Date.instance_eval do
-            def min_date
-              if $globals && $globals[:mfi_details] && $globals[:mfi_details][:in_operation_since] and not $globals[:mfi_details][:in_operation_since].blank?
-                $globals[:mfi_details][:in_operation_since]
-              else
-                Date.parse("2000-01-01")
-              end
-            end
-          end
-          Date.instance_eval do
-            def max_date
-              today+1000
-            end
-          end
-          Merb.logger.info("Date format set to:: #{$globals[:mfi_details][:date_format]} and min date is #{Date.min_date}")
         end
+        
+        Date.instance_eval do
+          class << self 
+            mfi = Mfi.first
+            min_allowed_transaction_date = if mfi.min_date_from and mfi.number_of_past_days
+                                             (mfi.min_date_from==:today ? Date.today : mfi.in_operation_since) - mfi.number_of_past_days
+                                           elsif mfi.in_operation_since
+                                             mfi.in_operation_since
+                                           else              
+                                             Date.new(2000, 01, 01)
+                                           end
+            
+            min_allowed_date = if not mfi.in_operation_since.blank?
+                                 mfi.in_operation_since 
+                               else
+                                 Date.new(2000, 01, 01)
+                               end
+            
+            max_allowed_date = Date.today + mfi.number_of_future_days
+            
+            max_allowed_transaction_date =
+              if mfi.number_of_future_days
+                Date.today + mfi.number_of_future_transaction_days
+              else              
+                Date.today+1000
+              end
+            
+            define_method :min_date do
+              min_allowed_date
+            end
+
+            define_method :max_date do
+              max_allowed_date
+            end
+
+            define_method :min_transaction_date do
+              min_allowed_transaction_date
+            end
+
+            define_method :max_transaction_date do
+              max_allowed_transaction_date
+            end
+          end
+        end
+
+        Merb.logger.info("Date format set to:: #{Mfi.first.date_format} and min date is #{Date.min_date}, max date is #{Date.max_date}, min transaction date is #{Date.min_transaction_date} and max transaction date is #{Date.max_transaction_date}")
       end
     end
   end

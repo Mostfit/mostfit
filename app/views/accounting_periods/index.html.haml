@@ -1,0 +1,24 @@
+%h1 List of Accounting Periods
+%table
+  %tr
+    %th
+      Begins
+    %th
+      Ends
+    %th
+      Duration (in days)
+  %tr
+  - for accounting_period in @accounting_periods
+    %tr
+      %td
+        = accounting_period.begin_date
+      %td
+        = accounting_period.end_date
+      %td
+        = accounting_period.duration
+      %td
+        = link_to 'Edit', url(:edit_accounting_period,  accounting_period)
+
+= link_to 'New', url(:new_accounting_period)
+|
+= link_to 'Back', url(:accounts)

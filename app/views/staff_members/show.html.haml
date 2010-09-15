@@ -2,7 +2,9 @@
   = @staff_member.name
 %ul
   %li
-    = link_to 'Day Sheet >>', url(:day_sheet, @staff_member.id), :class => "bold"
+    = link_to 'Daily Collection Sheet >>', url(:day_sheet, @staff_member.id), :class => "bold"
+  %li
+    = link_to 'Daily Disbursement Sheet >>', url(:disbursement_sheet, @staff_member.id), :class => "bold"
   %li
     = link_to 'Centers Managed >>', url(:show_staff_member_centers, @staff_member.id), :class => "bold"
   %li

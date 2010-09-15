@@ -156,15 +156,16 @@ Merb::BootLoader.after_app_loads do
   end
   
 #  Mime::Type.register 'application/pdf', :pdf
-  if File.exists?(File.join(Merb.root, "config", "mfi.yml"))
-    $globals ||= {}
-    begin
-      $globals[:mfi_details] = YAML.load(File.read(File.join(Merb.root, "config", "mfi.yml")))
-    rescue
-      Merb.logger.info("Couldn't not load MFI details from config/mfi.yml. Possibly a wrong YAML file specification.")
-    end
+  $globals ||= {}
+  begin
+    $globals[:mfi_details] = Mfi.first
+    Merb.logger.info("Loaded MFI details from config/mfi.yml. Loaded on #{Mfi.first.fetched}")
+  rescue
+    # create a new mfi_details object anyways
+    $globals[:mfi_details] = Mfi.new(:name => "Mostfit", :fetched => Date.today)
+    Misfit::Config::DateFormat.compile
+    Merb.logger.info("Couldn't not load MFI details from config/mfi.yml. Possibly a wrong YAML file specification.")
   end
-  Misfit::Config::DateFormat.compile
 
   module DmPagination
     class PaginationBuilder

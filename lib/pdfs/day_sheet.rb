@@ -3,7 +3,7 @@ module Pdf
     def generate_pdf
       pdf = PDF::Writer.new(:orientation => :landscape)
       pdf.select_font "Times-Roman"
-      pdf.text "Day sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
+      pdf.text "Daily Collection Sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
       pdf.text("\n")
       days_absent = Attendance.all(:status => "absent", :center => @centers).aggregate(:client_id, :all.count).to_hash
       @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each_with_index{|center, idx|
@@ -91,7 +91,7 @@ module Pdf
         table.render_on(pdf)
         
         #draw table for scheduled disbursals
-        loans_to_disburse = center.clients.loans(:disbursal_date => @date)
+        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => @date)
         if center.clients.count>0 and loans_to_disburse.count > 0
           table = PDF::SimpleTable.new
           table.data = []
@@ -120,28 +120,48 @@ module Pdf
       pdf.save_as("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
       return pdf
     end
+
+    def generate_disbursement_pdf(filename)
+      pdf = PDF::Writer.new(:orientation => :landscape)
+      pdf.select_font "Times-Roman"
+      pdf.text "Daily Disbursement Sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
+      pdf.text("\n")
+      days_absent = Attendance.all(:status => "absent", :center => @centers).aggregate(:client_id, :all.count).to_hash
+      @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each_with_index{|center, idx|
+        pdf.start_new_page if idx > 0
+        pdf.text "Center: #{center.name}, Manager: #{@staff_member.name}, signature: ______________________", :font_size => 12, :justification => :left
+        pdf.text("Center leader: #{center.leader.client.name}, signature: ______________________", :font_size => 12, :justification => :left) if center.leader
+        pdf.text("Date: #{@date}, Time: #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}", :font_size => 12, :justification => :left)
+        pdf.text("\n")
+        #draw table for scheduled disbursals
+        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil)
+        if center.clients.count>0 and loans_to_disburse.count > 0
+          table = PDF::SimpleTable.new
+          table.data = []
+
+          loans_to_disburse.each do |loan|
+            table.data.push({"amount" => loan.amount.to_currency, "name" => loan.client.name,
+                              "group" => loan.client.client_group.name,
+                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date
+                            })
+          end
+          table.column_order  = ["name", "group", "amount", "loan product", "first payment", "signature"]
+          table.show_lines    = :all
+          table.shade_rows    = :none
+          table.show_headings = true          
+          table.shade_headings = true
+          table.orientation   = :center
+          table.position      = :center
+          table.title_font_size = 16
+          table.header_gap = 10
+          pdf.text("\n")
+          pdf.text "Disbursements today"
+          pdf.text("\n")
+          table.render_on(pdf)
+        end        
+      } #centers end
+      pdf.save_as(filename)
+      return pdf
+    end
   end
 end
-
-#  def generate_pdf
-#    pdf = PDF::HTMLDoc.new
-#    pdf.set_option :bodycolor, :white
-#    pdf.set_option :toc, false
-#    pdf.set_option :portrait, true
-#    pdf.set_option :links, true
-#    pdf.set_option :webpage, true
-#    pdf.set_option :left, '2cm'
-#    pdf.set_option :right, '2cm'
-#    pdf.set_option :header, "Header here!"
-#    pdf.set_option :outfile, "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf"
-#    f = File.read("app/views/staff_members/day_sheet.html.haml")
-#    report = Haml::Engine.new(f).render(Object.new)
-#    pdf << report
-#    pdf.footer ".t."
-#    pdf.generate
-#    pdf.save_as("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date}.pdf")
-##    f = File.read("app/views/reports/_#{name.snake_case.gsub(" ","_")}.pdf.haml")
-##    report = Haml::Engine.new(f).render(Object.new, :report => self)
-#    return pdf
-#  end
-

@@ -17,7 +17,7 @@
 - else
   %table.report.nojs{:width => '100%'}
     %thead
-      %tr
+      %tr.header
         %th
           name
         %th
@@ -36,7 +36,7 @@
           disbursed loans
         %th{:colspan => 2}
           wrote off loans
-      %tr
+      %tr.header
         %th{:colspan => 2}
         -7.times do
           %th

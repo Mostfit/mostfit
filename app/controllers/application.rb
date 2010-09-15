@@ -2,6 +2,9 @@ class Application < Merb::Controller
   before :ensure_authenticated
   before :ensure_can_do
   before :insert_session_to_observer
+  before :add_collections, :only => [:index, :show]
+  
+  @@controllers  = ["regions", "area", "branches", "centers", "clients", "loans", "payments"]
 
   def insert_session_to_observer
     DataAccessObserver.insert_session(session.object_id)
@@ -117,5 +120,15 @@ class Application < Merb::Controller
       FileUtils.mkdir_p(dir)
     end
     File.join(dir, (hash.empty? ? "index" : hash.collect{|k,v| "#{k}_#{v}"}))
+  end
+
+  def add_collections
+    return unless session.user.role==:funder
+    return if not @@controllers.include?(params[:controller])
+    @funder = Funder.first(:user_id => session.user.id)
+    idx     = @@controllers.index(params[:controller])
+    idx    += 1 if params[:action]!="index"
+    var     = @@controllers[idx]
+    instance_variable_set("@#{var}", @funder.send(var))
   end
 end

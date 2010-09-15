@@ -34,7 +34,8 @@
       %td.text
         = link_to client.center.name, url(:quick_link, "centers", client.center.id)
       %td.text
-        = date_select("loans[#{loan.id}][approved_on]", @date||loan.applied_on, :id => "loans_#{loan.id}_approved_on")
+        - min_date = (loan.applied_on > Date.min_transaction_date ? loan.applied_on : Date.min_transaction_date)
+        = date_select("loans[#{loan.id}][approved_on]", min_date, :id => "loans_#{loan.id}_approved_on", :min_date => min_date, :max_date => Date.max_transaction_date)
       %td.text
         = loan.status.to_s.camelcase(' ')
       %td

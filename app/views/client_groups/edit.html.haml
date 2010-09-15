@@ -24,6 +24,7 @@
       %th
         GRT date
   
+    - min_date = Date.today
     -@client_group.clients.each do |client| 
       %tr
         %td
@@ -36,9 +37,10 @@
           =client.name
         %td
           =client.grt_pass_date ? client.grt_pass_date : " - "
+        - min_date = client.date_joined if min_date > client.date_joined
     %tr
       %td{:colspan => 4}
-        =date_select "grt_date"
+        =date_select "grt_date", Date.today, {:min_date => min_date, :max_date => Date.today}
     %tr
       %td{:colspan => 4}
         =submit "Save changes"

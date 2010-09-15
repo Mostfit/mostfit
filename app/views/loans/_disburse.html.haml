@@ -33,7 +33,8 @@
       %td.text
         = loan.scheduled_disbursal_date
       %td.text
-        = date_select("loans[#{loan.id}][disbursal_date]", loan.disbursal_date||loan.scheduled_disbursal_date, {:min_date => loan.scheduled_disbursal_date, :id => "loans_#{loan.id}_disbursal_date"})
+        - min_date = (loan.scheduled_disbursal_date > Date.min_transaction_date ? loan.scheduled_disbursal_date : Date.min_transaction_date)
+        = date_select("loans[#{loan.id}][disbursal_date]", min_date, {:min_date => min_date, :id => "loans_#{loan.id}_disbursal_date", :max_date => Date.max_transaction_date})
       %td.text
         - late =  @date - loan.scheduled_disbursal_date
         - if late > 0
@@ -42,7 +43,7 @@
           on time
       %td
         - if late > 0
-          = date_select("loans[#{loan.id}][scheduled_first_payment_date]", loan.scheduled_first_payment_date, {:min_date => loan.scheduled_first_payment_date, :id =>  "loans_#{loan.id}_first_payment"}) 
+          = date_select("loans[#{loan.id}][scheduled_first_payment_date]", min_date, {:min_date => min_date, :id =>  "loans_#{loan.id}_first_payment"}) 
         -else
           = loan.scheduled_first_payment_date
       %td

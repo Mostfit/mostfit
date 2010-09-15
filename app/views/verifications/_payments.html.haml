@@ -52,7 +52,7 @@
           %td
             =payment.received_by ? payment.received_by.name : ""
           %td
-            =payment.created_at ? payment.created_at.strftime($globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y") : ""
+            =payment.created_at ? payment.created_at.strftime(Mfi.first.date_format || "%d-%m-%Y") : ""
           %td
             =check_box(:name => "payments[#{payment.id}][]", :class => "payment_approval_box", :value => 1)
       %tr

@@ -76,6 +76,25 @@ class StaffMembers < Application
     end
   end
 
+  def disbursement_sheet(id)
+    #make it like day_sheet
+    @staff_member = StaffMember.get(id)
+    raise NotFound unless @staff_member
+    @date = params[:date] ? parse_date(params[:date]): Date.today
+    @date = @date.holiday_bump
+    center_ids = Loan.all(:scheduled_disbursal_date => @date, :approved_on.not => nil, :rejected_on => nil).map{|x| x.client.center_id}.uniq
+    @centers = @staff_member.centers(:id => center_ids).sort_by{|x| x.name}
+    #debugger
+    if params[:format] == "pdf"
+      #some problem not working as of now
+      filename = "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_disbursement_#{@date.strftime('%Y_%m_%d')}.pdf"
+      generate_disbursement_pdf(filename)
+      send_data(File.read(filename), :filename => filename)
+    else
+      display @centers
+    end
+  end
+
   def show(id)
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member

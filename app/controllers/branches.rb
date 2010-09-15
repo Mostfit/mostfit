@@ -3,7 +3,7 @@ class Branches < Application
   include DateParser
 
   def index
-    @branches = Branch.paginate(:page => params[:page], :per_page => 15)
+    @branches = (@branches || Branch.all).paginate(:page => params[:page], :per_page => 15)
     display @branches
   end
 

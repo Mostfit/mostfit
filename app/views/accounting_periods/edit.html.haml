@@ -1,0 +1,12 @@
+- form_url   =  resource(@accounting_period, {:return => params[:return]})
+= error_messages_for @accounting_period
+
+= form_for(@accounting_period, :action => form_url, :class => "form") do
+  %fieldset
+    %h1 Edit Accounting Period
+    = partial "accounting_periods/fields"
+    = submit "Update"
+
+= link_to 'Show', url(:accounting_period, @accounting_period)
+|
+= link_to 'Back', url(:accounting_periods)

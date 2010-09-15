@@ -14,7 +14,7 @@
  
   - length = 5
   - org_total = []
-  - time_format = $globals[:mfi_details] && $globals[:mfi_details][:date_format] ? $globals[:mfi_details][:date_format] : "%d-%m-%Y"
+  - time_format = Mfi.first.date_format || "%d-%m-%Y"
   - time_format += " %H:%M"
   - accounts = {}
   - Account.all.each{|acc|  accounts[acc.id] = acc}

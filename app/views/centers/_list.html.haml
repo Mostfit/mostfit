@@ -12,29 +12,26 @@
     %p
       %i No centers meet on this day.    
 - else
-  %table.narrow.form{ :width => '100%' }
-    %thead
-      %tr
-        %th
-        %th ID
-        %th Name
-        %th Manager
-        %th Meeting
-        %th Clients
-        %th Edit
+  %table.narrow.floating_header
+    %tr.header
+      %th{:style => "width: 5%"} ID
+      %th Name
+      %th Manager
+      %th Meeting
+      %th Clients
+      %th Edit
     %tbody
     - clients_count = Client.all(:center => @centers).aggregate(:center_id, :id.count).to_hash
     - @centers.each do |center|
-      %tr{ :class => cycle('odd',''), :style => center.meeting_day == Date.today.weekday ?  'background: lightgreen;' : ''  }
-        %td &nbsp;
+      %tr{:class => cycle('odd','')}
         %td
           = center.id
-        %td
+        %td.text
           %b= link_to center.name, resource(@branch, center )
-        %td
+        %td.text
           = link_to center.manager.name, resource(center.manager)
-        %td
-          - if center.meeting_day
+        %td{:style => center.meeting_day == Date.today.weekday ?  'background: #aaffaa;' : ''}
+          - if center.meeting_day            
             == #{center.meeting_day.to_s.capitalize}#{(center.meeting_time_hours and center.meeting_time_minutes) ? ", #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}" : ''}
         %td
           = clients_count[center.id] if clients_count.key?(center.id)

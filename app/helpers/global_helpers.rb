@@ -2,6 +2,7 @@ module Merb
   module GlobalHelpers
     CRUD_ACTIONS = ["list", "index", "show", "edit", "new"]
     MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    TRANSACTION_MODELS = [Branch, Center, ClientGroup, Cgt, Grt, Client, Loan, Payment]
     
     def page_title
       begin
@@ -99,22 +100,28 @@ module Merb
     end
 
     def date_select_for(obj, col = nil, attrs = {})
-      attrs.merge!(:name => "#{obj.class.to_s.snake_case}[#{col.to_s}]")
-      attrs.merge!(:id   => "#{obj.class.to_s.snake_case}_#{col.to_s}")
+      klass = obj.class
+      attrs.merge!(:name => "#{klass.to_s.snake_case}[#{col.to_s}]")
+      attrs.merge!(:id   => "#{klass.to_s.snake_case}_#{col.to_s}")
       nullable = attrs[:nullable] ? true : false
       date = obj.send(col) 
       date = Date.today if date.blank? and not nullable
       date = nil        if date.blank? and nullable
       attrs.merge!(:date => date)
-      attrs.merge!(:min_date => attrs[:min_date]||Date.min_date)
-      attrs.merge!(:max_date => attrs[:max_date]||Date.max_date)
+      if TRANSACTION_MODELS.include?(klass) or TRANSACTION_MODELS.include?(klass.superclass) or TRANSACTION_MODELS.include?(klass.superclass.superclass)
+        attrs.merge!(:min_date => attrs[:min_date]||Date.min_transaction_date)
+        attrs.merge!(:max_date => attrs[:max_date]||Date.max_transaction_date)
+      else
+        attrs.merge!(:min_date => attrs[:min_date]||Date.min_date)
+        attrs.merge!(:max_date => attrs[:max_date]||Date.max_date)
+      end
       date_select_html(attrs, obj, col)
 #       errorify_field(attrs, col)
     end
 
     def date_select_html (attrs, obj = nil, col = nil)
       str = %Q{
-        <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}" size="12">
+        <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}" size="20" #{Mfi.first.date_box_editable ? "" : "readonly='true'"}>
         <script type="text/javascript">
           $(function(){
             $("##{attrs[:id]}").datepicker('destroy').datepicker({altField: '##{attrs[:id]}', buttonImage: "/images/calendar.png", changeYear: true, buttonImageOnly: true,
@@ -129,8 +136,8 @@ module Merb
     end
 
     def datepicker_dateformat
-      if $globals and $globals[:mfi_details] and $globals[:mfi_details][:date_format]
-        ourDateFormat = $globals[:mfi_details][:date_format]
+      if Mfi.first and not Mfi.first.date_format.blank?
+        ourDateFormat = Mfi.first.date_format
       else
         ourDateFormat = "%Y-%m-%d"
       end

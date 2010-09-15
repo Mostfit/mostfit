@@ -7,7 +7,7 @@
   - if @loan.nil?
     %table
       - @loan_products.each do |product|
-        = form_for(@loan, :action => url(:enter_loans, :action => 'new'), :method => :get) do
+        = form_for(@loan, :action => url(:enter_loans, :action => 'new', :return => "/data_entry"), :method => :get) do
           %tr
             %td
               %h3= product.name

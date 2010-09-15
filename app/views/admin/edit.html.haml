@@ -79,6 +79,32 @@
             =date_select_for @mfi, :in_operation_since, {:min_date => Date.parse("2000-01-01")}
         %tr
           %td
+            Allow dates in past upto
+          %td
+            =text_field :number_of_past_days, :size => 3
+            days from
+            =select :min_date_from, :collection => Mfi::MinDateFrom.to_a
+        %tr
+          %td
+            Allow dates for transactions in future upto
+          %td
+            =text_field :number_of_future_transaction_days, :size => 3
+            days from today
+            %p.greytext
+              (for loan application, approval, disbursal, client joining date, branch & center creation date etc)
+        %tr
+          %td
+            Allow farthest dates in future 
+          %td
+            =text_field :number_of_future_days, :size => 3
+            days from today
+        %tr
+          %td
+            Allow date box to be editable?
+          %td
+            =check_box :date_box_editable
+        %tr
+          %td
             Number of branches
           %td
             =text_field :number_of_branches

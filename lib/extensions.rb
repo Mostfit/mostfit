@@ -9,7 +9,6 @@ module Misfit
         Merb.logger.info "Included Misfit::Extensions::User by #{base}"
         base.class_eval do
           alias :can_access? :_can_access?
-
           #congratulations you have over-ridden the base methods
           # you can now pollute away
         end
@@ -24,7 +23,7 @@ module Misfit
           end
           retrun false
         end
-        return false if role == :read_only
+        return false if role == :read_only or role == :funder or role==:data_entry
         return true
       end
 
@@ -74,8 +73,23 @@ module Misfit
         end
       end
 
+      def is_funder?
+        allowed_controller = (access_rights[:all].include?(@controller.to_sym))
+        return false unless allowed_controller
+        id = @route[:id].to_i
+        model = Kernel.const_get(@model.to_s.split("/")[-1].camelcase)
+        if [Browse, Report, Document, AuditTrail, Attendance].include?(model)
+          return true
+        elsif [Branch, Center, ClientGroup, Client, Loan].include?(model) and id>0 
+          return(@funder.send(model.to_s.snake_case.pluralize, {:id => id}).length>0)
+        elsif [Branch, Center, ClientGroup, Client, Loan].include?(model) and id==0
+          return(@funder.send(model.to_s.snake_case.downcase.pluralize).length>0)
+        end
+        return false
+      end
+
       def is_manager_of?(obj)
-        @staff ||= self.staff_member      
+        @staff ||= self.staff_member
         return true if obj and obj.new?
         if obj.class==Client and not (obj.center.manager==@staff or obj.center.branch.manager==@staff)
           return false
@@ -87,11 +101,21 @@ module Misfit
         return true
       end
 
+      def allow_read_only
+        if CUD_Actions.include?(@action)
+          return false
+        elsif @controller=="admin" and @action=="index"
+          return true
+        else
+          return access_rights[:all].include?(@controller.to_sym)
+        end
+      end
       
       def _can_access?(route,params = nil)        
         # more garbage
-        return true if role == :admin
-        return true if [:graph_data, :info, :dashboard].include?(route[:controller].to_sym) and self.role!=:data_entry
+        user_role = self.role
+        return true if user_role == :admin
+        return true if [:graph_data, :info, :dashboard].include?(route[:controller].to_sym) and user_role!=:data_entry
         return true if route[:controller] == "users" and route[:action] == "change_password"
 
         @route = route
@@ -99,14 +123,18 @@ module Misfit
         @model = route[:controller].singularize.to_sym
         @action = route[:action]
         @staff ||= self.staff_member
+
         #read only stuff
-        if role == :read_only 
-          if CUD_Actions.include?(@action)
-            return false
-          elsif @controller=="admin" and @action=="index"
+        return allow_read_only if user_role == :read_only
+        
+        #user is a funder
+        if user_role == :funder and @funder ||= Funder.first(:user_id => self.id)
+          @funding_lines = @funder.funding_lines
+          @funding_line_ids = @funder.funding_lines.map{|fl| fl.id}
+          if is_funder? and allow_read_only
             return true
           else
-            return access_rights[:all].include?(@controller.to_sym)
+            return false
           end
         end
         
@@ -118,9 +146,17 @@ module Misfit
           return true  if params[:parent_model]=="Branch" and (role==:staff_member and Branch.get(params[:parent_id]).manager==@staff)
           return false
         end
+
         r = (access_rights[@action.to_s.to_sym] or access_rights[:all])
-        return false if @action == "approve" and role == :data_entry
-        return false if r.nil?
+
+        if role == :data_entry and ["clients", "loans", "client_groups"].include?(@controller)
+          if ["new", "edit", "create", "update"].include?(@action)
+            return true
+          else
+            return false            
+          end
+        end
+
         if @staff
           return additional_checks if @route.has_key?(:id) and @route[:id]
           if ["staff_members", "branches"].include?(@controller)
