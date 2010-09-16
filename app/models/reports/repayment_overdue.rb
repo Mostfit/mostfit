@@ -4,8 +4,10 @@ class RepaymentOverdue < Report
   def initialize(params, dates, user)
     @date   = (dates and dates[:date]) ? dates[:date] : Date.today
     @name   = "Report as of #{@date}"
-    @branch_id = params[:branch_id]
-    @center_id = params[:center_id]
+    if params
+      @branch_id = params[:branch_id]
+      @center_id = params[:center_id]
+    end
     get_parameters(params, user)
   end
 
