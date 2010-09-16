@@ -12,50 +12,99 @@
   - Marshal.restore(obj).to_a.each do |condition_id, cond|
     %div{:class => type, :id => "#{div_prefix}#{condition_id}"} 
       - condition_id = condition_id.to_i
-      - keys = [@rule.model_name] + cond[:keys]
+      -#Start of CodeBlock001
+      - variable_id = 1
+      - keys = [@rule.model_name] + cond[:variable]["#{variable_id}"][:complete].split(".")
+      = text_field(:name => "rule[#{type}][1][variable][1][complete]", :value => cond[:variable]["#{variable_id}"][:complete], :class => "rules", :id => "#{type}_#{condition_id}_variable_#{variable_id}") #this holds the actual variable name like center.branch.count etc.
+      - debugger
       - model = nil
-      - keys.each_with_index do |key, idx|
-        - name, field, choices = Condition.get_field_choices_and_name(key)
-        - model, key_type = Condition.get_model(key)
-        - if model #field == :select
-          - name = "rule[#{type}][#{condition_id}][keys][]"
-          - selected = (keys.length==idx+1) ? cond[:comparator].to_s : keys[idx+1]
-          = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :id => "#{type}_select_#{id}")
-          :javascript
-            attachRulesFormEvents("#{type}", #{id});
-          - id+=1
-        - else
-          - model = Kernel.const_get(keys[idx-1].singularize.camelcase)
-          - if model == nil
-            error in model
-          - collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal to"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal to"]]
-          - collection2 = [["equal2", "equal"], ["not2", "not equal"]]
-          - select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :collection => collection1, :selected=>cond[:comprator])
-          - select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator][]", :collection => collection2, :selected=>cond[:comprator])
-          - if collection1.flatten.include?(cond[:comparator].to_s)
-            = select1
-          - elsif collection2.flatten.include?(cond[:comparator].to_s)
-            = select2
-          - else
-            = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value=>cond[:comparator])
-          - id+=1
+      %div{:class => type, :id => "#{type[0,1]}#{condition_id}#{"v"}#{variable_id}", :style => "display:none"}
+        %b 
+          = "#{type} #{condition_id} Variable #{variable_id}"
+        - keys.each_with_index do |key, idx|
+          - name, field, choices = Condition.get_field_choices_and_name(key)
+          - model, key_type = Condition.get_model(key)
+          
+          - if model#which obviously each one (except last one) is
+            - name = "rule[#{type}][#{condition_id}][keys][]"
+            -#selected = (keys.length==idx+1) ? cond[:comparator].to_s : keys[idx+1]
+            - selected = keys[idx+1]
+            = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :id => "#{type}_select_#{id}")
+            :javascript
+              attachRulesFormEvents("#{type}", #{id});
+            - id+=1
+        %a{:onclick => "javascript:this.parentNode.style.display='none';fillVariableField('condition',1,1);"}
+          %b Done
+      -#end of CodeBlock001
 
-      - name = "rule[#{type}][#{condition_id}][value]"
+      -#now comes binary operator
+      - displaySecondVariable = false
+      -if cond[:valuetype] == "date"
+        = select(:name => "rule[#{type}][#{condition_id}][binaryoperator]" , :collection => [["-", "minus"]], :class => "rules", :id => "#{type}_selectbinaryoperator_#{id}")
+        - displaySecondVariable = true
+      -elsif cond[:valuetype] == "int"
+        = select(:name => "rule[#{type}][#{condition_id}][binaryoperator]" , :collection => [["-", "minus"], ["+", "plus"]], :selected => cond[:binaryoperator], :class => "rules", :id => "#{type}_selectbinaryoperator_#{id}")
+        - displaySecondVariable = true
+
+      - if displaySecondVariable == true
+        -#Repeat of CodeBlock001 for variable 2 instead of 1
+        - variable_id = 2
+        - keys = [@rule.model_name] + cond[:variable]["#{variable_id}"][:complete].split(".")
+        = text_field(:name => "rule[#{type}][1][variable][1][complete]", :value => cond[:variable]["#{variable_id}"][:complete], :class => "rules", :id => "#{type}_#{condition_id}_variable_#{variable_id}") #this holds the actual variable name like center.branch.count etc.
+        - model = nil
+        %div{:class => type, :id => "#{type[0,1]}#{condition_id}#{"v"}#{variable_id}", :style => "display:none"}
+          %b 
+            = "#{type} #{condition_id} Variable #{variable_id}"
+          - keys.each_with_index do |key, idx|
+            - name, field, choices = Condition.get_field_choices_and_name(key)
+            - model, key_type = Condition.get_model(key)
+            
+            - if model#which obviously each one (except last one) is
+              - name = "rule[#{type}][#{condition_id}][keys][]"
+              -#selected = (keys.length==idx+1) ? cond[:comparator].to_s : keys[idx+1]
+              - selected = keys[idx+1]
+              - if ((variable_id>1) and (idx==0)) #first select field of second variable
+                - choices = choices + [["0","0"]]
+              = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :id => "#{type}_select_#{id}")
+              :javascript
+                attachRulesFormEvents("#{type}", #{id});
+                attachRulesFormEventsForVariableField("#{type}", #{condition_id}, #{variable_id})
+              - id+=1
+          %a{:onclick => "javascript:this.parentNode.style.display='none';fillVariableField('condition',1,1);"}
+            %b Done
+        -#end of Repeat of CodeBlock001
+
+      - model = Kernel.const_get(keys[keys.length-2].singularize.camelcase)#since last is not a model, making model from second last term and will use this model.
+      - if model == nil
+        error in model
+      - collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal to"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal to"]]
+      - collection2 = [["equal2", "equal"], ["not2", "not equal"]]
+      - select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :collection => collection1, :selected=>cond[:comprator])
+      - select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator][]", :collection => collection2, :selected=>cond[:comprator])
+      - if collection1.flatten.include?(cond[:comparator].to_s)
+        = select1
+      - elsif collection2.flatten.include?(cond[:comparator].to_s)
+        = select2
+      - else
+        = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value=>cond[:comparator])
+      - id+=1
+
+      - name = "rule[#{type}][#{condition_id}][const_value]"
       - type_name = "rule[#{type}][#{condition_id}][valuetype]" #will be either "string", "date" or "int"
       - property = model.properties.find{|p| p.name.to_s==keys.last} || model.relationships[keys.last]
       - if property.type==Date or property.type==DateTime or cond[:valuetype] == "date"
-        = date_select(name , cond[:value], :id => "#{type}_date_#{id}")
+        = date_select(name , cond[:const_value], :id => "#{type}_date_#{id}")
         = hidden_field(:id => "#{type}_hidden_#{id}", :name => type_name, :value => "date")
       - elsif [DataMapper::Types::Serial, Integer].include?(property.type) or cond[:valuetype] == "int"
-        = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value => cond[:value]) 
+        = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value => cond[:const_value]) 
         = hidden_field(:id => "#{type}_hidden_#{id}", :name => type_name, :value => "int")
       - elsif property.type==Float or cond[:valuetype] == "float"
-        = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value => cond[:value]) 
+        = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value => cond[:const_value]) 
         = hidden_field(:id => "#{type}_hidden_#{id}", :name => type_name, :value => "float")
       - elsif property.class==DataMapper::Associations::ManyToOne::Relationship
         = select(:id => "#{type}_selectvalue_#{id}", :name => name, :collection => property.parent_model.all, :value_method => :id, :text_method => :name, :prompt => "Choose #{property.name}")
       - else
-        = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value => cond[:value]) 
+        = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value => cond[:const_value]) 
 
       - id+=1
       = select(:id => "#{type}_selectmore_#{id}", :name => "rule[#{type}][#{condition_id}][linking_operator]", :selected => cond[:linking_operator], :collection => [["", ""], ["and", "and"], ["or", "or"]])
@@ -76,9 +125,14 @@
         %a{:onclick => "javascript:this.parentNode.style.display='none';fillVariableField('condition',1,1);"}
           %b Done
   - else
-    %div.precondition#p1
-      TODO
-      = #select(:name =>"rule[#{type}][1][keys][]", :prompt => "choose \"applicable for\"", :class => "rules", :id => "#{type}_select_1")
+    %div.abstract_precondition#p1
+      = text_field(:name => "rule[#{type}][1][variable][1][complete]", :value => "Variable 1", :class => "rules", :id => "#{type}_1_variable_1") #this holds the actual variable name like center.branch.count etc.
+      %div.precondition#p1v1{:style => "display:none"}
+        - #c1v1 implies condition1 variable1
+        %b Precondition 1 Variable 1
+        = select(:name =>"rule[#{type}][1][variable][1][keys][]", :prompt => "choose \"applicable for\"", :class => "rules", :id => "#{type}_select_1")
+        %a{:onclick => "javascript:this.parentNode.style.display='none';fillVariableField('precondition',1,1);"}
+          %b Done
       %a{:onclick =>"javascript:this.parentNode.innerHTML=''"}
-        Remove
+        Remove All Preconditions
 

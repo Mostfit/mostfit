@@ -1,10 +1,10 @@
 class Rule
   include DataMapper::Resource
   property :id,                  Serial
-  property :name,                String, :min => 1, :index => true
-  property :model_name,          String,  :index => true
+  property :name,                String, :nullable => false, :min => 1, :index => true
+  property :model_name,          String, :nullable => false, :min => 1, :index => true
   property :permit,              Boolean, :index => true, :default => true
-  property :on_action,           Enum[:create, :update, :save, :destroy], :index => true
+  property :on_action,           Enum[:create, :update, :save, :destroy], :nullable => false, :index => true
 
   property :active,              Boolean, :default => false
 

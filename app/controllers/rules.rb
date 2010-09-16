@@ -27,6 +27,10 @@ class Rules < Application
   def create(rule)
     rule = fix_conditions(rule)
 
+#    if(rule[:name]=="")
+#      message[:error] = "Name cannot be left blank"
+#      render @rule
+#    end
     @rule = Rule.new(rule)
     if @rule.save
       redirect resource(@rule), :message => {:notice => "Rule was successfully created"}
@@ -36,6 +40,7 @@ class Rules < Application
     end
   end
 
+  #TODO has to be fixed
   def update(id, rule)
     rule = fix_conditions(rule)
     @rule = Rule.get(id)
@@ -68,10 +73,11 @@ class Rules < Application
     end
   end
 
+  #only converts condition(hash) to condition(marshal objects) for DB storing
   def fix_conditions(rule)
     if rule[:precondition] == nil then rule[:precondition] = ""
-    elsif rule[:precondition]["1"]["value"] == nil then rule[:precondition] = ""
-    elsif rule[:precondition]["1"]["keys"] == nil or rule[:precondition]["1"]["keys"].to_s.length == 0 then rule[:precondition] = "" end
+    elsif rule[:precondition]["1"]["const_value"] == nil then rule[:precondition] = ""
+    elsif rule[:precondition]["1"]["variable"]["1"]["complete"] == nil or rule[:precondition]["1"]["variable"]["1"]["complete"].length == 0 then rule[:precondition] = "" end
     
     rule[:condition] = Marshal.dump(rule[:condition])
     rule[:precondition] = Marshal.dump(rule[:precondition])
@@ -111,13 +117,13 @@ class Rules < Application
 				return "nil1"
       end
 	    property = model.properties.find{|p| p.name.to_s==params[:for]} || model.relationships[params[:for]]
-      name = "rule[#{type}][#{condition_id}][value]"
+      name = "rule[#{type}][#{condition_id}][const_value]"
       type_name = "rule[#{type}][#{condition_id}][valuetype]" #will be either "string", "date" or "int"
 
 			collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal"]]
 			collection2 = [["equal2", "equal"], ["not2", "not equal"]]
-      collection4 = [["plus", "plus"], ["minus", "minus"]]
-      collection5 = [["minus", "minus"]] #specifically for dates
+      collection4 = [["+", "plus"], ["-", "minus"]]
+      collection5 = [["-", "minus"]] #specifically for dates
       select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection1)
       select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection2)
       select3 = select(:id => "#{type}_selectmore_#{id+2}", :name => "rule[#{type}][#{condition_id}][linking_operator]", :prompt => "Add more condition", 

@@ -414,17 +414,13 @@ function createVariableSelectionDiv(type, id, condition_id, variable_id) {
     new_select.name = "rule["+type+"]["+condition_id+"][variable]["+variable_id+"][keys][]";
     if(variable_id>1) {
       nilOption = document.createElement("option");
-      nilOption.value = "nil";
-      nilOption.appendChild(document.createTextNode("nil"));
+      nilOption.value = "0";
+      nilOption.appendChild(document.createTextNode("0"));
       new_select.appendChild(nilOption);
     }
     div1.innerHTML = "<b>Condition "+condition_id+" Variable "+variable_id+"</b>";
     div1.appendChild(new_select);
     div1.innerHTML += "<a onClick=\"javascript:this.parentNode.style.display='none';fillVariableField('"+type+"',"+condition_id+", "+variable_id+");\"><b>Done</b></a>";
-/*    if(variable_id > 1)
-      div1.innerHTML+= " or ";
-       div1.innerHTML += "<a onClick=\"javascript:\$('#'+'"+type+"_"+condition_id+"_variable_"+variable_id+"').attr('value','nil');\">Set it Nil</a>";     
-*/
     div1.style.display = "none";
     document.getElementById(type[0]+condition_id).appendChild(div1);
   }
@@ -432,12 +428,8 @@ function createVariableSelectionDiv(type, id, condition_id, variable_id) {
 
 //type is either condition or precondition
 function attachRulesFormEventsForVariableField(type, condition_id, variable_id) {
-  //alert('#'+type+'_'+condition_id+'_variable_'+variable_id);
   $("#"+type+"_"+condition_id+"_variable_"+variable_id).click( function(event) {
-      //display the div
-      //alert("hi");
-      //alert("427 c"+condition_id+"v"+variable_id);
-      document.getElementById("c"+condition_id+"v"+variable_id).style.display = "block";
+      document.getElementById(type[0]+condition_id+"v"+variable_id).style.display = "block";
       });
 }
 
@@ -459,7 +451,7 @@ function fillVariableField(type, condition_id, variable_id) {
   if(prev_field == null)//this happens for first select of every extra condition
     prev_field = document.getElementById("select_0");
   single_variable_mode = 0;
-  if(for_field_value == "nil" ) {//this handles the case when second variable has been selected to be nil, in that case, we will try to return the value of two fields prior to this (since between these two there is a select field wil binarycomparator) 
+  if(for_field_value == "0" ) {//this handles the case when second variable has been selected to be 0(nil), in that case, we will try to return the value of two fields prior to this (since between these two there is a select field wil binaryoperator) 
     for_field_value = document.getElementById(type+"_select_"+(id-2)).value;
     single_variable_mode = 1;
   }
@@ -785,6 +777,7 @@ $(document).ready(function(){
   attachRulesFormEvents("precondition", 0);
   attachRulesFormEvents("precondition", 1);
   attachRulesFormEventsForVariableField("condition", 1/*condition_id*/, 1/*variable_id*/)
+  attachRulesFormEventsForVariableField("precondition", 1/*condition_id*/, 1/*variable_id*/)
   $("a.enlarge_image").click(function(a){
 	  link=$(a.currentTarget);
 	  addFloater(link);
