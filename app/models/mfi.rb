@@ -22,6 +22,8 @@ class Mfi
   property :number_of_past_days, Integer, :nullable => true, :index => true, :default => 5
   property :min_date_from, Enum.send('[]', *MinDateFrom.keys), :nullable => true, :index => true, :default => :in_operation_since
 
+  property :number_of_future_transaction_days, Integer, :nullable => true, :index => true, :default => 0
+
   property :number_of_future_days, Integer, :nullable => true, :index => true, :default => 100
 
   property :date_box_editable, Boolean, :default => true, :index => true

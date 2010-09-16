@@ -169,47 +169,46 @@ function attachFormRemoteTo(form){
   if(form.length==0)
     return(false);
   $(form).submit(function(f){
-		   form=$(f.currentTarget);
-		   $(form).find("input[type='submit']").attr("disabled", true);
-		   $(form).after("<img id='spinner' src='/images/spinner.gif' />");
-		   $.ajax({
-			    type: form.attr("method"),
-			    url: form.attr("action"),
-			    data: form.serialize(),
-			    success: function(data, status, xmlObj){
-			      if(data.redirect){
-				window.location.href = data.redirect;
-			      }else if(form.find("input[name='_target_']").length>0){
-				id=form.find("input[name='_target_']").attr("value");
-				$("#"+id).html(data);
-				attachFormRemoteTo($("#"+id).find("form._remote_"));
-			      }else if(form.find("table").length>0){
-				form.find("table").html(data);
-				attachFormRemoteTo(form.find("table form._remote_"));
-			      }else if(form.find("div").length>0){
-				form.find("div").html(data);
-				attachFormRemoteTo(form.find("div").find("form._remote_"));
-			      }else{
-				form.append(data);
-				attachFormRemoteTo(form.find("form._remote_"));
-			      }
-			      $("#spinner").remove();
-			      $(form).find("input[type='submit']").attr("disabled", "");
-			    },
-			    error: function(xhr, text, errorThrown){
-			      if(xhr.status=="302"){
-				window.location.href = text;
-			      }else{
-				$("div.error").remove();
-				txt = "<div class='error'>"+xhr.responseText+"</div>"
-				form.before(txt);
-				$("#spinner").remove();
-				$(form).find("input[type='submit']").attr("disabled", "");
-			      }
-			    }
-			  });
-		   return false;
-		 });
+    form=$(f.currentTarget);
+    $(form).find("input[type='submit']").attr("disabled", true);
+    $(form).after("<img id='spinner' src='/images/spinner.gif' />");
+    $.ajax({
+      type: form.attr("method"),
+      url: form.attr("action"),
+      data: form.serialize(),
+      success: function(data, status, xmlObj){
+	if(data.redirect){
+	  window.location.href = data.redirect;
+	}else if(form.find("input[name='_target_']").length>0){
+	  id=form.find("input[name='_target_']").attr("value");
+	  $("#"+id).html(data);
+	  attachFormRemoteTo($("#"+id).find("form._remote_"));
+	}else if(form.find("table").length>0){
+	  form.find("table").html(data);
+	  attachFormRemoteTo(form.find("table form._remote_"));
+	}else if(form.find("div").length>0){
+	  form.find("div").html(data);
+	  attachFormRemoteTo(form.find("div").find("form._remote_"));
+	}else{
+	  attachFormRemoteTo(form.find("form._remote_"));
+	}
+	$("#spinner").remove();
+	$(form).find("input[type='submit']").attr("disabled", "");
+      },
+      error: function(xhr, text, errorThrown){
+	if(xhr.status=="302"){
+	  window.location.href = text;
+	}else{
+	  $("div.error").remove();
+	  txt = "<div class='error'>"+xhr.responseText+"</div>"
+	  form.before(txt);
+	  $("#spinner").remove();
+	  $(form).find("input[type='submit']").attr("disabled", "");
+	}
+      }
+    });
+    return false;
+  });
 }
 
 function create_remotes(){
@@ -235,6 +234,7 @@ function create_remotes(){
 	    $(a).remove();
 	    $("#spinner").remove();
 	  }
+	  floatHeaders();
 	},
 	error: function(xhr, text, errorThrown){
 	  txt = "<div class='error'>"+xhr.responseText+"</div>"
@@ -372,6 +372,26 @@ function fillCenters(){
   });
 }
 
+function floatHeaders(){
+  if($("table.report").length>0){
+    $('.report').floatHeader({
+      fadeIn: 250,
+      fadeOut: 250,
+      forceClass: true,
+      recalculate: true,
+      markerClass: 'header'
+    });
+  }
+  if($("table.floating_header").length>0){
+    $('table.floating_header').floatHeader({
+      fadeIn: 250,
+      fadeOut: 250,
+      forceClass: true,
+      recalculate: true,
+      markerClass: 'header'
+    });
+  }
+}
 
 $(document).ready(function(){
 	create_remotes();
@@ -479,15 +499,7 @@ $(document).ready(function(){
 		    setToggleText();
 		});
 	  }
-	if($("table.report").length>0){
-	  $('.report').floatHeader({
-	    fadeIn: 250,
-	    fadeOut: 250,
-	    forceClass: true,
-	    recalculate: true,
-	    markerClass: 'header'
-	  });
-	}
+
 	if($("a.moreinfo").length>0){
 	    $("a.moreinfo").click(function(){
 		    path="/"+$(this).attr("id").split("_").join("/");
@@ -717,5 +729,6 @@ $(document).ready(function(){
       $("#user_form #user_funder").val("");
     }
   });
+  floatHeaders();
 });
 

@@ -2,7 +2,7 @@ module Merb
   module GlobalHelpers
     CRUD_ACTIONS = ["list", "index", "show", "edit", "new"]
     MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-    TRANSACTION_MODELS = [Branch, Center, Cgt, Grt, ClientGroup, Client, Loan, Payment]
+    TRANSACTION_MODELS = [Branch, Center, ClientGroup, Cgt, Grt, Client, Loan, Payment]
     
     def page_title
       begin
@@ -108,7 +108,7 @@ module Merb
       date = Date.today if date.blank? and not nullable
       date = nil        if date.blank? and nullable
       attrs.merge!(:date => date)
-      if TRANSACTION_MODELS.include?(klass) or TRANSACTION_MODELS.include?(klass.superclass)
+      if TRANSACTION_MODELS.include?(klass) or TRANSACTION_MODELS.include?(klass.superclass) or TRANSACTION_MODELS.include?(klass.superclass.superclass)
         attrs.merge!(:min_date => attrs[:min_date]||Date.min_transaction_date)
         attrs.merge!(:max_date => attrs[:max_date]||Date.max_transaction_date)
       else

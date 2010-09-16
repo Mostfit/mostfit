@@ -88,13 +88,13 @@
       Scheduled disbursal date:
     %td
       on&nbsp;&nbsp;
-      = date_select_for @loan, :scheduled_disbursal_date
+      = date_select_for @loan, :scheduled_disbursal_date, :max_date => Date.max_date
   %tr
     %td
       Scheduled first payment:
     %td
       on&nbsp;&nbsp;
-      = date_select_for @loan, :scheduled_first_payment_date
+      = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date
   - if take_over_loan
     %tr
       %td{:colspan => 2}
@@ -109,19 +109,19 @@
       %td
         Original disbursal date:
       %td
-        = date_select_for @loan, :original_disbursal_date
+        = date_select_for @loan, :original_disbursal_date, :max_date => Date.max_date, :min_date => Date.min_date
         %span.greytext the date on which this loand originally disbursed
     %tr
       %td
         Original first payment date:
       %td
-        = date_select_for @loan, :original_first_payment_date
+        = date_select_for @loan, :original_first_payment_date, :max_date => Date.max_date, :min_date => Date.min_date
         %span.greytext the date on which first payment was made for this loan
     %tr
       %td
         Taken over on:
       %td
-        = date_select_for @loan, :taken_over_on
+        = date_select_for @loan, :taken_over_on, :max_date => Date.max_date, :min_date => Date.min_date
         %span.greytext the date on which this loan was taken over
     %tr
       %td

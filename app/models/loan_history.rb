@@ -226,12 +226,13 @@ class LoanHistory
   def self.sum_advance_payment(from_date, to_date, group_by)
     repository.adapter.query(%Q{
       SELECT 
-        SUM(principal_paid) AS advance_principal,
-        SUM(principal_paid) + SUM(interest_paid) AS advance_total,
+        (-1 * SUM(principal_due)) AS advance_principal,
+        (-1 * (SUM(principal_due) + SUM(interest_due))) AS advance_total,
         #{group_by}_id
       FROM loan_history
       WHERE status in (5,6) AND date>='#{from_date.strftime('%Y-%m-%d')}' AND date<='#{to_date.strftime('%Y-%m-%d')}'
             AND scheduled_outstanding_principal>actual_outstanding_principal AND scheduled_outstanding_total>actual_outstanding_total
+            AND principal_paid>0 and interest_paid>0
       GROUP BY #{group_by}_id;
     })
   end
