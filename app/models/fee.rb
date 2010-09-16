@@ -61,7 +61,7 @@ class Fee
     payables = Fee.properties[:payable_on].type.flag_map
     applicables = repository.adapter.query(%Q{
                                 SELECT l.id loan_id, l.client_id client_id, 
-                                       SUM(if(f.amount>0, convert(f.amount, decimal), convert(l.amount*f.percentage, decimal))) fees_applicable, 
+                                       SUM(if(f.amount>0, convert(f.amount, decimal), l.amount*f.percentage)) fees_applicable, 
                                        f.payable_on payable_on                                       
                                 FROM loan_products lp, fee_loan_products flp, fees f, loans l 
                                 WHERE flp.fee_id=f.id AND flp.loan_product_id=lp.id AND lp.id=l.loan_product_id #{query} GROUP BY l.id;})
@@ -69,9 +69,9 @@ class Fee
     applicables.each{|fee|
       if payables[fee.payable_on]==:loan_installment_dates
         installments = loans.find{|x| x.id==fee.loan_id}.installment_dates.reject{|x| x>Date.today}.length
-        fees.push(FeeApplicable.new(fee.loan_id, fee.client_id, fee.fees_applicable.to_i * installments))
+        fees.push(FeeApplicable.new(fee.loan_id, fee.client_id, fee.fees_applicable.to_f * installments))
       else
-        fees.push(FeeApplicable.new(fee.loan_id, fee.client_id, fee.fees_applicable))
+        fees.push(FeeApplicable.new(fee.loan_id, fee.client_id, fee.fees_applicable.to_f))
       end
     }
     fees
@@ -94,8 +94,8 @@ class Fee
       applicable = fees_applicable.find{|x| x.loan_id==lid}
       next if not applicable
       paid      = fees_paid.find_all{|x| x.loan_id==lid}
-      paid      = (paid and paid.length>0) ? paid.map{|x| x.amount.to_i}.inject(0){|s,x| s+=x} : 0
-      fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable.to_i : 0), paid, (applicable ? applicable.fees_applicable : 0) - paid)
+      paid      = (paid and paid.length>0) ? paid.map{|x| x.amount.to_f}.inject(0){|s,x| s+=x} : 0
+      fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable.to_f : 0), paid, (applicable ? applicable.fees_applicable : 0) - paid)
     }
     fees
   end

@@ -149,14 +149,15 @@ module DataEntry
         params[:paid][:loan].keys.each do |k|
           @loan = Loan.get(k.to_i)
           @loan.history_disabled = true
-          amounts = params[:paid][:loan][k.to_sym].to_i
+          amounts = params[:paid][:loan][k.to_sym].to_f
+          next if amounts<=0
           if params.key?(:payment_type) and params[:payment_type] == "fees"
             @loan.pay_fees(amounts, @date, @staff, session.user)
             next
           end
           @type = params[:payment][:type]
           style = params[:payment_style][k.to_sym].to_sym
-          next if amounts<=0          
+          next if amounts<=0
           @success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, false, style)
           if @success
             @loan.history_disabled = false
