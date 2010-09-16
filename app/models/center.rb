@@ -5,6 +5,7 @@ class Center
   
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   after :save, :handle_meeting_date_change
+  before :create, :set_meeting_change_date
 
   property :id,                   Serial
   property :name,                 String, :length => 100, :nullable => false, :index => true
@@ -129,8 +130,8 @@ class Center
     centers
   end
   
-  def loans
-    self.clients.loans
+  def loans(hash={})
+    self.clients.loans.all(hash)
   end
   
   def leader
@@ -162,8 +163,8 @@ class Center
   def handle_meeting_date_change
     self.meeting_day_change_date = parse_date(self.meeting_day_change_date) if self.meeting_day_change_date.class==String and not self.meeting_day_change_date.blank?
     return unless self.meeting_day_change_date
-
     date = self.meeting_day_change_date||Date.today
+
     if not CenterMeetingDay.first(:center => self)
       CenterMeetingDay.create(:center_id => self.id, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
     elsif self.meeting_day != self.meeting_day_for(date)
@@ -188,4 +189,9 @@ class Center
     }
     return true
   end  
+
+
+  def set_meeting_change_date
+    self.meeting_day_change_date = self.creation_date
+  end
 end
