@@ -5,7 +5,9 @@ describe Posting do
     load_fixtures :account_type, :account 
     Payment.all.destroy! if Payment.all.count > 0
     Journal.all.destroy!
-    p Account.all
+    mfi = Mfi.first
+    mfi.accounting_enabled = true
+    mfi.save
     @rule_book_1 =  RuleBook.new(:name => "Loan", :action => :disbursement, :branch_id => 1)
     @rule_book_1.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(2), :percentage => 100)
     @rule_book_1.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(1), :percentage => 100)

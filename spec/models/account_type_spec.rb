@@ -35,11 +35,11 @@ describe AccountType do
   end
   
   it "should be able to have accounts" do
-     name = "cash"
-    @account = Account.new(:name => name,:gl_code => "123aq")
+    name = "cash"
+    @account = Account.new(:name => name, :gl_code => "123aq")
     @account.account_type = @account_type
-    @account.parent_id = @account
-    @account.opening_balance = "0"
+    @account.parent_id = Account.first
+    @account.opening_balance = 0
     @account.save 
     @account.should be_valid
     

@@ -1,10 +1,10 @@
 1:
   :id: 1
   :name: Default
-  :max_amount: 15000
-  :min_amount: 5000
+  :max_amount: 18000
+  :min_amount: 1000
   :amount_multiple: 10
-  :max_interest_rate: 15
+  :max_interest_rate: 20
   :min_interest_rate: 12
   :interest_rate_multiple: 1
   :installment_frequency: :weekly
