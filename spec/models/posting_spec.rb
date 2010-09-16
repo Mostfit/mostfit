@@ -117,6 +117,12 @@ describe Posting do
     @payment = payments.first
   end
 
+  after(:all) do
+    mfi = Mfi.first
+    mfi.accounting_enabled = false
+    mfi.save
+  end
+
   it "should not be valid if book keeping entry are not made on loan disbursal" do
     @journal = Journal.last(:transaction_id => @loan.id, :journal_type_id => 1)
     @journal.errors

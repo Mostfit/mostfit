@@ -165,8 +165,12 @@ module Reporting
       get_latest_before(:scheduled_outstanding_principal, start_date) - get_latest_before(:scheduled_outstanding_principal, end_date) + loans_disbursed_between(start_date, end_date, "sum")
     end
 
+    def total_due_between(start_date, end_date)
+      get_latest_before(:scheduled_outstanding_total, start_date) - get_latest_before(:scheduled_outstanding_total, end_date) + loans_disbursed_between(start_date, end_date, "sum")
+    end
+
     def interest_due_between(start_date, end_date)
-      get_latest_before(:scheduled_outstanding_total, start_date) - get_latest_before(:scheduled_outstanding_principal, start_date) - get_latest_before(:actual_outstanding_total, end_date) + get_latest_before(:actual_outstanding_principal, end_date)
+      total_due_between(start_date, end_date) - principal_due_between(start_date, end_date)
     end
 
     def principal_outstanding(date = Date.today)

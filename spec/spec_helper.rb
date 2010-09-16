@@ -20,8 +20,12 @@ Spec::Runner.configure do |config|
 
   config.before(:all) do
     DataMapper.auto_migrate! if Merb.orm == :datamapper
+
+    mfi = Mfi.first
+    mfi.accounting_enabled = false
+    mfi.save
   end
-  
+
 end
 
 def load_fixtures(*files)

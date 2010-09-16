@@ -5,6 +5,9 @@ describe AccountLoanObserver do
   before(:all) do
     Payment.all.destroy! if Payment.all.count > 0
     Client.all.destroy! if Client.count > 0
+    mfi = Mfi.first
+    mfi.accounting_enabled = true
+    mfi.save
 
     load_fixtures :account_type, :account, :currency, :journal_type, :credit_account_rule, :debit_account_rule, :rule_book, :staff_members, :users, :funders, :funding_lines, :branches, :centers, :client_types, :clients, :loan_products
 
@@ -19,6 +22,12 @@ describe AccountLoanObserver do
   before (:each) do
     Journal.all.destroy!
     Posting.all.destroy!
+  end
+  
+  after(:all) do
+    mfi = Mfi.first
+    mfi.accounting_enabled = false
+    mfi.save
   end
   
   it "should not do journal entry when loan is created" do
