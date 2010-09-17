@@ -77,7 +77,7 @@
                   -data.each_with_index do |ele, idx|
                     - ele = (data[3]+data[4]+data[5]) if idx==6
                     %td
-                      =ele.to_i
+                      =ele.to_currency
                       -idx>6 ? quarter_total[idx]=ele : quarter_total[idx]+=ele
             %tr.quarter_total
               %td
@@ -86,7 +86,7 @@
               -quarter_total.each do |ele|
                 %td
                   %b
-                    =ele.to_i
+                    =ele.to_currency
         %tr.year_total
           %td
             %b==Year total:
@@ -95,7 +95,7 @@
           - branch_total.last.each do |ele|
             %td
               %b
-                =ele.to_i
+                =ele.to_currency
       %tr.branch_total
         %td
           %b==Branch total:
@@ -104,12 +104,12 @@
         - org_total.last.each do |ele|
           %td
             %b
-              =ele.to_i
+              =ele.to_currency
   %tr.org_total
     %td
       %b==Total
     -org_total.find_all{|x| x.length==length}.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
       %td
         %b
-          =ele.to_i
+          =ele.to_currency
 

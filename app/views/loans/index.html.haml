@@ -34,7 +34,8 @@
           center managed by:
           = link_to @center.branch.manager.name, resource(@center.manager)
     %tr
-      %tdGroup name
+      %td
+        Group
       %td
         -if @client.client_group
           =@client.client_group.name

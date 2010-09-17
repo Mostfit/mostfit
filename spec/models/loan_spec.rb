@@ -568,6 +568,7 @@ describe Loan do
     @center.meeting_day = :thursday
     @center.save
     @center = Center.get(@center.id)
+
     @center.meeting_day_for(Date.new(2001, 01, 31)).should eql(:wednesday)
     @center.meeting_day_for(Date.new(2001, 02, 2)).should eql(:thursday)
 

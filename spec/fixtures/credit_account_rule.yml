@@ -1,16 +1,16 @@
-1:
+disbursement:
   :credit_account_id: 2
   :rule_book_id: 1
   :percentage: 100
-2:
+principal:
   :credit_account_id: 4
   :rule_book_id: 2
   :percentage: 100
-3:
+interest:
   :credit_account_id: 4
   :rule_book_id: 3
   :percentage: 100
-4:
+fees:
   :rule_book_id: 4
   :credit_account_id: 3
   :percentage: 100

@@ -36,8 +36,8 @@ module DataEntry
         end
 
         if @errors.blank?
-          notice = 'All payments made succesfully'
           return_url = params[:return]||url(:data_entry)
+          notice = 'All payments made succesfully'
           if(request.xhr?)
             render("<div class='notice'>#{notice}<div>", :layout => layout?)
           else
@@ -45,8 +45,8 @@ module DataEntry
           end
         elsif params[:format] and params[:format]=="xml"
           display("")
-        else 
-          render      
+        else
+          params[:return] ? redirect(params[:return], :message => {:error => @errors}) : render
         end
       else
         render
@@ -78,7 +78,7 @@ module DataEntry
     
     def create(payment)
       raise NotFound unless @loan = Loan.get(payment[:loan_id])
-      amounts = payment[:amount].to_i
+      amounts = payment[:amount].to_f
       receiving_staff = StaffMember.get(payment[:received_by])
       # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
       if payment[:type] == "total"
@@ -149,14 +149,15 @@ module DataEntry
         params[:paid][:loan].keys.each do |k|
           @loan = Loan.get(k.to_i)
           @loan.history_disabled = true
-          amounts = params[:paid][:loan][k.to_sym].to_i
+          amounts = params[:paid][:loan][k.to_sym].to_f
+          next if amounts<=0
           if params.key?(:payment_type) and params[:payment_type] == "fees"
             @loan.pay_fees(amounts, @date, @staff, session.user)
             next
           end
           @type = params[:payment][:type]
           style = params[:payment_style][k.to_sym].to_sym
-          next if amounts<=0          
+          next if amounts<=0
           @success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, false, style)
           if @success
             @loan.history_disabled = false

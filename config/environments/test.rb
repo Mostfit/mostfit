@@ -4,8 +4,8 @@ Merb::Config.use { |c|
   c[:exception_details] = true
   c[:log_auto_flush ]   = true
   c[:log_level]         = :error
-  c[:log_stream] = STDOUT
-
-  # c[:log_file]  = Merb.root / "log" / "test.log"
+  #c[:log_stream] = STDOUT
+  c[:reload_classes] = false
+  c[:log_file]  = Merb.root / "log" / "test.log"
   # or redirect logger using IO handle
 }

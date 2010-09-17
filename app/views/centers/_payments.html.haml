@@ -30,7 +30,7 @@
     - histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
     - fees_applicable = Fee.due(loans.map{|x| x.id})
     - fees_paid       = {}
-    - Payment.all(:received_on => @date, :type => :fees, :loan_id => loans.map{|x| x.id}, :fields => [:id, :amount]).map{|p| fees_paid[p.loan_id] =  p}
+    - Payment.all(:received_on => @date, :type => :fees, :loan_id => loans.map{|x| x.id}, :fields => [:id, :amount]).map{|p| fees_paid[p.loan_id]||=0; fees_paid[p.loan_id] +=  p.amount}
     - tot_amount, tot_outstanding, tot_installments, tot_principal_due, tot_principal_paid, tot_interest_due, tot_interest_paid, tot_fee_due, tot_fee_paid, tot_total_due, tot_total_paid = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     - clients.group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each do |group, client_grouped|
       %tr.group
@@ -93,7 +93,7 @@
               - tot_fee_due += fee_due
               - grp_fee_due += fee_due
             %td.numeric
-              - fee_paid = fees_paid[loan.id] ? fees_paid[loan.id].amount : 0
+              - fee_paid = fees_paid[loan.id] ? fees_paid[loan.id] : 0
               = fee_paid.to_currency
               - tot_fee_paid += fee_paid
               - grp_fee_paid += fee_paid

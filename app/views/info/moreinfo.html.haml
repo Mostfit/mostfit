@@ -131,7 +131,7 @@
     %td
     %td
       -if @defaulted and @defaulted.total_due and @defaulted.principal_due
-        =(@defaulted.total_due.to_i-@defaulted.principal_due.to_i).to_currency
+        =(@defaulted.total_due-@defaulted.principal_due).to_currency
       -else
         0
   -if @centers and not @obj.class==StaffMember

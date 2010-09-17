@@ -71,11 +71,11 @@
               -data.each_with_index do |g, idx|
                 -if idx==6
                   %td
-                    = (data[3]+data[4]+data[5]).to_i
+                    = (data[3]+data[4]+data[5]).to_currency
                     -center_total[6]+=(data[3]+data[4]+data[5])
                 -else
                   %td
-                    =g.to_i
+                    =g.to_currency
                     -center_total[idx]+=g
           %tr.center_total
             %td
@@ -84,7 +84,7 @@
             -center_total.each do |ele|
               %td
                 %b
-                  =ele.to_i
+                  =ele.to_currency
       %tr.branch_total
         %td
           %b==Branch total:
@@ -92,12 +92,12 @@
         - org_total.last.each do |ele|
           %td
             %b
-              =ele.to_i
+              =ele.to_currency
   %tr.org_total
     %td
       %b==Total
     -org_total.find_all{|x| x.length==length}.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
       %td
         %b
-          =ele.to_i
+          =ele.to_currency
 

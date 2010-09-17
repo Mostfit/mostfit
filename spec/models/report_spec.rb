@@ -187,74 +187,75 @@ describe Report do
     end
     # TODO get the code working for loan cycles 2 and above
     # Branch.client_count_by_loan_cycle(2,@date).should == {1 => 3, 2=>2}
-    Branch.clients_added_between_such_and_such_date_count(@date - 10, @date).should == {1=> 6, 2=> 6}
-    Branch.clients_added_between_such_and_such_date_count('2008-01-02', @date - 2).should == {}
-    Branch.clients_added_between_such_and_such_date_count('2008-01-01', @date - 2).should == {1 => 1}
-    Branch.clients_added_between_such_and_such_date_count(@date, '2012-01-01').should == {}
+    Branch.clients_added_between(@date - 10, @date).should == {1=> 6, 2=> 6}
+    Branch.clients_added_between('2008-01-02', @date - 2).should == {}
+    Branch.clients_added_between('2008-01-01', @date - 2).should == {1 => 1}
+    Branch.clients_added_between(@date, '2012-01-01').should == {}
     Client.get(7).destroy
-    Branch.clients_deleted_between_such_and_such_date_count(Date.today, Date.today + 1).should == {2=>1}
-    Branch.clients_deleted_between_such_and_such_date_count(Date.today + 1, Date.today + 2).should == {}
+    Branch.clients_deleted_between(Date.today, Date.today + 1).should == {2=>1}
+    Branch.clients_deleted_between(Date.today + 1, Date.today + 2).should == {}
   end
 
   it "should return correct repaid loan count" do
     l = Loan.get(13)
     date = l.payments.last.received_on
-    Branch.loans_repaid_between_such_and_such_date(date-3,  date+3,   "count").should == {1=>5}
-    Branch.loans_repaid_between_such_and_such_date(date+1,  date+100, "count").should == {1=>2}
-    Branch.loans_repaid_between_such_and_such_date(date-100,date-1,   "count").should == {}
+    Branch.loans_repaid_between(date-3,  date+3,   "count").should == {1=>5}
+    Branch.loans_repaid_between(date+1,  date+100, "count").should == {1=>2}
+    Branch.loans_repaid_between(date-100,date-1,   "count").should == {}
   end
 
   it "should return correct repaid loan amount" do
     l = Loan.get(13)
     date = l.scheduled_maturity_date
-    Branch.loans_repaid_between_such_and_such_date(date - 3, date + 3,   "sum").should == {1=>50000}
-    Branch.loans_repaid_between_such_and_such_date(date+1,   date+100, "sum").should == {1=>20000}
-    Branch.loans_repaid_between_such_and_such_date(date-100, date-1,   "sum").should == {}
+    Branch.loans_repaid_between(date - 3, date + 3,   "sum").should == {1=>50000}
+    Branch.loans_repaid_between(date+1,   date+100, "sum").should == {1=>20000}
+    Branch.loans_repaid_between(date-100, date-1,   "sum").should == {}
   end
 
   it "should return correct disbursed loan count" do
     l = Loan.get(1)
     date = l.scheduled_disbursal_date
 
-    Branch.loans_disbursed_between_such_and_such_date(date-3,   date+3,"count").should == {1=>6, 2=>6}
-    Branch.loans_disbursed_between_such_and_such_date(date+1,   date+100,"count").should == {1=>3,2=>3}
-    Branch.loans_disbursed_between_such_and_such_date(date-100, date-1,"count").should == {}
+    Branch.loans_disbursed_between(date-3,   date+3,"count").should == {1=>6, 2=>6}
+    Branch.loans_disbursed_between(date+1,   date+100,"count").should == {1=>3,2=>3}
+    Branch.loans_disbursed_between(date-100, date-1,"count").should == {}
   end
 
   it "should return correct disbursed loan amount" do
     l = Loan.get(1)
     date = l.scheduled_disbursal_date
-    Branch.loans_disbursed_between_such_and_such_date(date,     date+3,"sum").should == {1=>12000, 2=>12000}
-    Branch.loans_disbursed_between_such_and_such_date(date+1,   date+100,"sum").should == {1=>6000, 2=>6000}
-    Branch.loans_disbursed_between_such_and_such_date(date-100, date-1,"sum").should == {}
+    Branch.loans_disbursed_between(date,     date+3,"sum").should == {1=>12000, 2=>12000}
+    Branch.loans_disbursed_between(date+1,   date+100,"sum").should == {1=>6000, 2=>6000}
+    Branch.loans_disbursed_between(date-100, date-1,"sum").should == {}
   end
 
   it "should give correct principal due" do
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    Branch.principal_due_between_such_and_such_date(date,     date + 6).should == {1=> 120, 2=>120}
-    Branch.principal_due_between_such_and_such_date(date + 7, date + 13).should == {1=>240, 2=>240}
+    Branch.principal_due_between(date,     date + 6).should == {1=> 120, 2=>120}
+    Branch.principal_due_between(date + 7, date + 13).should == {1=>240, 2=>240}
   end
 
   it "should give correct principal received" do
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    Branch.principal_received_between_such_and_such_date(date + 7, date + 13).should == {}
-    Branch.principal_received_between_such_and_such_date(date-1,     date + 6).should == {1=>(20 + 40 + 60), 2=>(40 + 60)}
+    Branch.principal_received_between(date + 7, date + 13).should == {}
+    Branch.principal_received_between(date-1,     date + 6).should == {1=>(20 + 40 + 60), 2=>(40 + 60)}
   end
 
   it "should give correct interest due" do
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    Branch.interest_due_between_such_and_such_date(date, date + 6).should == {1=>12, 2=>12}
-    Branch.interest_due_between_such_and_such_date(date + 7, date + 13).should == {1=>24, 2=>24}
+    loans =  Loan.all
+    Branch.interest_due_between(date, date + 6).should == {1=> 12, 2=> 12}
+    Branch.interest_due_between(date + 7, date + 13).should == {1=> 24, 2=> 24}
   end
 
   it "should give correct interest received" do
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    Branch.interest_received_between_such_and_such_date(date + 7, date + 13).should == {}
-    Branch.interest_received_between_such_and_such_date(date,     date + 6).should == {1 => (2 + 4 + 6), 2 => (4 + 6)}
+    Branch.interest_received_between(date + 7, date + 13).should == {}
+    Branch.interest_received_between(date,     date + 6).should == {1 => (2 + 4 + 6), 2 => (4 + 6)}
   end
 
   it "should give correct principal outstanding" do

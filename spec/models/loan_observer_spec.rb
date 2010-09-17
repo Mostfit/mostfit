@@ -1,70 +1,33 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
-describe LoanObserver do
+describe AccountLoanObserver do
   
   before(:all) do
-    load_fixtures :account_type, :account, :currency, :journal_type, :rule_book
     Payment.all.destroy! if Payment.all.count > 0
     Client.all.destroy! if Client.count > 0
-    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin)
-    @user.save
-    @user.should be_valid
+    mfi = Mfi.first
+    mfi.accounting_enabled = true
+    mfi.save
+
+    load_fixtures :account_type, :account, :currency, :journal_type, :credit_account_rule, :debit_account_rule, :rule_book, :staff_members, :users, :funders, :funding_lines, :branches, :centers, :client_types, :clients, :loan_products
 
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
     @manager.save
     @manager.should be_valid
-
-    @funder = Funder.new(:name => "FWWB")
-    @funder.save
-    @funder.should be_valid
-
-    @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
-    @funding_line.funder = @funder
-    @funding_line.save
-    @funding_line.should be_valid
-
-    @branch = Branch.new(:name => "Kerela branch")
-    @branch.manager = @manager
-    @branch.code = "bra"
-    @branch.save
-    @branch.should be_valid
-
-    @center = Center.new(:name => "Munnar hill center")
-    @center.manager = @manager
-    @center.branch  = @branch
-    @center.code = "cen"
-    @center.save
-    @center.should be_valid
-
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => Time.now.to_s, :client_type => ClientType.create(:type => "Standard"))
-    @client.center  = @center
-    @client.date_joined = Date.parse('2006-01-01')
-    @client.created_by_user_id = 1
-    @client.client_type_id = 1
-    @client.save
-    @client.errors.each {|e| puts e}
-    @client.should be_valid
-    # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
-    @loan_product = LoanProduct.new
-    @loan_product.name = "LP1"
-    @loan_product.max_amount = 10000
-    @loan_product.min_amount = 0
-    @loan_product.max_interest_rate = 100
-    @loan_product.min_interest_rate = 0.1
-    @loan_product.installment_frequency = :weekly
-    @loan_product.max_number_of_installments = 25
-    @loan_product.min_number_of_installments = 25
-    @loan_product.loan_type = "DefaultLoan"
-    @loan_product.valid_from = Date.parse('2000-01-01')
-    @loan_product.valid_upto = Date.parse('2012-01-01')
-    @loan_product.save
-    @loan_product.errors.each {|e| puts e}
-    @loan_product.should be_valid
+    @loan_product = LoanProduct.first
+    @funding_line = FundingLine.first
+    @client       = Client.first
   end
   
   before (:each) do
     Journal.all.destroy!
     Posting.all.destroy!
+  end
+  
+  after(:all) do
+    mfi = Mfi.first
+    mfi.accounting_enabled = false
+    mfi.save
   end
   
   it "should not do journal entry when loan is created" do
@@ -115,11 +78,12 @@ describe LoanObserver do
     @loan.amount = 5500
     @loan.save
     @loan.should be_valid
-    Journal.count.should eql(3)  
-    Journal.get(Journal.count - 1).postings.first.amount.should eql(old_amount) 
-    Journal.get(Journal.count - 1).postings.last.amount.should eql(old_amount * -1) 
+    Journal.count.should eql(3)
     Journal.get(Journal.count).postings.first.amount.should eql(@loan.amount.to_f * -1) 
     Journal.get(Journal.count).postings.last.amount.should eql(@loan.amount.to_f)
+
+    Journal.get(Journal.count - 1).postings.first.amount.should eql(old_amount) 
+    Journal.get(Journal.count - 1).postings.last.amount.should eql(old_amount * -1) 
     
     #No journal entry when amount is unchanged
     old_amount = @loan.amount.to_f

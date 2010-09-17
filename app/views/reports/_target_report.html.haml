@@ -35,7 +35,7 @@
         =target.target_value
       %td
         -present_value = target.get_present_value
-        -percentage    = ((present_value - target.start_value)*100.0/(target.target_value - target.start_value)).round(2)
+        -percentage    = ((present_value - target.start_value)*100.0/(target.target_value - target.start_value)).to_currency
         =present_value
       %td
         =percentage
