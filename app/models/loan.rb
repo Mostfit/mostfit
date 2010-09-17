@@ -638,12 +638,12 @@ class Loan
   def total_principal_to_be_received; get_scheduled(:total_principal, self.scheduled_maturity_date); end
   def total_interest_to_be_received; get_scheduled(:total_interest, self.scheduled_maturity_date); end
   def total_to_be_received
-    ((total_principal_to_be_received>0 ? total_principal_to_be_received : amount) + total_interest_to_be_received).to_i
+    ((total_principal_to_be_received>0 ? total_principal_to_be_received : amount) + total_interest_to_be_received)
   end
 
   def scheduled_principal_up_to(date); get_scheduled(:total_principal, date); end
   def scheduled_interest_up_to(date);  get_scheduled(:total_interest,  date); end
-  def scheduled_total_up_to(date); (scheduled_principal_up_to(date) + scheduled_interest_up_to(date)).to_i;  end
+  def scheduled_total_up_to(date); (scheduled_principal_up_to(date) + scheduled_interest_up_to(date));  end
 
 
   def scheduled_principal_due_on(date); get_scheduled(:principal, date); end

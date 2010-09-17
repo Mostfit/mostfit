@@ -26,7 +26,7 @@ class Payments < Application
   def create(payment)
     raise NotFound unless (@loan or @client)
       
-    amounts = payment[:amount].to_i
+    amounts = payment[:amount].to_f
     receiving_staff = StaffMember.get(payment[:received_by_staff_id])
     if payment[:type] == "total" and @loan
     # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
