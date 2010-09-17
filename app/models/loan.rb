@@ -71,6 +71,7 @@ class Loan
   belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
   belongs_to :created_by,     :child_key => [:created_by_user_id],        :model => 'User'
   belongs_to :loan_utilization
+
   has n, :history,                                                        :model => 'LoanHistory'
   has n, :payments
   has n, :audit_trails,       :child_key => [:auditable_id], :auditable_type => "Loan"
@@ -319,13 +320,13 @@ class Loan
   def repay(input, user, received_on, received_by, defer_update = false, style = :normal)
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
-    unless input.is_a? Array or input.is_a? Fixnum
+    unless input.is_a? Array or input.is_a? Fixnum or input.is_a? Float
       raise "the input argument of Loan#repay should be of class Fixnum or Array"
     end
     raise "cannot repay a loan that has not been saved" if new?
 
     principal, interest, total, fees_paid = 0, 0, nil, 0
-    if input.is_a? Fixnum  # in case only one amount is specified
+    if input.is_a? Fixnum or input.is_a? Float  # in case only one amount is specified
       # interest is paid first, the rest goes in as principal
       # the payment is filed on received_on without knowing about the future
       # it could happen that payment have been made after this payment
