@@ -34,8 +34,8 @@
           MOSTFIT
       - if session.authenticated?
         #navigation
-          = link_to_with_class('browse', url(:browse))
-          = link_to_with_class('manage', url(:data_entry))
+          = link_to_with_class('home', url(:browse))
+          = link_to_with_class('enter data', url(:data_entry))
           = link_to_with_class('admin', url(:admin))
           = link_to_with_class('dashboard', url(:dashboard))
           = link_to_with_class('reports', url(:reports))
@@ -58,9 +58,8 @@
         = catch_content :for_layout
     #footer
       %p{:style => "position: relative; right: 10%; float: right;"}
-        Powered by
-        =image_tag("/images/mostfit_logo.png", :height => 100)
-      == &copy; 2009 Intellecap &mdash; This software is released under the #{link_to 'GNU Affero General Public License', 'http://www.gnu.org/licenses/agpl.html'}.
+        =image_tag("/images/mostfit_logo.png", :height => 80)
+      == &copy; 2010 Intellecap &mdash; This software is released under the #{link_to 'GNU Affero General Public License', 'http://www.gnu.org/licenses/agpl.html'}.
       - if Merb::Config[:environment] == 'development'
         %p
           %a{ :name => "debug" }/

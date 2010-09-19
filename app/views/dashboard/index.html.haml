@@ -1,13 +1,15 @@
 - seg = "/" + ["branch_id", "center_id", "staff_member_id"].map{|k| "#{k}/#{params[k]}" if params[k] and not params[k].blank?}.compact.join("/")
 - seg+= "?time_period=#{params[:time_period]}" if params[:time_period]
 
+/Graph names in the list are out-of-sync with the legends on the graphs themselves (and will always be unless they both derive from a single DRY location)
+
 .tab_container
   %ul.tabs
-    %li#branch Branch
-    %li#centers Center
-    %li#clients Client
-    %li#loan Loan
-    %li#repayments Repayment
+    %li#branch Branches
+    %li#centers Centers
+    %li#clients Clients
+    %li#loan Loans
+    %li#repayments Repayments
     %li#key_ratios Key Ratios
   .tab
     %div.graphContainer
@@ -61,13 +63,13 @@
       %div.listContainer
         %ul#clients
           %li.selected
-            Client growth
+            Client growth (by month)
           %li
             Cumulative growth
           %li
-            Region wise breakup
+            By religion
           %li
-            Caste wise breakup
+            By caste
           %li
             Age profile
           %li
@@ -128,9 +130,9 @@
           %li
             Interest repayments
           %li
-            Fees repayments
+            Fee payments
           %li
-            Total repayments
+            Total receipts
           %li
             Repayment denominations
       %div.graphs
@@ -150,7 +152,7 @@
           %li.selected
             Yield on portfolio
           %li
-            Portfolio at risk
+            Portfolio-at-risk
           %li
             Average loan amount
           %li
