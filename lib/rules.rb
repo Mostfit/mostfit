@@ -45,10 +45,14 @@ module Mostfit
               obj1 = a.var1.split(".").map{|x| x.to_sym}.inject(obj){|s,x|
                       if s!= nil then s.send(x) end
               }
-              if obj1 == nil then true end #this can happend when the condition is ill-formed (say wrong spelling)
-              if a.comparator == "!=".to_sym then obj1 != a.const_value end
+              if obj1 == nil
+                true #this can happend when the condition is ill-formed (say wrong spelling)
+              elsif a.comparator == "!=".to_sym
+                then obj1 != a.const_value
               #otherwise
-              obj1.send(a.comparator, a.const_value)
+              else
+                obj1.send(a.comparator, a.const_value)
+              end
             else #two variables to be handled
               #get obj1
               obj1 = a.var1.split(".").map{|x| x.to_sym}.inject(obj){|s,x|
@@ -85,14 +89,14 @@ module Mostfit
       attr_accessor :condition1, :condition2 #makes sense only if its not a basic condition
 
       def self.get_condition(cond)
-        if(cond[:linking_operator].to_sym == :not) then
+        if((cond[:linking_operator] != nil) and (cond[:linking_operator].to_sym == :not)) then
           c = ComplexCondition.new
           c.operator = :not
           c.condition1 = ComplexCondition.get_condition(cond[:first_condition])
           c.condition2 = nil
           c.is_basic_condition = false
           return c
-        elsif((cond[:linking_operator].to_sym == :and) || (cond[:linking_operator].to_sym == :or)) then
+        elsif((cond[:linking_operator] != nil) and (cond[:linking_operator].to_sym == :and) || (cond[:linking_operator].to_sym == :or)) then
           c = ComplexCondition.new
           c.operator = cond[:linking_operator]
           c.condition1 = ComplexCondition.get_condition(cond[:first_condition])

@@ -85,6 +85,7 @@ class Rules < Application
   end
 
   def get
+    debugger
 		id = params[:id].to_i
     type = params[:type]
     if type != "precondition"
