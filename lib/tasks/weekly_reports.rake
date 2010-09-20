@@ -20,6 +20,6 @@ namespace :mostfit do
     if today.cwday != 7
       today = today - today.cwday
     end
-    WeeklyReport.new(today).calc
+    WeeklyReport.new(today-6).calc
   end
 end
