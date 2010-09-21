@@ -5,9 +5,9 @@
   = random_chart
   %br
 
-%h1 Browse
+%h1 Home
 %h3
-  Here you will find some convenience functions to browse your MFI
+  You can navigate to the most commonly used screens from here
 %div
   %ul
     %li
@@ -15,11 +15,10 @@
     %li
       = link_to_with_rights('Staff members', resource(:staff_members), :class => 'edit')
     %li
-      = link_to_with_rights('Regions', resource(:regions), :class => 'edit')
-    %li
       = link_to_with_rights('Centers meeting today', url(:browse, :centers_paying_today), :class => 'edit')
     %li
       = link_to_with_rights 'Verify data', resource(:verifications), :class => 'edit'
     %li
       = link_to_with_rights 'Documents', resource(:documents), :class => 'edit'
 %div
+%h3 Scroll down to view a chart chosen at random from your operations

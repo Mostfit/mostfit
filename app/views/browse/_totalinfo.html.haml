@@ -1,6 +1,6 @@
 %div.totalinfo
   %h1
-    Company info
+    At one glance
   - lh = LoanHistory.sum_outstanding_for(Mfi)
   - lh = lh ? lh.first : nil
   %table
@@ -36,17 +36,17 @@
         = lh.clients_count if lh
     %tr
       %td
-        Number of loans
+        All loans (number)
       %td{:colspan => 3}
         = (l = Loan.all(:disbursal_date.not => nil).count)
     %tr
       %td
-        Number of closed/repaid loans
+        Closed/repaid loans (number)
       %td{:colspan => 3}
         = (l - lh.loans_count) if lh
     %tr
       %td
-        Amount of loans disbursed
+        Loans disbursed (amount)
       %td{:colspan => 3}
         = Loan.all(:disbursal_date.not => nil).aggregate(:amount.sum).to_currency
     %tr
@@ -56,7 +56,7 @@
         = lh.actual_outstanding_principal.to_currency if lh
     %tr
       %td
-        Total repayments
+        Receipts
       %td
         Principal
       %td
@@ -66,11 +66,19 @@
     %tr
       %td
       %td
-        = Payment.all(:type => :principal).aggregate(:amount.sum).to_currency
+        - principal_repaid = Payment.all(:type => :principal).aggregate(:amount.sum)
+        = principal_repaid.to_currency 
       %td
-        = Payment.all(:type => :interest).aggregate(:amount.sum).to_currency
+        - interest = Payment.all(:type => :interest).aggregate(:amount.sum)
+        = interest.to_currency
       %td
-        = Payment.all(:type => :fees).aggregate(:amount.sum).to_currency
+        - fees = Payment.all(:type => :fees).aggregate(:amount.sum)
+        = fees.to_currency 
+    %tr
+      %td
+        Total receipts
+      %td{:colspan => 3}
+        = (principal_repaid + interest + fees).to_currency
     %tr
       %td
         Staff count
