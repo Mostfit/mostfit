@@ -182,11 +182,9 @@ module Mostfit
       end
 
 			def self.apply_rule(rule)
-        debugger
 		    h = {:name => rule[:name], :on_action => rule[:on_action], :model_name => rule[:model_name], 
 			    :permit => rule[:permit], :condition => convert_to_polish_notation(rule[:condition]),
           :precondition => convert_to_polish_notation(rule[:precondition]) }
-        debugger
 				self.add h
 			end
 

@@ -269,10 +269,56 @@ describe Rules do
 
   end
 
+  it "should handle string comparison rule" do
+    forbidden_region_name = "lalbagh"
+    h = {:name => :name_of_region, :model_name => Region, :on_action => :save,
+      :condition => { :var1 => "name", :var2 => 0, :binaryoperator => "",
+        :comparator => :not, :const_value => forbidden_region_name} }
+    Mostfit::Business::Rules.add h
+    @region_manager = StaffMember.first_or_create(:name => "Region manager1")
+    @region  = Region.first_or_create(:name => forbidden_region_name, :manager => @region_manager)
+    @region.should_not be_valid
+    @region.name = "something"
+    @region.should be_valid
+    @region.save
+    Mostfit::Business::Rules.remove h
 
-  #TODO add a rule for on string variable (say center name != chintu
-  #TODO add a rule for center creation_date != 2005-01-01
-  #TODO add a rule involving two variables say (branch.center.count - branch.count < 5)
+  end
+
+  it "should handle date comparison rule" do
+    forbidden_date = Date.parse("2009-01-01")
+    h = {:name => :creation_date_of_region, :model_name => Region, :on_action => :save,
+      :condition => { :var1 => "creation_date", :var2 => 0, :binaryoperator => "",
+        :comparator => :not, :const_value => forbidden_date} }
+    Mostfit::Business::Rules.add h
+    @region_manager = StaffMember.first_or_create(:name => "Region manager1")
+    @region  = Region.first_or_create(:manager => @region_manager)
+    @region.creation_date = forbidden_date
+    @region.should_not be_valid
+    @region.creation_date = forbidden_date+1
+    @region.should be_valid
+    @region.save
+    Mostfit::Business::Rules.remove h
+
+  end
+
+  it "should handle two variable date comparison rule" do
+    date1 = Date.today
+    h = {:name => :creation_date_of_region, :model_name => Region, :on_action => :save,
+      :condition => { :var1 => "creation_date", :var2 => "manager.creation_date",
+        :binaryoperator => "minus", :comparator => :greater_than, :const_value => 1} }
+    Mostfit::Business::Rules.add h
+    @region_manager = StaffMember.first_or_create(:name => "Region manager1")
+    @region_manager.creation_date = date1 #this is of no effect actually since the region_manager creation date is automatically assigned to be date.today
+    @region  = Region.first_or_create(:manager => @region_manager)
+    @region.creation_date = date1 - 1
+    @region.should_not be_valid
+    @region.creation_date = date1+2
+    @region.should be_valid
+    @region.save
+    Mostfit::Business::Rules.remove h
+
+  end
 
 #  it "should be able to handle rule on Loan model" do
 #   #TODO:not working, some problem discuss the loan thing with Piyush
