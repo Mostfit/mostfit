@@ -85,7 +85,7 @@ class Rules < Application
   end
 
   def get
-    debugger
+    #debugger
 		id = params[:id].to_i
     type = params[:type]
     if type != "precondition"
@@ -127,7 +127,7 @@ class Rules < Application
       collection5 = [["-", "minus"]] #specifically for dates
       select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection1)
       select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :prompt => "Choose operator", :collection => collection2)
-      select3 = select(:id => "#{type}_selectmore_#{id+2}", :name => "rule[#{type}][#{condition_id}][linking_operator]", :prompt => "Add more condition", 
+      select3 = select(:id => "#{type}_selectmore_#{id+2}", :name => "rule[#{type}][#{condition_id}][linking_operator]", :prompt => "Add more #{type}", 
                        :collection => [["and", "and"], ["or", "or"]])
       select4 = select(:id => "#{type}_selectbinaryoperator_#{id}", :name => "rule[#{type}][#{condition_id}][binaryoperator]", :prompt => "Choose operator", :collection => collection4)
       select5 = select(:id => "#{type}_selectbinaryoperator_#{id}", :name => "rule[#{type}][#{condition_id}][binaryoperator]", :prompt => "Choose operator", :collection => collection5)
