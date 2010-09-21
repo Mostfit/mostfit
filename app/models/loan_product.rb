@@ -8,7 +8,7 @@ class LoanProduct
   property :amount_multiple, Integer, :nullable => false, :index => true, :default => 1, :min => 1
   property :max_interest_rate, Float, :nullable => false, :index => true, :max => 100
   property :min_interest_rate, Float, :nullable => false, :index => true, :min => 0
-  property :interest_rate_multiple, Float, :nullable => false, :index => true, :default => 0.1, :min => 0.01
+  property :interest_rate_multiple, Float, :nullable => false, :index => true, :default => 0.1
   property :installment_frequency, Enum.send('[]', *([:any] + INSTALLMENT_FREQUENCIES)), :nullable => true, :index => true
 
   property :max_number_of_installments, Integer, :nullable => false, :index => true, :max => 1000
