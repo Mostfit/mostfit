@@ -12,30 +12,8 @@
   - Marshal.restore(obj).to_a.each do |condition_id, cond|
     %div{:class => type, :id => "#{div_prefix}#{condition_id}"} 
       - condition_id = condition_id.to_i
-      -#Start of CodeBlock001
       - variable_id = 1
-      - keys = [@rule.model_name] + cond[:variable]["#{variable_id}"][:complete].split(".")
-      = text_field(:name => "rule[#{type}][1][variable][1][complete]", :value => cond[:variable]["#{variable_id}"][:complete], :class => "rules", :id => "#{type}_#{condition_id}_variable_#{variable_id}") #this holds the actual variable name like center.branch.count etc.
-      - debugger
-      - model = nil
-      %div{:class => type, :id => "#{type[0,1]}#{condition_id}#{"v"}#{variable_id}", :style => "display:none"}
-        %b 
-          = "#{type} #{condition_id} Variable #{variable_id}"
-        - keys.each_with_index do |key, idx|
-          - name, field, choices = Condition.get_field_choices_and_name(key)
-          - model, key_type = Condition.get_model(key)
-          
-          - if model#which obviously each one (except last one) is
-            - name = "rule[#{type}][#{condition_id}][keys][]"
-            -#selected = (keys.length==idx+1) ? cond[:comparator].to_s : keys[idx+1]
-            - selected = keys[idx+1]
-            = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :id => "#{type}_select_#{id}")
-            :javascript
-              attachRulesFormEvents("#{type}", #{id});
-            - id+=1
-        %a{:onclick => "javascript:this.parentNode.style.display='none';fillVariableField('condition',1,1);"}
-          %b Done
-      -#end of CodeBlock001
+      = partial :variablefield, {:type => type, :cond => cond, :condition_id => condition_id, :variable_id => variable_id, :id => id}
 
       -#now comes binary operator
       - displaySecondVariable = false
@@ -47,34 +25,14 @@
         - displaySecondVariable = true
 
       - if displaySecondVariable == true
-        -#Repeat of CodeBlock001 for variable 2 instead of 1
-        -#TODO make a new partial and move codeblock 001 to that and call that partial from here
         - variable_id = 2
-        - keys = [@rule.model_name] + cond[:variable]["#{variable_id}"][:complete].split(".")
-        = text_field(:name => "rule[#{type}][1][variable][1][complete]", :value => cond[:variable]["#{variable_id}"][:complete], :class => "rules", :id => "#{type}_#{condition_id}_variable_#{variable_id}") #this holds the actual variable name like center.branch.count etc.
-        - model = nil
-        %div{:class => type, :id => "#{type[0,1]}#{condition_id}#{"v"}#{variable_id}", :style => "display:none"}
-          %b 
-            = "#{type} #{condition_id} Variable #{variable_id}"
-          - keys.each_with_index do |key, idx|
-            - name, field, choices = Condition.get_field_choices_and_name(key)
-            - model, key_type = Condition.get_model(key)
-            
-            - if model#which obviously each one (except last one) is
-              - name = "rule[#{type}][#{condition_id}][keys][]"
-              -#selected = (keys.length==idx+1) ? cond[:comparator].to_s : keys[idx+1]
-              - selected = keys[idx+1]
-              - if ((variable_id>1) and (idx==0)) #first select field of second variable
-                - choices = choices + [["0","0"]]
-              = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :id => "#{type}_select_#{id}")
-              :javascript
-                attachRulesFormEvents("#{type}", #{id});
-                attachRulesFormEventsForVariableField("#{type}", #{condition_id}, #{variable_id})
-              - id+=1
-          %a{:onclick => "javascript:this.parentNode.style.display='none';fillVariableField('condition',1,1);"}
-            %b Done
-        -#end of Repeat of CodeBlock001
+        = partial :variablefield, {:type => type, :cond => cond, :condition_id => condition_id, :variable_id => variable_id, :id => id}
 
+      - if (cond[:variable]["#{variable_id}"] == nil)
+        - cond[:variable]["#{variable_id}"] = Hash.new
+      - if (cond[:variable]["#{variable_id}"][:complete] == nil)
+        - cond[:variable]["#{variable_id}"][:complete] = ""
+      - keys = [@rule.model_name] + cond[:variable]["#{variable_id}"][:complete].split(".")
       - model = Kernel.const_get(keys[keys.length-2].singularize.camelcase)#since last is not a model, making model from second last term and will use this model.
       - if model == nil
         error in model
