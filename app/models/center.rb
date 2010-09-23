@@ -96,14 +96,14 @@ class Center
   end
 
   def next_meeting_date_from(date)
-    meeting_wday = Center.meeting_days.index(meeting_day_for(date))
+    meeting_wday = Center.meeting_days.index(meeting_day_for(date+7))
     next_meeting_date = date - date.wday + meeting_wday
     next_meeting_date += 7 if next_meeting_date <= date
     next_meeting_date.holiday_bump
   end
 
   def previous_meeting_date_from(date)
-    meeting_wday = Center.meeting_days.index(meeting_day_for(date))
+    meeting_wday = Center.meeting_days.index(meeting_day_for(date-7))
     previous_meeting_date = date - date.wday + meeting_wday
     previous_meeting_date -= 7 if previous_meeting_date >= date
     previous_meeting_date.holiday_bump
