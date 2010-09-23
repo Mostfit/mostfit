@@ -29,12 +29,19 @@ module DataEntry
       only_provides :html
       @client_group = ClientGroup.get(id)
       raise NotFound unless @client_group
+      @center  = @client_group.center
+      @branch  = @center.branch
+      @errors = []
       clients.each{|client_id|
-        if client = Client.get(client_id)
-          client.update_attributes(:grt_pass_date => grt_date)
+        if client = Client.get(client_id) and not client.update_attributes(:grt_pass_date => grt_date)
+          @errors << client
         end
       }
-      redirect(url(:enter_groups, :edit, @client_group), :message => {:notice => "GRT date for group was successfully saved"})
+      if @errors.length>0
+        display([@client_group], "client_groups/edit")
+      else
+        redirect(resource(@center), :message => {:notice => "GRT date for group #{@client_group.name} was successfully saved"})
+      end
     end
   end # ClientGroups    
 end
