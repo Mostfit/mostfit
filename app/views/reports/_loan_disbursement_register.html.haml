@@ -11,14 +11,25 @@
       Loan product
     %th
       Loan sequence
-    %th
+    %th{:colspan => 2}
       Disbursment date
     %th
       Amount
+  %tr.header
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+      Scheduled
+    %th
+      Actual
+    %th
   - center_id, branch_id = nil, nil
-  - length = 7
+  - length = 8
   - org_total = []
-  - summable_columns = [1,6]
+  - summable_columns = [1,7]
   - loan_products = {}; LoanProduct.all.map{|x| loan_products[x.id] = x}
   - @data.sort_by{|branch, x| branch.name}.each do |branch, centers|
     -if centers.keys.length>0

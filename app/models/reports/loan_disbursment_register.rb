@@ -44,7 +44,7 @@ class LoanDisbursementRegister < Report
       branch = branches[center.branch_id]
       data[branch][center][client.client_group] ||= []
       data[branch][center][client.client_group].push([client.reference, client.name, client.spouse_name, 
-                                                      l.loan_product_id, l.cycle_number, l.disbursal_date, l.amount])
+                                                      l.loan_product_id, l.cycle_number, l.scheduled_disbursal_date, l.disbursal_date, l.amount])
     }
     return data
   end
