@@ -534,7 +534,7 @@ table.report th{
     padding-right: 2px;
 }
 table.report th:first-child{
-    width: 10%;
+    width: 8%;
 }
 table.report tbody{
 }
