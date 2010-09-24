@@ -29,7 +29,7 @@ Spec::Runner.configure do |config|
 end
 
 def load_fixtures(*files)
-  #DataMapper.auto_migrate! if Merb.orm == :datamapper
+  DataMapper.auto_migrate! if Merb.orm == :datamapper
   files.each do |name|
     klass = Kernel::const_get(name.to_s.singularize.camel_case)
     yml_file =  "spec/fixtures/#{name}.yml"
