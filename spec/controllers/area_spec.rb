@@ -15,9 +15,9 @@ describe Areas, "Check area" do
     @staff_member = StaffMember.first
     @region       = Region.first
     params = {}
-    params[:area] =
-      {
-      :name => "TestArea",:region_id => @region.id,:manager_id => @staff_member.id,:address => "Near malad station", :contact_number => "9078345621", :landmark => "The city mall"
+    params[:area] = {
+      :name => "TestArea", :region_id => @region.id, :manager_id => @staff_member.id, :address => "Near malad station", 
+      :contact_number => "9078345621", :landmark => "The city mall"
     }
     response = request url(:areas), :method => "POST", :params => params
     response.should redirect
@@ -29,20 +29,15 @@ describe Areas, "Check area" do
     response.should redirect
     @area = Area.first
     response = (request resource(@area)).should be_successful
-
     params= {}
-    hash = @area.attributes
-    hash[:name] = @area.name + "_changed"
+    hash          = @area.attributes
+    hash[:name]   = @area.name + "_changed"
     params[:area] = hash
-    params[:id] = @area.id
-    
+    params[:id]   = @area.id
     response = request resource(@area), :method => "POST", :params => params
-    
     new_name = Area.get(@area.id).name
     new_name.should_not equal(@area.name)
-   
   end
-
 end
 
  

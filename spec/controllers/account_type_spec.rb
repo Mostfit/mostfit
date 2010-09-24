@@ -7,7 +7,6 @@ describe AccountTypes, "Check types" do
   end
 
   it "create a new account type" do
-
     response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
     response.should redirect
     request("/account_types").should be_successful
@@ -19,14 +18,13 @@ describe AccountTypes, "Check types" do
   end
 
   it "edit a account type" do
-
-   response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
+    response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
     response.should redirect
     @account_type = AccountType.first
     request(url(:account_types)).should be_successful
     params = {}
     hash                   = @account_type.attributes
-    hash[:name]            = @account_type.name+"_modified"
+    hash[:name]            = #{@account_type.name} + "_modified"
     params[:id]            = @account_type.id
     params[:account_type]  = hash
     response = request resource(@account_type), :method => "POST", :params => params

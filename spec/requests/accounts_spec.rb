@@ -105,6 +105,128 @@ describe "resource(@account)", :given => "a account exists" do
       @response.should redirect_to(resource(@account))
     end
   end
-  
 end
+
+describe Accounts, "Check accounts" do
+  before do
+    load_fixtures :users, :account_type, :staff_members
+  end
+
+  def create(branch)
+    @branch = Branch.new(branch)
+    if @branch.save
+      redirect(params[:return]||resource(:branches), :message => {:notice => "Branch #{@branch.name}' successfully created"})
+      else
+        message[:error] = "Branch failed to be created"
+        render :new
+      end
+  end
+
+  it "create a new account" do
+
+    response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
+    response.should redirect
+    request("/accounts/new").should be_successful
+
+    @branch       = Branch.first
+    @account_type = AccountType.first
+    @staff_member = StaffMember.first
+
+describe Accounts, "Check accounts" do
+  before do
+    load_fixtures :users, :account_type, :staff_members
+  end
+
+  def create(branch)
+    @branch = Branch.new(branch)
+    if @branch.save
+      redirect(params[:return]||resource(:branches), :message => {:notice => "Branch #{@branch.name}' successfully created"})
+      else
+        message[:error] = "Branch failed to be created"
+        render :new
+      end
+  end
+
+  it "create a new account" do
+
+    response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
+    response.should redirect
+    request("/accounts/new").should be_successful
+
+    @branch       = Branch.first
+    @account_type = AccountType.first
+    @staff_member = StaffMember.first
+describe Accounts, "Check accounts" do
+  before do
+    load_fixtures :users, :account_type, :staff_members
+  end
+
+  def create(branch)
+    @branch = Branch.new(branch)
+    if @branch.save
+      redirect(params[:return]||resource(:branches), :message => {:notice => "Branch #{@branch.name}' successfully created"})
+      else
+        message[:error] = "Branch failed to be created"
+        render :new
+      end
+  end
+
+  it "create a new account" do
+
+    response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
+    response.should redirect
+    request("/accounts/new").should be_successful
+
+    @branch       = Branch.first
+    @account_type = AccountType.first
+    @staff_member = StaffMember.first
+describe Accounts, "Check accounts" do
+  before do
+    load_fixtures :users, :account_type, :staff_members
+  end
+
+  def create(branch)
+    @branch = Branch.new(branch)
+    if @branch.save
+      redirect(params[:return]||resource(:branches), :message => {:notice => "Branch #{@branch.name}' successfully created"})
+      else
+        message[:error] = "Branch failed to be created"
+        render :new
+      end
+  end
+
+  it "create a new account" do
+
+    response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
+    response.should redirect
+    request("/accounts/new").should be_successful
+
+    @branch       = Branch.first
+    @account_type = AccountType.first
+    @staff_member = StaffMember.first
+describe Accounts, "Check accounts" do
+  before do
+    load_fixtures :users, :account_type, :staff_members
+  end
+
+  def create(branch)
+    @branch = Branch.new(branch)
+    if @branch.save
+      redirect(params[:return]||resource(:branches), :message => {:notice => "Branch #{@branch.name}' successfully created"})
+      else
+        message[:error] = "Branch failed to be created"
+        render :new
+      end
+  end
+
+  it "create a new account" do
+
+    response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
+    response.should redirect
+    request("/accounts/new").should be_successful
+
+    @branch       = Branch.first
+    @account_type = AccountType.first
+    @staff_member = StaffMember.first
+
 
