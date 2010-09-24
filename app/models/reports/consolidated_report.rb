@@ -19,9 +19,9 @@ class ConsolidatedReport < Report
   def generate
     branches, centers, data, clients, loans = {}, {}, {}, {}, {}
     histories = LoanHistory.sum_outstanding_grouped_by(self.to_date, :center, self.loan_product_id)
-    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, :center)||[]
-    balances  = LoanHistory.advance_balance(self.to_date, :center)||[]
-    old_balances = LoanHistory.advance_balance(self.from_date-1, :center)||[]
+    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, :center, self.loan_product_id)||[]
+    balances  = LoanHistory.advance_balance(self.to_date, :center, self.loan_product_id)||[]
+    old_balances = LoanHistory.advance_balance(self.from_date-1, :center, self.loan_product_id)||[]
     
     @branch.each{|b|
       data[b]||= {}
@@ -148,27 +148,3 @@ class ConsolidatedReport < Report
     return data
   end
 end
-
-
-# Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, :fields => [:id,:type,:loan_id,:amount,:client_id]).each{|p|
-#   if p.loan_id and loans[p.loan_id] and clients.key?(loans[p.loan_id].client_id)
-#     client = clients[loans[p.loan_id].client_id]
-#   elsif clients.key?(p.client_id)
-#     client = clients[p.client_id]
-#   end
-#   next unless client
-#   center_id = client.center_id
-#   next if not centers.key?(center_id)
-#   branch_id = centers[center_id].branch_id
-#   if groups[branch_id][center_id]
-#     group_id = client.client_group_id ? client.client_group_id : 0
-#     groups[branch_id][center_id][0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "No group"] if group_id==0 and not groups[branch_id][center_id].key?(0)
-#     if p.type==:principal
-#       groups[branch_id][center_id][group_id][3] += p.amount
-#     elsif p.type==:interest
-#       groups[branch_id][center_id][group_id][4] += p.amount
-#     elsif p.type==:fees
-#       groups[branch_id][center_id][group_id][5] += p.amount
-#     end
-#   end
-# }
