@@ -117,6 +117,7 @@ module Misfit
         return true if user_role == :admin
         return true if [:graph_data, :info, :dashboard].include?(route[:controller].to_sym) and user_role!=:data_entry
         return true if route[:controller] == "users" and route[:action] == "change_password"
+        return false if (user_role == :read_only or user_role == :funder or user_role == :data_entry) and route[:controller] == "payments" and route[:action] == "delete"
 
         @route = route
         @controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
