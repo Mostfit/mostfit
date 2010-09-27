@@ -272,6 +272,15 @@ function create_remotes(){
       $(form).unbind();
       attachFormRemoteTo($(form));
     });
+  $('.confirm_click').each(function(idx, link){
+    $(link).unbind();
+    $(link).click(function(event) {
+	link = event.currentTarget;
+	str  = $(link).attr("title") || 'Are you sure?';
+	var answer = confirm(str);
+	return answer;
+    });
+  });
 }
 function attachReportingFormEvents(id){
     $("#reporting_form tr#"+id+" select").change(function(){

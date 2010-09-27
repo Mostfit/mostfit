@@ -271,17 +271,15 @@ table.narrow tr.group td{
     font-weight: bold;
 } 
 /* .container .error, .container .notice, .container .success */
-#flash-messages
-{
+#flash-messages{
+    float: center;
 }
-.flash
-{
+.flash{
 margin-top: 15px;
 padding: 0px;
 text-align: center;
 }
-.flash p
-{
+.flash p{
 font-weight: bold;
 margin: 0px;
 }
