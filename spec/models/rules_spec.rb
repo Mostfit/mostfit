@@ -70,6 +70,7 @@ describe Rules do
   #       var1 BINARYOPERATOR var2 COMPARATOR const_value
   #       so there are two types of conditions, one contains linking_operator, first_condition and second_condition(like C1, C2)
   #       other contains var1, var2, binaryoperator, comparator, const_value (like C3)
+  #       if var1 is neither int nor date, than var2 is ignoreed and binaryoperator should be empty string
 
 
   it "should handle a complex condition" do
@@ -334,6 +335,92 @@ describe Rules do
     @region.should be_valid
     @region.save
     Mostfit::Business::Rules.remove h
+
+  end
+
+  it "TESTCASE01:should not permit more than 5 clients in a client group" do
+    h = {:name => :max_clients_in_a_group, :model_name => Client, :on_action => :save,
+      :condition => { :var1 => "client_group.clients.count", :var2 => 0,
+        :binaryoperator => "", :comparator => :less_than_equal , :const_value => 5} }
+    Mostfit::Business::Rules.add h
+
+    cg = ClientGroup.first_or_create(:name => "DummyGroup1", :code => "97", :center_id => 5, :created_by_staff_member_id => @branch_manager.id)
+    cg.save
+    cg.should be_valid
+
+    @center_manager = StaffMember.first_or_create(:name => "Center manager1")
+    @center_manager.save
+    @center_manager.should be_valid
+    @branch_manager = StaffMember.first_or_create(:name => "Branch manager1")
+    @branch_manager.save
+    @branch_manager.should be_valid
+    @branch = Branch.new(:name => "Kerela branch")
+    @branch.manager = @branch_manager
+    @branch.code = "br"
+    @branch.save
+    @branch.should be_valid
+    @center = Center.new(:name => "Munnar hill center")
+    @center.manager = @center_manager
+    @center.branch  = @branch
+    @center.code = "cen"
+    @center.save
+    @center.should be_valid
+
+    c1 = Client.first_or_create(:name => 'Dummy Client1', :reference => Time.now.to_s+"1",
+                                :client_type => ClientType.create(:type => "Standard"),
+                                :center  => @center, :date_joined => Date.parse('2010-01-01') )
+    c1.created_by_user_id = @branch_manager.id
+    c1.client_group = cg
+    c1.save
+    c1.should be_valid
+
+    c2 = Client.first_or_create(:name => 'Dummy Client2', :reference => Time.now.to_s+"2",
+                                :client_type => ClientType.create(:type => "Standard"),
+                                :center  => @center, :date_joined => Date.parse('2010-01-01') )
+    c2.created_by_user_id = @branch_manager.id
+    c2.client_group = cg
+    c2.save
+    c2.should be_valid
+
+    c3 = Client.first_or_create(:name => 'Dummy Client3', :reference => Time.now.to_s+"3",
+                                :client_type => ClientType.create(:type => "Standard"),
+                                :center  => @center, :date_joined => Date.parse('2010-01-01') )
+    c3.created_by_user_id = @branch_manager.id
+    c3.client_group = cg
+    c3.save
+    c3.should be_valid
+  
+    c4 = Client.first_or_create(:name => 'Dummy Client4', :reference => Time.now.to_s+"4",
+                                :client_type => ClientType.create(:type => "Standard"),
+                                :center  => @center, :date_joined => Date.parse('2010-01-01') )
+    c4.created_by_user_id = @branch_manager.id
+    c4.client_group = cg
+    c4.save
+    c4.should be_valid
+
+    c5 = Client.first_or_create(:name => 'Dummy Client5', :reference => Time.now.to_s+"5",
+                                :client_type => ClientType.create(:type => "Standard"),
+                                :center  => @center, :date_joined => Date.parse('2010-01-01') )
+    c5.created_by_user_id = @branch_manager.id
+    c5.client_group = cg
+    c5.save
+    c5.should be_valid
+   
+    c6 = Client.first_or_create(:name => 'Dummy Client6', :reference => Time.now.to_s+"6",
+                                :client_type => ClientType.create(:type => "Standard"),
+                                :center  => @center, :date_joined => Date.parse('2010-01-01') )
+    c6.created_by_user_id = @branch_manager.id
+    c6.client_group = cg
+    c6.save
+    c6.should_not be_valid
+
+    c1.destroy!
+    c2.destroy!
+    c3.destroy!
+    c4.destroy!
+    c5.destroy!
+    c6.destroy!
+    cg.destroy!
 
   end
 
