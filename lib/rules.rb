@@ -40,7 +40,7 @@ module Mostfit
           end
 
           a.validator = Proc.new{|obj| #obj is effectively an object of model_name class
-            debugger
+            #debugger
             if((a.var2 == nil) or (a.var2 == 0))#single variable has to be handled
               #var1 is a string
               obj1 = a.var1.split(".").map{|x| x.to_sym}.inject(obj){|s,x|

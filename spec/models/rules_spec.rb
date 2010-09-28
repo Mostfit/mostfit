@@ -55,6 +55,23 @@ describe Rules do
     @basic_condition1.const_value.should == 5
   end
 
+# A complex condition consists of one or two complex conditions attached by a linking operator
+# let C1, C2, C3 and C4 be complex conditions
+  # C1 = { :linking_operator => "not", :first_condition => C2 }
+  # C2 = { :linking_operator => "and", #and or or
+  #       :first_condition => C3 ,
+  #       :second_condition => C4}
+  # C3 = {:var1 => "id", #interpreted as model_name.var1
+  #       :binaryoperator => "minus", #relation between var1 and var2, only plus or minus allowed here
+  #       :var2 => "some_other_property", #interpreted as model_name.var2
+  #       :comparator => :less_than , #less_than, less_than_equal, equal, not etc.
+  #       :const_value => 5, #final const value
+  #       COMPLETE EVALUATION IS OF
+  #       var1 BINARYOPERATOR var2 COMPARATOR const_value
+  #       so there are two types of conditions, one contains linking_operator, first_condition and second_condition(like C1, C2)
+  #       other contains var1, var2, binaryoperator, comparator, const_value (like C3)
+
+
   it "should handle a complex condition" do
     @complex_condition1 = Mostfit::Business::ComplexCondition.get_condition(
       :linking_operator => :and,
