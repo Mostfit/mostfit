@@ -8,7 +8,6 @@ describe Rules do
 
 
   before(:all) do
-        
    @center_manager = StaffMember.first_or_create(:name => "Center manager1")
    @center_manager.save
    @center_manager.should be_valid
@@ -894,25 +893,71 @@ describe Rules do
 #
 #  end
 #
-  it "(TESTCASE05) branch manager should be able to disburse 10K loan" do     
-   
+  # it "(TESTCASE05) branch manager should not be able to disburse more than 10K loan" do     
+    
+  #   h = {:name => :should_not_disburse_more_than_10K_loan, :model_name => Loan, :on_action => :update,
+  #     :precondition => { :var1 => "disbursed_by_staff_id", :var2 => 0,
+  #       :binaryoperator => "", :comparator => :equal,:const_value => 1},
+  #     :condition => {:var1 => "amount_sanctioned",:var2 => 0 ,:binaryoperator => "", :comparator => :less_than_equal,:const_value =>10000 } }
 
-    h = {:name => :should_not_disburse_more_than_10K_loan, :model_name => Loan, :on_action => :update,
+  #   Mostfit::Business::Rules.add h
+    
+  #   @loan = Loan.new(:amount => 10001, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-02-10")
+  #   @loan.history_disabled = true
+  #   @loan.applied_by       = @branch_manager
+  #   @loan.approved_by      = @branch_manager
+  #   @loan.disbursed_by     = @branch_manager
+  #   @loan.funding_line     = @funding_line
+  #   @loan.client           = @c1
+  #   @loan.loan_product     = @loan_product
+  #   @loan.valid?
+  #   @loan.approved_on     = "2000-02-04"
+  #   @loan.disbursal_date  = "2000-02-10"
+  #   @loan.amount_sanctioned = 1000
+  #   @loan.save
+  #   @loan.errors.each {|e| puts e}
+  #   @loan.should_not be_valid
+    
+  #   Mostfit::Business::Rules.remove h
+
+  # end
+
+  it "(TESTCASE07) Area manager should be able to disburse up to 50K loan" do     
+    
+    @branch_manager.destroy!
+    @center_manager.destroy!    
+    @area_manager = StaffMember.first_or_create(:name => "Area manager")
+    @area_manager.save
+    @area_manager.should be_valid
+    @manager = StaffMember.first_or_create(:name => "Region manager1")
+    @manager.save
+    @manager.should be_valid
+    @region  = Region.first_or_create(:name => "test region3", :manager => @manager)
+    @region.should be_valid
+    @area = Area.new(:name => "Maharastra")
+    @area.manager = @area_manager
+    @area.region  = @region
+    @area.save
+    @area.should be_valid
+
+    h = {:name => :should_not_disburse_more_than_50K_loan, :model_name => Loan, :on_action => :update,
       :precondition => { :var1 => "disbursed_by_staff_id", :var2 => 0,
         :binaryoperator => "", :comparator => :equal,:const_value => 1},
-      :condition => {:var1 => "amount_sanctioned",:var2 => 0 ,:binaryoperator => "", :comparator => :less_than_equal,:const_value =>10000 } }
+      :condition => {:var1 => "amount_sanctioned",:var2 => 0 ,:binaryoperator => "", :comparator => :less_than_equal,:const_value =>50000 } }
 
     Mostfit::Business::Rules.add h
- 
-    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-02-10")
+    
+    @loan = Loan.new(:amount => 5000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-02-10")
     @loan.history_disabled = true
-    @loan.applied_by       = @branch_manager
+    @loan.applied_by       = @area_manager
+    @loan.approved_by      = @area_manager
+    @loan.disbursed_by     = @area_manager
     @loan.funding_line     = @funding_line
     @loan.client           = @c1
     @loan.loan_product     = @loan_product
     @loan.valid?
+    @loan.approved_on     = "2000-02-04"
     @loan.disbursal_date  = "2000-02-10"
-    @loan.amount_sanctioned = 1000
     @loan.save
     @loan.errors.each {|e| puts e}
     @loan.should be_valid
@@ -920,4 +965,5 @@ describe Rules do
     Mostfit::Business::Rules.remove h
 
   end
+
 end
