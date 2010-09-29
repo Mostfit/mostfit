@@ -8,6 +8,75 @@ describe Rules do
 
 
   before(:all) do
+        
+   @center_manager = StaffMember.first_or_create(:name => "Center manager1")
+   @center_manager.save
+   @center_manager.should be_valid
+   @branch_manager = StaffMember.first_or_create(:name => "Branch manager1")
+   @branch_manager.save
+   @branch_manager.should be_valid
+   @branch = Branch.new(:name => "Kerela branch1")
+   @branch.manager = @branch_manager
+   @branch.code = "br1"
+   @branch.save
+   @branch.should be_valid
+   @center = Center.new(:name => "Munnar hill center1")
+   @center.manager = @center_manager
+   @center.branch  = @branch
+   @center.code = "cen1"
+   @center.save
+   @center.should be_valid
+    
+    
+    cg = ClientGroup.first_or_create(:name => "DummyGroup1", :code => "97", :center_id => 1, :created_by_staff_member_id => @branch_manager.id)
+    cg.save
+    cg.should be_valid
+    
+    
+   @c1 = Client.first_or_create(:name => 'Dummy Client1', :reference => Time.now.to_s+"1",
+                               :client_type => ClientType.create(:type => "Standard"),
+                               :center  => @center, :date_joined => Date.parse('2010-01-01') )
+   @c1.created_by_user_id = @branch_manager.id
+   @c1.client_group = cg
+   @c1.save
+   @c1.should be_valid
+
+   @c2 = Client.first_or_create(:name => 'Dummy Client2', :reference => Time.now.to_s+"2",
+                               :client_type => ClientType.create(:type => "Standard"),
+                               :center  => @center, :date_joined => Date.parse('2010-01-01') )
+   @c2.created_by_user_id = @branch_manager.id
+   @c2.client_group = cg
+   @c2.save
+   @c2.should be_valid
+    
+    
+    
+    @funder = Funder.new(:name => "FWWB")
+    @funder.save
+    @funder.should be_valid
+
+    @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
+    @funding_line.funder = @funder
+    @funding_line.save
+    @funding_line.should be_valid
+
+    @loan_product = LoanProduct.new
+    @loan_product.name = "LP1"
+    @loan_product.max_amount = 1000
+    @loan_product.min_amount = 1000
+    @loan_product.max_interest_rate = 100
+    @loan_product.min_interest_rate = 0.1
+    @loan_product.installment_frequency = :weekly
+    @loan_product.max_number_of_installments = 25
+    @loan_product.min_number_of_installments = 25
+    @loan_product.loan_type = "DefaultLoan"
+    @loan_product.valid_from = Date.parse('2000-01-01')
+    @loan_product.valid_upto = Date.parse('2012-01-01')
+    @loan_product.save
+    @loan_product.errors.each {|e| puts e}
+    @loan_product.should be_valid
+ 
+
   end
 
  it "should handle a basic condition" do
@@ -769,194 +838,86 @@ describe Rules do
         :binaryoperator => "", :comparator => :greater_than_equal, :const_value => 3} }
     Mostfit::Business::Rules.add h
     
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
+    @loan.history_disabled = true
+    @loan.applied_by       = @branch_manager
+    @loan.funding_line     = @funding_line
+    @loan.client           = @c1
+    @loan.loan_product     = @loan_product
+    @loan.valid?
+    @loan.errors.each {|e| puts e}
+    @loan.should_not be_valid
     
-   @center_manager = StaffMember.first_or_create(:name => "Center manager1")
-   @center_manager.save
-   @center_manager.should be_valid
-   @branch_manager = StaffMember.first_or_create(:name => "Branch manager1")
-   @branch_manager.save
-   @branch_manager.should be_valid
-   @branch = Branch.new(:name => "Kerela branch1")
-   @branch.manager = @branch_manager
-   @branch.code = "br1"
-   @branch.save
-   @branch.should be_valid
-   @center = Center.new(:name => "Munnar hill center1")
-   @center.manager = @center_manager
-   @center.branch  = @branch
-   @center.code = "cen1"
-   @center.save
-   @center.should be_valid
-    
-    
-    cg = ClientGroup.first_or_create(:name => "DummyGroup1", :code => "97", :center_id => 1, :created_by_staff_member_id => @branch_manager.id)
-    cg.save
-    cg.should be_valid
-    
-    
-   c1 = Client.first_or_create(:name => 'Dummy Client1', :reference => Time.now.to_s+"1",
-                               :client_type => ClientType.create(:type => "Standard"),
-                               :center  => @center, :date_joined => Date.parse('2010-01-01') )
-   c1.created_by_user_id = @branch_manager.id
-   c1.client_group = cg
-   c1.save
-   c1.should be_valid
+    @loan.destroy!
+   Mostfit::Business::Rules.remove h
+ end
 
-   c2 = Client.first_or_create(:name => 'Dummy Client2', :reference => Time.now.to_s+"2",
-                               :client_type => ClientType.create(:type => "Standard"),
-                               :center  => @center, :date_joined => Date.parse('2010-01-01') )
-   c2.created_by_user_id = @branch_manager.id
-   c2.client_group = cg
-   c2.save
-   c2.should be_valid
-    
-    
-    
-    @funder = Funder.new(:name => "FWWB")
-    @funder.save
-    @funder.should be_valid
 
-    @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
-    @funding_line.funder = @funder
-    @funding_line.save
-    @funding_line.should be_valid
-
-    @loan_product = LoanProduct.new
-    @loan_product.name = "LP1"
-    @loan_product.max_amount = 1000
-    @loan_product.min_amount = 1000
-    @loan_product.max_interest_rate = 100
-    @loan_product.min_interest_rate = 0.1
-    @loan_product.installment_frequency = :weekly
-    @loan_product.max_number_of_installments = 25
-    @loan_product.min_number_of_installments = 25
-    @loan_product.loan_type = "DefaultLoan"
-    @loan_product.valid_from = Date.parse('2000-01-01')
-    @loan_product.valid_upto = Date.parse('2012-01-01')
-    @loan_product.save
-    @loan_product.errors.each {|e| puts e}
-    @loan_product.should be_valid
- 
+  it "(TESTCASE03) should not disburse loan if no of clients in group less than 3" do     
+    h = {:name => :min_clients_limit_in_group, :model_name => Loan, :on_action => :save,
+      :condition => { :var1 => "client.client_group.clients.count", :var2 => 0,
+        :binaryoperator => "", :comparator => :greater_than_equal, :const_value => 3} }
+    Mostfit::Business::Rules.add h
  
     @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
     @loan.history_disabled = true
     @loan.applied_by       = @branch_manager
     @loan.funding_line     = @funding_line
-    @loan.client           = c1
+    @loan.client           = @c1
     @loan.loan_product     = @loan_product
     @loan.valid?
     @loan.errors.each {|e| puts e}
     @loan.should_not be_valid
-
-
-  
-   c1.destroy!
-   c2.destroy!
-   cg.destroy!
-
-
-   Mostfit::Business::Rules.remove h
+    @loan.destroy!
+  Mostfit::Business::Rules.remove h
  end
 
+  it "(TESTCASE06) loan should not be disbursed if it is older than 5 days" do     
+    h = {:name => :should_not_disburse_5days_old_loan, :model_name => Loan, :on_action => :update,
+      :condition => { :var1 => "scheduled_disbursal_date", :var2 => 0,
+        :binaryoperator => "", :comparator => :minus, :var3 => "applied_on",:binaryoperator => "", :comparator => :less_than_equal,:const_value => 5 } }
+    Mostfit::Business::Rules.add h
+        
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-02-10")
+    @loan.history_disabled = true
+    @loan.applied_by       = @branch_manager
+    @loan.funding_line     = @funding_line
+    @loan.client           = @c1
+    @loan.loan_product     = @loan_product
+    @loan.disbursal_date   = "2000-02-10"
+    @loan.valid?
+    @loan.errors.each {|e| puts e}
+    @loan.should_not be_valid
+    
+    @loan.destroy!
+  Mostfit::Business::Rules.remove h
 
+  end
 
+  it "(TESTCASE05) branch manager should be able to disburse 10K loan" do     
+   
 
+    h = {:name => :should_not_disburse_more_than_10K_loan, :model_name => Loan, :on_action => :update,
+      :precondition => { :var1 => "disbursed_by_staff_id", :var2 => 0,
+        :binaryoperator => "", :comparator => :equal,:const_value => 1},
+      :condition => {:var1 => "amount_sanctioned",:var2 => 0 ,:binaryoperator => "", :comparator => :less_than_equal,:const_value =>10000 } }
 
+    Mostfit::Business::Rules.add h
+ 
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-02-10")
+    @loan.history_disabled = true
+    @loan.applied_by       = @branch_manager
+    @loan.funding_line     = @funding_line
+    @loan.client           = @c1
+    @loan.loan_product     = @loan_product
+    @loan.valid?
+    @loan.errors.each {|e| puts e}
+    @loan.disbursal_date  = "2000-02-10"
+    @loan.amount_sanctioned = 1000
+    @loan.save
+    @loan.should be_valid
+    
+    Mostfit::Business::Rules.remove h
 
-
-
-    #  it "should be able to handle rule on Loan model" do
-    #   #TODO:not working, some problem discuss the loan thing with Piyush
-    #    h = { :name => :loans_more_than_10k, :model_name => Loan,
-#          :on_action => :save,
-#             :precondition => {:linking_operator => :and,
-#               :first_condition => {:var1 => "disbursal_date", :var2 => 0,
-#                 :comparator => :not, :const_value => nil},
-#               :second_condition => {:var1 => "amount", :var2 => 0, 
-#                 :comparator => :greater_than_equal, :const_value => 10000} },
-#             :condition => {:var1 => :disbursed_by, :var2 => 0,
-#               :comparator => :equal, :const_value => "client.center.branch.manager"}}
-#    
-#    Mostfit::Business::Rules.add h
-#    Loan.new.respond_to?(:loans_more_than_10k).should == true
-#
-#
-#    @region_manager = StaffMember.first_or_create(:name => "Region manager1")
-#    @branch_manager = StaffMember.first_or_create(:name => "Branch manager1")
-#    @area_manager = StaffMember.first_or_create(:name => "Area manager1")
-#    @center_manager = StaffMember.first_or_create(:name => "Center manager1")
-#    @region_manager.save
-#    @branch_manager.save
-#    @area_manager.save
-#    @region_manager.should be_valid
-#    @branch_manager.should be_valid
-#    @area_manager.should be_valid
-#    @region  = Region.first_or_create(:name => "test region3", :manager => @region_manager)
-#    @region.should be_valid
-#    @area = Area.first_or_create(:name => "test area3", :region => @region, :manager => @area_manager)
-#    @area.save
-#    @area.should be_valid
-#
-#    @branch = Branch.new(:name => "Kerela branch")
-#    @branch.manager = @branch_manager
-#    @branch.code = "br"
-#    @branch.save
-#    @branch.should be_valid
-#
-#    @center = Center.new(:name => "Munnar hill center")
-#    @center.manager = @center_manager
-#    @center.branch  = @branch
-#    @center.code = "cen"
-#    @center.save
-#    @center.should be_valid
-#
-#    @funder = Funder.new(:name => "FWWB")
-#    @funder.save
-#    @funder.should be_valid
-#
-#    @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
-#    @funding_line.funder = @funder
-#    @funding_line.save
-#    @funding_line.should be_valid
-#
-#    @client = Client.first_or_create(:name => 'Ms C.L. Ient', :reference => Time.now.to_s, :client_type => ClientType.create(:type => "Standard"))
-#    @client.center  = @center
-#    @client.date_joined = Date.parse('2006-01-01')
-#    @client.created_by_user_id = 1
-#    @client.save
-#    @client.errors.each {|e| puts e}
-#    @client.should be_valid
-#
-#    @loan_product = LoanProduct.new
-#    @loan_product.name = "LP1"
-#    @loan_product.max_amount = 1000
-#    @loan_product.min_amount = 1000
-#    @loan_product.max_interest_rate = 100
-#    @loan_product.min_interest_rate = 0.1
-#    @loan_product.installment_frequency = :weekly
-#    @loan_product.max_number_of_installments = 25
-#    @loan_product.min_number_of_installments = 25
-#    @loan_product.loan_type = "DefaultLoan"
-#    @loan_product.valid_from = Date.parse('2000-01-01')
-#    @loan_product.valid_upto = Date.parse('2012-01-01')
-#    @loan_product.save
-#    @loan_product.errors.each {|e| puts e}
-#    @loan_product.should be_valid
-#
-#    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
-#    @loan.history_disabled = true
-#    @loan.applied_by       = @center_manager
-#    @loan.funding_line     = @funding_line
-#    @loan.client           = @client
-#    @loan.loan_product     = @loan_product
-#    @loan.valid?
-#    @loan.approved_on = "2000-02-03"
-#    @loan.approved_by = @manager
-#    @loan.should be_valid
-#
-#    @client.destroy
-#    @loan.destroy
-#    @loan_product.destroy
-#  end
-
+  end
 end
