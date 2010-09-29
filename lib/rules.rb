@@ -42,6 +42,7 @@ module Mostfit
           a.validator = Proc.new{|obj| #obj is effectively an object of model_name class
             #debugger
             if((a.var2 == nil) or (a.var2 == 0))#single variable has to be handled
+              #debugger
               #var1 is a string
               obj1 = a.var1.split(".").map{|x| x.to_sym}.inject(obj){|s,x|
                       if s!= nil then s.send(x) end
@@ -52,6 +53,7 @@ module Mostfit
                 then obj1 != a.const_value
               #otherwise
               else
+                #debugger
                 obj1.send(a.comparator, a.const_value)
               end
             else #two variables to be handled
@@ -113,6 +115,7 @@ module Mostfit
       end
       
       def check_condition(obj)
+        #debugger
         if is_basic_condition
           return @basic_condition.validator.call(obj)
         elsif operator == :not
@@ -252,6 +255,7 @@ module Mostfit
                                           :second_condition => c } }
           end
           c = ComplexCondition.get_condition(hash[:condition])
+          #debugger
           #puts c.to_s
           if c.check_condition(self) then
             return true
