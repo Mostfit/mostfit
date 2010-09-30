@@ -32,6 +32,7 @@ Merb::BootLoader.before_app_loads do
   require 'config/constants.rb'
 #  require 'csv'
   require 'uuid'
+  require 'grit'
   require 'ftools'
   require 'logger'
 
