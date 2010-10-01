@@ -13,7 +13,6 @@ describe "/admin", :given => "an admin user" do
     end
     
     it "responds successfully" do
-      pending
       @response.should be_successful
     end
     
