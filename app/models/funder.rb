@@ -8,7 +8,7 @@ class Funder
   belongs_to :user, :nullable => true
 
   has n, :funding_lines
-  
+  has n, :portfolios  
 
   def self.catalog
     result = {}
@@ -34,32 +34,58 @@ class Funder
   
   # this function gives out all the branches that are accessible to a funder
   def branches(hash={})
-    Branch.all(:id => LoanHistory.parents_where_loans_of(Branch, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}, :branch => hash}))
+    ids  = []
+    ids << LoanHistory.ancestors_of_portfolio(self.portfolios, Branch, :branch => hash) if self.portfolios.count > 0
+    ids << LoanHistory.parents_where_loans_of(Branch, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}, :branch => hash}) if funding_lines.count>0
+    Branch.all(:id => ids.flatten)
   end
 
-  # this function gives out all the branches that are accessible to a funder
+  # this function gives out all the centers that are accessible to a funder
   def centers(hash={})
-    Center.all(:id => LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}, :center => hash}))
+    ids = []
+    ids << LoanHistory.ancestors_of_portfolio(self.portfolios, Center, :center => hash) if self.portfolios.count > 0
+    ids << LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}, :center => hash}) if funding_lines.count>0
+    Center.all(:id => ids.flatten)
   end
 
   def client_groups(hash={})
-    ClientGroup.all(:id => LoanHistory.parents_where_loans_of(ClientGroup, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}, :client_group => hash}))
+    ids = []
+    ids << LoanHistory.ancestors_of_portfolio(self.portfolios, ClientGroup) if self.portfolios.count > 0
+    ids << LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}, :center => hash}) if funding_lines.count>0
+    ClientGroup.all(:id => ids.flatten)
   end
 
-  # this function gives out all the branches that are accessible to a funder
+  # this function gives out all the clients that are accessible to a funder
   def clients(hash={})
-    Client.all(:id => LoanHistory.parents_where_loans_of(Client, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}, :client => hash}))
+    ids = []
+    ids << LoanHistory.ancestors_of_portfolio(self.portfolios, Client, :client => hash) if self.portfolios.count > 0
+    ids << LoanHistory.parents_where_loans_of(Client, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}, :client => hash}) if funding_lines.count>0
+    Client.all(:id => ids.flatten)
   end
 
-  # this function gives out all the branches that are accessible to a funder
+  # this function gives out all the loans that are accessible to a funder
   def loans(hash={})
     hash[:funding_line_id] = funding_lines.map{|x| x.id}
-    Loan.all(hash)
+    loan_hash = {:loan => {:id => hash[:id]}} if hash.key?(:id)
+    ids  = LoanHistory.ancestors_of_portfolio(self.portfolios, Loan, loan_hash||{})
+    Loan.all(hash) + Loan.all(:id => ids)
   end
 
-  # this function gives out all the branches that are accessible to a funder
-  def payments(hash={})    
-    Loan.all(:funding_line_id => funding_lines.map{|x| x.id}).payments(hash)
+  # this function gives out all the payments that are accessible to a funder
+  def payments(hash={})
+    Loan.all(:funding_line_id => funding_lines.map{|x| x.id}).payments(hash) + self.portfolios.loans.payments(hash)
   end
 
+  def staff_members(hash={})
+    if hash[:id]
+      ids  = branches.map{|x| x.manager_staff_id}
+      ids += centers.map{|x| x.manager_staff_id}
+      hash[:id] = [hash[:id]].flatten & ids
+    else
+      hash[:id]  = []
+      hash[:id] += branches.map{|x| x.manager_staff_id}
+      hash[:id] += centers.map{|x| x.manager_staff_id}
+    end
+    StaffMember.all(hash)
+  end
 end

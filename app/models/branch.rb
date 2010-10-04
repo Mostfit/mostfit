@@ -39,7 +39,7 @@ class Branch
         hash[:manager] = user.staff_member
       end
     elsif user.role == :funder and funding_lines = Funder.first(:user_id => user.id).funding_lines
-      hash[:id] = LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}})
+      hash[:id] = LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}}) if funding_lines.count>0
     end
     hash[:branch] = self    
 

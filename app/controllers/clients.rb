@@ -5,7 +5,13 @@ class Clients < Application
   def index
 #    @clients = @center.clients
 #    display @clients
-    redirect resource(@branch, @center)  # redirecting to the centers show where the @date shizzle works
+    if request.xhr?
+      @clients = @center.clients
+      @loans   = @clients.loans
+      partial "clients/list"
+    else
+      redirect resource(@branch, @center)  # redirecting to the centers show where the @date shizzle works
+    end
   end
 
   def show(id)
@@ -13,7 +19,7 @@ class Clients < Application
     raise NotFound unless @client
     
     if @center
-      @loans = @loans || @client.loans
+      @loans = @loans ? @loans.find_all{|l| l.client_id == @client.id} : @client.loans
       display [@client, @loans], 'loans/index'
     else
       redirect_to_show(params[:id])

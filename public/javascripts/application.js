@@ -402,6 +402,57 @@ function floatHeaders(){
   }
 }
 
+function portfolioCalculations(){
+  $("table.portfolio input[type='checkbox']").click(function(event){
+    tr = $(event.currentTarget).parent().parent();
+    if($(event.currentTarget).attr("checked")){
+      $($(tr).find("td")[4]).html($($(tr).find("td")[1]).html().trim());
+      $($(tr).find("td")[5]).html($($(tr).find("td")[2]).html().trim());
+      $($(tr).find("td")[6]).html($($(tr).find("td")[2]).html().trim());
+      //setting branch total
+      [3, 4, 5, 6].forEach(function(td_id){
+	if(td_id == 3){
+	  var td_val = 1;
+	}else{
+	  var td = $($(tr).find("td")[td_id]);
+	  var td_val = parseInt(td.html().replace(/\s/g, ''));
+	}
+	var branch_val = parseInt($($(tr.nextAll("tr.branch_total")[0]).find("td b")[td_id]).html().replace(/\s/g, '')) || 0;
+	$($($(tr.nextAll("tr.branch_total")[0]).find("td")[td_id])).html("<b>" + (branch_val + td_val) + "</b>") || 0;
+      });
+    }else{
+      //setting branch total
+      [3, 4, 5, 6].forEach(function(td_id){
+	if(td_id == 3){
+	  var td_val = 1;
+	}else{
+	  var td = $($(tr).find("td")[td_id]);
+	  var td_val = parseInt(td.html().replace(/\s/g, ''));
+	}
+	var branch_val = parseInt($($(tr.nextAll("tr.branch_total")[0]).find("td b")[td_id]).html().replace(/\s/g, '')) || 0;
+	$($($(tr.nextAll("tr.branch_total")[0]).find("td")[td_id])).html("<b>" + (branch_val - td_val) + "</b>") || 0;
+      });
+      $($(tr).find("td")[4]).html("0");
+      $($(tr).find("td")[5]).html("0");
+      $($(tr).find("td")[6]).html("0");
+    }
+
+    //setting org total
+    var org_count = 0;
+    var org_allocated = 0;
+    var org_current = 0;
+    $("tr.branch_total").each(function(idx, tr){
+      org_count += parseInt($($(tr).find("td b")[4]).html().replace(/\s/g, '')) || 0;
+      org_allocated += parseInt($($(tr).find("td b")[5]).html().replace(/\s/g, '')) || 0;
+      org_current += parseInt($($(tr).find("td b")[6]).html().replace(/\s/g, '')) || 0;
+    });
+    $($("tr.org_total:first td")[4]).html("<b>" + org_count + "</b>");
+    $($("tr.org_total:first td")[5]).html("<b>" + org_allocated + "</b>");
+    $($("tr.org_total:first td")[6]).html("<b>" + org_current + "</b>");
+  });
+
+}
+
 $(document).ready(function(){
 	create_remotes();
 	fillCenters();
@@ -724,6 +775,9 @@ $(document).ready(function(){
       $(container).find(".graphs").hide();
       $($(container).find(".graphs")[idx]).show();
     }
+  }
+  if($(".portfolio").length>0){
+    portfolioCalculations();
   }
 
   $("table#user_form select#user_role").change(function(select){

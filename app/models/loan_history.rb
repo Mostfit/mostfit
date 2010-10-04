@@ -34,7 +34,7 @@ class LoanHistory
   
   validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
-  @@selects = {Branch => "b.id", Center => "c.id", Client => "cl.id", Loan => "l.id", Area => "a.id", Region => "r.id", ClientGroup => "cg.id"}
+  @@selects = {Branch => "b.id", Center => "c.id", Client => "cl.id", Loan => "l.id", Area => "a.id", Region => "r.id", ClientGroup => "cg.id", Portfolio => "p.id"}
   @@tables = ["regions r", "areas a", "branches b", "centers c", "client_groups cg", "clients cl", "loans l"]
   @@models = [Region, Area, Branch, Center, ClientGroup, Client, Loan]
   @@optionals = [ClientGroup]
@@ -264,12 +264,27 @@ class LoanHistory
 
   def self.loans_for(obj, hash={})
     select = "l.id id, l.amount amount, l.disbursal_date disbursal_date"
-    klass, obj = get_class_of(obj)    
-
+    klass, obj = get_class_of(obj)
     froms = build_froms(klass)
     conditions  = build_conditions(klass, obj, hash)
-    repository.adapter.query("SELECT #{select} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")    
+    repository.adapter.query("SELECT #{select} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end  
+
+  def self.loans_outstanding_for(obj, date=Date.today)
+    klass, obj = get_class_of(obj)
+    froms = build_froms(klass)
+    conditions  = build_conditions(klass, obj, {})   
+    ids      = get_latest_rows_of_loans(date, "#{klass.to_s.downcase}_id in (#{obj.map{|x| x.id}.join(",")})")
+    return if ids.length == 0
+    repository.adapter.query(%Q{
+      SELECT
+        lh.loan_id loan_id, l.amount   amount, l.disbursal_date disbursal_date,
+        lh.scheduled_outstanding_principal AS scheduled_outstanding_principal, lh.scheduled_outstanding_total AS scheduled_outstanding_total,        
+        lh.actual_outstanding_principal    AS actual_outstanding_principal, lh.actual_outstanding_total AS actual_outstanding_total
+      FROM loan_history lh, #{froms.join(', ')}
+      WHERE (lh.loan_id, lh.date) in (#{ids}) AND lh.loan_id=l.id AND lh.status in (5,6) AND #{conditions.join(' AND ')}
+    })    
+  end
 
   def self.amount_disbursed_for(obj, from_date=Date.min_date, to_date=Date.today)
     select = "sum(l.amount) amount, COUNT(l.id) loan_count, COUNT(DISTINCT(l.client_id)) client_count"
@@ -298,14 +313,23 @@ class LoanHistory
     repository.adapter.query("SELECT #{selects} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end
   
+  def self.ancestors_of_portfolio(portfolio, ancestor_klass, hash={})
+    portfolio_klass, obj = get_class_of(portfolio)
+    selects    = build_selects(ancestor_klass)
+    froms      = (build_froms(ancestor_klass) + build_froms(portfolio_klass)).uniq
+    conditions = (build_conditions(ancestor_klass, nil, hash) + build_conditions(portfolio_klass, obj, hash))
+    repository.adapter.query("SELECT #{selects} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
+  end
+  
   private
   def self.get_class_of(obj)
-    if [Array, DataMapper::Associations::OneToMany::Collection, DataMapper::Collection].include?(obj.class)
+    if [Array, DataMapper::Associations::OneToMany::Collection, DataMapper::Associations::ManyToMany::Collection, DataMapper::Collection].include?(obj.class)
       klass = obj.first.class 
     else
       klass = obj.class
       obj   = [obj]
     end
+    klass = Loan if not @@models.include?(klass) and (klass.superclass==Loan or klass.superclass.superclass==Loan)
     [klass, obj]
   end
   
@@ -315,7 +339,8 @@ class LoanHistory
     
   def self.build_froms(klass)
     froms  = []
-    return ["loans l", "clients cl"] if klass == StaffMember
+    return ["loans l", "clients cl"] if klass == StaffMember or klass == Loan
+    return ["loans l", "portfolios p", "portfolio_loans pfl"] if klass == Portfolio
     return false unless @@models.include?(klass)
 
     idx    = @@models.index(klass)
@@ -329,42 +354,52 @@ class LoanHistory
     froms
   end
 
-  def self.build_conditions(klass, obj, hash)
-    conditions =  ["cl.id=l.client_id", "l.deleted_at is NULL"]
+  def self.build_conditions(klass, obj, hash={})
+    # lets save some memory if we have to only get ids
+    obj = obj.all(:fields => [:id]) if obj and obj.class != Array
+
+    conditions =  ["cl.id=l.client_id", "l.deleted_at is NULL"] 
     if hash.length>0
       report = Report.new
       {:loan => "l", :client => "cl", :center =>  "c", :branch => "b"}.each{|model, prefix|
         conditions += hash[model].map{|k, v| 
-          "#{report.get_key(k)} #{report.get_operator(k)} #{report.get_value(v)}"
+          "#{prefix}.#{report.get_key(k)} #{report.get_operator(k, v)} #{report.get_value(v)}"
         } if hash.key?(model)
       }
     end
 
     if klass==Branch
-      conditions << "b.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "b.id in (#{obj.map{|x| x.id}.join(',')})" if obj and obj.length>0
       conditions << "cl.center_id=c.id"
       conditions << "c.branch_id=b.id"
     elsif klass==Center
       conditions << "cl.center_id=c.id"
-      conditions << "c.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "c.id in (#{obj.map{|x| x.id}.join(',')})" if obj and obj.length > 0
     elsif klass==ClientGroup
       conditions << "cl.client_group_id=cg.id"
-      conditions << "cg.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "cg.id in (#{obj.map{|x| x.id}.join(',')})" if obj and obj.length > 0
     elsif klass==Area
-      conditions << "a.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "a.id in (#{obj.map{|x| x.id}.join(',')})" if obj and obj.length > 0
       conditions << "a.id=b.area_id"
       conditions << "c.branch_id=b.id"
       conditions << "cl.center_id=c.id"
     elsif klass==Region
-      conditions << "r.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "r.id in (#{obj.map{|x| x.id}.join(',')})" if obj and obj.length > 0
       conditions << "r.id=a.region_id"
       conditions << "a.id=b.area_id"
       conditions << "c.branch_id=b.id"
       conditions << "cl.center_id=c.id"
     elsif klass==Client
-      conditions << "cl.id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions << "cl.id in (#{obj.map{|x| x.id}.join(',')})" if obj and obj.length > 0
     elsif klass==StaffMember
-      conditions <<  "l.disbursed_by_staff_id in (#{obj.map{|x| x.id}.join(',')})"
+      conditions <<  "l.disbursed_by_staff_id in (#{obj.map{|x| x.id}.join(',')})" if obj
+    elsif klass==Loan
+      conditions <<  "l.id in (#{obj.map{|x| x.id}.join(',')})" if obj
+    elsif klass==Portfolio
+      conditions = []
+      conditions << "p.id in (#{obj.map{|x| x.id}.join(',')})" if obj
+      conditions << "pfl.portfolio_id = p.id"
+      conditions << "l.id = pfl.loan_id"
     end
     conditions
   end
