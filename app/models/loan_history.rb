@@ -189,7 +189,9 @@ class LoanHistory
     else
       return
     end
-
+    
+    group_by = group_by.gsub("date_id", "date")
+    
     repository.adapter.query(%Q{
       SELECT 
         SUM(lh.scheduled_outstanding_principal) AS scheduled_outstanding_principal,
@@ -235,7 +237,7 @@ class LoanHistory
     ids=repository.adapter.query(%Q{
                                  SELECT lh.loan_id loan_id, max(lh.date) date
                                  FROM loan_history lh, loans l
-                                 WHERE l.id=lh.loan_id AND l.deleted_at is NULL AND l.disbursal_date is NOT NULL AND status in (5,6,7,8)
+                                 WHERE l.id=lh.loan_id AND l.deleted_at is NULL AND l.disbursal_date is NOT NULL AND lh.status in (5,6,7,8)
                                  AND #{query}
                                  AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
                                  GROUP BY lh.loan_id

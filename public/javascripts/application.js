@@ -501,7 +501,7 @@ $(document).ready(function(){
 		else
 		  level2_name='center';
 		if(table.find("tr." + level2_name).length>0)
-		  table.find("tr.branch td").append("<a id='"+level2_name+"' class='expand'>Expand "+level2_name+"s</a>");
+		  table.find("tr.branch td").append("<a id='"+level2_name+"' class='expand'>Expand " + level2_name.split("_").join(" ") + "s</a>");
 	      //level 3
 	      if(table.find("tr." + level2_name + " td")){
 		  if(table.find("tr." + level2_name).attr("id"))
@@ -509,7 +509,7 @@ $(document).ready(function(){
 		  else
 		    level3_name='group';
 		  if(table.find("tr." + level3_name).length>0)
-		    table.find("tr."+ level2_name + " td").append("<a id='"+level3_name+"' class='expand'>Expand "+level3_name+"s</a>");
+		    table.find("tr."+ level2_name + " td").append("<a id='"+level3_name+"' class='expand'>Expand " + level3_name.split("_").join(" ") + "s</a>");
 		  //level 4
 		  if(table.find("tr." + level3_name + " td").length>0){
 		    if(table.find("tr." + level3_name).attr("id"))
@@ -517,7 +517,7 @@ $(document).ready(function(){
 		    else
 		      level4_name='date';
 		    if(table.find("tr." + level4_name).length>0)
-		      table.find("tr."+ level3_name + " td").append("<a id='"+level4_name+"' class='expand'>Expand "+level4_name+"s</a>");
+		      table.find("tr."+ level3_name + " td").append("<a id='" + level4_name + "' class='expand'>Expand " + level4_name.split("_").join(" ") + "s</a>");
 		  }
 		}
 	    }

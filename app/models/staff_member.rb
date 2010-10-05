@@ -18,9 +18,10 @@ class StaffMember
   has n, :rejected_loans,    :child_key => [:rejected_by_staff_id],    :model => 'Loan'
   has n, :disbursed_loans,   :child_key => [:disbursed_by_staff_id],   :model => 'Loan'
   has n, :written_off_loans, :child_key => [:written_off_by_staff_id], :model => 'Loan'
-
   has n, :payments, :child_key  => [:received_by_staff_id]
+
   belongs_to :user
+
   validates_is_unique :name
   validates_length :name, :min => 3
   

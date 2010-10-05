@@ -567,6 +567,13 @@ table.report tr.center{
     font-size: 1em; 
     background-color: #ddd;
 }
+table.report tr.transaction_date{
+    border: 1px solid;
+    border-color: #ccc;
+    text-align: center;
+    font-size: 1em; 
+    background-color: #ddd;
+}
 table.report tr.year{
     border: 1px solid;
     border-color: #ccc;
