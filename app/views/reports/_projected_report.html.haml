@@ -5,9 +5,11 @@
       Group
     %th{:colspan => "2"}
       Disbursal scheduled
-    %th{:colspan => "4"}
+    %th{:colspan => "3"}
       Repayment scheduled
-    %th{:colspan => "4"}
+    %th{:colspan => "3"}
+      Overdue payments
+    %th{:colspan => "3"}
       Balance outstanding
   %tr.header
     %th
@@ -20,7 +22,11 @@
     %th
       Interest
     %th
-      Fee
+      Total
+    %th
+      Principal
+    %th
+      Interest
     %th
       Total
     %th
@@ -28,11 +34,10 @@
     %th
       Interest
     %th
-      Fee
-    %th
       Total
   - center_id, branch_id = nil, nil
-  - length = 10
+  - length = 11
+
   - org_total = []
   -@data.sort_by{|branch, dates| branch.name}.each do |branch, dates|
     -if dates.keys.length>0

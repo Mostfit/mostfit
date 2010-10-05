@@ -36,7 +36,7 @@ class ProjectedReport < Report
         data[branch][date] = {}
         rows.each{|row|
           center = @center.find{|c| c.id == row.center_id}
-          data[branch][date][center] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          data[branch][date][center] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
           #0              1                2              3                 4                 5,                  6                    7      
           #amount_applied,amount_santioned,outstanding(p),outstanding(i),outstanding(fee),Outstanding(total),principal(scheduled),interest(scheudled),fee(scheduled)
           principal_scheduled = row.scheduled_outstanding_principal.to_i
@@ -48,18 +48,35 @@ class ProjectedReport < Report
           data[branch][date][center][2] += principal_actual - principal_scheduled > 0 ? principal_actual - principal_scheduled : 0
           int  = (total_actual - total_scheduled) - (principal_actual - principal_scheduled)
           data[branch][date][center][3] += int >0 ? int : 0
-          data[branch][date][center][4] += 0
-          data[branch][date][center][5] += total_actual - total_scheduled>0 ? total_actual - total_scheduled : 0 
+          data[branch][date][center][4] += total_actual - total_scheduled>0 ? total_actual - total_scheduled : 0 
           
-          data[branch][date][center][6] += principal_scheduled
-          data[branch][date][center][7] += total_scheduled - principal_scheduled
-          data[branch][date][center][8] += 0
-          data[branch][date][center][9] += total_scheduled
+          data[branch][date][center][8] += principal_scheduled
+          data[branch][date][center][9] += total_scheduled - principal_scheduled
+          data[branch][date][center][10] += total_scheduled
         }
       }
     }
+
+    #7 Overdue payments: likly to come in this week
+    hash = {}
+    hash[:branch_id] = @branch.map{|b| b.id}
+    hash[:center_id] = @center.map{|b| b.id}
+    LoanHistory.defaulted_loan_info_by(:center, self.from_date-1, hash, ["branch_id", "date", "center_id"]).each{|row|
+      next unless branch = @branch.find{|b| b.id == row.branch_id}
+      next unless center = @center.find{|c| c.id == row.center_id}
+
+      data[branch] ||= {}
+      date = row.date + 7
+      data[branch][date] ||= {}
+      data[branch][date][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+      data[branch][date][center][5]= row.pdiff
+      data[branch][date][center][6]= row.tdiff - row.pdiff
+      data[branch][date][center][7]= row.tdiff
+    }
+    
     #1: Applied on
-    hash= {:scheduled_disbursal_date.gte => from_date, :scheduled_disbursal_date.lte => to_date, :rejected_on => nil}
+    hash = {:scheduled_disbursal_date.gte => from_date, :scheduled_disbursal_date.lte => to_date, :rejected_on => nil}
     hash[:loan_product_id] = loan_product_id if loan_product_id
 
     group_loans(["l.scheduled_disbursal_date", "c.id"], ["SUM(amount_applied_for) as amount", "b.id branch_id, c.id center_id"], hash).each{|row|
@@ -68,7 +85,7 @@ class ProjectedReport < Report
 
       data[branch] ||= {}
       data[branch][row.scheduled_disbursal_date] ||= {}
-      data[branch][row.scheduled_disbursal_date][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data[branch][row.scheduled_disbursal_date][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       data[branch][row.scheduled_disbursal_date][center][0] += row.amount.to_i
     }
     
@@ -79,7 +96,7 @@ class ProjectedReport < Report
 
       data[branch] ||= {}
       data[branch][row.scheduled_disbursal_date] ||= {}
-      data[branch][row.scheduled_disbursal_date][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data[branch][row.scheduled_disbursal_date][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
       data[branch][row.scheduled_disbursal_date][center][1] += row.amount.to_i
     }
