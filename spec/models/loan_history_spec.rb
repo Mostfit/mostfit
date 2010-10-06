@@ -150,4 +150,135 @@ describe LoanHistory do
   end
 
 
+  it "should give correct number of loans outstanding" do
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_disbursal_date, [:loan]).first.scheduled_outstanding_principal.should == 1000
+    @loan.repay(96, @user, @loan.scheduled_first_payment_date, @manager)
+    data = LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date, [:loan]).first
+    data.scheduled_outstanding_principal.should == 960
+    data.actual_outstanding_principal.should == 912
+    
+    @loan.repay(48, @user, @loan.scheduled_first_payment_date + 7, @manager)
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date + 7, [:loan]).first.scheduled_outstanding_principal.should == 920
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date + 7, [:loan]).first.actual_outstanding_principal.should == 872
+
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date + 14, [:loan]).first.scheduled_outstanding_principal.should == 880
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date + 14, [:loan]).first.actual_outstanding_principal.should == 872    
+  end
+
+  it "should give correct amount for loans defaulted" do
+    default =  LoanHistory.defaulted_loan_info_by(:loan, @loan.scheduled_first_payment_date + 21).first
+    default.pdiff.should == 32
+    default.tdiff.should == 48
+
+    default =  LoanHistory.defaulted_loan_info_by(:loan, @loan.scheduled_first_payment_date + 28).first
+    default.pdiff.should == 72
+    default.tdiff.should == 96
+
+    default =  LoanHistory.defaulted_loan_info_by(:loan, @loan.scheduled_first_payment_date + 35).first
+    default.pdiff.should == 112
+    default.tdiff.should == 144
+  end
+
+  it "should give correct loans defaulted for" do
+    due = LoanHistory.defaulted_loan_info_for(@loan.client, @loan.scheduled_first_payment_date + 35)
+    due.principal_due.should == 112
+    due.total_due.should == 144
+    
+    @client_2 = Client.new
+    attr    = @client.attributes.dup
+    attr.delete(:id)
+    @client_2.attributes = attr
+    @client_2.reference = @client.reference + "1"
+    @client_2.save
+
+    @loan_2 = Loan.new
+    attr    = @loan.attributes.dup
+    attr.delete(:id)
+    @loan_2.attributes = attr
+    @loan_2.client = @client_2
+    @loan_2.save
+    
+    due = LoanHistory.defaulted_loan_info_for(@center, @loan.scheduled_first_payment_date + 7)
+    due.principal_due.should == 80
+    due.total_due.should == 96
+    
+    due = LoanHistory.defaulted_loan_info_for(@center, @loan.scheduled_first_payment_date + 14)
+    due.principal_due.should == 120
+    due.total_due.should == 144
+
+    due = LoanHistory.defaulted_loan_info_for(@center, @loan.scheduled_first_payment_date + 21)
+    due.principal_due.should == 160 + 32
+    due.total_due.should     == 192 + 48
+
+    due = LoanHistory.defaulted_loan_info_for(@center, @loan.scheduled_first_payment_date + 28)
+    due.principal_due.should == 200 + 72
+    due.total_due.should     == 240 + 96
+
+    @center_2 = Center.new
+    attr      = @center.attributes.dup
+    attr.delete(:id)
+    @center_2.attributes = attr
+    @center_2.code = @center.code + "1"
+    @center_2.save
+
+    @client_3 = Client.new
+    attr    = @client.attributes.dup
+    attr.delete(:id)
+    @client_3.center = @center_2
+    @client_3.attributes = attr
+    @client_3.reference = @client.reference + "2"
+    @client_3.save
+
+    @loan_3 = Loan.new
+    attr    = @loan.attributes.dup
+    attr.delete(:id)
+    @loan_3.attributes = attr
+    @loan_3.client = @client_3
+    @loan_3.save
+    
+    due = LoanHistory.defaulted_loan_info_for(@center, @loan.scheduled_first_payment_date + 28)
+    due.principal_due.should == 200 + 72
+    due.total_due.should     == 240 + 96
+
+    due = LoanHistory.defaulted_loan_info_for(@center_2, @loan.scheduled_first_payment_date + 7)    
+    due.principal_due.should == 2 * 40
+    due.total_due.should     == 2 * 48
+
+    due = LoanHistory.defaulted_loan_info_for(@center_2, @loan.scheduled_first_payment_date + 28)    
+    due.principal_due.should == 5 * 40
+    due.total_due.should     == 5 * 48
+
+    due = LoanHistory.defaulted_loan_info_for(@branch, @loan.scheduled_first_payment_date + 28)
+    due.principal_due.should == 5 * 40 + 272
+    due.total_due.should     == 5 * 48 + 336
+  end
+
+  it "should get correct scheduled outstanding grouped by" do
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date - 7, [:loan]).map{|lh|
+      lh.scheduled_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == 3000
+
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date, [:loan]).map{|lh|
+      lh.scheduled_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == 3000 - 120
+
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date + 7, [:loan]).map{|lh|
+      lh.scheduled_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == 3000 - 120 -120
+  end
+
+  it "should get correct actual outstanding grouped by" do
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date - 7, [:loan]).map{|lh|
+      lh.actual_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == 3000
+
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date, [:loan]).map{|lh|
+      lh.actual_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == 3000 - 96 + 8
+
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date + 7, [:loan]).map{|lh|
+      lh.actual_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == 3000 - 96 + 8 - 40
+  end
+
 end
