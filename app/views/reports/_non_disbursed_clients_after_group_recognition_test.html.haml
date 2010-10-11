@@ -1,0 +1,61 @@
+=partial :form
+- length = 5
+%table.report
+  %tr.header
+    %th
+      Client Id
+    %th
+      Reference
+    %th
+      Name
+    %th
+      Joining date
+    %th
+      GRT Pass Date
+    %th
+      Loan disbursal date
+    %th
+      Delayed By
+  - length = 6
+  - org_total = 0
+  - @data.sort_by{|branch, x| branch.name}.each do |branch, centers|
+    -if centers.keys.length>0
+      -branch_total = 0
+      %tr.branch
+        %td{:colspan => length+1}
+          %b
+            =branch.name
+      -centers.sort_by{|center, data| center.name}.each do |center, clients|
+        -if clients.length>0
+          %tr.center#client
+            %td{:colspan => length+1}
+              %b
+                =center.name
+          - count = 0
+          - clients.each do |client|
+            %tr.client
+              - client.each_with_index do |d, i|
+                %td
+                  = d
+                - count += 1
+          %tr.center_total
+            %td
+              - branch_total += count
+              %b
+                = count
+            - (length - 1).times do 
+              %td
+      %tr.branch_total
+        %td
+          %b
+            = branch_total
+            - org_total += branch_total
+        - (length - 1).times do 
+          %td
+  %tr.org_total
+    %td
+      %b
+        = org_total
+    - (length - 1).times do 
+      %td
+
