@@ -112,6 +112,18 @@ class Payment
                   p.received_by_staff_id=#{obj.id} and p.type in (#{types.join(',')})
                   and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
                };
+    elsif obj.class==LoanProduct
+      from  = "loans l, payments p"
+      where = %Q{                  
+                  l.id = p.loan_id and l.deleted_at is NULL and l.loan_product_id = #{obj.id} and p.type in (#{types.join(',')})
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
+    elsif obj.class==FundingLine
+      from  = "loans l, payments p"
+      where = %Q{                  
+                  l.id = p.loan_id and l.deleted_at is NULL and l.funding_line_id = #{obj.id} and p.type in (#{types.join(',')})
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
     end
     repository.adapter.query(%Q{
                              SELECT SUM(p.amount) amount, p.type payment_type

@@ -60,13 +60,33 @@ class FundingLine
     return nil if interest_rate.blank?
     format("%.2f", interest_rate * 100)
   end
+
   def interest_percentage= (percentage)
-    p 'wqwwwwwwwwwwwwwwwwwwwwww'
-    p percentage
     self.interest_rate = percentage.to_f/100
-    p interest_rate
   end
 
+  def loans
+    centers_hash = {}
+    Center.all(:fields => [:id, :name]).each{|c| centers_hash[c.id] = c}
+    funding_line_query = ["funding_line_id=#{self.id}"]
+    LoanHistory.sum_outstanding_grouped_by(Date.today, [:center, :branch], nil, funding_line_query).group_by{|x| x.branch_id}.map{|bid, centers| 
+      [Branch.get(bid), centers.group_by{|x| x.center_id}.map{|cid, rows| [centers_hash[cid], rows.first]}.to_hash]
+    }.to_hash
+  end
+
+  def repayments
+    centers_hash = {}
+    Center.all(:fields => [:id, :name]).each{|c| centers_hash[c.id] = c}
+    repository.adapter.query(%Q{SELECT b.id branch_id, c.id center_id, p.type ptype, SUM(p.amount) amount
+                                FROM branches b, centers c, clients cl, loans l, payments p
+                                WHERE b.id=c.branch_id AND c.id=cl.center_id AND cl.id=l.client_id AND l.deleted_at is NULL AND p.loan_id=l.id AND p.deleted_at is NULL
+                                      AND l.funding_line_id=#{self.id}
+                                GROUP BY b.id, c.id, p.type
+    }).group_by{|x| x.branch_id}.map{|bid, centers| 
+      [Branch.get(bid), centers.group_by{|x| x.center_id}.map{|cid, rows| [centers_hash[cid], rows]}.to_hash]
+    }.to_hash
+  end
+  
   private
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
 

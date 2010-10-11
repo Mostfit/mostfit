@@ -6,6 +6,8 @@
 
 %div.tab_container
   %ul.tabs
+    %li#params
+      Paramaters
     %li#info
       Info
     %li#validations
@@ -20,6 +22,8 @@
             = attr.humanize
           %td
             = @loan_product.send(attr)
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@loan_product.id}?for=loan_product"}
   %div.tab
     %table.form
       - [:payment_validation_methods, :loan_validation_methods].each do |attr|

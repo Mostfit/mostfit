@@ -19,8 +19,15 @@
     %td
       = @funder.funding_lines.max(:disbursal_date)
 
-%p= link_to 'edit this funders details', resource(@funder, :edit)
+%p= link_to 'edit this funders details', resource(@funder, :edit), :class => "edit"
 
-= partial "funding_lines/list"
-
-= partial "portfolios/list"
+%div.tab_container
+  %ul.tabs
+    %li#funding_lines
+      Funding lines
+    %li#portfolios
+      Portfolios
+  %div.tab
+    = partial "funding_lines/list"
+  %div.tab  
+    = partial "portfolios/list"

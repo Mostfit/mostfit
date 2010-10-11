@@ -1,4 +1,113 @@
 %h1
   == Details for funding line #{@funding_line.id} by #{@funder.name}
-%p
-  Nothing here yet. sorry.
+%table.form
+  %tbody
+    %tr
+      %th{:align => "left"} 
+        id
+      %td
+        = link_to(@funding_line.id, resource(@funder, @funding_line))
+    %tr
+      %th{:align => "left"} amount
+      %td
+        %b= @funding_line.amount
+    %tr
+      %th{:align => "left"} interest
+      %td
+        %b
+          = @funding_line.interest_percentage
+          \%
+    %tr
+      %th{:align => "left"} disbursal
+      %td
+        = @funding_line.disbursal_date
+    %tr
+      %th{:align => "left"} first payment
+      %td
+        = @funding_line.first_payment_date
+    %tr
+      %th{:align => "left"} last payment
+      %td
+        = @funding_line.last_payment_date
+%div.tab_container
+  %ul.tabs
+    %li#loans
+      Loans
+    %li#info
+      Info
+  %div.tab
+    %table.report
+      %tr.header
+        %th
+          Center
+        %th
+          Loan count
+        %th
+          Disbursed amount
+        %th
+          Outstanding amount
+        %th{:colspan => "4"}
+          Repayments
+      %tr.header
+        %th
+        %th
+        %th
+        %th
+        %th
+          Principal
+        %th
+          Interest
+        %th
+          Fees
+        %th
+          Total
+      - length = 10
+      - repayments = @funding_line.repayments
+      - disbursals = LoanHistory.sum_disbursed_grouped_by(Center, {:loan => {:funding_line_id => @funding_line.id}}).map{|lh| [lh.id, lh.amount.to_i]}.to_hash
+      - org_total = []
+      - @funding_line.loans.sort_by{|branch, centers| branch.name}.each do |branch, centers|
+        %tr.branch
+          %td{:colspan => length}
+            %b= branch.name
+        - branch_total = Array.new(7, 0)
+        - centers.each do |center, row|
+          %tr.center
+            %td
+              = center.name
+            %td
+              = row.loan_count
+              - branch_total[0] += row.loan_count
+            %td
+              = disbursals[center.id].to_currency
+              - branch_total[1] += disbursals[center.id]
+            %td
+              = row.actual_outstanding_principal.to_currency
+              - branch_total[2] += row.actual_outstanding_principal
+            %td
+              - pay = repayments[branch][center].group_by{|x| x.ptype}.map{|t, p| [t, (p.first ? p.first.amount : 0)]}.to_hash
+              = (pay[1] || 0).to_currency
+              - branch_total[3] += pay[1]||0
+            %td
+              = (pay[2] || 0).to_currency
+              - branch_total[4] += pay[2]||0
+            %td
+              = (pay[3] || 0).to_currency
+              - branch_total[5] += pay[3]||0
+            %td
+              = ((pay[1]||0) + (pay[2]||0) + (pay[3]||0)).to_currency
+              - branch_total[6] += ((pay[1]||0) + (pay[2]||0) + (pay[3]||0))
+        %tr.branch_total
+          %td
+          - org_total << branch_total
+          - branch_total.each do |bt|
+            %td
+              %b
+                = bt.to_currency
+      %tr.branch_total
+        %td
+        - org_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |bt|
+          %td
+            %b
+              = bt.to_currency            
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@funding_line.id}?for=funding_line"}

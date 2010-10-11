@@ -11,7 +11,10 @@
     %td
       ="#{@obj.class.name} formation date"
     %td
-      =@obj.creation_date
+      - if @obj.respond_to?(:creation_date)
+        = @obj.creation_date
+      - elsif @obj.respond_to?(:created_at)
+        = @obj.created_at.strftime(Mfi.first.date_format)        
   -if @areas
     %tr
       %td

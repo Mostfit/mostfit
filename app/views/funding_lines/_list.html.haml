@@ -16,12 +16,13 @@
         %th first payment
         %th last payment
         %th
+        %th
     %tbody
     - for funding_line in @funding_lines
       %tr{ :class => cycle('odd','') }
         %td &nbsp;
         %td
-          = funding_line.id
+          = link_to(funding_line.id, resource(@funder, funding_line))
         %td
           %b= funding_line.amount
         %td
@@ -35,9 +36,11 @@
         %td
           = funding_line.last_payment_date
         %td
+          = link_to("details", resource(@funder, funding_line))          
+        %td
           = link_to 'edit', resource(@funder, funding_line, :edit), :class => "edit"
     %tfoot
       %tr
-        %td{ :colspan => 8 }
+        %td{ :colspan => 9 }
 
   

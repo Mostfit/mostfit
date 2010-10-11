@@ -8,22 +8,54 @@ class Info < Application
     @obj       = klass.get(id)
     raise NotFound unless @obj
 
-    if @obj.class==Region
+    if @obj.class == Region
       @areas        = {}
       @areas[:new]  = @obj.areas(new_date_hash)
       @areas[:upto] = @obj.areas(upto_date_hash)
-    elsif @obj.class==Area
+    elsif @obj.class == Area
       @branches        = {}
       @branches[:new]  = @obj.branches(new_date_hash)
       @branches[:upto] = @obj.branches(upto_date_hash)
-    elsif @obj.class==Branch
+    elsif @obj.class == Branch
       @centers        = {}
       @centers[:new]  = @obj.centers(new_date_hash)
       @centers[:upto] = @obj.centers(upto_date_hash)
-    elsif @obj.class==Center
+    elsif @obj.class  ==  Center
       @centers        = {}
       @centers[:new] = @centers[:upto] = Center.all(:id =>@obj.id)
-    elsif @obj.class==StaffMember
+    elsif @obj.class == LoanProduct
+      @regions, @areas, @branches, @centers, @clients = {}, {}, {}, {}, {}
+      @regions[:new]  = LoanHistory.parents_where_loans_of(Region, {:loan => {:loan_product_id => @obj.id}, :region => new_date_hash})
+      @regions[:upto] = LoanHistory.parents_where_loans_of(Region, {:loan => {:loan_product_id => @obj.id}, :region => upto_date_hash})
+
+      @areas[:new]  = LoanHistory.parents_where_loans_of(Area, {:loan => {:loan_product_id => @obj.id}, :area => new_date_hash})
+      @areas[:upto] = LoanHistory.parents_where_loans_of(Area, {:loan => {:loan_product_id => @obj.id}, :area => upto_date_hash})
+
+      @branches[:new]  = LoanHistory.parents_where_loans_of(Branch, {:loan => {:loan_product_id => @obj.id}, :branch => new_date_hash})
+      @branches[:upto] = LoanHistory.parents_where_loans_of(Branch, {:loan => {:loan_product_id => @obj.id}, :branch => upto_date_hash})
+
+      @centers[:new]  = Center.all(:id => LoanHistory.parents_where_loans_of(Center, {:loan => {:loan_product_id => @obj.id}, :center => new_date_hash}))
+      @centers[:upto] = Center.all(:id => LoanHistory.parents_where_loans_of(Center, {:loan => {:loan_product_id => @obj.id}, :center => upto_date_hash}))
+
+      @clients[:new]  = LoanHistory.parents_where_loans_of(Client, {:loan => {:loan_product_id => @obj.id}, :client => client_hash(:new)})
+      @clients[:upto] = LoanHistory.parents_where_loans_of(Client, {:loan => {:loan_product_id => @obj.id}, :client => client_hash(:upto)})
+    elsif @obj.class == FundingLine
+      @regions, @areas, @branches, @centers, @clients = {}, {}, {}, {}, {}
+      @regions[:new]  = LoanHistory.parents_where_loans_of(Region, {:loan => {:funding_line_id => @obj.id}, :region => new_date_hash})
+      @regions[:upto] = LoanHistory.parents_where_loans_of(Region, {:loan => {:funding_line_id => @obj.id}, :region => upto_date_hash})
+
+      @areas[:new]  = LoanHistory.parents_where_loans_of(Area, {:loan => {:funding_line_id => @obj.id}, :area => new_date_hash})
+      @areas[:upto] = LoanHistory.parents_where_loans_of(Area, {:loan => {:funding_line_id => @obj.id}, :area => upto_date_hash})
+
+      @branches[:new]  = LoanHistory.parents_where_loans_of(Branch, {:loan => {:funding_line_id => @obj.id}, :branch => new_date_hash})
+      @branches[:upto] = LoanHistory.parents_where_loans_of(Branch, {:loan => {:funding_line_id => @obj.id}, :branch => upto_date_hash})
+
+      @centers[:new]  = Center.all(:id => LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => @obj.id}, :center => new_date_hash}))
+      @centers[:upto] = Center.all(:id => LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => @obj.id}, :center => upto_date_hash}))
+
+      @clients[:new]  = LoanHistory.parents_where_loans_of(Client, {:loan => {:funding_line_id => @obj.id}, :client => client_hash(:new)})
+      @clients[:upto] = LoanHistory.parents_where_loans_of(Client, {:loan => {:funding_line_id => @obj.id}, :client => client_hash(:upto)})
+    elsif @obj.class == StaffMember
       @areas     = @obj.areas
       @branches, @centers  = {}, {}
       @branches[:new]  = @obj.branches(new_date_hash)
@@ -37,19 +69,21 @@ class Info < Application
 
     if @areas and not @branches
       @branches        = {}
-      @branches[:new]  = (@areas.class==Hash ? @areas[:upto] : @areas).branches(new_date_hash)
-      @branches[:upto] = (@areas.class==Hash ? @areas[:upto] : @areas).branches(upto_date_hash)
+      @branches[:new]  = (@areas.class == Hash ? @areas[:upto] : @areas).branches(new_date_hash)
+      @branches[:upto] = (@areas.class == Hash ? @areas[:upto] : @areas).branches(upto_date_hash)
     end
 
     if @branches and not @centers
       @centers   = {}
-      @centers[:new]   = (@branches.class==Hash ? @branches[:upto] : @branches).centers(new_date_hash)
-      @centers[:upto]   = (@branches.class==Hash ? @branches[:upto] : @branches).centers(upto_date_hash)
+      @centers[:new]   = (@branches.class == Hash ? @branches[:upto] : @branches).centers(new_date_hash)
+      @centers[:upto]   = (@branches.class == Hash ? @branches[:upto] : @branches).centers(upto_date_hash)
     end
-
-    @clients        = {} 
-    @clients[:new]  = (@centers.class==Hash ? @centers[:upto] : @centers).clients(client_hash(:new))
-    @clients[:upto] = (@centers.class==Hash ? @centers[:upto] : @centers).clients(client_hash(:upto))
+    
+    unless @clients
+      @clients        = {} 
+      @clients[:new]  = (@centers.class == Hash ? @centers[:upto] : @centers).clients(client_hash(:new) + {:fields => [:id]})
+      @clients[:upto] = (@centers.class == Hash ? @centers[:upto] : @centers).clients(client_hash(:upto) + {:fields => [:id]})
+    end
 
     set_more_info(@obj)
     render :file => 'info/moreinfo', :layout => false
@@ -99,12 +133,12 @@ private
   end
 
   def client_hash(type)
-    if params[:from_date] and type==:new
-      return {:fields => [:id], :date_joined.lte => @to_date, :date_joined.gte => @from_date}
-    elsif params[:from_date] and type==:upto
-      return {:fields => [:id], :date_joined.lte => @to_date}
+    if params[:from_date] and type == :new
+      return {:date_joined.lte => @to_date, :date_joined.gte => @from_date}
+    elsif params[:from_date] and type == :upto
+      return {:date_joined.lte => @to_date}
     else
-      return {:fields => [:id]}
+      return {}
     end
   end
 

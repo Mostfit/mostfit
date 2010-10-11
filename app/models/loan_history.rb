@@ -81,24 +81,26 @@ class LoanHistory
   
   def self.defaulted_loan_info_for(obj, date=Date.today, days=nil, type=:aggregate)
     if obj.class==Branch
-      query = "branch_id=#{obj.id}"
+      query = "lh.branch_id=#{obj.id}"
     elsif obj.class==Center
-      query = "center_id=#{obj.id}"
+      query = "lh.center_id=#{obj.id}"
     elsif obj.class==ClientGroup
-      query = "client_group_id=#{obj.id}"
+      query = "lh.client_group_id=#{obj.id}"
     elsif obj.class==Region or obj.class==Area      
       ids = (obj.class==Region ? obj.areas : obj).send(:branches, {:fields => [:id]}).map{|x| x.id}
       ids = (ids.length==0 ? "NULL" : ids.join(","))
-      query="branch_id in (#{ids})"
+      query="lh.branch_id in (#{ids})"
     elsif obj.class==StaffMember
       ids = Loan.all(:fields => [:id], :disbursed_by_staff_id => obj.id).map{|x| x.id}
       ids = (ids.length==0 ? "NULL" : ids.join(","))
-      query = "loan_id in (#{ids})"
+      query = "lh.loan_id in (#{ids})"
+    elsif obj.class == FundingLine
+      query = "l.funding_line_id = #{obj.id}"
     elsif obj == Mfi
       query = "1"
     end
 
-    query+=" AND days_overdue<=#{days}" if days
+    query+=" AND lh.days_overdue<=#{days}" if days
 
     # either we list or we aggregate depending on type
     if type==:listing
@@ -108,7 +110,8 @@ class LoanHistory
                };
     else
       select = %Q{
-                   SUM(actual_outstanding_total-scheduled_outstanding_total) total_due, SUM(actual_outstanding_principal-scheduled_outstanding_principal) principal_due
+                   SUM(lh.actual_outstanding_total - lh.scheduled_outstanding_total) total_due, 
+                   SUM(lh.actual_outstanding_principal - lh.scheduled_outstanding_principal) principal_due
                };
     end
       
@@ -119,9 +122,9 @@ class LoanHistory
     # These are the lines from the loan history
     query = %Q{
       SELECT #{select}
-      FROM loan_history lh
-      WHERE (lh.loan_id, lh.date) IN (#{rows}) AND lh.status in (5,6) 
-            AND actual_outstanding_principal > scheduled_outstanding_principal AND actual_outstanding_total > scheduled_outstanding_total}
+      FROM loan_history lh, loans l
+      WHERE (lh.loan_id, lh.date) IN (#{rows}) AND lh.status in (5,6) AND lh.loan_id = l.id AND l.deleted_at is NULL
+            AND lh.actual_outstanding_principal > lh.scheduled_outstanding_principal AND lh.actual_outstanding_total > lh.scheduled_outstanding_total}
     type==:listing ? repository.adapter.query(query) : repository.adapter.query(query).first
   end
 
@@ -173,25 +176,14 @@ class LoanHistory
     sum_outstanding_grouped_by(to_date, :center, loan_product_id)
   end
 
-  def self.sum_outstanding_grouped_by(to_date, group_by, loan_product_id=nil, extra=[])
-    if loan_product_id and loan_product_id.to_i>0
-      extra << "l.loan_product_id=#{loan_product_id}"
-    end
+  def self.sum_outstanding_grouped_by(to_date, group_by, loan_product_id=nil, extra=[], selects = "")
+    extra << "l.loan_product_id=#{loan_product_id}" if loan_product_id and loan_product_id.to_i>0
+
     ids = get_latest_rows_of_loans(to_date, extra)
     return false if ids.length==0
-    
-    if group_by.class==String
-      group_by = group_by+"_id"
-    elsif group_by.class==Array
-      group_by = group_by.map{|x| "#{x}_id"}.join(", ")
-    elsif group_by.class==Symbol
-      group_by = "#{group_by}_id"
-    else
-      return
-    end
-    
-    group_by = group_by.gsub("date_id", "date")
-    
+    group_by = get_group_by(group_by)
+    selects  = ", " + selects unless selects.blank?
+
     repository.adapter.query(%Q{
       SELECT 
         SUM(lh.scheduled_outstanding_principal) AS scheduled_outstanding_principal,
@@ -202,17 +194,28 @@ class LoanHistory
         SUM(if(lh.actual_outstanding_total<lh.scheduled_outstanding_total, lh.scheduled_outstanding_total-lh.actual_outstanding_total,0)) AS advance_total,
         COUNT(lh.loan_id) loan_count,
         #{group_by}
+        #{selects}
       FROM loan_history lh, loans l
       WHERE (lh.loan_id, lh.date) in (#{ids}) AND lh.status in (5,6) AND lh.loan_id=l.id AND l.deleted_at is NULL
       GROUP BY #{group_by};
     })
   end
 
-  # TODO: subsitute the body of this function with sum_outstanding_grouped_by
   def self.sum_outstanding_by_month(month, year, branch, loan_product_id=nil)
     date = Date.new(year, month, -1)
     extra = ["lh.branch_id=#{branch.id}"]
     sum_outstanding_grouped_by(date, :branch, loan_product_id, extra)
+  end
+
+  def self.sum_disbursed_grouped_by(klass, conditions = {}, from_date=Date.min_date, to_date=Date.today)
+    conditions[:loan] ||= {}
+    conditions[:loan] +=  {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date}
+    group_id  = @@selects[klass]
+    select    = "#{group_id}, SUM(l.amount) amount"    
+    klass, obj = get_class_of(klass.all)
+    froms = build_froms(klass)
+    conditions  = build_conditions(klass, nil, conditions)
+    repository.adapter.query("SELECT #{select} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')} GROUP BY #{group_id}")
   end
 
   def self.sum_outstanding_for(obj, to_date=Date.today)
@@ -229,6 +232,10 @@ class LoanHistory
       ids = (ids.length==0 ? "NULL" : ids.join(","))
       query="loan_id in (#{ids})"
       q = "branch_id"
+    elsif obj.class==LoanProduct
+      query="loan_product_id = #{obj.id}"
+    elsif obj.class==FundingLine
+      query="l.funding_line_id = #{obj.id}"
     elsif obj==Mfi
       query="1"
     end
@@ -341,8 +348,9 @@ class LoanHistory
     
   def self.build_froms(klass)
     froms  = []
-    return ["loans l", "clients cl"] if klass == StaffMember or klass == Loan
+    return ["loans l", "clients cl"] if klass == StaffMember or klass == Loan or klass == LoanProduct
     return ["loans l", "portfolios p", "portfolio_loans pfl"] if klass == Portfolio
+    klass = Client if klass == FundingLine
     return false unless @@models.include?(klass)
 
     idx    = @@models.index(klass)
@@ -366,7 +374,7 @@ class LoanHistory
       {:loan => "l", :client => "cl", :center =>  "c", :branch => "b"}.each{|model, prefix|
         conditions += hash[model].map{|k, v| 
           "#{prefix}.#{report.get_key(k)} #{report.get_operator(k, v)} #{report.get_value(v)}"
-        } if hash.key?(model)
+        } if hash.key?(model) and hash[model]
       }
     end
 
@@ -397,11 +405,15 @@ class LoanHistory
       conditions <<  "l.disbursed_by_staff_id in (#{obj.map{|x| x.id}.join(',')})" if obj
     elsif klass==Loan
       conditions <<  "l.id in (#{obj.map{|x| x.id}.join(',')})" if obj
+    elsif klass==LoanProduct
+      conditions <<  "l.loan_product_id in (#{obj.map{|x| x.id}.join(',')})" if obj
     elsif klass==Portfolio
       conditions = []
       conditions << "p.id in (#{obj.map{|x| x.id}.join(',')})" if obj
       conditions << "pfl.portfolio_id = p.id"
       conditions << "l.id = pfl.loan_id"
+    elsif klass==FundingLine
+      conditions <<  "l.funding_line_id in (#{obj.map{|x| x.id}.join(',')})" if obj
     end
     conditions
   end
@@ -422,5 +434,18 @@ class LoanHistory
                                        AND #{query}
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.mdate.strftime('%Y-%m-%d')}')"}.join(",")
+  end
+
+  def self.get_group_by(group_by)
+    if group_by.class==String
+      group_by = group_by+"_id"
+    elsif group_by.class==Array
+      group_by = group_by.map{|x| "#{x}_id"}.join(", ")
+    elsif group_by.class==Symbol
+      group_by = "#{group_by}_id"
+    else
+      return false
+    end
+    group_by.gsub("date_id", "date")
   end
 end
