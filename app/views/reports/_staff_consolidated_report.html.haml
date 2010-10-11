@@ -71,12 +71,12 @@
               -data_rows.each_with_index do |row, idx|
                 -if idx==6
                   %td
-                    = (data_rows[3] + data_rows[4] + data_rows[5]).to_i
-                    - staff_total[6]+=(data_rows[3]+data_rows[4]+data_rows[5]).to_i
+                    = (data_rows[3] + data_rows[4] + data_rows[5]).to_currency
+                    - staff_total[6]+=(data_rows[3]+data_rows[4]+data_rows[5])
                 -else
                   %td
-                    =row.to_i
-                    -staff_total[idx]+=row.to_i
+                    =row.to_currency
+                    -staff_total[idx]+=row
           %tr.manager_total
             %td
               %b==Staff total:
@@ -84,7 +84,7 @@
             -staff_total.each do |ele|
               %td
                 %b
-                  =ele
+                  =ele.to_currency
       %tr.branch_total
         %td
           %b==Branch total:
@@ -92,12 +92,12 @@
         - org_total.last.each do |ele|
           %td
             %b
-              =ele
+              =ele.to_currency
   %tr.org_total
     %td
       %b==Total
     -org_total.find_all{|x| x.length==length}.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
       %td
         %b
-          =ele
+          =ele.to_currency
 

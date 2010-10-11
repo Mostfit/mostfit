@@ -32,21 +32,21 @@
         %td
           = link_to center.name, url(:quick_link, "centers", center.id) + "#weeksheet"
         %td.numeric
-          = center.pd.to_i || 0
+          = center.pd.to_currency || 0
           - branch_prin_due += (center.pd || 0)
         %td.numeric
-          = center.pp.to_i || 0
+          = center.pp.to_currency || 0
           - branch_prin_paid += (center.pp || 0)
         %td.numeric
-          = center.intd.to_i || 0
+          = center.intd.to_currency || 0
           - branch_int_due += (center.intd || 0)
         %td.numeric
-          = center.intp.to_i || 0
+          = center.intp.to_currency || 0
           - branch_int_paid += (center.intp || 0)
         %td.numeric
-          = ((center.pd || 0) + (center.intd || 0)).to_i
+          = ((center.pd || 0) + (center.intd || 0)).to_currency
         %td.numeric
-          = ((center.pp || 0) + (center.intp || 0)).to_i
+          = ((center.pp || 0) + (center.intp || 0)).to_currency
         %td.numeric
           - scheduled_disbursal=@disbursals.find_all{|loan| loan.scheduled_disbursal_date==Date.today and loan.client.center.id==center.id}.inject(0){|s,x| s+=x.amount}
           - branch_scheduled_disbursal += scheduled_disbursal
@@ -65,17 +65,17 @@
       %td
         Branch Total
       %td.numeric
-        = branch_prin_due.to_i
+        = branch_prin_due.to_currency
       %td.numeric
-        = branch_prin_paid.to_i
+        = branch_prin_paid.to_currency
       %td.numeric
-        = branch_int_due.to_i
+        = branch_int_due.to_currency
       %td.numeric
-        = branch_int_paid.to_i
+        = branch_int_paid.to_currency
       %td.numeric
-        = (branch_int_due + branch_prin_due).to_i
+        = (branch_int_due + branch_prin_due).to_currency
       %td.numeric
-        = (branch_int_paid + branch_prin_paid).to_i
+        = (branch_int_paid + branch_prin_paid).to_currency
       %td.numeric
         = branch_scheduled_disbursal
       %td.numeric
@@ -85,22 +85,22 @@
       Total
     %td.numeric
       %b
-        = total_prin_due.to_i
+        = total_prin_due.to_currency
     %td.numeric
       %b
-        = total_prin_paid.to_i
+        = total_prin_paid.to_currency
     %td.numeric
       %b
-        = total_int_due.to_i
+        = total_int_due.to_currency
     %td.numeric
       %b
-        = total_int_paid.to_i
+        = total_int_paid.to_currency
     %td.numeric
       %b
-        = (total_int_due + total_prin_due).to_i
+        = (total_int_due + total_prin_due).to_currency
     %td.numeric
       %b
-        = (total_int_paid + total_prin_paid).to_i
+        = (total_int_paid + total_prin_paid).to_currency
     %td.numeric
       %b
         = total_scheduled_disbursal

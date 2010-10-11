@@ -15,8 +15,7 @@ describe Branches, "Check branches" do
     @staff_member = StaffMember.first
     @area         = Area.first
     params = {}
-    params[:branch] =
-      {
+    params[:branch] = {
       :name => "Test", :code => "T1", :contact_number => "9850783543", :creation_date => {"month"=>"4", "day"=>"29", "year"=>"2010"},
       :manager_staff_id => @staff_member.id,:area_id => @area.id
     }
@@ -31,17 +30,18 @@ describe Branches, "Check branches" do
     @branch =  Branch.first
     request(resource(@branch)).should be_successful
     params = {}
-    hash = @branch.attributes
+    hash   = @branch.attributes
     hash.delete(:created_at)
-    hash[:creation_date] = { :month => hash[:creation_date].month, :day => hash[:creation_date].day, :year => hash[:creation_date].year}
-    hash[:name]          = @branch.name+"_changed"
-    params[:branch]      =  hash
+    hash[:creation_date] = { 
+      :month => hash[:creation_date].month, :day => hash[:creation_date].day, :year => hash[:creation_date].year
+    }
+    hash[:name]       = @branch.name + "_changed"
+    params[:branch]   = hash
     response = request resource(@branch), :method => "POST", :params => params
     response.should redirect
     new_name = Branch.get(@branch.id).name
     new_name.should_not equal(@branch.name)
   end
-
 end
 
 

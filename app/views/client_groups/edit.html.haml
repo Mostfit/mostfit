@@ -11,6 +11,12 @@
 %hr
 %h1 
   Mark GRT pass these clients 
+- if not @errors.blank?
+  .error
+    - @errors.each do |client|
+      == Problem in saving client ID: #{client.id} because #{client.instance_variable_get("@errors").values.join(", ")}
+      %br        
+
 = form_for(@client_group, :action => url(:enter_groups, :action => "create_grt_date", :id => @client_group), :method => :post) do
   %table{:width => "50%"}
     %tr{:align => "left"}

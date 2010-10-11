@@ -15,8 +15,7 @@ describe Centers, "Check centers controller" do
     @staff_member = StaffMember.first
     @branch       = Branch.first
     params = {}
-    params[:center] =
-      {
+    params[:center] = {
       :branch_id => @branch.id, :name => "Test Center", :code => "C1", :creation_date => {"month"=>"4", "day"=>"29", "year"=>"2010"},
       :manager_staff_id => @staff_member.id
     }
@@ -30,16 +29,17 @@ describe Centers, "Check centers controller" do
     response.should redirect
     @center =  Center.first
     request(resource(@center)).should be_successful
-    params = {}
-    hash = @center.attributes
+    params  = {}
+    hash    = @center.attributes
     hash.delete(:created_at)
-    hash[:creation_date] = { :month => hash[:creation_date].month, :day => hash[:creation_date].day, :year => hash[:creation_date].year}
-    hash[:name]          = @center.name+"_changed"
-    params[:center]      =  hash
+    hash[:creation_date] = { 
+      :month => hash[:creation_date].month, :day => hash[:creation_date].day, :year => hash[:creation_date].year
+    }
+    hash[:name]      = @center.name+"_changed"
+    params[:center]  = hash
     response = request resource(@center), :method => "POST", :params => params
     response.should redirect
     new_name = Center.get(@center.id).name
     new_name.should_not equal(@center.name)
   end 
-
 end

@@ -13,28 +13,23 @@ describe Holidays, "Check holidays" do
     response.should redirect
     request("/holidays").should be_successful
     params = {}
-    params[:holiday] =
-      { :name => "sutti",:date => {"month" => "3", "day" => "14", "year" => "2010"}, :shift_meeting => "before" }
+    params[:holiday] = { :name => "sutti",:date => {"month" => "3", "day" => "14", "year" => "2010"}, :shift_meeting => "before" }
     response = request resource(:holidays), :method => "POST", :params => params
     response.should redirect
     Holiday.first(:name => "sutti").should_not nil
   end
 
   it "edit a holiday" do
-    
     response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password' }
     response.should redirect
     @holiday = Holiday.first
     request(resource(@holiday)).should be_successful
     params = {}
-    hash = @holiday.attributes
-    hash[:name] = @holiday.name + "_modified"
-    params[:holiday] = hash     
+    hash              = @holiday.attributes
+    hash[:name]       = @holiday.name + "_modified"
+    params[:holiday]  = hash     
     response = request resource(@holiday),:method => "POST", :params =>params 
-    
     new_name = Holiday.get(@holiday.id).name
     new_name.should_not equal(@holiday.name)
-
   end
-    
 end

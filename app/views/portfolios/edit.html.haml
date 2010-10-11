@@ -1,0 +1,11 @@
+%h1
+  ==Edit #{@portfolio.name}
+
+= error_messages_for @portfolio
+
+= form_for(@portfolio, :action => resource(@funder, @portfolio) ) do
+  = partial :fields
+  %p
+    = submit "Save portfolio"
+
+= link_to 'Back', url(@funder)

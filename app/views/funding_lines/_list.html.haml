@@ -1,0 +1,46 @@
+%h2== Funding lines by funder <i>#{@funder.name}</i>
+%p== Manage existing funding lines or #{link_to 'create a new funding line', resource(@funder, :funding_lines, :new), :class => "add"}.
+
+- if @funding_lines.blank?
+  %p
+    %i No funding_lines have been created yet.
+- else
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th id
+        %th amount
+        %th interest
+        %th disbursal
+        %th first payment
+        %th last payment
+        %th
+        %th
+    %tbody
+    - for funding_line in @funding_lines
+      %tr{ :class => cycle('odd','') }
+        %td &nbsp;
+        %td
+          = link_to(funding_line.id, resource(@funder, funding_line))
+        %td
+          %b= funding_line.amount
+        %td
+          %b
+            = funding_line.interest_percentage
+            \%
+        %td
+          = funding_line.disbursal_date
+        %td
+          = funding_line.first_payment_date
+        %td
+          = funding_line.last_payment_date
+        %td
+          = link_to("details", resource(@funder, funding_line))          
+        %td
+          = link_to 'edit', resource(@funder, funding_line, :edit), :class => "edit"
+    %tfoot
+      %tr
+        %td{ :colspan => 9 }
+
+  

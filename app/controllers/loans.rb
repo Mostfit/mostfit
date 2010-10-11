@@ -17,7 +17,7 @@ class Loans < Application
   def show(id)
     @loan = Loan.get(id)
     raise NotFound unless @loan
-    @payments = @loan.payments
+    @payments = @loan.payments(:order => [:received_on, :id])
     display [@loan, @payments], 'payments/index'
   end
 

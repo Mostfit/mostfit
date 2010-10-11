@@ -19,9 +19,9 @@ class GroupConsolidatedReport < Report
   def generate
     branches, centers, data, clients, loans, groups = {}, {}, {}, {}, {}, {}
     histories = LoanHistory.sum_outstanding_grouped_by(self.to_date, [:center, :client_group], self.loan_product_id)
-    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, :client_group)||[]
-    balances  = LoanHistory.advance_balance(self.to_date, :client_group)||[]
-    old_balances = LoanHistory.advance_balance(self.from_date-1, :client_group)||[]
+    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, :client_group, self.loan_product_id)||[]
+    balances  = LoanHistory.advance_balance(self.to_date, :client_group, self.loan_product_id)||[]
+    old_balances = LoanHistory.advance_balance(self.from_date-1, :client_group, self.loan_product_id)||[]
 
     @branch.each{|b|
       data[b]||= {}

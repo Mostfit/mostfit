@@ -19,9 +19,9 @@ class StaffConsolidatedReport < Report
   def generate
     branches, centers, data, staff, clients = {}, {}, {}, {}, {}
     histories = LoanHistory.sum_outstanding_by_center(self.from_date, self.to_date, self.loan_product_id)
-    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, :center)||[]
-    balances  = LoanHistory.advance_balance(self.to_date, :center)||[]
-    old_balances = LoanHistory.advance_balance(self.from_date-1, :center)||[]
+    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, :center, self.loan_product_id)||[]
+    balances  = LoanHistory.advance_balance(self.to_date, :center, self.loan_product_id)||[]
+    old_balances = LoanHistory.advance_balance(self.from_date-1, :center, self.loan_product_id)||[]
 
     StaffMember.all.each{|s| staff[s.id]=s}
     @branch.each{|b|

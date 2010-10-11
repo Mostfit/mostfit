@@ -65,7 +65,7 @@ private
     if params[:parent_model] and params[:parent_id]
       @parent = Kernel.const_get(params[:parent_model]).get(params[:parent_id])
     else
-      @parent = Mfi.new($globals ? $globals[:mfi_details] : {})
+      @parent = Mfi.new(Mfi.first ? Mfi.first.attributes : {})
     end
   end
 end # Documents

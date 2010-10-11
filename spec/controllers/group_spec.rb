@@ -12,19 +12,17 @@ describe ClientGroups, "Check groups" do
     response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
     response.should redirect
     request("/client_groups/new").should be_successful
-    
     @center   = Center.first
     @branch   = @center.branch
     params = {}
-    params[:client_group] =
-      {:center_id => @center.id, :name => "Test Group", :code => "TG", :number_of_members => 5 }
+    params[:client_group] = { :center_id => @center.id, :name => "Test Group", :code => "TG", :number_of_members => "5" }
     response = request resource(:client_groups), :method => "POST", :params => params
     response.should redirect
     ClientGroup.first(:code => "TG").should_not nil
   end
 
   it "edit a new group" do
-  response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
+    response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
     response.should redirect
     @group =  ClientGroup.first
     request(resource(@group)).should be_successful

@@ -1,13 +1,15 @@
 %h1
   Mostfit data upload
 %p
-  This is the place where your to-date MFI data in one go
-
-
+  Upload information for your past operations here, and you are ready to begin using Mostfit 
+%p
+  Download 
+  %a{:href => "/upload_data.xls"}
+    sample spreadsheet
 %form{:action => "/admin/upload", :enctype => "multipart/form-data",  :method => "post"}
   %fieldset
-    %h4
-      Upload excal sheet containing worksheets for 
+    %p
+      The spreadsheet can contain tabs for one or more of the following:
       %ol
         %li 
           Staff members
@@ -23,13 +25,7 @@
           Payments
         %li
           Loan products 
-    %h4
-      Download sample excel sheet 
-      %a{:href => "/upload_data.xls"}
-        here
       %br
-      %b Do you Want to erase data ?
-      = check_box :erase   
+      %b Upload currently erases all existing data for the items you upload (handle with care!) 
     %input{:name => "file", :size => "80",  :type => "file"}
     %input{:type => "submit", :value => "Upload"}
- 

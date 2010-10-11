@@ -1,8 +1,10 @@
 %h1== Edit the '#{@payment.id}' payment details
-
 = error_messages_for @payment
 
-= form_for(@payment, :action => url_for_loan(@loan, "payments/#{payment.id}")) do
+= form_for(@payment, :action => url_for_loan(@loan, "payments/#{@payment.id}")) do
   = partial :fields, :submit_text => "Save changes", :cancel_link => url_for_loan(@loan, 'payments')
 
+%div.greytext
+  This form is does not perform a normal edit. Payment #{@payment.id} will be deleted and a new one will be created with parameters below 
+%br
 = link_to 'Back', url_for_loan(@loan, 'payments')

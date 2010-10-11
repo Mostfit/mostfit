@@ -57,7 +57,9 @@ Merb::Router.prepare do
       end
     end
   end
-  resources :funders do    resources :funding_lines
+  resources :funders do    
+    resources :portfolios
+    resources :funding_lines
   end
   resources :center_meeting_days
 

@@ -33,12 +33,16 @@ class QuarterConsolidatedReport < Report
             # we do not generate report for the ongoing month
             next if year>=this_year and month_number >= this_month
             next if Date.today < Date.new(y, month_number, 1)
+            next if @from_date > Date.new(y, month_number, 1)
+            next if @to_date   < Date.new(y, month_number, 1)
             histories = LoanHistory.sum_outstanding_by_month(month_number, y, branch, self.loan_product_id)
             next if not histories
+            branch_query        = ["lh.branch_id=#{branch.id}"]
             month_start_date    = Date.new(y, month_number, 1)
             month_end_date      = Date.new(y, month_number, -1)
-            advances            = LoanHistory.sum_advance_payment(month_start_date, month_end_date, :branch)||[]
-            old_balances        = LoanHistory.advance_balance(month_start_date-1, :branch)||[]
+            advances            = LoanHistory.sum_advance_payment(month_start_date, month_end_date, :branch, self.loan_product_id, branch_query)||[]
+            old_balances        = LoanHistory.advance_balance(month_start_date-1, :branch, self.loan_product_id, branch_query)||[]
+            balances            = LoanHistory.advance_balance(month_end_date, :branch, self.loan_product_id, branch_query)||[]
 
             data[branch][year]||= {}
             data[branch][year][quarter]||= {}
@@ -53,8 +57,6 @@ class QuarterConsolidatedReport < Report
               
               principal_actual    = history.actual_outstanding_principal
               total_actual        = history.actual_outstanding_total
-              
-              total_advance       = history.advance_total
             else
               principal_scheduled, total_scheduled, principal_actual, total_actual, total_advance = 0, 0, 0, 0, 0
             end
@@ -69,12 +71,15 @@ class QuarterConsolidatedReport < Report
             
             advance  = advances.find{|x|  x.branch_id==branch.id}
             old_balance = old_balances.find{|x|  x.branch_id==branch.id}
+            balance  = balances.find{|x|  x.branch_id==branch.id}
+
             advance_total = advance ? advance.advance_total : 0
+            balance_total = balance ? balance.balance_total : 0
             old_balance_total = old_balance ? old_balance.balance_total : 0
-        
-            data[branch][year][quarter][month][13]  += advance_total
-            data[branch][year][quarter][month][14]  += advance_total - total_advance + old_balance_total
-            data[branch][year][quarter][month][15] += total_advance
+
+            data[branch][year][quarter][month][13] += advance_total
+            data[branch][year][quarter][month][15] += balance_total
+            data[branch][year][quarter][month][14] += advance_total - balance_total + old_balance_total
           }
         }
       }

@@ -1,0 +1,33 @@
+%h1== Funder: <i>#{@funder.name}</i>
+
+%table.narrow.form{ :style => "width: 40%;" }
+  %tr.odd
+    %td name
+    %td
+      %b= @funder.name
+      == (id: #{@funder.id})
+  %tr
+    %td funding lines
+    %td
+      %b= @funder.funding_lines.size
+  %tr.odd
+    %td first disbursement
+    %td
+      = @funder.funding_lines.min(:disbursal_date)
+  %tr
+    %td last disbursement
+    %td
+      = @funder.funding_lines.max(:disbursal_date)
+
+%p= link_to 'edit this funders details', resource(@funder, :edit), :class => "edit"
+
+%div.tab_container
+  %ul.tabs
+    %li#funding_lines
+      Funding lines
+    %li#portfolios
+      Portfolios
+  %div.tab
+    = partial "funding_lines/list"
+  %div.tab  
+    = partial "portfolios/list"

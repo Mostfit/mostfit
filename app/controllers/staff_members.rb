@@ -8,7 +8,7 @@ class StaffMembers < Application
     @date = params[:date] ? parse_date(params[:date]) : Date.today
     @branch = Branch.get(params[:branch_id]) if params[:branch_id]
     hash = get_staff_members_hash
-    @staff_members = StaffMember.all(hash).paginate(:page => params[:page], :per_page => per_page)
+    @staff_members = (@staff_members ? @staff_members : StaffMember.all(hash)).paginate(:page => params[:page], :per_page => per_page)
     set_staff_member_counts
     display @staff_members
   end

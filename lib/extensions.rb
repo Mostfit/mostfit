@@ -78,15 +78,15 @@ module Misfit
         return false unless allowed_controller
         id = @route[:id].to_i
         model = Kernel.const_get(@model.to_s.split("/")[-1].camelcase)
-        if [Browse, Report, Document, AuditTrail, Attendance].include?(model)
+        if [Browse, Report, Document, AuditTrail, Attendance, Search].include?(model)
           return true
-        elsif [Branch, Center, ClientGroup, Client, Loan].include?(model) and id>0 
+        elsif [Branch, Center, ClientGroup, Client, Loan, StaffMember].include?(model) and id>0 
           return(@funder.send(model.to_s.snake_case.pluralize, {:id => id}).length>0)
-        elsif [Branch, Center, ClientGroup, Client, Loan].include?(model) and id==0
+        elsif [Branch, Center, ClientGroup, Client, Loan, StaffMember].include?(model) and id==0
           return(@funder.send(model.to_s.snake_case.downcase.pluralize).length>0)
         end
         return false
-      end
+     end
 
       def is_manager_of?(obj)
         @staff ||= self.staff_member
@@ -117,6 +117,7 @@ module Misfit
         return true if user_role == :admin
         return true if [:graph_data, :info, :dashboard].include?(route[:controller].to_sym) and user_role!=:data_entry
         return true if route[:controller] == "users" and route[:action] == "change_password"
+        return false if (user_role == :read_only or user_role == :funder or user_role == :data_entry) and route[:controller] == "payments" and route[:action] == "delete"
 
         @route = route
         @controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]

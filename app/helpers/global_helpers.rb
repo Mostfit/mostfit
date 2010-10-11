@@ -44,8 +44,15 @@ module Merb
     def select_staff_member_for(obj, col, attrs = {}, allow_unassigned=false)
       id_col = "#{col.to_s}_staff_id".to_sym
       selected = ((obj.send(id_col) and obj.send(id_col)!="") ? obj.send(id_col).to_s : attrs[:selected] || "0")
+      allow_inactive = false
+
+      if selected and selected.to_i>0
+        staff = StaffMember.get(selected)
+        allow_inactive = true unless staff.active
+      end
+      
       select(col,
-             :collection   => staff_members_collection(allow_unassigned),
+             :collection   => staff_members_collection(allow_unassigned, allow_inactive),
              :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
              :id           => attrs[:id] || "#{obj.class.to_s.snake_case}_#{id_col}",
              :selected     => selected)
@@ -371,16 +378,17 @@ module Merb
     end
 
     private
-    def staff_members_collection(allow_unassigned=false)
+    def staff_members_collection(allow_unassigned=false, allow_inactive=false)
+      hash = allow_inactive ? {} : {:active => true}
       if session.user.staff_member
         staff = session.user.staff_member
         bms  = staff.branches.collect{|x| x.manager}
         cms  = staff.branches.centers.collect{|x| x.manager}               
         managers = [bms, cms, staff].flatten.uniq
-        managers+= (StaffMember.all(:active => true) - Branch.all.managers - Center.all.managers - Region.all.managers - Area.all.managers) if allow_unassigned
+        managers+= (StaffMember.all(hash) - Branch.all.managers - Center.all.managers - Region.all.managers - Area.all.managers) if allow_unassigned
         [["0", "<Select a staff member"]] + managers.sort_by{|x| x.name}.map{|x| [x.id, x.name]}
       else
-        [["0", "<Select a staff member"]] + StaffMember.all(:active => true).sort_by{|x| x.name}.map{|x| [x.id, x.name]}
+        [["0", "<Select a staff member"]] + StaffMember.all(hash).sort_by{|x| x.name}.map{|x| [x.id, x.name]}
       end
     end
     

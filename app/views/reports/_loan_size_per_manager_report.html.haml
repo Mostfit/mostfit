@@ -42,7 +42,7 @@
             =manager.name
         - data.each_with_index do |value, i|
           %td.number
-            =value.to_i
+            =value.to_currency
             - if summable_columns.include?(i)
               - branch_total[summable_columns.index(i)]+=value.to_f
     -org_total.push([managers.length, *branch_total])
@@ -57,9 +57,9 @@
           - if summable_columns.include?(idx)
             = branch_total[idx].to_currency
           -elsif idx==5
-            = branch_total[1] and branch_total[1]>0 ? (branch_total[4]/branch_total[1]).to_i.to_currency : 0
+            = branch_total[1] and branch_total[1]>0 ? (branch_total[4]/branch_total[1]).to_currency : 0
           -elsif idx==6
-            = branch_total[0] and branch_total[0]>0 ? (branch_total[4]/branch_total[0]).to_i.to_currency : 0
+            = branch_total[0] and branch_total[0]>0 ? (branch_total[4]/branch_total[0]).to_currency : 0
   %tr.org_total
     - org_total = org_total.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}}
     - org_total.each do |ele|
@@ -68,7 +68,7 @@
           =ele.to_currency
     %td.number
       %b
-        =org_total[2] and org_total[2]>0 ? (org_total[5]/org_total[2]).to_i.to_currency : 0
+        =org_total[2] and org_total[2]>0 ? (org_total[5]/org_total[2]).to_currency : 0
     %td.number
       %b
-        =org_total[1] and org_total[1]>0 ? (org_total[5]/org_total[1]).to_i.to_currency : 0
+        =org_total[1] and org_total[1]>0 ? (org_total[5]/org_total[1]).to_currency : 0

@@ -112,6 +112,18 @@ class Payment
                   p.received_by_staff_id=#{obj.id} and p.type in (#{types.join(',')})
                   and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
                };
+    elsif obj.class==LoanProduct
+      from  = "loans l, payments p"
+      where = %Q{                  
+                  l.id = p.loan_id and l.deleted_at is NULL and l.loan_product_id = #{obj.id} and p.type in (#{types.join(',')})
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
+    elsif obj.class==FundingLine
+      from  = "loans l, payments p"
+      where = %Q{                  
+                  l.id = p.loan_id and l.deleted_at is NULL and l.funding_line_id = #{obj.id} and p.type in (#{types.join(',')})
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
     end
     repository.adapter.query(%Q{
                              SELECT SUM(p.amount) amount, p.type payment_type
@@ -195,8 +207,11 @@ class Payment
       elsif type == :interest
         a = loan.actual_outstanding_interest_on(received_on)
       elsif type == :fees
-        a = loan.total_fees_payable_on(received_on) if loan
-        a = client.total_fees_payable_on(received_on) if client and not loan
+        loan_fees = loan.total_fees_payable_on(received_on) if loan
+        loan_fees_amount = loan_fees ? loan_fees : 0
+        client_fees = client.total_fees_payable_on(received_on) if client and not loan
+        client_fees_amount = client_fees ? client_fees : 0
+        a = loan_fees_amount + client_fees_amount
       end      
       if (not a.blank?) and amount - a > 0.01
         return [false, "#{type} is more than the total #{type} due"]

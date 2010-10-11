@@ -1,0 +1,16 @@
+%h1
+  Portfolios controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/portfolios/index.html.erb
+%table
+  %tr
+  - for portfolio in @portfolios
+    %tr
+      %td
+        = link_to 'Show', url(:portfolio, portfolio)
+      %td
+        = link_to 'Edit', url(:edit_portfolio,  portfolio)
+
+= link_to 'New', url(:new_portfolio)

@@ -1,0 +1,73 @@
+%table
+  %tr
+    %th
+      Name
+    %td
+      = text_field :name
+- length = 16
+%table.report.portfolio
+  %tr.header
+    %th
+    %th{:colspan => 2}
+      Total loans
+    %th{:colspan => 4}
+      Selected loans
+  %tr.header
+    %th
+      Center
+    %th
+      Count
+    %th
+      Outstanding      
+    %th
+      Select
+    %th
+      Count
+    %th
+      Allocated outstanding
+    %th
+      Current outstanding
+  - org_total = []
+  - @data.sort_by{|branch, centers| branch.name}.each do |branch, centers|
+    %tr.branch
+      %td{:colspan => length+1}
+        %b= branch.name
+    - branch_total = [0, 0, 0, 0, 0, 0, 0]
+    - center_loans = @portfolio.portfolio_loans.group_by{|pl| pl.loan.client.center}
+    - centers.sort_by{|center| center[0].name}.each do |center, data|
+      %tr.center
+        %td
+          = center.name
+          - branch_total[0]+=1
+        %td
+          = data.loan_count
+          - branch_total[1]+=data.loan_count
+        %td
+          = data.actual_outstanding_principal.to_currency
+          - branch_total[2]+=data.actual_outstanding_principal
+        %td
+          - selected = @centers.find{|c| c==center}
+          = check_box(:name => "portfolio[centers][#{center.id}]", :checked => selected, :disabled => selected)
+          - branch_total[3] += 1 if selected        
+        %td
+          = count = center_loans[center] ? center_loans[center].count : 0
+          - branch_total[4] += count
+        %td
+          = allocated_outstanding = center_loans[center] ? center_loans[center].map{|x| x.starting_value}.reduce(0){|s, x| s+=x} : 0
+          - branch_total[5] += allocated_outstanding
+        %td
+          = current_outstanding = center_loans[center] ? center_loans[center].map{|x| x.current_value}.reduce(0){|s, x| s+=x} : 0
+          - branch_total[6] += current_outstanding
+    %tr.branch_total
+      - branch_total.each do |x|
+        %td
+          %b= x.to_currency
+    - org_total << branch_total
+  %tr.org_total
+    - org_total.transpose.map{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
+      %td
+        %b
+          =ele.to_currency
+
+  
+      

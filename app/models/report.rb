@@ -80,12 +80,11 @@ class Report
     })    
   end
 
-  private
   def process_conditions(conditions)
     selects = []
     conditions = conditions.map{|query, value|
       key      = get_key(query)
-      operator = get_operator(query)
+      operator = get_operator(query, value)
       value    = get_value(value)
       operator = " is " if value=="NULL" and operator=="="
       next if not key
@@ -108,7 +107,7 @@ class Report
     end    
   end
   
-  def get_operator(query)
+  def get_operator(query, value)
     if query.respond_to?(:operator)
       case query.operator
       when :lte
@@ -124,6 +123,8 @@ class Report
       else
         "="
       end
+    elsif value.class == Array
+      "in"
     else
       "="
     end
@@ -133,7 +134,7 @@ class Report
     if val.class==Date
       "'#{val.strftime("%Y-%m-%d")}'"
     elsif val.class==Array
-      val.join(",")
+      "(#{val.join(",")})"
     elsif val.nil?
       "NULL"
     else

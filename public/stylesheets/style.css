@@ -24,8 +24,8 @@ h2 {
 }
 .container {
   background: #fff;
-  width: 80%;
-  margin-left: 10%;
+  width: 86%;
+  margin-left: 7%;
   padding: 0px 10px 10px 10px;
   min-height: 450px;
   border: 1px solid #c9c9c9;
@@ -80,7 +80,7 @@ ol { list-style-position: outside; list-style-type: decimal; }
   font-weight: normal;
 }
 h1.logo{
-    left: 10%;
+    left: 7%;
     position: absolute;
     top: 0px;
     height: 60px;
@@ -98,7 +98,7 @@ h1.logo span{
   background: white;
   position: absolute;
   top: 77px;
-  left: 10%;
+  left: 7%;
   width: 90%;
 }
 
@@ -271,17 +271,15 @@ table.narrow tr.group td{
     font-weight: bold;
 } 
 /* .container .error, .container .notice, .container .success */
-#flash-messages
-{
+#flash-messages{
+    float: center;
 }
-.flash
-{
+.flash{
 margin-top: 15px;
 padding: 0px;
 text-align: center;
 }
-.flash p
-{
+.flash p{
 font-weight: bold;
 margin: 0px;
 }
@@ -534,7 +532,7 @@ table.report th{
     padding-right: 2px;
 }
 table.report th:first-child{
-    width: 20%;
+    width: 8%;
 }
 table.report tbody{
 }
@@ -563,6 +561,13 @@ table.report tr.branch{
     font-size: 0.95em;
 }
 table.report tr.center{
+    border: 1px solid;
+    border-color: #ccc;
+    text-align: center;
+    font-size: 1em; 
+    background-color: #ddd;
+}
+table.report tr.transaction_date{
     border: 1px solid;
     border-color: #ccc;
     text-align: center;

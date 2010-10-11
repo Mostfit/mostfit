@@ -14,9 +14,11 @@ class Mfi
   property :address, Text, :nullable => false, :index => false
   property :website, String
   property :telephone, String, :nullable => false, :index => true
-  property :number_of_clients, Integer, :nullable => false, :index => true
-  property :number_of_branches, Integer, :nullable => false, :index => true
-  property :number_of_centers, Integer, :nullable => false, :index => true
+
+  property :number_of_clients, Integer, :nullable => true, :index => true
+  property :number_of_branches, Integer, :nullable => true, :index => true
+  property :number_of_centers, Integer, :nullable => true, :index => true
+
   property :in_operation_since, Date, :nullable => false, :index => true, :default => Date.new(2000, 1, 1)
 
   property :number_of_past_days, Integer, :nullable => true, :index => true, :default => 5
@@ -27,6 +29,7 @@ class Mfi
   property :number_of_future_days, Integer, :nullable => true, :index => true, :default => 100
 
   property :date_box_editable, Boolean, :default => true, :index => true
+  property :allow_grt_date_on_form, Boolean, :default => false, :index => true
 
   property :email, String, :nullable => false, :index => true, :format => :email_address
   property :created, Boolean, :nullable => false, :index => true, :default => false

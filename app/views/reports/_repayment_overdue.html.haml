@@ -45,7 +45,7 @@
                 - loan[1..-1].each_with_index do |d, idx|
                   %td
                     = d.to_currency
-                - center_total << [loan[1], loan[2], loan[3], loan[4].to_i, (loan[2] + loan[3] + loan[4]).to_i]
+                - center_total << [loan[1], loan[2], loan[3], loan[4], (loan[2] + loan[3] + loan[4])]
                 %td
                   = (loan[2] + loan[3] + loan[4]).to_currency
           %tr.center_total
@@ -56,17 +56,18 @@
               %td
                 -if summable_columns.include?(col)
                   %b
-                    =branch_total.last[summable_columns.index(col)]
+                    =branch_total.last[summable_columns.index(col)].to_currency
       %tr.branch_total
         %td
           %b==Branch total:
         -branch_total = branch_total.reject{|x| x.class!=Array or (x.class==Array and x.length==0)}.transpose.collect{|x| x.reduce{|sum, x| sum+=x}}
         - org_total << branch_total
-        -1.upto(length-1).each do |col|
-          %td
-            -if summable_columns.include?(col)
-              %b
-                =branch_total[summable_columns.index(col)]
+        - if branch_total.length>0
+          -1.upto(length-1).each do |col|
+            %td
+              -if summable_columns.include?(col)
+                %b
+                  =branch_total[summable_columns.index(col)].to_currency
   %tr.org_total
     %td
       %b==Total:
@@ -75,5 +76,5 @@
       %td
         -if summable_columns.include?(col)
           %b
-            =org_total[summable_columns.index(col)]
+            =org_total[summable_columns.index(col)].to_currency
       

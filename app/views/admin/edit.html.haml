@@ -105,9 +105,9 @@
             =check_box :date_box_editable
         %tr
           %td
-            Number of branches
+            Allow GRT date on new client form
           %td
-            =text_field :number_of_branches
+            =check_box :allow_grt_date_on_form
         %tr
           %td
             Do accounting ?
@@ -126,6 +126,11 @@
             Specify prefered date format
           %td
             =select :date_format, :collection => Mfi::DateFormats.map{|x| [x, Date.today.strftime(x)]}
+        %tr
+          %td
+            Application revision
+          %td
+            = revision
     %div.tab    
       %table{:width => "100%"}     
         %tr

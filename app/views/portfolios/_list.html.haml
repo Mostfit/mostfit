@@ -1,0 +1,46 @@
+%h2
+  Portfoilos owned by <i>#{@funder.name}</i>
+
+%p== Manage existing porfolios or #{link_to 'create a new portfolio', resource(@funder, :portfolios, :new), :class => "add"}.
+  
+- if @portfolios.blank?
+  %p
+    %i No portfolios have been created yet.
+- else
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th ID
+        %th Name
+        %th Number of loans
+        %th Starting value
+        %th Present value
+        %th Present value calculated at
+        %th Created on
+        %th
+    %tbody
+    - for portfolio in @portfolios
+      %tr{ :class => cycle('odd','') }
+        %td &nbsp;
+        %td
+          = link_to portfolio.id, resource(@funder, portfolio)
+        %td
+          = link_to portfolio.name, resource(@funder, portfolio)
+        %td
+          %b= portfolio.loans.count
+        %td
+          %b= portfolio.start_value
+        %td
+          = portfolio.outstanding_value
+        %td
+          = portfolio.outstanding_calculated_on.strftime("on #{Mfi.first.date_format} at %H:%M")
+        %td
+          = portfolio.created_at.strftime(Mfi.first.date_format)
+        %td
+          = link_to 'edit', resource(@funder, portfolio, :edit), :class => "edit"
+    %tfoot
+      %tr
+        %td{ :colspan => 9 }
+  
+  

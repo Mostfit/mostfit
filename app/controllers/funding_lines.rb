@@ -9,7 +9,7 @@ class FundingLines < Application
   end
 
   def show(id)
-    @funding_line = FundingLine.get(id)
+    @funding_line = FundingLine.get(id)    
     raise NotFound unless @funding_line
     display @funding_line
   end

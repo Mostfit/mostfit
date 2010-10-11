@@ -62,11 +62,12 @@
       Date joined
     %td
       = date_select_for @client, :date_joined, :max_date => Date.today
-  %tr
-    %td
-      Date of sucessful group recognization test:
-    %td
-      = date_select_for @client, :grt_pass_date, :nullable => true, :max_date => Date.today
+  - if not @client.new? or (@client.new? and mfi = Mfi.first and mfi.allow_grt_date_on_form)
+    %tr
+      %td
+        Date of sucessful group recognization test:
+      %td
+        = date_select_for @client, :grt_pass_date, :nullable => true, :max_date => Date.today
   %tr
     %td
       Spouse name:

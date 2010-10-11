@@ -4,7 +4,7 @@ class Application < Merb::Controller
   before :insert_session_to_observer
   before :add_collections, :only => [:index, :show]
   
-  @@controllers  = ["regions", "area", "branches", "centers", "clients", "loans", "payments"]
+  @@controllers  = ["regions", "area", "branches", "centers", "clients", "loans", "payments", "staff_members"]
 
   def insert_session_to_observer
     DataAccessObserver.insert_session(session.object_id)
@@ -124,11 +124,13 @@ class Application < Merb::Controller
 
   def add_collections
     return unless session.user.role==:funder
-    return if not @@controllers.include?(params[:controller])
+    return unless @@controllers.include?(params[:controller])
+
     @funder = Funder.first(:user_id => session.user.id)
     idx     = @@controllers.index(params[:controller])
-    idx    += 1 if params[:action]!="index"
+    idx    += 1 if params[:action] != "index" and not params[:controller] == "staff_members"
     var     = @@controllers[idx]
+    raise NotFound unless var
     instance_variable_set("@#{var}", @funder.send(var))
   end
 end
