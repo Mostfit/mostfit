@@ -1,7 +1,0 @@
---- 
-:id: 9
-:name: !str:CSV::Cell AHPI001
-:meeting_day: :wednesday
-:meeting_time: "09:00"
-:manager_staff_id: 8
-:branch_id: 1

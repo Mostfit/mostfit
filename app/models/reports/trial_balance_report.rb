@@ -18,7 +18,7 @@ class TrialBalanceReport < Report
   end
 
   def generate(param)  
-    Account.all(:order => [:account_type_id.asc])
+    Account.all(:order => [:account_type_id.asc]).group_by{|account| account.account_type}
   end
 end   
 
