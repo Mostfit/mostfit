@@ -1,8 +1,6 @@
 =partial :form
-%table.report.nojs
+%table.report
   %tr.header
-    %th
-      Account Type
     %th
       Account
     %th
@@ -14,42 +12,48 @@
     %th
       Total Balance
  
-  - length = 3
-  - org_total = []
-  - debit_sum, credit_sum, opening_sum = 0 , 0 , 0
-  - @data.each do |account|
-    %tr
+  - length = 5
+  - totals = []
+  - @data.sort_by{|at, accs| at.name}.each do |account_type, accounts|    
+    %tr.branch#account
+      %td{:colspan => length}
+        %b= account_type.name
+      - debit_sum, credit_sum, opening_sum = 0 , 0 , 0
+      - accounts.each do |account|
+        %tr.account
+          %td
+            = account.name
+          %td
+            - opening_balance = account.opening_balance
+            - opening_sum += opening_balance
+            = account.opening_balance_on_date
+            %br
+            = opening_balance  
+          %td
+            - debit = (account.postings.sum(:amount, :amount.lte => 0)||0) * -1
+            - debit_sum += debit
+            = debit.to_currency
+          %td
+            - credit = account.postings.sum(:amount, :amount.gte => 0)||0
+            - credit_sum += credit
+            = credit.to_currency
+          %td
+            = ((debit - credit) * -1) + opening_balance
+    %tr.branch_total
       %td
-        = account.account_type.name
       %td
-        = account.name
+        =opening_sum.to_currency
       %td
-        - opening_balance = account.opening_balance
-        - opening_sum += opening_balance
-        = account.opening_balance_on_date
-        %br
-        = opening_balance  
+        =debit_sum.to_currency
       %td
-        - debit = (account.postings.sum(:amount, :amount.lte => 0)||0) * -1
-        - debit_sum += debit
-        = debit.to_currency
+        =credit_sum.to_currency
       %td
-        - credit = account.postings.sum(:amount, :amount.gte => 0)||0
-        - credit_sum += credit
-        = credit.to_currency
+        =(opening_sum + (credit_sum - debit_sum)).to_currency
+    - totals << [opening_sum, debit_sum, credit_sum, opening_sum + (credit_sum - debit_sum)]
+  %tr.org_total
+    %td
+      %b Total
+    - totals.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
       %td
-        = ((debit - credit).to_currency * -1) + opening_balance
-
-  %tr
-    %td
-    %td
-    %td
-      =opening_sum.to_currency
-    %td
-      =debit_sum.to_currency
-    %td
-      =credit_sum.to_currency
-    %td
-      =(opening_sum + (credit_sum - debit_sum)).to_currency
-
+        %b= ele.to_currency
 
