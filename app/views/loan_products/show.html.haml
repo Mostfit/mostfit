@@ -3,26 +3,74 @@
 = link_to 'Edit',  url(:edit_loan_product,  @loan_product), :class => 'edit'
 |
 = link_to 'Back', url(:loan_products)
-%table{:style => "width: 50%; text-align: left;"}
-  - [:name, :loan_type, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments, :installment_frequency, :valid_from, :valid_upto].each do |attr|
-    %tr
-      %th
-        = attr.humanize
-      %td
-        = @loan_product.send(attr)
-  - [:payment_validation_methods, :loan_validation_methods].each do |attr|
-    %tr
-      %th
-        = attr.humanize
-      %td
-        = @loan_product.send(attr)
-  %tr
-    %th
-      Fees
-    %td
-      - @loan_product.fees.each do |fee|
-        %ul
-          %li
-            = fee.description
 
-
+%div.tab_container
+  %ul.tabs
+    %li#info
+      Info
+    %li#validations
+      Validations
+    %li#sample
+      Sample schedule
+  %div.tab
+    %table.form
+      - [:name, :loan_type, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments, :installment_frequency, :valid_from, :valid_upto].each do |attr|
+        %tr
+          %th{:align => "left"}
+            = attr.humanize
+          %td
+            = @loan_product.send(attr)
+  %div.tab
+    %table.form
+      - [:payment_validation_methods, :loan_validation_methods].each do |attr|
+        %tr
+          %th{:align => "left"}
+            = attr.humanize
+          %td
+            - if val = @loan_product.send(attr) and val.to_s.length > 0
+              %ul
+                = val.split(",").map{|x| x.split("_").join(" ").capitalize}.join("<br/>")
+      %tr
+        %th{:align => "left"}
+          Fees
+        %td
+          - @loan_product.fees.each do |fee|
+            %ul
+              %li
+                = fee.description
+  %div.tab
+    %table.report.nojs
+      %tr
+        %th
+          date
+        %th
+          principal
+        %th
+          interest
+        %th
+          total
+        %th
+          total paid
+        %th
+          balance   
+      - begin
+        - unless /^Take/.match(@loan_product.loan_type.to_s)
+          - loan = Loan.new(:loan_product => @loan_product, :discriminator => @loan_product.loan_type, :amount => @loan_product.min_amount, :interest_rate => @loan_product.min_interest_rate / 100, :disbursal_date => Date.today, :installment_frequency => @loan_product.installment_frequency, :number_of_installments => @loan_product.min_number_of_installments, :applied_by => StaffMember.new, :scheduled_first_payment_date => Date.today + 7, :client => Client.new)
+          - paid = 0
+          - loan.payment_schedule.sort_by{|date, data| date}.each do |date, ps|      
+            %tr
+              %td
+                = date
+              %td
+                = ps[:principal]
+              %td
+                = ps[:interest]
+              %td
+                = ps[:principal] + ps[:interest]
+              %td
+                - paid += ps[:principal] + ps[:interest]
+                = paid
+              %td
+                = ps[:balance]
+      - rescue
+        Cannot generate schedule as some parameters are missing

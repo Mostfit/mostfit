@@ -1,13 +1,15 @@
 =partial :form
-%table.report
+%table.report#branch
   %tr.header
     %th
       Group
     %th{:colspan => "2"}
       Disbursal scheduled
-    %th{:colspan => "4"}
+    %th{:colspan => "3"}
       Repayment scheduled
-    %th{:colspan => "4"}
+    %th{:colspan => "3"}
+      Overdue payments
+    %th{:colspan => "3"}
       Balance outstanding
   %tr.header
     %th
@@ -20,7 +22,11 @@
     %th
       Interest
     %th
-      Fee
+      Total
+    %th
+      Principal
+    %th
+      Interest
     %th
       Total
     %th
@@ -28,39 +34,38 @@
     %th
       Interest
     %th
-      Fee
-    %th
       Total
   - center_id, branch_id = nil, nil
-  - length = 10
+  - length = 11
+
   - org_total = []
-  -@data.sort_by{|branch, centers| branch.name}.each do |branch, centers|
-    -if centers.keys.length>0
+  -@data.sort_by{|branch, dates| branch.name}.each do |branch, dates|
+    -if dates.keys.length>0
       -branch_total = []
-      %tr.branch
+      %tr.branch#transaction_date
         %td{:colspan => length+1}
           %b
             =branch.name
-      -centers.sort_by{|center, groups| center.name}.each do |center, groups|
-        -if groups.keys.length>0
-          %tr.center
+      -dates.sort_by{|date, centers| date}.each do |date, centers|
+        -if centers.keys.length>0
+          %tr.transaction_date#center
             %td{:colspan => length+1}
               %b
-                =center.name
-          - center_total = Array.new(length, 0)
-          -groups.sort_by{|group, data| group.name}.each do |group, data|
-            %tr.group
+                =date
+          -date_total = Array.new(length, 0)
+          -centers.sort_by{|center, data| center.name}.each do |center, data|
+            %tr.center
               %td
-                =group.name
+                =center.name
               -data.each_with_index do |d, idx|
                 %td
                   = d
-                  - center_total[idx]+=d
-          %tr.center_total
+                  -date_total[idx]+=d
+          %tr.transaction_date_total
             %td
-              %b==Center total:
-              -branch_total.push(center_total)
-            -center_total.each do |ele|
+              %b==Date total:
+              -branch_total.push(date_total)
+            -date_total.each do |ele|
               %td
                 %b
                   =ele
