@@ -34,28 +34,28 @@
           - count = 0
           - clients.each do |client|
             %tr.client
+              - count += 1
               - client.each_with_index do |d, i|
                 %td
                   = d
-                - count += 1
           %tr.center_total
             %td
               - branch_total += count
               %b
                 = count
-            - (length - 1).times do 
+            - length.times do 
               %td
       %tr.branch_total
         %td
           %b
             = branch_total
             - org_total += branch_total
-        - (length - 1).times do 
+        - length.times do 
           %td
   %tr.org_total
     %td
       %b
         = org_total
-    - (length - 1).times do 
+    - length.times do 
       %td
 
