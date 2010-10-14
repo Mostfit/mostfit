@@ -1,10 +1,11 @@
 =partial :form
-%table.report.nojs
+- length = 8
+%table.report
   %tr.header
     %th{:width => '20%'}
       Client
     %th{:width => '10%'}
-      Death of
+      Reason
     %th{:width => '10%'}
       Date of Death
     %th{:width => '10%'}
@@ -12,39 +13,79 @@
     %th{:width => '10%'}
       Pending Documents
     %th{:width => '10%'}
-      Disbursed
+      Amount Disbursed
     %th{:width => '10%'}
-      Repayment
+      Amount Repaid
     %th{:width => '10%'}
       Balance Outstanding 
-  - @data.each do |claim| 
-    %tr 
+  - org_total = []
+  - @data.sort_by{|branch, x| branch.name}.each do |branch, claims|
+    %tr.branch#claim
+      %td{:colspan => length+1}
+        %b
+          =branch.name
+    - branch_total = Array.new(4, 0) 
+    - claims.each do |claim|      
+      %tr.claim
+        %td
+          = claim.client.name
+          - branch_total[0] += 1
+        %td
+          = claim.client.inactive_reason.to_s.camelcase(' ')
+        %td
+          = claim.date_of_death       
+        %td
+          = claim.claim_submission_date
+        %td
+          -documents = CLAIM_DOCUMENTS - claim.documents
+          - documents.each do |doc| 
+            = doc.to_s.camelcase(' ')
+            %br
+        %td
+          - loan = claim.client.loans
+          - loan.each do |l|
+            = l.amount.to_currency
+            - branch_total[1] += l.amount
+            %br
+        %td
+          - loan = claim.client.loans
+          - loan.each do |l|
+            = prin = l.principal_received_up_to(Date.today).to_f
+            - branch_total[2] += prin
+            %br
+        %td
+          - loan = claim.client.loans
+          - loan.each do |l|
+            = repaid = l.amount - l.principal_received_up_to(Date.today).to_f
+            %br
+            - branch_total[3] += repaid
+    %tr.branch_total
       %td
-        = claim.client.name
+        Branch Total
       %td
-        = claim.client.inactive_reason.to_s.camelcase(' ')
+        = branch_total[0]
       %td
-        = claim.date_of_death       
       %td
-        = claim.claim_submission_date
       %td
-        -documents = CLAIM_DOCUMENTS - claim.documents
-        - documents.each do |doc| 
-          = doc.to_s.camelcase(' ')
-          %br
       %td
-        - loan = claim.client.loans
-        - loan.each do |l|
-          = l.amount
-          %br
+        = branch_total[1].to_currency
       %td
-        - loan = claim.client.loans
-        - loan.each do |l|
-          = l.principal_received_up_to(Date.today).to_f
-          %br
+        = branch_total[2].to_currency
       %td
-        - loan = claim.client.loans
-        - loan.each do |l|
-          = l.amount - l.principal_received_up_to(Date.today).to_f
-          %br
+        = branch_total[3].to_currency
+    - org_total << branch_total
+  - org_total = org_total.transpose.collect{|ele| ele.reduce(0){|s, x| s+=x}}
+  %tr.org_total
+    %td Total
+    %td
+      = org_total[0]
+    %td
+    %td
+    %td
+    %td
+      = org_total[1].to_currency
+    %td
+      = org_total[2].to_currency
+    %td
+      = org_total[3].to_currency
 
