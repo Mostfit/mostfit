@@ -24,7 +24,7 @@ module Pdf
         #grouping by client groups
         center.clients(:fields => [:id, :name]).group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each{|group, clients|
           group_amount, group_outstanding, group_installments, group_principal, group_interest, group_fee, group_due = 0, 0, 0, 0, 0, 0, 0
-          table.data.push({"disbursed" => "#{group.name}"})
+          table.data.push({"disbursed" => group ? group.name : "No group"})
           #absent days
           #Grouped clients
           clients.sort_by{|x| x.name}.each{|client|

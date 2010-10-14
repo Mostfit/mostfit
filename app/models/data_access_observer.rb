@@ -1,6 +1,6 @@
 class DataAccessObserver
   include DataMapper::Observer
-  observe Center, Client, Loan
+  observe Branch, Center, Client, Loan
   
   def self.insert_session(id)
     @_session = ObjectSpace._id2ref(id)

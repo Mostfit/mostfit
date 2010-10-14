@@ -66,13 +66,13 @@
     %tr
       %td
       %td
-        - principal_repaid = Payment.all(:type => :principal).aggregate(:amount.sum)
+        - principal_repaid = Payment.all(:type => :principal).aggregate(:amount.sum) || 0
         = principal_repaid.to_currency 
       %td
-        - interest = Payment.all(:type => :interest).aggregate(:amount.sum)
+        - interest = Payment.all(:type => :interest).aggregate(:amount.sum) || 0
         = interest.to_currency
       %td
-        - fees = Payment.all(:type => :fees).aggregate(:amount.sum)
+        - fees = Payment.all(:type => :fees).aggregate(:amount.sum) || 0
         = fees.to_currency 
     %tr
       %td

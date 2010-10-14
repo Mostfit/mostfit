@@ -44,7 +44,7 @@
           %th
             Total
     - this_month     = Date.new(@date.year, @date.month, 1)
-    - this_month_end = @date+1
+    - this_month_end = Date.new(@date.year, @date.month, -1)
     -    
     - for staff_member in @staff_members
       %tr{ :class => cycle('odd','') }

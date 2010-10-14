@@ -6,7 +6,7 @@ describe Journal do
   end
   
   it "should create double entry transactions correctly" do
-    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :amount => 1000, :journal_type_id => Journal.first.id}
+    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :amount => 1000, :journal_type_id => JournalType.first.id}
     journal[:comment] = "some transaction"
     old_journal_count = Journal.count
     old_posting_count = Posting.count
@@ -26,7 +26,7 @@ describe Journal do
   end
 
   it "should create double entry transactions for multipl credit and debit accounts" do
-    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :journal_type_id => Journal.first.id}
+    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :journal_type_id => JournalType.first.id}
     journal[:comment] = "some transaction"
     old_journal_count = Journal.count
     old_posting_count = Posting.count
@@ -45,7 +45,7 @@ describe Journal do
   end
 
   it "should not be valid if both accounts are same" do
-    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :amount => 1000, :journal_type_id => Journal.first.id}
+    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :amount => 1000, :journal_type_id => JournalType.first.id}
     journal[:comment] = "some transaction"
     old_journal_count = Journal.count
     debit_account = Account.first 
@@ -56,7 +56,7 @@ describe Journal do
   end
 
   it "should not be valid if amount is zero" do
-    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :amount => 0, :journal_type_id => Journal.first.id}
+    journal = {:date => Time.now, :transaction_id => "1100110", :currency => Currency.first, :amount => 0, :journal_type_id => JournalType.first.id}
     journal[:comment] = "some transaction"
     old_journal_count = Journal.count
     debit_account = Account.first

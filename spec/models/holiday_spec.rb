@@ -8,6 +8,11 @@ describe Holiday do
     @h.should be_valid
   end
 
+  after(:all) do
+    Holiday.all.destroy!
+    $holidays = {}
+  end
+
   it "should have a name" do
     @h.name = nil
     @h.should_not be_valid
