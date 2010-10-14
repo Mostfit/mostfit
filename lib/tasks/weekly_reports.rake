@@ -15,7 +15,7 @@ require "merb-core"
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 namespace :mostfit do
-  namespace :weekly do
+  task :weekly do
     today = Date.today
     if today.cwday != 7
       today = today - today.cwday
