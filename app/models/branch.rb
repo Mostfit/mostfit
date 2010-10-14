@@ -1,6 +1,6 @@
 class Branch
-  extend Reporting::BranchReports
   include DataMapper::Resource
+  extend Reporting::BranchReports
 
   before :save, :convert_blank_to_nil
   
