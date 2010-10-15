@@ -29,27 +29,7 @@ class LoanPurposeReport < Report
         purpose = purposes[history.occupation_id]
         #0              1                 2                3              4              5     6                  7         8    9,10,11     12         13
         #amount_applied,amount_sanctioned,amount_disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults, name
-        data[b][purpose] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]        
-        principal_scheduled = history.scheduled_outstanding_principal
-        total_scheduled     = history.scheduled_outstanding_total
-        
-        principal_actual    = history.actual_outstanding_principal
-        total_actual        = history.actual_outstanding_total
-        
-        principal_advance   = history.advance_principal
-        total_advance       = history.advance_total
-        
-        data[b][purpose][7] += principal_actual
-        data[b][purpose][9] += total_actual
-        data[b][purpose][8] += total_actual - principal_actual
-        
-        data[b][purpose][10]  += (principal_actual > principal_scheduled ? principal_actual-principal_scheduled : 0)
-        data[b][purpose][11] += ((total_actual-principal_actual) > (total_scheduled-principal_scheduled) ? (total_actual-principal_actual - (total_scheduled-principal_scheduled)) : 0)
-        data[b][purpose][12] += total_actual > total_scheduled ? total_actual - total_scheduled : 0
-        
-        data[b][purpose][13]  += principal_advance
-        data[b][purpose][15] += total_advance
-        data[b][purpose][14] += (total_advance - principal_advance)
+        data[b][purpose] = [0, 0, 0, 0]        
       }
     }
 
@@ -65,17 +45,8 @@ class LoanPurposeReport < Report
       if branch = branches[branch_id]
         loan_purposes.group_by{|x| x.occupation_id}.each{|purpose_id, payments|
           purpose = purposes[purpose_id]
-          data[branch][purpose] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-          payments.each{|p|
-            if p.ptype==1
-              data[branch][purpose][3] += p.amount.round(2)
-            elsif p.ptype==2
-              data[branch][purpose][4] += p.amount.round(2)
-            elsif p.ptype==3
-              data[branch][purpose][5] += p.amount.round(2)
-            end
-            data[branch][purpose][6] += p.amount.round(2)
-          } 
+          data[branch][purpose] ||= [0, 0, 0, 0]
+              
         }
       end
     }
@@ -88,7 +59,7 @@ class LoanPurposeReport < Report
       branch  = branches[branch_id]
       loan_purposes.group_by{|x| x.occupation_id}.each{|purpose_id, loans|
         purpose = purposes[purpose_id]        
-        data[branch][purpose] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        data[branch][purpose] ||= [0, 0, 0, 0]
         l = loans.first
         data[branch][purpose][0] += l.amount if loans.length>0
       }
@@ -102,7 +73,7 @@ class LoanPurposeReport < Report
       branch  = branches[branch_id]
       loan_purposes.group_by{|x| x.occupation_id}.each{|purpose_id, loans|
         purpose = purposes[purpose_id]        
-        data[branch][purpose] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        data[branch][purpose] ||= [0, 0, 0, 0]
         l = loans.first
         data[branch][purpose][1] += l.amount if loans.length>0
       }
@@ -115,7 +86,7 @@ class LoanPurposeReport < Report
       branch  = branches[branch_id]
       loan_purposes.group_by{|x| x.occupation_id}.each{|purpose_id, loans|
         purpose = purposes[purpose_id]        
-        data[branch][purpose] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        data[branch][purpose] ||= [0, 0, 0, 0]
         data[branch][purpose][2] += loans.first.amount if loans.length>0
       }
     }
