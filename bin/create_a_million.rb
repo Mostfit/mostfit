@@ -4,6 +4,7 @@ require "merb-core"
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'huge')
 names = FasterCSV.parse(File.read("db/names.csv")).flatten
 len = names.length
+DataMapper.auto_upgrade!
 
 user = User.first
 client_type = ClientType.create(:type => "Standard client")
@@ -40,35 +41,43 @@ end
 @funding_line.funder = @funder
 @funding_line.save
 
-
-region_manager =  StaffMember.create(:name => "Region manager", :active => true, :creation_date => Date.today)
+region_manager = StaffMember.first(:name => "Region manager") || StaffMember.create(:name => "Region manager", :active => true, :creation_date => Date.today)
 p region_manager.errors unless region_manager.valid?
 
 1.upto(numbers[:region]){|region_id| 
-  region = Region.create(:manager => region_manager, :name => "Region#{region_id}", :creation_date => Date.today)  
+  region = Region.first(:name => "Region#{region_id}") || Region.create(:manager => region_manager, :name => "Region#{region_id}", :creation_date => Date.today)  
   if region.valid?
     puts "Region #{region.name} created" 
   else
     p region.errors
   end
+
   1.upto(numbers[:area]){|area_id|
-    area_manager = StaffMember.create(:name => "Area#{area_id} manager", :active => true, :creation_date => Date.today)
-    area = Area.create(:name => "Area#{region_id*area_id}", :manager => area_manager, :region => region)
-    puts "  Area #{area.name} created"
+    area_manager = StaffMember.first(:name => "Area#{area_id} manager") || StaffMember.create(:name => "Area#{area_id} manager", :active => true, :creation_date => Date.today)
+    area = Area.first(:name => "Area#{region_id*area_id}") || Area.create(:name => "Area#{region_id*area_id}", :manager => area_manager, :region => region)
+    if area.valid?
+      puts "  Area #{area.name} created"
+    else
+      p area.errors
+    end
     1.upto(numbers[:branch]){|branch_id|
       branch_manager = StaffMember.first(:name => "Branch#{branch_id} manager") || StaffMember.create(:name => "Branch#{branch_id} manager", 
                                                                                                       :active => true, :creation_date => Date.today)
-      branch = Branch.new
-      branch.name = "Branch#{region_id*area_id*branch_id}"
-      branch.code = "R#{region_id}A#{area_id}B#{branch_id}"
-      branch.area = area
-      branch.manager = branch_manager
-      branch.save
-      puts "    Branch #{branch.name} created"
+      branch = Branch.first(:name => "Branch#{region_id*area_id*branch_id}") || Branch.create(:name => "Branch#{region_id*area_id*branch_id}", 
+                                                                                              :code => "R#{region_id}A#{area_id}B#{branch_id}", :area => area, 
+                                                                                              :manager => branch_manager)
+      if branch.valid?
+        puts "    Branch #{branch.name} created"
+      else
+        p branch.errors
+      end
       center_manager = nil
       1.upto(numbers[:center]){|center_id|
         if center_id%20==1
-          center_manager = StaffMember.create(:name => "R#{region_id}A#{area_id}B#{branch_id} Cen#{center_id} manager", :active => true, :creation_date => Date.today)
+          center_manager = StaffMember.first(:name => "R#{region_id}A#{area_id}B#{branch_id} Cen#{center_id} manager") || StaffMember.create(:active => true, 
+                                                                                                                                             :name => "R#{region_id}A#{area_id}B#{branch_id} Cen#{center_id} manager", 
+                                                                                                                                             :creation_date => Date.today)
+          p center_manager.errors unless center_manager.valid?
         end
         next if Center.first(:code => "#{branch.code}C#{center_id}")
         center = Center.new
