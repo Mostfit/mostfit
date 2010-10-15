@@ -1,5 +1,5 @@
 - demo_uri = url(:branches)
--if Mfi.first and Mfi.first.main_text.length>3
+-if Mfi.first and Mfi.first.main_text and Mfi.first.main_text.length>3
   =Mfi.first.main_text
 - else
   %div{ :style => 'float: right; text-align: center;' }
