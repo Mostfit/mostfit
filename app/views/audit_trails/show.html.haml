@@ -1,0 +1,40 @@
+%div{:style => "float: right"}
+  %form{:action => "/audit_trails/dated"}
+    %b User
+    = select :name => "user", :collection => [["", "All users"]] + User.all.map{|u| [u.id, u.name]}, :selected => params[:user]
+    %b Changes in
+    = select :name => "auditable_type", :collection => ["", "Branch", "Center", "Client", "Loan"], :selected => params[:auditable_type]
+    %b Date
+    = date_select "date", params[:date]||Date.today, :max_date => Date.today
+    = submit "GO"
+%h1 Audit Trail
+%table.report.nojs{:width => "100%"}
+  %tr
+    %th
+      Type
+    %th
+      ID
+    %th
+      Action
+    %th
+      Time
+    %th
+      Changes
+    %th
+      User
+  -@trails.each do |trail|
+    %tr
+      %td
+        = trail.auditable_type
+      %td
+        = link_to "#{trail.auditable_id}", url(:controller => trail.auditable_type.pluralize.downcase, :action => "show", :id => trail.auditable_id)
+      %td.text
+        = trail.action
+      %td
+        = trail.created_at.strftime("%d-%m-%Y %H:%M")
+      %td.text
+        %table{:width => '100%'}
+          =diff_display(trail.changes, trail.auditable_type, trail.action) if trail.action == :update
+      %td
+        = trail.user ? trail.user.login : "admin"
+

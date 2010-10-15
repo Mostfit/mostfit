@@ -44,7 +44,9 @@
       = link_to_with_rights 'Assign and view Targets', resource(:targets), :class => 'edit'
     %li
       = link_to_with_rights 'Perform Audits', resource(:audit_items), :class => 'edit'
-  %h2 Migrate data
+    %li
+      = link_to_with_rights 'History log', url(:controller => :audit_trails, :action => :show), :class => 'edit'
+  %h2 Data
   %ul
     %li
       = link_to_with_rights 'Upload data', url(:controller => 'admin', :action => "upload"), :class => 'edit'
