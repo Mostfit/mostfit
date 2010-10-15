@@ -17,77 +17,35 @@ class LoanPurposeReport < Report
   end
   
   def generate
-    branches, centers, data, purposes, clients = {}, {}, {}, {}, {}
+    branches, centers, data, occupations, clients = {}, {}, {}, {}, {}
     histories = LoanHistory.sum_outstanding_grouped_by(to_date, ["occupation", "branch"], loan_product_id).group_by{|x| x.branch_id}
-  
-    Occupation.all.each{|p| purposes[p.id]=p}
+    Occupation.all.each{|p| occupations[p.id]=p}
+
     @branch.each{|b|
       data[b]||= {}
       branches[b.id] = b
       next unless histories.key?(b.id)
       histories[b.id].each{|history|
-        purpose = purposes[history.occupation_id]
-        #0              1                 2                3              4              5     6                  7         8    9,10,11     12         13
-        #amount_applied,amount_sanctioned,amount_disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults, name
-        data[b][purpose] = [0, 0, 0, 0]        
+        occupation = occupations[history.occupation_id]
+        data[b][occupation] = [0, 0, 0, 0]
+        data[b][occupation][2] += history.loan_count
+        data[b][occupation][3] += history.actual_outstanding_principal
       }
     }
 
-    payments = repository.adapter.query(%Q{
-                               SELECT l.occupation_id as occupation_id, c.branch_id branch_id, p.type ptype, SUM(p.amount) amount
-                               FROM clients cl, loans l, centers c, payments p
-                               WHERE p.received_on >= '#{from_date.strftime('%Y-%m-%d')}' and p.received_on <= '#{to_date.strftime('%Y-%m-%d')}'
-                               AND p.deleted_at is NULL AND p.loan_id=l.id AND l.client_id=cl.id AND cl.center_id=c.id 
-                               AND cl.deleted_at is NULL AND c.branch_id in (#{branches.keys.join(',')})
-                               GROUP BY l.occupation_id, c.branch_id, p.type
-                             }).group_by{|x| x.branch_id}
-    payments.each{|branch_id, loan_purposes| 
-      if branch = branches[branch_id]
-        loan_purposes.group_by{|x| x.occupation_id}.each{|purpose_id, payments|
-          purpose = purposes[purpose_id]
-          data[branch][purpose] ||= [0, 0, 0, 0]
-              
-        }
-      end
-    }
-      
-    #1: Applied on
-    hash = {:applied_on.gte => from_date, :applied_on.lte => to_date}
-    hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
-    group_loans(["l.occupation_id", "c.branch_id"], "sum(if(amount_applied_for>0, amount_applied_for, amount)) amount", hash).group_by{|x| x.branch_id}.each{|branch_id, loan_purposes|
-      next unless branches.key?(branch_id)
-      branch  = branches[branch_id]
-      loan_purposes.group_by{|x| x.occupation_id}.each{|purpose_id, loans|
-        purpose = purposes[purpose_id]        
-        data[branch][purpose] ||= [0, 0, 0, 0]
-        l = loans.first
-        data[branch][purpose][0] += l.amount if loans.length>0
-      }
-    }
-    
-    #2: Approved on
-    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :rejected_on => nil}
-    hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
-    group_loans(["l.occupation_id", "c.branch_id"], "sum(if(amount_sanctioned>0, amount_sanctioned, amount)) amount", hash).group_by{|x| x.branch_id}.each{|branch_id, loan_purposes|
-      next unless branches.key?(branch_id)
-      branch  = branches[branch_id]
-      loan_purposes.group_by{|x| x.occupation_id}.each{|purpose_id, loans|
-        purpose = purposes[purpose_id]        
-        data[branch][purpose] ||= [0, 0, 0, 0]
-        l = loans.first
-        data[branch][purpose][1] += l.amount if loans.length>0
-      }
-    }
     #3: Disbursal date
     hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
-    group_loans(["l.occupation_id", "c.branch_id"], "sum(amount) amount", hash).group_by{|x| x.branch_id}.each{|branch_id, loan_purposes|
+    group_loans(["l.occupation_id", "c.branch_id"], "SUM(l.amount) amount, COUNT(l.id) count", hash).group_by{|x| x.branch_id}.each{|branch_id, loan_occupations|
       next unless branches.key?(branch_id)
       branch  = branches[branch_id]
-      loan_purposes.group_by{|x| x.occupation_id}.each{|purpose_id, loans|
-        purpose = purposes[purpose_id]        
-        data[branch][purpose] ||= [0, 0, 0, 0]
-        data[branch][purpose][2] += loans.first.amount if loans.length>0
+      loan_occupations.group_by{|x| x.occupation_id}.each{|occupation_id, loans|
+        occupation = occupations[occupation_id]
+        if loans.length>0
+          data[branch][occupation] ||= [0, 0, 0, 0]
+          data[branch][occupation][0] += loans.first.count
+          data[branch][occupation][1] += loans.first.amount
+        end
       }
     }
     return data
