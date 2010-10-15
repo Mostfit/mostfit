@@ -27,7 +27,7 @@ class Browse < Application
 
   def centers_paying_today
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
-    center_ids = LoanHistory.all(:date => Date.today).map{|x| x.center_id}.uniq
+    center_ids = LoanHistory.all(:date => @date).map{|x| x.center_id}.uniq
         # restrict branch manager and center managers to their own branches
     if session.user.role==:staff_member
       st = session.user.staff_member
@@ -41,7 +41,7 @@ class Browse < Application
                                                    SUM(lh.principal_paid) pp, SUM(lh.interest_paid) intp
                                         FROM loan_history lh, centers c
                                         WHERE lh.center_id IN (#{center_ids}) AND lh.date='#{@date.strftime('%Y-%m-%d')}' AND c.id=lh.center_id
-                                        GROUP BY lh.center_id ORDER BY c.name}).group_by{|x| x.branch_id}
+                                        GROUP BY lh.center_id ORDER BY c.name}).group_by{|x| Branch.get(x.branch_id)}
     @disbursals = Loan.all(:client_id => client_ids, :scheduled_disbursal_date => @date)
     render :template => 'dashboard/today'
   end

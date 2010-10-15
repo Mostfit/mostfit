@@ -22,12 +22,13 @@
     %th
       Actual Disbursal
   - total_prin_due = total_prin_paid = total_int_due = total_int_paid = total_scheduled_disbursal = total_disbursal  = 0
-  - @data.each do |branch_id, centers|
+  - @data.sort_by{|branch, centers| branch.name}.each do |branch, centers|
     %tr.branch
       %td{:colspan => 9}
-        = Branch.get(branch_id).name
+        %b 
+          = branch.name
     - branch_prin_due = branch_prin_paid = branch_int_due = branch_int_paid = branch_scheduled_disbursal = branch_disbursal  = 0
-    -centers.each do |center|
+    -centers.sort_by{|center| center.name}.each do |center|
       %tr.center{:class => cycle('odd','even')}
         %td
           = link_to center.name, url(:quick_link, "centers", center.id) + "#weeksheet"

@@ -101,6 +101,7 @@ namespace :mostfit do
         end
       end
     end
+
     desc "makes clients and loans for massive_db"
     task :massive_clients do
       #make 20 clients per center and their loans
