@@ -3,52 +3,22 @@
   %tr.header
     %th
       Purpose
-    %th{:colspan => "3"}
-      Loan amount
-    %th{:colspan => "4"}
-      Repayment
-    %th{:colspan => "3"}
-      Balance outstanding
-    %th{:colspan => "3"}
-      Balance Overdue
-    %th{:colspan => "3"}
-      Advance repayment
+    %th{:colspan => "2"}
+      Loan Amount
+    %th{:colspan => "2"}
+      Loan Outstanding
   %tr.header
     %th
     %th
-      Applied
-    %th
-      Sanctioned
+      Count
     %th
       Disbursed
     %th
-      Principal
-    %th
-      Interest
-    %th
-      Fee
-    %th
-      Total
-    %th
-      Principal
-    %th
-      Interest
-    %th
-      Total
-    %th
-      Principal
-    %th
-      Interest
-    %th
-      Total
-    %th
-      Principal
-    %th
-      Interest
+      Count
     %th
       Total
   - center_id, branch_id = nil, nil
-  - length = 16
+  - length = 4
   - org_total = []
   -@data.sort_by{|branch, x| branch.name}.each do |branch, purposes|
     -if purposes.keys.length>0
