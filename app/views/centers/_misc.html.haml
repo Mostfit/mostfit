@@ -4,6 +4,7 @@
 %table.report.nojs{:style => "width: 40%"}
   %tr.header
     %th
+    %th
       Valid from
     %th
       Valid upto
@@ -13,6 +14,7 @@
       
   - @meeting_days.each do |day|
     %tr
+      %td
       %td
         = day.valid_from
       %td
