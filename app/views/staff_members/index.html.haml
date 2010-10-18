@@ -10,7 +10,7 @@
   Overview of all staff members 
   = " of #{@branch.name}" if @branch
 %p
-  =link_to 'create a new staff member', resource(:staff_members, :new), :class => "add"
+  =link_to_with_rights 'create a new staff member', resource(:staff_members, :new), :class => "add"
 - if @staff_members.blank?
   %p
     %i No staff members been created yet.

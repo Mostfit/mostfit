@@ -35,14 +35,15 @@ class Branch
   def centers_with_paginate(params, user)
     hash = {:order => [:meeting_day, :meeting_time_hours, :meeting_time_minutes]}
     # This the logged in person is a staff member and he is not a branch manager
+    hash[:branch] = self
+
     if staff = user.staff_member and not staff==self.manager
       if not staff.branches.include?(self) and not staff.areas.branches.include?(self) and not staff.regions.areas.branches.include?(self)
         hash[:manager] = user.staff_member
       end
-    elsif user.role == :funder and funding_lines = Funder.first(:user_id => user.id).funding_lines
-      hash[:id] = LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}}) if funding_lines.count>0
+    elsif user.role == :funder 
+      return Funder.first(:user_id => user.id).centers({:branch_id => self.id})
     end
-    hash[:branch] = self    
 
     if params[:meeting_day] and Center::DAYS.include?(params[:meeting_day].to_sym)
       hash[:meeting_day]= params[:meeting_day].to_sym

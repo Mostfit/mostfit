@@ -1,7 +1,7 @@
 %h2
   Portfoilos owned by <i>#{@funder.name}</i>
 
-%p== Manage existing porfolios or #{link_to 'create a new portfolio', resource(@funder, :portfolios, :new), :class => "add"}.
+%p== #{link_to_with_rights 'create a new portfolio', resource(@funder, :portfolios, :new), :class => "add"}.
   
 - if @portfolios.blank?
   %p
@@ -38,7 +38,7 @@
         %td
           = portfolio.created_at.strftime(Mfi.first.date_format)
         %td
-          = link_to 'edit', resource(@funder, portfolio, :edit), :class => "edit"
+          = link_to_with_rights 'edit', resource(@funder, portfolio, :edit), :class => "edit"
     %tfoot
       %tr
         %td{ :colspan => 9 }

@@ -4,7 +4,7 @@ class Application < Merb::Controller
   before :insert_session_to_observer
   before :add_collections, :only => [:index, :show]
   
-  @@controllers  = ["regions", "area", "branches", "centers", "clients", "loans", "payments", "staff_members"]
+  @@controllers  = ["regions", "area", "branches", "centers", "clients", "loans", "payments", "staff_members", "funders", "portfolios", "funding_lines"]
 
   def insert_session_to_observer
     DataAccessObserver.insert_session(session.object_id)
