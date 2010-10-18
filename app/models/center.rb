@@ -162,7 +162,7 @@ class Center
 
   def handle_meeting_date_change
     self.meeting_day_change_date = parse_date(self.meeting_day_change_date) if self.meeting_day_change_date.class==String and not self.meeting_day_change_date.blank?
-    return unless self.meeting_day_change_date
+    return if not self.meeting_day_change_date or self.meeting_day_change_date.blank?
     date = self.meeting_day_change_date||Date.today
 
     if not CenterMeetingDay.first(:center => self)
@@ -182,7 +182,9 @@ class Center
       end
       CenterMeetingDay.create!(:center_id => self.id, :valid_from => date, :meeting_day => self.meeting_day, :valid_upto => valid_upto)
     end
-    self.clients.loans.each{|l|
+    #clear cache
+    @meeting_days = nil 
+    self.reload.clients.loans.each{|l|
       if [:outstanding, :disbursed].include?(l.status)
         l.update_history
       end
