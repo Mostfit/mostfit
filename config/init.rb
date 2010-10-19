@@ -159,6 +159,11 @@ Merb::BootLoader.after_app_loads do
   begin
     $globals[:mfi_details] = Mfi.first
     Merb.logger.info("Loaded MFI details from config/mfi.yml. Loaded on #{Mfi.first.fetched}")
+    if DirtyLoan.start_thread
+      Merb.logger.info("Starting cleaner thread")
+    else
+      Merb.logger.info("Cleaner not enabled")
+    end
   rescue
     # create a new mfi_details object anyways
     $globals[:mfi_details] = Mfi.new(:name => "Mostfit", :fetched => Date.today)
@@ -175,6 +180,12 @@ Merb::BootLoader.after_app_loads do
     end
   end
 
-
+  if defined?(PhusionPassenger)
+    PhusionPassenger.on_event(:starting_worker_process) do |forked|
+      if forked
+        DirtyLoan.start_thread
+      end
+    end
+  end
 end
 

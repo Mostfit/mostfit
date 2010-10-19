@@ -790,9 +790,10 @@ class Loan
   # Moved this method here from instead of the LoanHistory model for purposes of speed. We sacrifice a bit of readability
   # for brute force iterations and caching => speed
 
-  def update_history
-    return if already_updated
-    return if history_disabled  # easy when doing mass db modifications (like with fixutes)
+  def update_history(force = false)
+    return true if Mfi.first.dirty_queue_enabled and DirtyLoan.add(self) and not force
+    return if already_updated and not force
+    return if history_disabled and not force # easy when doing mass db modifications (like with fixutes)
     clear_cache
     update_history_bulk_insert
     already_updated=true

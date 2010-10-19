@@ -37,6 +37,7 @@ class Mfi
   property :logo_name,  String, :nullable => true
   property :date_format, Enum.send('[]', *DateFormats), :nullable => true, :index => true
   property :accounting_enabled, Boolean, :default => false, :index => true
+  property :dirty_queue_enabled, Boolean, :default => false, :index => true
 
   property :main_text, Text, :nullable => true, :lazy => true
   validates_length :name, :min => 3, :max => 20
@@ -67,6 +68,7 @@ class Mfi
       f.puts self.to_yaml
     }
     Misfit::Config::DateFormat.compile
+    DirtyLoan.start_thread
   end
 
   def save_image
