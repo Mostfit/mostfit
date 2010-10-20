@@ -24,8 +24,8 @@ h2 {
 }
 .container {
   background: #fff;
-  width: 86%;
-  margin-left: 7%;
+  width: 92%;
+  margin-left: 3%;
   padding: 0px 10px 10px 10px;
   min-height: 450px;
   border: 1px solid #c9c9c9;
@@ -80,7 +80,7 @@ ol { list-style-position: outside; list-style-type: decimal; }
   font-weight: normal;
 }
 h1.logo{
-    left: 7%;
+    left: 3%;
     position: absolute;
     top: 0px;
     height: 60px;
@@ -98,7 +98,7 @@ h1.logo span{
   background: white;
   position: absolute;
   top: 77px;
-  left: 7%;
+  left: 3%;
   width: 90%;
 }
 
@@ -515,6 +515,7 @@ table.report{
     border-color: #ccc;
     text-align: right;
     padding: 0px;
+    overflow: auto;
 }
 table.report tr{
     border: 1px solid;
