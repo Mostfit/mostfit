@@ -74,10 +74,11 @@
   - @fee_paying_things = @fee_paying_clients + @fee_paying_loans
   - unless @fee_paying_things.values.inject({}){|s,x| s+=x}.length==0
     = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "javascript: return confirm_for({'received_by': #{@center.manager.id};", :class => "_disable_button_") do
-      = hidden_field :name => :for_date, :value => @date
       = hidden_field :name => :payment_type, :value => "fees"
       Fees collected by
       = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'fees_received_by'
+      collected on
+      = date_select :for_date, @date, :id => "fees_for_date"
       %table.report.nojs{:style => "width:100%"}
         %thead
           %tr{:style => "font-size: 0.85em"}
@@ -120,7 +121,7 @@
     
   %h1 Repayments
   = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "if ($('#payments_received_by').val() != '#{@center.manager.id}'){return(confirm('Payment receiver is not center manager. Proceed with payments?'));};", :class => "_disable_button_") do
-    = hidden_field :name => 'for_date', :value => @date
+    /= hidden_field :name => 'for_date', :value => @date
     = hidden_field :name => 'center_id', :value => @center.id
     = partial :cds
     = submit 'Make Repayments'

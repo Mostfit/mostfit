@@ -2,7 +2,8 @@
 
   Payments collected by 
   = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'payments_received_by'
-
+  collected on
+  = date_select "received_on", @date
   %table.report.nojs
     %thead
       %tr{:style => "font-size: 0.85em;"}

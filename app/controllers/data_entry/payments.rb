@@ -14,11 +14,17 @@ module DataEntry
       if params[:center_text] and not @center
         @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
       end
-      if params[:for_date]
+
+      # if recieved on is present use that, else use for_date (old hidden field) or use today's date
+      if params[:received_on] and not params[:received_on].blank?
+        @date = Date.parse(params[:received_on])
+      elsif params[:for_date] and not params[:for_date].blank?
         if params[:for_date][:month] and params[:for_date][:day] and params[:for_date][:year]
-          params[:for_date] = "#{params[:for_date][:year]}-#{params[:for_date][:month]}-#{params[:for_date][:day]}"
+          params[:for_date] = "#{params[:for_date][:year]}-#{params[:for_date][:month]}-#{params[:for_date][:day]}"  
         end
         @date = Date.parse(params[:for_date])
+      else
+        @date = Date.today
       end
 
       unless @center.nil?
@@ -142,7 +148,7 @@ module DataEntry
       @center = Center.get(params[:center_id]) || Center.first(:name => params[:center_id]) 
       @branch = @center.branch unless @center.nil?
       @clients = @center.clients(:fields => [:id, :name, :center_id, :client_group_id]) unless @center.nil?
-      @date = Date.parse(params[:for_date]) unless params[:for_date].nil?
+
       @staff = StaffMember.get(params[:payment][:received_by])
       @errors = []
       if params[:paid][:loan]
