@@ -123,12 +123,18 @@
             =check_box :dirty_queue_enabled
         %tr
           %td
-            Email address
+            Currency formats
           %td
-            =text_field :email
+            - formats = Numeric::Transformer.instance_variable_get("@formats").keys.map{|x| [x.to_s, "#{x.to_s} (#{100000.00.to_currency(x)})"]}.sort
+            =select :currency_format, :collection => formats, :include_blank => true
         %tr
           %td{:colspan => 2}
             %hr
+        %tr
+          %td
+            Email address
+          %td
+            =text_field :email
         %tr
           %td
             Specify prefered date format

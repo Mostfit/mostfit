@@ -38,6 +38,7 @@ class Mfi
   property :date_format, Enum.send('[]', *DateFormats), :nullable => true, :index => true
   property :accounting_enabled, Boolean, :default => false, :index => true
   property :dirty_queue_enabled, Boolean, :default => false, :index => true
+  property :currency_format,  String, :nullable => true, :length => 2
 
   property :main_text, Text, :nullable => true, :lazy => true
   validates_length :name, :min => 3, :max => 20
@@ -69,6 +70,9 @@ class Mfi
     }
     Misfit::Config::DateFormat.compile
     DirtyLoan.start_thread
+    if format = Mfi.first.currency_format and Numeric::Transformer.instance_variables.include?(format.to_sym)
+      Numeric::Transformer.change_default_format(format.to_sym)
+    end
   end
 
   def save_image

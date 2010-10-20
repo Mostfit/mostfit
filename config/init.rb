@@ -26,8 +26,8 @@ Merb::BootLoader.before_app_loads do
   Numeric::Transformer.add_format(
     :mostfit_default => { :number =>   { :precision => 3, :delimiter => ' ',  :separator => '.'},
                           :currency => { :unit => '',     :format => '%n',    :precision => 0 } },
-    :in              => { :number =>   { :precision => 3, :delimiter => ',',  :separator => '.'},
-                          :currency => { :unit => 'Rs.',  :format => '%u %n', :precision => 0 } })
+    :in              => { :number =>   {:precision => 3, :delimiter => ',',  :separator => '.', :regex => /(\d+?)(?=(\d\d)+(\d)(?!\d))(\.\d+)?/},
+                          :currency => { :format => '%u %n', :precision => 0, :delimiter => ',' } })
   Numeric::Transformer.change_default_format(:mostfit_default)
   require 'config/constants.rb'
   require 'uuid'
@@ -44,6 +44,7 @@ Merb::BootLoader.before_app_loads do
     require 'lib/grapher.rb'
     require("lib/pdfs/day_sheet.rb")
     require("lib/functions.rb")
+    require("lib/core_ext.rb")
     PDF_WRITER = true
   rescue
     PDF_WRITER = false
@@ -186,6 +187,11 @@ Merb::BootLoader.after_app_loads do
         DirtyLoan.start_thread
       end
     end
+  end
+  
+  # change default format to whatever is selected
+  if format_str = Mfi.first.currency_format and Numeric::Transformer.instance_variable_get("@formats")[format_str.to_sym]
+    Numeric::Transformer.change_default_format(format_str.to_sym)
   end
 end
 
