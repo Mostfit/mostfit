@@ -88,4 +88,9 @@ class Funder
     end
     StaffMember.all(hash)
   end
+
+  def funders(hash={})
+    hash[:id] = self.id
+    Funder.all(hash)
+  end
 end

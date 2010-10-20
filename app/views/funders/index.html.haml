@@ -28,12 +28,12 @@
         %td
           %b= funder.portfolios.size
         %td
-          = link_to 'edit', resource(funder, :edit)
+          = link_to_with_rights 'edit', resource(funder, :edit)
           &nbsp;|&nbsp
-          = link_to 'new funding line', resource(funder, :funding_lines, :new)
+          = link_to_with_rights 'new funding line', resource(funder, :funding_lines, :new)
 
     %tfoot
       %tr
         %td{ :colspan => 6 }
 
-  = link_to 'Create a new funder >>', url(:new_funder), :class => "button"
+  = link_to_with_rights 'Create a new funder >>', url(:new_funder), :class => "button"

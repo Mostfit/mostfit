@@ -2,12 +2,12 @@ class Funders < Application
   provides :xml, :yaml, :js
 
   def index
-    @funders = Funder.all
+    @funders = @funders || Funder.all
     display @funders
   end
 
   def show(id)
-    @funder = Funder.get(id)
+    @funder ||= Funder.get(id)
     raise NotFound unless @funder
     @funding_lines = @funder.funding_lines
     @portfolios    = @funder.portfolios

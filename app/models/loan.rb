@@ -260,28 +260,28 @@ class Loan
   def shift_date_by_installments(date, number, ensure_meeting_day = true)
     return date.holiday_bump if number == 0
     case installment_frequency
-      when :daily
-        new_date =  date + number
-      when :weekly
-        new_date =  date + number * 7
-      when :biweekly
-        new_date = date + number * 14
-      when :monthly
-        new_month = date.month + number
-        new_year  = date.year
-        while new_month > 12
-          new_year  += 1
-          new_month -= 12
-        end
-        while new_month < 1
-          new_year  -= 1
-          new_month += 12
-        end
-        month_lengths = [nil, 31, (Time.gm(new_year, new_month).to_date.leap? ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-        new_day = (date.day > month_lengths[new_month]) ? month_lengths[new_month] : date.day
-        new_date = Time.gm(new_year, new_month, new_day).to_date
-      else
-        raise ArgumentError.new("Strange period you got..")
+    when :daily
+      new_date =  date + number
+    when :weekly
+      new_date =  date + number * 7
+    when :biweekly
+      new_date = date + number * 14
+    when :monthly
+      new_month = date.month + number
+      new_year  = date.year
+      while new_month > 12
+        new_year  += 1
+        new_month -= 12
+      end
+      while new_month < 1
+        new_year  -= 1
+        new_month += 12
+      end
+      month_lengths = [nil, 31, (Time.gm(new_year, new_month).to_date.leap? ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+      new_day = (date.day > month_lengths[new_month]) ? month_lengths[new_month] : date.day
+      new_date = Time.gm(new_year, new_month, new_day).to_date
+    else
+      raise ArgumentError.new("Strange period you got..")
     end
     if cl=self.client(:fields => [:id, :center_id]) and cen=cl.center and cen.meeting_day != :none and ensure_meeting_day
       unless new_date.weekday == cen.meeting_day_for(new_date)
@@ -790,9 +790,10 @@ class Loan
   # Moved this method here from instead of the LoanHistory model for purposes of speed. We sacrifice a bit of readability
   # for brute force iterations and caching => speed
 
-  def update_history
-    return if already_updated
-    return if history_disabled  # easy when doing mass db modifications (like with fixutes)
+  def update_history(force = false)
+    return true if Mfi.first.dirty_queue_enabled and DirtyLoan.add(self) and not force
+    return if already_updated and not force
+    return if history_disabled and not force # easy when doing mass db modifications (like with fixutes)
     clear_cache
     update_history_bulk_insert
     already_updated=true
@@ -1252,6 +1253,7 @@ Loan.descendants.to_a.each do |c|
       _fp_date = scheduled_first_payment_date
       # recreate the original loan
       self.scheduled_first_payment_date = original_first_payment_date
+      saved_amount = self.amount unless self.new?
       self.amount = original_amount
       self.disbursal_date = original_disbursal_date
       # generate the payments_schedule
@@ -1260,15 +1262,15 @@ Loan.descendants.to_a.each do |c|
       self.taken_over_on ||= @schedule.keys.sort[(self.taken_over_on_installment_number) - 1]
       last_date = @schedule.reject{|k,v| k > self.taken_over_on}.keys.max
       total = @schedule[last_date][:total_balance]
-      self.amount = @schedule[last_date][:balance].ceil
-      @schedule = @schedule.reject{|k,v| k <  last_date}
+      self.amount = saved_amount || @schedule[last_date][:balance].ceil
+      @schedule = @schedule.reject{|k,v| k < last_date}
       # reset the original values
       self.disbursal_date = _disbursal_date
       self.scheduled_disbursal_date = _scheduled_disbursal_date
       self.scheduled_first_payment_date = _fp_date
       # adjust the first line of the payment_schedule
       dd = self.disbursal_date || self.scheduled_disbursal_date
-      balance = @schedule[last_date][:balance]
+      balance = saved_amount || @schedule[last_date][:balance]
       @schedule.delete(@schedule.keys.min)
       @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
       # adjust all the dates
@@ -1277,6 +1279,7 @@ Loan.descendants.to_a.each do |c|
       installment_dates.each_with_index do |d,i|
         adjusted_schedule[d] = payment_schedule[orig_dates[i]] if i < @schedule.count - 1
       end
+
       @schedule = {@schedule.keys.min => @schedule[@schedule.keys.min]} + adjusted_schedule
       # recreate the totals
       ti = tp = 0

@@ -13,6 +13,9 @@
   %body
     #header
       #login{:style => 'margin: 2px; float: right; padding: 4px;position:relative; right:150px;'}
+        - if Mfi.first.dirty_queue_enabled and count = DirtyLoan.pending.length and count > 0
+          %i
+            == (#{count} loans in queue)
         - if session.authenticated?
           =link_to 'change password', url(:change_password)
           |

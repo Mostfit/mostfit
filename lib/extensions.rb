@@ -78,12 +78,12 @@ module Misfit
         return false unless allowed_controller
         id = @route[:id].to_i
         model = Kernel.const_get(@model.to_s.split("/")[-1].camelcase)
-        if [Browse, Report, Document, AuditTrail, Attendance, Search].include?(model)
-          return true
-        elsif [Branch, Center, ClientGroup, Client, Loan, StaffMember].include?(model) and id>0 
+        if [Branch, Center, ClientGroup, Client, Loan, StaffMember, FundingLine, Funder, Portfolio].include?(model) and id>0 
           return(@funder.send(model.to_s.snake_case.pluralize, {:id => id}).length>0)
-        elsif [Branch, Center, ClientGroup, Client, Loan, StaffMember].include?(model) and id==0
+        elsif [Branch, Center, ClientGroup, Client, Loan, StaffMember, FundingLine, Funder, Portfolio].include?(model) and id==0
           return(@funder.send(model.to_s.snake_case.downcase.pluralize).length>0)
+        elsif [Browse, Report, Document, AuditTrail, Attendance, Search].include?(model)
+          return true
         end
         return false
      end

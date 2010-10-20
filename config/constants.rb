@@ -23,3 +23,4 @@ MASS_ENTRY_FIELDS = {
               :client_type], 
   :loan => [:loan_utilization, :purpose]
 }
+CLEANER_INTERVAL = 120

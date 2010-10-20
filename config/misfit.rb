@@ -54,7 +54,7 @@ module Misfit
       },
       :read_only => {
         :all => [:searches, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :insurance_policies, 
-                 :insurance_companies, :areas, :staff_members, :loan_products, :holidays, :document_types, :occupations, :client_types, :fees, :funders]
+                 :insurance_companies, :areas, :staff_members, :loan_products, :holidays, :document_types, :occupations, :client_types, :fees, :funders, :attendances]
       },
       :staff_member => {
         :all => [:documents, :searches, :browse, :branches, :centers, :payments, :clients, :client_groups, :groups, :audit_trails, :comments, :insurance_policies, 
@@ -62,8 +62,8 @@ module Misfit
                  :"data_entry/loans", :"data_entry/index", :insurance_companies, :info]
       },
       :funder => {
-        :all => [:searches, :browse, :branches, :centers, :client_groups, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :areas, 
-                 :audit_trails, :documents, :attendances, :staff_members]
+        :all => [:searches, :browse, :branches, :centers, :client_groups, :payments, :clients, :loans, :dashboard, :regions, :documents, :comments, :areas, 
+                 :audit_trails, :documents, :attendances, :staff_members, :funders, :portfolios, :funding_lines]
       }
     }
 

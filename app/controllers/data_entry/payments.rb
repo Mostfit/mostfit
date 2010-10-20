@@ -46,7 +46,7 @@ module DataEntry
         elsif params[:format] and params[:format]=="xml"
           display("")
         else
-          params[:return] ? redirect(params[:return], :message => {:error => @errors}) : render
+          params[:return] ? redirect(params[:return], :message => {:error => @errors.map{|e| e.instance_variables.include?("@errors") ? e.instance_variable_get("@errors") : e.to_s } }) : render
         end
       else
         render

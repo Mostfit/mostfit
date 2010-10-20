@@ -57,7 +57,9 @@ class ClientGroups < Application
   def update(id, client_group)
     @client_group = ClientGroup.get(id)
     raise NotFound unless @client_group
-    if @client_group.update(client_group)
+    @client_group.attributes = client_group
+    @client_group.center = Center.get(client_group[:center_id])
+    if @client_group.save
       message  = {:notice => "Group was successfully edited"}      
       (@branch and @center) ? redirect(resource(@client_group.center.branch, @client_group.center), :message => message) : redirect(resource(@client_group), :message => message)
     else

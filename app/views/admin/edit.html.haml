@@ -115,6 +115,14 @@
             =check_box :accounting_enabled
         %tr
           %td
+            Defer loan history re-generation ?
+            %br
+            %span.greytext
+              results in faster turn around time for data entry
+          %td
+            =check_box :dirty_queue_enabled
+        %tr
+          %td
             Email address
           %td
             =text_field :email

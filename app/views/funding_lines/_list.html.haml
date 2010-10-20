@@ -1,9 +1,9 @@
 %h2== Funding lines by funder <i>#{@funder.name}</i>
-%p== Manage existing funding lines or #{link_to 'create a new funding line', resource(@funder, :funding_lines, :new), :class => "add"}.
+%p== #{link_to_with_rights 'create a new funding line', resource(@funder, :funding_lines, :new), :class => "add"}
 
 - if @funding_lines.blank?
   %p
-    %i No funding_lines have been created yet.
+    %i No funding lines have been created yet.
 - else
   %table.narrow.form{ :width => '100%' }
     %thead
