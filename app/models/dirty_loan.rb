@@ -37,7 +37,8 @@ class DirtyLoan
         puts e.backtrace
       end
     }
-    @@poke_thread = false
+    @@poke_thread = false if pending.length ==  0
+    return true
   end
 
   def self.pending
@@ -48,12 +49,15 @@ class DirtyLoan
     cleaner_interval = Kernel.const_defined?("CLEANER_INTERVAL") ? CLEANER_INTERVAL : 300
     if Mfi.first.dirty_queue_enabled
       Thread.new{
+        counter = 0
         while true
-          if @@poke_thread or Time.now.to_i % cleaner_interval == 0
+          if @@poke_thread or counter == cleaner_interval
             self.clear
+            counter = 0
           end
-          sleep 10
-        end
+          sleep 1
+          counter += 1
+        end        
       }
       return true
     else
