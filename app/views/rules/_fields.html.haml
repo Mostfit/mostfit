@@ -1,0 +1,38 @@
+
+%table
+  %tr
+    %td
+      %b Name
+    %td
+      =text_field :name, :size => 40
+
+  %tr
+    %td
+      %b Allow
+    %td
+      = select :permit, :collection => [[true, "Yes"], [false, "No"]]  
+  %tr
+    %td
+      %b Applicable for
+    %td
+      = select :model_name, :collection => Mostfit::Business::Rules.all_models.map{|x| [x.to_s, x.to_s.camelcase(' ')]}.sort, :class => "rules", :id => "select_0", :prompt => "Select Applicable Type"
+  %tr
+    %td
+      %b On action
+    %td
+      = select :on_action, :collection => Rule.properties[:on_action].type.flag_map.map{|k,v| [v.to_s, v.to_s]}, :prompt => "Select Action"
+  %tr
+    %td
+
+      %b Pre Condition
+    %td#preconditions_container
+      %div.preconditions
+        = partial :conditions, {:type => "precondition"}
+
+  %tr
+    %td
+      %b Condition
+    %td#conditions_container
+      %div.conditions
+        = partial :conditions, {:type => "condition"}
+

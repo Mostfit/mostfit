@@ -18,10 +18,14 @@
       = link_to_with_rights 'Staff Members', resource(:staff_members), :class => 'edit'
     %li
       = link_to_with_rights 'Users and roles', resource(:users), :class => 'edit'
-  %h2 Manage financial products, funds, and accounting
+  %h2 Manage financial products, funds, rules, and accounting
   %ul
     %li
       = link_to_with_rights 'Funders and funding lines', resource(:funders), :class => 'edit'
+    %li      
+      = link_to_with_rights 'Manage Business Rules', resource(:rules), :class => 'edit'
+    %li
+      = link_to_with_rights 'Manage Targets', resource(:targets), :class => 'edit'
     %li
       = link_to_with_rights 'Fees', resource(:fees), :class => 'edit'
     %li

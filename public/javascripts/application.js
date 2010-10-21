@@ -331,6 +331,209 @@ function attachReportingFormEvents(id){
       });
 }
 
+//For Rules Engine
+total_fields = 0;
+total_conditions = 0;
+
+//For Rules Engine
+function cleanUpFields(type, id) {//used in rules form
+  for(i=Number(id)+1; i<total_fields; i++) {
+    $("#"+type+"_select_"+i).remove();
+    $("#"+type+"_selectcomparator_"+i).remove();
+    $("#"+type+"_selectbinaryoperator_"+i).remove();
+    $("#"+type+"_selectboolean_"+i).remove();
+    $("#"+type+"_selectvalue_"+i).remove();
+    $("#"+type+"_selectmore_"+i).remove();
+    $("#"+type+"_textfield_"+i).remove();
+    $("#"+type+"_date_"+i).datepicker("destroy");
+    $("#"+type+"_date_"+i).remove();
+    $("#"+type+"_hidden_"+i).remove();
+  }
+}
+
+//For Rules Engine
+function attachRulesFormEvents(type, id) {//type = {"condition", "precondition"}
+  if(id == 0) {
+    $("#select_0"/*name of the model*/).change(function() {
+	  	  $.ajax({
+		  	url: "/rules/get?id=1"+"&type="+type+"&for="+document.getElementById("select_0").value+"&condition_id=1&variable_id=1&return_only_models=true",
+			  success: function(data){
+            $("#"+type+"_select_1").replaceWith(data);
+            cleanUpFields(type,1);
+            attachRulesFormEvents(type,1);
+			    }
+  		    });
+        });
+  }
+
+  $("#"+type+"_select_"+id).change(function() {
+//      alert("called")
+      if(id+1> total_fields)
+        total_fields = id+10;//delete some more fields than id+1 since sometimes more than 1 field is returned per request(there is no harm is deleting extra fields anyways)
+      if(id == 0)
+        return;//special case to handle that
+      parent_div_id = document.getElementById(type+"_select_"+id).parentNode.id;//it is of type c1v2=> condition 1, variable 2 
+      condition_id = Number(parent_div_id.substr(1,1));//now this is with assumption that condition_id is single digit (can there be more than 9 conditions ever? if that happens this code fails)
+      variable_id = Number(parent_div_id.substr(3,1));//since we have only two variables per condition, variable_id will be single digit
+      prev_field = document.getElementById(type+"_select_"+(Number(id)-1));
+      if(prev_field == null)//this happens for first select of every extra condition
+        prev_field = document.getElementById("select_0");
+      $.ajax({
+      url: "/rules/get?for="+document.getElementById(type+"_select_"+id).value+
+          "&type="+type+
+          "&id="+(Number(id)+1)+"&prev_field="+prev_field.value+
+          "&condition_id="+condition_id+/*name of div boxes are c1v1, c2v1 ... where the firstnumber refers to condition_id and second to variable number local to that condition*/
+          "&variable_id="+variable_id+
+          "&return_only_models=true"
+      ,success: function(data) {
+          cleanUpFields(type,id);
+          $("#"+type+"_select_"+id).after(data);
+          if(data.indexOf("<select") != -1) {
+            attachRulesFormEvents(type,Number(id)+1);
+          }
+          if(data.indexOf("selectmore_") != -1) 
+            attachRulesFormEventsForSelectMoreField(type, Number(id)+3, condition_id);
+          //alert(data);
+          return true;
+        }
+        });
+      return true;
+      });
+}
+
+//For Rules Engine
+function getDiv(divId, div_container) {
+      div1 = document.getElementById(divId);
+      if(div1 != null)
+        return div1;
+
+      div1 = document.createElement('div');
+      div1.id = divId;
+      div_container.appendChild(div1);
+      return div1;
+}
+
+//For Rules Engine
+function attachRulesFormEventsForSelectMoreField(type, id, condition_id) {
+  condition_id = Number(condition_id)+1; //tis generates the new condition id whichwe are going to add
+  $('#'+type+'_selectmore_'+id).change(function() {
+      //alert(id+" "+condition_id);
+      val = document.getElementById(type+"_selectmore_"+id).value;
+      //alert(val);
+      if((val == "and") || (val == "or")) {
+        var div1;
+        if(type == "condition")
+          div1 = getDiv("c"+condition_id, document.getElementById("conditions_container"));
+        else {
+          div1 = getDiv("p"+condition_id, document.getElementById("preconditions_container"));
+          }
+        //new_select = document.getElementById(type+"_select_1").cloneNode(true);
+        //new_select.id = type+"_select_"+(Number(id)+1);
+        //new_select.name = "rule["+type+"]["+(Number(condition_id)+1)+"][keys][]";
+        variable_id = 1;
+        new_variable_field = document.getElementById(type+"_1_variable_1").cloneNode(true);
+        new_variable_field.id = type+"_"+condition_id+"_variable_"+variable_id;
+        new_variable_field.name = "rule["+type+"]["+condition_id+"][variable]["+variable_id+"][complete]";
+        div1.innerHTML="";
+        div1.appendChild(new_variable_field);
+        //div1.appendChild(new_select);
+        div1.innerHTML += "<a onclick=\"javascript:this.parentNode.innerHTML=''\">Remove</a>";
+        if(condition_id>total_conditions)
+          total_conditions = condition_id;
+        createVariableSelectionDiv(type, id+2, condition_id, variable_id);
+        attachRulesFormEventsForVariableField(type, condition_id, variable_id);
+      } 
+      });
+}
+
+//for Rules Engine
+function createVariableSelectionDiv(type, id, condition_id, variable_id) {
+  //id will be the id of new select field to be inserted
+  div_id = type[0]+condition_id+"v"+variable_id;
+  if($("#"+div_id).length == 0) {//div does not exist
+    //alert("creating new div:"+div_id);
+    div1 = document.createElement('div');
+    div1.id = div_id;
+    new_select = document.getElementById(type+"_select_1").cloneNode(true);
+    new_select.id = type+"_select_"+(id);
+    new_select.name = "rule["+type+"]["+condition_id+"][variable]["+variable_id+"][keys][]";
+    if(variable_id>1) {
+      nilOption = document.createElement("option");
+      nilOption.value = "0";
+      nilOption.appendChild(document.createTextNode("0"));
+      new_select.appendChild(nilOption);
+    }
+    div1.innerHTML = "<b>Condition "+condition_id+" Variable "+variable_id+"</b>";
+    div1.appendChild(new_select);
+    div1.innerHTML += "<a onClick=\"javascript:this.parentNode.style.display='none';fillVariableField('"+type+"',"+condition_id+", "+variable_id+");\"><b>Done</b></a>";
+    div1.style.display = "none";
+    document.getElementById(type[0]+condition_id).appendChild(div1);
+  }
+}
+
+//type is either condition or precondition
+function attachRulesFormEventsForVariableField(type, condition_id, variable_id) {
+  $("#"+type+"_"+condition_id+"_variable_"+variable_id).click( function(event) {
+      document.getElementById(type[0]+condition_id+"v"+variable_id).style.display = "block";
+      });
+}
+
+//for rules engine
+function fillVariableField(type, condition_id, variable_id) {
+  children = $(("#"+type[0])+condition_id+"v"+variable_id+" select")
+  str = children[0].value;
+  for(var i=1; i<children.length; i++)
+    str += "."+children[i].value;
+  $("#"+type+"_"+condition_id+"_variable_"+variable_id).attr("value", str);
+  parent_div = $("#"+type+"_"+condition_id+"_variable_"+variable_id).parent();
+  
+  last_accessed_id = children[children.length-1].id;//id of the last children
+  //alert("445:"+last_accessed_id);
+  id = Number(last_accessed_id.substring(last_accessed_id.indexOf("_select_")+"_select_".length));//this extracts out the id number at the end
+  for_field = document.getElementById(type+"_select_"+id);
+  for_field_value = for_field.value;
+  prev_field = document.getElementById(type+"_select_"+(id-1));
+  if(prev_field == null)//this happens for first select of every extra condition
+    prev_field = document.getElementById("select_0");
+  single_variable_mode = 0;
+  if(for_field_value == "0" ) {//this handles the case when second variable has been selected to be 0(nil), in that case, we will try to return the value of two fields prior to this (since between these two there is a select field wil binaryoperator) 
+    for_field_value = document.getElementById(type+"_select_"+(id-2)).value;
+    single_variable_mode = 1;
+  }
+  
+
+  $.ajax({
+  url: "/rules/get?for="+for_field_value+
+      "&type="+type+
+      "&id="+(Number(id)+1)+"&prev_field="+prev_field.value+
+      "&condition_id="+condition_id+/*name of div boxes are c1v1, c2v1 ... where the firstnumber refers to condition_id and second to variable number local to that condition*/
+      "&variable_id="+variable_id+
+      "&single_variable_mode="+single_variable_mode+
+      "&return_only_models=false"
+  ,success: function(data) {
+      //alert("cleaning up from"+id);
+      //alert("11#"+type+"_"+condition_id+"_variable_"+(Number(variable_id)+1));
+      cleanUpFields(type,id);
+      $("#"+type+"_"+condition_id+"_variable_"+(Number(variable_id)+1)).remove();
+      $("#"+type[0]+condition_id+"v"+(Number(variable_id)+1)).remove();
+      $("#"+type+"_"+condition_id+"_variable_"+variable_id).after(data);
+      if(data.indexOf("<select") != -1)
+        attachRulesFormEvents(type,Number(id)+1);
+      if(data.indexOf("selectmore_") != -1)
+        attachRulesFormEventsForSelectMoreField(type, Number(id)+3, condition_id);
+      if(data.indexOf("_variable_") != -1) {
+        createVariableSelectionDiv(type, id+2, condition_id, Number(variable_id)+1);
+        attachRulesFormEventsForVariableField(type, condition_id, Number(variable_id)+1);
+        attachRulesFormEvents(type, id+2);
+      }
+      //alert(data);
+      return true;
+    }
+    });
+
+}
+
+
 total_cols = 0;
 MAX_COLS = 20;
 function attachCustomTableEvents(){
@@ -704,6 +907,12 @@ $(document).ready(function(){
 	      });
       });
   attachReportingFormEvents("formdiv_1");
+  attachRulesFormEvents("condition", 0);
+  attachRulesFormEvents("condition", 1);
+  attachRulesFormEvents("precondition", 0);
+  attachRulesFormEvents("precondition", 1);
+  attachRulesFormEventsForVariableField("condition", 1/*condition_id*/, 1/*variable_id*/)
+  attachRulesFormEventsForVariableField("precondition", 1/*condition_id*/, 1/*variable_id*/)
   $("a.enlarge_image").click(function(a){
 	  link=$(a.currentTarget);
 	  addFloater(link);

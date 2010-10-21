@@ -1,0 +1,46 @@
+%h1
+  Rules
+%table
+  %tr
+    %td
+      %b Name
+    %td
+      %b Applicable to
+    %td
+      %b On action
+    %td
+      %b Pre conditions
+    %td
+      %b Rules
+    %td
+      %b On match
+  - for rule in @rules
+    %tr
+      %td
+        = link_to rule.name, url(:rule, rule)
+      %td
+        = rule.model_name
+      %td
+        = rule.on_action
+      %td
+        - if Marshal.restore(rule.precondition)
+          - Marshal.restore(rule.precondition).each do |key, cond|
+            /TODO do something better make this a function in rules and just call that function
+            = cond[:variable]["1"]["complete"]
+            - if (cond[:variable]["2"] != nil) and (cond[:variable]["2"]["complete"] != nil) and (cond[:variable]["2"]["complete"].to_i!= 0)
+              = cond [:binaryoperator]
+              = cond[:variable]["2"]["complete"]
+            = "#{Merb::GlobalHelpers::pretty_name_of_comparator(cond[:comparator])} #{cond[:const_value]} #{cond[:linking_operator]}"
+            %br
+      %td
+        - if Marshal.restore(rule.condition)
+          - Marshal.restore(rule.condition).each do |key, cond|
+            = cond[:variable]["1"]["complete"]
+            - if (cond[:variable]["2"] != nil) and (cond[:variable]["2"]["complete"] != nil) and (cond[:variable]["2"]["complete"].to_i != 0)
+              = cond [:binaryoperator]
+              = cond[:variable]["2"]["complete"]
+            = "#{Merb::GlobalHelpers::pretty_name_of_comparator(cond[:comparator])} #{cond[:const_value]} #{cond[:linking_operator]}"
+            %br
+      %td
+        = rule.permit ? 'Allow' : 'Disallow'
+= link_to 'New', url(:new_rule)
