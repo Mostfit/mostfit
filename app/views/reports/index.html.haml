@@ -4,8 +4,12 @@
   %h2
     = report_type.to_s.camelcase(' ')
   %ul
+    - role = session.user.role
     - reports.each do |report|
       %li
-        =link_to(report.name, url(:show_report, :report_type => report))
+        - if role == :funder
+          =link_to_with_rights(report.name, url(:show_report, :report_type => report))
+        - else
+          =link_to(report.name, url(:show_report, :report_type => report))
 %h2
   =link_to("Custom reports", resource(:bookmarks, :type => "custom_reports"))      

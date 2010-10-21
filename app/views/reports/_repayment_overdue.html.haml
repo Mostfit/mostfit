@@ -76,5 +76,5 @@
       %td
         -if summable_columns.include?(col)
           %b
-            =org_total[summable_columns.index(col)].to_currency
+            = org_total[summable_columns.index(col)] ? org_total[summable_columns.index(col)].to_currency : 0
       

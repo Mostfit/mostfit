@@ -35,22 +35,17 @@ class QuarterConsolidatedReport < Report
             next if Date.today < Date.new(y, month_number, 1)
             next if @from_date > Date.new(y, month_number, 1)
             next if @to_date   < Date.new(y, month_number, 1)
-            histories = LoanHistory.sum_outstanding_by_month(month_number, y, branch, self.loan_product_id)
+            query = []
+            query = ["l.loan_product_id = #{self.loan_product_id}"] if self.loan_product_id
+            histories = LoanHistory.sum_outstanding_by_month(month_number, y, branch, query)
             next if not histories
-            branch_query        = ["lh.branch_id=#{branch.id}"]
+            query              << ["lh.branch_id=#{branch.id}"]
             month_start_date    = Date.new(y, month_number, 1)
             month_end_date      = Date.new(y, month_number, -1)
-            advances            = LoanHistory.sum_advance_payment(month_start_date, month_end_date, :branch, self.loan_product_id, branch_query)||[]
-            old_balances        = LoanHistory.advance_balance(month_start_date-1, :branch, self.loan_product_id, branch_query)||[]
-            balances            = LoanHistory.advance_balance(month_end_date, :branch, self.loan_product_id, branch_query)||[]
-
-            data[branch][year]||= {}
-            data[branch][year][quarter]||= {}
+            advances            = LoanHistory.sum_advance_payment(month_start_date, month_end_date, :branch, query)||[]
+            old_balances        = LoanHistory.advance_balance(month_start_date-1, :branch, query)||[]
+            balances            = LoanHistory.advance_balance(month_end_date, :branch, query)||[]
             
-            #0        1          2                3              4          5     6                  7       8    9,10,11     12,13,14   15
-            #applied, sanctioned,disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults, name      
-            data[branch][year][quarter][month] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
             if histories and history = histories.first
               principal_scheduled = history.scheduled_outstanding_principal
               total_scheduled     = history.scheduled_outstanding_total
@@ -58,8 +53,14 @@ class QuarterConsolidatedReport < Report
               principal_actual    = history.actual_outstanding_principal
               total_actual        = history.actual_outstanding_total
             else
-              principal_scheduled, total_scheduled, principal_actual, total_actual, total_advance = 0, 0, 0, 0, 0
+              next
             end
+
+            data[branch][year]||= {}
+            data[branch][year][quarter]||= {}
+            #0        1          2                3              4          5     6                  7       8    9,10,11     12,13,14   15
+            #applied, sanctioned,disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults, name      
+            data[branch][year][quarter][month] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             
             data[branch][year][quarter][month][7] += principal_actual
             data[branch][year][quarter][month][9] += total_actual
@@ -89,7 +90,7 @@ class QuarterConsolidatedReport < Report
     extra_condition = ""
     froms = "payments p, clients cl, centers c"
     if self.loan_product_id
-      froms+= ", loans l"
+      froms += ", loans l"
       extra_condition = " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
     end
 

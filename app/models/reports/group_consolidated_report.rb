@@ -1,5 +1,5 @@
 class GroupConsolidatedReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id
 
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 7
@@ -18,10 +18,18 @@ class GroupConsolidatedReport < Report
   
   def generate
     branches, centers, data, clients, loans, groups = {}, {}, {}, {}, {}, {}
-    histories = LoanHistory.sum_outstanding_grouped_by(self.to_date, [:center, :client_group], self.loan_product_id)
-    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, :client_group, self.loan_product_id)||[]
-    balances  = LoanHistory.advance_balance(self.to_date, :client_group, self.loan_product_id)||[]
-    old_balances = LoanHistory.advance_balance(self.from_date-1, :client_group, self.loan_product_id)||[]
+    extra     = []
+    extra    << "l.loan_product_id = #{loan_product_id}" if loan_product_id
+    # if a funder is selected
+    if @funder
+      funder_loan_ids = @funder.loan_ids
+      extra    << "l.id in (#{funder_loan_ids.join(", ")})" 
+    end
+
+    histories = LoanHistory.sum_outstanding_grouped_by(self.to_date, [:center, :client_group], extra)
+    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, :client_group, extra)||[]
+    balances  = LoanHistory.advance_balance(self.to_date, :client_group, extra)||[]
+    old_balances = LoanHistory.advance_balance(self.from_date-1, :client_group, extra)||[]
 
     @branch.each{|b|
       data[b]||= {}
@@ -34,7 +42,6 @@ class GroupConsolidatedReport < Report
         c.client_groups.each{|g|
           #0              1                 2                3              4              5     6                  7         8    9,10,11     12         13          
           #amount_applied,amount_sanctioned,amount_disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults, name
-          data[b][c][g] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
           history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id} if histories
           advance  = advances.find{|x|  x.client_group_id==g.id}
           balance  = balances.find{|x|  x.client_group_id==g.id}
@@ -47,8 +54,10 @@ class GroupConsolidatedReport < Report
             principal_actual    = history.actual_outstanding_principal
             total_actual        = history.actual_outstanding_total
           else
-            principal_scheduled, total_scheduled, principal_actual, total_actual = 0, 0, 0, 0
+            next
           end
+
+          data[b][c][g] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
           data[b][c][g][7] += principal_actual
           data[b][c][g][9] += total_actual
@@ -80,8 +89,9 @@ class GroupConsolidatedReport < Report
     client_ids = clients.keys.length>0 ? clients.keys.join(',') : "NULL"
 
     #getting all the loans from the client list above. Filter also by loan product when provided
-    query = "l.client_id=c.id and c.center_id in (#{center_ids})"
-    query+= " and l.loan_product_id=#{self.loan_product_id}" if self.loan_product_id
+    query  = "l.client_id=c.id and c.center_id in (#{center_ids})"
+    query += " and l.loan_product_id=#{self.loan_product_id}" if self.loan_product_id
+
     repository.adapter.query("select l.id, l.client_id, l.amount FROM loans l, clients c WHERE #{query}").each{|l|
       loans[l.id] =  l
     }
@@ -89,9 +99,15 @@ class GroupConsolidatedReport < Report
     extra_condition = ""
     froms = "payments p, clients cl, centers c"
     if self.loan_product_id
-      froms+= ", loans l"
-      extra_condition = " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
+      froms += ", loans l"
+      extra_condition += " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
     end
+
+    if funder_loan_ids and funder_loan_ids.length > 0
+      froms += ", loans l" unless froms.include?(", loans l")
+      extra_condition += "and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
+      extra_condition += " and l.id in (#{funder_loan_ids.join(', ')})"
+    end      
                             
     repository.adapter.query(%Q{
                                SELECT c.branch_id branch_id, c.id center_id, cl.client_group_id client_group_id, type ptype, SUM(p.amount) amount, p.loan_id loan_id
@@ -119,6 +135,7 @@ class GroupConsolidatedReport < Report
     #1: Applied on
     hash = {:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :amount_applied_for, :client_id]}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
+    hash[:id]              = funder_loan_ids if funder_loan_ids and funder_loan_ids.length > 0
 
     Loan.all(hash).each{|l|
       client    = clients[l.client_id]
@@ -133,6 +150,8 @@ class GroupConsolidatedReport < Report
     #2: Approved on
     hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :amount_sanctioned, :client_id], :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
+    hash[:id]              = funder_loan_ids if funder_loan_ids and funder_loan_ids.length > 0
+
     Loan.all(hash).each{|l|
       client    = clients[l.client_id]
       next unless client
@@ -146,6 +165,8 @@ class GroupConsolidatedReport < Report
     #3: Disbursal date
     hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id], :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
+    hash[:id]              = funder_loan_ids if funder_loan_ids and funder_loan_ids.length > 0
+
     Loan.all(hash).each{|l|
       client    = clients[l.client_id]
       next unless client

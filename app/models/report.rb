@@ -33,7 +33,7 @@ class Report
   end
 
   def get_parameters(params, user=nil)
-    st = user.staff_member
+    st = user.staff_member if user
     @branch = if user and st
                 [st.centers.branches, st.branches].flatten
               else
@@ -53,6 +53,12 @@ class Report
                     else
                       nil
                     end
+    if params and params[:funder_id] and not params[:funder_id].blank? 
+      @funder = Funder.get(params[:funder_id])
+    elsif user.role == :funder
+      @funder = Funder.first(:user_id => user.id)
+    end
+
     [:late_by_more_than_days, :absent_more_than].each{|key|
       instance_variable_set("@#{key}", if params and params[key] and params[key].to_i>0
                                          params[key].to_i
@@ -131,7 +137,7 @@ class Report
         "="
       end
     elsif value.class == Array
-      "in"
+      " in "
     else
       "="
     end

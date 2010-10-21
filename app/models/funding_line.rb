@@ -69,7 +69,7 @@ class FundingLine
     centers_hash = {}
     Center.all(:fields => [:id, :name]).each{|c| centers_hash[c.id] = c}
     funding_line_query = ["funding_line_id=#{self.id}"]
-    LoanHistory.sum_outstanding_grouped_by(Date.today, [:center, :branch], nil, funding_line_query).group_by{|x| x.branch_id}.map{|bid, centers| 
+    LoanHistory.sum_outstanding_grouped_by(Date.today, [:center, :branch], funding_line_query).group_by{|x| x.branch_id}.map{|bid, centers| 
       [Branch.get(bid), centers.group_by{|x| x.center_id}.map{|cid, rows| [centers_hash[cid], rows.first]}.to_hash]
     }.to_hash
   end

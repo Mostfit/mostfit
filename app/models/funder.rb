@@ -74,6 +74,15 @@ class Funder
     Loan.all(hash) + Loan.all(:id => ids)
   end
 
+  # this function gives out all the loan ids that are accessible to a funder
+  def loan_ids(hash={})
+    hash[:funding_line_id] = funding_lines.map{|x| x.id}
+    hash[:fields] = [:id]
+    loan_hash = {:loan => {:id => hash[:id]}} if hash.key?(:id)
+    ids  = LoanHistory.ancestors_of_portfolio(self.portfolios, Loan, loan_hash||{})
+    Loan.all(hash).map{|x| x.id} + ids
+  end
+
   # this function gives out all the payments that are accessible to a funder
   def payments(hash={})
     Loan.all(:funding_line_id => funding_lines.map{|x| x.id}).payments(hash) + self.portfolios.loans.payments(hash)

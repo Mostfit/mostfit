@@ -37,7 +37,7 @@ class Portfolio
       taken_loans << "l.id not in (#{pids.join(', ')})"
     end
 
-    data = LoanHistory.sum_outstanding_grouped_by(Date.today, [:center, :branch], nil, taken_loans).group_by{|x| x.branch_id}.map{|bid, centers| 
+    data = LoanHistory.sum_outstanding_grouped_by(Date.today, [:center, :branch], taken_loans).group_by{|x| x.branch_id}.map{|bid, centers| 
       [Branch.get(bid), centers.group_by{|x| x.center_id}.map{|cid, rows| [centers_hash[cid], rows.first]}.to_hash]
     }.to_hash
   end

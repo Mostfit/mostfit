@@ -63,7 +63,7 @@ module Misfit
       },
       :funder => {
         :all => [:searches, :browse, :branches, :centers, :client_groups, :payments, :clients, :loans, :dashboard, :regions, :documents, :comments, :areas, 
-                 :audit_trails, :documents, :attendances, :staff_members, :funders, :portfolios, :funding_lines]
+                 :audit_trails, :documents, :attendances, :staff_members, :funders, :portfolios, :funding_lines, :reports]
       }
     }
 

@@ -24,3 +24,4 @@ MASS_ENTRY_FIELDS = {
   :loan => [:loan_utilization, :purpose]
 }
 CLEANER_INTERVAL = 120
+FUNDER_ACCESSIBLE_REPORTS = ["ConsolidatedReport", "GroupConsolidatedReport", "StaffConsolidatedReport", "RepaymentOverdue"]
