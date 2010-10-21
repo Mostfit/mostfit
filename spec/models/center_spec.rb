@@ -74,6 +74,26 @@ describe Center do
     @center.previous_meeting_date_from(Date.today-51).weekday.should eql(:monday)
   end
 
+  it "next and previous meeting dates should be correct" do
+    center =  Center.create(:branch => @branch, :name => "center 75", :code => "c75", :creation_date => Date.new(2010, 03, 17),
+                            :meeting_day => :wednesday, :manager => @manager)
+    center.should be_valid
+    center.meeting_day_change_date = Date.new(2010, 7, 7)
+    center.meeting_day = :tuesday    
+    center.save
+        
+    center.meeting_day_change_date = Date.new(2010, 10, 17)
+    center.meeting_day = :friday
+    center.save
+    
+    center = Center.get(center.id)
+    
+    center.next_meeting_date_from(Date.new(2010, 10, 12)).should == Date.new(2010, 10, 22)
+    center.previous_meeting_date_from(Date.new(2010, 10, 12)).should == Date.new(2010, 10, 5)
+    center.previous_meeting_date_from(Date.new(2010, 10, 22)).should == Date.new(2010, 10, 12)
+    center.next_meeting_date_from(Date.new(2010, 10, 22)).should == Date.new(2010, 10, 29)
+  end
+
   it "should not be valid with a name shorter than 3 characters" do
     @center.name = "ok"
     @center.should_not be_valid
