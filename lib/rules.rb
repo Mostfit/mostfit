@@ -1,10 +1,12 @@
 module Mostfit
   module Business
     class BasicCondition
-#      attr_accessor :appliesOn, :operator, :compareWith, :validator
-       attr_accessor :var1, :binaryoperator, :var2, :comparator, :const_value, :validator
-     
+      #      attr_accessor :appliesOn, :operator, :compareWith, :validator
+      attr_accessor :var1, :binaryoperator, :var2, :comparator, :const_value, :validator
+      
       def self.get_basic_condition(cond)
+        # debugger
+        
         if(cond.keys.length < 3)
           return nil
         else
@@ -13,8 +15,16 @@ module Mostfit
           a.var2 = cond[:var2]
           a.binaryoperator = cond[:binaryoperator].to_s #plus or minus
           a.comparator = cond[:comparator].to_s #less_than, greater_than etc.
-          a.const_value = cond[:const_value]
-
+          regex = Regexp.new(/.count/)
+          matchdata = regex.match(a.var1) 
+          if matchdata
+            a.const_value = (cond[:const_value] - 1 )
+          else 
+            a.const_value = cond[:const_value]
+          end
+          
+          # a.const_value = cond[:const_value]
+          
           if(a.comparator == "less_than")
             a.comparator = :<
           elsif(a.comparator == "less_than_equal")
@@ -30,7 +40,7 @@ module Mostfit
           else
             a.comparator = :UNKNOWN_COMPARATOR
           end
-
+          
           if(a.binaryoperator == "plus")
             a.binaryoperator = :+
           elsif(a.binaryoperator == "minus")
@@ -45,13 +55,13 @@ module Mostfit
               #debugger
               #var1 is a string
               obj1 = a.var1.split(".").map{|x| x.to_sym}.inject(obj){|s,x|
-                      if s!= nil then s.send(x) end
+                if s!= nil then s.send(x) end
               }
               if obj1 == nil
                 true #this can happend when the condition is ill-formed (say wrong spelling)
               elsif a.comparator == "!=".to_sym
-                then obj1 != a.const_value
-              #otherwise
+              then obj1 != a.const_value
+                #otherwise
               else
                 #debugger
                 obj1.send(a.comparator, a.const_value)
@@ -59,43 +69,43 @@ module Mostfit
             else #two variables to be handled
               #get obj1
               obj1 = a.var1.split(".").map{|x| x.to_sym}.inject(obj){|s,x|
-                      if s!= nil then s.send(x) end
+                if s!= nil then s.send(x) end
               }
               if obj1 == nil then true end #this can happend when the condition is ill-formed (say wrong spelling)
 
               #get obj2
               obj2 = a.var2.split(".").map{|x| x.to_sym}.inject(obj){|s,x|
-                      if s!= nil then s.send(x) end
+                if s!= nil then s.send(x) end
               }
               if obj2 == nil then true end #this can happend when the condition is ill-formed (say wrong spelling)
-
+              
               obj3 = obj1.send(a.binaryoperator, obj2)
               if a.comparator == "!=".to_sym then obj3 != a.const_value end
               #otherwise
               obj3.send(a.comparator, a.const_value)
             end
-            }
+          }
           return a
         end
       end
-
+      
       def to_s
         return "#{@appliesOn} #{@operator} #{@compareWith}"
       end
-
+      
       private_class_method :initialize #to prevent direct object creation
     end
-
+    
     class ComplexCondition
       attr_accessor :is_basic_condition , :basic_condition #makes sense only if its a basic condition
       attr_accessor :operator #makes sense only if its not a basic condition
       attr_accessor :condition1, :condition2 #makes sense only if its not a basic condition
-
+      
       def self.get_condition(cond)
         if((cond[:linking_operator] != nil) and (cond[:linking_operator].to_sym == :not)) then
           c = ComplexCondition.new
           c.operator = :not
-          c.condition1 = ComplexCondition.get_condition(cond[:first_condition])
+            c.condition1 = ComplexCondition.get_condition(cond[:first_condition])
           c.condition2 = nil
           c.is_basic_condition = false
           return c
@@ -119,14 +129,14 @@ module Mostfit
         if is_basic_condition
           return @basic_condition.validator.call(obj)
         elsif operator == :not
-          return (not @condition1.check_condition(obj))
+            return (not @condition1.check_condition(obj))
         elsif operator == :and
-          return (@condition1.check_condition(obj) && @condition2.check_condition(obj))
+            return (@condition1.check_condition(obj) && @condition2.check_condition(obj))
         elsif operator == :or
-          return (@condition1.check_condition(obj) || @condition2.check_condition(obj))
+            return (@condition1.check_condition(obj) || @condition2.check_condition(obj))
         end
       end
-
+      
       def to_s
         if is_basic_condition
           basic_condition.to_s
@@ -137,7 +147,7 @@ module Mostfit
 
       private :initialize
     end
-
+    
     class Rules
       @@rules = {}
       REJECT_REGEX = /^(Merb|merb)::*/
@@ -151,9 +161,9 @@ module Mostfit
         rescue #TODO find a better way of handling situation when rules table is missing
           puts "Rules Engine not deployed. continuing"
         end
-#        load(File.join(Merb.root, "config", "rules.rb"))
+        #        load(File.join(Merb.root, "config", "rules.rb"))
       end
-
+      
       def initialize
       end
       
@@ -161,18 +171,18 @@ module Mostfit
         #on which rules can be applied
         DataMapper::Model.descendants.reject{|x| x.superclass!=Object}.map{|d| d.to_s.snake_case.to_sym}
       end
-
+      
       def self.tree
         DataMapper::Model.descendants.to_a.collect{|m| 
           {m => m.relationships}
         }.inject({}){|s,x| s+=x}.reject{|k,v| v.length==0}
       end
-            
+      
       def self.prepare(&blk) # blk contains a set of calls to allow() and
-       # reject() to implement rules
+        # reject() to implement rules
         self.new.instance_eval(&blk)
       end
-
+      
       def self.get_value_obj(obj, type)
         if type == "date"
           return Date.parse(obj)
@@ -184,21 +194,21 @@ module Mostfit
           return obj
         end
       end
-
-			def self.apply_rule(rule)
-		    h = {:name => rule[:name], :on_action => rule[:on_action], :model_name => rule[:model_name], 
-			    :permit => rule[:permit], :condition => convert_to_polish_notation(rule[:condition]),
+      
+      def self.apply_rule(rule)
+        h = {:name => rule[:name], :on_action => rule[:on_action], :model_name => rule[:model_name], 
+          :permit => rule[:permit], :condition => convert_to_polish_notation(rule[:condition]),
           :precondition => convert_to_polish_notation(rule[:precondition]) }
-				self.add h
-			end
-
+        self.add h
+      end
+      
       #this is used for converting condition and precondition to polish notation
       def self.convert_to_polish_notation(marshalled_condition)
         condition1 = Hash.new
         if marshalled_condition == nil
           return condition1 #blank
         end
- 		    Marshal.restore(marshalled_condition).to_a.reverse!.each do |idx, cond|
+        Marshal.restore(marshalled_condition).to_a.reverse!.each do |idx, cond|
           var2 = nil
           if cond[:variable]["2"] != nil
             var2 = cond[:variable]["2"][:complete]
@@ -213,25 +223,25 @@ module Mostfit
             const_value = get_value_obj(cond[:const_value], cond[:valuetype])
           end
           condition_expression = {
-                   :var1 => cond[:variable]["1"][:complete],
-                   :binaryoperator => cond[:binaryoperator],
-                   :var2 => var2,
-                   :comparator => cond[:comparator].to_s,
-                   :const_value => const_value }
- 		      if cond[:linking_operator] != ""
+            :var1 => cond[:variable]["1"][:complete],
+            :binaryoperator => cond[:binaryoperator],
+            :var2 => var2,
+            :comparator => cond[:comparator].to_s,
+            :const_value => const_value }
+          if cond[:linking_operator] != ""
             hash1 = Hash.new
             hash1[:second_condition] = condition1.dup
-  		  	  hash1[:linking_operator] = cond[:linking_operator]
+            hash1[:linking_operator] = cond[:linking_operator]
             #condition format - Variable1, binary opearator(+/-), Variable2, comparator, const_value
             hash1[:first_condition]= condition_expression
             condition1 = hash1
           elsif
             condition1 = condition_expression
-  	      end
-  	    end
+          end
+        end
         return condition1
       end
-
+      
       #should not be called directly
       #only apply_rule should call this func
       def self.add(hash)
@@ -250,9 +260,9 @@ module Mostfit
             c = hash[:condition].dup
             p = hash[:precondition].dup
             hash[:condition] = {:linking_operator => :or,
-                    :first_condition => {:linking_operator =>:not, :first_condition => p}, 
-                    :second_condition => {:linking_operator =>:and, :first_condition => p, 
-                                          :second_condition => c } }
+              :first_condition => {:linking_operator =>:not, :first_condition => p}, 
+              :second_condition => {:linking_operator =>:and, :first_condition => p, 
+                :second_condition => c } }
           end
           c = ComplexCondition.get_condition(hash[:condition])
           #debugger
@@ -266,11 +276,11 @@ module Mostfit
         end
         hash[:model_name].validates_with_method(hash[:name])
       end
-
+      
       def self.remove_rule(hash)
         self.remove(hash)
       end
-
+      
       #not to be called directly, call remove_rule instead
       #to remove a validation
       def self.remove(hash)
@@ -284,7 +294,7 @@ module Mostfit
         end
         return true
       end
-
+      
       def self.rules
         @@rules
       end
@@ -307,7 +317,7 @@ module Mostfit
         end
         validator
       end
-    end
+  end
   end    
 end    
 
