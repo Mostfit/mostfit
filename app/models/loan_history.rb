@@ -180,7 +180,7 @@ class LoanHistory
     extra << "l.loan_product_id=#{loan_product_id}" if loan_product_id and loan_product_id.to_i>0
 
     ids = get_latest_rows_of_loans(to_date, extra)
-    return false if ids.length==0
+    return [] if ids.length==0
     group_by = get_group_by(group_by)
     selects  = ", " + selects unless selects.blank?
 
