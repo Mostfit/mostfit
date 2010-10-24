@@ -38,8 +38,8 @@
         error in model
       - collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal to"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal to"]]
       - collection2 = [["equal2", "equal"], ["not2", "not equal"]]
-      - select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :collection => collection1, :selected=>cond[:comprator])
-      - select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator][]", :collection => collection2, :selected=>cond[:comprator])
+      - select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :collection => collection1, :selected=> cond[:comparator])
+      - select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator][]", :collection => collection2, :selected=> cond[:comparator])
       - if collection1.flatten.include?(cond[:comparator].to_s)
         = select1
       - elsif collection2.flatten.include?(cond[:comparator].to_s)
