@@ -105,7 +105,7 @@ describe Rules do
     @basic_condition1.var1.should "client.center.branch.centers.count"
     @basic_condition1.var2.should == 0
     @basic_condition1.comparator.should == :==
-      @basic_condition1.const_value.should == 4
+    @basic_condition1.const_value.should == 4
   end
 
   # A complex condition consists of one or two complex conditions attached by a linking operator
