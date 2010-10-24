@@ -193,8 +193,6 @@ Merb::BootLoader.after_app_loads do
   end
   
   # change default format to whatever is selected
-  if format_str = Mfi.first.currency_format and Numeric::Transformer.instance_variable_get("@formats")[format_str.to_sym]
-    Numeric::Transformer.change_default_format(format_str.to_sym)
-  end
+  Mfi.first.set_currency_format
 end
 
