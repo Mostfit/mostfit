@@ -296,7 +296,7 @@ class Dashboard < Application
       graph.data(vals.map{|x|
                    branch=Branch.get(x.branch_id)
                    principal_overdue = if history = LoanHistory.defaulted_loan_info_for(branch)
-                                         history.principal_due
+                                         history.principal_due || 0
                                        else
                                          0
                                        end
