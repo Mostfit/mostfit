@@ -49,7 +49,7 @@ class Funder
   end
 
   def client_groups(hash={})
-    ids = []
+    ids = []    
     ids << LoanHistory.ancestors_of_portfolio(self.portfolios, ClientGroup) if self.portfolios.count > 0
     ids << LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}, :center => hash}) if funding_lines.count>0
     ClientGroup.all(:id => ids.flatten)
@@ -59,7 +59,9 @@ class Funder
   def clients(hash={})
     ids = []
     ids << LoanHistory.ancestors_of_portfolio(self.portfolios, Client, :client => hash) if self.portfolios.count > 0
-    ids << LoanHistory.parents_where_loans_of(Client, {:loan => {:funding_line_id => funding_lines.map{|x| x.id}}, :client => hash}) if funding_lines.count>0
+    loan_hash = {:funding_line_id => funding_lines.map{|x| x.id}, :fields => [:id]}
+    loan_hash[:client_id] = hash[:id] if hash[:id]
+    ids << Loan.all(loan_hash).map{|x| x.client_id} if funding_lines.count>0
     Client.all(:id => ids.flatten)
   end
 

@@ -42,7 +42,7 @@ class Branch
         hash[:manager] = user.staff_member
       end
     elsif user.role == :funder 
-      return Funder.first(:user_id => user.id).centers({:branch_id => self.id})
+      hash[:id] = Funder.first(:user_id => user.id).centers({:branch_id => self.id}).map{|c| c.id}
     end
 
     if params[:meeting_day] and Center::DAYS.include?(params[:meeting_day].to_sym)

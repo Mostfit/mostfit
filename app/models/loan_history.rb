@@ -316,16 +316,17 @@ class LoanHistory
   end
 
   def self.parents_where_loans_of(klass, hash)    
+    debugger
     selects    = build_selects(klass)
     froms      = build_froms(klass)    
-    conditions = build_conditions(klass, klass.all, hash)
+    conditions = build_conditions(klass, klass.all(hash[klass.to_s.snake_case.to_sym]), hash)
     repository.adapter.query("SELECT #{selects} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end
   
   def self.ancestors_of_portfolio(portfolio, ancestor_klass, hash={})
     portfolio_klass, obj = get_class_of(portfolio)
     selects    = build_selects(ancestor_klass)
-    froms      = (build_froms(ancestor_klass)||[] + build_froms(portfolio_klass)||[]).uniq
+    froms      = ((build_froms(ancestor_klass)||[]) + (build_froms(portfolio_klass)||[])).uniq
     conditions = (build_conditions(ancestor_klass, nil, hash) + build_conditions(portfolio_klass, obj, hash))
     repository.adapter.query("SELECT #{selects} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end
