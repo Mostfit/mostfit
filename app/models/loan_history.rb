@@ -316,7 +316,6 @@ class LoanHistory
   end
 
   def self.parents_where_loans_of(klass, hash)    
-    debugger
     selects    = build_selects(klass)
     froms      = build_froms(klass)    
     conditions = build_conditions(klass, klass.all(hash[klass.to_s.snake_case.to_sym]), hash)

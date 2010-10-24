@@ -122,7 +122,6 @@ module Mostfit
       end
       
       def check_condition(obj)
-        debugger
         if is_basic_condition
           return @basic_condition.validator.call(obj)
         elsif operator == :not
