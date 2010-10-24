@@ -189,7 +189,7 @@ class Centers < Application
   
   def grouped_clients
     clients = {}
-    (@clients.all(:center => @center) || @center.clients).each{|c|      
+    (@clients ? @clients.all(:center => @center) : @center.clients).each{|c|      
       group_name = c.client_group ? c.client_group.name : "No group"
       clients[group_name]||=[]
       clients[group_name] << c
