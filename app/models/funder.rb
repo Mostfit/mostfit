@@ -67,9 +67,10 @@ class Funder
 
   # this function gives out all the loans that are accessible to a funder
   def loans(hash={})
+    ids = []
     hash[:funding_line_id] = funding_lines.map{|x| x.id}
     loan_hash = {:loan => {:id => hash[:id]}} if hash.key?(:id)
-    ids  = LoanHistory.ancestors_of_portfolio(self.portfolios, Loan, loan_hash||{})
+    ids = LoanHistory.ancestors_of_portfolio(self.portfolios, Loan, loan_hash||{}) if self.portfolios.count > 0
     Loan.all(hash) + Loan.all(:id => ids)
   end
 
