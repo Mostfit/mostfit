@@ -128,7 +128,7 @@ class Application < Merb::Controller
 
     @funder = Funder.first(:user_id => session.user.id)
     idx     = @@controllers.index(params[:controller])
-    idx    += 1 if params[:action] != "index" and not params[:controller] == "staff_members"
+    idx    += 1 if params[:action] != "index" and not (params[:controller] == "staff_members" or params[:controller] == "funding_lines")
     var     = @@controllers[idx]
     raise NotFound unless var
     instance_variable_set("@#{var}", @funder.send(var))
