@@ -52,7 +52,7 @@
       - type_name = "rule[#{type}][#{condition_id}][valuetype]" #will be either "string", "date" or "int"
       - property = model.properties.find{|p| p.name.to_s==keys.last} || model.relationships[keys.last]
       - if property.type==Date or property.type==DateTime or cond[:valuetype] == "date"
-        = date_select(name , cond[:const_value], :id => "#{type}_date_#{id}")
+        = date_select(name , cond[:const_value], :id => "#{type}_date_#{id}", :nullable => true, :min_date => Date.min_date, :max_date => Date.max_date)
         = hidden_field(:id => "#{type}_hidden_#{id}", :name => type_name, :value => "date")
       - elsif [DataMapper::Types::Serial, Integer].include?(property.type) or cond[:valuetype] == "int"
         = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value => cond[:const_value]) 

@@ -52,31 +52,30 @@ module Mostfit
             if((a.var2 == nil) or (a.var2 == 0))#single variable has to be handled
               #var1 is a string
               obj1 = a.var1.split(".").map{|x| x.to_sym}.inject(obj){|s,x|
-                if s!= nil then s.send(x) end
+                s.send(x) if s!= nil
               }
               if obj1 == nil
-                true #this can happend when the condition is ill-formed (say wrong spelling)
+                false #this has happend when the condition is ill-formed (say wrong spelling)
               elsif a.comparator == "!=".to_sym
-              then obj1 != a.const_value
-                #otherwise
-              else
+                obj1 != a.const_value
+              else#otherwise
                 obj1.send(a.comparator, a.const_value)
               end
             else #two variables to be handled
               #get obj1
               obj1 = a.var1.split(".").map{|x| x.to_sym}.inject(obj){|s,x|
-                if s!= nil then s.send(x) end
+                s.send(x) if s!= nil
               }
-              if obj1 == nil then true end #this can happend when the condition is ill-formed (say wrong spelling)
+              next if obj1 == nil #this can happend when the condition is ill-formed (say wrong spelling)
 
               #get obj2
               obj2 = a.var2.split(".").map{|x| x.to_sym}.inject(obj){|s,x|
                 if s!= nil then s.send(x) end
               }
-              if obj2 == nil then true end #this can happend when the condition is ill-formed (say wrong spelling)
+              next if obj2 == nil #this can happend when the condition is ill-formed (say wrong spelling)
               
               obj3 = obj1.send(a.binaryoperator, obj2)
-              if a.comparator == "!=".to_sym then obj3 != a.const_value end
+              obj3 != a.const_value if a.comparator == "!=".to_sym
               #otherwise
               obj3.send(a.comparator, a.const_value)
             end
