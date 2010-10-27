@@ -167,7 +167,7 @@ describe Rules do
     h = {:name => :number_of_branches_in_area,
       :model_name => Branch, :on_action => :create,
       :condition => {:var1 => "area.branches.count", :var2 => 0, :binaryoperator => "",
-        :comparator => :less_than, :const_value => 3} }
+        :comparator => :less_than, :const_value => 2} }
     Mostfit::Business::Rules.add h
 
     @manager = StaffMember.first_or_create(:name => "Region manager1")
@@ -205,7 +205,7 @@ describe Rules do
     h = {:name => :number_of_branches_in_area,
       :model_name => Branch, :on_action => :create,
       :condition => {:var1 => "area.branches.count", :var2 => 0, :binaryoperator => "",
-        :comparator => :less_than, :const_value => 3} }
+        :comparator => :less_than, :const_value => 2} }
     Mostfit::Business::Rules.add h
 
     @manager = StaffMember.first_or_create(:name => "Region manager1")
@@ -286,7 +286,7 @@ describe Rules do
     @center2.code = "cer"
     @center2.save
     @center2.errors.each {|e| puts e}
-    @center2.should_not be_valid
+    @center2.should be_valid
 
     @center3 = Center.new(:name => "center 3")
     @center3.manager = @center_manager
@@ -684,21 +684,21 @@ describe Rules do
   end
 
   it "(TESTCASE06) loan should not be disbursed if it is older than 5 days" do     
-    h = {:name => :should_not_disburse_5days_old_loan, :model_name => Loan, :on_action => :update,
+    h = {:name => :should_not_disburse_5days_old_loan, :model_name => Loan, :on_action => :save,
       :condition => { :var1 => "scheduled_disbursal_date", :var2 => 0,
         :binaryoperator => "", :comparator => :minus, :var3 => "applied_on",:binaryoperator => "", :comparator => :less_than_equal,:const_value => 5 } }
     Mostfit::Business::Rules.add h
     
-    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-02-10")
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => Date.parse("2000-02-01"), :scheduled_disbursal_date => Date.parse("2000-02-10"))
     @loan.history_disabled = true
     @loan.applied_by       = @branch_manager
     @loan.funding_line     = @funding_line
     @loan.client           = @c1
     @loan.loan_product     = @loan_product
-    @loan.disbursal_date   = "2000-02-10"
+    @loan.disbursal_date   = Date.parse("2000-02-10")
     @loan.disbursed_by_staff_id = @branch_manager.id
-    @loan.approved_on = "2000-02-09"
-    @loan.approved_by = @branch_manager
+    @loan.approved_on     = Date.parse("2000-02-09")
+    @loan.approved_by     = @branch_manager
     @loan.valid?
     @loan.errors.each {|e| puts e}
     @loan.should_not be_valid

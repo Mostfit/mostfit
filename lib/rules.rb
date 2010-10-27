@@ -243,7 +243,7 @@ module Mostfit
         if(hash[:model_name].class != Class)
           hash[:model_name] = Kernel.const_get(hash[:model_name].camelcase)
         end
-        function_name = hash[:name].downcase.gsub(" ", "_")
+        function_name = hash[:name].to_s.downcase.gsub(" ", "_")
         hash[:model_name].send(:define_method, function_name) do
           if hash.key?(:permit)
             if(hash[:permit] == "false")
@@ -271,7 +271,7 @@ module Mostfit
           opts[:unless] = :new?
         elsif hash[:on_action] == :create
           opts[:if] = :new?
-        elsif hash[:on_action] == :create
+        elsif hash[:on_action] == :destroy
           opts[:when] = :destroy
         end
         return hash[:model_name].descendants.to_a.map{|model| model.validates_with_method(function_name, opts)}
