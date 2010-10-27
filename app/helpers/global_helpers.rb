@@ -100,7 +100,7 @@ module Merb
       attrs.merge!(:name => name)
       attrs.merge!(:date => date)
       attrs.merge!(:id => opts[:id]||name)
-      attrs.merge!(:nullable => opts[:nullable] || Mfi.first.date_box_editable)
+      attrs.merge!(:nullable => (opts.key?(:nullable) ? opts[:nullable] : Mfi.first.date_box_editable))
       attrs.merge!(:date     => date)
       attrs.merge!(:min_date => opts[:min_date]||Date.min_date)
       attrs.merge!(:max_date => opts[:max_date]||Date.max_date)
@@ -111,7 +111,7 @@ module Merb
       klass = obj.class
       attrs.merge!(:name => "#{klass.to_s.snake_case}[#{col.to_s}]")
       attrs.merge!(:id   => "#{klass.to_s.snake_case}_#{col.to_s}")
-      attrs[:nullable] = attrs[:nullable] || Mfi.first.date_box_editable
+      attrs[:nullable]   = (attrs.key?(:nullable) ? attrs[:nullable] : Mfi.first.date_box_editable)
       date = obj.send(col) 
       date = Date.today if date.blank? and not nullable
       date = nil        if date.blank? and nullable
