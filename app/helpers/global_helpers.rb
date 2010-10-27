@@ -100,6 +100,7 @@ module Merb
       attrs.merge!(:name => name)
       attrs.merge!(:date => date)
       attrs.merge!(:id => opts[:id]||name)
+      attrs.merge!(:nullable => opts[:nullable] || Mfi.first.date_box_editable)
       attrs.merge!(:date     => date)
       attrs.merge!(:min_date => opts[:min_date]||Date.min_date)
       attrs.merge!(:max_date => opts[:max_date]||Date.max_date)
@@ -110,7 +111,7 @@ module Merb
       klass = obj.class
       attrs.merge!(:name => "#{klass.to_s.snake_case}[#{col.to_s}]")
       attrs.merge!(:id   => "#{klass.to_s.snake_case}_#{col.to_s}")
-      nullable = attrs[:nullable] ? true : false
+      attrs[:nullable] = attrs[:nullable] || Mfi.first.date_box_editable
       date = obj.send(col) 
       date = Date.today if date.blank? and not nullable
       date = nil        if date.blank? and nullable
@@ -126,9 +127,9 @@ module Merb
 #       errorify_field(attrs, col)
     end
 
-    def date_select_html (attrs, obj = nil, col = nil)
+    def date_select_html (attrs, obj = nil, col = nil)      
       str = %Q{
-        <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}" size="20" #{Mfi.first.date_box_editable ? "" : "readonly='true'"}>
+        <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}" size="20" #{attrs[:nullable] ? "" : "readonly='true'"}>
         <script type="text/javascript">
           $(function(){
             $("##{attrs[:id]}").datepicker('destroy').datepicker({altField: '##{attrs[:id]}', buttonImage: "/images/calendar.png", changeYear: true, buttonImageOnly: true,
