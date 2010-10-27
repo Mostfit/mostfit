@@ -113,7 +113,7 @@ module Merb
       attrs.merge!(:id   => "#{klass.to_s.snake_case}_#{col.to_s}")
       attrs[:nullable]   = (attrs.key?(:nullable) ? attrs[:nullable] : Mfi.first.date_box_editable)
       date = obj.send(col) 
-      date = Date.today if date.blank? and not attr[:nullable]
+      date = Date.today if date.blank? and not attrs[:nullable]
       date = nil        if date.blank? and attrs[:nullable]
       attrs.merge!(:date => date)
       if TRANSACTION_MODELS.include?(klass) or TRANSACTION_MODELS.include?(klass.superclass) or TRANSACTION_MODELS.include?(klass.superclass.superclass)
