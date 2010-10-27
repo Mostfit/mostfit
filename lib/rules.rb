@@ -49,7 +49,6 @@ module Mostfit
           end
 
           a.validator = Proc.new{|obj| #obj is effectively an object of model_name class
-            p obj
             if((a.var2 == nil) or (a.var2 == 0))#single variable has to be handled
               #var1 is a string
               obj1 = a.var1.split(".").map{|x| x.to_sym}.inject(obj){|s,x|
@@ -102,7 +101,7 @@ module Mostfit
         if((cond[:linking_operator] != nil) and (cond[:linking_operator].to_sym == :not)) then
           c = ComplexCondition.new
           c.operator = :not
-            c.condition1 = ComplexCondition.get_condition(cond[:first_condition])
+          c.condition1 = ComplexCondition.get_condition(cond[:first_condition])
           c.condition2 = nil
           c.is_basic_condition = false
           return c
@@ -126,9 +125,9 @@ module Mostfit
           return @basic_condition.validator.call(obj)
         elsif operator == :not
           return (not @condition1.check_condition(obj))
-        elsif operator == :and
+        elsif operator == :and or operator == "and"
           return (@condition1.check_condition(obj) && @condition2.check_condition(obj))
-        elsif operator == :or
+        elsif operator == :or or operator == "or"
           return (@condition1.check_condition(obj) || @condition2.check_condition(obj))
         end
       end
@@ -244,7 +243,7 @@ module Mostfit
         if(hash[:model_name].class != Class)
           hash[:model_name] = Kernel.const_get(hash[:model_name].camelcase)
         end
-        function_name = hash[:name].gsub(" ", "_")
+        function_name = hash[:name].downcase.gsub(" ", "_")
         hash[:model_name].send(:define_method, function_name) do
           if hash.key?(:permit)
             if(hash[:permit] == "false")
@@ -259,16 +258,22 @@ module Mostfit
               :first_condition => {:linking_operator =>:not, :first_condition => p}, 
               :second_condition => {:linking_operator =>:and, :first_condition => p, 
                 :second_condition => c } }
-          end
+          end          
           c = ComplexCondition.get_condition(hash[:condition])
-          if c.check_condition(self) then
+          if c.check_condition(self)
             return true
           else
             return [false, "#{hash[:name]} violated"]
           end
         end
         opts = {}
-        opts[:unless] = :new? if hash[:on_action] == :update
+        if hash[:on_action] == :update
+          opts[:unless] = :new?
+        elsif hash[:on_action] == :create
+          opts[:if] = :new?
+        elsif hash[:on_action] == :create
+          opts[:when] = :destroy
+        end
         return hash[:model_name].descendants.to_a.map{|model| model.validates_with_method(function_name, opts)}
       end
       
