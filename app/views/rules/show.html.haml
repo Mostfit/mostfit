@@ -1,0 +1,51 @@
+%h1
+  =@rule.name
+
+%table
+  %tr
+    %td
+      Applicable on
+    %td
+      %b= @rule.model_name
+  %tr
+    %td
+      On action
+    %td
+      %b= @rule.on_action
+  %tr
+    %td
+      Pre-condition
+    %td
+      - if Marshal.restore(@rule.precondition)
+        - Marshal.restore(@rule.precondition).each do |key, cond|
+          = cond[:variable]["1"]["complete"]
+          - if (cond[:variable]["2"] != nil) and (cond[:variable]["2"]["complete"] != nil) and (cond[:variable]["2"]["complete"].to_i!= 0)
+            = cond [:binaryoperator]
+            = cond[:variable]["2"]["complete"]
+          = Merb::GlobalHelpers::pretty_name_of_comparator(cond[:comparator])
+          = cond[:const_value]
+          = cond[:linking_operator]
+          %br
+  %tr
+    %td
+      Condition
+    %td
+      - if Marshal.restore(@rule.condition)
+        - Marshal.restore(@rule.condition).each do |key, cond|
+          = cond[:variable]["1"]["complete"]
+          - if (cond[:variable]["2"] != nil) and (cond[:variable]["2"]["complete"] != nil)
+            = cond [:binaryoperator]
+            = cond[:variable]["2"]["complete"]
+          = Merb::GlobalHelpers::pretty_name_of_comparator(cond[:comparator])
+          = cond[:const_value]
+          = cond[:linking_operator]
+          %br
+  %tr
+    %td
+      Allow this condition?
+    %td
+      = @rule.permit
+
+= link_to 'Edit',  url(:edit_rule,  @rule)
+|
+= link_to 'Back', url(:rules)

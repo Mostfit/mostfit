@@ -1,5 +1,5 @@
 class ParByCenterReport < Report
-  attr_accessor :date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :late_by_days
+  attr_accessor :date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :late_by_more_than_days, :late_by_less_than_days
 
   def initialize(params,dates, user)
     @date = dates.blank? ? Date.today : dates[:date]
@@ -13,6 +13,15 @@ class ParByCenterReport < Report
 
   def self.name
     "PAR Report"
+  end
+
+  def include_late_day?(late_day)
+    more_than_specified = late_by_more_than_days ? true : false
+    less_than_specified = late_by_less_than_days ? true : false
+    return (late_by_more_than_days <= late_day and late_day < late_by_less_than_days) if (more_than_specified and less_than_specified)
+    return (late_by_more_than_days <= late_day) if (more_than_specified and !less_than_specified)
+    return (late_day < late_by_less_than_days) if (!more_than_specified and less_than_specified)
+    true
   end
 
   def generate
@@ -52,7 +61,8 @@ class ParByCenterReport < Report
           default.late_by
           if default.created_at and @date-default.created_at>0
             late_by = default.late_by + (@date-default.created_at.to_date).to_i
-            next if late_by_days and late_by <= late_by_days
+            to_include = include_late_day?(late_by)
+            next unless to_include
             r[branch][center] << [clients[default.client_id].name, clients[default.client_id].reference, loan.cycle_number, loan.loan_product.name, loan.amount, 
                                   loan.installment_frequency, default.principal_due, default.total_due-default.principal_due, default.total_due, late_by]
           end

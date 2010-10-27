@@ -27,10 +27,15 @@
             %td
               Product
               =select(:loan_product_id, :collection => LoanProduct.all.map{|x| [x.id, x.name]}, :include_blank => true, :selected => loan_product_id)
-          -if @report.respond_to?(:late_by_days)
+          -if @report.respond_to?(:late_by_more_than_days)
             %td
               Late by more than:
-              =text_field(:late_by_days, :size => 10)
+              =text_field(:late_by_more_than_days, :size => 10)
+              days
+          -if @report.respond_to?(:late_by_less_than_days)
+            %td
+              Late by less than:
+              =text_field(:late_by_less_than_days, :size => 10)
               days
           -if @report.respond_to?(:absent_more_than)
             %td

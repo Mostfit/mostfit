@@ -47,14 +47,14 @@ class Info < Application
       @areas[:new]  = LoanHistory.parents_where_loans_of(Area, {:loan => {:funding_line_id => @obj.id}, :area => new_date_hash})
       @areas[:upto] = LoanHistory.parents_where_loans_of(Area, {:loan => {:funding_line_id => @obj.id}, :area => upto_date_hash})
 
-      @branches[:new]  = LoanHistory.parents_where_loans_of(Branch, {:loan => {:funding_line_id => @obj.id}, :branch => new_date_hash})
-      @branches[:upto] = LoanHistory.parents_where_loans_of(Branch, {:loan => {:funding_line_id => @obj.id}, :branch => upto_date_hash})
+      @branches[:new]  = @obj.branches(new_date_hash)
+      @branches[:upto] = @obj.branches(upto_date_hash)
 
-      @centers[:new]  = Center.all(:id => LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => @obj.id}, :center => new_date_hash}))
-      @centers[:upto] = Center.all(:id => LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => @obj.id}, :center => upto_date_hash}))
+      @centers[:new]  = @obj.centers(new_date_hash)
+      @centers[:upto] = @obj.centers(new_date_hash)
 
-      @clients[:new]  = LoanHistory.parents_where_loans_of(Client, {:loan => {:funding_line_id => @obj.id}, :client => client_hash(:new)})
-      @clients[:upto] = LoanHistory.parents_where_loans_of(Client, {:loan => {:funding_line_id => @obj.id}, :client => client_hash(:upto)})
+      @clients[:new]  = @obj.clients(client_hash(:new))
+      @clients[:upto] = @obj.clients(client_hash(:upto))
     elsif @obj.class == StaffMember
       @areas     = @obj.areas
       @branches, @centers  = {}, {}

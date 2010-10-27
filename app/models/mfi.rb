@@ -43,6 +43,7 @@ class Mfi
   property :main_text, Text, :nullable => true, :lazy => true
   validates_length :name, :min => 3, :max => 20
   before :valid?, :save_image
+  after :save, :set_currency_format
   
   def self.first
     if $globals and $globals[:mfi_details] and $globals[:mfi_details].fetched==Date.today
@@ -70,9 +71,6 @@ class Mfi
     }
     Misfit::Config::DateFormat.compile
     DirtyLoan.start_thread
-    if format = Mfi.first.currency_format and Numeric::Transformer.instance_variables.include?(format.to_sym)
-      Numeric::Transformer.change_default_format(format.to_sym)
-    end
   end
 
   def save_image
@@ -81,6 +79,14 @@ class Mfi
       FileUtils.mv(self.logo[:tempfile].path, File.join(Merb.root, "public", "images", "logos", self.logo[:filename]))
       File.chmod(0755, File.join(Merb.root, "public", "images", "logos", self.logo[:filename]))
       self.logo_name = self.logo[:filename]
+    end
+  end
+
+  def set_currency_format
+    if format = currency_format and not format.blank? and Numeric::Transformer.instance_variable_get("@formats").keys.include?(format.to_sym)
+      Numeric::Transformer.change_default_format(format.to_sym)
+    else
+      Numeric::Transformer.change_default_format(:mostfit_default)
     end
   end
 end

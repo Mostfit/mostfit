@@ -30,6 +30,8 @@ Merb::BootLoader.before_app_loads do
                           :currency => { :format => '%u %n', :precision => 0, :delimiter => ',' } })
   Numeric::Transformer.change_default_format(:mostfit_default)
   require 'config/constants.rb'
+  require 'lib/rules'
+#  require 'csv'
   require 'uuid'
   require 'ftools'
   require 'logger'
@@ -96,7 +98,8 @@ Merb::BootLoader.after_app_loads do
 
   # set the rights
   require 'config/misfit'
-
+  
+  Mostfit::Business::Rules.deploy
   # enable the extensions
   Misfit::Extensions.hook
 
@@ -190,8 +193,6 @@ Merb::BootLoader.after_app_loads do
   end
   
   # change default format to whatever is selected
-  if format_str = Mfi.first.currency_format and Numeric::Transformer.instance_variable_get("@formats")[format_str.to_sym]
-    Numeric::Transformer.change_default_format(format_str.to_sym)
-  end
+  Mfi.first.set_currency_format
 end
 

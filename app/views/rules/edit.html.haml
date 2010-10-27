@@ -1,0 +1,10 @@
+%h1
+  =@rule.name
+= error_messages_for @rule
+
+= form_for(@rule, :action => url(:rule, @rule)) do
+  = partial :fields
+  %p
+    = submit "Update"
+
+= link_to 'Back', url(:rules)

@@ -1,0 +1,29 @@
+- #This partial displays a textbox (for each variable) which when clicked, presents a div to user to choose its the value (like branch.count) of variable 
+- if (cond[:variable]["#{variable_id}"] == nil)
+  - cond[:variable]["#{variable_id}"] = Hash.new
+- if (cond[:variable]["#{variable_id}"][:complete] == nil)
+  - cond[:variable]["#{variable_id}"][:complete] = ""
+- keys = [@rule.model_name] + cond[:variable]["#{variable_id}"][:complete].split(".")
+= text_field(:name => "rule[#{type}][#{condition_id}][variable][#{variable_id}][complete]", :value => cond[:variable]["#{variable_id}"][:complete], :class => "rules", :id => "#{type}_#{condition_id}_variable_#{variable_id}") #this holds the actual variable name like center.branch.count etc.
+- model = nil
+%div{:class => type, :id => "#{type[0,1]}#{condition_id}#{"v"}#{variable_id}", :style => "display:none"}
+  %b 
+    = "#{type} #{condition_id} Variable #{variable_id}"
+  - keys.each_with_index do |key, idx|
+    - name, field, choices = Condition.get_field_choices_and_name(key)
+    - model, key_type = Condition.get_model(key)
+  
+    - if model#which obviously each one (except last one) is
+      - name = "rule[#{type}][#{condition_id}][keys][]"
+      -#selected = (keys.length==idx+1) ? cond[:comparator].to_s : keys[idx+1]
+      - selected = keys[idx+1]
+      - if ((variable_id>1) and (idx==0)) #first select field of second variable
+        - choices = choices + [["0","0"]]
+      = select(:name => name, :collection => choices, :selected => selected, :class => "rules", :id => "#{type}_select_#{id}")
+      :javascript
+        attachRulesFormEvents("#{type}", #{id});
+        attachRulesFormEventsForVariableField("#{type}", #{condition_id}, #{variable_id})
+      - id+=1
+  %a{:onclick => "javascript:this.parentNode.style.display='none';fillVariableField('#{type}',#{condition_id},#{variable_id});"}
+
+    %b Done

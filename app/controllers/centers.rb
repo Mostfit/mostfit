@@ -13,7 +13,8 @@ class Centers < Application
   end
 
   def list
-    @centers = @centers || @branch.centers_with_paginate({:meeting_day => params[:meeting_day]}, session.user)
+    @centers = @centers ? @centers.all(:meeting_day => params[:meeting_day]||Date.today) : @branch.centers_with_paginate({:meeting_day => params[:meeting_day]}, 
+                                                                                                                         session.user)
     partial "centers/list", :layout => layout?
   end
 
@@ -188,7 +189,7 @@ class Centers < Application
   
   def grouped_clients
     clients = {}
-    (@clients || @center.clients).each{|c|
+    (@clients ? @clients.all(:center => @center) : @center.clients).each{|c|      
       group_name = c.client_group ? c.client_group.name : "No group"
       clients[group_name]||=[]
       clients[group_name] << c

@@ -6,6 +6,7 @@ Merb::Router.prepare do
   resources :rule_books
   resources :account_types
   resources :accounts, :id => /\d+/
+  resources :rules, :id => %r(\d+)
   resources :bookmarks
   resources :audit_items
   resources :attendances
@@ -108,6 +109,7 @@ Merb::Router.prepare do
   # this uses the redirect_to_show methods on the controllers to redirect some models to their appropriate urls
   match('/documents/:action(/:id)').to(:controller => "documents").name(:documents_action_link)
   match('/:controller/:id', :id => %r(\d+)).to(:action => 'redirect_to_show').name(:quick_link)
+  match('/rules/get').to(:controller => 'rules', :action => 'get') 
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
 end

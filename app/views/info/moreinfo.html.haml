@@ -142,7 +142,7 @@
       %td
         Number of center managers
       %td
-        =@centers[:upto].managers.count if @centers and @centers.length>0
+        = @centers[:upto].managers.count if @centers[:upto] and @centers[:upto].length>0
 %table.moreinfo
   -if @centers and not @obj.class==StaffMember
     %tr
@@ -150,4 +150,4 @@
         Center Managers
       %td
         %ul
-          =@centers[:upto].managers.collect{|sm| "<li>#{link_to(sm.name, resource(sm))}</li>"}.join
+          = @centers[:upto].managers.collect{|sm| "<li>#{link_to(sm.name, resource(sm))}</li>"}.join if @centers[:upto] and @centers[:upto].length>0

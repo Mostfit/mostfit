@@ -180,7 +180,7 @@ class LoanHistory
     extra << "l.loan_product_id=#{loan_product_id}" if loan_product_id and loan_product_id.to_i>0
 
     ids = get_latest_rows_of_loans(to_date, extra)
-    return false if ids.length==0
+    return [] if ids.length==0
     group_by = get_group_by(group_by)
     selects  = ", " + selects unless selects.blank?
 
@@ -318,14 +318,14 @@ class LoanHistory
   def self.parents_where_loans_of(klass, hash)    
     selects    = build_selects(klass)
     froms      = build_froms(klass)    
-    conditions = build_conditions(klass, klass.all, hash)
+    conditions = build_conditions(klass, klass.all(hash[klass.to_s.snake_case.to_sym]), hash)
     repository.adapter.query("SELECT #{selects} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end
   
   def self.ancestors_of_portfolio(portfolio, ancestor_klass, hash={})
     portfolio_klass, obj = get_class_of(portfolio)
     selects    = build_selects(ancestor_klass)
-    froms      = (build_froms(ancestor_klass) + build_froms(portfolio_klass)).uniq
+    froms      = ((build_froms(ancestor_klass)||[]) + (build_froms(portfolio_klass)||[])).uniq
     conditions = (build_conditions(ancestor_klass, nil, hash) + build_conditions(portfolio_klass, obj, hash))
     repository.adapter.query("SELECT #{selects} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end

@@ -74,6 +74,48 @@ class FundingLine
     }.to_hash
   end
 
+  # this function gives out all the branches that are accessible to a funder
+  def branches(hash={})
+    ids = []
+    if self.loans.count>0
+      ids = LoanHistory.parents_where_loans_of(Branch, {:loan => {:funding_line_id => self.id}, :branch => hash})
+      Branch.all(:id => ids)
+    else
+      []
+    end
+  end
+
+  # this function gives out all the centers that are accessible to a funder
+  def centers(hash={})
+    ids = []
+    if self.loans.count>0
+      ids = LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => self.id}, :center => hash})
+      Center.all(:id => ids)
+    else
+      []
+    end
+  end
+
+  def client_groups(hash={})
+    ids = []    
+    ids = LoanHistory.parents_where_loans_of(Center, {:loan => {:funding_line_id => self.id}, :center => hash}) if self.loans.count>0
+    ClientGroup.all(:id => ids)
+  end
+
+  # this function gives out all the clients that are accessible to a funder
+  def clients(hash={})
+    ids = []
+    loan_hash = {:funding_line_id => self.id, :fields => [:id]}
+    loan_hash[:client_id] = hash[:id] if hash[:id]
+    if self.loans.count>0
+      ids = Loan.all(loan_hash).map{|x| x.client_id}
+      Client.all(:id => ids)
+    else
+      []
+    end
+  end
+
+
   def repayments
     centers_hash = {}
     Center.all(:fields => [:id, :name]).each{|c| centers_hash[c.id] = c}
