@@ -27,7 +27,7 @@
         %td
           %b= link_to payment.received_by.name, resource(payment.received_by)
         %td
-          %b= payment.amount
+          %b= payment.amount.to_currency
         %td
           %b= payment.type.to_s
         %td
