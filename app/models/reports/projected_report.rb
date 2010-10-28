@@ -53,7 +53,7 @@ class ProjectedReport < Report
       }
     }
 
-    past_date = Date.today - 1
+    past_date = Date.min_date - 1
 
     #7 Overdue payments: likely to come in this week
     hash = {}
