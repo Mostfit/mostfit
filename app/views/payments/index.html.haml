@@ -14,7 +14,7 @@
     %td{ :width => '30%' } Amount disbursed
     %td
       -if @loan.disbursal_date
-        == <b>#{@loan.amount}</b> @
+        == <b>#{(@loan.amount).to_currency}</b> @
         %b= format("%.2f%", @loan.interest_rate*100)
       -else
         Not disbursed yet
@@ -110,7 +110,7 @@
     %td
       Fees paid
     %td
-      == #{@loan.total_fees_paid} / #{@loan.total_fees_due}
+      == #{(@loan.total_fees_paid).to_currency} / #{(@loan.total_fees_due).to_currency}
       - if @loan.fees_paid?
         %span.green Paid
   %tr
@@ -168,25 +168,25 @@
           %td
             = h[:date]
           %td
-            %b= format_currency h[:scheduled_outstanding_principal]
+            %b= h[:scheduled_outstanding_principal].to_currency
           %td
-            %b= format_currency(scheduled_principal + scheduled_interest)
+            %b= (scheduled_principal + scheduled_interest).to_currency
             %br/
             %span.greytext== #{scheduled_principal.to_currency} principal + #{scheduled_interest.to_currency} interest
           %td
             - if last_payment_date and (h[:date] <= last_payment_date or h[:date] <= Date.today)
-              %b= format_currency h[:actual_outstanding_principal]
+              %b= h[:actual_outstanding_principal].to_currency
           %td
             - if last_payment_date and (h[:date] <= last_payment_date or h[:date] <= Date.today)
-              %b= format_currency h[:principal_paid] + h[:interest_paid]
+              %b= (h[:principal_paid] + h[:interest_paid]).to_currency
               %br/
               %span.greytext
-                == #{format_currency h[:principal_paid]} principal + #{format_currency h[:interest_paid]} interest
+                == #{h[:principal_paid].to_currency} principal + #{h[:interest_paid].to_currency} interest
           %td
             - if h[:date] <= Date.today
               %b
                 %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
-                  = h[:amount_in_default].round
+                  = h[:amount_in_default].to_currency
               %br/
               %span.greytext
                 %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
