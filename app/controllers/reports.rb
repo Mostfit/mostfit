@@ -33,9 +33,6 @@ class Reports < Application
       @report   = klass.new(params[class_key], dates, session.user)
       if not params[:submit]
         render :form
-      elsif klass == TransactionLedger
-        @groups, @centers, @branches, @payments, @clients = @report.generate
-        display [@groups, @centers, @branches, @payments, @clients]
       else        
         case @report.method(:generate).arity
         when 0

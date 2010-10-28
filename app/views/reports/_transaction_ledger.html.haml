@@ -23,89 +23,80 @@
       Total
   - center_id, branch_id = nil, nil
   - length = 7
-  - groups_available = @payments.values.collect{|x| x.keys}.flatten.uniq
   - org_total = []
-  -@clients.each do |branch_id, centers|
+  -@data.each do |branch, centers|
     -if centers.keys.length>0
       -branch_total = []
       %tr.branch
         %td{:colspan => length}
           %b
-            =@branches[branch_id].name
-      -centers.sort_by{|center_id, groups| @centers[center_id].name}.each do |center_id, groups|
-        -if groups.keys.length>0 and (groups.keys & groups_available).length>0
+            =branch.name
+      -centers.sort_by{|center, groups| center.name}.each do |center, groups|
+        -if groups.values.map{|x| x.length}.reduce(0){|s,x| s+=x} > 0
           %tr.center
             %td{:colspan => length}
               %b
-                =@centers[center_id].name
-          - center_total = Array.new(length-2, 0)
-          -groups.sort_by{|x| @groups[x[0]].name}.each do |group_id, clients|
-            -if groups_available.include?(group_id)
-              -group_total = Array.new(length-2, 0)
+                =center.name
+          - center_total = []
+          -groups.sort_by{|group, clients| group ? group.name : ""}.each do |group, payments|
+            - if payments.length > 0
+              -group_total = []
               %tr.group
                 %td{:colspan => length}
-                  %b=@groups[group_id].name
-              -@payments.keys.sort.each do |date|
-                -date_total = Array.new(length-2, 0)
-                -if @payments[date] and @payments[date][group_id] and @payments[date][group_id].keys.length>0
-                  -@payments[date][group_id].keys.sort_by{|x| clients.find{|c| c.id==x}.name}.each do |client_id|
-                    -itr=@payments[date][group_id][client_id].collect{|x| x.length}.max
-                    -itr.times do |i|
+                  %b
+                    = group ? group.name : "No group"
+                    - payments.sort_by{|date, clients| date}.each do |date, clients|
+                      -date_total = Array.new(length-2, 0)
                       %tr.date
-                        %td.align_left
-                          = date
-                        %td.align_left
-                          =clients.find{|x| x.id==client_id}.name
-                        -sum=0
-                        -@payments[date][group_id][client_id].each_with_index do |e, col|
-                          %td
-                            -if e[i]
-                              =e[i].to_currency
-                              -e_val = e[i]
-                              -sum += e_val if col>0
-                              -center_total[col]+= e_val
-                              -group_total[col] += e_val
-                              -date_total[col]  += e_val
-                            -else
-                              0
+                        - clients.each do |client, data|
+                          %tr
+                            %td.align_left
+                              = date
+                            %td.align_left
+                              = client
+                            - data.each_with_index do |ele, i|
+                              %td
+                                = ele.to_currency                        
+                                - date_total[i] += ele
+                            %td
+                              = (data[1] + data[2] + data[3]).to_currency
+                              - date_total[4] += data[1] + data[2] + data[3]
+                      %tr.date_total
                         %td
-                          =sum
-                          -center_total[-1]+= sum
-                          -group_total[-1] += sum
-                          -date_total[-1]  += sum
-                  %tr.date_total
-                    %td
-                      %b
-                        Date total
-                    %td
-                    -date_total.each do |ele|
-                      %td
-                        %b=ele
+                          %b
+                            Date total
+                        %td
+                          - group_total << date_total
+                          -date_total.each do |ele|
+                            %td
+                              %b=ele.to_currency
               %tr.group_total
                 %td
                   %b==Group total
                 %td
-                -group_total.each do |ele|
-                  %td
-                    %b
-                      =ele.to_currency
+                  -group_total = group_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
+                  -center_total << group_total
+                  -group_total.each do |ele|
+                    %td
+                      %b
+                        =ele.to_currency
           %tr.center_total
             %td
               %b==Center total:
-              -branch_total.push(center_total)
+              -center_total = center_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
+              -branch_total.push(center_total) if center_total.length > 0
             %td
             -center_total.each do |ele|
               %td
                 %b
-                  =ele.to_currency
-      - branch_sum_arr = branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
-      - if branch_sum_arr.reduce{|x, sum| sum+=x}
-        %tr.branch_total
-          %td
-            %b==Branch total:
-          - org_total << branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
-          %td
-          -org_total.last.each do |ele|
+                  =ele.to_currency    
+      %tr.branch_total
+        %td
+          %b==Branch total:
+        - branch_total = branch_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
+        - org_total << branch_total if branch_total.length>0
+        %td
+          -branch_total.each do |ele|
             %td
               %b
                 =ele.to_currency
