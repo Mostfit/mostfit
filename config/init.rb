@@ -27,7 +27,9 @@ Merb::BootLoader.before_app_loads do
     :mostfit_default => { :number =>   { :precision => 3, :delimiter => ' ',  :separator => '.'},
                           :currency => { :unit => '',     :format => '%n',    :precision => 0 } },
     :in              => { :number =>   {:precision => 3, :delimiter => ',',  :separator => '.', :regex => /(\d+?)(?=(\d\d)+(\d)(?!\d))(\.\d+)?/},
-                          :currency => { :format => '%u %n', :precision => 0, :delimiter => ',' } })
+                          :currency => { :format => '%u %n', :precision => 0, :delimiter => ',' } },
+    :in_with_paise   => { :number =>   {:precision => 3, :delimiter => ',',  :separator => '.', :regex => /(\d+?)(?=(\d\d)+(\d)(?!\d))(\.\d+)?/},
+                          :currency => { :format => '%u %n', :precision => 2, :delimiter => ',' } })
   Numeric::Transformer.change_default_format(:mostfit_default)
   require 'config/constants.rb'
   require 'lib/rules'

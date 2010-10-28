@@ -38,12 +38,12 @@ class Mfi
   property :date_format, Enum.send('[]', *DateFormats), :nullable => true, :index => true
   property :accounting_enabled, Boolean, :default => false, :index => true
   property :dirty_queue_enabled, Boolean, :default => false, :index => true
-  property :currency_format,  String, :nullable => true, :length => 2
+  property :currency_format,  String, :nullable => true, :length => 20
 
   property :main_text, Text, :nullable => true, :lazy => true
   validates_length :name, :min => 3, :max => 20
   before :valid?, :save_image
-  after :save, :set_currency_format
+  #after :save, :set_currency_format
   
   def self.first
     if $globals and $globals[:mfi_details] and $globals[:mfi_details].fetched==Date.today
@@ -70,6 +70,7 @@ class Mfi
       f.puts self.to_yaml
     }
     Misfit::Config::DateFormat.compile
+    set_currency_format
     DirtyLoan.start_thread
   end
 
