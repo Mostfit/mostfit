@@ -457,6 +457,13 @@ class Loan
     end
   end
 
+  def first_payment_date
+    if self.disbursal_date
+      shift_date_by_installments(self.disbursal_date, 1)
+    else
+      nil
+    end
+  end
 
   def total_fees_due
     total_fees_due = fee_schedule.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
