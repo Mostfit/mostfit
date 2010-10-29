@@ -1,0 +1,11 @@
+%table
+  %tr
+    %td
+      Name
+    %td
+      = text_field :name
+  %tr
+    %td
+      Insurance company
+    %td
+      =select :insurance_company_id, :collection => InsuranceCompany.all.map{ |x| [x.id, x.name]}, :prompt => "Select company"

@@ -1,10 +1,10 @@
 %table
   %tr
     %td
-      Insurance Company
+      Insurance Product
     %td
-      = select :insurance_company_id, :collection => InsuranceCompany.all, :prompt => "---", :value_method => :id, :text_method => :name
-      = link_to 'Add a company', resource(:insurance_companies, :new, {:return => (@client ? resource(@client, :insurance_policies, :new) : nil)}),:class => "_remote_"
+      = select :insurance_product_id, :collection => InsuranceProduct.all, :prompt => "---", :value_method => :id, :text_method => :name
+      = link_to 'Add a product', resource(:insurance_products, :new, {:return => (@client ? resource(@client, :insurance_policies, :new) : nil)}),:class => "_remote_"
   %tr
     %td
       Policy Number
