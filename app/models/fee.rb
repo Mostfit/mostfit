@@ -1,7 +1,7 @@
 class Fee
   include DataMapper::Resource
   
-  PAYABLE = [:loan_applied_on, :loan_approved_on, :loan_disbursal_date, :loan_scheduled_first_payment_date, :loan_first_payment_date, :client_grt_pass_date, :client_date_joined, :loan_installment_dates]
+  PAYABLE = [:loan_applied_on, :loan_approved_on, :loan_disbursal_date, :loan_scheduled_first_payment_date, :loan_first_payment_date, :client_grt_pass_date, :client_date_joined, :loan_installment_dates, :policy_issue_date]
   FeeDue        = Struct.new(:applicable, :paid, :due)
   FeeApplicable = Struct.new(:loan_id, :client_id, :fees_applicable)
   property :id,            Serial
@@ -14,6 +14,7 @@ class Fee
 
   has n, :loan_products, :through => Resource
   has n, :client_types, :through => Resource
+  has n, :insurance_products, :through => Resource
   # anything else will have to be ruby code - sorry
   
   validates_with_method :amount_is_okay
@@ -38,6 +39,10 @@ class Fee
       desc += ", maximum of Rs. #{max_amount}" if max_amount
     end
     desc
+  end
+
+  def Fee.fees_for_insurance_products(fees)
+    fees.select {|fee| fee.payable_on == :policy_issue_date}
   end
 
   def self.payable_dates

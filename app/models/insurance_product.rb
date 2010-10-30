@@ -6,5 +6,6 @@ class InsuranceProduct
  
   belongs_to :insurance_company 
   has n, :insurance_policies
+  has n, :fees, :through => Resource
 
 end
