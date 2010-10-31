@@ -26,7 +26,7 @@ class AuditTrails < Application
     date = params[:date] ? Date.parse(params[:date]) : Date.today
     hash = {:created_at.gte => date, :created_at.lt => date + 1}
     hash[:user_id] = User.get(params[:user]).id if params[:user] and not params[:user].blank?
-    hash[:auditable_type] = params[:auditable_type] if params[:auditable_type]
+    hash[:auditable_type] = params[:auditable_type] if params[:auditable_type] and not params[:auditable_type].blank?
     @trails = AuditTrail.all(hash)
     render
   end
