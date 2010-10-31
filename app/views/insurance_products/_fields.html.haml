@@ -1,0 +1,22 @@
+%table
+  %tr
+    %td
+      Name
+    %td
+      = text_field :name
+  %tr
+    %td
+      Insurance company
+    %td
+      =select :insurance_company_id, :collection => InsuranceCompany.all.map{ |x| [x.id, x.name]}, :prompt => "Select company"
+
+%h2 Applicable Fees
+- fees_for_insurance = Fee.fees_for_insurance_products(Fee.all)
+- if fees_for_insurance.blank?
+  %p
+    %i No fees defined for insurance products
+- else
+  - for fee in fees_for_insurance
+    = check_box :name => "#{fee}", :checked => @insurance_product.fees.include?(fee)
+    = fee.name
+  %br

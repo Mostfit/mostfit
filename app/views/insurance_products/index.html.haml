@@ -1,0 +1,29 @@
+%h1
+  Insurance Products
+
+%table
+  %thead
+    %tr
+      %th
+        id
+      %th
+        Name
+      %th
+        Company
+      %th
+        Actions
+  %tbody
+    - for insurance_product in @insurance_products
+      %tr
+        %td
+          = insurance_product.id
+        %td
+          = insurance_product.name
+        %td
+          = insurance_product.insurance_company.name
+        %td
+          = link_to 'Show', url(:insurance_product, insurance_product)
+          &nbsp;|&nbsp; 
+          = link_to 'Edit', url(:edit_insurance_product,  insurance_product)
+
+= link_to 'New', url(:new_insurance_product)
