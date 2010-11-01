@@ -10,7 +10,7 @@ class Mfi
   attr_accessor :subdomain, :city_name, :state_id, :district_id, :logo, :fetched
 
   property :id, Serial, :nullable => false, :index => true
-  property :name, String, :nullable => false, :index => true
+  property :name, String, :nullable => true, :index => true
   property :address, Text, :nullable => false, :index => false
   property :website, String
   property :telephone, String, :nullable => false, :index => true
@@ -41,7 +41,7 @@ class Mfi
   property :currency_format,  String, :nullable => true, :length => 20
 
   property :main_text, Text, :nullable => true, :lazy => true
-  validates_length :name, :min => 3, :max => 20
+  validates_length :name, :min => 0, :max => 20
   before :valid?, :save_image
   #after :save, :set_currency_format
   
