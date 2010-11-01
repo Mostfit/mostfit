@@ -81,6 +81,13 @@ describe Center do
     center.meeting_day_change_date = Date.new(2010, 7, 7)
     center.meeting_day = :tuesday    
     center.save
+    center = Center.get(center.id)
+    
+    center.previous_meeting_date_from(Date.new(2010, 7, 7)).should == Date.new(2010, 6, 30)
+    center.next_meeting_date_from(Date.new(2010, 7, 7)).should     == Date.new(2010, 7, 13)
+    center.next_meeting_date_from(Date.new(2010, 7, 13)).should    == Date.new(2010, 7, 20)
+    center.previous_meeting_date_from(Date.new(2010, 7, 20)).should == Date.new(2010, 7, 13)
+    center.previous_meeting_date_from(Date.new(2010, 7, 13)).should == Date.new(2010, 7, 7)
         
     center.meeting_day_change_date = Date.new(2010, 10, 17)
     center.meeting_day = :friday
