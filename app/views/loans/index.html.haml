@@ -54,7 +54,7 @@
       %td
         Fees paid
       %td
-        == #{@client.total_fees_paid} / #{@client.total_fees_due}
+        == #{(@client.total_fees_paid).to_currency} / #{(@client.total_fees_due).to_currency}
         - if @client.fees_paid?
           %span.green Paid
   %p
@@ -106,7 +106,7 @@
             %td
               = link_to loan.id, url(:quick_link, "loans", loan.id)
             %td
-              %b= format_currency(loan.amount)
+              %b= (loan.amount).to_currency
             %td
               %b= format("%.2f%", loan.interest_rate * 100)
             %td

@@ -32,20 +32,20 @@ class DailyReport < Report
         c.client_groups.each{|g|
           #0              1                 2                3                  4     5   6                  7                   8               9               10
           #amount_applied,amount_sanctioned,amount_disbursed,bal_outstanding(p),bo(i),tot,principal_paidback,interest_collected, processing_fee, no_of_defaults, name
-          data[b][c][g] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
           history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id} if histories
           advance  = advances.find{|x|  x.client_group_id==g.id}
           balance  = balances.find{|x|  x.client_group_id==g.id}
           old_balance = old_balances.find{|x| x.client_group_id==g.id}
 
           if history
+            data[b][c][g] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             principal_scheduled = history.scheduled_outstanding_principal.to_i
             total_scheduled     = history.scheduled_outstanding_total.to_i
 
             principal_actual = history.actual_outstanding_principal.to_i
             total_actual     = history.actual_outstanding_total.to_i
           else
-            principal_scheduled, total_scheduled, principal_actual, total_actual = 0, 0, 0, 0
+            next
           end
 
           data[b][c][g][7] += principal_actual

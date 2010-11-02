@@ -70,8 +70,8 @@ class LoanHistory
     ids  = get_latest_rows_of_loans(date, query)
     return false if ids.length==0
     repository.adapter.query(%Q{
-         SELECT actual_outstanding_principal - scheduled_outstanding_principal as pdiff, 
-                actual_outstanding_total - scheduled_outstanding_total as tdiff, 
+         SELECT SUM(actual_outstanding_principal - scheduled_outstanding_principal) as pdiff, 
+                SUM(actual_outstanding_total - scheduled_outstanding_total) as tdiff, 
                 #{selects.uniq.join(',')}
          FROM loan_history 
          WHERE actual_outstanding_principal > scheduled_outstanding_principal AND actual_outstanding_total > scheduled_outstanding_total
