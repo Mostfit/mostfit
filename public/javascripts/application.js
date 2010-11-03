@@ -372,7 +372,7 @@ function attachRulesFormEvents(type, id) {//type = {"condition", "precondition"}
         total_fields = id+10;//delete some more fields than id+1 since sometimes more than 1 field is returned per request(there is no harm is deleting extra fields anyways)
       if(id == 0)
         return;//special case to handle that
-      parent_div_id = document.getElementById(type+"_select_"+id).parentNode.id;//it is of type c1v2=> condition 1, variable 2 
+      parent_div_id = document.getElementById(type+"_select_"+id).parentNode.id;//it is of type c1v2=> condition 1, variable 2
       condition_id = Number(parent_div_id.substr(1,1));//now this is with assumption that condition_id is single digit (can there be more than 9 conditions ever? if that happens this code fails)
       variable_id = Number(parent_div_id.substr(3,1));//since we have only two variables per condition, variable_id will be single digit
       prev_field = document.getElementById(type+"_select_"+(Number(id)-1));
@@ -391,7 +391,7 @@ function attachRulesFormEvents(type, id) {//type = {"condition", "precondition"}
           if(data.indexOf("<select") != -1) {
             attachRulesFormEvents(type,Number(id)+1);
           }
-          if(data.indexOf("selectmore_") != -1) 
+          if(data.indexOf("selectmore_") != -1)
             attachRulesFormEventsForSelectMoreField(type, Number(id)+3, condition_id);
           //alert(data);
           return true;
@@ -442,7 +442,7 @@ function attachRulesFormEventsForSelectMoreField(type, id, condition_id) {
           total_conditions = condition_id;
         createVariableSelectionDiv(type, id+2, condition_id, variable_id);
         attachRulesFormEventsForVariableField(type, condition_id, variable_id);
-      } 
+      }
       });
 }
 
@@ -486,7 +486,7 @@ function fillVariableField(type, condition_id, variable_id) {
     str += "."+children[i].value;
   $("#"+type+"_"+condition_id+"_variable_"+variable_id).attr("value", str);
   parent_div = $("#"+type+"_"+condition_id+"_variable_"+variable_id).parent();
-  
+
   last_accessed_id = children[children.length-1].id;//id of the last children
   //alert("445:"+last_accessed_id);
   id = Number(last_accessed_id.substring(last_accessed_id.indexOf("_select_")+"_select_".length));//this extracts out the id number at the end
@@ -496,11 +496,11 @@ function fillVariableField(type, condition_id, variable_id) {
   if(prev_field == null)//this happens for first select of every extra condition
     prev_field = document.getElementById("select_0");
   single_variable_mode = 0;
-  if(for_field_value == "0" ) {//this handles the case when second variable has been selected to be 0(nil), in that case, we will try to return the value of two fields prior to this (since between these two there is a select field wil binaryoperator) 
+  if(for_field_value == "0" ) {//this handles the case when second variable has been selected to be 0(nil), in that case, we will try to return the value of two fields prior to this (since between these two there is a select field wil binaryoperator)
     for_field_value = document.getElementById(type+"_select_"+(id-2)).value;
     single_variable_mode = 1;
   }
-  
+
 
   $.ajax({
   url: "/rules/get?for="+for_field_value+
@@ -609,19 +609,20 @@ function floatHeaders(){
 function portfolioCalculations(){
   $("table.portfolio input[type='checkbox']").click(function(event){
     tr = $(event.currentTarget).parent().parent();
+    $($(tr).find("td")[4]).html($($(tr).find("td")[1]).html().trim());
+    $($(tr).find("td")[5]).html($($(tr).find("td")[2]).html().trim());
+    $($(tr).find("td")[6]).html($($(tr).find("td")[2]).html().trim());
+
     if($(event.currentTarget).attr("checked")){
-      $($(tr).find("td")[4]).html($($(tr).find("td")[1]).html().trim());
-      $($(tr).find("td")[5]).html($($(tr).find("td")[2]).html().trim());
-      $($(tr).find("td")[6]).html($($(tr).find("td")[2]).html().trim());
       //setting branch total
       [3, 4, 5, 6].forEach(function(td_id){
 	if(td_id == 3){
 	  var td_val = 1;
 	}else{
 	  var td = $($(tr).find("td")[td_id]);
-	  var td_val = parseInt(td.html().replace(/\s/g, ''));
+	  var td_val = parseInt(td.html().replace(/\s|\,/g, ''));
 	}
-	var branch_val = parseInt($($(tr.nextAll("tr.branch_total")[0]).find("td b")[td_id]).html().replace(/\s/g, '')) || 0;
+	var branch_val = parseInt($($(tr.nextAll("tr.branch_total")[0]).find("td b")[td_id]).html().replace(/\s|\,/g, '')) || 0;
 	$($($(tr.nextAll("tr.branch_total")[0]).find("td")[td_id])).html("<b>" + (branch_val + td_val) + "</b>") || 0;
       });
     }else{
@@ -631,9 +632,9 @@ function portfolioCalculations(){
 	  var td_val = 1;
 	}else{
 	  var td = $($(tr).find("td")[td_id]);
-	  var td_val = parseInt(td.html().replace(/\s/g, ''));
+	  var td_val = parseInt(td.html().replace(/\s|\,/g, ''));
 	}
-	var branch_val = parseInt($($(tr.nextAll("tr.branch_total")[0]).find("td b")[td_id]).html().replace(/\s/g, '')) || 0;
+	var branch_val = parseInt($($(tr.nextAll("tr.branch_total")[0]).find("td b")[td_id]).html().replace(/\s|\,/g, '')) || 0;
 	$($($(tr.nextAll("tr.branch_total")[0]).find("td")[td_id])).html("<b>" + (branch_val - td_val) + "</b>") || 0;
       });
       $($(tr).find("td")[4]).html("0");
@@ -642,14 +643,17 @@ function portfolioCalculations(){
     }
 
     //setting org total
+    var org_client_count = 0;
     var org_count = 0;
     var org_allocated = 0;
     var org_current = 0;
     $("tr.branch_total").each(function(idx, tr){
-      org_count += parseInt($($(tr).find("td b")[4]).html().replace(/\s/g, '')) || 0;
-      org_allocated += parseInt($($(tr).find("td b")[5]).html().replace(/\s/g, '')) || 0;
-      org_current += parseInt($($(tr).find("td b")[6]).html().replace(/\s/g, '')) || 0;
+      org_client_count += parseInt($($(tr).find("td b")[3]).html().replace(/\s|\,/g, '')) || 0;
+      org_count += parseInt($($(tr).find("td b")[4]).html().replace(/\s|\,/g, '')) || 0;
+      org_allocated += parseInt($($(tr).find("td b")[5]).html().replace(/\s|\,/g, '')) || 0;
+      org_current += parseInt($($(tr).find("td b")[6]).html().replace(/\s|\,/g, '')) || 0;
     });
+    $($("tr.org_total:first td")[3]).html("<b>" + org_client_count + "</b>");
     $($("tr.org_total:first td")[4]).html("<b>" + org_count + "</b>");
     $($("tr.org_total:first td")[5]).html("<b>" + org_allocated + "</b>");
     $($("tr.org_total:first td")[6]).html("<b>" + org_current + "</b>");
