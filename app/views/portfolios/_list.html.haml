@@ -34,7 +34,7 @@
         %td
           = portfolio.outstanding_value.to_currency if portfolio.outstanding_value
         %td
-          = portfolio.outstanding_calculated_on.strftime("on #{Mfi.first.date_format} at %H:%M")
+          = portfolio.outstanding_calculated_on.strftime("on #{Mfi.first.date_format} at %H:%M") if portfolio.outstanding_calculated_on
         %td
           = portfolio.created_at.strftime(Mfi.first.date_format) if portfolio.created_at
         %td
