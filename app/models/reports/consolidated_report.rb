@@ -26,11 +26,11 @@ class ConsolidatedReport < Report
       extra    << "l.id in (#{funder_loan_ids.join(", ")})" 
     end
 
-    histories = LoanHistory.sum_outstanding_grouped_by(self.to_date, :center, extra)
-    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, :center, extra)||[]
+    histories = LoanHistory.sum_outstanding_grouped_by(self.to_date, [:branch, :center], extra)
+    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, [:branch, :center], extra)||[]
     balances  = LoanHistory.advance_balance(self.to_date, :center, extra)||[]
     old_balances = LoanHistory.advance_balance(self.from_date-1, :center, extra)||[]
-    
+
     @branch.each{|b|
       data[b]||= {}
       branches[b.id] = b

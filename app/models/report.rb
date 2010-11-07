@@ -33,31 +33,46 @@ class Report
   end
 
   def get_parameters(params, user=nil)
-    st = user.staff_member if user
-    @branch = if user and st
-                [st.centers.branches, st.branches].flatten
+    st     = user.staff_member if user
+    @funder = Funder.first(:user_id => user.id) if user and user.role == :funder
+
+    # if a branch is selected pick that or pick all of them
+    @branch = if (params and params[:branch_id] and not params[:branch_id].blank?)
+                Branch.all(:id => params[:branch_id])
               else
-                (params and params[:branch_id] and not params[:branch_id].blank?) ? Branch.all(:id => params[:branch_id]) : Branch.all(:order => [:name])
+                Branch.all(:order => [:name])
               end
-    @center = if user and st and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
-                [st.centers, st.branches.centers].flatten
-              elsif params and params[:center_id] and not params[:center_id].blank?
-                Center.all(:id => params[:center_id])
-              elsif params and params[:staff_member_id] and not params[:staff_member_id].blank?
-                StaffMember.get(params[:staff_member_id]).centers
-              else
-                @branch.collect{|b| b.centers}.flatten
-              end    
+    
+    # if the user is staff member or a funder then filter the branches against their managed branches list
+    if user and st
+      @branch = @branch & [st.centers.branches, st.branches].flatten
+    elsif @funder
+      @branch = @branch & @funder.branches
+    end
+
+    # if a center is selected pick that
+    @center = Center.all(:id => params[:center_id]) if params and params[:center_id] and not params[:center_id].blank?
+
+    # if the user is a staff member or funder and center is not selected then pick all the managed centers
+    @center = if user and not @center and (params and (not params[:staff_member_id] or params[:staff_member_id].blank?))
+                if st and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
+                  [st.centers, st.branches.centers].flatten
+                elsif st and params[:staff_member_id] and not params[:staff_member_id].blank?
+                  StaffMember.get(params[:staff_member_id]).centers
+                elsif @funder and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
+                  @funder.centers
+                elsif @funder and params[:staff_member_id] and not params[:staff_member_id].blank?
+                  @funder.centers & StaffMember.get(params[:staff_member_id]).centers
+                end                
+              end
+    @center ||= @branch.collect{|b| b.centers}.flatten
+    
+    @funder = Funder.get(params[:funder_id]) if not @funder and params and params[:funder_id] and not params[:funder_id].blank?
     @loan_product_id = if params and params[:loan_product_id] and params[:loan_product_id].to_i>0
                       params[:loan_product_id].to_i
                     else
                       nil
                     end
-    if params and params[:funder_id] and not params[:funder_id].blank? 
-      @funder = Funder.get(params[:funder_id])
-    elsif user.role == :funder
-      @funder = Funder.first(:user_id => user.id)
-    end
 
     [:late_by_more_than_days, :absent_more_than].each{|key|
       instance_variable_set("@#{key}", if params and params[key] and params[key].to_i>0

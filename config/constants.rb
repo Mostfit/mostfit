@@ -25,3 +25,4 @@ MASS_ENTRY_FIELDS = {
 }
 CLEANER_INTERVAL = 120
 FUNDER_ACCESSIBLE_REPORTS = ["ConsolidatedReport", "GroupConsolidatedReport", "StaffConsolidatedReport", "RepaymentOverdue"]
+INFINITY  = 1.0/0

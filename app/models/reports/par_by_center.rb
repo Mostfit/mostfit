@@ -15,60 +15,40 @@ class ParByCenterReport < Report
     "PAR Report"
   end
 
-  def include_late_day?(late_day)
-    more_than_specified = late_by_more_than_days ? true : false
-    less_than_specified = late_by_less_than_days ? true : false
-    return (late_by_more_than_days <= late_day and late_day < late_by_less_than_days) if (more_than_specified and less_than_specified)
-    return (late_by_more_than_days <= late_day) if (more_than_specified and !less_than_specified)
-    return (late_day < late_by_less_than_days) if (!more_than_specified and less_than_specified)
-    true
+  def include_late_day?(late_days)
+    late_days > (late_by_more_than_days||0) and late_days < (late_by_less_than_days||INFINITY)
   end
 
   def generate
     # these are the loan history lines which represent the last line before @date
-    rows = repository.adapter.query(%Q{
-      SELECT loan_id,max(date)
-      FROM loan_history 
-      WHERE date < '#{@date.strftime("%Y-%m-%d")}' and amount_in_default > 0 and status in (5,6)
-      GROUP BY loan_id})
-    # These are the lines from the loan history
-    query = %Q{
-      SELECT loan_id, branch_id, center_id, client_id, amount_in_default, days_overdue as late_by, created_at,
-             actual_outstanding_total-scheduled_outstanding_total total_due, actual_outstanding_principal-scheduled_outstanding_principal principal_due
-      FROM loan_history 
-      WHERE (loan_id,date) IN (#{rows.map{|x| "(#{x[0]}, '#{x[1].strftime("%Y-%m-%d")}')"}.join(',')})
-      ORDER BY branch_id, center_id}
-    center_defaults = {}
-    par_data = repository.adapter.query(query)
+    selects = [:loan_id, :branch_id, :center_id, :client_id, :amount_in_default, :days_overdue, :date]             
+    par_data = LoanHistory.defaulted_loan_info_by(:center, @date, {:branch_id => @branch.map{|x| x.id}, :center_id => @center.map{|x| x.id}}, selects)
 
-    par_data.map{|p| 
-      center_defaults[p.center_id] = [] if not center_defaults.key?(p.center_id)
-      center_defaults[p.center_id] << p
-    }
+    center_defaults = {}
     clients = Client.all(:id => par_data.map{|x| x.client_id}, :fields => [:id, :name, :reference, :center_id]).map{|x| [x.id, x]}.to_hash
     hash    = {:client_id => clients.keys, :fields => [:id, :client_id, :loan_product_id, :amount]}
     hash[:loan_product_id] = loan_product_id if loan_product_id
     loans   = Loan.all(hash).map{|x| [x.id, x]}.to_hash
-    r = {}
+    center_defaults = par_data.group_by{|x| x.center_id}
+
+    data = {}
     @branch.each do |branch|
-      r[branch] = {}
+      data[branch] = {}
       @center.find_all{|c| c.branch_id==branch.id}.each do |center|
-        next if not center_defaults[center.id]
-        r[branch][center] = []
+        next unless center_defaults[center.id]
+        data[branch][center] = []
         center_defaults[center.id].each do |default|
-          next if not loans.key?(default.loan_id)          
+          next unless loans.key?(default.loan_id)
           loan = loans[default.loan_id]
-          default.late_by
-          if default.created_at and @date-default.created_at>0
-            late_by = default.late_by + (@date-default.created_at.to_date).to_i
-            to_include = include_late_day?(late_by)
-            next unless to_include
-            r[branch][center] << [clients[default.client_id].name, clients[default.client_id].reference, loan.cycle_number, loan.loan_product.name, loan.amount, 
-                                  loan.installment_frequency, default.principal_due, default.total_due-default.principal_due, default.total_due, late_by]
+          if default.date and @date > default.date
+            late_by = default.days_overdue + (@date - default.date)
+            next unless to_include = include_late_day?(late_by)
+            data[branch][center] << [clients[default.client_id].name, clients[default.client_id].reference, loan.cycle_number, loan.loan_product.name, loan.amount, 
+                                     loan.installment_frequency, default.pdiff, default.tdiff - default.pdiff, default.tdiff, late_by]
           end
         end
       end
     end
-    return r
+    return data
   end
 end
