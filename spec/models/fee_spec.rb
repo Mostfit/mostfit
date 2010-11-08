@@ -236,12 +236,17 @@ describe Fee do
   it "should pay client fees correctly" do
     Payment.all.destroy!
     Fee.all.destroy!
-    @fee1 = Fee.new(:name => "client Fee", :amount => 20, :payable_on => :client_date_joined)
+    @client = Client.get(@client.id)
+    @fee1 = Fee.new(:name => "client fee", :amount => 20, :payable_on => :client_date_joined)
+    @fee1.client_types << @client.client_type
     @fee1.save
-    @fee2 = Fee.new(:name => "grt Fee", :amount => 10, :payable_on => :client_grt_pass_date)
+
+    @fee2 = Fee.new(:name => "grt fee", :amount => 10, :payable_on => :client_grt_pass_date)
+    @fee2.client_types << @client.client_type
     @fee2.save
-    @client.grt_pass_date = Date.today
-    @client.pay_fees(5, Date.today, @manager, @user)    
+    
+    @client.grt_pass_date = Date.today - 1
+    @client.pay_fees(5, Date.today - 1, @manager, @user)
     @client.fees_payable_on.should == {@fee1 => 20 - 5, @fee2 => 10}
   end
 end
