@@ -68,7 +68,7 @@ class LoanHistory
     # this does not work as expected if the loan is repaid and goes back into default within the days we are looking at it.
     selects << "#{group_by}_id"
     ids  = get_latest_rows_of_loans(date, query)
-    return false if ids.length==0
+    return [] if ids.length==0
     repository.adapter.query(%Q{
          SELECT SUM(actual_outstanding_principal - scheduled_outstanding_principal) as pdiff, 
                 SUM(actual_outstanding_total - scheduled_outstanding_total) as tdiff, 

@@ -63,9 +63,12 @@ class Report
                   @funder.centers
                 elsif @funder and params[:staff_member_id] and not params[:staff_member_id].blank?
                   @funder.centers & StaffMember.get(params[:staff_member_id]).centers
-                end                
+                end
+              else
+                @center
               end
-    @center ||= @branch.collect{|b| b.centers}.flatten
+    @center = @branch.collect{|b| b.centers}.flatten unless @center
+
     
     @funder = Funder.get(params[:funder_id]) if not @funder and params and params[:funder_id] and not params[:funder_id].blank?
     @loan_product_id = if params and params[:loan_product_id] and params[:loan_product_id].to_i>0
@@ -114,7 +117,7 @@ class Report
       key      = get_key(query)
       operator = get_operator(query, value)
       value    = get_value(value)
-      operator = " is " if value=="NULL" and operator=="="
+      operator = " is " if value == "NULL" and operator == "="
       next if not key
       "#{key}#{operator}#{value}"
     }
@@ -148,6 +151,8 @@ class Report
         "<"
       when :eq
         "="
+      when :not
+        " is not "
       else
         "="
       end
