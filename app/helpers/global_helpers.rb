@@ -200,7 +200,7 @@ module Merb
           swfobject.embedSWF(
             "#{swf_base}open-flash-chart.swf", "flashcontent_#{id}",
             "#{width}", "#{height}", "9.0.0", "expressInstall.swf",
-            {"data-file":"#{url}", "loading":"Waiting for data... (reload page when it takes too long)"} );
+            {"data-file":"#{url}", "loading":"Waiting for data... (reload page when it takes too long)"}, {"wmode": "transparent"} );
         </script>
       HTML
     end

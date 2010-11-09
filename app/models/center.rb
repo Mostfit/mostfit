@@ -48,9 +48,9 @@ class Center
 
   def self.search(q)
     if /^\d+$/.match(q)
-      all(:conditions => ["id = ? or code=?", q, q])
+      all(:conditions => ["id = ? or code=?", q, q], :limit => 10)
     else
-      all(:conditions => ["code=? or name like ?", q, q+'%'])
+      all(:conditions => ["code=? or name like ?", q, q+'%'], :limit => 10)
     end
   end
 

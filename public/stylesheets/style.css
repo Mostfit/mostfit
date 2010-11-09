@@ -941,3 +941,19 @@ a.expand_collapsed{
     top: 20px;
     display: none;
 }
+.floatingBox{
+    float: right;
+    top: 1px;
+    position: absolute;
+    border: 2px solid orange;    
+    right: 100px;
+    padding: 5px;
+    background: #eee;
+    z-index: 1;
+    width: 800px;
+}
+.floatingBox table{
+    float: left;
+    margin-right: 5px;
+    margin-left: 5px;
+}

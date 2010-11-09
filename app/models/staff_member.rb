@@ -24,6 +24,15 @@ class StaffMember
 
   validates_is_unique :name
   validates_length :name, :min => 3
+
+  def self.search(q)
+    if /^\d+$/.match(q)
+      all(:conditions => {:id => q}, :limit => 10)
+    else
+      all(:conditions => ["name like ?", q+'%'], :limit => 10)
+    end
+  end
+  
   
   def self.from_csv(row, headers)
     user = User.new(:login => row[headers[:name]], :role => :staff_member,

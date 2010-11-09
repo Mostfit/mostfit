@@ -173,6 +173,7 @@ function attachFormRemoteTo(form){
     form=$(f.currentTarget);
     $(form).find("input[type='submit']").attr("disabled", true);
     $(form).after("<img id='spinner' src='/images/spinner.gif' />");
+
     $.ajax({
       type: form.attr("method"),
       url: form.attr("action"),

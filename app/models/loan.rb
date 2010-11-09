@@ -193,7 +193,7 @@ class Loan
 
   def self.search(q)
     if /^\d+$/.match(q)
-      all(:conditions => {:id => q})
+      all(:conditions => {:id => q}, :limit => 10)
     end
   end
 
