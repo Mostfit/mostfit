@@ -289,11 +289,57 @@ module Merb
         change.map{|k, v|
           str="<tr><td>#{k.humanize}</td><td>"
           str+=if action==:update and v.class==Array
-                 "changed from #{v.first}</td><td>to #{v.last}"
+
+                 case k.to_s
+                 when 'manager_staff_id', 'created_by_staff_member_id','created_by_user_id','verified_by_user_id','disbursed_by_staff_id','approved_by_staff_id','applied_by_staff_id'
+                   "#{link_to(v.first, url(:controller => 'staff_members', :action => "show", :id => v.first))} </td><td> #{link_to(v.last, url(:controller => 'staff_members', :action => "show", :id => v.last))}" 
+                 when 'area_id'
+                   "#{link_to(v.first,url(:controller => 'areas', :action => "show", :id => v.first))}</td><td>#{link_to(v.last,url(:controller => 'areas', :action => "show", :id => v.last))}"
+                 when 'branch_id'
+                   "#{link_to(v.first, url(:controller => 'branches', :action => "show", :id => v.first))}</td><td>#{link_to(v.last, url(:controller => 'branches', :action => "show", :id => v.last))}"
+                 when 'center_id'
+                   "#{link_to(v.first, url(:controller => 'centers', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'centers', :action => "show", :id => v.last))}"
+                 when 'client_group_id'
+                   "#{link_to(v.first, url(:controller => 'client_groups', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'client_groups', :action => "show", :id => v.last))}"
+                 when 'occupation_id'
+                   "#{link_to(v.first, url(:controller => 'occupations', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'occupations', :action => "show", :id => v.last))}"
+                 when 'client_id'
+                   "#{link_to(v.first, url(:controller => 'clients', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'clients', :action => "show", :id => v.last))}"
+                 when 'loan_product_id'
+                   "#{link_to(v.first, url(:controller => 'loan_products', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'loan_products', :action => "show", :id => v.last))}"
+                 when 'funding_line_id'
+                   "#{link_to(v.first, url(:controller => 'funding_lines', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'funding_lines', :action => "show", :id => v.last))}"
+                 else
+                   "changed from #{v.first} </td><td> to #{v.last}"
+                 end
+                 
                elsif action==:create and v.class==Array
+                 
                  "#{v}"
                else
-                 "#{v}"
+                 case k.to_s
+                 when 'manager_staff_id', 'created_by_staff_member_id','created_by_user_id','verified_by_user_id','disbursed_by_staff_id','approved_by_staff_id','applied_by_staff_id'
+                   "#{link_to(v, url(:controller => 'staff_members', :action => "show", :id => v))}"
+                 when 'area_id'
+                   "#{link_to(v,url(:controller => 'areas', :action => "show", :id => v))}"
+                 when 'branch_id'
+                   "#{link_to(v, url(:controller => 'branches', :action => "show", :id => v))}"
+                 when 'center_id'
+                   "#{link_to(v, url(:controller => 'centers', :action => "show", :id => v))}"
+                 when 'client_group_id'
+                   "#{link_to(v, url(:controller => 'client_groups', :action => "show", :id => v))}"
+                 when 'occupation_id'
+                   "#{link_to(v, url(:controller => 'occupations', :action => "show", :id => v))}"
+                 when 'client_id'
+                   "#{link_to(v, url(:controller => 'clients', :action => "show", :id => v))}"
+                 when 'loan_product_id'
+                   "#{link_to(v, url(:controller => 'loan_products', :action => "show", :id => v))}"
+                 when 'funding_line_id'
+                   "#{link_to(v, url(:controller => 'funding_lines', :action => "show", :id => v))}"
+                 else
+                   "#{v}"
+                 end
+                 
                end
           str+="</td></tr>"
         }
