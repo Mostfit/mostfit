@@ -957,3 +957,8 @@ a.expand_collapsed{
     margin-right: 5px;
     margin-left: 5px;
 }
+.floatingBox .closeButton{
+    float: right;
+    font-weight: bold;
+    font-size: 1em;
+}

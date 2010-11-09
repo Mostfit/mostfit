@@ -2,10 +2,18 @@
 // Common JavaScript code across your application goes here.
 var lineNos=0;
 function addFloater(link){
+  if($(".floater").length>0){
     $(link).after("<div class='floater'><img height='400' src="+link.attr('href')+"/><span class='close_button'>X</span></div>");
     $(".close_button").click(function(button){
       $("div.floater").remove();
     });
+  }
+  if($(".closeButton").length>0){
+    $(".closeButton").click(function(){
+      $(".floatingBox").remove();
+    });
+  }
+
 }
 function spitLogs(){
     $.get("/logs/"+$("div.log_box").attr("id"), function(data){
@@ -196,6 +204,7 @@ function attachFormRemoteTo(form){
 	}
 	$("#spinner").remove();
 	$(form).find("input[type='submit']").attr("disabled", "");
+	addFloater("");
       },
       error: function(xhr, text, errorThrown){
 	if(xhr.status=="302"){
