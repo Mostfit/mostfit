@@ -400,6 +400,14 @@ module Merb
       staff_members.sort_by{|x| x.name}.map{|x| [x.id, x.name]}
     end
 
+    def get_accessible_funders
+      (if session.user.role == :funder
+        Funder.all(:user => session.user)
+      else
+        Funder.all
+      end).map{|x| [x.id, "#{x.name}"]}
+    end
+
     def select_mass_entry_field(attrs)
       collection = []
       MASS_ENTRY_FIELDS.keys.each do |model|

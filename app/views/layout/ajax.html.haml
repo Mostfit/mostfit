@@ -1,0 +1,11 @@
+#breadcrums= breadcrums
+- if message
+  #flash-messages.span-17.prefix-5.suffix-5.last
+    - message.each do |key, value|
+      .flash{ :class => key.to_s }
+        %p= value
+- if params[:action]=="edit" and session.user.admin?
+  %p{:style => "float: right; border: 1px solid orange; padding: 4px;"}
+    =link_to("Delete", url(:controller => "application", :action => "delete", :id => params[:id], :model => params[:controller], :return => request.uri), :class => 'delete')
+%p
+= catch_content :for_layout

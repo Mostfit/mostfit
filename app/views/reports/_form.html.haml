@@ -11,6 +11,7 @@
           - center_id = (params[report] and params[report][:center_id]) ? params[report][:center_id] : nil
           - loan_product_id = (params[report] and params[report][:loan_product_id]) ? params[report][:loan_product_id] : nil
           - staff_member_id = (params[report] and params[report][:staff_member_id]) ? params[report][:staff_member_id] : nil
+          - funder_id = (params[report] and params[report][:funder_id]) ? params[report][:funder_id] : nil
           -if @report.respond_to?(:from_date)
             %td
               From
@@ -56,5 +57,9 @@
             %td
               Staff member:
               =select(:staff_member_id , :collection => get_accessible_staff_members, :include_blank => true, :selected => staff_member_id)
+          -if @report.respond_to?(:funder_id)
+            %td
+              Funder:
+              =select(:funder_id , :collection => get_accessible_funders, :include_blank => true, :selected => funder_id)
           %td
             =submit "Go"

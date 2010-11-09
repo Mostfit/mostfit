@@ -68,7 +68,7 @@ class LoanHistory
     # this does not work as expected if the loan is repaid and goes back into default within the days we are looking at it.
     selects << "#{group_by}_id"
     ids  = get_latest_rows_of_loans(date, query)
-    return false if ids.length==0
+    return [] if ids.length==0
     repository.adapter.query(%Q{
          SELECT SUM(actual_outstanding_principal - scheduled_outstanding_principal) as pdiff, 
                 SUM(actual_outstanding_total - scheduled_outstanding_total) as tdiff, 
@@ -129,14 +129,11 @@ class LoanHistory
   end
 
   # TODO: subsitute the body of this function with sum_outstanding_grouped_by
-  def self.sum_outstanding_by_group(from_date, to_date, loan_product_id=nil)
-    sum_outstanding_grouped_by(to_date, [:center, :client_group], loan_product_id)
+  def self.sum_outstanding_by_group(from_date, to_date)
+    sum_outstanding_grouped_by(to_date, [:center, :client_group], extra)
   end
   
-  def self.advance_balance(to_date, group_by, loan_product_id=nil, extra=[])
-    if loan_product_id and loan_product_id.to_i>0
-      extra << "l.loan_product_id=#{loan_product_id}"
-    end
+  def self.advance_balance(to_date, group_by, extra=[])
     ids = get_latest_rows_of_loans(to_date, extra)
     return false if ids.length==0
     
@@ -152,33 +149,29 @@ class LoanHistory
     })    
   end
 
-  def self.sum_advance_payment(from_date, to_date, group_by, loan_product_id=nil, extra=[])
-    if loan_product_id and loan_product_id.to_i>0
-      extra << "l.loan_product_id=#{loan_product_id}"
-    end
-
+  def self.sum_advance_payment(from_date, to_date, group_by, extra=[])
     extra = "AND #{extra.join(' AND ')}" if extra.length>0      
+    group_by = get_group_by(group_by)
+
     repository.adapter.query(%Q{
       SELECT 
         (-1 * SUM(lh.principal_due)) AS advance_principal,
         (-1 * (SUM(lh.principal_due) + SUM(lh.interest_due))) AS advance_total,
-        lh.#{group_by}_id
+        #{group_by}
       FROM loan_history lh, loans l
-      WHERE lh.status in (5,6) AND l.id=lh.loan_id AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
+      WHERE lh.status in (5, 6) AND l.id=lh.loan_id AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
             AND lh.scheduled_outstanding_principal > lh.actual_outstanding_principal AND lh.scheduled_outstanding_total > lh.actual_outstanding_total
-            AND lh.principal_paid>0 and lh.interest_paid>0 AND l.deleted_at is NULL #{extra}
-      GROUP BY lh.#{group_by}_id;
+            AND lh.principal_paid>0 AND l.deleted_at is NULL #{extra}
+      GROUP BY #{group_by};
     })
   end
 
   # TODO: subsitute the body of this function with sum_outstanding_grouped_by
-  def self.sum_outstanding_by_center(from_date, to_date, loan_product_id=nil)
-    sum_outstanding_grouped_by(to_date, :center, loan_product_id)
+  def self.sum_outstanding_by_center(from_date, to_date, extra)
+    sum_outstanding_grouped_by(to_date, :center, extra)
   end
 
-  def self.sum_outstanding_grouped_by(to_date, group_by, loan_product_id=nil, extra=[], selects = "")
-    extra << "l.loan_product_id=#{loan_product_id}" if loan_product_id and loan_product_id.to_i>0
-
+  def self.sum_outstanding_grouped_by(to_date, group_by, extra=[], selects = "")
     ids = get_latest_rows_of_loans(to_date, extra)
     return [] if ids.length==0
     group_by = get_group_by(group_by)
@@ -201,17 +194,17 @@ class LoanHistory
     })
   end
 
-  def self.sum_outstanding_by_month(month, year, branch, loan_product_id=nil)
+  def self.sum_outstanding_by_month(month, year, branch, extra = [])
     date = Date.new(year, month, -1)
-    extra = ["lh.branch_id=#{branch.id}"]
-    sum_outstanding_grouped_by(date, :branch, loan_product_id, extra)
+    extra << ["lh.branch_id=#{branch.id}"]    
+    sum_outstanding_grouped_by(date, :branch, extra.join(" AND "))
   end
 
   def self.sum_disbursed_grouped_by(klass, conditions = {}, from_date=Date.min_date, to_date=Date.today)
     conditions[:loan] ||= {}
     conditions[:loan] +=  {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date}
     group_id  = @@selects[klass]
-    select    = "#{group_id}, SUM(l.amount) amount"    
+    select    = "#{group_id}, SUM(l.amount) amount"
     klass, obj = get_class_of(klass.all)
     froms = build_froms(klass)
     conditions  = build_conditions(klass, nil, conditions)
@@ -421,11 +414,12 @@ class LoanHistory
   def self.get_latest_rows_of_loans(date = Date.today, query="1")
     query = query.to_a.map{|k, v| 
       if v.is_a?(Array)
-        "lh.#{k} in (#{v.join(", ")})"
+        "#{k} in (#{v.join(", ")})"
       else
-        "lh.#{k}=#{v}"
+        "#{k}=#{v}"
       end
     }.join(" AND ") if query.is_a?(Hash)
+    query = query.join(" AND ") if query.is_a?(Array)
     query = "1" if query.blank?
     repository.adapter.query(%Q{
                                  SELECT lh.loan_id loan_id, max(lh.date) mdate

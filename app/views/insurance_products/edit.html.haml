@@ -1,0 +1,13 @@
+%h1
+  Edit Insurance Product
+  = @insurance_product.name
+
+= error_messages_for @insurance_product
+
+= form_for(@insurance_product, :action => url(:insurance_product, @insurance_product)) do
+  = partial :fields 
+  = submit "Update"
+
+= link_to 'Show', url(:insurance_product, @insurance_product)
+|
+= link_to 'Back', url(:insurance_products)

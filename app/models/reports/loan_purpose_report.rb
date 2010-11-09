@@ -1,5 +1,5 @@
 class LoanPurposeReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id
 
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.min_date
@@ -18,7 +18,15 @@ class LoanPurposeReport < Report
   
   def generate
     branches, centers, data, occupations, clients = {}, {}, {}, {}, {}
-    histories = LoanHistory.sum_outstanding_grouped_by(to_date, ["occupation", "branch"], loan_product_id).group_by{|x| x.branch_id}
+    extra     = []
+    extra    << "l.loan_product_id = #{loan_product_id}" if loan_product_id
+    # if a funder is selected
+    if @funder
+      funder_loan_ids = @funder.loan_ids
+      extra    << "l.id in (#{funder_loan_ids.join(", ")})" 
+    end
+
+    histories = LoanHistory.sum_outstanding_grouped_by(to_date, ["occupation", "branch"], extra).group_by{|x| x.branch_id}
     Occupation.all.each{|p| occupations[p.id]=p}
 
     @branch.each{|b|
@@ -36,6 +44,8 @@ class LoanPurposeReport < Report
     #3: Disbursal date
     hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :rejected_on => nil}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
+    hash["l.id"]           = funder_loan_ids if funder_loan_ids and funder_loan_ids.length > 0
+
     group_loans(["l.occupation_id", "c.branch_id"], "SUM(l.amount) amount, COUNT(l.id) count", hash).group_by{|x| x.branch_id}.each{|branch_id, loan_occupations|
       next unless branches.key?(branch_id)
       branch  = branches[branch_id]

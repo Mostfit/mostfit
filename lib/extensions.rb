@@ -82,8 +82,11 @@ module Misfit
           return(@funder.send(model.to_s.snake_case.pluralize, {:id => id}).length>0)
         elsif [Branch, Center, ClientGroup, Client, Loan, StaffMember, FundingLine, Funder, Portfolio].include?(model) and id==0
           return(@funder.send(model.to_s.snake_case.downcase.pluralize).length>0)
-        elsif [Browse, Report, Document, AuditTrail, Attendance, Search].include?(model)
+        elsif [Browse, Document, AuditTrail, Attendance, Search].include?(model)
           return true
+        elsif model == Report
+          return true unless @route[:report_type]
+          return FUNDER_ACCESSIBLE_REPORTS.include?(@route[:report_type])
         end
         return false
      end
@@ -123,7 +126,6 @@ module Misfit
         @controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
         @model = route[:controller].singularize.to_sym
         @action = route[:action]
-        @staff ||= self.staff_member
 
         #read only stuff
         return allow_read_only if user_role == :read_only
@@ -139,6 +141,7 @@ module Misfit
           end
         end
         
+        @staff ||= self.staff_member
         return true if @action == "redirect_to_show"
         if @controller=="documents" and CUD_Actions.include?(@action)
           return true  if params[:parent_model]=="Client"

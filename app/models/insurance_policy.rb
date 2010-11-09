@@ -14,7 +14,7 @@ class InsurancePolicy
   property :status, Enum.send("[]", *POLICY_STATUSES), :nullable => true
   property :cover_for, Enum.send("[]", *COVER_FOR), :nullable => true
 
-  belongs_to :insurance_company
+  belongs_to :insurance_product
   belongs_to :client
 
   validates_with_method :end_date_after_start_date
@@ -24,7 +24,7 @@ class InsurancePolicy
   end
 
   def description
-    "#{insurance_company.name}: Rs.#{sum_insured}"
+    "#{insurance_product.name}: Rs.#{sum_insured}"
   end
 
   private

@@ -125,7 +125,7 @@
           %td
             Currency formats
           %td
-            - formats = Numeric::Transformer.instance_variable_get("@formats").keys.map{|x| [x.to_s, "#{x.to_s} (#{100000.00.to_currency(x)})"]}.sort
+            - formats = Numeric::Transformer.instance_variable_get("@formats").keys.map{|x| [x.to_s, "#{x.to_s.camelcase(' ')} (#{100000.00.to_currency(x)})"]}.sort
             =select :currency_format, :collection => formats, :include_blank => true
         %tr
           %td{:colspan => 2}

@@ -25,13 +25,14 @@
       Days late
   - summable_columns = [4,6,7,8]
   - org_total = Array.new(summable_columns.length, 0)
-  - @data.each do |branch, centers|
+  - @data.sort_by{|branch, centers| branch.name}.each do |branch, centers|
     -branch_total = Array.new(summable_columns.length, 0)
     %tr.branch
       %td{:colspan => length+1}
         = branch.name
-    - centers.each do |center, loans|
+    - centers.sort_by{|center, loans| center.name}.each do |center, loans|
       -center_total = []
+      -next unless loans.length > 0
       %tr.center
         %td{:colspan => length+1}
           = center.name
@@ -41,16 +42,16 @@
           %td
           -l.each_with_index do |e, i|
             %td
-              = e
+              = e.is_a?(Numeric) ? e.to_currency : e
       - center_total = center_total.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}}
       %tr.center_total
         %td
           Center total
         -0.upto(length-1).each do |col|
           %td
-            -if summable_columns.include?(col)
+            -if summable_columns.include?(col) and center_total[summable_columns.index(col)]
               %b
-                =center_total[summable_columns.index(col)]
+                = center_total[summable_columns.index(col)].to_currency
         -branch_total.push(center_total) if center_total.class==Array
     -branch_total=branch_total.reject{|x| x.class!=Array or x.length!=summable_columns.length}.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}}
     %tr.branch_total
@@ -58,9 +59,9 @@
         Branch total
         -0.upto(length-1).each do |col|
           %td
-            -if summable_columns.include?(col)
+            -if summable_columns.include?(col) and branch_total[summable_columns.index(col)]
               %b
-                =branch_total[summable_columns.index(col)]
+                =branch_total[summable_columns.index(col)].to_currency
         - org_total.push(branch_total)
   %tr.org_total
     %td
@@ -68,6 +69,6 @@
     -org_total = org_total.reject{|x| x.class!=Array or x.length!=summable_columns.length}.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}}
     -0.upto(length-1).each do |col|
       %td
-        -if summable_columns.include?(col)
+        -if summable_columns.include?(col) and org_total[summable_columns.index(col)]
           %b
-            =org_total[summable_columns.index(col)]
+            =org_total[summable_columns.index(col)].to_currency

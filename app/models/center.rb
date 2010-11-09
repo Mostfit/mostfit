@@ -94,19 +94,23 @@ class Center
       @meeting_days[-1].meeting_day
     end
   end
-
+    
   def next_meeting_date_from(date)
-    meeting_wday = Center.meeting_days.index(meeting_day_for(date+7))
-    next_meeting_date = date - date.wday + meeting_wday
-    next_meeting_date += 7 if next_meeting_date - date < 7
-    next_meeting_date.holiday_bump
+    number = get_meeting_date(date, :next)
+    if (date + number - get_meeting_date(date + number, :previous)).cweek == (date + number).cweek
+      (date + number + get_meeting_date(date + number, :next)).holiday_bump
+    else
+      (date + number).holiday_bump
+    end
   end
 
   def previous_meeting_date_from(date)
-    meeting_wday = Center.meeting_days.index(meeting_day_for(date-7))
-    previous_meeting_date = date - 7 - (date - 7).wday + meeting_wday
-    previous_meeting_date -= 7 if date - previous_meeting_date < 7
-    previous_meeting_date.holiday_bump
+    number = get_meeting_date(date, :previous)
+    if (date - number - get_meeting_date(date - number, :previous)).cweek == (date - number).cweek
+      (date - number - get_meeting_date(date - number, :previous)).holiday_bump
+    else
+      (date - number).holiday_bump
+    end
   end
 
 
@@ -196,4 +200,19 @@ class Center
   def set_meeting_change_date
     self.meeting_day_change_date = self.creation_date
   end
+
+  def get_meeting_date(date, direction)
+    number = 1
+    if direction == :next
+      while (date + number).wday != Center.meeting_days.index(meeting_day_for(date + number))
+        number += 1
+      end
+    else
+      while (date - number).wday != Center.meeting_days.index(meeting_day_for(date - number))
+        number += 1
+      end
+    end
+    return number
+  end
+
 end

@@ -23,12 +23,13 @@ class ProjectedReport < Report
     repository.adapter.query(%Q{SELECT branch_id, date, center_id, SUM(principal_due) principal, SUM(interest_due) interest, 
                                        scheduled_outstanding_principal, scheduled_outstanding_total,
                                        actual_outstanding_principal, actual_outstanding_total
-                                FROM loan_history 
-                                WHERE date <= '#{self.to_date.strftime('%Y-%m-%d')}' AND date >= '#{self.from_date.strftime('%Y-%m-%d')}'
-                                GROUP BY branch_id, date, center_id}).group_by{|lh| 
+                                FROM loan_history lh, loans l
+                                WHERE lh.date <= '#{self.to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{self.from_date.strftime('%Y-%m-%d')}' AND #{extra.join( ' AND ')}
+                                      AND lh.loan_id = l.id AND l.deleted_at is NULL
+                                GROUP BY lh.branch_id, lh.date, lh.center_id}).group_by{|lh| 
       lh.branch_id
     }.map{|bid, dates| [bid, dates.group_by{|d| d.date}]}.to_hash.each{|bid, dates|
-      branch = Branch.get(bid)
+      next unless branch = @branch.find{|b| b.id == bid}
       data[branch] ||= {}
       branches[bid] = branch
       
@@ -36,7 +37,7 @@ class ProjectedReport < Report
         next if rows.length == 0
         data[branch][date] = {}
         rows.each{|row|
-          center = @center.find{|c| c.id == row.center_id}
+          next unless center = @center.find{|c| c.id == row.center_id}
           data[branch][date][center] = [0, 0, 0, 0, 0, 0, 0]
           #0              1                2              3                 4                 5,                  6                    7      
           #amount_applied,amount_santioned,outstanding(p),outstanding(i),outstanding(fee),Outstanding(total),principal(scheduled),interest(scheudled),fee(scheduled)

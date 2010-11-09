@@ -4,7 +4,7 @@ class Portfolios < Application
 
   def index
     @portfolios = Portfolio.all
-    display @portfolios
+    redirect resource(@funder)
   end
 
   def show(id)

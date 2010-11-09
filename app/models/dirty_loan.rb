@@ -55,8 +55,8 @@ class DirtyLoan
             self.clear
             counter = 0
           end
-          sleep 1
-          counter += 1
+          sleep 30
+          counter += 10
         end        
       }
       return true

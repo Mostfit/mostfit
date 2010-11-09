@@ -10,7 +10,7 @@
       %th
         policy details
       %th
-        insurance company
+        Insurance Product
       %th
         actions
       
@@ -22,7 +22,7 @@
       %td
         = link_to insurance_policy.description, resource(insurance_policy.client, insurance_policy)
       %td
-        = link_to insurance_policy.insurance_company.name, resource(insurance_policy.insurance_company)
+        = link_to insurance_policy.insurance_product.name, resource(insurance_policy.insurance_product)
       %td
         = link_to 'Show', resource(@client, insurance_policy)
         |

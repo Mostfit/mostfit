@@ -37,7 +37,7 @@ class Portfolio
       taken_loans << "l.id not in (#{pids.join(', ')})"
     end
 
-    data = LoanHistory.sum_outstanding_grouped_by(Date.today, [:center, :branch], nil, taken_loans).group_by{|x| x.branch_id}.map{|bid, centers| 
+    data = LoanHistory.sum_outstanding_grouped_by(Date.today, [:center, :branch], taken_loans).group_by{|x| x.branch_id}.map{|bid, centers| 
       [Branch.get(bid), centers.group_by{|x| x.center_id}.map{|cid, rows| [centers_hash[cid], rows.first]}.to_hash]
     }.to_hash
   end
@@ -79,8 +79,13 @@ class Portfolio
         loan_ids << l.loan_id
       }
     end
-    last_payment = Payment.all(:loan_id => loan_ids).max(:received_on)
-    outstanding_value = portfolio_loans.aggregate(:current_value.sum) || 0
-    repository.adapter.execute("UPDATE portfolios SET outstanding_value=#{outstanding_value}, outstanding_calculated_on=NOW(), last_payment_date='#{last_payment.strftime('%Y-%m-%d')}' WHERE id=#{self.id}")
+    if loan_ids.length > 0
+      last_payment = Payment.all(:loan_id => loan_ids).max(:received_on)
+      outstanding_value = portfolio_loans.aggregate(:current_value.sum) || 0
+      repository.adapter.execute(%Q{
+                                     UPDATE portfolios SET outstanding_value=#{outstanding_value}, outstanding_calculated_on=NOW(), last_payment_date='#{last_payment.strftime('%Y-%m-%d')}'
+                                     WHERE id=#{self.id}
+                                 })
+    end
   end
 end

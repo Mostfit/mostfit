@@ -219,9 +219,9 @@ class Client
     pay_order = fee_schedule.keys.sort.map{|d| fee_schedule[d].keys}.flatten
     pay_order.each do |k|
       if fees_payable_on(date).has_key?(k)
-        if pay = Payment.create(:amount => [fp[k], amount].min, :type => :fees, :received_on => date, :comment => k.name, :fee => k,
-                                :received_by => received_by, :created_by => created_by, :client => self)
-
+        pay = Payment.new(:amount => [fp[k], amount].min, :type => :fees, :received_on => date, :comment => k.name, :fee => k,
+                          :received_by => received_by, :created_by => created_by, :client => self)        
+        if pay.save_self
           amount -= pay.amount
           fp[k] -= pay.amount
         else
