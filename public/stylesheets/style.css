@@ -950,7 +950,6 @@ a.expand_collapsed{
     padding: 5px;
     background: #eee;
     z-index: 1;
-    width: 800px;
 }
 .floatingBox table{
     float: left;
