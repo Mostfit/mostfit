@@ -207,6 +207,13 @@ class Loans < Application
     end
   end
 
+  def repair(id)
+    loan = Loan.get(id)
+    raise NotFound unless loan
+    loan.update_history
+    redirect("/loans/#{loan.id}")
+  end
+
   private
   def get_context
     if params[:id]

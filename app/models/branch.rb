@@ -68,9 +68,9 @@ class Branch
 
   def self.search(q)
     if /^\d+$/.match(q)
-      Branch.all(:conditions => {:id => q})
+      Branch.all(:conditions => {:id => q}, :limit => 10)
     else
-      Branch.all(:conditions => ["code=? or name like ?", q, q+'%'])
+      Branch.all(:conditions => ["code=? or name like ?", q, q+'%'], :limit => 10)
     end
   end
   
