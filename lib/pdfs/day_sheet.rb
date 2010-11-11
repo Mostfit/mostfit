@@ -1,12 +1,13 @@
 module Pdf
   module DaySheet
     def generate_pdf
-      pdf = PDF::Writer.new(:orientation => :landscape)
+      pdf = PDF::Writer.new(:orientation => :landscape, :paper => "A4")
       pdf.select_font "Times-Roman"
       pdf.text "Daily Collection Sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
       pdf.text("\n")
-      days_absent = Attendance.all(:status => "absent", :center => @centers).aggregate(:client_id, :all.count).to_hash
-      @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each_with_index{|center, idx|
+      days_absent = Attendance.all(:status => "absent", :center => @centers).aggregate(:client_id, :all.count).to_hash 
+      days_present = Attendance.all(:center => @centers).aggregate(:client_id, :all.count).to_hash
+         @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each_with_index{|center, idx|
         pdf.start_new_page if idx > 0
         pdf.text "Center: #{center.name}, Manager: #{@staff_member.name}, signature: ______________________", :font_size => 12, :justification => :left
         pdf.text("Center leader: #{center.leader.client.name}, signature: ______________________", :font_size => 12, :justification => :left) if center.leader
@@ -45,9 +46,7 @@ module Pdf
               table.data.push({"name" => client.name, "loan id" => loan.id, "amount" => loan.amount.to_currency, 
                                 "outstanding" => actual_outstanding.to_currency, "status" => lh.status.to_s,                                
                                 "disbursed" => loan.disbursal_date.to_s, "installment" =>  number_of_installments,
-                                "principal" => principal_due.to_currency, "interest" => interest_due.to_currency, "days absent" => days_absent[client.id]||0,
-                                "fee"          => fee.to_currency, "total due" =>  total_due.to_currency, "attendance" => ""
-                              })
+                                "principal" => principal_due.to_currency, "interest" => interest_due.to_currency, "days absent/total" => (days_absent[client.id]||0).to_s / (days_present[client.id]||0).to_s,"fee" => fee.to_currency, "total due" =>  total_due.to_currency, "signature" => "" })
               group_amount       += loan.amount
               group_outstanding  += actual_outstanding
               group_installments += number_of_installments
@@ -57,7 +56,7 @@ module Pdf
               group_due          += total_due
             } # loans end
             if loan_row_count==0
-              table.data.push({"name" => client.name, "attendance" => "", "status" => "nothing outstanding"})              
+              table.data.push({"name" => client.name, "signature" => "", "status" => "nothing outstanding"})              
             end
           } #clients end
           table.data.push({"amount" => group_amount.to_currency, "outstanding" => group_outstanding.to_currency,
@@ -78,8 +77,7 @@ module Pdf
                           "total due" => (tot_principal + tot_interest + tot_fee).to_currency
                         })
         
-        table.column_order  = ["name", "loan id" , "amount", "outstanding", "status", "disbursed", "installment", "principal", "interest",
-                               "fee", "total due", "days absent", "attendance"]
+        table.column_order  = ["name", "loan id" , "amount", "outstanding", "status", "disbursed", "installment", "principal", "interest", "fee", "total due", "days absent/total", "signature"]
         table.show_lines    = :all
         table.show_headings = true
         table.shade_rows    = :none
