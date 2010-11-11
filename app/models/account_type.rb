@@ -1,4 +1,5 @@
 class AccountType
+  attr_accessor :debit, :credit, :balance, :opening_balance
   include DataMapper::Resource
   
   property :id,   Serial

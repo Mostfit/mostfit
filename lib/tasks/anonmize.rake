@@ -24,7 +24,7 @@ namespace :mostfit do
           repository.adapter.execute("update #{table} set spouse_name='#{model_string} #{idx+1}' where id=#{obj.id}") if model==Client
         end        
       end
-      User.all(:login.not => "admin").destroy!
+      #User.all(:login.not => "admin").destroy!
       
     end
   end

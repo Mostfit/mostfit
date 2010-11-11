@@ -1017,5 +1017,12 @@ $(document).ready(function(){
     }
   });
   floatHeaders();
+  if($("#tree").length>0){
+      $("#tree").treeview({
+	collapsed: true,
+	animated: "medium",
+	control:"#sidetreecontrol"
+      });
+  }
 });
 
