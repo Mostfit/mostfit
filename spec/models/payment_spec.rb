@@ -62,24 +62,28 @@ describe Payment do
     @loan.applied_by       = @manager
     @loan.funding_line     = @funding_line
     @loan.client           = @client
-    @loan.approved_on = "2000-02-03"
-    @loan.approved_by = @manager
-    @loan.disbursal_date = @loan.scheduled_disbursal_date
-    @loan.disbursed_by = @manager
-    @loan.loan_product = @loan_product
-    @loan.save
+    @loan.approved_on      = "2000-02-03"
+    @loan.approved_by      = @manager
+    @loan.disbursal_date   = @loan.scheduled_disbursal_date
+    @loan.disbursed_by     = @manager
+    @loan.loan_product     = @loan_product
+    @loan.save.should be_true
     @loan.errors.each {|e| puts e}
     @loan.should be_valid
   end
-
+  
   before(:each) do
+    @loan.payments.each{|p| p.destroy!}
     @user.active = true
     @manager.active = true
-    @payment = Payment.new(:amount =>1000,:type => :principal,:received_on=>"2000-12-06")
-    @payment.created_by=@user
-    @payment.received_by=@manager
-    @payment.loan=@loan
+
+    @payment = Payment.new(:amount => 10,:type => :principal, :received_on=>"2000-12-06")
+    @payment.created_by = @user
+    @payment.received_by = @manager
+    @payment.loan = @loan
+    @payment.client = @client
     @payment.valid?
+    @payment.save
     @payment.errors.each {|e| puts e}
     @payment.should be_valid
   end
@@ -108,8 +112,8 @@ describe Payment do
     @payment.deleted_by=@user
     @payment.deleted_at=nil
     @payment.should_not be_valid
-    @payment.deleted_at="2009-02-02"
-    @payment.should be_valid	
+    @payment.deleted_at=Date.parse("2009-02-02")
+    @payment.should be_valid
   end
   it "should not be valid if date of receival is in future" do
     @payment.received_on=Date.new() + 10
@@ -144,6 +148,21 @@ describe Payment do
     @payment.should_not be_valid
   end
 
+  it "should not be deleteable if verified" do    
+    payment = Payment.first(:loan_id => @loan.id)
+    payment.verified_by = @user
+    payment.save.should be_true
+    payment.deleted_by=@user
+    payment.deleted_at=Date.parse("2009-02-02")
+    payment.save.should be_false
 
+    payment = Payment.first(:loan_id => @loan.id)
+    payment.verified_by = nil
+    payment.save.should be_true
+    
+    payment.deleted_by=@user
+    payment.deleted_at=Date.parse("2009-02-02")
+    payment.save.should be_true
+  end
 
 end

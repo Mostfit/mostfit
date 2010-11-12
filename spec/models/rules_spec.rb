@@ -61,9 +61,12 @@ describe Rules do
     @loan_product.save
     @loan_product.errors.each {|e| puts e}
     @loan_product.should be_valid
-    
-
   end
+
+  after(:all) do
+    Rule.all.each{|r| r.destroy}
+  end
+
 
   it "should handle a basic condition" do
     @basic_condition1 = Mostfit::Business::BasicCondition.get_basic_condition(:var1 => "client.center.branch.centers.count", :binaryoperator => "", :var2 => 0, :comparator => :greater_than_equal, :const_value =>  5)

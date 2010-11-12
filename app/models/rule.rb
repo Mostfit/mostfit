@@ -25,15 +25,15 @@ class Rule
   validates_with_method :apply_rule
 
   after :destroy do
- 		h = {:name => @name, :model_name => @model_name}
+    h = {:name => @name, :model_name => @model_name}
     #puts "Removed Rule"
-	  Mostfit::Business::Rules.remove_rule h
+    Mostfit::Business::Rules.remove_rule h
   end
 
   after :update do
- 		h = {:name => @name, :model_name => @model_name}
+    h = {:name => @name, :model_name => @model_name}
     #puts "Removed Rule"
-	  Mostfit::Business::Rules.remove_rule h
+    Mostfit::Business::Rules.remove_rule h
     self.apply_rule #remove and re-apply rule
   end
 

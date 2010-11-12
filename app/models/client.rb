@@ -114,6 +114,7 @@ class Client
   validates_present   :center
   validates_present   :date_joined
   validates_is_unique :reference
+  validates_with_method  :verified_by_user_id,          :method => :verified_cannot_be_deleted, :on => [:destroy]
   validates_attachment_thumbnails :picture
   validates_with_method :dates_make_sense
 
@@ -292,5 +293,10 @@ class Client
     return [false, "Client cannot die before he became a client"] if deceased_on and (deceased_on < date_joined or deceased_on < grt_pass_date)
     true
   end
+
+  def verified_cannot_be_deleted
+    return true unless verified_by_user_id
+    [false, "Verified loan. Cannot be deleted"]
+  end  
 end
 

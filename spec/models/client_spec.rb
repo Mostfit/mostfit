@@ -126,6 +126,15 @@ describe Client do
     @client.loans.size.should eql(2)
   end
 
+  it "should not be deleteable if verified" do
+    @client.verified_by_user_id = User.first
+    @client.save
+    @client.destroy.should_not be_true
+
+    @client.verified_by_user_id = nil
+    @client.destroy.should be_true
+  end
+
   it "should not have more than one outstanding loan at a time if so specified"
 
   it "should deal with death of a client" do

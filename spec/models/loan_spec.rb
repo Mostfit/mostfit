@@ -514,6 +514,15 @@ describe Loan do
     end
   end
 
+  it "should not be deleteable if verified" do
+    @loan.verified_by_user_id = User.first
+    @loan.save
+    @loan.destroy.should_not be_true
+
+    @loan.verified_by_user_id = nil
+    @loan.destroy.should be_true
+  end
+    
   it ".installment_dates should correctly deal with holidays" do
     Holiday.all.destroy!
     d1 = @loan.installment_dates[5]

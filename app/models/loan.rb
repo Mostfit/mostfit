@@ -4,7 +4,7 @@ class Loan
   before :valid?,  :convert_blank_to_nil
   after  :save,    :update_history  # also seems to do updates
   before :create,  :update_cycle_number
-  after  :destroy, :update_history
+#  after  :destroy, :update_history
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
   attr_accessor :interest_percentage
@@ -71,6 +71,7 @@ class Loan
   belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
   belongs_to :created_by,     :child_key => [:created_by_user_id],        :model => 'User'
   belongs_to :loan_utilization
+  belongs_to :verified_by,    :child_key => [:verified_by_user_id],        :model => 'User'
 
   has n, :history,                                                        :model => 'LoanHistory'
   has n, :payments
@@ -108,6 +109,7 @@ class Loan
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :cheque_number,                :method => :check_validity_of_cheque_number
   validates_with_method  :client_active,                :method => :is_client_active
+  validates_with_method  :verified_by_user_id,          :method => :verified_cannot_be_deleted, :on => [:destroy]
 
   #product validations
 
@@ -763,8 +765,7 @@ class Loan
       @status =  :outstanding
     end
   end
-
-
+  
   # LOAN INFO FUNCTIONS - DATES
   def installment_for_date(date = Date.today)
     installment_dates.select{|d| d <= date}.count
@@ -957,7 +958,6 @@ class Loan
   end
 
   ## validations: read their method name and error to see what they do.
-
   def dates_are_not_holidays
     h = ["scheduled_disbursal_date", "scheduled_first_payment_date"].map{|d| [d,Misfit::Config.holidays.include?(self.send(d))]}.reject{|e| e[1] == false}
     return true if h.blank?
@@ -1035,6 +1035,10 @@ class Loan
     end
     return true
   end
+  def verified_cannot_be_deleted
+    return true unless verified_by_user_id
+    [false, "Verified loan. Cannot be deleted"]
+  end  
 end
 
 class DefaultLoan < Loan
@@ -1195,7 +1199,6 @@ class PararthRounded < Loan
     super
     @_rounding_schedule = nil
   end
-    
 end
 
 
