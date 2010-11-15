@@ -17,18 +17,21 @@ class Verifications < Application
       @loans    = loans.paginate(:page => params[:page], :per_page => 20)
     when "payments"
       @payments = payments.paginate(:page => params[:page], :per_page => 100)
+    when "portfolios"
+      @portfolios = portfolios.paginate(:page => params[:page], :per_page => 100)
     else
       if @centers.length>0
         @clients_count  = clients.count
         @loans_count    = loans.count
         @payments_count = payments.count
+        @portfolios_count = portfolios.count
       end
     end
     display "verifications/index"
   end
 
   def update(id)
-    if ["clients", "loans", "payments"].include?(id) and params[id]
+    if ["clients", "loans", "payments", "portfolios"].include?(id) and params[id]
       klass = Kernel.const_get(id.singularize.capitalize)
       verifier_id = session.user.id
       ids = params[id].keys.collect{|x| x.to_i}.join(',')
@@ -62,6 +65,17 @@ class Verifications < Application
     hash[:created_at] = @from_date..@to_date
     hash[:fields]     = [:id]
     Payment.all(hash)
+  end
+
+  def portfolios(centers = nil, type = :objects)
+    hash = {:verified_by_user_id => nil}
+    if session.user.role==:admin
+      hash[:created_at] = @from_date..@to_date
+      hash[:fields]     = [:id]
+      Portfolio.all(hash)
+    else
+      Portfolio.all(:id => nil)
+    end
   end
 
   def centers(user)

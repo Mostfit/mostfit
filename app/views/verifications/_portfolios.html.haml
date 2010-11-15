@@ -1,0 +1,38 @@
+%h2
+  Portfolios
+=form_for(@clients, :action => url("verifications/update/portfolios")) do
+  - if @portfolios and @portfolios.length>0
+    %table{:width => "100%"}
+      %tr{:style => "text-align: left;"}
+        %th
+          Name
+        %th
+          Funder
+        %th
+          Created by
+        %th
+          Creation date
+        %th
+          %a{:href => "#", :onclick => "$('input.client_approval_box').attr('checked', true);"}
+            Check all
+          ==/
+          %a{:href => "#", :onclick => "$('input.client_approval_box').attr('checked',false);"}
+            Check none
+      -@portfolios.each do |portfolio|
+        %tr
+          %td
+            =link_to(portfolio.name, resource(portfolio.funder), :target => "BLANK")
+          %td
+            =portfolio.funder.name
+          %td
+            =portfolio.created_by.name if portfolio.created_by
+          %td
+            =portfolio.created_at.strftime(Mfi.first.date_format)
+          %td
+            =check_box(:name => "portfolios[#{portfolio.id}][]", :class => "client_approval_box", :value => 1)
+      %tr
+        %td{:colspan => 8}
+        %td
+          =submit("Approve")
+  -else
+    %i==No pending verifications

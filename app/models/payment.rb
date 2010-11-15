@@ -68,7 +68,7 @@ class Payment
 
   def verified_cannot_be_deleted
     return true unless verified_by_user_id
-    [false, "Verified loan. Cannot be deleted"]
+    [false, "Verified payment. Cannot be deleted"]
   end
 
   def total

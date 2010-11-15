@@ -2,12 +2,13 @@ class Portfolio
   include DataMapper::Resource
   attr_accessor :centers
 
-  after  :save, :process_portfolio_details
-  after  :save, :update_portfolio_value
+  before :destroy, :verified_cannot_be_deleted
+  after  :save,    :process_portfolio_details
+  after  :save,    :update_portfolio_value
   
   property :id, Serial
   property :name, String, :index => true, :nullable => false, :length => 3..20
-  property :funder_id, Integer, :index => true, :nullable => true
+  property :funder_id, Integer, :index => true, :nullable => false
   property :start_value, Float, :nullable => true
   property :outstanding_value, Float, :nullable => true
   property :principal_repaid, Float, :nullable => true
@@ -15,6 +16,8 @@ class Portfolio
   property :fees_repaid, Float, :nullable => true
   property :last_payment_date, Date, :nullable => true
   property :outstanding_calculated_on, DateTime, :nullable => true
+  property :verified_by_user_id,            Integer, :nullable => true, :index => true
+  property :created_by_user_id,  Integer, :nullable => false, :index => true
 
   property :created_at, DateTime, :default => Time.now
   property :updated_at, DateTime, :default => Time.now
@@ -22,9 +25,11 @@ class Portfolio
   belongs_to :funder
   has n, :portfolio_loans
   has n, :loans, :through => :portfolio_loans
+  belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
 
   validates_is_unique :name
-
+  belongs_to :verified_by, :child_key => [:verified_by_user_id], :model => 'User'
+  validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :when => [:destroy]
 
   def eligible_loans
     centers_hash = {}
@@ -87,5 +92,10 @@ class Portfolio
                                      WHERE id=#{self.id}
                                  })
     end
+  end
+
+  def verified_cannot_be_deleted
+    return true unless verified_by_user_id
+    throw :halt
   end
 end
