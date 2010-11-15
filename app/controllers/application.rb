@@ -46,7 +46,12 @@ class Application < Merb::Controller
       error += " it has already been disbursed and "
     end
 
-    # if flag is still set to true delete the object
+    if obj.respond_to?(:verified_by) and obj.verified_by
+      flag = false
+      error += "verified data cannot be deleted"
+    end
+
+      # if flag is still set to true delete the object
     if flag == true and obj.destroy
       # delete all the loan history
       LoanHistory.all(:loan_id => obj.id).destroy if model  == Loan

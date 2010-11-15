@@ -127,11 +127,11 @@ describe Client do
   end
 
   it "should not be deleteable if verified" do
-    @client.verified_by_user_id = User.first
+    @client.verified_by = User.first
     @client.save
     @client.destroy.should_not be_true
 
-    @client.verified_by_user_id = nil
+    @client.verified_by = nil
     @client.destroy.should be_true
   end
 

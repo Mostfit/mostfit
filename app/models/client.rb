@@ -116,7 +116,7 @@ class Client
   validates_is_unique :reference
   validates_with_method  :verified_by_user_id,          :method => :verified_cannot_be_deleted, :on => [:destroy]
   validates_attachment_thumbnails :picture
-  validates_with_method :dates_make_sense
+  validates_with_method :dates_make_sense, :when => [:create, :update, :save]
 
   def self.from_csv(row, headers)
     if center_attr = row[headers[:center]].strip
@@ -296,7 +296,7 @@ class Client
 
   def verified_cannot_be_deleted
     return true unless verified_by_user_id
-    [false, "Verified loan. Cannot be deleted"]
+    [false, "Verified client. Cannot be deleted"]
   end  
 end
 

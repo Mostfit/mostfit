@@ -5,15 +5,15 @@
     %input{:type => "hidden", :name => "model", :value => params[:model]}
     %b
       Date range:     
-    =date_select("from_date", @from_date)
+    =date_select("from_date", @from_date.strftime(Mfi.first.date_format))
     ==-- 
-    =date_select("to_date", @to_date)
+    =date_select("to_date", @to_date.strftime(Mfi.first.date_format))
     %input{:type => "submit", :value => "Filter"}
-  =partial "verifications/#{params[:model]}" rescue nil
+  =partial "verifications/#{params[:model]}"
 -else
   %br
   %ul
-    -[:clients, :loans, :payments].each do |model|
+    -[:clients, :loans, :payments, :portfolios].each do |model|
       %li
         =link_to("List unverified #{model}", resource(:verifications, {:model => model}))
         (
