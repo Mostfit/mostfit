@@ -152,7 +152,7 @@ module Mostfit
           Rule.all.each do |r|
             r.apply_rule
           end
-        rescue #TODO find a better way of handling situation when rules table is missing
+        rescue Exception => e#TODO find a better way of handling situation when rules table is missing
           puts "Rules Engine not deployed. continuing"
         end
         #        load(File.join(Merb.root, "config", "rules.rb"))
@@ -286,12 +286,15 @@ module Mostfit
         if(hash[:model_name].class != Class)
           hash[:model_name] = Kernel.const_get(hash[:model_name].camelcase)
         end
+        hash[:name] = hash[:name].to_s.downcase.gsub(" ", "_")        
         if hash[:model_name].new.respond_to?(hash[:name])
           hash[:model_name].send(:define_method, hash[:name]) do
             return true #overwrite the old function
           end
+          return true
+        else
+          return false
         end
-        return true
       end
       
       def self.rules

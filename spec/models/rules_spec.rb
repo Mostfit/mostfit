@@ -63,10 +63,6 @@ describe Rules do
     @loan_product.should be_valid
   end
 
-  after(:all) do
-    Rule.all.each{|r| r.destroy}
-  end
-
 
   it "should handle a basic condition" do
     @basic_condition1 = Mostfit::Business::BasicCondition.get_basic_condition(:var1 => "client.center.branch.centers.count", :binaryoperator => "", :var2 => 0, :comparator => :greater_than_equal, :const_value =>  5)
@@ -346,7 +342,6 @@ describe Rules do
     @region.should_not be_valid
     @region.save
     Mostfit::Business::Rules.remove h
-
   end
 
   it "should handle string comparison rule" do
@@ -659,7 +654,7 @@ describe Rules do
 
   it "(TESTCASE05) branch manager should not be able to disburse more than 10K loan" do     
     
-    h = {:name => :should_not_disburse_more_than_10K_loan, :model_name => Loan, :on_action => :save, 
+    h = {:name => :should_not_disburse_more_than_10k_loan, :model_name => Loan, :on_action => :save, 
       :precondition => { :var1 => "disbursed_by_staff_id", :var2 => 0,
         :binaryoperator => "", :comparator => :equal,:const_value => @branch_manager.id},
       :condition => { :var1 => "amount_sanctioned", :var2 => 0 ,:binaryoperator => "", :comparator => :less_than_equal ,:const_value =>10000 }}
@@ -729,7 +724,7 @@ describe Rules do
     @area.save
     @area.should be_valid
 
-    h = {:name => :should_not_disburse_more_than_50K_loan, :model_name => Loan, :on_action => :save,
+    h = {:name => :should_not_disburse_more_than_50k_loan, :model_name => Loan, :on_action => :save,
       #       :precondition => { :var1 => "disbursed_by_staff_id", :var2 => 0, #why this (pre)condition, it looks meaningless to me - ashishb
       #         :binaryoperator => "", :comparator => :equal,:const_value => 1},
       :condition => {:var1 => "amount_sanctioned",:var2 => 0 ,:binaryoperator => "", :comparator => :less_than_equal,:const_value =>50000 } }
@@ -753,7 +748,7 @@ describe Rules do
     @loan.should_not be_valid
     
     @loan.destroy!
-    Mostfit::Business::Rules.remove h
+    p Mostfit::Business::Rules.remove h
 
   end
 
@@ -1004,7 +999,6 @@ describe Rules do
     @loan.should_not be_valid
     @loan.interest_rate = 0.10
     @loan.should be_valid
-    
     Mostfit::Business::Rules.remove h
   end
 end  

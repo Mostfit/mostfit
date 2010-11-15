@@ -129,7 +129,7 @@ describe Client do
   it "should not be deleteable if verified" do
     @client.verified_by = User.first
     @client.save
-    @client.destroy.should_not be_true
+    @client.destroy.should be_false
 
     @client.verified_by = nil
     @client.destroy.should be_true

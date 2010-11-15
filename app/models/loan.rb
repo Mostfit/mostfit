@@ -4,6 +4,7 @@ class Loan
   before :valid?,  :convert_blank_to_nil
   after  :save,    :update_history  # also seems to do updates
   before :create,  :update_cycle_number
+  before :destroy, :verified_cannot_be_deleted
 #  after  :destroy, :update_history
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
@@ -20,6 +21,8 @@ class Loan
   property :interest_rate,                  Float, :nullable => false, :index => true
   property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
   property :number_of_installments,         Integer, :nullable => false, :index => true
+  property :client_id,                      Integer, :nullable => false, :index => true
+
   property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false, :index => true
   property :scheduled_first_payment_date,   Date, :nullable => false, :auto_validation => false, :index => true
   property :applied_on,                     Date, :nullable => false, :auto_validation => false, :index => true
@@ -109,7 +112,7 @@ class Loan
   validates_with_method  :scheduled_disbursal_date,     :method => :scheduled_disbursal_before_scheduled_first_payment?
   validates_with_method  :cheque_number,                :method => :check_validity_of_cheque_number
   validates_with_method  :client_active,                :method => :is_client_active
-  validates_with_method  :verified_by_user_id,          :method => :verified_cannot_be_deleted, :on => [:destroy]
+  validates_with_method  :verified_by_user_id,          :method => :verified_cannot_be_deleted, :if => Proc.new{|x| x.deleted_at != nil}
 
   #product validations
 
@@ -525,7 +528,6 @@ class Loan
     # this is the fount of all knowledge regarding the scheduled payments for the loan. 
     # it feeds into every other calculation about the loan schedule such as get_scheduled, calculate_history, etc.
     # if this is wrong, everything about this loan is wrong.
-
     return @schedule if @schedule
     @schedule = {}
     principal_so_far = interest_so_far = fees_so_far = total = 0
@@ -1037,8 +1039,8 @@ class Loan
   end
   def verified_cannot_be_deleted
     return true unless verified_by_user_id
-    [false, "Verified loan. Cannot be deleted"]
-  end  
+    throw :halt
+  end
 end
 
 class DefaultLoan < Loan
