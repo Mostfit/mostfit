@@ -55,8 +55,8 @@ module Reporting
     def active_client_count(date = Date.today)      
       ids = repository.adapter.query(%Q{
                   SELECT loan_id, max(date) date
-                  FROM loan_history, clients cl 
-                  WHERE cl.date_joined <= '#{date.strftime('%Y-%m-%d')}' AND status in (5,6,7,8,9)
+                  FROM loan_history lh, clients cl 
+                  WHERE lh.client_id=cl.id AND cl.date_joined <= '#{date.strftime('%Y-%m-%d')}' AND status in (5,6,7,8,9)
                   GROUP BY loan_id}).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
       return false if ids.length==0     
       query_as_hash(%Q{
