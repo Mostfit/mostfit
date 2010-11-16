@@ -5,7 +5,7 @@ class TrialBalanceReport < Report
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.min_date
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
     @name      = "Trial Balance"
-    @branch_id = params[:branch_id] if params.key?(:branch_id) and not params[:branch_id].blank?
+    @branch_id = params[:branch_id] if params and params.key?(:branch_id) and not params[:branch_id].blank?
   #  @page      = params[:page] ||0
     get_parameters(params, user)
   end
