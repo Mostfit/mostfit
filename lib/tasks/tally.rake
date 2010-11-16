@@ -1,7 +1,3 @@
-require "rubygems"
-require 'iconv'
-require 'nokogiri'
-
 # Add the local gems dir if found within the app root; any dependencies loaded
 # hereafter will try to load from the local gems before loading system gems.
 if (local_gem_dir = File.join(File.dirname(__FILE__), '..', '..', 'gems')) && $BUNDLE.nil?
@@ -16,6 +12,7 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 namespace :mostfit do
   namespace :tally do
+
     def get_account_type(name)
       if name.include?("assets") or name.include?("investment") or name.include?("capital account") 
         AccountType.first(:name => "Assets")
@@ -31,6 +28,8 @@ namespace :mostfit do
     end
     desc "Create accounts from tally XML dump"    
     task :coa_import do
+      require 'iconv'
+      require 'nokogiri'
       str  = Iconv.iconv("LATIN1", "UTF-16", File.read(ARGV[1]))[0].downcase
       doc = Nokogiri(str)
       accounts = {}
