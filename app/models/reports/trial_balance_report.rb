@@ -1,10 +1,11 @@
 class TrialBalanceReport < Report
-  attr_accessor :from_date, :to_date, :account, :account_id, :journal,:posting, :account_type_id
+  attr_accessor :from_date, :to_date, :account, :account_id, :journal,:posting, :account_type_id, :branch, :branch_id
 
   def initialize(params,dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.min_date
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
     @name      = "Trial Balance"
+    @branch_id = params[:branch_id] if params.key?(:branch_id) and not params[:branch_id].blank?
   #  @page      = params[:page] ||0
     get_parameters(params, user)
   end
@@ -18,9 +19,9 @@ class TrialBalanceReport < Report
   end
 
 
-  def generate(param)  
+  def generate(param)
     data = {}
-    Account.all(:order => [:account_type_id.asc], :parent_id => nil).group_by{|account| account.account_type}.each{|account_type, accounts|
+    Account.all(:order => [:account_type_id.asc], :parent_id => nil, :branch_id => @branch_id).group_by{|account| account.account_type}.each{|account_type, accounts|
       data[account_type] = recurse(accounts)
       account_type.opening_balance = aggregates(data[account_type], :opening_balance).reduce(0){|s, x| s+=x}
       account_type.debit  = aggregates(data[account_type], :debit).reduce(0){|s, x| s+=x}
