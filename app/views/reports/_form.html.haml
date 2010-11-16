@@ -1,17 +1,37 @@
 - unless params[:layout] 
+  - report = @report.class.to_s.snake_case
+  - branch_id = (params[report] and params[report][:branch_id] and not params[report][:branch_id].blank?) ? params[report][:branch_id] : nil
+  - center_id = (params[report] and params[report][:center_id] and not params[report][:center_id].blank?) ? params[report][:center_id] : nil
+  - loan_product_id = (params[report] and params[report][:loan_product_id] and not params[report][:loan_product_id].blank?) ? params[report][:loan_product_id] : nil
+  - staff_member_id = (params[report] and params[report][:staff_member_id] and not params[report][:staff_member_id].blank?) ? params[report][:staff_member_id] : nil
+  - funder_id = (params[report] and params[report][:funder_id] and not params[report][:funder_id].blank?) ? params[report][:funder_id] : nil  
   - if params[:submit]
+    %h3{:style => "margin-bottom: 5px;"}
+      - if branch_id
+        Branch:
+        = Branch.get(branch_id).name
+      - if center_id
+        |
+        Center: 
+        = Center.get(center_id).name
+      - if loan_product_id
+        |
+        Product: 
+        = LoanProduct.get(loan_product_id).name
+      - if staff_member_id
+        |
+        Staff: 
+        = StaffMember.get(staff_member_id).name
+      - if funder_id
+        |
+        Funder:
+        = Funder.get(funder_id).name
     %a.expand_collapsed{:href => "#"}
       Change parameters
   %div{:class => "#{params[:submit] ? 'collapsed' : ''}"}
     = form_for(@report, :action => url(:show_report, :report_type => params[:report_type]), :method => :get) do
       %table
         %tr
-          - report = @report.class.to_s.snake_case
-          - branch_id = (params[report] and params[report][:branch_id]) ? params[report][:branch_id] : nil
-          - center_id = (params[report] and params[report][:center_id]) ? params[report][:center_id] : nil
-          - loan_product_id = (params[report] and params[report][:loan_product_id]) ? params[report][:loan_product_id] : nil
-          - staff_member_id = (params[report] and params[report][:staff_member_id]) ? params[report][:staff_member_id] : nil
-          - funder_id = (params[report] and params[report][:funder_id]) ? params[report][:funder_id] : nil
           -if @report.respond_to?(:from_date)
             %td
               From
