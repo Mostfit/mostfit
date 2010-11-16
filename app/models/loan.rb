@@ -1201,6 +1201,24 @@ class PararthRounded < Loan
     super
     @_rounding_schedule = nil
   end
+
+  def pay_prorata(total, received_on)
+    #adds up the principal and interest amounts that can be paid with this amount and prorates the amount   
+    return false if total.to_f > total.to_i 
+    last_payment = payments.max(:received_on)
+    used = prin = int = 0.0
+    payment_schedule.reject{|k,v| k <= last_payment}.sort_by{|k,v| k}.each{|date, hash|
+      if (prin + int) < total
+        prin += hash[:principal]
+        int  += hash[:interest]
+      end
+    }
+    interest  = total * int/(prin + int)
+    principal = total * prin/(prin + int)
+    pfloat    = principal - principal.to_i
+    ifloat    = interest  - interest.to_i
+    pfloat > ifloat ? [interest - ifloat, principal + ifloat] : [interest + pfloat, principal - pfloat]
+  end
 end
 
 

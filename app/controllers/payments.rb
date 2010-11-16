@@ -113,7 +113,8 @@ class Payments < Application
       @prin.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @prin
       @int.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @int
       @fees.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @fees
-      @loan.update_history if success and @loan
+      # reloading loan as payments can be stale here
+      Loan.get(@loan.id).update_history if success and @loan
       return success
     else
       @payment = Payment.new(payment)
@@ -131,7 +132,8 @@ class Payments < Application
         end
       end
       success = @payment.save
-      @loan.update_history if success and @loan
+      # reloading loan as payments can be stale here
+      Loan.get(@loan.id).update_history if success and @loan
       return success      
     end
   end
