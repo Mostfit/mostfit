@@ -18,7 +18,8 @@ module Reporting
       query_as_hash(%Q{
           SELECT b.id, COUNT(c.id) as count
           FROM centers c, branches b
-          WHERE c.branch_id = b.id and c.creation_date <= '#{end_date.strftime('%Y-%m-%d')}' and c.creation_date >= '#{start_date.strftime('%Y-%m-%d')}'
+          WHERE c.branch_id = b.id and c.creation_date >= '#{start_date.strftime('%Y-%m-%d')}' 
+                                   and c.creation_date <= '#{end_date.strftime('%Y-%m-%d')}'
           GROUP BY b.id})            
     end
     
@@ -26,7 +27,8 @@ module Reporting
       query_as_hash(%Q{
           SELECT b.id, COUNT(cl.id) as count
           FROM clients cl, centers c, branches b
-          WHERE cl.center_id = c.id AND c.branch_id = b.id and cl.date_joined <= '#{date.strftime('%Y-%m-%d')}' AND deleted_at is NULL
+          WHERE cl.center_id = c.id AND cl.date_joined <= '#{date.strftime('%Y-%m-%d')}' AND c.branch_id = b.id 
+                                    AND deleted_at is NULL
           GROUP BY b.id})            
     end
     
@@ -34,8 +36,9 @@ module Reporting
       query_as_hash(%Q{
           SELECT b.id, COUNT(l.id) 
           FROM loans l, clients cl, centers c, branches b
-          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id AND l.disbursal_date <='#{date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
-                AND cl.deleted_at is NULL
+          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id 
+                                    AND l.disbursal_date <='#{date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
+                                    AND cl.deleted_at is NULL
           GROUP BY b.id})
     end
     
@@ -43,16 +46,17 @@ module Reporting
       query_as_hash(%Q{
           SELECT b.id, SUM(l.amount) 
           FROM loans l, clients cl, centers c, branches b
-          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id AND l.disbursal_date <='#{date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
-                AND cl.deleted_at is NULL
+          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id 
+                                    AND l.disbursal_date <='#{date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
+                                    AND cl.deleted_at is NULL
           GROUP BY b.id})
     end
     
     def active_client_count(date = Date.today)      
       ids = repository.adapter.query(%Q{
                   SELECT loan_id, max(date) date
-                  FROM loan_history 
-                  WHERE date <= '#{date.strftime('%Y-%m-%d')}' AND status in (5,6,7,8,9)
+                  FROM loan_history, clients cl 
+                  WHERE cl.date_joined <= '#{date.strftime('%Y-%m-%d')}' AND status in (5,6,7,8,9)
                   GROUP BY loan_id}).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
       return false if ids.length==0     
       query_as_hash(%Q{
@@ -69,10 +73,12 @@ module Reporting
     
     def borrower_clients_count(date)
       query_as_hash(%Q{
-        SELECT b.id, COUNT(DISTINCT(client_id)) as count
-        FROM clients cl, loans l, branches b, centers c
-        WHERE cl.id = l.client_id AND cl.active = true AND l.disbursal_date is not NULL AND c.branch_id = b.id AND cl.center_id = c.id AND l.deleted_at is NULL
-        GROUP BY b.id
+                       SELECT b.id, COUNT(DISTINCT(client_id)) as count
+                       FROM clients cl, loans l, branches b, centers c
+                       WHERE cl.id = l.client_id AND cl.active = true AND l.disbursal_date is not NULL 
+                                                 AND cl.date_joined <= '#{date.strftime('%Y-%m-%d')}' AND c.branch_id = b.id 
+                                                 AND cl.center_id = c.id AND l.deleted_at is NULL
+                       GROUP BY b.id
       })
     end
     
@@ -116,7 +122,8 @@ module Reporting
          SELECT lh.branch_id, #{what}(l.amount)
          FROM loans l, loan_history lh
          WHERE l.id = lh.loan_id 
-               AND  lh.status = #{STATUSES.index(:repaid) + 1}  AND lh.date BETWEEN '#{start_date.strftime('%Y-%m-%d')}' AND '#{end_date.strftime('%Y-%m-%d')}'
+               AND  lh.status = #{STATUSES.index(:repaid) + 1}  AND lh.date BETWEEN '#{start_date.strftime('%Y-%m-%d')}' 
+               AND '#{end_date.strftime('%Y-%m-%d')}'
                AND  l.deleted_at is NULL
          GROUP BY lh.branch_id})
     end
@@ -129,7 +136,8 @@ module Reporting
          SELECT lh.branch_id, #{what}(l.amount)
          FROM loans l, loan_history lh
          WHERE l.id = lh.loan_id 
-               AND  lh.status = #{STATUSES.index(:disbursed) + 1} AND  l.disbursal_date BETWEEN '#{start_date.strftime('%Y-%m-%d')}' AND '#{end_date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
+               AND  lh.status = #{STATUSES.index(:disbursed) + 1} AND  l.disbursal_date BETWEEN '#{start_date.strftime('%Y-%m-%d')}' 
+               AND '#{end_date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
          GROUP BY lh.branch_id})
     end
     
@@ -140,7 +148,8 @@ module Reporting
       query_as_hash(%Q{
          SELECT c.branch_id branch_id, #{what}(l.amount)
          FROM loans l, clients cl, centers c
-         WHERE l.client_id = cl.id AND cl.center_id=c.id AND l.applied_on BETWEEN '#{start_date.strftime('%Y-%m-%d')}' AND '#{end_date.strftime('%Y-%m-%d')}' 
+         WHERE l.client_id = cl.id AND cl.center_id=c.id AND l.applied_on BETWEEN '#{start_date.strftime('%Y-%m-%d')}' 
+                                   AND '#{end_date.strftime('%Y-%m-%d')}' 
                AND l.deleted_at is NULL
          GROUP BY c.branch_id})
     end
@@ -152,8 +161,9 @@ module Reporting
       query_as_hash(%Q{
          SELECT c.branch_id branch_id, #{what}(l.amount)
          FROM loans l, clients cl, centers c
-         WHERE l.client_id = cl.id AND cl.center_id=c.id AND l.approved_on BETWEEN '#{start_date.strftime('%Y-%m-%d')}' AND '#{end_date.strftime('%Y-%m-%d')}' 
-               AND l.deleted_at is NULL
+         WHERE l.client_id = cl.id AND cl.center_id=c.id AND l.approved_on BETWEEN '#{start_date.strftime('%Y-%m-%d')}' 
+                                   AND '#{end_date.strftime('%Y-%m-%d')}' 
+                                   AND l.deleted_at is NULL
          GROUP BY c.branch_id})
     end
     
@@ -161,9 +171,11 @@ module Reporting
       query_type = :received
       define_method("#{payment_type}_#{query_type}_between") do |start_date, end_date|
         repository.adapter.query(%Q{SELECT branch_id, sum(amount) amount FROM payments p, clients cl, centers c, branches b 
-                                      WHERE b.id=c.branch_id AND cl.center_id=c.id AND p.client_id=cl.id AND p.deleted_at is NULL AND cl.deleted_at is NULL 
-                                            AND p.type=#{ptype+1} AND p.received_on>='#{start_date.strftime('%Y-%m-%d')}' 
-                                            AND p.received_on<='#{end_date.strftime('%Y-%m-%d')}' 
+                                      WHERE b.id=c.branch_id AND cl.center_id=c.id AND p.client_id=cl.id AND p.deleted_at is NULL 
+                                                             AND cl.deleted_at is NULL 
+                                                             AND p.type=#{ptype+1} 
+                                                             AND p.received_on>='#{start_date.strftime('%Y-%m-%d')}' 
+                                                             AND p.received_on<='#{end_date.strftime('%Y-%m-%d')}' 
                                       GROUP BY b.id;}).group_by{|x| x[0]}.map{|b, a| 
           {b => a[0].amount.to_i}
         }.inject({}){|s,x| s+=x}
@@ -189,11 +201,21 @@ module Reporting
     end
     
     def principal_amount(date = Date.today)
-      query_as_hash("SELECT SUM(p.amount) amount, p.type payment_type FROM branches b,centers c,clients cl, loans l , payments p WHERE p.loan_id=l.id and p.type=1 and l.client_id=cl.id and cl.center_id=c.id and c.branch_id=b.id and p.deleted_at is NULL GROUP BY b.id")
+      query_as_hash(%Q{SELECT SUM(p.amount) amount, p.type payment_type 
+                       FROM branches b,centers c,clients cl, loans l , payments p 
+                       WHERE p.type=1 AND p.loan_id=l.id AND cl.id=l.client_id AND c.id=cl.center_id 
+                                            AND b.id=c.branch_id AND p.received_on <= '#{date.strftime('%Y-%m-%d')}' 
+                                            AND p.deleted_at is NULL 
+                       GROUP BY b.id})
     end
     
     def interest_amount(date = Date.today)
-      query_as_hash("SELECT SUM(p.amount) amount, p.type payment_type FROM branches b,centers c,clients cl, loans l , payments p WHERE c.branch_id=b.id and cl.center_id=c.id and l.client_id=cl.id and p.loan_id=l.id and p.type=2 and p.deleted_at is NULL GROUP BY b.id")
+      query_as_hash(%Q{SELECT SUM(p.amount) amount, p.type payment_type 
+                       FROM branches b,centers c,clients cl, loans l , payments p 
+                       WHERE c.branch_id=b.id and cl.center_id=c.id and l.client_id=cl.id 
+                                              and p.loan_id=l.id and p.type=2 and p.received_on <= '#{date.strftime('%Y-%m-%d')}' 
+                                              and p.deleted_at is NULL 
+                       GROUP BY b.id})
     end
     
     def income(date = Date.today)
@@ -201,21 +223,42 @@ module Reporting
     end
 
     def fee_received(date)
-      query_as_hash("SELECT SUM(p.amount) amount,f.name name FROM branches b,centers c,clients cl, payments p, fees f WHERE c.branch_id=b.id and cl.center_id=c.id and p.client_id=cl.id and p.type=3 and p.fee_id=f.id and p.deleted_at is NULL GROUP BY b.id")
+      query_as_hash(%Q{SELECT SUM(p.amount) amount,f.name name 
+                       FROM branches b,centers c,clients cl, payments p, fees f 
+                       WHERE c.branch_id=b.id and cl.center_id=c.id and p.client_id=cl.id and p.type=3 
+                                              and p.fee_id=f.id and p.received_on <= '#{date.strftime('%Y-%m-%d')}' 
+                                              and p.deleted_at is NULL 
+                       GROUP BY b.id})
     end
   
     def fee_received_between(start_date, end_date)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
-      query_as_hash("SELECT SUM(p.amount) amount,f.name name FROM branches b,centers c,clients cl, payments p, fees f WHERE c.branch_id=b.id and cl.center_id=c.id and p.client_id=cl.id and p.type=3 and p.fee_id=f.id and p.deleted_at is NULL GROUP BY b.id") 
+      query_as_hash(%Q{SELECT SUM(p.amount) amount,f.name name 
+                       FROM branches b,centers c,clients cl, payments p, fees f 
+                       WHERE c.branch_id=b.id AND cl.center_id=c.id AND p.client_id=cl.id AND p.type=3 
+                                              AND p.fee_id=f.id AND p.received_on >= '#{start_date.strftime('%Y-%m-%d')}' 
+                                              AND p.received_on <= '#{end_date.strftime('%Y-%m-%d')}' 
+                                              AND p.deleted_at is NULL 
+                       GROUP BY b.id}) 
     end
     
     def card_fee(date)
-      repository.adapter.query("SELECT b.id, SUM(p.amount) amount FROM payments p, loans l, centers c, clients cl, branches b WHERE p.type=3 AND b.id=c.branch_id AND cl.center_id=c.id AND p.client_id=cl.id AND cl.deleted_at is NULL AND p.deleted_at IS NULL AND p.loan_id IS NULL GROUP BY b.id")
+      query_as_hash(%Q{SELECT b.id, SUM(p.amount) amount
+                       FROM payments p, clients cl, centers c, branches b
+                       WHERE p.type=3 AND p.deleted_at IS NULL AND p.loan_id IS NULL AND p.client_id=cl.id
+                              AND cl.center_id=c.id AND cl.deleted_at is NULL 
+                              AND p.received_on <= '#{date.strftime('%Y-%m-%d')}' AND b.id=c.branch_id
+                       GROUP BY b.id})
     end
     
     def loan_fee(date)
-      repository.adapter.query("SELECT b.id, SUM(p.amount) amount FROM payments p, loans l, centers c, clients cl, branches b WHERE p.type=3 AND b.id=c.branch_id AND cl.center_id=c.id AND p.client_id=cl.id AND cl.deleted_at is NULL AND p.deleted_at IS NULL AND p.loan_id IS NOT NULL")
+      query_as_hash(%Q{
+                       SELECT b.id, SUM(p.amount) amount FROM payments p, loans l, centers c, clients cl, branches b 
+                       WHERE p.type=3 AND p.loan_id=l.id AND cl.deleted_at is NULL AND p.deleted_at IS NULL
+                             AND p.loan_id IS NOT NULL AND l.client_id=cl.id AND cl.center_id=c.id 
+                             AND p.received_on <= '#{date.strftime('%Y-%m-%d')}' AND c.branch_id=b.id
+                        GROUP BY b.id})
     end
     
     def scheduled_principal_outstanding(date = Date.today)
@@ -234,7 +277,7 @@ module Reporting
     end
     
     def center_managers(date)
-      query_as_hash("select branch_id, count(distinct(manager_staff_id)) from centers group by branch_id ;")
+      query_as_hash(%Q{SELECT branch_id, count(distinct(manager_staff_id)) FROM centers GROUP BY branch_id})
     end
     
     def client_groups_count(date = Date.today)
@@ -246,20 +289,26 @@ module Reporting
     end
     
     def avg_outstanding_balance(date)
-      query_as_hash("select branch_id, avg(actual_outstanding_principal) amount from loan_history lh, loans l WHERE lh.date<='#{date.strftime('%Y-%m-%d')}' AND lh.loan_id=l.id AND lh.status in (5,6) AND l.deleted_at is NULL GROUP BY lh.branch_id;")
+      query_as_hash(%Q{SELECT branch_id, avg(actual_outstanding_principal) amount 
+                       FROM loan_history lh, loans l 
+                       WHERE lh.date<='#{date.strftime('%Y-%m-%d')}' AND lh.loan_id=l.id 
+                                                                     AND lh.status in (5,6) AND l.deleted_at is NULL 
+                       GROUP BY lh.branch_id})
     end
     
     def avg_outstanding_balance_per_cm(date)
       principal_outstanding(date)/center_managers(date)
-      # query_as_hash("select b.id, avg(actual_outstanding_principal) FROM loans l, loan_history lh ,staff_members s,centers c,branches b, clients cl where lh.loan_id = l.id and l.disbursed_by_staff_id = s.id and c.manager_staff_id = l.disbursed_by_staff_id and l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id and l.deleted_at is NULL GROUP BY b.id")
     end
     
     def avg_loan_size_per_cm(date)
-      query_as_hash("select disbursed_by_staff_id,avg(amount), b.name from loans l ,staff_members s,centers c,branches b, clients cl where l.disbursed_by_staff_id = s.id and c.manager_staff_id = l.disbursed_by_staff_id and l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id and l.deleted_at is NULL GROUP BY b.id")
+      loan_amount(date)/center_managers(date)
     end
     
     def avg_loan_size_per_client(date)
-      query_as_hash("select disbursed_by_staff_id,avg(amount),b.name from loans l ,staff_members s,centers c,branches b, clients cl where l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id group by b.id")
+      query_as_hash(%Q{SELECT disbursed_by_staff_id,avg(amount),b.name 
+                       FROM loans l ,staff_members s,centers c,branches b, clients cl 
+                       WHERE l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id 
+                       GROUP BY b.id})
     end
     
     def principal_overdue_by(date=Date.today)
@@ -298,7 +347,8 @@ module Reporting
     
     def get_latest_loan_history_row_before(date = Date.today)
       date = Date.parse(date) unless date.is_a? Date
-      repository.adapter.query("select loan_id, max(date) date from loan_history where date <= '#{date.strftime('%Y-%m-%d')}' AND status in (5,6,7,8) group by loan_id")
+      repository.adapter.query("SELECT loan_id, max(date) date FROM loan_history 
+                                WHERE date <= '#{date.strftime('%Y-%m-%d')}' AND status in (5,6,7,8) GROUP BY loan_id")
     end
     
     def get_latest_before(column, date = Date.today, group_by = nil)
