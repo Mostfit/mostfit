@@ -5,13 +5,13 @@ class Reports < Application
     :consolidated => [ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport], 
     :registers    => [TransactionLedger, LoanSanctionRegister, LoanDisbursementRegister, ScheduledDisbursementRegister, ClaimReport], 
     :targets_and_projections  => [ProjectedReport, TargetReport],
-    :statistics   => [LoanSizePerManagerReport, LoanPurposeReport, ClientOccupationReport], 
+    :statistics   => [LoanSizePerManagerReport, LoanPurposeReport, ClientOccupationReport, IncentiveReport], 
     :exceptions   => [RepaymentOverdue, LateDisbursalsReport, DelinquentLoanReport, ParByCenterReport, ClientAbsenteeismReport, DuplicateClientsReport, NonDisbursedClientsAfterGroupRecognitionTest],
     :accounting   => [GeneralLedgerReport, TrialBalanceReport]
   }
   Order = [:periodic, :consolidated, :registers, :targets_and_projections, :statistics, :exceptions, :accounting]
   layout :determine_layout 
-
+  
   # provides :xml, :yaml, :js
   def index
     @reports = Report.all

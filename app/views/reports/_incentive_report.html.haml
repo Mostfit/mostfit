@@ -1,0 +1,101 @@
+
+%table.report.nojs
+  %tr.header
+    %th
+      Sr. No.
+    %th
+      Name
+    %th
+      Date of Joining 
+    %th
+      Transfer
+    %th{:colspan => "2"}
+      Operation Area
+    %th{:colspan => "8"}
+      Actual Management-Loan frequency-1 (weekly)
+    %th{:colspan => "7"}
+      Actual Management-Loan frequency-2 (Monthly)
+    %th{:colspan => "3"}
+      Payable
+   
+  %tr.header
+    %th
+    %th
+    %th
+    %th
+    %th
+   
+      Present
+    %th
+      Transfer  
+    %th
+      For
+    %th
+      OP BL
+    %th
+      Take Over
+    %th
+      PREV MTH for
+    %th
+      HAND Over
+    %th
+      Close
+    %th
+      Death
+    %th
+      NET MGT
+    %th
+      OP BL
+    %th
+      Take Over
+    %th
+      PREV MTH for
+    %th
+      HAND Over
+    %th
+      Close
+    %th
+      Death
+    %th
+      NET MGT
+    %th
+    %th
+    %th
+  
+    - @data.each_with_index do |row, idx|
+      
+      %tr
+        %td
+          = idx + 1
+        %td
+          = row[:staff]
+        %td
+          = row[:doj]
+        %td 
+          
+        %td
+          = row[:area]        
+        %td
+
+        %td
+          = row[:tot_client]
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+        %td
+       
+             
+      
