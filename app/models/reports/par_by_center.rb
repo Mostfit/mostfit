@@ -2,13 +2,18 @@ class ParByCenterReport < Report
   attr_accessor :date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :late_by_more_than_days, :late_by_less_than_days
 
   def initialize(params,dates, user)
-    @date = dates.blank? ? Date.today : dates[:date]
+    @date   = dates.blank? ? Date.today : dates[:date]
     @name   = "PAR Report as on #{@date}"
+    @late_by_more_than_days = params[:late_by_more_than_days] if params and params.key?(:late_by_more_than_days) and not params[:late_by_more_than_days].blank?
+    @late_by_less_than_days = params[:late_by_less_than_days] if params and params.key?(:late_by_less_than_days) and not params[:late_by_less_than_days].blank?
     get_parameters(params, user)
   end
 
   def name
-    "PAR as on #{@date}"
+    extra = []
+    extra << "more than #{late_by_more_than_days} days" if late_by_more_than_days
+    extra << "less than #{late_by_less_than_days} days" if late_by_less_than_days
+    "PAR as on #{@date}: late by #{extra.join(' and ')}"
   end
 
   def self.name
