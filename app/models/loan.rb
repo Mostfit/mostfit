@@ -539,8 +539,13 @@ class Loan
     @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0, :fees => fees_so_far}
 
     repayed =  false
+
+    ensure_meeting_day = false
+    ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
+    ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
+
     (1..number_of_installments).each do |number|
-      date      = shift_date_by_installments(scheduled_first_payment_date, number - 1, [:weekly, :biweekly].include?(installment_frequency))
+      date      = shift_date_by_installments(scheduled_first_payment_date, number - 1, ensure_meeting_day)
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
       next if repayed
@@ -785,8 +790,12 @@ class Loan
   end
   # the installment dates
   def installment_dates
+    ensure_meeting_day = false
+    ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
+    ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
+
     (0..(number_of_installments-1)).to_a.map {|x| 
-      shift_date_by_installments(scheduled_first_payment_date, x, [:weekly, :biweekly].include?(installment_frequency))
+      shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day)
     }
   end
 

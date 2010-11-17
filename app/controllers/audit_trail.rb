@@ -15,11 +15,11 @@ class AuditTrails < Application
     end
 
     model = "Loan" if not ["Branch", "Center", "Loan", "Client", "Payment"].include?(model) and /Loan^/.match(model)   
-    if model=="Loan"
-      loan  = Loan.get(id)
-      model = ["Loan", loan.class.to_s]
-    end
+    @obj    = Kernel.const_get(model).get(id)
 
+    if model=="Loan"
+      model = ["Loan", @obj.class.to_s]
+    end
     @trails = AuditTrail.all(:auditable_id => id, :auditable_type => model, :order => [:created_at.desc])
     partial "audit_trails/list", :layout => false
   end
