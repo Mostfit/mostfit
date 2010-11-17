@@ -102,6 +102,7 @@ module Merb
       attrs.merge!(:id => opts[:id]||name)
       attrs.merge!(:nullable => (opts.key?(:nullable) ? opts[:nullable] : Mfi.first.date_box_editable))
       attrs.merge!(:date     => date)
+      attrs.merge!(:size     => opts[:size]||20)
       attrs.merge!(:min_date => opts[:min_date]||Date.min_date)
       attrs.merge!(:max_date => opts[:max_date]||Date.max_date)
       date_select_html(attrs) 
@@ -129,7 +130,7 @@ module Merb
 
     def date_select_html (attrs, obj = nil, col = nil)      
       str = %Q{
-        <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}" size="20" #{attrs[:nullable] ? "" : "readonly='true'"}>
+        <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}" size="#{attrs[:size]}" #{attrs[:nullable] ? "" : "readonly='true'"}>
         <script type="text/javascript">
           $(function(){
             $("##{attrs[:id]}").datepicker('destroy').datepicker({altField: '##{attrs[:id]}', buttonImage: "/images/calendar.png", changeYear: true, buttonImageOnly: true,
@@ -264,6 +265,26 @@ module Merb
     def paginate(pagination, *args, &block)
       DmPagination::PaginationBuilder.new(self, pagination, *args, &block)
     end
+
+    def paginate_array(arr, params, length)
+      page = ((params[:page] and not params[:page].blank?) ? params[:page].to_i : 1)
+      str  = ""
+      if page <= 1
+        page = 1
+      else
+        params[:page] = page - 1
+        str += link_to("prev", url(params))
+      end
+
+      params[:page] = page + 1
+
+      if (length / 20.0).ceil <= page
+        str
+      else
+        str + " | " + link_to("next", url(params))
+      end
+    end
+
     def chart(url, width=430, height=200, id=nil)
       id||= (rand()*100000).to_i + 100
       "<div id='flashcontent_#{id}'></div>
@@ -283,64 +304,38 @@ module Merb
       "/audit_trails?"+params.to_a.map{|x| "audit_for[#{x[0]}]=#{x[1]}"}.join("&")
     end
 
-    def diff_display(arr, model, action)      
+    def diff_display(arr, obj, action)      
+      relations = {}
+      if obj.class == String
+        model = Kernel.const_get(obj)
+      else
+        model = obj.class
+        relations = model.relationships.map{|k,v| {v.child_key.first.name => k}}.reduce({}){|s,x| s+=x}
+      end
+
       arr.map{|change|
         next unless change
         change.map{|k, v|
-          str="<tr><td>#{k.humanize}</td><td>"
-          str+=if action==:update and v.class==Array
-
-                 case k.to_s
-                 when 'manager_staff_id', 'created_by_staff_member_id','created_by_user_id','verified_by_user_id','disbursed_by_staff_id','approved_by_staff_id','applied_by_staff_id'
-                   "#{link_to(v.first, url(:controller => 'staff_members', :action => "show", :id => v.first))} </td><td> #{link_to(v.last, url(:controller => 'staff_members', :action => "show", :id => v.last))}" 
-                 when 'area_id'
-                   "#{link_to(v.first,url(:controller => 'areas', :action => "show", :id => v.first))}</td><td>#{link_to(v.last,url(:controller => 'areas', :action => "show", :id => v.last))}"
-                 when 'branch_id'
-                   "#{link_to(v.first, url(:controller => 'branches', :action => "show", :id => v.first))}</td><td>#{link_to(v.last, url(:controller => 'branches', :action => "show", :id => v.last))}"
-                 when 'center_id'
-                   "#{link_to(v.first, url(:controller => 'centers', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'centers', :action => "show", :id => v.last))}"
-                 when 'client_group_id'
-                   "#{link_to(v.first, url(:controller => 'client_groups', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'client_groups', :action => "show", :id => v.last))}"
-                 when 'occupation_id'
-                   "#{link_to(v.first, url(:controller => 'occupations', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'occupations', :action => "show", :id => v.last))}"
-                 when 'client_id'
-                   "#{link_to(v.first, url(:controller => 'clients', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'clients', :action => "show", :id => v.last))}"
-                 when 'loan_product_id'
-                   "#{link_to(v.first, url(:controller => 'loan_products', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'loan_products', :action => "show", :id => v.last))}"
-                 when 'funding_line_id'
-                   "#{link_to(v.first, url(:controller => 'funding_lines', :action => "show", :id => v.first))}</td><td> #{link_to(v.last, url(:controller => 'funding_lines', :action => "show", :id => v.last))}"
-                 else
-                   "changed from #{v.first} </td><td> to #{v.last}"
-                 end
-                 
-               elsif action==:create and v.class==Array
-                 
-                 "#{v}"
-               else
-                 case k.to_s
-                 when 'manager_staff_id', 'created_by_staff_member_id','created_by_user_id','verified_by_user_id','disbursed_by_staff_id','approved_by_staff_id','applied_by_staff_id'
-                   "#{link_to(v, url(:controller => 'staff_members', :action => "show", :id => v))}"
-                 when 'area_id'
-                   "#{link_to(v,url(:controller => 'areas', :action => "show", :id => v))}"
-                 when 'branch_id'
-                   "#{link_to(v, url(:controller => 'branches', :action => "show", :id => v))}"
-                 when 'center_id'
-                   "#{link_to(v, url(:controller => 'centers', :action => "show", :id => v))}"
-                 when 'client_group_id'
-                   "#{link_to(v, url(:controller => 'client_groups', :action => "show", :id => v))}"
-                 when 'occupation_id'
-                   "#{link_to(v, url(:controller => 'occupations', :action => "show", :id => v))}"
-                 when 'client_id'
-                   "#{link_to(v, url(:controller => 'clients', :action => "show", :id => v))}"
-                 when 'loan_product_id'
-                   "#{link_to(v, url(:controller => 'loan_products', :action => "show", :id => v))}"
-                 when 'funding_line_id'
-                   "#{link_to(v, url(:controller => 'funding_lines', :action => "show", :id => v))}"
-                 else
+          if relations.key?(k)
+            str = "<tr><td>#{relations[k].to_s.humanize}</td><td>"
+            str += if action==:update and v.class==Array                 
+                     "changed from #{obj.send(relations[k]).name}</td><td>to #{obj.send(relations[k]).name}"
+                   elsif action==:create and v.class==Array                 
+                     "#{obj.send(relations[k]).name}"
+                   else
+                     "#{v}"       
+                   end
+            
+          else
+            str="<tr><td>#{k.humanize}</td><td>"
+            str+=if action==:update and v.class==Array                 
+                   "changed from #{v.first}</td><td>to #{v.last}"
+                 elsif action==:create and v.class==Array                 
                    "#{v}"
+                 else
+                   "#{v}"                 
                  end
-                 
-               end
+          end
           str+="</td></tr>"
         }
       }
@@ -491,6 +486,10 @@ module Merb
       elsif comparator == "not2" then return "!="
       else return comparator
       end
+    end
+
+    def getPages(current_page, minimum=1, maximum=20, window=2)
+      return((minimum + window < current_page ? minimum.upto(window).collect : minimum.upto(current_page + window).collect) + (current_page - window > minimum+window ? [".."] : []) + (current_page > minimum + window ? (current_page - window > minimum + window ? current_page - window : minimum + window).upto(current_page + window > maximum ? maximum : current_page + window).collect : []) + (current_page + window + 1 < maximum - window ? [".."] : []) + (current_page < maximum - 2 * window ? maximum-window : current_page + window + 1).upto(maximum).collect)
     end
 
   end

@@ -76,11 +76,15 @@ class Searches < Application
 
   def get
     return "" if not params[:model] or params[:model].blank?
+    params[:counter] = (params[:counter] ? params[:counter].to_i : 0)
     model = Kernel.const_get(params[:model][params[:counter]].singularize.camelcase)
+
     if not params[:property] or not params[:property][params[:counter]] or params[:property][params[:counter]].blank?
       return "<option value=''>select property</option>"+get_properties_for(model).collect{|prop| "<option value='#{prop}'>#{prop}</option>"}.join, :layout => false
     end
+
     property = model.properties.find{|p| p.name.to_s==params[:property][params[:counter]]} || model.relationships[params[:property][params[:counter]]]
+
     if not params[:operator] or not params[:operator][params[:counter]] or params[:operator][params[:counter]].blank?
       ops = Search.get_operators(property)
       ops = [["", "Select operator"]] + ops
@@ -88,6 +92,7 @@ class Searches < Application
     else
       return get_values(model, property, params[:counter])
     end
+
   end
   
   private

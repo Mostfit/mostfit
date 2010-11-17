@@ -1024,5 +1024,17 @@ $(document).ready(function(){
 	control:"#sidetreecontrol"
       });
   }
+  if($("#audit_trail_form").length>0){
+      $("#audit_trail_form select#auditable_type").change(function(){
+	$.ajax({
+	  type: "GET",
+	  url: "/searches/get?counter=0&model[]=" + $(this).val(),
+	  success: function(data){
+	    $("#audit_col").remove();
+	    $("select#auditable_type").after("<b>of</b><select id=\"audit_col\" name=\"col\">" + data + "</select>");
+	  }
+	});
+      });
+  }
 });
 
