@@ -1,10 +1,11 @@
-%div.floatingBox
-  %a.closeButton
-    [close]
+%div{:class => (@floating ? "floatingBox" : "")}
+  - if @floating
+    %a.closeButton
+      [close]
   -[["branches", [:name, :manager]], ["centers", [:name, :manager]], ["clients", [:name, :center]], ["client_groups", [:name, :center]], ["loans", [:client, :amount]], ["staff_members", [:name]]].each do |model, functions|
-    %table
-      -objects = instance_variable_get("@#{model}")
-      -if objects and objects.length>0
+    -objects = instance_variable_get("@#{model}")
+    -if objects and objects.length>0
+      %table
         %tr
           %th{:colspan => 3}
             %h2
@@ -12,18 +13,18 @@
         %tr
           %th
             ID
-            -functions.each do |function|
-              %th
-                =function.class==Hash ? function.keys[0] : function
-        -objects.each do |obj|
-          %tr
-            %td
-              =obj.id
-            -functions.each do |function|
+          -functions.each do |function|
+            %th
+              =function.class==Hash ? function.keys[0] : function
+          -objects.each do |obj|
+            %tr
               %td
-                - field = obj.send(function)
-                - if function == :manager or function == :center
-                  =link_to(field.name, resource(field))
-                - else
-                  =link_to(field.respond_to?(:name) ? field.name : field, "/#{model}/#{obj.id}")
+                =obj.id
+              -functions.each do |function|
+                %td
+                  - field = obj.send(function)
+                  - if function == :manager or function == :center
+                    =link_to(field.name, resource(field))
+                  - else
+                    =link_to(field.respond_to?(:name) ? field.name : field, "/#{model}/#{obj.id}")
         

@@ -7,6 +7,7 @@ class Searches < Application
       @loans         = Loan.search(params[:query])
       @client_groups = ClientGroup.search(params[:query])
       @staff_members = StaffMember.search(params[:query])
+      @floating = true      
       render :layout => layout?
     else
       display "No results"
@@ -21,6 +22,7 @@ class Searches < Application
       hash.delete(:action)
       hash.delete(:model)      
       instance_variable_set("@#{model.to_s.downcase.pluralize}", model.all(hash))
+      @floating = false
       render :index
     else
       render :advanced
