@@ -35,11 +35,12 @@ class WeeklyReport < Report
 
     @report << {"Average Loan Size per Client" => Branch.avg_loan_size_per_client(end_date)}
     @report << {"Average Loan Size per Center Manager" => Branch.avg_loan_size_per_cm(end_date)}
-    @report << {"Average Outstanding Balance per Client" => Branch.avg_outstanding_balance(end_date)}
+    @report << {"Average Outstanding Balance per Client" => Branch.avg_outstanding_balance_per_client(end_date)}
     @report << {"Average Outstanding Balance per Center Manager" => Branch.avg_outstanding_balance_per_cm(end_date)}
 
     @report << {"Income" => Branch.income(end_date)}
     @report << {"Interest" => Branch.interest_amount(end_date)}
+    @report << {"Fees" => Branch.fee_received(end_date)} 
     @report << {"Loan Fee" => Branch.loan_fee(end_date)}
     @report << {"Card Fee" => Branch.card_fee(end_date)}
 #    @report << {"Total Income - New" }
