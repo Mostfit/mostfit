@@ -196,9 +196,9 @@ class Loan
     puts
   end
 
-  def self.search(q)
+  def self.search(q, per_page)
     if /^\d+$/.match(q)
-      all(:conditions => {:id => q}, :limit => 10)
+      all(:conditions => {:id => q}, :limit => per_page)
     end
   end
 

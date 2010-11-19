@@ -956,6 +956,9 @@ a.expand_collapsed{
     margin-right: 5px;
     margin-left: 5px;
 }
+.floatingBox table tr td{
+    padding-bottom: 2px;
+}
 .floatingBox .closeButton{
     float: right;
     font-weight: bold;

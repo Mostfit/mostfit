@@ -146,11 +146,11 @@ class Client
     [obj.save, obj]
   end
 
-  def self.search(q)
+  def self.search(q, per_page=10)
     if /^\d+$/.match(q)
-      all(:conditions => {:id => q}, :limit => 10)
+      all(:conditions => {:id => q}, :limit => per_page)
     else
-      all(:conditions => ["reference=? or name like ?", q, q+'%'], :limit => 10)
+      all(:conditions => ["reference=? or name like ?", q, q+'%'], :limit => per_page)
     end
   end
 

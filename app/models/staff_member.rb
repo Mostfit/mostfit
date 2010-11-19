@@ -25,11 +25,11 @@ class StaffMember
   validates_is_unique :name
   validates_length :name, :min => 3
 
-  def self.search(q)
+  def self.search(q, per_page)
     if /^\d+$/.match(q)
-      all(:conditions => {:id => q}, :limit => 10)
+      all(:conditions => {:id => q}, :limit => per_page)
     else
-      all(:conditions => ["name like ?", q+'%'], :limit => 10)
+      all(:conditions => ["name like ?", q+'%'], :limit => per_page)
     end
   end
   
