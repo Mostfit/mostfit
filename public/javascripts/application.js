@@ -1015,6 +1015,12 @@ $(document).ready(function(){
       $("#user_form .funder").hide();
       $("#user_form #user_funder").val("");
     }
+    if($(select.currentTarget).val()==="accountant"){
+      $("#user_form .staff_member").hide();
+      $("#user_form .funder").hide();
+      $("#user_form #user_funder").val("");
+      $("#user_form #staff_member").val("");
+    }
   });
   floatHeaders();
   if($("#tree").length>0){

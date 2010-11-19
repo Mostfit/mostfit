@@ -118,7 +118,6 @@ module Misfit
         # more garbage
         user_role = self.role
         return true if user_role == :admin
-        return true if [:graph_data, :info, :dashboard].include?(route[:controller].to_sym) and user_role!=:data_entry
         return true if route[:controller] == "users" and route[:action] == "change_password"
         return false if (user_role == :read_only or user_role == :funder or user_role == :data_entry) and route[:controller] == "payments" and route[:action] == "delete"
 
@@ -160,9 +159,9 @@ module Misfit
             return false            
           end
         end
-
+        
         if @staff
-          return additional_checks if @route.has_key?(:id) and @route[:id]
+          return additional_checks if @route.has_key?(:id) and @route[:id] and @controller == "controller"
           if ["staff_members", "branches"].include?(@controller)
             if not CUD_Actions.include?(@action)
               return true
