@@ -20,6 +20,9 @@ class GroupConsolidatedReport < Report
     branches, centers, data, clients, loans, groups = {}, {}, {}, {}, {}, {}
     extra     = []
     extra    << "l.loan_product_id = #{loan_product_id}" if loan_product_id
+    extra    << "lh.branch_id = #{@branch.first.id}" if @branch.length == 1
+    extra    << "lh.center_id = #{@center.first.id}" if @center.length == 1
+
     # if a funder is selected
     if @funder
       funder_loan_ids = @funder.loan_ids
