@@ -31,12 +31,23 @@ class Portfolio
   belongs_to :verified_by, :child_key => [:verified_by_user_id], :model => 'User'
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :when => [:destroy]
 
+  def loans(hash={})
+    hash[:id] = portfolio_loans(:active => true).map{|x| x.id}
+    Loan.all(hash)
+  end
+  
+  def portfolio_loans(hash={})
+    hash[:portfolio_id] = self.id
+    hash[:active] = true
+    PortfolioLoan.all(hash)
+  end
+  
   def eligible_loans
     centers_hash = {}
     Center.all(:fields => [:id, :name]).each{|c| centers_hash[c.id] = c}
     
     hash = self.new? ? {} : {:portfolio_id.not => id}
-    pids = (PortfolioLoan.all(hash).map{|x| x.loan_id})
+    pids = (PortfolioLoan.all(hash, :active => true).map{|x| x.loan_id})
     taken_loans = []
     if pids.length > 0
       taken_loans << "l.id not in (#{pids.join(', ')})"
@@ -50,18 +61,28 @@ class Portfolio
   def process_portfolio_details
     if centers and centers.length>0
       outstanding_statuses = [:outstanding, :disbursed]
-      loans = []
       loan_values = {}
+      accounted_for = []
       existing_loans = self.loans.map{|l| l.id}
       self.loans.each{|l| l.history_disabled = true}
-      
+      debugger
       centers = Center.all(:id => self.centers.reject{|cid, status| status != "on"}.keys)
       LoanHistory.loans_outstanding_for(centers).each{|loan|
-        unless existing_loans.include?(loan.loan_id)
+        if existing_loans.include?(loan.loan_id)
+          accounted_for << loan.loan_id
+        elsif pl = PortfolioLoan.first(:loan_id => lid, :portfolio_id => self.id, :active => false)
+          pl.active = true
+          pl.save
+        else
           PortfolioLoan.create!(:loan_id => loan.loan_id, :original_value => loan.amount, :added_on => Date.today, :portfolio => self,
                                 :starting_value => loan.actual_outstanding_principal, :current_value => loan.actual_outstanding_principal)
         end
       }
+      # deactivate all the loans which are not accounted for
+      (existing_loans - accounted_for).each{|lid|
+        PortfolioLoan.first(:loan_id => lid, :portfolio_id => self.id).update(:active => false)
+      }
+
       total_start_value = portfolio_loans.aggregate(:starting_value.sum) || 0
       repository.adapter.execute("UPDATE portfolios SET start_value=#{total_start_value}, outstanding_calculated_on=NOW() WHERE id=#{self.id}")
       return true
@@ -73,11 +94,11 @@ class Portfolio
     # force reloading to read associations correctly
     self.reload
     loan_ids = []
-    if PortfolioLoan.all(:portfolio_id => self.id).count > 0
+    if PortfolioLoan.all(:portfolio_id => self.id, :active => true).count > 0
       LoanHistory.loans_outstanding_for(self.loans(:fields => [:id])).each{|loan|
         loan_values[loan.loan_id] = loan
       }
-      self.portfolio_loans.each{|l|
+      self.portfolio_loans(:active => true).each{|l|
         next unless loan_values.key?(l.loan_id)
         l.current_value = loan_values[l.loan_id].actual_outstanding_principal
         l.save!
@@ -86,7 +107,7 @@ class Portfolio
     end
     if loan_ids.length > 0
       last_payment = Payment.all(:loan_id => loan_ids).max(:received_on)
-      outstanding_value = portfolio_loans.aggregate(:current_value.sum) || 0
+      outstanding_value = portfolio_loans(:active => true).aggregate(:current_value.sum) || 0
       repository.adapter.execute(%Q{
                                      UPDATE portfolios SET outstanding_value=#{outstanding_value}, outstanding_calculated_on=NOW(), last_payment_date='#{last_payment.strftime('%Y-%m-%d')}'
                                      WHERE id=#{self.id}

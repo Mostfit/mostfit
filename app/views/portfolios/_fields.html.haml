@@ -47,7 +47,7 @@
           - branch_total[2]+=data.actual_outstanding_principal
         %td
           - selected = @centers.find{|c| c==center}
-          = check_box(:name => "portfolio[centers][#{center.id}]", :checked => selected, :disabled => selected)
+          = check_box(:name => "portfolio[centers][#{center.id}]", :checked => selected)
           - branch_total[3] += 1 if selected        
         %td
           = count = center_loans[center] ? center_loans[center].count : 0

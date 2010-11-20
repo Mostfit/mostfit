@@ -406,6 +406,7 @@ class LoanHistory
       conditions = []
       conditions << "p.id in (#{obj.map{|x| x.id}.join(',')})" if obj
       conditions << "pfl.portfolio_id = p.id"
+      conditions << "pfl.active = 1"
       conditions << "l.id = pfl.loan_id"
     elsif klass==FundingLine
       conditions <<  "l.funding_line_id in (#{obj.map{|x| x.id}.join(',')})" if obj
