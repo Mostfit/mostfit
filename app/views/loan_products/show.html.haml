@@ -76,5 +76,5 @@
                 = paid
               %td
                 = ps[:balance]
-      - rescue
+      - rescue Exception => e
         Cannot generate schedule as some parameters are missing

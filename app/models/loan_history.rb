@@ -96,6 +96,8 @@ class LoanHistory
       query = "lh.loan_id in (#{ids})"
     elsif obj.class == FundingLine
       query = "l.funding_line_id = #{obj.id}"
+    elsif obj.class == LoanProduct
+      query = "l.loan_product_id = #{obj.id}"
     elsif obj == Mfi
       query = "1"
     end
