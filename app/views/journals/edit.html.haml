@@ -1,0 +1,50 @@
+%h1 Edit Journal Entry
+
+= error_messages_for @journal
+= form_for(@journal, :action => resource(@journal)) do
+  - if @journal
+    - postings = @journal.postings.group_by{|x| x.amount > 0 ? :credit : :debit}
+  %table
+    %tr
+      %td
+        Journal Type
+      %td
+        =select :name => "journal[journal_type_id]", :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select Journal", :selected => @journal.journal_type_id.to_s
+    %tr
+      %td
+        Credit accounts
+      %td
+        - if postings[:credit]
+          - postings[:credit].each do |credit_posting|  
+            = credit_posting.account.name
+    %tr
+      %td
+        Debit accounts
+      %td            
+        - if postings[:debit]
+          - postings[:debit].each do |debit_posting|          
+            = debit_posting.account.name
+    %tr
+      %td
+        Date
+      %td
+        =date_select_for @journal, :date
+    %tr
+      %td
+        Amount
+      %td
+        = postings[:credit].map{|x| x.amount}.reduce(0){|s,x| s+=x}
+    %tr
+      %td
+        Comment
+      %td
+        =text_field :name => "journal[comment]", :value => @journal.comment
+    %tr
+      %td
+        Transaction ID
+      %td
+        =text_field :name => "journal[transaction_id]", :value => @journal.transaction_id
+  %p
+    = submit "Save"
+
+= link_to 'Cancel', url(:accounts)

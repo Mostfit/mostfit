@@ -1,6 +1,13 @@
 %h1 New Journal Entry
 
 = error_messages_for @journal
+- unless request.xhr? and session.user.role == :admin
+  %div{:style => "float: right;"}
+    %b
+      Select branch
+    %form{:method => "GET", :action => "/journals/new"}
+      = select :name => :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Head office accounts", :selected => @branch.id.to_s
+      = submit "GO"
 
 = form_for(@journal, :action => (@branch ? resource(@branch, :journals) : resource(:journals))) do
   = partial :fields

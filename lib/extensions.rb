@@ -117,7 +117,8 @@ module Misfit
       def _can_access?(route,params = nil)        
         # more garbage
         user_role = self.role
-        return true if user_role == :admin
+        return true  if user_role == :admin
+        return false if route[:controller] == "journals" and route[:action] == "edit"
         return true if route[:controller] == "users" and route[:action] == "change_password"
         return false if (user_role == :read_only or user_role == :funder or user_role == :data_entry) and route[:controller] == "payments" and route[:action] == "delete"
 

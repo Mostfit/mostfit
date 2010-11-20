@@ -65,6 +65,7 @@ class Accounts < Application
   end
 
   def branch
+    @journal = Journal.new
     render :layout => layout?
   end
 

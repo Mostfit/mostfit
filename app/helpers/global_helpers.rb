@@ -92,7 +92,6 @@ module Merb
       html.gsub('!!!', '&nbsp;')  # otherwise the &nbsp; entities get escaped
     end
 
-
     def date_select(name, date=Date.today, opts={})
       # defaults to Date.today
       # should refactor
@@ -425,6 +424,21 @@ module Merb
           link_to(weekday, url(:controller => "centers", :action => "list", :branch_id => branch, :meeting_day => wday.to_s), :id => "centers_list", :class => "_remote_")
         end
       }.join(' | ')
+    end
+
+    def select_accounts(name, branch=nil, attrs = {})
+      collection = []
+      Account.all(:branch => branch).group_by{|a| a.account_type}.sort_by{|at, as| at.name}.each do |account_type, accounts|
+        collection << ['', "#{account_type.name}"]
+        accounts.sort_by{|a| a.name}.each{|a| collection << [a.id.to_s, "!!!!!!!!!#{a.name}"] }
+      end
+      html = select(
+        :collection   => collection,
+        :name         => name,
+        :id           => attrs[:id],
+        :selected     => attrs[:selected],
+        :prompt       => (attrs[:prompt] or "&lt;select a account&gt;"))
+      html.gsub('!!!', '&nbsp;')  # otherwise the &nbsp; entities get escaped
     end
 
     private
