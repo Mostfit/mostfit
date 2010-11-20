@@ -27,8 +27,9 @@ class Portfolios < Application
     only_provides :html
     @portfolio = Portfolio.get(id)
     raise NotFound unless @portfolio
+    disallow_updation_of_verified_portfolios
     @data      = @portfolio.eligible_loans
-    @centers   = @portfolio.loans.clients.centers
+    @centers   = Center.all(:id => LoanHistory.ancestors_of_portfolio(@portfolio, Center))
     display @portfolio
   end
 
@@ -81,5 +82,8 @@ class Portfolios < Application
       @funder = Funder.get(params[:funder_id])
       raise NotFound unless @funder
     end
+  end
+  def disallow_updation_of_verified_portfolios
+    raise NotChangeable if @portfolio.verified_by_user_id
   end
 end # Portfolios

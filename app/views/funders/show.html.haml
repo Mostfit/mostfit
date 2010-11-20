@@ -20,7 +20,7 @@
       = @funder.funding_lines.max(:disbursal_date)
   %tr
     %td Portfolios
-    %td
+    %td      
       %b= @funder.portfolios.size
 
 %p= link_to 'edit this funders details', resource(@funder, :edit), :class => "edit"

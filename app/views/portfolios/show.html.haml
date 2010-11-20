@@ -9,7 +9,10 @@
   %tr
     %td Number of loans
     %td
-      %b= @portfolio.loans.count
+      - if @portfolio.portfolio_loans.count > 0
+        %b= @portfolio.loans.count
+      -else
+        0  
   %tr.odd
     %td Starting value
     %td

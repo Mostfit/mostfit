@@ -25,7 +25,17 @@ class Exceptions < Merb::Controller
     render
   end
 
+  def not_changeable
+    if request.xhr?
+      return("Sorry! Not allowed to change verified data.")
+    elsif request.env['HTTP_REFERER'] 
+      redirect request.env['HTTP_REFERER'], :message => { :error => 'Sorry, Not allowed to change verified data.' }
+    else
+      render
+    end
+    
+  end
 end
 
 class NotPrivileged <  Merb::ControllerExceptions::Unauthorized; end
-
+class NotChangeable <  Merb::ControllerExceptions::Unauthorized; end

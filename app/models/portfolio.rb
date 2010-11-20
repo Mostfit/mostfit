@@ -47,7 +47,8 @@ class Portfolio
     Center.all(:fields => [:id, :name]).each{|c| centers_hash[c.id] = c}
     
     hash = self.new? ? {} : {:portfolio_id.not => id}
-    pids = (PortfolioLoan.all(hash, :active => true).map{|x| x.loan_id})
+    hash[:active] = true
+    pids = (PortfolioLoan.all(hash).map{|x| x.loan_id})
     taken_loans = []
     if pids.length > 0
       taken_loans << "l.id not in (#{pids.join(', ')})"
@@ -63,14 +64,19 @@ class Portfolio
       outstanding_statuses = [:outstanding, :disbursed]
       loan_values = {}
       accounted_for = []
-      existing_loans = self.loans.map{|l| l.id}
+
+      existing_loans = self.portfolio_loans.map{|l| l.loan_id}
       self.loans.each{|l| l.history_disabled = true}
-      debugger
+
       centers = Center.all(:id => self.centers.reject{|cid, status| status != "on"}.keys)
+      inactive_loans = PortfolioLoan.all(:portfolio_id => self.id, :active => false, :fields => [:id, :loan_id]).map{|x| x.loan_id}
+
       LoanHistory.loans_outstanding_for(centers).each{|loan|
         if existing_loans.include?(loan.loan_id)
           accounted_for << loan.loan_id
-        elsif pl = PortfolioLoan.first(:loan_id => lid, :portfolio_id => self.id, :active => false)
+        elsif inactive_loans.include?(loan.loan_id)
+          accounted_for << loan.loan_id
+          pl = PortfolioLoan.first(:portfolio_id => self.id, :loan_id => loan.loan_id)
           pl.active = true
           pl.save
         else
@@ -80,8 +86,10 @@ class Portfolio
       }
       # deactivate all the loans which are not accounted for
       (existing_loans - accounted_for).each{|lid|
-        PortfolioLoan.first(:loan_id => lid, :portfolio_id => self.id).update(:active => false)
-      }
+        if pl = PortfolioLoan.first(:loan_id => lid, :portfolio_id => self.id)
+          pl.update(:active => false)
+        end
+      } if (existing_loans - accounted_for).length > 0
 
       total_start_value = portfolio_loans.aggregate(:starting_value.sum) || 0
       repository.adapter.execute("UPDATE portfolios SET start_value=#{total_start_value}, outstanding_calculated_on=NOW() WHERE id=#{self.id}")

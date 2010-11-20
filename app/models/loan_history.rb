@@ -416,7 +416,9 @@ class LoanHistory
 
   def self.get_latest_rows_of_loans(date = Date.today, query="1")
     query = query.to_a.map{|k, v| 
-      if v.is_a?(Array)
+      if v.is_a?(Array) and v.length == 0
+        "#{k} in (NULL)"
+      elsif v.is_a?(Array)
         "#{k} in (#{v.join(", ")})"
       else
         "#{k}=#{v}"
