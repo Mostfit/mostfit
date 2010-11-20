@@ -83,7 +83,7 @@ module Misfit
     
     module DateFormat
       def self.compile
-        if format = Mfi.first.date_format and Mfi::DateFormats.include?(format)
+        if format = Mfi.first.date_format and not format.blank? and Mfi::DateFormats.include?(format)
           Date.class_eval do
             format = Mfi.first.date_format
             define_method :to_s do

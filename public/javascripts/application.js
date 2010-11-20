@@ -53,17 +53,19 @@ function fillCode(center_id, group_id){
 	});
 }
 function setToggleText(){
-    $("table.report tr td a").each(function(){
-	    if($(this).parent().parent().next().css("display")!="none"){
-		$(this).text($(this).text().replace('Expand', 'Collapse'));
-		$(this).addClass('collapse');
-		$(this).removeClass('expand');
-	    }else{
-		$(this).text($(this).text().replace('Collapse', 'Expand'));
-		$(this).addClass('expand');
-		$(this).removeClass('collapse');
-	    }
-	});
+  $("table.report tr td a").each(function(){
+    if(!$(this).hasClass("link")){
+      if($(this).parent().parent().next().css("display")!="none"){
+	$(this).text($(this).text().replace('Expand', 'Collapse'));
+	$(this).addClass('collapse');
+	$(this).removeClass('expand');
+      }else{
+	$(this).text($(this).text().replace('Collapse', 'Expand'));
+	$(this).addClass('expand');
+	$(this).removeClass('collapse');
+      }
+    }
+  });
 }
 function showThis(li, idx){
     $("div.tab_container div.tab").hide();
@@ -766,15 +768,16 @@ $(document).ready(function(){
 		    parent_type = $(this).parent().parent().attr("class");
 		    parent_type_total=parent_type+"_total";
 		    if(action==="expand"){
-			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type).show();
-			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type_total).show();
-		    }else{
-			$(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
-			$(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
-		    }
-		    if(parent_type=="branch" && action=="collapse")
+		      $(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type).show();
+		      $(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type_total).show();
+		      setToggleText();
+		    }else if(action === "collapse"){
+		      $(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
+		      $(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
+		      setToggleText();
+		      if(parent_type=="branch")
 			$(this).parent().parent().nextUntil("tr.branch_total").hide();
-		    setToggleText();
+		    }
 		});
 	  }
 

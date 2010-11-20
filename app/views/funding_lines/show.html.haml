@@ -78,13 +78,14 @@
               = row.loan_count
               - branch_total[0] += row.loan_count
             %td
-              = disbursals[center.id].to_currency
-              - branch_total[1] += disbursals[center.id]
+              = disbursals[center.id].to_currency if disbursals[center.id]
+              - branch_total[1] += disbursals[center.id] || 0
             %td
               = row.actual_outstanding_principal.to_currency
               - branch_total[2] += row.actual_outstanding_principal
             %td
-              - pay = repayments[branch][center].group_by{|x| x.ptype}.map{|t, p| [t, (p.first ? p.first.amount : 0)]}.to_hash
+              - pay = []
+              - pay = repayments[branch][center].group_by{|x| x.ptype}.map{|t, p| [t, (p.first ? p.first.amount : 0)]}.to_hash if repayments[branch][center]
               = (pay[1] || 0).to_currency
               - branch_total[3] += pay[1]||0
             %td
