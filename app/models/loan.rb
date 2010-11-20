@@ -211,8 +211,10 @@ class Loan
       1
     when :monthly
       30
-    when :bi_weekly
+    when :biweekly
       15
+    when :quadweekly
+      28
     end
   end
 
@@ -271,6 +273,8 @@ class Loan
       new_date =  date + number * 7
     when :biweekly
       new_date = date + number * 14
+    when :quadweekly
+      new_date = date + number * 28
     when :monthly
       new_month = date.month + number
       new_year  = date.year
@@ -693,6 +697,8 @@ class Loan
       then  ((date - scheduled_first_payment_date).to_f / 7).floor + 1
       when  :biweekly
       then  ((date - scheduled_first_payment_date).to_f / 14).floor + 1
+      when  :quadweekly
+      then  ((date - scheduled_first_payment_date).to_f / 28).floor + 1
       when  :monthly
       then  count = 1
             count += 1 while shift_date_by_installments(date, -count) >= scheduled_first_payment_date
