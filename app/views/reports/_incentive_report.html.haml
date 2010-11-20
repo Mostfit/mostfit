@@ -1,8 +1,7 @@
 
 %table.report.nojs
   %tr.header
-    %th
-      Sr. No.
+  
     %th
       Name
     %th
@@ -19,7 +18,7 @@
       Payable
    
   %tr.header
-    %th
+  
     %th
     %th
     %th
@@ -59,43 +58,61 @@
     %th
       NET MGT
     %th
+      For
     %th
+      MAN IGL
     %th
+      MAN LTL
   
-    - @data.each_with_index do |row, idx|
+    - @data.each_pair do |key, val|
       
       %tr
+        %td 
+          = key.name
         %td
-          = idx + 1
-        %td
-          = row[:staff]
-        %td
-          = row[:doj]
+          = key.creation_date
         %td 
           
         %td
-          = row[:area]        
+          = val[4]
+            
         %td
 
         %td
-          = row[:tot_client]
+          = val[6]
         %td
+          = val[7]
         %td
+          = val[8]
         %td
+          = val[9]
         %td
+          = val[10]
         %td
+          = val[11]
         %td
+          = val[12]
         %td
+          = val[13]
         %td
+          = val[14]
         %td
+          = val[15]
         %td
+          = val[16]
         %td
+          = val[17]
         %td
+          = val[18]
         %td
+          = val[19]
         %td
+          = val[20]
         %td
+          = val[21]
         %td
+          = val[22]
         %td
-       
+          = val[23]
              
       
