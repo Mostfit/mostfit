@@ -63,8 +63,8 @@
     %th
       MAN LTL
   
-    - @data.each_pair do |key, val|
-      
+   
+    - Marshal.load(@report.report).each do |key,val|
       %tr
         %td 
           = key.name
