@@ -28,11 +28,12 @@ class IncentiveReport < Report
   
     StaffMember.all(:active => true,:order => [:id.desc]).each_with_index{ |sm, idx|
       data[sm]||={}
-      abc = AuditTrail.all(:auditable_type => Center, :action => :update)
+     
+      center_changes = AuditTrail.all(:auditable_type => Center, :action => :update)
       
-      abc.each do |x| 
-        @center_id = x.auditable_id  
-        @updated= x.changes.flatten
+      center_changes.each do |trail| 
+        @center_id = trail.auditable_id  
+        @updated= trail.changes.flatten
         
         for i in 0..(@updated.length - 1)
      
@@ -41,7 +42,15 @@ class IncentiveReport < Report
             
             @staff1 = @updated[i].values[0][0] # hand over
             @staff2 = @updated[i].values[0][1] # taken over 
-          
+            change_date = trail.created_at.strftime("%Y-%m-%d")
+             if (sm.id == @staff2)
+               @c = Center.get(@center_id)
+             
+              data[sm][3] = "Transfered to Center #{@c.name} on #{change_date.to_s}"
+             elsif (sm.id == @staff1)
+               data[sm][5] = "Released from Center #{@c.name} on #{change_date.to_s}"
+            end
+
             if @staff1 == sm.id
               1.upto(2){|x|
                 if x == 1 
@@ -86,7 +95,7 @@ class IncentiveReport < Report
       data[sm]||={}
    
       data[sm][0] = idx+1
-      data[sm][4] = repository.adapter.query("select distinct (a.name) area from clients cl, centers c, staff_members sm,branches b,areas a where cl.center_id = c.id and c.branch_id = b.id and b.area_id = a.id and c.manager_staff_id = sm.id and sm.id = #{sm.id}")
+      data[sm][4] = repository.adapter.query("select distinct (b.name) area from clients cl, centers c, staff_members sm,branches b where cl.center_id = c.id and c.branch_id = b.id and c.manager_staff_id = sm.id and sm.id = #{sm.id}")
       
 
       data[sm][6]= data[sm][21] = repository.adapter.query("select count(*) from clients cl,centers c, staff_members sm where cl.date_joined between '#{@from_date}' and '#{@to_date}' and cl.center_id = c.id and cl.deleted_at is NULL and c.manager_staff_id = sm.id and sm.id = #{sm.id}")
