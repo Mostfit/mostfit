@@ -32,11 +32,13 @@ class NonDisbursedClientsAfterGroupRecognitionTest < Report
         next if @center and not @center.find{|x| x.id==c.id}
         data[b][c] ||= []
         clients[c.id].each{|client|
-          data[b][c] << [client.id, client.reference, client.name, client.date_joined, client.grt_pass_date, loans[client.id],
-                        ((loans[client.id] ? loans[client.id] : @date) - client.grt_pass_date).abs]
+          temp = (((loans[client.id] ? loans[client.id] : @date) - client.grt_pass_date).abs)
+          if temp > 0 : temp1 = temp
+            data[b][c] << [client.id, client.reference, client.name, client.date_joined, client.grt_pass_date, loans[client.id],temp1]
+          end
         }
       }
     }
     return data
   end
-end
+end  
