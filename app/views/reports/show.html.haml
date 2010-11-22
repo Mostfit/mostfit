@@ -9,7 +9,7 @@
 - else
   - if not params[:layout] 
     = link_to("Printer friendly version", get_printer_url, {:style => "float: right;", :target => "_BLANK"})
-  %h1
+  %h1{:style => "margin-bottom: 1px;"}
     =@report.name
   = partial "#{params[:report_type].snake_case.gsub(" ","_")}".to_sym
 

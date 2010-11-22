@@ -961,3 +961,40 @@ a.expand_collapsed{
     font-weight: bold;
     font-size: 1em;
 }
+span.branchName{
+    position: absolute;
+    margin-left: 150px;
+}
+ul#tree li{
+    margin-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+ul#tree li ul{
+    margin-top: 10px;
+}
+ul#tree li span.spacer1{
+    position: absolute;
+    margin-left: 100px;
+    padding-bottom: 10px;
+}
+ul#tree li span.spacer2{
+    position: absolute;
+    margin-left: 400px;
+    padding-bottom: 10px;
+}
+ul#tree li span.spacer3{
+    position: absolute;
+    margin-left: 500px;
+    padding-bottom: 10px;
+}
+ul#tree li span.spacer4{
+    position: absolute;
+    margin-left: 600px;
+    padding-bottom: 10px;
+}
+ul#tree li span.spacer5{
+    position: absolute;
+    margin-left: 800px;
+    padding-bottom: 10px;
+}

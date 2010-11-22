@@ -1,59 +1,58 @@
+= css_include_tag "jquery.treeview.css", :media => "screen, projection"
+%script{:type => "text/javascript", :src => "/javascripts/jquery.cookie.js"}
+%script{:type => "text/javascript", :src => "/javascripts/jquery.treeview.js"}
 =partial :form
-%table.report
-  %tr.header
-    %th
-      Account
-    %th
-      Opening Balance 
-    %th
-      Debit
-    %th
-      Credit
-    %th
-      Total Balance
+%div#sidetreecontrol
+  %a{:href => "?#"}
+    Collapse All
+  |
+  %a{:href => "?#"}
+    Expand All
+%ul#tree
+  %li
+    %span.spacer1
+      %b Account
+    %span.spacer2
+      %b Opening Balance 
+    %span.spacer3
+      %b Debit
+    %span.spacer4
+      %b Credit
+    %span.spacer5
+      %b Total Balance
  
   - length = 5
   - totals = []
-  - @data.sort_by{|at, accs| at.name}.each do |account_type, accounts|    
-    %tr.branch#account
-      %td{:colspan => length}
-        %b= account_type.name
-      - debit_sum, credit_sum, opening_sum = 0 , 0 , 0
-      - accounts.each do |account|
-        %tr.account
-          %td
-            = account.name
-          %td
-            - opening_balance = account.opening_balance
-            - opening_sum += opening_balance
-            = account.opening_balance_on_date
-            %br
-            = opening_balance  
-          %td
-            - debit = (account.postings.sum(:amount, :amount.lte => 0)||0) * -1
-            - debit_sum += debit
-            = debit.to_currency
-          %td
-            - credit = account.postings.sum(:amount, :amount.gte => 0)||0
-            - credit_sum += credit
-            = credit.to_currency
-          %td
-            = ((debit - credit) * -1) + opening_balance
-    %tr.branch_total
-      %td
-      %td
-        =opening_sum.to_currency
-      %td
-        =debit_sum.to_currency
-      %td
-        =credit_sum.to_currency
-      %td
-        =(opening_sum + (credit_sum - debit_sum)).to_currency
-    - totals << [opening_sum, debit_sum, credit_sum, opening_sum + (credit_sum - debit_sum)]
-  %tr.org_total
-    %td
-      %b Total
-    - totals.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
-      %td
-        %b= ele.to_currency
-
+  - @data.sort_by{|account_type, accounts| account_type.name}.each do |account_type, accounts|
+    %li
+      %span.spacer1
+        %b
+          = account_type.name
+      %span.spacer2
+        = account_type.opening_balance.to_currency
+      %span.spacer3
+        = account_type.debit.to_currency
+      %span.spacer4
+        = account_type.credit.to_currency
+      %span.spacer5
+        = account_type.balance.to_currency
+      %ul
+        - if accounts
+          - accounts.each do |account|
+            = show_accounts(account)
+  %li
+    %span.spacer1
+      %b
+        Total
+    %span.spacer2
+      %b
+        = @data.keys.map{|x| x.opening_balance}.reduce(0){|s, x| s+=x}.to_currency
+    %span.spacer3
+      %b
+        = @data.keys.map{|x| x.debit}.reduce(0){|s, x| s+=x}.to_currency
+    %span.spacer4
+      %b
+        = @data.keys.map{|x| x.credit}.reduce(0){|s, x| s+=x}.to_currency
+    %span.spacer5
+      %b
+        = @data.keys.map{|x| x.balance}.reduce(0){|s, x| s+=x}.to_currency

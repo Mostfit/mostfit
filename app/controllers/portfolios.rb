@@ -35,6 +35,7 @@ class Portfolios < Application
   def create(portfolio)
     @portfolio = Portfolio.new(portfolio)
     @portfolio.funder = @funder
+    @portfolio.created_by = session.user
 
     if @portfolio.save_self
       redirect resource(@funder), :message => {:notice => "Portfolio was successfully created"}

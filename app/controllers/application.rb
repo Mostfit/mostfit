@@ -46,11 +46,17 @@ class Application < Merb::Controller
       error += " it has already been disbursed and "
     end
 
-    # if flag is still set to true delete the object
+    if obj.respond_to?(:verified_by) and obj.verified_by
+      flag = false
+      error += "verified data cannot be deleted"
+    end
+
+      # if flag is still set to true delete the object
     if flag == true and obj.destroy
       # delete all the loan history
-      LoanHistory.all(:loan_id => obj.id).destroy if model==Loan
-      Attendance.all(:client_id => obj.id).destroy if model==Client
+      LoanHistory.all(:loan_id => obj.id).destroy if model  == Loan
+      Attendance.all(:client_id => obj.id).destroy if model == Client
+      PortfolioLoan.all(:portfolio_id => obj.id).destroy if model == Portfolio
       return_url = params[:return].split("/")[0..-3].join("/")
       redirect(return_url, :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
     else
@@ -76,7 +82,7 @@ class Application < Merb::Controller
     model =  obj.class
     # add child definitions to children; For loan model do not add history
     children = model.relationships.find_all{|x|
-      x[0] if x[1].class==DataMapper::Associations::OneToMany::Relationship and not x[0]=="history" and not x[0]=="audit_trails" and not x[0]=="attendances"
+      x[0] if x[1].class==DataMapper::Associations::OneToMany::Relationship and not x[0]=="history" and not x[0]=="audit_trails" and not x[0]=="attendances" and not x[0]=="portfolio_loans"
     }
    
     children_present = {}

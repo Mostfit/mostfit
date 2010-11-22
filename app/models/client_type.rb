@@ -7,6 +7,9 @@ class ClientType
 
   has n, :fees, :through => Resource
 
+  def name
+    type
+  end
 
 end
 

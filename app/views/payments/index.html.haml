@@ -3,7 +3,7 @@
     = ofc2(430, 250, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
 
 = error_messages_for @payment
-- if @loan.history.length == 0 or (@loan.disbursal_date and @loan.payments.count > 0  and @loan.history.first.created_at < @loan.payments.max(:created_at))
+- if @loan.history.length == 0 or (@loan.disbursal_date and @loan.payments.count > 0  and @loan.history.max(:created_at).to_time < @loan.payments.max(:created_at).to_time)
   .error
     History of this loan is not updated. Click
     =link_to("here", url(:controller => "loans", :id => @loan.id, :action => "repair"))
@@ -13,7 +13,7 @@
   = link_to "##{@loan.id}", url_for_loan(@loan)
   by client
   = link_to "<i>#{@client.name}</i>", resource(@branch, @center, @client)
-
+- @history = @loan.history
 %table.narrow.form{ :style => 'width : 50%' }
   %tr.odd
     %td{ :width => '30%' } Amount disbursed
@@ -121,8 +121,8 @@
   %tr
     %td Status
     %td
-      %b= @loan.status.to_s.gsub('_', ' ')
-      - if @loan.status == :written_off
+      %b= status = @loan.status.to_s.gsub('_', ' ')
+      - if @status == :written_off
         by
         %b= link_to @loan.written_off_by.name, resource(@loan.written_off_by)
 
@@ -153,15 +153,14 @@
       - last_payment = @loan.payments.first(:order => [:received_on.desc])
       - last_payment_date = last_payment.received_on if last_payment
       - principal_so_far = interest_so_far = principal_received_so_far = interest_received_so_far = 0
-      - @history = @loan.calculate_history
-      - @history.each_with_index do |h,i|
-        - principal_so_far += h[:principal_due]
-        - interest_so_far += h[:interest_due]
-        - principal_received_so_far += h[:principal_paid]
-        - interest_received_so_far += h[:interest_paid]
-        - scheduled_principal = i > 0 ? @history[i-1][:scheduled_outstanding_principal] - h[:scheduled_outstanding_principal] : 0
-        - scheduled_interest = i > 0 ? @history[i-1][:scheduled_outstanding_total] - h[:scheduled_outstanding_total] - scheduled_principal : 0
-        - if h[:date] > Date.today and not passed
+      - @history.each_with_index do |lh, i|
+        - principal_so_far += lh.principal_due
+        - interest_so_far += lh.interest_due
+        - principal_received_so_far += lh.principal_paid
+        - interest_received_so_far += lh.interest_paid
+        - scheduled_principal = i > 0 ? @history[i-1].scheduled_outstanding_principal - lh.scheduled_outstanding_principal : 0
+        - scheduled_interest = i > 0 ? @history[i-1].scheduled_outstanding_total - lh.scheduled_outstanding_total - scheduled_principal : 0
+        - if lh.date > Date.today and not passed
           - passed = true
           - if not first
             %tr{ :class => cycle('odd','') }
@@ -171,32 +170,32 @@
         %tr{ :class => cycle('odd','') }
           %td &nbsp;
           %td
-            = h[:date]
+            = lh.date
           %td
-            %b= h[:scheduled_outstanding_principal].to_currency
+            %b= lh.scheduled_outstanding_principal.to_currency
           %td
             %b= (scheduled_principal + scheduled_interest).to_currency
             %br/
             %span.greytext== #{scheduled_principal.to_currency} principal + #{scheduled_interest.to_currency} interest
           %td
-            - if last_payment_date and (h[:date] <= last_payment_date or h[:date] <= Date.today)
-              %b= h[:actual_outstanding_principal].to_currency
+            - if last_payment_date and (lh.date <= last_payment_date or lh.date <= Date.today)
+              %b= lh.actual_outstanding_principal.to_currency
           %td
-            - if last_payment_date and (h[:date] <= last_payment_date or h[:date] <= Date.today)
-              %b= (h[:principal_paid] + h[:interest_paid]).to_currency
+            - if last_payment_date and (lh.date <= last_payment_date or lh.date <= Date.today)
+              %b= (lh.principal_paid + lh.interest_paid).to_currency
               %br/
               %span.greytext
-                == #{h[:principal_paid].to_currency} principal + #{h[:interest_paid].to_currency} interest
+                == #{lh.principal_paid.to_currency} principal + #{lh.interest_paid.to_currency} interest
           %td
-            - if h[:date] <= Date.today
+            - if lh.date <= Date.today
               %b
-                %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
-                  = h[:amount_in_default].to_currency
+                %span{ :class => (lh.amount_in_default > 0 ? 'red' : 'green') }
+                  = lh.amount_in_default.to_currency
               %br/
               %span.greytext
-                %span{ :class => (h[:amount_in_default] > 0 ? 'red' : 'green') }
-                  = format("%.0f%", (h[:amount_in_default].abs.to_f / @loan.total_to_be_received) * 100)
-                = h[:amount_in_default] <= 0 ? 'overpaid' : 'shortfall'
+                %span{ :class => (lh.amount_in_default > 0 ? 'red' : 'green') }
+                  = format("%.0f%", (lh.amount_in_default.abs.to_f / @loan.total_to_be_received) * 100)
+                = lh.amount_in_default <= 0 ? 'overpaid' : 'shortfall'
       %tfoot
         %tr
           %td{ :colspan => 7 }

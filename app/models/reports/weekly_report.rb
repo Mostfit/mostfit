@@ -16,51 +16,48 @@ class WeeklyReport < Report
   def calc
     t0 = Time.now
     @report = []
-    @report << {'Total number of centers' => Branch.center_count(Date.min_date, end_date)}
-    @report << {'Total number of clients' => Branch.client_count(end_date)}
-    @report << {'Total number of loans' => Branch.loan_count(end_date)}
-    @report << {'Total amount disbursed so far' => Branch.loan_amount(end_date)}
-    @report << {"Active clients"  => Branch.active_client_count(end_date)}
+    @report << {"Number of Center Managers" => Branch.center_managers(end_date)}
+    @report << {'Total number of Centers' => Branch.center_count(Date.min_date, end_date)}
+    @report << {"Total number of Groups"  => Branch.client_groups_count(end_date)}
+    @report << {'Total number of Clients' => Branch.client_count(end_date)}
+    @report << {"Total number of Borrower Clients" => Branch.borrower_clients_count(end_date)}
+    @report << {"Active Clients"  => Branch.active_client_count(end_date)}
+    @report << {"Dormant Clients" => Branch.dormant_client_count(end_date)}
+    @report << {'Total number of Loans' => Branch.loan_count(end_date)}
     (1..4).each do |i|
       @report << {"Loan Cycle #{i}" => Branch.client_count_by_loan_cycle(i, end_date)}
     end
+    @report << {'Total Loan Disbursed so far' => Branch.loan_amount(end_date)}
+    @report << {"Principal Amount Received" => Branch.principal_amount(end_date) }
+    @report << {"Principal Amount Outstanding" => Branch.principal_outstanding(end_date)}
+    @report << {"Total Amount Outstanding" => Branch.total_outstanding(end_date)}
+    @report << {"Total Balance Overdue" => Branch.principal_overdue_by(end_date)}
 
-    @report << {"Dormant clients" => Branch.dormant_client_count(end_date)}
-    @report << {"Last week drop outs" => Branch.clients_deleted_between(start_date, end_date)}
-    @report << {"New clients last week" => Branch.clients_added_between(start_date, end_date)}
-    @report << {'New centers last week' => Branch.center_count(start_date, end_date)}
+    @report << {"Average Loan Size per Client" => Branch.avg_loan_size_per_client(end_date)}
+    @report << {"Average Loan Size per Center Manager" => Branch.avg_loan_size_per_cm(end_date)}
+    @report << {"Average Outstanding Balance per Client" => Branch.avg_outstanding_balance(end_date)}
+    @report << {"Average Outstanding Balance per Center Manager" => Branch.avg_outstanding_balance_per_cm(end_date)}
 
-    @report << {"Loans disbursed last week (count)"  => Branch.loans_disbursed_between(start_date, end_date, "count")}
-    @report << {"Loans disbursed last week (amount)" => Branch.loans_disbursed_between(start_date, end_date, "sum")}
+    @report << {"Income" => Branch.income(end_date)}
+    @report << {"Interest" => Branch.interest_amount(end_date)}
+    @report << {"Loan Fee" => Branch.loan_fee(end_date)}
+    @report << {"Card Fee" => Branch.card_fee(end_date)}
+#    @report << {"Total Income - New" }
+#    @report << {"Total Income - Old" }
+    @report << {"New Clients Last Week" => Branch.clients_added_between(start_date, end_date)}
+    @report << {'New Centers Last Week' => Branch.center_count(start_date, end_date)}
+    @report << {"Loans Applied in Last Week (count)"  => Branch.loans_applied_between(start_date, end_date, "count")}
+    @report << {"Loans Applied in Last Week (amount)" => Branch.loans_applied_between(start_date, end_date, "sum")}
+    @report << {"Loans Sanctioned in Last Week (count)"  => Branch.loans_approved_between(start_date, end_date, "count")}
+    @report << {"Loans Sanctioned in Last Week (amount)" => Branch.loans_approved_between(start_date, end_date, "sum")}
+    @report << {"Loans Disbursed Last Week (count)"  => Branch.loans_disbursed_between(start_date, end_date, "count")}
+    @report << {"Loans Disbursed Last Week (amount)" => Branch.loans_disbursed_between(start_date, end_date, "sum")}
+    @report << {"Principal Received Last Week" => Branch.principal_received_between(start_date, end_date) }
+    @report << {"Interest Received Last Week" => Branch.interest_received_between(start_date, end_date)}
+    @report << {"Fees Received Last Week" => Branch.fee_received_between(start_date, end_date)}
+    @report << {"Advance Payment Total Last Week" => Branch.overpaid_total_between(start_date, end_date)}
+    @report << {"Balance Overdue Last Week" => Branch.principal_overdue_last_week(7, end_date)}
 
-    @report << {"Loans applied in last week (count)"  => Branch.loans_applied_between(start_date, end_date, "count")}
-    @report << {"Loans applied in last week (amount)" => Branch.loans_applied_between(start_date, end_date, "sum")}
-
-    @report << {"Loans approved last week (count)"  => Branch.loans_approved_between(start_date, end_date, "count")}
-    @report << {"Loans approved last week (amount)" => Branch.loans_approved_between(start_date, end_date, "sum")}
-
-    @report << {"Loans repaid last week (count)" => Branch.loans_repaid_between(start_date, end_date, "count")}
-    @report << {"Loans repaid last week (amount)" => Branch.loans_repaid_between(start_date, end_date, "sum")}
-
-    @report << {"Principal received last week" => Branch.principal_received_between(start_date, end_date) }
-    @report << {"Interest received last week" => Branch.interest_received_between(start_date, end_date)}
-
-    @report << {"Principal amount outstanding" => Branch.principal_outstanding(end_date)}
-    @report << {"Total amount outstanding" => Branch.total_outstanding(end_date)}
-
-    @report << {"Overpaid principal this week" => Branch.overpaid_principal_between(start_date, end_date)}
-    @report << {"Overpaid total this week" => Branch.overpaid_total_between(start_date, end_date)}
-
-    [7, 14, 21, 28].each{|d|      
-      @report << {"Max. #{d} days late amount"  => Branch.principal_overdue_by(d, end_date)}
-    }
-
-    @report << {"Average os bal per loanee" => Branch.avg_outstanding_balance(end_date)}
-    @report << {"Number of staff members" => Branch.center_managers(end_date)}
-    @report << {"Number of center managers" => Branch.center_managers(end_date)}
-    @report << {"Average clients / staff" => Branch.avg_client_count_per_center_managers([[end_date], [end_date]])}
-    @report << {"Average balance / CM" => Branch.avg_principal_outstanding_per_center_managers([[end_date],[end_date]])}
-    @report << {"Average borrowers / CM" => Branch.avg_active_client_count_per_center_managers([[end_date], [end_date]])}
     WeeklyReport.all(:start_date => self.start_date, :end_date => self.end_date).destroy!
     self.raw = @report
     self.report = Marshal.dump(@report)

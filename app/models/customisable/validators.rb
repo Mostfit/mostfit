@@ -67,8 +67,9 @@ module Misfit
       failed = []
       correct_weekday = nil 
       ["scheduled_first_payment_date", "scheduled_disbursal_date"].each do |d|
+        next if self.disbursal_date and self.disbursal_date < Date.today
         if not date = instance_eval(d) or not date.weekday == center.meeting_day_for(date)
-          failed << d 
+          failed << d.humanize
           correct_weekday = center.meeting_day_for(date)
         end
       end

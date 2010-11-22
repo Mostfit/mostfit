@@ -25,7 +25,7 @@ class ProjectedReport < Report
                                        actual_outstanding_principal, actual_outstanding_total
                                 FROM loan_history lh, loans l
                                 WHERE lh.date <= '#{self.to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{self.from_date.strftime('%Y-%m-%d')}' AND #{extra.join( ' AND ')}
-                                      AND lh.loan_id = l.id AND l.deleted_at is NULL
+                                      AND lh.loan_id = l.id AND l.deleted_at is NULL AND status in (5, 6)
                                 GROUP BY lh.branch_id, lh.date, lh.center_id}).group_by{|lh| 
       lh.branch_id
     }.map{|bid, dates| [bid, dates.group_by{|d| d.date}]}.to_hash.each{|bid, dates|

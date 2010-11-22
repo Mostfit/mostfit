@@ -3,6 +3,7 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe Loan do
 
   before(:all) do
+    Rule.all.each{|r| r.destroy}
     Payment.all.destroy! if Payment.all.count > 0
     Client.all.destroy! if Client.count > 0
     @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin)
@@ -514,6 +515,15 @@ describe Loan do
     end
   end
 
+  it "should not be deleteable if verified" do
+    @loan.verified_by = User.first
+    @loan.save
+    @loan.destroy.should be_false
+
+    @loan.verified_by = nil
+    @loan.destroy.should be_true
+  end
+    
   it ".installment_dates should correctly deal with holidays" do
     Holiday.all.destroy!
     d1 = @loan.installment_dates[5]

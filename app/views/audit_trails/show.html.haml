@@ -1,15 +1,29 @@
 %div{:style => "float: right"}
-  %form{:action => "/audit_trails/dated"}
-    %b User
+  %form#audit_trail_form{:action => "/audit_trails/dated"}
+
+    %b Changes by
     = select :name => "user", :collection => [["", "All users"]] + User.all.map{|u| [u.id, u.name]}, :selected => params[:user]
-    %b Changes in
-    = select :name => "auditable_type", :collection => ["", "Branch", "Center", "Client", "Loan"], :selected => params[:auditable_type]
-    %b Date
-    = date_select "date", params[:date]||Date.today, :max_date => Date.today
+
+    %b in
+    = select :name => "auditable_type", :collection => ["", "Branch", "Center", "Client", "Loan"], :selected => params[:auditable_type], :class => "_remote_", :id => "auditable_type"
+
+    - if params[:auditable_type] and params[:col] and @properties
+      = select :name => "col", :id => "audit_col", :collection => @properties.map{|x| [x.to_s, x.to_s]}, :prompt => "select column", :selected => params[:col]
+
+    %b change type
+    = select :name => "change_action", :collection => ["", :create, :update].map{|x| [x.to_s, x]}, :selected => params[:change_action]
+
+    %b Between
+    = date_select "from_date", params[:from_date]||Date.today, :max_date => Date.today, :size => 10
+
+    %b and
+    = date_select "to_date", params[:to_date]||Date.today, :max_date => Date.today, :size => 10
     = submit "GO"
 %h1 Audit Trail
 %table.report.nojs{:width => "100%"}
-  %tr
+  %tr.header
+    %th
+      S.No.
     %th
       Type
     %th
@@ -22,19 +36,27 @@
       Changes
     %th
       User
-  -@trails.each do |trail|
+  -@trails.each_with_index do |trail, idx|
     %tr
+      - model = Kernel.const_get(trail.auditable_type)
+      - obj = model.get(trail.auditable_id)
+      %td
+        = idx + @offset + 1
       %td
         = trail.auditable_type
       %td
-        = link_to "#{trail.auditable_id}", url(:controller => trail.auditable_type.pluralize.downcase, :action => "show", :id => trail.auditable_id)
+        - if obj
+          = link_to "#{trail.auditable_id}", url(:controller => trail.auditable_type.pluralize.downcase, :action => "show", :id => trail.auditable_id)
+        - else
+          = "#{trail.auditable_id} [deleted]"
       %td.text
         = trail.action
       %td
         = trail.created_at.strftime("%d-%m-%Y %H:%M")
       %td.text
         %table{:width => '100%'}
-          =diff_display(trail.changes, trail.auditable_type, trail.action) if trail.action == :update
+          =diff_display(trail.changes, obj, trail.action)
       %td
         = trail.user ? trail.user.login : "admin"
 
+= paginate_array @trails, params, @length

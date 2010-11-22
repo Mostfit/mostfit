@@ -18,7 +18,7 @@
         =trail.action
       %td.text
         %table{:width => '100%'}
-          =diff_display(trail.changes, trail.auditable_type, trail.action)
+          =diff_display(trail.changes, @obj, trail.action)
       %td
         =trail.created_at.strftime("%d-%m-%Y %H:%M")
       %td

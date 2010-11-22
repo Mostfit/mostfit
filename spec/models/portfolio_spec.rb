@@ -26,4 +26,21 @@ describe Portfolio do
     
     outstanding_eligible.should be_equal(actual_outstanding)
   end
+
+  it "should not delete verified portfolios" do
+    @portfolio = Portfolio.new(:name => "first", :created_by => User.first, :funder => Funder.first)
+    @portfolio.save
+    @portfolio.should be_valid
+    
+    @portfolio.verified_by = User.first
+    @portfolio.should be_valid
+    @portfolio.save.should be_true
+    @portfolio.should be_valid
+    @portfolio.destroy.should == nil
+    
+    @portfolio.verified_by = nil
+    @portfolio.save
+    @portfolio.should be_valid    
+    @portfolio.destroy.should be_true
+  end  
 end
