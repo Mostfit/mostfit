@@ -54,6 +54,7 @@ class Report
     @center = Center.all(:id => params[:center_id]) if params and params[:center_id] and not params[:center_id].blank?
 
     # if the user is a staff member or funder and center is not selected then pick all the managed centers
+    debugger
     @center = if user and not @center and (params and (not params[:staff_member_id] or params[:staff_member_id].blank?))
                 if st and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
                   [st.centers, st.branches.centers].flatten
@@ -64,8 +65,10 @@ class Report
                 elsif @funder and params[:staff_member_id] and not params[:staff_member_id].blank?
                   @funder.centers & StaffMember.get(params[:staff_member_id]).centers
                 end
-              elsif params and params[:staff_member_id] and not params[:staff_member_id].blank?
+              elsif @center and params and params[:staff_member_id] and not params[:staff_member_id].blank?
                 @center & StaffMember.get(params[:staff_member_id]).centers
+              elsif params and params[:staff_member_id] and not params[:staff_member_id].blank?
+                StaffMember.get(params[:staff_member_id]).centers
               else
                 @center
               end
