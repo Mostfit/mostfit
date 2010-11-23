@@ -54,7 +54,6 @@ class Report
     @center = Center.all(:id => params[:center_id]) if params and params[:center_id] and not params[:center_id].blank?
 
     # if the user is a staff member or funder and center is not selected then pick all the managed centers
-    debugger
     @center = if user and not @center and (params and (not params[:staff_member_id] or params[:staff_member_id].blank?))
                 if st and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
                   [st.centers, st.branches.centers].flatten
