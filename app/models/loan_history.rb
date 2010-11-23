@@ -26,11 +26,16 @@ class LoanHistory
 
   property :status,                          Enum.send('[]', *STATUSES)
 
+  property :client_id,                   Integer, :index => true
+  property :client_group_id,             Integer, :index => true
+  property :center_id,                   Integer, :index => true
+  property :branch_id,                   Integer, :index => true
+
   belongs_to :loan#, :index => true
-  belongs_to :client, :index => true         # speed up reports
-  belongs_to :client_group, :index => true, :nullable => true   # by avoiding 
-  belongs_to :center, :index => true         # lots of joins!
-  belongs_to :branch, :index => true         # muahahahahahaha!
+  belongs_to :client         # speed up reports
+  belongs_to :client_group, :nullable => true   # by avoiding 
+  belongs_to :center         # lots of joins!
+  belongs_to :branch         # muahahahahahaha!
   
   validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 

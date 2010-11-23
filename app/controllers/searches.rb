@@ -32,16 +32,15 @@ class Searches < Application
 
   #get fields for all the models selected in form
   def fields
-    hash  = params.deep_clone
-    hash.delete(:controller)
-    hash.delete(:action)
-    @properties = {}
-    hash[:model].each{|counter, model|
-      klass = Kernel.const_get(model.camelcase)
-      @properties[model] = get_properties_for(klass)
-    }
+    @properties = get_all_properties(params)
     partial :fields
   end
+
+  def edit
+    @hash  = YAML::load(params[:parameters])
+    @properties = get_all_properties(@hash)
+    render
+  end  
 
   def reporting
     @counter = params[:counter]||1
@@ -79,7 +78,7 @@ class Searches < Application
 
   def get
     return "" if not params[:model] or params[:model].blank?
-    params[:counter] = (params[:counter] ? params[:counter].to_i : 0)
+    #params[:counter] = (params[:counter] ? params[:counter].to_i : 0)
     model = Kernel.const_get(params[:model][params[:counter]].singularize.camelcase)
 
     if not params[:property] or not params[:property][params[:counter]] or params[:property][params[:counter]].blank?
@@ -99,20 +98,21 @@ class Searches < Application
   end
   
   private
-  def get_values(model, property, counter)
+  def get_values(model, property, counter, value = nil)
+    value = value.to_s if value
     if property.type==Date or property.type==DateTime
-      return date_select("value[#{counter}][#{property.name}]", Date.today, :id => "value_#{counter}")
+      return date_select("value[#{counter}][#{property.name}]", value||Date.today, :id => "value_#{counter}")
     elsif [DataMapper::Types::Serial, Integer, Float, String, DataMapper::Types::Text].include?(property.type)
-      return text_field(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]")
+      return text_field(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", :value => value)
     elsif property.class==DataMapper::Associations::ManyToOne::Relationship
       return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", :collection => property.parent_model.all, 
-                    :value_method => :id, :text_method => :name,:prompt => "Choose #{property.name}")
+                    :value_method => :id, :text_method => :name,:prompt => "Choose #{property.name}", :selected => value)
     elsif property.type==DataMapper::Types::Boolean
       return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", 
-                    :collection => [["true", "yes"], ["false", "no"]], :prompt => "Choose #{property.name}")      
+                    :collection => [["true", "yes"], ["false", "no"]], :prompt => "Choose #{property.name}", :selected => value)
     elsif property.type.class==Class
       return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", 
-                    :collection => property.type.flag_map.to_a, :prompt => "Choose #{property.name}")
+                    :collection => property.type.flag_map.to_a, :prompt => "Choose #{property.name}", :selected => value)
     end
   end
 
@@ -124,5 +124,17 @@ class Searches < Application
         x.name
       end
     }
+  end
+
+  def get_all_properties(params)
+    hash  = params.deep_clone
+    hash.delete(:controller)
+    hash.delete(:action)
+    properties = {}
+    hash[:model].each{|counter, model|
+      klass = Kernel.const_get(model.camelcase)
+      properties[model] = get_properties_for(klass)
+    }
+    properties
   end
 end

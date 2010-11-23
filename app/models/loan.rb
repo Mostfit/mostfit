@@ -906,6 +906,10 @@ class Loan
     Merb.logger.info "update_history_bulk_insert done in #{Time.now - t}"
     return true
   end
+  
+  def to_s
+    id.to_s
+  end
 
   private
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
