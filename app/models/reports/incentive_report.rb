@@ -13,75 +13,131 @@ class IncentiveReport < Report
                                                                                                           
   def to_str                                                                                                   
     "#{self.start_date} - #{self.end_date}"                                                                    
-  end                          
- 
-  def calc
-    t0 = Time.now
-    @report, @hand_over_w,@taken_over_w,@hand_over_m,@taken_over_m = {},{},{},{},{}
-    StaffMember.all.to_hash
-    @from_date = Date.new(Date.today.year,Date.today.month,1).strftime('%Y-%m-%d') 
-    @to_date = Date.new(Date.today.year,Date.today.month, -1).strftime('%Y-%m-%d') 
+  end
 
-    @from_date_last = Date.new(Date.today.year,Date.today.month-1,1).strftime('%Y-%m-%d')
-    @to_date_last = Date.new(Date.today.year,Date.today.month-1, -1).strftime('%Y-%m-%d')
-    
-    @net_mgt_w,@net_mgt_m,@d2,@d4,@d15,@d17 = 0,0,0,0,0,0
-    
-    StaffMember.all(:active => true,:order => [:id.desc]).each_with_index{ |sm, idx|
+
+  def loan_count_by_frequency_and_cm_change(loan_frequency, old_cm, new_cm, center_id, from_date, to_date)
+    loan_count = repository.adapter.query(%Q{
+                 SELECT count(distinct(l.id))
+                 FROM loans l,clients cl, centers c, staff_members sm
+                 WHERE l.disbursal_date between '#{from_date}' AND '#{to_date}' 
+                       AND l.installment_frequency = #{loan_frequency} AND l.disbursed_by_staff_id = #{old_cm} 
+                       AND l.deleted_at is NULL AND cl.deleted_at is NULL AND l.client_id = cl.id 
+                       AND cl.center_id = c.id AND c.id = #{center_id} AND c.manager_staff_id = #{new_cm}})
+   
+  end
+  
+  def staff_member_work_area(sm)
+    staff_area = repository.adapter.query(%Q{
+                           SELECT distinct (b.name) 
+                           FROM clients cl, centers c, staff_members sm,branches b
+                           WHERE cl.center_id = c.id AND c.branch_id = b.id 
+                                 AND c.manager_staff_id = sm.id AND sm.id = #{sm.id}})
+  end
+
+  def new_client_count_current_month(sm, from_date, to_date)
+    new_client_count = repository.adapter.query(%Q{
+                            SELECT count(*) 
+                            FROM clients cl,centers c, staff_members sm 
+                            WHERE cl.date_joined BETWEEN '#{from_date}' AND '#{to_date}' 
+                                  AND cl.center_id = c.id AND cl.deleted_at is NULL 
+                                  AND c.manager_staff_id = sm.id AND sm.id = #{sm.id}})
+  end
+
+  def new_loan_count_current_month(sm,loan_frequency,from_date, to_date)
+    new_loan_count = repository.adapter.query(%Q{
+                           SELECT count(distinct(l.id)) 
+                           FROM loans l,staff_members sm 
+                           WHERE l.disbursal_date BETWEEN '#{from_date}' AND '#{to_date}' 
+                                 AND l.installment_frequency = #{loan_frequency}
+                                 AND l.disbursed_by_staff_id = #{sm.id} AND l.deleted_at is NULL})
+  end
+
+  def closed_loan_count_current_month(sm,loan_frequency,from_date, to_date)
+    closed_loan_count = repository.adapter.query(%Q{
+                           SELECT count(distinct (l.id))
+                           FROM loans l ,loan_history lh,staff_members sm 
+                           WHERE l.id = lh.loan_id AND l.installment_frequency = #{loan_frequency} 
+                              AND lh.status = 7 AND l.disbursed_by_staff_id = #{sm.id} 
+                              AND l.deleted_at is NULL AND lh.date between '#{from_date}' AND '#{to_date}'})
+  end
+
+  def death_cases_current_month(sm,loan_frequency,from_date, to_date)
+    death_count = repository.adapter.query(%Q{
+                           SELECT count(*) 
+                           FROM clients cl,centers c, staff_members sm, loans l 
+                           WHERE cl.date_joined BETWEEN '#{from_date}' AND '#{to_date}' 
+                              AND cl.center_id = c.id AND c.manager_staff_id = sm.id AND l.client_id = cl.id 
+                              AND sm.id = #{sm.id} AND l.installment_frequency = #{loan_frequency}
+                              AND cl.active = false AND cl.inactive_reason IN (3,4)})
+  end
+
+  def previous_month_client_count_by_loan_frequency(sm,loan_frequency,from_date_last,to_date_last)
+    pre_month_client_count = repository.adapter.query(%Q{
+                               SELECT count(*) 
+                               FROM clients cl, centers c, loans l, staff_members sm 
+                               WHERE cl.date_joined BETWEEN '#{from_date_last}' AND '#{to_date_last}' 
+                                     AND cl.center_id = c.id AND cl.deleted_at is NULL 
+                                     AND l.client_id = cl.id AND l.installment_frequency = #{loan_frequency} 
+                                     AND l.disbursal_date BETWEEN '#{from_date_last}' AND '#{to_date_last}'
+                                     AND l.disbursed_by_staff_id = #{sm.id} AND l.deleted_at is NULL
+                                     AND c.manager_staff_id = sm.id AND sm.id = #{sm.id}})
+  end
+
+  def center_change_details_for_cm(from_date,to_date)
+    @report,@hand_over_w,@taken_over_w,@hand_over_m,@taken_over_m = {},{},{},{},{}
+    StaffMember.all(:active => true,:order => [:id.desc]).each{ |sm|
       @report[sm]||={}
-      
-      center_changes = AuditTrail.all(:auditable_type => Center, :action => :update)
-      
-      center_changes.each do |trail| 
-        @center_id = trail.auditable_id  
-        @updated= trail.changes.flatten
         
-        for i in 0..(@updated.length - 1)
-          
-          q = @updated[i].keys.to_s
-          if q == "manager_staff_id"
-            
-            @staff1 = @updated[i].values[0][0] # hand over
-            @staff2 = @updated[i].values[0][1] # taken over 
+      AuditTrail.all(:auditable_type => Center, :action => :update).each do |trail| 
+        center_id = trail.auditable_id
+        data= trail.changes.flatten
+             
+        0.upto(data.length - 1).each do |change|
+          if data[change].keys.to_s == "manager_staff_id"    
+            staff1= data[change].values[0][0] # hand over
+            staff2 = data[change].values[0][1] # taken over 
             change_date = trail.created_at.strftime("%Y-%m-%d")
-            if (sm.id == @staff2)
-              @c = Center.get(@center_id)              
-              @report[sm][3] = "Transfered to Center #{@c.name} on #{change_date.to_s}"
-            elsif (sm.id == @staff1)
-              @report[sm][5] = "Released from Center #{@c.name} on #{change_date.to_s}"
+            center = Center.get(center_id)              
+            if (sm.id == staff2)
+              @report[sm][3] = "Transfered to Center #{center.name} on #{change_date.to_s}"
+            elsif (sm.id == staff1)
+              @report[sm][5] = "Released from Center #{center.name} on #{change_date.to_s}"
             end
 
-            if @staff1 == sm.id
+            if staff1== sm.id
               1.upto(2){|x|
                 if x == 1 
-                  @lf = 2
+                  loan_frequency = 2
                 else
-                  @lf = 4
+                  loan_frequency = 4
                 end
-                loan_count = repository.adapter.query("select count(distinct(l.id)) from loans l,clients cl, centers c, staff_members sm where l.disbursal_date between '#{@from_date}' and '#{@to_date}' and l.installment_frequency = #{@lf} and l.disbursed_by_staff_id = #{@staff1} and l.deleted_at is NULL and cl.deleted_at is NULL and l.client_id = cl.id and cl.center_id = c.id and c.id = #{@center_id} and c.manager_staff_id = #{@staff2}")          
-                if @lf == 2
-                  @hand_over_w[@staff]||={}
-                  @taken_over_w[@staff]||={}
-                  @hand_over_w[@staff2] = loan_count
+   
+                loan_count = loan_count_by_frequency_and_cm_change(loan_frequency, staff1, staff2, center_id, from_date, to_date)
+                
+                @hand_over_w[@staff]||={}
+                @taken_over_w[@staff]||={}
+                @hand_over_m[@staff]||={}
+                @taken_over_m[@staff]||={}
+                
+                if loan_frequency == 2
+                  @hand_over_w[staff2] = loan_count
                   @taken_over_w.map{ |k,v|     
-                    if @staff1 == k
-                      @taken_over_w[@staff1] = v
+                    if staff1 == k
+                      @taken_over_w[staff1] = loan_count[0] + v[0] 
                     else
-                      @taken_over_w[@staff1] = loan_count
+                      @taken_over_w[staff1] = loan_count
                     end
-                  }
-                  
+                  }  
                 else
-                  @hand_over_m[@staff]||={}
-                  @taken_over_m[@staff]||={}
                   @taken_over_m.map{ |k,v|     
-                    if @staff1 == k
-                      @taken_over_m[@staff1] = v 
+                    if staff1 == k
+                      @taken_over_m[staff1] = loan_count[0] + v[0]  
                     else
-                      @taken_over_m[@staff1] = loan_count
+                      @taken_over_m[staff1] = loan_count
                     end
                   }
-                  @hand_over_m[@staff2] = loan_count
+                  @hand_over_m[staff2] = loan_count
                 end
               }
             end
@@ -90,73 +146,82 @@ class IncentiveReport < Report
       end
       
     }
+  end
+                          
+  def calc
+    t0 = Time.now
+    from_date ='2009.1.1'  #Date.new(Date.today.year,Date.today.month,1).strftime('%Y-%m-%d') 
+    to_date = '2010.11.11' #Date.new(Date.today.year,Date.today.month, -1).strftime('%Y-%m-%d') 
+
+    from_date_last = Date.new(Date.today.year,Date.today.month-1,1).strftime('%Y-%m-%d')
+    to_date_last = Date.new(Date.today.year,Date.today.month-1, -1).strftime('%Y-%m-%d')
     
+    d2,d4,d15,d17 = 0,0,0,0
+    
+    center_change_details_for_cm(from_date,to_date)
+   
     StaffMember.all(:active => true,:order => [:id.desc]).each{ |sm|
+      @report[sm][4] = staff_member_work_area(sm)
+      @report[sm][6]= @report[sm][21] = new_client_count_current_month(sm,from_date,to_date)
           
-      @report[sm][4] = repository.adapter.query("select distinct (b.name) area from clients cl, centers c, staff_members sm,branches b where cl.center_id = c.id and c.branch_id = b.id and c.manager_staff_id = sm.id and sm.id = #{sm.id}")
-      
-      @report[sm][6]= @report[sm][21] = repository.adapter.query("select count(*) from clients cl,centers c, staff_members sm where cl.date_joined between '#{@from_date}' and '#{@to_date}' and cl.center_id = c.id and cl.deleted_at is NULL and c.manager_staff_id = sm.id and sm.id = #{sm.id}")
-      
       1.upto(2){ |x|
         if x == 1 
-          lf = 2
+          loan_frequency = 2
         else
-          lf = 4
+          loan_frequency = 4
         end
-        d1 = repository.adapter.query("select count(distinct(l.id)) from loans l,staff_members sm where l.disbursal_date between '#{@from_date}' and '#{@to_date}' and l.installment_frequency = #{lf} and l.disbursed_by_staff_id = #{sm.id} and l.deleted_at is NULL")
-        
+
+        d1 = new_loan_count_current_month(sm,loan_frequency,from_date, to_date)
         @taken_over_w.map{|k,v| 
           if (k == sm.id)
-            @d2 = v[0]
-            @report[sm][8] = @d2
+            d2 = v
+            @report[sm][8] = d2
           end
         }
         
-        d3 = repository.adapter.query("select count(*) from clients cl,centers c, staff_members sm where cl.date_joined between '#{@from_date_last}' and '#{@to_date_last}' and cl.center_id = c.id and cl.deleted_at is NULL and c.manager_staff_id = sm.id and sm.id = #{sm.id}")[0]
-
+        d3 = previous_month_client_count_by_loan_frequency(sm,loan_frequency,from_date_last,to_date_last)
         @hand_over_w.map{|k,v|
           if(k == sm.id)
-            @d4 = v[0]
-            @report[sm][10] = @d4
+            d4 = v
+            @report[sm][10] = d4
           end
         }
         
-        d5 = repository.adapter.query("select count(distinct (l.id)) from loans l ,loan_history lh,staff_members sm where l.id = lh.loan_id and l.installment_frequency = #{lf} and lh.status = 7 and l.disbursed_by_staff_id = #{sm.id} and l.deleted_at is NULL and lh.date between '#{@from_date}' and '#{@to_date}'")[0]
+        d5 = closed_loan_count_current_month(sm,loan_frequency,from_date, to_date)
         
-        d6 = repository.adapter.query("select count(*) from clients cl,centers c, staff_members sm, loans l where cl.date_joined between '#{@from_date}' and '#{@to_date}' and cl.center_id = c.id and c.manager_staff_id = sm.id and l.client_id = cl.id and sm.id = #{sm.id} and l.installment_frequency = #{lf} and cl.active = false and cl.inactive_reason in (3,4)")[0]
+        d6 =  death_cases_current_month(sm,loan_frequency,from_date, to_date)
 
         @taken_over_m.map{|k,v| 
           if (k == sm.id)
-            @d15 = v[0]
-            @report[sm][15] = @d15
+            d15 = v
+            @report[sm][15] = d15
           end
         }
         @hand_over_m.map{|k,v|
           if(k == sm.id)
-            @d17 = v[0]
-            @report[sm][17] = @d17
+            d17 = v
+            @report[sm][17] = d17
           end
         }
-        if lf == 2
+        if loan_frequency == 2
           @report[sm][7] = d1
           @report[sm][9] = d3 
           @report[sm][11] = d5
           @report[sm][12] = d6
           
-          @report[sm][13] = @report[sm][22] = ((d1[0]+d3[0]+@d2[0]) - (d5[0]+d6[0]+@d4[0])).abs
+          @report[sm][13] = @report[sm][22] = ((d1[0]+d3[0]+d2[0]) - (d5[0]+d6[0]+d4[0])).abs
         else
           @report[sm][14] = d1
           @report[sm][16] = d3
           @report[sm][18] = d5
           @report[sm][19] = d6
           
-          @report[sm][20] = @report[sm][23] = ((d1[0]+d3[0]+@d15[0]) - (d5[0]+d6[0]+@d17[0])).abs
+          @report[sm][20] = @report[sm][23] = ((d1[0]+d3[0]+d15[0]) - (d5[0]+d6[0]+d17[0])).abs
         end
       }
     }
-    
-    
-    IncentiveReport.all(:start_date => @from_date, :end_date =>@to_date).destroy!
+   
+    IncentiveReport.all(:start_date => from_date, :end_date =>to_date).destroy!
     self.raw = @report
     self.report = Marshal.dump(@report)
     self.generation_time = Time.now - t0
