@@ -15,7 +15,8 @@ class Bookmark
   property :share_with, Flag.send('[]', *ShareWith), :nullable => false, :default => :none, :index => true
   belongs_to :user
   
-  def self.shared_for(user, type=:other)
-    Bookmark.all(:share_with => [user.role, :all], :type => type||:other, :user.not => user) + Bookmark.all(:user => user, :type => type||:other)
+  def self.for(user, type=:other)
+    {:shared => Bookmark.all(:type => type||:other, :user.not => user).reject{|x| !(x.share_with & [user.role, :all])},  
+      :own => Bookmark.all(:user => user, :type => type||:other)}
   end
 end

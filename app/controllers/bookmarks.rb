@@ -2,7 +2,7 @@ class Bookmarks < Application
   # provides :xml, :yaml, :js
 
   def index
-    @bookmarks = Bookmark.shared_for(session.user, params[:type])
+    @bookmarks = Bookmark.for(session.user, params[:type])
     display @bookmarks, :layout => layout?
   end
 
