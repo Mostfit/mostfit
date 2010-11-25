@@ -108,9 +108,9 @@ class IncentiveReport < Report
             if staff1== sm.id
               1.upto(2){|x|
                 if x == 1 
-                  loan_frequency = 2
+                  loan_frequency = INSTALLMENT_FREQUENCIES.index(:weekly)+1
                 else
-                  loan_frequency = 4
+                  loan_frequency = INSTALLMENT_FREQUENCIES.index(:monthly)+1
                 end
    
                 loan_count = loan_count_by_frequency_and_cm_change(loan_frequency, staff1, staff2, center_id, from_date, to_date)
@@ -120,7 +120,7 @@ class IncentiveReport < Report
                 @hand_over_m[@staff]||={}
                 @taken_over_m[@staff]||={}
                 
-                if loan_frequency == 2
+                if loan_frequency == INSTALLMENT_FREQUENCIES.index(:weekly)+1
                   @hand_over_w[staff2] = loan_count
                   @taken_over_w.map{ |k,v|     
                     if staff1 == k
@@ -150,8 +150,8 @@ class IncentiveReport < Report
                           
   def calc
     t0 = Time.now
-    from_date ='2009.1.1'  #Date.new(Date.today.year,Date.today.month,1).strftime('%Y-%m-%d') 
-    to_date = '2010.11.11' #Date.new(Date.today.year,Date.today.month, -1).strftime('%Y-%m-%d') 
+    from_date = Date.new(Date.today.year,Date.today.month,1).strftime('%Y-%m-%d') 
+    to_date = Date.new(Date.today.year,Date.today.month, -1).strftime('%Y-%m-%d') 
 
     from_date_last = Date.new(Date.today.year,Date.today.month-1,1).strftime('%Y-%m-%d')
     to_date_last = Date.new(Date.today.year,Date.today.month-1, -1).strftime('%Y-%m-%d')
@@ -166,9 +166,9 @@ class IncentiveReport < Report
           
       1.upto(2){ |x|
         if x == 1 
-          loan_frequency = 2
+          loan_frequency = INSTALLMENT_FREQUENCIES.index(:weekly)+1
         else
-          loan_frequency = 4
+          loan_frequency = INSTALLMENT_FREQUENCIES.index(:monthly)+1
         end
 
         d1 = new_loan_count_current_month(sm,loan_frequency,from_date, to_date)
@@ -203,7 +203,7 @@ class IncentiveReport < Report
             @report[sm][17] = d17
           end
         }
-        if loan_frequency == 2
+        if loan_frequency == INSTALLMENT_FREQUENCIES.index(:weekly)+1
           @report[sm][7] = d1
           @report[sm][9] = d3 
           @report[sm][11] = d5
