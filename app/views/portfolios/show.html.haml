@@ -9,7 +9,10 @@
   %tr
     %td Number of loans
     %td
-      %b= @portfolio.loans.count
+      - if @portfolio.portfolio_loans.count > 0
+        %b= @portfolio.loans.count
+      -else
+        0  
   %tr.odd
     %td Starting value
     %td
@@ -57,7 +60,7 @@
     - portfolio_loans.each do |pf|
       %tr.loan
         %td
-          = link_to(pf.loan_id, "/loans/#{pf.loan_id}", {:target => "BLANK"})
+          = link_to(pf.loan_id, "/loans/#{pf.loan_id}", {:target => "BLANK", :class => "link"})
           - center_total[0]+= 1
         %td
           = pf.loan.amount

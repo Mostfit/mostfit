@@ -66,11 +66,11 @@ class Branch
     self.centers.clients.loans(hash)
   end
 
-  def self.search(q)
+  def self.search(q, per_page=10)
     if /^\d+$/.match(q)
-      Branch.all(:conditions => {:id => q}, :limit => 10)
+      Branch.all(:conditions => {:id => q}, :limit => per_page)
     else
-      Branch.all(:conditions => ["code=? or name like ?", q, q+'%'], :limit => 10)
+      Branch.all(:conditions => ["code=? or name like ?", q, q+'%'], :limit => per_page)
     end
   end
   

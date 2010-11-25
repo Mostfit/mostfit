@@ -956,6 +956,9 @@ a.expand_collapsed{
     margin-right: 5px;
     margin-left: 5px;
 }
+.floatingBox table tr td{
+    padding-bottom: 2px;
+}
 .floatingBox .closeButton{
     float: right;
     font-weight: bold;
@@ -980,17 +983,47 @@ ul#tree li span.spacer1{
 }
 ul#tree li span.spacer2{
     position: absolute;
+    margin-left: 350px;
+    padding-bottom: 10px;
+}
+ul#tree li span.spacer2a{
+    position: absolute;
+    margin-left: 300px;
+    padding-bottom: 10px;
+}
+ul#tree li span.spacer2b{
+    position: absolute;
     margin-left: 400px;
     padding-bottom: 10px;
 }
 ul#tree li span.spacer3{
     position: absolute;
-    margin-left: 500px;
+    margin-left: 600px;
+    padding-bottom: 10px;
+}
+ul#tree li span.spacer3a{
+    position: absolute;
+    margin-left: 550px;
+    padding-bottom: 10px;
+}
+ul#tree li span.spacer3b{
+    position: absolute;
+    margin-left: 650px;
     padding-bottom: 10px;
 }
 ul#tree li span.spacer4{
     position: absolute;
-    margin-left: 600px;
+    margin-left: 800px;
+    padding-bottom: 10px;
+}
+ul#tree li span.spacer4a{
+    position: absolute;
+    margin-left: 750px;
+    padding-bottom: 10px;
+}
+ul#tree li span.spacer4b{
+    position: absolute;
+    margin-left: 850px;
     padding-bottom: 10px;
 }
 ul#tree li span.spacer5{

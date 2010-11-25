@@ -196,9 +196,9 @@ class Loan
     puts
   end
 
-  def self.search(q)
+  def self.search(q, per_page)
     if /^\d+$/.match(q)
-      all(:conditions => {:id => q}, :limit => 10)
+      all(:conditions => {:id => q}, :limit => per_page)
     end
   end
 
@@ -211,8 +211,10 @@ class Loan
       1
     when :monthly
       30
-    when :bi_weekly
+    when :biweekly
       15
+    when :quadweekly
+      28
     end
   end
 
@@ -271,6 +273,8 @@ class Loan
       new_date =  date + number * 7
     when :biweekly
       new_date = date + number * 14
+    when :quadweekly
+      new_date = date + number * 28
     when :monthly
       new_month = date.month + number
       new_year  = date.year
@@ -693,6 +697,8 @@ class Loan
       then  ((date - scheduled_first_payment_date).to_f / 7).floor + 1
       when  :biweekly
       then  ((date - scheduled_first_payment_date).to_f / 14).floor + 1
+      when  :quadweekly
+      then  ((date - scheduled_first_payment_date).to_f / 28).floor + 1
       when  :monthly
       then  count = 1
             count += 1 while shift_date_by_installments(date, -count) >= scheduled_first_payment_date
@@ -899,6 +905,10 @@ class Loan
     repository.adapter.execute(sql)
     Merb.logger.info "update_history_bulk_insert done in #{Time.now - t}"
     return true
+  end
+  
+  def to_s
+    id.to_s
   end
 
   private

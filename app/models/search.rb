@@ -25,7 +25,7 @@ class Search
   end
 
   def process
-    property_to_relationship
+    relationship_to_properties
     transform_enums
     prepare_queries if queries.length==0
     return chain_queries
@@ -39,6 +39,7 @@ class Search
     objs = nil
     objs = models.first.all(queries[models.first])
     models.uniq[1..-1].each{|model|
+      debugger
       objs = objs.send(model.to_s.snake_case.pluralize, queries[model])
     }
     objs
@@ -69,11 +70,10 @@ class Search
       else
         queries[model][prop] = vals[idx]
       end
-
     }
   end
 
-  def property_to_relationship
+  def relationship_to_properties
     #check if property here is actually a relationship ?
     models.each_with_index{|m, idx|
       if not m.properties.find{|x| x.name==properties[idx].to_sym} and m.relationships[properties[idx].to_sym]

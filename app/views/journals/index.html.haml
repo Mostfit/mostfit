@@ -25,7 +25,7 @@
       %td
         = journal.id
       %td 
-        = journal.created_at.strftime("%Y/%m/%d")
+        = journal.date || journal.created_at.strftime("%Y/%m/%d")
       %td 
         = postings.first.account.name
       %td 
@@ -38,6 +38,8 @@
         = journal.journal_type.name
       %td
         = journal.comment
+      %td
+        = link_to_with_rights("edit", resource(journal, :edit)) 
 
 = paginate @journals
 

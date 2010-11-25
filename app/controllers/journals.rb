@@ -30,6 +30,23 @@ class Journals < Application
     end
   end
 
+  def edit(id)
+    only_provides :html
+    @journal = Journal.get(id)
+    raise NotFound unless @journal
+    display @journal, :layout => layout?
+  end
+
+  def update(id, journal)
+    @journal = Journal.get(id)
+    raise NotFound unless @journal
+    if @journal.update_attributes(journal)
+      redirect resource(:journals), :message => {:notice => "Journal was successfully edited"}
+    else
+      message[:error] = "Journal could not be edited"
+      redirect resource(:journals)
+    end
+  end
 
 private
   def get_context

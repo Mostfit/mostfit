@@ -2,53 +2,56 @@
 - if @objects.length>0
   - relations = @model.relationships.reject{|name, rel| rel.class!=DataMapper::Associations::ManyToOne::Relationship}.inject({}){|s,x| s+={x[1].child_key.collect{|y| y.name}.first => x[0]}}
   - model_names = constants_to_strings(@search.models)
-  = partial "bookmarks/form", :bookmark_type => 'custom_reports'
-  %div{:style => "padding-right: 35px;"}
+  = partial("bookmarks/form", :bookmark_type => 'custom_reports', :name => params[:report_name])
+  %div{:style => "padding-right: 25px;"}
     %h2
       - klass = @objects.first.class.ancestors.include?(Loan) ? "loan" : @objects.first.class.to_s.snake_case
-      = klass.camelcase
+      - if params[:report_name] and not params[:report_name].blank?
+        = params[:report_name]
+      - else
+        = klass.camelcase
+      %form{:action => "/searches/edit", :method => :post, :style => "margin-bottom: 0px;"}
+        %input{:type => "hidden", :name => "parameters", :value => YAML::dump(params)}
+        = submit "edit"
     %table
       %tr
         -@arr = Array.new;
         -@precedence.each do |model, prop|
           -keys = prop.keys
           -keys.each do |key|
-          - #puts @fields[model][key]
             -if(@fields[model][key] != nil)
-              - #puts "precedence is #{@precedence[model][key]}"
               -if(@arr[(@precedence[model][key]).to_i-1] == nil)
                 -@arr[(@precedence[model][key]).to_i-1] = [ [model, key] ]
               -else
                 -@arr[(@precedence[model][key]).to_i-1].push([model, key])
         -@arr.delete(nil)
         -@arr.flatten!(1) #flattens array once (this scheme is needed to handle
-        - #the case when a user enters same precedence for the two items
         -@arr.each do |model, key|
           %th
             -if model==klass
               =key.camelcase(' ')
             -else
               = model+' '+key.camelcase(' ')     
-            
       -@objects.each do |obj|
         %tr
           -@arr.each do |model, key|
-            -#debugger
             -if model==klass
               -if relations.find{|k,v| v==key} and obj.respond_to?(key) and child_obj = obj.send(key)
                 %td
                   =child_obj.respond_to?(:name) ? child_obj.name : child_obj
               -elsif obj.respond_to?(key)
                 %td
-                  =obj.send(key)
+                  - val = obj.send(key)
+                  = val.respond_to?(:name) ? val.name : val
               -else
                 %td
-                  =obj
+                  =obj.respond_to?(:name) ? obj.name : obj
             -elsif obj.respond_to?(model)
               -nested_obj=obj.send(model)
               %td
                 - if nested_obj.respond_to?(key)
-                  = nested_obj.send(key)
+                  - val = nested_obj.send(key)
+                  = val.respond_to?(:name) ? val.name : val
                 - else 
                   =nested_obj.respond_to?(:name) ? nested_obj.name : nested_obj
             -else

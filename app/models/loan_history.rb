@@ -26,11 +26,16 @@ class LoanHistory
 
   property :status,                          Enum.send('[]', *STATUSES)
 
+  property :client_id,                   Integer, :index => true
+  property :client_group_id,             Integer, :index => true
+  property :center_id,                   Integer, :index => true
+  property :branch_id,                   Integer, :index => true
+
   belongs_to :loan#, :index => true
-  belongs_to :client, :index => true         # speed up reports
-  belongs_to :client_group, :index => true, :nullable => true   # by avoiding 
-  belongs_to :center, :index => true         # lots of joins!
-  belongs_to :branch, :index => true         # muahahahahahaha!
+  belongs_to :client         # speed up reports
+  belongs_to :client_group, :nullable => true   # by avoiding 
+  belongs_to :center         # lots of joins!
+  belongs_to :branch         # muahahahahahaha!
   
   validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
@@ -96,6 +101,8 @@ class LoanHistory
       query = "lh.loan_id in (#{ids})"
     elsif obj.class == FundingLine
       query = "l.funding_line_id = #{obj.id}"
+    elsif obj.class == LoanProduct
+      query = "l.loan_product_id = #{obj.id}"
     elsif obj == Mfi
       query = "1"
     end
@@ -404,6 +411,7 @@ class LoanHistory
       conditions = []
       conditions << "p.id in (#{obj.map{|x| x.id}.join(',')})" if obj
       conditions << "pfl.portfolio_id = p.id"
+      conditions << "pfl.active = 1"
       conditions << "l.id = pfl.loan_id"
     elsif klass==FundingLine
       conditions <<  "l.funding_line_id in (#{obj.map{|x| x.id}.join(',')})" if obj
@@ -413,7 +421,9 @@ class LoanHistory
 
   def self.get_latest_rows_of_loans(date = Date.today, query="1")
     query = query.to_a.map{|k, v| 
-      if v.is_a?(Array)
+      if v.is_a?(Array) and v.length == 0
+        "#{k} in (NULL)"
+      elsif v.is_a?(Array)
         "#{k} in (#{v.join(", ")})"
       else
         "#{k}=#{v}"

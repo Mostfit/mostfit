@@ -25,6 +25,7 @@ class ConsolidatedReport < Report
     # if a funder is selected
     if @funder
       funder_loan_ids = @funder.loan_ids
+      funder_loan_ids = ["NULL"] if funder_loan_ids.length == 0
       extra    << "l.id in (#{funder_loan_ids.join(", ")})" 
     end
 

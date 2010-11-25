@@ -16,6 +16,6 @@ class Bookmark
   belongs_to :user
   
   def self.shared_for(user, type=:other)
-    Bookmark.all(:share_with => [user.role, :all], :type => type||:other) + Bookmark.all(:user => user, :type => type||:other)
+    Bookmark.all(:share_with => [user.role, :all], :type => type||:other, :user.not => user) + Bookmark.all(:user => user, :type => type||:other)
   end
 end

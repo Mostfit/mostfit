@@ -28,7 +28,7 @@
         %td
           = link_to portfolio.name, resource(@funder, portfolio)
         %td
-          %b= portfolio.loans.count
+          %b= portfolio.portfolio_loans.count
         %td
           %b= portfolio.start_value.to_currency if portfolio.start_value
         %td

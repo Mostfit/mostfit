@@ -1,11 +1,14 @@
 require 'builder'
 class Journal
   include DataMapper::Resource
+  include DateParser
+  
+  before :valid?, :parse_dates
  
   property :id,             Serial
   property :comment,        String
   property :transaction_id, String, :index => true  
-  property :date,           Date,   :index => true  
+  property :date,           Date,   :index => true, :default => Date.today
   property :created_at,     DateTime, :index => true  
   property :batch_id,       Integer, :nullable => true
   belongs_to :batch
@@ -19,6 +22,7 @@ class Journal
     return false if debit_account_postings.nil?  or debit_account_postings.length==0
     return false if credit_account_postings.nil? or credit_account_postings.length==0 
     return false if (credit_account_postings.map{|x| x.account_id} & debit_account_postings.map{|x| x.account_id}).length > 0
+    return false if self.postings.accounts.map{|x| x.branch_id}.uniq.length > 1
     return true
   end
 

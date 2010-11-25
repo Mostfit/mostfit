@@ -34,8 +34,10 @@ class Info < Application
       @branches[:new]  = LoanHistory.parents_where_loans_of(Branch, {:loan => {:loan_product_id => @obj.id}, :branch => new_date_hash})
       @branches[:upto] = LoanHistory.parents_where_loans_of(Branch, {:loan => {:loan_product_id => @obj.id}, :branch => upto_date_hash})
 
-      @centers[:new]  = Center.all(:id => LoanHistory.parents_where_loans_of(Center, {:loan => {:loan_product_id => @obj.id}, :center => new_date_hash}))
-      @centers[:upto] = Center.all(:id => LoanHistory.parents_where_loans_of(Center, {:loan => {:loan_product_id => @obj.id}, :center => upto_date_hash}))
+      new_center_ids  = LoanHistory.parents_where_loans_of(Center, {:loan => {:loan_product_id => @obj.id}, :center => new_date_hash})
+      upto_center_ids = LoanHistory.parents_where_loans_of(Center, {:loan => {:loan_product_id => @obj.id}, :center => upto_date_hash})
+      @centers[:new]  = Center.all(:id => new_center_ids) if new_center_ids.length > 0
+      @centers[:upto] = Center.all(:id => upto_center_ids) if upto_center_ids.length > 0
 
       @clients[:new]  = LoanHistory.parents_where_loans_of(Client, {:loan => {:loan_product_id => @obj.id}, :client => client_hash(:new)})
       @clients[:upto] = LoanHistory.parents_where_loans_of(Client, {:loan => {:loan_product_id => @obj.id}, :client => client_hash(:upto)})
@@ -143,8 +145,8 @@ private
   end
 
   def set_more_info(obj)
-    @centers_new_count  = @centers[:new].count
-    @centers_upto_count = @centers[:upto].count
+    @centers_new_count  = @centers.key?(:new) ? @centers[:new].count : 0
+    @centers_upto_count = @centers.key?(:upto) ? @centers[:upto].count : 0
 
     @groups_new_count  = (@centers_new_count>0) ? @centers[:new].client_groups(:fields => [:id]).count : 0
     @groups_upto_count = (@centers_upto_count>0) ? @centers[:upto].client_groups(:fields => [:id]).count : 0

@@ -24,7 +24,7 @@ class NonDisbursedClientsAfterGroupRecognitionTest < Report
     clients = Client.all(:id => client_ids, :fields => [:id, :name, :reference, :date_joined, :grt_pass_date, :center_id]).group_by{|client|     
       client.center_id
     }
-    loans = Loan.all(:client_id => client_ids, :fields => [:id, :client_id, :disbursal_date]).map{|l| [l.client_id, l.disbursal_date]}.to_hash
+    loans = Loan.all(:client_id => client_ids, :fields => [:id, :client_id, :scheduled_disbursal_date, :disbursal_date]).map{|l| [l.client_id, l.scheduled_disbursal_date, l.disbursal_date]}.to_hash
     @branch.each{|b|
       data[b]||= {}
       b.centers.each{|c|
@@ -32,11 +32,13 @@ class NonDisbursedClientsAfterGroupRecognitionTest < Report
         next if @center and not @center.find{|x| x.id==c.id}
         data[b][c] ||= []
         clients[c.id].each{|client|
-          data[b][c] << [client.id, client.reference, client.name, client.date_joined, client.grt_pass_date, loans[client.id],
-                         ((loans[client.id] ? loans[client.id] : @date) - client.grt_pass_date)]
+          temp = (((loans[client.id] ? loans[client.id] : @date) - client.grt_pass_date).abs)
+          if temp > 0 : temp1 = temp
+            data[b][c] << [client.id, client.reference, client.name, client.date_joined, client.grt_pass_date, loans[client.id],temp1]
+          end
         }
       }
     }
     return data
   end
-end
+end  

@@ -64,8 +64,10 @@ class Report
                 elsif @funder and params[:staff_member_id] and not params[:staff_member_id].blank?
                   @funder.centers & StaffMember.get(params[:staff_member_id]).centers
                 end
-              elsif params and params[:staff_member_id] and not params[:staff_member_id].blank?
+              elsif @center and params and params[:staff_member_id] and not params[:staff_member_id].blank?
                 @center & StaffMember.get(params[:staff_member_id]).centers
+              elsif params and params[:staff_member_id] and not params[:staff_member_id].blank?
+                StaffMember.get(params[:staff_member_id]).centers
               else
                 @center
               end

@@ -5,8 +5,8 @@
   - for bookmark in @bookmarks
     %tr
       %td
-        -if bookmark.user=session.user
-          =link_to("[Edit]", resource(bookmark, :edit), :style => "float: right")
+        -if bookmark.user == session.user
+          =link_to("[share]", resource(bookmark, :edit), :style => "float: right")
         - if bookmark.method==:get
           = link_to bookmark.name, url(:controller => bookmark.controller, :action => bookmark.action)
         -else

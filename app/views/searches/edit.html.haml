@@ -1,0 +1,63 @@
+%h1 Mostfit advanced search tool
+=form(:id => "reporting_form",  :action => "/search/reporting") do
+  %table
+    %tr
+      %th
+        %b Model
+      %th
+        %b Property
+      %th
+        %b operator
+      %th
+        %b values
+      %th
+        %b more
+    - @hash[:model].sort_by{|c, m| c}.each do |counter, model_str|
+      %tr{:id => "formdiv_#{counter}"}
+        %td
+          - model = Kernel.const_get(model_str.camelcase)
+          - if model and model.class==Class
+            = model.name
+            %input{:type => "hidden", :name => "model[#{counter}]", :id => "model_#{counter}", :value => model.name.snake_case}
+          -elsif model
+            =select :name => "model[#{counter}]", :id => "model_#{counter}", :collection => model.map{|x| [x, x.camelcase]}, :prompt => "choose model"
+          -else
+            = select :name => "model[#{counter}]", :id => "model_#{counter}", :collection => model_names, :prompt => "choose model"
+        %td
+          - properties = get_properties_for(model)
+          = select :name => "property[#{counter}]", :id => "property_#{counter}", :collection => (model and properties ? properties.map{|x| [x,x]} : []), :prompt => "choose property", :selected => @hash[:property][counter]
+        %td
+          - property = model.properties.find{|p| p.name.to_s == @hash[:property][counter]} || model.relationships[@hash[:property][counter]]
+          = select :name => "operator[#{counter}]", :id => "operator_#{counter}", :collection => Search.get_operators(property), :prompt => "choose operator", :selected => @hash[:operator][counter]
+        %td
+          %span{:id => "span_#{counter}"}
+            = get_values(model, property, counter, @hash[:value][counter][@hash[:property][counter]].to_s)
+        %td
+          = select :name => "more[#{counter}]", :id => "more_#{counter}", :class => "more", :collection => ["and", "or", "not", "chain"], :prompt => "Add more conditions", :selected => @hash[:more][counter]
+  %hr
+  %table#customtable
+    %tr
+      -@properties.each do |model, properties|
+        %td
+          %h2
+            = model
+          %table
+            - properties.each do |property|
+              %tr
+                %td
+                  - checked = (@hash[:fields] and @hash[:fields][model] and @hash[:fields][model][property]=="on" ? "checked" : nil)
+                  =check_box(:name => "fields[#{model}][#{property.to_s}]", :checked => checked)
+                %td
+                  = property.to_s.camelcase(' ')
+                %td
+                  - if checked
+                    =select(:name => "precedence[#{model}][#{property.to_s}]", :collection => %w(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20), :selected => @hash[:precedence][model][property])
+                  - else
+                    =select(:name => "precedence[#{model}][#{property.to_s}]", :collection => %w(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20), :style => "display: none")
+  %p
+    %b
+      Report name
+    %br
+    %input{:name => "report_name", :value => @hash[:report_name], :size => 50}
+  %p
+    =submit "Go"

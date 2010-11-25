@@ -7,17 +7,21 @@
       %b= @funder.name
       == (id: #{@funder.id})
   %tr
-    %td funding lines
+    %td Funding lines
     %td
       %b= @funder.funding_lines.size
   %tr.odd
-    %td first disbursement
+    %td First disbursement
     %td
       = @funder.funding_lines.min(:disbursal_date)
   %tr
-    %td last disbursement
+    %td Last disbursement
     %td
       = @funder.funding_lines.max(:disbursal_date)
+  %tr
+    %td Portfolios
+    %td      
+      %b= @funder.portfolios.size
 
 %p= link_to 'edit this funders details', resource(@funder, :edit), :class => "edit"
 

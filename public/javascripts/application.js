@@ -53,17 +53,19 @@ function fillCode(center_id, group_id){
 	});
 }
 function setToggleText(){
-    $("table.report tr td a").each(function(){
-	    if($(this).parent().parent().next().css("display")!="none"){
-		$(this).text($(this).text().replace('Expand', 'Collapse'));
-		$(this).addClass('collapse');
-		$(this).removeClass('expand');
-	    }else{
-		$(this).text($(this).text().replace('Collapse', 'Expand'));
-		$(this).addClass('expand');
-		$(this).removeClass('collapse');
-	    }
-	});
+  $("table.report tr td a").each(function(){
+    if(!$(this).hasClass("link")){
+      if($(this).parent().parent().next().css("display")!="none"){
+	$(this).text($(this).text().replace('Expand', 'Collapse'));
+	$(this).addClass('collapse');
+	$(this).removeClass('expand');
+      }else{
+	$(this).text($(this).text().replace('Collapse', 'Expand'));
+	$(this).addClass('expand');
+	$(this).removeClass('collapse');
+      }
+    }
+  });
 }
 function showThis(li, idx){
     $("div.tab_container div.tab").hide();
@@ -303,22 +305,24 @@ function attachReportingFormEvents(id){
 	  counter = $(this).attr("name").split(/\[/)[1].split("]")[0];
 
 	  $(this).find("option:selected").each(function(){
-		  for(i=types.indexOf(name)+1; i<=types.length; i++){
-		      $("#reporting_form select#"+types[i]+"_"+counter).html("");
-		  }
-		  nextType = types[types.indexOf(id.split('_')[0])+1];
-		  $.ajax({
-			url: "/search/get?counter="+counter+"&"+$("#reporting_form").serialize(),
-			success: function(data){
-                              if(nextType==="span"){
-				  $("#reporting_form span#"+nextType+'_'+counter).html(data);
-			      }else{
-				  $("#reporting_form select#"+nextType+'_'+counter).html("");
-				  $("#reporting_form select#"+nextType+'_'+counter).append(data);
-			      }
-			  }
-		    });
-	      });
+	    if(name!="value"){
+	      for(i=types.indexOf(name)+1; i<=types.length; i++){
+		$("#reporting_form select#"+types[i]+"_"+counter).html("");
+	      }
+	    }
+	    nextType = types[types.indexOf(id.split('_')[0])+1];
+	    $.ajax({
+	      url: "/search/get?counter="+counter+"&"+$("#reporting_form").serialize(),
+	      success: function(data){
+                if(nextType==="span"){
+		  $("#reporting_form span#"+nextType+'_'+counter).html(data);
+		}else{
+		  $("#reporting_form select#"+nextType+'_'+counter).html("");
+		  $("#reporting_form select#"+nextType+'_'+counter).append(data);
+		}
+	      }
+	    });
+	  });
       });
   $("#reporting_form tr#"+id+" select.more").change(function(){
 	  var type = $(this);
@@ -544,26 +548,30 @@ function fillVariableField(type, condition_id, variable_id) {
 }
 
 
-total_cols = 0;
 MAX_COLS = 20;
 function attachCustomTableEvents(){
   $("#reporting_form #customtable .checkbox").click(function() {
-      var type = $(this);
-      selected_field = window.document.getElementById(this.id.replace("fields","precedence"));
-      if(selected_field == null)
-        return;
-      if(total_cols >= MAX_COLS)
-        return;
-      if(selected_field.style.display == "none") {
-        selected_field.style.display = "";
-        selected_field.selectedIndex = total_cols;
-        total_cols++;
-      }
-      else {
-        selected_field.style.display = "none";
-        total_cols--;
-      }
-      });
+    var arr=[];
+    $("#customtable tr select").each(function(idx, select){
+      if($(select).css("display")!="none")
+	arr.push(parseInt($(select).val()));
+    });
+    var total_cols = arr.sort()[arr.length - 1];
+    var type = $(this);
+    selected_field = window.document.getElementById(this.id.replace("fields","precedence"));
+    if(selected_field == null)
+      return;
+    if(total_cols >= MAX_COLS)
+      return;
+    if(selected_field.style.display == "none") {
+      selected_field.style.display = "block";
+      selected_field.selectedIndex = total_cols;
+      total_cols++;
+    }else{
+      selected_field.style.display = "none";
+      total_cols--;
+    }
+  });
 }
 
 function confirm_for(things) {
@@ -766,15 +774,16 @@ $(document).ready(function(){
 		    parent_type = $(this).parent().parent().attr("class");
 		    parent_type_total=parent_type+"_total";
 		    if(action==="expand"){
-			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type).show();
-			$(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type_total).show();
-		    }else{
-			$(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
-			$(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
-		    }
-		    if(parent_type=="branch" && action=="collapse")
+		      $(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type).show();
+		      $(this).parent().parent().nextUntil("tr."+parent_type).filter("tr."+child_type_total).show();
+		      setToggleText();
+		    }else if(action === "collapse"){
+		      $(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
+		      $(this).parent().parent().nextUntil("tr."+parent_type_total).hide();
+		      setToggleText();
+		      if(parent_type=="branch")
 			$(this).parent().parent().nextUntil("tr.branch_total").hide();
-		    setToggleText();
+		    }
 		});
 	  }
 
@@ -869,7 +878,7 @@ $(document).ready(function(){
       $('#client_date_of_birth_month').val(dob[1]);
       $('#client_date_of_birth_day').val(dob[2]);
       return false;
-    })
+    });
   }
 
   if($('.notice')){
@@ -925,8 +934,8 @@ $(document).ready(function(){
   attachRulesFormEvents("condition", 1);
   attachRulesFormEvents("precondition", 0);
   attachRulesFormEvents("precondition", 1);
-  attachRulesFormEventsForVariableField("condition", 1/*condition_id*/, 1/*variable_id*/)
-  attachRulesFormEventsForVariableField("precondition", 1/*condition_id*/, 1/*variable_id*/)
+  attachRulesFormEventsForVariableField("condition", 1/*condition_id*/, 1/*variable_id*/);
+  attachRulesFormEventsForVariableField("precondition", 1/*condition_id*/, 1/*variable_id*/);
   $("a.enlarge_image").click(function(a){
 	  link=$(a.currentTarget);
 	  addFloater(link);
@@ -1015,6 +1024,12 @@ $(document).ready(function(){
       $("#user_form .funder").hide();
       $("#user_form #user_funder").val("");
     }
+    if($(select.currentTarget).val()==="accountant"){
+      $("#user_form .staff_member").hide();
+      $("#user_form .funder").hide();
+      $("#user_form #user_funder").val("");
+      $("#user_form #staff_member").val("");
+    }
   });
   floatHeaders();
   if($("#tree").length>0){
@@ -1036,5 +1051,9 @@ $(document).ready(function(){
 	});
       });
   }
+  if($("table#customtable").length>0){
+    attachCustomTableEvents();
+  }
+  addFloater("");
 });
 

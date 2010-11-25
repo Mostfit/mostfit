@@ -21,23 +21,58 @@ class TrialBalanceReport < Report
 
   def generate(param)
     data = {}
-    Account.all(:order => [:account_type_id.asc], :parent_id => nil, :branch_id => @branch_id).group_by{|account| account.account_type}.each{|account_type, accounts|
+    @branch_id = @branch_id.to_i if @branch_id 
+    Account.all(:order => [:account_type_id.asc], :parent_id => nil).group_by{|account| account.account_type}.each{|account_type, accounts|
       data[account_type] = recurse(accounts)
-      account_type.opening_balance = aggregates(data[account_type], :opening_balance).reduce(0){|s, x| s+=x}
+
+      account_type.opening_balance_debit  = aggregates(data[account_type], :opening_balance_debit).reduce(0){|s, x| s+=x} || 0
+      account_type.opening_balance_credit = aggregates(data[account_type], :opening_balance_credit).reduce(0){|s, x| s+=x} || 0
+
       account_type.debit  = aggregates(data[account_type], :debit).reduce(0){|s, x| s+=x}
       account_type.credit = aggregates(data[account_type], :credit).reduce(0){|s, x| s+=x}
-      account_type.balance = aggregates(data[account_type], :balance).reduce(0){|s, x| s+=x}
+
+      account_type.balance_debit = aggregates(data[account_type], :balance_debit).reduce(0){|s, x| s+=x}
+      account_type.balance_credit = aggregates(data[account_type], :balance_credit).reduce(0){|s, x| s+=x}
     }
     data
   end
 
   def recurse(accounts)
     accounts.map{|account|
-      account.debit  = (account.postings.sum(:amount, :amount.lte => 0)||0) * -1
-      account.credit = (account.postings.sum(:amount, :amount.gte => 0)||0)
-      account.balance = ((account.debit - account.credit) * -1) + account.opening_balance
-      account.children.length>0 ? [account, recurse(account.children)] : account
-    }
+      if account.branch_id == @branch_id
+        account.opening_balance_debit  = (account.opening_balance < 0 ? account.opening_balance * -1 : 0)
+        account.opening_balance_credit = (account.opening_balance > 0 ? account.opening_balance : 0)
+        
+        account.debit  = (account.postings.sum(:amount, :amount.lte => 0)||0) * -1
+        account.credit = (account.postings.sum(:amount, :amount.gte => 0)||0)
+
+        account.balance_debit  = account.debit   + account.opening_balance_debit
+        account.balance_credit = account.credit  + account.opening_balance_credit
+      else
+        account.opening_balance_debit  ||= 0
+        account.opening_balance_credit ||= 0
+        
+        account.debit  ||= 0
+        account.credit ||= 0
+
+        account.balance_debit  ||= 0
+        account.balance_credit ||= 0
+      end
+
+      if @branch_id == nil
+        if account.children.length>0
+          [account, recurse(account.children)]
+        else
+          account.branch_id == nil ? account : nil
+        end
+      else
+        if account.children.length>0 
+          [account, recurse(account.children)]
+        else
+          account.branch_id == @branch_id ? account : nil
+        end
+      end
+    }.compact
   end
   
   def aggregates(array, col)
@@ -46,7 +81,17 @@ class TrialBalanceReport < Report
     array.map{|parent, children|
       if parent.class == Account
         # parent is a Account
-        parent.instance_variable_set("@#{col}", (parent.instance_variable_get("@#{col}") + aggregates(children, col).reduce(0){|s, x| s+=x}))
+        if col == :opening_balance_credit
+          parent.opening_balance_credit = parent.opening_balance_credit + aggregates(children, col).reduce(0){|s, x| s+=x}
+        elsif col == :opening_balance_debit
+          parent.opening_balance_debit  = parent.opening_balance_debit  + aggregates(children, col).reduce(0){|s, x| s+=x}
+        elsif col == :balance_credit
+          parent.balance_credit = parent.balance_credit + aggregates(children, col).reduce(0){|s, x| s+=x}
+        elsif col == :balance_debit
+          parent.balance_debit  = parent.balance_debit + aggregates(children, col).reduce(0){|s, x| s+=x}
+        else
+          parent.instance_variable_set("@#{col}", (parent.instance_variable_get("@#{col}") + aggregates(children, col).reduce(0){|s, x| s+=x}))
+        end
       else
         # parent is a collection of account
         aggregates(parent, col)

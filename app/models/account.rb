@@ -1,6 +1,6 @@
 class Account
   include DataMapper::Resource
-  attr_accessor :debit, :credit, :balance
+  attr_accessor :debit, :credit, :balance, :balance_debit, :balance_credit, :opening_balance_debit, :opening_balance_credit
   before :save, :convert_blank_to_nil
 
   property :id,                     Serial  
