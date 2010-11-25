@@ -89,13 +89,14 @@ class IncentiveReport < Report
       AuditTrail.all(:auditable_type => Center, :action => :update).each do |trail| 
         center_id = trail.auditable_id
         data= trail.changes.flatten
-             
+
         0.upto(data.length - 1).each do |change|
           if data[change].keys.to_s == "manager_staff_id"    
             staff1= data[change].values[0][0] # hand over
             staff2 = data[change].values[0][1] # taken over 
             change_date = trail.created_at.strftime("%Y-%m-%d")
-            center = Center.get(center_id)              
+            center = @centers[center_id]
+            next unless center
             if (sm.id == staff2)
               @report[sm][3] = "Transfered to Center #{center.name} on #{change_date.to_s}"
             elsif (sm.id == staff1)
@@ -144,9 +145,10 @@ class IncentiveReport < Report
       
     }
   end
-                          
+
   def calc
     t0 = Time.now
+    @centers =  Center.all.map{|c| [c.id, c]}.to_hash
     from_date = Date.new(Date.today.year,Date.today.month,1).strftime('%Y-%m-%d') 
     to_date = Date.new(Date.today.year,Date.today.month, -1).strftime('%Y-%m-%d') 
 
