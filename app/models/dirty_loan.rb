@@ -23,11 +23,12 @@ class DirtyLoan
   def self.clear(id=nil)
     hash = {}
     hash[:cleaned_at] = nil
-    hash[:cleaning_started] = nil
     hash[:id] = id if id
     DirtyLoan.all(hash).each{|dl|
-      dl.cleaning_started = Time.now
-      dl.save
+      if not dl.cleaning_started or (Time.now.to_time - dl.cleaning_started.to_time > 14400)
+        dl.cleaning_started = Time.now
+        dl.save
+      end
       begin
         dl.loan.update_history(true)
         dl.cleaned_at = Time.now

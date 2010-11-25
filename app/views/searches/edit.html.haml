@@ -50,7 +50,7 @@
                 %td
                   = property.to_s.camelcase(' ')
                 %td
-                  - if checked
+                  - if checked and @hash[:precedence] and @hash[:precedence][model] and @hash[:precedence][model][property]
                     =select(:name => "precedence[#{model}][#{property.to_s}]", :collection => %w(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20), :selected => @hash[:precedence][model][property])
                   - else
                     =select(:name => "precedence[#{model}][#{property.to_s}]", :collection => %w(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20), :style => "display: none")

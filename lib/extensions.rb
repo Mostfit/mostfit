@@ -162,7 +162,7 @@ module Misfit
         end
         
         if @staff
-          return additional_checks if @route.has_key?(:id) and @route[:id] and @controller == "controller"
+          return additional_checks if @route.has_key?(:id) and @route[:id]
           if ["staff_members", "branches"].include?(@controller)
             if not CUD_Actions.include?(@action)
               return true

@@ -73,9 +73,9 @@ class GraphData < Application
 
   def branch(id)
     @branch    = Branch.get(id)
-    start_date = repository.adapter.query("select MIN(l.scheduled_disbursal_date) start_date FROM loans l, clients cl, centers c, branches b WHERE l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id AND b.id=#{id.to_i}")[0]
+    start_date = repository.adapter.query("select MIN(l.scheduled_disbursal_date) start_date FROM loans l, clients cl, centers c, branches b WHERE l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id AND b.id=#{id.to_i} AND l.deleted_at is NULL")[0]
     end_date   = Date.today
-    loan_ids   = repository.adapter.query("select l.id start_date FROM loans l, clients cl, centers c, branches b WHERE l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id AND b.id=#{id.to_i}")
+    loan_ids   = repository.adapter.query("select l.id start_date FROM loans l, clients cl, centers c, branches b WHERE l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id AND b.id=#{id.to_i} AND l.deleted_at is null")
     weekly_aggregate_loan_graph(loan_ids, start_date, end_date)
   end
 
@@ -87,7 +87,7 @@ class GraphData < Application
   end
   
   def loan_aging
-    vals = repository.adapter.query("select count(cl.id) count,cl.date_joined date from clients cl,centers c where cl.center_id=c.id GROUP BY date(cl.date_joined)")
+    vals = repository.adapter.query("select count(cl.id) count,cl.date_joined date from clients cl,centers c where cl.center_id=c.id AND cl.deleted_at is NULL GROUP BY date(cl.date_joined)")
     graph = BarGraph.new("Growth in number of borrowers")
     graph.data(vals.sort_by{|x| x.date})
     graph.x_axis.steps=5
@@ -270,30 +270,26 @@ class GraphData < Application
 
   def dashboard
     labels = []
-    case params[:id]
-    when "branch_pie"
+    if params[:id] == "branch_pie"
       vals = repository.adapter.query(%Q{SELECT SUM(l.amount) amount, b.name name
                                          FROM loans l, clients cl, centers c, branches b
                                          WHERE l.client_id=cl.id AND cl.center_id=c.id AND b.id=c.branch_id GROUP BY b.id;})
       graph = PieGraph.new("Branch growth by loan value")
       graph.data(vals, :amount, :name)
       graph.generate
-    when "center_day"
+      
       date =  Date.parse(params[:date])
-      # restrict branch manager and center managers to their own branches
-      centers = ""
       if session.user.role==:staff_member
         st = session.user.staff_member
-        center_ids = [st.branches.centers.map{|x| x.id}, st.centers.map{|x| x.id}].flatten.compact
-        center_ids = ["NULL"] if center_ids.length==0
-        center_ids = "AND center_id in (#{center_ids.join(',')})"
+        branches_ids = [st.branches.map{|x| x.id}, st.centers.branches.map{|x| x.id}].flatten.compact
+        branches_ids = ["NULL"] if center_ids.length==0
+        branches_ids = "AND branch_id in (#{center_ids.join(',')})"
       end
-      
       vals = repository.adapter.query(%Q{
-                                         SELECT SUM(lh.principal_due), SUM(lh.principal_paid), c.name
-                                         FROM loan_history lh, centers c
-                                         WHERE lh.center_id = c.id #{center_ids} AND date = '#{date.strftime('%Y-%m-%d')}' GROUP BY lh.center_id})
-      
+                                         SELECT SUM(lh.principal_due), SUM(lh.principal_paid), b.name
+                                         FROM loan_history lh, branches b
+                                         WHERE lh.branch_id = b.id #{branches_ids} AND date = '#{date.strftime('%Y-%m-%d')}' AND status in (5,6)
+                                         GROUP BY lh.branch_id})
       values = vals.map do |v| 
         val = v[0] + v[1]
         color_ratio = (val == 0 ? 1 : v[0]/val)
@@ -303,7 +299,37 @@ class GraphData < Application
         color = "00" + color if color.length == 4
         {:value => val.to_i, :label => "#{v[2]}( #{v[1].to_i}/ #{(v[1]+v[0]).to_i})", :colour => color}
       end
-      type="pie" 
+      type="pie"
+    else
+      date = params[:date] ? Date.parse(params[:date]) : Date.today
+      hash = {:date => date, :status => [:outstanding, :disbursed]}
+      # restrict branch manager and center managers to their own branches
+      if session.user.role==:staff_member
+        st = session.user.staff_member
+        hash[:center_id] = [st.branches.centers.map{|x| x.id}, st.centers.map{|x| x.id}].flatten.compact
+      end
+
+      hash[:branch_id] = params[:branch_id].to_i if params[:branch_id]
+
+      if params[:branch_id]
+        vals = LoanHistory.all(hash).aggregate(:center_id, :principal_paid.sum, :interest_paid.sum, :principal_due.sum, :interest_due.sum)
+        objs = Center.all(:fields => [:id, :name], :id => vals.map{|x| x[0]})
+      else
+        vals = LoanHistory.all(hash).aggregate(:branch_id, :principal_paid.sum, :interest_paid.sum, :principal_due.sum, :interest_due.sum)
+        objs = Branch.all(:fields => [:id, :name], :id => vals.map{|x| x[0]})
+      end
+      values = vals.map do |oid, pp, ip, pd, id| 
+        due = pd + id
+        paid = pp + ip
+
+        color_ratio = due == 0 ? 1 : paid/(paid + due).to_f
+        color_ratio = 0 if color_ratio < 0
+        color = (255 - 255 * color_ratio).to_i.to_s(16) + (255 * color_ratio).to_i.to_s(16) + "00"
+        color = color + "0" * (6 - color.length) if color.length < 6
+        percent = (paid*100/(paid + due)).to_i
+        {:value => (paid + due).to_i, :label => "#{objs.find{|x| x.id ==  oid}.name} -  (paid: #{percent}%)", :colour => color}
+      end
+      type="pie"
     end
     render_graph(values, type, labels)
   end
@@ -317,7 +343,7 @@ class GraphData < Application
 
   private
   def display_from_cache
-    return false if params[:action]=="dashboard" and params[:id]=="center_day"
+    return false if params[:action]=="dashboard" and (params[:id]=="center_day" or params[:id] == "branch_day")
     file = get_cached_filename
     return true unless File.exists?(file)
     return true if not File.mtime(file).to_date==Date.today
@@ -325,7 +351,7 @@ class GraphData < Application
   end
   
   def store_to_cache
-    return false if params[:action]=="dashboard" and params[:id]=="center_day"
+    return false if params[:action]=="dashboard" and (params[:id]=="center_day" or params[:id] == "branch_day")
     file = get_cached_filename
     if not (File.exists?(file) and File.mtime(file).to_date==Date.today)
       File.open(file, "w"){|f|
