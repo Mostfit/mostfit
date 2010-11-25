@@ -40,15 +40,14 @@ class ClientGroup
   def sync_clients
     return unless self.valid?
     Client.all(:client_group_id => self.id).each{|client|
+      client.center = self.center
+      client.save_self
+
       client.loans.each{|l|
         if [:rejected, :repaid, :written_off, :claim_settlement].include?(l.status)
-          client.center = self.center
-          client.save_self
           repository.adapter.execute("update loan_history set center_id=#{self.center.id}, client_group_id=#{self.id} where loan_id=#{l.id}")
         else
-          #l.update_history
-          client.center = self.center
-          client.save
+          l.update_history
         end
       }
     }
