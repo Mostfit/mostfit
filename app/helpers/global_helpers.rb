@@ -309,22 +309,24 @@ module Merb
         model = Kernel.const_get(obj)
       else
         model = obj.class
-        relations = model.relationships.map{|k,v| {v.child_key.first.name => k}}.reduce({}){|s,x| s+=x}
+        relations = model.relationships.find_all{|k, v|
+          v.class ==  DataMapper::Associations::ManyToOne::Relationship
+        }.map{|k,v| {v.child_key.first.name => [k, v.parent_key.first.model]}}.reduce({}){|s,x| s+=x}
       end
 
       arr.map{|change|
         next unless change
         change.map{|k, v|
           if relations.key?(k)
-            str = "<tr><td>#{relations[k].to_s.humanize}</td><td>"
-            str += if action==:update and v.class==Array                 
-                     "changed from #{obj.send(relations[k]).name}</td><td>to #{obj.send(relations[k]).name}"
-                   elsif action==:create and v.class==Array                 
-                     "#{obj.send(relations[k]).name}"
+            str = "<tr><td>#{relations[k].first.to_s.humanize}</td><td>"
+            str += (if action==:update and v.class==Array
+                     "changed from #{relations[k].last.get(v.first).name}</td><td>to #{relations[k].last.get(v.last).name}"
+                   elsif action==:create and v.class==Array
+                     child_obj = relations[k].last.get(v.last)
+                     ((child_obj and child_obj.respond_to?(:name)) ? child_obj.name : "id: #{v.last}")
                    else
-                     "#{v}"       
-                   end
-            
+                     "#{v}"
+                   end)||""
           else
             str="<tr><td>#{k.humanize}</td><td>"
             str+=if action==:update and v.class==Array                 
