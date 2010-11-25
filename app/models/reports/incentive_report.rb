@@ -1,54 +1,51 @@
 class IncentiveReport < Report
 #  attr_accessor :from_date, :to_date
-  def initialize(start_date)                                                                                   
-  
-    self.start_date = (start_date.is_a? Date) ? start_date : Date.parse(start_date)                            
+  def initialize(start_date)  
+    self.start_date = (start_date.is_a? Date) ? start_date : Date.parse(start_date)
     self.end_date   = Date.new(Date.today.year,Date.today.month, -1).strftime('%Y-%m-%d')
-    @name = "Incentive report"                                                             
-  end                                                                                                         
- 
-  def name                                                                                                     
-    "month starting #{self.start_date} upto #{self.end_date}"
+    @name = "Incentive report"
   end
-                                                                                                          
-  def to_str                                                                                                   
-    "#{self.start_date} - #{self.end_date}"                                                                    
+ 
+  def name
+    "Month starting #{self.start_date} upto #{self.end_date}"
   end
 
+  def to_str
+    "#{self.start_date} - #{self.end_date}"
+  end
 
   def loan_count_by_frequency_and_cm_change(loan_frequency, old_cm, new_cm, center_id, from_date, to_date)
     loan_count = repository.adapter.query(%Q{
                  SELECT count(distinct(l.id))
                  FROM loans l,clients cl, centers c, staff_members sm
-                 WHERE l.disbursal_date between '#{from_date}' AND '#{to_date}' 
-                       AND l.installment_frequency = #{loan_frequency} AND l.disbursed_by_staff_id = #{old_cm} 
-                       AND l.deleted_at is NULL AND cl.deleted_at is NULL AND l.client_id = cl.id 
+                 WHERE l.disbursal_date between '#{from_date}' AND '#{to_date}'
+                       AND l.installment_frequency = #{loan_frequency} AND l.disbursed_by_staff_id = #{old_cm}
+                       AND l.deleted_at is NULL AND cl.deleted_at is NULL AND l.client_id = cl.id
                        AND cl.center_id = c.id AND c.id = #{center_id} AND c.manager_staff_id = #{new_cm}})
-   
   end
-  
+
   def staff_member_work_area(sm)
     staff_area = repository.adapter.query(%Q{
-                           SELECT distinct (b.name) 
+                           SELECT distinct (b.name)
                            FROM clients cl, centers c, staff_members sm,branches b
-                           WHERE cl.center_id = c.id AND c.branch_id = b.id 
+                           WHERE cl.center_id = c.id AND c.branch_id = b.id
                                  AND c.manager_staff_id = sm.id AND sm.id = #{sm.id}})
   end
 
   def new_client_count_current_month(sm, from_date, to_date)
     new_client_count = repository.adapter.query(%Q{
-                            SELECT count(*) 
-                            FROM clients cl,centers c, staff_members sm 
-                            WHERE cl.date_joined BETWEEN '#{from_date}' AND '#{to_date}' 
-                                  AND cl.center_id = c.id AND cl.deleted_at is NULL 
+                            SELECT count(*)
+                            FROM clients cl,centers c, staff_members sm
+                            WHERE cl.date_joined BETWEEN '#{from_date}' AND '#{to_date}'
+                                  AND cl.center_id = c.id AND cl.deleted_at is NULL
                                   AND c.manager_staff_id = sm.id AND sm.id = #{sm.id}})
   end
 
   def new_loan_count_current_month(sm,loan_frequency,from_date, to_date)
     new_loan_count = repository.adapter.query(%Q{
-                           SELECT count(distinct(l.id)) 
-                           FROM loans l,staff_members sm 
-                           WHERE l.disbursal_date BETWEEN '#{from_date}' AND '#{to_date}' 
+                           SELECT count(distinct(l.id))
+                           FROM loans l,staff_members sm
+                           WHERE l.disbursal_date BETWEEN '#{from_date}' AND '#{to_date}'
                                  AND l.installment_frequency = #{loan_frequency}
                                  AND l.disbursed_by_staff_id = #{sm.id} AND l.deleted_at is NULL})
   end
@@ -56,29 +53,29 @@ class IncentiveReport < Report
   def closed_loan_count_current_month(sm,loan_frequency,from_date, to_date)
     closed_loan_count = repository.adapter.query(%Q{
                            SELECT count(distinct (l.id))
-                           FROM loans l ,loan_history lh,staff_members sm 
-                           WHERE l.id = lh.loan_id AND l.installment_frequency = #{loan_frequency} 
-                              AND lh.status = 7 AND l.disbursed_by_staff_id = #{sm.id} 
+                           FROM loans l ,loan_history lh,staff_members sm
+                           WHERE l.id = lh.loan_id AND l.installment_frequency = #{loan_frequency}
+                              AND lh.status = 7 AND l.disbursed_by_staff_id = #{sm.id}
                               AND l.deleted_at is NULL AND lh.date between '#{from_date}' AND '#{to_date}'})
   end
 
   def death_cases_current_month(sm,loan_frequency,from_date, to_date)
     death_count = repository.adapter.query(%Q{
-                           SELECT count(*) 
-                           FROM clients cl,centers c, staff_members sm, loans l 
-                           WHERE cl.date_joined BETWEEN '#{from_date}' AND '#{to_date}' 
-                              AND cl.center_id = c.id AND c.manager_staff_id = sm.id AND l.client_id = cl.id 
+                           SELECT count(*)
+                           FROM clients cl,centers c, staff_members sm, loans l
+                           WHERE cl.date_joined BETWEEN '#{from_date}' AND '#{to_date}'
+                              AND cl.center_id = c.id AND c.manager_staff_id = sm.id AND l.client_id = cl.id
                               AND sm.id = #{sm.id} AND l.installment_frequency = #{loan_frequency}
                               AND cl.active = false AND cl.inactive_reason IN (3,4)})
   end
 
   def previous_month_client_count_by_loan_frequency(sm,loan_frequency,from_date_last,to_date_last)
     pre_month_client_count = repository.adapter.query(%Q{
-                               SELECT count(*) 
-                               FROM clients cl, centers c, loans l, staff_members sm 
-                               WHERE cl.date_joined BETWEEN '#{from_date_last}' AND '#{to_date_last}' 
-                                     AND cl.center_id = c.id AND cl.deleted_at is NULL 
-                                     AND l.client_id = cl.id AND l.installment_frequency = #{loan_frequency} 
+                               SELECT count(*)
+                               FROM clients cl, centers c, loans l, staff_members sm
+                               WHERE cl.date_joined BETWEEN '#{from_date_last}' AND '#{to_date_last}'
+                                     AND cl.center_id = c.id AND cl.deleted_at is NULL
+                                     AND l.client_id = cl.id AND l.installment_frequency = #{loan_frequency}
                                      AND l.disbursal_date BETWEEN '#{from_date_last}' AND '#{to_date_last}'
                                      AND l.disbursed_by_staff_id = #{sm.id} AND l.deleted_at is NULL
                                      AND c.manager_staff_id = sm.id AND sm.id = #{sm.id}})
