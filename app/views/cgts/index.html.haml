@@ -4,7 +4,7 @@
 
 = partial :cgts
 
-= form_for(@cgt, :action => resource(@client_group, :cgts)) do
+= form_for(@cgt, :action => resource(@client_group, :cgts, :return => params[:return])) do
   = error_messages_for(@cgt)
   %h3
     %a.add Add a CGT day number

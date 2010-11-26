@@ -3,10 +3,20 @@
 = error_messages_for @client_group
 
 - cancel_url = (params[:controller]=="data_entry/client_groups" ? url(:data_entry) : resource(@branch, @center, :client_groups))
-- form_url   = (params[:controller]=="data_entry/client_groups" ? url(:enter_groups, :action => "update", :id => @client_group) : resource(@branch, @center, @client_group))
+- form_url   = (params[:controller]=="data_entry/client_groups" ? url(:controller => "client_groups", :action => "update", :id => @client_group, :return => "/data_entry") : resource(@branch, @center, @client_group))
 
 = form_for(@client_group, :action => form_url) do
   = partial "client_groups/fields", :submit_text => "Save changes", :cancel_link => cancel_url
+
+%hr
+%h1 CGTs
+= link_to 'Manage CGTs', resource(@client_group, :cgts, :return => @return), :class => 'edit'
+= partial 'cgts/cgts'
+
+%h1 GRTs
+= link_to 'Manage GRTs', resource(@client_group, :grts, :return => @return), :class => 'edit'
+= partial 'grts/grts'
+
 
 %hr
 %h1 
