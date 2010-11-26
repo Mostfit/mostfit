@@ -61,7 +61,11 @@ class ClientGroups < Application
     @client_group.center = Center.get(client_group[:center_id])
     if @client_group.save
       message  = {:notice => "Group was successfully edited"}      
-      (@branch and @center) ? redirect(resource(@client_group.center.branch, @client_group.center), :message => message) : redirect(resource(@client_group), :message => message)
+      if params[:return] and not params[:return].blank?
+        redirect(params[:return], :message => message)
+      else
+        (@branch and @center) ? redirect(resource(@client_group.center.branch, @client_group.center), :message => message) : redirect(resource(@client_group), :message => message)
+      end
     else
       display @client_group, :edit
     end

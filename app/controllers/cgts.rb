@@ -30,11 +30,19 @@ class Cgts < Application
   def create(cgt)
     @cgt = Cgt.new(cgt)
     if @cgt.save
-      redirect resource(@client_group, :cgts), :message => {:notice => "Cgt was successfully created"}
+      if params[:return] and not params[:return].blank?
+        redirect params[:return], :message => {:notice => "Cgt was successfully created"}
+      else
+        redirect resource(@client_group, :cgts), :message => {:notice => "Cgt was successfully created"}
+      end
     else
       message[:error] = "Cgt failed to be created"
       @cgts = @client_group.cgts
-      render :index
+      if params[:return] and not params[:return].blank?
+        redirect params[:return], :message => message
+      else
+        render :index
+      end
     end
   end
 
@@ -42,9 +50,17 @@ class Cgts < Application
     @cgt = Cgt.get(id)
     raise NotFound unless @cgt
     if @cgt.update(cgt)
-       redirect resource(@client_group)
+      if params[:return] and not params[:return].blank?
+        redirect params[:return], :message => {:notice => "Cgt was successfully saved"}
+      else
+        redirect resource(@client_group), :message => {:notice => "Cgt was successfully saved"}
+      end
     else
-      display @cgt, :edit
+      if params[:return] and not params[:return].blank?
+        redirect params[:return]
+      else
+        display @cgt, :edit
+      end
     end
   end
 

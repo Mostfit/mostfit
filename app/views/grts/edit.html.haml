@@ -3,7 +3,7 @@
 
 = error_messages_for @grt
 
-= form_for(@grt, :action => resource(@client_group, @grt)) do
+= form_for(@grt, :action => resource(@client_group, @grt, {:return => params[:return]})) do
   %table
     %tr
       %th

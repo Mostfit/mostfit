@@ -18,11 +18,9 @@
   
   
 %h1 CGTs
-= link_to 'Manage CGTs', resource(@client_group, :cgts), :class => 'edit'
+= link_to 'Manage CGTs', resource(@client_group, :cgts, :return => @return), :class => 'edit'
 = partial 'cgts/cgts'
 
 %h1 GRTs
-= link_to 'Manage GRTs', resource(@client_group, :grts), :class => 'edit'
+= link_to 'Manage GRTs', resource(@client_group, :grts, :return => @return), :class => 'edit'
 = partial 'grts/grts'
-
-

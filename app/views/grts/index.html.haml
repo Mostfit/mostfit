@@ -6,7 +6,7 @@
 
 = error_messages_for @grt
 %h2
-  = form_for(@grt, :action => resource(@client_group, :grts)) do
+  = form_for(@grt, :action => resource(@client_group, :grts, :return => params[:return])) do
     Add a GRT on
     = date_select_for @grt, :date
     = submit 'Add GRT'

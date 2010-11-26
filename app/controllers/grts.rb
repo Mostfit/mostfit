@@ -31,11 +31,20 @@ class Grts < Application
     @grt = Grt.new(grt)
     @grt.client_group = @client_group
     if @grt.save
-      redirect resource(@client_group, :grts), :message => {:notice => "GRT was created succesfully"}
+      message = {:notice => "GRT was successfully created"}
+      if params[:return] and not params[:return].blank?
+        redirect params[:return], :message => message
+      else
+        redirect resource(@client_group, :grts), :message => message
+      end
     else
-      message[:error] = "Cgt failed to be created"
+      message = {:error => "GRT failed to be created"}
       @grts = @client_group.grts
-      render :index
+      if params[:return] and not params[:return].blank?
+        redirect params[:return], :message => message
+      else
+        render :index
+      end
     end
   end
 
@@ -44,9 +53,19 @@ class Grts < Application
     @grt.client_group = @client_group
     raise NotFound unless @grt
     if @grt.update(grt)
-      redirect resource(:grts)
+      message = {:notice => "GRT was successfully saved"}
+      if params[:return] and not params[:return].blank?
+        redirect params[:return], :message => message
+      else
+        redirect resource(@client_group, :grts)
+      end     
     else
-      display @grt, :edit
+      message = {:notice => "GRT was failed to be saved"}      
+      if params[:return] and not params[:return].blank?
+        redirect params[:return], :message => message
+      else
+        display @grt, :edit
+      end      
     end
   end
 

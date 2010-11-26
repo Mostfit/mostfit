@@ -451,7 +451,7 @@ a.button:visited {
 
 #header_search_div {
     position: absolute; 
-    right: 10%;
+    right: -4%;
     padding: 3px;
     padding-bottom: 0px;    
     vertical-align: top;
@@ -460,6 +460,9 @@ a.button:visited {
 #header_search_div input{
     font-size: 1.5em;
     border: 1px solid #75b516;
+}
+#header_search_div input:first{
+    width: 100px;
 }
 
 div.log_box{
@@ -478,23 +481,20 @@ table#data_entry_index tr td{
 table#data_entry_index tr td img{
     padding-left: 2em;   
 }
-
-
 #darkenBackground {
-background-color: rgb(0, 0, 0);
-opacity: 0.7; /* Safari, Opera */
--moz-opacity:0.70; /* FireFox */
-filter: alpha(opacity=70); /* IE */
-z-index: 20;
-height: 100%;
-width: 100%;
-background-repeat:repeat;
-position:fixed;
-top: 0px;
-left: 0px;
-display: none;
+    background-color: rgb(0, 0, 0);
+    opacity: 0.7; /* Safari, Opera */
+    -moz-opacity:0.70; /* FireFox */
+    filter: alpha(opacity=70); /* IE */
+    z-index: 20;
+    height: 100%;
+    width: 100%;
+    background-repeat:repeat;
+    position:fixed;
+    top: 0px;
+    left: 0px;
+    display: none;
 }
-
 #loading {
   width:66%;
   position: relative;
