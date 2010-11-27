@@ -53,10 +53,10 @@ module Misfit
       :mis_manager => all_controllers_except([:users, :admin]),
       :data_entry => {
         :all => [:search, :comments, :documents, :"data_entry/client_groups", :"data_entry/payments", :"data_entry/clients",:"data_entry/loans", :"data_entry/index", 
-                :clients, :loans, :client_groups, :cgts, :grts]
+                 :clients, :loans, :client_groups, :cgts, :grts]
       },
       :read_only => {
-        :all => [:searches, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :insurance_policies, 
+        :all => [:searches, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :insurance_policies, :audit_trails,
                  :insurance_companies, :areas, :staff_members, :loan_products, :holidays, :document_types, :occupations, :client_types, :fees, :funders, :attendances, :dashboard, :graph_data]
       },
       :staff_member => {
