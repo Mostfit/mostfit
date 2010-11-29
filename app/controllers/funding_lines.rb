@@ -25,7 +25,7 @@ class FundingLines < Application
     @funding_line = FundingLine.new(funding_line)
     @funding_line.funder = @funder
     if @funding_line.save
-      redirect resource(@funder, :funding_lines), :message => {:notice => "FundingLine was successfully created"}
+      redirect resource(@funder), :message => {:notice => "FundingLine was successfully created"}
     else
       render :new
     end
@@ -44,7 +44,7 @@ class FundingLines < Application
     @funding_line = FundingLine.get(id)
     raise NotFound unless @funding_line
     if @funding_line.update_attributes(funding_line)
-       redirect resource(@funder, :funding_lines)
+       redirect resource(@funder)
     else
       display @funding_line, :edit
     end
