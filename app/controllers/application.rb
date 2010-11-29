@@ -134,7 +134,7 @@ class Application < Merb::Controller
   def add_collections
     return unless session.user.role==:funder
     return unless @@controllers.include?(params[:controller])
-
+    return if params[:controller] == "loans"
     @funder = Funder.first(:user_id => session.user.id)
     idx     = @@controllers.index(params[:controller])
     idx    += 1 if params[:action] != "index" and not (params[:controller] == "staff_members" or params[:controller] == "funding_lines")

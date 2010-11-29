@@ -85,7 +85,7 @@ class Funder
 
   # this function gives out all the payments that are accessible to a funder
   def payments(hash={})
-    Loan.all(:funding_line_id => funding_lines.map{|x| x.id}).payments(hash) + Loan.all(:fields => [:id], :id => self.portfolios_loans.map{|x| x.loan_id}).payments(hash)
+    Loan.all(:funding_line_id => funding_lines.map{|x| x.id}).payments(hash) + Loan.all(:fields => [:id], :id => self.portfolios.portfolio_loans.map{|x| x.loan_id}).payments(hash)
   end
 
   def staff_members(hash={})
