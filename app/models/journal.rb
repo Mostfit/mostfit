@@ -23,6 +23,7 @@ class Journal
     return false if credit_account_postings.nil? or credit_account_postings.length==0 
     return false if (credit_account_postings.map{|x| x.account_id} & debit_account_postings.map{|x| x.account_id}).length > 0
     return false if self.postings.accounts.map{|x| x.branch_id}.uniq.length > 1
+    return false if self.postings.map{|x| x.account_id}.compact.length != self.postings.length
     return true
   end
 
