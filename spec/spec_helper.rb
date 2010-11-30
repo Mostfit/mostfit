@@ -47,3 +47,10 @@ def load_fixtures(*files)
   end
 end
 
+class MockLog
+  def info(data)
+  end
+
+  def error(data)
+  end
+end

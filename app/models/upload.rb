@@ -63,7 +63,7 @@ class Upload
           end
         end    
       }
-      log.info("<font color='#8DC73F'><b>Created #{model.count} #{model.to_s.plural}</b></strong>")
+      log.info("<font color='#8DC73F'><b>Created #{model.count} #{model.to_s.plural}</b></strong>") if log
     }
   end
 end
