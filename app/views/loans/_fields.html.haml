@@ -80,7 +80,7 @@
       Application:
     %td
       on&nbsp;&nbsp;
-      = date_select_for @loan, :applied_on
+      = date_select_for @loan, :applied_on, :selected => Date.today
       &nbsp;&nbsp;by&nbsp;&nbsp;
       = select_staff_member_for @loan, :applied_by, :selected => @client.center.manager.id.to_s, :id => "applied_by"
   %tr
@@ -88,13 +88,21 @@
       Scheduled disbursal date:
     %td
       on&nbsp;&nbsp;
-      = date_select_for @loan, :scheduled_disbursal_date, :max_date => Date.max_date
-  %tr
-    %td
-      Scheduled first payment:
-    %td
-      on&nbsp;&nbsp;
-      = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date
+      = date_select_for @loan, :scheduled_disbursal_date, :selected => Date.today + 7, :max_date => Date.max_date
+  - if @loan_product.installment_frequency == :weekly
+    %tr
+      %td
+        Scheduled first payment:
+      %td
+        on&nbsp;&nbsp;
+        = date_select_for @loan, :scheduled_first_payment_date, :selected => Date.today + 14, :max_date => Date.max_date
+  - if @loan_product.installment_frequency == :monthly
+    %tr
+      %td
+        Scheduled first payment:
+      %td
+        on&nbsp;&nbsp;
+        = date_select_for @loan, :scheduled_first_payment_date, :selected => Date.today + 37, :max_date => Date.max_date
   - if take_over_loan
     %tr
       %td{:colspan => 2}
@@ -110,7 +118,7 @@
         Original disbursal date:
       %td
         = date_select_for @loan, :original_disbursal_date, :max_date => Date.max_date, :min_date => Date.min_date
-        %span.greytext the date on which this loand originally disbursed
+        %span.greytext the date on which this loan originally disbursed
     %tr
       %td
         Original first payment date:

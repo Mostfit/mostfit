@@ -36,7 +36,10 @@
             = link_to_with_rights("Approve Loans (#{pa})<br/>", url(:loan_actions,:action => 'approve'), :class => 'edit_small',:style => "font-weight: bold;")
           - nd = Loan.all(:disbursal_date => nil, :scheduled_disbursal_date.lte => Date.today).select{|l| l.status == :approved}.size
           %b{:style => "color:green;"}
-            = link_to_with_rights("Disburse Loans (#{nd})", url(:loan_actions, :action => 'disburse'), :class => 'edit_small',:style =>"font-weight: bold;")
+            = link_to_with_rights("Disburse Loans (#{nd})<br/>", url(:loan_actions, :action => 'disburse'), :class => 'edit_small',:style =>"font-weight: bold;")
+          - sg = Loan.all(:write_off_rejected_on => nil, :written_off_on => nil, :suggested_written_off_on.lte => Date.today).size
+          %b{:style => "color:green;"}
+            = link_to_with_rights("Write Off Loans (#{sg})", url(:loan_actions, :action => 'write_off_suggested'), :class => 'edit_small', :style => "font-weight: bold;")
             == 
         - @i += 1
 

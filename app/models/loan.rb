@@ -30,6 +30,8 @@ class Loan
   property :rejected_on,                    Date, :auto_validation => false, :index => true
   property :disbursal_date,                 Date, :auto_validation => false, :index => true
   property :written_off_on,                 Date, :auto_validation => false, :index => true
+  property :suggested_written_off_on,       Date, :auto_validation => false, :index => true
+  property :write_off_rejected_on,          Date, :auto_validation => false, :index => true
   property :validated_on,                   Date, :auto_validation => false, :index => true
   
   property :validation_comment,             Text
@@ -38,16 +40,18 @@ class Loan
   property :deleted_at,                     ParanoidDateTime
   property :loan_product_id,                Integer,  :index => true
 
-  property :applied_by_staff_id,            Integer, :nullable => true, :index => true
-  property :approved_by_staff_id,           Integer, :nullable => true, :index => true
-  property :rejected_by_staff_id,           Integer, :nullable => true, :index => true
-  property :disbursed_by_staff_id,          Integer, :nullable => true, :index => true
-  property :written_off_by_staff_id,        Integer, :nullable => true, :index => true
-  property :validated_by_staff_id,          Integer, :nullable => true, :index => true
-  property :verified_by_user_id,            Integer, :nullable => true, :index => true
-  property :created_by_user_id,             Integer, :nullable => true, :index => true
-  property :cheque_number,                  String,  :length => 20, :nullable => true, :index => true
-  property :cycle_number,                   Integer, :default => 1, :nullable => false, :index => true
+  property :applied_by_staff_id,               Integer, :nullable => true, :index => true
+  property :approved_by_staff_id,              Integer, :nullable => true, :index => true
+  property :rejected_by_staff_id,              Integer, :nullable => true, :index => true
+  property :disbursed_by_staff_id,             Integer, :nullable => true, :index => true
+  property :written_off_by_staff_id,           Integer, :nullable => true, :index => true
+  property :suggested_written_off_by_staff_id, Integer, :nullable => true, :index => true
+  property :write_off_rejected_by_staff_id,    Integer, :nullable => true, :index => true
+  property :validated_by_staff_id,             Integer, :nullable => true, :index => true
+  property :verified_by_user_id,               Integer, :nullable => true, :index => true
+  property :created_by_user_id,                Integer, :nullable => true, :index => true
+  property :cheque_number,                     String,  :length => 20, :nullable => true, :index => true
+  property :cycle_number,                      Integer, :default => 1, :nullable => false, :index => true
 
   property :original_amount,                    Integer
   property :original_disbursal_date,            Date
@@ -65,18 +69,20 @@ class Loan
   belongs_to :client
   belongs_to :funding_line
   belongs_to :loan_product
-  belongs_to :occupation,     :nullable  => true
-  belongs_to :applied_by,     :child_key => [:applied_by_staff_id],       :model => 'StaffMember'
-  belongs_to :approved_by,    :child_key => [:approved_by_staff_id],      :model => 'StaffMember'
-  belongs_to :rejected_by,    :child_key => [:rejected_by_staff_id],      :model => 'StaffMember'
-  belongs_to :disbursed_by,   :child_key => [:disbursed_by_staff_id],     :model => 'StaffMember'
-  belongs_to :written_off_by, :child_key => [:written_off_by_staff_id],   :model => 'StaffMember'
-  belongs_to :validated_by,   :child_key => [:validated_by_staff_id],     :model => 'StaffMember'
-  belongs_to :created_by,     :child_key => [:created_by_user_id],        :model => 'User'
+  belongs_to :occupation,                :nullable  => true
+  belongs_to :applied_by,                :child_key => [:applied_by_staff_id],                :model => 'StaffMember'
+  belongs_to :approved_by,               :child_key => [:approved_by_staff_id],               :model => 'StaffMember'
+  belongs_to :rejected_by,               :child_key => [:rejected_by_staff_id],               :model => 'StaffMember'
+  belongs_to :disbursed_by,              :child_key => [:disbursed_by_staff_id],              :model => 'StaffMember'
+  belongs_to :written_off_by,            :child_key => [:written_off_by_staff_id],            :model => 'StaffMember'
+  belongs_to :suggested_written_off_by,  :child_key => [:suggested_written_off_by_staff_id],  :model => 'StaffMember'
+  belongs_to :write_off_rejected_by,     :child_key => [:write_off_rejected_by_staff_id],     :model => 'StaffMember' 
+  belongs_to :validated_by,              :child_key => [:validated_by_staff_id],              :model => 'StaffMember'
+  belongs_to :created_by,                :child_key => [:created_by_user_id],                 :model => 'User'
   belongs_to :loan_utilization
-  belongs_to :verified_by,    :child_key => [:verified_by_user_id],        :model => 'User'
+  belongs_to :verified_by,               :child_key => [:verified_by_user_id],                :model => 'User'
 
-  has n, :history,                                                        :model => 'LoanHistory'
+  has n, :history,                                                                            :model => 'LoanHistory'
   has n, :payments
   has n, :audit_trails,       :child_key => [:auditable_id], :auditable_type => "Loan"
   #validations
@@ -94,6 +100,9 @@ class Loan
   validates_with_method  :disbursal_date,               :method => :approved_before_disbursed?
   validates_with_method  :disbursal_date,               :method => :disbursed_before_written_off?
   validates_with_method  :written_off_on,               :method => :disbursed_before_written_off?
+  validates_with_method  :suggested_written_off_on,     :method => :disbursed_before_suggested_written_off?
+  validates_with_method  :write_off_rejected_on,        :method => :disbursed_before_write_off_rejected?
+  validates_with_method  :write_off_rejected_on,        :method => :rejected_before_suggested_write_off?
   validates_with_method  :disbursal_date,               :method => :disbursed_before_validated?
   validates_with_method  :validated_on,                 :method => :disbursed_before_validated?
   validates_with_method  :approved_on,                  :method => :applied_before_scheduled_to_be_disbursed?
@@ -103,7 +112,11 @@ class Loan
   validates_with_method  :rejected_on,                  :method => :properly_rejected?
   validates_with_method  :rejected_by,                  :method => :properly_rejected?
   validates_with_method  :written_off_on,               :method => :properly_written_off?
+  validates_with_method  :suggested_written_off_on,     :method => :properly_suggested_for_written_off?
+  validates_with_method  :write_off_rejected_on,        :method => :properly_write_off_rejected?
   validates_with_method  :written_off_by,               :method => :properly_written_off?
+  validates_with_method  :suggested_written_off_by,     :method => :properly_suggested_written_off?
+  validates_with_method  :write_off_rejected_by,        :method => :properly_write_off_rejected?
   validates_with_method  :disbursal_date,               :method => :properly_disbursed?
   validates_with_method  :disbursed_by,                 :method => :properly_disbursed?
   validates_with_method  :validated_on,                 :method => :properly_validated?
@@ -725,7 +738,7 @@ class Loan
   def interest_received_on(date); get_actual(:interest, date); end
   def total_received_on(date); principal_received_on(date) + interest_received_on(date); end
 
-  # these 3 methods return overpayment amounts (PAYMENT-RECEIVED perspective)
+  # these 3 method1 return overpayment amounts (PAYMENT-RECEIVED perspective)
   # negative values mean shortfall (we're positive-minded at intellecap)
   def principal_overpaid_on(date)
     (principal_received_up_to(date) - scheduled_principal_up_to(date))
@@ -914,6 +927,16 @@ class Loan
     id.to_s
   end
 
+  def write_off(written_off_on_date, written_off_by_staff)
+    if written_off_on_date and written_off_by_staff
+      self.written_off_on = written_off_on_date
+      self.written_off_by = (written_off_by_staff.class == StaffMember ? written_off_by_staff : StaffMember.get(written_off_by_staff))
+      self.save_self
+    else
+      false
+    end
+  end
+
   private
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
   include Misfit::LoanValidators
@@ -1024,6 +1047,18 @@ class Loan
     return true if written_off_on.blank? or (disbursal_date and written_off_on and disbursal_date <= written_off_on)
     [false, "Cannot be written off before it is disbursed"]
   end
+  def disbursed_before_suggested_written_off?
+    return true if suggested_written_off_on.blank? or (disbursal_date and suggested_written_off_on and disbursal_date <= suggested_written_off_on)
+    [false, "Cannot be suggested for write off before the loan is disbursed"]
+  end
+  def disbursed_before_write_off_rejected?
+    return true if write_off_rejected_on.blank? or (disbursal_date and write_off_rejected_on and disbursal_date <= write_off_rejected_on)
+    [false, "Cannot be rejected before the loan is disbursed"]
+  end
+  def rejected_before_suggested_write_off?
+    return true if suggested_write_off_on.blank? or (write_off_rejected_on and suggested_written_off_on and write_off_rejected_on >= suggested_written_off_on)
+    [false, "Cannot reject a loan for write off before it is suggested for write off."]
+  end
   def applied_before_scheduled_to_be_disbursed?
     return true if scheduled_disbursal_date and applied_on and scheduled_disbursal_date >= applied_on
     [false, "Cannot be scheduled for disbusal before it is applied"]
@@ -1040,9 +1075,17 @@ class Loan
     return true if (rejected_on and rejected_by) or (rejected_on.blank? and rejected_by.blank?)
     [false, "The rejection date and the staff member that rejected the loan should both be given"]
   end
+  def properly_write_off_rejected?
+    return true if (write_off_rejected_on and write_off_rejected_by) or (write_off_rejected_on.blank? and write_off_rejected_by.blank?)
+    [false, "The date and the staff member that rejected the write off should both be given"]
+  end
   def properly_written_off?
     return true if (written_off_on and written_off_by) or (written_off_on.blank? and written_off_by.blank?)
     [false, "The date of writing off the loan and the staff member that wrote off the loan should both be given"]
+  end
+  def properly_suggested_for_written_off?
+    return true if (suggested_written_off_on and suggested_written_off_by) or (suggested_written_off_on.blank? and suggested_written_off_by.blank?)
+    [false, "The date of suggesting write off loan and staff member who is suggesting to write off the loan should both be given"]
   end
   def properly_disbursed?
     return true if (disbursal_date and disbursed_by) or (disbursal_date.blank? and disbursed_by.blank?)

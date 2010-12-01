@@ -1,9 +1,55 @@
 %table
   %tr
     %td
-      Loan Utilization
+      %b Loan Utilization
     %td
-      =form_for(:loan, :class => "_remote_", :action => url(:controller => :loans, :action => :update_utilization, :id => @loan.id), :method => "POST") do
+      = form_for(:loan, :class => "_remote_", :action => url(:controller => :loans, :action => :update_utilization, :id => @loan.id), :method => "POST") do
         %div
-        =select :loan_utilization_id, :collection => LoanUtilization.all.map{|lu| [lu.id, lu.name]}, :include_blank => true
-        =submit "Save"
+        = select :loan_utilization_id, :collection => LoanUtilization.all.map{|lu| [lu.id, lu.name]}, :include_blank => true
+        %br/
+        = submit "Save"
+- if session.user.role==:admin
+  = form_for(@loan, :action => url(:action => :write_off, :id => @loan.id), :method => "POST") do
+    %table
+      %tr
+        %td
+          %b Write Off Loan
+      %tr
+        %td
+          Write off Date : 
+        %td
+          = date_select_for @loan, :written_off_on
+      %tr
+        %td
+          Select Staff Member :
+        %td
+          - center = @client.center
+          - branch = center.branch
+          = select :written_off_by_staff_id, :id => "written_off_by_staff_id", :collection => [branch.manager, center.manager].uniq.map{|m| [m.id, m.name]}
+        %td
+          %span.greytext 
+            Pick the staff member who is writing off the loan.Pre-selected is Branch Manager.
+      %tr
+        %td
+          = submit "Write off"
+- elsif staff_member = session.user.staff_member
+  = form_for(@loan, :action => url(:action => :suggest_write_off, :id => @loan.id), :method => "POST") do
+    %table
+      %tr
+        %td
+          %b Suggest to Write Off this Loan
+      %tr
+        %td
+          suggested write off Date :
+        %td
+          = date_select_for @loan, :suggested_written_off_on
+      %tr
+        %td
+          Suggested by staff member :
+        %td
+          = staff_member.name
+        %td
+      %tr
+        %td
+          = submit "Send suggestion"
+  
