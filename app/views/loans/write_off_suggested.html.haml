@@ -1,0 +1,21 @@
+%h2
+  Write Off loans
+  %h2
+    The following loans have been suggested for write off
+- if not @errors.blank?
+  .error
+    %ul
+      - @errors.each do |e|
+        - e.values.each do |v|
+          %li
+            == Loan #{e.resource.id}: #{v}
+- if @loans_to_write_off.size > 0
+  = form_for(@loan, :action => url(:loan_actions, :action => "write_off_suggested"), :class => "_disable_button_") do
+    = hidden_field :name => :id, :value => @center.id
+    = partial :write_off_suggested
+    = submit 'Write Off selected loans', :name => "write_off_these_loans"
+    or
+    %a{:href => "#{url(:loan_actions, 'write_off_reject')}", :class => "_rejection_button_"}
+      Reject selected loans
+- else
+  Nothing to write off

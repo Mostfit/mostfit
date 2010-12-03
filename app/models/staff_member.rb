@@ -18,6 +18,8 @@ class StaffMember
   has n, :rejected_loans,    :child_key => [:rejected_by_staff_id],    :model => 'Loan'
   has n, :disbursed_loans,   :child_key => [:disbursed_by_staff_id],   :model => 'Loan'
   has n, :written_off_loans, :child_key => [:written_off_by_staff_id], :model => 'Loan'
+  has n, :suggested_written_off_loans, :child_key => [:suggested_written_off_by_staff_id], :model => 'Loan'
+  has n, :write_off_rejected_loans,    :child_key => [:write_off_rejected_by_staff_id],    :model => 'Loan'
   has n, :payments, :child_key  => [:received_by_staff_id]
 
   belongs_to :user
@@ -58,7 +60,7 @@ class StaffMember
   
   def self.related_to(obj)
     staff_members = []    
-    [:applied_by_staff_id, :approved_by_staff_id, :rejected_by_staff_id, :disbursed_by_staff_id, :written_off_by_staff_id].each{|type|
+    [:applied_by_staff_id, :approved_by_staff_id, :rejected_by_staff_id, :disbursed_by_staff_id, :written_off_by_staff_id, :suggested_written_off_by_staff_id].each{|type|
       staff_members << if obj.class==Branch
                          repository.adapter.query(%Q{SELECT distinct(#{type}) FROM branches b, centers c, clients cl, loans l
                                                     WHERE b.id=#{obj.id} and c.branch_id=b.id and cl.center_id=c.id and l.client_id=cl.id})
