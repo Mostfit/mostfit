@@ -26,11 +26,6 @@ class Rules < Application
 
   def create(rule)
     rule = fix_conditions(rule)
-
-#    if(rule[:name]=="")
-#      message[:error] = "Name cannot be left blank"
-#      render @rule
-#    end
     @rule = Rule.new(rule)
     if @rule.save
       redirect resource(@rule), :message => {:notice => "Rule was successfully created"}
@@ -85,7 +80,6 @@ class Rules < Application
   end
 
   def get
-    #debugger
     id = params[:id].to_i
     type = params[:type]
     if type != "precondition"
