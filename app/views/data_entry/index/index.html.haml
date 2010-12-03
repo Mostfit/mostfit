@@ -40,6 +40,5 @@
           - sg = Loan.all(:write_off_rejected_on => nil, :written_off_on => nil, :suggested_written_off_on.lte => Date.today).size
           %b{:style => "color:green;"}
             = link_to_with_rights("Write Off Loans (#{sg})", url(:loan_actions, :action => 'write_off_suggested'), :class => 'edit_small', :style => "font-weight: bold;")
-            == 
         - @i += 1
 
