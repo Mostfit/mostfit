@@ -28,6 +28,7 @@ class Rule
     h = {:name => @name, :model_name => @model_name}
     #puts "Removed Rule"
     Mostfit::Business::Rules.remove_rule h
+    File.touch(File.join(Merb.root, "tmp", "restart.txt"))
   end
 
   after :update do
@@ -35,7 +36,13 @@ class Rule
     #puts "Removed Rule"
     Mostfit::Business::Rules.remove_rule h
     self.apply_rule #remove and re-apply rule
+    File.touch(File.join(Merb.root, "tmp", "restart.txt"))
   end
+
+  after :create do
+    File.touch(File.join(Merb.root, "tmp", "restart.txt"))
+  end
+
 
   def apply_rule
     #puts "Applying Rule #{@name}"
