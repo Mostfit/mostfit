@@ -45,13 +45,24 @@ module Grapher
         labels(row.send(label_method))
       }
     end
+
+    def figures_in_lakhs?
+      @figures_in_lakhs ||= Mfi.first and Mfi.first.currency_format == "in"
+    end
     
-    def generate
+    def generate     
       @y_axis.smoothen(@elements[:values]) if @y_axis and @elements[:values].length>0
-      return {
-        :elements => [@elements], :x_axis => (@x_axis ? @x_axis.generate : ""), :y_axis => (@y_axis ? @y_axis.generate : ""), 
-        :title => (@title ? @title.generate : "")
-      }.to_json
+      hash = {:title => (@title ? @title.generate : ""), :bg_colour => "#FFFFFF"}
+      # change in lakh!
+      if figures_in_lakhs? and @elements[:values].length>0 and @elements[:values].max > 1_00_000
+        @elements[:values] = @y_axis.change_to_lakh(@elements[:values]) if @y_axis
+        y_legend = Title.new("figures in lakhs")
+        y_legend.style = '{color: #ff4500; font-size: 14px; font-weight: bold}'
+        hash[:y_legend] = y_legend.generate
+      end
+
+      hash += {:elements => [@elements], :x_axis => (@x_axis ? @x_axis.generate : ""), :y_axis => (@y_axis ? @y_axis.generate : "")}
+      return hash.to_json
     end
   end
 
@@ -69,6 +80,13 @@ module Grapher
       @min   = values.min > 0 ? 0 : values.min
       @max   = values.max > 0 ? values.max : 0
       @steps = get_steps(values.max) if @autoscale
+    end
+
+    def change_to_lakh(values)      
+      @steps = @steps/1_00_000
+      @min   = @min/1_00_000
+      @max   = @max/1_00_000
+      values.map{|x| x.to_f/1_00_000}
     end
 
     def generate
@@ -96,13 +114,13 @@ module Grapher
   end
 
   class Title
-    attr_accessor :text
+    attr_accessor :text, :style
     def initialize(text)
       @text = text
     end
     
     def generate
-      {:text => text}
+      style ? {:text => text, :style => style} : {:text => text}
     end
   end
 
