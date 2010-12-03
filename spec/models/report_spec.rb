@@ -1,7 +1,7 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe Report do
   before(:all) do 
-    @date = Date.new(2009, 7, 1)
+    @date = Date.new(2009, 6, 29)
     @weekdays = [:monday,:tuesday,:wednesday,:thursday,:friday,:saturday,:sunday]
     @user = User.new(:login => 'Joe', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @user.save
@@ -88,14 +88,15 @@ describe Report do
             loan.funding_line = @funding_line
             loan.client = client
             loan.loan_product = @loan_product
+            loan.history_disabled = true
             loan.save
             loan.errors.each  {|e| puts e}
             loan.should be_valid
-#            loan.history_disabled = true
           end
         end
       end
     end
+    Loan.all.each{|l| l.update_history}
   end
   
   it "should have 2 * 6 centers and centers * 3 clients" do
@@ -111,21 +112,23 @@ describe Report do
     @repaying_loans = Loan.all(:scheduled_first_payment_date => @date)
     @repaying_loans.count.should be == 2 * 3
     @repaying_loans.each_with_index do |l,i|
+      l.history_disabled = true
       # we know that the amount to be repaid is correct because of the tests on each individual loan type.
       # we also know that the outstanding balance etc are all kosher for the same reason
       # no need to repeat them here.
       amt = [l.scheduled_principal_for_installment(1),l.scheduled_interest_for_installment(1)]
-      success, prin, int, fee = l.repay(amt, @user, @date, @manager)
+      success, prin, int, fee = l.repay(amt, @user, @date, @manager)      
       success.should be_true
       prin.should be_true
       int.should be_true
     end
+    @repaying_loans.each{|l| l.update_history}
   end
     # now we check the reporting functionality
   
   it "should have correct loan count" do
-    # @date = Loan.all.min(:scheduled_first_payment_date)
-    # Branch.loan_count(@date).should == {1 => 21, 2 => 21}
+    @date = Loan.all.min(:scheduled_first_payment_date)
+    Branch.loan_count(@date).should == {1 => 6, 2 => 6}
   end
 
   it "should have correct number of clients" do
@@ -232,8 +235,9 @@ describe Report do
   it "should give correct principal due" do
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    Branch.principal_due_between(date,     date + 6).should == {1=> 120, 2=>120}
-    Branch.principal_due_between(date + 7, date + 13).should == {1=>240, 2=>240}
+    Branch.principal_due_between(date,     date + 6).should == {1=> 120, 2=> 120}
+    Branch.principal_due_between(date+7,   date + 13).should == {1=> 120, 2=> 120}
+    Branch.principal_due_between(date,     date + 13).should == {1=> 360, 2=> 360}
   end
 
   it "should give correct principal received" do
@@ -248,7 +252,7 @@ describe Report do
     date = l.scheduled_first_payment_date
     loans =  Loan.all
     Branch.interest_due_between(date, date + 6).should == {1=> 12, 2=> 12}
-    Branch.interest_due_between(date + 7, date + 13).should == {1=> 24, 2=> 24}
+    Branch.interest_due_between(date + 7, date + 13).should == {1=> 12, 2=> 12}
   end
 
   it "should give correct interest received" do
@@ -276,7 +280,7 @@ describe Report do
     Branch.scheduled_principal_outstanding(date - 1).should == {1 => 12000, 2 => 12000}
     Branch.scheduled_principal_outstanding(date).should == {1 => 12000 - (20 + 40 + 60),  2 => 12000 - (20 + 40 + 60)}
     Branch.scheduled_principal_outstanding(date+1).should == {1 => 12000 - 2*(20 + 40 + 60),  2 => 12000 - 2*(20 + 40 + 60)}
-    Branch.scheduled_principal_outstanding(date + 8).should == {1 => 12000 - (40 + 80 + 120), 2 => 12000 - (40 + 80 + 120)}
+    Branch.scheduled_principal_outstanding(date + 8).should == {1 => 12000 - 2*(40 + 80 + 120), 2 => 12000 - 2*(40 + 80 + 120)}
   end
 
 
@@ -296,11 +300,6 @@ describe Report do
     date = l.scheduled_first_payment_date
     Branch.scheduled_total_outstanding(date - 1).should == {1 => 13200, 2 => 13200}
     Branch.scheduled_total_outstanding(date).should == {1 => 13200 - (22 + 44 + 66), 2 => 13200 - (22 + 44 + 66)}
-    Branch.scheduled_total_outstanding(date + 15).should == {1 => 13200 - 2*(44 + 88 + 132), 2 => 13200 - 2*(44 + 88 + 132)}
+    Branch.scheduled_total_outstanding(date + 15).should == {1 => 13200 - 3*(44 + 88 + 132), 2 => 13200 - 3*(44 + 88 + 132)}
   end  
 end
-
-
-
-
-

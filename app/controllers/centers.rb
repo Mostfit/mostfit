@@ -59,14 +59,14 @@ class Centers < Application
       saved = []
       params[params["model"].snake_case].each{|id, attr|
         if id and not id.blank? and attr.length>0
-          attr.each{|col, val|         
+          attr.each{|col, val|
             next if val.blank?
             val = val.to_i if /^\d+$/.match(val)
             obj = model.get(id)     
             next if obj.send(column) == val
             obj.history_disabled=true if model==Loan
             obj.send("#{column}=", val)
-            saved << obj.save
+            saved << obj.save_self
           }
         end
       }

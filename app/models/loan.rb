@@ -295,10 +295,9 @@ class Loan
     if cl=self.client(:fields => [:id, :center_id]) and cen=cl.center and cen.meeting_day != :none and ensure_meeting_day
       unless new_date.weekday == cen.meeting_day_for(new_date)
         # got wrong val. recalculate
-        new_date = nil
-        number.times{
-          new_date = cen.next_meeting_date_from(new_date||date)
-        }
+        next_date = cen.next_meeting_date_from(new_date)
+        prev_date = cen.previous_meeting_date_from(new_date)
+        new_date  = (next_date.cweek == new_date.cweek ? next_date : prev_date)
       end
       #new_date - new_date.cwday + Center.meeting_days.index(client.center.meeting_day)
     end

@@ -56,7 +56,7 @@ module Misfit
                  :clients, :loans, :client_groups, :cgts, :grts]
       },
       :read_only => {
-        :all => [:searches, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :insurance_policies, :audit_trails,
+        :all => [:searches, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :insurance_policies, :audit_trails, :info,
                  :insurance_companies, :areas, :staff_members, :loan_products, :holidays, :document_types, :occupations, :client_types, :fees, :funders, :attendances, :dashboard, :graph_data]
       },
       :staff_member => {
@@ -65,11 +65,11 @@ module Misfit
                  :"data_entry/loans", :"data_entry/index", :insurance_companies, :info, :dashboard, :graph_data]
       },
       :funder => {
-        :all => [:searches, :browse, :branches, :centers, :client_groups, :payments, :clients, :loans, :dashboard, :regions, :documents, :comments, :areas, 
+        :all => [:searches, :browse, :branches, :centers, :client_groups, :payments, :clients, :loans, :dashboard, :regions, :documents, :comments, :areas, :info,
                  :audit_trails, :documents, :attendances, :staff_members, :funders, :portfolios, :funding_lines, :reports, :graph_data, :dashboard]
       },
       :accountant => {
-        :all => [:browse, :branches, :accounts, :journals, :rule_books, :account_types, :accounting_periods, :info, :reports]
+        :all => [:browse, :branches, :accounts, :journals, :rule_books, :account_types, :accounting_periods, :info, :reports, :reports, :dashboard, :graph_data]
       }
     }
 
