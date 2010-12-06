@@ -115,7 +115,7 @@ class Loan
   validates_with_method  :suggested_written_off_on,     :method => :properly_suggested_for_written_off?
   validates_with_method  :write_off_rejected_on,        :method => :properly_write_off_rejected?
   validates_with_method  :written_off_by,               :method => :properly_written_off?
-  validates_with_method  :suggested_written_off_by,     :method => :properly_suggested_written_off?
+  validates_with_method  :suggested_written_off_by,     :method => :properly_suggested_for_written_off?
   validates_with_method  :write_off_rejected_by,        :method => :properly_write_off_rejected?
   validates_with_method  :disbursal_date,               :method => :properly_disbursed?
   validates_with_method  :disbursed_by,                 :method => :properly_disbursed?
@@ -1055,7 +1055,7 @@ class Loan
     [false, "Cannot be rejected before the loan is disbursed"]
   end
   def rejected_before_suggested_write_off?
-    return true if suggested_write_off_on.blank? or (write_off_rejected_on and suggested_written_off_on and write_off_rejected_on >= suggested_written_off_on)
+    return true if suggested_written_off_on.blank? or (write_off_rejected_on and suggested_written_off_on and write_off_rejected_on >= suggested_written_off_on)
     [false, "Cannot reject a loan for write off before it is suggested for write off."]
   end
   def applied_before_scheduled_to_be_disbursed?
