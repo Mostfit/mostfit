@@ -149,6 +149,21 @@ class Center
       client.make_center_leader
     end
   end
+
+  def location
+    Location.first(:parent_id => self.id, :parent_type => "center")
+  end
+  
+  def self.meeting_today(date=Date.today, user=nil)
+    user = User.first
+    center_ids = LoanHistory.all(:date => date).map{|x| x.center_id}.uniq
+    # restrict branch manager and center managers to their own branches
+    if user.role==:staff_member
+      st = user.staff_member
+      center_ids = ([st.branches.centers.map{|x| x.id}, st.centers.map{|x| x.id}].flatten.compact) & center_ids
+    end
+    Center.all(:id => center_ids)
+  end
   
   private
   def hours_valid?

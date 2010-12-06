@@ -28,6 +28,7 @@ class Browse < Application
   def centers_paying_today
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
     center_ids = LoanHistory.all(:date => @date).map{|x| x.center_id}.uniq
+    @locations = Location.all(:parent_id => center_ids, :parent_type => "center")
     # restrict branch manager and center managers to their own branches
     if session.user.role==:staff_member
       st = session.user.staff_member

@@ -1,0 +1,13 @@
+%h1 Locations controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/locations/new.html.erb
+
+= error_messages_for @location
+
+= form_for(@location, :action => url(:locations) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:locations)

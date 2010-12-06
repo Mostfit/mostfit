@@ -1,0 +1,15 @@
+%h1
+  Locations controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/locations/edit.html.erb
+= error_messages_for @location
+
+= form_for(@location, :action => url(:location, @location)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:location, @location)
+|
+= link_to 'Back', url(:locations)

@@ -46,11 +46,13 @@
       %li#comments
         Comments
       %li#audit
-        Audits
+        Audit
       %li#history
         History
       %li#accounting
         Accounting
+      %li#map
+        Map
     %div.tab
       %div#centers_list
         =partial "centers/list"
@@ -71,3 +73,6 @@
       %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => "/accounts/branch?branch_id=#{@branch.id}"}
+    %div.tab
+      = js_include_tag :map
+      = partial "locations/map", {:obj => @branch}

@@ -1,4 +1,3 @@
-
 // Common JavaScript code across your application goes here.
 var lineNos=0;
 function addFloater(link){
@@ -72,33 +71,42 @@ function showThis(li, idx){
     $("div.tab_container ul.tabs li.active").removeClass("active");
     $(li).addClass("active");
     tab = $($("div.tab_container div.tab")[idx]).show();
+    if(typeof google != 'undefined' && $("#map_canvas")){
+	google.maps.event.trigger(map, 'resize');
+	if(marker)
+	    map.setCenter(marker.position);
+	$("#map_canvas").css('height', '400').css('width', '400');
+    }
     remote = $(tab).find("input:hidden");
     if(remote.length>0 && remote.attr("name")=="_load_remote"){
 	$.ajax({
-               url: remote.val(),
-	       success: function(data){
-		   $($("div.tab_container div.tab")[idx]).html(data);
-		   create_remotes();
-		},
-		beforeSend: function(){
-		    $('#spinner').show();
-		},
-		error: function(xhr, text, errorThrown){
-		    txt = "<div class='error'>"+xhr.responseText+"</div>"
-		    $($("div.tab_container div.tab")[idx]).html(txt);
-		},
-		complete: function(){
-		    $('#spinner').hide();
-		}
-	    }
-	);
+		   url: remote.val(),
+		   success: function(data){
+		       $($("div.tab_container div.tab")[idx]).html(data);
+		       if(typeof map_initialize != 'undefined'){
+			   map_initialize();
+			   $("#map_canvas").css("height", $(window).height()*4/5);
+		       }
+		       create_remotes();
+		   },
+		   beforeSend: function(){
+		       $('#spinner').show();
+		   },
+		   error: function(xhr, text, errorThrown){
+		       txt = "<div class='error'>"+xhr.responseText+"</div>";
+		       $($("div.tab_container div.tab")[idx]).html(txt);
+		   },
+		   complete: function(){
+		       $('#spinner').hide();
+		   }
+	       });
 	remote.remove();
     }
-  if(window.location.hash.length>0 && window.location.hash.indexOf($(li).attr("id"))>0 && window.location.hash!=$(li).attr("id")){
-    window.location.hash=window.location.hash;
-  }else{
-    window.location.hash=$(li).attr("id");
-  }
+    if(window.location.hash.length>0 && window.location.hash.indexOf($(li).attr("id"))>0 && window.location.hash!=$(li).attr("id")){
+	window.location.hash=window.location.hash;
+    }else{
+	window.location.hash=$(li).attr("id");
+    }
 }
 function showTableTrs(){
     $("table.report tr").hide();
@@ -235,6 +243,7 @@ function create_remotes(){
       }
       a=$(this);
       a.after("<img id='spinner' src='/images/spinner.gif'/>");
+
       $.ajax({
 	type: method,
 	url: href,
@@ -544,7 +553,6 @@ function fillVariableField(type, condition_id, variable_id) {
       return true;
     }
     });
-
 }
 
 
@@ -676,9 +684,7 @@ function portfolioCalculations(){
     $($("tr.org_total:first td")[5]).html("<b>" + org_allocated + "</b>");
     $($("tr.org_total:first td")[6]).html("<b>" + org_current + "</b>");
   });
-
 }
-
 $(document).ready(function(){
 	create_remotes();
 	fillCenters();
@@ -1055,5 +1061,10 @@ $(document).ready(function(){
     attachCustomTableEvents();
   }
   addFloater("");
+  if(typeof map_initialize != 'undefined')
+      map_initialize();
+  if($("#map_canvas"))
+      loadAPI();
+
 });
 

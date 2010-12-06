@@ -7,6 +7,8 @@
       Repayments & disbursals
     %li#graphs
       Graphs
+    %li#map
+      Map
   %div.tab
     - total_due = total_paid = 0
     %table.report
@@ -133,3 +135,6 @@
       = ofc2(1000, 800, url(:graph_data, :action => 'dashboard', :id => 'center_day', :branch_id => params[:branch_id]))
     -else
       = ofc2(800, 640, url(:graph_data, :action => 'dashboard', :id => 'branch_day'))
+  %div.tab
+    = js_include_tag :map
+    = partial "locations/multi_map"
