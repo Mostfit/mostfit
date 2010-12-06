@@ -11,8 +11,4 @@
     %b Staff member:
     =select(:staff_member_id , :collection => StaffMember.all(:order => [:name]).map{|x| [x.id, x.name]}, :include_blank => true, :selected => staff_member_id)
     %input{:type => "submit", :name => "filter", :value => "filter"}
-%script
-  ="var marker_objects = []"
-  - @locations.each do |loc|
-    = "marker_objects.push({'name': '#{loc.parent.name}', 'latitude': #{loc.latitude}, 'longitude': #{loc.longitude}, 'type': '#{loc.parent_type}'})"
-#map_canvas{:style => "height: 500px; width: 800px;"}
+= partial :multi_map

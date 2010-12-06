@@ -73,7 +73,8 @@ function showThis(li, idx){
     tab = $($("div.tab_container div.tab")[idx]).show();
     if(typeof google != 'undefined' && $("#map_canvas")){
 	google.maps.event.trigger(map, 'resize');
-	map.setCenter(marker.position);
+	if(marker)
+	    map.setCenter(marker.position);
 	$("#map_canvas").css('height', '400').css('width', '400');
     }
     remote = $(tab).find("input:hidden");

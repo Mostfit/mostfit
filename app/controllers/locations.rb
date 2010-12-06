@@ -6,10 +6,12 @@ class Locations < Application
     elsif params[:staff_member_id] and staff = StaffMember.get(params[:staff_member_id])
       @locations = (Location.all(:parent_type => "branch", :parent_id => staff.branches.map{|x| x.id}) + 
                     Location.all(:parent_type => "center", :parent_id => staff.centers.map{|x| x.id})).flatten.uniq
+    elsif params[:meeting_today] and not params[:meeting_today].blank?
+      @locations = Location.all(:parent_id => Center.meeting_today.map{|c| c.id}, :parent_type => "center")
     else
       @locations = Location.all
     end
-    display @locations
+    render :layout => layout?
   end
 
   def show(id)

@@ -9,8 +9,6 @@
     %input{:type => "text", :id => :latitude, :name => "location[latitude]", :value => (@location ? @location.latitude : '')}
     %b Longitude
     %input{:type => "text", :id => :longitude, :name => "location[longitude]", :value => (@location ? @location.longitude : '')}
-    %a{:href => "#"}
-      Map it
     %input{:type => "submit", :name => "submit", :value => "save"}
     %input{:type => "hidden", :name => "_target_", :value => "result_box"}
   #result_box
