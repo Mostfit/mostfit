@@ -149,6 +149,10 @@ class Center
       client.make_center_leader
     end
   end
+
+  def location
+    Location.first(:parent_id => self.id, :parent_type => "center")
+  end
   
   private
   def hours_valid?

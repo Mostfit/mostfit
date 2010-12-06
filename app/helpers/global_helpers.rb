@@ -445,6 +445,20 @@ module Merb
         :prompt       => (attrs[:prompt] or "&lt;select a account&gt;"))
       html.gsub('!!!', '&nbsp;')  # otherwise the &nbsp; entities get escaped
     end
+    
+    def approx_address(obj)
+      if obj.class == Center
+        if obj.name.include?(obj.branch.name)
+          obj.name
+        else
+          "#{obj.name}, #{obj.branch.name}, #{obj.branch.area.name}"
+        end
+      elsif obj.respond_to?(:address) and not obj.address.blank?
+        obj.address
+      elsif obj.class == Branch
+        obj.address.blank? ? obj.name : obj.address
+      end
+    end
 
     private
     def staff_members_collection(allow_unassigned=false, allow_inactive=false)

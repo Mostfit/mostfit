@@ -82,6 +82,10 @@ class Branch
                              })    
   end
 
+  def location
+    Location.first(:parent_id => self.id, :parent_type => "branch")
+  end
+  
   private
   def manager_is_an_active_staff_member?
     return true if manager and manager.active

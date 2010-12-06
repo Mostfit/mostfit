@@ -1,0 +1,18 @@
+- branch_id = (params[:branch_id] and not params[:branch_id].blank?) ? params[:branch_id] : nil
+- center_id = (params and params[:center_id] and not params[:center_id].blank?) ? params[:center_id] : nil
+- staff_member_id = (params and params[:staff_member_id] and not params[:staff_member_id].blank?) ? params[:staff_member_id] : nil
+= js_include_tag :map
+%h1
+  Locations
+%div
+  %form{:action => "/locations", :method => :get} 
+    %b Branch
+    =select(:branch_id , :collection => Branch.all(:order => [:name]).map{|x| [x.id, x.name]}, :include_blank => true, :selected => params[:branch_id])
+    %b Staff member:
+    =select(:staff_member_id , :collection => StaffMember.all(:order => [:name]).map{|x| [x.id, x.name]}, :include_blank => true, :selected => staff_member_id)
+    %input{:type => "submit", :name => "filter", :value => "filter"}
+%script
+  ="var marker_objects = []"
+  - @locations.each do |loc|
+    = "marker_objects.push({'name': '#{loc.parent.name}', 'latitude': #{loc.latitude}, 'longitude': #{loc.longitude}, 'type': '#{loc.parent_type}'})"
+#map_canvas{:style => "height: 500px; width: 800px;"}

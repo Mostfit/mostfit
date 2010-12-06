@@ -1,6 +1,5 @@
 .graph
   = ofc2(430, 250, url(:graph_data, :action => 'center', :id => @center.id, :scope_unit => 'months', :scope_size => 3) )
-
 %h1== Center: <i>#{@center.name}</i>
 %div.maininfo
   %table.narrow.form{ :style => "width: 40%;" }
@@ -50,13 +49,15 @@
     %li#documents
       Documents
     %li#audit
-      Audit Items
+      Audit
     %li#data_entry
       Data Entry
     %li#history
       History
     %li#miscellaneous
       Miscellaneous
+    %li#map
+      Map
   %div.tab    
     =partial "clients/list", :center_leader => leader
   %div.tab    
@@ -79,3 +80,6 @@
     %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :centers, :id => @center.id, :action => :misc)}
+  %div.tab
+    = js_include_tag :map
+    =partial "locations/map", {:obj => @center}
