@@ -11,4 +11,4 @@
     %b Staff member:
     =select(:staff_member_id , :collection => StaffMember.all(:order => [:name]).map{|x| [x.id, x.name]}, :include_blank => true, :selected => staff_member_id)
     %input{:type => "submit", :name => "filter", :value => "filter"}
-= partial :multi_map
+= partial :multi_map, {:locations => @locations}

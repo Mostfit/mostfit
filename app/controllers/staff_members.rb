@@ -145,6 +145,12 @@ class StaffMembers < Application
     end
   end
 
+  # this redirects to the proper url, used from the router
+  def redirect_to_show(id)
+    raise NotFound unless @staff_member = StaffMember.get(id)
+    redirect resource(@staff_member)
+  end
+
   private
   def determine_layout
     return "printer" if params[:layout] and params[:layout]=="printer"

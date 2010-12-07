@@ -1,19 +1,30 @@
 class Locations < Application
   # provides :xml, :yaml, :js
   def index
-    if params[:branch_id] and branch = Branch.get(params[:branch_id])
-      @locations = (Location.all(:parent_type => "branch", :parent_id => params[:branch_id]) + Location.all(:parent_type => "center", :parent_id => branch.centers.map{|x| x.id})).flatten.uniq
-    elsif params[:staff_member_id] and staff = StaffMember.get(params[:staff_member_id])
-      @locations = (Location.all(:parent_type => "branch", :parent_id => staff.branches.map{|x| x.id}) + 
-                    Location.all(:parent_type => "center", :parent_id => staff.centers.map{|x| x.id})).flatten.uniq
-    elsif params[:meeting_today] and not params[:meeting_today].blank?
-      @locations = Location.all(:parent_id => Center.meeting_today.map{|c| c.id}, :parent_type => "center")
-    else
-      @locations = Location.all
-    end
+    @locations = if params[:branch_id] and branch = Branch.get(params[:branch_id])
+                   (Location.all(:parent_type => "branch", :parent_id => params[:branch_id]) + Location.all(:parent_type => "center", :parent_id => branch.centers.map{|x| x.id})).flatten.uniq
+                 elsif params[:staff_member_id] and staff = StaffMember.get(params[:staff_member_id])
+                   if params[:meeting_day] and not params[:meeting_day].blank?
+                     Location.all(:parent_type => "center", :parent_id => staff.centers(:meeting_day => params[:meeting_day]).map{|x| x.id})
+                   else
+                     (Location.all(:parent_type => "branch", :parent_id => staff.branches.map{|x| x.id}) + 
+                      Location.all(:parent_type => "center", :parent_id => staff.centers.map{|x| x.id})).flatten.uniq
+                   end
+                 elsif params[:meeting_today] and not params[:meeting_today].blank?
+                   Location.all(:parent_id => Center.meeting_today.map{|c| c.id}, :parent_type => "center")
+                 else
+                   Location.all
+                 end
     render :layout => layout?
   end
 
+  def by_meeting_day
+    @locations = if params[:staff_member_id] and staff = StaffMember.get(params[:staff_member_id])
+                  Location.all(:parent_type => "center", :parent_id => staff.centers(:meeting_day => params[:meeting_day]).map{|x| x.id})
+                end
+    partial "locations/multi_map"
+  end
+  
   def show(id)
     @location = Location.get(id)
     raise NotFound unless @location

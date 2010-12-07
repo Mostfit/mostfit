@@ -1,0 +1,11 @@
+%script
+  - meeting_orders = {"monday" => 0, "tuesday" => 0, "wednesday" => 0, "thursday" => 0, "friday" => 0, "saturday" => 0}
+  ="var marker_objects = []"  
+  - if @locations
+    - @data.each do |branch, centers|
+      - centers.each_with_index do |center, idx|
+        - loc = @locations[center.id].first if @locations.key?(center.id)
+        - next unless loc
+        = "marker_objects.push({'name': '#{center.name}', 'latitude': #{loc.latitude}, 'longitude': #{loc.longitude}, 'type': '#{loc.parent_type}', 'meeting': '#{@date.weekday}', 'time': '#{center.meeting_time_hours}:#{center.meeting_time_minutes}', 'meeting_order': #{idx+1}, 'branch': '#{branch.name}', 'due': #{center.pd + center.intd}, 'paid': #{center.pp + center.intp}})"
+  = "var daywise=false"
+#map_canvas{:style => "height: 500px; width: 800px;"}

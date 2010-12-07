@@ -2,13 +2,20 @@
   Today
 
 %div.tab_container
+  %div{:style => "float: right;"}
+    %form{:action => "/browse/centers_paying_today", :method => "POST"}
+      %b Branch
+      = select :name => "branch_id", :collection => Branch.all.map{|x| [x.id, x.name]}, :selected => params[:branch_id].to_s, :prompt => "All branches"
+      = submit "GO"
+
   %ul.tabs
     %li#repayments
       Repayments & disbursals
     %li#graphs
       Graphs
-    %li#map
-      Map
+    - if Mfi.first.map_enabled
+      %li#map
+        Map
   %div.tab
     - total_due = total_paid = 0
     %table.report
@@ -127,14 +134,13 @@
           %b
             = total_disbursal
   %div.tab
-    %form{:action => "/browse/centers_paying_today#graphs", :method => "POST"}
-      %b Branch
-      = select :name => "branch_id", :collection => Branch.all.map{|x| [x.id, x.name]}, :selected => params[:branch_id].to_s, :prompt => "All branches"
-      = submit "GO"
     - if params[:branch_id] and params[:branch_id].to_i > 0
       = ofc2(1000, 800, url(:graph_data, :action => 'dashboard', :id => 'center_day', :branch_id => params[:branch_id]))
     -else
       = ofc2(800, 640, url(:graph_data, :action => 'dashboard', :id => 'branch_day'))
-  %div.tab
-    = js_include_tag :map
-    = partial "locations/multi_map"
+  - if Mfi.first.map_enabled
+    %div.tab
+      = js_include_tag :map
+      = partial "locations/today_map"
+      %span.greytext
+        Numbers indicate the order in which they meetings are held. Click on a center pin to know more

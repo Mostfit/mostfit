@@ -1,4 +1,6 @@
-var map, marker, geoCoder;
+var map, marker, geoCoder, setZoom;
+var dayColors = {'monday': 'blue', 'tuesday': 'brown', 'wednesday': 'violet', 'thursday': 'magenda', 'friday': 'black', 'saturday': 'red'};
+var branchColors = ['blue', 'brown', 'violet', 'magenda', 'black', 'red'];
 function codeAddress(){
     var address = $("#map_address").val();
     geocoder.geocode( { 'address': address}, function(results, status) {
@@ -44,14 +46,13 @@ function map_initialize(){
     map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
     marker = new google.maps.Marker({position: latlng, map: map});    
     google.maps.event.addListener(map, 'click', function(event){
-				      placeMarker(event.latLng);	    
+				      placeMarker(event.latLng);   
 				  });
 }
 function map_multiple_markers_initialize(){
     if(typeof google === 'undefined' || $("#map_canvas").length===0 || (typeof marker_objects === "undefined")){
 	return(false);
     }
-    var zoom;
     var locations = [];
     markers = [];
     var myOptions = {
@@ -60,16 +61,56 @@ function map_multiple_markers_initialize(){
     };
     map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
     var bounds = new google.maps.LatLngBounds();
-
-    marker_objects.forEach(function(marker){			    
-			       var loc = new google.maps.LatLng(marker.latitude, marker.longitude);
-			       var gmarker = new google.maps.Marker({position: loc, map: map, title: marker.name});
+    var infoWindow = new google.maps.InfoWindow({'maxWidth': 200});
+    var counter = 0;
+    marker_objects.forEach(function(marker){
+			       var loc = new google.maps.LatLng(marker.latitude, marker.longitude);			       
+			       var zindex, color, letter, icon_url;
+			       if(marker.type){
+				   if(marker.type === "center" && daywise===true){
+				       zindex = marker.meeting_order;
+				       color=dayColors[marker.meeting];
+				       letter=marker.meeting_order;
+				   }else if(marker.type=="center"){
+				       zindex = marker.meeting_order;
+				       letter="C";
+				       console.log(marker.paid);
+				       if(marker.due || marker.paid){
+					   if(marker.due>0)
+					       color="red";
+					   else
+					       color="green";
+				       }else{
+					   color="brown";
+				       }					   
+				   }else{
+				       zindex = 100;
+				       letter = marker.type[0].toUpperCase();
+				       color="green"; 
+				   }
+				   icon_url = "/images/map_icons/"+color+"/" + letter + ".png";
+				   var gmarker = new google.maps.Marker({position: loc, map: map, title: marker.name, flat: true, icon: icon_url, zIndex: zindex});
+			       }else{
+				   var gmarker = new google.maps.Marker({position: loc, map: map, title: marker.name, flat: true});
+			       }				   
 			       bounds.extend(loc);
 			       google.maps.event.addListener(gmarker, 'click', function(event){
-								 new google.maps.InfoWindow({content: marker.name}).open(map, gmarker);
+                                                                 var str ="<div class='infobox'><b>" + marker.type + "</b>: " + marker.name;
+								 if(marker.type === "center"){
+								     if(marker.branch)
+									 str += "<br/><b>Branch</b>: " + marker.branch;
+								     if(marker.due)
+									 str += "<br/><b>Due</b>: " + marker.due;
+								     if(marker.paid)
+									 str += "<br/><b>Paid</b>: " + marker.paid;
+								     str += "<br/><b>meeting time: </b>" + marker.meeting + " at " + marker.time+"</div>";
+								 }
+								 infoWindow.setContent(str);
+								 infoWindow.open(map, gmarker);
 							     });
 			});
     map.fitBounds(bounds);
+    setZoom = map.getZoom();
 }
 function placeMarker(location){    
     marker.setPosition(location);
@@ -79,6 +120,7 @@ function placeMarker(location){
 }
 function loadAPI(){    
     var script = document.createElement("script");
+    // need to more this key to some place like constants.
     script.src = "http://www.google.com/jsapi?key=ABQIAAAASgP9ZPn59Iu0JTNFCdiAfhSdz4-UClTyfBQvJsbaUx94ZLstTBS5W9TdTunVVIf0hdAgYavWg43f1w&callback=loadMaps&sensor=false";
     script.type = "text/javascript";
     document.getElementsByTagName("head")[0].appendChild(script);
@@ -88,4 +130,16 @@ function loadMaps(){
 	google.load("maps", "3", {"callback": "map_initialize", other_params:'sensor=false'});
     else
 	google.load("maps", "3", {"callback": "map_multiple_markers_initialize", other_params:'sensor=false'});
+}
+function centerMap(){
+    if(typeof google != 'undefined' && $("#map_canvas")){
+	if(marker){
+	    google.maps.event.trigger(map, 'resize');	    
+	    map.setCenter(marker.position);	    
+	}
+	else{
+	    map_multiple_markers_initialize();	    
+	}
+	$("#map_canvas").css('height', '400').css('width', '400');
+    }    
 }
