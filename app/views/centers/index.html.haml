@@ -51,8 +51,9 @@
         History
       %li#accounting
         Accounting
-      %li#map
-        Map
+      - if Mfi.first.map_enabled
+        %li#map
+          Map
     %div.tab
       %div#centers_list
         =partial "centers/list"

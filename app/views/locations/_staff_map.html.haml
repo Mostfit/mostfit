@@ -1,0 +1,9 @@
+%script
+  ="var marker_objects = []"
+  - if locations
+    - locations.each_with_index do |loc, idx|
+      - if loc.parent_type == "center"
+        = "marker_objects.push({'name': '#{loc.parent.name}', 'latitude': #{loc.latitude}, 'longitude': #{loc.longitude}, 'type': '#{loc.parent_type}', meeting: '#{loc.parent.meeting_day}', time: '#{parent.meeting_time_hours}:#{parent.meeting_time_minutes}', meeting_order: #{idx+1}})"
+      -else
+        = "marker_objects.push({'name': '#{loc.parent.name}', 'latitude': #{loc.latitude}, 'longitude': #{loc.longitude}, 'type': '#{loc.parent_type}'})"
+#map_canvas{:style => "height: 500px; width: 800px;"}

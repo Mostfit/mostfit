@@ -38,6 +38,7 @@ class Mfi
   property :date_format, Enum.send('[]', *DateFormats), :nullable => true, :index => true
   property :accounting_enabled, Boolean, :default => false, :index => true
   property :dirty_queue_enabled, Boolean, :default => false, :index => true
+  property :map_enabled, Boolean, :default => false, :index => true
   property :currency_format,  String, :nullable => true, :length => 20
 
   property :main_text, Text, :nullable => true, :lazy => true
@@ -69,6 +70,7 @@ class Mfi
     File.open(File.join(Merb.root, "config", "mfi.yml"), "w"){|f|
       f.puts self.to_yaml
     }
+    FileUtils.touch(File.join(Merb.root, "tmp", "restart.txt"))
     Misfit::Config::DateFormat.compile
     set_currency_format
     DirtyLoan.start_thread

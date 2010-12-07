@@ -123,6 +123,11 @@
             =check_box :dirty_queue_enabled
         %tr
           %td
+            Enable maps ?
+          %td
+            =check_box :map_enabled
+        %tr
+          %td
             Currency formats
           %td
             - formats = Numeric::Transformer.instance_variable_get("@formats").keys.map{|x| [x.to_s, "#{x.to_s.camelcase(' ')} (#{100000.00.to_currency(x)})"]}.sort

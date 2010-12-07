@@ -1,5 +1,12 @@
 %script
-  ="var marker_objects = []"
-  - @locations.each do |loc|
-    = "marker_objects.push({'name': '#{loc.parent.name}', 'latitude': #{loc.latitude}, 'longitude': #{loc.longitude}, 'type': '#{loc.parent_type}'})"
+  - meeting_orders = {"monday" => 0, "tuesday" => 0, "wednesday" => 0, "thursday" => 0, "friday" => 0, "saturday" => 0}
+  ="var marker_objects = []"  
+  - if @locations or locations
+    - (@locations || locations).each_with_index do |loc, idx|
+      - if loc.parent_type == "center"
+        - parent = loc.parent
+        = "marker_objects.push({'name': '#{parent.name}', 'latitude': #{loc.latitude}, 'longitude': #{loc.longitude}, 'type': '#{loc.parent_type}', 'meeting': '#{loc.parent.meeting_day}', 'time': '#{parent.meeting_time_hours}:#{parent.meeting_time_minutes}', 'meeting_order': #{meeting_orders[loc.parent.meeting_day.to_s]+=1}, 'branch_id': #{parent.branch_id}})"
+      -else
+        = "marker_objects.push({'name': '#{loc.parent.name}', 'latitude': #{loc.latitude}, 'longitude': #{loc.longitude}, 'type': '#{loc.parent_type}'})"
+  = (params[:controller] == "staff_members") ? "var daywise=true" : "var daywise=false"
 #map_canvas{:style => "height: 500px; width: 800px;"}
