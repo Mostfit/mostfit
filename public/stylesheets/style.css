@@ -970,64 +970,53 @@ span.branchName{
 }
 ul#tree li{
     margin-bottom: 10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-bottom: 10px
 }
 ul#tree li ul{
     margin-top: 10px;
 }
-ul#tree li span.spacer1{
-    position: absolute;
-    margin-left: 100px;
+ul#tree li span{
     padding-bottom: 10px;
+    position: absolute;
+}
+ul#tree li span{
+    margin-left: 20px;
+    margin-bottom: 5px;
+}
+ul#tree li span.spacer1{
+    width: 200px;
 }
 ul#tree li span.spacer2{
-    position: absolute;
-    margin-left: 350px;
-    padding-bottom: 10px;
+    left: 400px;
 }
 ul#tree li span.spacer2a{
-    position: absolute;
-    margin-left: 300px;
-    padding-bottom: 10px;
+    left: 350px;
 }
 ul#tree li span.spacer2b{
-    position: absolute;
-    margin-left: 400px;
-    padding-bottom: 10px;
+    left: 450px;
 }
 ul#tree li span.spacer3{
-    position: absolute;
-    margin-left: 600px;
-    padding-bottom: 10px;
+    left: 600px;
 }
 ul#tree li span.spacer3a{
-    position: absolute;
-    margin-left: 550px;
-    padding-bottom: 10px;
+    left: 550px;
 }
 ul#tree li span.spacer3b{
-    position: absolute;
-    margin-left: 650px;
-    padding-bottom: 10px;
+    left: 650px;
 }
 ul#tree li span.spacer4{
-    position: absolute;
-    margin-left: 800px;
-    padding-bottom: 10px;
+    left: 800px;
 }
 ul#tree li span.spacer4a{
-    position: absolute;
-    margin-left: 750px;
-    padding-bottom: 10px;
+    left: 750px;
 }
 ul#tree li span.spacer4b{
-    position: absolute;
-    margin-left: 850px;
-    padding-bottom: 10px;
+    left: 850px;
 }
 ul#tree li span.spacer5{
-    position: absolute;
     margin-left: 800px;
-    padding-bottom: 10px;
+}
+.infobox{
+    overflow-x: none;
+    height: 80px;
 }

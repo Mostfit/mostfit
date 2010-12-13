@@ -66,7 +66,7 @@ module Misfit
                  :"data_entry/loans", :"data_entry/index", :insurance_companies, :info, :dashboard, :graph_data]
       },
       :funder => {
-        :all => [:searches, :browse, :branches, :centers, :client_groups, :payments, :clients, :loans, :dashboard, :regions, :documents, :comments, :areas, :info, :locations
+        :all => [:searches, :browse, :branches, :centers, :client_groups, :payments, :clients, :loans, :dashboard, :regions, :documents, :comments, :areas, :info, :locations,
                  :audit_trails, :documents, :attendances, :staff_members, :funders, :portfolios, :funding_lines, :reports, :graph_data, :dashboard]
       },
       :accountant => {
