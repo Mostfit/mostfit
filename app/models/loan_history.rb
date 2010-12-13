@@ -452,4 +452,38 @@ class LoanHistory
     end
     group_by.gsub("date_id", "date")
   end
+
+
+
+    def self.loan_repaid_count(obj,from_date, to_date)
+ 
+    if obj.class == Branch 
+      from  = "branches b, centers c, clients cl, loans l, loan_history lh"
+      
+      where = %Q{
+                  lh.status = 7 AND lh.date >= #{from_date.strftime('%Y-%m-%d')} AND  lh.date <= #{to_date.strftime('%Y-%m-%d')} AND lh.loan_id = l.id AND l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = #{obj.id}
+                };
+      
+    elsif obj.class == Center
+       from  = "centers c, clients cl,loans l, loan_history lh"
+     
+     # status = STATUSES.index(:repaid) + 1
+      where = %Q{
+               lh.status = 'status' AND lh.date >= #{from_date.strftime('%Y-%m-%d')} AND  lh.date <= #{to_date.strftime('%Y-%m-%d')} AND lh.loan_id = l.id AND l.client_id =cl.id AND cl.center_id = #{obj.id} 
+                };
+
+    elsif obj.class == StaffMember
+       from  = "loans l, loan_history lh, staff_members sm"
+       where = %Q{
+               lh.status = 'status' AND lh.date >= #{from_date.strftime('%Y-%m-%d')} AND  lh.date <= #{to_date.strftime('%Y-%m-%d')} AND lh.loan_id = l.id AND l.disbursed_by_staff_id = #{obj.id} AND sm.id = #{obj.id} 
+                };
+
+    end
+    repository.adapter.query(%Q{
+                             SELECT COUNT(DISTINCT(lh.loan_id))loan_count
+                             FROM #{from}
+                             WHERE #{where}
+                           })
+  end
+
 end

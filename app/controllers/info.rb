@@ -48,7 +48,8 @@ class Info < Application
 
       @areas[:new]  = LoanHistory.parents_where_loans_of(Area, {:loan => {:funding_line_id => @obj.id}, :area => new_date_hash})
       @areas[:upto] = LoanHistory.parents_where_loans_of(Area, {:loan => {:funding_line_id => @obj.id}, :area => upto_date_hash})
-
+      
+     
       @branches[:new]  = @obj.branches(new_date_hash)
       @branches[:upto] = @obj.branches(upto_date_hash)
 
@@ -59,12 +60,15 @@ class Info < Application
       @clients[:upto] = @obj.clients(client_hash(:upto))
     elsif @obj.class == StaffMember
       @areas     = @obj.areas
-      @branches, @centers  = {}, {}
+      @branches, @centers, @managed_clients  = {}, {}, {}
       @branches[:new]  = @obj.branches(new_date_hash)
       @branches[:upto] = @obj.branches(upto_date_hash)
 
       @centers[:new]   = @obj.centers(new_date_hash)
       @centers[:upto]  = @obj.centers(upto_date_hash)
+
+      @managed_clients[:new] = @obj.clients #(client_hash(:new))
+      @managed_clients[:upto] = @obj.clients #(client_hash(:upto))
     else
       raise "Unknown obj class"
     end
@@ -81,12 +85,13 @@ class Info < Application
       @centers[:upto]   = (@branches.class == Hash ? @branches[:upto] : @branches).centers(upto_date_hash)
     end
     
-    unless @clients
+    unless @clients 
       @clients        = {} 
       @clients[:new]  = (@centers.class == Hash ? @centers[:upto] : @centers).clients(client_hash(:new) + {:fields => [:id]})
       @clients[:upto] = (@centers.class == Hash ? @centers[:upto] : @centers).clients(client_hash(:upto) + {:fields => [:id]})
     end
 
+    
     set_more_info(@obj)
     render :file => 'info/moreinfo', :layout => false
   end
@@ -162,6 +167,11 @@ private
     @loan_disbursed  = LoanHistory.amount_disbursed_for(obj, @from_date, @to_date)
     @loan_data       = LoanHistory.sum_outstanding_for(obj, @to_date)
     @defaulted       = LoanHistory.defaulted_loan_info_for(obj, @to_date)
+    @total_death_cases = Client.death_cases(obj,Date.min_date,@to_date)  
+    @death_cases = Client.death_cases(obj,@from_date,@to_date) 
+    @pending_death_cases = Client.pending_death_cases(obj,@from_date,@to_date)
+    @loans_repaid  = LoanHistory.loan_repaid_count(obj,@from_date, @to_date)
+    @loans_repaid_total =  LoanHistory.loan_repaid_count(obj,Date.min_date, @to_date)
   end
 end
   
