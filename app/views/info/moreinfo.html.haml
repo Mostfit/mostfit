@@ -70,6 +70,35 @@
         =@clients_upto_count
       -else
         =0
+  - if @managed_clients 
+    %tr
+      %td
+        Number of Managed Clients
+        %td
+          -if @managed_clients
+            =@managed_clients[:new].count
+          -else
+            =0
+        %td
+          -if @managed_clients
+            =@managed_clients[:upto].count
+          -else
+            =0    
+
+  %tr
+    %td
+      Number of death Cases
+    %td
+      =(@death_cases and @death_cases.length>0) ? @death_cases : 0
+    %td
+      =(@total_death_cases and @total_death_cases.length>0) ? @total_death_cases : 0
+  %tr
+    %td
+      Number of pending death Cases
+    %td
+      = '-'
+    %td
+      =(@pending_death_cases and @pending_death_cases.length>0) ? @pending_death_cases : 0  
   %tr
     %td
       borrower clients
@@ -84,6 +113,13 @@
       =(@loan_disbursed) ? @loan_disbursed.loan_count : 0
     %td
       =(@total_disbursed) ? @total_disbursed.loan_count : 0
+  %tr
+    %td
+      Number of loans Repaid
+    %td
+      =(@loans_repaid) ? @loans_repaid : 0
+    %td
+      =(@loans_repaid_total) ? @loans_repaid_total : 0
   %tr
     %td
       Amount Disbursed

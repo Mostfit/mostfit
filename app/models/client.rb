@@ -298,6 +298,67 @@ class Client
     return true unless verified_by_user_id
     throw :halt
     [false, "Verified client. Cannot be deleted"]
-  end  
-end
+  end
 
+  def self.death_cases(obj,from_date, to_date)
+     d2 = to_date.strftime('%Y-%m-%d')
+    if obj.class == Branch 
+      from  = "branches b, centers c, clients cl, claims cm"
+      where = %Q{
+                cl.active = false AND cl.inactive_reason IN (2,3) AND cl.id = cm.client_id AND cm.claim_submission_date >= #{from_date.strftime('%Y-%m-%d')} AND cm.claim_submission_date <= 'd2' AND cl.center_id = c.id AND c.branch_id = b.id  AND b.id = #{obj.id}   
+                };
+      
+    elsif obj.class == Center
+      from  = "centers c, clients cl, claims cm"     
+      where = %Q{
+               cl.active = false AND cl.inactive_reason IN (2,3) AND cl.id = cm.client_id AND cm.claim_submission_date >= #{from_date.strftime('%Y-%m-%d')} AND cm.claim_submission_date <= 'd2' AND cl.center_id = c.id AND c.id = #{obj.id}   
+                };
+      
+    elsif obj.class == StaffMember
+      # created_by_staff_member_id
+      from =  "clients cl, claims cm, staff_members sm"      
+      where = %Q{
+                cl.active = false AND cl.inactive_reason IN (2,3)  AND cl.id = cm.client_id AND cm.claim_submission_date >= #{from_date.strftime('%Y-%m-%d')} AND cm.claim_submission_date <= 'd2' AND cl.created_by_staff_member_id = sm.id AND sm.id = #{obj.id}    
+                };
+      
+    end
+    repository.adapter.query(%Q{
+                             SELECT COUNT(cl.id)
+                             FROM #{from}
+                             WHERE #{where}
+                           })
+  end
+  
+   def self.pending_death_cases(obj,from_date, to_date)
+ 
+     if obj.class == Branch
+       repository.adapter.query(%Q{
+                                SELECT COUNT(cl.id)
+                                FROM branches b, centers c, clients cl, claims cm
+                                WHERE cl.active = false AND cl.inactive_reason IN (2,3)
+                                AND cl.center_id = c.id AND c.branch_id = b.id 
+                                AND b.id = #{obj.id} AND cl.id NOT IN (SELECT client_id FROM claims)     
+                               })
+       
+     elsif obj.class == Center      
+       repository.adapter.query(%Q{
+                                SELECT COUNT(cl.id)
+                                FROM centers c, clients cl, claims cm 
+                                WHERE cl.active = false AND cl.inactive_reason IN (2,3)
+                                AND cl.center_id = c.id AND c.id = #{obj.id} AND cl.id
+                                NOT IN (SELECT client_id FROM claims )   
+                              })
+
+     elsif obj.class == StaffMember
+       repository.adapter.query(%Q{
+                                SELECT COUNT(cl.id)
+                                FROM clients cl, claims cm, staff_members sm 
+                                WHERE cl.active = false AND cl.inactive_reason IN (2,3)
+                                AND cl.created_by_staff_member_id = sm.id AND sm.id = #{obj.id} AND cl.id
+                                NOT IN (SELECT client_id FROM claims )
+                                })
+     end
+   end
+ end
+ 
+ 
