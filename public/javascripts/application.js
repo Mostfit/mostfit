@@ -71,13 +71,9 @@ function showThis(li, idx){
     $("div.tab_container ul.tabs li.active").removeClass("active");
     $(li).addClass("active");
     tab = $($("div.tab_container div.tab")[idx]).show();
-    if(typeof google != 'undefined' && $("#map_canvas")){
-	google.maps.event.trigger(map, 'resize');
-	if(marker)
-	    map.setCenter(marker.position);
-	$("#map_canvas").css('height', '400').css('width', '400');
-    }
     remote = $(tab).find("input:hidden");
+    if(typeof centerMap !="undefined")
+	centerMap();
     if(remote.length>0 && remote.attr("name")=="_load_remote"){
 	$.ajax({
 		   url: remote.val(),
@@ -191,26 +187,25 @@ function attachFormRemoteTo(form){
     form=$(f.currentTarget);
     $(form).find("input[type='submit']").attr("disabled", true);
     $(form).after("<img id='spinner' src='/images/spinner.gif' />");
-
     $.ajax({
       type: form.attr("method"),
       url: form.attr("action"),
       data: form.serialize(),
       success: function(data, status, xmlObj){
 	if(data.redirect){
-	  window.location.href = data.redirect;
+	    window.location.href = data.redirect;
 	}else if(form.find("input[name='_target_']").length>0){
-	  id=form.find("input[name='_target_']").attr("value");
-	  $("#"+id).html(data);
-	  attachFormRemoteTo($("#"+id).find("form._remote_"));
+	    id=form.find("input[name='_target_']").attr("value");
+	    $("#"+id).html(data);
+	    attachFormRemoteTo($("#"+id).find("form._remote_"));
 	}else if(form.find("table").length>0){
-	  form.find("table").html(data);
-	  attachFormRemoteTo(form.find("table form._remote_"));
+	    form.find("table").html(data);
+	    attachFormRemoteTo(form.find("table form._remote_"));
 	}else if(form.find("div").length>0){
-	  form.find("div").html(data);
-	  attachFormRemoteTo(form.find("div").find("form._remote_"));
+	    form.find("div").html(data);
+	    attachFormRemoteTo(form.find("div").find("form._remote_"));
 	}else{
-	  attachFormRemoteTo(form.find("form._remote_"));
+	    attachFormRemoteTo(form.find("form._remote_"));
 	}
 	$("#spinner").remove();
 	$(form).find("input[type='submit']").attr("disabled", "");
@@ -221,7 +216,7 @@ function attachFormRemoteTo(form){
 	  window.location.href = text;
 	}else{
 	  $("div.error").remove();
-	  txt = "<div class='error'>"+xhr.responseText+"</div>"
+	  txt = "<div class='error'>"+xhr.responseText+"</div>";
 	  form.before(txt);
 	  $("#spinner").remove();
 	  $(form).find("input[type='submit']").attr("disabled", "");
@@ -1063,8 +1058,7 @@ $(document).ready(function(){
   addFloater("");
   if(typeof map_initialize != 'undefined')
       map_initialize();
-  if($("#map_canvas"))
+  if($("#map_canvas") && (typeof loadAPI != "undefined"))
       loadAPI();
-
 });
 

@@ -27,8 +27,10 @@ class Browse < Application
 
   def centers_paying_today
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
-    center_ids = LoanHistory.all(:date => @date).map{|x| x.center_id}.uniq
-    @locations = Location.all(:parent_id => center_ids, :parent_type => "center")
+    hash  = {:date => @date}
+    hash  = {:branch_id => params[:branch_id]} if params[:branch_id] and not params[:branch_id].blank?
+    center_ids = LoanHistory.all(hash).aggregate(:center_id)
+    @locations = Location.all(:parent_id => center_ids, :parent_type => "center").group_by{|x| x.parent_id}
     # restrict branch manager and center managers to their own branches
     if session.user.role==:staff_member
       st = session.user.staff_member
@@ -39,7 +41,7 @@ class Browse < Application
     center_ids = center_ids.join(',')
     client_ids = repository.adapter.query(%Q{SELECT c.id FROM clients c WHERE c.center_id IN (#{center_ids})})
     @data = repository.adapter.query(%Q{SELECT c.id as id, c.branch_id as branch_id, c.name name, SUM(lh.principal_due) pd, SUM(lh.interest_due) intd, 
-                                                   SUM(lh.principal_paid) pp, SUM(lh.interest_paid) intp
+                                                   SUM(lh.principal_paid) pp, SUM(lh.interest_paid) intp, c.meeting_time_hours, c.meeting_time_minutes
                                         FROM loan_history lh, centers c, loans l
                                         WHERE lh.center_id IN (#{center_ids}) AND lh.date='#{@date.strftime('%Y-%m-%d')}' AND c.id=lh.center_id AND lh.status in (5,6) AND lh.loan_id=l.id
                                               AND l.deleted_at is NULL

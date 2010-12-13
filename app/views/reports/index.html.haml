@@ -1,7 +1,6 @@
 %h1
   Reports
 - Reports::Types.to_a.sort_by{|k, v| Reports::Order.index(k)}.each do |report_type, reports|
-  - next if session.user.role == :accountant and not report_type == :accounting
   %h2
     = report_type.to_s.camelcase(' ')
   %ul

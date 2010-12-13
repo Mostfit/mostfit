@@ -56,8 +56,9 @@
       History
     %li#miscellaneous
       Miscellaneous
-    %li#map
-      Map
+    - if Mfi.first.map_enabled
+      %li#map
+        Map
   %div.tab    
     =partial "clients/list", :center_leader => leader
   %div.tab    
@@ -80,6 +81,7 @@
     %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :centers, :id => @center.id, :action => :misc)}
-  %div.tab
-    = js_include_tag :map
-    =partial "locations/map", {:obj => @center}
+  - if Mfi.first.map_enabled
+    %div.tab
+      = js_include_tag :map
+      =partial "locations/map", {:obj => @center}

@@ -111,3 +111,57 @@ table.report tr.total{
     text-align: right;
     font-weight: bold;
 }
+ul#tree li{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    list-style-type:none;
+}
+ul#tree li ul{
+    padding-right: 0px;
+    margin-top: 5px;
+    padding-top: 5px;
+    padding-left: 11px;
+    list-style-type:none;
+}
+ul#tree li span{
+    position: absolute;
+}
+ul#tree li span{
+    line-height: 12px;
+}
+ul#tree li span.spacer1{
+    padding: 0px;
+    width: 300px;
+}
+ul#tree li span.spacer2{
+    left: 380px;
+}
+ul#tree li span.spacer2a{
+    left: 350px;
+}
+ul#tree li span.spacer2b{
+    left: 450px;
+}
+ul#tree li span.spacer3{
+    left: 600px;
+}
+ul#tree li span.spacer3a{
+    left: 550px;
+}
+ul#tree li span.spacer3b{
+    left: 650px;
+}
+ul#tree li span.spacer4{
+    left: 800px;
+}
+ul#tree li span.spacer4a{
+    left: 750px;
+}
+ul#tree li span.spacer4b{
+    left: 850px;
+}
+ul#tree li span.spacer5{
+    margin-left: 800px;
+}

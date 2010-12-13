@@ -102,8 +102,9 @@ class Portfolio
     # force reloading to read associations correctly
     self.reload
     loan_ids = []
+
     if PortfolioLoan.all(:portfolio_id => self.id, :active => true).count > 0
-      LoanHistory.loans_outstanding_for(self.loans(:fields => [:id])).each{|loan|
+      LoanHistory.loans_outstanding_for(Loan.all(:id => self.portfolio_loans.map{|x| x.loan_id}, :fields => [:id])).each{|loan|
         loan_values[loan.loan_id] = loan
       }
       self.portfolio_loans(:active => true).each{|l|
@@ -113,6 +114,7 @@ class Portfolio
         loan_ids << l.loan_id
       }
     end
+
     if loan_ids.length > 0
       last_payment = Payment.all(:loan_id => loan_ids).max(:received_on)
       outstanding_value = portfolio_loans(:active => true).aggregate(:current_value.sum) || 0

@@ -16,6 +16,8 @@
   %ul.tabs
     %li#manages Manages
     %li#info Info
+    - if Mfi.first.map_enabled
+      %li#map Map
   %div.tab
     - @manages.keys.each do |type|
       -if @manages[type].length> 0
@@ -27,3 +29,21 @@
               =link_to(obj.name, resource(obj))
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@staff_member.id}?for=staff_member"}
+  - if Mfi.first.map_enabled
+    %div.tab
+      = js_include_tag :map
+      - locations = []
+      - if @manages[:centers] and params[:meeting_day] and not params[:meeting_day].blank?
+        - locations << Location.all(:parent_id => @manages[:centers].find_all{|x| x.meeting_day==params[:meeting_day].to_sym}.map{|m| m.id}, :parent_type => 'center')
+      - elsif @manages[:centers]
+        - locations << Location.all(:parent_id => @manages[:centers].map{|m| m.id}, :parent_type => 'center') 
+      - elsif @manages[:branches]
+        - locations << Location.all(:parent_id => @manages[:branches].map{|m| m.id}, :parent_type => 'branch')
+      %form{:action => resource(@staff_member)+"#map", :style => "padding-left: 10px;"}
+        %b Filter centers by weekdays
+        = select(:name => "meeting_day", :collection => Center::DAYS[1..-1].map{|x| x.to_s}, :prompt => "All days", :selected => params[:meeting_day])
+        %input{:type => "submit", :name => "submit", :value => "filter"}
+      #staff_map
+        = partial "locations/multi_map", {:locations => locations.flatten}
+        %span.greytext
+          Centers meeting on different days are shown in different colors. Numbers indicate the order in which they meetings are held. Click on a center pin to know more
