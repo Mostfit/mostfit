@@ -1,4 +1,4 @@
-module Reporting
+ module Reporting
   module BranchReports
     # we must convert each SQL struct into a hash of {:branch_id => :value}, so that we are always looking at 
     # the correct branch, and we have to refactor the divison, multiplication, etc. of these arrays
@@ -275,7 +275,7 @@ module Reporting
       get_latest_before(:scheduled_outstanding_total, date)
     end
     
-    def center_managers(date)
+    def center_managers_count(date)
       query_as_hash(%Q{SELECT branch_id, count(distinct(manager_staff_id)) FROM centers GROUP BY branch_id})
     end
     
@@ -288,30 +288,33 @@ module Reporting
     end
     
     def avg_outstanding_balance_per_client(date)
-      principal_outstanding(date)/client_count(date)
-      # query_as_hash(%Q{SELECT branch_id, avg(actual_outstanding_principal) amount 
-      #                  FROM loan_history lh, loans l 
-      #                  WHERE lh.date<='#{date.strftime('%Y-%m-%d')}' AND lh.loan_id=l.id 
-      #                                                                AND lh.status in (5,6) AND l.deleted_at is NULL 
-      #                  GROUP BY lh.branch_id})
+      po = principal_outstanding(date)
+      cc = client_count(date)
+      summary = po.values.inject(0){|sum, a| sum+a} / cc.values.inject(0){|sum, a| sum+a}
+      (po/cc).merge( {:summary => summary})
     end
     
     def avg_outstanding_balance_per_cm(date)
-      principal_outstanding(date)/center_managers(date)
+      po = principal_outstanding(date)
+      cm = center_managers_count(date)
+      summary = po.values.inject(0){|sum, a| sum+a} / cm.values.inject(0){|sum, a| sum+a}
+      (po/cm).merge( {:summary => summary})
     end
     
     def avg_loan_size_per_cm(date)
-      loan_amount(date)/center_managers(date)
+      la = loan_amount(date)
+      cm = center_managers_count(date)
+      summary = la.values.inject(0){|sum, a| sum+a} / cm.values.inject(0){|sum, a| sum+a}
+      (la/cm).merge( {:summary => summary})
     end
     
     def avg_loan_size_per_client(date)
-      loan_amount(date)/client_count(date)
-      # query_as_hash(%Q{SELECT disbursed_by_staff_id,avg(amount),b.name 
-      #                  FROM loans l ,staff_members s,centers c,branches b, clients cl 
-      #                  WHERE l.client_id = cl.id and cl.center_id = c.id and c.branch_id = b.id 
-      #                  GROUP BY b.id})
+      la = loan_amount(date)
+      cc = client_count(date)
+      summary = la.values.inject(0){|sum, a| sum+a} / cc.values.inject(0){|sum, a| sum+a}
+      (la/cc).merge( {:summary => summary})
     end
-    
+
     def principal_overdue_by(date=Date.today)
       Branch.all.map{|b| 
         due = LoanHistory.defaulted_loan_info_for(b, date)

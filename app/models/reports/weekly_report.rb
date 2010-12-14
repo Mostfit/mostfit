@@ -16,7 +16,7 @@ class WeeklyReport < Report
   def calc
     t0 = Time.now
     @report = []
-    @report << {"Number of Center Managers" => Branch.center_managers(end_date)}
+    @report << {"Number of Center Managers" => Branch.center_managers_count(end_date)}
     @report << {'Total number of Centers' => Branch.center_count(Date.min_date, end_date)}
     @report << {"Total number of Groups"  => Branch.client_groups_count(end_date)}
     @report << {'Total number of Clients' => Branch.client_count(end_date)}
