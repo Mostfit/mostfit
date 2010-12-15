@@ -139,7 +139,6 @@ module Merb
 
        </script>
       }
-      debugger
       return str
     end
 
