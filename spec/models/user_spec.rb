@@ -1185,6 +1185,9 @@ describe User do
     user.can_access?({:action => "index", :namespace =>"data_entry", :controller => "index"}).should be_true
     user.can_access?({:action =>"hq_tab", :controller =>"browse"}).should be_false
     user.can_access?({:action => "index", :controller => "branches"}).should be_false
+    user.can_access?({:action => "disbursement_sheet", :controller => "staff_members"}).should be_true
+    user.can_access?({:action => "day_sheet", :controller => "staff_members"}).should be_true
+    user.can_access?({:action => "show", :controller => "reports"}).should be_true
 
     managed_branches = Branch.all
     managed_centers  = Center.all

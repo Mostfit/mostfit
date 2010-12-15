@@ -1,0 +1,16 @@
+%h1  Disbursement sheet
+
+%table
+  %tr
+    %th
+      ID
+    %th
+      Staff Name
+  - @data.each do |staff|
+    %tr
+      %td
+        = staff.id
+      %td
+        = staff.name
+      %td
+        = link_to 'Generate sheet',url(:disbursement_sheet,staff.id)

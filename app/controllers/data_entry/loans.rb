@@ -25,5 +25,46 @@ module DataEntry
       @loan_product = @loan.loan_product
       render
     end
+
+    def staff_disbursement_sheet
+      @data = StaffMember.all(:active => true)
+      render
+    end
+    # def make_loan_utilization
+    #   @loans_to_utilize = Loan.all(:loan_utilization_id => nil, :id.lt => 30)
+    #   render
+    # end
+
+    def make_loan_utilization
+      debugger
+      if request.method == :get
+        if params[:center_id]
+          @loans_to_utilize = @loan.all("client.center" => Center.get(params[:center_id]))
+        else
+          @loans_to_utilize = Loan.all(:loan_utilization_id => nil).paginate(:page => params[:page], :per_page => 10)
+        end
+        @loans_to_utilize.each {|l| l.clear_cache}
+        @clients =  @loans_to_utilize.clients
+        render
+      else
+        @errors = []
+        @loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
+        @loans.keys.each do |id|
+          loan = Loan.get(id)
+          params[:loans][id].delete("approved?")        
+          params[:loans][id][:loan_utilization_id] = params[:loans][id][:utilization_id]
+          loan.update(params[:loans][id])
+          @errors << loan.errors unless loan.save
+        end
+        if @errors.blank?
+          redirect(params[:return]||"/data_entry", :message => {:notice => 'loans utilised'})
+        else
+          @loans_to_utilize = Loan.all(:id.in => @loans.keys)
+          @clients =  @loans_to_utilize.clients
+          render
+        end
+      end
+    end
+    
   end
 end

@@ -1,0 +1,25 @@
+        
+%h2
+  Loan utilization
+  %h2
+    The following loans have not been utilized yet
+- if not @errors.blank?
+  .error
+    %ul
+      - @errors.each do |e|
+        - e.values.each do |v|
+          %li
+            == Loan #{e.resource.id}: #{v}
+- if @loans_to_utilize.size > 0
+  = form_for(@loan, :action => url(:enter_loans, :action => "make_loan_utilization"), :class => "_disable_button_") do
+    = hidden_field :name => :id, :value => @center.id
+    = partial :make_loan_utilization
+    = submit 'utilize selected loans', :name => "approve_loans"
+   
+- else
+  Nothing to approve
+
+
+        
+      
+      

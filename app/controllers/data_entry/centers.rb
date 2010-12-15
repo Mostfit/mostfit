@@ -4,7 +4,7 @@ module DataEntry
       @center = Center.new
       redirect(resource(:centers, :new, {:return => :data_entry}))
     end
-
+    
     def edit
       if params[:query] and @center = Center.get(params[:query]) || Center.first(:name => params[:query]) || Center.first(:code => params[:query]) 
         @branch = @center.branch

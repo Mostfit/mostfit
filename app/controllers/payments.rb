@@ -87,7 +87,6 @@ class Payments < Application
     end
   end
 
-
   private
   include DateParser
 
@@ -137,4 +136,6 @@ class Payments < Application
       return success      
     end
   end
+
+
 end # Payments
