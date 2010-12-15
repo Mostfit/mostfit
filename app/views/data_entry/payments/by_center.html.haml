@@ -43,6 +43,14 @@
           = date_select 'for_date', @date
           = hidden_field :name => :center_id, :value => @center.id
           = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
+  %h1 Loan Utilization
+  - @loans_to_utilize = @clients.loans(:loan_utilization_id => nil, :rejected_on => nil)
+  - if @loans_to_utilize.size > 0
+    = form_for(@loan, :action => url(:enter_loans, 'make_loan_utilization', :return => resource(@branch, @center)), :class => "_disable_button_") do
+      = partial "data_entry/loans/make_loan_utilization"
+      = submit "Loan Utilization", :name => "make LUC"
+  - else
+    No LUC  
   %h1 Approvals
   - @loans_to_approve = @clients.loans(:approved_on => nil, :rejected_on => nil)
   - if @loans_to_approve.size > 0

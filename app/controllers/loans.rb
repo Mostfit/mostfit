@@ -143,6 +143,7 @@ class Loans < Application
   end
 
   def approve
+    debugger
     if request.method == :get
       if params[:center_id]
         @loans_to_approve = @loan.all("client.center" => Center.get(params[:center_id]))
