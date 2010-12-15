@@ -25,7 +25,7 @@ class Loan
 
   property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false, :index => true
   property :scheduled_first_payment_date,   Date, :nullable => false, :auto_validation => false, :index => true
-  property :applied_on,                     Date, :nullable => false, :auto_validation => false, :index => true
+  property :applied_on,                     Date, :nullable => false, :auto_validation => false, :index => true, :default => Date.today
   property :approved_on,                    Date, :auto_validation => false, :index => true
   property :rejected_on,                    Date, :auto_validation => false, :index => true
   property :disbursal_date,                 Date, :auto_validation => false, :index => true
