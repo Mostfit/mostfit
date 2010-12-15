@@ -1,0 +1,47 @@
+%table.report.nojs    
+  %thead
+    %tr{:style => "font-size: 0.85em;"}
+      %th
+        id
+      %th
+        Client Name
+      %th
+        Details
+      %th
+        Amount
+      %th
+        Center
+      %th
+        Status
+      %th
+        Selected
+      %th
+        Utilization
+     
+  -@loans_to_utilize.each do |loan|
+   
+    %tr{:class => cycle('odd','')}
+      %td.number
+        = link_to loan.id, url(:quick_link, "loans", loan.id)
+      %td.text
+        = link_to loan.client.name
+      %td.number
+        = loan.description
+      %td.number
+        = loan.amount
+      %td.text
+        = loan.client.center.name
+      
+      %td.text
+        = loan.status.to_s.camelcase(' ')
+      %td
+        = check_box :name => "loans[#{loan.id}][approved?]"
+      %td.text
+        = select :name => "loans[#{loan.id}][loan_utilization_id]", :collection => LoanUtilization.all.map{|x| [x.id, x.name]}, :prompt => "Select Utilization"
+
+     
+  %tfoot
+    %tr
+      %td{:colspan => 10}
+  
+= paginate @loans_to_utilize if @loans_to_utilize.respond_to?(:page)

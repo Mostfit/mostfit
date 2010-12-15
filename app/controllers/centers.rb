@@ -198,5 +198,5 @@ class Centers < Application
       clients[k]=v.sort_by{|c| c.name} if v
     }.sort.collect{|k, v| v}.flatten
   end
-
+  
 end # Centers

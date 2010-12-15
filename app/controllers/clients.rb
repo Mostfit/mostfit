@@ -106,6 +106,12 @@ class Clients < Application
       redirect resource(@client, :edit)
     end
   end
+  
+  def death_count
+   @data = Client.all(:active => 'false',:inactive_reason => 'death_of_client')
+    render
+  end
+  
 
   private
   def get_context
@@ -118,4 +124,5 @@ class Clients < Application
   def disallow_updation_of_verified_clients
     raise NotPrivileged if @client.verified_by_user_id and not session.user.admin?
   end
+
 end # Clients

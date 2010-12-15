@@ -1,0 +1,29 @@
+%h1  List of dead clients
+%table
+  %tr
+    %th
+      ID
+    %th
+      Name
+    %th
+      Date of Birth
+    %th
+      Group
+    %th
+      Center
+    %th
+      Branch
+  - @data.each do |client|
+    %tr
+      %td
+        = client.id
+      %td
+        = client.name
+      %td
+        = client.date_of_birth
+      %td
+        = client.client_group.name
+      %td
+        = client.center.name
+      %td
+        = client.center.branch.name

@@ -16,7 +16,6 @@
           %td
             = (r[r.keys[0]][branch.id]||0).to_currency
         %td
-          - sum = 0.0
-          %b= (r[r.keys[0]].values.map{|x| x.to_i}.inject(0){|sum, item| sum+item} || 0).to_currency
+          %b= ((r[r.keys[0]][:summary]) || (r[r.keys[0]].values.map{|x| x.to_i}.inject(0){|sum, item| sum+item} || 0)).to_currency
 
 

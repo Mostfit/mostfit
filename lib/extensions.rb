@@ -153,13 +153,39 @@ module Misfit
         end
 
         r = (access_rights[@action.to_s.to_sym] or access_rights[:all])
-
+       
         if role == :data_entry and ["clients", "loans", "client_groups"].include?(@controller)
           if ["new", "edit", "create", "update"].include?(@action)
             return true
           else
             return false
           end
+        end
+       
+
+        if role == :data_entry and @action == "index" and @controller == "staff_members" 
+          return false
+        end
+        
+        if role == :data_entry and @action == "create" and @controller == "staff_members" 
+          return false
+        end
+        if role == :data_entry and @action == "update" and @controller == "staff_members" 
+          return false
+        end
+        if role == :data_entry and @action == "disbursement_sheet" and @controller == "staff_members" 
+          return true 
+        end
+
+        if role == :data_entry and @action == "day_sheet" and @controller == "staff_members" 
+          return true 
+        end
+      
+        if role == :data_entry and @action == "show" and @controller == "reports"
+          return true 
+        end
+        if role == :data_entry and @action == "death_count" and @controller == "clients"
+          return true 
         end
         
         if @staff

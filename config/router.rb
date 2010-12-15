@@ -108,6 +108,7 @@ Merb::Router.prepare do
   match('/staff_members/:id/disbursement_sheet.:format').to(:controller => 'staff_members', :action => 'disbursement_sheet', :format => ":format").name(:disbursement_sheet_with_format)
   match('/browse(/:action)').to(:controller => 'browse').name(:browse)
   match('/loans/:action').to(:controller => 'loans').name(:loan_actions)
+  match('/client/:action').to(:controller => 'clients').name(:client_actions)
   # this uses the redirect_to_show methods on the controllers to redirect some models to their appropriate urls
   match('/documents/:action(/:id)').to(:controller => "documents").name(:documents_action_link)
   match('/:controller/:id', :id => %r(\d+)).to(:action => 'redirect_to_show').name(:quick_link)

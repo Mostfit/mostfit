@@ -141,6 +141,14 @@ module DataEntry
       end
     end
     
+
+    def staff_collection_sheet
+
+      @data = StaffMember.all(:active => true)
+      render
+    end
+
+
     private
     include DateParser
     # this function is called by by_center and by_staff_member
@@ -205,6 +213,5 @@ module DataEntry
         @errors << a.errors unless a.save
       end
     end
-
   end
 end

@@ -1,5 +1,5 @@
 class Loans < Application
-  before :get_context, :exclude => ['redirect_to_show', 'approve', 'disburse', 'reject', 'write_off_reject', 'write_off_suggested']
+  before :get_context, :exclude => ['redirect_to_show', 'approve', 'disburse', 'reject', 'write_off_reject', 'write_off_suggested', 'collection_sheet']
   provides :xml, :yaml, :js
 
   def index
@@ -298,6 +298,12 @@ class Loans < Application
     redirect("/loans/#{loan.id}")
   end
 
+
+  # def make_loan_utilization
+    
+  #   render
+  # end
+
   private
   def get_context
     if params[:id]
@@ -328,4 +334,9 @@ class Loans < Application
   def disallow_updation_of_verified_loans
     raise NotPrivileged if @loan.verified_by_user_id and not session.user.admin?
   end
+
+  def collection_sheet
+    render
+  end
+  
 end # Loans

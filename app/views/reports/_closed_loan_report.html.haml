@@ -1,0 +1,29 @@
+=partial :form
+%table.report
+  %tr.header
+    %th
+      Branch
+    %th
+      Center
+    %th
+      Group
+    %th
+      Client Name
+    %th
+      Loan Amount
+    %th
+      Reason for closure
+  - @data.each do |key,val|
+    %tr
+      %td
+        = val[0]
+      %td
+        = val[1]
+      %td
+        = val[2]
+      %td
+        = val[3]
+      %td
+        = val[4]
+      %td  
+        = val[5]
