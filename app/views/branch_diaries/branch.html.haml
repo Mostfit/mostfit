@@ -1,0 +1,13 @@
+%h1
+  Branch Diary
+%h2
+  Record of Daily Activities of Branch
+  |
+  %a#new_entry{:href => "#new_entry", :onclick => "javascript: $('#new_branch_diary_entry').toggle()"}
+    New entry
+%div#new_branch_diary_entry{:style => "display: none;"}
+  = form_for(@branch_diary, :action => resource(@branch, :branch_diaries)) do
+    = partial "branch_diaries/fields", :branch => @branch
+%div#branch_diary_entries
+  = partial "branch_diaries/list", :branch_diaries => BranchDiary.all(:branch => @branch)
+
