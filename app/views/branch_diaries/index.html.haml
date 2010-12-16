@@ -1,0 +1,55 @@
+%h1
+  Daily Activities of Branch
+%p
+  = link_to_with_rights 'Enter new details for Branch Diary', resource(:branch_diaries, :new), :class => "add"
+- if @branch_diaries.blank?
+  %p
+    %i No data to display. Please enter the data to view the Branch Diary.
+- else
+  %table.narrow
+    %thead
+      %tr
+        %th
+        %th Id
+        %th
+        %th Branch
+        %th Date
+        %th Opening Time of Branch
+        %th Closing Time of Branch
+        %th Person holding the Branch Key
+        %th Branch Opened By
+ 
+    %tbody
+    - for branch_diary in @branch_diaries
+      %tr{ :class => cycle('odd', '') }
+        %td &nbsp;
+        %td
+          = branch_diary.id
+        %td
+        %td
+          = branch_diary.branch_id
+        %td
+          = branch_diary.diary_date
+        %td
+          = branch_diary.opening_time_hours
+          = ':'
+          = branch_diary.opening_time_minutes
+        %td
+          = branch_diary.closing_time_hours
+          = ':'
+          = branch_diary.closing_time_minutes
+        %td
+          = branch_diary.branch_key
+        %td
+          = branch_diary.manager.name
+
+    %tfoot
+      %tr
+        %td{ :colspan => 9}
+
+
+
+
+
+  = paginate @branch_diaries
+= link_to 'Back', url(:branch_diaries)

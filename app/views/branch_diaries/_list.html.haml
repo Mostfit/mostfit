@@ -1,0 +1,25 @@
+%table.narrow
+  %tr
+    %th
+      Date
+    %th
+      Opening Time of Branch
+    %th
+      Closing Time of Branch
+    %th
+      Key Hold By
+    %th
+      Branch Opened By
+  - BranchDiary.all(:branch => @branch).branch_diaries(:order => [:date.desc], :order => [:id.desc]).each do |branch_diary|
+ 
+    %tr
+      %td
+        = branch_diary.diary_date
+      %td
+        = branch.diary.branch_opened_at
+      %td
+        = branch.diary.branch_closed_at
+      %td
+        = branch_diary.branch_key
+      %td
+        = branch_diary.manager.name

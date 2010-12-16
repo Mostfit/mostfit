@@ -1,0 +1,10 @@
+- form_url = resource(:branch_diaries, {:return => params[:return]})
+= error_messages_for @branch_diary
+
+= form_for(@branch_diary, :action => form_url, :class => "form") do
+  %h1 Enter daily activities of the Branch
+
+  %fieldset
+    = partial "branch_diaries/fields"
+    = submit "Submit Details"
+    = link_to 'Cancel', url(:branch_diaries)

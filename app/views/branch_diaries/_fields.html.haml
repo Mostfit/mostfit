@@ -1,0 +1,43 @@
+%table
+  %tr
+    %td
+      Name
+    %td
+      = select_staff_member_for @branch_diary, :manager, {}, true
+      %span.greytext select the person who opens the branch
+  %tr
+    %td
+      Date
+    %td
+      = date_select_for @branch_diary, :diary_date
+      %span.greytext pre-selected id todays date
+  %tr
+    %td
+      Branch
+    %td
+      = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
+  %tr
+    %td
+      Opening Time
+    %td
+      = text_field :opening_time_hours, :size => 2
+      %b   :
+      = text_field :opening_time_minutes, :size => 2
+      %span.greytext enter time in 24 hour format (hh:mm)
+  %tr
+    %td
+      Closing Time
+    %td
+      = text_field :closing_time_hours, :size => 2
+      %b  :
+      = text_field :closing_time_minutes, :size => 2
+      %span.greytext enter time in 24 hour format (hh:mm)
+  %tr
+    %td
+      Branch Key
+    %td
+      = text_field :branch_key
+      %span.greytext person who holds the keys of the branch today
+
+
+  

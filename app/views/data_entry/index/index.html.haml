@@ -24,8 +24,10 @@
           %br
           = link_to "By Staff Member", url("enter_#{plural}".to_sym, :action => 'by_staff_member'), :class => 'add_small'
           %br
-          = link_to "Delete a repayment", url("enter_#{plural}".to_sym, :action => 'delete'), :class => 'add_small' 
-        -else
+          = link_to "Delete a repayment <br/>", url("enter_#{plural}".to_sym, :action => 'delete'), :class => 'add_small' 
+          %b{:style =>"color:green;"}
+          = link_to_with_rights("Collection sheet", url(:enter_payments,:action => 'staff_collection_sheet'), :class => 'edit_small', :style => "font-weight: bold;")
+        - else
           = link_to_with_rights "Add new #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'new'), :class => 'add_small'
           %br
           = link_to_with_rights "Edit a #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'edit'), :class => 'edit_small'
@@ -50,11 +52,8 @@
         
         - if thing == :client
           - cl = Client.all(:active => false).size
-          <br/>
-          %b{:style => "color:green;"}
+          %br
+          %b{:style =>"color:green;"}
             = link_to ("Death of Client(#{cl})", url(:client_actions,:action => 'death_count'), :class => 'edit_small', :style => "font-weight: bold;")
-        - if thing == :payment
-          <br/>
-          %b{:style => "color:green;"}
-            = link_to_with_rights("collection sheet", url(:enter_payments,:action => 'staff_collection_sheet'), :class => 'edit_small', :style => "font-weight: bold;")
+    
   
