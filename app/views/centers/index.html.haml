@@ -51,9 +51,16 @@
         History
       %li#accounting
         Accounting
-      - if Mfi.first.map_enabled
-        %li#map
-          Map
+      %li#branch_diary
+        Branch Diary
+      -# %li#asset_register
+      -#   Asset Register
+      -# %li#stock_register
+      -#   Stock Register
+    - if Mfi.first.map_enabled
+      %li#map
+        Map
+          
     %div.tab
       %div#centers_list
         =partial "centers/list"
@@ -74,6 +81,11 @@
       %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => "/accounts/branch?branch_id=#{@branch.id}"}
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => resource(:branch_diaries, :id => @branch.id, :model => "Branch")}
+    -# %div.tab
+    -# %div.tab
+      
     %div.tab
       = js_include_tag :map
       = partial "locations/map", {:obj => @branch}

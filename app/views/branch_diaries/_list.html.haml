@@ -3,9 +3,11 @@
     %th
       Date
     %th
-      Opening Time of Branch
+      Branch
     %th
-      Closing Time of Branch
+      Opening Time
+    %th
+      Closing Time
     %th
       Key Hold By
     %th
@@ -16,9 +18,15 @@
       %td
         = branch_diary.diary_date
       %td
-        = branch.diary.branch_opened_at
+        = branch_diary.branch_id
       %td
-        = branch.diary.branch_closed_at
+        = branch_diary.opening_time_hours
+        = ':'
+        = branch_diary.opening_time_minutes
+      %td
+        = branch_diary.closing_time_hours
+        = ':'
+        = branch_diary.closing_time_minutes
       %td
         = branch_diary.branch_key
       %td

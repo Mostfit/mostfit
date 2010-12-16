@@ -14,10 +14,11 @@
         %th
         %th Branch
         %th Date
-        %th Opening Time of Branch
-        %th Closing Time of Branch
-        %th Person holding the Branch Key
+        %th Opening Time
+        %th Closing Time
+        %th Branch Key held by
         %th Branch Opened By
+        %th Edit
  
     %tbody
     - for branch_diary in @branch_diaries
@@ -27,7 +28,7 @@
           = branch_diary.id
         %td
         %td
-          = branch_diary.branch_id
+          = branch_diary.branch.id
         %td
           = branch_diary.diary_date
         %td
@@ -42,10 +43,12 @@
           = branch_diary.branch_key
         %td
           = branch_diary.manager.name
+        %td
+          = link_to 'edit', resource(branch_diary, :edit)
 
     %tfoot
       %tr
-        %td{ :colspan => 9}
+        %td{ :colspan => 10}
 
 
 
@@ -53,3 +56,5 @@
 
   = paginate @branch_diaries
 = link_to 'Back', url(:branch_diaries)
+
+

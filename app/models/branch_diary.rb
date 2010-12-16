@@ -1,8 +1,6 @@
 class BranchDiary
   include DataMapper::Resource
 
-  DAYS = [:none, :monday, :tuesday, :wednessday, :thursday, :friday, :saturday, :sunday]
-  
   property :id,                      Serial
   property :name,                    String,                 :nullable => true,     :length => 100,         :index => true
   property :diary_date,              Date,                   :default => Date.today
