@@ -45,7 +45,7 @@ class BranchDiaries < Application
   def update(id, branch_diary)
     @branch_diary = BranchDiary.get(id)
     raise NotFound unless @branch_diary
-    if @branch_diary.update_attributes(branch_diary)
+    if @branch_diary.update(branch_diary)
       redirect(params[:return] || resource(:branch_diaries), :message => {:notice => "Details was successfully updated."})
     else
       display @branch_diary, :edit  #error messages will show
