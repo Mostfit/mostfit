@@ -23,6 +23,7 @@ class Account
 #  has n, :debit_accounts, RuleBook, :through => :debit_accounts_rules
 
   has n, :postings
+  has n, :journals, :through => :postings
   is :tree, :order => :name
   
   validates_present   :name 
@@ -33,6 +34,10 @@ class Account
   validates_is_unique :gl_code
   validates_is_number :opening_balance
   
+  def accounts
+    
+  end
+
   
   def convert_blank_to_nil
     self.attributes.each{|k, v|

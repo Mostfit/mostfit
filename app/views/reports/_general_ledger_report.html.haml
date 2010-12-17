@@ -18,20 +18,29 @@
   - time_format += " %H:%M"
   - accounts = {}
   - Account.all.each{|acc|  accounts[acc.id] = acc}
-  - @data.each do |journal|
+  - @data.each do |key,val|
     %tr
       %td
-        = journal.date.strftime(time_format)
+        = val[0].strftime(time_format)
       %td
-        = journal.comment
+        = val[1]
       %td
-        = journal.postings.sort_by{|x| x.amount}.map{|p| accounts[p.account_id].name}.join("<br/>")
-        - debit, credit = journal.postings.map{|p| p.amount}.sort
+        - val[2].each do |journal|
+          = journal.account.name
+          %br
+        - val[3].each do |journal|
+          = journal.account.name
+          %br
       %td
-        =debit * -1
+        - val[2].each do |journal|
+          = journal.amount * -1
+          %br
       %td
         %br
-        =credit
+        - val[3].each do |journal|
+          = journal.amount
+          %br
+       
   %tr
     %td
     %td
@@ -39,4 +48,4 @@
     %td 
     %td
     
-= paginate @data
+

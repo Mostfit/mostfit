@@ -43,6 +43,12 @@ class Report
                 Branch.all(:order => [:name])
               end
     
+    @account = Account.all(:order => [:name])
+      # if (params and params[:account_id] and not params[:account_id].blank?)
+      #           Account.all(:id => params[:account_id])
+      #         else
+               
+      #         end
     # if the user is staff member or a funder then filter the branches against their managed branches list
     if user and st
       @branch = @branch & [st.centers.branches, st.branches].flatten
