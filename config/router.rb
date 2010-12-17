@@ -1,5 +1,8 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :asset_registers
+  resources :stock_registers
+  resources :branch_diaries
   resources :locations, :id => /\d+/
   resources :insurance_products
   resources :accounting_periods
