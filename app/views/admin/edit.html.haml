@@ -128,6 +128,11 @@
             =check_box :map_enabled
         %tr
           %td
+            Enable branch diary ?
+          %td
+            =check_box :branch_diary_enabled
+        %tr
+          %td
             Currency formats
           %td
             - formats = Numeric::Transformer.instance_variable_get("@formats").keys.map{|x| [x.to_s, "#{x.to_s.camelcase(' ')} (#{100000.00.to_currency(x)})"]}.sort

@@ -39,6 +39,8 @@ class Mfi
   property :accounting_enabled, Boolean, :default => false, :index => true
   property :dirty_queue_enabled, Boolean, :default => false, :index => true
   property :map_enabled, Boolean, :default => false, :index => true
+  property :branch_diary_enabled, Boolean, :default => false, :index => true
+
   property :currency_format,  String, :nullable => true, :length => 20
 
   property :main_text, Text, :nullable => true, :lazy => true
