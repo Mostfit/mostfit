@@ -5,7 +5,7 @@ class BranchDiaries < Application
 
   def index
     if request.xhr? and params[:branch_id]
-      @branch_diaries = BranchDiary.all(:branch_id => params[:branch_id])
+      @branch_diaries = BranchDiary.all(:branch_id => params[:branch_id]).paginate(:page => params[:page], :per_page => 15, :order => [:diary_date.desc])
       display @branch_diaries, :layout => layout?
     else
       @branch_diaries = (@branch_diaries || BranchDiary.all).paginate(:page => params[:page], :per_page => 15)
@@ -22,6 +22,7 @@ class BranchDiaries < Application
   def new
     only_provides :html
     @branch_diary = BranchDiary.new
+    @branch = Branch.get(params[:branch_id]) if params and params.key?(:branch_id)
     display @branch_diary, :layout => layout?
   end
 
@@ -29,13 +30,14 @@ class BranchDiaries < Application
     only_provides :html
     @branch_diary = BranchDiary.get(id)
     raise NotFound unless @branch_diary
+    @branch = @branch_diary.branch if @branch_diary.branch_id
     display @branch_diary, :layout => layout?
   end
 
   def create(branch_diary)
     @branch_diary = BranchDiary.new(branch_diary)
     if @branch_diary.save
-      redirect(params[:return] ||resource(:branch_diaries), :message => {:notice => "Details was successfully entered"})
+      redirect(params[:return] ||resource(@branch_diary.branch), :message => {:notice => "Diary entry was successfully entered"})
     else
       message[:error] = "BranchDiary failed to be entered"
       render :new  # error messages will show
@@ -46,7 +48,7 @@ class BranchDiaries < Application
     @branch_diary = BranchDiary.get(id)
     raise NotFound unless @branch_diary
     if @branch_diary.update(branch_diary)
-      redirect(params[:return] || resource(:branch_diaries), :message => {:notice => "Details was successfully updated."})
+      redirect(params[:return] || resource(@branch_diary.branch), :message => {:notice => "Diary entry was successfully updated."})
     else
       display @branch_diary, :edit  #error messages will show
     end

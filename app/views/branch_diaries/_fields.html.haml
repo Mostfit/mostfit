@@ -15,7 +15,11 @@
     %td
       Branch
     %td
-      = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
+      - if @branch
+        = @branch.name
+        = hidden_field(:branch_id, :value => @branch.id)
+      - else
+        = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
   %tr
     %td
       Opening Time

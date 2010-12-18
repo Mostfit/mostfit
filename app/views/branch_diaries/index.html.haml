@@ -1,7 +1,7 @@
 %h1
   Daily Activities of Branch
 %p
-  = link_to_with_rights 'Enter new details for Branch Diary', resource(:branch_diaries, :new), :class => "add"
+  = link_to_with_rights "Enter new details for Branch Diary", resource(:branch_diaries, :new, {:branch_id => params[:branch_id]}), :class => "add _remote_"
 - if @branch_diaries.blank?
   %p
     %i No data to display. Please enter the data to view the Branch Diary.
@@ -28,7 +28,7 @@
           = branch_diary.id
         %td
         %td
-          = branch_diary.branch.id
+          = branch_diary.branch.name
         %td
           = branch_diary.diary_date
         %td
@@ -49,10 +49,6 @@
     %tfoot
       %tr
         %td{ :colspan => 10}
-
-
-
-
 
   = paginate @branch_diaries
 = link_to 'Back', url(:branch_diaries)

@@ -1,4 +1,4 @@
-- form_url = url(:controller => params[:controller], :action => 'update', :id => @branch, :return => params[:return])
+- form_url = url(:controller => params[:controller], :action => 'update', :id => @branch_diary.id, :return => params[:return])
 - cancel_url = params[:return] ? params[:return] : resource(@branch_diary)
 = error_messages_for @branch_diary
 
