@@ -405,7 +405,10 @@ module Merb
         Funder.all
       end).map{|x| [x.id, "#{x.name}"]}
     end
-
+    
+    def get_accessible_accounts
+      Account.all(:order => [:name])
+    end
     def select_mass_entry_field(attrs)
       collection = []
       MASS_ENTRY_FIELDS.keys.each do |model|

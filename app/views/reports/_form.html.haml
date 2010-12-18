@@ -4,7 +4,8 @@
   - center_id = (params[report] and params[report][:center_id] and not params[report][:center_id].blank?) ? params[report][:center_id] : nil
   - loan_product_id = (params[report] and params[report][:loan_product_id] and not params[report][:loan_product_id].blank?) ? params[report][:loan_product_id] : nil
   - staff_member_id = (params[report] and params[report][:staff_member_id] and not params[report][:staff_member_id].blank?) ? params[report][:staff_member_id] : nil
-  - funder_id = (params[report] and params[report][:funder_id] and not params[report][:funder_id].blank?) ? params[report][:funder_id] : nil  
+  - funder_id = (params[report] and params[report][:funder_id] and not params[report][:funder_id].blank?) ? params[report][:funder_id] : nil
+  - account_id = (params[report] and params[report][:account_id] and not params[report][:account_id].blank?) ? params[report][:account_id] : nil
   - if params[:submit]
     %h3{:style => "margin-bottom: 5px;"}
       - if branch_id
@@ -26,6 +27,10 @@
         |
         Funder:
         = Funder.get(funder_id).name
+      - if account_id
+        |
+        Account:
+        = Account.get(account_id).name
     %a.expand_collapsed{:href => "#"}
       Change parameters
   %div{:class => "#{params[:submit] ? 'collapsed' : ''}"}
@@ -81,5 +86,9 @@
             %td
               Funder:
               =select(:funder_id , :collection => get_accessible_funders, :include_blank => true, :selected => funder_id)
+          -if @report.respond_to?(:account_id)
+            %td
+              Account:
+              =select(:account_id, :collection => get_accessible_accounts, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id, :id => "account_selector")
           %td
             =submit "Go"

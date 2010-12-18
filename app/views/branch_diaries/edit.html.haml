@@ -1,0 +1,13 @@
+- form_url = url(:controller => params[:controller], :action => 'update', :id => @branch, :return => params[:return])
+- cancel_url = params[:return] ? params[:return] : resource(@branch_diary)
+= error_messages_for @branch_diary
+
+= form_for(@branch_diary, :action => form_url, :class => "") do
+  %h1 Edit the branch diary details
+  = error_messages_for @branch_diary
+  %fieldset
+    = partial "branch_diaries/fields"
+    = submit "Save changes" 
+    = link_to 'Cancel', url(:branch_diaries)
+
+

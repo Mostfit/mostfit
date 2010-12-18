@@ -14,7 +14,7 @@ class Journal
   belongs_to :batch
   belongs_to :journal_type
   has n, :postings
- 
+  has n, :accounts, :through => :postings
   
   def validity_check
     return false if self.postings.length<2 #minimum one posting for credit n one for debit
