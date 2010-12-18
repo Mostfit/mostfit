@@ -63,6 +63,7 @@ describe Loan do
     @loan_product.errors.each {|e| puts e}
     @loan_product.should be_valid
   end
+
   before(:each) do
     @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
     @loan.history_disabled = true
@@ -608,13 +609,18 @@ describe Loan do
     @center.meeting_day = :wednesday
     @center.save
 
-    old_dates = @loan.installment_dates
     @loan_product.loan_validation_methods = "scheduled_dates_must_be_center_meeting_days"
     @loan_product.save
-    @loan.scheduled_disbursal_date = Date.new(2000, 06, 14)
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", 
+                     :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, 
+                     :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
+    old_dates = @loan.installment_dates
     @loan.save
+    unless @loan.valid?
+      p @loan.errors
+    end
     @loan.should be_valid
-
+    
     @center.meeting_day_change_date = Date.new(2001, 01, 27)
     @center.meeting_day = :tuesday
     @center.save
