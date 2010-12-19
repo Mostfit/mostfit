@@ -94,7 +94,7 @@ class Report
                                          nil
                                        end)
     }
-    [:late_by_less_than_days, :absent_more_than].each{|key|
+    [:late_by_less_than_days, :absent_more_than, :include_past_data].each{|key|
       instance_variable_set("@#{key}", if params and params[key] and params[key].to_i>0
                                          params[key].to_i
                                        else

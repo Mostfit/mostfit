@@ -90,5 +90,9 @@
             %td
               Account:
               =select(:account_id, :collection => get_accessible_accounts, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id, :id => "account_selector")
+          -if @report.respond_to?(:include_past_data)
+            %td
+              Include past data ?
+              =check_box(:include_past_data)
           %td
             =submit "Go"
