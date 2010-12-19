@@ -106,7 +106,7 @@ class ProjectedReport < Report
       hash = {:scheduled_disbursal_date.lt => from_date, :approved_on.not => nil, :disbursal_date => nil, :rejected_on => nil}
       hash[:loan_product_id] = loan_product_id if loan_product_id
       
-      group_loans(["c.id"], ["SUM(amount_applied_for) as amount", "b.id branch_id, c.id center_id"], hash).each{|row|
+      group_loans(["c.id"], ["SUM(amount_sanctioned) as amount", "b.id branch_id, c.id center_id"], hash).each{|row|
         next unless branch = @branch.find{|b| b.id == row.branch_id}
         next unless center = @center.find{|c| c.id == row.center_id}
         
@@ -133,7 +133,7 @@ class ProjectedReport < Report
     
     #3: appovals
     hash[:approved_on.not]=nil
-    group_loans(["l.scheduled_disbursal_date", "c.id"], ["SUM(amount_applied_for) as amount", "b.id branch_id, c.id center_id"], hash).each{|row|
+    group_loans(["l.scheduled_disbursal_date", "c.id"], ["SUM(amount_sanctioned) as amount", "b.id branch_id, c.id center_id"], hash).each{|row|
       next unless branch = @branch.find{|b| b.id == row.branch_id}
       next unless center = @center.find{|c| c.id == row.center_id}
 
