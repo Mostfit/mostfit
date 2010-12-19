@@ -20,7 +20,7 @@
     - postings = journal.postings.group_by{|x| x.amount>0 ? :credit : :debit}
     %tr
       %td
-        = journal.created_at.strftime("%Y/%m/%d")
+        = journal.date
       %td 
         = journal.id
       %td 
