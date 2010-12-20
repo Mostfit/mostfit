@@ -833,10 +833,10 @@ describe User do
     user.can_access?({:action => "index", :controller => "reports"}).should be_true
 
     user.can_access?({:action => "show", :controller => "audit_trails"}).should be_true
-    user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => managed_centers.branches.first.id, :controller => "branches" }}).should be_false
+    user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => managed_centers.branches.first.id, :controller => "branches" }}).should be_true
     user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => (Branch.all - managed_centers.branches).first.id, :controller => "branches" }}).should be_false
 
-    user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => managed_centers.first.id, :controller => "branches" }}).should be_false
+    user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => managed_centers.first.id, :controller => "branches" }}).should be_true
     user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => non_managed_centers.first.id, :controller => "branches" }}).should be_false
   end
 
@@ -1022,10 +1022,10 @@ describe User do
     user.can_access?({:action => "index", :controller => "reports"}).should be_true
 
     user.can_access?({:action => "show", :controller => "audit_trails"}).should be_true
-    user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => managed_centers.branches.first.id, :controller => "branches" }}).should be_false
+    user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => managed_centers.branches.first.id, :controller => "branches" }}).should be_true
     user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => (Branch.all - managed_centers.branches).first.id, :controller => "branches" }}).should be_false
 
-    user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => managed_centers.first.id, :controller => "branches" }}).should be_false
+    user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => managed_centers.first.id, :controller => "branches" }}).should be_true
     user.can_access?({:action => "show", :controller => "audit_trails"}, {:audit_for => {:action => "show", :id => non_managed_centers.first.id, :controller => "branches" }}).should be_false
   end
 

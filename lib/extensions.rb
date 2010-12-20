@@ -30,7 +30,6 @@ module Misfit
       def additional_checks
         id = @route[:id].to_i
         model = Kernel.const_get(@model.to_s.split("/")[-1].camelcase)
-
         if model == StaffMember
           #Trying to check his own profile? Allowed!
           return(true) if @staff.id==id
@@ -46,14 +45,16 @@ module Misfit
           if [:delete].include?(@action.to_sym)
             return (@staff.areas.length>0 or @staff.regions.length>0)
           elsif @action.to_sym==:edit
-            return is_manager_of(branch)
+            return is_manager_of?(branch)
           else
             return(is_manager_of?(branch) or branch.centers.manager.include?(@staff))
           end
-        elsif [Comment, Document, InsurancePolicy, InsuranceCompany, Cgt, Grt].include?(model)
+        elsif [Comment, Document, InsurancePolicy, InsuranceCompany, Cgt, Grt, AuditTrail].include?(model)
           reutrn true
-        else
+        elsif model.respond_to?(:get)
           return is_manager_of?(model.get(id))
+        else
+          return false
         end
       end
 
@@ -118,7 +119,7 @@ module Misfit
         user_role = self.role
         return true  if user_role == :admin
         return false if route[:controller] == "journals" and route[:action] == "edit"
-        return true if route[:controller] == "users" and route[:action] == "change_password"
+        return true  if route[:controller] == "users" and route[:action] == "change_password"
         return false if (user_role == :read_only or user_role == :funder or user_role == :data_entry) and route[:controller] == "payments" and route[:action] == "delete"
         return false if (user_role != :admin) and route[:controller] == "loans" and route[:action] == "write_off_suggested"
 
@@ -162,7 +163,6 @@ module Misfit
           end
         end
        
-
         if role == :data_entry and @action == "index" and @controller == "staff_members" 
           return false
         end
@@ -189,7 +189,8 @@ module Misfit
         end
         
         if @staff
-          return additional_checks if @route.has_key?(:id) and @route[:id]
+          return additional_checks if @route.has_key?(:id) and @route[:id] and not [:graph_data, :dashboard, :info].include?(@route[:controller].to_sym)
+
           unless CUD_Actions.include?(@action)
             return true if ["staff_members", "branches"].include?(@controller)
             return true if @controller == "regions" and @staff.regions.length > 0
@@ -228,10 +229,12 @@ module Misfit
 
           if @controller == "audit_trails" and params and params[:audit_for] and params[:audit_for][:controller]
             if params[:audit_for][:id]
-              return @staff.send(params[:audit_for][:controller]).all(:id => params[:audit_for][:id]).length > 0 ? true : false
+              return is_manager_of?(Kernel.const_get(params[:audit_for][:controller].singularize.camelcase).get(params[:audit_for][:id]))
             else
               return false
             end
+          elsif @controller == "info" and params and params[:for] and params[:id]
+            return is_manager_of?(Kernel.const_get(params[:for].camelcase).get(params[:id]))
           end
         end
         r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
