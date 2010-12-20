@@ -163,29 +163,15 @@ module Misfit
           end
         end
        
-        if role == :data_entry and @action == "index" and @controller == "staff_members" 
-          return false
-        end
-        
-        if role == :data_entry and @action == "create" and @controller == "staff_members" 
-          return false
-        end
-        if role == :data_entry and @action == "update" and @controller == "staff_members" 
-          return false
-        end
-        if role == :data_entry and @action == "disbursement_sheet" and @controller == "staff_members" 
-          return true 
-        end
-
-        if role == :data_entry and @action == "day_sheet" and @controller == "staff_members" 
-          return true 
-        end
-      
-        if role == :data_entry and @action == "show" and @controller == "reports"
-          return true 
-        end
-        if role == :data_entry and @action == "death_count" and @controller == "clients"
-          return true 
+        if role == :data_entry 
+          if @controller == "staff_members"
+            return true if @controller == "staff_members" and (@action == "disbursement_sheet" or @action == "day_sheet")
+            return false
+          end
+          
+          if @action == "show" and @controller == "reports"
+            return (@route[:report_type] == "ProjectedReport" or @route[:report_type] == "DailyReport" or @route[:report_type] == "TransactionLedger")
+          end          
         end
         
         if @staff

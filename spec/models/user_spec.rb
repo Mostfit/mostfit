@@ -1187,7 +1187,12 @@ describe User do
     user.can_access?({:action => "index", :controller => "branches"}).should be_false
     user.can_access?({:action => "disbursement_sheet", :controller => "staff_members"}).should be_true
     user.can_access?({:action => "day_sheet", :controller => "staff_members"}).should be_true
-    user.can_access?({:action => "show", :controller => "reports"}).should be_true
+    user.can_access?({:action => "show", :controller => "reports"}).should be_false
+    user.can_access?({:action => "index", :controller => "reports"}).should be_false
+    user.can_access?({:action => "show", :controller => "reports", :report_type => "DailyReport"}).should be_true
+    user.can_access?({:action => "show", :controller => "reports", :report_type => "ProjectedReport"}).should be_true
+    user.can_access?({:action => "show", :controller => "reports", :report_type => "TransactionLedger"}).should be_true
+    user.can_access?({:action => "show", :controller => "reports", :report_type => "ConsolidatedReport"}).should be_false
 
     managed_branches = Branch.all
     managed_centers  = Center.all
