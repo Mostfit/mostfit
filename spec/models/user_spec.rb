@@ -307,11 +307,171 @@ describe User do
     @user.can_access?({:action => "index", :controller => "reports"}).should be_true
   end
 
+  it "should give access to mis manager who is also a staff member to only his/her side of mostfit" do
+    @user.role = :mis_manager
+    @user.staff_member = Branch.first.manager
+    @user.password = @user.password_confirmation = "mismanager"
+    @user.save
+
+    managed_branches     = @user.staff_member.branches
+    non_managed_branches = Branch.all(:id.not => @user.staff_member.branches.map{|x| x.id})
+    managed_centers      = managed_branches.centers
+    non_managed_centers  = non_managed_branches.centers
+
+    #verifications
+    @user.can_access?({:action =>"index", :controller =>"verifications"}).should be_true
+    @user.can_access?({:action =>"index", :controller =>"verifications"}, {:model => "clients", :action => "index", :controller => "verifications"}).should be_true
+    @user.can_access?({:action =>"index", :controller =>"verifications"}, {:model => "loans", :action => "index", :controller => "verifications"}).should be_true
+    @user.can_access?({:action =>"index", :controller =>"verifications"}, {:model => "payments", :action => "index", :controller => "verifications"}).should be_true
+    #browse page stuff
+    @user.can_access?({:action =>"index", :controller =>"documents"}).should be_true
+    @user.can_access?({:action =>"index", :controller =>"accounts"}).should be_true
+    @user.can_access?({:action =>"index", :controller =>"browse"}).should be_true
+    @user.can_access?({:action =>"index", :namespace =>"data_entry", :controller=>"index"}).should be_true
+    @user.can_access?({:action =>"hq_tab", :controller =>"browse"}).should be_true
+    @user.can_access?({:action => "branch", :branch_id => nil, :id=>"centers", :controller=>"dashboard"}).should be_true
+    @user.can_access?({:action => "index", :controller => "branches"}).should be_true
+    #branch access
+    managed_branches.each{|branch|
+      @user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_true
+    }
+    #branch creation
+    @user.can_access?({:action => "create", :controller => "branches"}, 
+                      {:branch => {:name => "Bhopal 1", :address => "dzv fsb g", :contact_number => "90000000000", :manager_staff_id => 1, :code => "MPBPL01", :landmark => "New Bhopal", 
+                          :creation_date => "27-11-2010", :area_id => 1}}).should be_false
+    non_managed_branches.each{|branch|
+      @user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_false
+    }
+
+    #center access
+    managed_centers.each{|center|
+      @user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_true
+    }
+
+    non_managed_centers.each{|center|
+      @user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_false
+    }
+    #center creation
+    @user.can_access?({:action => "create", :controller => "centers"}, 
+                      {:center => {:name => "Center 1", :address => "dzv fsb g", :contact_number => "90000000000", :manager_staff_id => 1, :code => "MPBPL0101", :landmark => "New Bhopal", 
+                          :creation_date => "27-11-2010", :meeting_time_hours => 8, :branch_id => 3, :meeting_day => "monday", :meeting_time_minutes => 30}}).should be_true
+
+    #client access
+    managed_centers.clients.each{|client|
+      @user.can_access?({:action => "show", :id => client.id, :controller => "clients", :branch_id => client.center.branch_id, :center_id => client.center_id}).should be_true
+    }
+    non_managed_centers.clients.each{|client|
+      @user.can_access?({:action => "show", :id => client.id, :controller => "clients", :branch_id => client.center.branch_id, :center_id => client.center_id}).should be_false
+    }
+
+    #client creation
+    @user.can_access?({:action => "create", :controller => "clients"}, 
+                      {:client => {:center_id => 1, :name => "piyush", :reference => "MPBPL0107012", :address => "", :date_of_birth => "03-03-1991", :client_type_id => 1}}).should be_true
+
+    #loan access
+    managed_centers.clients.loans.each{|loan|
+      @user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_true
+    }
+
+    non_managed_centers.clients.each{|loan|
+      @user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_false
+    }
+
+    #loans create
+    @user.can_access?({:action => "create", :controller => "loans", :branch_id => managed_branches.first.id, :center_id => managed_centers.first.id, 
+                        :client_id => managed_centers.first.clients.first.id, :loan_type => :default_loan}, 
+                      {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
+                          :scheduled_first_payment_date => "10-03-2010"}}).should be_true
+
+    # admin & manage stuff
+    @user.can_access?({:action => "index", :controller => "admin"}).should be_false
+    @user.can_access?({:action => "edit", :controller => "admin"}).should be_false
+
+    @user.can_access?({:action => "index", :controller => "holidays"}).should be_true
+    @user.can_access?({:action => "create", :controller => "holidays"}).should be_true
+    @user.can_access?({:action => "update", :controller => "holidays"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "regions"}).should be_true
+    @user.can_access?({:action => "create", :controller => "regions"}).should be_false
+    @user.can_access?({:action => "update", :controller => "regions"}).should be_false
+
+    @user.can_access?({:action => "index", :controller => "areas"}).should be_false
+    @user.can_access?({:action => "create", :controller => "areas"}).should be_false
+    @user.can_access?({:action => "update", :controller => "areas"}).should be_false
+
+    @user.can_access?({:action => "index", :controller => "staff_members"}).should be_true
+    @user.can_access?({:action => "create", :controller => "staff_members"}).should be_true
+    @user.can_access?({:action => "update", :controller => "staff_members"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "users"}).should be_false
+    @user.can_access?({:action => "update", :controller => "users"}).should be_false
+
+    @user.can_access?({:action => "index", :controller => "funders"}).should be_true
+    @user.can_access?({:action => "update", :controller => "funders"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "funding_lines", :funder_id => 1}).should be_true
+    @user.can_access?({:action => "update", :controller => "funding_lines", :funder_id => 1}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "portfolios", :funder_id => 1}).should be_true
+    @user.can_access?({:action => "update", :controller => "portfolios", :funder_id => 1}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "rules"}).should be_true
+    @user.can_access?({:action => "create", :controller => "rules"}).should be_true
+    @user.can_access?({:action => "update", :controller => "rules"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "targets"}).should be_true
+    @user.can_access?({:action => "create", :controller => "targets"}).should be_true
+    @user.can_access?({:action => "update", :controller => "targets"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "fees"}).should be_true
+    @user.can_access?({:action => "create", :controller => "fees"}).should be_true
+    @user.can_access?({:action => "update", :controller => "fees"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "loan_products"}).should be_true
+    @user.can_access?({:action => "create", :controller => "loan_products"}).should be_true
+    @user.can_access?({:action => "update", :controller => "loan_products"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "insurance_companies"}).should be_true
+    @user.can_access?({:action => "create", :controller => "insurance_companies"}).should be_true
+    @user.can_access?({:action => "update", :controller => "insurance_companies"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "accounts"}).should be_true
+    @user.can_access?({:action => "create", :controller => "accounts"}).should be_true
+    @user.can_access?({:action => "update", :controller => "accounts"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "client_types"}).should be_true
+    @user.can_access?({:action => "create", :controller => "client_types"}).should be_true
+    @user.can_access?({:action => "update", :controller => "client_types"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "occupations"}).should be_true
+    @user.can_access?({:action => "create", :controller => "occupations"}).should be_true
+    @user.can_access?({:action => "update", :controller => "occupations"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "loan_utilizations"}).should be_true
+    @user.can_access?({:action => "create", :controller => "loan_utilizations"}).should be_true
+    @user.can_access?({:action => "update", :controller => "loan_utilizations"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "document_types"}).should be_true
+    @user.can_access?({:action => "create", :controller => "document_types"}).should be_true
+    @user.can_access?({:action => "update", :controller => "document_types"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "audit_items"}).should be_true
+    @user.can_access?({:action => "create", :controller => "audit_items"}).should be_true
+    @user.can_access?({:action => "update", :controller => "audit_items"}).should be_true
+
+    # upload, download stuff
+    @user.can_access?({:action => "upload", :controller => "admin"}).should be_false
+    @user.can_access?({:action => "download", :controller => "admin"}).should be_false
+    @user.can_access?({:action => "dirty_loans", :controller => "admin"}).should be_false
+    @user.can_access?({:action => "index", :controller => "dashboard"}).should be_true
+    @user.can_access?({:action => "index", :controller => "reports"}).should be_true
+  end
+
   it "should give access to branch manager as staff member for relevant stuff" do
-    user = User.new(:login => "bm1",:created_at => "2002-11-23", :updated_at => "2003-11-23", :role => :staff_member)
+    user = User.new(:login => "bm1",:created_at => "2002-11-23", :updated_at => "2003-11-23", :role => :staff_member, :password => "foobar", :password_confirmation => "foobar")
     user.staff_member = StaffMember.first
     user.save
-
+    
     user.can_access?({:action =>"index", :controller =>"verifications"}).should be_false
     user.can_access?({:action =>"index", :controller =>"documents"}).should be_true
     user.can_access?({:action =>"index", :controller =>"accounts"}).should be_false
@@ -504,13 +664,13 @@ describe User do
     user.staff_member.centers.each{|center|
       user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_true
     }
-    #center creation
+    #center creation...no access
     managed_centers = user.staff_member.centers
-    user.can_access?({:action => "create", :controller => "centers", :center_id => managed_centers.first.id}, 
+    user.can_access?({:action => "create", :controller => "centers", :branch_id => managed_centers.branches.first.id}, 
                      {:center => {
                          :name => "Center 1", :address => "dzv fsb g", :contact_number => "90000000000", :manager_staff_id => 1, :code => "MPBPL0101", :landmark => "New Bhopal", 
                          :creation_date => "27-11-2010", :meeting_time_hours => 8, :center_id => managed_centers.first.id, :meeting_day => "monday", :meeting_time_minutes => 30}
-                     }).should be_true
+                     }).should be_false
 
     non_managed_centers = Center.all(:id.not => user.staff_member.centers.map{|x| x.id})
     user.can_access?({:action => "create", :controller => "centers"}, 

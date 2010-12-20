@@ -94,7 +94,7 @@ module Misfit
         elsif obj.class == Loan or obj.class.superclass == Loan
           return(is_manager_of?(obj.client.center))
         elsif obj.class == StaffMember
-          return(is_manager_of?(obj.centers.branches) or is_manager_of?(obj.branches) or is_manager_of?(obj.areas))
+          return(obj == @staff or is_manager_of?(obj.centers.branches) or is_manager_of?(obj.branches) or is_manager_of?(obj.areas))
         elsif obj.class == Array
           return(obj.map{|x| is_manager_of?(x)}.uniq.include?(true))
         else
@@ -113,9 +113,6 @@ module Misfit
       end
       
       def _can_access?(route, params = nil)
-        #File.open("params.txt", "a"){|f| f.puts params.inspect}
-        #File.open("routes.txt", "a"){|f| f.puts route.inspect}
-        # more garbage
         user_role = self.role
         return true  if user_role == :admin
         return false if route[:controller] == "journals" and route[:action] == "edit"
@@ -136,11 +133,7 @@ module Misfit
         if user_role == :funder and @funder ||= Funder.first(:user_id => self.id)
           @funding_lines = @funder.funding_lines
           @funding_line_ids = @funder.funding_lines.map{|fl| fl.id}
-          if is_funder? and allow_read_only
-            return true
-          else
-            return false
-          end
+          return(is_funder? and allow_read_only)
         end
         
         @staff ||= self.staff_member
@@ -154,27 +147,17 @@ module Misfit
         end
 
         r = (access_rights[@action.to_s.to_sym] or access_rights[:all])
-       
-        if role == :data_entry and ["clients", "loans", "client_groups"].include?(@controller)
-          if ["new", "edit", "create", "update"].include?(@action)
-            return true
-          else
-            return false
-          end
-        end
-       
+              
         if role == :data_entry 
-          if @controller == "staff_members"
-            return true if @controller == "staff_members" and (@action == "disbursement_sheet" or @action == "day_sheet")
-            return false
-          end
+          return ["new", "edit", "create", "update"].include?(@action) if ["clients", "loans", "client_groups"].include?(@controller)
+          return (@action == "disbursement_sheet" or @action == "day_sheet") if @controller == "staff_members"
           
           if @action == "show" and @controller == "reports"
             return (@route[:report_type] == "ProjectedReport" or @route[:report_type] == "DailyReport" or @route[:report_type] == "TransactionLedger")
           end          
         end
         
-        if @staff
+        if @staff          
           return additional_checks if @route.has_key?(:id) and @route[:id] and not [:graph_data, :dashboard, :info].include?(@route[:controller].to_sym)
 
           unless CUD_Actions.include?(@action)
@@ -182,25 +165,20 @@ module Misfit
             return true if @controller == "regions" and @staff.regions.length > 0
             return(@staff.areas.length>0 or @staff.regions.length > 0) if @controller == "areas"
           else
-            return(@staff.areas.length>0 or @staff.regions.length>0) if @controller == "staff_members"
-            return false if @controller == "regions" and @staff.regions.length > 0
-            return(@staff.regions.length > 0) if @controller == "areas"            
+            return(@staff.areas.length>0 or @staff.regions.length>0 or role == :mis_manager) if @controller == "staff_members"
+            return false if @controller == "regions"
+            return(@staff.regions.length > 0) if @controller == "areas" 
           end
           
           if [:branches, :centers, :clients, :loans].include?(@controller.to_sym) and CUD_Actions.include?(@action) and params
-            if params[:branch_id] and not params[:branch_id].blank?
-              # allowing branch and managers to create stuff inside his/her own branch/center
-              return is_manager_of?(Branch.get(params[:branch_id]))
-            elsif params[:center_id] and not params[:center_id].blank?
-              #center
-              return is_manager_of?(Center.get(params[:center_id]))
-            elsif params[:client_id] and not params[:client_id].blank?
-              # client
-              return is_manager_of?(Client.get(params[:client_id]))
-            elsif params[:area_id] and not params[:area_id].blank?
-              # client
-              return is_manager_of?(Area.get(params[:area_id]))
-            elsif hash=params[@controller.singularize.to_sym] or (params[:loan_type] and not params[:loan_type].blank? and hash=params[params[:loan_type].snake_case.to_sym])
+            params = params.merge(@route)
+            
+            {:branch_id => Branch, :center_id => Center, :client_id => Client, :area_id => Area, :region_id => Region}.each{|key, klass|
+              # allowing branch, center, area, region managers to create stuff inside his/her own branch/center/area/region
+              return is_manager_of?(klass.get(params[:branch_id])) if params[key] and not params[key].blank?
+            }
+
+            if hash=params[@controller.singularize.to_sym] or (params[:loan_type] and not params[:loan_type].blank? and hash=params[params[:loan_type].snake_case.to_sym])
               if hash[:branch_id] and branch=Branch.get(hash[:branch_id])
                 return is_manager_of?(branch)
               elsif (hash[:center_id] and center = Center.get(hash[:center_id])) or (hash[:client_id] and center = Client.get(hash[:client_id]).center)
