@@ -89,7 +89,7 @@
         %br/
         %span.greytext (scheduled, no payments yet)
       - else
-        = actual_first_payment = @loan.payments.first(:order => [:received_on]).received_on
+        = actual_first_payment = @loan.payments(:type => [:principal, :interest]).min(:received_on)
         %br/
         %span.greytext
           - if actual_first_payment == @loan.scheduled_first_payment_date

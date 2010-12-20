@@ -88,15 +88,15 @@
       Scheduled disbursal date:
     %td
       on&nbsp;&nbsp;
-      - sdd = @client.center.next_meeting_date_from(Date.today)
-      = date_select_for @loan, :scheduled_disbursal_date, :max_date => Date.max_date, :date => sdd
+      - probable_scheduled_disbursal_date = @client.center.next_meeting_date_from(Date.today)
+      = date_select_for @loan, :scheduled_disbursal_date, :max_date => Date.max_date, :date => (@loan.scheduled_disbursal_date || probable_scheduled_disbursal_date)
   - if @loan_product.installment_frequency == :weekly
     %tr
       %td
         Scheduled first payment:
       %td
         on&nbsp;&nbsp;
-        = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date, :date => @client.center.next_meeting_date_from(sdd)
+        = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date, :date => (@loan.scheduled_first_payment_date || @client.center.next_meeting_date_from(probable_scheduled_disbursal_date))
   - if @loan_product.installment_frequency == :monthly
     %tr
       %td
