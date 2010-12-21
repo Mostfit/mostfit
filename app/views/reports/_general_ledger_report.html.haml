@@ -17,7 +17,9 @@
   - time_format = Mfi.first.date_format || "%d-%m-%Y"
   - time_format += " %H:%M"
   - accounts = {}
+  - cr_sum, dr_sum = 0,0
   - Account.all.each{|acc|  accounts[acc.id] = acc}
+ 
   - @data.each do |key,val|
     %tr
       %td
@@ -33,11 +35,13 @@
           %br
       %td
         - val[2].each do |journal|
+          - dr_sum += journal.amount 
           = journal.amount * -1
           %br
       %td
         %br
         - val[3].each do |journal|
+          - cr_sum += journal.amount
           = journal.amount
           %br
        
@@ -46,6 +50,7 @@
     %td
     %td
     %td 
+      = dr_sum * -1
     %td
-    
+      = cr_sum
 

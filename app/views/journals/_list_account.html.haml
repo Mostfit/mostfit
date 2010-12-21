@@ -3,36 +3,33 @@
     %th
       Date
     %th 
-      Journal ID  
+      Discription
     %th 
-      Debit Account
+      Account
     %th 
-      Credit Account
+      Debit
     %th 
-      Break up
-    %th 
-      Amount
-    %th 
-      TXN ID
-    %th 
-      Comment
+      Credit
+   
   - @account.postings.journals(:order => [:date.desc], :order => [:id.desc]).each do |journal|
     - postings = journal.postings.group_by{|x| x.amount>0 ? :credit : :debit}
+    - time_format = Mfi.first.date_format || "%d-%m-%Y"
+    - time_format += " %H:%M"
+   
     %tr
       %td
-        = journal.date
+        = journal.date.strftime(time_format)
       %td 
-        = journal.id
+        = journal.comment     
       %td 
         = postings[:debit].collect{|p| p.account.name}.join("<br/>")
-      %td 
-        = "<br>"*postings[:debit].length
+        %br
         = postings[:credit].collect{|p| p.account.name}.join("<br/>")
       %td 
-        = (postings[:debit] + postings[:credit]).collect{|p| p.amount.abs}.join("<br/>")
+        - dr_amount = postings[:debit].collect{|p| p.amount.abs}
+        = dr_amount
       %td 
-        = postings[:credit].collect{|p| p.amount.abs}.inject(0){|s,x| s+=x}
-      %td 
-        = journal.transaction_id 
-      %td 
-        = journal.comment
+        %br
+        - cr_amount = postings[:credit].collect{|p| p.amount.abs}.inject(0){|s,x| s+=x}
+        = cr_amount
+   
