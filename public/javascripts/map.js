@@ -74,7 +74,6 @@ function map_multiple_markers_initialize(){
 				   }else if(marker.type=="center"){
 				       zindex = marker.meeting_order;
 				       letter="C";
-				       console.log(marker.paid);
 				       if(marker.due || marker.paid){
 					   if(marker.due>0)
 					       color="red";

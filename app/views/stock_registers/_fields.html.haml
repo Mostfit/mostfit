@@ -1,0 +1,52 @@
+%table
+  %tr
+    %td
+      Branch
+    %td
+      - if @branch
+        = @branch.name
+        = hidden_field(:branch_id, :value => @branch.id)
+      - else
+        = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
+  %tr
+    %td
+      Stock Code
+    %td
+      = text_field :stock_code
+      %span.greytext enter the code of the stock
+  %tr
+    %td
+      Stock Name
+    %td
+      = text_field :stock_name
+      %span.greytext enter the stock name
+  %tr
+    %td
+      Quatity
+    %td
+      = text_field :stock_quatity
+      %span.greytext enter the stock quatity
+  %tr
+    %td
+      Bill Number
+    %td
+      = text_field :bill_number
+      %span.greytext enter the bill number of stock
+  %tr
+    %td
+      Bill Date
+    %td
+      = date_select_for @stock_register, :bill_date
+      %span.greytext select the bill date of stock
+  %tr
+    %td
+      Date of Entry
+    %td
+      = date_select_for @stock_register, :date_of_entry
+      %span.greytext select date of stock entry
+  %tr
+    %td
+      Stock Details Entered By
+    %td
+      = select_staff_member_for @stock_register, :manager, {}, true
+      %span.greytext select the person who is entering the details

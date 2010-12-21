@@ -11,6 +11,7 @@ class StaffMember
 
   has n, :branches,          :child_key => [:manager_staff_id]
   has n, :branch_diaries,    :child_key => [:manager_staff_id]
+  has n, :stock_registers,   :child_key => [:manager_staff_id]
   has n, :centers,           :child_key => [:manager_staff_id]
   has n, :regions,           :child_key => [:manager_id]
   has n, :areas,             :child_key => [:manager_id]

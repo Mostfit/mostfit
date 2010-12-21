@@ -1,0 +1,11 @@
+- form_url = url(:controller => params[:controller], :action => 'update', :id => @stock_register.id, :return => params[:return])
+- cancel_url = params[:return] ? params[:return] : resource(@stock_register)
+= error_messages_for @stock_register
+
+= form_for(@stock_register, :action => form_url, :class => "") do
+  %h1 Edit the Stock details
+  = error_messages_for @stock_register
+  %fieldset
+    = partial "stock_registers/fields"
+    = submit "Save changes"
+    = link_to 'Cancel', url(:stock_registers)
