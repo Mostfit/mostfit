@@ -93,6 +93,10 @@
           -if @report.respond_to?(:include_past_data)
             %td
               Include past data ?
-              =check_box(:include_past_data)
+              =check_box(:name => "#{report}[include_past_data]", :value => "1", :checked => (params[report] and params[report].key?(:include_past_data) and params[report][:include_past_data] == "1" ? true : false))
+          -if @report.respond_to?(:include_unapproved_loans)
+            %td
+              Include unapproved loans ?
+              =check_box(:name => "#{report}[include_unapproved_loans]", :value => "1", :checked => (params[report] and params[report].key?(:include_unapproved_loans) and params[report][:include_unapproved_loans] == "1" ? true : false))
           %td
             =submit "Go"
