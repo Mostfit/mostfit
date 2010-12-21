@@ -1,0 +1,43 @@
+%div
+  %form{:action => url(:action => :duplicate), :method => :get}
+    %h2
+      Duplicate all accounts of      
+      %b Branch
+    = select :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select a branch", :selected => @branch.id.to_s
+    = submit "GO"
+  - if @accounts
+    %form{:action => resource(:accounts), :method => :post}
+      %table
+        %tr
+          %th        
+          %th
+            Account type
+          %th
+            Name
+          %th
+            Gl code
+          %th
+            Opening balance
+          %th
+            Opening balance on
+          %th
+        - @accounts.each_with_index do |account, idx|
+          %tr
+            %td
+              = idx + 1
+            %td
+              = account.account_type.name
+              = hidden_field :name => "account[][account_type_id]", :value => account.account_type_id
+              = hidden_field :name => "account[][parent_id]", :value => account.parent_id
+            %td
+              = text_field :name => "account[][name]", :value => account.name
+            %td
+              = text_field :name => "account[][gl_code]", :value => account.gl_code
+            %td
+              = text_field :name => "account[][opening_balance]", :value => 0
+            %td
+              = date_select "account[][opening_balance_on_date]", Date.today, :id => "account_#{idx}_opening_balance_on_date"
+      For branch
+      = select :branch_id, :collection => Branch.all(:id.not => @branch.id).map{|b| [b.id, b.name]}, :prompt => "Select branch"
+      = hidden_field :parent_branch_id, :value => @branch.id
+      = submit "Create"
