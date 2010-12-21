@@ -7,6 +7,10 @@ class RuleBook
   property :name,   String
   property :action, Enum.send('[]',*ACTIONS)
   property :fee_id, Integer, :nullable => true
+  property :from_date, Date, :nullable => false, :default => Date.today
+  property :to_date, Date, :nullable => false, :default => Date.today+365
+  property :created_at, DateTime, :nullable => false, :default => Time.now 
+  
 
   has n, :credit_account_rules
   has n, :debit_account_rules
@@ -15,7 +19,8 @@ class RuleBook
 
   belongs_to :branch,         Branch, :nullable => true
   belongs_to :fee,            Fee, :nullable => true
-
+  
+  
   validates_present      :name
   validates_is_unique    :name
   validates_length       :name,     :minimum => 3
@@ -30,20 +35,23 @@ class RuleBook
       client = obj.client_id > 0 ? obj.client : obj.loan.client
       branch  = client.center.branch
       fee     = obj.fee
+      date = obj.received_on
       #TODO:hack alert! Write it better
     elsif obj.class==Loan or obj.class.superclass==Loan or obj.class.superclass.superclass==Loan
       transaction_type = :disbursement
       branch  = obj.client.center.branch
+      date = obj.disbursal_date
     elsif obj.class==Array
       # In case of objects being passed in a set then we give out hashes of credit and debit accounts with values being amount and keys being acocunt
       client = obj.first.client_id > 0 ? obj.first.client : obj.first.loan.client
-      branch  = client.center.branch      
+      branch  = client.center.branch
+      date = obj.first.loan.disbursal_date
       credit_accounts, debit_accounts  = {}, {}
       obj.each{|p|  
         rule = if p.type==:fees
-                 first(:action => p.type, :branch => branch, :fee => p.fee) || first(:action => p.type, :branch => nil, :fee => p.fee)
+                 first(:action => p.type, :branch => branch, :fee => p.fee, :from_date.lte => date, :to_date.gte => date ) || first(:action => p.type, :branch => nil, :fee => p.fee, :from_date.lte => date, :to_date.gte => date)
                else
-                 first(:action => p.type, :branch => branch) || first(:action => p.type, :branch => nil)
+                 first(:action => p.type, :branch => branch, :from_date.lte => date, :to_date.gte => date) || first(:action => p.type, :branch => nil, :from_date.lte => date, :to_date.gte => date)
                end
         rule.credit_account_rules.each{|car|
           credit_accounts[car.credit_account] ||= 0
@@ -58,10 +66,10 @@ class RuleBook
       return [credit_accounts, debit_accounts]
     end
     
-    if rule = first(:action => transaction_type, :branch => branch, :fee => fee)
-    elsif rule = first(:action => transaction_type, :branch => nil, :fee => nil)
-    elsif rule = first(:action => transaction_type, :branch => nil, :fee => fee)
-    elsif rule = first(:action => transaction_type, :branch => branch, :fee => nil)
+    if rule = first(:action => transaction_type, :branch => branch, :fee => fee, :from_date.lte => date, :to_date.gte => date)
+    elsif rule = first(:action => transaction_type, :branch => nil, :fee => nil, :from_date.lte => date, :to_date.gte => date)
+    elsif rule = first(:action => transaction_type, :branch => nil, :fee => fee, :from_date.lte => date, :to_date.gte => date)
+    elsif rule = first(:action => transaction_type, :branch => branch, :fee => nil, :from_date.lte => date, :to_date.gte => date)
     else
       raise "NoRuleFoundError"
     end

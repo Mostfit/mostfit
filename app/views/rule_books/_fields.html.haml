@@ -9,6 +9,16 @@
       Branch
     %td
       =select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
+  %tr
+    %td
+      Rule begin date 
+    %td
+      = date_select_for @rule_book, :from_date, :nullable => false, :min_date => Date.today-365, :max_date => Date.today+365
+  %tr
+    %td
+      Rule end date 
+    %td
+      = date_select_for @rule_book, :to_date, :nullable => false, :min_date => Date.today-365, :max_date => Date.today+(2*365)
 
   %tr
     %td
