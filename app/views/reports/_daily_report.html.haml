@@ -1,4 +1,5 @@
-=partial :form
+- unless session.user.role == :data_entry
+  =partial :form
 %table.report
   %tr.header
     %th

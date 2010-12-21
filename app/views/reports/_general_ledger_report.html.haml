@@ -19,7 +19,6 @@
   - accounts = {}
   - cr_sum, dr_sum = 0,0
   - Account.all.each{|acc|  accounts[acc.id] = acc}
- 
   - @data.each do |key,val|
     %tr
       %td
@@ -49,6 +48,7 @@
     %td
     %td
     %td
+      Total
     %td 
       = dr_sum * -1
     %td
