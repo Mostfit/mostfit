@@ -3,17 +3,19 @@
 %script{:type => "text/javascript", :src => "/javascripts/jquery.treeview.js"}
 %h1  Manage Book Keeping
 %div
-  = link_to 'Manage Accounting Periods', url(:accounting_periods)
+  = link_to "Manage Accounting Periods", url(:accounting_periods)
   |
-  = link_to 'Manage Account Type', url(:account_types)
+  = link_to "Manage Account Type", url(:account_types)
   |
-  = link_to 'New Account', url(:new_account)
+  = link_to "New Account", url(:new_account)
   |
-  = link_to 'Manage Accounting Rule', url(:rule_books)
+  = link_to "Manage Accounting Rule", url(:rule_books)
   |
-  = link_to_with_rights 'Create a new voucher', resource(:journals, :new)
+  = link_to_with_rights "Create a new voucher", resource(:journals, :new)
   | 
-  = link_to_with_rights 'View recent journal entries', resource(:journals)
+  = link_to_with_rights "View recent journal entries", resource(:journals)
+  | 
+  = link_to_with_rights "Duplicate branch accounts", url(:action => :duplicate)
 
 %h1 List of Account
 %div#sidetreecontrol
@@ -34,4 +36,4 @@
       %ul
         - accounts.each do |account|
           = show_accounts(account)
-= link_to 'Back', url(:admin)
+= link_to "Back", url(:admin)

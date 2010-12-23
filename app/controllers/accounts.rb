@@ -35,12 +35,37 @@ class Accounts < Application
   end
 
   def create(account)
-    @account = Account.new(account)
-    if @account.save
-      redirect resource(:accounts), :message => {:notice => "Account was successfully created"}
-    else
-      message[:error] = "Account failed to be created"
-      render :new
+    if account.is_a?(Hash)
+      @account = Account.new(account)
+      if @account.save
+        redirect resource(:accounts), :message => {:notice => "Account was successfully created"}
+      else
+        message[:error] = "Account failed to be created"
+        render :new
+      end
+    elsif account.is_a?(Array)
+      #bulk creating accounts
+      if (params[:branch_id] and branch = Branch.get(params[:branch_id]))
+        errors = bulk_create_for(branch, account)
+        if errors.blank?
+          redirect resource(:accounts), :message => {:notice => "All accounts were successfully created"}
+        else
+          message[:error] = "Some accounts failed to be created"
+          message[:error] += "<ul>"
+          errors.each{|error|
+            message[:error] += error.instance_variable_get("@errors").map{|k, v| "<li>#{error.name} - #{k}: #{v}</li>"}.to_s
+          }
+          message[:error] += "</ul>"
+          @branch = Branch.get(params[:parent_branch_id])
+          @accounts = Account.all(:branch => @branch) if @branch     
+          render :duplicate
+        end
+      else
+        message[:error] = "No branch selected"
+        @branch = Branch.get(params[:parent_branch_id])
+        @accounts = Account.all(:branch => @branch) if @branch
+        render :duplicate
+      end
     end
   end
 
@@ -69,9 +94,30 @@ class Accounts < Application
     render :layout => layout?
   end
 
+  def duplicate
+    unless params[:branch_id].blank?
+      @branch = Branch.get(params[:branch_id])
+      raise NotFound unless @branch
+      @accounts = Account.all(:branch_id => params[:branch_id])
+    end
+    render
+  end
+
   private
   def get_context
     @branch = Branch.get(params[:branch_id]) if params.key?(:branch_id)
+  end
+
+  def bulk_create_for(branch, accounts)
+    errors = []
+    accounts.each{|a|
+      new_account = Account.new(a)
+      new_account.branch = branch
+      unless new_account.save
+        errors.push(new_account)
+      end
+    }
+    errors
   end
 
 end # Accounts

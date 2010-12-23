@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 describe Centers, "Check centers controller" do 
-  before do
+  before(:all) do
     load_fixtures :users, :staff_members, :regions, :areas, :branches, :centers 
     @u_admin = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @u_admin.save
@@ -27,8 +27,10 @@ describe Centers, "Check centers controller" do
   it "edit a new center" do
     response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
     response.should redirect
-    @center =  Center.first
-    request(resource(@center)).should be_successful
+    @center = Center.first
+    @branch = @center.branch
+
+    request(resource(@branch, @center, :edit)).should be_successful
     params  = {}
     hash    = @center.attributes
     hash.delete(:created_at)

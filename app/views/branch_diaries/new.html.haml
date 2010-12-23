@@ -1,8 +1,7 @@
 - form_url = resource(:branch_diaries, {:return => params[:return]})
 = error_messages_for @branch_diary
 
-= form_for(@branch_diary, :action => form_url, :class => "form") do
-  %h1 Enter daily activities of the Branch
+= form_for(@branch_diary, :action => form_url, :class => "") do
 
   %fieldset
     = partial "branch_diaries/fields"

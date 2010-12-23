@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 describe Clients, "Check clients details" do
-  before do
+  before(:all) do
     load_fixtures :users, :staff_members, :regions, :areas, :branches, :centers, :client_types
   end
 

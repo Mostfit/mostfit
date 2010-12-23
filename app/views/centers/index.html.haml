@@ -54,10 +54,13 @@
       - if Mfi.first.branch_diary_enabled
         %li#branch_diary
           Diary
+      - if Mfi.first.stock_register_enabled
+        %li#stock_register
+          Stock
       - if Mfi.first.map_enabled
         %li#map
           Map
-          
+               
     %div.tab
       %div#centers_list
         =partial "centers/list"
@@ -81,7 +84,13 @@
     - if Mfi.first.branch_diary_enabled
       %div.tab
         %input{:type => "hidden", :name => "_load_remote", :value => resource(:branch_diaries, :branch_id => @branch.id, :model => "Branch")}
+    - if Mfi.first.stock_register_enabled
+      %div.tab
+        %input{:type => "hidden", :name => "_load_remote", :value => resource(:stock_registers, :branch_id => @branch.id, :model => "Branch")}
     - if Mfi.first.map_enabled        
       %div.tab
         = js_include_tag :map
         = partial "locations/map", {:obj => @branch}
+   
+
+      

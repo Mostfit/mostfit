@@ -214,7 +214,8 @@ describe "Controllers "  do
     @loan = Loan.new(:amount => @loan_product.min_amount, :interest_rate => @loan_product.min_interest_rate/100.0, :installment_frequency => :weekly, :number_of_installments => @loan_product.min_number_of_installments, :scheduled_first_payment_date => Date.today, :applied_on => Date.today-7, :applied_by => @staff, :scheduled_disbursal_date => Date.today-7, :client => @client, :loan_product => @loan_product)
     if @loan.save
       request(url(:new_branch_center_client_loan, @branch.id, @center.id, @client.id)).body.to_s.should =~ /Not Privileged/
-      request(url(:edit_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).body.to_s.should =~ /Not Privileged/       request(url(:delete_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).body.to_s.should =~ /Not Privileged/ 
+      request(url(:edit_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).body.to_s.should =~ /Not Privileged/
+      request(url(:delete_branch_center_client_loan, @branch.id, @center.id, @client.id, @loan.id)).body.to_s.should =~ /Not Privileged/ 
     else
       @loan.errors
     end
