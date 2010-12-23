@@ -19,7 +19,11 @@
       Rule end date 
     %td
       = date_select_for @rule_book, :to_date, :nullable => false, :min_date => Date.today-365, :max_date => Date.today+(2*365)
-
+  %tr
+    %td
+      Active:
+    %td
+      = check_box :active
   %tr
     %td
       Action

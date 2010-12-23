@@ -12,6 +12,8 @@
     %th
       To date
     %th
+      Active
+    %th
       Credit accounts
     %th
       Debit accounts
@@ -31,6 +33,8 @@
         = rule_book.from_date
       %td
         = rule_book.to_date
+      %td
+        = rule_book.active
       %td 
         - rule_book.credit_accounts.map do |credit_account|
           =credit_account.name
