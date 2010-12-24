@@ -3,17 +3,17 @@ class BranchDiary
   before :save, :convert_blank_to_nil
 
   property :id,                      Serial
-  property :name,                    String,                 :nullable => true,     :length => 100,         :index => true
-  property :diary_date,              Date,                   :default => Date.today
-  property :opening_time_hours,      Integer,                :nullable => false,    :length => 2,           :index => true
-  property :opening_time_minutes,    Integer,                :nullable => false,    :length => 2,           :index => true
+  property :name,                    String,                 :nullable => true,    :length => 100,         :index => true
+  property :diary_date,              Date,                   :nullable => false,   :default => Date.today
+  property :opening_time_hours,      Integer,                :nullable => false,   :length => 2,           :index => true
+  property :opening_time_minutes,    Integer,                :nullable => false,   :length => 2,           :index => true
   property :closing_time_hours,      Integer,                :nullable => true,    :length => 2,           :index => true
   property :closing_time_minutes,    Integer,                :nullable => true,    :length => 2,           :index => true
-  property :branch_opened_at,        DateTime,               :nullable => false,    :default => Time.now,   :index => true
-  property :branch_closed_at,        DateTime,               :nullable => false,    :default => Time.now,   :index => true
-  property :branch_key,              String,                 :nullable => false,    :length => 100,         :index => true
-  property :branch_name,             String,                 :nullable => true,     :index => true
-  property :branch_id,               Integer,                :nullable => false,    :index => true
+  property :branch_opened_at,        DateTime,               :nullable => false,   :default => Time.now,   :index => true
+  property :branch_closed_at,        DateTime,               :nullable => false,   :default => Time.now,   :index => true
+  property :branch_key,              String,                 :nullable => false,   :length => 100,         :index => true
+  property :branch_name,             String,                 :nullable => true,    :index => true
+  property :branch_id,               Integer,                :nullable => false,   :index => true
 
   belongs_to  :manager,   :child_key =>[:manager_staff_id], :model => 'StaffMember'
   belongs_to  :branch,    :child_key =>[:branch_id],        :model => 'Branch'

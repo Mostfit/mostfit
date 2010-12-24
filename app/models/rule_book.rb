@@ -10,8 +10,10 @@ class RuleBook
   property :from_date, Date, :nullable => false, :default => Date.today
   property :to_date, Date, :nullable => false, :default => Date.today+365
   property :created_at, DateTime, :nullable => false, :default => Time.now 
+  property :active,          Boolean, :default => true, :nullable => false, :index => true  
+  property :created_by_user_id, Integer, :nullable => false
+  property :updated_by_user_id, Integer, :nullable => true
   
-
   has n, :credit_account_rules
   has n, :debit_account_rules
   has n, :credit_accounts, :model => 'Account', :through => :credit_account_rules
@@ -19,16 +21,19 @@ class RuleBook
 
   belongs_to :branch,         Branch, :nullable => true
   belongs_to :fee,            Fee, :nullable => true
-  
+  belongs_to :created_by, :child_key => [:created_by_user_id], :model => 'User'  
+  belongs_to :updated_by, :child_key => [:updated_by_user_id], :model => 'User'  
   
   validates_present      :name
   validates_is_unique    :name
   validates_length       :name,     :minimum => 3
   validates_with_method  :debit_account,   :method => :credit_account_is_not_same_as_debit_account?
-  validates_with_method  :action_not_chosen_twice_for_particular_branch
+#  validates_with_method  :action_not_chosen_twice_for_particular_branch
   validates_with_method  :percentage_should_be_100
-  
+  validates_with_method  :expire_old_rule
+  validates_with_method  :rule_date_range_validation
   def self.get_accounts(obj)
+
     return false if not Mfi.first.accounting_enabled
     if obj.class==Payment
       transaction_type = obj.type
@@ -49,9 +54,9 @@ class RuleBook
       credit_accounts, debit_accounts  = {}, {}
       obj.each{|p|  
         rule = if p.type==:fees
-                 first(:action => p.type, :branch => branch, :fee => p.fee, :from_date.lte => date, :to_date.gte => date ) || first(:action => p.type, :branch => nil, :fee => p.fee, :from_date.lte => date, :to_date.gte => date)
+                 first(:action => p.type, :branch => branch, :fee => p.fee, :active => true) || first(:action => p.type, :branch => nil, :fee => p.fee, :active => true)
                else
-                 first(:action => p.type, :branch => branch, :from_date.lte => date, :to_date.gte => date) || first(:action => p.type, :branch => nil, :from_date.lte => date, :to_date.gte => date)
+                 first(:action => p.type, :branch => branch, :active => true) || first(:action => p.type, :branch => nil, :active => true)
                end
         rule.credit_account_rules.each{|car|
           credit_accounts[car.credit_account] ||= 0
@@ -66,10 +71,10 @@ class RuleBook
       return [credit_accounts, debit_accounts]
     end
     
-    if rule = first(:action => transaction_type, :branch => branch, :fee => fee, :from_date.lte => date, :to_date.gte => date)
-    elsif rule = first(:action => transaction_type, :branch => nil, :fee => nil, :from_date.lte => date, :to_date.gte => date)
-    elsif rule = first(:action => transaction_type, :branch => nil, :fee => fee, :from_date.lte => date, :to_date.gte => date)
-    elsif rule = first(:action => transaction_type, :branch => branch, :fee => nil, :from_date.lte => date, :to_date.gte => date)
+    if rule = first(:action => transaction_type, :branch => branch, :fee => fee, :active => true)
+    elsif rule = first(:action => transaction_type, :branch => nil, :fee => nil, :active => true)
+    elsif rule = first(:action => transaction_type, :branch => nil, :fee => fee, :active => true)
+    elsif rule = first(:action => transaction_type, :branch => branch, :fee => nil, :active => true)
     else
       raise "NoRuleFoundError"
     end
@@ -115,5 +120,29 @@ class RuleBook
       return [false, "Action has already been chosen for this branch"] if RuleBook.first(:action => action, :branch_id => branch_id, :id.not => self.id)
     end
     return true 
+  end
+# this function will work  if same rule is been created for same branch 
+#  it will deactivate old rule after creation of new rule for same action like disbursment, interest, fee or principal 
+  def expire_old_rule
+    if self.new?
+      RuleBook.all.each do |rule|
+        if rule.action == self.action and rule.branch_id == self.branch_id and rule.fee_id == self.fee_id and rule.to_date >= self.from_date and rule.active == true
+          rule.to_date = self.from_date-1
+          rule.active =  false
+          rule.save
+          return true 
+        end
+      end
+    end
+    return true
+  end
+
+# will verify that from date is always less than to date 
+  def rule_date_range_validation
+    if self and self.from_date > self.to_date
+      return [false,"from_date should be less than to_date"]
+    else
+      return true
+    end
   end
 end

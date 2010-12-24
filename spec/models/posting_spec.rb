@@ -8,28 +8,37 @@ describe Posting do
     mfi = Mfi.first
     mfi.accounting_enabled = true
     mfi.save
+    
     @rule_book_1 =  RuleBook.new(:name => "Loan", :action => :disbursement, :branch_id => 1)
     @rule_book_1.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(2), :percentage => 100)
     @rule_book_1.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(1), :percentage => 100)
+    @rule_book_1.created_by_user_id = 1
     @rule_book_1.save
+    @rule_book_1.errors.each{|e| puts e}
     @rule_book_1.should be_valid
 
     @rule_book_2 =  RuleBook.new(:name => "Principal", :action => :principal, :branch_id => 1)
     @rule_book_2.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(3), :percentage => 100)
     @rule_book_2.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(4), :percentage => 100)
+    @rule_book_2.created_by_user_id = 1
     @rule_book_2.save
+    @rule_book_2.errors.each{|e| puts e}
     @rule_book_2.should be_valid
 
     @rule_book_3 =  RuleBook.new(:name => "Interest", :action => :interest, :branch_id => 1)
     @rule_book_3.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(1), :percentage => 100)
     @rule_book_3.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(4), :percentage => 100)
+    @rule_book_3.created_by_user_id = 1
     @rule_book_3.save
+    @rule_book_3.errors.each{|e| puts e}
     @rule_book_3.should be_valid
 
     @rule_book_4 =  RuleBook.new(:name => "Fees", :action => :fees, :branch_id => 1)
     @rule_book_4.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(2), :percentage => 100)
     @rule_book_4.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(3), :percentage => 100)
+    @rule_book_4.created_by_user_id = 1
     @rule_book_4.save
+    @rule_book_4.errors.each{|e| puts e}
     @rule_book_4.should be_valid
 
     @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin)
