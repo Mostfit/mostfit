@@ -103,7 +103,7 @@
         Scheduled first payment:
       %td
         on&nbsp;&nbsp;
-        = select_date_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date
+        = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date
   - if take_over_loan
     %tr
       %td{:colspan => 2}
