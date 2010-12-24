@@ -6,7 +6,7 @@ class StockRegister
   property :name,             String,    :length => 100,  :nullable => true,  :index => true
   property :stock_code,       String,    :length => 10,   :nullable => false,  :index => true
   property :stock_name,       String,    :length => 100,  :nullable => true,   :index => true
-  property :stock_quatity,    Integer,                    :nullable => true
+  property :stock_quantity,   Integer,                    :nullable => true
   property :bill_number,      String,                     :nullable => false,  :index => true
   property :bill_date,        Date
   property :date_of_entry,    Date,      :default => Date.today, :nullable => false
