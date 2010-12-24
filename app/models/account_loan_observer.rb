@@ -50,7 +50,9 @@ class AccountLoanObserver
     return unless (credit_account and debit_account)
     amount = old_attributes[:amount]||obj.amount
     date   = old_attributes[:disbursal_date]||obj.disbursal_date
-
+    debit_account.each{|dac, dam| debit_account[dac]=nil}
+    credit_account.each{|cac, cam| credit_account[cac]=nil}
+    
     journal = {:date => date, :transaction_id => obj.id.to_s, :currency => Currency.first, :amount => (amount * -1)}
     journal[:comment] = "Loan_id: #{obj.id}-Client:#{obj.client.name} - reverse entry"
     journal[:journal_type_id] = 1

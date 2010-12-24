@@ -32,8 +32,8 @@ class RuleBook
   validates_with_method  :percentage_should_be_100
   validates_with_method  :expire_old_rule
   validates_with_method  :rule_date_range_validation
-  def self.get_accounts(obj)
 
+  def self.get_accounts(obj, amount = nil)
     return false if not Mfi.first.accounting_enabled
     if obj.class==Payment
       transaction_type = obj.type
