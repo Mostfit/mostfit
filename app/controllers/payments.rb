@@ -33,10 +33,13 @@ class Payments < Application
     raise NotFound unless @payment
     disallow_updation_of_verified_payments
     return unless session.user.role == :admin
-
     if @loan and @loan.delete_payment(@payment, session.user)
-      do_payment(payment)
-      redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{id}' has been deleted and a new one #{@payment.id} created"}
+      if do_payment(payment)
+        redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{id}' has been deleted and a new one #{@payment.id} created"}
+      else
+        redirect(url_for_loan(@loan, 'payments'), 
+                 :message => {:error => "Payment '#{id}' has been deleted but a new one could not be created because #{@payment.errors.instance_variable_get("@errors").map{|k, v| v.join(", ")}.join(", ")}"})
+      end
     elsif @client and @payment.deleted_by = session.user and @payment.destroy      
       do_payment(payment)
       redirect url_for_loan(@client, 'payments'), :message => {:notice => "Payment '#{id}' has been deleted and a new one #{@payment.id} created"}      
@@ -136,6 +139,4 @@ class Payments < Application
       return success      
     end
   end
-
-
 end # Payments

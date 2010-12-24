@@ -94,9 +94,9 @@
         %span.greytext
           - if actual_first_payment == @loan.scheduled_first_payment_date
             as scheduled
-          - else
+          - elsif actual_first_payment
             = difference_in_days(@loan.scheduled_first_payment_date, actual_first_payment, ['days earlier', 'days later'])
-            then scheduled
+            than scheduled
             == (#{@loan.scheduled_first_payment_date})
       - if @loan.class.to_s.match(/^TakeOver/)
         %br

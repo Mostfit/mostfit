@@ -122,10 +122,10 @@ describe Report do
       prin.should be_true
       int.should be_true
     end
-    @repaying_loans.each{|l| l.update_history}
+    @repaying_loans.each{|l| l.update_history(true)}
   end
-    # now we check the reporting functionality
-  
+
+  # now we check the reporting functionality  
   it "should have correct loan count" do
     @date = Loan.all.min(:scheduled_first_payment_date)
     Branch.loan_count(@date).should == {1 => 6, 2 => 6}
@@ -179,12 +179,12 @@ describe Report do
         date = loan.date_for_installment(i)
         _p = loan.scheduled_principal_for_installment(i)
         _i = loan.scheduled_interest_for_installment(i)
-        paid = loan.repay([_p,_i],@user,date,@manager)        
+        paid = loan.repay([_p,_i], @user, date, @manager, true)        
         paid[1].errors.each {|e| puts e}
         total += _p
       end
       loan.history_disabled = false
-      loan.update_history
+      loan.update_history(true)
       loan.get_status(loan.scheduled_maturity_date).should == :repaid
       LoanHistory.all(:loan_id => loan.id).last.actual_outstanding_principal.should == 0
     end

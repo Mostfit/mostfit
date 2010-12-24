@@ -155,40 +155,11 @@ h1.logo span{
   font-size: 13px;
 }
 
-/*.box
-{
-  margin-bottom: 15px;
-}
-.box-narrowed
+.box
 {
   padding-left: 10px;
   padding-right: 10px;
 }
-.box-title
-{
-  background: url(../images/home-header-bg.gif) 0 0 repeat-x #003568;
-  padding: 3px 5px 2px 5px;
-}
-.box-title h1, .box-title h2, .box-title h3
-{
-  margin: 0px;
-  color: #fff;
-  padding: 0px;
-}
-.box-title h1 {  font-size: 150%; padding: 5px; }  
-.box-title h2 {  font-size: 118%; padding: 5px; }
-.box-title h3 {  font-size: 110%; }
-
-.box-content
-{
-  padding: 3px 5px 0px 5px;
-border: 1px solid #8c9292;
-}
-.box-content.topless
-{
-  border-top: 0px;
-}*/
-
 #content h1{
   font-size: 200%;
 }

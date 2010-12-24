@@ -3,7 +3,7 @@ class RuleBooks < Application
 
   def index
     @rule_books = RuleBook.all.paginate(:page =>params[:page],:per_page => 5)
-    display @rule_books
+    display @rule_books, :layout => layout?
   end
 
   def show(id)

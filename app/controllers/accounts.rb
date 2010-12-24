@@ -3,11 +3,16 @@ class Accounts < Application
   before :get_context
 
   def index
-    if request.xhr? and params[:account_type_id]
+    if request.xhr? and params[:account_type_id] and not params[:account_type_id].blank?
       @accounts = Account.all(:account_type_id => params[:account_type_id])
       partial :accounts_selection
     else
-      @accounts = Account.all(:parent_id => "") + Account.all(:parent_id => nil)
+      if params[:branch_id] and not params[:branch_id].blank?
+        @branch =  Branch.get(params[:branch_id])
+      else
+        @branch = nil
+      end
+      @accounts = Account.tree((params[:branch_id] and not params[:branch_id].blank?) ? params[:branch_id].to_i : nil )
       display @accounts, :layout => layout?
     end
   end
@@ -15,13 +20,13 @@ class Accounts < Application
   def show(id)
     @account = Account.get(id)
     raise NotFound unless @account
-    display @account
+    display @account, :layout => layout?
   end
 
   def new
     only_provides :html
     @account = Account.new
-    display @account
+    display @account, :layout => layout?
   end
 
   def edit(id)
@@ -31,7 +36,7 @@ class Accounts < Application
       @parent_accounts = (Account.all(:account_type => @account.account_type)-[@account])
     end
     raise NotFound unless @account
-    display @account
+    display @account, :layout => layout?
   end
 
   def create(account)
@@ -100,7 +105,7 @@ class Accounts < Application
       raise NotFound unless @branch
       @accounts = Account.all(:branch_id => params[:branch_id])
     end
-    render
+    render :layout => layout?
   end
 
   private
