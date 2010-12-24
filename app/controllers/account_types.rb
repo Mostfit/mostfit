@@ -3,7 +3,7 @@ class AccountTypes < Application
 
   def index
     @account_types = AccountType.all
-    display @account_types
+    display @account_types, :layout => layout?
   end
 
   def show(id)
@@ -15,7 +15,7 @@ class AccountTypes < Application
   def new
     only_provides :html
     @account_type = AccountType.new
-    display @account_type
+    display @account_type, :layout => layout?
   end
 
   def edit(id)
@@ -28,7 +28,7 @@ class AccountTypes < Application
   def create(account_type)
     @account_type = AccountType.new(account_type)
     if @account_type.save
-      redirect resource(:account_types), :message => {:notice => "AccountType was successfully created"}
+      redirect resource(:accounts), :message => {:notice => "AccountType was successfully created"}
     else
       message[:error] = "AccountType failed to be created"
       render :new
@@ -39,7 +39,7 @@ class AccountTypes < Application
     @account_type = AccountType.get(id)
     raise NotFound unless @account_type
     if @account_type.update(account_type)
-       redirect resource(:account_types)
+       redirect resource(:accounts)
     else
       display @account_type, :edit
     end

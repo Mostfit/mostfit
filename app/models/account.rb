@@ -1,6 +1,6 @@
 class Account
   include DataMapper::Resource
-  attr_accessor :debit, :credit, :balance, :balance_debit, :balance_credit, :opening_balance_debit, :opening_balance_credit
+  attr_accessor :debit, :credit, :balance, :balance_debit, :balance_credit, :opening_balance_debit, :opening_balance_credit, :branch_edge
   before :save, :convert_blank_to_nil
 
   property :id,                     Serial  
@@ -46,6 +46,53 @@ class Account
       end
     }
   end
+
+  def self.tree(branch_id = nil)
+    data = {}
+    Account.all(:order => [:account_type_id.asc], :parent_id => nil).group_by{|account| account.account_type}.each{|account_type, accounts|
+      accounts.each{|account| 
+        account.branch_edge = (account.branch_id == branch_id)
+      }
+      # recurse the tree: climb
+      data[account_type] = climb(accounts, branch_id)
+      #color branches which contain the specific branch id
+      color(data[account_type], branch_id)
+      # cut uncolored branches
+      #data[account_type] = cut(data[account_type])
+    }
+    data
+  end
+
+  private
+  def self.climb(accounts, branch_id)
+    # mark branch edges
+    accounts.each{|account| account.branch_edge = (account.branch_id == branch_id)}
+    #make tree
+    accounts.map{|account|
+      account.children.length>0 ? [account, climb(account.children, branch_id)] : [account]
+    }
+  end
   
+  def self.color(accounts, branch_id)
+    return if accounts.length == 0
+    first_account, rest_accounts = accounts[0], accounts[1..-1]||[]
+    if first_account.is_a?(Account)      
+      accounts[0].branch_edge ||= accounts[1..-1].flatten.map{|x| x.branch_edge}.include?(true)
+      color(accounts[1..-1], branch_id)
+    else
+      color(accounts[0], branch_id)
+      color(accounts[1..-1], branch_id)
+    end
+  end
+
+  def self.cut(accounts)
+    return if accounts.length == 0
+    first_account, rest_accounts = accounts[0], accounts[1..-1]||[]
+    if first_account.is_a?(Account)
+      accounts[0].branch_edge ? accounts : []
+    else
+      cut(first_account)||[] + [cut(rest_accounts)]
+    end    
+  end
 end
 

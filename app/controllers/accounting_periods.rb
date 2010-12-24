@@ -3,7 +3,7 @@ class AccountingPeriods < Application
 
   def index
     @accounting_periods = AccountingPeriod.all(:order => [:begin_date.asc])
-    display @accounting_periods
+    display @accounting_periods, :layout => layout?
   end
 
   def show(id)
@@ -15,7 +15,7 @@ class AccountingPeriods < Application
   def new
     only_provides :html
     @accounting_period = AccountingPeriod.new
-    display @accounting_period
+    display @accounting_period, :layout => layout?
   end
 
   def edit(id)
@@ -29,7 +29,7 @@ class AccountingPeriods < Application
     @accounting_period = AccountingPeriod.new(accounting_period)
     @accounting_period.created_by_user_id = session.user.id
     if @accounting_period.save
-      redirect resource(:accounting_periods), :message => {:notice => "AccountingPeriod was successfully created"}
+      redirect resource(:accounts), :message => {:notice => "AccountingPeriod was successfully created"}
     else
       message[:error] = "AccountingPeriod failed to be created"
       render :new
@@ -40,19 +40,9 @@ class AccountingPeriods < Application
     @accounting_period = AccountingPeriod.get(id)
     raise NotFound unless @accounting_period
     if @accounting_period.update(accounting_period)
-       redirect resource(:accounting_periods)
+       redirect resource(:accounts)
     else
       display @accounting_period, :edit
-    end
-  end
-
-  def destroy(id)
-    @accounting_period = AccountingPeriod.get(id)
-    raise NotFound unless @accounting_period
-    if @accounting_period.destroy
-      redirect resource(:accounting_periods)
-    else
-      raise InternalServerError
     end
   end
 

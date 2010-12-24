@@ -1,9 +1,10 @@
-%div
-  %form{:action => url(:action => :duplicate), :method => :get}
-    %h2
-      Duplicate all accounts of      
-      %b Branch
-    = select :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select a branch", :selected => @branch.id.to_s
+%div.box#form_holder
+  %h2
+    Duplicate all accounts of      
+    %b Branch
+  %form._remote_{:action => url(:action => :duplicate), :method => :get}
+    = select :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select a branch", :selected => (@branch ? @branch.id.to_s : "")
+    %input{:type => "hidden", :name => "_target_", :value => "form_holder"}
     = submit "GO"
   - if @accounts
     %form{:action => resource(:accounts), :method => :post}
