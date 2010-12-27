@@ -25,7 +25,6 @@ class ParByCenterReport < Report
   end
 
   def generate
-    debugger
     # these are the loan history lines which represent the last line before @date
     selects = [:loan_id, :branch_id, :center_id, :client_id, :amount_in_default, :days_overdue, :date]             
     par_data = LoanHistory.defaulted_loan_info_by(:center, @date, {:branch_id => @branch.map{|x| x.id}, :center_id => @center.map{|x| x.id}}, selects)
@@ -39,10 +38,10 @@ class ParByCenterReport < Report
 
     data = {}
     @branch.each do |branch|
-      debugger
+    
       data[branch] = {}
       @center.find_all{|c| c.branch_id==branch.id}.each do |center|
-        debugger
+    
         next unless center_defaults[center.id]
         data[branch][center] = []
         center_defaults[center.id].each do |default|
