@@ -43,7 +43,9 @@
           %b
             = account_type.name
           %ul
-            = show_accounts(accounts)
+            - if accounts
+              - accounts.each do |account|
+                = show_accounts(account)
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url(:accounting_periods)}
   %div.tab

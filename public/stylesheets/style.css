@@ -940,22 +940,28 @@ span.branchName{
     margin-left: 150px;
 }
 ul#tree li{
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     padding-bottom: 10px
+    width: 100%;
+    padding-top: 10px;
 }
 ul#tree li ul{
     margin-top: 10px;
+    margin-bottom: 20px;
+    padding-top: 5px;
 }
 ul#tree li span{
-    padding-bottom: 10px;
-    position: absolute;
-}
-ul#tree li span{
-    margin-left: 20px;
-    margin-bottom: 5px;
+   text-align: center;
+   padding-bottom: 10px;
+   position: absolute;
+   margin-left: 20px;
+   margin-bottom: 5px;
+   text-align: right;
+   width: 100px;
 }
 ul#tree li span.spacer1{
     width: 200px;
+    text-align: left;
 }
 ul#tree li span.spacer2{
     left: 400px;
@@ -987,6 +993,22 @@ ul#tree li span.spacer4b{
 ul#tree li span.spacer5{
     margin-left: 800px;
 }
+ul#tree li.depth_1 span{
+    background-color: #eee;
+}
+ul#tree li.depth_2 span{
+    background-color: #ddd;
+}
+ul#tree li.depth_3 span{
+    background-color: #ccc;
+}
+ul#tree li.depth_4 span{
+    background-color: #bbb;
+}
+ul#tree li.depth_4 span{
+    background-color: #aaa;
+}
+
 .infobox{
     overflow-x: none;
     height: 80px;

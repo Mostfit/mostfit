@@ -1,5 +1,5 @@
 class TrialBalanceReport < Report
-  attr_accessor :from_date, :to_date, :account, :account_id, :journal,:posting, :account_type_id, :branch, :branch_id
+  attr_accessor :from_date, :to_date, :account, :account_id, :journal,:posting, :account_type_id, :branch, :branch_id, :display_type
 
   def initialize(params,dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.min_date
@@ -17,13 +17,15 @@ class TrialBalanceReport < Report
   def self.name
     "Trial Balance"
   end
-
-
+  
   def generate(param)
     data = {}
     @branch_id = @branch_id.to_i if @branch_id 
+    @debit_postings  = Posting.all(:amount.lt => 0).aggregate(:account_id, :amount.sum).to_hash
+    @credit_postings = Posting.all(:amount.gt => 0).aggregate(:account_id, :amount.sum).to_hash
+    
     Account.all(:order => [:account_type_id.asc], :parent_id => nil).group_by{|account| account.account_type}.each{|account_type, accounts|
-      data[account_type] = recurse(accounts)
+      data[account_type] = recurse(accounts)    
 
       account_type.opening_balance_debit  = aggregates(data[account_type], :opening_balance_debit).reduce(0){|s, x| s+=x} || 0
       account_type.opening_balance_credit = aggregates(data[account_type], :opening_balance_credit).reduce(0){|s, x| s+=x} || 0
@@ -38,17 +40,24 @@ class TrialBalanceReport < Report
   end
 
   def recurse(accounts)
+    # iterate over accounts
     accounts.map{|account|
       if account.branch_id == @branch_id
         account.opening_balance_debit  = (account.opening_balance < 0 ? account.opening_balance * -1 : 0)
         account.opening_balance_credit = (account.opening_balance > 0 ? account.opening_balance : 0)
         
-        account.debit  = (account.postings.sum(:amount, :amount.lte => 0)||0) * -1
-        account.credit = (account.postings.sum(:amount, :amount.gte => 0)||0)
-
-        account.balance_debit  = account.debit   + account.opening_balance_debit
-        account.balance_credit = account.credit  + account.opening_balance_credit
+        account.debit  = (@debit_postings[account.id]||0) * -1
+        account.credit = (@credit_postings[account.id]||0)
+        
+        if account.credit  + account.opening_balance_credit > account.debit + account.opening_balance_debit
+          account.balance_credit = account.credit  + account.opening_balance_credit - account.debit - account.opening_balance_debit
+          account.balance_debit  = 0          
+        else
+          account.balance_credit = 0
+          account.balance_debit  = account.debit + account.opening_balance_debit - account.credit - account.opening_balance_credit
+        end
       else
+        next if account.children.length == 0
         account.opening_balance_debit  ||= 0
         account.opening_balance_credit ||= 0
         
