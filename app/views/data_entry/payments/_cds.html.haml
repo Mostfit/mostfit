@@ -53,7 +53,7 @@
               %td.text
                 = loan.disbursal_date.to_s
               %td.number
-                - ins = 0
+                - ins = loan.number_of_installments_before(@date)
                 = ins
                 - tot_installments += ins
               %td.number
