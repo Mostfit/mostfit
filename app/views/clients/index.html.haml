@@ -35,6 +35,12 @@
       %td Center leader
       - leader = @center.leader
       %td=leader.client.name if leader
+      - tot_attendance_at_center = @center.clients.attendances.count
+      - absent_at_center =  @center.clients.attendances(:status => "absent").count
+      - if tot_attendance_at_center > 0
+        %tr
+          %td Attendance(%)
+          %td=((1-(absent_at_center.to_f/tot_attendance_at_center.to_f))* 100).round(2)
   %p
     = link_to 'edit this center\'s details', resource(@branch, @center, :edit), :class => "edit"
     = link_to 'add a new client', resource(@branch, @center, :clients, :new), :class => "add"

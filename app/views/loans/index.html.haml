@@ -57,6 +57,14 @@
         == #{(@client.total_fees_paid).to_currency} / #{(@client.total_fees_due).to_currency}
         - if @client.fees_paid?
           %span.green Paid
+        - total_attendance_client = @client.attendances.count
+        - total_absent_client = @client.attendances(:status => "absent").count
+        - if total_attendance_client > 0
+          %tr
+            %td
+              Attendance(%)
+            %td
+              = ((1-(total_absent_client.to_f/total_attendance_client.to_f)) * 100).round(2)
   %p
     =link_to('edit client details', params[:controller]=="data_entry/clients" ? url(:enter_clients, :action => 'edit', :id => @client) : resource(@branch, @center, @client, :edit), :class => "button")
     -if @client.tags and @client.tags.include?(:insincere)
