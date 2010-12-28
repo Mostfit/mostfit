@@ -1,3 +1,4 @@
+- loan_utilizations = LoanUtilization.all.map{|x| [x.id, x.name]}
 %table.report.nojs    
   %thead
     %tr{:style => "font-size: 0.85em;"}
@@ -12,14 +13,12 @@
       %th
         Center
       %th
-        Status
+        Disbursed on
       %th
         Selected
       %th
-        Utilization
-     
-  -@loans_to_utilize.each do |loan|
-   
+        Utilization    
+  -@loans_to_utilize.each do |loan|   
     %tr{:class => cycle('odd','')}
       %td.number
         = link_to loan.id, url(:quick_link, "loans", loan.id)
@@ -30,16 +29,13 @@
       %td.number
         = loan.amount
       %td.text
-        = loan.client.center.name
-      
+        = loan.client.center.name      
       %td.text
-        = loan.status.to_s.camelcase(' ')
+        = loan.disbursal_date
       %td
         = check_box :name => "loans[#{loan.id}][approved?]"
       %td.text
-        = select :name => "loans[#{loan.id}][loan_utilization_id]", :collection => LoanUtilization.all.map{|x| [x.id, x.name]}, :prompt => "Select Utilization"
-
-     
+        = select :name => "loans[#{loan.id}][loan_utilization_id]", :collection => loan_utilizations, :prompt => "Select Utilization"     
   %tfoot
     %tr
       %td{:colspan => 10}

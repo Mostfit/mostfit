@@ -37,7 +37,6 @@ module DataEntry
 
     def make_loan_utilization
       if request.method == :get
-        
         if params[:center_id]
           @loans_to_utilize = @loan.all("client.center" => Center.get(params[:center_id]), :disbursal_date.lte => (Date.today - 28))
         else
@@ -48,19 +47,22 @@ module DataEntry
         render
       else
         @errors = []
-        @loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
-        @loans.keys.each do |id|
+        loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
+        loans.keys.each do |id|
           loan = Loan.get(id)
           params[:loans][id].delete("approved?")      
-          params[:loans][id][:loan_utilization_id] = params[:loans][id][:loan_utilization_id]
-          loan.update(params[:loans][id])
           loan.history_disabled = true
-          loan.save
+          loan.already_updated  = true
+          next if params[:loans][id].blank?
+          loan.loan_utilization_id = params[:loans][id][:loan_utilization_id]
+          unless loan.save_self
+            @errors << false
+          end
         end
         if @errors.blank?
-          redirect(params[:return]||"/data_entry", :message => {:notice => 'loans utilised'})
+          redirect(params[:return]||"/data_entry", :message => {:notice => 'loans utilization data saved'})
         else
-          @loans_to_utilize = Loan.all(:id.in => @loans.keys)
+          @loans_to_utilize = Loan.all(:id.in => loans.keys)
           @clients =  @loans_to_utilize.clients
           render
         end

@@ -828,8 +828,8 @@ class Loan
 
   def update_history(forced=false)
     return true if Mfi.first.dirty_queue_enabled and DirtyLoan.add(self) and not forced
-    return if already_updated and not forced
-    return if history_disabled and not forced# easy when doing mass db modifications (like with fixutes)
+    return if self.already_updated
+    return if self.history_disabled and not forced# easy when doing mass db modifications (like with fixutes)
     clear_cache
     update_history_bulk_insert
     already_updated=true
