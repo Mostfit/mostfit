@@ -403,11 +403,7 @@ class Loan
       AccountPaymentObserver.single_voucher_entry(payments)
     end
 
-    if defer_update #i.e. bulk updating loans
-      Merb.run_later do
-        update_history
-      end
-    else
+    unless defer_update #i.e. bulk updating loans
       self.history_disabled=false
       already_updated=false
       update_history(true)  # update the history if we saved a payment

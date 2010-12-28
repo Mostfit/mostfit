@@ -143,7 +143,7 @@ module DataEntry
     
 
     def staff_collection_sheet
-
+      
       @data = StaffMember.all(:active => true)
       render
     end
@@ -172,7 +172,8 @@ module DataEntry
           @type = params[:payment][:type]
           style = params[:payment_style][k.to_sym].to_sym
           next if amounts<=0
-          @success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, false, style)
+
+          @success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, true, style)
           if @success
             @loan.history_disabled = false
             @loan.update_history
