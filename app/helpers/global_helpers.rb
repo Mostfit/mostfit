@@ -326,18 +326,22 @@ module Merb
                       ((child_obj and child_obj.respond_to?(:name)) ? child_obj.name : "id: #{v.last}")
                     elsif action==:create
                       child_obj = relations[k].last.get(v)
-                      ((child_obj and child_obj.respond_to?(:name)) ? child_obj.name : "id: #{v.last}")                      
+                      ((child_obj and child_obj.respond_to?(:name)) ? child_obj.name : "id: #{v.last}")
                     else
                       "#{v}"
                     end)||""
           else
             str="<tr><td>#{k.humanize}</td><td>"
-            str+=if action==:update and v.class==Array                 
-                   "changed from #{v.first}</td><td>to #{v.last}"
-                 elsif action==:create and v.class==Array                 
+            str+=if action==:update and v.class==Array
+                   if model.properties.find{|x| x.name == k}.type.respond_to?(:flag_map)
+                     "changed from #{model.properties.find{|x| x.name == k}.type.flag_map[v.first]}</td><td>to #{v.last}"                     
+                   else
+                     "changed from #{v.first}</td><td>to #{v.last}"
+                   end
+                 elsif action==:create and v.class==Array
                    "#{v}"
                  else
-                   "#{v}"                 
+                   "#{v}"
                  end
           end
           str+="</td></tr>"

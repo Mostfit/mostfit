@@ -131,6 +131,8 @@ describe Accounts, "Check accounts" do
     @branch       = Branch.first
     @account_type = AccountType.first
     @staff_member = StaffMember.first
+  end
+end
 
 describe Accounts, "Check accounts" do
   before do
@@ -156,6 +158,9 @@ describe Accounts, "Check accounts" do
     @branch       = Branch.first
     @account_type = AccountType.first
     @staff_member = StaffMember.first
+  end
+end
+
 describe Accounts, "Check accounts" do
   before do
     load_fixtures :users, :account_type, :staff_members
@@ -180,6 +185,9 @@ describe Accounts, "Check accounts" do
     @branch       = Branch.first
     @account_type = AccountType.first
     @staff_member = StaffMember.first
+  end
+end
+
 describe Accounts, "Check accounts" do
   before do
     load_fixtures :users, :account_type, :staff_members
@@ -204,6 +212,9 @@ describe Accounts, "Check accounts" do
     @branch       = Branch.first
     @account_type = AccountType.first
     @staff_member = StaffMember.first
+  end
+end
+
 describe Accounts, "Check accounts" do
   before do
     load_fixtures :users, :account_type, :staff_members
@@ -228,5 +239,6 @@ describe Accounts, "Check accounts" do
     @branch       = Branch.first
     @account_type = AccountType.first
     @staff_member = StaffMember.first
-
+  end
+end
 
