@@ -91,7 +91,7 @@ module Misfit
           return(is_manager_of?(obj.center))
         elsif obj.class == ClientGroup
           return(obj.center.manager == @staff or is_manager_of?(obj.center))
-        elsif obj.class == Loan or obj.class.superclass == Loan
+        elsif obj.class == Loan or obj.class.superclass == Loan or obj.class.superclass.superclass == Loan
           return(is_manager_of?(obj.client.center))
         elsif obj.class == StaffMember
           return(obj == @staff or is_manager_of?(obj.centers.branches) or is_manager_of?(obj.branches) or is_manager_of?(obj.areas))

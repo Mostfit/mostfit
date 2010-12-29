@@ -7,10 +7,12 @@ module Merb
         ((first_account.is_a?(Account) ? output_li(first_account, false) : show_accounts(first_account)) + rest_accounts.map{|account|
            if account.is_a?(Account)
              output_li(account)
+           elsif account.is_a?(Array) and account.length == 1 and account.first.is_a?(Account)
+             output_li(account.first)
            elsif account.is_a?(Array) and account.length > 0
              "<ul>#{show_accounts(account)}</ul>"
            end
-         }.join + "</li>").gsub("<ul></ul>", "")
+         }.join + "</li>").gsub("<ul></li></ul>", "")
       else
         output_li(accounts)
       end
