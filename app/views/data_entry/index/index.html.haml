@@ -26,13 +26,10 @@
           %br
           = link_to "Delete a repayment <br/>", url("enter_#{plural}".to_sym, :action => 'delete'), :class => 'add_small' 
           = link_to_with_rights("Collection sheet<br/>", url(:enter_payments,:action => 'staff_collection_sheet'), :class => 'edit_small')
-          - @day = Date.today.day + 1
-          - @pday = Date.today.day - 1
-          - @month = Date.today.strftime('%B')
-          - @year = Date.today.year         
-          = link_to "Daily Report <br/>", url(:show_report, 'DailyReport') + '? daily_report[date]=Date.today.day+@month%2C+@year&submit=Go', :class => 'edit_small'
-          = link_to "Transaction Ledger <br/>", url(:show_report, 'TransactionLedger') +'? transaction_ledger[from_date]=@pday+@month%2C+@year&submit=Go', :class => 'edit_small'
-       
+          = link_to "Daily Report", url(:show_report, 'DailyReport', {:daily_report => {:date => Date.today}, :submit => "Go"}), :class => 'edit_small'
+          %br
+          = link_to "Transaction Ledger", url(:show_report, 'TransactionLedger', {:transaction_ledger => {:from_date => Date.today}, :submit => "GO"}), :class => 'edit_small'
+          %br
         - else
           = link_to_with_rights "Add new #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'new'), :class => 'add_small'
           %br
@@ -48,7 +45,7 @@
           - sg = Loan.all(:write_off_rejected_on => nil, :written_off_on => nil, :suggested_written_off_on.lte => Date.today).size
           = link_to_with_rights("Write Off Loans (#{sg})<br/>", url(:loan_actions, :action => 'write_off_suggested'), :class => 'edit_small')
          
-          = link_to "Weekly requirement of funds <br/>", url(:show_report, 'ProjectedReport') + '? projected_report[from_date]=@day+@month%2C+@year&submit=Go', :class => 'edit_small'
+          = link_to "Weekly requirement of funds <br/>", url(:show_report, 'ProjectedReport', {:projected_report => {:from_date => Date.today}, :submit => "GO"}), :class => 'edit_small'
           = link_to_with_rights("Disbursement Sheet <br/>", url(:enter_loans,:action => 'staff_disbursement_sheet'), :class => 'edit_small')
         - @i += 1
       
