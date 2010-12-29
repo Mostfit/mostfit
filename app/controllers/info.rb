@@ -60,7 +60,7 @@ class Info < Application
       @clients[:upto] = @obj.clients(client_hash(:upto))
     elsif @obj.class == StaffMember
       @areas     = @obj.areas
-      @branches, @centers, @managed_clients  = {}, {}, {}
+      @branches, @centers, @managed_clients, @loan_served  = {}, {}, {}, {}
       @branches[:new]  = @obj.branches(new_date_hash)
       @branches[:upto] = @obj.branches(upto_date_hash)
 
@@ -69,6 +69,10 @@ class Info < Application
 
       @managed_clients[:new] = @obj.clients #(client_hash(:new))
       @managed_clients[:upto] = @obj.clients #(client_hash(:upto))
+      
+      @loan_served[:new] = @obj.centers.clients.loans(new_date_hash).count
+      @loan_served[:upto] = @obj.centers.clients.loans(upto_date_hash).count
+
     else
       raise "Unknown obj class"
     end
