@@ -20,13 +20,13 @@ class ClientAbsenteeismReport < Report
     data, att, client_groups, clients = {}, {}, {}, {}
     num_absent_more_than = @absent_more_than ? @absent_more_than : 0
 
-    Attendance.all(:center => @center, :date.gte => @from_date, :date.lte => @to_date, :status => :absent).aggregate(:fields => [:center_id, :client_id, :status, :client_id.count]).map{|center_id, client_id, status, count|
+    Attendance.all(:center => @center, :date.gte => @from_date, :date.lte => @to_date).aggregate(:fields => [:center_id, :client_id, :status, :client_id.count]).map{|center_id, client_id, status, count|
       att[client_id]||={}
-      att[client_id][status.to_i]=count
+      att[client_id][status.to_i]=count 
     }
-    att.each{|client_id, statues|
-      att.delete(client_id) if not statues[4] or statues[4] <= num_absent_more_than
-    }
+    # att.each{|client_id, statues|
+    #  # att.delete(client_id) if not statues[4] or statues[4] <= num_absent_more_than
+    # }
     client_ids = att.keys
     Client.all(:id => client_ids, :fields => [:id, :name, :reference, :client_group_id, :center_id]).each{|c|
       clients[c.center_id]||= []
