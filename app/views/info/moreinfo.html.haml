@@ -84,7 +84,6 @@
             =@managed_clients[:upto].count
           -else
             =0    
-
   %tr
     %td
       Number of death Cases
@@ -113,6 +112,21 @@
       =(@loan_disbursed) ? @loan_disbursed.loan_count : 0
     %td
       =(@total_disbursed) ? @total_disbursed.loan_count : 0
+
+  - if @loan_served 
+    %tr
+      %td
+        Number of served Loans
+        %td
+          -if @loan_served
+            =@loan_served[:new]
+          -else
+            =0
+        %td
+          -if @loan_served
+            =@loan_served[:upto]
+          -else
+            =0
   %tr
     %td
       Number of loans Repaid
