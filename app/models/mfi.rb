@@ -41,6 +41,7 @@ class Mfi
   property :map_enabled, Boolean, :default => false, :index => true
   property :branch_diary_enabled, Boolean, :default => false, :index => true
   property :stock_register_enabled, Boolean, :default => false, :index => true
+  property :asset_register_enabled, Boolean, :default => false, :index => true
 
   property :currency_format,  String, :nullable => true, :length => 20
 
