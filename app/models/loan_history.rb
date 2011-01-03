@@ -331,7 +331,7 @@ class LoanHistory
   end
   
   def self.payment_due_by_center(date, hash)
-    hash[:date.lt] = Date.new(2010, 12, 31)
+    hash[:date.lt] = Date.today
     last_due_dates_query = LoanHistory.all(hash).aggregate(:center_id, :date.max).map{|x| "(#{x[0]}, '#{x[1].strftime('%Y-%m-%d')}')"}.join(", ")
     return [] if last_due_dates_query.length==0
 
