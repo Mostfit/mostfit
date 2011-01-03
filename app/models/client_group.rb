@@ -13,7 +13,7 @@ class ClientGroup
   validates_length      :code, :min => 1, :max => 14
 
   has n, :clients
-  belongs_to :center
+  belongs_to :center, :nullable => false
   belongs_to :created_by_staff,  :child_key => [:created_by_staff_member_id], :model => 'StaffMember'
   validates_is_unique :name, :scope => :center_id
   validates_with_method :client_should_be_migratable

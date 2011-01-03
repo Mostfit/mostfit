@@ -16,8 +16,9 @@ describe LoanHistory do
     @center.save
     @center.should be_valid
     ClientType.create(:type => "Standard")
+    @client_group =ClientGroup.create(:center => @center, :code => "01", :name => "group 01")
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => Date.parse('2000-01-01'), 
+    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => Date.parse('2000-01-01'), :client_group => @client_group,
                          :client_type => ClientType.first, :created_by => @user, :center => @center)
     @client.save
     @client.errors.each{|e| puts e}
@@ -147,6 +148,7 @@ describe LoanHistory do
 
     LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date + 14, [:loan]).first.scheduled_outstanding_principal.should == 880
     LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date + 14, [:loan]).first.actual_outstanding_principal.should == 872    
+    LoanHistory.sum_outstanding_for_loans(@loan.scheduled_first_payment_date + 14, [@loan.id]).first.scheduled_outstanding_principal.should == 880
   end
 
   it "should give correct amount for loans defaulted" do
@@ -263,6 +265,130 @@ describe LoanHistory do
     LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date + 7, [:loan]).map{|lh|
       lh.actual_outstanding_principal
     }.reduce(0){|s, x| s+=x}.should == 3000 - 96 + 8 - 40
+    #monthly outstanding
+    LoanHistory.sum_outstanding_by_month(@loan.scheduled_first_payment_date.month, @loan.scheduled_first_payment_date.year, Branch.first).map{|lh|
+      lh.actual_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == 3000 - 96 + 8 - 40
+
+    date = @loan.scheduled_first_payment_date
+
+    #sum outstanding for branch
+    LoanHistory.sum_outstanding_for(@branch, @loan.scheduled_first_payment_date).map{|lh|
+      lh.actual_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == (@branch.centers.clients.loans.all(:disbursal_date.lte => date).map{|l| 
+                                          l.amount
+                                        }.reduce(0){|s,x| s+=x} - @branch.centers.clients.loans.payments.all(:type => :principal, :received_on.lte => date).map{|p| 
+                                          p.amount}.reduce(0){|s,x| s+=x})
+
+    #sum outstanding for center
+    LoanHistory.sum_outstanding_for(@center, @loan.scheduled_first_payment_date).map{|lh|
+      lh.actual_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == (@center.clients.loans.all(:disbursal_date.lte => date).map{|l| 
+                                          l.amount
+                                        }.reduce(0){|s,x| s+=x} - @center.clients.loans.payments.all(:type => :principal, :received_on.lte => date).map{|p| 
+                                          p.amount}.reduce(0){|s,x| s+=x})
+
+    #sum outstanding for client
+    LoanHistory.sum_outstanding_for(@client, @loan.scheduled_first_payment_date).map{|lh|
+      lh.actual_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == (@client.loans.all(:disbursal_date.lte => date).map{|l| 
+                                          l.amount
+                                        }.reduce(0){|s,x| s+=x} - @client.loans.payments.all(:type => :principal, :received_on.lte => date).map{|p| 
+                                          p.amount}.reduce(0){|s,x| s+=x})
+    #sum outstanding for group
+    client_group = @client.client_group
+    LoanHistory.sum_outstanding_for(client_group, @loan.scheduled_first_payment_date).map{|lh|
+      lh.actual_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == (client_group.clients.loans.all(:disbursal_date.lte => date).map{|l| 
+                                          l.amount
+                                        }.reduce(0){|s,x| s+=x} - client_group.clients.loans.payments.all(:type => :principal, :received_on.lte => date).map{|p| 
+                                          p.amount}.reduce(0){|s,x| s+=x})
+    #sum outstanding for staff member
+    LoanHistory.sum_outstanding_for(@branch.manager, @loan.scheduled_first_payment_date).map{|lh|
+      lh.actual_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == (@branch.centers.clients.loans.all(:disbursal_date.lte => date).map{|l| 
+                                          l.amount
+                                        }.reduce(0){|s,x| s+=x} - @branch.centers.clients.loans.payments.all(:type => :principal, :received_on.lte => date).map{|p| 
+                                          p.amount}.reduce(0){|s,x| s+=x})
+  end
+
+  it "should show correct advance payment figures" do
+    @loan.payments.destroy!
+    @loan.update_history(true)
+    @loan.repay(48, @user, @loan.scheduled_first_payment_date, @manager)
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date, [:loan]).length.should == 0
+    @loan.repay(160, @user, @loan.scheduled_first_payment_date, @manager)
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date, [:loan]).first.balance_principal.should == 160
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date, [:loan]).first.balance_total.should == 160
+
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 7, [:loan]).first.balance_principal.should == 120
+     # adjsuted principal
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 14, [:loan]).first.balance_principal.should == 80
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 21, [:loan]).first.balance_principal.should == 40
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 28, [:loan]).length.should == 0
+    #testing advance_principal
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 14, [:loan]).first.advance_principal.should == 160
+    @loan.repay(160, @user, @loan.scheduled_first_payment_date + 7, @manager)
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 14, [:loan]).first.advance_principal.should == 272
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 21, [:loan]).first.advance_principal.should == 272
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 28, [:loan]).first.advance_principal.should == 272
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 35, [:loan]).first.advance_principal.should == 272
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 42, [:loan]).first.advance_principal.should == 272
+    @loan.repay(160, @user, @loan.scheduled_first_payment_date + 14, @manager)
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 14, [:loan]).first.advance_principal.should == 272 + 160 - 48
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 42, [:loan]).first.advance_principal.should == 272 + 160 - 48    
+    @loan.repay(160, @user, @loan.scheduled_first_payment_date + 21, @manager)
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 14, [:loan]).first.advance_principal.should == 272 + 160 - 48
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 42, [:loan]).first.advance_principal.should == 272 + 160 + 160 - 48 - 48
+  end
+  
+  it "should show correct loans for" do
+    LoanHistory.loans_for(@branch).count.should == 3
+    LoanHistory.loans_for(@center).count.should == 2
+    LoanHistory.loans_for(@client_group).count.should == 3
+    LoanHistory.loans_for(@client).count.should == 1
+    LoanHistory.loans_for(@branch.manager).count.should == 3
+  end
+
+  it "should show correct loans outstanding for" do
+    LoanHistory.loans_outstanding_for(@branch).count.should == 3
+    LoanHistory.loans_outstanding_for(@center).count.should == 2
+    LoanHistory.loans_outstanding_for(@client_group).count.should == 3
+    LoanHistory.loans_outstanding_for(@client).count.should == 1
+    LoanHistory.loans_outstanding_for(@branch.manager).count.should == 3
+  end
+
+  it "should show correct amount disbursed for" do
+    LoanHistory.amount_disbursed_for(@branch).client_count.should == 3
+    LoanHistory.amount_disbursed_for(@center).client_count.should == 2
+    LoanHistory.amount_disbursed_for(@client_group).client_count.should == 3
+    LoanHistory.amount_disbursed_for(@client).client_count.should == 1
+    LoanHistory.amount_disbursed_for(@branch.manager).client_count.should == 3
+  end
+
+  it "should show correct borrower client count" do
+    LoanHistory.borrower_clients_count_in(@branch).count.should == 1
+    LoanHistory.borrower_clients_count_in(@center).count.should == 1
+    LoanHistory.borrower_clients_count_in(@client_group).count.should == 1
+    LoanHistory.borrower_clients_count_in(@client).count.should == 1
+    LoanHistory.borrower_clients_count_in(@branch.manager).count.should == 1
+  end
+
+  it "should show parents" do
+    LoanHistory.parents_where_loans_of(Branch, {}).should == [1]
+    LoanHistory.parents_where_loans_of(Center, {}).should == [1, 2]
+    LoanHistory.parents_where_loans_of(ClientGroup, {}).should == [1]
+    LoanHistory.parents_where_loans_of(Client, {}).should == [1, 2, 3]
+  end
+
+  it "loan repaid count" do
+    LoanHistory.loan_repaid_count(@branch).should == 0
+    LoanHistory.loan_repaid_count(@center).should == 0
+    LoanHistory.loan_repaid_count(@branch.manager).should == 0
+    @loan.repay(@loan.amount - @loan.payments(:type => :principal).aggregate(:amount.sum), @user, @loan.scheduled_first_payment_date, @manager)
+    LoanHistory.loan_repaid_count(@branch).should == 1
+    LoanHistory.loan_repaid_count(@center).should == 1
+    LoanHistory.loan_repaid_count(@branch.manager).should == 1
   end
 
 end

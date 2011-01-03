@@ -338,7 +338,9 @@ describe Loan do
     loan.number_of_installments_before(Date.parse('2001-03-30')).should == 3
   end
 
-  it ".last_loan_history_date should have some tests -- albeit more a view thing"
+  it ".last_loan_history_date should have some tests -- albeit more a view thing" do
+    (@loan.scheduled_first_payment_date + (@loan.number_of_installments - 1) * @loan.installment_frequency_in_days).should == @loan.payment_schedule.keys.max
+  end
 
   it ".scheduled_repaid_on give the proper date" do
     @loan.scheduled_repaid_on.should eql(Date.parse('2001-05-23'))

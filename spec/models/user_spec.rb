@@ -90,6 +90,9 @@ describe User do
                       {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
                           :scheduled_first_payment_date => "10-03-2010"}}).should be_true
  
+    #info
+    @user.can_access?({:action => "moreinfo", :controller => "info"}).should be_true
+
     # admin stuff
     @user.can_access?({:action => "index", :controller => "admin"}).should be_true
     @user.can_access?({:action => "edit", :controller => "admin"}).should be_true
@@ -188,6 +191,9 @@ describe User do
     @user.can_access?({:action =>"hq_tab", :controller =>"browse"}).should be_true
     @user.can_access?({:action => "branch", :branch_id => nil, :id=>"centers", :controller=>"dashboard"}).should be_true
     @user.can_access?({:action => "index", :controller => "branches"}).should be_true
+    
+    @user.can_access?({:action => "moreinfo", :controller => "info"}).should be_true
+
     #branch access
     Branch.all.each{|branch|
       @user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_true
@@ -383,6 +389,9 @@ describe User do
                       {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
                           :scheduled_first_payment_date => "10-03-2010"}}).should be_true
 
+    #info
+    @user.can_access?({:action => "moreinfo", :controller => "info"}).should be_true
+
     # admin & manage stuff
     @user.can_access?({:action => "index", :controller => "admin"}).should be_false
     @user.can_access?({:action => "edit", :controller => "admin"}).should be_false
@@ -549,7 +558,8 @@ describe User do
     Branch.all(:manager.not => user.staff_member).centers(:manager.not => user.staff_member).clients.loans.all.each{|loan|
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_false
     }
-
+    #info
+    user.can_access?({:action => "moreinfo", :controller => "info"}).should be_true
     # admin & manage stuff: no access
     user.can_access?({:action => "index", :controller => "admin"}).should be_false
     user.can_access?({:action => "edit", :controller => "admin"}).should be_false
@@ -723,6 +733,8 @@ describe User do
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_false
     }
 
+    #info
+    user.can_access?({:action => "moreinfo", :controller => "info"}).should be_true
     # admin & manage stuff: no access
     user.can_access?({:action => "index", :controller => "admin"}).should be_false
     user.can_access?({:action => "edit", :controller => "admin"}).should be_false
@@ -909,6 +921,8 @@ describe User do
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_false
     }
 
+    #info
+    user.can_access?({:action => "moreinfo", :controller => "info"}).should be_true
     # admin & manage stuff: no access
     user.can_access?({:action => "index", :controller => "admin"}).should be_false
     user.can_access?({:action => "edit", :controller => "admin"}).should be_false
@@ -1098,6 +1112,8 @@ describe User do
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_false
     }
 
+    #info
+    user.can_access?({:action => "moreinfo", :controller => "info"}).should be_true
     # admin & manage stuff: no access
     user.can_access?({:action => "index", :controller => "admin"}).should be_false
     user.can_access?({:action => "edit", :controller => "admin"}).should be_false
@@ -1245,6 +1261,8 @@ describe User do
                       {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
                           :scheduled_first_payment_date => "10-03-2010", :client_id => managed_centers.clients.first.id}, :loan_type => "DefaultLoan"}).should be_false
 
+    #info
+    user.can_access?({:action => "moreinfo", :controller => "info"}).should be_true
     # admin & manage stuff: no access
     user.can_access?({:action => "index", :controller => "admin"}).should be_true
     user.can_access?({:action => "edit", :controller => "admin"}).should be_false
@@ -1403,6 +1421,8 @@ describe User do
     user.can_access?({:action => "create", :controller => "client_groups"}, {:center_id => 1, :name => "foo", :code => "bar"}).should be_true
     user.can_access?({:action => "update", :controller => "client_groups", :id => 1}, {:center_id => 1, :name => "foo", :code => "bar"}).should be_true
 
+    #info
+    user.can_access?({:action => "moreinfo", :controller => "info"}).should be_false
     # admin & manage stuff: no access
     user.can_access?({:action => "index", :controller => "admin"}).should be_false
     user.can_access?({:action => "edit", :controller => "admin"}).should be_false
