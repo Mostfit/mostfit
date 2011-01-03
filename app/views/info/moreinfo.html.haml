@@ -70,7 +70,7 @@
         =@clients_upto_count
       -else
         =0
-  - if @managed_clients 
+  -if @managed_clients 
     %tr
       %td
         Number of Managed Clients
@@ -113,7 +113,7 @@
     %td
       =(@total_disbursed) ? @total_disbursed.loan_count : 0
 
-  - if @loan_served 
+  -if @loan_served 
     %tr
       %td
         Number of served Loans

@@ -31,6 +31,13 @@
         = Client.count
     %tr
       %td
+        Attendance % 
+      %td{:colspan => 3}
+        - absent_count = Attendance.all(:status => "absent").count.to_f
+        - total_count = Attendance.all.count.to_f
+        = ((1 - (absent_count/total_count))*100).round(2)
+    %tr
+      %td
         Active clients
       %td{:colspan => 3}
         = lh.clients_count if lh

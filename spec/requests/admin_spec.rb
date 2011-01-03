@@ -16,7 +16,8 @@ describe "/admin", :given => "an admin user" do
       @response.should be_successful
     end
     
-    it "should have edit" do
+    #Manage organization profile and calendar
+    it "should have edit" do    
       pending
       @response.should have_xpath("//ul/li")
     end
@@ -26,6 +27,7 @@ describe "/admin", :given => "an admin user" do
       @response.should have_xpath("//ul/li[2]")
     end
     
+    #Manage geographical locations
     it "should have regions" do
       pending
       @response.should have_xpath("//ul[2]/li")
@@ -36,6 +38,7 @@ describe "/admin", :given => "an admin user" do
       @response.should have_xpath("//ul[2]/li[2]")
     end
     
+    #Manage staff, users, and roles
     it "should have staff members" do
       pending
       @response.should have_xpath("//ul[3]/li")
@@ -46,26 +49,43 @@ describe "/admin", :given => "an admin user" do
       @response.should have_xpath("//ul[3]/li[2]")
     end
     
+    #Manage financial products, funds, rules, and accounting
     it "should have funders" do
       pending
       @response.should have_xpath("//ul[4]/li")
     end
-    
-    it "should have fees" do
+
+    it "should have rules" do
       pending
       @response.should have_xpath("//ul[4]/li[2]")
     end
-    
-    it "should have loan products" do
+
+    it "should have targets" do
       pending
       @response.should have_xpath("//ul[4]/li[3]")
     end
-    
-    it "should have accounts" do
+
+    it "should have fees" do
       pending
       @response.should have_xpath("//ul[4]/li[4]")
     end
     
+    it "should have loan products" do
+      pending
+      @response.should have_xpath("//ul[4]/li[5]")
+    end
+
+    it "should have insurance companies" do
+      pending
+      @response.should have_xpath("//ul[4]/li[6]")
+    end
+    
+    it "should have accounts" do
+      pending
+      @response.should have_xpath("//ul[4]/li[7]")
+    end
+    
+    #Manage commonly-used lists (masters)
     it "should have client types" do
       pending
       @response.should have_xpath("//ul[5]/li")
@@ -85,7 +105,13 @@ describe "/admin", :given => "an admin user" do
       pending
       @response.should have_xpath("//ul[5]/li[4]")
     end
+
+    it "should have stock list" do
+      pending
+      @response.should have_xpath("//ul[5]/li[5]")
+    end
     
+    #Assign targets, perform audits
     it "should have targets" do
       pending
       @response.should have_xpath("//ul[6]/li")
@@ -93,9 +119,15 @@ describe "/admin", :given => "an admin user" do
     
     it "should have audit items" do
       pending
-      @response.should have_xpath("//ul[6]/li")
+      @response.should have_xpath("//ul[6]/li[2]")
+    end
+
+    it "should have history log" do
+      pending
+      @response.should have_xpath("//ul[6]/li[3]")
     end
     
+    #Data
     it "should have upload" do
       pending
       @response.should have_xpath("//ul[7]/li")

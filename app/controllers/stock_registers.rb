@@ -35,7 +35,6 @@ class StockRegisters < Application
   end
 
   def create(stock_register)
-    debugger
     @stock_register = StockRegister.new(stock_register)
     if @stock_register.save
       redirect(params[:return] ||resource(@stock_register.branch), :message => {:notice => "Stock entry was successfully entered"})

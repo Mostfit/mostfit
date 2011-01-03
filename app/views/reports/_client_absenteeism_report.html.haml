@@ -15,9 +15,12 @@
       Absent count
     %th
       Proxy count
+    %th
+      Attendance(%)
   - center_id, branch_id = nil, nil
-  - length = 7
+  - length = 8
   - org_total = []
+  - absent_total, attendance_total = 0, 0
   -summable_columns = [0, 1, 2, 3, 4, 5]
   -@data.each do |branch, centers|
     -if centers.keys.length>0
@@ -50,8 +53,13 @@
                     - Attendance::ATTENDANCY_STATES.each_with_index do |st, counter|
                       - i=counter+1
                       %td
-                        = statuses[i]
+                        = statuses[i]||0
+                        - absent_total+=statuses[i]||0 if st == 'absent'
+                        - attendance_total+=statuses[i]||0
                         - group_total[i]+=statuses[i]||0
+                    %td
+                      = ((1-(absent_total.to_f/attendance_total.to_f))*100).round(2)
+                      
               %tr.group_total
                 %td
                   %b==Group total               
