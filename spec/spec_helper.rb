@@ -1,5 +1,6 @@
 require "rubygems"
 require "erb"
+require File.join(File.dirname(__FILE__), 'spec_helper_html.rb')
 # Add the local gems dir if found within the app root; any dependencies loaded
 # hereafter will try to load from the local gems before loading system gems.
 if (local_gem_dir = File.join(File.dirname(__FILE__), '..', 'gems')) && $BUNDLE.nil?
@@ -18,6 +19,7 @@ Spec::Runner.configure do |config|
 #  config.include(Merb::Test::ViewHelper)
   config.include(Merb::Test::RouteHelper)
   config.include(Merb::Test::ControllerHelper)
+  config.include(Spec::Matchers)
   
   config.before(:all) do
     if Merb.orm == :datamapper
