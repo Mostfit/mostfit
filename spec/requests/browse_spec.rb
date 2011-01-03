@@ -40,5 +40,10 @@ describe "/browse", :given => "an admin user" do
       pending
       @response.should have_xpath("//ul/li[5]")
     end
+    
+    it "should have accounts" do
+      pending
+      @response.should have_xpath("//ul/li[6]")
+    end
   end
 end
