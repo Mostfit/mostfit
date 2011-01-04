@@ -798,7 +798,7 @@ class Loan
     shift_date_by_installments(scheduled_first_payment_date, number-1)
   end
   def scheduled_maturity_date
-    shift_date_by_installments(scheduled_first_payment_date, number_of_installments - 1)
+    shift_date_by_installments(scheduled_first_payment_date, number_of_installments - 1, self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days))
   end
   def scheduled_repaid_on
     # first payment is on "scheduled_first_payment_date", so number_of_installments-1 periods later
