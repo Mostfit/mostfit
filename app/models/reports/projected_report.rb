@@ -22,15 +22,11 @@ class ProjectedReport < Report
     branches, centers, data = {}, {}, {}
     extra =  ["lh.branch_id in (#{@branch.map{|b| b.id}.join(", ")})"]
     extra << ["lh.center_id in (#{@center.map{|b| b.id}.join(", ")})"]
-    old_dues = {}
-    due_data = LoanHistory.payment_due_by_center(from_date - 1, {:center_id => @center.map{|c| c.id}}).group_by{|x| x.center_id}
-    old_dues[:principal] = due_data.map{|cid, row| [cid, row.first.principal_due]}.to_hash
-    old_dues[:interest]  = due_data.map{|cid, row| [cid, row.first.interest_due]}.to_hash
 
-    outstanding_at_from_date = LoanHistory.sum_outstanding_grouped_by(from_date - 1 , :center, extra).group_by{|x| x.center_id}
+    outstanding_at_from_date = LoanHistory.sum_outstanding_grouped_by(from_date - 1 , :loan, extra).group_by{|x| x.loan_id}
     
     LoanHistory.all("loan.deleted_at" => nil, :center_id => @center.map{|c| c.id}, :status => [:disbursed, :outstanding],
-                    :date => from_date..to_date).aggregate(:branch_id, :date, :center_id, 
+                    :date => from_date..to_date).aggregate(:branch_id, :date, :center_id, :loan_id, 
                                                            :scheduled_outstanding_principal.sum, :scheduled_outstanding_total.sum).group_by{|lh| 
       lh[0]
     }.map{|bid, date_rows| [bid, date_rows.group_by{|d| d[1]}]}.to_hash.each{|bid, dates|
@@ -38,32 +34,33 @@ class ProjectedReport < Report
       data[branch] ||= {}
       branches[bid] = branch
       branch_dates = dates.keys.sort
-      center_data = {}
+      loan_data = {}
 
-      dates.sort_by{|date, rows| date}.each{|date, rows|
-        next if rows.length == 0
+      dates.sort_by{|date, rows| date}.each{|date, centers|
+        next if centers.length == 0
         data[branch][date] = {}
-        rows.each{|row|
+        centers.each{|row|
           next unless center = @center.find{|c| c.id == row[2]}
-          data[branch][date][center] = [0, 0, 0, 0, 0, 0, 0]
+          data[branch][date][center] ||= [0, 0, 0, 0, 0, 0, 0]
           # first row is treated specially as outstanding at this point is subtracted from already existing balance
-          unless center_data.key?(center)
-            center_data[center] = {}
-            pre_outstanding_principal = outstanding_at_from_date[center.id] ? outstanding_at_from_date[center.id].first.scheduled_outstanding_principal : 0
-            pre_outstanding_total     = outstanding_at_from_date[center.id] ? outstanding_at_from_date[center.id].first.scheduled_outstanding_total : 0
-            data[branch][date][center][4] += pre_outstanding_principal - row[3]
-            data[branch][date][center][5] += (pre_outstanding_total - pre_outstanding_principal) - (row[4] - row[3])
-            data[branch][date][center][6] += pre_outstanding_total - row[4]
+          loan_id = row[3]
+          if not data[branch][date][center] or not loan_data[loan_id]
+            loan_data[loan_id] = {}
+            pre_outstanding_principal = outstanding_at_from_date[loan_id] ? outstanding_at_from_date[loan_id].first.scheduled_outstanding_principal : 0
+            pre_outstanding_total     = outstanding_at_from_date[loan_id] ? outstanding_at_from_date[loan_id].first.scheduled_outstanding_total : 0
+            data[branch][date][center][4] += pre_outstanding_principal - row[4]
+            data[branch][date][center][5] += (pre_outstanding_total - pre_outstanding_principal) - (row[5] - row[4])
+            data[branch][date][center][6] += pre_outstanding_total - row[5]
           else
-            last_date = center_data[center].keys.max
+            last_date = loan_data[loan_id].keys.max
             next unless data[branch][date] and data[branch][date][center]
-            if center_data[center] and center_data[center][last_date]
-              data[branch][date][center][4] = center_data[center][last_date][0] - row[3]
-              data[branch][date][center][5] = center_data[center][last_date][1] - center_data[center][last_date][0] - (row[4] - row[3])
-              data[branch][date][center][6] = center_data[center][last_date][1] - row[4] 
+            if loan_data[loan_id] and loan_data[loan_id][last_date]
+              data[branch][date][center][4] += (loan_data[loan_id][last_date][0] - row[4])
+              data[branch][date][center][5] += (loan_data[loan_id][last_date][1] - loan_data[loan_id][last_date][0] - (row[5] - row[4]))
+              data[branch][date][center][6] += (loan_data[loan_id][last_date][1] - row[5])
             end
           end
-          center_data[center][date] = [row[3], row[4]]          
+          loan_data[loan_id][date] = [row[4], row[5]]
         } #rows
       } #dates
     } #branch
