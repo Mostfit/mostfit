@@ -33,6 +33,7 @@ class ConsolidatedReport < Report
     advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, [:branch, :center], extra)||[]
     balances  = LoanHistory.advance_balance(self.to_date, :center, extra)||[]
     old_balances = LoanHistory.advance_balance(self.from_date-1, :center, extra)||[]
+    defaults   = LoanHistory.defaulted_loan_info_by(:center, @to_date, extra).group_by{|x| x.center_id}.map{|cid, row| [cid, row[0]]}.to_hash
 
     @branch.each{|b|
       data[b]||= {}
@@ -64,10 +65,12 @@ class ConsolidatedReport < Report
         data[b][c][9] += total_actual
         data[b][c][8] += total_actual - principal_actual
         #overdue
-        data[b][c][10] += (principal_actual > principal_scheduled ? principal_actual-principal_scheduled : 0).to_i
-        data[b][c][12] += (total_actual > total_scheduled ? total_actual - total_scheduled : 0).to_i
-        data[b][c][11] += (data[b][c][12] - data[b][c][10])
-        
+        if defaults[c.id]
+          data[b][c][10] += defaults[c.id].pdiff
+          data[b][c][12] += defaults[c.id].tdiff
+          data[b][c][11] += (data[b][c][12] - data[b][c][10])
+        end
+
         advance_total = advance ? advance.advance_total : 0
         balance_total = balance ? balance.balance_total : 0
         old_balance_total = old_balance ? old_balance.balance_total : 0
