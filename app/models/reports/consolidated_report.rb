@@ -63,15 +63,15 @@ class ConsolidatedReport < Report
         data[b][c][7] += principal_actual
         data[b][c][9] += total_actual
         data[b][c][8] += total_actual - principal_actual
-
-        data[b][c][10]  += (principal_actual > principal_scheduled ? principal_actual-principal_scheduled : 0)
-        data[b][c][11] += ((total_actual-principal_actual) > (total_scheduled-principal_scheduled) ? (total_actual-principal_actual - (total_scheduled-principal_scheduled)) : 0)
-        data[b][c][12] += total_actual > total_scheduled ? total_actual - total_scheduled : 0
+        #overdue
+        data[b][c][10] += (principal_actual > principal_scheduled ? principal_actual-principal_scheduled : 0).to_i
+        data[b][c][12] += (total_actual > total_scheduled ? total_actual - total_scheduled : 0).to_i
+        data[b][c][11] += (data[b][c][12] - data[b][c][10])
         
         advance_total = advance ? advance.advance_total : 0
         balance_total = balance ? balance.balance_total : 0
         old_balance_total = old_balance ? old_balance.balance_total : 0
-        
+        #advance
         data[b][c][13]  += advance_total
         data[b][c][15]  += balance_total
         data[b][c][14]  += advance_total - balance_total + old_balance_total

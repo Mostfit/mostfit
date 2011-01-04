@@ -231,10 +231,10 @@ function create_remotes(){
     $("a._remote_").click(function(){
       $(this).unbind();
       href=$(this).attr("href");
-      method="GET"
+      method="GET";
       if($(this).hasClass("self")){
 	href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
-        method="POST"
+        method="POST";
       }
       a=$(this);
       a.after("<img id='spinner' src='/images/spinner.gif'/>");
@@ -254,7 +254,7 @@ function create_remotes(){
 	  floatHeaders();
 	},
 	error: function(xhr, text, errorThrown){
-	  txt = "<div class='error'>"+xhr.responseText+"</div>"
+	  txt = "<div class='error'>"+xhr.responseText+"</div>";
 	  $(a).after(txt);
 	  $("#spinner").remove();
 	}
