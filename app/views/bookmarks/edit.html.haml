@@ -16,7 +16,7 @@
       %td
         Accessible to:
       %td
-        -Bookmark::ShareWith.each do |sw|
+        -Bookmark.properties.find{|p| p.name == :share_with}.type.flag_map.each do |idx, sw|
           =check_box :name => "bookmark[share_with][]", :value => sw, :checked => @bookmark.share_with.include?(sw) ? true : false
           = sw.to_s.camelcase(' ')
   %p
