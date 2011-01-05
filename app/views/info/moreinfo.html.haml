@@ -6,200 +6,201 @@
     %b To
     =date_select "to_date", @to_date
     =submit "GO"
-%table.moreinfo#moreinfo
-  %tr
-    %td
-      ="#{@obj.class.name} formation date"
-    %td
-      - if @obj.respond_to?(:creation_date)
-        = @obj.creation_date
-      - elsif @obj.respond_to?(:created_at)
-        = @obj.created_at.strftime(Mfi.first.date_format)        
-  -if @areas
+#moreinfo
+  %table.moreinfo
     %tr
       %td
-        Number of Areas
+        ="#{@obj.class.name} formation date"
       %td
-        =@areas.count
-  %tr
-    %td
-      &nbsp;
-    %td
-      %b New
-    %td
-      %b Total
-  -if @branches
-    %tr
-      %td
-        Number of Branches
-      %td
-        =@branches[:new].count
-      %td
-        =@branches[:upto].count
-  -if @centers and not @obj.class==Center
-    %tr
-      %td
-        Number of Centers
-      %td
-        =@centers_new_count
-      %td
-        =@centers_upto_count
-  %tr
-    %td
-      Number of Groups
-    %td
-      -if @groups_new_count then
-        =@groups_new_count
-      -else
-        =0
-    %td
-      -if @groups_upto_count
-        =@groups_upto_count
-      -else
-        =0
-  %tr
-    %td
-      Number of Clients
-    %td
-      -if @clients_new_count
-        =@clients_new_count
-      -else
-        =0
-    %td
-      -if @clients_upto_count
-        =@clients_upto_count
-      -else
-        =0
-  -if @managed_clients 
-    %tr
-      %td
-        Number of Managed Clients
+        - if @obj.respond_to?(:creation_date)
+          = @obj.creation_date
+        - elsif @obj.respond_to?(:created_at)
+          = @obj.created_at.strftime(Mfi.first.date_format)        
+    -if @areas
+      %tr
         %td
-          -if @managed_clients and @managed_clients[:new]
-            = @managed_clients[:new].count
-          -else
-            =0
+          Number of Areas
         %td
-          -if @managed_clients and @managed_clients[:upto]
-            = @managed_clients[:upto].count
-          -else
-            =0    
-  - if @death_cases
+          =@areas.count
     %tr
       %td
-        Number of death Cases
+        &nbsp;
       %td
-        =(@death_cases and @death_cases.length>0) ? @death_cases : 0
+        %b New
       %td
-        =(@total_death_cases and @total_death_cases.length>0) ? @total_death_cases : 0
-  - if @pending_death_cases
-    %tr
-      %td
-        Number of pending death Cases
-      %td
-        = '-'
-      %td
-        =(@pending_death_cases and @pending_death_cases.length>0) ? @pending_death_cases : 0  
-  %tr
-    %td
-      borrower clients
-    %td
-      =(@loan_disbursed and @loan_disbursed.length>0) ? @loan_disbursed.client_count : 0
-    %td
-      =(@total_disbursed and @total_disbursed.length>0) ? @total_disbursed.client_count : 0
-  %tr
-    %td
-      Number of Loans
-    %td
-      =(@loan_disbursed) ? @loan_disbursed.loan_count : 0
-    %td
-      =(@total_disbursed) ? @total_disbursed.loan_count : 0
-
-  -if @loan_served 
-    %tr
-      %td
-        Number of served Loans
+        %b Total
+    -if @branches
+      %tr
         %td
-          -if @loan_served
-            =@loan_served[:new]
-          -else
-            =0
+          Number of Branches
         %td
-          -if @loan_served
-            =@loan_served[:upto]
-          -else
-            =0
-  %tr
-    %td
-      Number of loans Repaid
-    %td
-      =(@loans_repaid) ? @loans_repaid : 0
-    %td
-      =(@loans_repaid_total) ? @loans_repaid_total : 0
-  %tr
-    %td
-      Amount Disbursed
-    %td
-      =(@loan_disbursed and @loan_disbursed.amount) ? @loan_disbursed.amount.to_currency : 0
-    %td
-      =(@total_disbursed and @total_disbursed.amount) ? @total_disbursed.amount.to_currency : 0
-  %tr
-    %td
-      Principal Received
-    %td
-      =(@payments and @payments[:principal]) ? @payments[:principal].to_currency : "0"
-    %td
-      =(@total_payments and @total_payments[:principal]) ? @total_payments[:principal].to_currency : "0"
-  %tr
-    %td
-      Interest Received
-    %td
-      =(@payments and @payments[:interest]) ? @payments[:interest].to_currency : "0"
-    %td
-      =(@total_payments and @total_payments[:interest]) ? @total_payments[:interest].to_currency : "0"
-  %tr
-    %td
-      Fee Received
-  -@fees.each do |fee, amount|
+          =@branches[:new].count
+        %td
+          =@branches[:upto].count
+    -if @centers and not @obj.class==Center
+      %tr
+        %td
+          Number of Centers
+        %td
+          =@centers_new_count
+        %td
+          =@centers_upto_count
     %tr
       %td
-        %b=fee
+        Number of Groups
       %td
-        =amount
+        -if @groups_new_count then
+          =@groups_new_count
+        -else
+          =0
       %td
-        =@total_fees[fee]
-  %tr
-    %td
-      Amount Outstanding
-    %td
-    %td
-      =(@loan_data and @loan_data.length>0 and @loan_data.first.actual_outstanding_principal) ? @loan_data[0].actual_outstanding_principal.to_currency : "-"
-  %tr
-    %td
-      Total Principal Overdue
-    %td 
-    %td
-      =(@defaulted and @defaulted.principal_due) ? @defaulted.principal_due.to_currency : 0
-  %tr
-    %td
-      Total Interest Overdue
-    %td
-    %td
-      -if @defaulted and @defaulted.total_due and @defaulted.principal_due
-        =(@defaulted.total_due-@defaulted.principal_due).to_currency
-      -else
-        0
-  -if @centers and not @obj.class==StaffMember
+        -if @groups_upto_count
+          =@groups_upto_count
+        -else
+          =0
     %tr
       %td
-        Number of center managers
+        Number of Clients
       %td
-        = @centers[:upto].managers.count if @centers[:upto] and @centers[:upto].length>0
-%table.moreinfo
-  -if @centers and not @obj.class==StaffMember
+        -if @clients_new_count
+          =@clients_new_count
+        -else
+          =0
+      %td
+        -if @clients_upto_count
+          =@clients_upto_count
+        -else
+          =0
+    -if @managed_clients 
+      %tr
+        %td
+          Number of Managed Clients
+          %td
+            -if @managed_clients and @managed_clients[:new]
+              = @managed_clients[:new].count
+            -else
+              =0
+          %td
+            -if @managed_clients and @managed_clients[:upto]
+              = @managed_clients[:upto].count
+            -else
+              =0    
+    - if @death_cases
+      %tr
+        %td
+          Number of death Cases
+        %td
+          =(@death_cases and @death_cases.length>0) ? @death_cases : 0
+        %td
+          =(@total_death_cases and @total_death_cases.length>0) ? @total_death_cases : 0
+    - if @pending_death_cases
+      %tr
+        %td
+          Number of pending death Cases
+        %td
+          = '-'
+        %td
+          =(@pending_death_cases and @pending_death_cases.length>0) ? @pending_death_cases : 0  
     %tr
       %td
-        Center Managers
+        borrower clients
       %td
-        %ul
-          = @centers[:upto].managers.collect{|sm| "<li>#{link_to(sm.name, resource(sm))}</li>"}.join if @centers[:upto] and @centers[:upto].length>0
+        =(@loan_disbursed and @loan_disbursed.length>0) ? @loan_disbursed.client_count : 0
+      %td
+        =(@total_disbursed and @total_disbursed.length>0) ? @total_disbursed.client_count : 0
+    %tr
+      %td
+        Number of Loans
+      %td
+        =(@loan_disbursed) ? @loan_disbursed.loan_count : 0
+      %td
+        =(@total_disbursed) ? @total_disbursed.loan_count : 0
+  
+    -if @loan_served 
+      %tr
+        %td
+          Number of served Loans
+          %td
+            -if @loan_served
+              =@loan_served[:new]
+            -else
+              =0
+          %td
+            -if @loan_served
+              =@loan_served[:upto]
+            -else
+              =0
+    %tr
+      %td
+        Number of loans Repaid
+      %td
+        =(@loans_repaid) ? @loans_repaid : 0
+      %td
+        =(@loans_repaid_total) ? @loans_repaid_total : 0
+    %tr
+      %td
+        Amount Disbursed
+      %td
+        =(@loan_disbursed and @loan_disbursed.amount) ? @loan_disbursed.amount.to_currency : 0
+      %td
+        =(@total_disbursed and @total_disbursed.amount) ? @total_disbursed.amount.to_currency : 0
+    %tr
+      %td
+        Principal Received
+      %td
+        =(@payments and @payments[:principal]) ? @payments[:principal].to_currency : "0"
+      %td
+        =(@total_payments and @total_payments[:principal]) ? @total_payments[:principal].to_currency : "0"
+    %tr
+      %td
+        Interest Received
+      %td
+        =(@payments and @payments[:interest]) ? @payments[:interest].to_currency : "0"
+      %td
+        =(@total_payments and @total_payments[:interest]) ? @total_payments[:interest].to_currency : "0"
+    %tr
+      %td
+        Fee Received
+    -@fees.each do |fee, amount|
+      %tr
+        %td
+          %b=fee
+        %td
+          =amount
+        %td
+          =@total_fees[fee]
+    %tr
+      %td
+        Amount Outstanding
+      %td
+      %td
+        =(@loan_data and @loan_data.length>0 and @loan_data.first.actual_outstanding_principal) ? @loan_data[0].actual_outstanding_principal.to_currency : "-"
+    %tr
+      %td
+        Total Principal Overdue
+      %td 
+      %td
+        =(@defaulted and @defaulted.principal_due) ? @defaulted.principal_due.to_currency : 0
+    %tr
+      %td
+        Total Interest Overdue
+      %td
+      %td
+        -if @defaulted and @defaulted.total_due and @defaulted.principal_due
+          =(@defaulted.total_due-@defaulted.principal_due).to_currency
+        -else
+          0
+    -if @centers and not @obj.class==StaffMember
+      %tr
+        %td
+          Number of center managers
+        %td
+          = @centers[:upto].managers.count if @centers[:upto] and @centers[:upto].length>0
+  %table.moreinfo
+    -if @centers and not @obj.class==StaffMember
+      %tr
+        %td
+          Center Managers
+        %td
+          %ul
+            = @centers[:upto].managers.collect{|sm| "<li>#{link_to(sm.name, resource(sm))}</li>"}.join if @centers[:upto] and @centers[:upto].length>0

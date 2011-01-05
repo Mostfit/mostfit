@@ -13,19 +13,19 @@
     %tr
       %td Manager
       %td= link_to @branch.manager.name, resource(@branch.manager)
-    %tr
+    %tr.odd
       %td No. of centers
       %td=@branch.centers.count
     %tr
       %td Address
       %td=@branch.address
-    %tr
+    %tr.odd
       %td Contact number
       %td=@branch.contact_number
     %tr
       %td Landmark
       %td=@branch.landmark
-    %tr
+    %tr.odd
       %td Area
       - area = @branch.area
       %td=link_to(area.name, resource(area)) if area
