@@ -30,16 +30,20 @@
 
       - if (cond[:variable]["#{variable_id}"] == nil)
         - cond[:variable]["#{variable_id}"] = Hash.new
+
       - if (cond[:variable]["#{variable_id}"][:complete] == nil)
         - cond[:variable]["#{variable_id}"][:complete] = ""
       - keys = [@rule.model_name] + cond[:variable]["#{variable_id}"][:complete].split(".")
       - model = Kernel.const_get(keys[keys.length-2].singularize.camelcase)#since last is not a model, making model from second last term and will use this model.
+
       - if model == nil
         error in model
+
       - collection1 = [["less_than", "less than"], ["less_than_equal", "less than equal"], ["equal1", "equal to"], ["greater_than", "greater than"], ["greater_than_equal", "greater than equal"], ["not1", "not equal to"]]
       - collection2 = [["equal2", "equal"], ["not2", "not equal"]]
       - select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :collection => collection1, :selected=> cond[:comparator])
       - select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator][]", :collection => collection2, :selected=> cond[:comparator])
+
       - if collection1.flatten.include?(cond[:comparator].to_s)
         = select1
       - elsif collection2.flatten.include?(cond[:comparator].to_s)
@@ -51,7 +55,10 @@
       - name = "rule[#{type}][#{condition_id}][const_value]"
       - type_name = "rule[#{type}][#{condition_id}][valuetype]" #will be either "string", "date" or "int"
       - property = model.properties.find{|p| p.name.to_s==keys.last} || model.relationships[keys.last]
-      - if property.type==Date or property.type==DateTime or cond[:valuetype] == "date"
+      - property_2 = model.properties.find{|p| p.name.to_s==cond[:keys].last} if cond[:keys]
+
+      - val_type = /\-|\\/.match(cond[:const_value])
+      - if (property.type==Date or property.type==DateTime or cond[:valuetype] == "date") and val_type
         = date_select(name , cond[:const_value], :id => "#{type}_date_#{id}", :nullable => true, :min_date => Date.min_date, :max_date => Date.max_date)
         = hidden_field(:id => "#{type}_hidden_#{id}", :name => type_name, :value => "date")
       - elsif [DataMapper::Types::Serial, Integer].include?(property.type) or cond[:valuetype] == "int"
