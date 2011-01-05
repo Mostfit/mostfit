@@ -94,14 +94,14 @@ module Misfit
         elsif obj.class == Loan or obj.class.superclass == Loan or obj.class.superclass.superclass == Loan
           return(is_manager_of?(obj.client.center))
         elsif obj.class == StaffMember
-          return(obj == @staff or is_manager_of?(obj.centers.branches) or is_manager_of?(obj.branches) or is_manager_of?(obj.areas))
-        elsif obj.class == Array
+          return(obj == @staff or is_manager_of?(obj.centers.branches) or is_manager_of?(obj.branches) or is_manager_of?(obj.centers) or is_manager_of?(obj.areas))
+        elsif obj.class == Array or obj.class == DataMapper::Collection
           return(obj.map{|x| is_manager_of?(x)}.uniq.include?(true))
         else
           return false
         end
       end
-
+      
       def allow_read_only
         if CUD_Actions.include?(@action)
           return false
@@ -112,7 +112,7 @@ module Misfit
         end
       end
       
-      def _can_access?(route, params = nil)
+      def _can_access?(route, params = nil)       
         user_role = self.role
         return true  if user_role == :admin
         return false if route[:controller] == "journals" and route[:action] == "edit"
@@ -157,11 +157,11 @@ module Misfit
           end          
         end
         
-        if @staff          
+        if @staff
           return additional_checks if @route.has_key?(:id) and @route[:id] and not [:graph_data, :dashboard, :info].include?(@route[:controller].to_sym)
 
           unless CUD_Actions.include?(@action)
-            return true if ["staff_members", "branches"].include?(@controller)
+            return true if ["staff_members"].include?(@controller)
             return true if @controller == "regions" and @staff.regions.length > 0
             return(@staff.areas.length>0 or @staff.regions.length > 0) if @controller == "areas"
           else
@@ -169,7 +169,7 @@ module Misfit
             return false if @controller == "regions"
             return(@staff.regions.length > 0) if @controller == "areas" 
           end
-          
+
           if [:branches, :centers, :clients, :loans].include?(@controller.to_sym) and CUD_Actions.include?(@action) and params
             params = params.merge(@route)
             
@@ -197,8 +197,10 @@ module Misfit
             else
               return false
             end
-          elsif @controller == "info" and params and params[:for] and params[:id]
-            return is_manager_of?(Kernel.const_get(params[:for].camelcase).get(params[:id]))
+          end
+
+          if @controller == "info" and route[:for] and route[:id]            
+            return is_manager_of?(Kernel.const_get(route[:for].camelcase).get(route[:id]))
           end
         end
         r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)

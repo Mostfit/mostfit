@@ -272,6 +272,10 @@ class LoanHistory
       hash["loan.loan_product_id"] = obj.id
     elsif obj.class == FundingLine
       hash["loan.funding_line_id"] = obj.id
+    elsif obj.class == Region
+      hash[:branch_id] = obj.areas.branches.map{|b| b.id}
+    elsif obj.class == Area
+      hash[:branch_id] = obj.branches.map{|b| b.id}
     else
       hash["#{obj.class.to_s.snake_case}_id".to_sym] = (obj.is_a?(Array) ? obj.map{|x| x.id} : obj.id)
     end
@@ -323,6 +327,10 @@ class LoanHistory
       hash["loan.funding_line_id"] = obj.id
     elsif obj.class == LoanProduct
       hash["loan.loan_product_id"] = obj.id
+    elsif obj.class == Region
+      hash[:branch_id] = obj.areas.branches.map{|b| b.id}
+    elsif obj.class == Area
+      hash[:branch_id] = obj.branches.map{|b| b.id}
     else
       hash["#{obj.class.to_s.snake_case}_id".to_sym] = (obj.is_a?(Array) ? obj.map{|x| x.id} : obj.id)
     end
