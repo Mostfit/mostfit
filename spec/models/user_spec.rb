@@ -635,7 +635,8 @@ describe User do
     #info
     user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => user.staff_member.id}).should be_true
     user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => Branch.first(:manager.not => user.staff_member).manager.id}).should be_false
-    user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => Center.first(:branch.not => user.staff_member.branches).manager.id}).should be_false
+    manager = StaffMember.all.reject{|sm| (sm.branches & user.staff_member.branches).length > 0 or (sm.branches.centers & user.staff_member.branches.centers).length > 0}.first
+    user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => manager.id}).should be_false if manager
 
     user.can_access?({:action => "index", :controller => "users"}).should be_false
     user.can_access?({:action => "update", :controller => "users"}).should be_false

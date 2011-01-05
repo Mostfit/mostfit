@@ -14,19 +14,6 @@ module Misfit
         end
       end
 
-      def can_approve?(obj)        
-        if @staff or @staff ||= staff_member
-          if obj.class==Client
-            return (obj.center.branch.manager == @staff)
-          elsif obj.class==Loan or Loan.descendants.map{|x| x}.include?(obj.class)
-            return (obj.client.center.branch.manager == @staff)
-          end
-          retrun false
-        end
-        return false if role == :read_only or role == :funder or role==:data_entry
-        return true
-      end
-
       def additional_checks
         id = @route[:id].to_i
         model = Kernel.const_get(@model.to_s.split("/")[-1].camelcase)
@@ -103,13 +90,9 @@ module Misfit
       end
       
       def allow_read_only
-        if CUD_Actions.include?(@action)
-          return false
-        elsif @controller=="admin" and @action=="index"
-          return true
-        else
-          return access_rights[:all].include?(@controller.to_sym)
-        end
+        return false if CUD_Actions.include?(@action)
+        return true if @controller=="admin" and @action=="index"
+        return access_rights[:all].include?(@controller.to_sym)
       end
       
       def _can_access?(route, params = nil)       
@@ -175,7 +158,7 @@ module Misfit
             
             {:branch_id => Branch, :center_id => Center, :client_id => Client, :area_id => Area, :region_id => Region}.each{|key, klass|
               # allowing branch, center, area, region managers to create stuff inside his/her own branch/center/area/region
-              return is_manager_of?(klass.get(params[:branch_id])) if params[key] and not params[key].blank?
+              return is_manager_of?(klass.get(params[key])) if params[key] and not params[key].blank?
             }
 
             if hash=params[@controller.singularize.to_sym] or (params[:loan_type] and not params[:loan_type].blank? and hash=params[params[:loan_type].snake_case.to_sym])
@@ -198,10 +181,7 @@ module Misfit
               return false
             end
           end
-
-          if @controller == "info" and route[:for] and route[:id]            
-            return is_manager_of?(Kernel.const_get(route[:for].camelcase).get(route[:id]))
-          end
+          return is_manager_of?(Kernel.const_get(route[:for].camelcase).get(route[:id])) if @controller == "info" and route[:for] and route[:id]            
         end
         r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
       end
