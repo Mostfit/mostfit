@@ -1,3 +1,5 @@
+- @journals = @journals || Account.all(:branch => @branch).postings.journals(:order => [:created_at.desc]).paginate(:per_page => 20, :page => params[:page])
+
 %div#container_journal_entries
   %h1
     Accounts
@@ -10,4 +12,4 @@
     = form_for(@journal, :action => resource(@branch, :journals)) do
       = partial "journals/fields", :branch => @branch
   %div
-    = partial "journals/list"
+    = partial "journals/list", :journals => @journals

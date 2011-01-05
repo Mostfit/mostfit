@@ -3,7 +3,7 @@ class Journals < Application
 
   # provides :xml, :yaml, :js
   def index
-    @journals = Journal.all.paginate(:per_page => 10, :page => params[:page] ||1 )
+    @journals = Journal.all(:order => [:created_at.desc]).paginate(:per_page => 20, :page => params[:page] ||1 )
     display @journals, :layout => layout?
   end
 

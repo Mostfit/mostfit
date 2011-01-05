@@ -9,20 +9,22 @@ class RuleBooks < Application
   def show(id)
     @rule_book = RuleBook.get(id)
     raise NotFound unless @rule_book
-    display @rule_book
+    display @rule_book, :layout => layout?
   end
 
   def new
     only_provides :html
     @rule_book = RuleBook.new
-    display @rule_book
+    @accounts = Account.all(:branch_id => params[:branch_id], :order => [:account_type_id]).map{|x| [x.id ,"#{x.account_type.name} -- #{x.name}"]}
+    display @rule_book, :layout => layout?
   end
 
   def edit(id)
     only_provides :html
     @rule_book = RuleBook.get(id)
     raise NotFound unless @rule_book
-    display @rule_book
+    @accounts = Account.all(:branch_id => params[:branch_id], :order => [:account_type_id]).map{|x| [x.id ,"#{x.account_type.name} -- #{x.name}"]}
+    display @rule_book, :layout => layout?
   end
 
   def create(rule_book)
