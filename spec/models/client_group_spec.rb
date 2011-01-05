@@ -49,10 +49,12 @@ describe ClientGroup do
       client.should be_valid
       client.save.should be_true
       client.center = center_2
-      client.save.should be_false
+      client.date_joined = center_2.creation_date - 10
       client.should_not be_valid
+      client.save.should be_false
       client.center = center
-      client.should be_valid      
+      client.grt_pass_date = client.date_joined
+      client.should be_valid
     }
     cg.center = center_2
     cg.should_not be_valid

@@ -116,7 +116,7 @@ class Client
   validates_is_unique :reference
   validates_with_method  :verified_by_user_id,          :method => :verified_cannot_be_deleted, :if => Proc.new{|x| x.deleted_at != nil}
   validates_attachment_thumbnails :picture
-  validates_with_method :dates_make_sense, :when => [:create, :update, :save]
+  validates_with_method :date_joined, :method => :dates_make_sense
 
   def self.from_csv(row, headers)
     if center_attr = row[headers[:center]].strip
