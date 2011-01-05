@@ -66,13 +66,12 @@ class Info < Application
 
       @centers[:new]   = @obj.centers(new_date_hash)
       @centers[:upto]  = @obj.centers(upto_date_hash)
+            
+      @managed_clients[:new]  = @centers[:new].clients(client_hash(:new))   if @centers[:new] and @centers[:new].length > 0
+      @managed_clients[:upto] = @centers[:upto].clients(client_hash(:upto)) if @centers[:upto] and @centers[:upto].length > 0
 
-      @managed_clients[:new] = @obj.clients #(client_hash(:new))
-      @managed_clients[:upto] = @obj.clients #(client_hash(:upto))
-      
-      @loan_served[:new] = @obj.centers.clients.loans(new_date_hash).count
-      @loan_served[:upto] = @obj.centers.clients.loans(upto_date_hash).count
-
+      @loan_served[:new]  = @managed_clients[:new].loans(new_date_hash).count   if @managed_clients[:new] and @managed_clients[:new].length>0
+      @loan_served[:upto] = @managed_clients[:upto].loans(upto_date_hash).count if @managed_clients[:upto] and @managed_clients[:upto].length>0
     else
       raise "Unknown obj class"
     end
@@ -171,9 +170,9 @@ private
     @loan_disbursed  = LoanHistory.amount_disbursed_for(obj, @from_date, @to_date)
     @loan_data       = LoanHistory.sum_outstanding_for(obj, @to_date)
     @defaulted       = LoanHistory.defaulted_loan_info_for(obj, @to_date)
-    @total_death_cases = Client.death_cases(obj,Date.min_date,@to_date)  
-    @death_cases = Client.death_cases(obj,@from_date,@to_date) 
-    @pending_death_cases = Client.pending_death_cases(obj,@from_date,@to_date)
+    # @total_death_cases = Client.death_cases(obj,Date.min_date,@to_date)  
+    # @death_cases = Client.death_cases(obj,@from_date,@to_date) 
+    # @pending_death_cases = Client.pending_death_cases(obj,@from_date,@to_date)
     @loans_repaid  = LoanHistory.loan_repaid_count(obj,@from_date, @to_date)
     @loans_repaid_total =  LoanHistory.loan_repaid_count(obj,Date.min_date, @to_date)
   end

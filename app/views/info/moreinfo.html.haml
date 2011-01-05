@@ -75,29 +75,31 @@
       %td
         Number of Managed Clients
         %td
-          -if @managed_clients
-            =@managed_clients[:new].count
+          -if @managed_clients and @managed_clients[:new]
+            = @managed_clients[:new].count
           -else
             =0
         %td
-          -if @managed_clients
-            =@managed_clients[:upto].count
+          -if @managed_clients and @managed_clients[:upto]
+            = @managed_clients[:upto].count
           -else
             =0    
-  %tr
-    %td
-      Number of death Cases
-    %td
-      =(@death_cases and @death_cases.length>0) ? @death_cases : 0
-    %td
-      =(@total_death_cases and @total_death_cases.length>0) ? @total_death_cases : 0
-  %tr
-    %td
-      Number of pending death Cases
-    %td
-      = '-'
-    %td
-      =(@pending_death_cases and @pending_death_cases.length>0) ? @pending_death_cases : 0  
+  - if @death_cases
+    %tr
+      %td
+        Number of death Cases
+      %td
+        =(@death_cases and @death_cases.length>0) ? @death_cases : 0
+      %td
+        =(@total_death_cases and @total_death_cases.length>0) ? @total_death_cases : 0
+  - if @pending_death_cases
+    %tr
+      %td
+        Number of pending death Cases
+      %td
+        = '-'
+      %td
+        =(@pending_death_cases and @pending_death_cases.length>0) ? @pending_death_cases : 0  
   %tr
     %td
       borrower clients
