@@ -35,10 +35,10 @@ class Payment
   belongs_to :deleted_by,  :child_key => [:deleted_by_user_id],   :model => 'User'
   belongs_to :verified_by,  :child_key => [:verified_by_user_id],        :model => 'User'
 
-  validates_present     :created_by, :received_by, :if => Proc.new{|p| p.new?}
-  validates_with_method :loan_or_client_present?
+  validates_present     :created_by, :received_by, :if => Proc.new{|p| p.deleted_at == nil}
+  validates_with_method :loan_or_client_present?,  :method => :loan_or_client_present?
   validates_with_method :only_take_payments_on_disbursed_loans?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
-  validates_with_method :created_by,  :method => :created_by_active_user?, :if => Proc.new{|p| p.new?}
+  validates_with_method :created_by,  :method => :created_by_active_user?, :if => Proc.new{|p| p.deleted_at == nil}
   validates_with_method :received_by, :method => :received_by_active_staff_member?
   validates_with_method :deleted_by,  :method => :properly_deleted?
   validates_with_method :deleted_at,  :method => :properly_deleted?
@@ -85,53 +85,56 @@ class Payment
       from  = "branches b, centers c, clients cl, loans l , payments p"
       where = %Q{
                   b.id=#{obj.id} and c.branch_id=b.id and cl.center_id=c.id and l.client_id=cl.id and p.loan_id=l.id and p.type in (#{types.join(',')})
-                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
                };
     elsif obj.class==Center
       from  = "centers c, clients cl, loans l , payments p"
       where = %Q{
                   c.id=#{obj.id} and cl.center_id=c.id and l.client_id=cl.id and p.loan_id=l.id and p.type in (#{types.join(',')})
-                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
                };
     elsif obj.class==ClientGroup
       from  = "client_groups cg, clients cl, loans l , payments p"
       where = %Q{
                  cg.id=#{obj.id} and cg.id=c.client_group_id and l.client_id=cl.id and p.loan_id=l.id and p.type in (#{types.join(',')})
-                 and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
               };
     elsif obj.class==Area
       from  = "areas a, branches b, centers c, clients cl, loans l , payments p"
       where = %Q{
                   a.id=#{obj.id} and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
                   and l.client_id=cl.id and p.loan_id=l.id and p.type in (#{types.join(',')})
-                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
                };
     elsif obj.class==Region
       from  = "regions r, areas a, branches b, centers c, clients cl, loans l , payments p"
       where = %Q{
                   r.id=#{obj.id} and r.id=a.region_id and a.id=b.area_id and c.branch_id=b.id and cl.center_id=c.id 
                   and l.client_id=cl.id and p.loan_id=l.id and p.type in (#{types.join(',')})
-                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
                };
     elsif obj.class==StaffMember
       from  = "payments p"
       where = %Q{                  
                   p.received_by_staff_id=#{obj.id} and p.type in (#{types.join(',')})
-                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
                };
     elsif obj.class==LoanProduct
       from  = "loans l, payments p"
       where = %Q{                  
                   l.id = p.loan_id and l.deleted_at is NULL and l.loan_product_id = #{obj.id} and p.type in (#{types.join(',')})
-                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
+    elsif obj.class==Loan
+      from  = "loans l, payments p"
+      where = %Q{                  
+                  l.id = p.loan_id and l.deleted_at is NULL and l.id = #{obj.id} and p.type in (#{types.join(',')})
+               };
+    elsif obj.class==Client
+      from  = "clients cl, payments p"
+      where = %Q{                  
+                   p.type in (#{types.join(',')}) and cl.id=p.client_id and cl.id=#{obj.id}
                };
     elsif obj.class==FundingLine
       from  = "loans l, payments p"
       where = %Q{                  
                   l.id = p.loan_id and l.deleted_at is NULL and l.funding_line_id = #{obj.id} and p.type in (#{types.join(',')})
-                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
                };
     end
+    where += "AND p.deleted_at is NULL AND p.received_on>='#{from_date.strftime('%Y-%m-%d')}' AND p.received_on<='#{to_date.strftime('%Y-%m-%d')}'"
     repository.adapter.query(%Q{
                              SELECT SUM(p.amount) amount, p.type payment_type
                              FROM #{from}

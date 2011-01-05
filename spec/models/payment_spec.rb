@@ -165,4 +165,30 @@ describe Payment do
     payment.save.should be_true
   end
 
+  it "should give correct payment collected for" do
+    @loan.history_disabled = false
+    @loan.update_history(true)
+    amount = Payment.all(:type => :principal).map{|x| x.amount}.reduce(0){|s,x| s+=x}
+
+    Payment.collected_for(@loan,  Date.parse("2000-12-1"), Date.parse("2000-12-4"))[:principal].should == nil
+    Payment.collected_for(@loan,  Date.parse("2000-12-1"), Date.parse("2000-12-31"))[:principal].should == amount
+
+    Payment.collected_for(@branch, Date.parse("2000-12-1"), Date.parse("2000-12-4"))[:principal].should == nil
+    Payment.collected_for(@branch, Date.parse("2000-12-1"), Date.parse("2000-12-31"))[:principal].should == amount
+
+    Payment.collected_for(@center, Date.parse("2000-12-1"), Date.parse("2000-12-4"))[:principal].should == nil
+    Payment.collected_for(@center, Date.parse("2000-12-1"), Date.parse("2000-12-31"))[:principal].should == amount
+
+    Payment.collected_for(@client, Date.parse("2000-12-1"), Date.parse("2000-12-4"))[:principal].should == nil
+    Payment.collected_for(@client, Date.parse("2000-12-1"), Date.parse("2000-12-31"))[:principal].should == amount
+
+    Payment.collected_for(@manager, Date.parse("2000-12-1"), Date.parse("2000-12-4"))[:principal].should == nil
+    Payment.collected_for(@manager, Date.parse("2000-12-1"), Date.parse("2000-12-31"))[:principal].should == amount
+
+    Payment.collected_for(@loan_product, Date.parse("2000-12-1"), Date.parse("2000-12-4"))[:principal].should == nil
+    Payment.collected_for(@loan_product, Date.parse("2000-12-1"), Date.parse("2000-12-31"))[:principal].should == amount
+
+    Payment.collected_for(@funding_line, Date.parse("2000-12-1"), Date.parse("2000-12-4"))[:principal].should == nil
+    Payment.collected_for(@funding_line, Date.parse("2000-12-1"), Date.parse("2000-12-31"))[:principal].should == amount    
+  end
 end
