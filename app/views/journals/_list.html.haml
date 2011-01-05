@@ -1,5 +1,8 @@
-%table
+- journals = Account.all(:branch => @branch).postings.journals(:order => [:created_at.desc]).paginate(:per_page => 20, :page => params[:page])
+%table.report.nojs
   %tr
+    %th 
+      Created at
     %th
       Date
     %th 
@@ -12,23 +15,26 @@
       Amount
     %th 
       Comment
-  - Account.all(:branch => @branch).postings.journals(:order => [:date.desc], :order => [:id.desc]).each do |journal|
+  - journals.each do |journal|
     - postings = journal.postings.sort_by{|x| x.amount}
     %tr
-      %td
+      %td.text
+        = journal.created_at.strftime(Mfi.first.date_format + " at %H:%m")
+      %td.text
         = journal.date
-      %td 
+      %td
         = journal.id
       - debit_postings, credit_postings = journal.postings.group_by{|x| x.amount>0}.values
-      %td 
+      %td.text 
         - debit_postings.each do |p|
           = p.account.name
           %br
-      %td 
+      %td.text
         - credit_postings.each do |p|
           = p.account.name
           %br
-      %td 
+      %td
         = postings.map{|x| x.amount>0 ? x.amount : 0}.inject(0){|s,x| s+=x}
-      %td 
+      %td.text 
         = journal.comment
+= link_to("Next", url(:controller => :accounts, :action => :branch, :branch_id => @branch.id, :page => (params[:page]||0).to_i + 1), :class => "_remote_", :id => "journal_entries")

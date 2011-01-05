@@ -228,8 +228,7 @@ function attachFormRemoteTo(form){
 }
 
 function create_remotes(){
-    $("a._remote_").click(function(){
-      $(this).unbind();
+    $("a._remote_").live('click', function(){
       href=$(this).attr("href");
       method="GET";
       if($(this).hasClass("self")){
@@ -237,21 +236,21 @@ function create_remotes(){
         method="POST";
       }
       a=$(this);
-      a.after("<img id='spinner' src='/images/spinner.gif'/>");
-
+      a.after("<img id='spinner' src='/images/spinner.gif'/>");      
       $.ajax({
 	type: method,
 	url: href,
 	success: function(data){
-	  if($(a).attr("id") && $("#"+$(a).attr("id")).length>0){
-	    $("#"+$(a).attr("id")).html(data);
-	    create_remotes();
-	  }else{
-	    $(a).after(data);
-	    $(a).remove();
+	    if($(a).attr("id") && $("#container_"+$(a).attr("id")).length>0){
+		$("#container_"+$(a).attr("id")).html(data);
+	    }else if($(a).attr("id") && $("#"+$(a).attr("id")).length>0){
+		$("#"+$(a).attr("id")).html(data);
+	    }else{
+		$(a).after(data);
+		$(a).remove();
+	    }
+	    floatHeaders();
 	    $("#spinner").remove();
-	  }
-	  floatHeaders();
 	},
 	error: function(xhr, text, errorThrown){
 	  txt = "<div class='error'>"+xhr.responseText+"</div>";
