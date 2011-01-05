@@ -33,7 +33,7 @@
         %span.greytext
           center managed by:
           = link_to @center.branch.manager.name, resource(@center.manager)
-    %tr
+    %tr.odd
       %td
         Group
       %td
@@ -50,7 +50,7 @@
         - @client.fee_schedule.each do |date, fees|
           - fees.each do |fee, amount|
             = fee.description
-    %tr
+    %tr.odd
       %td
         Fees paid
       %td
