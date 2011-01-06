@@ -23,7 +23,7 @@ class RuleBooks < Application
     only_provides :html
     @rule_book = RuleBook.get(id)
     raise NotFound unless @rule_book
-    @accounts = Account.all(:branch_id => params[:branch_id], :order => [:account_type_id]).map{|x| [x.id ,"#{x.account_type.name} -- #{x.name}"]}
+    @accounts = Account.all(:branch_id => @rule_book.branch_id, :order => [:account_type_id]).map{|x| [x.id ,"#{x.account_type.name} -- #{x.name}"]}
     display @rule_book, :layout => layout?
   end
 
@@ -37,6 +37,7 @@ class RuleBooks < Application
     if @rule_book.save
       redirect resource(:rule_books), :message => {:notice => "RuleBook was successfully created"}
     else
+      @accounts = Account.all(:branch_id => params[:branch_id], :order => [:account_type_id]).map{|x| [x.id ,"#{x.account_type.name} -- #{x.name}"]}
       message[:error] = "RuleBook failed to be created"
       render :new
     end
