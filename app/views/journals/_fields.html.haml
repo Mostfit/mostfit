@@ -3,17 +3,17 @@
     %td
       Journal Type
     %td
-      =select :name => "journal[journal_type_id]", :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select Journal"
-  %tr
-    %td
-      Credit account
-    %td
-      = select_accounts("credit_account[account_id]", @branch)
-  %tr
-    %td
-      Debit account
-    %td
-      = select_accounts("debit_account[account_id]", @branch)
+      =select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select Journal"
+  - if params[:credit_accounts]
+    - params[:credit_accounts].each_with_index do |ca, idx|
+      = partial "journals/account_amount", :account => ca, :account_type => :credit_accounts, :last_account => (params[:debit_accounts].length == idx + 1 ? true : false)
+  - else
+    = partial "journals/account_amount", :account => {}, :account_type => :credit_accounts, :last_account => true
+  - if params[:debit_accounts]
+    - params[:debit_accounts].each_with_index do |ca, idx|
+      = partial "journals/account_amount", :account => ca, :account_type => :debit_accounts, :last_account => (params[:debit_accounts].length == idx + 1 ? true : false)
+  - else
+    = partial "journals/account_amount", :account => {}, :account_type => :debit_accounts, :last_account => true
   %tr
     %td
       Date
@@ -21,18 +21,13 @@
       =date_select_for @journal, :date
   %tr
     %td
-      Amount
-    %td
-      =text_field :name => "journal[amount]"
-  %tr
-    %td
       Comment
     %td
-      =text_field :name => "journal[comment]"
+      =text_field :comment
   %tr
     %td
       Transaction ID
     %td
-      =text_field :name => "journal[transaction_id]"
+      =text_field :transaction_id
 %p
   = submit "Create"

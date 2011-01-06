@@ -19,12 +19,26 @@ class Journal
   def validity_check
     return false if self.postings.length<2 #minimum one posting for credit n one for debit
     debit_account_postings, credit_account_postings = self.postings.group_by{|x| x.amount>0}.values
-    return false if debit_account_postings.nil?  or debit_account_postings.length==0
-    return false if credit_account_postings.nil? or credit_account_postings.length==0 
-    return false if (credit_account_postings.map{|x| x.account_id} & debit_account_postings.map{|x| x.account_id}).length > 0
-    return false if self.postings.accounts.map{|x| x.branch_id}.uniq.length > 1
-    return false if self.postings.map{|x| x.account_id}.compact.length != self.postings.length
-    return true
+
+    #no debit account posting
+    return [false, "no debit account posting"] if debit_account_postings.nil?  or debit_account_postings.length==0
+    
+    #no credit account posting
+    return [false, "no credit account posting"] if credit_account_postings.nil? or credit_account_postings.length==0 
+    
+    #same debit and credit accounts
+    return [false, "same debit and credit accounts"] if (credit_account_postings.map{|x| x.account_id} & debit_account_postings.map{|x| x.account_id}).length > 0
+    
+    #cross branch posting
+    return [false, "cross branch posting"] if self.postings.accounts.map{|x| x.branch_id}.uniq.length > 1
+    
+    #duplicate postings
+    return [false, "duplicate accounts"] if self.postings.map{|x| x.account_id}.compact.length != self.postings.length
+    
+    #amount mismatch
+    return [false, "debit and credit amount mismatch"] if credit_account_postings.map{|x| x.amount}.reduce(0){|s,x| s+=x} + debit_account_postings.map{|x| x.amount}.reduce(0){|s,x| s+=x} != 0
+    
+    return [true, ""]
   end
 
 
@@ -68,11 +82,11 @@ class Journal
       end
       
       # Rollback in case of both accounts being the same      
-      if journal.validity_check
-        status = true
-      else
+      status, reason = journal.validity_check
+      unless status
         t.rollback
         status = false
+        journal.errors.add(:postings, reason)
       end
     end
 

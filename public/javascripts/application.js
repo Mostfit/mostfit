@@ -236,6 +236,8 @@ function create_remotes(){
 					    success: function(data){
 						if($(a).attr("id") && $("#container_"+$(a).attr("id")).length>0){
 						    $("#container_"+$(a).attr("id")).html(data);
+						}else if($(a).attr("id") && $("#after_"+$(a).attr("id")).length>0){
+						    $("#after_"+$(a).attr("id")).after(data);
 						}else if($(a).attr("id") && $("#"+$(a).attr("id")).length>0){
 						    $("#"+$(a).attr("id")).html(data);
 						}else{

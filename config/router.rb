@@ -6,7 +6,7 @@ Merb::Router.prepare do
   resources :locations, :id => %r(\d+)
   resources :insurance_products
   resources :accounting_periods
-  resources :journals
+  resources :journals, :id => %r(\d+)
   resources :loan_utilizations
   resources :rule_books
   resources :account_types

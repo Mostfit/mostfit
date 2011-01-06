@@ -1,0 +1,14 @@
+- random = rand(10000).to_i
+%tr{:id => "after_account_row_#{random}"}
+  %td
+    = account_type.to_s.camelcase(' ')
+  %td
+    = select_accounts("#{account_type.to_s}[][account_id]", @branch, :selected => account[:account_id])
+  %td
+    Amount
+  %td
+    =text_field :name => "#{account_type.to_s}[][amount]", :value => account[:amount]
+  - if last_account
+    %td
+      %a{:href => url(:controller => :journals, :action => :add_account, :account_type => account_type, :branch_id => (@branch ? @branch.id : "")), :class => "_remote_", :id => "account_row_#{random}"}
+        add account
