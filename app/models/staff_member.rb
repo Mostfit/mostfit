@@ -48,16 +48,20 @@ class StaffMember
     [obj.save, obj]
   end
 
-  def clients
-    Client.all(:created_by_staff_member_id => self.id)
+  def clients(hash={})
+    hash[:created_by_staff_member_id] = self.id
+    Client.all(hash)
   end
 
-  def loans
-    Loan.all(:applied_by_staff_id => self.id)
+  def loans(hash={})
+    Loan.all(hash + {:applied_by_staff_id => self.id}) + 
+      Loan.all(hash + {:approved_by_staff_id => self.id}) + 
+      Loan.all(hash + {:disbursed_by_staff_id => self.id})
   end
 
-  def client_groups
-    ClientGroup.all(:created_by_staff_member_id => self.id)
+  def client_groups(hash)
+    hash[:created_by_staff_member_id] = self.id
+    ClientGroup.all(hash)
   end
   
   def self.related_to(obj)

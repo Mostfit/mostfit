@@ -60,18 +60,21 @@ class Info < Application
       @clients[:upto] = @obj.clients(client_hash(:upto))
     elsif @obj.class == StaffMember
       @areas     = @obj.areas
-      @branches, @centers, @managed_clients, @loan_served  = {}, {}, {}, {}
+      @branches, @centers, @clients, @loans = {}, {}, {}, {}
+
       @branches[:new]  = @obj.branches(new_date_hash)
       @branches[:upto] = @obj.branches(upto_date_hash)
-
+      
       @centers[:new]   = @obj.centers(new_date_hash)
       @centers[:upto]  = @obj.centers(upto_date_hash)
-            
-      @managed_clients[:new]  = @centers[:new].clients(client_hash(:new))   if @centers[:new] and @centers[:new].length > 0
-      @managed_clients[:upto] = @centers[:upto].clients(client_hash(:upto)) if @centers[:upto] and @centers[:upto].length > 0
 
-      @loan_served[:new]  = @managed_clients[:new].loans(new_date_hash).count   if @managed_clients[:new] and @managed_clients[:new].length>0
-      @loan_served[:upto] = @managed_clients[:upto].loans(upto_date_hash).count if @managed_clients[:upto] and @managed_clients[:upto].length>0
+      if params[:type] == "managed"
+        @clients[:new]  = @centers[:new].clients(client_hash(:new))   if @centers[:new] and @centers[:new].length > 0
+        @clients[:upto] = @centers[:upto].clients(client_hash(:upto)) if @centers[:upto] and @centers[:upto].length > 0
+      else
+        @clients[:new]  = @obj.clients(client_hash(:new))   if @centers[:new] and @centers[:new].length > 0
+        @clients[:upto] = @obj.clients(client_hash(:upto))  if @centers[:upto] and @centers[:upto].length > 0        
+      end
     else
       raise "Unknown obj class"
     end
@@ -94,7 +97,6 @@ class Info < Application
       @clients[:upto] = (@centers.class == Hash ? @centers[:upto] : @centers).clients(client_hash(:upto) + {:fields => [:id]})
     end
 
-    
     set_more_info(@obj)
     render :file => 'info/moreinfo', :layout => false
   end

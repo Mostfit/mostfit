@@ -15,7 +15,8 @@
 %div.tab_container
   %ul.tabs
     %li#manages Manages
-    %li#info Info
+    %li#info_created Info created
+    %li#info_managed Info managed
     - if Mfi.first.map_enabled
       %li#map Map
   %div.tab
@@ -28,7 +29,10 @@
             %li
               =link_to(obj.name, resource(obj))
   %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@staff_member.id}?for=staff_member"}
+    %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@staff_member.id}?for=staff_member&type=created"}
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@staff_member.id}?for=staff_member&type=managed"}
+
   - if Mfi.first.map_enabled
     %div.tab
       = js_include_tag :map
