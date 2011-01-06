@@ -55,7 +55,7 @@
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url(:rule_books)}
   %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => url(:journal, :new)}
+    %input{:type => "hidden", :name => "_load_remote", :value => url({:controller => :journals, :action => :new, :return => url(:accounts)})}
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url(:journals)}
   %div.tab

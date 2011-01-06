@@ -37,7 +37,7 @@
       - credit_accounts = @rule_book.credit_accounts
       - 3.times do |idx|
         - selected_val = (credit_accounts[idx] ? credit_accounts[idx].id.to_s : "")
-        = select(:name => "rule_book[credit_accounts][#{idx+1}][account_id]", :collection => @accounts, :prompt => "Select credit account #{idx}", :selected => selected_val)
+        = select(:name => "rule_book[credit_accounts][#{idx+1}][account_id]", :collection => @accounts, :prompt => "Select credit account #{idx}", :selected => selected_val.to_s)
         %br
     %td
       Percentage split

@@ -2,14 +2,17 @@
   %h1 New Journal Entry  
   = error_messages_for @journal
 
-  - if session.user.role == :admin
+  - if session.user.role == :admin and not @branch
     %div{:style => "padding-left: 25px;"}
-      %form{:class => "_remote_", :method => "GET", :action => "/journals/new"}
+      %form{:class => "_remote_", :method => "GET", :action => resource(:journals, :new, {:return => params[:return]})}
         %b Select branch
         = select :name => :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Head office accounts", :selected => params[:branch_id]
         %input{:type => :hidden, :name => "_target_", :value => "voucher_container"}
+        %input{:type => :hidden, :name => "return", :value => params[:return]}
         = submit "GO"
-
-  = form_for(@journal, :action => (@branch ? resource(@branch, :journals) : resource(:journals))) do
+  - if @branch
+    %h2
+      = @branch.name
+  = form_for(@journal, :action => resource(:journals, {:branch_id => (@branch ? @branch.id : nil), :return => params[:return]}), :method => :post) do
     = partial :fields
-= link_to 'Back', (@branch ? resource(@branch) : url(:accounts))
+  = link_to 'Back', (@branch ? resource(@branch) : url(:accounts))
