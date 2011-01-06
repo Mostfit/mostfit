@@ -747,7 +747,7 @@ describe User do
     non_managed_centers = Center.all(:id.not => user.staff_member.centers.map{|x| x.id})
     user.can_access?({:action => "create", :controller => "centers"}, 
                      {:center => {:name => "Center 1", :address => "dzv fsb g", :contact_number => "90000000000", :manager_staff_id => 2, :code => "MPBPL0101", :landmark => "New Bhopal", 
-                         :creation_date => "27-11-2010", :meeting_time_hours => 8, :branch_id => non_managed_centers.first.id, :meeting_day => "monday", 
+                         :creation_date => "27-11-2010", :meeting_time_hours => 8, :branch_id => Branch.first(:id.not => managed_centers.map{|c| c.branch_id}).id, :meeting_day => "monday", 
                          :meeting_time_minutes => 30}}).should be_false
 
     #client access
@@ -904,9 +904,6 @@ describe User do
     user = User.new(:login => "am1",:created_at => "2002-11-23", :updated_at => "2003-11-23", :role => :staff_member, :password => "password", :password_confirmation => "password",
                     :staff_member => area.manager)
     user.save_self.should be_true
-    branch = Branch.first
-    branch.area_id = area.id
-    branch.save
 
     #browse page links
     user.can_access?({:action =>"index", :controller =>"verifications"}).should be_false
@@ -925,6 +922,7 @@ describe User do
       user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_true
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "branch", :id => branch.id}).should be_true
+      user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => branch.manager.id}).should be_true
     }
     
     #branch creation
@@ -936,6 +934,7 @@ describe User do
       user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_true
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "center", :id => center.id}).should be_true
+      user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => center.manager.id}).should be_true
     }
     #center creation    
     user.can_access?({:action => "create", :controller => "centers", :branch_id => managed_branches.first.id}, 
@@ -985,12 +984,16 @@ describe User do
       user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_false
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "branch", :id => branch.id}).should be_false
+      user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => branch.manager.id}).should be_false
     }
     #center access
     non_managed_centers.each{|center|
       user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_false
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "center", :id => center.id}).should be_false
+      if not Branch.first(:manager => center.manager) and not Area.first(:manager => center.manager) and not Region.first(:manager => center.manager)
+        user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => center.manager.id}).should be_false
+      end
     }
     #client access
     non_managed_centers.clients.each{|client|
@@ -1105,14 +1108,11 @@ describe User do
 
 
   it "should give access to region manager as staff member for relevant stuff" do
-    #area manager
+    #region manager
     region = Region.first
     user = User.new(:login => "rm1",:created_at => "2002-11-23", :updated_at => "2003-11-23", :role => :staff_member, :password => "password", :password_confirmation => "password",
                     :staff_member => region.manager)
     user.save_self.should be_true
-    branch = Branch.first
-    branch.area_id = region.areas.first.id
-    branch.save
 
     area =  region.areas.first
 
@@ -1133,6 +1133,7 @@ describe User do
       user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_true
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "branch", :id => branch.id}).should be_true
+      user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => branch.manager.id}).should be_true
     }
     
     #branch creation
@@ -1144,6 +1145,7 @@ describe User do
       user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_true
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "center", :id => center.id}).should be_true
+      user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => center.manager.id}).should be_true
     }
     #center creation    
     user.can_access?({:action => "create", :controller => "centers", :branch_id => managed_branches.first.id}, 
@@ -1193,12 +1195,14 @@ describe User do
       user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_false
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "branch", :id => branch.id}).should be_false
+      user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => branch.manager.id}).should be_false
     }
     #center access
     non_managed_centers.each{|center|
       user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_false
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "center", :id => center.id}).should be_false
+      user.can_access?({:action => "moreinfo", :controller => "info", :for => "staff_member", :id => center.manager.id}).should be_false
     }
     #client access
     non_managed_centers.clients.each{|client|
