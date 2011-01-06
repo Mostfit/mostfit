@@ -17,9 +17,15 @@
           %i
             == (#{count} loans in queue)
         - if session.authenticated?
+          - if session.user.role == :admin and Merb.env == "development"
+            %div{:style => "float: left"}
+              %form{:action => "/admin/proxy_logon", :methoid => :post}
+                login as
+                = select :user_id, :collection => User.all(:order => [:login]).map{|u| [u.id, u.login]}
+                = submit "go"
           =link_to 'change password', url(:change_password)
           |
-          == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})
+          == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})          
         - else
           existing users can
           %b= link_to 'login', url(:login)
