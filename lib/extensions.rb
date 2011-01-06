@@ -81,8 +81,15 @@ module Misfit
         elsif obj.class == Loan or obj.class.superclass == Loan or obj.class.superclass.superclass == Loan
           return(is_manager_of?(obj.client.center))
         elsif obj.class == StaffMember
-          return(obj == @staff or is_manager_of?(obj.centers.branches) or is_manager_of?(obj.branches) or is_manager_of?(obj.centers) or is_manager_of?(obj.areas))
-        elsif obj.class == Array or obj.class == DataMapper::Collection
+          return true if obj == @staff 
+          #branch manager needs access to the its Center managers
+          return(is_manager_of?(obj.centers)) if @staff.branches.count > 0
+          #area manager needs access to the its branch managers and center managers
+          return(is_manager_of?(obj.branches) or is_manager_of?(obj.centers)) if @staff.areas.count > 0
+          #region manager needs access to the its area manager, branch managers and center managers
+          return(is_manager_of?(obj.areas) or is_manager_of?(obj.branches) or is_manager_of?(obj.centers)) if @staff.regions.count > 0
+          return false
+        elsif obj.respond_to?(:map)
           return(obj.map{|x| is_manager_of?(x)}.uniq.include?(true))
         else
           return false
@@ -137,7 +144,7 @@ module Misfit
           
           if @action == "show" and @controller == "reports"
             return (@route[:report_type] == "ProjectedReport" or @route[:report_type] == "DailyReport" or @route[:report_type] == "TransactionLedger")
-          end          
+          end      
         end
         
         if @staff
@@ -173,7 +180,7 @@ module Misfit
               return false
             end
           end
-
+          
           if @controller == "audit_trails" and params and params[:audit_for] and params[:audit_for][:controller]
             if params[:audit_for][:id]
               return is_manager_of?(Kernel.const_get(params[:audit_for][:controller].singularize.camelcase).get(params[:audit_for][:id]))
@@ -181,7 +188,8 @@ module Misfit
               return false
             end
           end
-          return is_manager_of?(Kernel.const_get(route[:for].camelcase).get(route[:id])) if @controller == "info" and route[:for] and route[:id]            
+
+          return is_manager_of?(Kernel.const_get(route[:for].camelcase).get(route[:id])) if @controller == "info" and route[:for] and route[:id]
         end
         r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
       end
