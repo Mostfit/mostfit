@@ -52,7 +52,19 @@ module DataEntry
         elsif params[:format] and params[:format]=="xml"
           display("")
         else
-          params[:return] ? redirect(params[:return], :message => {:error => @errors.map{|e| e.instance_variables.include?("@errors") ? e.instance_variable_get("@errors") : e.to_s } }) : render
+          params[:return] ? redirect(params[:return], :message => {
+                                       :error => @errors.map{|e| 
+                                         if e.instance_variables.include?("@errors")
+                                           if e.resource.loan_id
+                                             "#{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}"
+                                           else
+                                             "#{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}"
+                                           end
+                                         else
+                                           e.to_s
+                                         end
+                                         }.join("\n")
+                                     }) : render
         end
       else
         render
