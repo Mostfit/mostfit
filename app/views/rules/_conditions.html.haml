@@ -44,6 +44,11 @@
       - select1 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator]", :collection => collection1, :selected=> cond[:comparator])
       - select2 = select(:id => "#{type}_selectcomparator_#{id}", :name => "rule[#{type}][#{condition_id}][comparator][]", :collection => collection2, :selected=> cond[:comparator])
 
+      - name = "rule[#{type}][#{condition_id}][const_value]"
+      - type_name = "rule[#{type}][#{condition_id}][valuetype]" #will be either "string", "date" or "int"
+      - property = model.properties.find{|p| p.name.to_s==keys.last} || model.relationships[keys.last]
+      - property_2 = model.properties.find{|p| p.name.to_s==cond[:keys].last} if cond[:keys]
+
       - if collection1.flatten.include?(cond[:comparator].to_s)
         = select1
       - elsif collection2.flatten.include?(cond[:comparator].to_s)
@@ -52,10 +57,6 @@
         = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value=>cond[:comparator])
       - id+=1
 
-      - name = "rule[#{type}][#{condition_id}][const_value]"
-      - type_name = "rule[#{type}][#{condition_id}][valuetype]" #will be either "string", "date" or "int"
-      - property = model.properties.find{|p| p.name.to_s==keys.last} || model.relationships[keys.last]
-      - property_2 = model.properties.find{|p| p.name.to_s==cond[:keys].last} if cond[:keys]
 
       - val_type = /\-|\\/.match(cond[:const_value])
       - if (property.type==Date or property.type==DateTime or cond[:valuetype] == "date") and val_type
