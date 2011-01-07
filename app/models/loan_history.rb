@@ -83,7 +83,7 @@ class LoanHistory
   end
   
   def self.defaulted_loan_info_for(obj, date=Date.today, days=nil, type=:aggregate)    
-    query =  get_query(obj) 
+    query =  get_query(obj)
     query += " AND lh.days_overdue<=#{days}" if days
 
     # either we list or we aggregate depending on type
@@ -468,7 +468,7 @@ class LoanHistory
       ids = (ids.length==0 ? "NULL" : ids.join(","))
       "lh.branch_id in (#{ids})"      
     elsif obj.class==StaffMember
-      ids = Loan.all(:fields => [:id], :disbursed_by_staff_id => obj.id).map{|x| x.id}
+      ids = obj.centers.map{|x| x.id}
       ids = (ids.length==0 ? "NULL" : ids.join(","))
       "lh.loan_id in (#{ids})"
     elsif obj.class == FundingLine
