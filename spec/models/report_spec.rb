@@ -302,4 +302,69 @@ describe Report do
     Branch.scheduled_total_outstanding(date).should == {1 => 13200 - (22 + 44 + 66), 2 => 13200 - (22 + 44 + 66)}
     Branch.scheduled_total_outstanding(date + 15).should == {1 => 13200 - 3*(44 + 88 + 132), 2 => 13200 - 3*(44 + 88 + 132)}
   end  
+
+  #cases for branch target reports.
+  it "should give correct disbursal loan count,amount,overdue,sanctioned, total and variance" do
+    l = Loan.get 1
+    date = l.scheduled_disbursal_date
+    report = BranchTargetReport.new({}, {:date => date}, User.first)
+    data    = report.generate
+    loan_overdue = Loan.all(:scheduled_disbursal_date.lte => date, :disbursal_date => nil).sum(:amount)
+    loan_sanctioned = Loan.all(:approved_on => date).sum(:amount)
+    total_loan = ((loan_overdue || 0) + loan_sanctioned)
+    loan_disbursed = Loan.all(:disbursal_date => date).sum(:amount)
+
+    data[@manager][:disbursement][:till_date][0].should == Loan.all(:disbursal_date.lte => date).count
+    data[@manager][:disbursement][:till_date][1].should == Loan.all(:disbursal_date.lte => date).sum(:amount)
+    data[@manager][:disbursement][:today][:overdue].should == (loan_overdue || 0)
+    data[@manager][:disbursement][:today][:sanctioned].should == loan_sanctioned
+    data[@manager][:disbursement][:today][:disbursed].should == Loan.all(:disbursal_date => date).sum(:amount)
+    data[@manager][:disbursement][:today][:total].should == ((loan_overdue || 0) + loan_sanctioned)
+    data[@manager][:disbursement][:today][:variance].should == (total_loan - loan_disbursed)
+  end
+
+  it "should show correct loan overdue disbursals" do
+    l = Loan.get 1
+    date = l.scheduled_disbursal_date
+    l.disbursal_date = nil
+    l.disbursed_by = nil
+    l.save
+    report = BranchTargetReport.new({}, {:date => date}, User.first)
+    data   = report.generate
+
+    data[@manager][:disbursement][:today][:overdue].should == l.amount
+  end
+
+  it "should give correct repayments" do
+    l = Loan.get 1
+    date = l.scheduled_first_payment_date
+    report = BranchTargetReport.new({}, {:date => date}, User.first)
+    data   = report.generate
+    @center = Center.all
+    outstandings_past  = LoanHistory.sum_outstanding_grouped_by(date - 1, :center, {:center_id => @center.map{|c| c.id}})
+    center_ids = @center.map{|c| c.id}
+    outstanding = outstandings_past.find_all{|row| center_ids.include?(row.center_id)}.map{|x| x[0].to_i}.reduce(0){|s,x| s+=x}
+    actual_payment = Payment.all(:received_on => date).sum(:amount)
+    variance = outstanding - (actual_payment || 0)
+    overdue_repayment = 0
+
+    data[@manager][:repayment][:actual].should == (actual_payment || 0)
+    data[@manager][:repayment][:due].should == outstanding
+    data[@manager][:repayment][:total_variance].should == variance
+    data[@manager][:repayment][:variance_till_date].should == (overdue_repayment + variance)
+  end
+
+  it "should give correct outstanding loan amount" do
+    l = Loan.get 1
+    date = l.scheduled_disbursal_date
+    report = BranchTargetReport.new({}, {:date => date}, User.first)
+    data = report.generate
+    @center = Center.all
+    outstandings_past  = LoanHistory.sum_outstanding_grouped_by(date - 1, :center, {:center_id => @center.map{|c| c.id}})
+    center_ids = @center.map{|c| c.id}
+    outstanding = outstandings_past.find_all{|row| center_ids.include?(row.center_id)}.map{|x| x[0].to_i}.reduce(0){|s,x| s+=x}
+
+    data[@manager][:total_outstanding].should == outstanding
+  end
+
 end

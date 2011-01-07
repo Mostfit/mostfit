@@ -1,0 +1,140 @@
+=partial :form
+
+%table.report.nojs
+  %tr.header
+    %th
+      MFO Name
+    %th{:colspan => "5"}
+      Development
+    %th{:colspan => "7"}
+      Disbursement
+    %th{:colspan => "5"}
+      Repayment
+    %th
+      Total
+      %br
+      Outstanding
+
+  %tr.header
+    %th
+    %th{:colspan => "2"}
+      Target
+    %th{:colspan => "2"}
+      Actual
+    %th
+      Variance
+    %th{:colspan => "2"}
+      Till Date
+    %th{:colspan => "5"}
+      Today
+    %th{:colspan => "4"}
+      Today
+    %th
+      Total
+      %br
+        Variance
+    %th
+
+  %tr.header
+    %th
+    %th{:colspan => "2"}
+      This Month
+    %th
+      Today
+    %th
+      Till Date
+    %th
+    %th
+      Nos
+    %th
+      Amount
+    %th
+      Overdue
+    %th
+      Santioned
+    %th
+      Total
+    %th
+      Disbursement
+    %th
+      Variance
+    %th
+      Var
+    %th
+      Due
+    %th
+      Actual
+    %th
+      Variance
+    %th
+    %th
+
+  %tr.header
+    %th
+    %th
+      Nos
+    %th
+      Amount
+    %th
+      Nos
+    %th
+      Nos
+    %th
+      Nos
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+    %th
+
+  - length = 19
+  - @data.sort_by{|staff, centers| staff.name}.each do |staff, centers|
+    %tr.staff
+      %td
+        %b
+          = staff.name
+      %td
+        = centers[:development][:target][0] || 0
+      %td
+        = centers[:development][:target][1] || 0
+      %td
+        = centers[:development][:actual][0] || 0
+      %td
+        = centers[:development][:actual][1] || 0
+      %td
+        = centers[:development][:variance]
+      %td
+        = centers[:disbursement][:till_date][0]
+      %td
+        = centers[:disbursement][:till_date][1] || 0
+      %td
+        = centers[:disbursement][:today][:overdue]
+      %td
+        = centers[:disbursement][:today][:sanctioned]
+      %td
+        = centers[:disbursement][:today][:total]
+      %td
+        = centers[:disbursement][:today][:disbursed]
+      %td
+        = centers[:disbursement][:today][:variance]
+      %td
+        = centers[:repayment][:var]
+      %td
+        = centers[:repayment][:due]
+      %td
+        = centers[:repayment][:actual]
+      %td
+        = centers[:repayment][:total_variance]
+      %td
+        = centers[:repayment][:variance_till_date]
+      %td
+        = centers[:total_outstanding] || 0
+ 
