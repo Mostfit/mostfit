@@ -37,20 +37,20 @@ Merb::BootLoader.before_app_loads do
   require 'uuid'
   require 'ftools'
   require 'logger'
-
+  require 'dm-pagination'
+  require 'dm-pagination/paginatable'
+  require 'dm-pagination/pagination_builder'
+  require 'lib/string.rb'
+  require 'lib/grapher.rb'
+  require("lib/functions.rb")
+  require("lib/core_ext.rb")
+  
   begin
-    require 'dm-pagination'
-    require 'dm-pagination/paginatable'
-    require 'dm-pagination/pagination_builder'
     require "pdf/writer"
     require "pdf/simpletable"
-    require 'lib/string.rb'
-    require 'lib/grapher.rb'
     require("lib/pdfs/day_sheet.rb")
-    require("lib/functions.rb")
-    require("lib/core_ext.rb")
     PDF_WRITER = true
-  rescue
+  rescue LoadError
     PDF_WRITER = false
     puts "--------------------------------------------------------------------------------"
     puts "--------Do a gem install pdf-writer otherwise pdf generation won't work---------"
