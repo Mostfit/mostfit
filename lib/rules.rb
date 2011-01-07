@@ -5,8 +5,6 @@ module Mostfit
       attr_accessor :var1, :binaryoperator, :var2, :comparator, :const_value, :validator
       
       def self.get_basic_condition(cond)
-        # debugger
-        
         if(cond.keys.length < 3)
           return nil
         else
@@ -77,7 +75,11 @@ module Mostfit
               obj3 = obj1.send(a.binaryoperator, obj2)
               obj3 != a.const_value if a.comparator == "!=".to_sym
               #otherwise
-              obj3.send(a.comparator, a.const_value)
+              if obj3.class == Rational
+                obj3.send(a.comparator, a.const_value.to_i)
+              else
+                obj3.send(a.comparator, a.const_value)
+              end
             end
           }
           return a

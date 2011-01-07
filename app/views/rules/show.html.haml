@@ -19,7 +19,7 @@
       - if Marshal.restore(@rule.precondition)
         - Marshal.restore(@rule.precondition).each do |key, cond|
           = cond[:variable]["1"]["complete"]
-          - if (cond[:variable]["2"] != nil) and (cond[:variable]["2"]["complete"] != nil) and (cond[:variable]["2"]["complete"].to_i!= 0)
+          - if (cond[:variable]["2"] != nil) and (cond[:variable]["2"]["complete"] != nil)
             = cond [:binaryoperator]
             = cond[:variable]["2"]["complete"]
           = Merb::GlobalHelpers::pretty_name_of_comparator(cond[:comparator])
