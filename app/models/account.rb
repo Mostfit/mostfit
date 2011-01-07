@@ -10,7 +10,7 @@ class Account
   property :gl_code,                String, :index => true
   property :parent_id,              Integer, :index => true
   property :account_id,             Integer, :index => true
-
+  property :account_category,       Enum.send('[]', *['', 'Cash', 'Bank']), :default => '', :nullable => true, :index => true
   belongs_to :account, :model => 'Account', :child_key => [:parent_id]
   belongs_to :account_type
   
@@ -38,6 +38,13 @@ class Account
     
   end
 
+  def is_cash_account?
+    @account_category ? @account_category.eql?('Cash') : false
+  end
+  
+  def is_bank_account?
+    @account_category ? @account_category.eql?('Bank') : false
+  end
   
   def convert_blank_to_nil
     self.attributes.each{|k, v|
