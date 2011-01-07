@@ -62,4 +62,14 @@ class Admin < Application
     DirtyLoan.clear(params[:id])
     render "done", :layout => false
   end
+
+  def proxy_logon
+    raise NotFound unless Merb.env=="development"    
+    if session.user.role == :admin and params[:user_id] and user = User.get(params[:user_id])
+      session.user = user
+      redirect resource(:branches)
+    else
+      raise NotFound
+    end
+  end
 end
