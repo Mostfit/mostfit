@@ -914,7 +914,7 @@ $(document).ready(function(){
 								   }
 
 							       });
-		      $("#account_account_type_id").change(function(select){
+		      $("#account_account_type_id").live('change', function(select){
 							       val=$("#account_account_type_id").val();
 							       $.ajax({
 									  url: "/accounts?account_type_id="+val,
