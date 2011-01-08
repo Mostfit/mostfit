@@ -79,7 +79,9 @@ class Payment
     PAYMENT_TYPES
   end
   
-  def self.collected_for(obj, from_date=Date.min_date, to_date=Date.max_date, types=[1,2])    
+  # returns the amount collected by/under/for various kind of objects like Branch, Center, StaffMember, Area, Region, LoanProduct etc
+  # TODO:  rewrite it using Datamapper
+  def self.collected_for(obj, from_date=Date.min_date, to_date=Date.max_date, types=[1,2], payment_created_type = :created)
     from, where = "", ""
     if obj.class==Branch
       from  = "branches b, centers c, clients cl, loans l , payments p"
@@ -109,10 +111,17 @@ class Payment
                   and l.client_id=cl.id and p.loan_id=l.id and p.type in (#{types.join(',')})
                };
     elsif obj.class==StaffMember
-      from  = "payments p"
-      where = %Q{                  
+      if payment_created_type == :created
+        from  = "payments p"
+        where = %Q{         
                   p.received_by_staff_id=#{obj.id} and p.type in (#{types.join(',')})
                };
+      else
+        from  = "centers c, clients cl, loans l , payments p"
+        where = %Q{
+                  c.manager_staff_id=#{obj.id} and cl.center_id=c.id and l.client_id=cl.id and p.loan_id=l.id and p.type in (#{types.join(',')})
+               };
+      end
     elsif obj.class==LoanProduct
       from  = "loans l, payments p"
       where = %Q{                  

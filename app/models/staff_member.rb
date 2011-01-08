@@ -36,8 +36,7 @@ class StaffMember
       all(:conditions => ["name like ?", q+'%'], :limit => per_page)
     end
   end
-  
-  
+    
   def self.from_csv(row, headers)
     user = User.new(:login => row[headers[:name]], :role => :staff_member,
                     :password => row[headers[:password]], :password_confirmation => row[headers[:password]])    
@@ -48,19 +47,32 @@ class StaffMember
     [obj.save, obj]
   end
 
-  def clients(hash={})
-    hash[:created_by_staff_member_id] = self.id
+  def clients(hash={}, owner_type = :created)
+    if owner_type == :created
+      hash[:created_by_staff_member_id] = self.id
+    else
+      hash["center.manager_staff_id"] = self.id
+    end
     Client.all(hash)
   end
 
-  def loans(hash={})
-    Loan.all(hash + {:applied_by_staff_id => self.id}) + 
-      Loan.all(hash + {:approved_by_staff_id => self.id}) + 
-      Loan.all(hash + {:disbursed_by_staff_id => self.id})
+  def loans(hash={}, owner_type = :created)
+    if owner_type == :created
+      Loan.all(hash + {:applied_by_staff_id => self.id}) + 
+        Loan.all(hash + {:approved_by_staff_id => self.id}) + 
+        Loan.all(hash + {:disbursed_by_staff_id => self.id})
+    else
+      hash["client.center.manager_staff_id"] = self.id
+      Loan.all(hash)
+    end
   end
 
   def client_groups(hash)
-    hash[:created_by_staff_member_id] = self.id
+    if owner_type == :created
+      hash[:created_by_staff_member_id] = self.id
+    else
+      hash["center.manager_staff_id"] = self.id      
+    end
     ClientGroup.all(hash)
   end
   

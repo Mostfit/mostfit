@@ -82,8 +82,10 @@ class LoanHistory
          GROUP BY #{group_by}_id;})
   end
   
-  def self.defaulted_loan_info_for(obj, date=Date.today, days=nil, type=:aggregate)    
-    query =  get_query(obj)
+  # loan_type here is relevant only for the case of staff member. This comes into play when we need all the loans under centers
+  # managed by the staff member.
+  def self.defaulted_loan_info_for(obj, date=Date.today, days=nil, type=:aggregate, loan_type = :created)    
+    query =  get_query(obj, loan_type)
     query += " AND lh.days_overdue<=#{days}" if days
 
     # either we list or we aggregate depending on type
@@ -181,6 +183,7 @@ class LoanHistory
     sum_outstanding_grouped_by(date, :branch, extra.join(" AND "))
   end
 
+  # TODO:  rewrite it using Datamapper
   def self.sum_disbursed_grouped_by(klass, conditions = {}, from_date=Date.min_date, to_date=Date.today)
     conditions[:loan] ||= {}
     conditions[:loan] +=  {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date}
@@ -192,7 +195,9 @@ class LoanHistory
     repository.adapter.query("SELECT #{select} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')} GROUP BY #{group_id}")
   end
 
-  def self.sum_outstanding_for(obj, to_date=Date.today)
+  # loan_type here is relevant only for the case of staff member. This comes into play when we need all the loans under centers
+  # managed by the staff member.
+  def self.sum_outstanding_for(obj, to_date=Date.today, loan_type = :created)
     if [Branch, Center, ClientGroup, Client].include?(obj.class)
       q = "lh.#{obj.class.name.snake_case}_id"
       query = "#{q}=#{obj.id}"
@@ -202,7 +207,11 @@ class LoanHistory
       q = "lh.branch_id"
       query="branch_id in (#{ids})"
     elsif obj.class==StaffMember
-      ids = Loan.all(:fields => [:id], :disbursed_by_staff_id => obj.id).map{|x| x.id}
+      if loan_type == :created
+        ids = Loan.all(:fields => [:id], :disbursed_by_staff_id => obj.id).map{|x| x.id}
+      elsif loan_type == :managed
+        ids = Loan.all(:fields => [:id], "client.center.manager_staff_id" => obj.id).map{|x| x.id}
+      end
       ids = (ids.length==0 ? "NULL" : ids.join(","))
       query="loan_id in (#{ids})"
       q = "lh.branch_id"
@@ -239,6 +248,7 @@ class LoanHistory
     })
   end
 
+  # TODO:  rewrite it using Datamapper
   def self.loans_for(obj, hash={})
     select = "l.id id, l.amount amount, l.disbursal_date disbursal_date"
     klass, obj = get_class_of(obj)
@@ -264,10 +274,14 @@ class LoanHistory
     })    
   end
 
-  def self.amount_disbursed_for(obj, from_date=Date.min_date, to_date=Date.today)
+  # loan_type here is relevant only for the case of staff member. This comes into play when we need all the loans under centers
+  # managed by the staff member.
+  def self.amount_disbursed_for(obj, from_date=Date.min_date, to_date=Date.today, loan_type = :created)
     hash = {:status => :disbursed, "loan.deleted_at" => nil, :date.gte => from_date, :date.lte => to_date}
-    if obj.class == StaffMember
+    if obj.class == StaffMember and loan_type == :created
       hash["loan.disbursed_by_staff_id"] = obj.id
+    elsif obj.class == StaffMember and loan_type == :managed
+      hash["loan.client.center.manager_staff_id"] = obj.id
     elsif obj.class == LoanProduct
       hash["loan.loan_product_id"] = obj.id
     elsif obj.class == FundingLine
@@ -284,6 +298,7 @@ class LoanHistory
     Struct.new(:client_count, :loan_count, :amount).new(LoanHistory.all(hash).aggregate(:client_id).count, data[1], data[0])
   end
 
+  # TODO:  rewrite it using Datamapper
   def self.borrower_clients_count_in(obj, hash={})
     klass, obj = get_class_of(obj)
     froms = build_froms(klass)
@@ -291,6 +306,7 @@ class LoanHistory
     repository.adapter.query("SELECT count(*) FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end
 
+  # TODO:  rewrite it using Datamapper
   def self.parents_where_loans_of(klass, hash)
     selects    = build_selects(klass)
     froms      = build_froms(klass)
@@ -298,6 +314,7 @@ class LoanHistory
     repository.adapter.query("SELECT #{selects} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end
   
+  # TODO:  rewrite it using Datamapper
   def self.ancestors_of_portfolio(portfolio, ancestor_klass, hash={})
     portfolio_klass, obj = get_class_of(portfolio)
     selects    = build_selects(ancestor_klass)
@@ -319,10 +336,20 @@ class LoanHistory
     })
   end
 
-  def self.loan_repaid_count(obj, from_date=Date.min_date, to_date=Date.today) 
+  # loan_type here is relevant only for the case of staff member. This comes into play when we need all the loans under centers
+  # managed by the staff member.
+  def self.loan_repaid_count(obj, from_date=Date.min_date, to_date=Date.today, loan_type = :created) 
     hash = {:status => :repaid, :date.gte => from_date, :date.lte => to_date, "loan.deleted_at" => nil}
     if obj.class == StaffMember
-      hash["loan.disbursed_by_staff_id"] = obj.id
+      if loan_type == :created
+        hash["loan.disbursed_by_staff_id"] = obj.id
+      else        
+        if obj.centers(:fields => [:id]).count > 0
+          hash["center_id"] = obj.centers(:fields => [:id]).map{|x| x.id}
+        else
+          return 0
+        end
+      end
     elsif obj.class == FundingLine
       hash["loan.funding_line_id"] = obj.id
     elsif obj.class == LoanProduct
@@ -371,6 +398,8 @@ class LoanHistory
     froms
   end
 
+
+  # TODO:  rewrite it for Datamapper
   def self.build_conditions(klass, obj, hash={})
     # lets save some memory if we have to only get ids
     obj = obj.all(:fields => [:id]) if obj and obj.class != Array
@@ -421,6 +450,7 @@ class LoanHistory
     conditions
   end
 
+  # TODO:  rewrite it using Datamapper
   def self.get_latest_rows_of_loans(date = Date.today, query="1")
     query = query.to_a.map{|k, v| 
       if v.is_a?(Array) and v.length == 0
@@ -456,7 +486,10 @@ class LoanHistory
   end
 
   # returns the subquery which can be used elsewhere
-  def self.get_query(obj)
+
+  # loan_type here is relevant only for the case of staff member. This comes into play when we need all the loans under centers
+  # managed by the staff member.
+  def self.get_query(obj, loan_type)
     if [Branch, Center, ClientGroup].include?(obj.class)
       "lh.#{obj.class.to_s.snake_case}_id=#{obj.id}"
     elsif obj.class==Region
@@ -468,9 +501,13 @@ class LoanHistory
       ids = (ids.length==0 ? "NULL" : ids.join(","))
       "lh.branch_id in (#{ids})"      
     elsif obj.class==StaffMember
-      ids = obj.centers.map{|x| x.id}
-      ids = (ids.length==0 ? "NULL" : ids.join(","))
-      "lh.loan_id in (#{ids})"
+      if loan_type == :created
+        "l.disbursed_by_staff_id= #{obj.id}"
+      elsif loan_type == :managed
+        ids = obj.centers.map{|x| x.id}      
+        ids = (ids.length==0 ? "NULL" : ids.join(","))
+        "lh.loan_id in (#{ids})"
+      end
     elsif obj.class == FundingLine
       "l.funding_line_id = #{obj.id}"
     elsif obj.class == LoanProduct

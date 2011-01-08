@@ -111,8 +111,11 @@ class Fee
     (fees - paid).reject{|lid, a| a<=0}
   end
 
-   # faster compilation of fee collected for/by a given obj. This obj can be a branch, center, area, region or staff member
-  def self.collected_for(obj, from_date=Date.min_date, to_date=Date.max_date)
+  # faster compilation of fee collected for/by a given obj. This obj can be a branch, center, area, region or staff member
+  # fee_collected_type here is relevant only for the case of staff member. This comes into play when we need all the fee collected under centers
+  # managed by the staff member.
+  # TODO:  rewrite it using Datamapper
+  def self.collected_for(obj, from_date=Date.min_date, to_date=Date.max_date, fee_collected_type = :created)
     if obj.class==Branch
       from  = "branches b, centers c, clients cl, payments p, fees f"
       where = %Q{
@@ -152,11 +155,19 @@ class Fee
                   and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
                };
     elsif obj.class==StaffMember
-      from  = "payments p, fees f"
-      where = %Q{
+      if fee_collected_type == :created
+        from  = "payments p, fees f"
+        where = %Q{
                   p.received_by_staff_id=#{obj.id} and p.type=3 and p.fee_id=f.id
                   and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
                };
+      elsif fee_collected_type == :managed
+        from  = "centers c, clients cl, payments p, fees f"
+        where = %Q{
+                  c.manager_staff_id=#{obj.id} and cl.center_id=c.id and p.client_id=cl.id and p.type=3 and p.fee_id=f.id
+                  and p.deleted_at is NULL and p.received_on>='#{from_date.strftime('%Y-%m-%d')}' and p.received_on<='#{to_date.strftime('%Y-%m-%d')}'
+               };
+      end
     elsif obj.class==LoanProduct
       from  = "loans l, payments p, fees f"
       where = %Q{
