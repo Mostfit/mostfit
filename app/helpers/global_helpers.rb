@@ -103,6 +103,7 @@ module Merb
       attrs.merge!(:size     => opts[:size]||20)
       attrs.merge!(:min_date => opts[:min_date]||Date.min_date)
       attrs.merge!(:max_date => opts[:max_date]||Date.max_date)
+      attrs.merge!(:nullable => opts[:nullable]) if opts.key?(:nullable)
       date_select_html(attrs) 
     end
  
