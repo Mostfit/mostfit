@@ -4,6 +4,11 @@
       Account Type
     %td
       =select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
+  %tr
+    %td
+      Account Category (if applicable)
+    %td
+      = select(:account_category, :collection => [[:Cash, "Cash"], [:Bank, "Bank"]] , :prompt => "Select Account Category")
   %tr 
     %td
       Branch
