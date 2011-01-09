@@ -456,7 +456,7 @@ module Merb
     
     def approx_address(obj)
       if obj.class == Center
-        if obj.name.include?(obj.branch.name)
+        if obj.branch and obj.name.include?(obj.branch.name)
           obj.name
         else
           "#{obj.name}, #{obj.branch.name}, #{obj.branch.area.name}"
