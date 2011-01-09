@@ -26,14 +26,17 @@ class ParByCenterReport < Report
 
   def generate
     # these are the loan history lines which represent the last line before @date
-    selects = [:loan_id, :branch_id, :center_id, :client_id, :amount_in_default, :days_overdue, :date]             
-    par_data = LoanHistory.defaulted_loan_info_by(:center, @date, {:branch_id => @branch.map{|x| x.id}, :center_id => @center.map{|x| x.id}}, selects)
+    selects = [:loan_id, :branch_id, :center_id, :client_id, :amount_in_default, :days_overdue, :date]
+    par_data = LoanHistory.defaulted_loan_info_by(:loan, @date, {:branch_id => @branch.map{|x| x.id}, :center_id => @center.map{|x| x.id}}, selects)
 
-    center_defaults = {}
+    center_defaults, loans = {}, {}
     clients = Client.all(:id => par_data.map{|x| x.client_id}, :fields => [:id, :name, :reference, :center_id]).map{|x| [x.id, x]}.to_hash
     hash    = {:client_id => clients.keys, :fields => [:id, :client_id, :loan_product_id, :amount]}
     hash[:loan_product_id] = loan_product_id if loan_product_id
-    loans   = Loan.all(hash).map{|x| [x.id, x]}.to_hash
+    loans   = {}
+    Loan.all(hash).map{|loan| 
+      loans[loan.id] = loan
+    }
     center_defaults = par_data.group_by{|x| x.center_id}
 
     data = {}
@@ -45,13 +48,13 @@ class ParByCenterReport < Report
         next unless center_defaults[center.id]
         data[branch][center] = []
         center_defaults[center.id].each do |default|
-          next unless loans.key?(default.loan_id)
-          loan = loans[default.loan_id]
+          next unless loans.key?(default.loan_id)          
           if default.date and @date > default.date - default.days_overdue
+            loan    = loans[default.loan_id]
             late_by = default.days_overdue + (@date - default.date)
             next unless to_include = include_late_day?(late_by)
-            data[branch][center] << [clients[default.client_id].name, clients[default.client_id].reference, loan.cycle_number, loan.loan_product.name, loan.amount, 
-                                     loan.installment_frequency, default.pdiff, default.tdiff - default.pdiff, default.tdiff, late_by]
+            data[branch][center].push([clients[default.client_id].name, clients[default.client_id].reference, loan.cycle_number, loan.loan_product.name, loan.amount, 
+                                       loan.installment_frequency, default.pdiff, default.tdiff - default.pdiff, default.tdiff, late_by])
           end
         end
       end

@@ -321,7 +321,7 @@ module Merb
           if relations.key?(k)
             str = "<tr><td>#{relations[k].first.to_s.humanize}</td><td>"
             str += (if action==:update and v.class==Array
-                     "changed from #{v.first.nil? ? 'nil' : relations[k].last.get(v.first).name}</td><td>to #{relations[k].last.get(v.last).name}"
+                     "changed from #{v.first.nil? ? 'nil' : relations[k].last.get(v.first).name}</td><td>to #{v.last.nil? ? 'nil' : relations[k].last.get(v.last).name}"
                     elsif action==:create and v.class==Array
                       child_obj = relations[k].last.get(v.last)
                       ((child_obj and child_obj.respond_to?(:name)) ? child_obj.name : "id: #{v.last}")
