@@ -3,7 +3,7 @@ class Comment
   
   property :id, Serial
   
-  property :text,           Text, :min => 2
+  property :text,           Text, :min => 5
   property :parent_model,   String
   property :parent_id,      Integer
   property :created_at,     DateTime

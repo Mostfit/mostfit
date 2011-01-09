@@ -193,15 +193,19 @@ function attachFormRemote(){
 						   window.location.href = data.redirect;
 					       }else if(form.find("input[name='_target_']").length>0){
 						   id=form.find("input[name='_target_']").attr("value");
-						   $("#"+id).html(data);
+						   if($("#"+id).length>0){
+						       $("#"+id).html(data);						       
+						   }
+						   else if($("#append_"+id).length>0){
+						       $(data).appendTo($("#append_"+id));
+						   }
 					       }else if(form.find("table").length>0){
 						   form.find("table").html(data);
 					       }else if(form.find("div").length>0){
 						   form.find("div").html(data);
-						   $("#spinner").remove();
-						   $(form).find("input[type='submit']").attr("disabled", "");
-						   addFloater("");
 					       }
+					       addFloater("");
+					       $(form).find("input[type='submit']").attr("disabled", "");
 					       $("#spinner").remove();
 					   },
 					   error: function(xhr, text, errorThrown){
@@ -219,7 +223,6 @@ function attachFormRemote(){
 				return(false);
 			    });
 }
-
 function create_remotes(){
 	$("a._remote_").live('click', function(){			     
 				 href=$(this).attr("href");
@@ -881,24 +884,6 @@ $(document).ready(function(){
 						  $('.closeNotice').addClass('notice');
 						  $('.notice').remove();
 					      });
-		      $("#comments_form").submit(function(){
-						     form = $("#comments_form");
-						     $.ajax({
-								type: "POST",
-								url: form.attr("action"),
-								data: form.serialize(),
-								success: function(data){
-								    $("table.comments").html(data);
-								    $("table.comments tr:last").hide().prev().hide();
-								    $("textarea#comment_text").val("");
-								    $("table.comments tr:last").fadeIn("slow").prev().fadeIn("slow");
-								},
-								error: function(data){
-								    alert("sorry could not add that");
-								}
-							    });
-						     return false;
-						 });
 		      $("#bookmark_form input:checkbox").click(function(){
 								   if($(this).attr("value")==="all" && $(this).attr("checked")===true){
 								       $("#bookmark_form input:checkbox").each(function(){

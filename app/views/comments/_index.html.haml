@@ -1,5 +1,5 @@
 - @comments = Comment.all(:parent_model => object.class.to_s, :parent_id => object.id, :order => [:created_at])
-%table.comments
+%table.comments#comments_container
   - @comments.each do |comment|
     %tr{:class => cycle('even','odd')}
       %td

@@ -1,6 +1,7 @@
 - @comment = Comment.new
-= form_for(@comment, :id => "comments_form", :action => resource(:comments)) do
+= form_for(@comment, :id => "comments_form", :action => resource(:comments), :class => "_remote_", :onsubmit => "$('comment_text').value('')") do
   = text_area :text, :cols => 80, :rows => 10
+  = hidden_field :name => "_target_", :value => "comments_container"
   %br
   %button{:type => 'submit', :class => 'add'}
     Add a Comment
