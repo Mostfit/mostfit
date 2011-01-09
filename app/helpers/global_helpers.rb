@@ -456,11 +456,10 @@ module Merb
     
     def approx_address(obj)
       if obj.class == Center
-        if obj.branch and obj.name.include?(obj.branch.name)
-          obj.name
-        else
-          "#{obj.name}, #{obj.branch.name}, #{obj.branch.area.name}"
-        end
+        str  =  obj.name
+        str += obj.branch.name      if obj.branch and not obj.name.include?(obj.branch.name)
+        str += obj.branch.area.name if obj.branch.area
+        return str
       elsif obj.respond_to?(:address) and not obj.address.blank?
         obj.address
       elsif obj.class == Branch
