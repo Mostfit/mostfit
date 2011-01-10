@@ -1,4 +1,4 @@
-h1. MISFIT:  an MIS for MFIs.
+h1. MOSTFIT:  an MIS for MFIs.
 
 This software is build using the Ruby programming language, on top of the Merb web framework and the DataMapper ORM. MISFIT takes a minimal approach, it basically creates the application in the most generic form, yet fully usable for the needs of our clients and beyond. You can see our demo at http://mostfit.intellecap.in
 
@@ -15,6 +15,8 @@ rake mock:load_demo
 Go get a cup of coffee when you see text whizzing by and by the time you finish your delicious beverage, the demo fixtures should have been loaded and the system set up for your use.
 Run "bin/merb" to start the server
 
+More detailed instructions at [[https://github.com/Mostfit/mostfit/wiki/How-to-install]]
+
 h2. Customizing
 
 Customizing MISFIT is very simple, in most cases not many modifications will be needed in order to fit your needs. In case you want to create different types of loan (different payment schemes and other acocunting details) just subclass from the Loan class in /app/models/loan.rb. There should be already some specific loan types there. For other modifications, like disabeling some functionality or adding a field, we suggest you just modify the code directly.
@@ -26,4 +28,4 @@ We use github, that means you can easily host your own branch of this software. 
  * easily contribute your changes back to the community
  * incorporate community innovation
 
-Which brings us to our goals of sharing costs, being flexible and delivering the best --free for all-- though open innovation. The license is AGPLv3, which is considered a strong-copyleft (viral) Open and Free Software license.
+Which brings us to our goals of sharing costs, being flexible and delivering the best --free for all-- though open innovation. The license is MIT.
