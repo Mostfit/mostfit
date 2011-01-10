@@ -95,7 +95,7 @@
       %td
         Reason
       %td
-        = select :inactive_reason, :collection => INACTIVE_REASONS.reject{|x| x.blank?}.map{|x| [x.to_s, x.to_s.camelcase(' ')]}
+        = select :inactive_reason, :collection => INACTIVE_REASONS.reject{|x| x.blank?}.map{|x| [x.to_s, x.to_s.camelcase(' ')]}, :prompt => "Select reason for being inactive"
      
   %tr
     %td
