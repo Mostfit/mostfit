@@ -1,6 +1,7 @@
 class Portfolios < Application
   # provides :xml, :yaml, :js
   before :get_context
+  include DateParser
 
   def index
     @portfolios = Portfolio.all
@@ -18,6 +19,8 @@ class Portfolios < Application
   def new
     only_provides :html    
     @portfolio = Portfolio.new
+    @portfolio.added_on  = Date.parse(params[:added_on])  if params[:added_on] and not params[:added_on].blank?
+    @portfolio.branch_id = params[:branch_id] if params[:branch_id] and not params[:branch_id].blank?
     @data      = @portfolio.eligible_loans
     @centers   = []
     display @portfolio

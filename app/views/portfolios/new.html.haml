@@ -1,9 +1,11 @@
 %h1 Create a new portfolio
 
 = error_messages_for @portfolio
+= partial :form
 
 = form_for(@portfolio, :action => resource(@funder, :portfolios) ) do
   = partial :fields
+  = hidden_field :added_on, :value => @portfolio.added_on||Date.today 
   %p
     = submit "Create"
 

@@ -489,7 +489,7 @@ class LoanHistory
 
   # loan_type here is relevant only for the case of staff member. This comes into play when we need all the loans under centers
   # managed by the staff member.
-  def self.get_query(obj, loan_type)
+  def self.get_query(obj, loan_type=:created)
     if [Branch, Center, ClientGroup].include?(obj.class)
       "lh.#{obj.class.to_s.snake_case}_id=#{obj.id}"
     elsif obj.class==Region

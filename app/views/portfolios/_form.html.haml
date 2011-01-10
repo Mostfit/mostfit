@@ -1,0 +1,16 @@
+%a.expand_collapsed{:style => "color: green"}
+  Change parameters
+.collapsed
+  %form{:action => resource(@funder, :portfolios, :new), :method => :get, :style => "width: 50%"}
+    %table
+      %tr
+        %th
+          Added on
+        %td
+          = date_select :added_on, params[:added_on]||Date.today
+        %th
+          Branch
+        %td
+          = select :branch_id, :collection => Branch.all.map{|b| [b.id, b.name]}, :prompt => "Select branch"
+        %td
+          = submit "change"

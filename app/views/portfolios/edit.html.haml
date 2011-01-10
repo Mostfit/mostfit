@@ -1,7 +1,7 @@
 %h1
   ==Edit #{@portfolio.name}
-
 = error_messages_for @portfolio
+= partial :form
 
 = form_for(@portfolio, :action => resource(@funder, @portfolio) ) do
   = partial :fields
