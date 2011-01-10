@@ -4,6 +4,7 @@
 = partial :form
 
 = form_for(@portfolio, :action => resource(@funder, @portfolio) ) do
+  = hidden_field :added_on, :value => @portfolio.added_on||Date.today
   = partial :fields
   %p
     = submit "Save portfolio"
