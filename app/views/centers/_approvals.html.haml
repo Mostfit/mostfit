@@ -8,7 +8,7 @@
           Scheduled Disbursal Date
         %th
           Status
-    - loans_to_approve.group_by{|x| x.client.client_group}.sort_by{|x| x[0].name}.each do |group, loans|
+    - loans_to_approve.group_by{|x| x.client.client_group}.sort_by{|x| x[0] ? x[0].name : ""}.each do |group, loans|
       %tr.group
         %td{:colspan => 5}
           - if group
