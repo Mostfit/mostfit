@@ -149,7 +149,6 @@ module Misfit
         
         if @staff
           return additional_checks if @route.has_key?(:id) and @route[:id] and not [:graph_data, :dashboard, :info].include?(@route[:controller].to_sym)
-
           unless CUD_Actions.include?(@action)
             return true if ["staff_members"].include?(@controller)
             return true if @controller == "regions" and @staff.regions.length > 0
@@ -159,8 +158,8 @@ module Misfit
             return false if @controller == "regions"
             return(@staff.regions.length > 0) if @controller == "areas" 
           end
-
-          if [:branches, :centers, :clients, :loans].include?(@controller.to_sym) and CUD_Actions.include?(@action) and params
+          
+          if [:branches, :centers, :clients, :loans].include?(@controller.to_sym) and params
             params = params.merge(@route)
             
             {:branch_id => Branch, :center_id => Center, :client_id => Client, :area_id => Area, :region_id => Region}.each{|key, klass|

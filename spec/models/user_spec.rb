@@ -561,6 +561,7 @@ describe User do
     #client access
     user.staff_member.branches.centers.clients.all.each{|client|
       user.can_access?({:action => "show", :id => client.id, :controller => "clients", :branch_id => client.center.branch_id, :center_id => client.center_id}).should be_true
+      user.can_access?({:action => "index", :controller => "clients"}, {:branch_id => client.center.branch_id, :center_id => client.center_id}).should be_true
     }
     #client creation
     user.can_access?({:action => "create", :controller => "clients"}, 
@@ -576,6 +577,7 @@ describe User do
     #loan access
     user.staff_member.branches.centers.clients.loans.all.each{|loan|
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_true
+      user.can_access?({:action => "index", :controller => "loans"}, {:client_id => loan.client_id, :center_id => loan.client.center_id, :branch_id => loan.client.center.branch_id}).should be_true
     }
     #loans create
     user.can_access?({:action => "create", :controller => "loans"}, 
@@ -595,6 +597,7 @@ describe User do
     }
     #center access
     Branch.all(:manager.not => user.staff_member).centers(:manager.not => user.staff_member).each{|center|
+      user.can_access?({:action => "index", :id => center.id, :controller => "centers"}, {:branch_id => center.branch_id}).should be_false
       user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_false
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "center", :id => center.id}).should be_false
@@ -602,11 +605,14 @@ describe User do
     #client access
     Branch.all(:manager.not => user.staff_member).centers(:manager.not => user.staff_member).clients.each{|client|
       user.can_access?({:action => "show", :id => client.id, :controller => "clients", :branch_id => client.center.branch_id, :center_id => client.center_id}).should be_false
+      user.can_access?({:action => "index", :controller => "clients"}, {:branch_id => client.center.branch_id, :center_id => client.center_id}).should be_false
     }
     #loan access
     Branch.all(:manager.not => user.staff_member).centers(:manager.not => user.staff_member).clients.loans.all.each{|loan|
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_false
+      user.can_access?({:action => "index", :controller => "loans"}, {:client_id => loan.client_id, :center_id => loan.client.center_id, :branch_id => loan.client.center.branch_id}).should be_false
     }
+    
     #info
     user.can_access?({:action => "moreinfo", :controller => "info"}).should be_true
     # admin & manage stuff: no access
@@ -732,6 +738,7 @@ describe User do
                          :creation_date => "27-11-2010", :area_id => 1}}).should be_false
     #center access
     user.staff_member.centers.each{|center|
+      user.can_access?({:action => "index", :branch_id => center.branch_id, :controller => "centers"}).should be_true
       user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_true
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "center", :id => center.id}).should be_true
@@ -753,6 +760,7 @@ describe User do
     #client access
     user.staff_member.branches.centers.clients.all.each{|client|
       user.can_access?({:action => "show", :id => client.id, :controller => "clients", :branch_id => client.center.branch_id, :center_id => client.center_id}).should be_true
+      user.can_access?({:action => "index", :controller => "clients", :branch_id => client.center.branch_id, :center_id => client.center_id}).should be_true
     }
     #client creation
     user.can_access?({:action => "create", :controller => "clients"}, 

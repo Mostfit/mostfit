@@ -45,7 +45,7 @@ class Loans < Application
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' was successfully created"})
       else
-        redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
+        redirect resource(@branch, @center, @client), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
       end
     else
       @loan.interest_rate *= 100
@@ -77,7 +77,7 @@ class Loans < Application
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' has been edited"})
       else
-        redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
+        redirect resource(@branch, @center, @client), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
       end
     else
       @loan.interest_rate*=100
@@ -94,7 +94,7 @@ class Loans < Application
     disallow_updation_of_verified_loans
     raise NotFound unless @loan
     if @loan.destroy
-      redirect resource(@branch, @center, @client, :loans), :message => {:notice => "Loan '#{@loan.id}' has been deleted"}
+      redirect resource(@branch, @center, @client), :message => {:notice => "Loan '#{@loan.id}' has been deleted"}
     else
       raise InternalServerError
     end
