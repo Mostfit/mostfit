@@ -184,11 +184,12 @@ module DataEntry
           @type = params[:payment][:type]
           style = params[:payment_style][k.to_sym].to_sym
           next if amounts<=0
-
           @success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, true, style)
-          if @success
+
+          if @success 
             @loan.history_disabled = false
-            @loan.update_history
+            @loan.already_updated  = false
+            @loan.update_history(true)
           end
           @errors << @prin.errors if (@prin and not @prin.errors.blank?)
           @errors << @int.errors if (@int and not @int.errors.blank? )

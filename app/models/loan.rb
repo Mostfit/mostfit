@@ -807,13 +807,14 @@ class Loan
   end
   # the installment dates
   def installment_dates
+    #return @_installment_dates if @_installment_dates
     ensure_meeting_day = false
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
 
     (0..(number_of_installments-1)).to_a.map {|x| 
       shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day)
-    }
+    }    
   end
 
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
@@ -844,7 +845,7 @@ class Loan
                d.holiday_bump if d.is_a?(Date)
              } + payment_dates + installment_dates).compact.uniq.sort
     last_paid_date = nil
-    
+
     repayed=false
     dates.each_with_index do |date,i|
       current   = date == Date.today ? true : (((dates[[i,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or 
@@ -1262,17 +1263,18 @@ class PararthRounded < Loan
     @_rounding_schedule = nil
   end
 
+  # repayment styles
   def pay_prorata(total, received_on)
-    #adds up the principal and interest amounts that can be paid with this amount and prorates the amount   
-    return false if total.to_f > total.to_i 
-    last_payment = payments.max(:received_on)
-    used = prin = int = 0.0
-    payment_schedule.reject{|k,v| k <= last_payment}.sort_by{|k,v| k}.each{|date, hash|
-      if (prin + int) < total
-        prin += hash[:principal]
-        int  += hash[:interest]
-      end
-    }
+    #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
+    i = used = prin = int = 0.0
+    d = received_on
+    total = total.to_f
+    while used < total
+      prin -= principal_overpaid_on(d).round(2)
+      int  -= interest_overpaid_on(d).round(2)
+      used  = (prin + int)
+      d = client.center.next_meeting_date_from(d)
+    end
     interest  = total * int/(prin + int)
     principal = total * prin/(prin + int)
     pfloat    = principal - principal.to_i
