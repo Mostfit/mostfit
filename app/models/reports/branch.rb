@@ -36,7 +36,7 @@
       query_as_hash(%Q{
           SELECT b.id, COUNT(l.id) 
           FROM loans l, clients cl, centers c, branches b
-          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id 
+          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id AND l.rejected_on is NULL
                                     AND l.disbursal_date <='#{date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
                                     AND cl.deleted_at is NULL
           GROUP BY b.id})
@@ -46,17 +46,18 @@
       query_as_hash(%Q{
           SELECT b.id, SUM(l.amount) 
           FROM loans l, clients cl, centers c, branches b
-          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id 
+          WHERE l.client_id = cl.id AND cl.center_id = c.id AND c.branch_id = b.id AND l.rejected_on is NULL
                                     AND l.disbursal_date <='#{date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
                                     AND cl.deleted_at is NULL
           GROUP BY b.id})
     end
     
-    def active_client_count(date = Date.today)      
+    def active_client_count(date = Date.today)
       ids = repository.adapter.query(%Q{
                   SELECT loan_id, max(date) date
-                  FROM loan_history lh, clients cl 
-                  WHERE lh.client_id=cl.id AND cl.date_joined <= '#{date.strftime('%Y-%m-%d')}' AND status in (5,6,7,8,9)
+                  FROM loan_history lh, clients cl, loans l
+                  WHERE lh.client_id=cl.id AND cl.date_joined <= '#{date.strftime('%Y-%m-%d')}' AND lh.status in (5,6,7,8,9)
+                        AND lh.loan_id=l.id AND l.rejected_on is NULL AND l.deleted_at is NULL
                   GROUP BY loan_id}).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
       return false if ids.length==0     
       query_as_hash(%Q{
@@ -77,7 +78,7 @@
                        FROM clients cl, loans l, branches b, centers c
                        WHERE cl.id = l.client_id AND cl.active = true AND l.disbursal_date is not NULL 
                                                  AND cl.date_joined <= '#{date.strftime('%Y-%m-%d')}' AND c.branch_id = b.id 
-                                                 AND cl.center_id = c.id AND l.deleted_at is NULL
+                                                 AND cl.center_id = c.id AND l.deleted_at is NULL AND l.rejected_on is NULL
                        GROUP BY b.id
       })
     end
@@ -88,7 +89,7 @@
             SELECT b.id, COUNT(l.id) 
             FROM branches b, centers c, clients cl, loans l
             WHERE b.id=c.branch_id AND cl.center_id=c.id AND cl.deleted_at is NULL AND cl.id=l.client_id AND l.deleted_at is NULL
-                  AND l.disbursal_date<='#{date.strftime('%Y-%m-%d')}' AND cycle_number='#{loan_cycle}'
+                  AND l.disbursal_date<='#{date.strftime('%Y-%m-%d')}' AND cycle_number='#{loan_cycle}' AND l.rejected_on is NULL
             GROUP BY b.id})
     end
     
@@ -124,7 +125,7 @@
          WHERE l.id = lh.loan_id 
                AND  lh.status = #{STATUSES.index(:repaid) + 1}  AND lh.date BETWEEN '#{start_date.strftime('%Y-%m-%d')}' 
                AND '#{end_date.strftime('%Y-%m-%d')}'
-               AND  l.deleted_at is NULL
+               AND  l.deleted_at is NULL AND l.rejected_on is NULL
          GROUP BY lh.branch_id})
     end
     
@@ -136,8 +137,8 @@
          SELECT lh.branch_id, #{what}(l.amount)
          FROM loans l, loan_history lh
          WHERE l.id = lh.loan_id 
-               AND  lh.status = #{STATUSES.index(:disbursed) + 1} AND  l.disbursal_date BETWEEN '#{start_date.strftime('%Y-%m-%d')}' 
-               AND '#{end_date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL
+               AND  lh.status = #{STATUSES.index(:disbursed) + 1} AND  lh.date BETWEEN '#{start_date.strftime('%Y-%m-%d')}' 
+               AND '#{end_date.strftime('%Y-%m-%d')}' AND l.deleted_at is NULL AND l.rejected_on is NULL
          GROUP BY lh.branch_id})
     end
     
@@ -146,11 +147,11 @@
       end_date = Date.parse(end_date) unless end_date.is_a? Date
       return unless what.downcase == "sum" or what.downcase == "count"
       query_as_hash(%Q{
-         SELECT c.branch_id branch_id, #{what}(l.amount)
+         SELECT c.branch_id branch_id, #{what}(if(l.amount_applied_for>0, l.amount_applied_for, l.amount))
          FROM loans l, clients cl, centers c
          WHERE l.client_id = cl.id AND cl.center_id=c.id AND l.applied_on BETWEEN '#{start_date.strftime('%Y-%m-%d')}' 
                                    AND '#{end_date.strftime('%Y-%m-%d')}' 
-               AND l.deleted_at is NULL
+               AND l.deleted_at is NULL AND l.rejected_on is NULL
          GROUP BY c.branch_id})
     end
     
@@ -159,11 +160,11 @@
       end_date = Date.parse(end_date) unless end_date.is_a? Date
       return unless what.downcase == "sum" or what.downcase == "count"
       query_as_hash(%Q{
-         SELECT c.branch_id branch_id, #{what}(l.amount)
+         SELECT c.branch_id branch_id, #{what}(if(amount_sanctioned > 0, amount_sanctioned, amount))
          FROM loans l, clients cl, centers c
          WHERE l.client_id = cl.id AND cl.center_id=c.id AND l.approved_on BETWEEN '#{start_date.strftime('%Y-%m-%d')}' 
                                    AND '#{end_date.strftime('%Y-%m-%d')}' 
-                                   AND l.deleted_at is NULL
+                                   AND l.deleted_at is NULL AND l.rejected_on is NULL
          GROUP BY c.branch_id})
     end
     
@@ -174,7 +175,7 @@
                                       WHERE b.id=c.branch_id AND cl.center_id=c.id AND p.client_id=cl.id AND p.deleted_at is NULL 
                                                              AND cl.deleted_at is NULL 
                                                              AND p.type=#{ptype+1} 
-                                                             AND p.received_on>='#{start_date.strftime('%Y-%m-%d')}' 
+                                                             AND p.received_on>='#{start_date.strftime('%Y-%m-%d')}'
                                                              AND p.received_on<='#{end_date.strftime('%Y-%m-%d')}' 
                                       GROUP BY b.id;}).group_by{|x| x[0]}.map{|b, a| 
           {b => a[0].amount.to_i}
@@ -204,7 +205,7 @@
       query_as_hash(%Q{SELECT b.id, 
                        SUM(p.amount) amount 
                        FROM payments p, loans l, clients cl, centers c, branches b 
-                       WHERE p.type=1 AND p.deleted_at is NULL AND p.loan_id=l.id 
+                       WHERE p.type=1 AND p.deleted_at is NULL AND p.loan_id=l.id AND p.received_on <= '#{date.strftime('%Y-%m-%d')}'
                                       AND l.client_id=cl.id AND cl.center_id=c.id AND c.branch_id=b.id 
                        GROUP BY b.id})
     end
@@ -213,7 +214,7 @@
       query_as_hash(%Q{SELECT b.id, 
                        SUM(p.amount) amount 
                        FROM payments p, loans l, clients cl, centers c, branches b 
-                       WHERE p.type=2 AND p.loan_id=l.id AND p.deleted_at is NULL 
+                       WHERE p.type=2 AND p.loan_id=l.id AND p.deleted_at is NULL AND p.received_on <= '#{date.strftime('%Y-%m-%d')}'
                                       AND l.client_id=cl.id AND cl.center_id=c.id AND c.branch_id=b.id 
                        GROUP BY b.id})
     end
@@ -231,12 +232,12 @@
       end_date = Date.parse(end_date) unless end_date.is_a? Date
       query_as_hash(%Q{SELECT b.id, 
                        SUM(p.amount) amount 
-                       FROM payments p, loans l, clients cl, centers c, branches b
-                       WHERE p.type=3 AND p.loan_id=l.id AND p.deleted_at is NULL  
+                       FROM payments p, clients cl, centers c, branches b
+                       WHERE p.type=3 AND p.client_id=cl.id AND p.deleted_at is NULL  
                                       AND p.received_on >= '#{start_date.strftime('%Y-%m-%d')}' 
                                       AND p.received_on <= '#{end_date.strftime('%Y-%m-%d')}' 
-                                      AND l.client_id=cl.id AND cl.center_id=c.id AND c.branch_id=b.id
-                       GROUP BY b.id}) 
+                                      AND cl.center_id=c.id AND c.branch_id=b.id
+                       GROUP BY b.id})
     end
     
     def card_fee(date)
@@ -244,6 +245,7 @@
                        SUM(p.amount) amount
                        FROM payments p, clients cl, centers c, branches b
                        WHERE p.type=3 AND p.deleted_at IS NULL AND p.loan_id IS NULL AND p.client_id=cl.id
+                                      AND p.received_on <= '#{date.strftime('%Y-%m-%d')}'
                                       AND cl.center_id=c.id AND cl.deleted_at is NULL 
                                       AND c.branch_id=b.id
                        GROUP BY b.id})
@@ -255,6 +257,7 @@
                        SUM(p.amount) amount 
                        FROM payments p, loans l, clients cl, centers c, branches b 
                        WHERE p.type=3 AND p.loan_id=l.id AND cl.deleted_at is NULL AND p.deleted_at IS NULL
+                                      AND p.received_on <= '#{date.strftime('%Y-%m-%d')}'
                                       AND p.loan_id IS NOT NULL AND l.client_id=cl.id AND cl.center_id=c.id 
                                       AND c.branch_id=b.id
                        GROUP BY b.id})
@@ -283,7 +286,7 @@
       query_as_hash(%Q{ 
           SELECT b.id, COUNT(*) as count
           FROM client_groups clg, centers c, branches b
-          WHERE clg.center_id = c.id AND c.branch_id = b.id 
+          WHERE clg.center_id = c.id AND c.branch_id = b.id
           GROUP BY b.id})
     end
     
@@ -326,7 +329,7 @@
       }.to_hash
     end
     
-    def principal_overdue_last_week(days, date=Date.today)
+    def principal_overdue_last_week(date=Date.today, days=nil)
       Branch.all.map{|b|
         due = LoanHistory.defaulted_loan_info_for(b, date, days)
         if due

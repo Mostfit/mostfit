@@ -115,7 +115,7 @@ class Report
     repository.adapter.query(%Q{
        SELECT #{[by, columns, select].flatten.reject{|x| x.blank?}.join(', ')}
        FROM branches b, centers c, clients cl, loans l
-       WHERE b.id=c.branch_id AND c.id=cl.center_id AND cl.id=l.client_id AND l.deleted_at is NULL AND cl.deleted_at is NULL
+       WHERE b.id=c.branch_id AND c.id=cl.center_id AND cl.id=l.client_id AND l.deleted_at is NULL AND cl.deleted_at is NULL AND l.rejected_on is NULL
              #{condition}
        GROUP BY #{by_query}
     })    
