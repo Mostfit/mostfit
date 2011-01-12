@@ -28,12 +28,13 @@
     %th
       Current outstanding
   - org_total = []
+  - center_loans = @portfolio.portfolio_loans.group_by{|pl| pl.loan.client.center}
+
   - @data.sort_by{|branch, centers| branch.name}.each do |branch, centers|
     %tr.branch
       %td{:colspan => length+1}
         %b= branch.name
     - branch_total = [0, 0, 0, 0, 0, 0, 0]
-    - center_loans = @portfolio.portfolio_loans.group_by{|pl| pl.loan.client.center}
     - centers.sort_by{|center| center[0].name}.each do |center, data|
       %tr.center
         %td

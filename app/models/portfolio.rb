@@ -47,20 +47,32 @@ class Portfolio
   
   def eligible_loans
     centers_hash = {}
+    row = Struct.new(:loan_count, :actual_outstanding_principal)
+
     Center.all(:fields => [:id, :name]).each{|c| centers_hash[c.id] = c}
     
     hash = self.new? ? {} : {:portfolio_id.not => id}
     hash[:active] = true
     pids = (PortfolioLoan.all(hash).map{|x| x.loan_id})
+    repaid_loans = LoanHistory.all(:current => true, :loan_id => PortfolioLoan.all(:portfolio_id => self.id).map{|pl| pl.loan_id}, :status => [:repaid, :written_off, :claim_settlement])
+    
     taken_loans = []
     
     taken_loans << "l.id not in (#{pids.join(', ')})" if pids.length > 0
     taken_loans << "lh.branch_id = #{self.branch_id}" if self.branch_id and self.branch_id.to_i > 0
+
     date = self.added_on || Date.today
 
     data = LoanHistory.sum_outstanding_grouped_by(date, [:center, :branch], taken_loans).group_by{|x| x.branch_id}.map{|bid, centers| 
       [Branch.get(bid), centers.group_by{|x| x.center_id}.map{|cid, rows| [centers_hash[cid], rows.first]}.to_hash]
     }.to_hash
+
+    repaid_loans.each{|lh|
+      data[lh.branch][lh.center] ||= row.new(0, 0)
+      data[lh.branch][lh.center].loan_count += 1
+      data[lh.branch][lh.center].actual_outstanding_principal += lh.actual_outstanding_principal
+    }
+    data
   end
 
   def process_portfolio_details
@@ -113,8 +125,11 @@ class Portfolio
         loan_values[loan.loan_id] = loan
       }
       self.portfolio_loans(:active => true).each{|l|
-        next unless loan_values.key?(l.loan_id)
-        l.current_value = loan_values[l.loan_id].actual_outstanding_principal
+        if loan_values.key?(l.loan_id)
+          l.current_value = loan_values[l.loan_id].actual_outstanding_principal
+        else
+          l.current_value = 0
+        end
         l.save!
         loan_ids << l.loan_id
       }
