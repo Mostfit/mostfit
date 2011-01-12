@@ -1,7 +1,7 @@
 module Misfit
   module Extensions
     module User
-      CUD_Actions =["create", "new", "edit", "update", "destroy"]
+      CUD_Actions =["create", "new", "edit", "update", "destroy", "approve", "disburse", "reject", "write_off", "write_off_reject"]
       CR_Actions =["create", "new", "index", "show"]
       #add hooks to before and after can_access? and can_manage? methods to override their behaviour
       # here we add hooks to see if the user can manage a particular instance of a model.
@@ -25,8 +25,7 @@ module Misfit
           # do not allow a staff member any other staff member access
           return false if @staff.branches.length==0 and @staff.areas.length==0 and @staff.regions.length==0 
           # Only allow branch managers to edit or create a new staff member
-          branch = st.centers.branches.first
-          return is_manager_of?(branch)
+          return is_manager_of?(st.centers.branches)
         elsif model == Branch
           branch = Branch.get(id)
           if [:delete].include?(@action.to_sym)
@@ -144,7 +143,7 @@ module Misfit
           
           if @action == "show" and @controller == "reports"
             return (@route[:report_type] == "ProjectedReport" or @route[:report_type] == "DailyReport" or @route[:report_type] == "TransactionLedger")
-          end      
+          end
         end
         
         if @staff
@@ -152,9 +151,11 @@ module Misfit
           unless CUD_Actions.include?(@action)
             return true if ["staff_members"].include?(@controller)
             return true if @controller == "regions" and @staff.regions.length > 0
+            return true if @controller == "branches" and @action == "index"
             return(@staff.areas.length>0 or @staff.regions.length > 0) if @controller == "areas"
           else
             return(@staff.areas.length>0 or @staff.regions.length>0 or role == :mis_manager) if @controller == "staff_members"
+            return(@staff.branches.length>0 or @staff.areas.length>0 or @staff.regions.length>0 or role == :mis_manager) if @controller == "loans" and ["approve", "disburse", "suggest_write_off"].include?(@action)
             return false if @controller == "regions"
             return(@staff.regions.length > 0) if @controller == "areas" 
           end
@@ -167,7 +168,7 @@ module Misfit
               return is_manager_of?(klass.get(params[key])) if params[key] and not params[key].blank?
             }
 
-            if hash=params[@controller.singularize.to_sym] or (params[:loan_type] and not params[:loan_type].blank? and hash=params[params[:loan_type].snake_case.to_sym])
+            if hash = params[@controller.singularize.to_sym] or (params[:loan_type] and not params[:loan_type].blank? and hash=params[params[:loan_type].snake_case.to_sym])
               if hash[:branch_id] and branch=Branch.get(hash[:branch_id])
                 return is_manager_of?(branch)
               elsif (hash[:center_id] and center = Center.get(hash[:center_id])) or (hash[:client_id] and center = Client.get(hash[:client_id]).center)
