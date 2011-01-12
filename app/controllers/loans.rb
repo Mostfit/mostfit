@@ -337,7 +337,7 @@ class Loans < Application
   end
 
   def disallow_updation_of_verified_loans
-    raise NotPrivileged if @loan.verified_by_user_id and not session.user.admin?
+    raise NotChangeable if @loan.verified_by_user_id and not session.user.admin?
   end
 
   def collection_sheet
