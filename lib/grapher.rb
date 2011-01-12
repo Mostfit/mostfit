@@ -58,8 +58,8 @@ module Grapher
         y_legend = Title.new("figures in lakhs")
         y_legend.style = '{color: #ff4500; font-size: 14px; font-weight: bold}'
         
-        if (@elements[:values].length>0 and @elements[:values].first.is_a?(Numeric) and @elements[:values].max > 1_00_000)
-          @elements[:values] = @y_axis.change_to_lakh(@elements[:values]) if @y_axis
+        if @elements[:values].length>0 and (@elements[:values].first.is_a?(Numeric) or @elements[:values].first.is_a?(Float))          
+          @elements[:values] = @y_axis.change_to_lakh(@elements[:values]) if @y_axis if @elements[:values].max > 1_00_000
           hash[:y_legend] = y_legend.generate
         elsif @elements[:values].map{|x| x[:value]}.max > 1_00_000
           @elements[:values].each{|ele| 
