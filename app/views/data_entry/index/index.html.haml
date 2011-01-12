@@ -36,23 +36,22 @@
           = link_to_with_rights "Edit a #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'edit'), :class => 'edit_small'
         - if thing == :loan
           %br
-          - pa = Loan.all(:approved_on => nil).size
+          - pa = get_loans(:approved_on => nil, :rejected_on => nil).count
           %b{:style => "color:green;"}
             = link_to_with_rights("Approve Loans (#{pa})<br/>", url(:loan_actions,:action => 'approve'), :class => 'edit_small',:style => "font-weight: bold;")
-          - nd = Loan.all(:disbursal_date => nil, :scheduled_disbursal_date.lte => Date.today).select{|l| l.status == :approved}.size
+          - nd = get_loans(:disbursal_date => nil, :scheduled_disbursal_date.lte => Date.today, :approved_on.not => nil, :rejected_on => nil).count
           %b{:style => "color:green;"}
             = link_to_with_rights("Disburse Loans (#{nd})<br/>", url(:loan_actions, :action => 'disburse'), :class => 'edit_small',:style =>"font-weight: bold;")
           - sg = Loan.all(:write_off_rejected_on => nil, :written_off_on => nil, :suggested_written_off_on.lte => Date.today).size
-          = link_to_with_rights("Write Off Loans (#{sg})<br/>", url(:loan_actions, :action => 'write_off_suggested'), :class => 'edit_small')
-         
-          = link_to "Weekly requirement of funds <br/>", url(:show_report, 'ProjectedReport', {:projected_report => {:from_date => Date.today + 1}, :submit => "GO"}), :class => 'edit_small'
+          = link_to_with_rights("Write Off Loans (#{sg})<br/>", url(:loan_actions, :action => 'write_off_suggested'), :class => 'edit_small')         
+          = link_to_with_rights "Weekly requirement of funds <br/>", url(:show_report, 'ProjectedReport', {:projected_report => {:from_date => Date.today + 1}, :submit => "GO"}), :class => 'edit_small'
           = link_to_with_rights("Disbursement Sheet <br/>", url(:enter_loans,:action => 'staff_disbursement_sheet'), :class => 'edit_small')
         - @i += 1
       
         - if thing == :client
           %br
           - cl = Client.all(:active => false).size
-          = link_to ("Inactive Clients(#{cl})", url(:client_actions,:action => 'inactive_client_count'), :class => 'edit_small')
+          = link_to_with_rights("Inactive Clients(#{cl})", url(:controller => :clients, :action => :inactive_client_count), :class => 'edit_small')
         - if thing == :center
           %br
           = link_to_with_rights("Loan Utilization", url(:enter_loans,:action => 'make_loan_utilization'), :class => 'edit_small')

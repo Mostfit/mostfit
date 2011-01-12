@@ -1,7 +1,7 @@
 module Misfit
   module Extensions
     module User
-      CUD_Actions =["create", "new", "edit", "update", "destroy", "approve", "disburse", "reject", "write_off", "write_off_reject"]
+      CUD_Actions =["create", "new", "edit", "update", "destroy", "approve", "disburse", "reject", "suggest_write_off", "write_off_suggest", "write_off", "write_off_reject"]
       CR_Actions =["create", "new", "index", "show"]
       #add hooks to before and after can_access? and can_manage? methods to override their behaviour
       # here we add hooks to see if the user can manage a particular instance of a model.
@@ -155,7 +155,13 @@ module Misfit
             return(@staff.areas.length>0 or @staff.regions.length > 0) if @controller == "areas"
           else
             return(@staff.areas.length>0 or @staff.regions.length>0 or role == :mis_manager) if @controller == "staff_members"
-            return(@staff.branches.length>0 or @staff.areas.length>0 or @staff.regions.length>0 or role == :mis_manager) if @controller == "loans" and ["approve", "disburse", "suggest_write_off"].include?(@action)
+            if @controller == "loans"
+              if ["approve", "disburse", "reject", "suggest_write_off"].include?(@action)
+                return(@staff.branches.length>0 or @staff.areas.length>0 or @staff.regions.length>0 or role == :mis_manager)
+              elsif ["write_off", "write_off_suggested", "write_off_reject"].include?(@action)
+                return false
+              end
+            end
             return false if @controller == "regions"
             return(@staff.regions.length > 0) if @controller == "areas" 
           end

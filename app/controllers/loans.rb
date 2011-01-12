@@ -109,23 +109,26 @@ class Loans < Application
   
   def disburse
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    hash   = {:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil}
+    @loans = get_loans(hash)
+
     if request.method == :get
-      @loans = Loan.all(:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil).paginate(:page => params[:page], :per_page => 10)
       render
     else
       @errors = []
       cheque_numbers = params[:loans].select{|k,v| v[:disbursed?]!= "on" and not v[:cheque_number].blank?}.to_hash
       #save cheque numbers
       cheque_numbers.keys.each do |id|
-        loan = Loan.get(id)
+        loan = Loan.get(id.to_i)
         loan.cheque_number  = params[:loans][id][:cheque_number] and params[:loans][id][:cheque_number].to_i>0 ? params[:loans][id][:cheque_number] : nil
         loan.save
       end
 
       # disburse loans
-      loans = params[:loans].select{|k,v| v[:disbursed?] == "on"}.to_hash
-      loans.keys.each do |id|
-        loan = Loan.get(id)
+      disbursal_loans = params[:loans].select{|k,v| v[:disbursed?] == "on"}.to_hash
+      disbursal_loans.keys.each do |id|        
+        loan = Loan.get(id.to_i)
+        next unless @loans.include?(loan)
         loan.disbursal_date = params[:loans][id][:disbursal_date]
         loan.cheque_number  = params[:loans][id][:cheque_number] and params[:loans][id][:cheque_number].to_i>0 ? params[:loans][id][:cheque_number] : nil
         loan.scheduled_first_payment_date = params[:loans][id][:scheduled_first_payment_date] if params[:loans][id][:scheduled_first_payment_date]
@@ -134,30 +137,31 @@ class Loans < Application
         @errors << loan.errors if not loan.save
       end
       if @errors.blank?
-        redirect params[:return]||url(:data_entry),{:message => {:notice => "#{loans.size} loans disbursed. #{params[:loans].size - loans.size} loans not disbursed."}}
+        redirect params[:return]||url(:data_entry),{:message => {:notice => "#{disbursal_loans.size} loans disbursed. #{params[:loans].size - disbursal_loans.size} loans not disbursed."}}
       else
-        @loans  ||= Loan.all(:id => loans.keys)
         render
       end
     end
   end
 
   def approve
-    debugger
     if request.method == :get
       if params[:center_id]
         @loans_to_approve = @loan.all("client.center" => Center.get(params[:center_id]))
       else
-        @loans_to_approve = Loan.all(:approved_on => nil, :rejected_on => nil).paginate(:page => params[:page], :per_page => 10)
+        @loans_to_approve = get_loans({:approved_on => nil, :rejected_on => nil})
       end
       @loans_to_approve.each {|l| l.clear_cache}
       @clients =  @loans_to_approve.clients
       render
     else
       @errors = []
-      @loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
-      @loans.keys.each do |id|
+      loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
+      @loans_to_approve = get_loans({:approved_on => nil, :rejected_on => nil})
+
+      loans.keys.each do |id|
         loan = Loan.get(id)
+        next unless @loans_to_approve.include?(loan)
         params[:loans][id].delete("approved?")        
         params[:loans][id][:amount] = params[:loans][id][:amount_sanctioned]
         loan.update(params[:loans][id])
@@ -166,7 +170,7 @@ class Loans < Application
       if @errors.blank?
         redirect(params[:return]||"/data_entry", :message => {:notice => 'loans approved'})
       else
-        @loans_to_approve = Loan.all(:id.in => @loans.keys)
+        @loans_to_approve = Loan.all(:id.in => loans.keys)
         @clients =  @loans_to_approve.clients
         render
       end
@@ -340,4 +344,13 @@ class Loans < Application
     render
   end
   
+  # set the loans which are accessible by the user
+  def get_loans(hash)
+    if staff = session.user.staff_member
+      hash["client.center.branch_id"] = [staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten.map{|x| x.id}
+      Loan.all(hash)
+    else
+      Loan.all(hash).paginate(:page => params[:page], :per_page => 10)        
+    end
+  end
 end # Loans

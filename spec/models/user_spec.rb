@@ -89,6 +89,11 @@ describe User do
     Loan.all.each{|loan|
       @user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_true
     }
+    @user.can_access?({:action => "approve", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "disburse", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "reject", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "write_off", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "write_off_suggested", :controller => "loans"}).should be_true
     #loans create
     @user.can_access?({:action => "create", :controller => "loans", :branch_id => 1, :center_id => 1, :client_id => 1, :loan_type => :default_loan}, 
                       {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
@@ -237,6 +242,12 @@ describe User do
     Loan.all.each{|loan|
       @user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_true
     }
+    @user.can_access?({:action => "approve", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "disburse", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "reject", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "write_off", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "write_off_suggested", :controller => "loans"}).should be_false
+
     #loans create
     @user.can_access?({:action => "create", :controller => "loans", :branch_id => 1, :center_id => 1, :client_id => 1, :loan_type => :default_loan}, 
                       {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
@@ -411,6 +422,12 @@ describe User do
     non_managed_centers.clients.each{|loan|
       @user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_false
     }
+    @user.can_access?({:action => "approve", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "disburse", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "reject", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "suggest_write_off", :controller => "loans"}).should be_true
+    @user.can_access?({:action => "write_off", :controller => "loans"}).should be_false
+    @user.can_access?({:action => "write_off_suggested", :controller => "loans"}).should be_false
 
     #loans create
     @user.can_access?({:action => "create", :controller => "loans", :branch_id => managed_branches.first.id, :center_id => managed_centers.first.id, 
@@ -578,7 +595,13 @@ describe User do
     user.staff_member.branches.centers.clients.loans.all.each{|loan|
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_true
       user.can_access?({:action => "index", :controller => "loans"}, {:client_id => loan.client_id, :center_id => loan.client.center_id, :branch_id => loan.client.center.branch_id}).should be_true
+      user.can_access?({:action => "suggest_write_off", :controller => "loans", :id => loan.id}).should be_true
     }
+    user.can_access?({:action => "approve", :controller => "loans"}).should be_true
+    user.can_access?({:action => "disburse", :controller => "loans"}).should be_true
+    user.can_access?({:action => "reject", :controller => "loans"}).should be_true
+    user.can_access?({:action => "write_off", :controller => "loans"}).should be_false
+    user.can_access?({:action => "write_off_suggested", :controller => "loans"}).should be_false
     #loans create
     user.can_access?({:action => "create", :controller => "loans"}, 
                       {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
@@ -593,7 +616,6 @@ describe User do
       user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_false
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "branch", :id => branch.id}).should be_false
-
     }
     #center access
     Branch.all(:manager.not => user.staff_member).centers(:manager.not => user.staff_member).each{|center|
@@ -777,6 +799,13 @@ describe User do
     user.staff_member.centers.clients.loans.all.each{|loan|
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_true
     }
+    user.can_access?({:action => "approve", :controller => "loans"}).should be_false
+    user.can_access?({:action => "disburse", :controller => "loans"}).should be_false
+    user.can_access?({:action => "reject", :controller => "loans"}).should be_false
+    user.can_access?({:action => "suggest_write_off", :controller => "loans"}).should be_false
+    user.can_access?({:action => "write_off", :controller => "loans"}).should be_false
+    user.can_access?({:action => "write_off_suggested", :controller => "loans"}).should be_false
+
     #loans create
     user.can_access?({:action => "create", :controller => "loans"}, 
                       {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
@@ -977,7 +1006,14 @@ describe User do
     #loan access
     user.staff_member.centers.clients.loans.all.each{|loan|
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_true
+      user.can_access?({:action => "suggest_write_off", :controller => "loans", :id => loan.id}).should be_true
     }
+    user.can_access?({:action => "approve", :controller => "loans"}).should be_true
+    user.can_access?({:action => "disburse", :controller => "loans"}).should be_true
+    user.can_access?({:action => "reject", :controller => "loans"}).should be_true
+    user.can_access?({:action => "write_off", :controller => "loans"}).should be_false
+    user.can_access?({:action => "write_off_reject", :controller => "loans"}).should be_false
+    user.can_access?({:action => "write_off_suggested", :controller => "loans"}).should be_false
     #loans create
     user.can_access?({:action => "create", :controller => "loans"}, 
                       {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
@@ -1010,6 +1046,7 @@ describe User do
     #loan access
     non_managed_centers.clients.loans.all.each{|loan|
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_false
+      user.can_access?({:action => "suggest_write_off", :controller => "loans", :id => loan.id}).should be_false
     }
 
     #info
@@ -1188,7 +1225,13 @@ describe User do
     #loan access
     user.staff_member.centers.clients.loans.all.each{|loan|
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_true
+      user.can_access?({:action => "suggest_write_off", :controller => "loans", :id => loan.id}).should be_true
     }
+    user.can_access?({:action => "approve", :controller => "loans"}).should be_true
+    user.can_access?({:action => "disburse", :controller => "loans"}).should be_true
+    user.can_access?({:action => "reject", :controller => "loans"}).should be_true
+    user.can_access?({:action => "write_off", :controller => "loans"}).should be_false
+    user.can_access?({:action => "write_off_suggested", :controller => "loans"}).should be_false
     #loans create
     user.can_access?({:action => "create", :controller => "loans"}, 
                       {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
@@ -1375,7 +1418,13 @@ describe User do
     #loan access
     Loan.all.each{|loan|
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_true
+      user.can_access?({:action => "suggest_write_off", :controller => "loans", :id => loan.id}).should be_false
     }
+    user.can_access?({:action => "approve", :controller => "loans"}).should be_false
+    user.can_access?({:action => "disburse", :controller => "loans"}).should be_false
+    user.can_access?({:action => "reject", :controller => "loans"}).should be_false
+    user.can_access?({:action => "write_off", :controller => "loans"}).should be_false
+    user.can_access?({:action => "write_off_suggested", :controller => "loans"}).should be_false
     #loans create
     user.can_access?({:action => "create", :controller => "loans"}, 
                       {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
@@ -1537,6 +1586,13 @@ describe User do
     Loan.all.each{|loan|
       user.can_access?({:action => "show", :id => loan.id, :controller => "loans"}).should be_false
     }
+    user.can_access?({:action => "approve", :controller => "loans"}).should be_false
+    user.can_access?({:action => "disburse", :controller => "loans"}).should be_false
+    user.can_access?({:action => "reject", :controller => "loans"}).should be_false
+    user.can_access?({:action => "write_off", :controller => "loans"}).should be_false
+    user.can_access?({:action => "write_off_suggested", :controller => "loans"}).should be_false
+    user.can_access?({:action => "suggest_write_off", :controller => "loans"}).should be_false
+
     #loans create
     user.can_access?({:action => "create", :controller => "loans"}, 
                       {:default_loan => {:loan_product_id => 1, :amount => 10000, :interest => 10, :applied_on => "03-03-2010", :scheduled_disbursement_date => "03-03-2010",
