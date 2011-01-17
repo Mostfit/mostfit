@@ -103,6 +103,15 @@ class Report
     }
   end
 
+  def calc
+    t0 = Time.now
+    BranchTargetReport.all(:report_type => self.report_type, :start_date => self.start_date, :end_date => self.end_date).destroy!
+    self.report = Marshal.dump(self.generate)
+    self.generation_time = Time.now - t0
+    self.save
+  end
+
+
   def group_loans(by, columns, conditions = {})
     by_query = if by.class == String
                  by
