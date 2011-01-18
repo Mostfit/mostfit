@@ -5,7 +5,7 @@ class QuarterConsolidatedReport < Report
 
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.min_date
-    @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.new(Date.today.year, Date.today.month-1, -1)
+    @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.new(Date.today.year, Date.today.month, -1)
     @name   = "Report from #{@from_date} to #{@to_date}"
     get_parameters(params, user)
   end

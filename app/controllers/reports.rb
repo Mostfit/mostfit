@@ -33,7 +33,7 @@ class Reports < Application
       @report   = klass.new(params[class_key], dates, session.user)
       if not params[:submit]
         render :form
-      else        
+      else
         case @report.method(:generate).arity
         when 0
           @data = @report.generate
