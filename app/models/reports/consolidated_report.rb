@@ -71,13 +71,13 @@ class ConsolidatedReport < Report
           data[b][c][11] += (data[b][c][12] - data[b][c][10])
         end
 
-        advance_total = advance ? advance.advance_total : 0
-        balance_total = balance ? balance.balance_total : 0
-        old_balance_total = old_balance ? old_balance.balance_total : 0
+        new_advance         = advance ? advance.advance_total : 0
+        new_advance_balance = balance ? balance.balance_total : 0
+        old_advance_balance = old_balance ? old_balance.balance_total : 0
         #advance
-        data[b][c][13]  += advance_total
-        data[b][c][15]  += balance_total
-        data[b][c][14]  += advance_total - balance_total + old_balance_total
+        data[b][c][13]  += new_advance
+        data[b][c][14]  += new_advance + old_advance_balance - new_advance_balance 
+        data[b][c][15]  += new_advance_balance
       }
     }
     

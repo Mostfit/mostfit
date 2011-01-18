@@ -111,7 +111,6 @@ class LoanHistory
     type==:listing ? repository.adapter.query(query) : repository.adapter.query(query).first
   end
 
-  # TODO: subsitute the body of this function with sum_outstanding_grouped_by
   def self.sum_outstanding_by_group(from_date, to_date)
     sum_outstanding_grouped_by(to_date, [:center, :client_group], extra)
   end
@@ -138,8 +137,8 @@ class LoanHistory
 
     repository.adapter.query(%Q{
       SELECT 
-        (-1 * MIN(lh.principal_due)) AS advance_principal,
-        (-1 * (MIN(lh.principal_due) + MIN(lh.interest_due))) AS advance_total,
+        (-1 * SUM(lh.principal_due)) AS advance_principal,
+        (-1 * (SUM(lh.principal_due) + SUM(lh.interest_due))) AS advance_total,
         #{group_by}
       FROM loan_history lh, loans l
       WHERE lh.status in (5, 6) AND l.id=lh.loan_id AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
@@ -184,15 +183,21 @@ class LoanHistory
   end
 
   # TODO:  rewrite it using Datamapper
-  def self.sum_disbursed_grouped_by(klass, conditions = {}, from_date=Date.min_date, to_date=Date.today)
-    conditions[:loan] ||= {}
-    conditions[:loan] +=  {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date}
-    group_id  = @@selects[klass]
-    select    = "#{group_id}, SUM(l.amount) amount"
-    klass, obj = get_class_of(klass.all)
-    froms = build_froms(klass)
-    conditions  = build_conditions(klass, nil, conditions)
-    repository.adapter.query("SELECT #{select} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')} GROUP BY #{group_id}")
+  def self.sum_disbursed_grouped_by(group_by, from_date=Date.min_date, to_date=Date.today, extra=[], selects="")
+    group_by = get_group_by(group_by)
+    selects  = ", " + selects unless selects.blank?
+
+    repository.adapter.query(%Q{
+      SELECT 
+        SUM(lh.scheduled_outstanding_principal) AS loan_amount,
+        COUNT(lh.loan_id) loan_count,
+        #{group_by}
+        #{selects}
+      FROM loan_history lh, loans l
+      WHERE lh.status in (5) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+            AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}'
+      GROUP BY #{group_by};
+    })
   end
 
   # loan_type here is relevant only for the case of staff member. This comes into play when we need all the loans under centers
@@ -362,6 +367,40 @@ class LoanHistory
       hash["#{obj.class.to_s.snake_case}_id".to_sym] = (obj.is_a?(Array) ? obj.map{|x| x.id} : obj.id)
     end
     LoanHistory.all(hash).aggregate(:loan_id.count)
+  end
+
+  def self.sum_repaid_grouped_by(group_by, from_date, to_date, extra=[], selects="")
+    group_by = get_group_by(group_by)
+    selects  = ", " + selects unless selects.blank?
+
+    repository.adapter.query(%Q{
+      SELECT 
+        SUM(lh.scheduled_outstanding_principal) AS loan_amount,
+        COUNT(lh.loan_id) loan_count,
+        #{group_by}
+        #{selects}
+      FROM loan_history lh, loans l
+      WHERE lh.status in (7) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+            AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}'
+      GROUP BY #{group_by};
+    })    
+  end
+
+  def self.sum_foreclosure_grouped_by(group_by, from_date, to_date, extra=[], selects="")
+    group_by = get_group_by(group_by)
+    selects  = ", " + selects unless selects.blank?
+
+    repository.adapter.query(%Q{
+      SELECT
+        SUM(lh.scheduled_outstanding_principal) AS loan_amount,
+        COUNT(lh.loan_id) loan_count,
+        #{group_by}
+        #{selects}
+      FROM loan_history lh, loans l
+      WHERE lh.status in (8, 9) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+            AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}'
+      GROUP BY #{group_by};
+    })    
   end
 
   private

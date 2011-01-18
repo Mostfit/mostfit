@@ -63,7 +63,7 @@
           Total
       - length = 10
       - repayments = @funding_line.repayments
-      - disbursals = LoanHistory.sum_disbursed_grouped_by(Center, {:loan => {:funding_line_id => @funding_line.id}}).map{|lh| [lh.id, lh.amount.to_i]}.to_hash
+      - disbursals = LoanHistory.sum_disbursed_grouped_by(:center, Date.min_date, Date.today, {:loan => {:funding_line_id => @funding_line.id}}).map{|lh| [lh.center_id, lh.loan_amount.to_i]}.to_hash
       - org_total = []
       - @funding_line.loans.sort_by{|branch, centers| branch.name}.each do |branch, centers|
         %tr.branch
@@ -85,7 +85,7 @@
               - branch_total[2] += row.actual_outstanding_principal
             %td
               - pay = []
-              - pay = repayments[branch][center].group_by{|x| x.ptype}.map{|t, p| [t, (p.first ? p.first.amount : 0)]}.to_hash if repayments[branch][center]
+              - pay = repayments[branch][center].group_by{|x| x.ptype}.map{|t, p| [t, (p.first ? p.first.amount : 0)]}.to_hash if repayments[branch] and repayments[branch][center]
               = (pay[1] || 0).to_currency
               - branch_total[3] += pay[1]||0
             %td
