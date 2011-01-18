@@ -4,7 +4,13 @@
     %b From
     =date_select "from_date", @from_date
     %b To
-    =date_select "to_date", @to_date
+    - if params[:type] and params[:type]=="managed"
+      = @to_date
+      =hidden_field :to_date, :value => @to_date
+    - else
+      =date_select "to_date", @to_date
+    - if params[:type]
+      = hidden_field :type, :value => params[:type]
     =submit "GO"
 #moreinfo
   %table.moreinfo
