@@ -141,9 +141,9 @@ class LoanHistory
         (-1 * (SUM(lh.principal_due) + SUM(lh.interest_due))) AS advance_total,
         #{group_by}
       FROM loan_history lh, loans l
-      WHERE lh.status in (5, 6) AND l.id=lh.loan_id AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
+      WHERE lh.status in (6) AND l.id=lh.loan_id AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
             AND lh.scheduled_outstanding_principal > lh.actual_outstanding_principal AND lh.scheduled_outstanding_total > lh.actual_outstanding_total
-            AND lh.principal_paid>0 AND l.deleted_at is NULL #{extra}
+            AND lh.principal_paid>0 AND lh.principal_due < 0 AND l.deleted_at is NULL #{extra}
       GROUP BY #{group_by};
     })
   end

@@ -61,26 +61,21 @@ class Info < Application
       @areas     = @obj.areas
       @branches, @centers, @clients, @loans = {}, {}, {}, {}
 
+      owner_type = (params[:type] and params[:type] == "managed" ? :managed : :created)
+
       @branches[:new]  = @obj.branches(new_date_hash)
       @branches[:upto] = @obj.branches(upto_date_hash)
       
       @centers[:new]   = @obj.centers(new_date_hash)
       @centers[:upto]  = @obj.centers(upto_date_hash)
 
-      owner_type = (params[:type] and params[:type] == "managed" ? :managed : :created)
-
-      if owner_type == :created
-        hash = new_date_hash||{}
-        hash[:created_by_staff] = @obj
-        @groups_new_count  = ClientGroup.all(hash).count || 0
-
-        hash = upto_date_hash||{}
-        hash[:created_by_staff] = @obj
-        @groups_upto_count = ClientGroup.all(hash).count || 0
-      end
-
       @clients[:new]  = @obj.clients(client_hash(:new), owner_type)
       @clients[:upto] = @obj.clients(client_hash(:upto), owner_type)
+
+      if owner_type == :created
+        @groups_new_count  = @clients[:new] and @clients[:new].count > 0 ? @clients[:new].client_groups(:created_by_staff => @obj).count : 0
+        @groups_upto_count = @clients[:upto] and @clients[:upto].count > 0 ? @clients[:upto].client_groups(:created_by_staff => @obj).count : 0
+      end
     else
       raise "Unknown obj class"
     end
@@ -164,11 +159,11 @@ private
     @centers_new_count  = @centers.key?(:new) ? @centers[:new].count : 0
     @centers_upto_count = @centers.key?(:upto) ? @centers[:upto].count : 0
 
-    @groups_new_count  = (@centers_new_count>0) ? @centers[:new].client_groups(:fields => [:id]).count : 0    unless @groups_new_count
-    @groups_upto_count = (@centers_upto_count>0) ? @centers[:upto].client_groups(:fields => [:id]).count : 0  unless @groups_upto_count
+    @groups_new_count  = (@centers_new_count>0 and @centers[:new] and not @groups_new_count) ? @centers[:new].client_groups(:fields => [:id]).count : 0 
+    @groups_upto_count = (@centers_upto_count>0 and @centers[:upto] and not @groups_upto_count) ? @centers[:upto].client_groups(:fields => [:id]).count : 0
 
-    @clients_new_count  = (@centers_new_count>0) ?  @clients[:new].count : 0
-    @clients_upto_count = (@centers_upto_count>0) ? @clients[:upto].count : 0
+    @clients_new_count  = (@clients and @clients[:new]) ?  @clients[:new].count : 0
+    @clients_upto_count = (@clients and @clients[:upto]) ? @clients[:upto].count : 0
 
     @payments        = Payment.collected_for(obj, @from_date, @to_date, [1, 2], child_type)
     @total_payments  = Payment.collected_for(obj, Date.min_date, @to_date, [1, 2], child_type)
