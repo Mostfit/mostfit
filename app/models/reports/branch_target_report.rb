@@ -106,7 +106,7 @@ class BranchTargetReport < Report
       #fills in the values to be displayed in the report in the variable data which is an array.
       data[staff.name] = {:development => {
           :target => [target_number[staff.id]],
-          :actual => [actual_client_created_date, actual_client_created_till_date], :variance => target_variance
+          :actual => [actual_client_created_date, actual_client_created_till_date], :variance => (target_variance).abs
         }, 
         :disbursement => {:target => [target_amount[staff.id]],
           :till_date => [
