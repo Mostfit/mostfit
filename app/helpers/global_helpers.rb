@@ -394,14 +394,14 @@ module Merb
       staff_members   =  if session.user.staff_member
                            st = session.user.staff_member
                            if branches = st.branches and branches.length>0
-                             [st] + branches.centers.managers 
+                             [st] + branches.centers.managers(:order => [:name]) 
                            else
                              st
                            end
                          else
-                           StaffMember.all
+                           StaffMember.all(:order => [:name])
                          end      
-      staff_members.sort_by{|x| x.name}.map{|x| [x.id, x.name]}
+      staff_members.map{|x| [x.id, x.name]}
     end
 
     def get_accessible_funders
@@ -475,10 +475,10 @@ module Merb
         bms  = staff.branches.collect{|x| x.manager}
         cms  = staff.branches.centers.collect{|x| x.manager}               
         managers = [bms, cms, staff].flatten.uniq
-        managers+= (StaffMember.all(hash) - Branch.all.managers - Center.all.managers - Region.all.managers - Area.all.managers) if allow_unassigned
-        [["0", "<Select a staff member"]] + managers.sort_by{|x| x.name}.map{|x| [x.id, x.name]}
+        managers+= (StaffMember.all(hash.merge(:order => [:name])) - Branch.all.managers - Center.all.managers - Region.all.managers - Area.all.managers) if allow_unassigned
+        [["0", "<Select a staff member"]] + managers.map{|x| [x.id, x.name]}
       else
-        [["0", "<Select a staff member"]] + StaffMember.all(hash).sort_by{|x| x.name}.map{|x| [x.id, x.name]}
+        [["0", "<Select a staff member"]] + StaffMember.all(hash.merge(:order => [:name])).map{|x| [x.id, x.name]}
       end
     end
     
