@@ -33,7 +33,8 @@ class ClosedLoanReport < Report
                  status = lh.status.to_s
                end
       data[lh.branch][lh.center] ||= []
-      data[lh.branch][lh.center].push([lh.loan_id, lh.client_group.name, lh.client.name, lh.loan.amount, status])
+      data[lh.branch][lh.center].push([lh.loan_id, lh.client_group != nil ? lh.client_group.name : "no group", lh.client.name, lh.loan.amount, status])
+
     }    
 
     # claim settlement
