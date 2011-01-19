@@ -315,31 +315,38 @@ describe LoanHistory do
   it "should show correct advance payment figures" do
     @loan.payments.destroy!
     @loan.update_history(true)
-    @loan.repay(48, @user, @loan.scheduled_first_payment_date, @manager)
+    @loan.repay(48, @user, @loan.scheduled_first_payment_date, @manager, false, :prorata)
     LoanHistory.advance_balance(@loan.scheduled_first_payment_date, [:loan]).length.should == 0
-    @loan.repay(160, @user, @loan.scheduled_first_payment_date, @manager)
-    LoanHistory.advance_balance(@loan.scheduled_first_payment_date, [:loan]).first.balance_principal.should == 160
-    LoanHistory.advance_balance(@loan.scheduled_first_payment_date, [:loan]).first.balance_total.should == 160
 
-    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 7, [:loan]).first.balance_principal.should == 120
+    @loan.repay(144, @user, @loan.scheduled_first_payment_date + 7, @manager, false, :prorata)
+
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date, [:loan]).should == []
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 7, [:loan]).first.balance_total.should == 96
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 7, [:loan]).first.balance_principal.should == 80
      # adjsuted principal
-    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 14, [:loan]).first.balance_principal.should == 80
-    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 21, [:loan]).first.balance_principal.should == 40
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 14, [:loan]).first.balance_total.should == 48
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 14, [:loan]).first.balance_principal.should == 40
+
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 21, [:loan]).length.should == 0
     LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 28, [:loan]).length.should == 0
     #testing advance_principal
-    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 14, [:loan]).first.advance_principal.should == 160
-    @loan.repay(160, @user, @loan.scheduled_first_payment_date + 7, @manager)
-    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 14, [:loan]).first.advance_principal.should == 272
-    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 21, [:loan]).first.advance_principal.should == 272
-    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 28, [:loan]).first.advance_principal.should == 272
-    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 35, [:loan]).first.advance_principal.should == 272
-    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 42, [:loan]).first.advance_principal.should == 272
-    @loan.repay(160, @user, @loan.scheduled_first_payment_date + 14, @manager)
-    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 14, [:loan]).first.advance_principal.should == 272 + 160 - 48
-    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 42, [:loan]).first.advance_principal.should == 272 + 160 - 48    
-    @loan.repay(160, @user, @loan.scheduled_first_payment_date + 21, @manager)
-    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 14, [:loan]).first.advance_principal.should == 272 + 160 - 48
-    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 42, [:loan]).first.advance_principal.should == 272 + 160 + 160 - 48 - 48
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 14, [:loan]).first.advance_principal.should == 80
+
+    @loan.repay(144, @user, @loan.scheduled_first_payment_date + 28, @manager, false, :prorata)
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 7, [:loan]).first.advance_principal.should == 80
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 14, [:loan]).first.advance_principal.should == 80
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 14, [:loan]).first.balance_principal.should == 40
+
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 21, [:loan]).first.advance_principal.should == 80
+    LoanHistory.advance_balance(@loan.scheduled_first_payment_date + 21, [:loan]).length.should == 0
+
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 28, [:loan]).first.advance_principal.should == 160
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 35, [:loan]).first.advance_principal.should == 160
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 42, [:loan]).first.advance_principal.should == 160
+ 
+    @loan.repay(96, @user, @loan.scheduled_first_payment_date + 28, @manager, false, :prorata)
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 14, [:loan]).first.advance_principal.should == 80
+    LoanHistory.sum_advance_payment(@loan.scheduled_first_payment_date, @loan.scheduled_first_payment_date + 42, [:loan]).first.advance_principal.should == 240
   end
   
   it "should show correct loans for" do
