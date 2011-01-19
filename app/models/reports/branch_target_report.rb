@@ -119,8 +119,8 @@ class BranchTargetReport < Report
             :sanctioned => sanctioned_loan, 
             :total => total_loan,
             :disbursed => disbursed_loan,
-            :variance_from_sanctioned => (total_loan - disbursed_loan),
-            :variance_from_target => (target_amount[staff.id] - (till_date_loan_amount || 0) - disbursed_loan)
+            :variance_from_sanctioned => (total_loan - disbursed_loan).abs,
+            :variance_from_target => (target_amount[staff.id] - (till_date_loan_amount || 0) - disbursed_loan).abs
           }
         }, 
         :repayment => {
@@ -128,7 +128,7 @@ class BranchTargetReport < Report
           :due => outstanding[staff], 
           :actual => actual_repayment, 
           :total_variance => variance,
-          :variance_till_date => (overdue_repayment + variance) 
+          :variance_till_date => (overdue_repayment + variance).abs 
         }, 
         :total_outstanding => total_outstanding[staff]
       }
