@@ -24,7 +24,7 @@ describe Center do
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
     @center.branch = @branch
-    @center.creation_date = Date.today - 100
+    @center.creation_date = Date.new(2010, 1, 1)
     @center.meeting_day = :monday
     @center.code = "center"
     @center.save
