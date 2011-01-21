@@ -5,16 +5,16 @@ class BranchTargetReport < Report
   def initialize(params, dates, user)
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
     @date = Date.new(@to_date.year, @to_date.month, 01)
-    @name = "Branch Target Report from #{@date} to #{@to_date}"
+    @name = "Target Report from #{@date} to #{@to_date}"
     get_parameters(params, user)
   end
 
   def name
-    "Branch Target Report from #{@date} to #{@to_date}"
+    "Target Report from #{@date} to #{@to_date}"
   end
   
   def self.name
-    "Branch Target Report"
+    "Target Report"
   end
 
   def generate    
