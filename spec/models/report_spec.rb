@@ -35,6 +35,19 @@ describe Report do
     @loan_product.save
     @loan_product.errors.each {|e| puts e}
     @loan_product.should be_valid
+
+    @target_for_number = Target.new(:attached_to => :staff_member, :type => :client_registration, :attached_id => @manager.id, :start_value => 100,
+                         :target_value => 1000, :created_at => Date.today, :deadline => Date.new(Date.today.year, Date.today.month, -1))
+    @target_for_number.save
+    @target_for_number.errors.each {|e| puts e}
+    @target_for_number.should be_valid
+
+    @target_for_amount = Target.new(:attached_to => :staff_member, :type => :loan_disbursement_by_amount, :attached_id => @manager.id,
+                                    :target_value => 10_00_000, :created_at => Date.today, :start_value => 10_000,
+                                    :deadline => Date.new(Date.today.year, Date.today.month, -1))
+    @target_for_amount.save!
+    @target_for_amount.errors.each {|e| puts e}
+    @target_for_amount.should be_valid
     
       # generate a couple of branches
     if Loan.all.count == 0
@@ -327,8 +340,7 @@ describe Report do
     data[@manager.name][:disbursement][:today][:sanctioned].should == loan_sanctioned
     data[@manager.name][:disbursement][:today][:disbursed].should == disbursed_loan
     data[@manager.name][:disbursement][:today][:total].should == ((loan_overdue || 0) + loan_sanctioned)
-    data[@manager.name][:disbursement][:today][:variance_from_sanctioned].should == (total_loan - disbursed_loan)
- #   data[@manager][:disbursement][:today][:variance_from_target].should == loan_amount_till_date - 
+    data[@manager.name][:disbursement][:today][:variance_from_sanctioned].should == (total_loan - disbursed_loan).abs
   end
 
   it "should show correct loan overdue disbursals" do
@@ -359,8 +371,8 @@ describe Report do
     data[@manager.name][:repayment][:actual].should == (actual_payment || 0)
     data[@manager.name][:repayment][:var].should == overdue_repayment
     data[@manager.name][:repayment][:due].should == outstanding
-    data[@manager.name][:repayment][:total_variance].should == variance
-    data[@manager.name][:repayment][:variance_till_date].should == (overdue_repayment + variance)
+    data[@manager.name][:repayment][:total_variance].should == (variance).abs
+    data[@manager.name][:repayment][:variance_till_date].should == (overdue_repayment + variance).abs
   end
 
   it "should give correct outstanding loan amount" do
@@ -380,7 +392,7 @@ describe Report do
   end
 
   it "should give correct actual and target client count" do
-    date = Date.today
+    date = @date
     report = BranchTargetReport.new({}, {:to_date => date}, User.first)
     data = report.generate
     actual_client_created_date      = Client.all(:date_joined => date, :created_by_staff_member_id => @manager.id).count
@@ -391,33 +403,36 @@ describe Report do
     data[@manager.name][:development][:actual][1].should == actual_client_created_till_date
   end
 
-  #I am finishing off with this one at the moment of commiting this spec.
-  # it "should give correct targets for the month and the variance" do
-  #   date = Date.today
-  #   report = BranchTargetReport.new({}, {:to_date => date}, User.first)
-  #   data = report.generate
-  #   staff_members = {}
-  #   target_amount, target_number = Hash.new(0), Hash.new(0)
-  #   Target.all(:attached_to => :staff_member, :type => :loan_disbursement_by_amount, :attached_id => @manager.id,
-  #              :created_at.gte => Date.new(date.year, date.month, 01),
-  #              :deadline.lte => Date.new(date.year, date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
-  #     target_amount[staff_id] ||= 0
-  #     target_amount[staff_id] += targets.map{|t| t.target_value}.reduce(0){|s,x| s+=x} if targets
-  #   }
+  it "should give correct targets for the month and the variance" do
+    date = Date.today
+    report = BranchTargetReport.new({}, {:to_date => date}, User.first)
+    data = report.generate
+    staff_members = {}
+    target_amount, target_number = Hash.new(0), Hash.new(0)
+    Target.all(:attached_to => :staff_member, :type => :loan_disbursement_by_amount, :attached_id => @manager.id,
+               :created_at.gte => Date.new(date.year, date.month, 01),
+               :deadline.lte => Date.new(date.year, date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
+      target_amount[staff_id] ||= 0
+      target_amount[staff_id] += targets.map{|t| t.target_value}.reduce(0){|s,x| s+=x} if targets
+    }
     
-  #   Target.all(:attached_to => :staff_member, :type => :client_registration, :attached_id => @manager.id,
-  #              :created_at.gte => Date.new(date.year, date.month, 01),
-  #              :deadline.lte => Date.new(date.year, date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
-  #     target_number[staff_id] ||= 0
-  #     target_number[staff_id] += targets.map{|t| t.target_value}.reduce(0){|s,x| s+=x} if targets
-  #   }
+    Target.all(:attached_to => :staff_member, :type => :client_registration, :attached_id => @manager.id,
+                   :created_at.gte => Date.new(date.year, date.month, 01),
+                   :deadline.lte => Date.new(date.year, date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
+      target_number[staff_id] ||= 0
+      target_number[staff_id] += targets.map{|t| t.target_value}.reduce(0){|s,x| s+=x} if targets
+    }
 
-  #   actual_client_created_till_date = Client.all(:date_joined.lte => date, :created_by_staff_member_id => @manager.id).count
-  #   target_variance = target_number - actual_client_created_till_date
+    actual_client_created_till_date = Client.all(:date_joined.gte => Date.new(date.year, date.month, 01), :date_joined.lte => date,
+                                                 :created_by_staff_member_id => @manager.id).count
+    target_variance = (target_number.values[0]) - actual_client_created_till_date
+    loan_amount_till_date = Loan.all(:disbursed_by => @manager, :disbursal_date.gte => Date.new(date.year, date.month, 01),
+                                     :disbursal_date.lte => date, :rejected_on => nil, :written_off_on => nil).aggregate(:amount.sum)
+    disbursed_loan = LoanHistory.amount_disbursed_for(@manager, :from_date => date, :to_date => date).amount.to_i
 
-  #   data[@manager.name][:development][:target][0].should == target_number
-  #   data[@manager.name][:development][:target][1].should == target_amount
-  #   data[@manager.name][:development][:variance].should == target_variance
-  # end
-
+    data[@manager.name][:development][:target][0].should == target_number.values[0]
+    data[@manager.name][:disbursement][:target][0].should == target_amount.values[0]
+    data[@manager.name][:development][:variance].should == (target_variance).abs
+    data[@manager.name][:disbursement][:today][:variance_from_target].should == (target_amount.values[0] - (loan_amount_till_date || 0) - disbursed_loan).abs
+  end
 end
