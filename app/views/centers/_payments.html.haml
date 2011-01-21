@@ -68,25 +68,25 @@
               - tot_installments += i
               - grp_installments += i
             %td.numeric
-              - i = [(lh ? lh.principal_due : 0), 0].max
-              = i.to_currency
-              - tot_principal_due += i
-              - grp_principal_due += i
+              - pdue = [(lh ? lh.principal_due : 0), 0].max
+              = pdue.to_currency
+              - tot_principal_due += pdue
+              - grp_principal_due += pdue
             %td.numeric
-              - i = (lh ? lh.principal_paid : 0)
-              = i.to_currency
-              - tot_principal_paid += i
-              - grp_principal_paid += i
+              - ppaid = (lh ? lh.principal_paid : 0)
+              = ppaid.to_currency
+              - tot_principal_paid += ppaid
+              - grp_principal_paid += ppaid
             %td.numeric
-              - i = [(lh ? lh.interest_due : 0), 0].max
-              = i.to_currency
-              - tot_interest_due += i
-              - grp_interest_due += i
+              - idue = [(lh ? lh.interest_due : 0), 0].max
+              = idue.to_currency
+              - tot_interest_due += idue
+              - grp_interest_due += idue
             %td.numeric
-              - i = [(lh ? lh.interest_paid : 0), 0].max
-              = i.to_currency
-              - tot_interest_paid += i
-              - grp_interest_paid += i
+              - ipaid = [(lh ? lh.interest_paid : 0), 0].max
+              = ipaid.to_currency
+              - tot_interest_paid += ipaid
+              - grp_interest_paid += ipaid
             %td.numeric
               - fee_due = fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
               = fee_due.to_currency
@@ -98,15 +98,13 @@
               - tot_fee_paid += fee_paid
               - grp_fee_paid += fee_paid
             %td.numeric
-              - i = [(lh ? (lh.principal_due+lh.interest_due): 0), 0].max
-              = (i+fee_due).to_currency
-              - tot_total_due += (i + fee_due)
-              - grp_total_due += (i + fee_due)
+              = (pdue + idue + fee_due).to_currency
+              - tot_total_due += (pdue + idue + fee_due)
+              - grp_total_due += (pdue + idue + fee_due)
             %td.numeric
-              - i = [(lh ? (lh.principal_paid+lh.interest_paid): 0), 0].max
-              = (i+fee_paid).to_currency
-              - tot_total_paid += (i + fee_paid)
-              - grp_total_paid += (i + fee_paid)
+              = (ppaid + ipaid + fee_paid).to_currency
+              - tot_total_paid += (ppaid + ipaid + fee_paid)
+              - grp_total_paid += (ppaid + ipaid + fee_paid)
         - if loan_row_count == 0
           %tr{ :class => cycle('odd','') }
             %td
