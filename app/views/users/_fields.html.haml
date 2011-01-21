@@ -27,9 +27,9 @@
     %td
       Is a staff member?
     %td
-      = select :staff_member, :collection => [["","---"]] + StaffMember.all.map{|s| [s.id.to_s, s.name]}, :selected => (@user.staff_member ? @user.staff_member.id.to_s : "")
+      = select :staff_member, :collection => [["","---"]] + StaffMember.all(:order => [:name]).map{|s| [s.id.to_s, s.name]}, :selected => (@user.staff_member ? @user.staff_member.id.to_s : "")
   %tr.funder
     %td
       Is a funder
     %td
-      = select :funder, :collection => [["","---"]] + Funder.all.map{|s| [s.id.to_s, s.name]}, :selected => (@user.funder ? @user.funder.id.to_s : "")
+      = select :funder, :collection => [["","---"]] + Funder.all(:order => [:name]).map{|s| [s.id.to_s, s.name]}, :selected => (@user.funder ? @user.funder.id.to_s : "")

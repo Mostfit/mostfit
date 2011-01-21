@@ -390,13 +390,15 @@ module Merb
       centers.map{|x| [x.id, "#{x.name}"]}
     end
 
-    def get_accessible_staff_members      
+    def get_accessible_staff_members
       staff_members   =  if session.user.staff_member
                            st = session.user.staff_member
                            if branches = st.branches and branches.length>0
-                             [st] + branches.centers.managers(:order => [:name]) 
+                             [st] + branches.centers.managers(:order => [:name])
+                           elsif centers = st.centers and centers.length>0
+                             [st] + centers.managers(:order => [:name])
                            else
-                             st
+                             [st] + [st]
                            end
                          else
                            StaffMember.all(:order => [:name])
