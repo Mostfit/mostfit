@@ -2,10 +2,12 @@
   - meeting_orders = {"monday" => 0, "tuesday" => 0, "wednesday" => 0, "thursday" => 0, "friday" => 0, "saturday" => 0}
   ="var marker_objects = []"  
   - if @locations
-    - @data.each do |branch, centers|
-      - centers.each_with_index do |center, idx|
-        - loc = @locations[center.id].first if @locations.key?(center.id)
+    - @data.each do |branch_id, centers|
+      - centers.each_with_index do |lh, idx|
+        - loc = @locations[lh[1]].first if @locations.key?(lh[1])
+        - center = @centers[lh[1]]
+        - branch = @branches[lh[0]]
         - next unless loc
-        = "marker_objects.push({'name': '#{center.name}', 'latitude': #{loc.latitude}, 'longitude': #{loc.longitude}, 'type': '#{loc.parent_type}', 'meeting': '#{@date.weekday}', 'time': '#{center.meeting_time_hours}:#{center.meeting_time_minutes}', 'meeting_order': #{idx+1}, 'branch': '#{branch.name}', 'due': #{center.pd + center.intd}, 'paid': #{center.pp + center.intp}})"
+        = "marker_objects.push({'name': '#{center.name}', 'latitude': #{loc.latitude}, 'longitude': #{loc.longitude}, 'type': '#{loc.parent_type}', 'meeting': '#{@date.weekday}', 'time': '#{center.meeting_time_hours}:#{center.meeting_time_minutes}', 'meeting_order': #{idx+1}, 'branch': '#{branch}', 'due': #{lh[2] + lh[3]}, 'paid': #{lh[4] + lh[5]}})"
   = "var daywise=false"
 #map_canvas{:style => "height: 500px; width: 800px;"}

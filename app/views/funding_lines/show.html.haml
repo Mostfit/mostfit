@@ -63,7 +63,7 @@
           Total
       - length = 10
       - repayments = @funding_line.repayments
-      - disbursals = LoanHistory.sum_disbursed_grouped_by(:center, Date.min_date, Date.today, {:loan => {:funding_line_id => @funding_line.id}}).map{|lh| [lh.center_id, lh.loan_amount.to_i]}.to_hash
+      - disbursals = LoanHistory.sum_disbursed_grouped_by(:center, Date.min_date, Date.today, ["l.funding_line_id=#{@funding_line.id}"]).map{|lh| [lh.center_id, lh.loan_amount.to_i]}.to_hash
       - org_total = []
       - @funding_line.loans.sort_by{|branch, centers| branch.name}.each do |branch, centers|
         %tr.branch

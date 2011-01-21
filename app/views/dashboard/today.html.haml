@@ -1,11 +1,12 @@
 %h2
   Today
-
+- length = 16
 %div.tab_container
   %div{:style => "float: right;"}
-    %form{:action => "/browse/centers_paying_today", :method => "POST"}
+    %form{:action => "/browse/centers_paying_today", :method => "GET"}
       %b Branch
-      = select :name => "branch_id", :collection => Branch.all.map{|x| [x.id, x.name]}, :selected => params[:branch_id].to_s, :prompt => "All branches"
+      = select :name => "branch_id", :collection => @branches.map{|bid, b| [bid, b]}, :selected => params[:branch_id].to_s, :prompt => "All branches"
+      = date_select "date",  params[:date]||Date.today
       = submit "GO"
 
   %ul.tabs
@@ -21,62 +22,118 @@
     %table.report
       %tr.header
         %th
-          Name
+          Center
+        %th{:colspan => 4}
+          Due
+        %th{:colspan => 4}
+          Paid
+        %th{:colspan => 4}
+          Overdue
+        %th{:colspan => 1}
+          Advance
+        %th{:colspan => 2}
+          Disbursal
+      %tr.header
         %th
-          Principal Due
         %th
-          Principal Paid
+          Principal
         %th
-          Interest due
+          Interest
         %th
-          Interest Paid
+          Fee
         %th
-          Total due
+          Total
         %th
-          Total paid
+          Principal
         %th
-          Scheduled Disbursal
+          Interest
         %th
-          Actual Disbursal
-      - total_prin_due = total_prin_paid = total_int_due = total_int_paid = total_scheduled_disbursal = total_disbursal  = 0
-      - @data.sort_by{|branch, centers| branch.name}.each do |branch, centers|
+          Fee
+        %th
+          Total
+        %th
+          Principal
+        %th
+          Interest
+        %th
+          Fee
+        %th
+          Total
+        %th
+          Collected
+        %th
+          Scheduled
+        %th
+          Actual
+      - total_prin_due = total_prin_paid = total_int_due = total_int_paid = total_fee_due = total_fee_paid = total_scheduled_disbursal = total_disbursal  = 0
+      - total_prin_overdue = total_int_overdue = total_fee_overdue = total_advance = 0
+      - @data.sort_by{|branch_id, centers| @branches[branch_id]}.each do |branch_id, centers|
         %tr.branch
-          %td{:colspan => 9}
+          %td{:colspan => length}
             %b
-              = branch.name
-        - branch_prin_due = branch_prin_paid = branch_int_due = branch_int_paid = branch_scheduled_disbursal = branch_disbursal  = 0
-        - centers.sort_by{|center| center.name}.each do |center|
+              = @branches[branch_id]
+        - branch_prin_due = branch_prin_paid = branch_int_due = branch_int_paid = branch_fee_due = branch_fee_paid = branch_scheduled_disbursal = branch_disbursal  = 0
+        - branch_prin_overdue = branch_int_overdue = branch_fee_overdue = branch_advance = 0
+        - centers.sort_by{|center| @centers[center[1]].name}.each do |lh|
+          - center = @centers[lh[1]]
           %tr.center{:class => cycle('odd','even')}
             %td
               = link_to(center.name, url(:quick_link, "centers", center.id) + "#weeksheet")
             %td.numeric
-              = (pd = (center.pd and center.pd > 0) ? center.pd : 0).to_currency
+              = (pd = (lh[2] and lh[2] > 0) ? lh[2] : 0).to_currency
               - branch_prin_due += pd
             %td.numeric
-              = (pp = (center.pp and center.pp > 0) ? center.pp : 0).to_currency
-              - branch_prin_paid += pp
-            %td.numeric
-              = (intd = (center.intd and center.intd > 0) ? center.intd : 0).to_currency
+              = (intd = (lh[3] and lh[3] > 0) ? lh[3] : 0).to_currency
               - branch_int_due += intd
             %td.numeric
-              = (intp = (center.intp and center.intp > 0) ? center.intp : 0).to_currency
+              = (fd = @fees_due[lh[1]]||0).to_currency
+              - branch_fee_due += fd
+            %td.numeric
+              = (pd + intd + fd).to_currency
+            %td.numeric
+              = (pp = (lh[4] and lh[4] > 0) ? lh[4] : 0).to_currency
+              - branch_prin_paid += pp
+            %td.numeric
+              = (intp = (lh[5] and lh[5] > 0) ? lh[5] : 0).to_currency
               - branch_int_paid += (intp || 0)
             %td.numeric
-              = (pd + intd).to_currency
+              = (fp = @fees_paid[lh[1]]||0).to_currency
+              - branch_fee_paid += fp
             %td.numeric
-              = (pp + intp).to_currency
+              = (pp + intp + fp).to_currency
+            %td.numeric              
+              = (pdiff = (@overdues[lh[1]] and @overdues[lh[1]].length>0) ? @overdues[lh[1]].first.pdiff||0 : 0).to_currency
+              - branch_prin_overdue += pdiff
+              - tdiff  = (@overdues[lh[1]] and @overdues[lh[1]].length>0) ? @overdues[lh[1]].first.tdiff||0 : 0
             %td.numeric
-              - scheduled_disbursal=@disbursals.find_all{|loan| loan.scheduled_disbursal_date==Date.today and loan.client.center.id==center.id}.inject(0){|s,x| s+=x.amount}
+              = (tdiff - pdiff).to_currency
+              - branch_int_overdue += tdiff - pdiff
+            %td.numeric
+              = @fees_overdue[lh[1]].to_currency
+              - branch_fee_overdue += @fees_overdue[lh[1]]
+            %td.numeric
+              = tdiff.to_currency
+            %td.numeric
+              = (advance = (@advances[lh[1]] and @advances[lh[1]].length>0) ? @advances[lh[1]].first.advance_total : 0).to_currency
+              - branch_advance += advance
+            %td.numeric
+              - scheduled_disbursal=@disbursals.find_all{|loan| loan.scheduled_disbursal_date == @date and loan.client.center.id==lh[1]}.inject(0){|s,x| s+=x.amount}
               - branch_scheduled_disbursal += scheduled_disbursal
               = scheduled_disbursal
             %td.numeric
-              - disbursal = @disbursals.find_all{|loan| loan.disbursal_date!=nil and loan.client.center.id==center.id}.inject(0){|s,x| s+=x.amount}
+              - disbursal = @disbursals.find_all{|loan| loan.disbursal_date!=nil and loan.client.center.id==lh[1]}.inject(0){|s,x| s+=x.amount}
               - branch_disbursal += disbursal
               = disbursal
         - total_prin_due  += branch_prin_due
         - total_prin_paid += branch_prin_paid
         - total_int_due   += branch_int_due
         - total_int_paid  += branch_int_paid 
+        - total_fee_due   += branch_fee_due
+        - total_fee_paid  += branch_fee_paid
+        - total_prin_overdue += branch_prin_overdue
+        - total_int_overdue += branch_int_overdue
+        - total_fee_overdue += branch_fee_overdue
+        - total_advance += branch_advance
         - total_scheduled_disbursal += branch_scheduled_disbursal
         - total_disbursal += branch_disbursal
         %tr.branch_total
@@ -87,19 +144,40 @@
               = branch_prin_due.to_currency
           %td.numeric
             %b
-              = branch_prin_paid.to_currency
+              = branch_int_due.to_currency
           %td.numeric
             %b
-              = branch_int_due.to_currency
+              = branch_fee_due.to_currency
+          %td.numeric
+            %b
+              = (branch_int_due + branch_prin_due + branch_fee_due).to_currency
+          %td.numeric
+            %b
+              = branch_prin_paid.to_currency
           %td.numeric
             %b
               = branch_int_paid.to_currency
           %td.numeric
             %b
-              = (branch_int_due + branch_prin_due).to_currency
+              = branch_fee_paid.to_currency
           %td.numeric
             %b
-              = (branch_int_paid + branch_prin_paid).to_currency
+              = (branch_fee_paid + branch_int_paid + branch_prin_paid).to_currency
+          %td.numeric
+            %b
+              = branch_prin_overdue.to_currency
+          %td.numeric
+            %b
+              = branch_int_overdue.to_currency
+          %td.numeric
+            %b
+              = branch_fee_overdue.to_currency
+          %td.numeric
+            %b
+              = (branch_fee_overdue + branch_int_overdue + branch_prin_overdue).to_currency
+          %td.numeric
+            %b
+              = branch_advance.to_currency
           %td.numeric
             %b
               = branch_scheduled_disbursal
@@ -114,19 +192,40 @@
             = total_prin_due.to_currency
         %td.numeric
           %b
-            = total_prin_paid.to_currency
+            = total_int_due.to_currency
         %td.numeric
           %b
-            = total_int_due.to_currency
+            = total_fee_due.to_currency
+        %td.numeric
+          %b
+            = (total_int_due + total_prin_due + total_fee_due).to_currency
+        %td.numeric
+          %b
+            = total_prin_paid.to_currency
         %td.numeric
           %b
             = total_int_paid.to_currency
         %td.numeric
           %b
-            = (total_int_due + total_prin_due).to_currency
+            = total_fee_paid.to_currency
         %td.numeric
           %b
-            = (total_int_paid + total_prin_paid).to_currency
+            = (total_int_paid + total_prin_paid + total_fee_paid).to_currency
+        %td.numeric
+          %b
+            = total_prin_overdue.to_currency
+        %td.numeric
+          %b
+            = total_int_overdue.to_currency
+        %td.numeric
+          %b
+            = total_fee_overdue.to_currency
+        %td.numeric
+          %b
+            = (total_int_overdue + total_prin_overdue + total_fee_overdue).to_currency
+        %td.numeric
+          %b
+            = (total_advance).to_currency
         %td.numeric
           %b
             = total_scheduled_disbursal
@@ -141,6 +240,6 @@
   - if Mfi.first.map_enabled
     %div.tab
       = js_include_tag :map
-      = partial "locations/today_map"
+      = partial "locations/today_map" rescue nil
       %span.greytext
         Numbers indicate the order in which they meetings are held. Click on a center pin to know more

@@ -55,13 +55,15 @@ class Fee
   end
   
   def self.applicable(loan_ids, hash = {})
+    date = hash[:date] || Date.today
+
     if loan_ids == :all
       query    = " AND l.disbursal_date is not NULL"
-      query   += " AND l.disbursal_date<='#{hash[:date].strftime('%Y-%m-%d')}'" if hash[:date]
+      query   += " AND l.disbursal_date<='#{date.strftime('%Y-%m-%d')}'"
     else
       loan_ids = loan_ids.length>0 ? loan_ids.join(",") : "NULL"
       query    = "AND l.id IN (#{loan_ids})"
-    end
+    end   
 
     payables = Fee.properties[:payable_on].type.flag_map
     applicables = repository.adapter.query(%Q{
@@ -69,11 +71,14 @@ class Fee
                                        SUM(if(f.amount>0, convert(f.amount, decimal), l.amount*f.percentage)) fees_applicable, 
                                        f.payable_on payable_on                                       
                                 FROM loan_products lp, fee_loan_products flp, fees f, loans l 
-                                WHERE flp.fee_id=f.id AND flp.loan_product_id=lp.id AND lp.id=l.loan_product_id #{query} GROUP BY l.id;})
+                                WHERE flp.fee_id=f.id AND flp.loan_product_id=lp.id AND lp.id=l.loan_product_id #{query}
+                                      AND l.deleted_at is NULL AND l.rejected_on is NULL
+                                GROUP BY l.id;})
     fees = []
+
     applicables.each{|fee|
       if payables[fee.payable_on]==:loan_installment_dates
-        installments = loans.find{|x| x.id==fee.loan_id}.installment_dates.reject{|x| x>Date.today}.length
+        installments = loans.find{|x| x.id==fee.loan_id}.installment_dates.reject{|x| x > date}.length
         fees.push(FeeApplicable.new(fee.loan_id, fee.client_id, fee.fees_applicable.to_f * installments))
       else
         fees.push(FeeApplicable.new(fee.loan_id, fee.client_id, fee.fees_applicable.to_f))
