@@ -595,6 +595,9 @@ table.report tr td a{
     float: right;
     cursor: pointer;
 }
+table.report tr td.normal{
+    background-color: #fff;
+}
 a.expand_all{
     color: blue;
     float: right;

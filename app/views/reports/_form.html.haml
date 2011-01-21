@@ -98,5 +98,11 @@
             %td
               Include unapproved loans ?
               =check_box(:name => "#{report}[include_unapproved_loans]", :value => "1", :checked => (params[report] and params[report].key?(:include_unapproved_loans) and params[report][:include_unapproved_loans] == "1" ? true : false))
-          %td
-            =submit "Go"
+          -if @report.respond_to?(:group_by_types)
+            %td
+              Group by
+              =select(:name => "#{report}[group_by_types]", :selected => (params[report] and params[report][:group_by_types]), :collection => @report.group_types.map{|name, gt| [name, name.to_s.camelcase(" - ")]}.sort_by{|name, gt| gt}, :prompt => "select grouping")
+        %tr
+          %td{:colspan => 6}
+            %div{:style => "float: right"}
+              =submit "Generate"
