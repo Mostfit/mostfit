@@ -265,6 +265,11 @@ describe LoanHistory do
     LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date + 7, [:loan]).map{|lh|
       lh.actual_outstanding_principal
     }.reduce(0){|s, x| s+=x}.should == 3000 - 96 + 8 - 40
+
+    LoanHistory.sum_outstanding_grouped_by(@loan.scheduled_first_payment_date + 7, [:staff_member]).map{|lh|
+      lh.actual_outstanding_principal
+    }.reduce(0){|s, x| s+=x}.should == 3000 - 96 + 8 - 40
+
     #monthly outstanding
     LoanHistory.sum_outstanding_by_month(@loan.scheduled_first_payment_date.month, @loan.scheduled_first_payment_date.year, Branch.first).map{|lh|
       lh.actual_outstanding_principal

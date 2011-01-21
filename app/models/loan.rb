@@ -560,7 +560,8 @@ class Loan
     repayed =  false
 
     ensure_meeting_day = false
-    ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
+    # commenting this code so that meeting dates not automatically set
+    #ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
 
     (1..number_of_installments).each do |number|
@@ -771,18 +772,18 @@ class Loan
                                                           # considerably by passing total_received, i.e. from history_for
     #return @status if @status
     date = Date.parse(date)      if date.is_a? String
-    return :applied_in_future    if applied_on > date  # non existant
-    return :pending_approval     if applied_on <= date and
-                                 not (approved_on and approved_on <= date) and
-                                 not (rejected_on and rejected_on <= date)
-    return :approved             if (approved_on and approved_on <= date) and not (disbursal_date and disbursal_date <= date) and 
-                                 not (rejected_on and rejected_on <= date)
-    return :rejected             if (rejected_on and rejected_on <= date)
+    return :applied_in_future    if applied_on.holiday_bump > date  # non existant
+    return :pending_approval     if applied_on.holiday_bump <= date and
+                                 not (approved_on and approved_on.holiday_bump <= date) and
+                                 not (rejected_on and rejected_on.holiday_bump <= date)
+    return :approved             if (approved_on and approved_on.holiday_bump <= date) and not (disbursal_date and disbursal_date.holiday_bump <= date) and 
+                                 not (rejected_on and rejected_on.holiday_bump <= date)
+    return :rejected             if (rejected_on and rejected_on.holiday_bump <= date)
     return :written_off          if (written_off_on and written_off_on <= date)
-    return :claim_settlement     if under_claim_settlement and under_claim_settlement <= date
+    return :claim_settlement     if under_claim_settlement and under_claim_settlement.holiday_bump <= date
     total_received ||= total_received_up_to(date)
     principal_received ||= principal_received_up_to(date)
-    return :disbursed          if (date == disbursal_date) and total_received < total_to_be_received
+    return :disbursed            if (date == disbursal_date.holiday_bump) and total_received < total_to_be_received
     if total_received >= total_to_be_received
       @status =  :repaid
     elsif amount<=principal_received and scheduled_interest_up_to(date)<=interest_received_up_to(Date.today)
@@ -1332,7 +1333,8 @@ Loan.descendants.to_a.each do |c|
 
     def calculate_history
       super
-      @history_array = @history_array.reject{|h| h[:date] < applied_on}
+      applied_on_date = self.applied_on.holiday_bump if self.applied_on
+      @history_array = @history_array.reject{|h| h[:date] < applied_on_date}      
       return @history_array
     end
     
