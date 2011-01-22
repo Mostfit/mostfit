@@ -5,6 +5,8 @@ class AggregateConsolidatedReport < Report
   @@group_by = {:branch => :branch_id, :center => :center_id, :client_group => :client_group_id, :staff_member => :disbursed_by_staff_id,
     :year => :year, :month => :month}
 
+  validates_with_method :group_by_types, :group_by_should_be_present
+
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 7
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
@@ -208,5 +210,8 @@ class AggregateConsolidatedReport < Report
     dates
   end
 
-
+  def group_by_should_be_present
+    return [false, "No group by selected"] unless @group_by_types
+    return true
+  end
 end

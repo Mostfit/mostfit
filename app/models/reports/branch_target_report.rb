@@ -1,6 +1,6 @@
 #This report gives the Target Report for the staff members to check their performance on monthly basis.
 class BranchTargetReport < Report
-  attr_accessor :branches, :branch_id, :to_date
+  attr_accessor :branch_id, :branch, :to_date
   
   validates_present :branch_id
 

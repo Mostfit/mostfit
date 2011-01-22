@@ -11,6 +11,8 @@ class Report
   property :created_at, DateTime
   property :generation_time, Integer
 
+  validates_with_method :from_date, :from_date_should_be_less_than_to_date
+
   def name
     "#{report_type}: #{start_date} - #{end_date}"
   end
@@ -32,8 +34,11 @@ class Report
     @funder = Funder.get(params[:funder_id]) if not @funder and params and params[:funder_id] and not params[:funder_id].blank?
 
     [:loan_product_id, :late_by_more_than_days, :absent_more_than, :late_by_less_than_days, :absent_more_than, :include_past_data, :include_unapproved_loans].each{|key|
-      instance_variable_set("@#{key}", ((params and params[key] and params[key].to_i>0) ? params[key].to_i : nil))
+      if params and params[key] and params[key].to_i>0
+        instance_variable_set("@#{key}", params[key].to_i)
+      end
     }
+    set_instance_variables(params)
   end
 
   def calc
@@ -177,6 +182,19 @@ class Report
         @center
       end
     @center = @branch.collect{|b| b.centers}.flatten unless @center
+  end
+
+  def set_instance_variables(params)
+    params.each{|key, value|
+      instance_variable_set("@#{key}", value) if not [:date, :from_date, :to_date].include?(key.to_sym) and value and value.to_i>0
+    } if params
+  end
+
+  def from_date_should_be_less_than_to_date
+    if @from_date and @to_date and @from_date > @to_date
+      return [false, "From date should be before to date"]
+    end
+    return true
   end
 
 end
