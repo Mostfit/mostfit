@@ -40,7 +40,7 @@
       %span.greytext select the bill date of stock
   %tr
     %td
-      Date of Entry
+      Date of Stock Entry
     %td
       = date_select_for @stock_register, :date_of_entry
       %span.greytext select date of stock entry
@@ -48,5 +48,8 @@
     %td
       Stock Details Entered By
     %td
-      = select_staff_member_for @stock_register, :manager, {}, true
+      - if @branch
+        = select :manager_staff_id, :collection => @branch.centers.managers(:order => [:name]).map{ |x| [x.id, x.name]}
+      - else
+        = select_staff_member_for @stock_register, :manager, {}, true
       %span.greytext select the person who is entering the details
