@@ -11,7 +11,7 @@ class Report
   property :created_at, DateTime
   property :generation_time, Integer
 
-  validates_with_method :from_date, :from_date_should_be_less_than_to_date
+  validates_with_method :method => :from_date_should_be_less_than_to_date
 
   def name
     "#{report_type}: #{start_date} - #{end_date}"
