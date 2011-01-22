@@ -15,84 +15,24 @@ class Report
     "#{report_type}: #{start_date} - #{end_date}"
   end
 
-  def get_pdf
-    pdf = PDF::HTMLDoc.new
-    pdf.set_option :bodycolor, :white
-    pdf.set_option :toc, false
-    pdf.set_option :portrait, true
-    pdf.set_option :links, true
-    pdf.set_option :webpage, true
-    pdf.set_option :left, '2cm'
-    pdf.set_option :right, '2cm'
-    pdf.set_option :header, "Header here!"
-    f = File.read("app/views/reports/_#{name.snake_case.gsub(" ","_")}.pdf.haml")
-    report = Haml::Engine.new(f).render(Object.new, :report => self)
-    pdf << report
-    pdf.footer ".t."
-    pdf
-  end
-
   def get_parameters(params, user=nil)
     st     = user.staff_member if user
     @funder = Funder.first(:user_id => user.id) if user and user.role == :funder
-
-    # if a branch is selected pick that or pick all of them
-    @branch = if (params and params[:branch_id] and not params[:branch_id].blank?)
-                Branch.all(:id => params[:branch_id])
-              else
-                Branch.all(:order => [:name])
-              end
-    
+    @branch = get_branches(params)
     @account = Account.all(:order => [:name])
-      # if (params and params[:account_id] and not params[:account_id].blank?)
-      #           Account.all(:id => params[:account_id])
-      #         else
-               
-      #         end
+
     # if the user is staff member or a funder then filter the branches against their managed branches list
     if user and st
       @branch = @branch & [st.centers.branches, st.branches].flatten
     elsif @funder
       @branch = @branch & @funder.branches
     end
-
-    # if a center is selected pick that
-    @center = Center.all(:id => params[:center_id]) if params and params[:center_id] and not params[:center_id].blank?
-
-    # if the user is a staff member or funder and center is not selected then pick all the managed centers
-    @center = if user and not @center and (params and (not params[:staff_member_id] or params[:staff_member_id].blank?))
-                if st and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
-                  [st.centers, st.branches.centers].flatten
-                elsif st and params[:staff_member_id] and not params[:staff_member_id].blank?
-                  StaffMember.get(params[:staff_member_id]).centers
-                elsif @funder and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
-                  @funder.centers
-                elsif @funder and params[:staff_member_id] and not params[:staff_member_id].blank?
-                  @funder.centers & StaffMember.get(params[:staff_member_id]).centers
-                end
-              elsif @center and params and params[:staff_member_id] and not params[:staff_member_id].blank?
-                @center & StaffMember.get(params[:staff_member_id]).centers
-              elsif params and params[:staff_member_id] and not params[:staff_member_id].blank?
-                StaffMember.get(params[:staff_member_id]).centers
-              else
-                @center
-              end
-    @center = @branch.collect{|b| b.centers}.flatten unless @center
-
     
+    set_centers(params, user, st)    
     @funder = Funder.get(params[:funder_id]) if not @funder and params and params[:funder_id] and not params[:funder_id].blank?
-    @loan_product_id = if params and params[:loan_product_id] and params[:loan_product_id].to_i>0
-                      params[:loan_product_id].to_i
-                    else
-                      nil
-                    end
 
-    [:late_by_more_than_days, :absent_more_than, :late_by_less_than_days, :absent_more_than, :include_past_data, :include_unapproved_loans].each{|key|
-      instance_variable_set("@#{key}", if params and params[key] and params[key].to_i>0
-                                         params[key].to_i
-                                       else
-                                         nil
-                                       end)
+    [:loan_product_id, :late_by_more_than_days, :absent_more_than, :late_by_less_than_days, :absent_more_than, :include_past_data, :include_unapproved_loans].each{|key|
+      instance_variable_set("@#{key}", ((params and params[key] and params[key].to_i>0) ? params[key].to_i : nil))
     }
   end
 
@@ -103,7 +43,6 @@ class Report
     self.generation_time = Time.now - t0
     self.save
   end
-
 
   def group_loans(by, columns, conditions = {})
     by_query = if by.class == String
@@ -123,6 +62,24 @@ class Report
     })    
   end
 
+  def get_pdf
+    pdf = PDF::HTMLDoc.new
+    pdf.set_option :bodycolor, :white
+    pdf.set_option :toc, false
+    pdf.set_option :portrait, true
+    pdf.set_option :links, true
+    pdf.set_option :webpage, true
+    pdf.set_option :left, '2cm'
+    pdf.set_option :right, '2cm'
+    pdf.set_option :header, "Header here!"
+    f = File.read("app/views/reports/_#{name.snake_case.gsub(" ","_")}.pdf.haml")
+    report = Haml::Engine.new(f).render(Object.new, :report => self)
+    pdf << report
+    pdf.footer ".t."
+    pdf
+  end
+
+  private
   def process_conditions(conditions)
     selects = []
     conditions = conditions.map{|query, value|
@@ -186,4 +143,40 @@ class Report
       val
     end    
   end
+
+  def get_branches(params)
+    # if a branch is selected pick that or pick all of them
+    if (params and params[:branch_id] and not params[:branch_id].blank?)
+      Branch.all(:id => params[:branch_id])
+    else
+      Branch.all(:order => [:name])
+    end
+  end
+
+  def set_centers(params, user=nil, staff=nil)
+    # if a center is selected pick that
+    @center = Center.all(:id => params[:center_id]) if params and params[:center_id] and not params[:center_id].blank?
+
+    # if the user is a staff member or funder and center is not selected then pick all the managed centers
+    @center = 
+      if user and not @center and (params and (not params[:staff_member_id] or params[:staff_member_id].blank?))
+        if staff and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
+          [staff.centers, staff.branches.centers].flatten
+        elsif staff and params[:staff_member_id] and not params[:staff_member_id].blank?
+          StaffMember.get(params[:staff_member_id]).centers
+        elsif @funder and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
+          @funder.centers
+        elsif @funder and params[:staff_member_id] and not params[:staff_member_id].blank?
+          @funder.centers & StaffMember.get(params[:staff_member_id]).centers
+        end
+      elsif @center and params and params[:staff_member_id] and not params[:staff_member_id].blank?
+        @center & StaffMember.get(params[:staff_member_id]).centers
+      elsif params and params[:staff_member_id] and not params[:staff_member_id].blank?
+        StaffMember.get(params[:staff_member_id]).centers
+      else
+        @center
+      end
+    @center = @branch.collect{|b| b.centers}.flatten unless @center
+  end
+
 end

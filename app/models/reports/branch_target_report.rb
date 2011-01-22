@@ -1,6 +1,8 @@
 #This report gives the Target Report for the staff members to check their performance on monthly basis.
 class BranchTargetReport < Report
   attr_accessor :branches, :branch_id, :to_date
+  
+  validates_present :branch_id
 
   def initialize(params, dates, user)
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today

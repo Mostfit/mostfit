@@ -1,3 +1,4 @@
+= error_messages_for @report
 - unless params[:layout] 
   - report = @report.class.to_s.snake_case
   - branch_id = (params[report] and params[report][:branch_id] and not params[report][:branch_id].blank?) ? params[report][:branch_id] : nil

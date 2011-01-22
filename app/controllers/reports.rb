@@ -34,13 +34,19 @@ class Reports < Application
       if not params[:submit]
         render :form
       else
-        case @report.method(:generate).arity
-        when 0
-          @data = @report.generate
-        when 1
-          @data = @report.generate(params)
+        if @report.valid?
+          case @report.method(:generate).arity
+          when 0
+            @data = @report.generate
+          when 1
+            @data = @report.generate(params)
+          end
+          display @data
+        else
+          params.delete(:submit)
+          message[:error] = "Report cannot be generated"          
+          render :form
         end
-        display @data
       end
     elsif id.nil?
       @reports = klass.all(:order => [:start_date.desc])
