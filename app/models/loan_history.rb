@@ -382,7 +382,7 @@ class LoanHistory
 
     repository.adapter.query(%Q{
       SELECT 
-        SUM(lh.scheduled_outstanding_principal) AS loan_amount,
+        SUM(l.amount) AS loan_amount,
         COUNT(DISTINCT(lh.loan_id)) loan_count,
         #{selects}
       FROM loan_history lh, loans l
