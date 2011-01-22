@@ -3,7 +3,10 @@
     %td
       Name
     %td
-      = select_staff_member_for @branch_diary, :manager, {}, true
+      - if @branch
+        = select :manager_staff_id, :collection => @branch.centers.managers(:order => [:name]).map{ |x| [x.id, x.name]}
+      - else
+        = select_staff_member_for @branch_diary, :manager, {}, true
       %span.greytext select the person who opens the branch
   %tr
     %td
