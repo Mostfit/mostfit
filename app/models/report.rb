@@ -84,6 +84,12 @@ class Report
     pdf
   end
 
+  def get_xls
+    f = File.read("app/views/reports/_#{name.snake_case.gsub(" ","_")}.pdf.haml")
+    doc = Hpricot(Haml::Engine.new(f).render(Object.new, :data => self.generate))
+    
+  end
+
   private
   def process_conditions(conditions)
     selects = []
