@@ -42,6 +42,8 @@ class LoanHistory
   @@models = [Region, Area, Branch, Center, ClientGroup, Client, Loan]
   @@optionals = [ClientGroup]
 
+  
+  # Provides outstanding amount of loans given as ids on a particular date
   def self.sum_outstanding_for_loans(date, loan_ids)
     loan_ids = loan_ids.length > 0 ? loan_ids.join(', ') : "NULL"
     repository.adapter.query(%Q{
@@ -57,6 +59,7 @@ class LoanHistory
       where lh.loan_id = dt.loan_id and lh.date = dt.date) as dt1;})
   end
 
+  # Provides loan ids which have defaulted for more than 'days'
   def self.defaulted_loan_info (days = 7, date = Date.today, query ={})
     # this does not work as expected if the loan is repaid and goes back into default within the days we are looking at it.
     defaulted_loan_ids = repository.adapter.query(%Q{
@@ -67,6 +70,12 @@ class LoanHistory
                WHERE actual_outstanding_principal != scheduled_outstanding_principal and date < now()) as dt group by loan_id having diff < #{days}) as dt1;})
   end
 
+  
+  # Get loans defaulted grouped by given group_by
+  # For instance we can group loans by [:branch, :center] or [:branch, :center, :client_group]
+  # by saying LoanHistory.defaulted_loan_info_by([:branch, :center], Date.today)
+  # on can also restrict the scope of the query by providing 'query'
+  # for instance, query = {:branch_id => [3, 4]}
   def self.defaulted_loan_info_by(group_by, date = Date.today, query={}, selects="")
     # this does not work as expected if the loan is repaid and goes back into default within the days we are looking at it.
     group_by = get_group_by(group_by)
@@ -85,6 +94,10 @@ class LoanHistory
          #{group_by};})
   end
   
+  # Gives loan defaulted for a particular object
+  # For instance LoanHistory.defaulted_loan_info_for(Branch.first, Date.today, 10) gives back loans inside Branch.first defaulted by less than 10 days
+  # For instance LoanHistory.defaulted_loan_info_for(Branch.first, Date.today) gives back loans inside Branch.first in default
+
   # loan_type here is relevant only for the case of staff member. This comes into play when we need all the loans under centers
   # managed by the staff member.
   def self.defaulted_loan_info_for(obj, date=Date.today, days=nil, type=:aggregate, loan_type = :created)    
@@ -118,8 +131,14 @@ class LoanHistory
     sum_outstanding_grouped_by(to_date, [:center, :client_group], extra)
   end
   
-  def self.advance_balance(to_date, group_by, extra=[], selects="")
-    ids = get_latest_rows_of_loans(to_date, extra)
+  # Get loans for which there is some advance in balance
+  # For instance we can group loans by [:branch, :center] or [:branch, :center, :client_group]
+  # by saying LoanHistory.advance_balance(Date.today, [:branch, :center])
+
+  # on can also restrict the scope of the query by providing 'query'
+  # for instance, query = ["branch_id=3", "center_id=100"]
+  def self.advance_balance(to_date, group_by, query=[], selects="")
+    ids = get_latest_rows_of_loans(to_date, query)
     return false if ids.length==0
     group_by = get_group_by(group_by)
     selects  = get_selects(group_by, selects)
@@ -137,8 +156,13 @@ class LoanHistory
     })    
   end
 
-  def self.sum_advance_payment(from_date, to_date, group_by, extra=[], selects="")
-    extra = "AND #{extra.join(' AND ')}" if extra.length>0
+  # Get total advance collected between a date range (from_date, to_date). This presentes the data in grouped by given group_by array
+  # For instance we can group loans by [:branch, :center] or [:branch, :center, :client_group]
+  # by saying LoanHistory.sum_advance_payment([:branch, :center], Date.today)
+  # on can also restrict the scope of the query by providing 'extra_conditions'
+  # for instance, extra_conditions = ["branch_id=3", "center_id=100"]
+  def self.sum_advance_payment(from_date, to_date, group_by, extra_conditions=[], selects="")
+    extra_conditions = "AND #{extra_conditions.join(' AND ')}" if extra_conditions.length>0
     group_by = get_group_by(group_by)
     selects  = get_selects(group_by, selects)
 
@@ -150,7 +174,7 @@ class LoanHistory
       FROM loan_history lh, loans l
       WHERE lh.status in (6) AND l.id=lh.loan_id AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
             AND lh.scheduled_outstanding_principal > lh.actual_outstanding_principal AND lh.scheduled_outstanding_total > lh.actual_outstanding_total
-            AND lh.principal_paid>0 AND lh.principal_due < 0 AND l.deleted_at is NULL #{extra}
+            AND lh.principal_paid>0 AND lh.principal_due < 0 AND l.deleted_at is NULL #{extra_conditions}
       #{group_by};
     })
   end
@@ -160,8 +184,13 @@ class LoanHistory
     sum_outstanding_grouped_by(to_date, :center, extra)
   end
 
-  def self.sum_outstanding_grouped_by(to_date, group_by, extra=[], selects = "")
-    ids = get_latest_rows_of_loans(to_date, extra)
+  # Get sum outstanding for all the loans grouped by given group_by array for a given date
+  # For instance we can group loans by [:branch, :center] or [:branch, :center, :client_group]
+  # by saying LoanHistory.sum_outstanding_grouped_by(Date.today, [:branch, :center])
+  # on can also restrict the scope of the query by providing 'extra_condition'
+  # for instance, extra_conditions = ["branch_id=3", "center_id=100"]
+  def self.sum_outstanding_grouped_by(to_date, group_by, extra_conditions=[], selects = "")
+    ids = get_latest_rows_of_loans(to_date, extra_conditions)
     return [] if ids.length==0
     group_by = get_group_by(group_by)
     selects  = get_selects(group_by, selects)
@@ -189,10 +218,15 @@ class LoanHistory
   end
 
   # TODO:  rewrite it using Datamapper
-  def self.sum_disbursed_grouped_by(group_by, from_date=Date.min_date, to_date=Date.today, extra=[], selects="")
+  # Get sum disbursed for all the loans grouped by given group_by array for a given date
+  # For instance we can group loans by [:branch, :center] or [:branch, :center, :client_group]
+  # by saying LoanHistory.sum_disbursed_grouped_by([:branch, :center], Date.today-100, Date.today)
+  # on can also restrict the scope of the query by providing 'extra_condition'
+  # for instance, extra_conditions = ["branch_id=3", "center_id=100"]
+  def self.sum_disbursed_grouped_by(group_by, from_date=Date.min_date, to_date=Date.today, extra_conditions=[], selects="")
     group_by = get_group_by(group_by)
     selects  = get_selects(group_by, selects)
-    extra    = build_extra(extra)
+    extra    = build_extra(extra_conditions)
 
     repository.adapter.query(%Q{
       SELECT 
@@ -206,6 +240,8 @@ class LoanHistory
     })
   end
 
+  # Gives loan outstanding for/under a particular object
+  # For instance LoanHistory.sum_outstanding_for(Branch.first, Date.today) gives back loans disbursed under Branch.first
   # loan_type here is relevant only for the case of staff member. This comes into play when we need all the loans under centers
   # managed by the staff member.
   def self.sum_outstanding_for(obj, to_date=Date.today, loan_type = :created)
@@ -268,6 +304,8 @@ class LoanHistory
     repository.adapter.query("SELECT #{select} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end  
 
+  # Gives loans outstanding for/under a particular object. Not be to confused with sum_outstanding_for which gives a aggregation. This provides listing.
+  # For instance LoanHistory.loans_outstanding_for(Branch.first, Date.today) gives back loans outstanding under Branch.first on that date
   def self.loans_outstanding_for(obj, date=Date.today)
     klass, obj = get_class_of(obj)
     froms = build_froms(klass)
@@ -285,6 +323,8 @@ class LoanHistory
     })    
   end
 
+  # Gives loans outstanding for/under a particular object. Not be to confused with sum_outstanding_for which gives a aggregation. This provides listing.
+  # For instance LoanHistory.loans_outstanding_for(Branch.first, Date.today) gives back loans outstanding under Branch.first on that date
   # loan_type here is relevant only for the case of staff member. This comes into play when we need all the loans under centers
   # managed by the staff member.
   def self.amount_disbursed_for(obj, from_date=Date.min_date, to_date=Date.today, loan_type = :created)
@@ -317,7 +357,9 @@ class LoanHistory
     repository.adapter.query("SELECT count(*) FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end
 
-  # TODO:  rewrite it using Datamapper
+  # returns back which ids of the objects of klass which are attached to loans restricted by 'hash'
+  # for instance LoanHistory.parents_where_loans_of(Branch, {:loan_product_id => 4})
+  # finds all the branch ids where loans of loan product id 4 has been disbursed.
   def self.parents_where_loans_of(klass, hash)
     selects    = build_selects(klass)
     froms      = build_froms(klass)
@@ -325,7 +367,10 @@ class LoanHistory
     repository.adapter.query("SELECT #{selects} FROM #{froms.join(', ')} WHERE #{conditions.join(' AND ')}")
   end
   
-  # TODO:  rewrite it using Datamapper
+  # returns back which ids of the objects of ancestor_klass which are attached to portfolio
+  # for instance LoanHistory.ancestors_of_portfolio(Portfolio.first, Branch.first)
+  # this will find all the loans in the give 'Poritfolio.first' and traverse up the hierarchy to find all branches reachable from these loans
+  # 'portfolio' can also be an array containing multiple portfolios
   def self.ancestors_of_portfolio(portfolio, ancestor_klass, hash={})
     portfolio_klass, obj = get_class_of(portfolio)
     selects    = build_selects(ancestor_klass)
@@ -347,6 +392,7 @@ class LoanHistory
     })
   end
 
+  # Given back loan repaid count for an object.
   # loan_type here is relevant only for the case of staff member. This comes into play when we need all the loans under centers
   # managed by the staff member.
   def self.loan_repaid_count(obj, from_date=Date.min_date, to_date=Date.today, loan_type = :created) 
@@ -375,6 +421,7 @@ class LoanHistory
     LoanHistory.all(hash).aggregate(:loan_id.count)
   end
 
+  # group loans which have been repaid. 
   def self.sum_repaid_grouped_by(group_by, from_date, to_date, extra=[], selects="")
     group_by = get_group_by(group_by)
     selects  = get_selects(group_by, selects)
@@ -392,6 +439,7 @@ class LoanHistory
     })    
   end
 
+  # group loans which have been foreclosed, either written off or closed due to death of client. 
   def self.sum_foreclosure_grouped_by(group_by, from_date, to_date, extra=[], selects="")
     group_by = get_group_by(group_by)
     selects  = get_selects(group_by, selects)
