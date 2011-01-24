@@ -135,8 +135,6 @@ describe Client do
     @client.destroy.should be_true
   end
 
-  it "should not have more than one outstanding loan at a time if so specified"
-
   it "should deal with death of a client" do
     @client.deceased_on = Date.today
   end
