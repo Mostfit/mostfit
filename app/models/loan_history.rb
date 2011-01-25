@@ -618,6 +618,9 @@ class LoanHistory
   end
 
   def self.get_selects(group_by_str, selects)
+    selects = selects.map { |sel|
+      sel.to_s
+    }.join(", ") if selects.is_a?(Array)
     selects  = (selects + ", ") if selects and selects.length > 0
     selects += (group_by_str.length>0 ? group_by_str.gsub("GROUP BY", "") : "1")
     selects
