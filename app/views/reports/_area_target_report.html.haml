@@ -1,0 +1,132 @@
+= partial :form
+%table.report.nojs
+  %tr.header
+    %th
+      Center Manager
+    %th{:colspan => "4"}
+      Development
+    %th{:colspan => "9"}
+      Disbursement
+    %th{:colspan => "5"}
+      Repayment (Principal & Interest)
+    %th
+      Outstanding
+
+  %tr.header
+    %th
+    %th
+      Target
+      %br
+      For Month
+    %th
+      Actual
+      %br
+      Today
+    %th
+      Actual
+      %br
+      Till Date
+    %th
+      Variance
+    %th
+      Target
+      %br
+      For Month
+    %th{:colspan => "2"}
+      Till Date
+    %th{:colspan => "6"}
+      Today
+    %th{:colspan => "4"}
+      Today
+    %th
+      Variance
+    %th
+
+  %tr.header
+    %th
+    %th
+      Nos
+    %th
+      Nos
+    %th
+      Nos
+    %th
+      Nos
+    %th
+      Amount
+    %th
+      Nos
+    %th
+      Amount
+    %th
+      Variance
+    %th
+      Sanctioned
+    %th
+      Total
+    %th
+      Disbursed
+    %th
+      Variance
+      %br
+      From Sanctioned
+    %th
+      Variance
+      %br
+      From Target
+    %th
+      Variance
+    %th
+      Due
+    %th
+      Actual
+    %th
+      Variance
+    %th
+      Till Date
+    %th
+
+    - length = 19
+    - @data.sort_by{|staff, centers| staff}.each do |staff, centers|
+      %tr.staff
+        %td
+          %b
+            = staff
+        %td
+          = centers[:development][:target][0] || 0
+        %td
+          = centers[:development][:actual][0] || 0
+        %td
+          = centers[:development][:actual][1] || 0
+        %td
+          = centers[:development][:variance]
+        %td
+          = (centers[:disbursement][:target][0] || 0).to_currency
+        %td
+          = centers[:disbursement][:till_date][0]
+        %td
+          = (centers[:disbursement][:till_date][1] || 0).to_currency
+        %td
+          = centers[:disbursement][:today][:overdue].to_currency
+        %td
+          = centers[:disbursement][:today][:sanctioned].to_currency
+        %td
+          = centers[:disbursement][:today][:total].to_currency
+        %td
+          = centers[:disbursement][:today][:disbursed].to_currency
+        %td
+          = centers[:disbursement][:today][:variance_from_sanctioned].to_currency
+        %td
+          = centers[:disbursement][:today][:variance_from_target].to_currency
+        %td
+          = centers[:repayment][:var].to_currency
+        %td
+          = centers[:repayment][:due].to_currency
+        %td
+          = centers[:repayment][:actual].to_currency
+        %td
+          = centers[:repayment][:total_variance].to_currency
+        %td
+          = (centers[:repayment][:variance_till_date] || 0).to_currency
+        %td
+          = (centers[:total_outstanding] || 0).to_currency

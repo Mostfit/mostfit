@@ -22,12 +22,20 @@ class Report
     @funder = Funder.first(:user_id => user.id) if user and user.role == :funder
     @branch = get_branches(params)
     @account = Account.all(:order => [:name])
+    @area = get_areas(params)
 
     # if the user is staff member or a funder then filter the branches against their managed branches list
     if user and st
       @branch = @branch & [st.centers.branches, st.branches].flatten
     elsif @funder
       @branch = @branch & @funder.branches
+    end
+
+    # if the user is staff member or a funder then filter the branches against their managed branches list
+    if user and st
+      @area = @area & [st.branches.areas, st.areas].flatten
+    elsif @funder
+      @area = @area & @funder.areas
     end
     
     set_centers(params, user, st)    
@@ -161,6 +169,15 @@ class Report
       Branch.all(:id => params[:branch_id])
     else
       Branch.all(:order => [:name])
+    end
+  end
+
+  def get_areas(params)
+    #if an area is selected pick otherwise pick all of them
+    if (params and params[:area_id] and not params[:area_id].blank?)
+      Area.all(:id => params[:area_id])
+    else
+      Area.all(:order => [:name])
     end
   end
 

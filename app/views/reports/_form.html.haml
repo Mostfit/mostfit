@@ -1,6 +1,7 @@
 = error_messages_for @report
 - unless params[:layout] 
   - report = @report.class.to_s.snake_case
+  - area_id = (params[report] and params[report][:area_id] and not params[report][:area_id].blank?) ? params[report][:area_id] : nil
   - branch_id = (params[report] and params[report][:branch_id] and not params[report][:branch_id].blank?) ? params[report][:branch_id] : nil
   - center_id = (params[report] and params[report][:center_id] and not params[report][:center_id].blank?) ? params[report][:center_id] : nil
   - loan_product_id = (params[report] and params[report][:loan_product_id] and not params[report][:loan_product_id].blank?) ? params[report][:loan_product_id] : nil
@@ -9,6 +10,9 @@
   - account_id = (params[report] and params[report][:account_id] and not params[report][:account_id].blank?) ? params[report][:account_id] : nil
   - if params[:submit]
     %h3{:style => "margin-bottom: 5px;"}
+      - if area_id
+        Area:
+        = Area.get(area_id).name
       - if branch_id
         Branch:
         = Branch.get(branch_id).name
@@ -38,72 +42,76 @@
     = form_for(@report, :action => url(:show_report, :report_type => params[:report_type]), :method => :get) do
       %table
         %tr
-          -if @report.respond_to?(:from_date)
+          - if @report.respond_to?(:from_date)
             %td
               From
-              =date_select_for(@report, "from_date", :date => @report.from_date)
-          -if @report.respond_to?(:to_date)
+              = date_select_for(@report, "from_date", :date => @report.from_date)
+          - if @report.respond_to?(:to_date)
             %td
               To
-              =date_select_for(@report, "to_date", :date => @report.to_date)
-          -if @report.respond_to?(:date)
+              = date_select_for(@report, "to_date", :date => @report.to_date)
+          - if @report.respond_to?(:date)
             %td
               Date
-              =date_select_for(@report, "date", :date => @report.date)
-          -if @report.respond_to?(:loan_product_id)
+              = date_select_for(@report, "date", :date => @report.date)
+          - if @report.respond_to?(:loan_product_id)
             %td
               Product
-              =select(:loan_product_id, :collection => LoanProduct.all.map{|x| [x.id, x.name]}, :include_blank => true, :selected => loan_product_id)
-          -if @report.respond_to?(:late_by_more_than_days)
+              = select(:loan_product_id, :collection => LoanProduct.all.map{|x| [x.id, x.name]}, :include_blank => true, :selected => loan_product_id)
+          - if @report.respond_to?(:late_by_more_than_days)
             %td
               Late by more than:
-              =text_field(:late_by_more_than_days, :size => 10)
+              = text_field(:late_by_more_than_days, :size => 10)
               days
-          -if @report.respond_to?(:late_by_less_than_days)
+          - if @report.respond_to?(:late_by_less_than_days)
             %td
               Late by less than:
-              =text_field(:late_by_less_than_days, :size => 10)
+              = text_field(:late_by_less_than_days, :size => 10)
               days
-          -if @report.respond_to?(:absent_more_than)
+          - if @report.respond_to?(:absent_more_than)
             %td
               Absent by more than:
-              =text_field(:absent_more_than, :size => 3)
+              = text_field(:absent_more_than, :size => 3)
               days
       %table{:style => "padding-top: 0px;"}
         %tr
-          -if @report.respond_to?(:branch_id)
+          - if @report.respond_to?(:area_id)
+            %td
+              Area:
+              = select(:area_id, :collection => get_accessible_areas, :value_method => :id, :text_method => :name, :include_blank => true, :selected => area_id, :id => "area_selector")
+          - if @report.respond_to?(:branch_id)
             %td
               Branch: 
-              =select(:branch_id , :collection => get_accessible_branches, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id, :id => "branch_selector")
-          -if @report.respond_to?(:center_id)
+              = select(:branch_id , :collection => get_accessible_branches, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id, :id => "branch_selector")
+          - if @report.respond_to?(:center_id)
             %td
               Center:          
-              =select(:center_id , :collection => get_accessible_centers(branch_id), :include_blank => true, :selected => center_id, :id => "center_selector")
-          -if @report.respond_to?(:staff_member_id)
+              = select(:center_id , :collection => get_accessible_centers(branch_id), :include_blank => true, :selected => center_id, :id => "center_selector")
+          - if @report.respond_to?(:staff_member_id)
             %td
               Staff member:
-              =select(:staff_member_id , :collection => get_accessible_staff_members, :include_blank => true, :selected => staff_member_id)
-          -if @report.respond_to?(:funder_id)
+              = select(:staff_member_id , :collection => get_accessible_staff_members, :include_blank => true, :selected => staff_member_id)
+          - if @report.respond_to?(:funder_id)
             %td
               Funder:
-              =select(:funder_id , :collection => get_accessible_funders, :include_blank => true, :selected => funder_id)
-          -if @report.respond_to?(:account_id)
+              = select(:funder_id , :collection => get_accessible_funders, :include_blank => true, :selected => funder_id)
+          - if @report.respond_to?(:account_id)
             %td
               Account:
-              =select(:account_id, :collection => get_accessible_accounts, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id, :id => "account_selector")
-          -if @report.respond_to?(:include_past_data)
+              = select(:account_id, :collection => get_accessible_accounts, :value_method => :id, :text_method => :name, :include_blank => true, :selected => branch_id, :id => "account_selector")
+          - if @report.respond_to?(:include_past_data)
             %td
               Include past data ?
-              =check_box(:name => "#{report}[include_past_data]", :value => "1", :checked => (params[report] and params[report].key?(:include_past_data) and params[report][:include_past_data] == "1" ? true : false))
-          -if @report.respond_to?(:include_unapproved_loans)
+              = check_box(:name => "#{report}[include_past_data]", :value => "1", :checked => (params[report] and params[report].key?(:include_past_data) and params[report][:include_past_data] == "1" ? true : false))
+          - if @report.respond_to?(:include_unapproved_loans)
             %td
               Include unapproved loans ?
-              =check_box(:name => "#{report}[include_unapproved_loans]", :value => "1", :checked => (params[report] and params[report].key?(:include_unapproved_loans) and params[report][:include_unapproved_loans] == "1" ? true : false))
-          -if @report.respond_to?(:group_by_types)
+              = check_box(:name => "#{report}[include_unapproved_loans]", :value => "1", :checked => (params[report] and params[report].key?(:include_unapproved_loans) and params[report][:include_unapproved_loans] == "1" ? true : false))
+          - if @report.respond_to?(:group_by_types)
             %td
               Group by
-              =select(:name => "#{report}[group_by_types]", :selected => (params[report] and params[report][:group_by_types]), :collection => @report.group_types.map{|name, gt| [name, name.to_s.camelcase(" - ")]}.sort_by{|name, gt| gt}, :prompt => "select grouping")
+              = select(:name => "#{report}[group_by_types]", :selected => (params[report] and params[report][:group_by_types]), :collection => @report.group_types.map{|name, gt| [name, name.to_s.camelcase(" - ")]}.sort_by{|name, gt| gt}, :prompt => "select grouping")
         %tr
           %td{:colspan => 6}
             %div{:style => "float: right"}
-              =submit "Generate"
+              = submit "Generate"

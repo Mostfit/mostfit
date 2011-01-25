@@ -371,6 +371,14 @@ module Merb
       end
     end
 
+    def get_accessible_areas
+      if session.user.staff_member
+        [session.user.staff_member.branches.areas, session.user.staff_member.areas].flatten
+      else
+        Area.all(:order => [:name])
+      end
+    end
+
     def get_accessible_branches
       if session.user.staff_member
         [session.user.staff_member.centers.branches, session.user.staff_member.branches].flatten
