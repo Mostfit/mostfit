@@ -45,7 +45,7 @@
       %td
         All loans (number)
       %td{:colspan => 3}
-        = (l = Loan.all(:disbursal_date.not => nil).count)
+        = (l = Loan.count(:disbursal_date.not => nil, :rejected_on => nil))
     %tr
       %td
         Closed/repaid loans (number)
@@ -55,7 +55,7 @@
       %td
         Loans disbursed (amount)
       %td{:colspan => 3}
-        = Loan.all(:disbursal_date.not => nil).aggregate(:amount.sum).to_currency
+        = Loan.all(:disbursal_date.not => nil, :rejected_on => nil).aggregate(:amount.sum).to_currency
     %tr
       %td
         Amount outstanding

@@ -22,9 +22,16 @@ namespace :mostfit do
     }.to_hash
     problems = []
     data1.each{|lid, date| problems << lid if data2[lid] and (data2[lid] - date ) >0}
-    problems.eahc{|lid|
+    problems.each{|lid|
       Loan.get(lid).update_history
       puts lid
     }
+    # update loans where OS + paid != disbursed
+    problems = []
+    data = LoanHistory.sum_outstanding_grouped_by(Date.today, :loan).map{|lh| [lh.loan_id, lh.actual_outstanding_principal.to_i]}.to_hash; puts
+    problems = data.map{|lid, os| 
+      [lid, Loan.all(:id => lid, :disbursal_date.lte => Date.today).aggregate(:amount.sum) - os - (Payment.all(:type => :principal, :loan_id => lid).aggregate(:amount.sum)||0)]
+    }.find_all{|k,v| v!=0}
+    problems.keys.each{|lid| Loan.get(lid).update_history}
   end
 end

@@ -282,15 +282,16 @@ class LoanHistory
         SUM(if(actual_outstanding_total>0,     actual_outstanding_total, 0))        AS actual_outstanding_total,
         SUM(if(actual_outstanding_principal<0, actual_outstanding_principal,0))    AS advance_principal,
         SUM(if(actual_outstanding_total<0,     actual_outstanding_total,0))        AS advacne_total,
-        COUNT(DISTINCT(loan_id))             AS loans_count,
-        COUNT(DISTINCT(client_id))           AS clients_count
+        COUNT(DISTINCT(lh.loan_id))             AS loans_count,
+        COUNT(DISTINCT(lh.client_id))           AS clients_count
         #{q}
     }
 
     repository.adapter.query(%Q{
       SELECT #{select}
-      FROM loan_history lh
-      WHERE (lh.loan_id, lh.date) in (#{ids}) AND lh.status in (5,6)
+      FROM loan_history lh, loans l
+      WHERE (lh.loan_id, lh.date) in (#{ids}) AND lh.status in (5,6) AND lh.loan_id=l.id
+            AND l.deleted_at is NULL AND l.rejected_on is NULL
       #{group_by}
     })
   end
