@@ -33,7 +33,7 @@ class ClientAbsenteeismReport < Report
       clients[c.center_id] << c
     }
     center_ids = clients.keys
-
+    p @branch
     @branch.each do |branch|
       data[branch] = {}
       branch.centers.each do |center|

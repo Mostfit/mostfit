@@ -48,7 +48,6 @@ class Journals < Application
         redirect resource(:accounts)+"#journal_entries", :message => {:notice => "Journal was successfully created"}
       end
     else
-      debugger
       message[:error] = "Journal failed to be created"
       render :new
     end

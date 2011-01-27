@@ -37,6 +37,9 @@ class QuarterConsolidatedReport < Report
             next if @to_date   < Date.new(y, month_number, 1)
             query = []
             query = ["l.loan_product_id = #{self.loan_product_id}"] if self.loan_product_id
+            query    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})" if @branch.length > 0
+            query    << "lh.center_id in (#{@center.map{|c| c.id}.join(', ')})" if @center.length > 0
+
             histories = LoanHistory.sum_outstanding_by_month(month_number, y, branch, query)
             next if not histories
             query              << ["lh.branch_id=#{branch.id}"]

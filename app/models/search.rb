@@ -39,7 +39,6 @@ class Search
     objs = nil
     objs = models.first.all(queries[models.first])
     models.uniq[1..-1].each{|model|
-      debugger
       objs = objs.send(model.to_s.snake_case.pluralize, queries[model])
     }
     objs

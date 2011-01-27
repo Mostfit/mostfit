@@ -21,6 +21,8 @@ class StaffConsolidatedReport < Report
 
     extra     = []
     extra    << "l.loan_product_id = #{loan_product_id}" if loan_product_id
+    extra    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})" if @branch.length > 0
+    extra    << "lh.center_id in (#{@center.map{|c| c.id}.join(', ')})" if @center.length > 0
     # if a funder is selected
     if @funder
       funder_loan_ids = @funder.loan_ids

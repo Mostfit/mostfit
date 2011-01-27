@@ -37,7 +37,7 @@ class Report
       elsif @funder
         @area = @area & @funder.areas
       end
-      @branch = @area.branches
+      @branch = Branch.all(:area_id => @area.map{|a| a.id})
     end
 
     set_centers(params, user, st)    
