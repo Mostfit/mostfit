@@ -1,22 +1,22 @@
 #This report gives the Target Report for the staff members to check their performance on monthly basis.
-class BranchTargetReport < Report
-  attr_accessor :branch_id, :branch, :to_date
+class StaffTargetReport < Report
+  attr_accessor :branch_id, :branch, :to_date, :area_id, :area
   
-  validates_present :branch_id
+  validates_with_method :branch_id, :method => :branch_or_area_present
 
   def initialize(params, dates, user)
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
     @date = Date.new(@to_date.year, @to_date.month, 01)
-    @name = "Target Report from #{@date} to #{@to_date}"
+    @name = "Staff Target Report from #{@date} to #{@to_date}"
     get_parameters(params, user)
   end
 
   def name
-    "Target Report from #{@date} to #{@to_date}"
+    "Staff Target Report from #{@date} to #{@to_date}"
   end
   
   def self.name
-    "Target Report"
+    "Staff Target Report"
   end
 
   def generate    
@@ -136,4 +136,10 @@ class BranchTargetReport < Report
     }
     return data
   end
+
+  def branch_or_area_present
+    return [false, "Either branch or area should be selected"] if (branch_id and area_id) or (not branch_id and not area_id)
+    return true
+  end
+  
 end

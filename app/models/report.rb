@@ -22,7 +22,6 @@ class Report
     @funder = Funder.first(:user_id => user.id) if user and user.role == :funder
     @branch = get_branches(params)
     @account = Account.all(:order => [:name])
-    @area = get_areas(params)
 
     # if the user is staff member or a funder then filter the branches against their managed branches list
     if user and st
@@ -32,12 +31,15 @@ class Report
     end
 
     # if the user is staff member or a funder then filter the branches against their managed branches list
-    if user and st
-      @area = @area & [st.branches.areas, st.areas].flatten
-    elsif @funder
-      @area = @area & @funder.areas
+    if @area = get_areas(params)
+      if user and st
+        @area = @area & [st.branches.areas, st.areas].flatten
+      elsif @funder
+        @area = @area & @funder.areas
+      end
+      @branch = @area.branches
     end
-    
+
     set_centers(params, user, st)    
     @funder = Funder.get(params[:funder_id]) if not @funder and params and params[:funder_id] and not params[:funder_id].blank?
 
@@ -51,7 +53,7 @@ class Report
 
   def calc
     t0 = Time.now
-    BranchTargetReport.all(:report_type => self.report_type, :start_date => self.start_date, :end_date => self.end_date).destroy!
+    all(:report_type => self.report_type, :start_date => self.start_date, :end_date => self.end_date).destroy!
     self.report = Marshal.dump(self.generate)
     self.generation_time = Time.now - t0
     self.save
@@ -173,11 +175,9 @@ class Report
   end
 
   def get_areas(params)
-    #if an area is selected pick otherwise pick all of them
+    #if an area is selected pick otherwise pick NONE of them
     if (params and params[:area_id] and not params[:area_id].blank?)
       Area.all(:id => params[:area_id])
-    else
-      Area.all(:order => [:name])
     end
   end
 
