@@ -94,7 +94,7 @@ class StaffTargetReport < Report
 
       #calculates the total outstanding amount and displays only if the value is not false otherwise 0 is displayed.
       amount_outstanding[staff] = LoanHistory.sum_outstanding_for(staff, @to_date)
-      if amount_outstanding[staff] != false
+      if amount_outstanding[staff] and amount_outstanding[staff][0]
         total_outstanding[staff] = amount_outstanding[staff][0].actual_outstanding_principal.to_i
       else
         total_outstanding[staff] = 0
