@@ -100,7 +100,6 @@ class Report
     
   end
 
-  private
   def process_conditions(conditions)
     selects = []
     conditions = conditions.map{|query, value|
@@ -165,6 +164,7 @@ class Report
     end    
   end
 
+  private
   def get_branches(params)
     # if a branch is selected pick that or pick all of them
     if (params and params[:branch_id] and not params[:branch_id].blank?)
