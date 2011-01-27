@@ -1,0 +1,14 @@
+Journal.all(:journal_type_id => 2, :transaction_id => Payment.all(:type.not => :fees).map{|x| x.id}).destroy!
+Payment.all(:type.not => :fees).destroy!
+Loan.all.each{|l| l.discriminator=EquatedWeekly; l.interest_rate=0.317444; l.save}
+
+
+repository.adapter.execute("alter table loan_history change amount_in_default amount_in_default FLOAT NULL")
+repository.adapter.execute("alter table loan_history change scheduled_outstanding_total scheduled_outstanding_total  FLOAT NOT NULL")
+repository.adapter.execute("alter table loan_history change scheduled_outstanding_principal scheduled_outstanding_principal  FLOAT NOT NULL")
+repository.adapter.execute("alter table loan_history change actual_outstanding_total actual_outstanding_total  FLOAT NOT NULL")
+repository.adapter.execute("alter table loan_history change actual_outstanding_principal actual_outstanding_principal  FLOAT NOT NULL")
+repository.adapter.execute("alter table loan_history change principal_due principal_due  FLOAT NOT NULL")
+repository.adapter.execute("alter table loan_history change principal_paid principal_paid  FLOAT NOT NULL")
+repository.adapter.execute("alter table loan_history change interest_due interest_due  FLOAT NOT NULL")
+repository.adapter.execute("alter table loan_history change interest_paid interest_paid  FLOAT NOT NULL")

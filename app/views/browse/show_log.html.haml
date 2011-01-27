@@ -1,0 +1,46 @@
+%table.report.nojs
+  %tr
+    %th
+      IP
+    %th
+      At
+    %th
+      Action
+    %th
+      What
+    %th
+      
+    %th
+      Status
+    %th
+      Respone time (secs)
+  - @lines.each do |line|
+    %tr
+      %td
+        = line.ip
+      %td
+        = line.date_time
+      %td
+        %b
+          - if line.action == "GET"
+            Accessed
+          - else
+            Created:
+      %td
+        = line.url[:controller].camelcase(' ') if line.url[:controller]
+      %td
+        - if line.url.key?(:id) and line.model
+          = line.model.get(line.url[:id], :fields => [:id, :name]).name
+        - elsif line.url[:controller] == "loans" and line.url[:client_id]
+          = Client.get(line.url[:client_id], :fields => [:id, :name]).name
+        - elsif line.url[:controller] == "centers" and line.url[:action] == "weeksheet" and line.url[:center_id]
+          weeksheet of 
+          = Center.get(line.url[:center_id], :fields => [:id, :name]).name
+        - elsif line.url[:controller] == "reports" and line.url[:report_type]
+          = line.url[:report_type]
+          = "#{line.url[:from_date]} - #{line.url[:from_date]}" if line.url[:from_date] and line.url[:to_date]
+          = "#{line.url[:date]}" if line.url[:date]
+      %td
+        = line.status < 500 ? "successful" : "failure"
+      %td
+        = line.response_time

@@ -6,7 +6,7 @@ module Merb
     
     def page_title
       begin
-        generate_page_title
+        generate_page_title(params)
       rescue
         return "MostFit" rescue Exception
       end
@@ -321,7 +321,20 @@ module Merb
           if relations.key?(k)
             str = "<tr><td>#{relations[k].first.to_s.humanize}</td><td>"
             str += (if action==:update and v.class==Array
-                     "changed from #{v.first.nil? ? 'nil' : relations[k].last.get(v.first).name}</td><td>to #{v.last.nil? ? 'nil' : relations[k].last.get(v.last).name}"
+                      str = "changed from "
+                      if v.first and relations[k] and obj=relations[k].last.get(v.first)
+                        str += obj.name
+                      else
+                        str += "nil"
+                      end
+                      str += "</td><td>to "
+
+                      if v.last and relations[k] and obj=relations[k].last.get(v.last)
+                        str += obj.name
+                      else
+                        str += "nil"
+                      end
+                      str
                     elsif action==:create and v.class==Array
                       child_obj = relations[k].last.get(v.last)
                       ((child_obj and child_obj.respond_to?(:name)) ? child_obj.name : "id: #{v.last}")
@@ -488,7 +501,7 @@ module Merb
       args.map{|x| x.class==Array ? x.uniq : x}.flatten.reject{|x| not x or x.blank?}.join(' - ').capitalize
     end
 
-    def generate_page_title
+    def generate_page_title(params)
       prefix, postfix = [], []
       controller=params[:controller].split("/")[-1]
       controller_name = (params[:action]=="list" or params[:action]=="index") ? controller.join_snake(' ') : controller.singularize.join_snake(' ')

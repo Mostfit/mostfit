@@ -1,0 +1,2 @@
+ids = Loan.all(:disbursal_date.not => nil, :rejected_on => nil).aggregate(:id) - LoanHistory.sum_disbursed_grouped_by([:loan], Date.min_date, Date.today).map{|x| x.loan_id}
+Loan.all(:id => ids).each{|l| l.update_history}
