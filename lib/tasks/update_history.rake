@@ -6,7 +6,7 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'production')
 namespace :mostfit do
   desc "Update history of all loans"
   task :eod  do
-    loan_ids = Payment.all(:created_at.gte => Date.today - 1).map{|l| l.loan_id}.compact.uniq
+    loan_ids = Payment.all(:created_at.gte => Date.today, :type => :principal).aggregate(:loan_id).compact.uniq
     puts loan_ids.count
     
     loan_ids.each{|lid|
@@ -33,5 +33,13 @@ namespace :mostfit do
       [lid, Loan.all(:id => lid, :disbursal_date.lte => Date.today).aggregate(:amount.sum) - os - (Payment.all(:type => :principal, :loan_id => lid).aggregate(:amount.sum)||0)]
     }.find_all{|k,v| v!=0}
     problems.keys.each{|lid| Loan.get(lid).update_history}
+    
+    centers = Center.all.map{|c|
+      [c.id, c.branch_id]
+    }.to_hash
+    problems = LoanHistory.all(:current => 1, :status => :outstanding, :date.lt => Date.today).find_all{|lh|
+      centers[lh.center_id]!=lh.branch_id
+    }.map{|lh| lh.loan_id}
+    Loan.all(:id => data).each{|l| l.update_history}
   end
 end
