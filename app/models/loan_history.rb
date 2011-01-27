@@ -206,7 +206,7 @@ class LoanHistory
         COUNT(lh.loan_id) loan_count,
         #{selects}
       FROM loan_history lh, loans l
-      WHERE (lh.loan_id, lh.date) in (#{ids}) AND lh.status in (5,6) AND lh.loan_id=l.id AND l.deleted_at is NULL
+      WHERE (lh.loan_id, lh.date) in (#{ids}) AND lh.status in (5,6) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
       #{group_by};
     })
   end
