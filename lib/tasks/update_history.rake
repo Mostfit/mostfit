@@ -29,10 +29,15 @@ namespace :mostfit do
     # update loans where OS + paid != disbursed
     problems = []
     data = LoanHistory.sum_outstanding_grouped_by(Date.today, :loan).map{|lh| [lh.loan_id, lh.actual_outstanding_principal.to_i]}.to_hash; puts
+    disbursals = Loan.all(:disbursal_date.lte => Date.today, :rejected_on => nil).aggregate(:id, :amount.sum).to_hash
+    payments   = Payment.all(:type => :principal).aggregate(:loan_id, :amount.sum).to_hash
     problems = data.map{|lid, os| 
-      [lid, Loan.all(:id => lid, :disbursal_date.lte => Date.today).aggregate(:amount.sum) - os - (Payment.all(:type => :principal, :loan_id => lid).aggregate(:amount.sum)||0)]
-    }.find_all{|k,v| v!=0}
-    problems.keys.each{|lid| Loan.get(lid).update_history}
+      [lid, disbursals[lid] - os - (payments[lid]||0)]
+    }.find_all{|k,v| v!=0}.to_hash
+    problems.keys.each{|lid| 
+      puts lid
+      Loan.get(lid).update_history
+    }
     
     centers = Center.all.map{|c|
       [c.id, c.branch_id]
@@ -40,6 +45,9 @@ namespace :mostfit do
     problems = LoanHistory.all(:current => 1, :status => :outstanding, :date.lt => Date.today).find_all{|lh|
       centers[lh.center_id]!=lh.branch_id
     }.map{|lh| lh.loan_id}
-    Loan.all(:id => data).each{|l| l.update_history}
+    Loan.all(:id => data).each{|l| 
+      puts l.id
+      l.update_history
+    }
   end
 end

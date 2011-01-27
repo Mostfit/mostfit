@@ -331,7 +331,7 @@ describe Report do
   it "should give correct disbursal loan count,amount,overdue,sanctioned, total and variance" do
     l = Loan.get 1
     date = l.scheduled_disbursal_date
-    report = BranchTargetReport.new({}, {:to_date => date}, User.first)
+    report = StaffTargetReport.new({:branch_id => l.client.center.branch.id}, {:to_date => date}, User.first)
     data    = report.generate
     loan_overdue = Loan.all(:scheduled_disbursal_date.gte => Date.new(date.year, date.month, 01), :scheduled_disbursal_date.lte =>date,
                             :approved_on.not => nil, :applied_by => @manager, :disbursal_date => nil, :rejected_on => nil, :written_off_on => nil).sum(:amount)
@@ -360,7 +360,7 @@ describe Report do
     l.disbursal_date = nil
     l.disbursed_by = nil
     l.save
-    report = BranchTargetReport.new({}, {:to_date => date}, User.first)
+    report = StaffTargetReport.new({:area_id => @manager.centers.branches.areas[0].id}, {:to_date => date}, User.first)
     data   = report.generate
     
     data[@manager.name][:disbursement][:today][:overdue].should == l.amount
@@ -369,13 +369,14 @@ describe Report do
   it "should give correct repayments and loan overdue" do
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    report = BranchTargetReport.new({}, {:to_date => date}, User.first)
+    branch_id = @manager.centers.branches.first.id
+    report = StaffTargetReport.new({:branch_id => branch_id}, {:to_date => date}, User.first)
     data   = report.generate
-    @center = Center.all
+    @center = Center.all(:branch_id => branch_id)
     outstandings_past  = LoanHistory.sum_outstanding_grouped_by(date - 1, :center, {:center_id => @center.map{|c| c.id}})
     center_ids = @center.map{|c| c.id}
     outstanding = outstandings_past.find_all{|row| center_ids.include?(row.center_id)}.map{|x| x[0].to_i}.reduce(0){|s,x| s+=x}
-    actual_payment = Payment.all(:received_on => date).sum(:amount)
+    actual_payment = Payment.all(:received_by => @manager, :received_on => date).sum(:amount)
     variance = outstanding - (actual_payment || 0)
     overdue_repayment = LoanHistory.defaulted_loan_info_for(@manager, date).principal_due.to_i
 
@@ -389,7 +390,7 @@ describe Report do
   it "should give correct outstanding loan amount" do
     l = Loan.get 1
     date = l.scheduled_disbursal_date
-    report = BranchTargetReport.new({}, {:to_date => date}, User.first)
+    report = StaffTargetReport.new({:branch_id => l.client.center.branch_id}, {:to_date => date}, User.first)
     data = report.generate
     amount_outstanding, total_outstanding = {}, {}
     amount_outstanding[@manager] = LoanHistory.sum_outstanding_for(@manager, date)
@@ -404,7 +405,7 @@ describe Report do
 
   it "should give correct actual and target client count" do
     date = @date
-    report = BranchTargetReport.new({}, {:to_date => date}, User.first)
+    report = StaffTargetReport.new({:branch_id => @manager.centers.branches.map{|b| b.id}.uniq[0]}, {:to_date => date}, User.first)
     data = report.generate
     actual_client_created_date      = Client.all(:date_joined => date, :created_by_staff_member_id => @manager.id).count
     actual_client_created_till_date = Client.all(:date_joined.gte => Date.new(date.year, date.month, 1), :date_joined.lte => date,
@@ -416,7 +417,7 @@ describe Report do
 
   it "should give correct targets for the month and the variance" do
     date = Date.today
-    report = BranchTargetReport.new({}, {:to_date => date}, User.first)
+    report = StaffTargetReport.new({:branch_id => @manager.centers.branches.map{|b| b.id}.uniq[0]}, {:to_date => date}, User.first)
     data = report.generate
     staff_members = {}
     target_amount, target_number = Hash.new(0), Hash.new(0)
@@ -452,7 +453,7 @@ describe Report do
   it "should give correct disbursal loan count,amount,overdue,sanctioned, total and variance" do
     l = Loan.get 1
     date = l.scheduled_disbursal_date
-    report = AreaTargetReport.new({}, {:to_date => date}, User.first)
+    report = StaffTargetReport.new({:area_id => l.client.center.branch.area_id}, {:to_date => date}, User.first)
     data   = report.generate
     loan_overdue = Loan.all(:scheduled_disbursal_date.gte => Date.new(date.year, date.month, 01), :scheduled_disbursal_date.lte =>date,
                             :approved_on.not => nil, :applied_by => @manager, :disbursal_date => nil, :rejected_on => nil, :written_off_on => nil).sum(:amount)
@@ -481,7 +482,7 @@ describe Report do
     l.disbursal_date = nil
     l.disbursed_by = nil
     l.save
-    report = AreaTargetReport.new({}, {:to_date => date}, User.first)
+    report = StaffTargetReport.new({:area_id => l.client.center.branch.area_id}, {:to_date => date}, User.first)
     data   = report.generate
 
     data[@manager.name][:disbursement][:today][:overdue].should == l.amount
@@ -490,7 +491,7 @@ describe Report do
   it "should give correct repayments and loan overdue" do
     l = Loan.get 1
     date = l.scheduled_first_payment_date
-    report = AreaTargetReport.new({}, {:to_date => date}, User.first)
+    report = StaffTargetReport.new({:area_id => l.client.center.branch.area_id}, {:to_date => date}, User.first)
     data   = report.generate
     @center = Center.all
     outstandings_past  = LoanHistory.sum_outstanding_grouped_by(date - 1, :center, {:center_id => @center.map{|c| c.id}})
@@ -510,7 +511,7 @@ describe Report do
   it "should give correct outstanding loan amount" do
     l = Loan.get 1
     date = l.scheduled_disbursal_date
-    report = AreaTargetReport.new({}, {:to_date => date}, User.first)
+    report = StaffTargetReport.new({:area_id => l.client.center.branch.area_id}, {:to_date => date}, User.first)
     data = report.generate
     amount_outstanding, total_outstanding = {}, {}
     amount_outstanding[@manager] = LoanHistory.sum_outstanding_for(@manager, date)
@@ -525,7 +526,7 @@ describe Report do
 
   it "should give correct actual and target client count" do
     date = @date
-    report = AreaTargetReport.new({}, {:to_date => date}, User.first)
+    report = StaffTargetReport.new({:area_id => @manager.centers.branches.areas.map{|a| a.id}[0]}, {:to_date => date}, User.first)
     data = report.generate
     actual_client_created_date      = Client.all(:date_joined => date, :created_by_staff_member_id => @manager.id).count
     actual_client_created_till_date = Client.all(:date_joined.gte => Date.new(date.year, date.month, 1), :date_joined.lte => date,
@@ -537,7 +538,7 @@ describe Report do
 
   it "should give correct targets for the month and the variance" do
     date = Date.today
-    report = AreaTargetReport.new({}, {:to_date => date}, User.first)
+    report = StaffTargetReport.new({:area_id => @manager.centers.branches.areas.map{|a| a.id}[0]}, {:to_date => date}, User.first)
     data = report.generate
     staff_members = {}
     target_amount, target_number = Hash.new(0), Hash.new(0)
