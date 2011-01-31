@@ -555,17 +555,17 @@ class LoanHistory
   def self.get_group_by(group_by)
     group_by = 
       if group_by.class==String and not group_by.match(/_id$/)
-        group_by+"_id"
+        "lh.#{group_by}_id"
       elsif group_by.class==String
-        group_by
+        "lh.#{group_by}_id"
       elsif group_by.class==Array
-        group_by.map{|x| "#{x}_id"}.join(", ")
+        group_by.map{|x| "lh.#{x}_id"}.join(", ")
       elsif group_by.class==Symbol
-        "#{group_by}_id"
+        "lh.#{group_by}_id"
       else
         false
       end
-    group_by ? "GROUP BY #{group_by.gsub("date_id", "date").gsub("staff_member_id", "disbursed_by_staff_id")}" : ""
+    group_by ? "GROUP BY #{group_by.gsub("date_id", "date").gsub("lh.staff_member_id", "l.disbursed_by_staff_id")}" : ""
   end
 
   def self.build_extra(query)
