@@ -1,11 +1,10 @@
 class ParByCenterReport < Report
   attr_accessor :date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :late_by_more_than_days, :late_by_less_than_days
+  ParRow = Struct.new(:loan_count, :loan_amount, :par, :default, :late_by_days)
 
   def initialize(params,dates, user)
     @date   = dates.blank? ? Date.today : dates[:date]
     @name   = "PAR Report as on #{@date}"
-    @late_by_more_than_days = params[:late_by_more_than_days] if params and params.key?(:late_by_more_than_days) and not params[:late_by_more_than_days].blank?
-    @late_by_less_than_days = params[:late_by_less_than_days] if params and params.key?(:late_by_less_than_days) and not params[:late_by_less_than_days].blank?
     get_parameters(params, user)
   end
 
@@ -20,41 +19,32 @@ class ParByCenterReport < Report
     "PAR Report"
   end
 
-  def include_late_day?(late_days)
-    late_days > (late_by_more_than_days||0) and late_days < (late_by_less_than_days||INFINITY)
+  def include_late_day?(late_days)    
+    late_days > (@late_by_more_than_days||0) and late_days < (@late_by_less_than_days||INFINITY)
   end
 
   def generate
     # these are the loan history lines which represent the last line before @date
-    selects = [:loan_id, :branch_id, :center_id, :client_id, :amount_in_default, :days_overdue, :date]
-    par_data = LoanHistory.defaulted_loan_info_by(:loan, @date, {:branch_id => @branch.map{|x| x.id}, :center_id => @center.map{|x| x.id}}, selects)
-
-    center_defaults, loans = {}, {}
-    clients = Client.all(:id => par_data.map{|x| x.client_id}, :fields => [:id, :name, :reference, :center_id]).map{|x| [x.id, x]}.to_hash
-    hash    = {:client_id => clients.keys, :fields => [:id, :client_id, :loan_product_id, :amount]}
-    hash[:loan_product_id] = loan_product_id if loan_product_id
-    loans   = {}
-    Loan.all(hash).map{|loan| 
-      loans[loan.id] = loan
+    selects = [:branch_id, :center_id, :days_overdue, :date, :amount_in_default, "l.amount amount", :actual_outstanding_principal]
+    par_data = LoanHistory.defaulted_loan_info_by(:loan, @date, {:branch_id => @branch.map{|x| x.id}, :center_id => @center.map{|x| x.id}}, selects).group_by{|x| 
+      x.center_id
     }
-    center_defaults = par_data.group_by{|x| x.center_id}
-
     data = {}
-    @branch.each do |branch|
-    
+    @branch.each do |branch|    
       data[branch] = {}
-      @center.find_all{|c| c.branch_id==branch.id}.each do |center|
-    
-        next unless center_defaults[center.id]
-        data[branch][center] = []
-        center_defaults[center.id].each do |default|
-          next unless loans.key?(default.loan_id)          
+      @center.find_all{|c| c.branch_id==branch.id}.each do |center|    
+        next unless par_data[center.id]
+
+        par_data[center.id].each do |default|          
           if default.date and @date > default.date - default.days_overdue
-            loan    = loans[default.loan_id]
             late_by = default.days_overdue + (@date - default.date)
-            next unless to_include = include_late_day?(late_by)
-            data[branch][center].push([clients[default.client_id].name, clients[default.client_id].reference, loan.cycle_number, loan.loan_product.name, loan.amount, 
-                                       loan.installment_frequency, default.pdiff, default.tdiff - default.pdiff, default.tdiff, late_by])
+            next unless include_late_day?(late_by.to_i)
+            data[branch][center] ||= ParRow.new(0, 0, 0, 0, 0)
+            
+            data[branch][center].loan_count   += 1
+            data[branch][center].loan_amount  += default.amount
+            data[branch][center].par          += default.actual_outstanding_principal
+            data[branch][center].default      += default.amount_in_default
           end
         end
       end

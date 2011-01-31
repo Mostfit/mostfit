@@ -212,7 +212,7 @@ class Report
 
   def set_instance_variables(params)
     params.each{|key, value|
-      instance_variable_set("@#{key}", value) if not [:date, :from_date, :to_date].include?(key.to_sym) and value and value.to_i>0
+      instance_variable_set("@#{key}", value.to_i) if not [:date, :from_date, :to_date].include?(key.to_sym) and value and value.to_i>0
     } if params
   end
 
