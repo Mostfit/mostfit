@@ -384,25 +384,25 @@ module Merb
       end
     end
 
-    def get_accessible_areas
-      if session.user.staff_member
-        [session.user.staff_member.branches.areas, session.user.staff_member.areas].flatten
+    def get_accessible_areas(staff)
+      if staff or staff = session.user.staff_member
+        [staff.branches.areas, staff.areas].flatten
       else
         Area.all(:order => [:name])
       end
     end
 
-    def get_accessible_branches
-      if session.user.staff_member
-        [session.user.staff_member.centers.branches, session.user.staff_member.branches].flatten
+    def get_accessible_branches(staff=nil)
+      if staff or staff=session.user.staff_member
+        [staff.centers.branches, staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten
       else
         Branch.all(:order => [:name])
       end
     end
     
-    def get_accessible_centers(branch_id)
-      centers = if st = session.user.staff_member
-                  [st.centers, st.branches.centers].flatten
+    def get_accessible_centers(branch_id, staff=nil)
+      centers = if staff or session.user.staff_member
+                  Center.all(:branch => get_accessible_branches, :order => [:name])
                 elsif branch_id and not branch_id.blank?
                   Center.all(:branch_id => branch_id, :order => [:name])
                 else 
@@ -411,15 +411,14 @@ module Merb
       centers.map{|x| [x.id, "#{x.name}"]}
     end
 
-    def get_accessible_staff_members
-      staff_members   =  if session.user.staff_member
-                           st = session.user.staff_member
-                           if branches = st.branches and branches.length>0
-                             [st] + branches.centers.managers(:order => [:name])
-                           elsif centers = st.centers and centers.length>0
-                             [st] + centers.managers(:order => [:name])
+    def get_accessible_staff_members(staff=nil)
+      staff_members   =  if staff or staff = session.user.staff_member
+                           if branches = staff.branches and branches.length>0
+                             [staff] + branches.centers.managers(:order => [:name])
+                           elsif centers = staff.centers and centers.length>0
+                             [staff] + centers.managers(:order => [:name])
                            else
-                             [st] + [st]
+                             [staff] + [staff]
                            end
                          else
                            StaffMember.all(:order => [:name])
@@ -427,9 +426,9 @@ module Merb
       staff_members.map{|x| [x.id, x.name]}
     end
 
-    def get_accessible_funders
-      (if session.user.role == :funder
-        Funder.all(:user => session.user)
+    def get_accessible_funders(user=nil)
+      (if user.role == :funder
+        Funder.all(:user => user)
       else
         Funder.all
       end).map{|x| [x.id, "#{x.name}"]}
@@ -493,8 +492,7 @@ module Merb
     private
     def staff_members_collection(allow_unassigned=false, allow_inactive=false)
       hash = allow_inactive ? {} : {:active => true}
-      if session.user.staff_member
-        staff = session.user.staff_member
+      if staff = session.user.staff_member
         bms  = staff.branches.collect{|x| x.manager}
         cms  = staff.branches.centers.collect{|x| x.manager}               
         managers = [bms, cms, staff].flatten.uniq

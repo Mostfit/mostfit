@@ -75,6 +75,14 @@ class StaffMember
     end
     ClientGroup.all(hash)
   end
+
+  def related_branches
+    [self.branches, self.areas.branches, self.regions.areas.branches].flatten
+  end
+
+  def related_centers
+    [self.centers, self.branches.centers, self.areas.branches.centers, self.regions.areas.branches.centers].flatten
+  end
   
   def self.related_to(obj)
     staff_members = []    

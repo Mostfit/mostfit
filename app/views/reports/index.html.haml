@@ -4,7 +4,7 @@
   %h2
     = report_type.to_s.camelcase(' ')
   %ul
-    - role = session.user.role
+    - role = @user.role
     - reports.each do |report|
       %li
         - if role == :funder

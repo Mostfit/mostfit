@@ -11,6 +11,7 @@ class Reports < Application
   }
   Order = [:periodic, :consolidated, :registers, :targets_and_projections, :statistics, :exceptions, :accounting]
   layout :determine_layout 
+  before :set_staff_and_user, :only => [:index, :show]
   
   # provides :xml, :yaml, :js
   def index
@@ -123,4 +124,10 @@ class Reports < Application
   def determine_layout
     return "printer" if params[:layout] and params[:layout]=="printer"
   end
+  
+  def set_staff_and_user
+    @user = session.user
+    @staff_member = @user.staff_member
+  end
+  
 end # Reports

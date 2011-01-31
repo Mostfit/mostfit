@@ -86,6 +86,10 @@ class User
   def to_s
     login
   end
+  
+  def staff_member
+    @staff = @staff || StaffMember.first(:user_id => self.id)
+  end
 
   def method_missing(name, params)
     if x = /can_\w+\?/.match(name.to_s)

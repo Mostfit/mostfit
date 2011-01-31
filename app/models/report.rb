@@ -18,29 +18,23 @@ class Report
   end
 
   def get_parameters(params, user=nil)
-    st     = user.staff_member if user
+    staff     = user.staff_member if user
     @funder = Funder.first(:user_id => user.id) if user and user.role == :funder
-    @branch = get_branches(params)
+    @branch = get_branches(params, staff)
     @account = Account.all(:order => [:name])
 
-    # if the user is staff member or a funder then filter the branches against their managed branches list
-    if user and st
-      @branch = @branch & [st.centers.branches, st.branches].flatten
-    elsif @funder
-      @branch = @branch & @funder.branches
-    end
-
-    # if the user is staff member or a funder then filter the branches against their managed branches list
+    # if an area is selected then filter branches against their managed areas > branches list
+    # if the user is a funder then get related areas
     if @area = get_areas(params)
-      if user and st
-        @area = @area & [st.branches.areas, st.areas].flatten
+      if user and staff
+        @area = @area & [staff.branches.areas, staff.areas].flatten
       elsif @funder
         @area = @area & @funder.areas
       end
       @branch = Branch.all(:area_id => @area.map{|a| a.id})
     end
 
-    set_centers(params, user, st)    
+    set_centers(params, user, staff)
     @funder = Funder.get(params[:funder_id]) if not @funder and params and params[:funder_id] and not params[:funder_id].blank?
 
     [:loan_product_id, :late_by_more_than_days, :absent_more_than, :late_by_less_than_days, :absent_more_than, :include_past_data, :include_unapproved_loans].each{|key|
@@ -165,9 +159,11 @@ class Report
   end
 
   private
-  def get_branches(params)
+  def get_branches(params, staff)
     # if a branch is selected pick that or pick all of them
-    if (params and params[:branch_id] and not params[:branch_id].blank?)
+    if staff
+      staff.related_branches
+    elsif (params and params[:branch_id] and not params[:branch_id].blank?)
       Branch.all(:id => params[:branch_id])
     else
       Branch.all(:order => [:name])
@@ -182,17 +178,24 @@ class Report
   end
 
   def set_centers(params, user=nil, staff=nil)
+    params||={}
+
     # if a center is selected pick that
-    @center = Center.all(:id => params[:center_id]) if params and params[:center_id] and not params[:center_id].blank?
+    if params and params[:center_id] and not params[:center_id].blank?
+      @center = Center.all(:id => params[:center_id])
+    end
 
     # if the user is a staff member or funder and center is not selected then pick all the managed centers
     @center = 
-      if user and not @center and (params and (not params[:staff_member_id] or params[:staff_member_id].blank?))
-        if staff and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
-          [staff.centers, staff.branches.centers].flatten
+      if user and not @center and (not params[:staff_member_id] or params[:staff_member_id].blank?)
+        if staff and (not params[:staff_member_id] or params[:staff_member_id].blank?)
+          # if user is a staff and not staff member is selected then fill eligible staff members          
+          staff.related_centers
         elsif staff and params[:staff_member_id] and not params[:staff_member_id].blank?
-          StaffMember.get(params[:staff_member_id]).centers
+          # if user is a staff and staff member is selected then fill eligible centers of staff member
+          staff.related_centers & StaffMember.get(params[:staff_member_id]).centers
         elsif @funder and (not params or not params[:staff_member_id] or params[:staff_member_id].blank?)
+          # if funder is selected and no staff is selected
           @funder.centers
         elsif @funder and params[:staff_member_id] and not params[:staff_member_id].blank?
           @funder.centers & StaffMember.get(params[:staff_member_id]).centers
