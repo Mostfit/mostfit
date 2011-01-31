@@ -80,17 +80,17 @@ class LoanHistory
     # this does not work as expected if the loan is repaid and goes back into default within the days we are looking at it.
     group_by = get_group_by(group_by)
     selects  = get_selects(group_by, selects)
-    ids  = get_latest_rows_of_loans(date, query)
-    return [] if ids.length==0
+    subtable = get_subtable(date, query)
+
     repository.adapter.query(%Q{
          SELECT SUM(lh.actual_outstanding_principal - lh.scheduled_outstanding_principal) as pdiff, 
                 SUM(lh.actual_outstanding_total -     lh.scheduled_outstanding_total) as tdiff, 
                 #{selects}
-         FROM loan_history lh, loans l
-         WHERE lh.loan_id = l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+         FROM #{subtable} dt, loan_history lh, loans l
+         WHERE lh.loan_id=dt.loan_id AND lh.date=dt.date AND lh.loan_id = l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
                AND lh.actual_outstanding_principal > lh.scheduled_outstanding_principal
                AND lh.actual_outstanding_total > lh.scheduled_outstanding_total
-               AND (lh.loan_id, lh.date) in (#{ids}) AND status in (6)
+               AND status in (6)
          #{group_by};})
   end
   
@@ -114,15 +114,13 @@ class LoanHistory
       select = %Q{SUM(lh.actual_outstanding_total - lh.scheduled_outstanding_total) total_due, SUM(lh.actual_outstanding_principal - lh.scheduled_outstanding_principal) principal_due};
     end
       
-    rows = get_latest_rows_of_loans(date, query)
-    # these are the loan history lines which represent the last line before @date
-    return nil if rows.length == 0
+    subtable = get_subtable(to_date, query)
 
     # These are the lines from the loan history
     query = %Q{
       SELECT #{select}
-      FROM loan_history lh, loans l
-      WHERE (lh.loan_id, lh.date) IN (#{rows}) AND lh.status in (5,6) AND lh.loan_id = l.id AND l.deleted_at is NULL
+      FROM #{subtable} dt, loan_history lh, loans l
+      WHERE lh.loan_id=dt.loan_id AND lh.date=dt.date AND lh.status in (5,6) AND lh.loan_id = l.id AND l.deleted_at is NULL
             AND lh.actual_outstanding_principal > lh.scheduled_outstanding_principal AND lh.actual_outstanding_total > lh.scheduled_outstanding_total}
     type==:listing ? repository.adapter.query(query) : repository.adapter.query(query).first
   end
@@ -138,8 +136,7 @@ class LoanHistory
   # on can also restrict the scope of the query by providing 'query'
   # for instance, query = ["branch_id=3", "center_id=100"]
   def self.advance_balance(to_date, group_by, query=[], selects="")
-    ids = get_latest_rows_of_loans(to_date, query)
-    return false if ids.length==0
+    subtable = get_subtable(to_date, query)
     group_by = get_group_by(group_by)
     selects  = get_selects(group_by, selects)
     
@@ -148,8 +145,8 @@ class LoanHistory
         SUM(lh.scheduled_outstanding_principal - lh.actual_outstanding_principal) AS balance_principal,
         SUM(lh.scheduled_outstanding_total - lh.actual_outstanding_total) AS balance_total,
         #{selects}
-      FROM loan_history lh, loans l
-      WHERE (lh.loan_id, lh.date) in (#{ids}) AND lh.status in (5,6) AND lh.loan_id=l.id
+      FROM #{subtable} dt, loan_history lh
+      WHERE lh.loan_id=dt.loan_id AND lh.date=dt.date AND lh.status in (5,6)
             AND lh.scheduled_outstanding_principal > lh.actual_outstanding_principal
             AND lh.scheduled_outstanding_total > lh.actual_outstanding_total
       #{group_by};
@@ -190,8 +187,7 @@ class LoanHistory
   # on can also restrict the scope of the query by providing 'extra_condition'
   # for instance, extra_conditions = ["branch_id=3", "center_id=100"]
   def self.sum_outstanding_grouped_by(to_date, group_by, extra_conditions=[], selects = "")
-    ids = get_latest_rows_of_loans(to_date, extra_conditions)
-    return [] if ids.length==0
+    subtable = get_subtable(to_date, extra_conditions)
     group_by = get_group_by(group_by)
     selects  = get_selects(group_by, selects)
 
@@ -205,8 +201,8 @@ class LoanHistory
         SUM(if(lh.actual_outstanding_total<lh.scheduled_outstanding_total, lh.scheduled_outstanding_total-lh.actual_outstanding_total,0)) AS advance_total,
         COUNT(lh.loan_id) loan_count,
         #{selects}
-      FROM loan_history lh, loans l
-      WHERE (lh.loan_id, lh.date) in (#{ids}) AND lh.status in (5,6) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+      FROM #{subtable} as dt, loan_history lh, loans l
+      WHERE lh.loan_id=dt.loan_id AND lh.date=dt.date AND lh.status in (5,6) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
       #{group_by};
     })
   end
@@ -626,4 +622,14 @@ class LoanHistory
     selects += (group_by_str.length>0 ? group_by_str.gsub("GROUP BY", "") : "1")
     selects
   end
+
+  def self.get_subtable(date, query)
+    query = build_extra(query)    
+    return "(SELECT max(lh.date) date, lh.loan_id loan_id
+     FROM loan_history lh, loans l
+     WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (5,6,7,8) AND lh.date<='#{date.strftime('%Y-%m-%d')}' #{query}
+     GROUP BY lh.loan_id
+     )"
+  end
+
 end

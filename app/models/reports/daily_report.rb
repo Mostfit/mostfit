@@ -22,14 +22,20 @@ class DailyReport < Report
     balances  = LoanHistory.advance_balance(self.date, :client_group)||[]
     old_balances = LoanHistory.advance_balance(self.date-1, :client_group)||[]
 
+    center_keys  = @center.map{|c| c.id}
+    @center.each{|c| centers[c.id] = c}
+    ClientGroup.all(:fields => [:id, :name, :center_id]).each{|g| 
+      groups[g.id] = g
+    }
+
+
     @branch.each{|b|
       data[b]||= {}
       branches[b.id] = b
       b.centers.each{|c|
         next if @center and not @center.find{|x| x.id==c.id}
         data[b][c]||= {}
-        centers[c.id]  = c
-        c.client_groups.each{|g|
+        c.client_groups(:fields => [:id, :name]).each{|g|
           #0              1                 2                3                  4     5   6                  7                   8               9               10
           #amount_applied,amount_sanctioned,amount_disbursed,bal_outstanding(p),bo(i),tot,principal_paidback,interest_collected, processing_fee, no_of_defaults, name
           history  = histories.find{|x| x.client_group_id==g.id and x.center_id==c.id} if histories
@@ -68,90 +74,51 @@ class DailyReport < Report
       }
     }
     
-    center_ids  = centers.keys.length>0 ? centers.keys.join(',') : "NULL"
-    Client.all(:fields => [:id, :center_id, :client_group_id], :center_id => centers.keys).each{|c| 
-      clients[c.id] = c
-    }
-
-    ClientGroup.all(:fields => [:id, :name, :center_id], :center_id => centers.keys).each{|g| 
-      groups[g.id] = g
-    }
-
-    client_ids = clients.keys.length>0 ? clients.keys.join(',') : "NULL"
-
-    #getting all the loans from the client list above. Filter also by loan product when provided
-    query = "l.client_id=c.id and c.center_id in (#{center_ids})"
-    query+= " and l.loan_product_id=#{self.loan_product_id}" if self.loan_product_id
-    repository.adapter.query("select l.id, l.client_id, l.amount FROM loans l, clients c WHERE #{query}").each{|l|
-      loans[l.id] =  l
-    }
-
-    extra_condition = ""
-    froms = "payments p, clients cl, centers c"
-    if self.loan_product_id
-      froms+= ", loans l"
-      extra_condition = " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
-    end
-                            
-    repository.adapter.query(%Q{
-                               SELECT c.branch_id branch_id, c.id center_id, cl.client_group_id client_group_id, type ptype, SUM(p.amount) amount, p.loan_id loan_id
-                               FROM #{froms}
-                               WHERE p.received_on = '#{date.strftime('%Y-%m-%d')}'
-                               AND   p.deleted_at is NULL AND p.client_id = cl.id AND cl.center_id=c.id AND c.id in (#{center_ids}) #{extra_condition}
-                               GROUP BY branch_id, center_id, client_group_id, ptype
-                             }).each{|p|
-      next unless center = centers[p.center_id]
-      branch = branches[p.branch_id]
+    hash = {:principal_paid.not => nil, :date => date, :center_id => center_keys}
+    hash["loan.loan_product_id"] = loan_product_id if loan_product_id
+    # principal and interest paid
+    LoanHistory.all(hash).aggregate(:branch_id, :center_id, :client_group_id, :principal_paid.sum, :interest_paid.sum).each{|p|
+      next unless center = centers[p[1]]
+      branch = branches[p[0]]
       if data[branch][center]
-        group = groups[p.client_group_id]
+        group = groups[p[2]]
         data[branch][center][group] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        if p.ptype==1
-          data[branch][center][group][3] += p.amount.round(2)
-        elsif p.ptype==2
-          data[branch][center][group][4] += p.amount.round(2)
-        elsif p.ptype==3
-          data[branch][center][group][5] += p.amount.round(2)
-        end
+        data[branch][center][group][3] += p[3].round(2)
+        data[branch][center][group][4] += p[4].round(2)
       end
     }
 
     #1: Applied on
-    hash = {:applied_on => date, :fields => [:id, :amount, :amount_applied_for, :client_id]}
-    hash[:loan_product_id] = loan_product_id if loan_product_id
-    Loan.all(hash).each{|l|
-      client    = clients[l.client_id]
-      next unless client
-      next if not center = centers[client.center_id]
-      branch = branches[center.branch_id]
-      group = groups[client.client_group_id]
+    hash = {:status => :applied, :date => date, :center_id => center_keys}
+    hash["loan.loan_product_id"] = loan_product_id if loan_product_id
+    LoanHistory.all(hash).each{|l|
+      branch = branches[l.branch_id]
+      center = centers[l.center_id]
+      group = groups[l.client_group_id]
       data[branch][center][group] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][center][group][0] += l.amount_applied_for||l.amount
+      data[branch][center][group][0] += l.amount_applied_for||l.amount    
     }
 
     #2: Approved on
-    hash = {:approved_on => date}
-    hash[:loan_product_id] = loan_product_id if loan_product_id
-    Loan.all(hash).each{|l|
-      client    = clients[l.client_id]
-      next unless client
-      next if not center = centers[client.center_id]
-      branch = branches[center.branch_id]
-      group = groups[client.client_group_id]
+    hash = {:status => :approved, :date => date, :center_id => center_keys}
+    hash["loan.loan_product_id"] = loan_product_id if loan_product_id
+    LoanHistory.all(hash).each{|l|
+      branch = branches[l.branch_id]
+      center = centers[l.center_id]
+      group = groups[l.client_group_id]
       data[branch][center][group] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][center][group][1] += l.amount_sanctioned||l.amount
+      data[branch][center][group][1] += l.loan.amount_sanctioned||l.loan.amount
     }
 
     #3: Disbursal date
-    hash = {:disbursal_date => date}
-    hash[:loan_product_id] = loan_product_id if loan_product_id
-    Loan.all(hash).each{|l|
-      client    = clients[l.client_id]
-      next unless client
-      next if not center = centers[client.center_id]
-      branch = branches[center.branch_id]
-      group = groups[client.client_group_id]
+    hash = {:status => :disbursed, :date => date, :center_id => center_keys}
+    hash["loan.loan_product_id"] = loan_product_id if loan_product_id
+    LoanHistory.all(hash).each{|l|
+      branch = branches[l.branch_id]
+      center = centers[l.center_id]
+      group = groups[l.client_group_id]
       data[branch][center][group] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][center][group][2] += l.amount
+      data[branch][center][group][3] += l.scheduled_outstanding_principal
     }
     return data
   end

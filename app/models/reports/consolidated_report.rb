@@ -20,8 +20,8 @@ class ConsolidatedReport < Report
     branches, centers, data, clients, loans = {}, {}, {}, {}, {}
     extra     = []
     extra    << "l.loan_product_id = #{loan_product_id}" if loan_product_id
-    extra    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})" if @branch.length > 0
-    extra    << "lh.center_id in (#{@center.map{|c| c.id}.join(', ')})" if @center.length > 0
+    extra    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})" if @branch.length > 0 and @branch.length != Branch.count
+    extra    << "lh.center_id in (#{@center.map{|c| c.id}.join(', ')})" if @center.length > 0 and @center.length != Center.count
     # if a funder is selected
     if @funder
       funder_loan_ids = @funder.loan_ids
@@ -82,12 +82,9 @@ class ConsolidatedReport < Report
     }
     
     center_ids  = centers.keys.length>0 ? centers.keys.join(',') : "NULL"
-    repository.adapter.query("select id, center_id from clients where center_id in (#{center_ids}) AND deleted_at is NULL").each{|c|
-      clients[c.id] = c
-    }
-    
     extra_condition = ""
     froms = "payments p, clients cl, centers c"
+
     if self.loan_product_id
       froms += ", loans l"
       extra_condition = " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
@@ -117,7 +114,6 @@ class ConsolidatedReport < Report
         end
       end
     }
-
 
     #1: Applied on
     hash = {:applied_on.gte => from_date, :applied_on.lte => to_date}

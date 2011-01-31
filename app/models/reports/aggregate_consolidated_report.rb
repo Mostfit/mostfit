@@ -37,7 +37,7 @@ class AggregateConsolidatedReport < Report
     set_cache
     extra     = []
     extra    << "l.loan_product_id = #{loan_product_id}" if loan_product_id
-    extra    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})" if @branch.length > 0
+    extra    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})" if @branch.length > 0 and self.branch_id
     extra    << "lh.center_id in (#{@center.map{|c| c.id}.join(', ')})" if @center.length > 0
     # if a funder is selected
     if @funder
@@ -69,7 +69,7 @@ class AggregateConsolidatedReport < Report
       repaid       = LoanHistory.sum_repaid_grouped_by(@group_by_types, @from_date, @to_date, extra)
       foreclosure  = LoanHistory.sum_foreclosure_grouped_by(@group_by_types, @from_date, @to_date, extra)
       overdue      = LoanHistory.defaulted_loan_info_by(@group_by_types, @to_date, extra, "count(distinct(lh.loan_id)) loan_count")
-      advance      = LoanHistory.advance_balance(@to_date, @group_by_types, extra, "count(distinct(loan_id)) loan_count")
+      advance      = LoanHistory.advance_balance(@to_date, @group_by_types, extra, "count(distinct(lh.loan_id)) loan_count")
 
       length = @group_by_types.length
       
