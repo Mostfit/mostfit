@@ -114,7 +114,7 @@ class LoanHistory
       select = %Q{SUM(lh.actual_outstanding_total - lh.scheduled_outstanding_total) total_due, SUM(lh.actual_outstanding_principal - lh.scheduled_outstanding_principal) principal_due};
     end
       
-    subtable = get_subtable(to_date, query)
+    subtable = get_subtable(date, query)
 
     # These are the lines from the loan history
     query = %Q{
