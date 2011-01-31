@@ -16,7 +16,16 @@ begin
   # Mixin the salted user mixin
   require 'merb-auth-more/mixins/salted_user'
   Merb::Authentication.user_class.class_eval{ include Merb::Authentication::Mixins::SaltedUser }
-    
+  
+  Merb::Authentication.after_authentication do |user, request, params|
+    if user.active
+      user
+    else
+      request.session.authentication.errors.add(:general, 'You are not an active user')
+      nil
+    end
+  end
+
   # Setup the session serialization
   class Merb::Authentication
 

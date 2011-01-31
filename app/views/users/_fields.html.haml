@@ -33,3 +33,8 @@
       Is a funder
     %td
       = select :funder, :collection => [["","---"]] + Funder.all(:order => [:name]).map{|s| [s.id.to_s, s.name]}, :selected => (@user.funder ? @user.funder.id.to_s : "")
+  %tr
+    %td
+      Active ?
+    %td
+      = check_box :active
