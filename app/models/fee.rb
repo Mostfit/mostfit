@@ -97,13 +97,13 @@ class Fee
   end
 
   def self.due(loan_ids)
-    fees_applicable = self.applicable(loan_ids)
-    fees_paid       = self.paid(loan_ids)
+    fees_applicable = self.applicable(loan_ids).group_by{|x| x.loan_id}
+    fees_paid       = self.paid(loan_ids).group_by{|x| x.loan_id}
     fees = {}
     loan_ids.each{|lid|
-      applicable = fees_applicable.find{|x| x.loan_id==lid}
+      applicable = fees_applicable[lid].first if fees_applicable.key?(lid) and fees_applicable[lid].length>0
       next if not applicable
-      paid      = fees_paid.find_all{|x| x.loan_id==lid}
+      paid      = fees_paid[lid] if fees_paid.key?(lid) and fees_paid[lid].length>0
       paid      = (paid and paid.length>0) ? paid.map{|x| x.amount.to_f}.inject(0){|s,x| s+=x} : 0
       fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable.to_f : 0), paid, (applicable ? applicable.fees_applicable : 0) - paid)
     }
