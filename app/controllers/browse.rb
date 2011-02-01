@@ -33,9 +33,9 @@ class Browse < Application
     loans      = LoanHistory.all(hash).aggregate(:loan_id, :center_id).to_hash
 
     # restrict branch manager and center managers to their own branches
-    if session.user.role==:staff_member
-      st = session.user.staff_member
-      center_ids = ([st.branches.centers.map{|x| x.id}, st.centers.map{|x| x.id}].flatten.compact) & center_ids
+    if user = session.user and staff = user.staff_member
+      hash[:branch_id] = [staff.related_branches.map{|x| x.id}, staff.centers.branches.map{|x| x.id}].uniq
+      center_ids = staff.related_centers.map{|x| x.id} & center_ids
     end
     
     if Mfi.first.map_enabled

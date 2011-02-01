@@ -233,9 +233,11 @@
           %b
             = total_disbursal
   %div.tab
-    - if params[:branch_id] and params[:branch_id].to_i > 0
+    - if (params[:branch_id] and params[:branch_id].to_i > 0)
       = ofc2(1000, 800, url(:graph_data, :action => 'dashboard', :id => 'center_day', :branch_id => params[:branch_id]))
-    -else
+    - elsif @branches and @branches.keys.length == 1
+      = ofc2(1000, 800, url(:graph_data, :action => 'dashboard', :id => 'center_day', :branch_id => @branches.keys.first))
+    - else
       = ofc2(800, 640, url(:graph_data, :action => 'dashboard', :id => 'branch_day'))
   - if Mfi.first.map_enabled
     %div.tab
