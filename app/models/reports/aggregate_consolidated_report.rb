@@ -2,6 +2,8 @@ class AggregateConsolidatedReport < Report
   attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :group_by_types
   Year = Struct.new(:name)
 
+  validates_with_method :from_date, :date_should_not_be_in_future
+
   @@group_by = {:branch => :branch_id, :center => :center_id, :client_group => :client_group_id, :staff_member => :disbursed_by_staff_id,
     :year => :year, :month => :month}
 

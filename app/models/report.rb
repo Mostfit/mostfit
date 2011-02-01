@@ -89,8 +89,15 @@ class Report
   end
 
   def get_xls
-    f = File.read("app/views/reports/_#{name.snake_case.gsub(" ","_")}.pdf.haml")
-    doc = Hpricot(Haml::Engine.new(f).render(Object.new, :data => self.generate))
+    f   = File.read("app/views/reports/_#{name.snake_case.gsub(' ', '_')}.html.haml").gsub("=partial :form\n", "")
+    doc = Hpricot(Haml::Engine.new(f).render(Object.new, "@data" => self.generate))
+    headers = doc.search("tr.header").map{|tr|
+      tr.search("th").map{|td| 
+        {td.inner_text.strip => td.attributes["colspan"].blank? ? 1 : td.attributes["colspan"].to_i}
+      }
+    }.map{|x| 
+      x.reduce({}){|s,x| s+=x}
+    }
     
   end
 
@@ -156,6 +163,18 @@ class Report
     else
       val
     end    
+  end
+
+  def date_should_not_be_in_future
+    return [false, "Date cannot be in futute"] if self.respond_to?(:date) and self.date > Date.today
+    return [false, "From date cannot be in futute"] if self.respond_to?(:from_date) and self.from_date > Date.today
+    return [false, "To date cannot be in futute"] if self.respond_to?(:to_date) and self.to_date > Date.today
+    return true
+  end
+
+  def branch_should_be_selected
+    return [false, "Branch needs to be selected"] if self.respond_to?(:branch_id) and not self.branch_id
+    return true
   end
 
   private

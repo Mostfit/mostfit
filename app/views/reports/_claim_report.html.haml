@@ -50,13 +50,15 @@
         %td
           - loan = claim.client.loans
           - loan.each do |l|
-            = prin = l.principal_received_up_to(Date.today).to_f
+            - prin = l.principal_received_up_to(Date.today)
+            = prin.to_currency
             - branch_total[2] += prin
             %br
         %td
           - loan = claim.client.loans
           - loan.each do |l|
-            = repaid = l.amount - l.principal_received_up_to(Date.today).to_f
+            - repaid = l.amount - l.principal_received_up_to(Date.today)
+            = repaid.to_currency
             %br
             - branch_total[3] += repaid
     %tr.branch_total

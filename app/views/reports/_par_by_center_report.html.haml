@@ -1,5 +1,5 @@
 =partial :form
-- length = 4
+- length = 7
 %table.report
   %tr.header
     %th
@@ -10,8 +10,21 @@
       Disbursed amount
     %th
       PAR
+    %th{:colspan => 4}
+      Overdue amount
+  %tr.header
     %th
-      Amount overdue
+    %th
+    %th
+    %th
+    %th
+      Principal
+    %th
+      Interest
+    %th
+      Fee
+    %th
+      Total      
   - org_total = []
   - @data.sort_by{|branch, centers| branch.name}.each do |branch, centers|
     -branch_total = []
@@ -31,11 +44,20 @@
         %td.number
           = row.par.to_currency
         %td.number
-          = row.default.to_currency
+          = row.prin_overdue.to_currency
+        %td.number
+          = row.int_overdue.to_currency
+        %td.number
+          = row.fee_overdue.to_currency
+        %td.number
+          = row.tot_overdue.to_currency
           - center_total[0] = row.loan_count
           - center_total[1] = row.loan_amount
           - center_total[2] = row.par
-          - center_total[3] = row.default
+          - center_total[3] = row.prin_overdue
+          - center_total[4] = row.int_overdue
+          - center_total[5] = row.fee_overdue
+          - center_total[6] = row.tot_overdue
       -branch_total.push(center_total) if center_total.length == length
     -branch_total=branch_total.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}}
     %tr.branch_total
