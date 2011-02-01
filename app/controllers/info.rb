@@ -93,9 +93,14 @@ class Info < Application
     end
     
     unless @clients 
-      @clients        = {} 
-      @clients[:new]  = (@centers.class == Hash ? @centers[:upto] : @centers).clients(client_hash(:new) + {:fields => [:id]})
-      @clients[:upto] = (@centers.class == Hash ? @centers[:upto] : @centers).clients(client_hash(:upto) + {:fields => [:id]})
+      @clients        = {}
+      if (@centers.class == Hash) and (@centers[:upto].count == 0)
+        @clients[:new]
+        @clients[:upto]
+      else
+        @clients[:new]  = (@centers.class == Hash ? @centers[:upto] : @centers).clients(client_hash(:new) + {:fields => [:id]})
+        @clients[:upto] = (@centers.class == Hash ? @centers[:upto] : @centers).clients(client_hash(:upto) + {:fields => [:id]})
+      end
     end
 
     set_more_info(@obj, owner_type||:managed)
