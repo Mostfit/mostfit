@@ -8,6 +8,7 @@
     %ul.tabs
       %li#contact Contact details
       %li#operational Operational details
+      %li#security Access control & Security
       %li#info Main page
     %div.tab
       %table.wide
@@ -165,8 +166,18 @@
             Application revision
           %td
             = revision
-    %div.tab    
-      %table{:width => "100%"}     
+    %div.tab
+      %table
+        %tr
+          %td
+            Session expiry time
+            %br
+            %span.greytext
+              Automatically log out users after certain time
+          %td
+            =text_field :session_expiry
+    %div.tab
+      %table{:width => "100%"}
         %tr
           %th
             Text

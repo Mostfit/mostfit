@@ -14,7 +14,8 @@ Merb::Config.use do |c|
 
   # cookie session store configuration
   c[:session_secret_key]  = '573a2e64628a0656a8149f6f6b802d11bfc74123'  # required for cookie session store
-  c[:session_id_key] = '_mostfit_session_id' # cookie session id key, defaults to "_session_id"
+  c[:session_id_key]      = '_mostfit_session_id' # cookie session id key, defaults to "_session_id"
+  c[:session_expiry]      = 86400
 end
 
 Merb::BootLoader.before_app_loads do
@@ -165,11 +166,7 @@ Merb::BootLoader.after_app_loads do
   begin
     $globals[:mfi_details] = Mfi.first
     Merb.logger.info("Loaded MFI details from config/mfi.yml. Loaded on #{Mfi.first.fetched}")
-    if DirtyLoan.start_thread
-      Merb.logger.info("Starting cleaner thread")
-    else
-      Merb.logger.info("Cleaner not enabled")
-    end
+    Merb.logger.info("Starting cleaner thread") if DirtyLoan.start_thread
   rescue
     # create a new mfi_details object anyways
     $globals[:mfi_details] = Mfi.new(:name => "Mostfit", :fetched => Date.today)
