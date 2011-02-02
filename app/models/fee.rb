@@ -87,25 +87,19 @@ class Fee
     fees
   end
 
-  def self.paid(loan_ids)
-    client_ids = Loan.all(:fields => [:id, :client_id], :id => loan_ids).map{|x| x.client_id}.uniq
-    client_ids = client_ids.length>0 ? client_ids.join(",") : "NULL"
-    repository.adapter.query(%Q{
-                                SELECT loan_id, client_id, SUM(amount) amount
-                                FROM payments p
-                                WHERE p.client_id IN (#{client_ids}) AND p.type=3 AND deleted_at is NULL GROUP BY p.loan_id;})
+  def self.paid(loan_ids, date=Date.today)    
+    Payment.all(:type => :fees, :loan_id => loan_ids, :received_on.lte => date).aggregate(:loan_id, :amount.sum).to_hash
   end
 
-  def self.due(loan_ids)
-    fees_applicable = self.applicable(loan_ids).group_by{|x| x.loan_id}
-    fees_paid       = self.paid(loan_ids).group_by{|x| x.loan_id}
+  def self.due(loan_ids, date=Date.today)
+    fees_applicable = self.applicable(loan_ids, {:date => date}).group_by{|x| x.loan_id}
+    fees_paid       = self.paid(loan_ids, {:date => date})
     fees = {}
     loan_ids.each{|lid|
       applicable = fees_applicable[lid].first if fees_applicable.key?(lid) and fees_applicable[lid].length>0
       next if not applicable
-      paid      = fees_paid[lid] if fees_paid.key?(lid) and fees_paid[lid].length>0
-      paid      = (paid and paid.length>0) ? paid.map{|x| x.amount.to_f}.inject(0){|s,x| s+=x} : 0
-      fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable.to_f : 0), paid, (applicable ? applicable.fees_applicable : 0) - paid)
+      paid      = fees_paid.key?(lid) ? fees_paid[lid] : 0
+      fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable.to_f : 0), paid, ((applicable ? applicable.fees_applicable : 0) - paid).to_i)
     }
     fees
   end
