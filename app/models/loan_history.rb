@@ -444,12 +444,15 @@ class LoanHistory
 
     repository.adapter.query(%Q{
       SELECT
-        SUM(lh.scheduled_outstanding_principal) AS loan_amount,
+        SUM(lh.actual_outstanding_principal) AS loan_amount,
         COUNT(lh.loan_id) loan_count,
         #{selects}
-      FROM loan_history lh, loans l
-      WHERE lh.status in (8, 9) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
-            AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
+      FROM (SELECT max(lh.date) date, lh.loan_id loan_id
+            FROM loan_history lh, loans l
+            WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (8, 9) AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{query}
+            GROUP BY lh.loan_id
+            ) dt, loan_history lh
+      WHERE lh.loan_id=dt.loan_id AND lh.date = dt.date AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
       #{group_by_query};
     })    
   end
@@ -640,7 +643,7 @@ class LoanHistory
     query = build_extra(query)    
     return "(SELECT max(lh.date) date, lh.loan_id loan_id
      FROM loan_history lh, loans l
-     WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (5,6,7,8) AND lh.date<='#{date.strftime('%Y-%m-%d')}' #{query}
+     WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (5,6,7,8,9) AND lh.date<='#{date.strftime('%Y-%m-%d')}' #{query}
      GROUP BY lh.loan_id
      )"
   end
