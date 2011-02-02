@@ -623,6 +623,8 @@ class LoanHistory
           "l.#{group_by}"
         elsif Loan.properties.map{|x| x.name.to_s}.include?("#{group_by}_id")
           "l.#{group_by}_id"
+        elsif group_by.to_s == "staff_member" or group_by.to_s == "staff_member_id"
+          "l.disbursed_by_staff_id"
         else
           group_by
         end
