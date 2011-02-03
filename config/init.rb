@@ -170,7 +170,7 @@ Merb::BootLoader.after_app_loads do
     Merb.logger.info("Couldn't create the voucher, Possibly unable to access the database.")
   end
     
-  Mfi.first
+  Mfi.activate
 
   if defined?(PhusionPassenger)
     PhusionPassenger.on_event(:starting_worker_process) do |forked|
@@ -178,9 +178,6 @@ Merb::BootLoader.after_app_loads do
         DirtyLoan.start_thread
       end
     end
-  end
-  
-  # change default format to whatever is selected
-  Mfi.first.set_currency_format
+  end  
 end
 
