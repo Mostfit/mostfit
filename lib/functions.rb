@@ -218,3 +218,12 @@ module FinancialFunctions
     end
   end
 end
+
+module DmPagination
+  class PaginationBuilder
+    def url(params)
+      @context.params.delete(:action) if @context.params[:action] == 'index'
+      @context.url(@context.params.merge(params).reject{|k,v| k=="_message"})
+    end
+  end
+end
