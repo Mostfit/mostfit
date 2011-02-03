@@ -1,10 +1,17 @@
 class Application < Merb::Controller
   before :ensure_authenticated
+  before :ensure_password_fresh
   before :ensure_can_do
   before :insert_session_to_observer
   before :add_collections, :only => [:index, :show]
   
   @@controllers  = ["regions", "area", "branches", "centers", "clients", "loans", "payments", "staff_members", "funders", "portfolios", "funding_lines"]
+
+  def ensure_password_fresh
+    if session.key?(:change_password) and session[:change_password] and not params[:action] == "change_password"
+      redirect url(:change_password)
+    end
+  end
 
   def insert_session_to_observer
     DataAccessObserver.insert_session(session.object_id)

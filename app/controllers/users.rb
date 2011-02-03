@@ -59,20 +59,34 @@ class Users < Application
     end
   end
 
-  def change_password
+  # Allow users to change their passwords
+  # Do not allow a change if passwords are different
+  # or if the new password is same as the old one
+  def change_password    
     user = params[:user]
     @user = session.user
+    @status = false
     if request.method==:put and user.key?(:password) and user.key?(:password_confirmation)
-      @user.password = user[:password]
-      @user.password_confirmation = user[:password]
-      if @user.save
-        redirect("/browse", :message => {:notice => "Password changed successfully"})
-      else
-        render
+      @user.transaction do |t|
+        old_crypt = @user.crypted_password
+        @user.password = user[:password]
+        @user.password_confirmation = user[:password]
+        @user.password_changed_at   = DateTime.now
+        @status = @user.save
+        t.rollback if not status
+        if (@user.crypted_password == old_crypt)
+          t.rollback
+          @status = false
+          @user.errors.add(:password, "Same as old password")
+        end
       end
-    else
-      render
+
+      if @status
+        session.delete(:change_password) if session.key?(:change_password)
+        redirect("/browse", :message => {:notice => "Password changed successfully"})
+      end
     end
+    render
   end
   
   private

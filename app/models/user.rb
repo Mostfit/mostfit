@@ -8,6 +8,7 @@ class User
   property :login,        String, :nullable => false
   property :created_at,   DateTime              
   property :updated_at,   DateTime
+  property :password_changed_at, DateTime, :default => Time.now, :nullable => false
   property :active,       Boolean, :default => true, :nullable => false
 
   # permissions
@@ -87,6 +88,11 @@ class User
     login
   end
   
+  def password_too_old
+    if self.password_changed_at and mfi = Mfi.first and mfi.password_change_in
+      return true if Date.today - self.password_changed_at > mfi.password_change_in
+    end
+  end
 
   def method_missing(name, params)
     if x = /can_\w+\?/.match(name.to_s)
