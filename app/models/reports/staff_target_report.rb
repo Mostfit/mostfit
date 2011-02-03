@@ -6,13 +6,13 @@ class StaffTargetReport < Report
 
   def initialize(params, dates, user)
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
-    @date = Date.new(@to_date.year, @to_date.month, 01)
-    @name = "Staff Target Report from #{@date} to #{@to_date}"
+    @from_date = Date.new(@to_date.year, @to_date.month, 01)
+    @name = "Staff Target Report from #{@from_date} to #{@to_date}"
     get_parameters(params, user)
   end
 
   def name
-    "Staff Target Report from #{@date} to #{@to_date}"
+    "Staff Target Report from #{@from_date} to #{@to_date}"
   end
   
   def self.name
@@ -32,46 +32,48 @@ class StaffTargetReport < Report
     outstandings_today = LoanHistory.sum_outstanding_grouped_by(@to_date, :center, {:center_id => @center.map{|c| c.id}})
     staff_members.each{|staff, centers|
       center_ids = centers.map{|c| c.id}
-      outstanding[staff] = outstandings_past.find_all{|row| center_ids.include?(row.center_id)}.map{|x| x[0].to_i}.reduce(0){|s,x| s+=x}
+      outstanding[staff] = outstandings_today.find_all{|row| center_ids.include?(row.center_id)}.map{|x| x[0].to_i}.reduce(0){|s,x| s+=x}
     }
     
     target_amount, target_number = Hash.new(0), Hash.new(0)
     
     #calculates the target attached to a staff member for disbursed loan amount for this month.
     Target.all(:attached_to => :staff_member, :type => :loan_disbursement_by_amount, :attached_id => staff_members.keys.map{|sm| sm.id},
-               :created_at.gte => @date,
+               :created_at.lte => @to_date, :deadline.gte => @from_date,
                :deadline.lte => Date.new(@to_date.year, @to_date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
       target_amount[staff_id] ||= 0
-      target_amount[staff_id] += targets.map{|t| t.target_value}.reduce(0){|s,x| s+=x} if targets
+      target_amount[staff_id] += targets.map{|t| (t.target_value - t.start_value)}.reduce(0){|s,x| s+=x} if targets
     }
 
     #calculates the target attached to a staff member for no. of clients registered this month.
     Target.all(:attached_to => :staff_member, :type => :client_registration, :attached_id => staff_members.keys.map{|sm| sm.id},
-               :created_at.gte => @date,
+               :created_at.lte => @to_date, :deadline.gte => @from_date,
                :deadline.lte => Date.new(@to_date.year, @to_date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
       target_number[staff_id] ||= 0
-      target_number[staff_id] += targets.map{|t| t.target_value}.reduce(0){|s,x| s+=x} if targets
+      target_number[staff_id] += targets.map{|t| (t.target_value - t.start_value)}.reduce(0){|s,x| s+=x} if targets
     }
 
     #loop to calculate different values according to each staff member.
     staff_members.each {|staff, centers|      
       # calculates overdue loan amount for current month per staff member.
-      overdue_loan = Loan.all(:scheduled_disbursal_date.gte => @date, :scheduled_disbursal_date.lte => @to_date, :approved_on.not => nil, 
-                              :disbursal_date => nil, :applied_by => staff, :rejected_on => nil, :written_off_on => nil).aggregate(:amount.sum).to_i
+      overdue_loan = Loan.all(:scheduled_disbursal_date.lte => @to_date, :approved_on.lte => @to_date, :disbursal_date => nil,
+                              :applied_by => staff, :rejected_on => nil, :written_off_on => nil).aggregate(:amount.sum).to_i
 
       #calculates the loan sanctioned amount.
-      sanctioned_loan = Loan.all(:approved_on.lte => @to_date, :approved_by => staff, :scheduled_disbursal_date => @to_date,
+      sanctioned_loan = Loan.all(:approved_on.not => nil, :approved_by => staff, :scheduled_disbursal_date.lte => @to_date, :disbursal_date => nil,
                                  :rejected_on => nil, :written_off_on => nil).aggregate(:amount.sum).to_i
 
-      #calculates the total loan bu adding overdue_loan and sanctioned_loan.
+      #calculates the total loan by adding overdue_loan and sanctioned_loan.
       total_loan = overdue_loan + sanctioned_loan
 
       #calculates the amount disbursed.
-      disbursed_loan = LoanHistory.amount_disbursed_for(staff, :from_date => @to_date, :to_date => @to_date).amount.to_i
+      disbursed_loan = Loan.all(:approved_on.lte => @to_date, :scheduled_disbursal_date.lte => @to_date, :disbursed_by => staff,
+                                :disbursal_date => @to_date, :rejected_on => nil, :written_off_on => nil).aggregate(:amount.sum).to_i
+    #  disbursed_loan = LoanHistory.amount_disbursed_for(staff, :from_date => @to_date, :to_date => @to_date).amount.to_i
 
       #calculates the overdue repayment amount and displays only if not nil otherwise displays a 0.
-      repayment = LoanHistory.defaulted_loan_info_for(staff, @to_date)
-      if repayment != nil
+      repayment = LoanHistory.defaulted_loan_info_for(staff, @to_date, nil, :aggregate, :managed)
+      if repayment
         overdue_repayment = repayment.principal_due.to_i
       else
         overdue_repayment = 0
@@ -87,13 +89,13 @@ class StaffTargetReport < Report
       actual_client_created_date      = Client.all(:date_joined => @to_date, :created_by_staff_member_id => staff.id).count
 
       #calculates actual client created till today from 1st day of current month.
-      actual_client_created_till_date = Client.all(:date_joined.gte => @date, :date_joined.lte => @to_date, :created_by_staff_member_id => staff.id).count
+      actual_client_created_till_date = Client.all(:date_joined.gte => @from_date, :date_joined.lte => @to_date, :created_by_staff_member_id => staff.id).count
 
       #calculates the variance by comparing the target attached and the actual number of clients created till date and substraction the values.
       target_variance = target_number[staff.id] - actual_client_created_till_date
 
       #calculates the total outstanding amount and displays only if the value is not false otherwise 0 is displayed.
-      amount_outstanding[staff] = LoanHistory.sum_outstanding_for(staff, @to_date)
+      amount_outstanding[staff] = LoanHistory.sum_outstanding_for(staff, @to_date, :managed)
       if amount_outstanding[staff] and amount_outstanding[staff][0]
         total_outstanding[staff] = amount_outstanding[staff][0].actual_outstanding_principal.to_i
       else
@@ -101,7 +103,7 @@ class StaffTargetReport < Report
       end
 
       #calculates disbursed loan amount for the current month.
-      till_date_loan_amount = Loan.all(:disbursed_by => staff, :disbursal_date.gte => @date,
+      till_date_loan_amount = Loan.all(:disbursed_by => staff, :disbursal_date.gte => @from_date,
                                        :disbursal_date.lte => @to_date, :rejected_on => nil, :written_off_on => nil).aggregate(:amount.sum)
 
       #fills in the values to be displayed in the report in the variable data which is an array.
@@ -111,7 +113,7 @@ class StaffTargetReport < Report
         }, 
         :disbursement => {:target => [target_amount[staff.id]],
           :till_date => [
-                         Loan.count(:disbursed_by => staff, :disbursal_date.gte => @date, :disbursal_date.lte => @to_date,
+                         Loan.count(:disbursed_by => staff, :disbursal_date.gte => @from_date, :disbursal_date.lte => @to_date,
                                     :rejected_on => nil, :written_off_on => nil), 
                          till_date_loan_amount
                         ],
@@ -128,7 +130,7 @@ class StaffTargetReport < Report
           :var => overdue_repayment, 
           :due => outstanding[staff], 
           :actual => actual_repayment, 
-          :total_variance => variance,
+          :total_variance => variance.abs,
           :variance_till_date => (overdue_repayment + variance).abs 
         }, 
         :total_outstanding => total_outstanding[staff]
