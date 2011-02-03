@@ -1,18 +1,25 @@
 %h1
   Targets
-%table{:width => "100%"}
-  %tr
-    %th
-      Attached to
-    %th
-      Start value
-    %th
-      To reach
-    %th
-      Deadline date
-    %th
-      Assigned to
-    %th
+%table.report.nojs
+  %thead
+    %tr
+      %th
+        Attached to
+      %th
+        Start Value
+      %th
+        To Reach
+      %th
+        Target
+      %th
+        Target Month
+      %th
+        Start Date
+      %th
+        Deadline Date
+      %th
+        Assigned to
+      %th
   - for target in @targets
     %tr
       %td
@@ -22,10 +29,21 @@
       %td
         = target.target_value
       %td
+        = target.target_value - target.start_value
+      %td
+        = target.target_month.to_s.camelcase(' ')
+      %td
+        = target.start_date
+      %td
         = target.deadline
       %td
         = target.responsible.name
       %td
         = link_to 'Edit', url(:edit_target,  target)
 
+  %tfoot
+    %tr
+      %td{:colspan => 10}
+
 = link_to 'New', url(:new_target)
+= paginate @targets if @targets.respond_to?(:page)

@@ -11,6 +11,17 @@
       = text_field :target_value
   %tr
     %td
+      Target for Month
+    %td
+      - options = [['none', '<none>']] + (Target.target_months.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
+      = select :target_month, :collection => options, :onchange => "$('#hidden').css('display', 'block')"
+  %tr
+    %td
+      Start Date Of Target
+    %td
+      = date_select_for @target, :start_date
+  %tr
+    %td
       Deadline
     %td
       = date_select_for @target, :deadline

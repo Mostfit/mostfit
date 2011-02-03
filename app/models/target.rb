@@ -3,6 +3,7 @@ class Target
   Types = [:center_creation, :group_creation, :client_registration, :loan_disbursement_by_amount, :loan_disbursements_by_number]
   TypeClasses = [Center, ClientGroup, Client, Loan, Loan]
   ValidAttaches = [:branch, :center, :staff_member]
+  MONTHS = [:none, :january, :february, :march, :april, :may, :june, :july, :august, :september, :october, :november, :december]
 
   property :id,            Serial
   property :target_value,  Integer, :nullable => false, :index => true
@@ -14,17 +15,38 @@ class Target
   property :created_at,    DateTime, :default => Time.now
   property :present_value, Integer, :nullable => true, :index => true
   property :checked_at,    Date
+  property :target_month,  Enum.send('[]', *MONTHS), :nullable => true, :default => :none, :index => true
+  property :start_date,    Date, :nullable => true, :index => true
 
   validates_with_method :attached_id, :check_existance
   validates_with_method :deadline, :future_date
   validates_present :target_value
   validates_with_method :target_value, :target_value_invalid
+  validates_present :target_month
+#  validates_with_method :target_month, :target_month_same_as_date_range
+  validates_present :start_date
+  validates_present :deadline
+  validates_with_method :deadline, :start_date_cannot_be_greater_than_deadline
 
   before :valid?, :set_start_value
 
   def check_existance
     return true if responsible
     return [false, "This #{responsible_class} doesn't exists"]
+  end
+
+  def self.target_months
+    MONTHS
+  end
+
+  # def target_month_same_as_date_range
+  #   return [false, "Target for month should be same as month of date range"] if target_month != (start_date.strftime("%B")) and target_month != (deadline.strftime("%B"))
+  #   return true if target_month == (start_date.strftime("%B")) and target_month != (deadline.strftime("%B"))
+  # end
+
+  def start_date_cannot_be_greater_than_deadline
+    return [false, "Start date should be less than deadline"] if start_date > deadline
+    return true if start_date < deadline
   end
 
   def target_value_invalid
