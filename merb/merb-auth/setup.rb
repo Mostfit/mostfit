@@ -18,11 +18,14 @@ begin
   Merb::Authentication.user_class.class_eval{ include Merb::Authentication::Mixins::SaltedUser }
   
   Merb::Authentication.after_authentication do |user, request, params|
-    if user.active
-      user
-    else
+    if not user.active
       request.session.authentication.errors.add(:general, 'You are not an active user')
       nil
+    elsif user.password_too_old
+      request.session[:change_password] = true
+      user
+    else
+      user
     end
   end
 

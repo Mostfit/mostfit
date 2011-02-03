@@ -44,7 +44,8 @@ class Mfi
   property :asset_register_enabled, Boolean, :default => false, :index => true
 
   property :currency_format,  String,  :nullable => true, :length => 20
-  property :session_expiry,   Integer, :nullable => true, :min => 1, :max => 86400
+  property :session_expiry,   Integer, :nullable => true, :min => 60, :max => 86400
+  property :password_change_in, Integer, :nullable => true
 
   property :main_text, Text, :nullable => true, :lazy => true
   validates_length :name, :min => 0, :max => 20

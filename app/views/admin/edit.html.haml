@@ -176,6 +176,14 @@
               Automatically log out users after certain time
           %td
             =text_field :session_expiry
+        %tr
+          %td
+            Force password change in
+            %br
+            %span.greytext
+              force users to change password in
+          %td
+            =text_field :password_change_in
     %div.tab
       %table{:width => "100%"}
         %tr
