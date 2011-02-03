@@ -89,7 +89,7 @@ class User
   end
   
   def password_too_old
-    if self.password_changed_at and mfi = Mfi.first and mfi.password_change_in
+    if self.password_changed_at and mfi = Mfi.first and mfi.password_change_in and mfi.password_change_in.to_i>0
       return true if Date.today - self.password_changed_at > mfi.password_change_in
     end
   end
