@@ -39,7 +39,7 @@ class StaffTargetReport < Report
     
     #calculates the target attached to a staff member for disbursed loan amount for this month.
     Target.all(:attached_to => :staff_member, :type => :loan_disbursement_by_amount, :attached_id => staff_members.keys.map{|sm| sm.id},
-               :created_at.lte => @to_date, :deadline.gte => @from_date,
+               :start_date.gte => @from_date,
                :deadline.lte => Date.new(@to_date.year, @to_date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
       target_amount[staff_id] ||= 0
       target_amount[staff_id] += targets.map{|t| (t.target_value - t.start_value)}.reduce(0){|s,x| s+=x} if targets
@@ -47,7 +47,7 @@ class StaffTargetReport < Report
 
     #calculates the target attached to a staff member for no. of clients registered this month.
     Target.all(:attached_to => :staff_member, :type => :client_registration, :attached_id => staff_members.keys.map{|sm| sm.id},
-               :created_at.lte => @to_date, :deadline.gte => @from_date,
+               :start_date.gte => @from_date,
                :deadline.lte => Date.new(@to_date.year, @to_date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
       target_number[staff_id] ||= 0
       target_number[staff_id] += targets.map{|t| (t.target_value - t.start_value)}.reduce(0){|s,x| s+=x} if targets
