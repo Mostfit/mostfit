@@ -23,9 +23,9 @@ class Target
   validates_present :target_value
   validates_with_method :target_value, :target_value_invalid
   validates_present :target_month
-#  validates_with_method :target_month, :target_month_same_as_date_range
-  validates_present :start_date
-  validates_present :deadline
+  validates_with_method :target_month, :target_month_and_date_range_same
+  validates_present :start_date, :deadline
+  validates_with_method :start_date, :start_date_and_deadline_of_same_month
   validates_with_method :deadline, :start_date_cannot_be_greater_than_deadline
 
   before :valid?, :set_start_value
@@ -39,10 +39,15 @@ class Target
     MONTHS
   end
 
-  # def target_month_same_as_date_range
-  #   return [false, "Target for month should be same as month of date range"] if target_month != (start_date.strftime("%B")) and target_month != (deadline.strftime("%B"))
-  #   return true if target_month == (start_date.strftime("%B")) and target_month != (deadline.strftime("%B"))
-  # end
+  def target_month_and_date_range_same
+    return [false, "Target for Month cannot be different from month of date range specified"] if target_month.to_s.camelcase != start_date.strftime("%B") and target_month.to_s.camelcase!= deadline.strftime("%B")
+    return true if target_month.to_s.camelcase == start_date.strftime("%B") and target_month.to_s.camelcase == deadline.strftime("%B")
+  end
+
+  def start_date_and_deadline_of_same_month
+    return [false, "Start date and deadline should be of same month"] if start_date.strftime("%B") != deadline.strftime("%B")
+    return true if start_date.strftime("%B") == deadline.strftime("%B")
+  end
 
   def start_date_cannot_be_greater_than_deadline
     return [false, "Start date should be less than deadline"] if start_date > deadline

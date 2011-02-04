@@ -1,10 +1,18 @@
 %h1
   Targets
-%table.report.nojs
+%table.narrow
   %thead
     %tr
       %th
-        Attached to
+        Assigned to
+      %th
+        Target For
+      %th
+        Target Month
+      %th
+        Start Date
+      %th
+        Deadline
       %th
         Start Value
       %th
@@ -12,24 +20,18 @@
       %th
         Target
       %th
-        Target Month
-      %th
-        Start Date
-      %th
-        Deadline Date
-      %th
-        Assigned to
-      %th
+        Edit/Delete
   - for target in @targets
-    %tr
+    %tr{ :class => cycle('odd','') }
+      %td
+        - if target.attached_to == :staff_member
+          = link_to target.responsible.name, url(:quick_link, "staff_members", target.responsible.id)
+        - if target.attached_to == :branch
+          = link_to target.responsible.name, url(:quick_link, "branches", target.responsible.id)
+        - if target.attached_to == :center
+          = link_to target.responsible.name, url(:quick_link, "centers", target.responsible.id)
       %td
         = target.type.to_s.camelcase(' ')
-      %td
-        = target.start_value
-      %td
-        = target.target_value
-      %td
-        = target.target_value - target.start_value
       %td
         = target.target_month.to_s.camelcase(' ')
       %td
@@ -37,7 +39,20 @@
       %td
         = target.deadline
       %td
-        = target.responsible.name
+        - if target.type == :loan_disbursement_by_amount
+          = target.start_value.to_currency
+        - else
+          = target.start_value
+      %td
+        - if target.type == :loan_disbursement_by_amount
+          = target.target_value.to_currency
+        - else
+          = target.target_value
+      %td
+        - if target.type == :loan_disbursement_by_amount
+          = (target.target_value - target.start_value).to_currency
+        - else
+          = target.target_value - target.start_value
       %td
         = link_to 'Edit', url(:edit_target,  target)
 
