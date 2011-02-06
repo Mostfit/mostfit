@@ -329,7 +329,7 @@
       }.to_hash
     end
     
-    def principal_overdue_last_week(date=Date.today, days=nil)
+    def principal_overdue_last_week(date=Date.today, days=7)
       Branch.all.map{|b|
         due = LoanHistory.defaulted_loan_info_for(b, date, days)
         if due
