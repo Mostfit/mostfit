@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), '..', '..', 'spec_helper.rb')
 
-given "a branch exists" do
-  Branch.all.destroy!
+given "a client exist" do
+  Client.all.destroy!
 end
 
 given "an admin user exist" do
@@ -11,10 +11,10 @@ given "an admin user exist" do
   response.should redirect
 end
 
-describe "/data_entry/branches", :given => "an admin user exist" do
+describe "/data_entry/clients", :given => "an admin user exist" do
   describe "GET" do
     before(:each) do
-      @response = request("/branches/new")
+      @response = request("/data_entry/clients/new")
     end
 
     it "responds successfully" do
@@ -23,10 +23,10 @@ describe "/data_entry/branches", :given => "an admin user exist" do
   end
 end
 
-describe "/data_entry/branches/edit", :given => "an admin user exist" do
+describe "/data_entry/clients/edit", :given => "an admin user exist" do
   describe "PUT" do
     before(:each) do
-      @response = request("/data_entry/branches/edit")
+      @response = request("/data_entry/clients/edit")
     end
 
     it "responds successsfully" do

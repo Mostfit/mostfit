@@ -31,19 +31,29 @@ describe "/browse", :given => "an admin user" do
       @response.should have_xpath("//ul/li[3]")
     end
 
-    it "should have verifications" do
+    it "should have areas" do
       pending
       @response.should have_xpath("//ul/li[4]")
+    end
+
+    it "should have regions" do
+      pending
+      @response.should have_xpath("//ul/li[5]")
+    end
+
+    it "should have verifications" do
+      pending
+      @response.should have_xpath("//ul/li[6]")
     end
     
     it "should have documents" do
       pending
-      @response.should have_xpath("//ul/li[5]")
+      @response.should have_xpath("//ul/li[7]")
     end
     
     it "should have accounts" do
       pending
-      @response.should have_xpath("//ul/li[6]")
+      @response.should have_xpath("//ul/li[8]")
     end
   end
 end

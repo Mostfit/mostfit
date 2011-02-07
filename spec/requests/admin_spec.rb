@@ -22,7 +22,7 @@ describe "/admin", :given => "an admin user" do
       @response.should have_xpath("//ul/li")
     end
     
-    it "should have index" do
+    it "should have holidays" do
       pending
       @response.should have_xpath("//ul/li[2]")
     end

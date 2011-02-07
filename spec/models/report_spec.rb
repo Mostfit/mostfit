@@ -37,13 +37,15 @@ describe Report do
     @loan_product.should be_valid
 
     @target_for_number = Target.new(:attached_to => :staff_member, :type => :client_registration, :attached_id => @manager.id, :start_value => 100,
-                         :target_value => 1000, :created_at => Date.today, :deadline => Date.new(Date.today.year, Date.today.month, -1))
+                                    :target_value => 1000, :created_at => Date.today, :start_date => Date.new(Date.today.year, Date.today.month, 01),
+                                    :target_month => Date.today.strftime("%B").snake_case, :deadline => Date.new(Date.today.year, Date.today.month, -1))
     @target_for_number.save
     @target_for_number.errors.each {|e| puts e}
     @target_for_number.should be_valid
 
     @target_for_amount = Target.new(:attached_to => :staff_member, :type => :loan_disbursement_by_amount, :attached_id => @manager.id,
                                     :target_value => 10_00_000, :created_at => Date.today, :start_value => 10_000,
+                                    :target_month => Date.today.strftime("%B").snake_case, :start_date => Date.new(Date.today.year, Date.today.month, 01),
                                     :deadline => Date.new(Date.today.year, Date.today.month, -1))
     @target_for_amount.save!
     @target_for_amount.errors.each {|e| puts e}
@@ -422,14 +424,14 @@ describe Report do
     staff_members = {}
     target_amount, target_number = Hash.new(0), Hash.new(0)
     Target.all(:attached_to => :staff_member, :type => :loan_disbursement_by_amount, :attached_id => @manager.id,
-               :created_at.lte => date, :deadline.gte => Date.new(date.year, date.month, 01), 
+               :start_date.gte => Date.new(date.year, date.month, 01),
                :deadline.lte => Date.new(date.year, date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
       target_amount[staff_id] ||= 0
       target_amount[staff_id] += targets.map{|t| (t.target_value - t.start_value)}.reduce(0){|s,x| s+=x} if targets
     }
     
     Target.all(:attached_to => :staff_member, :type => :client_registration, :attached_id => @manager.id,
-                   :created_at.lte => date, :deadline.gte =>  Date.new(date.year, date.month, 01),
+                   :start_date.gte => Date.new(date.year, date.month, 01),
                    :deadline.lte => Date.new(date.year, date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
       target_number[staff_id] ||= 0
       target_number[staff_id] += targets.map{|t| (t.target_value - t.start_value)}.reduce(0){|s,x| s+=x} if targets
@@ -544,14 +546,14 @@ describe Report do
     staff_members = {}
     target_amount, target_number = Hash.new(0), Hash.new(0)
     Target.all(:attached_to => :staff_member, :type => :loan_disbursement_by_amount, :attached_id => @manager.id,
-               :created_at.lte => date, :deadline.gte => Date.new(date.year, date.month, 01),
+               :start_date.gte => Date.new(date.year, date.month, 01),
                :deadline.lte => Date.new(date.year, date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
       target_amount[staff_id] ||= 0
       target_amount[staff_id] += targets.map{|t| (t.target_value - t.start_value)}.reduce(0){|s,x| s+=x} if targets
     }
 
     Target.all(:attached_to => :staff_member, :type => :client_registration, :attached_id => @manager.id,
-               :created_at.lte => date, :deadline.gte => Date.new(date.year, date.month, 01),
+               :start_date.gte => Date.new(date.year, date.month, 01),
                :deadline.lte => Date.new(date.year, date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
       target_number[staff_id] ||= 0
       target_number[staff_id] += targets.map{|t| (t.target_value - t.start_value)}.reduce(0){|s,x| s+=x} if targets
