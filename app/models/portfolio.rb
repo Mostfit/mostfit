@@ -2,7 +2,7 @@ class Portfolio
   include DataMapper::Resource
   include DateParser
 
-  attr_accessor :centers, :added_on, :branch_id
+  attr_accessor :centers, :added_on, :branch_id, :disbursed_after
 
   before :destroy, :verified_cannot_be_deleted
   before :valid?,  :parse_dates
@@ -56,14 +56,14 @@ class Portfolio
     pids = (PortfolioLoan.all(hash).map{|x| x.loan_id})
     repaid_loans = LoanHistory.all(:current => true, :loan_id => PortfolioLoan.all(:portfolio_id => self.id).map{|pl| pl.loan_id}, :status => [:repaid, :written_off, :claim_settlement])
     
-    taken_loans = []
-    
-    taken_loans << "l.id not in (#{pids.join(', ')})" if pids.length > 0
-    taken_loans << "lh.branch_id = #{self.branch_id}" if self.branch_id and self.branch_id.to_i > 0
+    query = []    
+    query << "l.id not in (#{pids.join(', ')})" if pids.length > 0
+    query << "l.disbursal_date>='#{self.disbursed_after.strftime('%Y-%m-%d')}'" if self.disbursed_after and self.disbursed_after.is_a?(Date)
+    query << "lh.branch_id = #{self.branch_id}" if self.branch_id and self.branch_id.to_i > 0
 
     date = self.added_on || Date.today
 
-    data = LoanHistory.sum_outstanding_grouped_by(date, [:center, :branch], taken_loans).group_by{|x| x.branch_id}.map{|bid, centers| 
+    data = LoanHistory.sum_outstanding_grouped_by(date, [:center, :branch], query).group_by{|x| x.branch_id}.map{|bid, centers| 
       [Branch.get(bid), centers.group_by{|x| x.center_id}.map{|cid, rows| [centers_hash[cid], rows.first]}.to_hash]
     }.to_hash
 
