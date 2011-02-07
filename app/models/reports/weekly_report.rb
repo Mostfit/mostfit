@@ -57,7 +57,7 @@ class WeeklyReport < Report
     @report << {"Interest Received Last Week" => Branch.interest_received_between(start_date, end_date)}
     @report << {"Fees Received Last Week" => Branch.fee_received_between(start_date, end_date)}
     @report << {"Advance Payment Total Last Week" => Branch.overpaid_total_between(start_date, end_date)}
-    @report << {"Balance Overdue Last Week" => Branch.principal_overdue_last_week(end_date)}
+    @report << {"Additional Balance Overdue Last Week" => Branch.additional_principal_overdue_last_week(start_date, end_date)}
 
     WeeklyReport.all(:start_date => self.start_date, :end_date => self.end_date).destroy!
     self.raw = @report

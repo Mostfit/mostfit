@@ -329,15 +329,12 @@
       }.to_hash
     end
     
-    def principal_overdue_last_week(date=Date.today, days=7)
-      Branch.all.map{|b|
-        due = LoanHistory.defaulted_loan_info_for(b, date, days)
-        if due
-          [b.id, due.principal_due.to_i]
-        else
-          [b.id, 0]
-        end
-      }.to_hash
+    def additional_principal_overdue_last_week(start_date=Date.today, end_date =Date.today)
+      added_overdue = Branch.principal_overdue_by(end_date) - Branch.principal_overdue_by(start_date-1)
+      added_overdue.values.each do |x|
+        x > 0 ? x : 0 
+      end
+      added_overdue.to_hash
     end
     
     def overpaid_principal_between(start_date=Date.today, end_date=Date.today)
