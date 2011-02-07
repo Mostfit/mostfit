@@ -21,6 +21,7 @@ class Portfolios < Application
     @portfolio = Portfolio.new
     @portfolio.added_on  = Date.parse(params[:added_on])  if params[:added_on] and not params[:added_on].blank?
     @portfolio.branch_id = params[:branch_id] if params[:branch_id] and not params[:branch_id].blank?
+    @portfolio.disbursed_after = Date.parse(params[:disbursed_after]) if params[:disbursed_after] and not params[:disbursed_after].blank?
     @data      = @portfolio.eligible_loans
     @centers   = []
     display @portfolio
@@ -31,6 +32,9 @@ class Portfolios < Application
     @portfolio = Portfolio.get(id)
     raise NotFound unless @portfolio
     disallow_updation_of_verified_portfolios
+    @portfolio.added_on  = Date.parse(params[:added_on])  if params[:added_on] and not params[:added_on].blank?
+    @portfolio.branch_id = params[:branch_id] if params[:branch_id] and not params[:branch_id].blank?
+    @portfolio.disbursed_after = Date.parse(params[:disbursed_after]) if params[:disbursed_after] and not params[:disbursed_after].blank?
     @data      = @portfolio.eligible_loans
     @centers   = Center.all(:id => LoanHistory.ancestors_of_portfolio(@portfolio, Center))
     display @portfolio
