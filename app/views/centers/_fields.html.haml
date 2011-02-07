@@ -2,10 +2,10 @@
   %label{:for => "branch"}Branch
   - if @branch and not @center.new?
     = select :name => 'center[branch_id]', :collection => get_accessible_branches.map{|b| [b.id,b.name]}, :selected => @branch.id.to_s
-  -elsif @branch and @center.new?
+  - elsif @branch and @center.new?
     = select :name => 'center[branch_id]', :collection => Branch.all(:id => @branch.id).map{|b| [b.id,b.name]}
-  -else
-    = select :name => 'center[branch_id]', :collection => get_accessible_branches.map{|b| [b.id,b.name]}
+  - else
+    = select :name => 'center[branch_id]', :collection => get_accessible_branches.map{|b| [b.id,b.name]}, :selected => session[:branch_id].to_s
 %p
   %label{:for => "name"}Center name:
   = text_field :name, :size => 40

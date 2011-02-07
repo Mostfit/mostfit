@@ -66,11 +66,14 @@ module Merb
         collection << ['', branch_name]
         catalog[branch_name].sort_by{|x| x[1]}.each{ |k,v| collection << [k.to_s, "!!!!!!!!!#{v}"] }
       end
+      selected_id = (obj.send(id_col) ? obj.send(id_col).to_s : nil)
+      selected_id = session[:center_id].to_s unless selected_id and session.key?(:center_id)
+      
       html = select col,
         :collection   => collection,
         :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
         :id           => "#{obj.class.to_s.snake_case}_#{id_col}",
-        :selected     => (obj.send(id_col) ? obj.send(id_col).to_s : nil),
+        :selected     => selected_id,
         :prompt       => (attrs[:prompt] or "&lt;select a center&gt;")
       html.gsub('!!!', '&nbsp;')  # otherwise the &nbsp; entities get escaped
     end

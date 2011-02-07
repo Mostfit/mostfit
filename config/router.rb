@@ -38,7 +38,7 @@ Merb::Router.prepare do
   resources :loan_products
   resources :users
   resources :staff_members
-  resources :clients do
+  resources :clients, :id => %r(\d+) do
     resources :insurance_policies
     resources :attendances
     resources :claims
@@ -52,7 +52,7 @@ Merb::Router.prepare do
   resources :payments
   resources :branches, :id => %r(\d+)  do    
     resources :journals
-    resources :centers, :id => %r(\d+)  do
+    resources :centers, :id => %r(\d+) do
       resources :client_groups
       resources :clients do
         resources :payments
@@ -80,7 +80,7 @@ Merb::Router.prepare do
   match('/reports/show(/:id)').to(:controller => 'reports', :action => 'show')
   match('/reports/:report_type(/:id)').to(:controller => 'reports', :action => 'show').name(:show_report)
   resources :reports
-  match('/data_entry').to(:namespace => 'data_entry', :controller => 'index').name(:data_entry)
+  match('/data_entry(/:action)').to(:namespace => 'data_entry', :controller => 'index').name(:data_entry)
   namespace :data_entry, :name_prefix => 'enter' do  # for url(:enter_payment) and the likes
     match('/clients(/:action)(/:id)(.:format)').to(:controller => 'clients').name(:clients)
     match('/loans/approve_by_center/:id').to(:controller => 'loans', :action => 'approve').name(:approval_by_center)

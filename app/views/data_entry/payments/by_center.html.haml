@@ -164,7 +164,7 @@
         %th
           Centers repaying today
         %td
-          = select :name => 'center_id', :collection => centers_paying_today_collection(@date)
+          = select :name => 'center_id', :collection => centers_paying_today_collection(@date), :selected => session[:center_id]
       %tr
         %th
           or any other center

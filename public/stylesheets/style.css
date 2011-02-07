@@ -1016,3 +1016,6 @@ ul#tree li.depth_4 span{
     overflow-x: none;
     height: 80px;
 }
+.right{
+    float: right;
+}

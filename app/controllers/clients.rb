@@ -108,7 +108,7 @@ class Clients < Application
   end
   
   def inactive_client_count
-    @data = Client.all(:active => false,:inactive_reason => 'death_of_client') + Client.all(:active => false, :inactive_reason => 'death_of_spouse')
+    @data = Client.all(:active => false, :inactive_reason => 'death_of_client') + Client.all(:active => false, :inactive_reason => 'death_of_spouse')
     render
   end
   

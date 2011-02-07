@@ -1,8 +1,16 @@
+.right
+  %form{:action => url(:controller => "data_entry", :action => :fixate), :method => :post}
+    %b Select branch
+    = select :branch_id, :collection => Branch.all(:order => [:name]).map{|x| [x.id, x.name]}, :selected => session[:branch_id], :prompt => "Select branch", :id => "branch_selector"
+    %b Select center
+    = select(:center_id, :collection => get_accessible_centers(session[:branch_id]), :include_blank => true, :selected => session[:center_id], :id => "center_selector")
+    = submit "Fixate"
 %h1 Data Entry
 %h3 Follow the links below to perform common actions quickly. 
 %h3{:style => "color: #6C8506;"}
   Most forms are made especially for mass data entry.
 /%p At the bottom you find an overview of all modifications that you have made.
+
 - @i = 1
 %table#data_entry_index
   -user = session.user
@@ -26,9 +34,9 @@
           %br
           = link_to "Delete a repayment <br/>", url("enter_#{plural}".to_sym, :action => 'delete'), :class => 'add_small' 
           = link_to_with_rights("Collection sheet<br/>", url(:enter_payments,:action => 'staff_collection_sheet'), :class => 'edit_small')
-          = link_to "Daily Report", url(:show_report, 'DailyReport', {:daily_report => {:date => Date.today}, :submit => "Go"}), :class => 'edit_small'
+          = link_to "Daily Report", url(:show_report, 'DailyReport', {:daily_report => {:date => Date.today, :branch_id => session[:branch_id], :center_id => session[:center_id]}, :submit => "Go"}), :class => 'edit_small'
           %br
-          = link_to "Transaction Ledger", url(:show_report, 'TransactionLedger', {:transaction_ledger => {:from_date => Date.today}, :submit => "GO"}), :class => 'edit_small'
+          = link_to "Transaction Ledger", url(:show_report, 'TransactionLedger', {:transaction_ledger => {:from_date => Date.today, :branch_id => session[:branch_id], :center_id => session[:center_id]}, :submit => "GO"}), :class => 'edit_small'
           %br
         - else
           = link_to_with_rights "Add new #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'new'), :class => 'add_small'
@@ -44,7 +52,7 @@
             = link_to_with_rights("Disburse Loans (#{nd})<br/>", url(:loan_actions, :action => 'disburse'), :class => 'edit_small',:style =>"font-weight: bold;")
           - sg = Loan.all(:write_off_rejected_on => nil, :written_off_on => nil, :suggested_written_off_on.lte => Date.today).size
           = link_to_with_rights("Write Off Loans (#{sg})<br/>", url(:loan_actions, :action => 'write_off_suggested'), :class => 'edit_small')         
-          = link_to_with_rights "Weekly requirement of funds <br/>", url(:show_report, 'ProjectedReport', {:projected_report => {:from_date => Date.today + 1}, :submit => "GO"}), :class => 'edit_small'
+          = link_to_with_rights "Weekly requirement of funds <br/>", url(:show_report, 'ProjectedReport', {:projected_report => {:from_date => Date.today + 1, :branch_id => session[:branch_id], :center_id => session[:center_id]}, :submit => "GO"}), :class => 'edit_small'
           = link_to_with_rights("Disbursement Sheet <br/>", url(:enter_loans,:action => 'staff_disbursement_sheet'), :class => 'edit_small')
         - @i += 1
       

@@ -18,11 +18,11 @@
       %td
         = client.id
       %td
-        = link_to "#{client.name}", resource(client, :claims, :new)
+        = link_to client.name, resource(client, :claims, :new)
       %td
         = client.date_of_birth
       %td
-        = client.client_group.name
+        = client.client_group ? client.client_group.name : "none"
       %td
         = client.center.name
       %td
