@@ -38,14 +38,14 @@ describe Report do
 
     @target_for_number = Target.new(:attached_to => :staff_member, :type => :client_registration, :attached_id => @manager.id, :start_value => 100,
                                     :target_value => 1000, :created_at => Date.today, :start_date => Date.new(Date.today.year, Date.today.month, 01),
-                                    :target_month => Date.today.strftime("%B").snake_case, :deadline => Date.new(Date.today.year, Date.today.month, -1))
+                                    :deadline => Date.new(Date.today.year, Date.today.month, -1))
     @target_for_number.save
     @target_for_number.errors.each {|e| puts e}
     @target_for_number.should be_valid
 
     @target_for_amount = Target.new(:attached_to => :staff_member, :type => :loan_disbursement_by_amount, :attached_id => @manager.id,
                                     :target_value => 10_00_000, :created_at => Date.today, :start_value => 10_000,
-                                    :target_month => Date.today.strftime("%B").snake_case, :start_date => Date.new(Date.today.year, Date.today.month, 01),
+                                    :start_date => Date.new(Date.today.year, Date.today.month, 01),
                                     :deadline => Date.new(Date.today.year, Date.today.month, -1))
     @target_for_amount.save!
     @target_for_amount.errors.each {|e| puts e}

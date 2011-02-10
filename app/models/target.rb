@@ -20,8 +20,6 @@ class Target
   validates_with_method :deadline, :future_date
   validates_present :target_value
   validates_with_method :target_value, :target_value_invalid
-  validates_present :target_month
-  validates_with_method :target_month, :target_month_and_date_range_same
   validates_present :start_date, :deadline
   validates_with_method :start_date, :start_date_and_deadline_of_same_month
   validates_with_method :deadline, :start_date_cannot_be_greater_than_deadline
