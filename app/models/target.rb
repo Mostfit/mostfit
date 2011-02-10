@@ -3,7 +3,6 @@ class Target
   Types = [:center_creation, :group_creation, :client_registration, :loan_disbursement_by_amount, :loan_disbursements_by_number]
   TypeClasses = [Center, ClientGroup, Client, Loan, Loan]
   ValidAttaches = [:branch, :center, :staff_member]
-  MONTHS = [:none, :january, :february, :march, :april, :may, :june, :july, :august, :september, :october, :november, :december]
 
   property :id,            Serial
   property :target_value,  Integer, :nullable => false, :index => true
@@ -15,7 +14,6 @@ class Target
   property :created_at,    DateTime, :default => Time.now
   property :present_value, Integer, :nullable => true, :index => true
   property :checked_at,    Date
-  property :target_month,  Enum.send('[]', *MONTHS), :nullable => true, :default => :none, :index => true
   property :start_date,    Date, :nullable => true, :index => true
 
   validates_with_method :attached_id, :check_existance

@@ -145,8 +145,9 @@ class LoanHistory
         SUM(lh.scheduled_outstanding_principal - lh.actual_outstanding_principal) AS balance_principal,
         SUM(lh.scheduled_outstanding_total - lh.actual_outstanding_total) AS balance_total,
         #{selects}
-      FROM #{subtable} dt, loan_history lh
+      FROM #{subtable} dt, loan_history lh, loans l
       WHERE lh.loan_id=dt.loan_id AND lh.date=dt.date AND lh.status in (5,6)
+            AND lh.loan_id=l.id AND l.deleted_at is NULL
             AND lh.scheduled_outstanding_principal > lh.actual_outstanding_principal
             AND lh.scheduled_outstanding_total > lh.actual_outstanding_total
       #{group_by_query};
@@ -451,8 +452,9 @@ class LoanHistory
             FROM loan_history lh, loans l
             WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (8, 9) AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{query}
             GROUP BY lh.loan_id
-            ) dt, loan_history lh
-      WHERE lh.loan_id=dt.loan_id AND lh.date = dt.date AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
+            ) dt, loan_history lh, loans l
+      WHERE lh.loan_id=dt.loan_id AND lh.date = dt.date AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}'
+            AND lh.loan_id=l.id AND l.deleted_at is NULL AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
       #{group_by_query};
     })    
   end
