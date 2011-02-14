@@ -34,3 +34,15 @@ describe "/data_entry/clients/edit", :given => "an admin user exist" do
     end
   end
 end
+
+describe "/clients/inactive_client_count", :given => "an admin user exist" do
+  describe "PUT" do
+    before(:each) do
+      @response = request("/clients/inactive_client_count")
+    end
+    
+    it "responds successsfully" do
+      @response.should be_successful
+    end
+  end
+end
