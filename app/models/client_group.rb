@@ -37,6 +37,10 @@ class ClientGroup
     return true
   end
 
+  # this function moves the client from one center to another. It moves all the open loans to new center. 
+  # This updates the schedule of the open loans and make sure they conform to the guidelines of the center meeting day etc.
+  # Old loan histories are updated to reflect the new center 
+  # without disturbing the schedule.
   def sync_clients
     return unless self.valid?
     Client.all(:client_group_id => self.id).each{|client|
