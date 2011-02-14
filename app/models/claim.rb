@@ -111,6 +111,8 @@ class Claim
   def set_amount_to_be_paid_to_client
     if amount_of_claim and not amount_of_claim.blank? and amount_to_be_deducted and not amount_to_be_deducted.blank?
       self.amount_to_be_paid_to_client = amount_of_claim - amount_to_be_deducted
+    elsif amount_of_claim and amount_to_be_deducted.blank?
+      self.amount_to_be_paid_to_client = self.amount_of_claim
     else
       self.amount_to_be_paid_to_client = 0
     end
@@ -118,6 +120,7 @@ class Claim
 
   def convert_blank_to_nil
     self.attributes.each{|k, v|
+      next if k == :id
       if v.is_a?(String) and v.empty? and [Float, Integer].include?(self.class.send(k).type)
         self.send("#{k}=", nil)
       elsif [Date].include?(self.class.send(k).type)
