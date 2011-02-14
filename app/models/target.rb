@@ -1,4 +1,4 @@
-0class Target
+class Target
   include DataMapper::Resource
   Types = [:center_creation, :group_creation, :client_registration, :loan_disbursement_by_amount, :loan_disbursements_by_number]
   TypeClasses = [Center, ClientGroup, Client, Loan, Loan]
