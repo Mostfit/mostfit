@@ -97,7 +97,7 @@
       %td
         on&nbsp;&nbsp;
         = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date, :date => (@loan.scheduled_first_payment_date || @client.center.next_meeting_date_from(probable_scheduled_disbursal_date))
-  - if @loan_product.installment_frequency == :monthly
+  - else
     %tr
       %td
         Scheduled first payment:
