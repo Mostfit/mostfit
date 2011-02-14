@@ -214,7 +214,6 @@ class LoanHistory
     sum_outstanding_grouped_by(date, :branch, extra.join(" AND "))
   end
 
-  # TODO:  rewrite it using Datamapper
   # Get sum disbursed for all the loans grouped by given group_by array for a given date
   # For instance we can group loans by [:branch, :center] or [:branch, :center, :client_group]
   # by saying LoanHistory.sum_disbursed_grouped_by([:branch, :center], Date.today-100, Date.today)
@@ -235,6 +234,76 @@ class LoanHistory
             AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
       #{group_by_query};
     })
+  end
+
+  # Get sum approved for all the loans grouped by given group_by array for a given date
+  # For instance we can group loans by [:branch, :center] or [:branch, :center, :client_group]
+  # by saying LoanHistory.sum_approved_grouped_by([:branch, :center], Date.today-100, Date.today)
+  # on can also restrict the scope of the query by providing 'extra_condition'
+  # for instance, extra_conditions = ["branch_id=3", "center_id=100"]
+  def self.sum_approved_grouped_by(group_by, from_date=Date.min_date, to_date=Date.today, extra_conditions=[], selects="")
+    group_by_query = get_group_by(group_by)
+    selects        = get_selects(group_by, selects)
+    extra          = build_extra(extra_conditions)
+
+    repository.adapter.query(%Q{
+      SELECT 
+        SUM(if(l.amount_sanctioned>0, l.amount_sanctioned, l.amount)) AS loan_amount,
+        COUNT(lh.loan_id) loan_count,
+        #{selects}
+      FROM loan_history lh, loans l
+      WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+            AND l.approved_on <= '#{to_date.strftime('%Y-%m-%d')}' AND l.approved_on >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
+            AND l.approved_on = lh.date
+      #{group_by_query};
+    })
+  end
+
+  # Get sum applied for all the loans grouped by given group_by array for a given date
+  # For instance we can group loans by [:branch, :center] or [:branch, :center, :client_group]
+  # by saying LoanHistory.sum_approved_grouped_by([:branch, :center], Date.today-100, Date.today)
+  # on can also restrict the scope of the query by providing 'extra_condition'
+  # for instance, extra_conditions = ["branch_id=3", "center_id=100"]
+  def self.sum_applied_grouped_by(group_by, from_date=Date.min_date, to_date=Date.today, extra_conditions=[], selects="")
+    group_by_query = get_group_by(group_by)
+    selects        = get_selects(group_by, selects)
+    extra          = build_extra(extra_conditions)
+
+    repository.adapter.query(%Q{
+      SELECT 
+        SUM(if(l.amount_applied_for>0, l.amount_applied_for, l.amount)) AS loan_amount,
+        SUM(lh.scheduled_outstanding_principal) AS loan_amount,
+        COUNT(lh.loan_id) loan_count,
+        #{selects}
+      FROM loan_history lh, loans l
+      WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+            AND l.applied_on <= '#{to_date.strftime('%Y-%m-%d')}' AND l.applied_on >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
+            AND l.applied_on = lh.date
+      #{group_by_query};
+    })
+  end
+
+  # Get sum repayment grouped by given group_by array for a given date
+  # For instance we can group by [:branch, :center] or [:branch, :center, :client_group]
+  # by saying LoanHistory.sum_repayment_grouped_by([:branch, :center], from_date, to_date)
+  # on can also restrict the scope of the query by providing 'extra_condition'
+  # for instance, extra_conditions = ["branch_id=3", "center_id=100"]
+  def self.sum_repayment_grouped_by(group_by, from_date=Date.min_date, to_date=Date.today, extra_conditions=[], selects="")
+    group_by_query = get_group_by(group_by)
+    selects        = get_selects(group_by, selects)
+    extra          = build_extra(extra_conditions)
+
+    repository.adapter.query(%Q{
+      SELECT 
+        SUM(p.amount) AS amount,
+        p.type type,
+        #{selects}
+      FROM loan_history lh, payments p
+      WHERE lh.loan_id=p.loan_id AND p.deleted_at is NULL
+            AND p.received_on <= '#{to_date.strftime('%Y-%m-%d')}' AND p.received_on >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
+            AND p.received_on = lh.date
+      #{group_by_query}, p.type;
+    }).group_by{|x| Payment::PAYMENT_TYPES[x.type-1]}
   end
 
   # Gives loan outstanding for/under a particular object
