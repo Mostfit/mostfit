@@ -8,8 +8,6 @@
       %th
         Target For
       %th
-        Target Month
-      %th
         Start Date
       %th
         Deadline
@@ -32,8 +30,6 @@
           = link_to target.responsible.name, url(:quick_link, "centers", target.responsible.id)
       %td
         = target.type.to_s.camelcase(' ')
-      %td
-        = target.target_month.to_s.camelcase(' ')
       %td
         = target.start_date
       %td

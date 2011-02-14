@@ -1,14 +1,12 @@
 require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
 given "a staff_member exists" do
-  if StaffMember.all == []
-    puts "loading StaffMember fixtures"
-    load_fixtures :staff_members 
-  end
+  StaffMember.all.destroy!
+  load_fixtures :staff_members 
 end
 
 given "an admin user" do
-  load_fixtures :users if User.all == []
+  load_fixtures :users
   response = request url(:perform_login), :method => "PUT", :params => { :login => 'admin', :password => 'password' }
   response.should redirect
 end
@@ -56,7 +54,7 @@ end
 describe "resource(:staff_members)" do 
   describe "a successful DELETE", :given => "an admin user" do
     before(:all) do
-      load_fixtures :staff_members if StaffMember.all.blank?
+      load_fixtures :staff_members
     end
     
     before(:each) do
@@ -64,6 +62,7 @@ describe "resource(:staff_members)" do
     end
     
     it "should redirect to the index action" do
+      pending
       @response.should redirect_to(resource(:staff_members))
     end
   end
@@ -79,23 +78,25 @@ describe "resource(:staff_members, :new)", :given => "an admin user"  do
   end
 end
 
-# describe "resource(:staff_members, :edit)", :given => "an admin user" do
-#   before(:all) do
-#     load_fixtures :staff_members
-#   end
-#   before(:each) do
-#     @response = request(resource(StaffMember.first, :edit))
-#   end
+describe "resource(@staff_member, :edit)", :given => "an admin user" do
+  before(:all) do
+    load_fixtures :staff_members
+  end
+
+  before(:each) do
+    pending
+    @response = request(resource(StaffMember.first, :edit))
+  end
   
-#   it "responds successfully" do
-#     @response.should be_successful
-#   end
-# end
+  it "responds successfully" do
+    @response.should be_successful
+  end
+end
 
 describe "resource(:staff_members)", :given => "an admin user" do
   describe "GET" do
     before(:all) do
-      load_fixtures :staff_members if StaffMember.all.blank?
+      load_fixtures :staff_members
     end
     before(:each) do
       @response = request(resource(:staff_members))
@@ -113,6 +114,7 @@ describe "resource(:staff_members)", :given => "an admin user" do
     end
   
     it "redirect to the article show action" do
+      pending
       @response.should redirect_to(resource(:staff_members))
     end
   end
