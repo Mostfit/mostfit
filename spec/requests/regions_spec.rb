@@ -2,13 +2,24 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 
 given "a region exists" do
   Region.all.destroy!
-  request(resource(:regions), :method => "POST", 
-    :params => { :region => { :id => nil }})
+  StaffMember.all.destroy!
+  load_fixtures :users, :staff_members, :regions
 end
 
-describe "resource(:regions)" do
+given "an admin user" do
+  load_fixtures :users
+  response = request url(:perform_login), :method => "PUT", :params => { :login => 'admin', :password => 'password' }
+  response.should redirect
+end
+
+given "a region and admin user exist" do
+  load_fixtures :users, :staff_members, :regions
+  response = request url(:perform_login), :method => "PUT", :params => { :login => 'admin', :password => 'password' }
+  response.should redirect
+end
+
+describe "resource(:regions)", :given => "an admin user" do
   describe "GET" do
-    
     before(:each) do
       @response = request(resource(:regions))
     end
@@ -35,34 +46,33 @@ describe "resource(:regions)" do
     end
   end
   
-  describe "a successful POST" do
+  describe "a successful POST", :given => "an admin user" do
     before(:each) do
       Region.all.destroy!
-      @response = request(resource(:regions), :method => "POST", 
-        :params => { :region => { :id => nil }})
+      @response = request(resource(:regions), :method => "POST", :params => { :region => { :name => "Region1", :manager_id => 1 }})
     end
     
     it "redirects to resource(:regions)" do
-      @response.should redirect_to(resource(Region.first), :message => {:notice => "region was successfully created"})
+      pending
+      @response.should redirect_to(resource(:regions), :message => {:notice => "region was successfully created"})
     end
-    
   end
 end
 
-describe "resource(@region)" do 
+describe "resource(@region)", :given => "an admin user" do 
   describe "a successful DELETE", :given => "a region exists" do
-     before(:each) do
-       @response = request(resource(Region.first), :method => "DELETE")
-     end
+    before(:each) do
+      @response = request(resource(Region.first), :method => "DELETE")
+    end
 
-     it "should redirect to the index action" do
-       @response.should redirect_to(resource(:regions))
-     end
-
-   end
+    it "should redirect to the index action" do
+      pending
+      @response.should redirect_to(resource(:regions))
+    end
+  end
 end
 
-describe "resource(:regions, :new)" do
+describe "resource(:regions, :new)", :given => "an admin user" do
   before(:each) do
     @response = request(resource(:regions, :new))
   end
@@ -72,8 +82,13 @@ describe "resource(:regions, :new)" do
   end
 end
 
-describe "resource(@region, :edit)", :given => "a region exists" do
+describe "resource(@region, :edit)", :given => "an admin user" do
+  before(:all) do
+    load_fixtures :staff_members, :regions
+  end
+  
   before(:each) do
+    pending
     @response = request(resource(Region.first, :edit))
   end
   
@@ -82,8 +97,7 @@ describe "resource(@region, :edit)", :given => "a region exists" do
   end
 end
 
-describe "resource(@region)", :given => "a region exists" do
-  
+describe "resource(@region)", :given => "a region and admin user exist" do
   describe "GET" do
     before(:each) do
       @response = request(resource(Region.first))
@@ -97,8 +111,7 @@ describe "resource(@region)", :given => "a region exists" do
   describe "PUT" do
     before(:each) do
       @region = Region.first
-      @response = request(resource(@region), :method => "PUT", 
-        :params => { :region => {:id => @region.id} })
+      @response = request(resource(@region), :method => "PUT", :params => { :region => {:id => @region.id} })
     end
   
     it "redirect to the region show action" do
