@@ -1,0 +1,11 @@
+- form_url = url(:controller => params[:controller], :action => 'update', :id => @asset_register.id, :return => params[:return])
+- cancel_url = params[:return] ? params[:return] : resource(@asset_register)
+= error_messages_for @asset_register
+
+= form_for(@asset_register, :action => form_url, :class => "") do
+  %h1 Asset Register
+  = error_messages_for @asset_register
+  %fieldset
+    = partial "asset_registers/fields"
+    = submit "Save changes"
+    = link_to 'Cancel', url(:asset_registers)

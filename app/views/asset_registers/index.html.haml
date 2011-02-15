@@ -1,0 +1,42 @@
+%h2
+  Asset Register
+%p
+  = link_to_with_rights "Enter new details", resource(:asset_registers, :new, {:branch_id => params[:branch_id]}), :class => "add _remote_"
+%table.narrow
+  %thead
+    %tr
+      %th Id
+      %th Branch
+      %th Issued To
+      %th Asset Type
+      %th Issue Date
+      %th Issued By
+      %th Returned On
+      %th Edit/Delete
+
+  %tbody
+    - for asset_register in @asset_registers
+      %tr{ :class => cycle('odd', '') }
+        %td
+          = asset_register.id
+        %td
+          = asset_register.branch.name
+        %td
+          = asset_register.name
+        %td
+          = asset_register.asset_type
+        %td
+          = asset_register.issue_date
+        %td
+          = asset_register.manager.name
+        %td
+          = asset_register.returned_date
+        %td
+          = link_to 'edit', resource(asset_register, :edit)
+
+  %foot
+    %tr
+      %td{ :colspan => 10 }
+
+  = paginate @asset_registers
+= link_to 'Back', url(:asset_registers)

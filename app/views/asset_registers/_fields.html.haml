@@ -1,0 +1,41 @@
+%table
+  %tr
+    %td
+      Branch
+    %td
+      - if @branch
+        = @branch.name
+        = hidden_field(:branch_id, :value => @branch.id)
+      - else
+        = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
+  %tr
+    %td
+      Asset Type
+    %td
+      = text_field :asset_type
+  %tr
+    %td
+      Issue To
+    %td
+      = text_field :name
+      %span.greytext enter the name to whom the asset type is being issued.
+  %tr
+    %td
+      Issue Date
+    %td
+      = date_select_for @asset_register, :issue_date
+  %tr
+    %td
+      Issued By
+    %td
+      - if @branch
+        = select :manager_staff_id, :collection => @branch.centers.managers(:order => [:name]).map{ |x| [x.id, x.name]}
+      - else
+        = select_staff_member_for @asset_register, :manager, {}, true
+      %span.greytext select the person who has issued the asset
+  %tr
+    %td
+      To Be Returned On
+    %td
+      = date_select_for @asset_register, :returned_date
+      

@@ -96,6 +96,8 @@
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => resource(:stock_registers, :branch_id => @branch.id, :model => "Branch")}
     %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => resource(:asset_registers, :branch_id => @branch.id, :model => "Branch")}
+    %div.tab
     - if Mfi.first.map_enabled        
       %div.tab
         = js_include_tag :map
