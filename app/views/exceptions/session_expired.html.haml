@@ -1,0 +1,34 @@
+%p
+  %br/
+
+.prefix-4.span-16.suffix-4.last
+  %h1 Please login to continue...
+
+  = error_messages_for session.authentication
+  - @login_param = Merb::Authentication::Strategies::Basic::Base.login_param
+  - @password_param = Merb::Authentication::Strategies::Basic::Base.password_param
+  %form{ :action => url(:login), :method => "POST", "accept-charset" => "utf-8" }
+    %input{ :name => "_method", :type => "hidden", :value => "PUT" }/
+    // TODO: replace this with a form helper function
+    %table.form{ :cellspacing => "0", :border => "0", :cellpadding => "3", :width => "100%", :style => "margin-bottom: 0px" }
+      %tr
+        %td{ :align => "right", :style => "padding-right: 0px;" }
+          Login:
+        %td{ :width => "75%" }
+          %input{ :name => @login_param.to_s, :type => "text", :size => 25 }/
+      %tr
+        %td{ :align => "right", :style => "padding-right: 0px;" }
+          Password:
+        %td
+          %input{ :name => @password_param.to_s, :type => "password", :size => 25 }/
+      %tr
+        %td
+          \&nbsp;
+        %td
+          %input#Submit{ :type => "submit", :value => "Go!", :style => "margin-bottom: 5px" }/
+  %p
+    %br/
+    &nbsp;
+    %br/
+    &nbsp;
+    %br/
