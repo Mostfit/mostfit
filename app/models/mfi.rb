@@ -44,7 +44,7 @@ class Mfi
   property :asset_register_enabled, Boolean, :default => false, :index => true
 
   property :currency_format,  String,  :nullable => true, :length => 20
-  property :session_expiry,   Integer, :nullable => true, :min => 60, :max => 86400
+  property :session_expiry,   Integer, :nullable => true, :min => 60, :max => 86400, :default => 0
   property :password_change_in, Integer, :nullable => true
 
   property :main_text, Text, :nullable => true, :lazy => true
@@ -101,7 +101,6 @@ class Mfi
   end
   
   def set_variables
-    Merb::Config.session_expiry = Mfi.first.session_expiry if Mfi.first.session_expiry
     Misfit::Config::DateFormat.compile
     set_currency_format
     DirtyLoan.start_thread

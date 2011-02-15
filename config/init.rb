@@ -15,15 +15,7 @@ Merb::Config.use do |c|
   # cookie session store configuration
   c[:session_secret_key]  = '573a2e64628a0656a8149f6f6b802d11bfc74123'  # required for cookie session store
   c[:session_id_key]      = '_mostfit_session_id' # cookie session id key, defaults to "_session_id"
-  
-  # set cookie expiry
-  begin
-    config = YAML.load(File.read(File.join(Merb.root, "config", "mfi.yml")))
-    c[:session_expiry]      = config[:session_expiry].to_i
-  rescue Exception => e
-    puts e
-    c[:session_expiry]      = 86400
-  end
+  c[:session_expiry]      = 86400
 end
 
 Merb::BootLoader.before_app_loads do

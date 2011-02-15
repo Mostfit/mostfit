@@ -25,6 +25,16 @@ class Exceptions < Merb::Controller
     render
   end
 
+  def session_expired
+    if request.xhr?
+      return("Sorry! Your session has expired.")
+    elsif request.env['HTTP_REFERER'] 
+      redirect request.env['HTTP_REFERER'], :message => { :error => 'Sorry, your session has expired' }
+    else
+      render
+    end
+  end
+
   def not_changeable
     if request.xhr?
       return("Sorry! Not allowed to change verified data.")
@@ -39,3 +49,4 @@ end
 
 class NotPrivileged <  Merb::ControllerExceptions::Unauthorized; end
 class NotChangeable <  Merb::ControllerExceptions::Unauthorized; end
+class SessionExpired < Merb::ControllerExceptions::Unauthorized; end
