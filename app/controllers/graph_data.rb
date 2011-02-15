@@ -1,8 +1,8 @@
 class GraphData < Application
   COLORS = ["edd400", "f57900", "c17d11", "73d216", "3465a4", "75507b", "cc0000", "fce94f", "3465a4", "fcaf3e", "204a87", "ad7fa8", "875678", "456789", "234567"]
   include Grapher
-  before :display_from_cache, :exclude => [:today]
-  after  :store_to_cache, :exclude => [:today]
+  before :display_from_cache, :exclude => [:dashboard]
+  after  :store_to_cache, :exclude => [:dashboard]
 
   def loan(id)
     @loan      = Loan.get(id)
@@ -321,7 +321,7 @@ class GraphData < Application
       values = vals.map do |oid, pp, ip, pd, id| 
         due = pd + id
         paid = pp + ip
-
+        next unless paid + due > 0
         color_ratio = due == 0 ? 1 : paid/(paid + due).to_f
         color_ratio = 0 if color_ratio < 0
         color = (255 - 255 * color_ratio).to_i.to_s(16) + (255 * color_ratio).to_i.to_s(16) + "00"

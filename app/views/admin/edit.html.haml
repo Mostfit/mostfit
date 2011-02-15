@@ -181,7 +181,7 @@
             %span.greytext
               Automatically log out users after certain time
           %td
-            = text_field :session_expiry
+            = select :session_expiry, :collection => [[0, "Never"], [300, "5 minutes"], [900, "15 minutes"], [1800, "30 minutes"], [3600, "1 hour"], [7200, "2 hours"], [14400, "4 hours"], [21600, "6 hours"], [28800, "8 hours"], [43200, "12 hours"], [86400, "1 day"]]
         %tr
           %td
             Force password change in

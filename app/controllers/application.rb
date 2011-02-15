@@ -19,7 +19,9 @@ class Application < Merb::Controller
 
   def ensure_can_do
     @route = Merb::Router.match(request)
-    raise NotPrivileged unless session.user.can_access?(@route[1], params)
+    unless session.user and session.user.can_access?(@route[1], params)
+      raise NotPrivileged
+    end
   end
 
   def render_to_pdf(options = nil)

@@ -25,6 +25,7 @@ begin
       request.session[:change_password] = true
       user
     else
+      request.session[:last_seen] = Time.now
       user
     end
   end
@@ -33,7 +34,13 @@ begin
   class Merb::Authentication
 
     def fetch_user(session_user_id)
-      Merb::Authentication.user_class.get(session_user_id)
+      if Mfi.first.session_expiry.is_a?(Numeric) and session.key?(:last_seen) and session[:last_seen].is_a?(Time) and Time.now - session[:last_seen] > Mfi.first.session_expiry
+        session.abandon!
+        raise SessionExpired
+      else
+        session[:last_seen] = Time.now
+        Merb::Authentication.user_class.get(session_user_id)
+      end
     end
 
     def store_user(user)
