@@ -3,7 +3,7 @@
 = js_include_tag "mce_editor.js"
 = css_include_tag "colorPicker.css"
 = error_messages_for @mfi
-=form_for(@mfi, :action => url(:controller => :admin, :action => :update), :enctype => "multipart/form-data") do
+= form_for(@mfi, :action => url(:controller => :admin, :action => :update), :enctype => "multipart/form-data") do
   %div.tab_container
     %ul.tabs
       %li#contact Contact details
@@ -16,12 +16,12 @@
           %td
             Name of the mfi
           %td
-            =text_field :name
+            = text_field :name
         %tr
           %td
             Select Color for this name
           %td
-            =text_field :color
+            = text_field :color
         %tr
           %td
             and choose a logo
@@ -46,17 +46,17 @@
           %td
             Address of MFI HQ
           %td
-            =text_area :address
+            = text_area :address
         %tr
           %td
             Website (if any)
           %td
-            =text_field :website
+            = text_field :website
         %tr
           %td
             Telephone number
           %td
-            =text_field :telephone
+            = text_field :telephone
     %div.tab
       %table
         %tr
@@ -67,29 +67,29 @@
           %td
             Number of clients
           %td
-            =text_field :number_of_clients
+            = text_field :number_of_clients
         %tr
           %td
             Number of centers
           %td
-            =text_field :number_of_centers
+            = text_field :number_of_centers
         %tr
           %td
             In operation since
           %td
-            =date_select_for @mfi, :in_operation_since, {:min_date => Date.parse("2000-01-01")}
+            = date_select_for @mfi, :in_operation_since, {:min_date => Date.parse("2000-01-01")}
         %tr
           %td
             Allow dates in past upto
           %td
-            =text_field :number_of_past_days, :size => 3
+            = text_field :number_of_past_days, :size => 3
             days from
-            =select :min_date_from, :collection => Mfi::MinDateFrom.to_a
+            = select :min_date_from, :collection => Mfi::MinDateFrom.to_a
         %tr
           %td
             Allow dates for transactions in future upto
           %td
-            =text_field :number_of_future_transaction_days, :size => 3
+            = text_field :number_of_future_transaction_days, :size => 3
             days from today
             %p.greytext
               (for loan application, approval, disbursal, client joining date, branch & center creation date etc)
@@ -97,23 +97,23 @@
           %td
             Allow farthest dates in future 
           %td
-            =text_field :number_of_future_days, :size => 3
+            = text_field :number_of_future_days, :size => 3
             days from today
         %tr
           %td
             Allow date box to be editable?
           %td
-            =check_box :date_box_editable
+            = check_box :date_box_editable
         %tr
           %td
             Allow GRT date on new client form
           %td
-            =check_box :allow_grt_date_on_form
+            = check_box :allow_grt_date_on_form
         %tr
           %td
             Do accounting ?
           %td
-            =check_box :accounting_enabled
+            = check_box :accounting_enabled
         %tr
           %td
             Defer loan history re-generation ?
@@ -121,12 +121,18 @@
             %span.greytext
               results in faster turn around time for data entry
           %td
-            =check_box :dirty_queue_enabled
+            = check_box :dirty_queue_enabled
         %tr
           %td
             Enable Maps ?
           %td
             = check_box :map_enabled
+        %tr
+          %td{:colspan => 2}
+            %hr
+        %tr
+          %td
+            %h3 Branch Registers
         %tr
           %td
             Enable Branch Diary ?
@@ -143,24 +149,24 @@
           %td
             = check_box :asset_register_enabled
         %tr
-          %td
-            Currency formats
-          %td
-            - formats = Numeric::Transformer.instance_variable_get("@formats").keys.map{|x| [x.to_s, "#{x.to_s.camelcase(' ')} (#{100000.00.to_currency(x)})"]}.sort
-            =select :currency_format, :collection => formats, :include_blank => true
-        %tr
           %td{:colspan => 2}
             %hr
         %tr
           %td
             Email address
           %td
-            =text_field :email
+            = text_field :email
         %tr
           %td
             Specify prefered date format
           %td
-            =select :date_format, :collection => Mfi::DateFormats.map{|x| [x, Date.today.strftime(x)]}
+            = select :date_format, :collection => Mfi::DateFormats.map{|x| [x, Date.today.strftime(x)]}
+        %tr
+          %td
+            Currency formats
+          %td
+            - formats = Numeric::Transformer.instance_variable_get("@formats").keys.map{|x| [x.to_s, "#{x.to_s.camelcase(' ')} (#{100000.00.to_currency(x)})"]}.sort
+            = select :currency_format, :collection => formats, :include_blank => true
         %tr
           %td
             Application revision
@@ -183,14 +189,14 @@
             %span.greytext
               force users to change password in
           %td
-            =text_field :password_change_in
+            = text_field :password_change_in
     %div.tab
       %table{:width => "100%"}
         %tr
           %th
             Text
           %td
-            =text_area :main_text, :rows => 40, :cols => 120, :class => "mceEditor"
+            = text_area :main_text, :rows => 40, :cols => 120, :class => "mceEditor"
        
-  =submit "Save my details"
+  = submit "Save my details"
   

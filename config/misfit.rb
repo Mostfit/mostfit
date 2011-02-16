@@ -38,7 +38,7 @@ module Misfit
         :all => [:client, :loan, :payment, :document, :client_group, :group, :insurance_company, :insurance_policy, :cgt, :grt, :staff_member],
       },
       :staff_member => {
-        :all => [:center, :client, :loan, :payment, :document, :client_group, :group, :comment, :insurance_company, :staff_member, :location, :branch_diary, :stock_register]
+        :all => [:center, :client, :loan, :payment, :document, :client_group, :group, :comment, :insurance_company, :staff_member, :location, :branch_diary, :stock_register, :asset_register]
       },
       :funder => {
         :all => []
@@ -58,12 +58,12 @@ module Misfit
       :read_only => {
         :all => [:searches, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :insurance_policies, :audit_trails, :info,
                  :insurance_companies, :areas, :staff_members, :loan_products, :holidays, :document_types, :occupations, :client_types, :fees, :funders, :attendances, :dashboard, :graph_data,
-                :locations, :branch_diaries, :stock_registers]
+                :locations, :branch_diaries, :stock_registers, :asset_registers]
       },
       :staff_member => {
         :all => [:documents, :searches, :browse, :branches, :centers, :payments, :clients, :client_groups, :groups, :audit_trails, :comments, :insurance_policies, 
                  :reports, :"data_entry/centers", :"data_entry/client_groups", :"data_entry/payments", :"data_entry/clients", :staff_members, :audit_items, :locations,
-                 :"data_entry/loans", :"data_entry/index", :insurance_companies, :info, :dashboard, :graph_data, :branch_diaries, :stock_registers]
+                 :"data_entry/loans", :"data_entry/index", :insurance_companies, :info, :dashboard, :graph_data, :branch_diaries, :stock_registers, :asset_registers]
       },
       :funder => {
         :all => [:searches, :browse, :branches, :centers, :client_groups, :payments, :clients, :loans, :dashboard, :regions, :documents, :comments, :areas, :info, :locations,
