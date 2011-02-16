@@ -55,7 +55,7 @@ class Targets < Application
       }
       render :bulk_entry_new
     else
-      redirect url(:action => :bulk_entry_new, :target_type => @target_type, :attached_to => @attached_to, :target_of => @target_of)
+      redirect url(:action => :bulk_entry_new, :target_type => @target_type, :attached_to => @attached_to, :target_of => @target_of), :message => {:notice => "Target were successfully created"}
     end
   end
 

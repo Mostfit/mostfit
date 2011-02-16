@@ -1,5 +1,9 @@
+.right
+  = link_to 'New', url(:new_target), :class => "add"
+  = link_to "Monthly bulk target entry", url(:action => :bulk_entry_new), :class => "add"
 %h1
   Targets
+
 %table.narrow
   %thead
     %tr
@@ -29,23 +33,23 @@
         - if target.attached_to == :center
           = link_to target.responsible.name, url(:quick_link, "centers", target.responsible.id)
       %td
-        = target.type.to_s.camelcase(' ')
+        = target.target_of.to_s.camelcase(' ')
       %td
         = target.start_date
       %td
         = target.deadline
       %td
-        - if target.type == :loan_disbursement_by_amount
+        - if target.target_of == :loan_disbursement_by_amount
           = target.start_value.to_currency
         - else
           = target.start_value
       %td
-        - if target.type == :loan_disbursement_by_amount
+        - if target.target_of == :loan_disbursement_by_amount
           = target.target_value.to_currency
         - else
           = target.target_value
       %td
-        - if target.type == :loan_disbursement_by_amount
+        - if target.target_of == :loan_disbursement_by_amount
           = (target.target_value - target.start_value).to_currency
         - else
           = target.target_value - target.start_value
@@ -56,7 +60,4 @@
     %tr
       %td{:colspan => 10}
 
-= link_to 'New', url(:new_target)
-|
-= link_to "Bulk entry", url(:action => :bulk_entry_new)
 = paginate @targets if @targets.respond_to?(:page)
