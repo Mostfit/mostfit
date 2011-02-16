@@ -1,9 +1,8 @@
-%a#new_entry.add{:href => "#new_entry", :onclick => "javascript: $('#new_asset_register_entry').toggle()"} New Asset Entry
-
-- form_url = resource(:asset_registers)
+- form_url = resource(:asset_registers, {:return => params[:return]})
 = error_messages_for @asset_register
 
-= form_for(@asset_register, :action => form_url, :class => "", :id => "new_asset_register_entry", :style => "display: none;") do
+= form_for(@asset_register, :action => form_url, :class => "") do
+  
   %fieldset
     = partial "asset_registers/fields"
     = submit "Submit Details"
