@@ -28,7 +28,7 @@
           = branch_diary.id
         %td
         %td
-          = branch_diary.branch.name
+          = link_to branch_diary.branch.name, url(:quick_link, "branches", branch_diary.branch_id)
         %td
           = branch_diary.diary_date
         %td
@@ -42,7 +42,7 @@
         %td
           = branch_diary.branch_key
         %td
-          = branch_diary.manager.name
+          = link_to branch_diary.manager.name, url(:quick_link, "staff_members", branch_diary.manager_staff_id)
         %td
           = link_to 'edit', resource(branch_diary, :edit)
 

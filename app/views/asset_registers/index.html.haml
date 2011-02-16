@@ -2,25 +2,29 @@
   Asset Register
 %p
   = link_to_with_rights "Enter new details", resource(:asset_registers, :new, {:branch_id => params[:branch_id]}), :class => "add _remote_"
-%table.narrow
-  %thead
-    %tr
-      %th Id
-      %th Branch
-      %th Issued To
-      %th Asset Type
-      %th Issue Date
-      %th Issued By
-      %th Returned On
-      %th Edit/Delete
+- if @asset_registers.blank?
+  %p
+    %i No data to display. Please enter the data to the Asset Register.
+- else
+  %table.narrow
+    %thead
+      %tr
+        %th Id
+        %th Branch
+        %th Issued To
+        %th Asset Type
+        %th Issue Date
+        %th Issued By
+        %th Returned On
+        %th Edit/Delete
 
-  %tbody
+    %tbody
     - for asset_register in @asset_registers
       %tr{ :class => cycle('odd', '') }
         %td
           = asset_register.id
         %td
-          = asset_register.branch.name
+          = link_to asset_register.branch.name, url(:quick_link, "branches", asset_register.branch_id)
         %td
           = asset_register.name
         %td
@@ -28,15 +32,15 @@
         %td
           = asset_register.issue_date
         %td
-          = asset_register.manager.name
+          = link_to asset_register.manager.name, url(:quick_link, "staff_members", asset_register.manager_staff_id)
         %td
           = asset_register.returned_date
         %td
           = link_to 'edit', resource(asset_register, :edit)
 
-  %foot
-    %tr
-      %td{ :colspan => 10 }
+    %tfoot
+      %tr
+        %td{ :colspan => 10 }
 
   = paginate @asset_registers
 = link_to 'Back', url(:asset_registers)
