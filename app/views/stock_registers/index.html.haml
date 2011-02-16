@@ -2,27 +2,31 @@
   Stock Details
 %p
   = link_to_with_rights "Enter new Stock details", resource(:stock_registers, :new, {:branch_id => params[:branch_id]}), :class => "add _remote_"
-%table.narrow
-  %thead
-    %tr
-      %th Id
-      %th Branch
-      %th Stock Code
-      %th Stock Name
-      %th Quantity
-      %th Invoice Number
-      %th Invoice Date
-      %th Date Of Stock Entry
-      %th Entered By
-      %th Edit
+- if @stock_registers.blank?
+  %p
+    %i No data to display. Please enter the data to view the Stock Register.
+- else
+  %table.narrow
+    %thead
+      %tr
+        %th Id
+        %th Branch
+        %th Stock Code
+        %th Stock Name
+        %th Quantity
+        %th Invoice Number
+        %th Invoice Date
+        %th Date Of Stock Entry
+        %th Entered By
+        %th Edit
       
-  %tbody
+    %tbody
     - for stock_register in @stock_registers
       %tr{ :class => cycle('odd', '') }
         %td
           = stock_register.id
         %td
-          = stock_register.branch.name
+          = link_to stock_register.branch.name, url(:quick_link, "branches", stock_register.branch_id)
         %td
           = stock_register.stock_code
         %td
@@ -36,13 +40,13 @@
         %td
           = stock_register.date_of_entry
         %td
-          = stock_register.manager.name
+          = link_to stock_register.manager.name, url(:quick_link, "staff_members", stock_register.manager_staff_id)
         %td
           = link_to 'edit', resource(stock_register, :edit)
           
-  %foot
-    %tr
-      %td{ :colspan => 10 }
+    %tfoot
+      %tr
+        %td{ :colspan => 10 }
 
   = paginate @stock_registers
 = link_to 'Back', url(:stock_registers)
