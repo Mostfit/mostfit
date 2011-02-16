@@ -2,6 +2,7 @@ class TransactionLedger < Report
   attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id
 
   validates_with_method :from_date, :date_should_not_be_in_future
+  validates_with_method :branch_id, :branch_should_be_selected
 
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today
@@ -17,12 +18,13 @@ class TransactionLedger < Report
   def generate
     branches, centers, clients, groups, data = {}, {}, {}, {}, {}
     ClientGroup.all(:center => @center).each{|cg| groups[cg.id] = cg}
+    centers =  @center.map{|c| [c.id, c]}.to_hash
     @branch.each{|b|
       data[b]||= {}
       branches[b.id] = b
 
       b.centers.each{|c|
-        next if @center and not @center.find{|x| x.id==c.id}
+        next unless centers.key?(c.id)
         data[b][c]||= {}
         centers[c.id]        = c
         c.clients.group_by{|x| x.client_group_id}.each{|cgid, client_grouped|
@@ -37,7 +39,7 @@ class TransactionLedger < Report
     }
 
     Payment.all(:received_on.gte => from_date, :received_on.lte => to_date, 
-                :client_id => clients.keys).each{|p|
+                "client.center_id" => centers.keys).each{|p|
       #0          1,                 2                3
       #disbursed, payment_principal, payment_interest,payment_fee
       next if @loan_product_id and p.loan_id and p.loan.loan_product_id != @loan_product_id
@@ -58,7 +60,7 @@ class TransactionLedger < Report
       end
     }
 
-    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :rejected_on => nil}
+    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :rejected_on => nil, "client.center_id" => centers.keys}
     hash[:loan_product_id] = @loan_product_id if @loan_product_id
     Loan.all(hash).each{|loan|
       next unless client = clients[loan.client_id]
