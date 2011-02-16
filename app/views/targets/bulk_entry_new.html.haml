@@ -1,0 +1,31 @@
+%form{:action => url(:action => :bulk_entry_new), :method => :get}
+  = select :attached_to, :collection => Target::ValidAttaches.map{|x| [x, x.to_s.camelcase(' ')]}, :prompt => "choose target assigned to"
+  = select :target_of, :collection => Target::TargetOf.map{|x| [x, x.to_s.camelcase(' ')]}, :prompt => "choose target of"
+  = select :target_type, :collection => Target::TargetType.map{|x| [x, x.to_s.camelcase(' ')]}, :prompt => "choose target reference"
+  = submit "GO"
+
+- today = Date.today
+- if @target_type and @attached_to
+  - start_month = today.month
+  - dates      = []
+  - start_month.upto(start_month + 11){|m| mnum = (m%12 == 0 ? 12 : m%12); year = m < 13 ? today.year : today.year + 1; dates.push(Date.new(year, mnum, 1))}
+  = form_for(@targets, :action => url(:action => :bulk_entry_create), :method => :post) do
+    = hidden_field :name => "target_type", :value => @target_type
+    = hidden_field :name => "attached_to", :value => @attached_to
+    = hidden_field :name => "target_of", :value => @target_of
+    %table.report.nojs
+      %tr
+        %th
+          - dates.each do |start_date|
+            %th
+              = start_date.strftime('%b %Y')        
+      - @model.all.each do |obj|
+        %tr
+          %td
+            %b 
+              = link_to obj.name, resource(obj), :target => "blank"
+          - dates.each do |start_date|
+            %td              
+              - target = ((@targets.key?(obj.id) and @targets[obj.id][start_date]) ? @targets[obj.id][start_date][0] : nil)
+              = text_field :name => "target[#{obj.id}][#{start_date.strftime('%Y_%m')}]", :value => (target ? target.target_value : ''), :size => 2, :class => ((target and not target.errors.blank?) ? 'error' : ''), :title => ((target and not target.errors.blank?) ? target.errors.instance_variable_get("@errors").values.to_s : '') 
+    = submit "Save targets"

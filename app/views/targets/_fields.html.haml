@@ -1,17 +1,17 @@
 %table.form
   %tr
     %td
-      Target for
+      Target of
     %td
-      = select :type, :collection => Target::Types.map{|x| [x.to_s.camelcase(' '), x.to_s]}, :text_method => :first, :value_method => :last, :prompt => "&lt;select a valid attache&gt;"
+      = select :target_of, :collection => Target::TargetOf.map{|x| [x.to_s.camelcase(' '), x]}, :text_method => :first, :value_method => :last, :prompt => "&lt;select a valid attache&gt;"
   %tr
     %td
-      Target
+      Target value
     %td
       = text_field :target_value
   %tr
     %td
-      Start Date Of Target
+      Start Date
     %td
       = date_select_for @target, :start_date
   %tr
@@ -19,6 +19,11 @@
       Deadline
     %td
       = date_select_for @target, :deadline
+  %tr
+    %td
+      Target type
+    %td
+      = select :target_type, :collection => Target::TargetType.map{|x| [x.to_s.camelcase(' '), x.to_s]}, :text_method => :first, :value_method => :last, :prompt => "&lt;select a target type&gt;"
   %tr
     %td
       Responsibility of:
