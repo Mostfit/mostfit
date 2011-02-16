@@ -23,7 +23,7 @@
     %td
       %b Group
     %td
-      = @client.client_group.name
+      = @client.client_group ? @client.client_group.name : "No group"
   %tr
     %td
       %b Reference number
