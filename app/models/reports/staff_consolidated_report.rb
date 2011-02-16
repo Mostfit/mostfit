@@ -1,5 +1,5 @@
 class StaffConsolidatedReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id, :report_by_loans_created
   validates_with_method :from_date, :date_should_not_be_in_future
 
   def initialize(params, dates, user)
@@ -30,27 +30,28 @@ class StaffConsolidatedReport < Report
       extra    << "l.id in (#{funder_loan_ids.join(", ")})" 
     end
 
-    histories = LoanHistory.sum_outstanding_by_center(self.from_date, self.to_date, extra)
-    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, :center, extra)||[]
-    balances  = LoanHistory.advance_balance(self.to_date, :center, extra)||[]
-    old_balances = LoanHistory.advance_balance(self.from_date-1, :center, extra)||[]
+    histories = (LoanHistory.sum_outstanding_grouped_by(self.to_date, [:branch, :center], extra)||{}).group_by{|x| x.center_id}
+    advances  = (LoanHistory.sum_advance_payment(self.from_date, self.to_date, :center, extra)||{}).group_by{|x| x.center_id}
+    balances  = (LoanHistory.advance_balance(self.to_date, :center, extra)||{}).group_by{|x| x.center_id}
+    old_balances = (LoanHistory.advance_balance(self.from_date-1, :center, extra)||{}).group_by{|x| x.center_id}
 
     StaffMember.all.each{|s| staff[s.id]=s}
+    @center.each{|c| centers[c.id] = c}
+
     @branch.each{|b|
       data[b]||= {}
       branches[b.id] = b
       
       b.centers.each{|c|
         cm = c.manager
-        next if @center and not @center.find{|x| x.id==c.id}
+        next unless centers.key?(c.id)
         data[b][cm]||= {}
-        centers[c.id]  = c
         #0              1                 2                3              4              5     6                  7         8    9,10,11     12         13
         #amount_applied,amount_sanctioned,amount_disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults, name
-        history  = histories.find{|x| x.center_id==c.id} if histories
-        advance  = advances.find{|x|  x.center_id==c.id}
-        balance  = balances.find{|x|  x.center_id==c.id}
-        old_balance = old_balances.find{|x|  x.center_id==c.id}
+        history  = histories[c.id][0]       if histories.key?(c.id)
+        advance  = advances[c.id][0]        if advances.key?(c.id)
+        balance  = balances[c.id][0]        if balances.key?(c.id)
+        old_balance = old_balances[c.id][0] if old_balances.key?(c.id)
 
         if history
           principal_scheduled = history.scheduled_outstanding_principal
@@ -83,9 +84,6 @@ class StaffConsolidatedReport < Report
     }
 
     center_ids  = centers.keys.length>0 ? centers.keys.join(',') : "NULL"
-    repository.adapter.query("select id, center_id from clients where center_id in (#{center_ids}) AND deleted_at is NULL").each{|c|
-      clients[c.id] = c
-    }
     
     extra_condition = ""
     froms = "payments p, clients cl, centers c"
@@ -100,13 +98,15 @@ class StaffConsolidatedReport < Report
       extra_condition += " and l.id in (#{funder_loan_ids.join(', ')})"
     end      
 
+
+    staff_id_col  = (report_by_loans_created == 1 ? "p.received_by_staff_id" : "c.manager_staff_id")
     repository.adapter.query(%Q{
-                               SELECT p.received_by_staff_id staff_id, c.id center_id, c.branch_id branch_id, type ptype, SUM(p.amount) amount
+                               SELECT #{staff_id_col} staff_id, c.id center_id, c.branch_id branch_id, type ptype, SUM(p.amount) amount
                                FROM #{froms}
                                WHERE p.received_on >= '#{from_date.strftime('%Y-%m-%d')}' and p.received_on <= '#{to_date.strftime('%Y-%m-%d')}' #{extra_condition}
                                AND p.deleted_at is NULL AND p.client_id=cl.id AND cl.center_id=c.id AND cl.deleted_at is NULL AND c.id in (#{center_ids})
                                GROUP BY staff_id, center_id, p.type
-                             }).each{|p|      
+                             }).each{|p|
       if branch = branches[p.branch_id] and center = centers[p.center_id] and st=staff[p.staff_id]
         data[branch][st] ||= {}
         data[branch][st][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -122,55 +122,46 @@ class StaffConsolidatedReport < Report
     
     
     #1: Applied on
-    hash = {:applied_on.gte => from_date, :applied_on.lte => to_date, :fields => [:id, :amount, :client_id, :applied_by_staff_id]}
+    hash = {:center_id => centers.keys}
+    hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
     hash[:id]              = funder_loan_ids if funder_loan_ids and funder_loan_ids.length > 0
 
-    Loan.all(hash).each{|l|
-      next if not clients.key?(l.client_id)
-      center_id = clients[l.client_id].center_id
-      next if not centers.key?(center_id)
-      center = centers[center_id]
-      branch = branches[center.branch_id]
-      st= staff[l.applied_by_staff_id]
+    group_by  = (report_by_loans_created == 1 ? [:branch, :staff_member, :center] : [:branch, :center])
+
+    LoanHistory.sum_applied_grouped_by(group_by, from_date, to_date, hash).each{|l|
+      next if not centers.key?(l.center_id)
+      center = centers[l.center_id]
+      branch = branches[l.branch_id]
+      st     = (report_by_loans_created == 1 ? staff[l.applied_by_staff_id] : staff[center.manager_staff_id])
 
       data[branch][st] ||= {}
       data[branch][st][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][st][center][0] += l.amount_applied_for||l.amount
+      data[branch][st][center][0] += l.loan_amount
     }
 
     #2: Approved on
-    hash = {:approved_on.gte => from_date, :approved_on.lte => to_date, :fields => [:id, :amount, :client_id, :approved_by_staff_id], :rejected_on => nil}
-    hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
-    hash[:id]              = funder_loan_ids if funder_loan_ids and funder_loan_ids.length > 0
-    Loan.all(hash).each{|l|
-      next if not clients.key?(l.client_id)
-      center_id = clients[l.client_id].center_id
-      next if not centers.key?(center_id)
-      center = centers[center_id]
-      branch = branches[center.branch_id]
-      st= staff[l.approved_by_staff_id]
+    LoanHistory.sum_approved_grouped_by(group_by, from_date, to_date, hash).each{|l|
+      next if not centers.key?(l.center_id)
+      center = centers[l.center_id]
+      branch = branches[l.branch_id]
+      st     = (report_by_loans_created == 1 ? staff[l.approved_by_staff_id] : staff[center.manager_staff_id])
 
       data[branch][st] ||= {}
       data[branch][st][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][st][center][1] += l.amount_sanctioned||l.amount
+      data[branch][st][center][1] += l.loan_amount
     }
 
     #3: Disbursal date
-    hash = {:disbursal_date.gte => from_date, :disbursal_date.lte => to_date, :fields => [:id, :amount, :client_id, :disbursed_by_staff_id], :rejected_on => nil}
-    hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
-    hash[:id]              = funder_loan_ids if funder_loan_ids and funder_loan_ids.length > 0
-    Loan.all(hash).each{|l|
-      next if not clients.key?(l.client_id)
-      center_id = clients[l.client_id].center_id
-      next if not centers.key?(center_id)
-      center = centers[center_id]
-      branch = branches[center.branch_id]
-      st= staff[l.disbursed_by_staff_id]
+    LoanHistory.sum_disbursed_grouped_by(group_by, from_date, to_date, hash).each{|l|
+      next if not centers.key?(l.center_id)
+      center = centers[l.center_id]
+      branch = branches[l.branch_id]
+      st     = (report_by_loans_created == 1 ? staff[l.disbursed_by_staff_id] : staff[center.manager_staff_id])
 
       data[branch][st] ||= {}
       data[branch][st][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      data[branch][st][center][2] += l.amount
+      data[branch][st][center][2] += l.loan_amount
     }
     return data
   end

@@ -226,35 +226,12 @@ class LoanHistory
 
     repository.adapter.query(%Q{
       SELECT 
-        SUM(lh.scheduled_outstanding_principal) AS loan_amount,
+        SUM(l.amount) AS loan_amount,
         COUNT(lh.loan_id) loan_count,
         #{selects}
       FROM loan_history lh, loans l
       WHERE lh.status in (5) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
             AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
-      #{group_by_query};
-    })
-  end
-
-  # Get sum approved for all the loans grouped by given group_by array for a given date
-  # For instance we can group loans by [:branch, :center] or [:branch, :center, :client_group]
-  # by saying LoanHistory.sum_approved_grouped_by([:branch, :center], Date.today-100, Date.today)
-  # on can also restrict the scope of the query by providing 'extra_condition'
-  # for instance, extra_conditions = ["branch_id=3", "center_id=100"]
-  def self.sum_approved_grouped_by(group_by, from_date=Date.min_date, to_date=Date.today, extra_conditions=[], selects="")
-    group_by_query = get_group_by(group_by)
-    selects        = get_selects(group_by, selects)
-    extra          = build_extra(extra_conditions)
-
-    repository.adapter.query(%Q{
-      SELECT 
-        SUM(if(l.amount_sanctioned>0, l.amount_sanctioned, l.amount)) AS loan_amount,
-        COUNT(lh.loan_id) loan_count,
-        #{selects}
-      FROM loan_history lh, loans l
-      WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
-            AND l.approved_on <= '#{to_date.strftime('%Y-%m-%d')}' AND l.approved_on >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
-            AND l.approved_on = lh.date
       #{group_by_query};
     })
   end
@@ -265,20 +242,51 @@ class LoanHistory
   # on can also restrict the scope of the query by providing 'extra_condition'
   # for instance, extra_conditions = ["branch_id=3", "center_id=100"]
   def self.sum_applied_grouped_by(group_by, from_date=Date.min_date, to_date=Date.today, extra_conditions=[], selects="")
-    group_by_query = get_group_by(group_by)
-    selects        = get_selects(group_by, selects)
+    group_by_query = get_group_by(group_by).gsub("l.disbursed_by_staff_id", "l.applied_by_staff_id")
+    selects        = get_selects(group_by, selects).gsub("l.disbursed_by_staff_id", "l.applied_by_staff_id")
     extra          = build_extra(extra_conditions)
 
     repository.adapter.query(%Q{
       SELECT 
         SUM(if(l.amount_applied_for>0, l.amount_applied_for, l.amount)) AS loan_amount,
-        SUM(lh.scheduled_outstanding_principal) AS loan_amount,
         COUNT(lh.loan_id) loan_count,
         #{selects}
-      FROM loan_history lh, loans l
-      WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
-            AND l.applied_on <= '#{to_date.strftime('%Y-%m-%d')}' AND l.applied_on >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
-            AND l.applied_on = lh.date
+      FROM (SELECT max(lh.date) date, lh.loan_id loan_id
+            FROM loan_history lh, loans l
+            WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+              AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
+              AND l.applied_on >= '#{from_date.strftime('%Y-%m-%d')}' AND l.applied_on <= '#{to_date.strftime('%Y-%m-%d')}'
+              #{extra}
+            GROUP BY lh.loan_id)AS dt, loan_history lh, loans l
+      WHERE lh.date=dt.date AND lh.loan_id=dt.loan_id AND lh.loan_id = l.id
+      #{group_by_query};
+    })
+  end
+
+
+  # Get sum approved for all the loans grouped by given group_by array for a given date
+  # For instance we can group loans by [:branch, :center] or [:branch, :center, :client_group]
+  # by saying LoanHistory.sum_approved_grouped_by([:branch, :center], Date.today-100, Date.today)
+  # on can also restrict the scope of the query by providing 'extra_condition'
+  # for instance, extra_conditions = ["branch_id=3", "center_id=100"]
+  def self.sum_approved_grouped_by(group_by, from_date=Date.min_date, to_date=Date.today, extra_conditions=[], selects="")
+    group_by_query = get_group_by(group_by).gsub("l.disbursed_by_staff_id", "l.approved_by_staff_id")
+    selects        = get_selects(group_by, selects).gsub("l.disbursed_by_staff_id", "l.approved_by_staff_id")
+    extra          = build_extra(extra_conditions)
+
+    repository.adapter.query(%Q{
+      SELECT 
+        SUM(if(l.amount_sanctioned>0, l.amount_sanctioned, l.amount)) AS loan_amount,
+        COUNT(lh.loan_id) loan_count,
+        #{selects}
+      FROM (SELECT max(lh.date) date, lh.loan_id loan_id
+            FROM loan_history lh, loans l
+            WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+              AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
+              AND l.approved_on >= '#{from_date.strftime('%Y-%m-%d')}' AND l.approved_on <= '#{to_date.strftime('%Y-%m-%d')}'
+              #{extra}
+            GROUP BY lh.loan_id)AS dt, loan_history lh, loans l
+      WHERE lh.date=dt.date AND lh.loan_id=dt.loan_id AND lh.loan_id = l.id
       #{group_by_query};
     })
   end

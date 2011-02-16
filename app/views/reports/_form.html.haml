@@ -107,6 +107,10 @@
             %td
               Include unapproved loans ?
               = check_box(:name => "#{report}[include_unapproved_loans]", :value => "1", :checked => (params[report] and params[report].key?(:include_unapproved_loans) and params[report][:include_unapproved_loans] == "1" ? true : false))
+          - if @report.respond_to?(:report_by_loans_created)
+            %td
+              Report by Loans Created
+              = check_box(:name => "#{report}[report_by_loans_created]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loans_created) and params[report][:report_by_loans_created] == "1" ? true : false))
           - if @report.respond_to?(:group_by_types)
             %td
               Group by

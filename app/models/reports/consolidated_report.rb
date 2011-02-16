@@ -30,25 +30,27 @@ class ConsolidatedReport < Report
       extra    << "l.id in (#{funder_loan_ids.join(", ")})" 
     end
 
-    histories = LoanHistory.sum_outstanding_grouped_by(self.to_date, [:branch, :center], extra)
-    advances  = LoanHistory.sum_advance_payment(self.from_date, self.to_date, [:branch, :center], extra)||[]
-    balances  = LoanHistory.advance_balance(self.to_date, :center, extra)||[]
-    old_balances = LoanHistory.advance_balance(self.from_date-1, :center, extra)||[]
+    histories = (LoanHistory.sum_outstanding_grouped_by(self.to_date, [:branch, :center], extra)||{}).group_by{|x| x.center_id}
+    advances  = (LoanHistory.sum_advance_payment(self.from_date, self.to_date, [:branch, :center], extra)||{}).group_by{|x| x.center_id}
+    balances  = (LoanHistory.advance_balance(self.to_date, :center, extra)||{}).group_by{|x| x.center_id}
+    old_balances = (LoanHistory.advance_balance(self.from_date-1, :center, extra)||{}).group_by{|x| x.center_id}
     defaults   = LoanHistory.defaulted_loan_info_by(:center, @to_date, extra).group_by{|x| x.center_id}.map{|cid, row| [cid, row[0]]}.to_hash
+
+    @center.each{|c| centers[c.id] = c}
 
     @branch.each{|b|
       data[b]||= {}
       branches[b.id] = b
       
       b.centers.each{|c|
-        next if @center and not @center.find{|x| x.id==c.id}
+        next unless centers.key?(c.id)
         centers[c.id]  = c
         #0              1                 2                3              4              5     6                  7         8    9,10,11     12       
         #amount_applied,amount_sanctioned,amount_disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults
-        history  = histories.find{|x| x.center_id==c.id}
-        advance  = advances.find{|x|  x.center_id==c.id}
-        balance  = balances.find{|x|  x.center_id==c.id}
-        old_balance = old_balances.find{|x|  x.center_id==c.id}
+        history  = histories[c.id][0]       if histories.key?(c.id)
+        advance  = advances[c.id][0]        if advances.key?(c.id)
+        balance  = balances[c.id][0]        if balances.key?(c.id)
+        old_balance = old_balances[c.id][0] if old_balances.key?(c.id)
 
         if history
           principal_scheduled = history.scheduled_outstanding_principal

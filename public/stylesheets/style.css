@@ -529,7 +529,7 @@ table.report tr.group td:first-child{
 }
 table.report tr.branch{
     text-align: center; 
-    background-color: #ccc;
+    background-color: #bbb;
     font-size: 0.95em;
 }
 table.report tr.center{
