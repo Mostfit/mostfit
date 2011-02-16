@@ -262,16 +262,17 @@ margin: 0px;
   color: #8a1f11;
   font-size: 120%;
   padding: 0px 15px 0px 15px;
-  border: 0px;
+  border: 0px;  
 }
-
 input[type="text"], input[type="password"], textarea {
   font-size: 100%;
   font-family: sans;
-  background: #FFFFFF url(/images/fieldbg.gif) repeat-x scroll center top
-
+  background: url(/images/fieldbg.gif) repeat-x scroll center top;
 }
-
+input.error{
+    border-color: red;
+    outline: 2px solid red;
+}
 .asterisk {
   font-weight: bold;
   color: #a00;

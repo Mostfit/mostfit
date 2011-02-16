@@ -79,6 +79,7 @@ class Searches < Application
   def get
     return "" if not params[:model] or params[:model].blank?
     #params[:counter] = (params[:counter] ? params[:counter].to_i : 0)
+    params[:model][params[:counter]] = "loan_histories" if params[:model][params[:counter]] == "history"
     model = Kernel.const_get(params[:model][params[:counter]].singularize.camelcase)
 
     if not params[:property] or not params[:property][params[:counter]] or params[:property][params[:counter]].blank?
