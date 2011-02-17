@@ -8,4 +8,7 @@
   %fieldset
     = partial "stock_registers/fields"
     = submit "Save changes"
-    = link_to 'Cancel', url(:stock_registers)
+    - if @branch
+      = link_to 'Cancel', url(:quick_link, "branches", @stock_register.branch_id)
+    - else
+      = link_to 'Cancel', url(:stock_registers)
