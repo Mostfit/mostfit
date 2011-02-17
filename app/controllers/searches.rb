@@ -79,7 +79,6 @@ class Searches < Application
   def get
     return "" if not params[:model] or params[:model].blank?
     #params[:counter] = (params[:counter] ? params[:counter].to_i : 0)
-    params[:model][params[:counter]] = "loan_histories" if params[:model][params[:counter]] == "history"
     model = Kernel.const_get(params[:model][params[:counter]].singularize.camelcase)
 
     if not params[:property] or not params[:property][params[:counter]] or params[:property][params[:counter]].blank?
@@ -111,6 +110,9 @@ class Searches < Application
     elsif property.type==DataMapper::Types::Boolean
       return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", 
                     :collection => [["true", "yes"], ["false", "no"]], :prompt => "Choose #{property.name}", :selected => value)
+    elsif property.type == DataMapper::Types::Discriminator
+      return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]",
+                    :collection => property.model.descendants.to_a.map{|e| [e.to_s, e.to_s]}, :prompt => "Choose #{property.name}", :selected => value)      
     elsif property.type.class==Class
       return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", 
                     :collection => property.type.flag_map.to_a, :prompt => "Choose #{property.name}", :selected => value)

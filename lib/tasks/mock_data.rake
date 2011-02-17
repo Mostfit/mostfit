@@ -238,7 +238,7 @@ namespace :mostfit do
       t0 = Time.now
       Merb.logger.info! "Start mock:history rake task at #{t0}"
       Loan.all.each do |l|
-        l.update_history if l.history.blank?
+        l.update_history if l.loan_history.blank?
       end
       t1 = Time.now
       secs = (t1 - t0).round

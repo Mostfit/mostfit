@@ -82,7 +82,7 @@ class Loan
   belongs_to :loan_utilization
   belongs_to :verified_by,               :child_key => [:verified_by_user_id],                :model => 'User'
 
-  has n, :history,                                                                            :model => 'LoanHistory'
+  has n, :loan_history,                                                                       :model => 'LoanHistory'
   has n, :payments
   has n, :audit_trails,       :child_key => [:auditable_id], :auditable_type => "Loan"
   #validations
@@ -902,7 +902,7 @@ class Loan
   def update_history_bulk_insert
     # this gets the history from calculate_history and does one single insert into the database
     t = Time.now
-    Merb.logger.error! "could not destroy the history" unless self.history.destroy!
+    Merb.logger.error! "could not destroy the history" unless self.loan_history.destroy!
     d0 = Date.parse('2000-01-03')
     sql = %Q{ INSERT INTO loan_history(loan_id, date, status, scheduled_outstanding_principal, scheduled_outstanding_total,
                                        actual_outstanding_principal, actual_outstanding_total, current, amount_in_default, client_group_id, center_id, client_id, 
