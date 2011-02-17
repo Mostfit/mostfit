@@ -2,6 +2,7 @@ class Portfolios < Application
   # provides :xml, :yaml, :js
   before :get_context
   include DateParser
+  layout :determine_layout
 
   def index
     @portfolios = Portfolio.all

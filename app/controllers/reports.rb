@@ -10,7 +10,7 @@ class Reports < Application
     :accounting   => [GeneralLedgerReport, TrialBalanceReport]
   }
   Order = [:periodic, :consolidated, :registers, :targets_and_projections, :statistics, :exceptions, :accounting]
-  layout :determine_layout 
+  layout :determine_layout
   before :set_staff_and_user, :only => [:index, :show]
   
   # provides :xml, :yaml, :js
@@ -120,11 +120,7 @@ class Reports < Application
       return Date.strptime(date_hash, Mfi.first.date_format)
     end
   end
-  
-  def determine_layout
-    return "printer" if params[:layout] and params[:layout]=="printer"
-  end
-  
+    
   def set_staff_and_user
     @user = session.user
     @staff_member = @user.staff_member

@@ -116,6 +116,9 @@ class Portfolio
   
   def update_portfolio_value
     loan_values = {}
+    last_payment_created_at = Payment.all("loan.portfolio_loans.portfolio_id" => self.id).max(:created_at)
+    return if last_payment_created_at.new_offset <=  (self.updated_at + self.updated_at.offset).new_offset
+    
     # force reloading to read associations correctly
     self.reload
     loan_ids = []
@@ -136,10 +139,10 @@ class Portfolio
     end
 
     if loan_ids.length > 0
-      last_payment = Payment.all(:loan_id => loan_ids).max(:received_on)
       outstanding_value = portfolio_loans(:active => true).aggregate(:current_value.sum) || 0
+      last_payment_date       = Payment.all("loan.portfolio_loans.portfolio_id" => self.id).max(:received_on)
       repository.adapter.execute(%Q{
-                                     UPDATE portfolios SET outstanding_value=#{outstanding_value}, outstanding_calculated_on=NOW(), last_payment_date='#{last_payment.strftime('%Y-%m-%d')}'
+                                     UPDATE portfolios SET outstanding_value=#{outstanding_value}, outstanding_calculated_on=NOW(), last_payment_date='#{last_payment_date.strftime('%Y-%m-%d')}', updated_at=NOW()
                                      WHERE id=#{self.id}
                                  })
     end

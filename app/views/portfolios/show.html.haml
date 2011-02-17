@@ -1,3 +1,5 @@
+- if not params[:layout]
+  = link_to("Printer friendly version", resource(@funder, @portfolio, {:layout => 'printer'}), {:style => "float: right;", :target => "_BLANK"})
 %h1
   Portfolio: 
   = @portfolio.name
@@ -34,7 +36,13 @@
 %table.report
   %tr.header
     %th
+      Client ID
+    %th
+      Client name
+    %th
       Loan ID
+    %th
+      Loan purpose
     %th
       Amount
     %th
@@ -47,21 +55,29 @@
       Current balance
     %th
       Payments
-  - length = 7
+  - length = 10
   - org_total = []
   - @portfolio.portfolio_loans.group_by{|pf| pf.loan.client.center}.sort_by{|center, pf| center.name}.each do |center, portfolio_loans|
     %tr.branch#loan
       %td{:colspan => length}
-        %b= center.name
-        (
-        = center.branch.name
-        )
+        %b
+          Branch:
+          = center.branch.name
+          ,
+          Center:
+          = center.name
     - center_total = [0, 0, 0, 0, 0]
     - portfolio_loans.each do |pf|
       %tr.loan
+        %td        
+          = link_to(pf.loan.client.reference, "/clients/#{pf.loan.client_id}", {:target => "BLANK", :class => "link"})
+        %td
+          = pf.loan.client.name
         %td
           = link_to(pf.loan_id, "/loans/#{pf.loan_id}", {:target => "BLANK", :class => "link"})
           - center_total[0]+= 1
+        %td
+          = pf.loan.occupation.name
         %td
           = pf.loan.amount
           - center_total[1]+= pf.loan.amount
@@ -84,7 +100,11 @@
           %td
           %td
         %td
-          = ele.to_currency
+          %b= ele.to_currency
+        - if idx == 0
+          %td
+          %td
+          %td
     - org_total << center_total
   %tr.org_total
     - org_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each_with_index do |ele, idx|
@@ -94,10 +114,12 @@
       - if idx == 0
         %td.center
           %b= ele.to_currency
+        %td
+        %td
       - else
         %td        
           %b= ele.to_currency
-  
-= link_to 'edit', resource(@funder, @portfolio, :edit), :class => "edit"
-|
-= link_to 'Back', url(@funder)
+- if not params[:layout] or params[:layout] != "printer"
+  = link_to 'edit', resource(@funder, @portfolio, :edit), :class => "edit"
+  |
+  = link_to 'Back', url(@funder)

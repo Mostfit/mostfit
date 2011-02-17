@@ -24,6 +24,10 @@ class Application < Merb::Controller
     end
   end
 
+  def determine_layout
+    return params[:layout] if params[:layout] and not params[:layout].blank?
+  end
+
   def render_to_pdf(options = nil)
     data = render_to_string(options)
     pdf = PDF::HTMLDoc.new
