@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 describe AccountTypes, "Check types" do
-  before do
+  before(:all) do
     load_fixtures :users
   end
 
@@ -14,15 +14,17 @@ describe AccountTypes, "Check types" do
     params[:account_type] = {:name => "Asset", :code => "PUC1"}
     response = request resource(:account_types), :method => "POST", :params => params
     response.should redirect
-    AccountType.first(:name => "asset").should_not nil
+    AccountType.all(:name => "asset").count.should == 1
   end
 
   it "edit a account type" do
     response = request url(:perform_login), :method => "PUT", :params => {:login => 'admin', :password => 'password'}
-    response.should redirect
-    @account_type = AccountType.first
+    response.should redirect    
+
     request(url(:account_types)).should be_successful
     params = {}
+
+    @account_type = AccountType.first
     hash                   = @account_type.attributes
     hash[:name]            = #{@account_type.name} + "_modified"
     params[:id]            = @account_type.id

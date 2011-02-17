@@ -2,8 +2,8 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 describe Areas, "Check area" do
-  before do
-    load_fixtures :users, :staff_members, :regions, :areas, :branches
+  before(:all) do
+    load_fixtures :users, :staff_members, :regions
     @u_admin = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @u_admin.save
   end

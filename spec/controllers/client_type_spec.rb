@@ -2,8 +2,8 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 describe ClientTypes, "Check types" do
-  before do
-    load_fixtures :users, :staff_members, :regions, :areas, :branches,:centers,:client_groups,:client_types
+  before(:all) do
+    load_fixtures :users
   end
 
   it "create a new client type" do

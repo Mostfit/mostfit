@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 describe Branches, "Check branches" do 
-  before do
+  before(:all) do
     load_fixtures :users, :staff_members, :regions, :areas, :branches
     @u_admin = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @u_admin.save

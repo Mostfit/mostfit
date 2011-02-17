@@ -3,7 +3,7 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 describe Centers, "Check centers controller" do 
   before(:all) do
-    load_fixtures :users, :staff_members, :regions, :areas, :branches, :centers 
+    load_fixtures :users, :staff_members, :branches, :centers 
     @u_admin = User.new(:login => 'admin', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @u_admin.save
   end

@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 Merb.start_environment(:environment => ENV['MERV_ENV'] || 'development')
 
 describe RuleBooks, "Check rules" do
-  before do
+  before(:all) do
     load_fixtures :users, :staff_members, :account, :branches
   end
 

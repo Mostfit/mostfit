@@ -3,7 +3,7 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 describe Clients, "Check clients details" do
   before(:all) do
-    load_fixtures :users, :staff_members, :regions, :areas, :branches, :centers, :client_types
+    load_fixtures :users, :staff_members, :branches, :centers, :client_types
   end
 
   it "create a new client" do

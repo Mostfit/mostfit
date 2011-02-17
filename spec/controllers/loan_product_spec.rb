@@ -2,8 +2,8 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper.rb')
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 describe LoanProducts, "Check loan product" do
-  before do
-    load_fixtures :users, :staff_members, :regions, :areas, :branches, :centers, :client_types, :clients, :loan_products
+  before(:all) do
+    load_fixtures :users
   end
 
   it "create a new loan_product" do
