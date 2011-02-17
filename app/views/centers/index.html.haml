@@ -91,13 +91,15 @@
       %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => "/accounts/branch?branch_id=#{@branch.id}"}
-    %div.tab
-      %input{:type => "hidden", :name => "_load_remote", :value => resource(:branch_diaries, :branch_id => @branch.id, :model => "Branch")}
-    %div.tab
-      %input{:type => "hidden", :name => "_load_remote", :value => resource(:stock_registers, :branch_id => @branch.id, :model => "Branch")}
-    %div.tab
-      %input{:type => "hidden", :name => "_load_remote", :value => resource(:asset_registers, :branch_id => @branch.id, :model => "Branch")}
-    %div.tab
+    - if Mfi.first.branch_diary_enabled
+      %div.tab
+        %input{:type => "hidden", :name => "_load_remote", :value => resource(:branch_diaries, :branch_id => @branch.id, :model => "Branch")}
+    - if Mfi.first.stock_register_enabled
+      %div.tab
+        %input{:type => "hidden", :name => "_load_remote", :value => resource(:stock_registers, :branch_id => @branch.id, :model => "Branch")}
+    - if Mfi.first.asset_register_enabled
+      %div.tab
+        %input{:type => "hidden", :name => "_load_remote", :value => resource(:asset_registers, :branch_id => @branch.id, :model => "Branch")}
     - if Mfi.first.map_enabled        
       %div.tab
         = js_include_tag :map
