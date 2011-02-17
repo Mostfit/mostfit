@@ -9,8 +9,6 @@
     %th
       What
     %th
-      
-    %th
       Status
     %th
       Respone time (secs)
@@ -21,25 +19,52 @@
       %td
         = line.date_time
       %td
-        %b
-          - if line.action == "GET"
-            Accessed
-          - else
-            Created:
+        - if line.method == :get
+          Accessed
+        - else
+          Created:
       %td
-        = line.url[:controller].camelcase(' ') if line.url[:controller]
-      %td
-        - if line.url.key?(:id) and line.model
-          = line.model.get(line.url[:id], :fields => [:id, :name]).name
-        - elsif line.url[:controller] == "loans" and line.url[:client_id]
-          = Client.get(line.url[:client_id], :fields => [:id, :name]).name
-        - elsif line.url[:controller] == "centers" and line.url[:action] == "weeksheet" and line.url[:center_id]
-          weeksheet of 
-          = Center.get(line.url[:center_id], :fields => [:id, :name]).name
-        - elsif line.url[:controller] == "reports" and line.url[:report_type]
-          = line.url[:report_type]
+        - if line.url[:controller] == "reports" and line.url[:report_type]
+          = line.url[:report_type].snake_case.camelcase(' ')
           = "#{line.url[:from_date]} - #{line.url[:from_date]}" if line.url[:from_date] and line.url[:to_date]
           = "#{line.url[:date]}" if line.url[:date]
+        - elsif line.url[:controller] == "reports" and not line.url[:report_type]
+          Reports list
+        - elsif line.url.key?(:id) and line.model
+          - obj = line.model.get(line.url[:id], :fields => [:id, :name])
+          - if obj and obj.respond_to?(:name)
+            = obj.name
+          - elsif obj.respond_to?(:client)
+            = obj.client.name
+          - else
+            = obj
+        - elsif line.url[:controller] == "loans" and line.url[:client_id]
+          - client = Client.get(line.url[:client_id], :fields => [:id, :name])
+          Loan for
+          = client.name if client
+        - elsif line.url[:controller] == "centers" and line.url[:action] == "weeksheet" and line.url[:center_id]
+          Weeksheet of           
+          - center = Center.get(line.url[:center_id], :fields => [:id, :name])
+          = center.name if center
+        - elsif line.url[:controller] == "payments" and line.url[:client_id]
+          Payments of 
+          = Client.get(line.url[:client_id]).name
+        - elsif line.url[:controller] == "centers" and line.url[:branch_id]
+          Centers of 
+          = Branch.get(line.url[:branch_id]).name
+        - elsif line.url[:controller] == "clients" and line.url[:center_id]
+          Client list of
+          - center =  Center.get(line.url[:center_id])
+          = center.name if center
+        - elsif line.url[:action] == "index"
+          List of 
+          = line.url[:controller]
+        - elsif line.url[:controller] == "data_entry/payments"
+          Payments made for
+          - center =  Center.get(line.url["center_id"])
+          = center.name if center
+        - else
+          = line.url.inspect
       %td
         = line.status < 500 ? "successful" : "failure"
       %td
