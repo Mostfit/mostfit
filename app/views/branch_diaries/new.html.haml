@@ -6,4 +6,7 @@
   %fieldset
     = partial "branch_diaries/fields"
     = submit "Submit Details"
-    = link_to 'Cancel', url(:branch_diaries)
+    - if @branch
+      = link_to 'Cancel', url(:quick_link, "branches", @branch.id)
+    - else
+      = link_to 'Cancel', url(:branch_diaries)

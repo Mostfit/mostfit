@@ -6,6 +6,9 @@
   %h1 Asset Register
   = error_messages_for @asset_register
   %fieldset
-    = partial "asset_registers/fields"
+    = partial "asset_registers/edit_fields"
     = submit "Save changes"
-    = link_to 'Cancel', url(:asset_registers)
+    - if @branch
+      = link_to 'Cancel', url(:quick_link, "branches", @asset_register.branch_id)
+    - else
+      = link_to 'Cancel', url(:asset_registers)
