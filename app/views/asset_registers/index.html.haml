@@ -43,4 +43,7 @@
         %td{ :colspan => 10 }
 
   = paginate @asset_registers
-= link_to 'Back', url(:asset_registers)
+  - if @branch
+    = link_to 'Back', url(:quick_link, "branches", asset_register.branch_id)
+  - else
+    = link_to 'Back', url(:asset_registers)

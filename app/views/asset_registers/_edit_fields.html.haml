@@ -18,7 +18,7 @@
       Issue To
     %td
       = text_field :name
-      %span.greytext enter the name to whom the asset type is being issued.
+      %span.greytext
   %tr
     %td
       Issue Date
@@ -33,3 +33,8 @@
       - else
         = select_staff_member_for @asset_register, :manager, {}, true
       %span.greytext select the person who has issued the asset
+  %tr
+    %td
+      Returned On
+    %td
+      = date_select_for @asset_register, :returned_date
