@@ -1215,6 +1215,20 @@ class BulletLoan < Loan
   def scheduled_principal_for_installment(number = 1)
     amount
   end
+
+  def scheduled_interest_up_to(date)
+    return scheduled_interest_for_installment if date > scheduled_first_payment_date
+    scheduled_interest_for_installment * (1 - (scheduled_first_payment_date - date) / (scheduled_first_payment_date - disbursal_date||scheduled_disbursal_date))
+  end
+
+  def pay_prorata(total, received_on)
+    #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
+    int  = scheduled_interest_up_to(received_on)
+    int -= interest_received_up_to(received_on)
+    prin = total - int
+    [int, prin]
+  end
+
   
   private
   def set_installments_to_1
