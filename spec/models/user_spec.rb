@@ -55,6 +55,9 @@ describe User do
     @user.can_access?({:action =>"hq_tab", :controller =>"browse"}).should be_true
     @user.can_access?({:action => "branch", :branch_id => nil, :id=>"centers", :controller=>"dashboard"}).should be_true
     @user.can_access?({:action => "index", :controller => "branches"}).should be_true
+    @user.can_access?({:action => "index", :controller => "branch_diaries"}).should be_true
+    @user.can_access?({:action => "index", :controller => "stock_registers"}).should be_true
+    @user.can_access?({:action => "index", :controller => "asset_registers"}).should be_true
     #branch access
     Branch.all.each{|branch|
       @user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_true
@@ -66,6 +69,28 @@ describe User do
                       {:branch => {:name => "Bhopal 1", :address => "dzv fsb g", :contact_number => "90000000000", :manager_staff_id => 1, :code => "MPBPL01", :landmark => "New Bhopal", 
                           :creation_date => "27-11-2010", :area_id => 1}}).should be_true
 
+    #branch_diary access
+    BranchDiary.all.each{|branch_diary|
+      @user.can_access?({:action => "show", :id => branch_diary.id, :controller => "branch_diaries"}).should be_true
+    }
+    #branch_diary creation
+    @user.can_access?({:action => "create", :controller => "branch_diaries"}, {:branch_diary => {:diary_date => Date.today, :opening_time_hours => 10,
+                          :opening_time_minutes => 00, :closing_time_hours => 20, :closing_time_minutes => 00, :branch_key => "Ramu",
+                          :branch_id => 3, :manager_staff_id => 13}}).should be_true
+    #stock_register access
+    StockRegister.all.each{|stock_register|
+      @user.can_access?({:action => "show", :id => stock_register.id, :controller => "stock_registers"}).should be_true
+    }
+    #stock_register creation
+    @user.can_access?({:action => "create", :controller => "stock_registers"}, {:stock_register => {:stock_code => "CCUO", :stock_name => "Lappy",
+                          :stock_quantity => 20, :bill_number => 1234, :bill_date => Date.today, :date_of_entry => Date.today,
+                          :branch_id => 3, :manager_staff_id => 3}}).should be_true
+    #asset_register access
+    AssetRegister.all.each{|asset_register|
+      @user.can_access?({:action => "show", :id => asset_register.id, :controller => "asset_registers"}).should be_true
+    }
+    #asset_register creation
+    @user.can_access?({:action => "create", :ceontroller => "asset_register"}, {:asset_register => {:name => "Ramu Kaka", :asset_type => "Lappy", :issue_date => Date.today, :branch_id => 3, :manager_staff_id => 13}}).should be_true 
     #center access
     Center.all.each{|center|
       @user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_true
@@ -182,6 +207,18 @@ describe User do
     @user.can_access?({:action => "create", :controller => "audit_items"}).should be_true
     @user.can_access?({:action => "update", :controller => "audit_items"}).should be_true
 
+    @user.can_access?({:action => "index", :controller => "branch_diaries"}).should be_true
+    @user.can_access?({:action => "create", :controller => "branch_diaries"}).should be_true
+    @user.can_access?({:action => "update", :controller => "branch_diaries"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "stock_registers"}).should be_true
+    @user.can_access?({:action => "create", :controller => "stock_registers"}).should be_true
+    @user.can_access?({:action => "update", :controller => "stock_registers"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "asset_registers"}).should be_true
+    @user.can_access?({:action => "create", :controller => "asset_registers"}).should be_true
+    @user.can_access?({:action => "update", :controller => "asset_registers"}).should be_true
+
     @user.can_access?({:action => "show", :id => "show", :controller => "audit_trails"}).should be_true
     @user.can_access?({:action => "upload", :controller => "admin"}).should be_true
     @user.can_access?({:action => "download", :controller => "admin"}).should be_true
@@ -205,6 +242,9 @@ describe User do
     @user.can_access?({:action =>"hq_tab", :controller =>"browse"}).should be_true
     @user.can_access?({:action => "branch", :branch_id => nil, :id=>"centers", :controller=>"dashboard"}).should be_true
     @user.can_access?({:action => "index", :controller => "branches"}).should be_true
+    @user.can_access?({:action => "index", :controller => "branch_diaries"}).should be_true
+    @user.can_access?({:action => "index", :controller => "stock_registers"}).should be_true
+    @user.can_access?({:action => "index", :controller => "asset_registers"}).should be_true
     
     @user.can_access?({:action => "moreinfo", :controller => "info"}).should be_true
 
@@ -219,6 +259,33 @@ describe User do
                       {:branch => {:name => "Bhopal 1", :address => "dzv fsb g", :contact_number => "90000000000", :manager_staff_id => 1, :code => "MPBPL01", :landmark => "New Bhopal", 
                           :creation_date => "27-11-2010", :area_id => 1}}).should be_true
 
+    #branch_diary access
+    BranchDiary.all.each{|branch_diary|
+      @user.can_access?({:action => "show", :id => branch_diary.id, :controller => "branch_diaries"}).should be_true
+    }
+    #branch_diary creation
+    @user.can_access?({:action => "create", :controller => "branch_diaries"},
+                      {:branch_diary => {:diary_date => Date.today, :opening_time_hours => 10, :opening_time_minutes => 00,
+                          :closinig_time_hours => 20, :closing_time_minutes => 00, :branch_key => "Ramu Kaka", :branch_id => 3,
+                          :manager_staff_id => 13}}).should be_true
+
+    #stock_register access
+    StockRegister.all.each{|stock_register|
+      @user.can_access?({:action => "show", :id => stock_register.id, :controller => "stock_registers"}).should be_true
+    }
+    #stock_register creation
+    @user.can_access?({:action => "create", :controller => "stock_registers"},
+                      {:stock_register => {:stock_code => "CNHGD", :stock_name => "Chairs", :stock_quantity => 20, :bill_number => 12738,
+                          :bill_date => Date.today, :date_of_entry => Date.today, :branch_id => 3, :manager_staff_id => 13}}).should be_true
+
+    #asset_register access
+    AssetRegister.all.each{|asset_register|
+      @user.can_access?({:action => "show", :id => asset_register.id, :controller => "asset_registers"}).should be_true
+    }
+    #asset_register creation
+    @user.can_access?({:action => "create", :controller => "asset_registers"},
+                      {:asset_register => {:name => "Shyam", :asset_type => "Laptop", :issue_date => Date.today, :branch_id => 3,
+                          :manager_staff_id => 20}}).should be_true
     #center access
     Center.all.each{|center|
       @user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_true
@@ -337,6 +404,18 @@ describe User do
     @user.can_access?({:action => "create", :controller => "audit_items"}).should be_true
     @user.can_access?({:action => "update", :controller => "audit_items"}).should be_true
 
+    @user.can_access?({:action => "index", :controller => "branch_diaries"}).should be_true
+    @user.can_access?({:action => "create", :controller => "branch_diaries"}).should be_true
+    @user.can_access?({:action => "update", :controller => "branch_diaries"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "stock_registers"}).should be_true
+    @user.can_access?({:action => "create", :controller => "stock_registers"}).should be_true
+    @user.can_access?({:action => "update", :controller => "stock_registers"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "asset_registers"}).should be_true
+    @user.can_access?({:action => "create", :controller => "asset_registers"}).should be_true
+    @user.can_access?({:action => "update", :controller => "asset_registers"}).should be_true
+    
     # upload, download stuff
     @user.can_access?({:action => "upload", :controller => "admin"}).should be_false
     @user.can_access?({:action => "download", :controller => "admin"}).should be_false
@@ -369,6 +448,9 @@ describe User do
     @user.can_access?({:action =>"hq_tab", :controller =>"browse"}).should be_true
     @user.can_access?({:action => "branch", :branch_id => nil, :id=>"centers", :controller=>"dashboard"}).should be_true
     @user.can_access?({:action => "index", :controller => "branches"}).should be_true
+    @user.can_access?({:action => "index", :controller => "branch_diaries"}).should be_true
+    @user.can_access?({:action => "index", :controller => "stock_registers"}).should be_true
+    @user.can_access?({:action => "index", :controller => "asset_registers"}).should be_true
     #branch access
     managed_branches.each{|branch|
       @user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_true
@@ -385,6 +467,42 @@ describe User do
       @user.can_access?({:action => "moreinfo", :controller => "info", :for => "branch", :id => branch.id}).should be_false
     }
 
+    #branch_diary access
+    @user.staff_member.branch_diaries.each{|branch_diary|
+      @user.can_access?({:action => "show", :id => branch_diary.id, :controller => "branch_diaries"}).should be_true
+    }
+    non_managed_branches.each{|branch_diary|
+      @user.can_access?({:action => "show", :id => branch_diary.id, :controller => "branch_diaries"}).should be_false
+    }
+    #branch_diary creation
+    @user.can_access?({:action => "create", :controller => "branch_diaries"},
+                      {:branch_diary => {:diary_date => Date.today, :opening_time_hours => 10, :opening_time_minutes => 00,
+                          :closing_time_hours => 20, :closing_time_minutes => 00, :branch_id => 3, :manager_staff_id => 13, :branch_key => "Ramesh"}}).should be_true
+
+    #stock_register access
+    @user.staff_member.stock_registers.each{|stock_register|
+      @user.can_access?({:action => "show", :id => stock_register.id, :controller => "stock_registers"}).should be_true
+    }
+    non_managed_branches.each{|stock_register|
+      @user.can_access?({:action => "show", :id => stock_register.id, :controller => "stock_registers"}).should be_false
+    }
+    #stock_register creation
+    @user.can_access?({:action => "create", :controller => "stock_registers"},
+                      {:stock_register => {:stock_code => "ABNDG", :stock_name => "Tables", :stock_quantity => 30, :bill_number => 2345,
+                          :bill_date => Date.today, :date_of_entry => Date.today, :branch_id => 3, :manager_staffid => 12}}).should be_true
+
+    #asset_register access
+    @user.staff_member.asset_registers.each{|asset_register|
+      @user.can_access?({:action => "show", :id => asset_register.id, :controller => "asset_registers"}).should be_true
+    }
+    non_managed_branches.each{|asset_register|
+      @user.can_access?({:action => "show", :id => asset_register.id, :controller => "asset_registers"}).should be_false
+    }
+    #asset_register creation
+    @user.can_access?({:action => "create", :controller => "asset_registers"},
+                      {:asset_register => {:name => "Jay", :asset_type => "Laptop Charger", :issue_date => Date.today, :branch_id => 3,
+                          :manager_staff_id => 20}}).should be_true
+    
     #center access
     managed_centers.each{|center|
       @user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_true
@@ -525,6 +643,18 @@ describe User do
     @user.can_access?({:action => "create", :controller => "audit_items"}).should be_true
     @user.can_access?({:action => "update", :controller => "audit_items"}).should be_true
 
+    @user.can_access?({:action => "index", :controller => "branch_diaries"}).should be_true
+    @user.can_access?({:action => "create", :controller => "branch_diaries"}).should be_true
+    @user.can_access?({:action => "update", :controller => "branch_diaries"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "stock_registers"}).should be_true
+    @user.can_access?({:action => "create", :controller => "stock_registers"}).should be_true
+    @user.can_access?({:action => "update", :controller => "stock_registers"}).should be_true
+
+    @user.can_access?({:action => "index", :controller => "asset_registers"}).should be_true
+    @user.can_access?({:action => "create", :controller => "asset_registers"}).should be_true
+    @user.can_access?({:action => "update", :controller => "asset_registers"}).should be_true
+
     # upload, download stuff
     @user.can_access?({:action => "upload", :controller => "admin"}).should be_false
     @user.can_access?({:action => "download", :controller => "admin"}).should be_false
@@ -545,6 +675,9 @@ describe User do
     user.can_access?({:action =>"index", :namespace =>"data_entry", :controller => "index"}).should be_true
     user.can_access?({:action =>"hq_tab", :controller =>"browse"}).should be_true
     user.can_access?({:action => "index", :controller => "branches"}).should be_true
+    user.can_access?({:action => "index", :controller => "branch_diaries"}).should be_true
+    user.can_access?({:action => "index", :controller => "stock_registers"}).should be_true
+    user.can_access?({:action => "index", :controller => "asset_registers"}).should be_true
     #branch access
     user.staff_member.branches.each{|branch|
       user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_true
@@ -555,6 +688,33 @@ describe User do
     user.can_access?({:action => "create", :controller => "branches"}, 
                      {:branch => {:name => "Bhopal 1", :address => "dzv fsb g", :contact_number => "90000000000", :manager_staff_id => 1, :code => "MPBPL01", :landmark => "New Bhopal", 
                          :creation_date => "27-11-2010", :area_id => 1}}).should be_false
+
+    #branch_diary access
+    user.staff_member.branch_diaries.each{|branch_diary|
+      user.can_access?({:action => "show", :id => branch_diary.id, :controller => "branch_diaries"}).should be_true
+    }
+    #branch_diary creation
+    user.can_access?({:action => "create", :controller => "branch_diaries"},
+                     {:branch_diary => {:diary_date => Date.today, :opening_time_hours => 10, :opening_time_minutes => 00, :closing_time_hours => 20,
+                         :closing_time_minutes => 00, :branch_key => "Ramesh", :branch_id => 3, :manager_staff_id => 20}}).should be_true
+
+    #stock_register access
+    user.staff_member.stock_registers.each{|stock_register|
+      user.can_access?({:action => "show", :id => stock_register.id, :controller => "stock_registers"}).should be_true
+    }
+    #stock_register creation
+    user.can_access?({:action => "create", :controller => "stock_registers"},
+                     {:stock_register => {:stock_code => "CHSGF", :stock_name => "Chairs", :stock_quantity => 20, :bill_date => Date.today,
+                         :bill_number => 35637, :date_of_entry => Date.today, :branch_id => 3, :manager_staff_id => 20}}).should be_true
+
+    #asset_register access
+    user.staff_member.asset_registers.each{|asset_register|
+      user.can_access?({:action => "show", :id => asset_register.id, :controller => "asset_register"}).should be_true
+    }
+    #asset_register creation
+    user.can_access?({:action => "create", :controller => "asset_registers"},
+                     {:asset_register => {:name => "Charu", :asset_type => "Broadband", :issue_date => Date.today, :branch_id => 3,
+                         :manager_staff_id => 20}}).should be_true
     #center access
     user.staff_member.branches.centers.each{|center|
       user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_true
@@ -616,6 +776,18 @@ describe User do
       user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_false
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "branch", :id => branch.id}).should be_false
+    }
+    #branch_diary access
+    BranchDiary.all(:manager.not => user.staff_member).each{|branch_diary|
+      user.can_access?({:action => "show", :id => branch_diary.id, :controller => "branch_diaries"}).should be_false
+    }
+    #stock_register access
+    StockRegister.all(:manager.not => user.staff_member).each{|stock_register|
+      user.can_access?({:action => "show", :id => stock_register.id, :controller => "stock_registers"}).should be_false
+    }
+    #asset_register access
+    AssetRegister.all(:manager.not => user.staff_member).each{|asset_register|
+      user.can_access?({:action => "show", :id => asset_register.id, :controller => "asset_registers"}).should be_false
     }
     #center access
     Branch.all(:manager.not => user.staff_member).centers(:manager.not => user.staff_member).each{|center|
@@ -722,6 +894,19 @@ describe User do
     user.can_access?({:action => "create", :controller => "audit_items"}).should be_true
     user.can_access?({:action => "update", :controller => "audit_items"}).should be_true
 
+    user.can_access?({:action => "index", :controller => "branch_diaries"}).should be_true
+    user.can_access?({:action => "create", :controller => "branch_diaries"}).should be_true
+    user.can_access?({:action => "update", :controller => "branch_diaries"}).should be_true
+
+    user.can_access?({:action => "index", :controller => "stock_registers"}).should be_true
+    user.can_access?({:action => "create", :controller => "stock_registers"}).should be_true
+    user.can_access?({:action => "update", :controller => "stock_registers"}).should be_true
+
+    user.can_access?({:action => "index", :controller => "asset_registers"}).should be_true
+    user.can_access?({:action => "create", :controller => "asset_registers"}).should be_true
+    user.can_access?({:action => "update", :controller => "asset_registers"}).should be_true
+
+
     # upload, download stuff
     user.can_access?({:action => "upload", :controller => "admin"}).should be_false
     user.can_access?({:action => "download", :controller => "admin"}).should be_false
@@ -747,6 +932,9 @@ describe User do
     user.can_access?({:action =>"index", :namespace =>"data_entry", :controller => "index"}).should be_true
     user.can_access?({:action =>"hq_tab", :controller =>"browse"}).should be_true
     user.can_access?({:action => "index", :controller => "branches"}).should be_true
+    user.can_access?({:action => "index", :controller => "branch_diaries"}).should be_true
+    user.can_access?({:action => "index", :controller => "stock_registers"}).should be_true
+    user.can_access?({:action => "index", :controller => "asset_registers"}).should be_true 
 
     #branch access
     user.staff_member.centers.branches.each{|branch|
@@ -758,6 +946,30 @@ describe User do
     user.can_access?({:action => "create", :controller => "branches"}, 
                      {:branch => {:name => "Bhopal 1", :address => "dzv fsb g", :contact_number => "90000000000", :manager_staff_id => 1, :code => "MPBPL01", :landmark => "New Bhopal", 
                          :creation_date => "27-11-2010", :area_id => 1}}).should be_false
+    #branch_diary access
+    user.staff_member.branch_diaries.each{|branch_diary|
+      user.can_access?({:action => "show", :id => branch_diary.id, :controller => "branch_diaries"}).should be_false
+    }
+    #branch_diary creation
+    user.can_access?({:action => "create", :controller => "branch_diaries"},
+                     {:branch_diary => {:diary_date => Date.today, :opening_time_hours => 10, :opening_time_minutes => 00, :closing_time_hours => 20,
+                         :closing_time_minutes => 00, :branch_id => 3, :manager_staff_id => 20, :branch_key => "Ramesh"}}).should be_true
+    #stock_register access
+    user.staff_member.stock_registers{|stock_register|
+      user.can_acccess?({:action => "show", :id => stock_register.id, :controller => "stock_register"}).should be_false
+    }
+    #stock_register creation
+    user.can_access?({:action => "create", :controller => "stock_registers"},
+                     {:stock_register => {:stock_code => "JHDJ", :stock_name => "Wheel Chair", :stock_quantity => 20, :bill_number => 12337,
+                         :bill_date => Date.today, :date_of_entry => Date.today, :branch_id => 3, :manager_staff_id => 20}}).should be_true
+    #asset_register access
+    user.staff_member.asset_registers.each{|asset_register|
+      user.can_access?({:action => "show", :id => asset_register.id, :controller => "asset_registers"}).should be_false
+    }
+    #asset_register creation
+    user.can_access?({:action => "create", :controller => "asset_registers"},
+                     {:asset_register => {:name => "Rajesh", :asset_type => "Pen Holder", :issue_date => Date.today, :branch_id => 3,
+                         :manager_staff_id => 20}}).should be_true
     #center access
     user.staff_member.centers.each{|center|
       user.can_access?({:action => "index", :branch_id => center.branch_id, :controller => "centers"}).should be_true
@@ -820,6 +1032,18 @@ describe User do
       user.can_access?({:action => "show", :id => branch.id, :controller => "branches"}).should be_false
       #info
       user.can_access?({:action => "moreinfo", :controller => "info", :for => "branch", :id => branch.id}).should be_false
+    }
+    #branch_diary access
+    BranchDiary.all(:manager.not => user.staff_member).each{|branch_diary|
+      user.can_access?({:action => "show", :id => branch_diary.id, :controller => "branch_diaries"}).should be_false
+    }
+    #stock_register access
+    StockRegister.all(:manager.not => user.staff_member).each{|stock_register|
+      user.can_access?({:action => "show", :id => stock_register.id, :controller => "stock_registers"}).should be_false
+    }
+    #asset_register access
+    AssetRegister.all(:manager.not => user.staff_member).each{|asset_register|
+      user.can_access?({:action => "show", :id => asset_register.id, :controller => "asset_registers"}).should be_false
     }
     #center access
     Center.all(:manager.not => user.staff_member).each{|center|
@@ -920,6 +1144,18 @@ describe User do
     user.can_access?({:action => "create", :controller => "audit_items"}).should be_true
     user.can_access?({:action => "update", :controller => "audit_items"}).should be_true
 
+    user.can_access?({:action => "index", :controller => "branch_diaries"}).should be_true
+    user.can_access?({:action => "create", :controller => "branch_diaries"}).should be_true
+    user.can_access?({:action => "update", :controller => "branch_diaries"}).should be_true
+
+    user.can_access?({:action => "index", :controller => "stock_registers"}).should be_true
+    user.can_access?({:action => "create", :controller => "stock_registers"}).should be_true
+    user.can_access?({:action => "update", :controller => "stock_registers"}).should be_true
+
+    user.can_access?({:action => "index", :controller => "asset_registers"}).should be_true
+    user.can_access?({:action => "create", :controller => "asset_registers"}).should be_true
+    user.can_access?({:action => "update", :controller => "asset_registers"}).should be_true
+
     # upload, download stuff
     user.can_access?({:action => "upload", :controller => "admin"}).should be_false
     user.can_access?({:action => "download", :controller => "admin"}).should be_false
@@ -950,6 +1186,9 @@ describe User do
     user.can_access?({:action =>"index", :namespace =>"data_entry", :controller => "index"}).should be_true
     user.can_access?({:action =>"hq_tab", :controller =>"browse"}).should be_true
     user.can_access?({:action => "index", :controller => "branches"}).should be_true
+    user.can_access?({:action => "index", :controller => "branch_diaries"}).should be_true
+    user.can_access?({:action => "index", :controller => "stock_registers"}).should be_true
+    user.can_access?({:action => "index", :controller => "asset_registers"}).should be_true
 
     managed_branches = area.branches
     managed_centers  = area.branches.centers
@@ -966,6 +1205,11 @@ describe User do
     user.can_access?({:action => "create", :controller => "branches"}, 
                      {:branch => {:name => "Bhopal 1", :address => "dzv fsb g", :contact_number => "90000000000", :manager_staff_id => 1, :code => "MPBPL01", :landmark => "New Bhopal", 
                          :creation_date => "27-11-2010", :area_id => area.id}}).should be_true
+
+    #branch_diary access
+    managed_branches.each{|branch_diary|
+      user.can_access?({:action => "show", :id => branch_diary.id, :controller => "branch_diaries"}).should be_false
+    }
     #center access
     managed_centers.each{|center|
       user.can_access?({:action => "show", :id => center.id, :controller => "centers", :branch_id => center.branch_id}).should be_true
