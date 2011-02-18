@@ -1,5 +1,5 @@
 class QuarterConsolidatedReport < Report
-  attr_accessor :from_date, :to_date, :branch, :branch_id, :loan_product_id
+  attr_accessor :from_date, :to_date, :branch, :branch_id, :loan_product_id, :report_by_loan_disbursed_during_selected_date_range
   QUARTERS = {1 => [:april, :may, :june], 2 => [:july, :august, :september], 3 => [:october, :november, :december], 4 => [:january, :february, :march]}
   MONTHS  = [:january, :february, :march, :april, :may, :june, :july, :august, :september, :october, :november, :december]
 
@@ -40,6 +40,10 @@ class QuarterConsolidatedReport < Report
             query = []
             query = ["l.loan_product_id = #{self.loan_product_id}"] if self.loan_product_id
             query    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})" if @branch.length > 0
+
+            if @report_by_loan_disbursed_during_selected_date_range == 1
+              query    << "l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
+            end
 
             histories = LoanHistory.sum_outstanding_by_month(month_number, y, branch, query)
             next if not histories
@@ -96,6 +100,11 @@ class QuarterConsolidatedReport < Report
     if self.loan_product_id
       froms += ", loans l"
       extra_condition = " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
+    end
+
+    if report_by_loan_disbursed_during_selected_date_range and report_by_loan_disbursed_during_selected_date_range == 1
+      froms += ", loans l"
+      extra_condition = " and p.loan_id=l.id and l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
     end
 
     repository.adapter.query(%Q{

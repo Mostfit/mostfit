@@ -1,5 +1,6 @@
 class GroupConsolidatedReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id, :report_by_loan_disbursed_during_selected_date_range
+  
   validates_with_method :from_date, :date_should_not_be_in_future
 
   def initialize(params, dates, user)
@@ -23,6 +24,10 @@ class GroupConsolidatedReport < Report
     extra    << "l.loan_product_id = #{loan_product_id}" if loan_product_id
     extra    << "lh.branch_id = #{@branch.first.id}" if @branch.length == 1
     extra    << "lh.center_id = #{@center.first.id}" if @center.length == 1
+    
+    if @report_by_loan_disbursed_during_selected_date_range == 1
+      extra    << "l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
+    end
 
     # if a funder is selected
     if @funder
@@ -105,6 +110,11 @@ class GroupConsolidatedReport < Report
     if self.loan_product_id
       froms += ", loans l"
       extra_condition += " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
+    end
+
+    if report_by_loan_disbursed_during_selected_date_range and report_by_loan_disbursed_during_selected_date_range == 1
+      froms += ", loans l"
+      extra_condition = " and p.loan_id=l.id and l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
     end
 
     if funder_loan_ids and funder_loan_ids.length > 0
