@@ -15,7 +15,7 @@ class InsuranceProducts < Application
   def new
     only_provides :html
     @insurance_product = InsuranceProduct.new
-    display @insurance_product
+    display @insurance_product, :layout => (request.xhr? ? false : layout?)
   end
 
   def edit(id)

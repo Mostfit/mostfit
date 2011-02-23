@@ -4,7 +4,7 @@
       Insurance Product
     %td
       = select :insurance_product_id, :collection => InsuranceProduct.all, :prompt => "---", :value_method => :id, :text_method => :name
-      = link_to 'Add a product', resource(:insurance_products, :new, {:return => (@client ? resource(@client, :insurance_policies, :new) : nil)}),:class => "_remote_"
+      = link_to 'Add a product', resource(:insurance_products, :new, {:return => (@client ? resource(@client, :insurance_policies, :new) : nil)}), :class => "_remote_"
   %tr
     %td
       Policy Number
@@ -34,7 +34,7 @@
     %td
       Date to
     %td
-      = date_select_for(@insurance_policy, "date_to", :date => @insurance_policy.date_to)
+      = date_select_for(@insurance_policy, "date_to", :date => @insurance_policy.date_to, :max_date => Date.today + 3650)
       = hidden_field :client_id, :value => @client.id
   %tr
     %td
