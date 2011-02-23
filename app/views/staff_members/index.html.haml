@@ -2,6 +2,11 @@
   =form(:method => :get, :action => url(:staff_members)) do 
     %b Branch selector
     = select :branch_id, :collection => get_accessible_branches, :text_method => :name, :value_method => :id, :prompt => "All branches"
+    |
+    %b
+      Show inactive staff members
+    = check_box :name => :show_disabled, :checked => ((params[:show_disabled] and params[:show_disabled]=="1") ? "1" : false), :value => "1"
+    |
     %b Change date
     = date_select "date", @date
     =submit "Go"
