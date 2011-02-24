@@ -1,12 +1,12 @@
-class ParByCenterReport < Report
-  attr_accessor :date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :late_by_more_than_days, :late_by_less_than_days
-  ParRow = Struct.new(:loan_count, :loan_amount, :par, :prin_overdue, :int_overdue, :fee_overdue, :tot_overdue)
+class ParByStaffReport < Report
+  attr_accessor :date, :branch
+  ParRow = Struct.new(:less_than_30, :between_30_and_60, :between_60_and_90, :more_than_90)
 
   validates_with_method :date, :date_should_not_be_in_future
 
   def initialize(params,dates, user)
     @date   = dates.blank? ? Date.today : dates[:date]
-    @name   = "PAR Report as on #{@date}"
+    @name   = "PAR report by staff as on #{@date}"
     get_parameters(params, user)    
     @late_by_more_than_days ||= 0
   end
@@ -15,11 +15,11 @@ class ParByCenterReport < Report
     extra = []    
     extra << "more than #{late_by_more_than_days} days" if late_by_more_than_days
     extra << "less than #{late_by_less_than_days} days" if late_by_less_than_days
-    "PAR by center as on #{@date}: late by #{extra.join(' and ')}"
+    "PAR as on #{@date}: late by #{extra.join(' and ')}"
   end
 
   def self.name
-    "PAR Report by center"
+    "PAR Report by Staff"
   end
 
   def include_late_day?(late_days)    
@@ -29,29 +29,34 @@ class ParByCenterReport < Report
   def generate
     # these are the loan history lines which represent the last line before @date
     selects = [:branch_id, :center_id, :days_overdue, :date, :amount_in_default, "l.amount amount", :actual_outstanding_principal]
-    par_data = LoanHistory.defaulted_loan_info_by(:loan, @date, {:branch_id => @branch.map{|x| x.id}}, selects).group_by{|x| 
-      x.center_id
+    centers = {}
+    # group by centers
+    @center.each{|c|
+      cenetrs[c.id] = c
     }
-
+    
+    par_data = LoanHistory.defaulted_loan_info_by(:loan, @date, {:branch_id => @branch.map{|x| x.id}}, selects).group_by{|x| 
+      centers[x.center_id].manager_staff_id
+    }
+    
     data = {}
     loans = []
     @branch.each do |branch|
       data[branch] = {}
-      @center.find_all{|c| c.branch_id==branch.id}.each do |center|    
+      branch.centers.each{|center|
         next unless par_data[center.id]
+        staff = center.manager
 
         par_data[center.id].each do |default|          
           if default.date and true and @date >= default.date - default.days_overdue
             late_by = default.days_overdue + (@date - default.date)
             next unless include_late_day?(late_by.to_i)
-            data[branch][center] ||= ParRow.new(0, 0, 0, 0, 0, 0, 0)
+            data[branch] ||= ParRow.new(0, 0, 0, 0)
             loans.push(default.loan_id)
-            data[branch][center].loan_count   += 1
-            data[branch][center].loan_amount  += default.amount
-            data[branch][center].par          += default.actual_outstanding_principal
-            data[branch][center].prin_overdue += default.pdiff
-            data[branch][center].int_overdue  += (default.tdiff > default.pdiff ? default.tdiff - default.pdiff : 0)
-            data[branch][center].tot_overdue  += default.tdiff
+            data[branch][staff].less_than_30       += 1
+            data[branch][staff].between_30_and_60  += default.amount
+            data[branch][staff].between_60_and_90  += default.actual_outstanding_principal
+            data[branch][staff].more_than_90       += default.amount
           end
         end
       end
