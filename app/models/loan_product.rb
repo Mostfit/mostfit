@@ -5,7 +5,7 @@ class LoanProduct
   property :name, String, :nullable => false, :index => true, :min => 3
   property :max_amount, Integer, :nullable => false, :index => true
   property :min_amount, Integer, :nullable => false, :index => true
-  property :amount_multiple, Integer, :nullable => false, :index => true, :default => 1, :min => 1
+  property :amount_multiple, Float, :nullable => false, :index => true, :default => 1, :min => 0.01
   property :max_interest_rate, Float, :nullable => false, :index => true, :max => 100
   property :min_interest_rate, Float, :nullable => false, :index => true, :min => 0
   property :interest_rate_multiple, Float, :nullable => false, :index => true, :default => 0.1

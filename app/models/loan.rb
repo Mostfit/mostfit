@@ -14,9 +14,9 @@ class Loan
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false, :index => true
 
-  property :amount,                         Integer, :nullable => false, :index => true  # this is the disbursed amount
-  property :amount_applied_for,             Integer, :index => true
-  property :amount_sanctioned,              Integer, :index => true
+  property :amount,                         Float, :nullable => false, :index => true  # this is the disbursed amount
+  property :amount_applied_for,             Float, :index => true
+  property :amount_sanctioned,              Float, :index => true
 
   property :interest_rate,                  Float, :nullable => false, :index => true
   property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
