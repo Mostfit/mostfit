@@ -87,8 +87,12 @@ class Fee
     fees
   end
 
-  def self.paid(loan_ids, date=Date.today)    
-    Payment.all(:type => :fees, :loan_id => loan_ids, :received_on.lte => date).aggregate(:loan_id, :amount.sum).to_hash
+  def self.paid(loan_ids, date=Date.today)
+    if loan_ids.length > 0
+      Payment.all(:type => :fees, :loan_id => loan_ids, :received_on.lte => date).aggregate(:loan_id, :amount.sum).to_hash
+    else
+      {}
+    end
   end
 
   def self.due(loan_ids, date=Date.today)

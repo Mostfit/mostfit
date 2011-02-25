@@ -77,7 +77,7 @@
           = link_to(pf.loan_id, "/loans/#{pf.loan_id}", {:target => "BLANK", :class => "link"})
           - center_total[0]+= 1
         %td
-          = pf.loan.occupation.name
+          = pf.loan.occupation.name if pf.loan.occupation
         %td
           = pf.loan.amount
           - center_total[1]+= pf.loan.amount
