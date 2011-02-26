@@ -51,11 +51,11 @@ class Browse < Application
 
     Payment.all(:type => :fees, "client.center_id" => center_ids, :received_on.lt => @date).aggregate(:loan_id, :amount.sum).each{|fp|
       @fees_due[loans[fp[0]]] -= fp[1]
-    }
+    } if center_ids.length>0
     
     Payment.all(:type => :fees, :received_on => @date, "client.center_id" => center_ids).aggregate(:loan_id, :amount.sum).each{|fp|
-     @fees_paid[loans[fp[0]]] += fp[1]
-    }
+      @fees_paid[loans[fp[0]]] += fp[1]
+    } if center_ids.length>0
 
     @disbursals = {}
     @disbursals[:scheduled] = LoanHistory.all("loan.scheduled_disbursal_date" => @date, :date => @date).aggregate(:center_id, :scheduled_outstanding_principal.sum).to_hash
@@ -80,9 +80,10 @@ class Browse < Application
     @centers  = @centers.map{|c| [c.id, c]}.to_hash
 
     #get payments done on @date in format of {<loan_id> => [<principal>, <interest>]}
+    @payments = {}
     @payments = LoanHistory.all(:date => @date, :center_id => center_ids).aggregate(:loan_id, :principal_paid.sum, :interest_paid.sum).group_by{|x| 
       x[0]
-    }
+    } if center_ids.length > 0
 
     #advance balance
     new_advance_balances = LoanHistory.advance_balance(@date, [:center],   {:center_id => center_ids}).group_by{|x| x.center_id}
