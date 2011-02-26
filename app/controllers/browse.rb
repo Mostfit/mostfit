@@ -51,11 +51,11 @@ class Browse < Application
 
     Payment.all(:type => :fees, "client.center_id" => center_ids, :received_on.lt => @date).aggregate(:loan_id, :amount.sum).each{|fp|
       @fees_due[loans[fp[0]]] -= fp[1]
-    }
+    } if center_ids.length>0
     
     Payment.all(:type => :fees, :received_on => @date, "client.center_id" => center_ids).aggregate(:loan_id, :amount.sum).each{|fp|
-     @fees_paid[loans[fp[0]]] += fp[1]
-    }
+      @fees_paid[loans[fp[0]]] += fp[1]
+    } if center_ids.length>0
 
     @disbursals = {}
     @disbursals[:scheduled] = LoanHistory.all("loan.scheduled_disbursal_date" => @date, :date => @date).aggregate(:center_id, :scheduled_outstanding_principal.sum).to_hash
