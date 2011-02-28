@@ -1,0 +1,84 @@
+=partial :form
+%table.report.nojs
+  %tr.header
+    %th{:width => "10px"}
+      Loan Account No.
+    %th
+      Unique Reference Number / Cust ID
+    %th
+      Loan Amount
+    %th
+      Full Name with Initials
+    %th
+      Gender
+    %th
+      Age
+    %th
+      Date of Birth (dd/mm/yyyy) or Age
+    %th
+      Date of Disbursement (dd/mm/yyyy)
+    %th
+      Location - Branch Name
+    %th
+      Occupation of the member
+    %th
+      Member(M)/ Guarantor(G)
+  - clients = @data
+  - clients_and_loans = {} 
+  - clients_and_loans = Hash[*clients.collect { |client| [client.loans.first, client] }.flatten]
+  - guarantors_and_loans = {} 
+  - guarantors_and_loans = Hash[*clients.collect { |client| [client.loans.first, client.guarantors.first]}.flatten]
+  - guarantors_and_loans.each { |k, v| guarantors_and_loans.delete(k) unless v }
+  - clients_and_loans.each do |loan, client| 
+    %tr 
+      %td{:width => "10px"}
+        = loan.id.to_s
+      %td
+        = client.id
+      %td
+        = loan.amount
+      %td
+        = client.name
+      %td
+        - gender = client.respond_to?(:gender) ? client.gender.to_s.capitalize : ""  
+        = gender
+      %td
+        - age = client.date_of_birth ? (Time.now.year - client.date_of_birth.year) : "" 
+        = age
+      %td
+        = client.date_of_birth
+      %td
+        = loan.disbursal_date
+      %td
+        = client.center.branch.name
+      %td
+        - occupation_name = client.occupation ? client.occupation.name : ""
+        = occupation_name
+      %td
+        = "M" 
+  - guarantors_and_loans.each do |loan, guarantor| 
+    %tr 
+      %td
+        = loan.id.to_s
+      %td
+        = "G-" + guarantor.id.to_s
+      %td
+        = loan.amount
+      %td
+        = guarantor.name
+      %td
+        = guarantor.gender.to_s.capitalize
+      %td
+        - age = guarantor.date_of_birth ? (Time.now.year - guarantor.date_of_birth.year) : "" 
+        = age
+      %td
+        = guarantor.date_of_birth
+      %td
+        = loan.disbursal_date
+      %td
+        = guarantor.client.center.branch.name
+      %td
+        - occupation_name = guarantor.guarantor_occupation ? guarantor.guarantor_occupation.name : ""
+        = occupation_name
+      %td
+        = "G" 
