@@ -58,7 +58,7 @@ class ParByStaffReport < Report
             end
           end
         end
-      }
+      end
     end
     return data
   end
