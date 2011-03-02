@@ -1,6 +1,7 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe Report do
   before(:all) do 
+    ParRow = Struct.new(:less_than_30, :between_30_and_60, :between_60_and_90, :more_than_90)
     @date = Date.new(2009, 6, 29)
     @weekdays = [:monday,:tuesday,:wednesday,:thursday,:friday,:saturday,:sunday]
     @user = User.new(:login => 'Joe', :password => 'password', :password_confirmation => 'password', :role => :admin)
@@ -572,4 +573,156 @@ describe Report do
     data[@manager.name][:development][:variance].should == (target_variance).abs
     data[@manager.name][:disbursement][:today][:variance_from_target].should == (target_amount.values[0] - (loan_amount_till_date || 0) - disbursed_loan).abs
   end
+
+  #spec for PAR by Staff report.
+  
+  it "should give correct PAR values for less than 30 days" do
+    @date = Date.today
+    report = ParByStaffReport.new({:branch_id => @branch.id}, {:date => @date}, User.first)
+    data = report.generate
+    selects = [:branch_id, :center_id, :days_overdue, :date, :amount_in_default, "l.amount amount", :actual_outstanding_principal]
+    centers = {}
+    @center = Center.all
+    @branch = Branch.all
+
+    @center.each{|c|
+      centers[c.id] = c
+    }
+    par_data = LoanHistory.defaulted_loan_info_by(:loan, @date, {:branch_id => @branch.map{|x| x.id}}, selects).group_by{|x|
+      centers[x.center_id].manager_staff_id
+    }
+
+    data = {}
+    loans = []
+    @branch.each do |branch|
+      data[branch] = {}
+      branch.centers.each{|center|
+        next unless par_data[center.id]
+        staff = center.manager
+        
+        par_data[center.id].each do |default|
+          if default.date and true and @date >= default.date - default.days_overdue
+            late_by = default.days_overdue + (@date - default.date)
+            data[branch][staff] ||= ParRow.new(0, 0, 0, 0)
+            loans.push(default.loan_id)
+            if late_by <= 30
+              data[branch][staff].less_than_30       += default.actual_outstanding_principal
+              data[branch][staff].less_than_30.should == default.actual_outstanding_principal
+            end
+          end
+        end
+      }
+    end
+  end
+
+  it "should give correct values for PAR between 30 and 60 days" do
+    @date = Date.today
+    report = ParByStaffReport.new({:branch_id => @branch.id}, {:date => @date}, User.first)
+    data = report.generate
+    selects = [:branch_id, :center_id, :days_overdue, :date, :amount_in_default, "l.amount amount", :actual_outstanding_principal]
+    centers = {}
+    @center = Center.all
+    @branch = Branch.all
+
+    @center.each{|c|
+      centers[c.id] = c
+    }
+    par_data = LoanHistory.defaulted_loan_info_by(:loan, @date, {:branch_id => @branch.map{|x| x.id}}, selects).group_by{|x|
+      centers[x.center_id].manager_staff_id
+    }
+    data = {}
+    loans = []
+    @branch.each do |branch|
+      data[branch] = {}
+      branch.centers.each{|center|
+        next unless par_data[center.id]
+        staff = center.manager
+        par_data[center.id].each do |default|
+          if default.date and true and @date >= default.date - default.days_overdue
+            late_by = default.days_overdue + (@date - default.date)
+            data[branch][staff] ||= ParRow.new(0, 0, 0, 0)
+            loans.push(default.loan_id)
+            if (late_by > 30 and late_by <= 60)
+              data[branch][staff].between_30_and_60  += default.actual_outstanding_principal
+              data[branch][staff].between_30_and_60.should == default.actual_outstanding_principal
+            end
+          end
+        end
+      }
+    end
+  end
+
+  it "should give correct values for PAR between 60 and 90 days" do
+    @date = Date.today
+    report = ParByStaffReport.new({:branch_id => @branch.id}, {:date => @date}, User.first)
+    data = report.generate
+    selects = [:branch_id, :center_id, :days_overdue, :date, :amount_in_default, "l.amount amount", :actual_outstanding_principal]
+    centers = {}
+    @center = Center.all
+    @branch = Branch.all
+
+    @center.each{|c|
+      centers[c.id] = c
+    }
+    par_data = LoanHistory.defaulted_loan_info_by(:loan, @date, {:branch_id => @branch.map{|x| x.id}}, selects).group_by{|x|
+      centers[x.center_id].manager_staff_id
+    }
+    data = {}
+    loans = []
+    @branch.each do |branch|
+      data[branch] = {}
+      branch.centers.each{|center|
+        next unless par_data[center.id]
+        staff = center.manager
+        par_data[center.id].each do |default|
+          if default.date and true and @date >= default.date - default.days_overdue
+            late_by = default.days_overdue + (@date - default.date)
+            data[branch][staff] ||= ParRow.new(0, 0, 0, 0)
+            loans.push(default.loan_id)
+            if (late_by > 60 and late_by <= 90)
+              data[branch][staff].between_60_and_90  += default.actual_outstanding_principal
+              data[branch][staff].between_60_and_90.should == default.actual_outstanding_principal
+            end
+          end
+        end
+      }
+    end
+  end
+
+  it "should give correct values for PAR more than 90 days" do
+    report = ParByStaffReport.new({:branch_id => @branch.id}, {:date => @date}, User.first)
+    data = report.generate
+    selects = [:branch_id, :center_id, :days_overdue, :date, :amount_in_default, "l.amount amount", :actual_outstanding_principal]
+    centers = {}
+    @center = Center.all
+    @branch = Branch.all
+    
+    @center.each{|c|
+      centers[c.id] = c
+    }
+    par_data = LoanHistory.defaulted_loan_info_by(:loan, @date, {:branch_id => @branch.map{|x| x.id}}, selects).group_by{|x|
+      centers[x.center_id].manager_staff_id
+    }
+    data = {}
+    loans = []
+    @branch.each do |branch|
+      data[branch] = {}
+      branch.centers.each{|center|
+        next unless par_data[center.id]
+        staff = center.manager
+        par_data[center.id].each do |default|
+          if default.date and true and @date >= default.date - default.days_overdue
+            late_by = default.days_overdue + (@date - default.date)
+            data[branch][staff] ||= ParRow.new(0, 0, 0, 0)
+            loans.push(default.loan_id)
+            if late_by > 90
+              data[branch][staff].more_than_90  += default.actual_outstanding_principal
+              data[branch][staff].more_than_90.should == default.actual_outstanding_principal
+            end
+          end
+        end
+      }
+    end
+  end
+
 end

@@ -89,6 +89,7 @@ class Client
   has n, :insurance_policies
   has n, :attendances
   has n, :claims
+  has n, :guarantors
   validates_length :account_number, :max => 20
 
   belongs_to :center

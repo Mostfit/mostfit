@@ -1,0 +1,58 @@
+= partial :form
+- length = 5
+%table.report.nojs
+  %tr.header
+    %th
+      Center Manager
+    %th{:colspan => 4}
+      Days
+    %th
+      Total
+  %tr.header
+    %th
+    %th
+      less than 30
+    %th
+      between 30 - 60
+    %th
+      between 60 - 90
+    %th
+      more than 90
+    %th
+  - org_total = []
+  - @data.sort_by{|branch, centers| branch.name}.each do |branch, centers|
+    - branch_total = []
+    %tr.branch
+      %td{:colspan => length+1}
+        %b
+          = branch.name
+    - centers.sort_by{|center, rows| center.name}.each do |center, row|
+      - center_total = Array.new(length, 0)
+      %tr.center
+        %td
+          = center.name
+        %td.number
+          = row.less_than_30.to_currency
+        %td.number
+          = row.between_30_and_60.to_currency
+        %td.number
+          = row.between_60_and_90.to_currency
+        %td.number
+          = row.more_than_90.to_currency
+        %td.number
+          = (row.less_than_30 + row.between_30_and_60 + row.between_60_and_90 + row.more_than_90).to_currency
+          - center_total[0] = row.less_than_30
+          - center_total[1] = row.between_30_and_60
+          - center_total[2] = row.between_60_and_90
+          - center_total[3] = row.more_than_90
+          - center_total[4] = row.less_than_30 + row.between_30_and_60 + row.between_60_and_90 + row.more_than_90
+      - branch_total.push(center_total) if center_total.length == length
+    - branch_total=branch_total.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}}
+    %tr.branch_total
+      %td
+        Branch total
+        - 0.upto(length-1).each do |col|
+          %td
+            %b
+              = (branch_total[col]||0).to_currency
+        - org_total.push(branch_total) if branch_total.length == length
