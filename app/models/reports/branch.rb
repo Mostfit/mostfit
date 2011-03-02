@@ -339,13 +339,13 @@
     
     def overpaid_principal_between(start_date=Date.today, end_date=Date.today)
       LoanHistory.sum_advance_payment(start_date, end_date, :branch).group_by{|x| x.branch_id}.map{|bid, d| 
-        {bid, d.first.advance_principal.to_i}
+        {bid => d.first.advance_principal.to_i}
       }.inject({}){|s,x| s+=x}      
     end
     
     def overpaid_total_between(start_date=Date.today, end_date=Date.today)
       LoanHistory.sum_advance_payment(start_date, end_date, :branch).group_by{|x| x.branch_id}.map{|bid, d| 
-        {bid, d.first.advance_total.to_i}
+        {bid => d.first.advance_total.to_i}
       }.inject({}){|s,x| s+=x}      
     end
     
@@ -358,7 +358,7 @@
     def get_latest_before(column, date = Date.today, group_by = nil)
       date     = Date.parse(date) unless date.is_a? Date
       @os_data = LoanHistory.sum_outstanding_grouped_by(date, :branch).group_by{|x| x.branch_id}
-      @os_data.map{|b, d| {b, d.first.send(column).to_i}}.inject({}){|s,x| s+=x}
+      @os_data.map{|b, d| {b => d.first.send(column).to_i}}.inject({}){|s,x| s+=x}
     end
     
     def method_missing(name, params)

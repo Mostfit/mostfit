@@ -43,7 +43,7 @@ class ParByStaffReport < Report
     loans = []
     @branch.each do |branch|
       data[branch] = {}
-      branch.centers.each{|center|
+      branch.centers.each do |center|
         next unless par_data[center.id]
         staff = center.manager
 
