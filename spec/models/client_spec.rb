@@ -107,7 +107,7 @@ describe Client do
     @client.valid?
     @client.errors.each {|e| puts e}
     @client.should be_valid
-    @client.loans.first.amount.should eql(1000)
+    @client.loans.first.amount.to_i.should eql(1000)
     @client.loans.first.installment_frequency.should eql(:weekly)
 
 

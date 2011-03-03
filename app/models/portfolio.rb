@@ -117,6 +117,7 @@ class Portfolio
   def update_portfolio_value
     loan_values = {}
     last_payment_created_at = Payment.all("loan.portfolio_loans.portfolio_id" => self.id).max(:created_at)
+    return unless last_payment_created_at
     return if last_payment_created_at.new_offset <=  (self.updated_at + self.updated_at.offset).new_offset
     
     # force reloading to read associations correctly
