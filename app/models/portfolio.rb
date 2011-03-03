@@ -2,7 +2,7 @@ class Portfolio
   include DataMapper::Resource
   include DateParser
 
-  attr_accessor :centers, :added_on, :branch_id, :disbursed_after
+  attr_accessor :centers, :added_on, :branch_id, :disbursed_after, :displayed_centers
 
   before :destroy, :verified_cannot_be_deleted
   before :valid?,  :parse_dates
@@ -54,7 +54,10 @@ class Portfolio
     hash = self.new? ? {} : {:portfolio_id.not => id}
     hash[:active] = true
     pids = (PortfolioLoan.all(hash).map{|x| x.loan_id})
-    repaid_loans = LoanHistory.all(:current => true, :loan_id => PortfolioLoan.all(:portfolio_id => self.id).map{|pl| pl.loan_id}, :status => [:repaid, :written_off, :claim_settlement])
+    
+    hash         = {:current => true, :loan_id => PortfolioLoan.all(:portfolio_id => self.id).map{|pl| pl.loan_id}, :status => [:repaid, :written_off, :claim_settlement]}
+    hash[:branch_id] = self.branch_id  if self.branch_id and self.branch_id.to_i > 0
+    repaid_loans = LoanHistory.all(hash)
     
     query = []    
     query << "l.id not in (#{pids.join(', ')})" if pids.length > 0
@@ -101,8 +104,9 @@ class Portfolio
                                 :starting_value => loan.actual_outstanding_principal, :current_value => loan.actual_outstanding_principal)
         end
       }
+
       # deactivate all the loans which are not accounted for
-      (existing_loans - accounted_for).each{|lid|
+      Loan.all(:id => (existing_loans - accounted_for), "client.center_id" => displayed_centers).each{|lid|
         if pl = PortfolioLoan.first(:loan_id => lid, :portfolio_id => self.id)
           pl.update(:active => false)
         end
