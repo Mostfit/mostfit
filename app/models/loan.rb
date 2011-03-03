@@ -1128,6 +1128,12 @@ class DefaultLoan < Loan
   end
 end
 
+class A50Loan < Loan
+  def self.display_name
+    "A50Loan - defunct"
+  end
+end
+
 class EquatedWeekly < Loan
   # these 2 methods define the pay back scheme
   # typically reimplemented in subclasses
