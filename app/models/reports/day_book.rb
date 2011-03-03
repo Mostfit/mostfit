@@ -21,12 +21,14 @@ class DayBook < Report
     uniq_accounts_hit = accounts_hit.uniq
     day_entries = {}
     uniq_accounts_hit.each do |account|
-      day_entries[account] = 0
+      for_branch = account.branch ? account.branch : HeadOfficeAccounts::HEAD_OFFICE
+      day_entries[for_branch] = {} if day_entries[account.branch].nil?
+      day_entries[for_branch][account] = 0.0
       postings_on_date.each do |posting|
-        day_entries[account] += posting.amount if (posting.account_id == account.id) #currently ignores currency
+        day_entries[for_branch][account] += posting.amount if (posting.account_id == account.id)
       end
     end
-    day_entries
+    day_entries.sort
   end
 
   def name
@@ -36,5 +38,20 @@ class DayBook < Report
   def self.name
     "Day book"
   end
+
+end
+
+class HeadOfficeAccounts
+  attr_reader :name
+
+  def initialize(naam)
+    @name = naam
+  end
+
+  def <=> (other)
+    1
+  end
+
+  HEAD_OFFICE = HeadOfficeAccounts.new("Head office")
 
 end

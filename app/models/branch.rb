@@ -1,5 +1,6 @@
 class Branch
   include DataMapper::Resource
+  include Comparable
   extend Reporting::BranchReports
 
   before :save, :convert_blank_to_nil
@@ -99,4 +100,9 @@ class Branch
       end
     }
   end
+  
+  def <=> (other)
+    @name <=> other.name
+  end
+
 end
