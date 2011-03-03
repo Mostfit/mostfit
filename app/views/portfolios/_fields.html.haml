@@ -36,6 +36,7 @@
         %b= branch.name
     - branch_total = [0, 0, 0, 0, 0, 0, 0]
     - centers.sort_by{|center| center[0].name}.each do |center, data|
+      = hidden_field :name => "portfolio[displayed_centers][]", :value => center.id
       %tr.center
         %td
           = center.name
