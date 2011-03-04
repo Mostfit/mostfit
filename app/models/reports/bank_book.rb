@@ -10,7 +10,7 @@ class BankBook < DayBook
       end
     end
     bank_entries.delete_if {|key, value| bank_entries[key].empty? }
-    bank_entries.sort
+    bank_entries
   end
 
   def name

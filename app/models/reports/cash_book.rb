@@ -10,7 +10,7 @@ class CashBook < DayBook
       end
     end
     cash_entries.delete_if {|key, value| cash_entries[key].empty? }
-    cash_entries.sort
+    cash_entries
   end
 
   def name

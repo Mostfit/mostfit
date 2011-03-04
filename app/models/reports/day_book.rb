@@ -7,6 +7,12 @@ class DayBook < Report
     get_parameters(params, user)
   end
 
+  #TODO: Allow user to select particular account
+  #TODO: Allow user to select accounts at a particular branch
+  #TODO: to pass the actual accounting entries through to let the drill-down
+  #TODO: CashBook and BankBook inherit from day book and should simply specify
+  #the account_category (Cash|Bank) to fetch instead of filtering out the rest
+  #after the fact
   def generate
     date_params = {:date => date}
     journals_on_date = Journal.all(date_params)
@@ -28,7 +34,7 @@ class DayBook < Report
         day_entries[for_branch][account] += posting.amount if (posting.account_id == account.id)
       end
     end
-    day_entries.sort
+    day_entries
   end
 
   def name
