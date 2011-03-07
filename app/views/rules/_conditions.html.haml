@@ -17,20 +17,21 @@
 
       -#now comes binary operator
       - displaySecondVariable = false
-      -if cond[:valuetype] == "date"
+
+      - if cond[:valuetype] == "date"
         = select(:name => "rule[#{type}][#{condition_id}][binaryoperator]" , :collection => [["-", "minus"]], :class => "rules", :id => "#{type}_selectbinaryoperator_#{id}")
         - displaySecondVariable = true
-      -elsif cond[:valuetype] == "int"
+      - elsif cond[:valuetype] == "int"
         = select(:name => "rule[#{type}][#{condition_id}][binaryoperator]" , :collection => [["-", "minus"], ["+", "plus"]], :selected => cond[:binaryoperator], :class => "rules", :id => "#{type}_selectbinaryoperator_#{id}")
         - displaySecondVariable = true
-
+      
       - if displaySecondVariable == true
         - variable_id = 2
         = partial :variablefield, {:type => type, :cond => cond, :condition_id => condition_id, :variable_id => variable_id, :id => id}
 
       - if (cond[:variable]["#{variable_id}"] == nil)
         - cond[:variable]["#{variable_id}"] = Hash.new
-
+        
       - if (cond[:variable]["#{variable_id}"][:complete] == nil)
         - cond[:variable]["#{variable_id}"][:complete] = ""
       - keys = [@rule.model_name] + cond[:variable]["#{variable_id}"][:complete].split(".")
@@ -46,8 +47,9 @@
 
       - name = "rule[#{type}][#{condition_id}][const_value]"
       - type_name = "rule[#{type}][#{condition_id}][valuetype]" #will be either "string", "date" or "int"
-      - property = model.properties.find{|p| p.name.to_s==keys.last} || model.relationships[keys.last]
-      - property_2 = model.properties.find{|p| p.name.to_s==cond[:keys].last} if cond[:keys]
+
+      - property = model.properties.find{|p| p.name.to_s == keys.last} || model.relationships[keys.last]
+      - property_2 = model.properties.find{|p| p.name == cond[:keys].first.to_sym} || model.relationships[cond[:keys].last] if cond[:keys]
 
       - if collection1.flatten.include?(cond[:comparator].to_s)
         = select1
@@ -57,9 +59,9 @@
         = text_field(:id => "#{type}_textfield_#{id}", :name => name, :class => "rules", :value=>cond[:comparator])
       - id+=1
 
-
       - val_type = /\-|\\/.match(cond[:const_value])
-      - if (property.type==Date or property.type==DateTime or cond[:valuetype] == "date") and val_type
+
+      - if (property.type==Date or property.type==DateTime or cond[:valuetype] == "date") and (val_type or not cond.key?(:const_value))
         = date_select(name , cond[:const_value], :id => "#{type}_date_#{id}", :nullable => true, :min_date => Date.min_date, :max_date => Date.max_date)
         = hidden_field(:id => "#{type}_hidden_#{id}", :name => type_name, :value => "date")
       - elsif [DataMapper::Types::Serial, Integer].include?(property.type) or cond[:valuetype] == "int"
