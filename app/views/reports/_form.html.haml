@@ -121,6 +121,12 @@
               = check_box(:name => "#{report}[report_by_loan_disbursed_during_selected_date_range]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loan_disbursed_during_selected_date_range) and params[report][:report_by_loan_disbursed_during_selected_date_range] == "1" ? true : false))
               Show only those loans which were disbursed during selected date range
         %tr
+          - if @report.respond_to?(:ageing_interval)
+            %td
+              Ageing interval
+              - ages = ["3", "5", "10"]
+              = select(:ageing_interval, :collection => ages, :prompt => "select ageing multiple")
+        %tr
           %td{:colspan => 6}
             %div{:style => "float: right"}
               = submit "Generate"
