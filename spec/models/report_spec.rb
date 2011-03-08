@@ -725,4 +725,62 @@ describe Report do
     end
   end
 
+  #spec for PAR by Loan Ageing Report
+  it "should give correct PAR values by Loan Ageing in intervals of 3" do
+    @date = Date.today
+    @branch = Branch.all
+    report = ParByLoanAgeingReport.new({:branch_id => @branch.id}, {:date => @date}, User.first)
+    data, ages = {}, {}
+    @branch.each do |branch|
+      data[branch] = {}
+      branch.centers.managers.each{|manager|
+        data[branch][manager] = 1.upto(3).map{|x| [x, 0]}.to_hash
+        Loan.all(:fields => [:id, :disbursal_date, :client_id, :number_of_installments, :installment_frequency],
+                 :disbursal_date.not => nil, :disbursal_date.lte => @date, "client.center.manager_staff_id" => manager.id).each{|l|
+          age = (100 * (@date - l.disbursal_date) / (l.number_of_installments * l.installment_frequency_in_days) / 3).ceil
+          age = 3 if age > 3
+          data[branch][manager][age] += 1
+        }
+      }
+    end
+  end
+
+  it "should give correct PAR values by Loan Ageing in intervals of 5" do
+    @date = Date.today
+    @branch = Branch.all
+    report = ParByLoanAgeingReport.new({:branch_id => @branch.id}, {:date => @date}, User.first)
+    data, ages = {}, {}
+    @branch.each do |branch|
+      data[branch] = {}
+      branch.centers.managers.each{|manager|
+        data[branch][manager] = 1.upto(5).map{|x| [x, 0]}.to_hash
+        Loan.all(:fields => [:id, :disbursal_date, :client_id, :number_of_installments, :installment_frequency],
+                 :disbursal_date.not => nil, :disbursal_date.lte => @date, "client.center.manager_staff_id" => manager.id).each{|l|
+          age = (100 * (@date - l.disbursal_date) / (l.number_of_installments * l.installment_frequency_in_days) / 5).ceil
+          age = 5 if age > 5
+          data[branch][manager][age] += 1
+        }
+      }
+    end
+  end
+
+  it "should give correct PAR values by Loan Ageing in intervals of 10" do
+    @date = Date.today
+    @branch = Branch.all
+    report = ParByLoanAgeingReport.new({:branch_id => @branch.id}, {:date => @date}, User.first)
+    data, ages = {}, {}
+    @branch.each do |branch|
+      data[branch] = {}
+      branch.centers.managers.each{|manager|
+        data[branch][manager] = 1.upto(10).map{|x| [x, 0]}.to_hash
+        Loan.all(:fields => [:id, :disbursal_date, :client_id, :number_of_installments, :installment_frequency],
+                 :disbursal_date.not => nil, :disbursal_date.lte => @date, "client.center.manager_staff_id" => manager.id).each{|l|
+          age = (100 * (@date - l.disbursal_date) / (l.number_of_installments * l.installment_frequency_in_days) / 10).ceil
+          age = 10 if age > 10
+          data[branch][manager][age] += 1
+        }
+      }
+    end
+  end
+
 end
