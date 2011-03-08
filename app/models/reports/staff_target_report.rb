@@ -38,7 +38,8 @@ class StaffTargetReport < Report
     target_amount, target_number = Hash.new(0), Hash.new(0)
     
     #calculates the target attached to a staff member for disbursed loan amount for this month.
-    Target.all(:attached_to => :staff_member, :target_of => :loan_disbursement_by_amount, :attached_id => staff_members.keys.map{|sm| sm.id}, :target_type => :relative,
+    Target.all(:attached_to => :staff_member, :target_of => :loan_disbursement_by_amount, :attached_id => staff_members.keys.map{|sm| sm.id},
+               :target_type => :relative,
                :start_date.gte => @from_date,
                :deadline.lte => Date.new(@to_date.year, @to_date.month, -1)).group_by{|t| t.attached_id}.each{|staff_id, targets|
       target_amount[staff_id] ||= 0
