@@ -1,4 +1,11 @@
 class Users < Application
+  #API call : after authenticate get user information and send xml response
+  def authenticate
+    only_provides :xml
+    u = User.first(:login => params[:login])
+    u ? u : nil
+    display u
+  end
 
   def show(id)
     u = User.get(id)

@@ -116,6 +116,9 @@ Merb::Router.prepare do
   match('/documents/:action(/:id)').to(:controller => "documents").name(:documents_action_link)
   match('/:controller/:id', :id => %r(\d+)).to(:action => 'redirect_to_show').name(:quick_link)
   match('/rules/get').to(:controller => 'rules', :action => 'get') 
+  #API Route
+  match('/api/v1/users/authenticate.:format').to(:controller => 'users', :action => 'authenticate')
+  
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
 end

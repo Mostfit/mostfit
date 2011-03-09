@@ -319,4 +319,17 @@ describe "Controllers "  do
       @loan.errors
     end
   end
+  #API Spec
+  it "user should be authenticate through api call" do	   
+    params = {}
+    params = {:format =>"xml", :login=>"admin", :password=>"password"}
+    response = post("/api/v1/users/authenticate.xml", params)
+    response.should be_successful 
+  end
+
+  it "user should not be authenticate through api call" do	   
+    params = {}
+    params = {:format =>"xml", :login=>"admin", :password=>"pas"}
+    response.should_not be_successful 
+  end
 end
