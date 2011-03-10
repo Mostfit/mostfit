@@ -136,6 +136,10 @@ class Loan
   validates_with_method  :clients,                      :method => :check_client_sincerity
 
 
+  def self.display_name
+    "Loan"
+  end
+
   def check_validity_of_cheque_number
     return true if not self.cheque_number or (self.cheque_number and self.cheque_number.blank?)
     return [false, "This cheque is already used"] if Loan.all(:cheque_number => self.cheque_number, :id.not => self.id).count>0

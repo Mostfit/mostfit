@@ -97,10 +97,10 @@ module Pdf
           loans_to_disburse.each do |loan|
             table.data.push({"amount" => loan.amount.to_currency, "name" => loan.client.name,
                               "group" => loan.client.client_group.name,
-                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date
+                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date                              ,"spouse name" => loan.client.spouse_name 
                             })
           end
-          table.column_order  = ["name", "group", "amount", "loan product", "first payment"]
+          table.column_order  = ["name", "spouse name", "group", "amount", "loan product", "first payment", "signature"]
           table.show_lines    = :all
           table.shade_rows    = :none
           table.show_headings = true          
@@ -130,20 +130,23 @@ module Pdf
         pdf.text "Center: #{center.name}, Manager: #{@staff_member.name}, signature: ______________________", :font_size => 12, :justification => :left
         pdf.text("Center leader: #{center.leader.client.name}, signature: ______________________", :font_size => 12, :justification => :left) if center.leader
         pdf.text("Date: #{@date}, Time: #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}", :font_size => 12, :justification => :left)
+        pdf.text("Actual Disbursement on ___________________________, signature: ______________________", :font_size => 12, :justification => :left)
         pdf.text("\n")
         #draw table for scheduled disbursals
-        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil)
+        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => @date) #, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil)
         if center.clients.count>0 and loans_to_disburse.count > 0
           table = PDF::SimpleTable.new
           table.data = []
-
+          tot_amount = 0
           loans_to_disburse.each do |loan|
+            tot_amount += loan.amount
             table.data.push({"amount" => loan.amount.to_currency, "name" => loan.client.name,
                               "group" => loan.client.client_group.name,
-                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date
+                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date                              , "spouse name" => loan.client.spouse_name, "loan status" => loan.status
                             })
           end
-          table.column_order  = ["name", "group", "amount", "loan product", "first payment", "signature"]
+          table.data.push({"amount" => tot_amount.to_currency})
+          table.column_order  = ["name", "spouse name",  "group", "amount", "loan product", "first payment", "loan status", "signature"]
           table.show_lines    = :all
           table.shade_rows    = :none
           table.show_headings = true          
@@ -151,7 +154,7 @@ module Pdf
           table.orientation   = :center
           table.position      = :center
           table.title_font_size = 16
-          table.header_gap = 10
+          table.header_gap = 20
           pdf.text("\n")
           pdf.text "Disbursements today"
           pdf.text("\n")
