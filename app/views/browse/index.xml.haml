@@ -1,0 +1,6 @@
+%xml
+  = session.user.to_xml
+  - if session.user.staff_member
+    %centers
+      - session.user.staff_member.centers.each do |center|
+        = center.to_xml
