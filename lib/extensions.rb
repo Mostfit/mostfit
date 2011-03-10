@@ -55,9 +55,6 @@ module Misfit
           return(@funder.send(model.to_s.snake_case.downcase.pluralize).length>0)
         elsif [Browse, Document, AuditTrail, Attendance, Search].include?(model)
           return true
-        elsif model == Report
-          return true unless @route[:report_type]
-          return FUNDER_ACCESSIBLE_REPORTS.include?(@route[:report_type])
         end
         return false
      end
@@ -106,6 +103,7 @@ module Misfit
         return true  if user_role == :admin
         return false if route[:controller] == "journals" and route[:action] == "edit"
         return true  if route[:controller] == "users" and route[:action] == "change_password"
+        return true  if route[:controller] == "reports" and route[:action] == "index"        
         return false if (user_role == :read_only or user_role == :funder or user_role == :data_entry) and route[:controller] == "payments" and route[:action] == "delete"
         return false if (user_role != :admin) and route[:controller] == "loans" and route[:action] == "write_off_suggested"
 
@@ -114,6 +112,10 @@ module Misfit
         @controller = (route[:namespace] ? route[:namespace] + "/" : "" ) + route[:controller]
         @model = route[:controller].singularize.to_sym
         @action = route[:action]
+
+        if route[:controller] == "reports" and route[:action] == "show" and route[:report_type]          
+          return Mfi.first.report_access_rules[route[:report_type]].include?(user_role.to_s)
+        end
 
         #read only stuff
         return allow_read_only if user_role == :read_only
@@ -140,10 +142,6 @@ module Misfit
         if role == :data_entry 
           return ["new", "edit", "create", "update"].include?(@action) if ["clients", "loans", "client_groups"].include?(@controller)
           return (@action == "disbursement_sheet" or @action == "day_sheet") if @controller == "staff_members"
-          
-          if @action == "show" and @controller == "reports"
-            return (@route[:report_type] == "ProjectedReport" or @route[:report_type] == "DailyReport" or @route[:report_type] == "TransactionLedger")
-          end
         end
         
         if @staff
