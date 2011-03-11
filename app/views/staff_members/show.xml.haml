@@ -1,7 +1,18 @@
 %xml
-  = @staff_member.to_xml
-  - if @manages
-    - @manages.keys.each do |type|
-      - if @manages[type].length > 0
-        - @manages[type].each do |obj|
-          = obj.to_xml
+  %staff_member
+    %id #{@staff_member.id}
+    %name #{@staff_member.name}
+    %mobile_number #{@staff_member.mobile_number}
+    %creation_date #{@staff_member.creation_date}
+    %active #{@staff_member.active}
+    %user_id #{@staff_member.user_id}
+    - if @staff_member.branches
+      - @staff_member.branches.each do |branch|
+        %branch
+          %id #{branch.id}
+          %name #{branch.name}
+          - if branch.centers
+            - branch.centers.each do |center|
+              %center
+                %id #{center.id}
+                %name #{center.name}         
