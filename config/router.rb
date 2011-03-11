@@ -117,7 +117,9 @@ Merb::Router.prepare do
   match('/:controller/:id', :id => %r(\d+)).to(:action => 'redirect_to_show').name(:quick_link)
   match('/rules/get').to(:controller => 'rules', :action => 'get') 
   #API Route
-  match('/api/v1/login.xml').to(:controller => 'merb_auth_slice_password/sessions', :action => 'update', :format => 'xml')
+  match('/api/v1/users/my_details.xml').to(:controller => 'users', :action => 'my_details', :format => 'xml')
+  match('/api/v1/staff_members/show.xml').to(:controller => 'staff_members', :action => 'show', :format => 'xml')
+  match('/api/v1/staff_members/day_sheet.xml').to(:controller => 'staff_members', :action => 'day_sheet', :format => 'xml')
   
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')

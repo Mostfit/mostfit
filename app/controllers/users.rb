@@ -1,10 +1,8 @@
 class Users < Application
+  provides :xml
   #API call : after authenticate get user information and send xml response
-  def authenticate
-    only_provides :xml
-    u = User.first(:login => params[:login])
-    u ? u : nil
-    display u
+  def my_details   
+    display @template
   end
 
   def show(id)

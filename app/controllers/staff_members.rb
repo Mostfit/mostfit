@@ -2,7 +2,7 @@ class StaffMembers < Application
   include Pdf::DaySheet if PDF_WRITER
   include DateParser
   layout :determine_layout
-
+  provides :xml
   def index
     per_page = 25
     @date = params[:date] ? parse_date(params[:date]) : Date.today

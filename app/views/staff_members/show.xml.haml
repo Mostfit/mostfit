@@ -1,0 +1,7 @@
+%xml
+  = @staff_member.to_xml
+  - if @manages
+    - @manages.keys.each do |type|
+      - if @manages[type].length > 0
+        - @manages[type].each do |obj|
+          = obj.to_xml
