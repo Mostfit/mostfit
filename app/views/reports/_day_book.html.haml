@@ -1,0 +1,38 @@
+=partial :form
+%table.report.nojs
+  %tr.header
+    %th{:width => "60%"}
+      Account
+    %th{:width => "20%"}
+      Net credit
+    %th{:width => "20%"}
+      Net debit
+  - sum_of_credits = 0.0
+  - sum_of_debits = 0.0
+  - accounts_hit = @data
+  - accounts_hit.sort.each do |branch, account_netchange|
+    %tr
+      %td{:colspan => "3", :align => "center"}
+        = branch.name
+    - account_netchange.each do |account, net_change|
+      %tr
+        %td
+          = account.name
+        %td
+          - sum_of_credits += net_change if (net_change > 0)
+          - credit = net_change > 0 ? net_change : 0.0
+          = (credit > 0) ? credit.to_currency : '--'
+        %td
+          - sum_of_debits += net_change.abs if (net_change < 0)
+          - debit = net_change < 0 ? net_change.abs : 0.0
+          = (debit > 0) ? debit.to_currency : '--'
+  %tr.header
+    %th{:colspan => "3"}
+      = ((sum_of_debits - sum_of_credits).abs < EPSILON) ? "Books are balanced" : "Books DO NOT balance"
+  %tr.header
+    %th
+      Totals of credits and debits
+    %th
+      = sum_of_credits
+    %th
+      = sum_of_debits

@@ -1,0 +1,46 @@
+= partial :form
+- length = (params[:par_by_loan_ageing_report][:ageing_interval].to_i) + 1
+%table.report.nojs
+  %tr.header
+    %th
+      Center Manager
+    %th{:colspan => (params[:par_by_loan_ageing_report][:ageing_interval].to_i)}
+      Loan Ageing (in %)
+    %th
+      Total
+  %tr.header
+    %th
+    - 1.upto(params[:par_by_loan_ageing_report][:ageing_interval].to_i) do |i|
+      %th
+        = "#{(i-1) * 10 + 1} - #{i * 10}"
+    %th
+  - org_total = []
+  - @data.sort_by{|branch, managers| branch.name}.each do |branch, managers|
+    - branch_total = []
+    %tr.branch
+      %td{:colspan => length+1}
+        %b
+          = branch.name
+    - managers.sort_by{|manager, columns| manager.name}.each do |manager, columns|
+      - staff_total = []
+      %tr.center
+        %td
+          = manager.name
+        - sum = 0  
+        - columns.sort_by{|k, v| k}.each do |key, val|
+          %td.number
+            = val
+            - staff_total.push(val)
+            - sum += val
+        %td.number
+          =  sum
+          - staff_total.push(sum)
+      - branch_total.push(staff_total)
+    - branch_total=branch_total.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}}
+    %tr.branch_total
+      %td
+        Branch total
+        - branch_total.each do |col|
+          %td
+            %b
+              = col

@@ -85,7 +85,7 @@ class Loan
   has n, :loan_history,                                                                       :model => 'LoanHistory'
   has n, :payments
   has n, :audit_trails,       :child_key => [:auditable_id], :auditable_type => "Loan"
-  has n,  :portfolio_loans
+  has n, :portfolio_loans
   #validations
 
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
@@ -135,6 +135,10 @@ class Loan
   validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
   validates_with_method  :clients,                      :method => :check_client_sincerity
 
+
+  def self.display_name
+    "Loan"
+  end
 
   def check_validity_of_cheque_number
     return true if not self.cheque_number or (self.cheque_number and self.cheque_number.blank?)
@@ -1113,6 +1117,10 @@ end
 class DefaultLoan < Loan
   # This is the "Default" loan type. It is nothing better of worse than its parent.
   # That explains the emptyness
+  def self.display_name
+    "Standard loan (Default Loan)"
+  end
+
   def self.description
     "This is the default loan in Mostfit. In this loan type interest is is paid flat over the installments, so all the installments are the same size. It allows both repayment in totals and repayment in principal-interest pairs. In case of paying in totals the interest due is payed before the principal due."
   end
@@ -1125,33 +1133,8 @@ class DefaultLoan < Loan
 end
 
 class A50Loan < Loan
-  # a fine example of a subclassing (if it was finished)
-  # these 2 methods define the pay back scheme
-  # typically reimplemented in subclasses
-  # property :purpose,  String
-
-  attr_accessor :defaults
-
-  def defaults
-    {:interest_rate => 0.18, :installment_frequency => :weekly, :number_of_installments => 50}
-  end
-
-  def self.description
-    "50 Weeks, 18%, [6000-10000]"
-  end
-
-  def scheduled_principal_for_installment(number)
-    # number unused in this implentation, subclasses may decide differently
-    # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
-    amount.to_f / number_of_installments
-  end
-
-  def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
-    # number unused in this implentation, subclasses may decide differently
-    # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
-    number < 45 ? total_interest_to_be_received / 45 : 0
+  def self.display_name
+    "A50Loan - defunct"
   end
 end
 
@@ -1160,6 +1143,10 @@ class EquatedWeekly < Loan
   # typically reimplemented in subclasses
   include ExcelFormula
   # property :purpose,  String
+
+  def self.display_name
+    "Reducing balance schedule (Equated Weekly)"
+  end
 
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
@@ -1208,6 +1195,10 @@ end
 class BulletLoan < Loan
   before :save, :set_installments_to_1
   
+  def self.display_name
+    "Single shot repayment (Bullet Loan)"
+  end
+
   def scheduled_interest_for_installment(number = 1)
     amount * interest_rate
   end
@@ -1237,6 +1228,9 @@ class BulletLoan < Loan
 end
 
 class BulletLoanWithPeriodicInterest < BulletLoan
+  def self.display_name
+    "Single shot principal with periodic interest (Bullet Loan With Periodic Interest)"
+  end
   
   def scheduled_interest_for_installment(number)
     raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
@@ -1251,6 +1245,9 @@ class BulletLoanWithPeriodicInterest < BulletLoan
 end
 
 class PararthRounded < Loan
+  def self.display_name
+    "Rounded schedule (Pararth Rounded)"
+  end
 
   def scheduled_principal_for_installment(number)
     raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
@@ -1272,7 +1269,7 @@ class PararthRounded < Loan
     (1..number_of_installments).to_a.each do |i| 
       prin = (_prin_per_installment + rf).round
       rf = _prin_per_installment - prin + rf
-      int = _installment - prin
+      int = (_installment - prin).round
       @_rounding_schedule[i] =  {:principal => prin, :interest => int}
     end
     return @_rounding_schedule
@@ -1312,13 +1309,16 @@ end
 # Remember, the payments on the loan remain exactly the same as before for the customer.
 
 
-Loan.descendants.to_a.each do |c|
+(Loan.descendants.to_a - [Loan]).each do |c|
   k = Class.new(c)
   Object.const_set "TakeOver#{c.to_s}", k # we have to name it first otherwise DataMapper craps out
   Kernel.const_get("TakeOver#{c.to_s}").class_eval do
     before :valid?, :set_amount
     validates_with_method :original_properties_specified?
     validates_with_method :taken_over_properly?
+    def self.display_name
+      "Take over #{super}"
+    end
 
     def set_amount
       # this sets the amount to be the outstanding amount unless it is already set
@@ -1432,3 +1432,59 @@ Loan.descendants.to_a.each do |c|
 
   end # Class.new
 end # each
+
+# pararth rounded with last principal less/more than usual
+class RoundedAtLastInstallmentLoan < Loan
+  def self.display_name
+    "Rounded with last principal and interest adjusted"
+  end
+
+  def scheduled_principal_for_installment(number)
+    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    prin = (amount.to_f / number_of_installments)
+
+    if number == number_of_installments
+      ro_factor = prin - prin.round
+      (prin.round + (number_of_installments - 1) * ro_factor).round
+    else
+      prin.round
+    end
+  end
+
+  def scheduled_interest_for_installment(number)
+    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    total = (amount.to_f * (1 + interest_rate) / number_of_installments)
+
+    if number == number_of_installments
+      ro_factor = total - total.round
+      (total.round - scheduled_principal_for_installment(number) + (number_of_installments - 1) * ro_factor).round
+    else
+      total.round - scheduled_principal_for_installment(number)
+    end       
+  end
+end
+
+# pararth rounded with last ineterst less/more than usual
+class RoundedPrincipalAndInterestLoan < PararthRounded
+  def self.display_name
+    "Rounded with last interest adjusted"
+  end
+    
+  def scheduled_principal_for_installment(number)
+    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    rounding_schedule[number][:principal].round
+  end
+
+  def scheduled_interest_for_installment(number)
+    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    if number == number_of_installments
+      int_received_so_far = (1..(number-1)).map{|x| rounding_schedule[x][:interest]}.reduce(0){|s,x| s+=x}
+      (amount * interest_rate - int_received_so_far).round
+    else
+      rounding_schedule[number][:interest].round
+    end
+  end
+  
+end
+
+# always add new loan types here i.e. at last

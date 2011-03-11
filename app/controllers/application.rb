@@ -1,7 +1,7 @@
 class Application < Merb::Controller
-#  before :ensure_authenticated
-#  before :ensure_password_fresh
-#  before :ensure_can_do
+  before :ensure_authenticated
+  before :ensure_password_fresh
+  before :ensure_can_do
   before :insert_session_to_observer
   before :add_collections, :only => [:index, :show]
   

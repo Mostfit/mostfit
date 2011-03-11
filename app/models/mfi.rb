@@ -47,6 +47,8 @@ class Mfi
   property :session_expiry,   Integer, :nullable => true, :min => 60, :max => 86400
   property :password_change_in, Integer, :nullable => true
 
+  property :report_access_rules, Yaml, :nullable => true, :default => {}
+
   property :main_text, Text, :nullable => true, :lazy => true
   validates_length :name, :min => 0, :max => 20
   before :valid?, :save_image
@@ -101,6 +103,7 @@ class Mfi
   end
   
   def set_variables
+    self.report_access_rules = REPORT_ACCESS_HASH if not self.report_access_rules or self.report_access_rules == {}
     Misfit::Config::DateFormat.compile
     set_currency_format
     DirtyLoan.start_thread

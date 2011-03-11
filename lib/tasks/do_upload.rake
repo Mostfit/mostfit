@@ -2,11 +2,11 @@ if (local_gem_dir = File.join(File.dirname(__FILE__), '..', '..', 'gems')) && $B
   $BUNDLE = true; Gem.clear_paths; Gem.path.unshift(local_gem_dir)
 end
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'production')
-require "log4r"
 
 namespace :mostfit do
   desc "Create DB from excel sheet"
   task :upload, :directory, :filename do |task, args|
+    require "log4r"
     #    include Log4r
     filename  = args[:filename]
     directory = args[:directory]
