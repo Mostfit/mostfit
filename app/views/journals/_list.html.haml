@@ -33,6 +33,12 @@
           = p.account.name
           %br
       %td
+        %b De
+        = debit_postings.map{|x| x.amount>0 ? x.amount.round(2) : 0}.join(", ")
+        %br
+        %b Cr
+        = credit_postings.map{|x| x.amount>0 ? x.amount.round(2) : 0}.join(", ")
+      %td
         = postings.map{|x| x.amount>0 ? x.amount : 0}.inject(0){|s,x| s+=x}
       %td.text
         = journal.comment
