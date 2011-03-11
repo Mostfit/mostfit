@@ -1,0 +1,16 @@
+%h1
+  ApplicableFees controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/applicable_fees/index.html.erb
+%table
+  %tr
+  - for applicable_fee in @applicable_fees
+    %tr
+      %td
+        = link_to 'Show', url(:applicable_fee, applicable_fee)
+      %td
+        = link_to 'Edit', url(:edit_applicable_fee,  applicable_fee)
+
+= link_to 'New', url(:new_applicable_fee)
