@@ -13,8 +13,8 @@ class ApiAccess
     post("/staff_members/show.xml",  :query => {:id => id, :login => login, :password => pwd})
   end
   
-  def self.get_staff_member_day_sheet(id, login, pwd)
-    post("/staff_members/day_sheet.xml",  :query => {:id => id, :login => login, :password => pwd})
+  def self.get_staff_member_day_sheet(id, date, login, pwd)
+    post("/staff_members/day_sheet.xml",  :query => {:id => id, :date => date, :login => login, :password => pwd})
   end
 end
 

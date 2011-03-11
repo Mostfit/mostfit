@@ -1,2 +1,9 @@
 %xml
   = @staff_member.to_xml
+  - if @centers
+    - @centers.each do |center|
+      = center.to_xml
+      - clients = center.clients
+      - clients.each do |client|
+        = client.to_xml
+      = clients.loans(:scheduled_disbursal_date => @date).to_xml
