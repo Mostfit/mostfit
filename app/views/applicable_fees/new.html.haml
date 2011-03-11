@@ -1,0 +1,13 @@
+%h1 ApplicableFees controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/applicable_fees/new.html.erb
+
+= error_messages_for @applicable_fee
+
+= form_for(@applicable_fee, :action => url(:applicable_fees) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:applicable_fees)
