@@ -44,7 +44,7 @@
     %a.expand_collapsed{:href => "#"}
       Change parameters
   %div{:class => "#{params[:submit] ? 'collapsed' : ''}"}
-    = form_for(@report, :action => url(:show_report, :report_type => params[:report_type]), :method => :get) do
+    = form_for(@report, :action => url(:show_report, :report_type => params[:report_type]), :method => :get, :class => "_disable_button_") do
       %table
         %tr
           - if @report.respond_to?(:from_date)
@@ -140,4 +140,5 @@
         %tr
           %td{:colspan => 6}
             %div{:style => "float: right"}
-              = submit "Generate"
+              = hidden_field :name => "submit", :value => "go"
+              = submit "Generate", :name => "submit_button", :value => "submit"

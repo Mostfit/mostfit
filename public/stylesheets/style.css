@@ -269,6 +269,9 @@ input[type="text"], input[type="password"], textarea {
   font-family: sans;
   background: url(/images/fieldbg.gif) repeat-x scroll center top;
 }
+input.disabled[type="submit"] {
+    color: #ccc;
+}
 input.error{
     border-color: red;
     outline: 2px solid red;
