@@ -45,6 +45,12 @@ class StaffMembers < Application
     @defaulted     = LoanHistory.defaulted_loan_info_for(@center, @to_date)
     render :file => 'branches/moreinfo', :layout => false
   end
+  def show_branches(id)
+    @staff_member = StaffMember.get(id)
+    raise NotFound unless @staff_member
+    @branches = @staff_member.branches
+    display @branches
+  end
 
   def show_centers(id)
     @staff_member = StaffMember.get(id)

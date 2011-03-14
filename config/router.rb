@@ -118,8 +118,10 @@ Merb::Router.prepare do
   match('/rules/get').to(:controller => 'rules', :action => 'get') 
   #API Route
   match('/api/v1/users/my_details.xml').to(:controller => 'users', :action => 'my_details', :format => 'xml')
-  match('/api/v1/staff_member/branches.xml').to(:controller => 'staff_members', :action => 'show', :format => 'xml')
-  match('/api/v1/staff_member/day_sheet.xml').to(:controller => 'staff_members', :action => 'day_sheet', :format => 'xml')
+  match('/api/v1/staff_member/:id/branches.xml').to(:controller => 'staff_members', :action =>'show_branches', :format => 'xml')
+  match('/api/v1/staff_member/:id/centers.xml').to(:controller => 'staff_members', :action =>'show_centers', :format => 'xml')
+  match('/api/v1/staff_member/:id/clients.xml').to(:controller => 'staff_members', :action =>'show_clients', :format => 'xml')
+  match('/api/v1/staff_member/:id/loans.xml').to(:controller => 'staff_members', :action =>'show_disbursed', :format => 'xml')
   
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
