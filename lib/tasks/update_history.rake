@@ -49,5 +49,12 @@ namespace :mostfit do
       puts l.id
       l.update_history
     }
+
+    #updating target values EOD.
+    target = Target.all(:start_date.lte => Date.today,
+                        :deadline.gte => Date.today).each{|t|
+      t.set_present_value
+      t.save
+    }
   end
 end

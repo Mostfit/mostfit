@@ -184,12 +184,34 @@
             = select :session_expiry, :collection => [["", "Never"], [300, "5 minutes"], [900, "15 minutes"], [1800, "30 minutes"], [3600, "1 hour"], [7200, "2 hours"], [14400, "4 hours"], [21600, "6 hours"], [28800, "8 hours"], [43200, "12 hours"], [86400, "1 day"]]
         %tr
           %td
-            Force password change in
+            Force password change (in days)
             %br
             %span.greytext
-              force users to change password in
+              prompt users to change password 
+              %br 
+              and not allow to use the application unless done so
           %td
             = text_field :password_change_in
+      %h2 Access control for reports
+      %table.report.nojs
+        %tr.header
+          %th
+            Reports
+          - User::ROLES.each do |role|
+            %th
+              = role.to_s.camelcase(' ')
+        - Reports::Types.sort_by{|rt, rs| rt.to_s}.each do |report_type, reports|
+          %tr.branch
+            %td{:colspan => User.roles.length + 1}
+              %b
+                = report_type.to_s.camelcase(' ')
+          - reports.each do |report|
+            %tr
+              %td
+                = report.name
+              - User::ROLES.each do |role|
+                %td
+                  = check_box :name => "mfi[report_access_rules][#{report}][]", :value => role.to_s, :checked => (@mfi.report_access_rules[report.to_s] and @mfi.report_access_rules[report.to_s].index(role.to_s))
     %div.tab
       %table{:width => "100%"}
         %tr
@@ -197,6 +219,6 @@
             Text
           %td
             = text_area :main_text, :rows => 40, :cols => 120, :class => "mceEditor"
-       
+      
   = submit "Save my details"
   

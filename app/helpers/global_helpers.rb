@@ -66,8 +66,9 @@ module Merb
         collection << ['', branch_name]
         catalog[branch_name].sort_by{|x| x[1]}.each{ |k,v| collection << [k.to_s, "!!!!!!!!!#{v}"] }
       end
+
       selected_id = (obj.send(id_col) ? obj.send(id_col).to_s : nil)
-      selected_id = session[:center_id].to_s unless selected_id and session.key?(:center_id)
+      selected_id = session[:center_id].to_s if not selected_id and session.key?(:center_id)
       
       html = select col,
         :collection   => collection,

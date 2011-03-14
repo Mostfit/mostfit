@@ -72,7 +72,7 @@ class Target
   end
 
   def fetch_present_value
-    klass  = TypeClasses[TargetType.index(self.target_type)]
+    klass  = TypeClasses[TargetOf.index(self.target_of)]
     method = klass.to_s.snake_case.pluralize.to_sym
     return unless self.attached_to and self.attached_id and self.target_of
     return unless responsible.respond_to?(method)
