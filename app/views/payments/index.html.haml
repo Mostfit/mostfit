@@ -14,6 +14,7 @@
   by client
   = link_to "<i>#{@client.name}</i>", resource(@branch, @center, @client)
 - @history = @loan.loan_history
+
 %table.narrow.form{ :style => 'width : 50%' }
   %tr.odd
     %td{ :width => '30%' } Amount disbursed
@@ -111,7 +112,7 @@
       - @loan.loan_product.fees.each do |f|
         = f.description
         %br
-  %tr
+  %tr.odd
     %td
       Fees paid
     %td
@@ -132,10 +133,12 @@
   %ul.tabs
     %li#repayment_schedule Repayment Schedule
     %li#repayments_made Repayments made
+    - if @loan.insurance_policy
+      %li#insurance Insurance policy
     %li#audit Audits
     %li#misc Miscellaneous
     %li#history History
-
+    
   %div.tab
     %h2== Repayment schedule
     %table.narrow.form{ :width => '100%' }
@@ -200,7 +203,10 @@
         %tr
           %td{ :colspan => 7 }
   %div.tab
-    =partial "payments/list"
+    = partial "payments/list"
+  - if @loan.insurance_policy
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => resource(@loan.insurance_policy)}
   %div.tab 
     %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :model => "Loan", :id => @loan.id)}
   %div.tab

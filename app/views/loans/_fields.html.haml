@@ -138,6 +138,16 @@
       %td
         = text_field :taken_over_on_installment_number, :size => 5
         %span.greytext number of installments already paid
+  - if @loan_product.linked_to_insurance
+    %tr              
+      %td
+        %b Insurance policy details
+      %td{:colspan => 4}
+        - @insurance_policy.insurance_product = @loan_product.insurance_product
+        = error_messages_for @insurance_policy
+        = form_for(@insurance_policy, :action => resource(@client, :insurance_policies) ) do
+          = partial "insurance_policies/fields"
+
   -if not @loan.new? and [:admin, :mis_manager].include?(session.user.role)
     %tr
       %td

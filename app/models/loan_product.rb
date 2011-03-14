@@ -12,7 +12,7 @@ class LoanProduct
   property :installment_frequency, Enum.send('[]', *([:any] + INSTALLMENT_FREQUENCIES)), :nullable => true, :index => true
 
   property :max_number_of_installments, Integer, :nullable => false, :index => true, :max => 1000
-  property :min_number_of_installments, Integer, :nullable => false, :index => true, :min => 0  
+  property :min_number_of_installments, Integer, :nullable => false, :index => true, :min => 0
 
   #This property is defined in init.rb after app load as Loan may not have loaded by the time this class initializes
   #  property :loan_type, Enum.send('[]'), :nullable => false, :index => true
@@ -24,9 +24,12 @@ class LoanProduct
 
   property :payment_validation_methods, Text
   property :loan_validation_methods, Text
+  property :linked_to_insurance, Boolean, :nullable => false, :index => true, :default => false
+  property :insurance_product_id, Integer, :nullable => true, :index => true
 
   has n, :fees, :through => Resource#, :mutable => true
   has n, :loans
+  belongs_to :insurance_product, :nullable => true
 
   validates_with_method :min_is_less_than_max
   validates_is_unique   :name

@@ -1,0 +1,41 @@
+%form._remote_{:action => url(:controller => :loans, :action => :bulk_loan_creation, :center_id => @center.id, :branch_id => @branch.id), :method => :post}
+  %input{:name => "_target_", :type => "hidden", :value => "bulkDataEntryNotice"}
+  %table.report.nojs
+    %thead
+      %tr
+        %th Client
+        %th Loan amount
+        %th Interest
+        %th Installment frequency
+        %th Number of installments
+        %th Purpose
+        %th Funding Line
+        %th Application date
+        %th Applied by
+        %th Scheduled disbursal
+        %th Scheduled first payment
+    %tbody
+    - @clients.group_by{|c| c.client_group}.each do |group, clients|
+      %tr.group
+        %td{:colspan => 5}
+          - if group
+            = group.name
+          -else
+            Not attached to any group
+      - clients.each do |client|
+        %tr{:class => cycle('odd','')}
+          %td
+            = link_to client.name, resource(@branch, @center, client)
+          %td
+            = text_field :name => "loans[#{client.id}][:amount]"
+          %td
+            = text_field :name => "loans[#{client.id}][:interest]"
+          %td
+            = text_field :name => "loans[#{client.id}][:installment_frequency]"
+          %td
+            = text_field :name => "loans[#{client.id}][:number_of_installments]"
+          %td
+            = text_field :name => "loans[#{client.id}][:purpose_id]"
+
+  =submit("Save")   
+%div#bulkDataEntryNotice

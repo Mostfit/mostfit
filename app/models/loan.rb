@@ -86,6 +86,7 @@ class Loan
   has n, :payments
   has n, :audit_trails,       :child_key => [:auditable_id], :auditable_type => "Loan"
   has n, :portfolio_loans
+  has 1, :insurance_policy
   #validations
 
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
@@ -554,6 +555,8 @@ class Loan
     # if this is wrong, everything about this loan is wrong.
     return @schedule if @schedule
     @schedule = {}
+    return @schedule unless amount.to_f > 0
+
     principal_so_far = interest_so_far = fees_so_far = total = 0
     balance = amount
     fs = fee_schedule
@@ -1262,6 +1265,7 @@ class PararthRounded < Loan
   def rounding_schedule
     return @_rounding_schedule if @_rounding_schedule
     @_rounding_schedule = {}
+    return @_rounding_schedule unless amount.to_f > 0
     _prin_per_installment = amount.to_f / number_of_installments
     _total = amount * (1 + interest_rate) # cannot use total_to_be_received without blowing the universe up
     _installment = _total / number_of_installments

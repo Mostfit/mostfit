@@ -1,7 +1,7 @@
 class Loans < Application
   before :get_context, :exclude => ['redirect_to_show', 'approve', 'disburse', 'reject', 'write_off_reject', 'write_off_suggested', 'collection_sheet']
   provides :xml, :yaml, :js
-
+  
   def index
     @loans = @loans || @client.loans
     display @loans
@@ -27,8 +27,10 @@ class Loans < Application
       if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type)
         klass = Kernel::const_get(@loan_product.loan_type)
         @loan = klass.new
+        set_insurance_policy        
       end
     end
+
     @loan_products = LoanProduct.valid if @loan.nil?
     display [@loan_types, @loan]
   end
@@ -36,12 +38,29 @@ class Loans < Application
   def create
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
+    @loan_product = LoanProduct.is_valid(params[:loan_product_id])
+
+    set_insurance_policy
+    if @loan_product.linked_to_insurance and insurance_policy_attr = params[:insurance_policy]
+      @insurance_policy = InsurancePolicy.new(insurance_policy_attr)
+      @insurance_policy.client = @client
+    end
+
     @loan = klass.new(attrs)
     raise NotFound if not @loan.client  # should be known though hidden field
-    @loan_product = LoanProduct.is_valid(params[:loan_product_id])
     @loan.loan_product_id = @loan_product.id     
-    @loan.amount          = @loan.amount_applied_for
-    if @loan.save
+    @loan.amount          = @loan.amount_applied_for    
+
+    status = []
+    # save both insurance policy (if present) and loan in one go
+    Loan.transaction do |t|
+      status.push(@insurance_policy.save) if @insurance_policy
+      status.push(@loan.save)      
+      status.push(@insurance_policy.update(:loan => @loan))
+      t.rollback if status.include?(false)
+    end
+
+    if not status.include?(false)
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' was successfully created"})
       else
@@ -58,6 +77,8 @@ class Loans < Application
     @loan = Loan.get(id)
     @loan_product =  @loan.loan_product
     raise NotFound unless @loan
+
+    set_insurance_policy
     disallow_updation_of_verified_loans
     @loan.interest_rate*=100
     display @loan
@@ -351,6 +372,13 @@ class Loans < Application
       Loan.all(hash)
     else
       Loan.all(hash).paginate(:page => params[:page], :per_page => 10)        
+    end
+  end
+
+  def set_insurance_policy
+    if @loan_product.linked_to_insurance
+      @insurance_policy = InsurancePolicy.new
+      @insurance_policy.client = @client
     end
   end
 end # Loans

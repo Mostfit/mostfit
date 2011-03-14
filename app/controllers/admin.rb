@@ -72,4 +72,10 @@ class Admin < Application
       raise NotFound
     end
   end
+  
+  def insurance
+    @insurance_companies = InsuranceCompany.all
+    @insurance_products  = InsuranceProduct.all
+    render
+  end
 end

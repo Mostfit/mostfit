@@ -4,13 +4,13 @@ class InsurancePolicies < Application
 
   def index
     @insurance_policies = @client ? @client.insurance_policies : InsurancePolicy.all
-    display @insurance_policies
+    display @insurance_policies, :layout => layout?
   end
 
   def show(id)
     @insurance_policy ||= InsurancePolicy.get(id)
     raise NotFound unless @insurance_policy
-    display @insurance_policy
+    display @insurance_policy, :layout => layout?
   end
 
   def new
@@ -42,7 +42,7 @@ class InsurancePolicies < Application
     @insurance_policy ||= InsurancePolicy.get(id)
     raise NotFound unless @insurance_policy
     if @insurance_policy.update(insurance_policy)
-       redirect resource(@client, :insurance_policies)
+       redirect resource(@client)
     else
       display @insurance_policy, :edit
     end

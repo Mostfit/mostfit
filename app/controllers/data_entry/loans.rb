@@ -9,6 +9,7 @@ module DataEntry
           if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type)
             klass = Kernel::const_get(@loan_product.loan_type)
             @loan = klass.new
+            set_insurance_policy
           end
         end
       end
@@ -23,6 +24,7 @@ module DataEntry
       @client = @loan.client(:fields => [:id, :name, :center_id, :client_group_id])
       @loan.interest_rate *= 100 if @loan.interest_rate
       @loan_product = @loan.loan_product
+      set_insurance_policy
       render
     end
 
@@ -69,5 +71,12 @@ module DataEntry
       end
     end
     
+    private
+    def set_insurance_policy
+      if @loan_product and @loan_product.linked_to_insurance
+        @insurance_policy = InsurancePolicy.new
+        @insurance_policy.client = @client if @client
+      end
+    end
   end
 end
