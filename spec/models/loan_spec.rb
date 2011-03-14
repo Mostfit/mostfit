@@ -47,6 +47,7 @@ describe Loan do
     @client.errors.each {|e| puts e}
     @client.should be_valid
     # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
+
     @loan_product = LoanProduct.new
     @loan_product.name = "LP1"
     @loan_product.max_amount = 1000
@@ -65,19 +66,23 @@ describe Loan do
   end
 
   before(:each) do
+    @loan_product.loan_validation_methods = nil
+    @loan_product.save
+
     @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
     @loan.discriminator = DefaultLoan
     @loan.history_disabled = true
     @loan.applied_by       = @manager
     @loan.funding_line     = @funding_line
     @loan.client           = @client
-    @loan.loan_product     = @loan_product
+    @loan.loan_product     = @loan_product.reload
     @loan.valid?
     @loan.errors.each {|e| puts e}
     @loan.should be_valid
     @loan.approved_on = "2000-02-03"
     @loan.approved_by = @manager
     @loan.should be_valid
+    @loan_product.errors.each {|e| puts e}
   end
   
   it "should have a discrimintator" do
@@ -257,8 +262,74 @@ describe Loan do
     @loan.should_not be_valid
   end
   it "should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates" do
+#     @loan.scheduled_disbursal_date = @center.meeting_day
+#     @loan.should be_valid
+#     @loan.scheduled_first_payment_date = @center.meeting_day
+#     @loan.should be_valid
+#     @loan.scheduled_disbursal_date = @center.meeting_day + 1
+#     @loan.should_not be_valid
+#     @loan.scheduled_disbursal_date = @center.meeting_day - 1
+#     @loan.should_not be_valid
+#     @loan.scheduled_first_payment_date = @center.meeting_day + 1
+#     @loan.should_not be_valid
+#     @loan.scheduled_first_payment_date = @center.meeting_day - 1
+#     @loan.should_not be_valid
   end
+  
+  it "should not be valid if repayment dates are not center meeting dates" do
+    @loan.scheduled_disbursal_date = Date.new(2000, 11, 30)
+    @loan.should be_valid
 
+    @loan.scheduled_disbursal_date = Date.new(2000, 11, 29)
+    @loan.should be_valid
+
+    @loan.disbursal_date = Date.new(2000, 11, 23)
+    @loan.applied_by     = @manager
+    @loan.disbursed_by   = @manager
+    @loan.valid?
+    @loan.errors.each {|e| puts e}
+    @loan.should be_valid
+
+    @loan.disbursal_date = Date.new(2000, 12, 29)
+    @loan.should be_valid
+
+    @loan.disbursal_date = Date.new(2000, 12, 30)
+    @loan.should be_valid
+
+    @loan_product.loan_validation_methods = "disbursal_dates_must_be_center_meeting_days"
+    @loan_product.save
+
+    @center.meeting_day_for(Date.new(2000, 11, 29)).should == :wednesday
+    @loan.scheduled_disbursal_date = Date.new(2000, 11, 29)
+    @loan.disbursal_date = nil
+    @loan.disbursed_by   = nil
+    @loan.valid?
+    @loan.errors.each {|e| puts e}
+    @loan.should be_valid
+
+    @loan.disbursal_date = Date.new(2000, 11, 30)
+    @loan.disbursed_by   = @manager
+    @loan.valid?
+    @loan.should_not be_valid
+
+    @loan.disbursal_date = Date.new(2000, 11, 02)
+    @loan.disbursed_by   = @manager
+    @loan.valid?
+    @loan.should_not be_valid
+
+    @loan.disbursal_date = Date.new(2000, 11, 27)
+    @loan.disbursed_by   = @manager
+    @loan.should_not be_valid
+
+    @loan.disbursal_date = Date.new(2000, 11, 22)
+    @loan.disbursed_by   = @manager    
+    @loan.should be_valid
+
+#     @loan.scheduled_first_payment_date = @loan.scheduled_first_payment_date + 1
+#     @loan.should_not be_valid
+#     @loan.scheduled_first_payment_date = @loan.scheduled_first_payment_date - 1
+    #     @loan.should_not be_valid
+  end
 
   it ".shift_date_by_installments should shift dates properly, even odd ones.. and backwards." do
     loan = Loan.new(:installment_frequency => :daily)
