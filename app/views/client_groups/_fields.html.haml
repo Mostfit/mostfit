@@ -6,7 +6,7 @@
       - if @center and @client_group.new?
         = @center.name
       - else
-        = select_center_for @client_group, :center
+        = select_center_for @client_group, :center 
   %tr
     %td
       Group name:

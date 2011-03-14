@@ -97,8 +97,9 @@ module DataEntry
     def create(payment)
       raise NotFound unless @loan = Loan.get(payment[:loan_id])
       amounts = payment[:amount].to_f
-      receiving_staff = StaffMember.get(payment[:received_by])
+      receiving_staff = StaffMember.get(payment[:received_by]||payment[:received_by_staff_id])
       # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
+
       if payment[:type] == "total"
         succes, @prin, @int, @fees  = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff)
       else
