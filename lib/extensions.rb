@@ -103,7 +103,7 @@ module Misfit
         return true  if user_role == :admin
         return false if route[:controller] == "journals" and route[:action] == "edit"
         return true  if route[:controller] == "users" and route[:action] == "change_password"
-        return true  if route[:controller] == "reports" and route[:action] == "index"        
+        return true  if route[:controller] == "reports" and route[:action] == "index" and not user_role == :data_entry
         return false if (user_role == :read_only or user_role == :funder or user_role == :data_entry) and route[:controller] == "payments" and route[:action] == "delete"
         return false if (user_role != :admin) and route[:controller] == "loans" and route[:action] == "write_off_suggested"
 
