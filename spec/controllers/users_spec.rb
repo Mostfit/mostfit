@@ -319,18 +319,47 @@ describe "Controllers "  do
       @loan.errors
     end
   end
+
   #API Spec
-  it "user should be authenticate through api call" do	   
+  it "user role admin should be authenticate through api call" do	   
     params = {}
     params = {:format =>"xml", :login=>"admin", :password=>"password"}
-    response = put("/api/v1/users/my_details.xml", params)
-    response.should be_successful 
+    response = post("/api/v1/users/my_details.xml", params)
+    response.body.to_s.should  =~ /<login>admin<\/login>/
   end
 
-  it "user should not be authenticate through api call" do	   
+  it "user role mis_manager should be authenticate through api call" do	   
+    params = {}
+    params = {:format =>"xml", :login=>"mis", :password=>"manager"}
+    response = post("/api/v1/users/my_details.xml", params)
+    response.body.to_s.should  =~ /<login>mis<\/login>/
+  end
+
+  it "user role staff_member should be authenticate through api call" do	   
+    params = {}
+    params = {:format =>"xml", :login=>"branch", :password=>"branch"}
+    response = post("/api/v1/users/my_details.xml", params)
+    response.body.to_s.should  =~ /<login>branch<\/login>/
+  end
+
+  it "user role data_entry user should be authenticate through api call" do	   
+    params = {}
+    params = {:format =>"xml", :login=>"data", :password=>"entry1"}
+    response = post("/api/v1/users/my_details.xml", params)
+    response.body.to_s.should  =~ /<login>data<\/login>/
+  end
+
+  it "user role read_only should be authenticate through api call" do	   
+    params = {}
+    params = {:format =>"xml", :login=>"read", :password=>"only12"}
+    response = post("/api/v1/users/my_details.xml", params)
+    response.body.to_s.should  =~ /<login>read<\/login>/
+  end
+
+  it "unauthorized user should not be authenticate through api call" do	   
     params = {}
     params = {:format =>"xml", :login=>"admin", :password=>"pas"}
-    response = put("/api/v1/users/my_details.xml", params)
-    response.should_not be_successful 
+    response = post("/api/v1/users/my_details.xml", params)
+    response.body.to_s.should_not  =~ /<login>admin1<\/login>/
   end
 end

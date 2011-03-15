@@ -8,6 +8,15 @@
     %user_id #{@staff_member.user_id}
     - if @loans
       - @loans.each do |loan|
-        = loan.to_xml
+        %loans
+          %id #{loan.id}
+          %discriminator #{loan.discriminator}
+          %amount #{loan.amount}
+          %amount_applied_for #{loan.amount_applied_for}
+          %amount_sanctioned #{loan.amount_sanctioned}
+          %interest_rate #{loan.interest_rate}
+          %installment_frequency #{loan.installment_frequency}
+          %client_id #{loan.client_id}
+          %number_of_installments #{loan.number_of_installments}
           
         

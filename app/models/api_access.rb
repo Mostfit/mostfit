@@ -22,7 +22,7 @@ class ApiAccess
   end
   
   #staff member client infromation 
-  def self.get_staff_member_client(id,login, pwd)
+  def self.get_staff_member_clients(id,login, pwd)
     get("/staff_member/#{id}/clients.xml",  :query => {:login => login, :password => pwd})
   end
 

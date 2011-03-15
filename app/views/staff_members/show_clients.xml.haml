@@ -8,6 +8,12 @@
     %user_id #{@staff_member.user_id}
     - if @clients
       - @clients.each do |client|
-        = client.to_xml
+        %client
+          %id #{client.id}
+          %reference #{client.reference}
+          %name #{client.name}
+          %address #{client.address}
+          %client_group_id #{client.client_group_id}
+          %center_id #{client.center_id}
           
         
