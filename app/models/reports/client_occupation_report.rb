@@ -20,7 +20,10 @@ class ClientOccupationReport < Report
     repository.adapter.query(%Q{SELECT o.name occupation, count(clients.id) clients, count(loans.id) loans, SUM(loans.amount) amount
                                 FROM loans, clients
                                 LEFT OUTER JOIN occupations o ON o.id=clients.occupation_id
-                                WHERE clients.id=loans.client_id AND clients.id IN (SELECT id FROM clients WHERE date_joined BETWEEN '#{@from_date.strftime('%Y-%m-%d')}' AND '#{@to_date.strftime('%Y-%m-%d')}')
+                                WHERE clients.id=loans.client_id AND clients.id IN (SELECT id FROM clients 
+                                                                                    WHERE date_joined BETWEEN '#{@from_date.strftime('%Y-%m-%d')}' 
+                                                                                          AND '#{@to_date.strftime('%Y-%m-%d')}'
+                                                                                          AND clients.center_id in (#{@center.map{|c| c.id}.join(', ')}))
                                       AND loans.deleted_at is NULL AND loans.disbursal_date is NOT NULL
                                 GROUP BY clients.occupation_id;})
   end
