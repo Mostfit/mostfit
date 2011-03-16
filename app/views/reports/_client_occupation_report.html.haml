@@ -10,6 +10,7 @@
       Number of loans
     %th
       Amount disbursed
+  - clients, loans, amount = 0, 0, 0
   - @data.each_with_index do |row, idx|
     %tr
       %td
@@ -18,8 +19,20 @@
         = row[:occupation]||"None"
       %td
         = row[:clients]
+        - clients += row[:clients]
       %td
         = row[:loans]
+        - loans += row[:loans]
       %td
         = row[:amount] ? row[:amount].to_currency : 0
-
+        - amount += row[:amount] || 0
+  %tr
+    %td
+      %b Total
+    %td
+    %td
+      %b= clients
+    %td
+      %b= loans
+    %td
+      %b= amount.to_currency
