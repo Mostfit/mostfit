@@ -30,7 +30,7 @@
       Link to an insurance policy ?
     %td
       = check_box :linked_to_insurance, :checked => @loan_product.linked_to_insurance, :onchange => "$('#insurance_product_selector').toggle()"
-    %td#insurance_product_selector{:style => (@loan_product.linked_to_insurance ? "display: block" : "display: hidden")}
+    %td#insurance_product_selector{:style => ((@loan_product.linked_to_insurance) ? "display: block" : "display: none")}
       = select :insurance_product_id, :collection => InsuranceProduct.all.map{|ip| [ip.id, ip.name]}, :prompt => "any product"
 %h2 Fees
 - Fee.all.each do |fee|

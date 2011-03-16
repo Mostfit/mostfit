@@ -1,6 +1,7 @@
 class LoanProduct
   include DataMapper::Resource  
-  
+  before :save, :convert_blank_to_nil
+
   property :id, Serial, :nullable => false, :index => true
   property :name, String, :nullable => false, :index => true, :min => 3
   property :max_amount, Integer, :nullable => false, :index => true
@@ -91,4 +92,14 @@ class LoanProduct
   def to_s
     "Loans of Rs. #{(max_amount==min_amount ? max_amount : min_amount.to_s+'-'+max_amount.to_s)} at #{(max_interest_rate==min_interest_rate ? max_interest_rate : min_interest_rate.to_s+'% - '+max_interest_rate.to_s+'%')}"
   end
+
+  private
+  def convert_blank_to_nil
+    self.attributes.each{|k, v|
+      if v.is_a?(String) and v.empty? and self.class.properties.find{|x| x.name == k}.type==Integer
+        self.send("#{k}=", nil)
+      end
+    }
+  end
+
 end
