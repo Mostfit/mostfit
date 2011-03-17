@@ -94,7 +94,9 @@ class StaffMembers < Application
     #debugger
     if params[:format] == "pdf"
       #some problem not working as of now
-      filename = "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_disbursement_#{@date.strftime('%Y_%m_%d')}.pdf"
+      folder   = File.join(Merb.root, "public", "pdfs")
+      FileUtils.mkdir_p(folder)
+      filename = File.join(folder, "staff_#{@staff_member.id}_disbursement_#{@date.strftime('%Y_%m_%d')}.pdf")
       generate_disbursement_pdf(filename)
       send_data(File.read(filename), :filename => filename)
     else
