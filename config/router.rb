@@ -122,6 +122,8 @@ Merb::Router.prepare do
   match('/api/v1/staff_member/:id/centers.xml').to(:controller => 'staff_members', :action =>'show_centers', :format => 'xml')
   match('/api/v1/staff_member/:id/clients.xml').to(:controller => 'staff_members', :action =>'show_clients', :format => 'xml')
   match('/api/v1/staff_member/:id/loans.xml').to(:controller => 'staff_members', :action =>'show_disbursed', :format => 'xml')
+  match('/api/v1/staff_member/:id/day_sheet.xml').to(:controller => 'staff_members', :action =>'day_sheet', :format => 'xml')
+  match('/api/v1/data_entry/payments/by_center.xml').to(:controller => 'data_entry/payments', :action =>'by_center', :format => 'xml')
   
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
