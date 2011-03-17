@@ -140,13 +140,22 @@ module Pdf
           tot_amount = 0
           loans_to_disburse.each do |loan|
             tot_amount += loan.amount
+            premia, amount_to_disburse = 0, nil
+            if loan.loan_product.linked_to_insurance
+               premia = loan.insurance_policy.premium
+               amount_to_disburse = loan.amount - loan.insurance_policy.premium
+            else
+               premia = "NA"
+            end
             table.data.push({"amount" => loan.amount.to_currency, "name" => loan.client.name,
                               "group" => loan.client.client_group.name,
-                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date                              , "spouse name" => loan.client.spouse_name, "loan status" => loan.status
+                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date, 
+                              "spouse name" => loan.client.spouse_name, "loan status" => loan.status,
+                              "insurance premium" => premia, "balance to disburse" => (amount_to_disburse||loan.amount.to_currency)
                             })
           end
           table.data.push({"amount" => tot_amount.to_currency})
-          table.column_order  = ["name", "spouse name",  "group", "amount", "loan product", "first payment", "loan status", "signature"]
+          table.column_order  = ["name", "spouse name",  "group", "amount", "insurance premium", "balance to disburse", "loan product", "first payment", "loan status", "signature"]
           table.show_lines    = :all
           table.shade_rows    = :none
           table.show_headings = true          
