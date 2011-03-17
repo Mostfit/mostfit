@@ -44,6 +44,10 @@
           %th
             Amount
           %th
+            Insurance Premium
+          %th
+            Balance to Disburse
+          %th
             First Payment
       - loans_to_disburse.each do |loan|
         - tot_disbursement += loan.amount
@@ -57,6 +61,16 @@
               = loan.loan_product.name
           %td 
             = loan.amount
+            %td
+              - if loan.loan_product.linked_to_insurance and loan.insurance_policy
+                = loan.insurance_policy.premium
+              - else
+                = "-"
+          %td
+            - if loan.loan_product.linked_to_insurance
+              = loan.amount - loan.insurance_policy.premium
+            - else
+              = loan.amount
           %td
             = loan.scheduled_first_payment_date
       %tr{ :style => 'border-bottom: 2px solid;font-weight: bold;border-top: solid 1px #aaa;' }

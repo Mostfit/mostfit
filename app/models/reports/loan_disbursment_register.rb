@@ -45,8 +45,16 @@ class LoanDisbursementRegister < Report
       next unless center
       branch = branches[center.branch_id]
       data[branch][center][client.client_group] ||= []
+
+      premia, amount_to_disburse = 0, nil
+      if l.loan_product.linked_to_insurance
+        premia = l.insurance_policy.premium
+        amount_to_disburse = l.amount - l.insurance_policy.premium
+      end
+
       data[branch][center][client.client_group].push([client.reference, client.name, client.spouse_name, 
-                                                      l.loan_product_id, l.cycle_number, l.scheduled_disbursal_date, l.disbursal_date, l.amount])
+                                                      l.loan_product_id, l.cycle_number, l.scheduled_disbursal_date, 
+                                                      l.disbursal_date, l.amount, premia, amount_to_disburse||l.amount])
     }
     return data
   end
