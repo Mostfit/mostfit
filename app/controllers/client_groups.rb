@@ -1,5 +1,5 @@
 class ClientGroups < Application
-  # provides :xml, :yaml, :js
+  provides :xml
   before :get_context, :only => ['edit', 'update', 'index']
 
   def index

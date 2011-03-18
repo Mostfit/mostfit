@@ -1,5 +1,5 @@
 class Areas < Application
-  # provides :xml, :yaml, :js
+  provides :xml
   include DateParser
   before :get_region
 

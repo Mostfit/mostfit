@@ -23,19 +23,20 @@
           %address #{@center.address}
           %time "#{@center.meeting_time_hours}:#{'%02d' % @center.meeting_time_minutes}"
           - clients.group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each do |group, clients_grouped|
-            %group_name #{group ? group.name : "none"}
-            -clients_grouped.sort_by{|x| x.name}.each do |client|
-              %client
-                %id #{client.id}
-                %name #{client.name}
-                - loans.find_all{|l| l.client_id == client.id and l.disbursal_date}.each do |loan|
-                - lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
-                - next if not lh
-                - next if LOANS_NOT_PAYABLE.include? lh.status
-                  %loan_id #{loan.id}
-                  %disbursal_on #{loan.disbursal_date.to_s}
-                  %outstanding #{lh ? lh.actual_outstanding_principal : 0}
-                  %installment #{loan.number_of_installments_before(@date)}
-                  %principle  #{p = lh.nil? ? 0 : [lh.principal_due, 0].max} 
-                  %interest   #{i = lh.nil? ? 0 : [lh.interest_due,0].max} 
-                  %total_due #{p + i}
+            %group
+              %group_name #{group ? group.name : "none"}
+              -clients_grouped.sort_by{|x| x.name}.each do |client|
+                %client
+                  %id #{client.id}
+                  %name #{client.name}
+                  - loans.find_all{|l| l.client_id == client.id and l.disbursal_date}.each do |loan|
+                  - lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
+                  - next if not lh
+                  - next if LOANS_NOT_PAYABLE.include? lh.status
+                    %loan_id #{loan.id}
+                    %disbursal_on #{loan.disbursal_date.to_s}
+                    %outstanding #{lh ? lh.actual_outstanding_principal : 0}
+                    %installment #{loan.number_of_installments_before(@date)}
+                    %principle  #{p = lh.nil? ? 0 : [lh.principal_due, 0].max} 
+                    %interest   #{i = lh.nil? ? 0 : [lh.interest_due,0].max} 
+                    %total_due #{p + i}

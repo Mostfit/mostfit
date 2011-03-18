@@ -1,5 +1,5 @@
 class Regions < Application
-  # provides :xml, :yaml, :js
+  provides :xml
   include DateParser
 
   def index

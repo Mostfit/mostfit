@@ -40,5 +40,25 @@ class ApiAccess
   def self.get_staff_payments_by_center(center_id,login, pwd)
     get("/data_entry/payments/by_center.xml",  :query => {:center_id =>center_id, :login => login, :password => pwd})
   end
+  
+  #Get Regions details
+  def self.get_regions(login, pwd)
+    get("/regions.xml",  :query => {:login => login, :password => pwd})
+  end
+
+  #Get areas details
+  def self.get_areas(login, pwd)
+    get("/areas.xml",  :query => {:login => login, :password => pwd})
+  end
+
+  #Get client groups details
+  def self.get_client_groups(login, pwd)
+    get("/client_groups.xml",  :query => {:login => login, :password => pwd})
+  end
+
+  #Get centers paying today 
+  def self.get_centers_paying_today(login, pwd)
+    get("/browse/centers_paying_today.xml",  :query => {:login => login, :password => pwd})
+  end
 end
 

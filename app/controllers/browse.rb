@@ -131,7 +131,11 @@ class Browse < Application
 
       }
     }
-    render :template => 'dashboard/today'
+    if params[:format] == "xml"
+      display @data
+    else
+      render :template => 'dashboard/today'
+    end
   end
 
   # method to parse log file and show activity. 
