@@ -39,28 +39,9 @@ class Loans < Application
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])
+    status, @loan, @insurance_policy = create_loan(klass, attrs, @loan_product)
 
-    set_insurance_policy
-    if @loan_product.linked_to_insurance and insurance_policy_attr = params[:insurance_policy]
-      @insurance_policy = InsurancePolicy.new(insurance_policy_attr)
-      @insurance_policy.client = @client
-    end
-
-    @loan = klass.new(attrs)
-    raise NotFound if not @loan.client  # should be known though hidden field
-    @loan.loan_product_id = @loan_product.id     
-    @loan.amount          = @loan.amount_applied_for    
-
-    status = []
-    # save both insurance policy (if present) and loan in one go
-    Loan.transaction do |t|
-      status.push(@insurance_policy.save) if @insurance_policy
-      status.push(@loan.save)      
-      status.push(@insurance_policy.update(:loan => @loan))
-      t.rollback if status.include?(false)
-    end
-
-    if not status.include?(false)
+    if status
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' was successfully created"})
       else
@@ -69,6 +50,42 @@ class Loans < Application
     else
       @loan.interest_rate *= 100
       render :new # error messages will be shown
+    end
+  end
+
+  def bulk_create
+    klass, attrs = get_loan_and_attrs
+    attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
+    loan_product = LoanProduct.is_valid(params[:loan_product_id])
+    statuses, loans = [], []
+    
+    # create loans for all the clients
+    params[:client_ids].each{|client_id|
+      attrs[:client_id] = client_id.to_i
+      status, loan, insurance = create_loan(klass, attrs, loan_product)
+      statuses.push(status)
+      loans.push(loan)
+    }
+
+    if not statuses.include?(false)
+      if params[:return]
+        redirect(params[:return], :message => {:notice => "'#{statuses.count}' loans were successfully created"})
+      else
+        redirect(url(:data_entry), :message => {:notice => "'#{statuses.count}' loans were successfully created"})
+      end
+    else
+      # on error recreate form with errors
+      @loan = loans.first
+      @loan.interest_rate *= 100
+      @loan_product = loan_product
+      @clients = Client.all(:id => params[:client_ids])
+
+      # if the loan is insurance loan then populate necessary objects
+      if @loan_product.linked_to_insurance
+        @client = @clients.first
+        @insurance_policy = InsurancePolicy.new(:insurance_product => @loan_product.insurance_product)
+      end
+      display [], "data_entry/loans/bulk_form"
     end
   end
 
@@ -339,10 +356,15 @@ class Loans < Application
       @center = @client.center
       @branch = @center.branch
     else
-      @client = Client.get(params[:client_id])
+      if params[:client_id]
+        @client = Client.get(params[:client_id])
+      elsif params[:client_ids]
+        @clients = Client.all(:id => params[:client_id])
+      end
       @center = Center.get(params[:center_id])
       @branch = Branch.get(params[:branch_id])
-      raise NotFound unless @branch and @center and @client
+      raise NotFound unless @branch and @center
+      raise NotFound unless (@client or @clients)
     end
   end
 
@@ -352,6 +374,7 @@ class Loans < Application
     loan_product = LoanProduct.get(params[:loan_product_id])
     attrs = params[loan_product.loan_type.snake_case.to_sym]
     attrs[:client_id]=params[:client_id] if params[:client_id]
+    attrs[:insurance_policy] = params[:insurance_policy] if params[:insurance_policy]
     raise NotFound if not params[:loan_type]
     klass = Kernel::const_get(params[:loan_type])
     [klass, attrs]
@@ -375,10 +398,40 @@ class Loans < Application
     end
   end
 
-  def set_insurance_policy
+  def set_insurance_policy(loan_product)
     if @loan_product.linked_to_insurance
       @insurance_policy = InsurancePolicy.new
       @insurance_policy.client = @client
     end
+  end
+
+  def create_loan(klass, attrs, loan_product)
+    loan = klass.new(attrs)
+    raise NotFound if not loan.client  # should be known though hidden field
+
+    if loan_product.linked_to_insurance and insurance_policy_attr = attrs[:insurance_policy]
+      insurance_policy = InsurancePolicy.new(insurance_policy_attr)
+      insurance_policy.client = loan.client
+    end
+
+    loan.loan_product_id ||= loan_product.id
+    loan.amount          ||= loan.amount_applied_for
+
+    status = false
+
+    # save both insurance policy (if present) and loan in one go
+    Loan.transaction do |t|
+      statuses = []
+      statuses.push(insurance_policy.save) if insurance_policy
+      statuses.push(loan.save)
+      statuses.push(loan.update(:insurance_policy => insurance_policy)) if insurance_policy
+      if statuses.include?(false)
+        status = false
+        t.rollback
+      else
+        status = true
+      end
+    end
+    [status, loan, insurance_policy]
   end
 end # Loans

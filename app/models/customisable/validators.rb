@@ -46,6 +46,8 @@ module Misfit
       return [false, "Number of installments not defined"] if number_of_installments.nil? or number_of_installments.blank?
       return [false, "Amount not defined"] unless amount
       return [false, "Interest rate not defined"] unless interest_rate
+      return [false, "Installment frequency is not defined"] unless installment_frequency
+      return [false, "Scheduled first payment date is not defined"] unless scheduled_first_payment_date
 
       self.payment_schedule.each do |date, val|
         pri = val[:principal]
@@ -73,7 +75,7 @@ module Misfit
 	  return true
 	end
 	  
-	if not date = instance_eval(d) or not date.weekday == center.meeting_day_for(date)
+	if date = instance_eval(d) and not date.weekday == center.meeting_day_for(date)
           failed << d.humanize
           correct_weekday = center.meeting_day_for(date)
         end
