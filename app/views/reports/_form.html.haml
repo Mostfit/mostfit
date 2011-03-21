@@ -37,7 +37,7 @@
         |
         Account:
         = Account.get(account_id).name
-      - if type
+      - if type_of_target
         |
         Target Type:
         = params[report][:type_of_target].to_s.camelcase
@@ -128,7 +128,7 @@
         %tr
           - if @report.respond_to?(:ageing_interval)
             %td
-              Ageing interval:
+              Ageing intervals:
               - ages = ["3", "5", "10"]
               = select(:ageing_interval, :collection => ages, :prompt => "select ageing multiple")
         %tr
