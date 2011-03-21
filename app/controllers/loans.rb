@@ -424,7 +424,7 @@ class Loans < Application
       statuses = []
       statuses.push(insurance_policy.save) if insurance_policy
       statuses.push(loan.save)
-      statuses.push(loan.update(:insurance_policy => insurance_policy)) if insurance_policy
+      statuses.push(loan.update(:insurance_policy => insurance_policy)) if insurance_policy and not statuses.include?(false)
       if statuses.include?(false)
         status = false
         t.rollback
