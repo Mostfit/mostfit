@@ -27,7 +27,7 @@ class Loans < Application
       if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type)
         klass = Kernel::const_get(@loan_product.loan_type)
         @loan = klass.new
-        set_insurance_policy        
+        set_insurance_policy(@loan_product)
       end
     end
 
@@ -95,7 +95,7 @@ class Loans < Application
     @loan_product =  @loan.loan_product
     raise NotFound unless @loan
 
-    set_insurance_policy
+    set_insurance_policy(@loan_product)
     disallow_updation_of_verified_loans
     @loan.interest_rate*=100
     display @loan
