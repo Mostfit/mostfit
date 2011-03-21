@@ -5,7 +5,7 @@ class InsurancePolicy
   COVER_FOR       = [:self, :spouse, :son, :daughter, :mother, :father]
   property :id, Serial
   property :application_number, String, :nullable => true
-  property :policy_no, String, :nullable => false
+  property :policy_no, String, :nullable => true
   property :sum_insured, Integer, :nullable => false
   property :premium, Integer, :nullable => false
   property :date_from, Date, :nullable => false

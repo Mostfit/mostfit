@@ -60,18 +60,20 @@ class Loans < Application
     statuses, loans = [], []
     
     # create loans for all the clients
-    params[:client_ids].each{|client_id|
-      attrs[:client_id] = client_id.to_i
-      status, loan, insurance = create_loan(klass, attrs, loan_product)
-      statuses.push(status)
-      loans.push(loan)
-    }
-
+    if not loan_product.linked_to_insurance
+      params[:client_ids].each{|client_id|
+        attrs[:client_id] = client_id.to_i
+        status, loan, insurance = create_loan(klass, attrs, loan_product)
+        statuses.push(status)
+        loans.push(loan)
+      }
+    end
+    
     if not statuses.include?(false)
       if params[:return]
         redirect(params[:return], :message => {:notice => "'#{statuses.count}' loans were successfully created"})
       else
-        redirect(url(:data_entry), :message => {:notice => "'#{statuses.count}' loans were successfully created"})
+        redirect(url(:data_entry), :message => {:notice => "insurance linked loans can not be created with bulk entry"})
       end
     else
       # on error recreate form with errors
@@ -79,12 +81,6 @@ class Loans < Application
       @loan.interest_rate *= 100
       @loan_product = loan_product
       @clients = Client.all(:id => params[:client_ids])
-
-      # if the loan is insurance loan then populate necessary objects
-      if @loan_product.linked_to_insurance
-        @client = @clients.first
-        @insurance_policy = InsurancePolicy.new(:insurance_product => @loan_product.insurance_product)
-      end
       display [], "data_entry/loans/bulk_form"
     end
   end
@@ -406,6 +402,7 @@ class Loans < Application
   end
 
   def create_loan(klass, attrs, loan_product)
+    debugger
     loan = klass.new(attrs)
     raise NotFound if not loan.client  # should be known though hidden field
 
@@ -421,10 +418,9 @@ class Loans < Application
 
     # save both insurance policy (if present) and loan in one go
     Loan.transaction do |t|
+       debugger
       statuses = []
-      statuses.push(insurance_policy.save) if insurance_policy
       statuses.push(loan.save)
-      statuses.push(loan.update(:insurance_policy => insurance_policy)) if insurance_policy and not statuses.include?(false)
       if statuses.include?(false)
         status = false
         t.rollback
