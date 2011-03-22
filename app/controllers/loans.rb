@@ -39,15 +39,19 @@ class Loans < Application
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])
-    status, @loan, @insurance_policy = create_loan(klass, attrs, @loan_product)
+    raise NotAllowed unless @loan_product
+    @loan = klass.new(attrs)
+    @loan.loan_product = @loan_product
+    @loan.amount      ||= @loan.amount_applied_for
 
-    if status
+    if @loan.save
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' was successfully created"})
       else
         redirect resource(@branch, @center, @client), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
       end
     else
+      set_insurance_policy(@loan_product)
       @loan.interest_rate *= 100
       render :new # error messages will be shown
     end
@@ -57,14 +61,23 @@ class Loans < Application
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     loan_product = LoanProduct.is_valid(params[:loan_product_id])
-    statuses, loans = [], []
+    statuses = []
+
     # create loans for all the clients
-    params[:client_ids].each{|client_id|
-      attrs[:client_id] = client_id.to_i
-      status, loan, insurance = create_loan(klass, attrs, loan_product)
-      statuses.push(status)
-      loans.push(loan)
-    }
+    Loan.transaction do |t|
+      params[:client_ids].each{|client_id|      
+        attrs[:client_id] = client_id.to_i
+        @loan = klass.new(attrs)
+        @loan.loan_product  = loan_product
+        @loan.amount      ||= @loan.amount_applied_for        
+        unless @loan.save
+          statuses.push(false)
+          t.rollback
+        else
+          statuses.push(true)
+        end
+      }
+    end
     
     if not statuses.include?(false)
       if params[:return]
@@ -72,11 +85,9 @@ class Loans < Application
       else
         redirect(url(:data_entry), :message => {:notice => "'#{statuses.count}' loans were successfully created"})
       end
-    else
+    else      
       # on error recreate form with errors
-      @loan = loans.first
-      @loan.interest_rate *= 100
-      @loan_product = loan_product
+      @loan_product  = @loan.loan_product if @loan
       @clients = Client.all(:id => params[:client_ids])
       display [], "data_entry/loans/bulk_form"
     end
@@ -101,8 +112,17 @@ class Loans < Application
     @loan = klass.get(id)
     raise NotFound unless @loan
     disallow_updation_of_verified_loans
+
+    # if an attached insurance policy then create or update insurance policy
+    if attrs[:insurance_policy]
+      @insurance = @loan.insurance_policy || Insurance.new
+      @insurance.client = @loan.client
+      @insurance.attributes = attrs.delete(:insurance_policy)
+    end
+    
     @loan.attributes = attrs
     @loan_product = @loan.loan_product
+    @loan.insurance_policy = @insurance if @loan_product.linked_to_insurance and @insurance
 
     if @loan.save or @loan.errors.length==0
       if params[:return]
@@ -396,33 +416,5 @@ class Loans < Application
       @insurance_policy = @loan.insurance_policy || InsurancePolicy.new
       @insurance_policy.client = @client
     end
-  end
-
-  def create_loan(klass, attrs, loan_product)
-    loan = klass.new(attrs)
-    raise NotFound if not loan.client  # should be known though hidden field
-    
-    if loan_product.linked_to_insurance and insurance_policy_attr = attrs[:insurance_policy]
-      insurance_policy = InsurancePolicy.new(insurance_policy_attr)
-      insurance_policy.client = loan.client
-    end
-    
-    loan.loan_product_id ||= loan_product.id
-    loan.amount          ||= loan.amount_applied_for
-
-    status = false
-    
-    # save both insurance policy (if present) and loan in one go
-    Loan.transaction do |t|
-      statuses = []
-      statuses.push(loan.save)
-      if statuses.include?(false)
-        status = false
-        t.rollback
-      else
-        status = true
-      end
-    end
-    [status, loan, insurance_policy]
   end
 end # Loans
