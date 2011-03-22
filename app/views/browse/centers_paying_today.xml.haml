@@ -7,11 +7,11 @@
         - center = @centers[center_id]
           %center
             %name #{center.name}
-            %due_principle #{(pd = (lh[2] and lh[2] > 0) ? lh[2] : 0).to_currency}
+            %due_principal #{(pd = (lh[2] and lh[2] > 0) ? lh[2] : 0).to_currency}
             %due_interest #{ (intd = (lh[3] and lh[3] > 0) ? lh[3] : 0).to_currency}
             %due_fee  #{(fd = @fees_due[center_id]||0).to_currency}
             %due_total #{ (pd + intd + fd).to_currency}
-            %paid_principle #{(pp = (lh[4] and lh[4] > 0) ? lh[4] : 0).to_currency}
+            %paid_principal #{(pp = (lh[4] and lh[4] > 0) ? lh[4] : 0).to_currency}
             %paid_interest #{  (intp = (lh[5] and lh[5] > 0) ? lh[5] : 0).to_currency}
             %paid_fee  #{(fp = @fees_paid[center_id]||0).to_currency}
             %paid_total #{(pp + intp + fp).to_currency}
