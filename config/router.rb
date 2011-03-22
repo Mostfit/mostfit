@@ -118,17 +118,19 @@ Merb::Router.prepare do
   match('/rules/get').to(:controller => 'rules', :action => 'get') 
   #API Route
   match('/api/v1/users/my_details.xml').to(:controller => 'users', :action => 'my_details', :format => 'xml')
-  match('/api/v1/staff_member/:id/branches.xml').to(:controller => 'staff_members', :action =>'show_branches', :format => 'xml')
-  match('/api/v1/staff_member/:id/centers.xml').to(:controller => 'staff_members', :action =>'show_centers', :format => 'xml')
-  match('/api/v1/staff_member/:id/clients.xml').to(:controller => 'staff_members', :action =>'show_clients', :format => 'xml')
-  match('/api/v1/staff_member/:id/loans.xml').to(:controller => 'staff_members', :action =>'show_disbursed', :format => 'xml')
-  match('/api/v1/staff_member/:id/day_sheet.xml').to(:controller => 'staff_members', :action =>'day_sheet', :format => 'xml')
+  match('/api/v1/staff_members/:id/branches.xml').to(:controller => 'staff_members', :action =>'show_branches', :format => 'xml')
+  match('/api/v1/staff_members/:id/centers.xml').to(:controller => 'staff_members', :action =>'show_centers', :format => 'xml')
+  match('/api/v1/staff_members/:id/clients.xml').to(:controller => 'staff_members', :action =>'show_clients', :format => 'xml')
+  match('/api/v1/staff_members/:id/loans.xml').to(:controller => 'staff_members', :action =>'show_disbursed', :format => 'xml')
+  match('/api/v1/staff_members/:id/day_sheet.xml').to(:controller => 'staff_members', :action =>'day_sheet', :format => 'xml')
   match('/api/v1/data_entry/payments/by_center.xml').to(:controller => 'data_entry/payments', :action =>'by_center', :format => 'xml')
   match('/api/v1/regions.xml').to(:controller => 'regions', :action =>'index', :format => 'xml')
   match('/api/v1/areas.xml').to(:controller => 'areas', :action =>'index', :format => 'xml')
   match('/api/v1/client_groups.xml').to(:controller => 'client_groups', :action =>'index', :format => 'xml')
   match('/api/v1/browse/centers_paying_today.xml').to(:controller => 'browse', :action =>'centers_paying_today', :format => 'xml')
-  
+  match('/api/v1/centers/:id.xml').to(:controller => 'centers', :action =>'show', :format => 'xml')
+  match('/api/v1/branches/:branch_id/centers/:center_id/clients/:id.xml').to(:controller => 'clients', :action =>'show', :format => 'xml')
+
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
 end

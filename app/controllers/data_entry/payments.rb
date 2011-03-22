@@ -67,7 +67,12 @@ module DataEntry
                                      }) : render
         end
       else
-        render
+        if params[:format] and params[:format]=="xml"
+          @weeksheets = Weeksheet.get_center_sheet(@center,@date)
+          display @weeksheets
+        else
+          render
+        end
       end
     end
     

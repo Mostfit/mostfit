@@ -1,0 +1,15 @@
+%xml
+  %center_clients
+    %center_id #{@center.id}
+    %center_name #{@center.name}
+    %center_meeting_day #{@center.meeting_day}
+    %center_meeting_time #{@center.meeting_time_hours}:#{@center.meeting_time_minutes}
+    %center_manager_id #{@center.manager.id}
+    %center_manager_name #{@center.manager.name}
+    %branch_id  #{@branch.id}
+    %branch_name #{@branch.name}
+    - @clients.each do |client|
+      %client
+        %client_id #{client.id}
+        %client_name #{client.name}
+

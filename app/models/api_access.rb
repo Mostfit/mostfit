@@ -13,27 +13,27 @@ class ApiAccess
 
   #staff member info with their branches and center
   def self.get_staff_member_branches(id, login, pwd)
-    get("/staff_member/#{id}/branches.xml",  :query => {:login => login, :password => pwd})
+    get("/staff_members/#{id}/branches.xml",  :query => {:login => login, :password => pwd})
   end
 
   #staff member centers infromation 
   def self.get_staff_member_centers(id,login, pwd)
-    get("/staff_member/#{id}/centers.xml",  :query => {:login => login, :password => pwd})
+    get("/staff_members/#{id}/centers.xml",  :query => {:login => login, :password => pwd})
   end
   
   #staff member client infromation 
   def self.get_staff_member_clients(id,login, pwd)
-    get("/staff_member/#{id}/clients.xml",  :query => {:login => login, :password => pwd})
+    get("/staff_members/#{id}/clients.xml",  :query => {:login => login, :password => pwd})
   end
 
   #staff member loans infromation 
   def self.get_staff_member_loans(id,login, pwd)
-    get("/staff_member/#{id}/loans.xml",  :query => {:login => login, :password => pwd})
+    get("/staff_members/#{id}/loans.xml",  :query => {:login => login, :password => pwd})
   end
 
   #staff member day sheet infromation 
   def self.get_staff_member_day_sheet(id,login, pwd)
-    get("/staff_member/#{id}/day_sheet.xml",  :query => {:login => login, :password => pwd})
+    get("/staff_members/#{id}/day_sheet.xml",  :query => {:login => login, :password => pwd})
   end
 
   #Get payment details by center
@@ -59,6 +59,16 @@ class ApiAccess
   #Get centers paying today 
   def self.get_centers_paying_today(login, pwd)
     get("/browse/centers_paying_today.xml",  :query => {:login => login, :password => pwd})
+  end
+
+  #Fetch clients for center 
+  def self.get_clients_for_center(id,login, pwd)
+    get("/centers/#{id}.xml",  :query => {:login => login, :password => pwd})
+  end
+
+  #Fetch loans for client
+  def self.get_loans_for_client(branch_id, center_id, client_id, login, pwd)
+    get("/branches/#{branch_id}/centers/#{center_id}/clients/#{client_id}.xml",  :query => {:login => login, :password => pwd})
   end
 end
 
