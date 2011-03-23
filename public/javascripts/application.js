@@ -949,7 +949,12 @@ $(document).ready(function(){
 						     $("#inactive_options").toggle();
 						 });
 		      $("a.expand_collapsed").click(function(a){
-							$(".collapsed").toggle();
+							id = $(a.currentTarget).attr("id");
+							if((id && $("#element_" + id).length > 0)){
+							    $("#element_" + id).toggle();    
+							}else{
+							    $(".collapsed").toggle();
+							}
 							if($(a.currentTarget).css("background-image").indexOf("closed.gif")>0){
 							    $(a.currentTarget).css("background-image", "url(/images/elements/open.gif)");
 							}else{

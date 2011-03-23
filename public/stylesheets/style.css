@@ -291,9 +291,9 @@ border: solid 1px #33a;
 }
 
 
-span.red   { color: #d33; }
-span.green { color: #3d3; }
-
+span.red   { background-color: #a44848; padding: 3px; color: white;}
+span.green { background-color: #64DE89; padding: 3px; color: black;}
+span.blue  { background-color: #3465a4; padding: 3px; color: white;}
 /**************************************/
 /*               FOOTER               */
 /**************************************/
