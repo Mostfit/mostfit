@@ -192,12 +192,11 @@
           %td
             - if lh.date <= Date.today
               %b
-                %span{ :class => (lh.amount_in_default > 0 ? 'red' : 'green') }
+                %span{:class => (lh.amount_in_default > 0 ? 'red' : (lh.amount_in_default < 0 ? 'blue' : 'green')) }
                   = lh.amount_in_default.to_currency
               %br/
               %span.greytext
-                %span{ :class => (lh.amount_in_default > 0 ? 'red' : 'green') }
-                  = format("%.0f%", (lh.amount_in_default.abs.to_f / @loan.total_to_be_received) * 100)
+                = format("%.0f%", (lh.amount_in_default.abs.to_f / @loan.total_to_be_received) * 100)
                 = lh.amount_in_default <= 0 ? 'overpaid' : 'shortfall'
       %tfoot
         %tr

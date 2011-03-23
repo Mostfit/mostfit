@@ -1,6 +1,6 @@
 %h2
   Centers meeting on 
-  =params[:meeting_day]||Date.today.weekday
+  = params[:meeting_day]||Date.today.weekday
 %p{:style => "margin-left: 15px;"}
   %b Select center meeting day: &nbsp; 
   = paginate_on_weekdays(@branch, (params.key?(:meeting_day) ? params[:meeting_day].to_sym : Date.today.weekday))
@@ -22,6 +22,7 @@
       %th Edit
     %tbody
     - clients_count = Client.all(:center => @centers).aggregate(:center_id, :id.count).to_hash
+    - today = Date.today.weekday
     - @centers.each do |center|
       %tr{:class => cycle('odd','')}
         %td
@@ -30,9 +31,10 @@
           %b= link_to center.name, resource(@branch, center )
         %td.text
           = link_to center.manager.name, resource(center.manager)
-        %td{:style => center.meeting_day == Date.today.weekday ?  'background: #aaffaa;' : ''}
-          - if center.meeting_day            
-            == #{center.meeting_day.to_s.capitalize}#{(center.meeting_time_hours and center.meeting_time_minutes) ? ", #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}" : ''}
+        %td
+          - if center.meeting_day
+            %span{:class => center.meeting_day == today ? 'blue' : ''}
+              == #{center.meeting_day.to_s.capitalize}#{(center.meeting_time_hours and center.meeting_time_minutes) ? ", #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}" : ''}
         %td
           = clients_count[center.id] if clients_count.key?(center.id)
         %td
