@@ -41,6 +41,11 @@ class ApiAccess
     get("/data_entry/payments/by_center.xml",  :query => {:center_id =>center_id, :login => login, :password => pwd})
   end
   
+  #Create payment by client at center on date accepted by staff member
+  def self.create_client_payments(center_id,login, pwd)
+    post("/data_entry/payments/by_center.xml",  :query => {:center_id =>center_id, :login => login, :password => pwd, :received_on =>"2011-03-22", :paid =>{:loan =>{"532"=>"10.0"}}, :payment_style =>{"532"=>"prorata"}, :attendance =>{"520"=>"present"}, :payment =>{"received_by"=>"5"}})
+  end
+
   #Get Regions details
   def self.get_regions(login, pwd)
     get("/regions.xml",  :query => {:login => login, :password => pwd})

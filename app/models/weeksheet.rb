@@ -1,5 +1,20 @@
 class Weeksheet
-  attr_accessor :date,:center_id, :center_name, :center_meeting_time, :group_name, :client_id, :client_name, :loan_id, :loan_amount, :disbursal_date, :outstanding, :principal, :interest, :total_due, :fee, :installment_number
+  attr_accessor :date
+  attr_accessor :center_id
+  attr_accessor :center_name
+  attr_accessor :center_meeting_time
+  attr_accessor :group_name
+  attr_accessor :client_id
+  attr_accessor :client_name
+  attr_accessor :loan_id
+  attr_accessor :loan_amount
+  attr_accessor :disbursal_date
+  attr_accessor :outstanding
+  attr_accessor :principal
+  attr_accessor :interest
+  attr_accessor :total_due
+  attr_accessor :fee
+  attr_accessor :installment_number
 
   #Get weeksheet of center 
   def self.get_center_sheet(center, date)

@@ -46,25 +46,30 @@ module DataEntry
           notice = 'All payments made succesfully'
           if(request.xhr?)
             render("<div class='notice'>#{notice}<div>", :layout => layout?)
+          elsif params[:format] and params[:format]=="xml" and @errors.blank?
+            @message = 'All payments made succesfully'         
+            display @message
           else
             redirect(return_url, :message => {:notice => notice})
           end
-        elsif params[:format] and params[:format]=="xml"
-          display("")
         else
-          params[:return] ? redirect(params[:return], :message => {
-                                       :error => @errors.map{|e| 
-                                         if e.instance_variables.include?("@errors")
-                                           if e.resource.loan_id
-                                             "#{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}"
-                                           else
-                                             "#{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}"
-                                           end
-                                         else
-                                           e.to_s
-                                         end
-                                         }.join("\n")
-                                     }) : render
+          if params[:format] and params[:format]=="xml"
+            display @errors
+          else
+            params[:return] ? redirect(params[:return], :message => {
+              :error => @errors.map{|e| 
+              if e.instance_variables.include?("@errors")
+                if e.resource.loan_id
+                  "#{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}"
+                else
+                  "#{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}"
+                end
+              else
+                e.to_s
+              end
+            }.join("\n")
+            }) : render
+          end
         end
       else
         if params[:format] and params[:format]=="xml"

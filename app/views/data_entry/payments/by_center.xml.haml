@@ -1,9 +1,18 @@
--error=@payment.errors.instance_variable_get("@errors") if @payment
-- if error
+- if not @errors.blank?
   %xml
-    %error
-    - error.each_key do |k|
-      =error[k]
+    %message
+      - @errors.map do |e|
+        - if e.instance_variables.include?("@errors")
+          - if e.resource.loan_id
+            %error #{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
+          - else
+            %error #{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
+        - else
+          %error #{e.to_s}
+- elsif not @message.blank? and @errors.blank?
+  %xml
+    %message 
+      %success #{@message}
 - else
   -if @center
     %xml
