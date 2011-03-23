@@ -2,12 +2,35 @@ class Exceptions < Merb::Controller
   
   # handle NotFound exceptions (404)
   def not_found
-    render :format => :html
+    if request.xhr?
+      return("Sorry! Not found.")
+    elsif request.env['HTTP_REFERER']
+      redirect request.env['HTTP_REFERER'], :message => { :error => 'Sorry, page not found' }
+    else
+      render :status => 404
+    end
+  end
+
+  # handle NotAcceptable exceptions (400)
+  def bad_request
+    if request.xhr?
+      return("Sorry! Missing parameters. Please fill the form correctly")
+    elsif request.env['HTTP_REFERER']
+      redirect request.env['HTTP_REFERER'], :message => { :error => 'Sorry! Missing parameters. Please fill the form correctly' }
+    else
+      render :format => :html, :layout => layout?, :status => 400
+    end
   end
 
   # handle NotAcceptable exceptions (406)
-  def not_acceptable
-    render :format => :html
+  def not_complete
+    if request.xhr?
+      return("Sorry! Not found.")
+    elsif request.env['HTTP_REFERER']
+      redirect request.env['HTTP_REFERER'], :message => { :error => 'Sorry, not acceptable' }
+    else
+      render :format => :html, :layout => layout?, :status => 406
+    end
   end
 
   def not_privileged
@@ -16,13 +39,13 @@ class Exceptions < Merb::Controller
     elsif request.env['HTTP_REFERER'] 
       redirect request.env['HTTP_REFERER'], :message => { :error => 'Sorry, not enough privileges to do this' }
     else
-      render
+      render :status => 403
     end
   end
 
   def not_authorized
     return "Not privileged" if request.xhr?
-    render
+    render :status => 403
   end
 
   def session_expired
