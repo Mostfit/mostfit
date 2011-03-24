@@ -15,11 +15,12 @@
       %td
         =link_to "#{trail.auditable_type} #{trail.auditable_id}", url(:controller => trail.auditable_type.pluralize.downcase, :action => "show", :id => trail.auditable_id)
       %td.text
-        =trail.action
+        %span{:class => get_status_class([:delete, :create, :update].index(trail.action))}
+          = trail.action
       %td.text
         %table{:width => '100%'}
-          =diff_display(trail.changes, @obj, trail.action)
+          = diff_display(trail.changes, @obj, trail.action)
       %td
-        =trail.created_at.strftime("%d-%m-%Y %H:%M")
+        = trail.created_at.strftime("%d-%m-%Y %H:%M")
       %td
-        =trail.user ? trail.user.login : "admin"
+        = trail.user ? trail.user.login : "admin"

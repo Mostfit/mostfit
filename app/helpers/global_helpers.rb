@@ -492,6 +492,20 @@ module Merb
         obj.address.blank? ? obj.name : obj.address
       end
     end
+    
+    def get_status_class(idx)
+      case idx
+      when 0
+        'red'
+      when 1
+        'green'
+      when 2
+        'blue'
+      else
+        'grey'
+      end
+    end
+    
 
     private
     def staff_members_collection(allow_unassigned=false, allow_inactive=false)
