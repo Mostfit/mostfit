@@ -38,10 +38,12 @@ class Account
     
   end
 
+  # check if it is a cash account
   def is_cash_account?
     @account_category ? @account_category.eql?('Cash') : false
   end
   
+  # check if it is a bank account
   def is_bank_account?
     @account_category ? @account_category.eql?('Bank') : false
   end
@@ -54,6 +56,9 @@ class Account
     }
   end
 
+  
+  # generate tree form of accounts based on parent relationships.
+  # TODO: Not working correctly right now
   def self.tree(branch_id = nil)
     data = {}
     Account.all(:order => [:account_type_id.asc], :parent_id => nil).group_by{|account| account.account_type}.each{|account_type, accounts|

@@ -1,7 +1,7 @@
 class RuleBook
   include DataMapper::Resource
   before :save, :convert_blank_to_nil
-  ACTIONS = ['principal', 'interest', 'fees', 'disbursement']
+  ACTIONS = ['principal', 'interest', 'fees', 'disbursement', 'advance_principal', 'advance_interest', 'advance_principal_adjusted', 'advance_interest_adjusted']
 
   property :id,     Serial
   property :name,   String
@@ -33,6 +33,13 @@ class RuleBook
   validates_with_method  :expire_old_rule
   validates_with_method  :rule_date_range_validation
 
+  # This function is used to get accounts based on the transaction in the loan system.
+  # Right now these transactions can be payments, loans, or array of payments or loans.
+  # This function tries to find the rule by matching the transaction type (principal, interest etc)
+  # to the rules available and find the most suitable one.
+  # If a rule with branch is available that rule is returned. Otherwise global rule is returned.
+  # For advance payments (principal and interest) this function would make normal principal and interest accounts. 
+  # advance postings only work from EOD voucher. No automatic postings
   def self.get_accounts(obj, amount = nil)
     return false if not Mfi.first.accounting_enabled
     if obj.class==Payment
@@ -53,7 +60,7 @@ class RuleBook
       date = obj.first.loan.disbursal_date
       credit_accounts, debit_accounts  = {}, {}
       obj.each{|p|  
-        rule = if p.type==:fees
+        rule = if p.type == :fees
                  first(:action => p.type, :branch => branch, :fee => p.fee, :active => true) || first(:action => p.type, :branch => nil, :fee => p.fee, :active => true)
                else
                  first(:action => p.type, :branch => branch, :active => true) || first(:action => p.type, :branch => nil, :active => true)
@@ -92,14 +99,16 @@ class RuleBook
     [credit_accounts, debit_accounts]
   end
   
+  # presentage split between credit and debit accounts should be 100% (each)
   def percentage_should_be_100
     return [false, "Credit account split is not 100%"] if credit_account_rules.map{|a| a.percentage}.inject(0){|s,x| s+=x||0}!=100
     return [false, "Debit account split is not 100%"]  if debit_account_rules.map{|a| a.percentage}.inject(0){|s,x| s+=x||0}!=100
     return true
   end
 
+  # credit and debit accounts cannot be exactly same
   def credit_account_is_not_same_as_debit_account?
-    return true if (credit_accounts.map{|x| x.id} & debit_accounts.map{|x| x.id}).length==0
+    return true unless (credit_account_rules.map{|x| x.credit_account_id} == debit_account_rules.map{|x| x.debit_account_id})
     [false, "Credit and Debit account cannot be same"]
   end
 
@@ -111,6 +120,7 @@ class RuleBook
     }
   end
   
+  # This function makes sure duplicate active reules are not created for the same action and branch
   def action_not_chosen_twice_for_particular_branch
     if self.fee and self.new?
       return [false, "Fee action has already been chosen for this branch"] if RuleBook.first(:fee => fee, :action => action, :branch_id => branch_id)
@@ -121,8 +131,9 @@ class RuleBook
     end
     return true 
   end
-# this function will work  if same rule is been created for same branch 
-#  it will deactivate old rule after creation of new rule for same action like disbursment, interest, fee or principal 
+
+  # this function will work  if same rule is been created for same branch 
+  #  it will deactivate old rule after creation of new rule for same action like disbursment, interest, fee or principal 
   def expire_old_rule
     if self.new?
       RuleBook.all.each do |rule|
@@ -137,7 +148,7 @@ class RuleBook
     return true
   end
 
-# will verify that from date is always less than to date 
+  # will verify that from date is always less than to date 
   def rule_date_range_validation
     if self and self.from_date > self.to_date
       return [false,"from_date should be less than to_date"]

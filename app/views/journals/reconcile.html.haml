@@ -1,0 +1,54 @@
+#reconcile_container
+  %form{:class => "_remote_", :method => "GET", :action => url(:controller => :journals, :action => :reconcile, :return => params[:return])}
+    %b Select branch
+    = select :name => :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select branch", :selected => params[:branch_id]
+    from
+    - today = Date.today
+    - month_first = Date.new(today.year, today.month, 1)
+    = date_select :from_date, (params[:from_date] || month_first), :min_date => Date.min_date, :max_date => Date.today
+    to
+    = date_select :to_date, (params[:to_date] || Date.today), :min_date => Date.min_date, :max_date => Date.today
+    %input{:type => :hidden, :name => "return", :value => params[:return]}
+    %input{:type => :hidden, :name => "_target_", :value => "reconcile_container"}
+    = submit "GO"
+  - if @rules
+    %table{:width => "30%"}
+      %tr
+        %th
+        %th
+          %b Loan System
+        %th
+          %b Account System
+        %th
+          %b Difference
+      %tr
+        %td
+          %b Disbursement
+        %td
+          = (ls = @disbursement || 0).to_currency
+        %td
+          = (as = (Posting.all("journal.date" => (@from_date..@to_date), :account_id => @rules[:disbursement].map{|x| x.debit_account_rules.map{|da| da.debit_account_id}}.flatten, :amount.lt => 0).aggregate(:amount.sum) || 0) * -1).to_currency
+        %td
+          %span{:class => "#{(ls - as)!=0 ? 'red' : 'green'}"}
+            = (ls - as).to_currency
+      %tr
+        %td
+          %b Principal, interest and fee income 
+        %td
+          = (ls = @principal + @interest).to_currency
+        %td
+          - account_ids = []
+          - account_ids += @rules[:principal].map{|x| x.debit_account_rules.map{|ca| ca.debit_account_id}}.flatten
+          - account_ids += @rules[:interest].map{|x| x.debit_account_rules.map{|ca|  ca.debit_account_id}}.flatten
+          - account_ids += @rules[:fees].map{|x| x.debit_account_rules.map{|ca|  ca.debit_account_id}}.flatten
+          - as = (Posting.all("journal.date" => (@from_date..@to_date), :account_id => account_ids, :amount.lt => 0).aggregate(:amount.sum) || 0) * -1
+          - # subtracting this figure below as above are debit entries
+          - as -= (Posting.all("journal.date" => (@from_date..@to_date), :account_id => @rules[:fees].map{|x| x.credit_account_rules.map{|ca|  ca.credit_account_id}}.flatten).aggregate(:amount.sum) || 0)
+          - account_ids = []
+          - account_ids += @rules[:advance_principal].map{|x| x.credit_account_rules.map{|ca| ca.credit_account_id}}.flatten
+          - account_ids += @rules[:advance_interest].map{|x| x.credit_account_rules.map{|ca|  ca.credit_account_id}}.flatten        
+          - as -= (Posting.all("journal.date" => (@from_date..@to_date), :account_id => account_ids, :amount.gt => 0).aggregate(:amount.sum) || 0)
+          = as.to_currency
+        %td
+          %span{:class => "#{(ls - as)!=0 ? 'red' : 'green'}"}
+            = (ls - as).to_currency

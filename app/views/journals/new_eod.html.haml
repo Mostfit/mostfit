@@ -1,0 +1,78 @@
+%div
+  = form_for(@journal, :action => url(:controller => :journals, :action => :create_eod), :class => "_remote_") do
+    %table
+      %tr
+        %td
+          %b Journal Type
+        %td
+          = select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select Journal", :selected => "3"
+      %tr
+        %td
+          %b Action
+        %td
+          %b Credit account
+        %td
+          %b Amount
+        %td
+          %b Debit account
+        %td
+          %b Amount
+      - debit_total, credit_total = 0, 0
+      - if @rules and @rules.length > 0
+        - @rules.each do |rule|
+          %tr
+            - if rule.credit_account_rules and rule.credit_account_rules.length > 0
+              - rule.credit_account_rules.each_with_index do |ca, idx|
+                %td
+                  %b= rule.action.camelcase(' ')
+                %td
+                  = ca.credit_account.name                  
+                  = hidden_field :name => "credit_accounts[][account_id]", :value => ca.credit_account.id
+                %td
+                  - amount, changable = ca.amount(@date)
+                  - credit_total += amount
+                  - if false
+                    = text_field :name => "credit_accounts[][amount]", :value => (amount || 0)
+                  - else
+                    = (amount || 0).to_currency
+                    = hidden_field :name => "credit_accounts[][amount]", :value => (amount||0)
+            - if rule.debit_account_rules and rule.debit_account_rules.length > 0
+              - rule.debit_account_rules.each_with_index do |da, idx|
+                %td
+                  = da.debit_account.name
+                  = hidden_field :name => "debit_accounts[][account_id]", :value => da.debit_account.id
+                %td
+                  - amount, changable = da.amount(@date)
+                  - debit_total += amount
+                  - if false
+                    = text_field :name => "debit_accounts[][amount]", :value => (amount || 0)
+                  - else
+                    = (amount || 0).to_currency
+                    = hidden_field :name => "debit_accounts[][amount]", :value => (amount||0)
+      %tr
+        %td
+        %td
+        %td
+          = credit_total.to_currency
+        %td
+        %td
+          = debit_total.to_currency
+      %tr
+        %td
+          Date
+        %td
+          = date_select_for @journal, :date, {:date => @date}
+      %tr
+        %td
+          Comment
+        %td
+          = text_field :comment, :value => (@journal.comment || "EOD voucher entry for #{@date}")
+      %tr
+        %td
+          Transaction ID
+        %td
+          =text_field :transaction_id, :value => "#{@date.strftime('%Y-%m-%d')}-#{@branch.id}"
+      %tr
+        %td
+          = submit "Create"
+

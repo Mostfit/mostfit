@@ -11,6 +11,8 @@
     %th 
       Credit Account
     %th 
+      Breakup
+    %th 
       Amount
     %th 
       Comment
@@ -34,10 +36,10 @@
           %br
       %td
         %b De
-        = debit_postings.map{|x| x.amount>0 ? x.amount.round(2) : 0}.join(", ")
+        = debit_postings.map{|x| x.amount.abs.to_currency}.join("<br/>")
         %br
         %b Cr
-        = credit_postings.map{|x| x.amount>0 ? x.amount.round(2) : 0}.join(", ")
+        = credit_postings.map{|x| x.amount.abs.to_currency}.join("<br/>")
       %td
         = postings.map{|x| x.amount>0 ? x.amount : 0}.inject(0){|s,x| s+=x}
       %td.text

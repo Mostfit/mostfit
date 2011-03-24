@@ -4,16 +4,17 @@
 = error_messages_for @rule_book
 #rule_container
   %h2
-    %form{:action => resource(:rule_books, :new), :method => :get} 
+    %form{:action => resource(:rule_books, :new, {:return => params[:return]}), :method => :get, :class => (request.xhr? ? "_remote_" : "")} 
       Branch
-      = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "HO accounts", :selected => params[:branch_id]
+      = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select branch", :selected => params[:branch_id]
       %input{:type => :hidden, :name => "_target_", :value => "rule_container"}
       = submit "GO"
-  = form_for(@rule_book, :action => form_url, :class => "form") do
-    %fieldset
-      %h1 Create a Rule
-      = hidden_field :branch_id, :value => params[:branch_id]
-      = partial "rule_books/fields"
-      = submit "Create"
-      = link_to "Cancel", url(:rule_books)
+  - if @branch
+    = form_for(@rule_book, :action => form_url, :class => "form") do
+      %fieldset
+        %h1 Create a Rule
+        = hidden_field :branch_id, :value => params[:branch_id]
+        = partial "rule_books/fields"
+        = submit "Create"
+        = link_to "Cancel", url(:rule_books)
 
