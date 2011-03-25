@@ -1,11 +1,6 @@
 class Users < Application
   provides :xml
   #API call : after authenticate get user information and send xml response
-  def my_details   
-    display @template
-  end
-  
-  #API call : after authenticate get user information and send xml response
   #this change made for testing purpose for dm-rest-adapter
   def show
     display @template
