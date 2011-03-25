@@ -1,0 +1,11 @@
+%xml
+  %user
+    %id  #{session.user.id}
+    %login #{session.user.login}
+    %created_at #{session.user.created_at}
+    %updated_at #{session.user.updated_at}
+    %password_changed_at #{session.user.password_changed_at}
+    %active #{session.user.active}
+    - if session.user.staff_member
+      %staff_member
+        %id #{session.user.staff_member.id}

@@ -4,10 +4,11 @@ class Users < Application
   def my_details   
     display @template
   end
-
-  def show(id)
-    u = User.get(id)
-    u ? u : nil
+  
+  #API call : after authenticate get user information and send xml response
+  #this change made for testing purpose for dm-rest-adapter
+  def show
+    display @template
   end
 
   def index
