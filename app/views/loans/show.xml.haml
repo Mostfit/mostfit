@@ -1,0 +1,5 @@
+%xml
+  = @loan.to_xml
+  - @payments.each do |payment|
+    = payment.to_xml
+        

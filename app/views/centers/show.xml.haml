@@ -1,0 +1,7 @@
+%xml
+  = @center.to_xml
+  %date #{@date}
+  - if @clients
+    %clients
+      - @clients.each do |client|
+        = client.to_xml

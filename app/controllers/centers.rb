@@ -23,7 +23,11 @@ class Centers < Application
     raise NotFound unless @center
     @branch  =  @center.branch if not @branch
     @clients =  grouped_clients
-    display [@center, @clients, @date], 'clients/index'
+    if params[:format] and params[:format] == "xml"
+      display [@center, @clients, @date]
+    else
+      display [@center, @clients, @date], 'clients/index'
+    end
   end
 
   def today(id)

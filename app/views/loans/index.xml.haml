@@ -1,19 +1,13 @@
 %xml
-  %client_loans
-    %center_id #{@center.id}
-    %center_name #{@center.name}
-    %center_manager_id #{@center.manager.id}
-    %center_manager_name #{@center.manager.name}
-    %branch_id  #{@center.branch.id}
-    %branch_name #{@center.branch.name}
-    %client_id #{@client.id}
-    %client_name #{@client.name}
-    - @loans.each do |loan|
-      %loan
-        %loan_id #{loan.id}
-        %loan_amount #{loan.amount}
-        %interest #{format("%.2f%", loan.interest_rate * 100)}
-        %disbursal_date #{loan.disbursal_date}
-        %repaid #{format("%.2f%", loan.principal_received_up_to(Date.today).to_f / loan.amount * 100)}
-        %status #{loan.status.to_s.camelcase(' ')}
-
+  = @client.to_xml
+  %center_id #{@center.id}
+  %center_name #{@center.name}
+  %center_manager_id #{@center.manager.id}
+  %center_manager_name #{@center.manager.name}
+  %branch_id  #{@center.branch.id}
+  %branch_name #{@center.branch.name}
+  %client_id #{@client.id}
+  %client_name #{@client.name}
+  - @loans.each do |loan|
+    = loan.to_xml
+        

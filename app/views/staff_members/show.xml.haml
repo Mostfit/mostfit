@@ -1,0 +1,38 @@
+%xml
+  = @staff_member.to_xml
+  - if @option == "regions" 
+    %regions
+      - @staff_member.regions.each do |region|
+        = region.to_xml
+  - elsif @option == "areas"
+    %areas
+      - @staff_member.areas.each do |area|
+        = area.to_xml
+  - elsif @option == "branches"
+    %branches
+      - @staff_member.branches.each do |branche|
+        = branche.to_xml
+  - elsif @option == "centers"
+    %centers
+      - @staff_member.centers.each do |center|
+        = center.to_xml
+  - elsif @option == "clients"
+    %clients
+      - @staff_member.clients.each do |client|
+        = client.to_xml
+  - elsif @option == "full"
+    %regions
+      - @staff_member.regions.each do |region|
+        = region.to_xml
+    %areas
+      - @staff_member.areas.each do |area|
+        = area.to_xml
+    %branches
+      - @staff_member.branches.each do |branche|
+        = branche.to_xml
+    %centers
+      - @staff_member.centers.each do |center|
+        = center.to_xml
+    %clients
+      - @staff_member.clients.each do |client|
+        = client.to_xml

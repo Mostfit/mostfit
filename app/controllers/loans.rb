@@ -18,7 +18,11 @@ class Loans < Application
     @loan = Loan.get(id)
     raise NotFound unless @loan
     @payments = @loan.payments(:order => [:received_on, :id])
-    display [@loan, @payments], 'payments/index'
+    if params[:format] and params[:format] == "xml"
+      display [@loan, @payments]
+    else
+      display [@loan, @payments], 'payments/index'
+    end
   end
 
   def new

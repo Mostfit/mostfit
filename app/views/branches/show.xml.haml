@@ -1,0 +1,7 @@
+%xml
+  = @branch.to_xml
+  - if @centers
+    %centers
+      - @centers.each do |center|
+        = center.to_xml
+  
