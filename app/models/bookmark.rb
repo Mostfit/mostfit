@@ -1,6 +1,6 @@
 class Bookmark
   include DataMapper::Resource
-  Types   = [:custom_reports, :other]
+  Types   = [:custom_reports, :other, :system]
   Methods = [:get, :post, :put, :delete]
   #ShareWith = [:none, :all, :admin, :staff_member, :mis_manager, :data_entry, :read_only]
 
@@ -19,4 +19,13 @@ class Bookmark
     {:shared => Bookmark.all(:type => type||:other, :user.not => user).reject{|x| !(x.share_with & [user.role, :all])},  
       :own => Bookmark.all(:user => user, :type => type||:other)}
   end
+
+  def self.search(q, per_page=10)
+    if /^\d+$/.match(q)
+      all(:conditions => ["id = ?", q], :limit => per_page)
+    else
+      all(:conditions => ["name like ?", q+'%'], :limit => per_page)
+    end
+  end
+
 end

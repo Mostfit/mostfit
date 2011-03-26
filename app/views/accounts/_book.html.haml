@@ -1,9 +1,8 @@
-=partial :form
-- @accounts = @data
-- debugger
-- balance = @accounts.map{|a| a.opening_balance_as_of(@from_date)}.reduce(0,:+)
-%table.report.nojs
-  %tr.header
+- @from_date ||= @account.account_earliest_date - 1
+- @to_date||= Date.today - 1
+- balance = @account.opening_balance_as_of(@from_date) || 0
+%table.form.narrow
+  %tr
     %thead
       %th
         Date
@@ -27,8 +26,7 @@
     %td
       = balance.to_currency
     %td
-  - debugger
-  - posting_hash = Posting.all(:account.in => @accounts, "journal.date.lte" => @report.to_date, "journal.date.gte" => @report.from_date).map{|p| [p.journal.date, p]}.to_hash
+  - posting_hash = Posting.all(:account => @account, "journal.date.lte" => @to_date, "journal.date.gte" => @from_date).map{|p| [p.journal.date, p]}.to_hash
   - posting_hash.keys.sort.each do |date|
     %tr{:class => cycle('odd','even')}
       - posting = posting_hash[date]
@@ -55,3 +53,4 @@
     %td
         
         
+  

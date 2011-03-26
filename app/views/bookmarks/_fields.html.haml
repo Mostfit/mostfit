@@ -1,0 +1,33 @@
+= form_for(@bookmark, :action => resource(:bookmarks), :class => "_remote_", :style => "display: none;", :id => "form_for_bookmark_saving") do  
+  %table.form
+    %tr
+      %th
+        Name
+      %td
+        = text_field :name
+    %tr
+      %th
+        Title
+      %td
+        = text_field :title
+    %tr
+      %th
+        Method
+      %td
+        = text_field :method
+    %tr
+      %th
+        Route
+      %td
+        = text_area :route
+    %tr
+      %th
+        Type
+      %td
+        = text_field :type
+    %tr
+      %th
+        Params
+      %td
+        = text_field :params
+  = submit "Save"

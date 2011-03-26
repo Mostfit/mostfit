@@ -51,10 +51,17 @@
           = link_to_with_class('Dashboard', url(:dashboard))
           = link_to_with_class('Reports', url(:reports))
           #header_search_div
-            %form._remote_{:action => '/search', :class => 'search', :method => "POST"}
+            %form._remote_{:action => '/search', :class => 'search', :method => "POST", :style => "float:left;"}
               %input{:name => 'query', :value => params[:query], :autocomplete => "off"}
               %input{:type => 'hidden', :name => '_target_', :value => "content p"}
               %input{:type => 'submit', :value=>'search'}
+            = form_for(Bookmark.new, :action => url(:new_bookmark)) do
+              = hidden_field :route, :value => YAML::dump(@route)
+              = hidden_field :title, :value => page_title
+              = hidden_field :name, :value => page_title
+              = hidden_field :type, :value => :system
+              = submit '+'
+              
     #content
       .container
         #breadcrums= breadcrums

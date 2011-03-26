@@ -41,3 +41,7 @@ public/browse
 spec/spec_failing_examples.txt
 spec/spec_full_report.txt
 spec/spec_report.html
+daily_log.rb
+*bak
+oink.sed
+*sql

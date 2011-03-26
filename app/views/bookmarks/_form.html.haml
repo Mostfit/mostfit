@@ -2,7 +2,7 @@
 %div{:style => "float: right;"}
   %a{:onclick => "$('#form_for_bookmark_saving').toggle();", :href => "#"}
     ="Save this #{(type==:custom_report ? 'report' : 'page')}"
-  = form_for(@bookmark, :action => resource(:bookmarks), :class => "_remote_", :style => "display: none;", :id => "form_for_bookmark_saving") do  
+  = form_for(Bookmark.new, :action => resource(:bookmarks), :class => "_remote_", :style => "display: none;", :id => "form_for_bookmark_saving") do  
     %div.floatingBox{:style => "position: absolute; right: 150px;"}
       %a.closeButton
         [x]

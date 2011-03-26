@@ -9,12 +9,13 @@ class Bookmarks < Application
   def show(id)
     @bookmark = Bookmark.get(id)
     raise NotFound unless @bookmark
-    display @bookmark, :layout => layout?
+    debugger
+    redirect url(YAML::load(@bookmark.route)[1])
   end
 
   def new
     only_provides :html
-    @bookmark = Bookmark.new
+    @bookmark = Bookmark.new(params[:bookmark])
     display @bookmark, :layout => layout?
   end
 
@@ -38,6 +39,7 @@ class Bookmarks < Application
   end
 
   def update(id, bookmark)
+    debugger
     @bookmark = Bookmark.get(id)
     raise NotFound unless @bookmark
     if @bookmark.update(bookmark)
