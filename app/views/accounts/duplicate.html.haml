@@ -45,18 +45,24 @@
 - unless @accounts
   %hr
   %div.box
-    %a{:class => "_remote_", :href => url(:account_types)}
-      Account types
+    %h1
+      %a{:class => "_remote_", :href => url(:account_types), :id => "account_types"}
+        Account types
+    #container_account_types
   %br
 - unless @accounts
   %hr
   %div.box
-    %a{:class => "_remote_", :href => url(:accounting_periods)}
-      Accounting periods
+    %h1
+      %a{:class => "_remote_", :href => url(:accounting_periods), :id => "periods"}
+        Accounting periods
+    #container_periods
   %br
 - unless @accounts
   %hr
   %div.box
-    %a{:class => "_remote_", :href => url(:controller =>  :journals, :action => :tally_download)}
-      Tally download
+    %h1
+      %a{:class => "_remote_", :href => url(:controller =>  :journals, :action => :tally_download), :id => "tally"}
+        Tally download
+    #container_tally
   %br

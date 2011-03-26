@@ -2,9 +2,9 @@
 
 = error_messages_for @accounting_period
 
-= form_for(@accounting_period, :action => form_url, :class => "form" ) do
+= form_for(@accounting_period, :action => form_url, :class => "form " ) do
   %fieldset
-    %h1 Create a new accounting period
+    %h2 Create a new accounting period
     = partial "accounting_periods/fields"
     = submit "Create"
     = link_to 'Cancel', url(:accounting_periods)

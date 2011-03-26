@@ -8,6 +8,7 @@ class AccountingPeriod
   include DataMapper::Resource
   
   property :id, Serial
+  property :name, String
   property :begin_date, Date, :nullable => false, :default => Date.today
   property :end_date, Date, :nullable => false, :default => Date.today+365
   property :created_at, DateTime, :nullable => false, :default => Time.now 

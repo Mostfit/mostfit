@@ -644,6 +644,15 @@ div.tab_container ul.tabs{
     height: 45px;
     border-bottom: 3px solid #CDD3FE;
 }
+
+div.tab_container ul.inner{
+    margin-left: 0px;
+    height: 45px;
+    border-bottom: solid 1px #9e9e8e;
+    background-color: beige;
+}
+
+
 div.tab_container ul.tabs li{
     display: inline;
     padding: 5px;
@@ -659,6 +668,23 @@ div.tab_container ul.tabs li{
     border: 1px solid #EDF3FE;
     font-weight: strong;
 }
+
+div.tab_container div.inner {
+}
+
+div.tab_container ul.inner li{
+    background-color: #9e9e8e;
+    color: white;
+    font-size: 1.2em;
+    position: relative;
+    top: 20px;
+}
+
+div.tab_container ul.inner .active{
+    background-color: lightyellow;
+    color: black;
+}
+
 div.tab_container ul.tabs li.active{
     border-bottom: 3px solid white;
     background-color: white;
@@ -705,8 +731,6 @@ table.comments tr td span{
 form.form {
 /*  background-color: #F6E8B1; */
 /*  background-color: #F5F6D4; */
-  border: solid 2px #696C82;
-  font-family: "Lucida Grande";
   font-size: 14px;
   margin-left: auto;
   margin-right: auto;
