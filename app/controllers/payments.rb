@@ -52,9 +52,18 @@ class Payments < Application
     raise NotFound unless (@loan or @client)
     success = do_payment(payment)
     if success  # true if saved
-      redirect url_for_loan(@loan||@client), :message => {:notice => "Payment of ##{@payment.id} has been registered"}
+      if params[:format] and params[:format] == "xml"
+        display @payment
+      else
+        redirect url_for_loan(@loan||@client), :message => {:notice => "Payment of #{@payment.id} has been registered"}
+      end
     else
-      render :new
+      if params[:format] and params[:format] == "xml"
+        @error = "Payment has been failed"
+        display @error
+      else
+        render :new
+      end
     end
   end
 

@@ -1,2 +1,14 @@
-%status
-  = @payment.status
+%payment
+  -if not @error.blank?
+    %error #{@error}
+  - elsif not @payment.blank?
+    %message "Payment of #{@payment.id} has been registered"
+    %id #{@payment.id}
+    %amount #{@payment.amount}
+    %type #{@payment.type}
+    %client_id #{@payment.client_id}
+    %loan_id #{@payment.loan_id}
+    %received_on #{@payment.received_on}
+    %received_by_staff_id #{@payment.received_by_staff_id}
+  
+  

@@ -12,8 +12,8 @@ class ApiAccess
   end 
 
   #staff member info with their branches and center
-  def self.get_staff_member_branches(id, login, pwd)
-    get("/staff_members/#{id}/branches.xml",  :query => {:login => login, :password => pwd})
+  def self.get_staff_member_branches(login, pwd)
+    get("/branches.xml",  :query => {:login => login, :password => pwd})
   end
 
   #staff member centers infromation 

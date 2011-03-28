@@ -137,6 +137,7 @@ Merb::Router.prepare do
   match('/api/v1/branches/:branch_id/centers/:id.xml').to(:controller => 'centers', :action =>'show', :format => 'xml')
   match('/api/v1/loans/:id.xml').to(:controller => 'loans', :action =>'show', :format => 'xml')
   match('/api/v1/users.xml').to(:controller => 'users', :action =>'index', :format => 'xml')
+  match('/api/v1/branches/:branch_id/centers/:center_id/clients/:client_id/loans/:loan_id/payments.xml').to(:controller => 'payments', :action =>'create', :format => 'xml')
 
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
