@@ -4,76 +4,59 @@ require "httparty"
 class ApiAccess
   include HTTParty
   base_uri 'http://localhost:4000/api/v1'
+  basic_auth 'admin', 'password'
   format :xml   
 
   #user details
-  def self.get_my_details(login, pwd)
-    post("/users/my_details.xml",  :query => {:login => login, :password => pwd})
+  def self.get_user_info
+    get("/browse.xml")
   end 
 
-  #staff member info with their branches and center
-  def self.get_staff_member_branches(login, pwd)
-    get("/branches.xml",  :query => {:login => login, :password => pwd})
+  #get branches 
+  def self.get_branches
+    get("/branches.xml")
   end
 
-  #staff member centers infromation 
-  def self.get_staff_member_centers(id,login, pwd)
-    get("/staff_members/#{id}/centers.xml",  :query => {:login => login, :password => pwd})
-  end
-  
-  #staff member client infromation 
-  def self.get_staff_member_clients(id,login, pwd)
-    get("/staff_members/#{id}/clients.xml",  :query => {:login => login, :password => pwd})
+  #get branch info
+  def self.get_branch_info(id)
+    get("/branches/#{id}.xml")
   end
 
-  #staff member loans infromation 
-  def self.get_staff_member_loans(id,login, pwd)
-    get("/staff_members/#{id}/loans.xml",  :query => {:login => login, :password => pwd})
+  #get centers 
+  def self.get_centers
+    get("/centers.xml")
   end
 
-  #staff member day sheet infromation 
-  def self.get_staff_member_day_sheet(id,login, pwd)
-    get("/staff_members/#{id}/day_sheet.xml",  :query => {:login => login, :password => pwd})
+  #get center info
+  def self.get_center_info(id)
+    get("/centers/#{id}.xml")
   end
 
-  #Get payment details by center
-  def self.get_staff_payments_by_center(center_id,login, pwd)
-    get("/data_entry/payments/by_center.xml",  :query => {:center_id =>center_id, :login => login, :password => pwd})
-  end
-  
-  #Create payment by client at center on date accepted by staff member
-  def self.create_client_payments(center_id,login, pwd)
-    post("/data_entry/payments/by_center.xml",  :query => {:center_id =>center_id, :login => login, :password => pwd, :received_on =>"2011-03-22", :paid =>{:loan =>{"532"=>"10.0"}}, :payment_style =>{"532"=>"prorata"}, :attendance =>{"520"=>"present"}, :payment =>{"received_by"=>"5"}})
+  #get areas
+  def self.get_areas
+    get("/areas.xml")
   end
 
-  #Get Regions details
-  def self.get_regions(login, pwd)
-    get("/regions.xml",  :query => {:login => login, :password => pwd})
+  #get area info
+  def self.get_area_info(id)
+    get("/areas/#{id}.xml")
   end
 
-  #Get areas details
-  def self.get_areas(login, pwd)
-    get("/areas.xml",  :query => {:login => login, :password => pwd})
+  #get staff_members
+  def self.get_staff_members
+    get("/staff_members.xml")
   end
 
-  #Get client groups details
-  def self.get_client_groups(login, pwd)
-    get("/client_groups.xml",  :query => {:login => login, :password => pwd})
+  #get staff_member info
+  def self.get_staff_member_info(id)
+    get("/staff_members/#{id}.xml")
   end
 
-  #Get centers paying today 
-  def self.get_centers_paying_today(login, pwd)
-    get("/browse/centers_paying_today.xml",  :query => {:login => login, :password => pwd})
+  #get staff_member centers,banches,client, loans
+  #option='centers' or option='clients' etc.
+  def self.get_staff_member_info_full(id)
+    get("/staff_members/#{id}.xml", :query => {:option =>"full"})
   end
 
-  #Fetch clients for center 
-  def self.get_clients_for_center(id,login, pwd)
-    get("/centers/#{id}.xml",  :query => {:login => login, :password => pwd})
-  end
-
-  #Fetch loans for client
-  def self.get_loans_for_client(branch_id, center_id, client_id, login, pwd)
-    get("/branches/#{branch_id}/centers/#{center_id}/clients/#{client_id}.xml",  :query => {:login => login, :password => pwd})
-  end
 end
 

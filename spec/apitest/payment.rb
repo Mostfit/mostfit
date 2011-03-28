@@ -9,7 +9,7 @@ class Payment
   property :loan_id,  Integer
   property :client_id,  Integer
   property :received_by_staff_id,  Integer
-  
+  property :received_on,  Date
   
 
   #using httparty call mostfit api
