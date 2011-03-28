@@ -17,6 +17,7 @@ namespace :mostfit do
     pf        = Log4r::PatternFormatter.new(:pattern => "<b>[%l]</b> %m")
     file_log  = Log4r::FileOutputter.new('output_log', :filename => [Merb.root, "public", "logs", file.directory].join("/"), :truncate => false, :formatter => pf)
     log.add(file_log) 
+    p file_log
     log.level = Log4r::INFO
 
     log.info("File has been uploaded to the server. Now processing it into a bunch of csv files")

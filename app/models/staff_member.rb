@@ -39,11 +39,17 @@ class StaffMember
   end
     
   def self.from_csv(row, headers)
-    user = User.new(:login => row[headers[:name]], :role => :staff_member,
-                    :password => row[headers[:password]], :password_confirmation => row[headers[:password]])    
-    user.save
+    user = nil
+    if headers[:name] and row[headers[:name]] and headers[:password] and row[headers[:password]]
+      user = User.new(:login => row[headers[:name]], :role => :staff_member,
+                      :password => row[headers[:password]], :password_confirmation => row[headers[:password]])    
+      user.save
+    end
+    
+    mobile = nil
+    mobile = row[headers[:mobile_number]] if headers[:mobile_number] and row[headers[:mobile_number]]
     obj = new(:name => row[headers[:name]], :user => user, :creation_date => Date.today,
-              :mobile_number => row[headers[:mobile_number]], 
+              :mobile_number => mobile, 
               :active => true)
     [obj.save, obj]
   end

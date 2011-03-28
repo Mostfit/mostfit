@@ -46,6 +46,8 @@ class Upload
               elsif model==Payment
                 model.from_csv(row, headers, loans)
               else
+                p row
+                p headers
                 model.from_csv(row, headers)
               end
 
