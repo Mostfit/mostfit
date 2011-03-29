@@ -1,7 +1,8 @@
 class Bookmark
   include DataMapper::Resource
-  Types   = [:custom_reports, :other, :system]
+  Types   = [:custom_reports, :system]
   Methods = [:get, :post, :put, :delete]
+  attr_accessor :url
   #ShareWith = [:none, :all, :admin, :staff_member, :mis_manager, :data_entry, :read_only]
 
   property :id, Serial
@@ -15,17 +16,31 @@ class Bookmark
   property :share_with, Flag.send('[]', *User::ROLES), :nullable => false, :default => :none, :index => true
   belongs_to :user
   
-  def self.for(user, type=:other)
-    {:shared => Bookmark.all(:type => type||:other, :user.not => user).reject{|x| !(x.share_with & [user.role, :all])},  
-      :own => Bookmark.all(:user => user, :type => type||:other)}
+  validates_is_unique :name, :with_scope => [:type, :user]
+
+  def self.for(user, type=:system)
+    {
+      :shared => Bookmark.all(:user.not => user, :type => type, :share_with => user.role),  
+      :own => Bookmark.all(:user => user, :type => type)
+    }
   end
 
   def self.search(q, per_page=10)
     if /^\d+$/.match(q)
       all(:conditions => ["id = ?", q], :limit => per_page)
     else
-      all(:conditions => ["name like ?", q+'%'], :limit => per_page)
+      all(:name.like => q+'%', :limit => per_page, :type => :system)
     end
+  end
+
+  def controller
+    @url ||= YAML::load(self.route).last
+    @url[:controller]
+  end
+
+  def action
+    @url ||= YAML::load(self.route).last
+    @url[:action]
   end
 
 end

@@ -439,7 +439,30 @@ a.button:visited {
 #header_search_div input:first{
     width: 100px;
 }
-
+.bookmark{
+    font-size: 1.2em;
+    padding: 0px;
+    margin: 0px;
+    position: absolute;
+    left: 0px;
+    top: 50%;
+    width: 32px;
+    z-index: 100;
+}
+.bookmark form input[type='submit']{
+    border: 1px solid orange;
+    font-size: 1.5em;
+    color: white;
+    background: orange;
+    z-index: 100;
+    -webkit-transform: rotate(-90deg); 
+    -moz-transform: rotate(-90deg);
+    -moz-transform-origin: bottom left;
+    -webkit-transform-origin: top left;
+    -o-transform: rotate(-270deg);
+    -o-transform-origin:  bottom left;
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+}
 div.log_box{
     border: 2px solid #8DC73F;
     height: 400px;
@@ -943,15 +966,13 @@ a.expand_collapsed{
     top: 20px;
     display: none;
 }
-.floatingBox{
-    float: right;
-    top: 1px;
+.floatingBox{    
     position: absolute;
     border: 2px solid orange;    
-    right: 100px;
     padding: 5px;
     background: #eee;
     z-index: 1;
+    min-height: 20px;
 }
 .floatingBox table{
     float: left;
@@ -965,6 +986,12 @@ a.expand_collapsed{
     float: right;
     font-weight: bold;
     font-size: 1em;
+}
+.floatingBox h3{
+    font-size: 1.25em;
+}
+.floatingBox h2{
+    font-size: 1.35em;
 }
 span.branchName{
     position: absolute;
@@ -1046,4 +1073,11 @@ ul#tree li.depth_4 span{
 }
 .right{
     float: right;
+}
+ul.bookmarks li{
+    margin-bottom: 5px;
+    padding-bottom: 5px
+    width: 100%;
+    font-size: 1.25em;
+    padding-top: 10px;
 }
