@@ -38,8 +38,8 @@ res = Payment.make_payment(1,11,167,199)
 	puts res['payment']["received_on"]
 	puts "----------------"
 
-
-
+#made payment using datamapper
+#pay = Payment.create(:amount =>99.06, :type =>:principal, :loan_id => 199, :client_id => 167, :received_by_staff_id =>1, :received_on => "2011-03-28")
 
 #~ url = URI.parse('http://localhost:4000/branches.xml')
 #~ req = Net::HTTP::Get.new(url.path)
