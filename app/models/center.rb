@@ -228,7 +228,7 @@ class Center
       end
     else
       nwday = (date + number).wday
-      while (date - number).wday != Center.meeting_days.index(meeting_day_for(date - number))
+      while nwday != Center.meeting_days.index(meeting_day_for(date - number))
         number += 1
         nwday = (date - number).wday
         nwday = 7 if nwday == 0

@@ -2,7 +2,7 @@ class Loan
   include DataMapper::Resource
   before :valid?,  :parse_dates
   before :valid?,  :convert_blank_to_nil
-  after  :save,    :update_history  # also seems to do updates
+  after  :save,    :update_history_caller  # also seems to do updates
   before :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
 #  after  :destroy, :update_history
@@ -836,10 +836,12 @@ class Loan
   end
 
   # HISTORY
-
+  def update_history_caller
+    update_history(false)
+  end
+  
   # Moved this method here from instead of the LoanHistory model for purposes of speed. We sacrifice a bit of readability
   # for brute force iterations and caching => speed
-
   def update_history(forced=false)
     return true if Mfi.first.dirty_queue_enabled and DirtyLoan.add(self) and not forced
     return if self.already_updated
