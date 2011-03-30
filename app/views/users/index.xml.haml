@@ -1,0 +1,14 @@
+%users
+  - @users.each do |user|
+    %user
+      %id #{user.id}
+      %login #{user.login}
+      %created_at #{user.created_at}
+      %updated_at #{user.updated_at}
+      %role #{user.role}
+      %active #{user.active}
+      - if user.staff_member 
+        %staff_member
+          %id #{user.staff_member.id}
+          %name #{user.staff_member.name}
+  
