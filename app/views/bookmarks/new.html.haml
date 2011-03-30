@@ -1,13 +1,11 @@
-%h1 Bookmarks controller, new action
-
-%p 
-  Edit this file in 
-  %tt app/views/bookmarks/new.html.erb
-
+- unless request.xhr?
+  %h1 New Bookmark
+  
 = error_messages_for @bookmark
-
-= form_for(@bookmark, :action => url(:bookmarks) ) do
-  %p
-    = submit "Create"
-
-= link_to 'Back', url(:bookmarks)
+%div{:class => (request.xhr? ? "floatingBox autoPosition" : "")}
+  - if request.xhr?
+    %a.closeButton
+      [close]
+  = form_for(@bookmark, :action => resource(:bookmarks), :class => "_remote_", :id => "form_for_bookmark_saving") do  
+    = partial :fields
+  

@@ -1,0 +1,10 @@
+.floatingBox.shiftUp
+  %a.closeButton
+    [close]
+  = partial :list
+  - if @bookmark
+    %hr
+    %h3 Bookmark this page
+    = error_messages_for @bookmark
+    = form_for(@bookmark, :action => resource(:bookmarks), :onsubmit => "javascript: $('#bookmark_route').val(window.location.pathname+window.location.hash);", :class => "_remote_", :id => "form_for_bookmark_saving") do  
+      = partial :fields

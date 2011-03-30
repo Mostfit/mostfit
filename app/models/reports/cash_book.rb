@@ -1,20 +1,21 @@
-class CashBook < DayBook
+class CashBook < Report
 
-  def generate
-    day_entries = super
-    cash_entries = {}
-    day_entries.each do |branch, account_change|
-      cash_entries[branch] = {} if cash_entries[branch].nil?
-      account_change.each do |account, change|
-        cash_entries[branch][account] = change if account.is_cash_account?
-      end
-    end
-    cash_entries.delete_if {|key, value| cash_entries[key].empty? }
-    cash_entries
+  attr_accessor :from_date, :to_date
+
+  def initialize(params, dates, user)
+    @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Account.all(:account_category => "Cash").map{|a| a.account_earliest_date}.min
+    @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
+    @name   = "Cash Book from #{@from_date} to #{@to_date}"
   end
 
+
+  def generate
+    @data = Account.all(:account_category => "Cash")
+  end
+
+
   def name
-    "Cash book for #{date}"
+    "Cash book from #{from_date} to #{to_date}"
   end
 
   def self.name

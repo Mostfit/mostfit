@@ -531,7 +531,7 @@ module Merb
       controller_name = (params[:action]=="list" or params[:action]=="index") ? controller.join_snake(' ') : controller.singularize.join_snake(' ')
       controller_name = controller_name.map{|x| x.join_snake(' ')}.join(' ')
       prefix  << params[:namespace].join_snake(' ') if params[:namespace]
-      postfix << params[:action].join_snake(' ') if not CRUD_ACTIONS.include?(params[:action])
+      postfix << params[:action].join_snake(' ') if params[:action] and not CRUD_ACTIONS.include?(params[:action])
       prefix  << params[:action].join_snake(' ') if CRUD_ACTIONS[3..-1].include?(params[:action])
       
       return "Loan for #{@loan.client.name}" if controller=="payments" and @loan
@@ -544,7 +544,6 @@ module Merb
 
       #if @<controller> is indeed present
       obj = instance_variable_get("@"+controller.singularize)
-#      prefix  += "New" if obj.new?
       postfix << "for #{@loan.client.name}" if obj.respond_to?(:client)
 
       return join_segments(prefix, controller_name, obj.name, postfix) if obj.respond_to?(:name) and not obj.new?

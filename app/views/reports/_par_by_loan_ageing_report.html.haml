@@ -10,9 +10,21 @@
       Total
   %tr.header
     %th
-    - 1.upto(params[:par_by_loan_ageing_report][:ageing_interval].to_i) do |i|
-      %th
-        = "#{(i-1) * 10 + 1} - #{i * 10}"
+    - p = params[:par_by_loan_ageing_report][:ageing_interval].to_i
+    - a = (100/p)
+    - b = a
+    - c = a
+    - 1.upto(p) do |i|
+      - if i == 1
+        %th
+          = "#{(i-1) * 10 + 1} - #{b}"
+          - b += b
+      - else
+        %th
+          - b = 100 if b == 99
+          = "#{a + 1 } - #{b}"
+          - b += c
+          - a += c
     %th
   - org_total = []
   - @data.sort_by{|branch, managers| branch.name}.each do |branch, managers|

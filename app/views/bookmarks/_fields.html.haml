@@ -1,0 +1,10 @@
+= hidden_field :method
+= hidden_field :route
+= hidden_field :params
+= hidden_field :type
+= hidden_field :title    
+%input{:type => 'hidden', :name => "_target_", :value => "bookmark_form_container"}
+%p
+  %b Name
+  = text_field :name
+= submit "Bookmark"

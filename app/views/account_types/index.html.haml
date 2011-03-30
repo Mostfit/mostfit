@@ -1,13 +1,17 @@
-%h1 List of Account Types
-%table
+= link_to 'Add an account type', url(:new_account_type), :class => "_remote_ add"
+%br
+%br
+%table.form.narrow
   %tr
-    %th
-      Account Type
-    %th
-      GL Code
-  %tr
+    %thead
+      %th
+        Account Type
+      %th
+        GL Code
+      %th
+        Actions
   - for account_type in @account_types
-    %tr
+    %tr{:class => cycle('odd','even')}
       %td
         = account_type.name
       %td
@@ -15,5 +19,4 @@
       %td
         = link_to 'Edit', url(:edit_account_type, account_type)
 
-= link_to 'New', url(:new_account_type), :class => "_remote_"
 

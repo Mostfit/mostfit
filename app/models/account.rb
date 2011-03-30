@@ -48,6 +48,15 @@ class Account
     @account_category ? @account_category.eql?('Bank') : false
   end
   
+  def opening_balance_as_of(date = Date.today)
+    postings("journal.date.lte" => date).aggregate(:amount.sum)
+  end
+
+  def account_earliest_date
+    # oops! the opening_balance_as_on date is greater than the earliest posting date!!
+    postings("journal.date.lte" => Date.today).map{|p| p.journal.date}.min
+  end
+
   def convert_blank_to_nil
     self.attributes.each{|k, v|
       if v.is_a?(String) and v.empty? and self.class.send(k).type==Integer

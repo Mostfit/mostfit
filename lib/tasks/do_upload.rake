@@ -17,6 +17,7 @@ namespace :mostfit do
     pf        = Log4r::PatternFormatter.new(:pattern => "<b>[%l]</b> %m")
     file_log  = Log4r::FileOutputter.new('output_log', :filename => [Merb.root, "public", "logs", file.directory].join("/"), :truncate => false, :formatter => pf)
     log.add(file_log) 
+    p file_log
     log.level = Log4r::INFO
 
     log.info("File has been uploaded to the server. Now processing it into a bunch of csv files")
@@ -24,7 +25,7 @@ namespace :mostfit do
     log.info("CSV extraction complete. Processing files.")
     file.load_csv(log)
     log.info("CSV files are now loaded into the DB. Creating loan schedules. This may take a few minutes.")
-    `rake mostfit:mock:update_all_history`
+    Loan.all.each{|l| l.update_history}
     log.info("<h2>Processing complete! Your MIS is now ready for use. Please take a note of all the errors reported here(if any) and rectify them.</h2>")            
   end
 end
