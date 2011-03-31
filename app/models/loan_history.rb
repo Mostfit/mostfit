@@ -514,7 +514,7 @@ class LoanHistory
     })    
   end
 
-  # group loans which have been foreclosed, either written off or closed due to death of client. 
+  # group loans which have been foreclosed. 
   def self.sum_foreclosure_grouped_by(group_by, from_date, to_date, extra=[], selects="")
     group_by_query = get_group_by(group_by)
     selects        = get_selects(group_by, selects)
@@ -527,11 +527,56 @@ class LoanHistory
         #{selects}
       FROM (SELECT max(lh.date) date, lh.loan_id loan_id
             FROM loan_history lh, loans l
-            WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (8, 9) AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{query}
+            WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (7) AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
+                  AND lh.scheduled_outstanding_total > 0 AND lh.scheduled_outstanding_principal > 0 #{extra}
             GROUP BY lh.loan_id
             ) dt, loan_history lh, loans l
-      WHERE lh.loan_id=dt.loan_id AND lh.date = dt.date AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}'
-            AND lh.loan_id=l.id AND l.deleted_at is NULL AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
+      WHERE lh.loan_id=dt.loan_id AND lh.date = dt.date AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}'
+            AND lh.loan_id=l.id AND l.deleted_at is NULL #{extra}
+      #{group_by_query};
+    })    
+  end
+
+  # group loans which have been written off. 
+  def self.sum_written_off_grouped_by(group_by, from_date, to_date, extra=[], selects="")
+    group_by_query = get_group_by(group_by)
+    selects        = get_selects(group_by, selects)
+    extra          = build_extra(extra)
+
+    repository.adapter.query(%Q{
+      SELECT
+        SUM(lh.actual_outstanding_principal) AS loan_amount,
+        COUNT(lh.loan_id) loan_count,
+        #{selects}
+      FROM (SELECT max(lh.date) date, lh.loan_id loan_id
+            FROM loan_history lh, loans l
+            WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (8) AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{query}
+            GROUP BY lh.loan_id
+            ) dt, loan_history lh, loans l
+      WHERE lh.loan_id=dt.loan_id AND lh.date = dt.date AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}'
+            AND lh.loan_id=l.id AND l.deleted_at is NULL #{extra}
+      #{group_by_query};
+    })    
+  end
+
+  # group loans which have been claimed. 
+  def self.sum_claimed_grouped_by(group_by, from_date, to_date, extra=[], selects="")
+    group_by_query = get_group_by(group_by)
+    selects        = get_selects(group_by, selects)
+    extra          = build_extra(extra)
+
+    repository.adapter.query(%Q{
+      SELECT
+        SUM(lh.actual_outstanding_principal) AS loan_amount,
+        COUNT(lh.loan_id) loan_count,
+        #{selects}
+      FROM (SELECT max(lh.date) date, lh.loan_id loan_id
+            FROM loan_history lh, loans l
+            WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (9) AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{query}
+            GROUP BY lh.loan_id
+            ) dt, loan_history lh, loans l
+      WHERE lh.loan_id=dt.loan_id AND lh.date = dt.date AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}'
+            AND lh.loan_id=l.id AND l.deleted_at is NULL #{extra}
       #{group_by_query};
     })    
   end
