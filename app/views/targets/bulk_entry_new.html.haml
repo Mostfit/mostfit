@@ -1,3 +1,5 @@
+%h1
+  Bulk Target Entry Form
 %form{:action => url(:action => :bulk_entry_new), :method => :get}
   = select :attached_to, :collection => Target::ValidAttaches.map{|x| [x, x.to_s.camelcase(' ')]}, :prompt => "choose target assigned to"
   = select :target_of, :collection => Target::TargetOf.map{|x| [x, x.to_s.camelcase(' ')]}, :prompt => "choose target of"
