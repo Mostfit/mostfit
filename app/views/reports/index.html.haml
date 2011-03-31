@@ -3,7 +3,7 @@
 - role = session.user.role.to_s
 - rules = Mfi.first.report_access_rules
 - Reports::Types.to_a.sort_by{|k, v| Reports::Order.index(k)}.each do |report_type, reports|
-  - if reports.map{|r| rules[r.to_s].include?(role)}.include?(true)        
+  - if reports.map{|r| rules[r.to_s] and rules[r.to_s].include?(role)}.include?(true)        
     %h2
       = report_type.to_s.camelcase(' ')
     %ul
