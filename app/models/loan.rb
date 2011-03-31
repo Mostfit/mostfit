@@ -149,8 +149,8 @@ class Loan
 
   def self.from_csv(row, headers, funding_lines)
     interest_rate = (row[headers[:interest_rate]].to_f>1 ? row[headers[:interest_rate]].to_f/100 : row[headers[:interest_rate]].to_f)
-
-    obj = new(:loan_product_id => LoanProduct.first(:name => row[headers[:product]]).id, :amount => row[headers[:amount]],
+    
+    obj = new(:loan_product => LoanProduct.first(:name => row[headers[:product]]), :amount => row[headers[:amount]],
               :interest_rate => interest_rate,
               :installment_frequency => row[headers[:installment_frequency]].downcase, :number_of_installments => row[headers[:number_of_installments]],
               :scheduled_disbursal_date => Date.parse(row[headers[:scheduled_disbursal_date]]),
@@ -161,7 +161,7 @@ class Loan
               :funding_line_id => funding_lines[row[headers[:funding_line_serial_number]]].id,
               :applied_by_staff_id => StaffMember.first(:name => row[headers[:applied_by_staff]]).id,
               :approved_by_staff_id => StaffMember.first(:name => row[headers[:approved_by_staff]]).id,
-              :client_id => Client.first(:reference => row[headers[:client_reference]]).id)
+              :client => Client.first(:reference => row[headers[:client_reference]]))
     obj.history_disabled=true
     [obj.save, obj]
   end
