@@ -1,55 +1,59 @@
 =partial :form
 - @accounts = @data
 - balance = @accounts.map{|a| a.opening_balance_as_of(@from_date) || 0}.reduce(:+)
-%table.report.nojs
-  %tr.header
-    %thead
-      %th
-        Date
-      %th
-        Particulars
-      %th
-        Vch Type
-      %th
-        Vch. No.
-      %th
-        %b Debit
-      %th
-        %b Credit
-  %tr.total
-    %td
-      = @from_date
-    %td
-      Opening Balance
-    %td
-    %td
-    %td
-      = balance.to_currency
-    %td
-  - posting_hash = Posting.all(:account.in => @accounts, "journal.date.lte" => @report.to_date, "journal.date.gte" => @report.from_date).map{|p| [p.journal.date, p]}.to_hash
-  - posting_hash.keys.sort.each do |date|
-    %tr{:class => cycle('odd','even')}
-      - posting = posting_hash[date]
-      - balance += posting.amount
+- if @data.empty?
+  %h3  Nothing to show. Perhaps no bank accounts set up?
+- else
+  %table.report.nojs
+    %tr.header
+      %thead
+        %th
+          Date
+        %th
+          Particulars
+        %th
+          Vch Type
+        %th
+          Vch. No.
+        %th
+          %b Debit
+        %th
+          %b Credit
+    %tr.total
       %td
-        = date
+        = @from_date
       %td
-        = posting.journal.comment
+        Opening Balance
       %td
       %td
       %td
-        = posting.amount > 0 ? posting.amount.to_currency : "-"
+        = balance.to_currency
       %td
-        = posting.amount < 0 ? posting.amount.abs.to_currency : "-"
-  %tr.total
-    %td
-      = @to_date
-    %td
-      Closing Balance
-    %td
-    %td
-    %td
-      = balance.to_currency
-    %td
+    - debugger
+    - posting_hash = Posting.all(:account.in => @accounts, "journal.date.lte" => @report.to_date, "journal.date.gte" => @report.from_date).map{|p| [p.journal.date, p]}.to_hash
+    - posting_hash.keys.sort.each do |date|
+      %tr{:class => cycle('odd','even')}
+        - posting = posting_hash[date]
+        - balance += posting.amount
+        %td
+          = date
+        %td
+          = posting.journal.comment
+        %td
+        %td
+        %td
+          = posting.amount > 0 ? posting.amount.to_currency : "-"
+        %td
+          = posting.amount < 0 ? posting.amount.abs.to_currency : "-"
+    %tr.total
+      %td
+        = @to_date
+      %td
+        Closing Balance
+      %td
+      %td
+      %td
+        = balance.to_currency
+      %td
         
         

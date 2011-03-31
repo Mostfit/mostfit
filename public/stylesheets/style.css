@@ -431,6 +431,7 @@ a.button:visited {
     padding-bottom: 0px;    
     vertical-align: top;
     top: -12px;
+    width: 400px;
 }
 #header_search_div input{
     font-size: 1.5em;

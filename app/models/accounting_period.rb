@@ -14,6 +14,9 @@ class AccountingPeriod
   property :created_at, DateTime, :nullable => false, :default => Time.now 
   property :created_by_user_id, Integer, :nullable => false
 
+  has n, :account_balances
+  has n, :accounts, :through => :account_balances
+
   belongs_to :created_by, :child_key => [:created_by_user_id], :model => 'User'
 
   def duration

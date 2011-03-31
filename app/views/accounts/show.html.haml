@@ -27,9 +27,13 @@
 %div.tab_container
   %ul.tabs
     %li#journal Journal
+    %li#accounting_periods Accounting Periods
     %li#book Book
+    
   %div.tab
     = partial "journals/list_account", :accounts => @accounts
+  %div.tab{:class => "_load_remote_"}
+    = partial "account_balances/list", :account => @accounts, :date => (params[:date] || Date.today)
   %div.tab{:class => "_load_remote_"}
     = partial "accounts/book", :account => @accounts, :date => (params[:date] || Date.today)
 %br
