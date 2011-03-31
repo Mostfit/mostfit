@@ -457,7 +457,7 @@ a.button:visited {
     z-index: 100;
     -webkit-transform: rotate(-90deg); 
     -moz-transform: rotate(-90deg);
-    -moz-transform-origin: bottom left;
+    -moz-transform-origin: top left;
     -webkit-transform-origin: top left;
     -o-transform: rotate(-270deg);
     -o-transform-origin:  bottom left;
