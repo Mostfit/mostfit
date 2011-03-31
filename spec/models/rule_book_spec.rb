@@ -47,8 +47,8 @@ describe RuleBook do
   end
   
   it "should not be valid if credit account and debit account is same" do
-    @rule_book.credit_accounts << @credit_account
-    @rule_book.debit_accounts  << @credit_account
+    @rule_book.credit_accounts = [@credit_account]
+    @rule_book.debit_accounts  = [@credit_account]
     @rule_book.should_not be_valid
   end
   
