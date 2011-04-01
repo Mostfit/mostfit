@@ -1,5 +1,14 @@
 require "rubygems"
 require "httparty"
+require "base64"
+
+# If require response work like hash uncomment this line
+# eg: res.a.parsed_response.xml.user.login
+#class Hash
+# def method_missing(key)
+#  self[key.to_s] || super
+#end
+#end
 
 class ApiAccess
   include HTTParty
@@ -52,11 +61,26 @@ class ApiAccess
     get("/staff_members/#{id}.xml")
   end
 
+  #get loan_product
+  def self.get_loan_products
+    get("/loan_products.xml")
+  end
+
+  #get loan_product info
+  def self.get_loan_product_info(id)
+    get("/loan_products/#{id}.xml")
+  end
+
   #get staff_member centers,banches,client, loans
   #option='centers' or option='clients' etc.
   def self.get_staff_member_info_full(id)
     get("/staff_members/#{id}.xml", :query => {:option =>"full"})
   end
 
+  #branch: 1, center : 8, client :119
+  def self.update_fingerprint(branch,center,client)
+    image = Base64.encode64("#{File.read('/home/kiran/Desktop/sample.fpt')}") 
+    put("/branches/#{branch}/centers/#{center}/clients/#{client}.xml", :query => {:client => {:fingerprint => image}})
+  end
 end
 

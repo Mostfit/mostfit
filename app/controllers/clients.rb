@@ -62,10 +62,25 @@ class Clients < Application
         @client.tags = []
       end
       @client.save
-      if @branch and @center
-        redirect(params[:return]||resource(@branch, @center, @client), :message => {:notice => "Client '#{@client.name}' has been edited"})
+      if params[:format] and params[:format]=="xml"
+        if params[:client] and params[:client][:fingerprint]
+          doc = Base64.decode64(params[:client][:fingerprint]) 
+          temp = File.new("tmp/client_#{@client.id}_fingerprint.fpt", "w")
+          File.open( temp.path, 'wb') do |f|
+            f.write(doc)
+          end
+          doc_file = File.open(temp.path, 'rb')
+          @client.fingerprint = doc_file
+          @client.save
+          File.delete("tmp/client_#{@client.id}_fingerprint.fpt")
+        end
+        display @client
       else
-        redirect(resource(@client, :edit), :message => {:notice => "Client '#{@client.name}' has been edited"})
+        if @branch and @center
+          redirect(params[:return]||resource(@branch, @center, @client), :message => {:notice => "Client '#{@client.name}' has been edited"})
+        else
+          redirect(resource(@client, :edit), :message => {:notice => "Client '#{@client.name}' has been edited"})
+        end
       end
     else
       display @client, :edit  # error messages will be shown

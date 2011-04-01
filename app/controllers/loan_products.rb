@@ -1,5 +1,5 @@
 class LoanProducts < Application
-  # provides :xml, :yaml, :js
+  provides :xml, :yaml, :js
 
   def index
     @loan_products = LoanProduct.all

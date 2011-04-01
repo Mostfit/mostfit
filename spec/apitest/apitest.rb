@@ -3,6 +3,7 @@ require 'dm-core'
 require 'branch'
 require 'center'
 require 'payment'
+require 'client'
 require "uri"
 require 'httparty'
 
@@ -29,15 +30,21 @@ centers.each { |center| puts center.name }
 #create payment checking using httparty request
 #branch: 1, center : 11, client :167, loans : 199
 
-res = Payment.make_payment(1,11,167,199)
-        puts "Payment created"
-	puts res['payment']["message"]
-	puts res['payment']["id"]
-	puts res['payment']["type"]
-	puts res['payment']["amount"]
-	puts res['payment']["received_on"]
-	puts "----------------"
+#~ res = Payment.make_payment(1,11,167,199)
+        #~ puts "Payment created"
+	#~ puts res['payment']["message"]
+	#~ puts res['payment']["id"]
+	#~ puts res['payment']["type"]
+	#~ puts res['payment']["amount"]
+	#~ puts res['payment']["received_on"]
+	#~ puts "----------------"
 
+
+res = Client.update_client(1,8,119)
+puts "---------------"
+puts res
+	
+	
 #made payment using datamapper
 #pay = Payment.create(:amount =>99.06, :type =>:principal, :loan_id => 199, :client_id => 167, :received_by_staff_id =>1, :received_on => "2011-03-28")
 

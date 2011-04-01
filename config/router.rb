@@ -133,11 +133,14 @@ Merb::Router.prepare do
   match('/api/v1/centers/:id.xml').to(:controller => 'centers', :action =>'show', :format => 'xml')
   match('/api/v1/client_groups.xml').to(:controller => 'client_groups', :action =>'index', :format => 'xml')
   match('/api/v1/client_groups/:id.xml').to(:controller => 'client_groups', :action =>'show', :format => 'xml')
-  match('/api/v1/branches/:branch_id/centers/:center_id/clients/:id.xml').to(:controller => 'clients', :action =>'show', :format => 'xml')
+  match('/api/v1/branches/:branch_id/centers/:center_id/clients/:id.xml', :method => "get").to(:controller => 'clients', :action =>'show', :format => 'xml')
   match('/api/v1/branches/:branch_id/centers/:id.xml').to(:controller => 'centers', :action =>'show', :format => 'xml')
   match('/api/v1/loans/:id.xml').to(:controller => 'loans', :action =>'show', :format => 'xml')
   match('/api/v1/users.xml').to(:controller => 'users', :action =>'index', :format => 'xml')
+  match('/api/v1/loan_products.xml').to(:controller => 'loan_products', :action =>'index', :format => 'xml')
+  match('/api/v1/loan_products/:id.xml').to(:controller => 'loan_products', :action =>'show', :format => 'xml')
   match('/api/v1/branches/:branch_id/centers/:center_id/clients/:client_id/loans/:loan_id/payments.xml').to(:controller => 'payments', :action =>'create', :format => 'xml')
+  match('/api/v1/branches/:branch_id/centers/:center_id/clients/:id.xml', :method => "put").to(:controller => 'clients', :action =>'update', :format => 'xml')
 
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')

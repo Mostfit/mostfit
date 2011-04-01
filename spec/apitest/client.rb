@@ -1,25 +1,25 @@
 require 'rubygems'
 require 'httparty'
-class Payment
+require "base64"
+class Client
   include DataMapper::Resource
     
   property :id,     Serial
-  property :amount,  String
-  property :type,  String
-  property :loan_id,  Integer
-  property :client_id,  Integer
-  property :received_by_staff_id,  Integer
-  property :received_on,  Date
+  property :name,  String
+  property :document,  String
+  
 
   #using httparty call mostfit api
   include HTTParty
-  base_uri 'http://localhost:4000/api/v1'
+  base_uri 'http://localhost:4000'
   basic_auth 'admin', 'password'
   format :xml
   
-  #branch: 1, center : 11, client :167, loans : 199
-  def self.make_payment(branch,center,client,loan)
-    post("/branches/#{branch}/centers/#{center}/clients/#{client}/loans/#{loan}/payments.xml", :query => {:payment => {:amount =>99.06, :type =>:principal, :loan_id => loan, :client_id => client, :received_by_staff_id =>1, :received_on => "2011-03-28"}})
+  #branch: 1, center : 8, client :119
+  def self.update_client(branch,center,client)
+    image = Base64.encode64("#{File.read('/home/kiran/Desktop/sample.fpt')}") 
+    
+    put("/api/v1/branches/#{branch}/centers/#{center}/clients/#{client}.xml", :query => {:client => {:name =>"kiran1", :fingerprint => image}})
   end
   
 end
