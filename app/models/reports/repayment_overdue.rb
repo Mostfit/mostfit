@@ -53,7 +53,7 @@ class RepaymentOverdue < Report
     # all the fee dues
     fees_due         = Fee.overdue(@date)
     fees_due_keys    = fees_due.keys & funder_loan_ids if @funder
-    fees_due_loans   = Loan.all(:id => fees_due_keys, :fields => [:id, :client_id, :amount]) if fees_due.length>0
+    fees_due_loans   = fees_due.length>0 ? Loan.all(:id => fees_due_keys, :fields => [:id, :client_id, :amount]) : []
     fees_due_clients = Client.all(:id => fees_due_loans.map{|x| x.client_id}, :fields => [:id, :name, :center_id]).map{|c| [c.id, c]}.to_hash
     
     fees_due.each{|loan_id, amount|
