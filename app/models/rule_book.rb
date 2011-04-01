@@ -108,8 +108,13 @@ class RuleBook
 
   # credit and debit accounts cannot be exactly same
   def credit_account_is_not_same_as_debit_account?
-    return true unless (credit_account_rules.map{|x| x.credit_account_id} == debit_account_rules.map{|x| x.debit_account_id})
-    [false, "Credit and Debit account cannot be same"]
+    if credit_account_rules.length > 0 and debit_account_rules.length > 0 and (credit_account_rules.map{|x| x.credit_account_id} == debit_account_rules.map{|x| x.debit_account_id})
+      [false, "Credit and Debit account cannot be same"]
+    elsif credit_accounts.length > 0 and debit_accounts.length > 0 and (credit_accounts.map{|x| x.account_id} == debit_accounts.map{|x| x.account_id})
+      [false, "Credit and Debit account cannot be same"]
+    else
+      return true 
+    end
   end
 
   def convert_blank_to_nil

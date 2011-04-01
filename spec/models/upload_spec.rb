@@ -12,10 +12,9 @@ describe Upload do
     Center.all.destroy!
     LoanProduct.all.destroy!
     file = Upload.new("test_data.xls")
-    #`cp #{File.join(Merb.root, "spec", "fixtures", file.filename)} /tmp/testing_upload.txt`
     FileUtils.cp(File.join(Merb.root, "spec", "fixtures", file.filename), File.join("/", "tmp", "testing_upload.xls"))
     file.move("/tmp/testing_upload.xls")
-    file.process_excel_to_csv    
+    file.process_excel_to_csv
     file.load_csv(MockLog.new)
   end
   
@@ -28,11 +27,11 @@ describe Upload do
   end
 
   it "Should create clients" do
-#    Client.all.count.should > 0
+    Client.all.count.should > 0
   end
 
   it "Should create loans" do
-#    Loan.all.count.should > 0
+    Loan.all.count.should > 0
   end
 
   it "Should create funding line" do
@@ -40,7 +39,7 @@ describe Upload do
   end
 
   it "Should create payments" do
- #   Payment.all.count.should > 0
+    Payment.all.count.should > 0
   end
 
   it "Should create loan products" do

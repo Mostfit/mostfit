@@ -12,7 +12,11 @@ Merb::Router.prepare do
   resources :loan_utilizations
   resources :rule_books
   resources :account_types
-  resources :accounts, :id => %r(\d+)
+  resources :accounts, :id => %r(\d+) do
+    resources :accounting_periods do
+      resources :account_balances
+    end
+  end
   resources :rules, :id => %r(\d+)
   resources :bookmarks
   resources :audit_items
@@ -119,6 +123,7 @@ Merb::Router.prepare do
   match('/:controller/:id', :id => %r(\d+)).to(:action => 'redirect_to_show').name(:quick_link)
   match('/rules/get').to(:controller => 'rules', :action => 'get') 
   match('/login.xml').to(:controller => 'merb_auth_slice_password/sessions', :action => 'update', :format => 'xml') 
+  match('/accounts/:account_id/accounting_periods/:accounting_period_id/account_balances/:id/verify').to(:controller => 'account_balances', :action => 'verify').name(:verify_account_balance)
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
 end

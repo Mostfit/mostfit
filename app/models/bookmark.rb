@@ -9,7 +9,7 @@ class Bookmark
   property :name,       String, :length => 50, :nullable => false
   property :title,      String, :length => 100, :nullable => false
   property :route,      Text,   :nullable => false
-  property :type,       Enum.send('[]', *Types), :nullable => false,   :default => :other, :index => true
+  property :type,       Enum.send('[]', *Types), :nullable => false,   :default => :system, :index => true
   property :method,     Enum.send('[]', *Methods), :nullable => false, :default => :get, :index => true
   property :params,     Text,    :nullable => true
   property :user_id,    Integer, :nullable => false, :index => true

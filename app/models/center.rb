@@ -39,6 +39,7 @@ class Center
     hour, minute = row[headers[:center_meeting_time_in_24h_format]].split(":")
     branch       = Branch.first(:name => row[headers[:branch]].strip)
     staff_member = StaffMember.first(:name => row[headers[:manager]])
+
     creation_date = ((headers[:creation_date] and row[headers[:creation_date]]) ? row[headers[:creation_date]] : Date.today)
     obj = new(:name => row[headers[:center_name]], :meeting_day => row[headers[:meeting_day]].downcase.to_s.to_sym, :code => row[headers[:code]],
               :meeting_time_hours => hour, :meeting_time_minutes => minute, :branch_id => branch.id, :manager_staff_id => staff_member.id,
@@ -227,7 +228,7 @@ class Center
         nwday = 7 if nwday == 0
       end
     else
-      nwday = (date + number).wday
+      nwday = (date - number).wday
       while nwday != Center.meeting_days.index(meeting_day_for(date - number))
         number += 1
         nwday = (date - number).wday
