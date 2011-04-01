@@ -1,0 +1,5 @@
+%xml
+  %branches
+    - if @branches
+      - @branches.each do |branch|
+        = branch.to_xml
