@@ -38,6 +38,7 @@ class ClientTypes < Application
 
   def update(id, client_type)
     @client_type = ClientType.get(id)
+    @client_type.fees = Fee.all(:id => params[:fees].keys) if params[:fees]
     raise NotFound unless @client_type
     if @client_type.update(client_type)
        redirect resource(@client_type)
