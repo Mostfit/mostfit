@@ -24,7 +24,7 @@
     %td
     %td
     %td
-      = balance.to_currency
+      = (balance || 0).to_currency
     %td
   - posting_hash = Posting.all(:account.in => @accounts, "journal.date.lte" => @report.to_date, "journal.date.gte" => @report.from_date).map{|p| [p.journal.date, p]}.to_hash
   - posting_hash.keys.sort.each do |date|
@@ -49,7 +49,7 @@
     %td
     %td
     %td
-      = balance.to_currency
+      = (balance || 0).to_currency
     %td
         
         
