@@ -3,10 +3,9 @@
   
 = error_messages_for @client_type
 
-= form_for(@client_type, :action => url(:client_type, @client_type)) do
-  %p
-    = text_field :type
-    = submit "Update"
+= form_for(@client_type, :action => url(:client_type, @client_type), :class => "form") do
+  = partial :fields
+  = submit "Update"
 
 = link_to 'Show', url(:client_type, @client_type)
 |

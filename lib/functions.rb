@@ -1,4 +1,10 @@
 # small monkey patch, real patch is submitted to extlib/merb/dm, hoping for inclusion soon
+class NilClass
+  def to_currency
+    "-"
+  end
+end
+
 class Date
   WEEKDAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   def inspect
