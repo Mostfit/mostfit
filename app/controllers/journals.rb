@@ -131,8 +131,8 @@ class Journals < Application
     if params[:branch_id] and not params[:branch_id].blank?
       @branch = Branch.get(params[:branch_id])
       raise BadRequest unless @branch
-      @from_date = Date.parse(params[:from_date])
-      @to_date = Date.parse(params[:to_date])
+      @from_date = (params[:from_date] ? Date.parse(params[:from_date]) : Date.today - 30)
+      @to_date = (params[:to_date] ? Date.parse(params[:to_date]) : Date.today)
       
       # get all the relevant rules
       @rules = RuleBook.all(:branch => @branch, :from_date.lte => @to_date, :to_date.gte => @to_date).group_by{|x| x.action.to_sym}
@@ -144,8 +144,8 @@ class Journals < Application
                                   :received_on.lte => @to_date, :type => :principal).aggregate(:amount.sum)
       @interest     = Payment.all("client.center.branch_id" => @branch.id, :received_on.gte => @from_date,
                                   :received_on.lte => @to_date, :type => :interest).aggregate(:amount.sum)
-      @fees         = Payment.all("client.center.branch_id" => @branch.id, :received_on.gte => @from_date,
-                                  :received_on.lte => @to_date, :type => :fees).aggregate(:fee_id, :amount.sum)
+      @fees         = (Payment.all("client.center.branch_id" => @branch.id, :received_on.gte => @from_date,
+                                   :received_on.lte => @to_date, :type => :fees).aggregate(:fee_id, :amount.sum)||[]).to_hash
     end
     render :layout => layout?
   end

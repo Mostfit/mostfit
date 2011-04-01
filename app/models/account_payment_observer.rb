@@ -12,7 +12,7 @@ class AccountPaymentObserver
     journal = {:date => obj.received_on, :transaction_id => obj.id.to_s, :currency => Currency.first, :amount => obj.amount}
     journal[:comment] = "Payment: #{obj.type} - #{obj.amount}"
 
-      journal[:journal_type_id]=  2
+    journal[:journal_type_id]=  2
 
     status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)
   end
