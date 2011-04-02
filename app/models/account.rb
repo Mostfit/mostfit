@@ -24,6 +24,9 @@ class Account
 
   has n, :postings
   has n, :journals, :through => :postings
+  has n, :account_balances
+  has n, :accounting_periods, :through => :account_balances
+  
   is :tree, :order => :name
   
   validates_present   :name 
@@ -54,7 +57,7 @@ class Account
 
   def account_earliest_date
     # oops! the opening_balance_as_on date is greater than the earliest posting date!!
-    postings("journal.date.lte" => Date.today).map{|p| p.journal.date}.min
+    postings("journal.date.lte" => Date.today).map{|p| p.journal.date}.min || opening_balance_on_date || Date.min_date
   end
 
   def convert_blank_to_nil
