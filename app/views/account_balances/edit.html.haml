@@ -1,0 +1,15 @@
+%h1 Edit Account Balance
+
+%h3 
+  for
+  = @account_balance.account.name
+  for period
+  = @account_balance.accounting_period.name
+
+= error_messages_for @account_balance
+
+= form_for(@account_balance, :action => resource(@account_balance.account, @account_balance.accounting_period, @account_balance)) do
+  = partial :fields
+  = submit "Update"
+
+= link_to 'Back', url(:account_balances)

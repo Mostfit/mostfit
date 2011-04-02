@@ -1,0 +1,44 @@
+%h1 
+  Accounting Periods for "
+  = @account.name
+  "
+
+%table.form.narrow
+  %tr
+    %thead
+      %th
+        Accounting Period
+      %th
+        Start Date
+      %th
+        End Date
+      %th
+        Opening Balance
+      %th
+        Closing Balance
+      %th
+        Actions
+  - AccountingPeriod.all.each do |ap|
+    %tr
+      %td
+        = ap.name
+      %td
+        = ap.begin_date
+      %td
+        = ap.end_date
+      %td
+        - ab = ap.account_balances(:account => @account)[0] 
+        = ab.opening_balance if ab
+      %td
+        = ab.closing_balance if ab
+      %td
+        - if ab
+          - unless ab.verified_on
+            = link_to 'Edit', resource(@account, ap, ab)
+            = link_to 'Close Account'
+          - else
+            Account Balance Locked
+        - else
+          = link_to "Create", resource(@account, ap, :account_balances, :new)
+
+  

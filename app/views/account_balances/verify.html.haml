@@ -1,0 +1,21 @@
+%h1 Close Account
+
+%h3 
+  This will close and lock the account balances for 
+  = @account_balance.account.name
+  for accounting period
+  = @account_balance.accounting_period.name
+
+= form_for(@account_balance, :action => url(:verify_account_balance, @account, @accounting_period, @account)) do
+  %table.form
+    %tr
+      %th
+        Opening Balance
+      %td
+        = @account_balance.opening_balance
+    %tr
+      %th
+        Closing Balance
+      %td
+        = @account_balance.closing_balance
+  = submit 'Verify and Close this Accounting Period'
