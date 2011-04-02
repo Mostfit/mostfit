@@ -56,8 +56,9 @@ class DailyTransactionSummary < Report
                 
       data[b][0] += disbursements[b.id] || 0
       # collection
-      data[b][1][:principal] += collections[:principal][b.id] || 0 
-      data[b][1][:interest]  += collections[:interest][b.id] || 0 
+      data[b][1][:principal] += collections[:principal][b.id] || 0 - ( advances.key?(b.id) ? (advances[b.id][0][0] || 0) : 0 ) 
+      data[b][1][:interest]  += collections[:interest][b.id] || 0 - 
+                (( advances.key?(b.id) ? (advances[b.id][0][1] || 0) : 0 ) - ( advances.key?(b.id) ? (advances[b.id][0][0] || 0) : 0 )) 
       data[b][1][:fees] += collections[:fees][b.id] || 0 
                 
       branches[b.id] = b
@@ -86,7 +87,7 @@ class DailyTransactionSummary < Report
       # var adjusted
       if advances.key?(b.id)
         data[b][1][:var] += advances[b.id][0][1] || 0  
-        data[b][1][:total] += (advances[b.id][0][1] || 0)    
+        #data[b][1][:total] += (advances[b.id][0][1] || 0)    
         principal = ((advances[b.id][0][0] || 0) + 
                      (old_balances.key?(b.id) ? (old_balances[b.id][0][0] || 0) : 0) - 
                     (balances.key?(b.id) ? (balances[b.id][0][0] || 0) : 0 ))
