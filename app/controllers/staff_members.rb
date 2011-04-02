@@ -169,7 +169,7 @@ class StaffMembers < Application
     if session.user.role == :staff_member or session.user.staff_member
       st = session.user.staff_member
       ids = []
-      [st.branches, st.centers.branches].flatten.uniq.each{|branch|        
+      [st.areas.branches, st.regions.areas.branches, st.branches, st.centers.branches].flatten.uniq.each{|branch|        
         staff_members = StaffMember.related_to(branch)
         ids += ([staff_members, branch.manager.id] << branch.centers.manager.map{|x| x.id}).flatten.uniq        
       }

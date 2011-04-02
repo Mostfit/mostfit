@@ -53,7 +53,7 @@ module Misfit
           return(@funder.send(model.to_s.snake_case.pluralize, {:id => id}).length>0)
         elsif [Branch, Center, ClientGroup, Client, Loan, StaffMember, FundingLine, Funder, Portfolio].include?(model) and id==0
           return(@funder.send(model.to_s.snake_case.downcase.pluralize).length>0)
-        elsif [Browse, Document, AuditTrail, Attendance, Search].include?(model)
+        elsif [Browse, Document, AuditTrail, Attendance, Search, Bookmark].include?(model)
           return true
         end
         return false
@@ -123,6 +123,7 @@ module Misfit
 
         #user is a funder
         if user_role == :funder and @funder ||= Funder.first(:user_id => self.id)
+          return true if route[:controller] == "dashboard" or route[:controller] == "graph_data" or route[:controller] == "bookmarks"
           @funding_lines = @funder.funding_lines
           @funding_line_ids = @funder.funding_lines.map{|fl| fl.id}
           return(is_funder? and allow_read_only)
