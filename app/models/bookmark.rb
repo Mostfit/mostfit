@@ -20,7 +20,7 @@ class Bookmark
 
   def self.for(user, type=:system)
     {
-      :shared => Bookmark.all(:user.not => user, :type => type, :share_with => user.role),  
+      :shared => Bookmark.all(:user.not => user, :type => type).find_all{|b| b.share_with.include?(user.role)},
       :own => Bookmark.all(:user => user, :type => type)
     }
   end

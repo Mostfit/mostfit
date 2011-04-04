@@ -9,7 +9,7 @@
       - route = YAML.load(bookmark.route)          
       - route_url = route.class == Array ? url(route.last) : route
       %li
-        = link_to("[share]", resource(bookmark, :edit), :style => "float: right") if @share
+        = link_to("[share]", resource(bookmark, :edit), :style => "float: right")
         - if bookmark.method==:get
           = link_to bookmark.name, route_url
         - else
