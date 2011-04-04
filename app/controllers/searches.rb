@@ -9,11 +9,9 @@ class Searches < Application
       @client_groups = ClientGroup.search(params[:query], per_page)
       @staff_members = StaffMember.search(params[:query], per_page)
       @bookmarks     = Bookmark.search(params[:query], per_page)
-      @floating = true if request.xhr?      
-      render :layout => layout?
-    else
-      display "No results"
     end
+    @floating = true if request.xhr?
+    render :layout => layout?
   end
 
   def advanced
