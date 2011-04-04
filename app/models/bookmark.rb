@@ -25,11 +25,15 @@ class Bookmark
     }
   end
 
-  def self.search(q, per_page=10)
+  def self.search(q, user, per_page=10)
     if /^\d+$/.match(q)
-      all(:conditions => ["id = ?", q], :limit => per_page)
+      all(:conditions => ["id = ?", q], :limit => per_page, :type => :system).find_all{|b|
+        b.share_with.include?(user.role)
+      }
     else
-      all(:name.like => q+'%', :limit => per_page, :type => :system)
+      all(:name.like => q+'%', :limit => per_page, :type => :system).find_all{|b|
+        b.share_with.include?(user.role)
+      }
     end
   end
 

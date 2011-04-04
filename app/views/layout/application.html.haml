@@ -55,7 +55,7 @@
           #header_search_div
             %form._remote_{:action => '/search', :class => 'search', :method => "POST", :style => "float:left;"}
               %input{:name => 'query', :value => params[:query], :autocomplete => "off"}
-              %input{:type => 'hidden', :name => '_target_', :value => "content p"}
+              %input{:type => 'hidden', :name => '_target_', :value => "content p:first"}
               %input{:type => 'submit', :value=>'search'}
     #content
       .container

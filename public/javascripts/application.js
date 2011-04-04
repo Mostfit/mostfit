@@ -1,18 +1,16 @@
 // Common JavaScript code across your application goes here.
 var lineNos=0;
 function addFloater(link, form){
-    if($(".floatingBox").length>0){
+    if($(".floatingBox").length>0 && link){
 	if(window.document.width > link.offset().left + link.width() + form.width()){
 	    var left = link.offset().left + link.width();
 	}else{
 	    var left =  link.width() + link.offset().left - form.width();
 	}
 	if((window.document.height > form.offset().top + form.height()) && !$(".floatingBox").hasClass("shiftUp")){
-	    console.log("here");
 	    var top = link.offset().top + link.height();
 	}else{
 	    var top = link.offset().top - form.height();
-	    console.log(top);
 	}
 	$(form).offset({top: top, left: left});	
     }
@@ -23,12 +21,6 @@ function addFloater(link, form){
 				    $("div.floater").remove();
 				});
     }
-    if($(".closeButton").length>0){
-	$(".closeButton").live('click', function(){
-				   $(".floatingBox").remove();
-			       });
-    }
-
 }
 function spitLogs(){
     $.get("/logs/"+$("div.log_box").attr("id"), function(data){
@@ -1059,5 +1051,8 @@ $(document).ready(function(){
 			  map_initialize();
 		      if($("#map_canvas") && (typeof loadAPI != "undefined"))
 			  loadAPI();
+		      $("a.closeButton").live('click', function(){
+						  $(".floatingBox").remove();
+					      });
 		  });
 

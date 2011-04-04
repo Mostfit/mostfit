@@ -425,13 +425,13 @@ a.button:visited {
 }
 
 #header_search_div {
-    position: absolute; 
-    right: -4%;
+    position: relative; 
+    right: -77%;
     padding: 3px;
     padding-bottom: 0px;    
     vertical-align: top;
-    top: -12px;
-    width: 400px;
+    top: -25px;
+    width: 300px;
 }
 #header_search_div input{
     font-size: 1.5em;

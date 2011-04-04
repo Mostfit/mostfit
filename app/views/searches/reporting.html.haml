@@ -15,46 +15,46 @@
         = submit "edit"
     %table
       %tr
-        -@arr = Array.new;
-        -@precedence.each do |model, prop|
-          -keys = prop.keys
-          -keys.each do |key|
-            -if(@fields[model][key] != nil)
-              -if(@arr[(@precedence[model][key]).to_i-1] == nil)
-                -@arr[(@precedence[model][key]).to_i-1] = [ [model, key] ]
-              -else
-                -@arr[(@precedence[model][key]).to_i-1].push([model, key])
-        -@arr.delete(nil)
-        -@arr.flatten!(1) #flattens array once (this scheme is needed to handle
-        -@arr.each do |model, key|
+        - @arr = Array.new;
+        - @precedence.each do |model, prop|
+          - keys = prop.keys
+          - keys.each do |key|
+            - if(@fields[model][key] != nil)
+              - if(@arr[(@precedence[model][key]).to_i-1] == nil)
+                - @arr[(@precedence[model][key]).to_i-1] = [ [model, key] ]
+              - else
+                - @arr[(@precedence[model][key]).to_i-1].push([model, key])
+        - @arr.delete(nil)
+        - @arr.flatten!(1) #flattens array once (this scheme is needed to handle
+        - @arr.each do |model, key|
           %th
-            -if model==klass
-              =key.camelcase(' ')
-            -else
+            - if model==klass
+              = key.camelcase(' ')
+            - else
               = model+' '+key.camelcase(' ')     
-      -@objects.each do |obj|
+      - @objects.each do |obj|
         %tr
-          -@arr.each do |model, key|
-            -if model==klass
-              -if relations.find{|k,v| v==key} and obj.respond_to?(key) and child_obj = obj.send(key)
+          - @arr.each do |model, key|
+            - if model==klass
+              - if relations.find{|k,v| v==key} and obj.respond_to?(key) and child_obj = obj.send(key)
                 %td
-                  =child_obj.respond_to?(:name) ? child_obj.name : child_obj
-              -elsif obj.respond_to?(key)
+                  = child_obj.respond_to?(:name) ? child_obj.name : child_obj
+              - elsif obj.respond_to?(key)
                 %td
                   - val = obj.send(key)
                   = val.respond_to?(:name) ? val.name : val
               -else
                 %td
-                  =obj.respond_to?(:name) ? obj.name : obj
-            -elsif obj.respond_to?(model)
-              -nested_obj=obj.send(model)
+                  = obj.respond_to?(:name) ? obj.name : obj
+            - elsif obj.respond_to?(model)
+              - nested_obj=obj.send(model)
               %td
                 - if nested_obj.respond_to?(key)
                   - val = nested_obj.send(key)
                   = val.respond_to?(:name) ? val.name : val
                 - else 
-                  =nested_obj.respond_to?(:name) ? nested_obj.name : nested_obj
-            -else
+                  = nested_obj.respond_to?(:name) ? nested_obj.name : nested_obj
+            - else
               - path = get_path(model_names, model, klass)
               - nested_obj= obj
               - while(func=path.pop)

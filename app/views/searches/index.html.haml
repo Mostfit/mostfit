@@ -1,4 +1,4 @@
-%div{:class => (@floating ? "floatingBox" : ""), :style => "width: 60%"}
+%div{:class => (@floating ? "floatingBox" : ""), :style => "max-width: 80%"}
   - if @floating
     %a.closeButton
       [close]
@@ -22,18 +22,18 @@
           -objects[0..last].each do |obj|
             %tr
               %td
-                =obj.id
+                = obj.id
               -functions.each do |function|
                 %td
                   - field = obj.send(function)
                   - if function == :manager or function == :center
-                    =link_to(field.name, resource(field))
+                    = link_to(field.name, resource(field))
                   - elsif model.to_sym == :bookmarks
                     - if obj.method==:get
                       - route = YAML::load(obj.route).last
                       = link_to obj.name, url(route)
                   - else
-                    =link_to(field.respond_to?(:name) ? field.name : field, "/#{model}/#{obj.id}")
+                    = link_to(field.respond_to?(:name) ? field.name : field, "/#{model}/#{obj.id}")
         - if @floating and count > 10
           %tr
             %td
