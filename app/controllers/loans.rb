@@ -39,7 +39,7 @@ class Loans < Application
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])
-    raise NotAllowed unless @loan_product
+    raise BadRequest unless @loan_product
     @loan = klass.new(attrs)
     @loan.loan_product = @loan_product
     @loan.amount      ||= @loan.amount_applied_for
@@ -61,6 +61,7 @@ class Loans < Application
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     loan_product = LoanProduct.is_valid(params[:loan_product_id])
+    raise BadRequest unless loan_product
     statuses = []
 
     # create loans for all the clients
