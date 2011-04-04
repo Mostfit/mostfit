@@ -3,7 +3,11 @@ class Branches < Application
   include DateParser
 
   def index
-    @branches = (@branches || Branch.all).paginate(:page => params[:page], :per_page => 15)
+    if session.user.role == :staff_member
+      @branches = Branch.for_staff_member(session.user.staff_member).paginate(:page => params[:page], :per_page => 15)
+    else
+      @branches = (@branches || Branch.all).paginate(:page => params[:page], :per_page => 15)
+    end
     display @branches
   end
 

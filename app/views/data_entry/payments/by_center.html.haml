@@ -73,7 +73,7 @@
           = "(#{@loans_to_utilize.size})"
     %div.tab    
       %h1 Repayments
-      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "if ($('#payments_received_by').val() != '#{@center.manager.id}'){return(confirm('Payment receiver is not center manager. Proceed with payments?'));};", :class => "_disable_button_") do
+      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => params[:return] || resource(@branch, @center)), :onsubmit => "if ($('#payments_received_by').val() != '#{@center.manager.id}'){return(confirm('Payment receiver is not center manager. Proceed with payments?'));};", :class => "_disable_button_") do
         /= hidden_field :name => 'for_date', :value => @date
         = hidden_field :name => 'center_id', :value => @center.id
         = partial :cds
@@ -175,4 +175,5 @@
           For Date
         %td
           = text_field :name => 'for_date', :value => @date || Date.today
+          = hidden_field :name => 'return', :value => url(:data_entry)
     = submit 'Submit'
