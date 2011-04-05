@@ -5,7 +5,7 @@ class Reports < Application
     :consolidated => [DailyTransactionSummary, ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, AggregateConsolidatedReport], 
     :registers    => [TransactionLedger, LoanSanctionRegister, LoanDisbursementRegister, ScheduledDisbursementRegister, ClaimReport, InsuranceRegister], 
     :targets_and_projections  => [ProjectedReport, TargetReport, StaffTargetReport, IncentiveReport],
-    :statistics   => [LoanSizePerManagerReport, LoanPurposeReport, ClientOccupationReport, ClosedLoanReport], 
+    :statistics   => [LoanSizePerManagerReport, LoanPurposeReport, ClientOccupationReport, ClosedLoanReport, PortfolioAllocationReport], 
     :exceptions   => [RepaymentOverdue, LateDisbursalsReport, DelinquentLoanReport, ParByCenterReport, ParByStaffReport, ParByLoanAgeingReport, ClientAbsenteeismReport, DuplicateClientsReport, NonDisbursedClientsAfterGroupRecognitionTest],
     :accounting   => [GeneralLedgerReport, TrialBalanceReport, DayBook, CashBook, BankBook]
   }
