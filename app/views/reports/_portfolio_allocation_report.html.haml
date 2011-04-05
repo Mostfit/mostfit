@@ -1,4 +1,4 @@
-=partial :form
+= partial :form
 %table.report.nojs
   %tr.header
     %th 
@@ -18,24 +18,23 @@
   - org_total = []
   - branch_total = [0,0]
   - @data.sort_by{|funder, data| funder.name}.each do |funder, data|
-    -if data.length > 0
+    - if data.length > 0
       %tr
         %td
           %b
             = funder.name
-        -data.each_with_index do |d, idx|
-          %td
-            = d[0][5]
-          %td
-            = d[0][3]
-          %td
-            = d[0][4]
+        %td
+          = data[0][5]
+        %td
+          = (data[0][3] || 0).to_currency
+        %td
+          = (data[0][4] || 0).to_currency
     - org_total.push(branch_total) 
   %tr.org_total
     %td
-      %b==Total
+      %b Total
     - branch_total.each do |ele|
       %td
         %b
-          =ele.to_currency
+          = ele.to_currency
           
