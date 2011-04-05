@@ -3,7 +3,7 @@
     %td
       Journal Type
     %td
-      =select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select Journal"
+      = select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select Journal"
   - if params[:credit_accounts]
     - params[:credit_accounts].each_with_index do |ca, idx|
       = partial "journals/account_amount", :account => ca, :account_type => :credit_accounts, :last_account => (params[:debit_accounts].length == idx + 1 ? true : false)

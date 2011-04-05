@@ -14,7 +14,7 @@ class Journals < Application
   end
 
   def add_account
-    @branch = (params[:branch_id] ? Branch.get(params[:branch_id]) : nil)
+    @branch = (params[:branch_id] and not params[:branch_id].blank? ? Branch.get(params[:branch_id]) : nil)
     partial :account_amount, :layout => layout?, :last_account => true, :account_type => (params[:account_type]||"credit_account").to_sym, :account => {}
   end
 
