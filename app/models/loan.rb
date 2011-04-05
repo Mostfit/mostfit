@@ -1175,7 +1175,7 @@ private
     payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
     1.upto(number_of_installments){|installment|
       @reducing_schedule[installment] = {}
-      @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / 52).round(2)
+      @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider)
       @reducing_schedule[installment][:principal_payable] = (payment - @reducing_schedule[installment][:interest_payable]).round(2)
       balance = balance - @reducing_schedule[installment][:principal_payable]
     }
@@ -1191,7 +1191,7 @@ private
     when :monthly
       12
     when :daily
-      360
+      365
     end    
   end
 end
