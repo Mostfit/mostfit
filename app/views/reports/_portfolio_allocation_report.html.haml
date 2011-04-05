@@ -24,7 +24,7 @@
           %b
             = funder.name
         %td
-          = data[0][5]
+          = data[0][5].to_time.strftime('%e') + (' ') + data[0][5].to_time.strftime('%b') + (' ') + data[0][5].to_time.strftime('%Y')
         %td
           = (data[0][3] || 0).to_currency
         %td
@@ -33,6 +33,7 @@
   %tr.org_total
     %td
       %b Total
+    %td
     - branch_total.each do |ele|
       %td
         %b
