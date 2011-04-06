@@ -56,5 +56,10 @@ namespace :mostfit do
       t.set_present_value
       t.save
     }
+
+    # update portfolios
+    Portfolio.all.each{|p|
+      p.update_portfolio_value
+    }
   end
 end
