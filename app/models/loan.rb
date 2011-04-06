@@ -21,6 +21,7 @@ class Loan
   property :interest_rate,                  Float, :nullable => false, :index => true
   property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
   property :number_of_installments,         Integer, :nullable => false, :index => true
+  property :weekly_off,                     Enum.send('[]', *WEEKDAYS), :nullable => true
   property :client_id,                      Integer, :nullable => false, :index => true
 
   property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false, :index => true
@@ -287,7 +288,8 @@ class Loan
     return date.holiday_bump if number == 0
     case installment_frequency
     when :daily
-      new_date =  date + number
+      intervening_weekly_offs =  weekly_off ? date.count_weekday_uptil(weekly_off, date + number) : 0
+      new_date =  date + number + intervening_weekly_offs
     when :weekly
       new_date =  date + number * 7
     when :biweekly
@@ -829,6 +831,8 @@ class Loan
       shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day)
     }    
   end
+
+   
 
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
   def update_cycle_number
