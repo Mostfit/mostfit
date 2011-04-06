@@ -142,6 +142,7 @@ Merb::Router.prepare do
     match('/loan_products/:id.xml').to(:controller => 'loan_products', :action =>'show', :format => 'xml')
     match('/branches/:branch_id/centers/:center_id/clients/:client_id/loans/:loan_id/payments.xml').to(:controller => 'payments', :action =>'create', :format => 'xml')
     match('/branches/:branch_id/centers/:center_id/clients/:id.xml', :method => "put").to(:controller => 'clients', :action =>'update', :format => 'xml')
+    match('/branches/:branch_id/centers/:center_id/clients.xml', :method => "post").to(:controller => 'clients', :action =>'create', :format => 'xml')
   end
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')

@@ -1,4 +1,8 @@
 -error=@client.errors.instance_variable_get("@errors")
-%error
-  - error.each_key do |k|
-    =error[k]
+- if not error.blank?
+  %error
+    - error.each_key do |k|
+      =error[k]
+- else
+  %message
+    %success Client '#{@client.name}' successfully created.

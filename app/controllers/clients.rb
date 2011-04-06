@@ -37,9 +37,17 @@ class Clients < Application
     @client.center = @center if @center# set direct context
     @client.created_by_user_id = session.user.id
     if @client.save
-      redirect(params[:return]||resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' successfully created"})
+      if params[:format] and params[:format]=="xml"
+        display @client
+      else
+        redirect(params[:return]||resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' successfully created"})
+      end
     else
-      render :new  # error messages will be shown
+      if params[:format] and params[:format]=="xml"
+        display @client
+      else
+        render :new  # error messages will be shown
+      end
     end
   end
 

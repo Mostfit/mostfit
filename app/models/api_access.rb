@@ -82,5 +82,9 @@ class ApiAccess
     image = Base64.encode64("#{File.read('/home/kiran/Desktop/sample.fpt')}") 
     put("/branches/#{branch}/centers/#{center}/clients/#{client}.xml", :query => {:client => {:fingerprint => image}})
   end
+  
+   def self.create_client(branch,center)
+    post("/branches/#{branch}/centers/#{center}/clients.xml", :query => {:client => {:name => "my new client", :reference => "BS0999", :date_joined => "2011-04-05", :client_type_id => 1}})
+  end
 end
 
