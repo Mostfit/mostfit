@@ -1,6 +1,6 @@
 class Dashboard < Application
   include Grapher
-  PAYMENT_TYPES = {"principal" => 1, "interest" => 2, "fees" => 3}
+  PAYMENT_TYPES_HASH = {"principal" => 1, "interest" => 2, "fees" => 3}
   before :get_context
   before :display_from_cache, :exclude => [:index]
   after  :store_to_cache, :exclude => [:index]
@@ -313,7 +313,7 @@ class Dashboard < Application
 
     case params[:id]
     when "principal", "interest", "fees", "total"
-      types = PAYMENT_TYPES.key?(params[:id]) ? [PAYMENT_TYPES[params[:id]]] : PAYMENT_TYPES.values
+      types = PAYMENT_TYPES_HASH.key?(params[:id]) ? [PAYMENT_TYPES_HASH[params[:id]]] : PAYMENT_TYPES_HASH.values
       vals = repository.adapter.query(%Q{
                                          SELECT SUM(p.amount) amount, DATE(p.received_on) date
                                          FROM payments p, clients cl, centers c

@@ -1,12 +1,12 @@
 #reconcile_container
   %form{:class => "_remote_", :method => "GET", :action => url(:controller => :journals, :action => :reconcile, :return => params[:return])}
     %b Select branch
-    = select :name => :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select branch", :selected => params[:branch_id]
-    from
+    = select :name => :branch_id, :collection => [["0", "All branches"]] + Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select branch", :selected => params[:branch_id]
+    %b From
     - today = Date.today
     - month_first = Date.new(today.year, today.month, 1)
     = date_select :from_date, (params[:from_date] || month_first), :min_date => Date.min_date, :max_date => Date.today
-    to
+    %b To
     = date_select :to_date, (params[:to_date] || Date.today), :min_date => Date.min_date, :max_date => Date.today
     %input{:type => :hidden, :name => "return", :value => params[:return]}
     %input{:type => :hidden, :name => "_target_", :value => "reconcile_container"}
@@ -28,7 +28,7 @@
         %td
           = (ls = @disbursement || 0).to_currency
         %td
-          - account_ids = @rules[:disbursement].map{|x| x.debit_accounts.map{|da| da.id}}.flatten
+          - account_ids = @rules[:disbursement].map{|x| x.debit_accounts.map{|da| da.id} if x.debit_accounts.length > 0}.flatten
           - (as = (Posting.all("journal.date" => (@from_date..@to_date), :account_id => account_ids, :amount.lt => 0).aggregate(:amount.sum) || 0) * -1).to_currency
           - as -= (reverses.postings(:amount.gt => 0, :account_id => account_ids).aggregate(:amount.sum) || 0) if reverses.length>0
           = (as || 0).to_currency

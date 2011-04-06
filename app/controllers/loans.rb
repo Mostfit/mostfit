@@ -216,9 +216,11 @@ class Loans < Application
         next unless @loans_to_approve.include?(loan)
         params[:loans][id].delete("approved?")        
         params[:loans][id][:amount] = params[:loans][id][:amount_sanctioned]
-        loan.update(params[:loans][id])
-        @errors << loan.errors unless loan.save
+        unless loan.update(params[:loans][id])
+          @errors << loan.errors
+        end
       end
+
       if @errors.blank?
         redirect(params[:return]||"/data_entry", :message => {:notice => 'loans approved'})
       else
