@@ -3,7 +3,12 @@ class Users < Application
   #API call : after authenticate get user information and send xml response
   #this change made for testing purpose for dm-rest-adapter
   def show
-    display @template
+    if params[:id]
+      @user = User.get(params[:id])
+    else
+      @user = session.user
+    end
+    display @user
   end
 
   def index
