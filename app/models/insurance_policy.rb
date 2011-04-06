@@ -2,7 +2,7 @@ class InsurancePolicy
   include DataMapper::Resource
 
   POLICY_STATUSES = [:active, :expired, :claim_pending, :claim_settled]
-  COVER_FOR       = [:self, :spouse, :son, :daughter, :mother, :father]
+  COVER_FOR       = [:self, :spouse, :both, :son, :daughter, :mother, :father]
   property :id, Serial
   property :application_number, String, :nullable => true
   property :policy_no, String, :nullable => true

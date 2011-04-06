@@ -21,6 +21,7 @@ class Loan
   property :interest_rate,                  Float, :nullable => false, :index => true
   property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
   property :number_of_installments,         Integer, :nullable => false, :index => true
+  property :weekly_off,                     Enum.send('[]', *WEEKDAYS), :nullable => true
   property :client_id,                      Integer, :nullable => false, :index => true
 
   property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false, :index => true
@@ -287,7 +288,8 @@ class Loan
     return date.holiday_bump if number == 0
     case installment_frequency
     when :daily
-      new_date =  date + number
+      intervening_weekly_offs =  weekly_off ? date.count_weekday_uptil(weekly_off, date + number) : 0
+      new_date =  date + number + intervening_weekly_offs
     when :weekly
       new_date =  date + number * 7
     when :biweekly
@@ -830,6 +832,8 @@ class Loan
     }    
   end
 
+   
+
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
   def update_cycle_number
     self.cycle_number=self.client.loans(:id.lt => id, :disbursal_date.not => nil).count+1
@@ -1079,7 +1083,7 @@ class Loan
     [false, "The scheduled first payment date cannot precede the scheduled disbursal date"]
   end
   def properly_approved?
-    return true if (approved_on and approved_by) or (approved_on.blank? and approved_by.blank?)
+    return true if (approved_on and (approved_by or approved_by_staff_id)) or (approved_on.blank? and (approved_by.blank? or approved_by_staff_id.blank?))
     [false, "The approval date and the staff member that approved the loan should both be given"]
   end
   def properly_rejected?
@@ -1175,7 +1179,7 @@ private
     payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
     1.upto(number_of_installments){|installment|
       @reducing_schedule[installment] = {}
-      @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / 52).round(2)
+      @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider)
       @reducing_schedule[installment][:principal_payable] = (payment - @reducing_schedule[installment][:interest_payable]).round(2)
       balance = balance - @reducing_schedule[installment][:principal_payable]
     }
@@ -1191,7 +1195,7 @@ private
     when :monthly
       12
     when :daily
-      360
+      365
     end    
   end
 end
@@ -1213,8 +1217,8 @@ class BulletLoan < Loan
   end
 
   def scheduled_interest_up_to(date)
-    return scheduled_interest_for_installment if date > scheduled_first_payment_date
-    scheduled_interest_for_installment * (1 - (scheduled_first_payment_date - date) / (scheduled_first_payment_date - disbursal_date||scheduled_disbursal_date))
+    return scheduled_interest_for_installment(1) if date > scheduled_first_payment_date
+    scheduled_interest_for_installment(1) * (1 - (scheduled_first_payment_date - date) / (scheduled_first_payment_date - disbursal_date||scheduled_disbursal_date))
   end
 
   def pay_prorata(total, received_on)
@@ -1492,5 +1496,63 @@ class RoundedPrincipalAndInterestLoan < PararthRounded
   end
   
 end
+
+class EquatedWeeklyRoundedAdjustedLastPayment < Loan
+  # these 2 methods define the pay back scheme
+  # typically reimplemented in subclasses
+  include ExcelFormula
+  # property :purpose,  String
+
+  def self.display_name
+    "Equated Payments - rounded, adjusted in last payment "
+  end
+
+  def scheduled_principal_for_installment(number)
+    # number unused in this implentation, subclasses may decide differently
+    # therefor always supply number, so it works for all implementations
+    raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > number_of_installments
+    return reducing_schedule[number][:principal_payable]
+  end
+
+  def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
+    # number unused in this implentation, subclasses may decide differently
+    # therefor always supply number, so it works for all implementations
+    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
+    return reducing_schedule[number][:interest_payable]
+  end
+
+private
+  def reducing_schedule
+    return @reducing_schedule if @reducing_schedule
+    @reducing_schedule = {}    
+    balance = amount
+    payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
+    1.upto(number_of_installments){|installment|
+      @reducing_schedule[installment] = {}
+      @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider).round(0)
+      if installment == number_of_installments
+        @reducing_schedule[installment][:principal_payable] = balance
+      else
+        @reducing_schedule[installment][:principal_payable] = (payment - @reducing_schedule[installment][:interest_payable]).round(0)
+      end
+      balance = balance - @reducing_schedule[installment][:principal_payable]
+    }
+    return @reducing_schedule
+  end
+
+  def get_divider
+    case installment_frequency
+    when :weekly
+      52
+    when :bi_weekly
+      26
+    when :monthly
+      12
+    when :daily
+      365
+    end    
+  end
+end
+
 
 # always add new loan types here i.e. at last

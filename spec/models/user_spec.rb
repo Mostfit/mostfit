@@ -50,7 +50,7 @@ describe User do
     @user.can_access?({:action =>"index", :controller =>"browse"}).should be_true
     @user.can_access?({:action =>"index", :namespace =>"data_entry", :controller=>"index"}).should be_true
     @user.can_access?({:action =>"index", :controller =>"admin"}).should be_true
-    @user.can_access?({:action =>"index", :controller =>"dashboard"})
+    @user.can_access?({:action =>"index", :controller =>"dashboard"}).should be_true
     @user.can_access?({:action =>"index", :controller =>"reports"}).should be_true
     @user.can_access?({:action =>"hq_tab", :controller =>"browse"}).should be_true
     @user.can_access?({:action => "branch", :branch_id => nil, :id=>"centers", :controller=>"dashboard"}).should be_true
