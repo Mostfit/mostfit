@@ -17,25 +17,23 @@
   -if @center
     %xml
       %weeksheet
-        %staff_member
-          %id #{@center.manager.id}
-          %name #{@center.manager.name}
+        %staff_member_id #{@center.manager.id}
+        %staff_member_name #{@center.manager.name}
         %date #{@date}
         %center_id #{@center.id}
         %center_name #{@center.name}
         %center_code #{@center.code}
         %center_address #{@center.address}
-        - @weeksheets.each do |weeksheet|
-          %client
-            %group_name #{weeksheet.group_name}
-            %client_id #{weeksheet.client_id}
-            %client_name #{weeksheet.client_name}
-            %loan_id #{weeksheet.loan_id}
-            %loan_amount #{weeksheet.loan_amount}
-            %disbursal_on #{weeksheet.disbursal_date.to_s}
-            %outstanding #{weeksheet.outstanding}
-            %installment_number #{weeksheet.installment_number}
-            %expected_principal #{weeksheet.principal} 
-            %expected_interest   #{weeksheet.interest} 
-            %expected_fee   #{weeksheet.fee} 
-            %expected_total_due #{weeksheet.total_due}
+        %weeksheet_rows
+          - @weeksheets.each do |weeksheet|
+            %weeksheet_row
+              %client_id #{weeksheet.client_id}
+              %loan_id #{weeksheet.loan_id}
+              %loan_amount #{weeksheet.loan_amount}
+              %disbursal_on #{weeksheet.disbursal_date.to_s}
+              %outstanding #{weeksheet.outstanding}
+              %installment #{weeksheet.installment_number}
+              %principal #{weeksheet.principal} 
+              %interest   #{weeksheet.interest} 
+              %fee   #{weeksheet.fee} 
+              %total_due #{weeksheet.total_due}
