@@ -20,7 +20,8 @@ class Date
     Holiday.all.include?(self)
   end
 
-  def count_weekdays_uptil(weekday, d2)
+  def count_weekday_uptil(weekday, d2)
+    debugger
     return 0 if d2 < self
     num_weeks = ((d2 - self) / 7).floor
     d_ = self + num_weeks
@@ -28,12 +29,13 @@ class Date
     num_weeks + add_one
   end
 
-  def holiday_bump
+  def holiday_bump(direction = nil)
     hols = $holidays
     new_date = self
     return new_date unless hols
     while hols.keys.include?(new_date)
-      case hols[new_date].shift_meeting
+      direction ||= hols[new_date].shift_meeting
+      case direction
         when :before
           new_date -= 1 
         when :after

@@ -1,5 +1,8 @@
 class Loan
   include DataMapper::Resource
+
+  DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+
   before :valid?,  :parse_dates
   before :valid?,  :convert_blank_to_nil
   after  :save,    :update_history_caller  # also seems to do updates
@@ -21,7 +24,7 @@ class Loan
   property :interest_rate,                  Float, :nullable => false, :index => true
   property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
   property :number_of_installments,         Integer, :nullable => false, :index => true
-  property :weekly_off,                     Enum.send('[]', *WEEKDAYS), :nullable => true
+  property :weekly_off,                     Enum.send('[]', *DAYS), :nullable => true
   property :client_id,                      Integer, :nullable => false, :index => true
 
   property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false, :index => true
@@ -288,8 +291,7 @@ class Loan
     return date.holiday_bump if number == 0
     case installment_frequency
     when :daily
-      intervening_weekly_offs =  weekly_off ? date.count_weekday_uptil(weekly_off, date + number) : 0
-      new_date =  date + number + intervening_weekly_offs
+      new_date =  date + number
     when :weekly
       new_date =  date + number * 7
     when :biweekly
@@ -823,6 +825,23 @@ class Loan
   # the installment dates
   def installment_dates
     #return @_installment_dates if @_installment_dates
+    if installment_frequency == :daily
+      # we have to br careful that when we do a holiday bump, we do not get stuck in an endless loop
+      ld = scheduled_first_payment_date - 1
+      dates = []
+      (1..number_of_installments).each do |i|
+        ld += 1
+        if ld.weekday == weekly_off
+          ld +=1
+        end
+        if ld.holiday_bump.cwday == weekly_off # endless loop
+          ld.holiday_bump(:after)
+        end
+        dates << ld
+      end
+      return dates
+    end
+        
     ensure_meeting_day = false
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
