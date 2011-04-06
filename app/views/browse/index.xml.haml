@@ -9,9 +9,7 @@
       %active #{session.user.active}
       %role #{session.user.role}
       - if session.user.staff_member
-        %staff_member
-          %id #{session.user.staff_member.id}
-          %name #{session.user.staff_member.name}
+        %staff_member_id #{session.user.staff_member.id}
   -else
     %error
       %message "Unauthorized User"
