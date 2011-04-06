@@ -8,8 +8,8 @@ module DataEntry
         @center = @client.center
 
         if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])
-          if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type)
-            klass = Kernel::const_get(@loan_product.loan_type)
+          if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type_string)
+            klass = Kernel::const_get(@loan_product.loan_type_string)
             @loan = klass.new
             set_insurance_policy
           end
@@ -100,7 +100,7 @@ module DataEntry
         @loan_product = LoanProduct.get(params[:loan_product_id])
         raise NotFound unless @loan_product
 
-        klass = Kernel::const_get(@loan_product.loan_type)
+        klass = Kernel::const_get(@loan_product.loan_type_string)
         @loan = klass.new
         
         @branch = @center.branch

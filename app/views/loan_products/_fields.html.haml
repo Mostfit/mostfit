@@ -14,7 +14,7 @@
     %th
       Loan Type
     %td{:colspan => 2}
-      = select :loan_type, :collection => Loan.descendants.map{|f| [f, f.respond_to?(:display_name) ? f.display_name : f.to_s.snake_case.camelcase(' ')]}
+      = select :loan_type_string, :collection => Loan.descendants.map{|f| [f, f.respond_to?(:display_name) ? f.display_name : f.to_s.snake_case.camelcase(' ')]}
   %tr
     %th
       Valid from

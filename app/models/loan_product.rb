@@ -17,7 +17,7 @@ class LoanProduct
 
   #This property is defined in init.rb after app load as Loan may not have loaded by the time this class initializes
   #  property :loan_type, Enum.send('[]'), :nullable => false, :index => true
-  # property :loan_type_string, String
+  property :loan_type_string, String
   property :valid_from, Date, :nullable => false, :index => true
   property :valid_upto, Date, :nullable => false, :index => true
   
@@ -45,7 +45,7 @@ class LoanProduct
               :min_interest_rate => min_interest, :max_interest_rate => max_interest, 
               :min_number_of_installments => row[headers[:min_number_of_installments]], :max_number_of_installments => row[headers[:max_number_of_installments]], 
               :installment_frequency => row[headers[:installment_frequency]].downcase.to_sym,
-              :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]), :loan_type => row[headers[:loan_type]])
+              :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]), :loan_type_string => row[headers[:loan_type]])
     [obj.save, obj]
   end
 
@@ -62,7 +62,7 @@ class LoanProduct
   end
 
   def check_loan_type_correctness
-    if Loan.descendants.collect{|x| x.to_s}.include?(loan_type)
+    if Loan.descendants.collect{|x| x.to_s}.include?(loan_type_string)
       return true
     else
       return false

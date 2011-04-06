@@ -55,7 +55,7 @@ class LoanProducts < Application
     @loan_product.fees = fees
     @loan_product.attributes = loan_product
     if @loan_product.save
-       redirect resource(@loan_product)
+      redirect resource(@loan_product), :message => {:notice => "Updated Succesfully"}
     else
       display @loan_product, :edit
     end
