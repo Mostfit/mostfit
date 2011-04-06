@@ -6,7 +6,6 @@ class NilClass
 end
 
 class Date
-  WEEKDAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   def inspect
     "<Date: #{self.to_s}>"
   end

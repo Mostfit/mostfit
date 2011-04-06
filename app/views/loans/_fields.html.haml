@@ -44,6 +44,12 @@
         = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
   %tr
     %td
+      Weekly Off
+    %td
+      - weekdays = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+      = select :weekly_off, :collection => [["","--"]] + weekdays.map{|w| [(weekdays.index(w) + 1).to_s, w]}
+  %tr
+    %td
       Number of installments:
     %td
       - if @loan_product.min_number_of_installments==@loan_product.max_number_of_installments
@@ -142,6 +148,7 @@
       %td
         %b Insurance policy details
       %td{:colspan => 4}
+        - debugger
         - @insurance_policy.insurance_product = @loan_product.insurance_product
         = error_messages_for @insurance_policy
         = form_for(@insurance_policy, :action => resource(@client, :insurance_policies) ) do

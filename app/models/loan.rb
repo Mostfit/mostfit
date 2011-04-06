@@ -25,7 +25,7 @@ class Loan
   property :interest_rate,                  Float, :nullable => false, :index => true
   property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
   property :number_of_installments,         Integer, :nullable => false, :index => true
-  property :weekly_off,                     Enum.send('[]', *DAYS), :nullable => true
+  property :weekly_off,                     Integer, :nullable => true # cwday pls
   property :client_id,                      Integer, :nullable => false, :index => true
 
   property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false, :index => true
