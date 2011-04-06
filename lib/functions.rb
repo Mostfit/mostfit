@@ -20,6 +20,14 @@ class Date
     Holiday.all.include?(self)
   end
 
+  def count_weekdays_uptil(weekday, d2)
+    return 0 if d2 < self
+    num_weeks = ((d2 - self) / 7).floor
+    d_ = self + num_weeks
+    add_one = ((d_.cwday)..((d2.cwday < d_.cwday ? 7 : d2.cwday))).include?(WEEKDAYS.index(weekday) + 1) ? 1 : 0
+    num_weeks + add_one
+  end
+
   def holiday_bump
     hols = $holidays
     new_date = self
