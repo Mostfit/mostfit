@@ -6,6 +6,7 @@ class Loan
   before :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
 #  after  :destroy, :update_history
+  DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
   attr_accessor :interest_percentage
@@ -21,7 +22,7 @@ class Loan
   property :interest_rate,                  Float, :nullable => false, :index => true
   property :installment_frequency,          Enum.send('[]', *INSTALLMENT_FREQUENCIES), :nullable => false, :index => true
   property :number_of_installments,         Integer, :nullable => false, :index => true
-  property :weekly_off,                     Enum.send('[]', *WEEKDAYS), :nullable => true
+  property :weekly_off,                     Integer, :nullable => true  # use the cwday and not the day
   property :client_id,                      Integer, :nullable => false, :index => true
 
   property :scheduled_disbursal_date,       Date, :nullable => false, :auto_validation => false, :index => true
