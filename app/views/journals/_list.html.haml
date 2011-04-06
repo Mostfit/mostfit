@@ -1,47 +1,59 @@
-%table.report.nojs
-  %tr
-    %th 
-      Created at
-    %th
-      Date
-    %th 
-      Journal ID  
-    %th 
-      Debit Account
-    %th 
-      Credit Account
-    %th 
-      Breakup
-    %th 
-      Amount
-    %th 
-      Comment
-  - journals.each do |journal|
-    - postings = journal.postings.sort_by{|x| x.amount}
+#journals_container
+  %form{:class => "_remote_", :method => "GET", :action => url(:controller => :journals, :action => :index)}
+    %b From
+    - today = Date.today
+    = date_select :from_date, (params[:from_date] || today), :min_date => Date.min_date, :max_date => Date.today
+    %b To
+    = date_select :to_date, (params[:to_date] || today), :min_date => Date.min_date, :max_date => Date.today
+    %b Journal type
+    = select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt => "All types of journals"
+    %input{:type => :hidden, :name => "return", :value => params[:return]}
+    %input{:type => :hidden, :name => "_target_", :value => "journals_container"}
+    = submit "GO"  
+  %table.report.nojs
     %tr
-      %td.text
-        = journal.created_at.strftime(Mfi.first.date_format + " at %H:%m")
-      %td.text
-        = journal.date
-      %td
-        = journal.id
-      - debit_postings, credit_postings = journal.postings.group_by{|x| x.amount>0}.values
-      %td.text 
-        - debit_postings.each do |p|
-          = p.account.name
+      %th 
+        Created at
+      %th
+        Date
+      %th 
+        Journal ID  
+      %th 
+        Debit Account
+      %th 
+        Credit Account
+      %th 
+        Breakup
+      %th 
+        Amount
+      %th 
+        Comment
+    - journals.each do |journal|
+      - postings = journal.postings.sort_by{|x| x.amount}
+      %tr
+        %td.text
+          = journal.created_at.strftime(Mfi.first.date_format + " at %H:%m")
+        %td.text
+          = journal.date
+        %td
+          = journal.id
+        - debit_postings, credit_postings = journal.postings.group_by{|x| x.amount>0}.values
+        %td.text 
+          - debit_postings.each do |p|
+            = p.account.name
+            %br
+        %td.text
+          - credit_postings.each do |p|
+            = p.account.name
+            %br
+        %td
+          %b De
+          = debit_postings.map{|x| x.amount.abs.to_currency}.join("<br/>")
           %br
-      %td.text
-        - credit_postings.each do |p|
-          = p.account.name
-          %br
-      %td
-        %b De
-        = debit_postings.map{|x| x.amount.abs.to_currency}.join("<br/>")
-        %br
-        %b Cr
-        = credit_postings.map{|x| x.amount.abs.to_currency}.join("<br/>")
-      %td
-        = postings.map{|x| x.amount>0 ? x.amount : 0}.inject(0){|s,x| s+=x}
-      %td.text
-        = journal.comment
-= paginate(journals).to_s.gsub("<a", "<a class='_remote_' id='journal_entries'")
+          %b Cr
+          = credit_postings.map{|x| x.amount.abs.to_currency}.join("<br/>")
+        %td
+          = postings.map{|x| x.amount>0 ? x.amount : 0}.inject(0){|s,x| s+=x}
+        %td.text
+          = journal.comment
+  = paginate(journals).to_s.gsub("<a", "<a class='_remote_' id='journal_entries'")

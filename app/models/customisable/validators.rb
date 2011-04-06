@@ -116,7 +116,15 @@ module Misfit
       end
       return true
     end
-
+    
+    def loans_must_not_be_duplicated
+      if Loan.first(:client_id => self.client_id, :applied_on => self.applied_on, :amount => self.amount).nil?
+	return [false, "The Loan seems to be a duplicate entry"]
+      else
+	return true
+      end
+    end
+    
   end    #LoanValidators
 
 end

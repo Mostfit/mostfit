@@ -17,8 +17,8 @@ class PortfolioAllocationReport < Report
   def generate
     data = {}
     funders = {}
-    Funder.all.each{|f| funders[f.id]=(f.portfolios.aggregate(:id, :name, :funder_id, :start_value,
-                                                              :outstanding_value, :created_at).map{|y| [y[0], y[1], y[2], y[3], y[4], y[5]]})}
+    Funder.all.each{|f| funders[f.id]=(f.portfolios.aggregate(:created_at, :start_value, :outstanding_calculated_on,
+                                                              :outstanding_value).map{|y| [y[0], y[1], y[2], y[3]]})}
     
     if @funder
       data[@funder] = funders[@funder.id]
