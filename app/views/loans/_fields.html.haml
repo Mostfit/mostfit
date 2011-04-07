@@ -42,12 +42,13 @@
         = @loan_product.installment_frequency.to_s
       - else
         = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
-  %tr
-    %td
-      Weekly Off
-    %td
-      - weekdays = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
-      = select :weekly_off, :collection => [["","--"]] + weekdays.map{|w| [(weekdays.index(w) + 1).to_s, w]}
+  - if @loan_product.installment_frequency == :daily
+    %tr
+      %td
+        Weekly Off
+      %td
+        - weekdays = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+        = select :weekly_off, :collection => [["","--"]] + weekdays.map{|w| [(weekdays.index(w) + 1).to_s, w]}
   %tr
     %td
       Number of installments:
