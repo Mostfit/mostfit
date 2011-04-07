@@ -62,8 +62,11 @@ class LoanProduct
   end
 
   def check_loan_type_correctness
-    if Loan.descendants.collect{|x| x.to_s}.include?(loan_type_string)
+    if loan_type_string and not loan_type_string.blank? and Loan.descendants.collect{|x| x.to_s}.include?(loan_type_string)
       self.loan_type = Loan.descendants.find{|x| x.to_s == loan_type_string}
+      return true
+    elsif loan_type_string.blank? and loan_type and Loan.descendants.collect{|x| x.to_s}.include?(loan_type.to_s) 
+      self.loan_type_string = loan_type.to_s
       return true
     else
       return false
