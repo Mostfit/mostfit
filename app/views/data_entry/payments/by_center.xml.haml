@@ -24,22 +24,22 @@
         %center_name #{@center.name}
         %center_code #{@center.code}
         %center_address #{@center.address}
-        %meeting_day #{@center.meeting_day}
-        %meeting_time_hours #{@center.meeting_time_hours}
-        %meeting_time_minutes #{@center.meeting_time_minutes}
-      - if @option == "rows"
-        %weeksheet_rows
-          - @weeksheet_rows.each do |weeksheet_row|
-            %weeksheet_row
-              %date #{@date}
-              %center_id #{@center.id}
-              %client_id #{weeksheet_row.client_id}
-              %client_name #{weeksheet_row.client_name}
-              %loan_id #{weeksheet_row.loan_id}
-              %loan_amount #{weeksheet_row.loan_amount}
-              %disbursal_date #{weeksheet_row.disbursal_date.to_s}
-              %outstanding #{weeksheet_row.outstanding}
-              %installment #{weeksheet_row.installment_number}
-              %principal #{weeksheet_row.principal} 
-              %interest #{weeksheet_row.interest} 
-              %fees #{weeksheet_row.fees} 
+        %meeting_day #{@center.meeting_day?(@date)? @center.meeting_day : ""}
+        %meeting_time_hours #{@center.meeting_day?(@date) ? @center.meeting_time_hours : ""}
+        %meeting_time_minutes #{@center.meeting_day?(@date) ? @center.meeting_time_minutes : ""}
+        - if @option == "rows"
+          %weeksheet_rows
+            - @weeksheet_rows.each do |weeksheet_row|
+              %weeksheet_row
+                %date #{@date}
+                %center_id #{@center.id}
+                %client_id #{weeksheet_row.client_id}
+                %client_name #{weeksheet_row.client_name}
+                %loan_id #{weeksheet_row.loan_id}
+                %loan_amount #{weeksheet_row.loan_amount}
+                %disbursal_date #{weeksheet_row.disbursal_date.to_s}
+                %outstanding #{weeksheet_row.outstanding}
+                %installment #{weeksheet_row.installment_number}
+                %principal #{weeksheet_row.principal} 
+                %interest #{weeksheet_row.interest} 
+                %fees #{weeksheet_row.fees} 

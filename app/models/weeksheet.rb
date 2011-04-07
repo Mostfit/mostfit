@@ -25,10 +25,12 @@ class Weeksheet
     fees_applicable = Fee.due(loans.map{|x| x.id})
     clients.group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each do |group, clients_grouped|
       clients_grouped.sort_by{|x| x.name}.each do |client|
+        loan_row_count = 0
         loans.find_all{|l| l.client_id == client.id and l.disbursal_date}.each do |loan|	    
           lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
           next if not lh
           next if LOANS_NOT_PAYABLE.include? lh.status
+          loan_row_count += 1
           fee = fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0          
 
           weeksheet = Weeksheet.new
@@ -47,6 +49,26 @@ class Weeksheet
           weeksheet.interest = [(lh ? lh.interest_due : 0), 0].max
           weeksheet.fees = fee.to_currency
           weeksheet.installment_number = loan.number_of_installments_before(date)
+
+          collection_of_weeksheet << weeksheet	      
+        end
+        if loan_row_count == 0
+          weeksheet = Weeksheet.new
+          weeksheet.date = date
+          weeksheet.center_meeting_time = "#{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}"
+          weeksheet.center_id = center.id
+          weeksheet.center_name = center.name
+          weeksheet.group_name = group ? group.name : "No group"
+          weeksheet.client_id = client.id
+          weeksheet.client_name = client.name
+          weeksheet.loan_id = nil
+          weeksheet.loan_amount = 0
+          weeksheet.disbursal_date =  nil
+          weeksheet.outstanding = 0
+          weeksheet.principal = 0
+          weeksheet.interest = 0
+          weeksheet.fees = 0
+          weeksheet.installment_number = 0
 
           collection_of_weeksheet << weeksheet	      
         end
