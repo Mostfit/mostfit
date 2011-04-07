@@ -9,7 +9,13 @@
     - if @option == "regions" and not @staff_member.regions.blank?
       %regions
         - @staff_member.regions.each do |region|
-          = region.to_xml
+          %region
+            %id #{region.id}
+            %name #{region.name}
+            %address #{region.address}
+            %contact_number #{region.contact_number}
+            %landmark #{region.landmark}
+            %creation_date #{region.creation_date}
     - elsif @option == "areas" and not @staff_member.areas.blank?
       %areas
         - @staff_member.areas.each do |area|
@@ -56,7 +62,13 @@
       - if not @staff_member.regions.blank?
         %regions
           - @staff_member.regions.each do |region|
-            = region.to_xml
+            %region
+              %id #{region.id}
+              %name #{region.name}
+              %address #{region.address}
+              %contact_number #{region.contact_number}
+              %landmark #{region.landmark}
+              %creation_date #{region.creation_date}
       - if not @staff_member.areas.blank?
         %areas
           - @staff_member.areas.each do |area|
