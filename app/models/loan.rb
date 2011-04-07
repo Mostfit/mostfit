@@ -243,7 +243,7 @@ class Loan
   end
 
   def clear_cache
-    @payments_cache = @schedule = @history_array = @fee_schedule = @hols = nil
+    @payments_cache = @schedule = @history_array = @fee_schedule = @hols = @_installment_dates = nil
   end
 
   # this method returns the last date the loan history makes sense
@@ -578,7 +578,7 @@ class Loan
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
 
     (1..number_of_installments).each do |number|
-      date      = shift_date_by_installments(scheduled_first_payment_date, number - 1, ensure_meeting_day)
+      date      = installment_dates[number-1] #shift_date_by_installments(scheduled_first_payment_date, number - 1, ensure_meeting_day)
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
       next if repayed
@@ -825,31 +825,29 @@ class Loan
   end
   # the installment dates
   def installment_dates
-    #return @_installment_dates if @_installment_dates
+    return @_installment_dates if @_installment_dates
     if installment_frequency == :daily
       # we have to br careful that when we do a holiday bump, we do not get stuck in an endless loop
       ld = scheduled_first_payment_date - 1
-      dates = []
+      @_installment_dates = []
       (1..number_of_installments).each do |i|
         ld += 1
-        if ld.weekday == weekly_off
+        if ld.cwday == weekly_off
           ld +=1
         end
         if ld.holiday_bump.cwday == weekly_off # endless loop
           ld.holiday_bump(:after)
         end
-        dates << ld
+        @_installment_dates << ld
       end
-      return dates
+      return @_installment_dates
     end
         
     ensure_meeting_day = false
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
 
-    (0..(number_of_installments-1)).to_a.map {|x| 
-      shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day)
-    }    
+    @_installment_dates = (0..(number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
   end
 
    
@@ -1546,11 +1544,11 @@ private
     return @reducing_schedule if @reducing_schedule
     @reducing_schedule = {}    
     balance = amount
-    payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
+    payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0).round(0)
     1.upto(number_of_installments){|installment|
       @reducing_schedule[installment] = {}
       @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider).round(0)
-      if installment == number_of_installments
+      if installment == number_of_installments or balance < (payment - @reducing_schedule[installment][:interest_payable])
         @reducing_schedule[installment][:principal_payable] = balance
       else
         @reducing_schedule[installment][:principal_payable] = (payment - @reducing_schedule[installment][:interest_payable]).round(0)
