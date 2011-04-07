@@ -57,7 +57,7 @@ describe Loan do
     @loan_product.installment_frequency = :weekly
     @loan_product.max_number_of_installments = 25
     @loan_product.min_number_of_installments = 25
-    @loan_product.loan_type = "DefaultLoan"
+    @loan_product.loan_type_string = "DefaultLoan"
     @loan_product.valid_from = Date.parse('2000-01-01')
     @loan_product.valid_upto = Date.parse('2012-01-01')
     @loan_product.save
