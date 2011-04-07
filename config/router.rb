@@ -122,7 +122,6 @@ Merb::Router.prepare do
     match('/users/:id.xml').to(:controller => 'users', :action => 'show', :format => 'xml')
     match('/staff_members.xml').to(:controller => 'staff_members', :action =>'index', :format => 'xml')
     match('/staff_members/:id.xml').to(:controller => 'staff_members', :action =>'show', :format => 'xml')
-    match('/staff_members/:id/day_sheet.xml').to(:controller => 'staff_members', :action =>'day_sheet', :format => 'xml')
     match('/data_entry/payments/by_center.xml').to(:controller => 'data_entry/payments', :action =>'by_center', :format => 'xml')
     match('/regions.xml').to(:controller => 'regions', :action =>'index', :format => 'xml')
     match('/regions/:id.xml').to(:controller => 'regions', :action =>'show', :format => 'xml')

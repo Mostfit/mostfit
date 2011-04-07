@@ -1,8 +1,8 @@
 class Exceptions < Merb::Controller
-  
+  provides :xml, :yaml, :js  
   # handle NotFound exceptions (404)
   def not_found
-    render :format => :html
+    display @template 
   end
 
   # handle NotAcceptable exceptions (406)
@@ -42,8 +42,7 @@ class Exceptions < Merb::Controller
       redirect request.env['HTTP_REFERER'], :message => { :error => 'Sorry, Not allowed to change verified data.' }
     else
       render
-    end
-    
+    end    
   end
 end
 

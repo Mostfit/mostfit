@@ -24,6 +24,7 @@
         %center_name #{@center.name}
         %center_code #{@center.code}
         %center_address #{@center.address}
+        %center_meeting_time #{@center.meeting_time}
         %weeksheet_rows
           - @weeksheets.each do |weeksheet|
             %weeksheet_row
@@ -34,6 +35,6 @@
               %outstanding #{weeksheet.outstanding}
               %installment #{weeksheet.installment_number}
               %principal #{weeksheet.principal} 
-              %interest   #{weeksheet.interest} 
-              %fee   #{weeksheet.fee} 
+              %interest #{weeksheet.interest} 
+              %fee #{weeksheet.fee} 
               %total_due #{weeksheet.total_due}
