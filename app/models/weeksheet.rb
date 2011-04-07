@@ -12,8 +12,7 @@ class Weeksheet
   attr_accessor :outstanding
   attr_accessor :principal
   attr_accessor :interest
-  attr_accessor :total_due
-  attr_accessor :fee
+  attr_accessor :fees
   attr_accessor :installment_number
 
   #Get weeksheet of center 
@@ -38,7 +37,7 @@ class Weeksheet
           weeksheet.center_id = center.id
           weeksheet.center_name = center.name
           weeksheet.group_name = group ? group.name : "No group"
-          weeksheet.client_id = client.name 
+          weeksheet.client_id = client.id
           weeksheet.client_name = client.name
           weeksheet.loan_id = loan.id
           weeksheet.loan_amount = loan.amount.to_currency
@@ -46,8 +45,7 @@ class Weeksheet
           weeksheet.outstanding = (lh ? lh.actual_outstanding_principal : 0)
           weeksheet.principal = [(lh ? lh.principal_due : 0), 0].max
           weeksheet.interest = [(lh ? lh.interest_due : 0), 0].max
-          weeksheet.total_due = [(lh ? (fee+lh.principal_due+lh.interest_due): 0), 0].max
-          weeksheet.fee = fee.to_currency
+          weeksheet.fees = fee.to_currency
           weeksheet.installment_number = loan.number_of_installments_before(date)
 
           collection_of_weeksheet << weeksheet	      
