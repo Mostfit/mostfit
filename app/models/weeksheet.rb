@@ -42,12 +42,12 @@ class Weeksheet
           weeksheet.client_id = client.id
           weeksheet.client_name = client.name
           weeksheet.loan_id = loan.id
-          weeksheet.loan_amount = loan.amount.to_currency
+          weeksheet.loan_amount = loan.amount
           weeksheet.disbursal_date =  loan.disbursal_date.to_s
           weeksheet.outstanding = (lh ? lh.actual_outstanding_principal : 0)
           weeksheet.principal = [(lh ? lh.principal_due : 0), 0].max
           weeksheet.interest = [(lh ? lh.interest_due : 0), 0].max
-          weeksheet.fees = fee.to_currency
+          weeksheet.fees = fee
           weeksheet.installment_number = loan.number_of_installments_before(date)
 
           collection_of_weeksheet << weeksheet	      
