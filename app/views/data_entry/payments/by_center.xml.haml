@@ -24,7 +24,10 @@
         %center_name #{@center.name}
         %center_code #{@center.code}
         %center_address #{@center.address}
-        %center_meeting_time #{@center.meeting_time}
+        %center_meeting_day #{@center.meeting_day}
+        %center_meeting_time_hours #{@center.meeting_time_hours}
+        %center_meeting_time_minutes #{@center.meeting_time_minutes}
+      - if @option == "rows"
         %weeksheet_rows
           - @weeksheets.each do |weeksheet|
             %weeksheet_row
