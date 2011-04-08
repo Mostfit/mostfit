@@ -55,7 +55,7 @@ class Payments < Application
       if params[:format] and params[:format] == "xml"
         display @payment
       else
-        redirect url_for_loan(@loan||@client), :message => {:notice => "Payment of #{@payment.id} has been registered"}
+        redirect url_for_loan(@loan||@client), :message => {:notice => "Payment of #{@client.name} has been registered"}
       end
     else
       if params[:format] and params[:format] == "xml"
