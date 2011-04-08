@@ -92,6 +92,12 @@ describe Loan do
     @loan.client = nil
     @loan.should_not be_valid
   end
+  it "should not give error if amount is blank" do
+    @loan.amount = ''
+    @loan.save.should be_false
+    @loan.should_not be_valid
+  end
+
   it "should not be valid without being approved properly" do
     @loan.applied_by = nil
     @loan.should_not be_valid
