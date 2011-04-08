@@ -55,7 +55,7 @@ class Payments < Application
       if params[:format] and params[:format] == "xml"
         display @payment
       else
-        redirect url_for_loan(@loan||@client), :message => {:notice => "Payment of #{@client.name} has been registered"}
+        redirect url_for_loan(@loan||@client), :message => {:notice => "Payment of #{@payment.id} has been registered"}
       end
     else
       if params[:format] and params[:format] == "xml"
@@ -118,6 +118,7 @@ class Payments < Application
     amounts = payment[:amount].to_f
     receiving_staff = StaffMember.get(payment[:received_by_staff_id])
     if payment[:type] == "total" and @loan
+      @payment_type = payment[:type]
     # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
       success, @prin, @int, @fees = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff, true, params[:style].to_sym)
       @payment = Payment.new
@@ -128,6 +129,7 @@ class Payments < Application
       Loan.get(@loan.id).update_history(true) if success and @loan
       return success
     else
+      @payment_type = payment[:type] if payment[:type]
       @payment = Payment.new(payment)
       @payment.loan = @loan if @loan
       @payment.client = @client if @client

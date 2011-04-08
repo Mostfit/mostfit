@@ -92,7 +92,7 @@ class ApiAccess
   #create client payment
   #branch: 1, center : 11, client :167, loans : 199
   def self.create_payment(branch,center,client,loan)
-    post("/branches/#{branch}/centers/#{center}/clients/#{client}/loans/#{loan}/payments.xml", :query => {:payment => {:amount =>99.06, :type =>:principal, :loan_id => loan, :client_id => client, :received_by_staff_id =>1, :received_on => "2010-10-28", :desktop_id => 1, :origin => "abcd"}})
+    post("/branches/#{branch}/centers/#{center}/clients/#{client}/loans/#{loan}/payments.xml", :query => {:payment => {:amount =>99.06, :type =>:total, :loan_id => loan, :client_id => client, :received_by_staff_id =>1, :received_on => "2010-10-28", :desktop_id => 1, :origin => "abcd"}, :style => "normal"})
   end
 
   #create client attendance

@@ -1,8 +1,8 @@
 %payment
   -if not @error.blank?
     %error #{@error}
-  - elsif not @payment.blank?
-    %message "Payment of #{@payment.id} has been registered"
+  - elsif not @payment.blank? and @payment_type != "total"
+    %message "Payment of client '#{@client.name}' has been registered"
     %id #{@payment.id}
     %amount #{@payment.amount}
     %type #{@payment.type}
@@ -18,4 +18,59 @@
     %desktop_id #{@payment.desktop_id}
     %origin #{@payment.origin}
     %verified_by_user_id #{@payment.verified_by_user_id}
-  
+  - elsif @payment_type == "total"
+    - if not @payment.errors.blank?
+      %error #{@payment.errors}
+    - else
+      - if @prin
+        %principal
+          %message "Loan principal of client '#{@client.name}' has been registered"
+          %id #{@prin.id}
+          %amount #{@prin.amount}
+          %type #{@prin.type}
+          %received_on #{@prin.received_on}
+          %deleted_by_user_id #{@prin.deleted_by_user_id}
+          %created_at #{@prin.created_at}
+          %deleted_at #{@prin.deleted_at}
+          %created_by_user_id #{@prin.created_by_user_id}
+          %verified_by_user_id #{@prin.verified_by_user_id}
+          %loan_id #{@prin.loan_id}
+          %client_id #{@prin.client_id}
+          %fee_id #{@prin.fee_id}
+          %desktop_id #{@prin.desktop_id}
+          %origin #{@prin.origin}
+      - if @int
+        %interest
+          %message "Loan interest of client '#{@client.name}' has been registered"
+          %id #{@int.id}
+          %amount #{@int.amount}
+          %type #{@int.type}
+          %received_on #{@int.received_on}
+          %deleted_by_user_id #{@int.deleted_by_user_id}
+          %created_at #{@int.created_at}
+          %deleted_at #{@int.deleted_at}
+          %created_by_user_id #{@int.created_by_user_id}
+          %verified_by_user_id #{@int.verified_by_user_id}
+          %loan_id #{@int.loan_id}
+          %client_id #{@int.client_id}
+          %fee_id #{@int.fee_id}
+          %desktop_id #{@int.desktop_id}
+          %origin #{@int.origin}
+      - if @fees
+        %fees
+          %message "Loan fees of client '#{@client.name}' has been registered"
+          %id #{@fees.id}
+          %amount #{@fees.amount}
+          %type #{@fees.type}
+          %received_on #{@fees.received_on}
+          %deleted_by_user_id #{@fees.deleted_by_user_id}
+          %created_at #{@fees.created_at}
+          %deleted_at #{@fees.deleted_at}
+          %created_by_user_id #{@fees.created_by_user_id}
+          %verified_by_user_id #{@fees.verified_by_user_id}
+          %loan_id #{@fees.loan_id}
+          %client_id #{@fees.client_id}
+          %fee_id #{@fees.fee_id}
+          %desktop_id #{@fees.desktop_id}
+          %origin #{@fees.origin}
+        
