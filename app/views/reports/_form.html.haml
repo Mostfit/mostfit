@@ -1,5 +1,4 @@
 = error_messages_for @report
-- debugger
 - unless params[:layout] 
   - report = @report.class.to_s.snake_case
   - area_id = (params[report] and params[report][:area_id] and not params[report][:area_id].blank?) ? params[report][:area_id] : nil

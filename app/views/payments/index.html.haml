@@ -191,13 +191,14 @@
                 == #{lh.principal_paid.to_currency} principal + #{lh.interest_paid.to_currency} interest
           %td
             - if lh.date <= Date.today
+              - default =  lh.actual_outstanding_total - lh.scheduled_outstanding_total
               %b
-                %span{:class => (lh.amount_in_default > 0 ? 'red' : (lh.amount_in_default < 0 ? 'blue' : 'green')) }
-                  = lh.amount_in_default.to_currency
+                %span{:class => (default > 0 ? 'red' : (default < 0 ? 'blue' : 'green')) }
+                  = default.to_currency
               %br/
               %span.greytext
-                = format("%.0f%", (lh.amount_in_default.abs.to_f / @loan.total_to_be_received) * 100)
-                = lh.amount_in_default <= 0 ? 'overpaid' : 'shortfall'
+                = format("%.0f%", (default.abs.to_f / @loan.total_to_be_received) * 100)
+                = default <= 0 ? 'overpaid' : 'shortfall'
       %tfoot
         %tr
           %td{ :colspan => 7 }

@@ -149,7 +149,6 @@
       %td
         %b Insurance policy details
       %td{:colspan => 4}
-        - debugger
         - @insurance_policy.insurance_product = @loan_product.insurance_product
         = error_messages_for @insurance_policy
         = form_for(@insurance_policy, :action => resource(@client, :insurance_policies) ) do
