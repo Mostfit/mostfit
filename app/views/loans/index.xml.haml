@@ -13,18 +13,18 @@
     %fingerprint #{Base64.encode64(File.read("#{@client.fingerprint.path}"))}
     - if @client.loans
       %loans
-      - @client.loans.each do |loan|
-        %loan
-          %id #{loan.id}
-          %amount #{loan.amount}
-          %interest_rate #{loan.interest_rate}
-          %installment_frequency #{loan.installment_frequency}
-          %number_of_installments #{loan.number_of_installments}
-          %client_id #{loan.client_id}
-          %applied_on #{loan.applied_on}
-          %approved_on #{loan.approved_on}
-          %disbursal_date #{loan.disbursal_date}
-          %loan_product_id #{loan.loan_product_id}
-          %applied_by_staff_id #{loan.applied_by_staff_id}
-          %disbursed_by_staff_id #{loan.disbursed_by_staff_id}
+        - @client.loans.each do |loan|
+          %loan
+            %id #{loan.id}
+            %amount #{loan.amount}
+            %interest_rate #{loan.interest_rate}
+            %installment_frequency #{loan.installment_frequency}
+            %number_of_installments #{loan.number_of_installments}
+            %client_id #{loan.client_id}
+            %applied_on #{loan.applied_on}
+            %approved_on #{loan.approved_on}
+            %disbursal_date #{loan.disbursal_date}
+            %loan_product_id #{loan.loan_product_id}
+            %applied_by_staff_id #{loan.applied_by_staff_id}
+            %disbursed_by_staff_id #{loan.disbursed_by_staff_id}
 
