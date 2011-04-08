@@ -99,5 +99,11 @@ class ApiAccess
   def self.create_attendance
     post("/attendance.xml", :query => {:attendance => {:status => :present, :client_id => 167, :center_id => 11,:date => "2011-03-28"}})
   end
+
+  #create loan
+  #branch: 1, center : 11, client :167
+  def self.create_loan(branch,center,client)
+    post("/branches/#{branch}/centers/#{center}/clients/#{client}/loans.xml", :query => {:equated_weekly =>{:interest_rate =>31.7444, :number_of_installments => 46, :scheduled_first_payment_date =>"18-04-2011", :installment_frequency => "weekly",:applied_by_staff_id =>5, :amount_applied_for => 8000, :occupation_id => 20, :funding_line_id =>1, :scheduled_disbursal_date =>"11-04-2011", :applied_on =>"08-04-2011"}, :loan_product_id => 1, :loan_type=>"EquatedWeekly"})
+  end
 end
 

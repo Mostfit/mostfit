@@ -1,0 +1,7 @@
+%xml
+  %loan
+    - if not @loan.errors.blank?
+      %error Loan creation failed.
+    - else    
+      %message Loan '#{@loan.id}' was successfully created
+      = @loan.to_xml

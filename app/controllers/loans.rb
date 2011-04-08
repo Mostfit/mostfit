@@ -46,14 +46,22 @@ class Loans < Application
     @loan.loan_product_id = @loan_product.id     
     @loan.amount          = @loan.amount_applied_for
     if @loan.save
-      if params[:return]
-        redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' was successfully created"})
+      if params[:format] and params[:format] == "xml"
+        display @loan
       else
-        redirect resource(@branch, @center, @client), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
+        if params[:return]
+          redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' was successfully created"})
+        else
+          redirect resource(@branch, @center, @client), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
+        end
       end
     else
       @loan.interest_rate *= 100
-      render :new # error messages will be shown
+      if params[:format] and params[:format] == "xml"
+        display @loan
+      else
+        render :new # error messages will be shown
+      end
     end
   end
 
