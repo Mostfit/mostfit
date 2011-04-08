@@ -3,10 +3,11 @@
     Change date
     = date_select "date", @date
     =submit "Go"
-    - all_centers = @staff_member.centers
+    - all_centers = @staff_member.centers.aggregate(:id)
     -if all_centers.length>0
-      = link_to 'previous day', url(:disbursement_sheet, :date => Loan.all(:scheduled_disbursal_date.lt => @date).max(:scheduled_disbursal_date))
-      = link_to 'next day', url(:disbursement_sheet, :date => Loan.all(:scheduled_disbursal_date.gt => @date).min(:scheduled_disbursal_date)), :style => "padding-left: 120px;"
+      = link_to 'previous day', url(:disbursement_sheet, :date => Loan.all(:scheduled_disbursal_date.lt => @date, "client.center_id" => all_centers).max(:scheduled_disbursal_date))
+      |
+      = link_to 'next day', url(:disbursement_sheet, :date => Loan.all(:scheduled_disbursal_date.gt => @date, "client.center_id" => all_centers).min(:scheduled_disbursal_date))
 %h1 
   Daily Disbursement Sheet for 
   = @staff_member.name
