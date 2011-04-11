@@ -120,7 +120,7 @@ module Pdf
     end
 
     def generate_disbursement_pdf(filename)
-      pdf = PDF::Writer.new(:orientation => :landscape)
+      pdf = PDF::Writer.new(:orientation => :landscape, :paper => "A4")
       pdf.select_font "Times-Roman"
       pdf.text "Daily Disbursement Sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
       pdf.text("\n")
