@@ -7,6 +7,13 @@
       %contact_number #{@region.contact_number}
       %landmark #{@region.landmark}
       %creation_date #{@region.creation_date}
-      %manager_id #{@region.manager_id}
       - if @region.areas
-        = @region.areas.to_xml
+        %areas
+          - @region.areas.each do |area|
+            %area
+              %id #{area.id}
+              %name #{area.name}
+              %address #{area.address}
+              %contact_number #{area.contact_number}
+              %landmark #{area.landmark}
+              %creation_date #{area.creation_date}
