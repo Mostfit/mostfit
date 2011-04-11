@@ -1416,10 +1416,11 @@ end
       balance = saved_amount || @schedule[last_date][:balance]
       @schedule.delete(@schedule.keys.min)
       @schedule[dd] = {:principal => 0, :interest => 0, :total_principal => 0, :total_interest => 0, :balance => balance, :total => 0}
+
       # adjust all the dates
       adjusted_schedule = {}
       orig_dates = @schedule.keys.sort[1..-1]
-      installment_dates.each_with_index do |d,i|
+      installment_dates.find_all{|d| d > last_date}.each_with_index do |d,i|
         adjusted_schedule[d] = payment_schedule[orig_dates[i]] if i < @schedule.count - 1
       end
 
