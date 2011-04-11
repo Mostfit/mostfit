@@ -99,18 +99,18 @@ class DailyTransactionSummary < Report
         data[b][3][:total] += total
       end
 
+      # claimed or death settlement
+       if claimed.key?(b.id)
+        data[b][4][:principal] += claimed[b.id][0] || 0
+        data[b][4][:interest]  += ((claimed[b.id][1] || 0) - (claimed[b.id][0] || 0))
+        data[b][4][:total]     += claimed[b.id][1] || 0
+      end
+      
       # written off
       if write_offs.key?(b.id)
-        data[b][4][:principal] += write_offs[b.id][0] || 0
-        data[b][4][:interest]  += ((write_offs[b.id][1] || 0) - (write_offs[b.id][0] || 0))
-        data[b][4][:total]     += write_offs[b.id][1] || 0
-      end
-
-      # claimed
-      if claimed.key?(b.id)
-        data[b][5][:principal] += claimed[b.id][0] || 0
-        data[b][5][:interest]  += ((claimed[b.id][1] || 0) - (claimed[b.id][0] || 0))
-        data[b][5][:total]     += claimed[b.id][1] || 0
+        data[b][5][:principal] += write_offs[b.id][0] || 0
+        data[b][5][:interest]  += ((write_offs[b.id][1] || 0) - (write_offs[b.id][0] || 0))
+        data[b][5][:total]     += write_offs[b.id][1] || 0
       end
     } 
     return data
