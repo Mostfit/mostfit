@@ -643,6 +643,45 @@ describe Loan do
     @loan2.payment_schedule.count.should == @loan.payment_schedule.count - 9
   end
 
+  it "should have correct takeover schedule and balances" do
+    @loan_product.max_amount = 8000
+    @loan_product.max_number_of_installments = 50
+    @loan1 = Loan.create(:amount => 8000, :interest_rate => 0.15, :installment_frequency => :weekly, :number_of_installments => 46, :discriminator => DefaultLoan,
+                         :scheduled_first_payment_date => "2009-12-28", :applied_on => "2009-12-22", :scheduled_disbursal_date => "2009-12-22", :disbursal_date => "2009-12-22", 
+                         :applied_by       => @manager, :funding_line     => @funding_line, :client => @client, :loan_product => @loan_product, :approved_on => "2009-12-22",
+                         :approved_by => @manager, :disbursed_by => @manager
+                         )
+    @loan1.errors.each {|e| puts e} unless @loan1.valid?
+    @loan1.should be_valid
+    orig_schedule = @loan1.payment_schedule
+
+    @loan_product.min_interest_rate = 0
+    @loan_product.min_amount = 0
+    @loan2 = Object.const_get("TakeOver#{@loan1.discriminator}").new(:interest_rate => 0.15, :installment_frequency => :weekly, :number_of_installments => 46, 
+                                                                     :original_amount => @loan1.amount,
+                                                                     :original_first_payment_date => "2009-12-28", :applied_on => "2009-12-22", :original_disbursal_date => "2009-12-22",
+                                                                     :applied_by       => @manager, :funding_line => @funding_line, :client => @client, :loan_product => @loan_product, 
+                                                                     :approved_on => "2009-12-22", :approved_by => @manager, :disbursed_by => @manager,
+                                                                     :taken_over_on_installment_number => 10, :taken_over_on => "2010-02-28", :scheduled_disbursal_date => "2010-02-28",
+                                                                     :scheduled_first_payment_date => "2010-03-01", :disbursal_date => "2010-02-28", :amount => 8000
+                                                                    )
+    @loan2.save.should be_true
+    @loan2.errors.each {|e| puts e} unless @loan2.valid?
+    @loan2.should be_valid
+#    @loan._show_cf; @loan2._show_cf
+    @loan2.payment_schedule.count.should == @loan1.payment_schedule.count - 9
+    @loan2.amount.should == 6435
+    
+    @loan2.payment_schedule.each{|date, ps|
+      next if date = @loan2.taken_over_on
+      orig_schedule.key?(date).should be_true
+      orig_schedule[date][:balance].round.should == ps[:balance].round
+      orig_schedule[date][:principal].round.should == ps[:principal].round
+      orig_schedule[date][:interest].round.should == ps[:interest].round
+    }
+    @loan_product = @loan_product.reload
+  end
+
   it "should do deletion of payment" do 
   end
 
