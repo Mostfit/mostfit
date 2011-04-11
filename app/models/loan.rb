@@ -1270,6 +1270,7 @@ class BulletLoanWithPeriodicInterest < BulletLoan
     return amount if number == number_of_installments
   end
   
+  def scheduled_interest_up_to(date);  get_scheduled(:total_interest,  date); end
 end
 
 class PararthRounded < Loan
