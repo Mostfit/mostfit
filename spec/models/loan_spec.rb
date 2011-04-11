@@ -723,4 +723,25 @@ describe Loan do
     (old_dates.find_all{|x| x <= Date.new(2001, 01, 26)} - new_dates.find_all{|x| x <= Date.new(2001, 01, 26)}).length.should eql(0)
     (old_dates.find_all{|x| x >  Date.new(2001, 01, 26)} - new_dates.find_all{|x| x >  Date.new(2001, 01, 26)}.map{|x| x + 1}).length.should eql(0)
   end
+  
+  it "should not be valid if duplicated" do
+    @loan_product.loan_validation_methods = "loans_must_not_be_duplicated"
+    @loan_product.save
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", 
+                     :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, 
+                     :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
+    @loan.save.should_not be_true
+    client = Client.new(:name => 'Mary', :reference => Time.now.to_s, :client_type => ClientType.create(:type => "Standard"))
+    client.center  = @center
+    client.date_joined = Date.parse('2006-01-01')
+    client.created_by_user_id = 1
+    client.client_type_id = 1
+    client.save
+    client.errors.each {|e| puts e}
+    client.should be_valid
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", 
+                     :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(client.id), :funding_line => @funding_line, 
+                     :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
+    @loan.save.should be_true
+  end
 end
