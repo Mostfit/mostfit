@@ -137,7 +137,7 @@ class Payments < Application
       end
       success = @payment.save
       # reloading loan as payments can be stale here
-      Loan.get(@loan.id).update_history if success and @loan
+      Loan.get(@loan.id).update_history if @loan
       return success      
     end
   end
