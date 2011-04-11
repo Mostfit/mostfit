@@ -8,7 +8,7 @@ class Loan
   after  :save,    :update_history_caller  # also seems to do updates
   before :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
-#  after  :destroy, :update_history
+  #  after  :destroy, :update_history
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
@@ -980,6 +980,7 @@ class Loan
         self.send("#{k}=", nil)
       end
     }
+    self.amount      ||= self.amount_applied_for
   end
 
   # repayment styles

@@ -42,7 +42,6 @@ class Loans < Application
     raise BadRequest unless @loan_product
     @loan = klass.new(attrs)
     @loan.loan_product = @loan_product
-    @loan.amount      ||= @loan.amount_applied_for
 
     if @loan.save
       if params[:return]
@@ -66,11 +65,10 @@ class Loans < Application
 
     # create loans for all the clients
     Loan.transaction do |t|
-      params[:client_ids].each{|client_id|      
+      params[:client_ids].each{|client_id|
         attrs[:client_id] = client_id.to_i
         @loan = klass.new(attrs)
         @loan.loan_product  = loan_product
-        @loan.amount      ||= @loan.amount_applied_for        
         unless @loan.save
           statuses.push(false)
           t.rollback
@@ -123,7 +121,7 @@ class Loans < Application
     
     @loan.attributes = attrs
     @loan_product = @loan.loan_product
-    @loan.insurance_policy = @insurance_policy if @loan_product.linked_to_insurance and @insurance_policy
+    @loan.insurance_policy = @insurance_policy if @loan_product.linked_to_insurance and @insurance_policy   
 
     if @loan.save or @loan.errors.length==0
       if params[:return]
