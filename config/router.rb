@@ -129,9 +129,9 @@ Merb::Router.prepare do
     match('/areas/:id.xml').to(:controller => 'areas', :action =>'show', :format => 'xml')
     match('/branches.xml').to(:controller => 'branches', :action =>'index', :format => 'xml')
     match('/branches/:id.xml').to(:controller => 'branches', :action =>'show', :format => 'xml')
-    match('/centers.xml').to(:controller => 'centers', :action =>'index', :format => 'xml')
+    match('/centers.xml', :method => "get").to(:controller => 'centers', :action =>'index', :format => 'xml')
     match('/centers/:id.xml').to(:controller => 'centers', :action =>'show', :format => 'xml')
-    match('/client_groups.xml').to(:controller => 'client_groups', :action =>'index', :format => 'xml')
+    match('/client_groups.xml', :method => "get").to(:controller => 'client_groups', :action =>'index', :format => 'xml')
     match('/client_groups/:id.xml').to(:controller => 'client_groups', :action =>'show', :format => 'xml')
     match('/branches/:branch_id/centers/:center_id/clients/:id.xml', :method => "get").to(:controller => 'clients', :action =>'show', :format => 'xml')
     match('/branches/:branch_id/centers/:id.xml').to(:controller => 'centers', :action =>'show', :format => 'xml')
@@ -144,6 +144,8 @@ Merb::Router.prepare do
     match('/branches/:branch_id/centers/:center_id/clients.xml', :method => "post").to(:controller => 'clients', :action =>'create', :format => 'xml')
     match('/attendance.xml', :method => "post").to(:controller => 'attendances', :action =>'create', :format => 'xml')
     match('/branches/:branch_id/centers/:center_id/clients/:client_id/loans.xml', :method => "post").to(:controller => 'loans', :action =>'create', :format => 'xml')
+    match('/centers.xml', :method => "post").to(:controller => 'centers', :action =>'create', :format => 'xml')
+    match('/client_groups.xml', :method => "post").to(:controller => 'client_groups', :action =>'create', :format => 'xml')
   end
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')

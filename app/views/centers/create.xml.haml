@@ -1,0 +1,8 @@
+%xml
+  %center
+    - if not @center.errors.blank?
+      - @center.errors.map do |e|
+        %error #{e.to_s} 
+    - else    
+      %message Center '#{@center.id}' was successfully created
+      = @center.to_xml

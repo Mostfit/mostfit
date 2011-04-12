@@ -97,10 +97,18 @@ class Centers < Application
       @center.branch = @branch  # set direct context
     end
     if @center.save
-      redirect(params[:return]||resource(@center), :message => {:notice => "Center '#{@center.name}' successfully created"})
+      if params[:format] and params[:format] == "xml"
+        display @center
+      else
+        redirect(params[:return]||resource(@center), :message => {:notice => "Center '#{@center.name}' successfully created"})
+      end
     else
-#       message[:error] = "Center failed to be created"
-      render :new  # error messages will be shown
+      #       message[:error] = "Center failed to be created"
+      if params[:format] and params[:format] == "xml"
+        display @center
+      else
+        render :new  # error messages will be shown
+      end
     end
   end
 

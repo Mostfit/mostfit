@@ -65,22 +65,23 @@
             %date_joined #{client.date_joined}
             %client_group_id #{client.client_group_id}
             %center_id #{client.center_id}
-            - if client.loans
-              %loans
-                - client.loans.each do |loan|
-                  %loan
-                    %id #{loan.id}
-                    %amount #{loan.amount}
-                    %interest_rate #{loan.interest_rate}
-                    %installment_frequency #{loan.installment_frequency}
-                    %number_of_installments #{loan.number_of_installments}
-                    %client_id #{loan.client_id}
-                    %applied_on #{loan.applied_on}
-                    %approved_on #{loan.approved_on}
-                    %disbursal_date #{loan.disbursal_date}
-                    %loan_product_id #{loan.loan_product_id}
-                    %applied_by_staff_id #{loan.applied_by_staff_id}
-                    %disbursed_by_staff_id #{loan.disbursed_by_staff_id}
+    - if @option == "loans" and not @staff_member.clients.blank?
+      %loans
+        - @staff_member.clients.each do |client|
+          - client.loans.each do |loan|
+            %loan
+              %id #{loan.id}
+              %amount #{loan.amount}
+              %interest_rate #{loan.interest_rate}
+              %installment_frequency #{loan.installment_frequency}
+              %number_of_installments #{loan.number_of_installments}
+              %client_id #{loan.client_id}
+              %applied_on #{loan.applied_on}
+              %approved_on #{loan.approved_on}
+              %disbursal_date #{loan.disbursal_date}
+              %loan_product_id #{loan.loan_product_id}
+              %applied_by_staff_id #{loan.applied_by_staff_id}
+              %disbursed_by_staff_id #{loan.disbursed_by_staff_id}
     - elsif @option == "full"
       - if not @staff_member.regions.blank?
         %regions
@@ -118,7 +119,7 @@
               %id #{center.id}
               %name #{center.name}
               %code #{center.code}
-              %address #{center.address}
+              %address #{h(center.address)}
               %contact_number #{center.contact_number}
               %landmark #{center.landmark}
               %meeting_day #{center.meeting_day}
@@ -141,19 +142,20 @@
               %date_joined #{client.date_joined}
               %client_group_id #{client.client_group_id}
               %center_id #{client.center_id}
-              - if client.loans
-                %loans
-                  - client.loans.each do |loan|
-                    %loan
-                      %id #{loan.id}
-                      %amount #{loan.amount}
-                      %interest_rate #{loan.interest_rate}
-                      %installment_frequency #{loan.installment_frequency}
-                      %number_of_installments #{loan.number_of_installments}
-                      %client_id #{loan.client_id}
-                      %applied_on #{loan.applied_on}
-                      %approved_on #{loan.approved_on}
-                      %disbursal_date #{loan.disbursal_date}
-                      %loan_product_id #{loan.loan_product_id}
-                      %applied_by_staff_id #{loan.applied_by_staff_id}
-                      %disbursed_by_staff_id #{loan.disbursed_by_staff_id}
+      - if not @staff_member.clients.blank?
+        %loans
+          - @staff_member.clients.each do |client|
+            - client.loans.each do |loan|
+              %loan
+                %id #{loan.id}
+                %amount #{loan.amount}
+                %interest_rate #{loan.interest_rate}
+                %installment_frequency #{loan.installment_frequency}
+                %number_of_installments #{loan.number_of_installments}
+                %client_id #{loan.client_id}
+                %applied_on #{loan.applied_on}
+                %approved_on #{loan.approved_on}
+                %disbursal_date #{loan.disbursal_date}
+                %loan_product_id #{loan.loan_product_id}
+                %applied_by_staff_id #{loan.applied_by_staff_id}
+                %disbursed_by_staff_id #{loan.disbursed_by_staff_id}

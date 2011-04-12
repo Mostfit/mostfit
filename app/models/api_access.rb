@@ -41,6 +41,16 @@ class ApiAccess
     get("/centers/#{id}.xml")
   end
 
+  #get regions
+  def self.get_regions
+    get("/regions.xml")
+  end
+
+  #get region info
+  def self.get_region_info(id)
+    get("/regions/#{id}.xml")
+  end
+
   #get areas
   def self.get_areas
     get("/areas.xml")
@@ -104,6 +114,16 @@ class ApiAccess
   #branch: 1, center : 11, client :167
   def self.create_loan(branch,center,client)
     post("/branches/#{branch}/centers/#{center}/clients/#{client}/loans.xml", :query => {:equated_weekly =>{:interest_rate =>31.7444, :number_of_installments => 46, :scheduled_first_payment_date =>"18-04-2011", :installment_frequency => "weekly",:applied_by_staff_id =>5, :amount_applied_for => 8000, :occupation_id => 20, :funding_line_id =>1, :scheduled_disbursal_date =>"11-04-2011", :applied_on =>"08-04-2011"}, :loan_product_id => 1, :loan_type=>"EquatedWeekly"})
+  end
+
+  #create centers
+  def self.create_center
+    post("/centers.xml", :query => { :center =>{:name =>"Josh", :code => "987", :manager_staff_id => 4, :creation_date=>"2011-04-12",:branch_id => 1}})
+  end
+
+  #create client Group
+  def self.create_client_group
+    post("/client_groups.xml", :query => { :client_group =>{"name"=>"Josh", "number_of_members"=>"5", "code"=>"7653", "center_id"=>167 }})
   end
 end
 

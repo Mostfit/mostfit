@@ -1,0 +1,8 @@
+%xml
+  %client_group
+    - if not @client_group.errors.blank?
+      - @client_group.errors.map do |e|
+        %error #{e.to_s} 
+    - else    
+      %message Client Group '#{@client_group.id}' was successfully created
+      = @client_group.to_xml
