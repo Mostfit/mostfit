@@ -241,6 +241,26 @@ describe "Test the API call" do
   end
   
   it "Should be create client_group" do
+    params = {'client_group[name]' => "test client group",'client_group[number_of_members]' => '1', 'client_group[code]' => '76533', 'client_group[center_id]' => '167' }
+    url = URI.parse('http://localhost:4000/client_groups.xml')
+    req = Net::HTTP::Post.new(url.path)
+    req.basic_auth 'admin', 'password'
+    req.set_form_data(params)
+    res = Net::HTTP.new(url.host, url.port).start {|http| http.request(req) }
+    res.code.should == "200"
+    doc = REXML::Document.new res.body
+    doc.root.elements[1].elements["error"].should == nil
   end
 
+  it "Should be create center" do
+    params = {'center[name]' => "test center",'center[code]' => '98761', 'center[manager_staff_id]' => '4', 'center[creation_date]' => '2011-04-11', 'center[branch_id]' => '1'  }
+    url = URI.parse('http://localhost:4000/centers.xml')
+    req = Net::HTTP::Post.new(url.path)
+    req.basic_auth 'admin', 'password'
+    req.set_form_data(params)
+    res = Net::HTTP.new(url.host, url.port).start {|http| http.request(req) }
+    res.code.should == "200"
+    doc = REXML::Document.new res.body
+    doc.root.elements[1].elements["error"].should == nil
+  end
 end
