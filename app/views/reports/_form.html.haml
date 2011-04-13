@@ -50,7 +50,7 @@
       - if type_of_journal
         |
         Journal Type:
-        = params[report][:type_of_journal]
+        = JournalType.get(type_of_journal).name
     %a.expand_collapsed{:href => "#"}
       Change parameters
   %div{:class => "#{params[:submit] ? 'collapsed' : ''}"}
