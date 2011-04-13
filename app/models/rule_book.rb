@@ -1,7 +1,10 @@
 class RuleBook
   include DataMapper::Resource
   before :save, :convert_blank_to_nil
-  ACTIONS = ['principal', 'interest', 'fees', 'disbursement', 'advance_principal', 'advance_interest', 'advance_principal_adjusted', 'advance_interest_adjusted']
+  ACTIONS = [
+             'principal', 'interest', 'fees', 'disbursement', 'advance_principal', 
+             'advance_interest', 'advance_principal_adjusted', 'advance_interest_adjusted'
+            ]
 
   property :id,     Serial
   property :name,   String
@@ -21,6 +24,7 @@ class RuleBook
 
   belongs_to :branch,         Branch, :nullable => true
   belongs_to :fee,            Fee, :nullable => true
+  belongs_to :journal_type
   belongs_to :created_by, :child_key => [:created_by_user_id], :model => 'User'  
   belongs_to :updated_by, :child_key => [:updated_by_user_id], :model => 'User'  
   
@@ -59,6 +63,7 @@ class RuleBook
       branch  = client.center.branch
       date = obj.first.loan.disbursal_date
       credit_accounts, debit_accounts  = {}, {}
+      rules = []
       obj.each{|p|  
         rule = if p.type == :fees
                  first(:action => p.type, :branch => branch, :fee => p.fee, :active => true) || first(:action => p.type, :branch => nil, :fee => p.fee, :active => true)
@@ -74,8 +79,10 @@ class RuleBook
           debit_accounts[dar.debit_account] ||= 0
           debit_accounts[dar.debit_account] += (p.amount * (dar.percentage)/100)
         }
+        rules.push(rule)
       }
-      return [credit_accounts, debit_accounts]
+      raise "NoRuleFoundError" unless rules.compact.length == 1
+      return [credit_accounts, debit_accounts, rules]
     end
     
     if rule = first(:action => transaction_type, :branch => branch, :fee => fee, :active => true)
@@ -96,7 +103,7 @@ class RuleBook
       debit_accounts[dar.debit_account] ||= 0
       debit_accounts[dar.debit_account] += (obj.amount * (dar.percentage)/100)
     }    
-    [credit_accounts, debit_accounts]
+    [credit_accounts, debit_accounts, rule]
   end
   
   # presentage split between credit and debit accounts should be 100% (each)

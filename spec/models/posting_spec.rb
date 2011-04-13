@@ -2,7 +2,7 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Posting do
   before (:all) do
-    load_fixtures :account_type, :account 
+    load_fixtures :account_type, :account, :journal_types
     Payment.all.destroy! if Payment.all.count > 0
     Journal.all.destroy!
     mfi = Mfi.first
@@ -13,6 +13,7 @@ describe Posting do
     @rule_book_1.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(2), :percentage => 100)
     @rule_book_1.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(1), :percentage => 100)
     @rule_book_1.created_by_user_id = 1
+    @rule_book_1.journal_type = JournalType.first
     @rule_book_1.save
     @rule_book_1.errors.each{|e| puts e}
     @rule_book_1.should be_valid
@@ -21,6 +22,7 @@ describe Posting do
     @rule_book_2.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(3), :percentage => 100)
     @rule_book_2.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(4), :percentage => 100)
     @rule_book_2.created_by_user_id = 1
+    @rule_book_2.journal_type = JournalType.last
     @rule_book_2.save
     @rule_book_2.errors.each{|e| puts e}
     @rule_book_2.should be_valid
@@ -29,6 +31,7 @@ describe Posting do
     @rule_book_3.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(1), :percentage => 100)
     @rule_book_3.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(4), :percentage => 100)
     @rule_book_3.created_by_user_id = 1
+    @rule_book_3.journal_type = JournalType.last
     @rule_book_3.save
     @rule_book_3.errors.each{|e| puts e}
     @rule_book_3.should be_valid
@@ -37,6 +40,7 @@ describe Posting do
     @rule_book_4.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(2), :percentage => 100)
     @rule_book_4.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(3), :percentage => 100)
     @rule_book_4.created_by_user_id = 1
+    @rule_book_4.journal_type = JournalType.last
     @rule_book_4.save
     @rule_book_4.errors.each{|e| puts e}
     @rule_book_4.should be_valid
@@ -147,20 +151,20 @@ describe Posting do
 
   
   it "should not be valid if proper book keeping entry are not made on reverse entry" do
-    before_entries  = Journal.all(:transaction_id => @loan.id, :journal_type_id => 1).length
-    before_postings = Journal.all(:transaction_id => @loan.id, :journal_type_id => 1).postings.length
+    before_entries  = Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).length
+    before_postings = Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).postings.length
 
     @loan.disbursal_date = nil
     @loan.disbursed_by = nil
     @loan.save
     @loan.should be_valid
-    after_entries =  Journal.all(:transaction_id => @loan.id, :journal_type_id => 1).length
-    after_postings = Journal.all(:transaction_id => @loan.id, :journal_type_id => 1).postings.length
+    after_entries =  Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).length
+    after_postings = Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).postings.length
 
     (before_entries  + 1).should  == after_entries
     (before_postings + 2).should  == after_postings
-
-    @journal = Journal.last(:transaction_id => @loan.id, :journal_type_id => 1)
+    
+    @journal = Journal.last(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id)
     @postings = @journal.postings.group_by{|x| x.amount < 0 ? :credit : :debit}
     @loan.amount.should == @postings[:debit].map{|x| x.amount}.reduce(0){|s,x| s+=x}
 
@@ -172,15 +176,15 @@ describe Posting do
     @loan.disbursed_by = @manager
     @loan.save
     @postings = @journal.postings.group_by{|x| x.amount < 0 ? :credit : :debit}
-    after_entries =  Journal.all(:transaction_id => @loan.id, :journal_type_id => 1).length
-    after_postings = Journal.all(:transaction_id => @loan.id, :journal_type_id => 1).postings.length
+    after_entries =  Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).length
+    after_postings = Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).postings.length
 
     (before_entries+2).should == after_entries
     (before_postings+4).should == after_postings
   end
 
   it "should be valid if book keeping entry are made on payment" do
-    @journal = Journal.last(:transaction_id => @payment.id, :journal_type_id => 2)
+    @journal = Journal.last(:transaction_id => @payment.id, :journal_type_id => JournalType.last.id)
     @journal.errors
     @journal.should be_valid    
 
@@ -197,7 +201,7 @@ describe Posting do
   end
 
   it "delete a payment should do a reverse entry" do
-    before_entries  =  Journal.count     
+    before_entries  =  Journal.count
     before_postings =  Posting.count
     id  = @payment
     @loan.delete_payment(@payment, User.first)
@@ -206,11 +210,11 @@ describe Posting do
     after_postings = Posting.count
 
     (before_entries  + 1).should == after_entries
-    (before_postings + 2).should == after_postings    
+    (before_postings + 2).should == after_postings
   end
 
   it "should not be valid if amount in credit_account and debit_account are different in magnitude" do
-    @journal = Journal.last(:transaction_id => @payment.id, :journal_type_id => 2)
+    @journal = Journal.last(:transaction_id => @payment.id, :journal_type_id => JournalType.last.id)
     @postings = @journal.postings.group_by{|x| x.amount < 0 ? :credit : :debit}
     @postings = @journal.postings.group_by{|x| x.amount < 0 ? :credit : :debit}
     
@@ -218,7 +222,7 @@ describe Posting do
   end
 
   it "should not be valid if both the posting entries are not made" do
-    @journal = Journal.last(:transaction_id => @payment.id, :journal_type_id => 2)
+    @journal = Journal.last(:transaction_id => @payment.id, :journal_type_id => JournalType.last.id)
     @postings = @journal.postings.group_by{|x| x.amount < 0 ? :credit : :debit}
 
     @postings[:credit].length.should > 0
@@ -226,19 +230,19 @@ describe Posting do
   end
 
   it "should do forward and reverse book keeping entry When disbursal_date is changed" do
-    before_entries  =  Journal.all(:transaction_id => @loan.id, :journal_type_id => 1).length
-    before_postings = Journal.all(:transaction_id => @loan.id, :journal_type_id => 1).postings.length
+    before_entries  =  Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).length
+    before_postings = Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).postings.length
 
     @loan.disbursal_date = "2000-04-05"
     @loan.save
-    @journal = Journal.all(:transaction_id => @loan.id, :journal_type_id => 1)
+    @journal = Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id)
     @postings = @journal.postings.group_by{|x| x.amount < 0 ? :credit : :debit}
 
     @postings[:credit].length.should > 0
     @postings[:debit].length.should > 0
 
-    after_entries  =  Journal.all(:transaction_id => @loan.id, :journal_type_id => 1).length
-    after_postings = Journal.all(:transaction_id => @loan.id, :journal_type_id => 1).postings.length
+    after_entries  =  Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).length
+    after_postings = Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).postings.length
 
     (before_entries+2).should == after_entries
     (before_postings+4).should == after_postings

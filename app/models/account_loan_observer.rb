@@ -35,17 +35,17 @@ class AccountLoanObserver
   end
   
   def self.forward_entry(obj)
-    credit_account, debit_account = RuleBook.get_accounts(obj)
+    credit_account, debit_account, rule = RuleBook.get_accounts(obj)
     # do not do accounting if no matching accounts
     return unless (credit_account and debit_account)
     journal = {:date => obj.disbursal_date, :transaction_id => obj.id.to_s, :currency => Currency.first, :amount => obj.amount}
     journal[:comment] = "Loan_id: #{obj.id}-Client:#{obj.client.name}"
-    journal[:journal_type_id] = 1
+    journal[:journal_type_id] = rule.journal_type_id
     status, @journal = Journal.create_transaction(journal, debit_account, credit_account)
   end
   
   def self.reverse_entry(obj, old_attributes)
-    credit_account, debit_account = RuleBook.get_accounts(obj)
+    credit_account, debit_account, rule = RuleBook.get_accounts(obj)
     # do not do accounting if no matching accounts
     return unless (credit_account and debit_account)
     amount = old_attributes[:amount]||obj.amount
@@ -55,7 +55,7 @@ class AccountLoanObserver
     
     journal = {:date => date, :transaction_id => obj.id.to_s, :currency => Currency.first, :amount => (amount * -1)}
     journal[:comment] = "Loan_id: #{obj.id}-Client:#{obj.client.name} - reverse entry"
-    journal[:journal_type_id] = 1
+    journal[:journal_type_id] = rule.journal_type_id
     status, @journal = Journal.create_transaction(journal, debit_account, credit_account)
   end
   
