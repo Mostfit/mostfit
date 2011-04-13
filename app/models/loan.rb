@@ -140,7 +140,7 @@ class Loan
   validates_with_method  :interest_rate,                :method => :is_valid_loan_product_interest_rate
   validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
   validates_with_method  :clients,                      :method => :check_client_sincerity
-
+  validates_with_method  :insurance_policy,             :method => :check_insurance_policy    
 
   def self.display_name
     "Loan"
@@ -1140,6 +1140,13 @@ class Loan
     return true unless verified_by_user_id
     throw :halt
   end
+  
+  def check_insurance_policy
+    return true unless insurance_policy
+    return [false, "Insurance Policy is not valid"] unless insurance_policy.valid?
+    return true
+  end
+  
 end
 
 class DefaultLoan < Loan

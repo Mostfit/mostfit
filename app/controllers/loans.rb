@@ -36,14 +36,14 @@ class Loans < Application
   end
 
   def create
+    debugger
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])
     raise BadRequest unless @loan_product
     @loan = klass.new(attrs)
     @loan.loan_product = @loan_product
-
-    if @loan.save
+    if  @loan.save
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' was successfully created"})
       else

@@ -154,7 +154,8 @@
         = form_for(@insurance_policy, :action => resource(@client, :insurance_policies) ) do
           = partial "insurance_policies/fields"
 
-  -if not @loan.new? and [:admin, :mis_manager].include?(session.user.role)
+  - debugger
+  - if not @loan.new? and [:admin, :mis_manager].include?(session.user.role)
     %tr
       %td
         Approved Amount:
