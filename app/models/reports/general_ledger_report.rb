@@ -18,7 +18,6 @@ class GeneralLedgerReport < Report
   end
 
   def generate(params)
-    debugger
     params1 = {:date.gte => from_date, :date.lte => to_date, :order => [:date]}.merge(:journal_type_id => @type_of_journal)
     params2 = {:id => params.values[0].values[0]}
    
