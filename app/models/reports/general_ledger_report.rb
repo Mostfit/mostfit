@@ -2,10 +2,9 @@ class GeneralLedgerReport < Report
   attr_accessor :from_date, :to_date, :account_id, :journal, :posting, :type_of_journal
 
   def initialize(params, dates, user)
-    @from_date = (dates and dates[:from_date]) ? dates[:from_date] : AccountingPeriod.first.begin_date
-    @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
+    @from_date = (dates and dates[:from_date]) ? dates[:from_date] : AccountingPeriod.first(:begin_date.lte => Date.today, :end_date.gte => Date.today).begin_date
+    @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : AccountingPeriod.first(:begin_date.lte => Date.today, :end_date.gte => Date.today).end_date
     @name      = "General Ledger"
-    @type_of_journal = (params and params[:type_of_journal]) ? params[:type_of_journal] : :journal
     get_parameters(params, user)
   end
 
@@ -18,7 +17,12 @@ class GeneralLedgerReport < Report
   end
 
   def generate(params)
-    params1 = {:date.gte => from_date, :date.lte => to_date, :order => [:date]}.merge(:journal_type_id => @type_of_journal)
+    params3 = {:journal_type_id => @type_of_journal}
+    if @type_of_journal
+      params1 = {:date.gte => from_date, :date.lte => to_date, :order => [:date]}.merge(params3)
+    else
+      params1 = {:date.gte => from_date, :date.lte => to_date, :order => [:date]}
+    end
     params2 = {:id => params.values[0].values[0]}
    
     @data = {}
