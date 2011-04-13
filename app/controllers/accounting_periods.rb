@@ -27,7 +27,6 @@ class AccountingPeriods < Application
 
   def create(accounting_period)
     @accounting_period = AccountingPeriod.new(accounting_period)
-    @accounting_period.created_by_user_id = session.user.id
     if @accounting_period.save
       redirect resource(:accounts), :message => {:notice => "AccountingPeriod was successfully created"}
     else
