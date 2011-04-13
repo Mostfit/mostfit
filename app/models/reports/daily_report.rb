@@ -1,5 +1,5 @@
 class DailyReport < Report
-  attr_accessor :date, :loan_product_id, :branch_id, :staff_member_id
+  attr_accessor :date, :loan_product_id, :branch_id, :staff_member_id, :center_id
 
   def initialize(params, dates, user)
     @date   =  dates[:date]||Date.today
@@ -40,26 +40,31 @@ class DailyReport < Report
         if history
           principal_scheduled = history.scheduled_outstanding_principal.to_i
           total_scheduled     = history.scheduled_outstanding_total.to_i
-          
-          principal_actual = history.actual_outstanding_principal.to_i
-          total_actual     = history.actual_outstanding_total.to_i
+          advance_principal   = history.advance_principal.to_i
+          advance_total       = history.advance_total.to_i
+          principal_actual    = history.actual_outstanding_principal.to_i
+          total_actual        = history.actual_outstanding_total.to_i
         else
           next
         end
         
+        #balance outstanding            
         data[b][c][7] += principal_actual
         data[b][c][9] += total_actual
         data[b][c][8] += total_actual - principal_actual
         
-        data[b][c][10] += (principal_actual > principal_scheduled ? principal_actual-principal_scheduled : 0)
-        data[b][c][11] += ((total_actual-principal_actual) > (total_scheduled-principal_scheduled) ? (total_actual-principal_actual - (total_scheduled-principal_scheduled)) : 0)
-        data[b][c][12] += total_actual > total_scheduled ? total_actual - total_scheduled : 0
-        
+        #balance overdue            
+        data[b][c][10] += ((principal_actual > principal_scheduled ? (principal_actual - principal_scheduled): 0) + advance_principal)
+        #data[b][c][11] += ((total_actual - principal_actual) > (total_scheduled - principal_scheduled) ? (total_actual - principal_actual - (total_scheduled - principal_scheduled)) : 0)
+        data[b][c][12] += ((total_actual > total_scheduled ? (total_actual - total_scheduled): 0) + advance_total)
+        data[b][c][11] += (data[b][c][12] - data[b][c][10])
+                    
         advance_total = advance ? advance.advance_total : 0
         balance_total = balance ? balance.balance_total : 0
         old_balance_total = old_balance ? old_balance.balance_total : 0
         
-        data[b][c][13]  += advance_total
+        #advance repayment            
+        data[b][c][13]  += advance_total 
         data[b][c][15]  += balance_total
         data[b][c][14]  += advance_total - balance_total + old_balance_total
       }
