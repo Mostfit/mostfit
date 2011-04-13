@@ -111,7 +111,7 @@ class Journal
   
 
   def self.xml_tally(hash={}, xml_file = nil)
-    xml_file = '/tmp/voucher.xml'
+    xml_file ||= '/tmp/voucher.xml'
     f = File.open(xml_file,"w")
     x = Builder::XmlMarkup.new(:target => f,:indent => 1)
     x.ENVELOPE{
