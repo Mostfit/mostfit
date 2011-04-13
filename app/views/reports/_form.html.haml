@@ -7,8 +7,10 @@
   - loan_product_id = (params[report] and params[report][:loan_product_id] and not params[report][:loan_product_id].blank?) ? params[report][:loan_product_id] : nil
   - staff_member_id = (params[report] and params[report][:staff_member_id] and not params[report][:staff_member_id].blank?) ? params[report][:staff_member_id] : nil
   - funder_id = (params[report] and params[report][:funder_id] and not params[report][:funder_id].blank?) ? params[report][:funder_id] : nil
+  - funding_line_id = (params[report] and params[report][:funding_line_id] and not params[report][:funding_line_id].blank?) ? params[report][:funding_line_id] : nil
   - account_id = (params[report] and params[report][:account_id] and not params[report][:account_id].blank?) ? params[report][:account_id] : nil
   - type_of_target = (params[report] and params[report][:type_of_target] and not params[report][:type_of_target].blank?) ? params[report][:type_of_target] : nil
+  - type_of_journal = (params[report] and params[report][:type_of_journal] and not params[report][:type_of_journal].blank?) ? params[report][:type_of_journal] : nil
   - if params[:submit]
     %h3{:style => "margin-bottom: 5px;"}
       - if area_id
@@ -33,6 +35,10 @@
         |
         Funder:
         = Funder.get(funder_id).name
+      - if funding_line_id
+        |
+        Funding Line:
+        = FundingLine.get(funding_line_id).name
       - if account_id
         |
         Account:
@@ -41,6 +47,10 @@
         |
         Target Type:
         = params[report][:type_of_target].to_s.camelcase
+      - if type_of_journal
+        |
+        Journal Type:
+        = params[report][:type_of_journal]
     %a.expand_collapsed{:href => "#"}
       Change parameters
   %div{:class => "#{params[:submit] ? 'collapsed' : ''}"}
@@ -99,7 +109,11 @@
           - if @report.respond_to?(:funder_id)
             %td
               Funder:
-              = select(:funder_id , :collection => get_accessible_funders(@user), :include_blank => true, :selected => funder_id)
+              = select(:funder_id , :collection => get_accessible_funders(@user), :include_blank => true, :selected => funder_id, :id => "funder_selector")
+          - if @report.respond_to?(:funding_line_id)
+            %td
+            /  Funding Line:
+            /  = select(:funding_line_id, :collection => get_accessible_funding_lines(funder_id, @user), :include_blank => true, :selected => funding_line_id, :id => "funding_line_selector")
           - if @report.respond_to?(:account_id)
             %td
               Account:
@@ -114,31 +128,32 @@
               = check_box(:name => "#{report}[include_unapproved_loans]", :value => "1", :checked => (params[report] and params[report].key?(:include_unapproved_loans) and params[report][:include_unapproved_loans] == "1" ? true : false))
           - if @report.respond_to?(:report_by_loans_created)
             %td
-              Report by Loans Created
               = check_box(:name => "#{report}[report_by_loans_created]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loans_created) and params[report][:report_by_loans_created] == "1" ? true : false))
+              Report by Loans Created
           - if @report.respond_to?(:group_by_types)
             %td
               Group by:
               = select(:name => "#{report}[group_by_types]", :selected => (params[report] and params[report][:group_by_types]), :collection => @report.group_types.map{|name, gt| [name, name.to_s.camelcase(" - ")]}.sort_by{|name, gt| gt}, :prompt => "select grouping")
-        %tr
           - if @report.respond_to?(:report_by_loan_disbursed_during_selected_date_range)
             %td
               = check_box(:name => "#{report}[report_by_loan_disbursed_during_selected_date_range]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loan_disbursed_during_selected_date_range) and params[report][:report_by_loan_disbursed_during_selected_date_range] == "1" ? true : false))
               Show only those loans which were disbursed during selected date range
-        %tr
           - if @report.respond_to?(:ageing_interval)
             %td
               Ageing intervals:
               - ages = ["3", "5", "10"]
               = select(:ageing_interval, :collection => ages, :prompt => "select ageing multiple")
-        %tr
           - if @report.respond_to?(:type_of_target)
             %td
               Target Type:
               - types = ["relative", "absolute"]
               = select(:type_of_target, :collection => types.map{|x| [x.to_s.camelcase(' '), x.to_s]}, :text_method => :first, :value_method => :last)
+          - if @report.respond_to?(:type_of_journal)
+            %td
+              Journal Type:
+              = select(:type_of_journal, :collection => JournalType.all.map{|m| [m.id, m.name]}, :selected => type_of_journal, :include_blank => true)
         %tr
-          %td{:colspan => 6}
-            %div{:style => "float: right"}
+          %td
+            %div{:style => "float: left"}
               = hidden_field :name => "submit", :value => "go"
               = submit "Generate", :name => "submit_button", :value => "submit"
