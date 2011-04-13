@@ -9,7 +9,7 @@ describe AccountLoanObserver do
     mfi.accounting_enabled = true
     mfi.save
 
-    load_fixtures :account_type, :account, :currency, :journal_type, :credit_account_rule, :debit_account_rule, :rule_book, :staff_members, :users, :funders, :funding_lines, :branches, :centers, :client_types, :clients, :loan_products
+    load_fixtures :account_type, :account, :currency, :journal_types, :credit_account_rule, :debit_account_rule, :rule_book, :staff_members, :users, :funders, :funding_lines, :branches, :centers, :client_types, :clients, :loan_products
 
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
     @manager.save
