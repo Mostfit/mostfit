@@ -111,9 +111,9 @@ class Journal
   
 
   def self.xml_tally(hash={}, xml_file = nil)
-    xml_file ||= '/tmp/voucher.xml'
-    f = File.open(xml_file,'w')
-    x = Builder::XmlMarkup.new(:indent => 1)
+    xml_file = '/tmp/voucher.xml'
+    f = File.open(xml_file,"w")
+    x = Builder::XmlMarkup.new(:target => f,:indent => 1)
     x.ENVELOPE{
       x.HEADER {    
         x.VERSION "1"
@@ -150,7 +150,6 @@ class Journal
         }
       }
     } 
-    f.write(x)
     f.close
   end 
 end
