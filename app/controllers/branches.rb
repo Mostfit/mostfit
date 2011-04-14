@@ -8,6 +8,7 @@ class Branches < Application
   end
 
   def show(id)
+    @option = params[:option] if params[:option]
     @branch = Branch.get(id)
     raise NotFound unless @branch
     @centers = @branch.centers_with_paginate({:meeting_day => params[:meeting_day]}, session.user)

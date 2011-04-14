@@ -15,6 +15,7 @@ class Loans < Application
   end
 
   def show(id)
+    @option = params[:option] if params[:option]
     @loan = Loan.get(id)
     raise NotFound unless @loan
     @payments = @loan.payments(:order => [:received_on, :id])

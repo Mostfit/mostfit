@@ -19,6 +19,7 @@ class Centers < Application
   end
 
   def show(id)
+    @option = params[:option] if params[:option]
     @center = Center.get(id)
     raise NotFound unless @center
     @branch  =  @center.branch if not @branch

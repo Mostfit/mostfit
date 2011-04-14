@@ -12,7 +12,7 @@
           %region
             %id #{region.id}
             %name #{region.name}
-            %address #{region.address}
+            %address #{h(region.address)}
             %contact_number #{region.contact_number}
             %landmark #{region.landmark}
             %creation_date #{region.creation_date}
@@ -29,7 +29,7 @@
             %id #{branch.id}
             %name #{branch.name}
             %code #{branch.code}
-            %address #{branch.address}
+            %address #{h(branch.address)}
             %contact_number #{branch.contact_number}
             %landmark #{branch.landmark}
             %creation_date #{branch.creation_date}
@@ -42,7 +42,7 @@
             %id #{center.id}
             %name #{center.name}
             %code #{center.code}
-            %address #{center.address}
+            %address #{h(center.address)}
             %contact_number #{center.contact_number}
             %landmark #{center.landmark}
             %meeting_day #{center.meeting_day}
@@ -89,7 +89,7 @@
             %region
               %id #{region.id}
               %name #{region.name}
-              %address #{region.address}
+              %address #{h(region.address)}
               %contact_number #{region.contact_number}
               %landmark #{region.landmark}
               %creation_date #{region.creation_date}
@@ -106,7 +106,7 @@
               %id #{branch.id}
               %name #{branch.name}
               %code #{branch.code}
-              %address #{branch.address}
+              %address #{h(branch.address)}
               %contact_number #{branch.contact_number}
               %landmark #{branch.landmark}
               %creation_date #{branch.creation_date}

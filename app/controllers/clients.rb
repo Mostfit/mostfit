@@ -15,12 +15,13 @@ class Clients < Application
   end
 
   def show(id)
+    @option = params[:option] if params[:option]    
     @client = Client.get(id)
     raise NotFound unless @client
     
     if @center
       @loans = @loans ? @loans.find_all{|l| l.client_id == @client.id} : @client.loans
-      display [@client, @loans], 'loans/index'
+      display [@client, @loans, @option], 'loans/index'
     else
       redirect_to_show(params[:id])
     end

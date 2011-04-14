@@ -10,8 +10,7 @@
     %date_joined #{@client.date_joined}
     %client_group_id #{@client.client_group_id}
     %center_id #{@client.center_id}
-    %fingerprint #{Base64.encode64(File.read("#{@client.fingerprint.path}"))}
-    - if @client.loans
+    - if @client.loans and @option == "loans"
       %loans
         - @client.loans.each do |loan|
           %loan
