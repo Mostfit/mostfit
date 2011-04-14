@@ -44,6 +44,7 @@ Merb::BootLoader.before_app_loads do
   require 'lib/grapher.rb'
   require("lib/functions.rb")
   require("lib/core_ext.rb")
+  require 'lib/fees.rb'
   
   begin
     require "pdf/writer"
