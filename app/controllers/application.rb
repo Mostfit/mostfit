@@ -4,8 +4,16 @@ class Application < Merb::Controller
   before :ensure_can_do
   before :insert_session_to_observer
   before :add_collections, :only => [:index, :show]
+  before :desktop_user_log
   
   @@controllers  = ["regions", "area", "branches", "centers", "clients", "loans", "payments", "staff_members", "funders", "portfolios", "funding_lines"]
+
+  def desktop_user_log
+    if request.route.to_s.match(/\/api\/v1\/([a-z0-9_\/:]*).xml*/)
+      Merb.logger.info("-------------- Desktop User ------------ ")
+      Merb.logger.info("----User: #{session.user.login}  ------  Access Time: #{Time.now} ----------") if session and session.user
+    end
+  end
 
   def ensure_password_fresh
     if session.key?(:change_password) and session[:change_password] and not params[:action] == "change_password"
