@@ -25,14 +25,22 @@ module FeesContainer
 
   # returns fees that are applied for the client
   def fees
+<<<<<<< HEAD
     Fee.all(:id => ApplicableFee.all(:applicable_id => self.id, :applicable_type => self.class.to_s).aggregate(:fee_id))
+=======
+    Fee.all(:id => ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class).aggregate(:fee_id))
+>>>>>>> Added fees container and coresponding hooks in Client and Loan model
   end
   
   # return total fee due for this client including fees applicable to client, loan and insurance policies
   def total_fees_due(date=Date.today)
     fees = 0
 
+<<<<<<< HEAD
     fees += (ApplicableFee.all(:applicable_type => self.class.to_s, :applicable_id => self.id, :applicable_on.lte => date).aggregate(:amount.sum) || 0)
+=======
+    fees += (ApplicableFee.all(:applicable_type => get_class, :applicable_id => self.id, :applicable_on.lte => date).aggregate(:amount.sum) || 0)
+>>>>>>> Added fees container and coresponding hooks in Client and Loan model
 
     if self.class == Client
       if self.loans.length > 0
@@ -48,7 +56,17 @@ module FeesContainer
 
   # return total fee paid for this client
   def total_fees_paid(date=Date.today)
+<<<<<<< HEAD
     Payment.all(:type => :fees, :client => self, :received_on.lte => date).sum(:amount) || 0
+=======
+    if self.class == Client
+      Payment.all(:type => :fees, :client => self, :received_on.lte => date).sum(:amount) || 0
+    elsif self.is_a?(Loan)
+      Payment.all(:type => :fees, :loan   => self, :received_on.lte => date).sum(:amount) || 0
+    elsif self.is_a?(InsurancePolicy)
+      Payment.all(:type => :fees, :client => self.client, :received_on.lte => date, :fee_id => ApplicableFee.all(:applicable_type => 'InsurancePolicy', :applicable_id => self.id).aggregate(:fee_id)).sum(:amount) || 0
+    end
+>>>>>>> Added fees container and coresponding hooks in Client and Loan model
   end
 
   def total_fees_payable_on(date = Date.today)
@@ -78,7 +96,11 @@ module FeesContainer
   # returns a hash of fee schedule which has keys as dates and values as {fee => amount}
   def fee_schedule
     @fee_schedule = {}
+<<<<<<< HEAD
     ApplicableFee.all(:applicable_id => self.id, :applicable_type => self.class.to_s).map{|af|
+=======
+    ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class).map{|af|
+>>>>>>> Added fees container and coresponding hooks in Client and Loan model
       @fee_schedule[af.applicable_on] ||= {}
       @fee_schedule[af.applicable_on][af.fee] = af.amount
     }
@@ -88,4 +110,18 @@ module FeesContainer
   def fee_payments
     @fees_payments = {}
   end
+<<<<<<< HEAD
+=======
+
+  private
+  def get_class
+    if self.is_a?(Client)
+      'Client'
+    elsif self.is_a?(InsurancePolicy)
+      'InsurancePolicy'
+    elsif self.is_a?(Loan)
+      'Loan'
+    end
+  end
+>>>>>>> Added fees container and coresponding hooks in Client and Loan model
 end
