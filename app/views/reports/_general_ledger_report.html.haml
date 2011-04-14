@@ -1,18 +1,22 @@
-=partial :form
+= partial :form
 %table.report.nojs
   %tr.header
     %th
       Date
     %th
-      Discription
+      Particulars
     %th
-      Account
+      Vch. Type
     %th
-      Debit
+      Vch. No.
     %th
-      Credit
+      Accounts
+    %th
+      Debit Amount
+    %th
+      Credit Amount
  
-  - length = 5
+  - length = 6
   - org_total = []
   - time_format = Mfi.first.date_format || "%d-%m-%Y"
   - time_format += " %H:%M"
@@ -22,35 +26,45 @@
   - @data.each do |key,val|
     %tr
       %td
-        = val[0].strftime(time_format)
+        = val[0].strftime(Mfi.first.date_format)
       %td
         = val[1]
       %td
-        - val[2].each do |journal|
+        = val[2]
+      %td
+        = val[3]
+      %td
+        - val[4].each do |journal|
           = journal.account.name
           %br
-        - val[3].each do |journal|
+        - val[5].each do |journal|
           = journal.account.name
           %br
       %td
-        - val[2].each do |journal|
+        - val[4].each do |journal|
           - dr_sum += journal.amount 
-          = journal.amount * -1
+          = journal.amount * -1 
+          %b Dr
           %br
       %td
         %br
-        - val[3].each do |journal|
+        - val[5].each do |journal|
           - cr_sum += journal.amount
-          = journal.amount
+          = journal.amount 
+          %b Cr
           %br
        
   %tr
     %td
     %td
     %td
-      Total
-    %td 
-      = dr_sum * -1
     %td
-      = cr_sum
+    %td
+      %b Total
+    %td
+      %b
+        = dr_sum * -1
+    %td
+      %b
+        = cr_sum
 
