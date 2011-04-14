@@ -9,7 +9,6 @@ class Loan
   before :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
   #  after  :destroy, :update_history
-  DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
   attr_accessor :interest_percentage
