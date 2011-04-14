@@ -85,54 +85,43 @@ class Fee
     end
   end
   
-  def self.applicable(loan_ids, hash = {})
-    date = hash[:date] || Date.today
 
-    if loan_ids == :all
-      query    = " AND l.disbursal_date is not NULL"
-      query   += " AND l.disbursal_date<='#{date.strftime('%Y-%m-%d')}'"
-    else
-      loan_ids = loan_ids.length>0 ? loan_ids.join(",") : "NULL"
-      query    = "AND l.id IN (#{loan_ids})"
-    end   
-
-    payables = Fee.properties[:payable_on].type.flag_map
-    applicables = repository.adapter.query(%Q{
-                                SELECT l.id loan_id, l.client_id client_id, 
-                                       SUM(if(f.amount>0, convert(f.amount, decimal), l.amount*f.percentage)) fees_applicable, 
-                                       f.payable_on payable_on                                       
-                                FROM loan_products lp, fee_loan_products flp, fees f, loans l 
-                                WHERE flp.fee_id=f.id AND flp.loan_product_id=lp.id AND lp.id=l.loan_product_id #{query}
-                                      AND l.deleted_at is NULL AND l.rejected_on is NULL
-                                GROUP BY l.id;})
-    fees = []
-
-    applicables.each{|fee|
-      if payables[fee.payable_on]==:loan_installment_dates
-        installments = loans.find{|x| x.id==fee.loan_id}.installment_dates.reject{|x| x > date}.length
-        fees.push(FeeApplicable.new(fee.loan_id, fee.client_id, fee.fees_applicable.to_f * installments))
-      else
-        fees.push(FeeApplicable.new(fee.loan_id, fee.client_id, fee.fees_applicable.to_f))
-      end
-    }
-    fees
+  # returns the applicable fees for a list of ids and applicable type. Additional params can be provided by hash 
+  def self.applicable(ids, hash = {}, applicable_type = 'Loan')
+    date = hash.delete(:date) || Date.today
+    
+    query  = {:applicable_on.lte => date}
+    query[:applicable_id] = ids unless ids == :all
+    query[:applicable_type] = applicable_type
+    query.merge!(hash)
+    ApplicableFee.all(query)
   end
 
-  def self.paid(loan_ids, date=Date.today)
-    if loan_ids.length > 0
-      Payment.all(:type => :fees, :loan_id => loan_ids, :received_on.lte => date).aggregate(:loan_id, :amount.sum).to_hash
+  # returns the paid fee for a list of ids and applicable type. Additional params can be provided by hash 
+  def self.paid(ids, hash = {}, applicable_type = 'Loan')
+    if ids.length > 0
+      query = {:applicable_id => ids, :applicable_type => 'Loan', :applicable_on.lte => hash[:date] || Date.today}
+      query.merge!(hash)
+      query_str = "(#{AppliableFee.all(query).map{|x| [x.fee_id, x.applicable_id].join('), (')}})"
+      if applicable_type = 'Loan'
+        respository.adapter.query("SELECT loan_id, client_id, SUM(amount) FROM payments WHERE (fee_id, loan_id) in (#{query_str})").map{|x| [x[0], x[1]]}.to_hash
+      else
+        respository.adapter.query("SELECT loan_id, client_id, SUM(amount) FROM payments WHERE (fee_id, client_id) in (#{query_str})").map{|x| [x[0], x[1]]}.to_hash
+      end
     else
       {}
     end
   end
 
-  def self.due(loan_ids, date=Date.today)
-    fees_applicable = self.applicable(loan_ids, {:date => date}).group_by{|x| x.loan_id}
-    fees_paid       = self.paid(loan_ids, {:date => date})
+  # returns any due fee for a list of ids and applicable type. Additional params can be provided by hash 
+  def self.due(ids, hash={}, applicable_type = 'Loan')
+    fees_applicable = self.applicable(ids, hash, applicable_type).group_by{|x| x.applicable_id}
+    fees_paid       = self.paid(ids, hash, applicable_type)
     fees = {}
-    loan_ids.each{|lid|
+
+    ids.each{|lid|
       applicable = fees_applicable[lid].first if fees_applicable.key?(lid) and fees_applicable[lid].length>0
-      next if not applicable
+      next unless applicable
       paid      = fees_paid.key?(lid) ? fees_paid[lid] : 0
       fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable.to_f : 0), paid, ((applicable ? applicable.fees_applicable : 0) - paid).to_i)
     }

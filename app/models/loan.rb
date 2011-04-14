@@ -1,5 +1,6 @@
 class Loan
   include DataMapper::Resource
+  include FeesContainer
 
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
@@ -499,60 +500,6 @@ class Loan
     else
       nil
     end
-  end
-
-  def total_fees_due
-    total_fees_due = fee_schedule.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
-  end
-
-  def total_fees_paid
-    payments(:type => :fees, :loan_id.not => nil).sum(:amount) || 0
-  end
-
-  def total_fees_payable_on(date = Date.today)
-    # returns one consolidated number
-    _total_fees_due = fee_schedule.select{|k,v| k <= date}.to_hash.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
-    _total_fees_due - total_fees_paid
-  end
-
-  def fees_payable_on(date = Date.today)
-    # returns a hash of fee type and amounts
-    scheduled_fees = fee_schedule.reject{|k,v| k > date}.values.inject({}){|s,x| s+=x}
-    #scheduled_fees = schedule.size > 0 ? schedule.inject({}){|s,x| s+={x.keys.first.downcase => x.values.first}}.to_hash : {}
-    (scheduled_fees - (fees_paid.reject{|k,v| k > date}.values.inject({}){|s,x| s+=x})).reject{|k,v| v<=0}
-  end
-
-  def fees_paid
-    @fees_payments = {}
-    payments(:type => :fees, :order => [:received_on], :amount.gt => 0).each do |p|
-      @fees_payments += {p.received_on => {p.fee => p.amount}}
-    end
-    @fees_payments
-  end
-
-  def fees_paid?
-    total_fees_paid >= total_fees_due
-  end
-
-  def fee_schedule
-    @fee_schedule = {}
-    klass_identifier = "loan"
-    loan_product.fees.each do |f|
-      type, *payable_on = f.payable_on.to_s.split("_")
-      date = send(payable_on.join("_")) if type == klass_identifier
-      if date.class==Date
-        @fee_schedule += {date => {f => f.fees_for(self)}} unless date.nil?
-      elsif date.class==Array
-        date.each{|date|
-          @fee_schedule += {date => {f => f.fees_for(self)}} unless date.nil?
-        }
-      end
-    end
-    @fee_schedule
-  end
-
-  def fee_payments
-    @fees_payments = {}
   end
 
   def payment_schedule
