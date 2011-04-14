@@ -315,7 +315,9 @@ class Loan
     else
       raise ArgumentError.new("Strange period you got..")
     end
-    if cl=self.client(:fields => [:id, :center_id]) and cen=cl.center and cen.meeting_day != :none and ensure_meeting_day
+    
+    # take care of date changes in weekly schedules
+    if [:weekly, :biweekly, :quadweekly].include?(installment_frequency) and cl=self.client(:fields => [:id, :center_id]) and cen=cl.center and cen.meeting_day != :none and ensure_meeting_day
       unless new_date.weekday == cen.meeting_day_for(new_date)
         # got wrong val. recalculate
         next_date = cen.next_meeting_date_from(new_date)
@@ -719,21 +721,23 @@ class Loan
   def number_of_installments_before(date)
     return 0 if date < scheduled_first_payment_date
     result = case installment_frequency
-      when  :daily
-      then  (date - scheduled_first_payment_date).to_f.floor + 1
-      when  :weekly
-      then  ((date - scheduled_first_payment_date).to_f / 7).floor + 1
-      when  :biweekly
-      then  ((date - scheduled_first_payment_date).to_f / 14).floor + 1
-      when  :quadweekly
-      then  ((date - scheduled_first_payment_date).to_f / 28).floor + 1
-      when  :monthly
-      then  count = 1
-            count += 1 while shift_date_by_installments(date, -count) >= scheduled_first_payment_date
-            count
-      else
-        raise ArgumentError.new("Strange period you got..")
-    end
+             when  :daily
+             then  (date - scheduled_first_payment_date).to_f.floor + 1
+             when  :weekly
+             then  ((date - scheduled_first_payment_date).to_f / 7).floor + 1
+             when  :biweekly
+             then  ((date - scheduled_first_payment_date).to_f / 14).floor + 1
+             when  :quadweekly
+             then  ((date - scheduled_first_payment_date).to_f / 28).floor + 1
+             when  :monthly
+             then  count = 1
+               while shift_date_by_installments(date, -count) >= scheduled_first_payment_date and count < number_of_installments
+                 count += 1
+               end
+               count
+             else
+               raise ArgumentError.new("Strange period you got..")
+             end
     [result, number_of_installments].min  # never return more than the number_of_installments
   end
 
