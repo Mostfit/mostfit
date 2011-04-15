@@ -111,6 +111,7 @@ class Centers < Application
     @center = Center.get(id)
     raise NotFound unless @center
     @center.attributes = center
+
     if @center.save
       redirect(params[:return]||resource(@center), :message => {:notice => "Center '#{@center.name}' has been successfully edited"})
     else

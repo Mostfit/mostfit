@@ -6,6 +6,7 @@ class Application < Merb::Controller
   before :add_collections, :only => [:index, :show]
   
   @@controllers  = ["regions", "area", "branches", "centers", "clients", "loans", "payments", "staff_members", "funders", "portfolios", "funding_lines"]
+  @@dependant_deletable_associations = ["history", "loan_history", "audit_trails", "attendances", "portfolio_loans", "postings", "credit_account_rules", "debit_account_rules", "center_meeting_days"]
 
   def ensure_password_fresh
     if session.key?(:change_password) and session[:change_password] and not params[:action] == "change_password"
@@ -103,7 +104,7 @@ class Application < Merb::Controller
     # add child definitions to children; For loan model do not add history
 
     children = model.relationships.find_all{|x|
-      if x[1].class==DataMapper::Associations::OneToMany::Relationship and not x[0]=="history" and not x[0]=="loan_history" and not x[0]=="audit_trails" and not x[0]=="attendances" and not x[0]=="portfolio_loans" and not x[0] == "postings" and not x[0] == "credit_account_rules" and not x[0] == "debit_account_rules"
+      if x[1].class==DataMapper::Associations::OneToMany::Relationship and not @@dependant_deletable_associations.include?(x[0])
         x[0]
       end
     }
