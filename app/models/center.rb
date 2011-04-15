@@ -6,6 +6,7 @@ class Center
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   after :save, :handle_meeting_date_change
   before :create, :set_meeting_change_date
+  before :valid?, :convert_blank_to_nil
 
   property :id,                   Serial
   property :name,                 String, :length => 100, :nullable => false, :index => true
@@ -236,6 +237,14 @@ class Center
       end
     end
     return number
+  end
+
+  def convert_blank_to_nil
+    self.attributes.each{|k, v|
+      if v.is_a?(String) and v.empty? and self.class.properties.find{|x| x.name == k}.type==Integer
+        self.send("#{k}=", nil)
+      end
+    }
   end
 
 end
