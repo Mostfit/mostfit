@@ -100,7 +100,7 @@ module DataEntry
         @loan_product = LoanProduct.get(params[:loan_product_id])
         raise NotFound unless @loan_product
 
-        klass = Kernel::const_get(@loan_product.loan_type_string)
+        klass = Kernel::const_get(@loan_product.loan_type_string || @loan_product.loan_type)
         @loan = klass.new
         
         @branch = @center.branch

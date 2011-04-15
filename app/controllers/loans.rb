@@ -61,7 +61,7 @@ class Loans < Application
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     loan_product = LoanProduct.is_valid(params[:loan_product_id])
     raise BadRequest unless loan_product
-    statuses = []
+    loans = statuses = []
 
     # create loans for all the clients
     Loan.transaction do |t|
@@ -69,13 +69,10 @@ class Loans < Application
         attrs[:client_id] = client_id.to_i
         @loan = klass.new(attrs)
         @loan.loan_product  = loan_product
-        unless @loan.save
-          statuses.push(false)
-          t.rollback
-        else
-          statuses.push(true)
-        end
+        loans.push(@loan)
       }
+      statuses = loans.map{|l| l.save}
+      t.rollback if statuses.include?(false)
     end
     
     if not statuses.include?(false)
