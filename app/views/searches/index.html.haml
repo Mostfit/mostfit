@@ -1,9 +1,9 @@
-%div{:class => (@floating ? "floatingBox" : "")}
+%div{:class => (@floating ? "floatingBox" : ""), :style => "max-width: 80%"}
   - if @floating
     %a.closeButton
       [close]
   - atleast_one = false
-  -[["branches", [:name, :manager]], ["centers", [:name, :manager]], ["clients", [:name, :center]], ["client_groups", [:name, :center]], ["loans", [:client, :amount]], ["staff_members", [:name]]].each do |model, functions|
+  - [["branches", [:name, :manager]], ["centers", [:name, :manager]], ["clients", [:name, :center]], ["client_groups", [:name, :center]], ["loans", [:client, :amount]], ["staff_members", [:name]], ["bookmarks",[:name]]].each do |model, functions|
     -objects = instance_variable_get("@#{model}")
     -if objects and count = objects.length and count > 0
       - atleast_one = true
@@ -22,14 +22,18 @@
           -objects[0..last].each do |obj|
             %tr
               %td
-                =obj.id
+                = obj.id
               -functions.each do |function|
                 %td
                   - field = obj.send(function)
                   - if function == :manager or function == :center
-                    =link_to(field.name, resource(field))
+                    = link_to(field.name, resource(field))
+                  - elsif model.to_sym == :bookmarks
+                    - if obj.method==:get
+                      - route = YAML::load(obj.route).last
+                      = link_to obj.name, url(route)
                   - else
-                    =link_to(field.respond_to?(:name) ? field.name : field, "/#{model}/#{obj.id}")
+                    = link_to(field.respond_to?(:name) ? field.name : field, "/#{model}/#{obj.id}")
         - if @floating and count > 10
           %tr
             %td

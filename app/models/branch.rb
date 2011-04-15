@@ -86,6 +86,11 @@ class Branch
   def location
     Location.first(:parent_id => self.id, :parent_type => "branch")
   end
+
+  def self.for_staff_member(staff_member)
+    Branch.all(:manager => staff_member) or Center.all(:manager => staff_member).branches
+  end
+
   
   private
   def manager_is_an_active_staff_member?
@@ -104,5 +109,6 @@ class Branch
   def <=> (other)
     @name <=> other.name
   end
+
 
 end

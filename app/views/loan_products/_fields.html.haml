@@ -13,8 +13,8 @@
   %tr
     %th
       Loan Type
-    %td
-      = select :loan_type, :collection => Loan.descendants.map{|f| [f, f.respond_to?(:display_name) ? f.display_name : f.to_s.snake_case.camelcase(' ')]}
+    %td{:colspan => 2}
+      = select :loan_type_string, :collection => Loan.descendants.map{|f| [f, f.respond_to?(:display_name) ? f.display_name : f.to_s.snake_case.camelcase(' ')]}
   %tr
     %th
       Valid from
@@ -25,7 +25,13 @@
       Valid upto
     %td
       = date_select_for @loan_product, :valid_upto
-  
+  %tr
+    %th
+      Link to an insurance policy ?
+    %td
+      = check_box :linked_to_insurance, :checked => @loan_product.linked_to_insurance, :onchange => "$('#insurance_product_selector').toggle()"
+    %td#insurance_product_selector{:style => ((@loan_product.linked_to_insurance) ? "display: block" : "display: none")}
+      = select :insurance_product_id, :collection => InsuranceProduct.all.map{|ip| [ip.id, ip.name]}, :prompt => "any product"
 %h2 Fees
 - Fee.all.each do |fee|
   = check_box :name => "fees[#{fee.id}]", :checked => @loan_product.fees.include?(fee)

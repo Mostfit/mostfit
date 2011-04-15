@@ -42,3 +42,27 @@
       = select :branch_id, :collection => Branch.all(:id.not => @branch.id).map{|b| [b.id, b.name]}, :prompt => "Select branch"
       = hidden_field :parent_branch_id, :value => @branch.id
       = submit "Create"
+- unless @accounts
+  %hr
+  %div.box
+    %h1
+      %a{:class => "_remote_", :href => url(:account_types), :id => "account_types"}
+        Account types
+    #container_account_types
+  %br
+- unless @accounts
+  %hr
+  %div.box
+    %h1
+      %a{:class => "_remote_", :href => url(:accounting_periods), :id => "periods"}
+        Accounting periods
+    #container_periods
+  %br
+- unless @accounts
+  %hr
+  %div.box
+    %h1
+      %a{:class => "_remote_", :href => url(:controller =>  :journals, :action => :tally_download), :id => "tally"}
+        Tally download
+    #container_tally
+  %br

@@ -14,6 +14,7 @@
   by client
   = link_to "<i>#{@client.name}</i>", resource(@branch, @center, @client)
 - @history = @loan.loan_history
+
 %table.narrow.form{ :style => 'width : 50%' }
   %tr.odd
     %td{ :width => '30%' } Amount disbursed
@@ -111,7 +112,7 @@
       - @loan.loan_product.fees.each do |f|
         = f.description
         %br
-  %tr
+  %tr.odd
     %td
       Fees paid
     %td
@@ -132,10 +133,12 @@
   %ul.tabs
     %li#repayment_schedule Repayment Schedule
     %li#repayments_made Repayments made
+    - if @loan.insurance_policy
+      %li#insurance Insurance policy
     %li#audit Audits
     %li#misc Miscellaneous
     %li#history History
-
+    
   %div.tab
     %h2== Repayment schedule
     %table.narrow.form{ :width => '100%' }
@@ -188,19 +191,22 @@
                 == #{lh.principal_paid.to_currency} principal + #{lh.interest_paid.to_currency} interest
           %td
             - if lh.date <= Date.today
+              - default =  lh.actual_outstanding_total - lh.scheduled_outstanding_total
               %b
-                %span{ :class => (lh.amount_in_default > 0 ? 'red' : 'green') }
-                  = lh.amount_in_default.to_currency
+                %span{:class => (default > 0 ? 'red' : (default < 0 ? 'blue' : 'green')) }
+                  = default.to_currency
               %br/
               %span.greytext
-                %span{ :class => (lh.amount_in_default > 0 ? 'red' : 'green') }
-                  = format("%.0f%", (lh.amount_in_default.abs.to_f / @loan.total_to_be_received) * 100)
-                = lh.amount_in_default <= 0 ? 'overpaid' : 'shortfall'
+                = format("%.0f%", (default.abs.to_f / @loan.total_to_be_received) * 100)
+                = default <= 0 ? 'overpaid' : 'shortfall'
       %tfoot
         %tr
           %td{ :colspan => 7 }
   %div.tab
-    =partial "payments/list"
+    = partial "payments/list"
+  - if @loan.insurance_policy
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => resource(@loan.insurance_policy)}
   %div.tab 
     %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :model => "Loan", :id => @loan.id)}
   %div.tab

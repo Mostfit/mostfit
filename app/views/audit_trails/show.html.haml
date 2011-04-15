@@ -48,11 +48,14 @@
         - else
           = "#{trail.auditable_id} [deleted]"
       %td.text
-        = trail.action
+        %span{:class => get_status_class([:delete, :create, :update].index(trail.action))}
+          = trail.action
       %td
         = trail.created_at.strftime("%d-%m-%Y %H:%M")
       %td.text
-        %table{:width => '100%'}
+        %a.expand_collapsed{:id => idx}
+          Show diff
+        %table.collapsed{:id => "element_#{idx}", :width => '100%'}
           =diff_display(trail.changes, obj, trail.action)
       %td
         = trail.user ? trail.user.login : "admin"

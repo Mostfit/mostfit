@@ -8,12 +8,17 @@
     %td
       Rule begin date 
     %td
-      = date_select_for @rule_book, :from_date, :nullable => false, :min_date => Date.today-365, :max_date => Date.today+365
+      = date_select_for @rule_book, :from_date, :nullable => false, :min_date => Date.min_date, :max_date => Date.max_date
   %tr
     %td
       Rule end date 
     %td
-      = date_select_for @rule_book, :to_date, :nullable => false, :min_date => Date.today-365, :max_date => Date.today+(2*365)
+      = date_select_for @rule_book, :to_date, :nullable => false, :min_date => Date.min_date, :max_date => Date.today + 365 * 5
+  %tr
+    %td
+      Journal type 
+    %td
+      = select :journal_type_id, :collection => JournalType.all.map{|jt| [jt.id, jt.name]}, :prompt => "Select journal type"
   %tr
     %td
       Active:
@@ -23,9 +28,9 @@
     %td
       Action
     %td
-      - options = (RuleBook::ACTIONS.map { |x| [x.to_s, x.to_s.capitalize] })
-      =select :action, :collection => options, :prompt => "Select action"
-  %tr#fees_row
+      - options = (RuleBook::ACTIONS.map { |x| [x.to_s, x.to_s.camelcase(' ').capitalize] })
+      = select :action, :collection => options, :prompt => "Select action", :onchange => "if($(this).val()==='fees'){$('#fees_row').css('display', 'block');}else{$('#fees_row').css('display', 'none')}"
+  %tr#fees_row{:style => "display: none"}
     %td
       Fee Type: 
     %td

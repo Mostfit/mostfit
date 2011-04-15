@@ -2,15 +2,15 @@
 %div{:style => "float: right;"}
   %a{:onclick => "$('#form_for_bookmark_saving').toggle();", :href => "#"}
     ="Save this #{(type==:custom_report ? 'report' : 'page')}"
-  = form_for(@bookmark, :action => resource(:bookmarks), :class => "_remote_", :style => "display: none;", :id => "form_for_bookmark_saving") do  
-    %div.floatingBox{:style => "position: absolute; right: 150px;"}
-      %a.closeButton
-        [x]
+  %div.floatingBox#form_for_bookmark_saving{:style => "position: absolute; right: 150px; display: none;"}
+    %a.closeButton{:hre => ""}
+      [x]
+    = form_for(Bookmark.new, :action => resource(:bookmarks), :class => "_remote_") do  
       Save as
-      %input{:type => "text", :name => "bookmark[name]",     :value => name, :size => 50}
-      %input{:type => "hidden", :name => "bookmark[title]",  :value => page_title}
-      %input{:type => "hidden", :name => "bookmark[method]", :value => request.method}
-      %input{:type => "hidden", :name => "bookmark[route]",  :value => @route.to_yaml}
-      %input{:type => "hidden", :name => "bookmark[type]",   :value => bookmark_type}
-      %input{:type => "hidden", :name => "bookmark[params]", :value => request.raw_post}
-      =submit "Save"
+      = text_field :name, :value => name
+      = hidden_field :title, :value => page_title
+      = hidden_field :method, :value => request.method
+      = hidden_field :route, :value => @route.to_yaml
+      = hidden_field :type, :value => bookmark_type
+      = hidden_field :params, :value => request.raw_post
+      = submit "Save"

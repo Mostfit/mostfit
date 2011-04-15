@@ -8,7 +8,7 @@
     %td
       Insurance company
     %td
-      =select :insurance_company_id, :collection => InsuranceCompany.all.map{ |x| [x.id, x.name]}, :prompt => "Select company"
+      = select :insurance_company_id, :collection => InsuranceCompany.all.map{ |x| [x.id, x.name]}, :prompt => "Select company"
 
 %h2 Applicable Fees
 - fees_for_insurance = Fee.fees_for_insurance_products(Fee.all)

@@ -1,18 +1,26 @@
 // Common JavaScript code across your application goes here.
 var lineNos=0;
-function addFloater(link){
-    if($(".floater").length>0){
-	$(link).after("<div class='floater'><img height='400' src="+link.attr('href')+"/><span class='close_button'>X</span></div>");
-	$(".close_button").click(function(button){
-				     $("div.floater").remove();
-				 });
-    }
-    if($(".closeButton").length>0){
-	$(".closeButton").click(function(){
-				    $(".floatingBox").remove();
-				});
+function addFloater(link, form){
+    if($(".floatingBox").length>0 && link){
+	if(window.document.width > link.offset().left + link.width() + form.width()){
+	    var left = link.offset().left + link.width();
+	}else{
+	    var left =  link.width() + link.offset().left - form.width();
+	}
+	if((window.document.height > form.offset().top + form.height()) && !$(".floatingBox").hasClass("shiftUp")){
+	    var top = link.offset().top + link.height();
+	}else{
+	    var top = link.offset().top - form.height();
+	}
+	$(form).offset({top: top, left: left});	
     }
 
+    if($(".floater").length>0){
+	$(link).after("<div class='floater'><img height='400' src="+link.attr('href')+"/><span class='close_button'>X</span></div>");
+	$(".close_button").live('click', function(button){
+				    $("div.floater").remove();
+				});
+    }
 }
 function spitLogs(){
     $.get("/logs/"+$("div.log_box").attr("id"), function(data){
@@ -184,6 +192,7 @@ function attachFormRemote(){
 				form=$(f.currentTarget);
 				$(form).find("input[type='submit']").attr("disabled", true);
 				$(form).after("<img id='spinner' src='/images/spinner.gif' />");
+				$(".floatingBox").remove();
 				$.ajax({
 					   type: form.attr("method"),
 					   url: form.attr("action"),
@@ -194,7 +203,7 @@ function attachFormRemote(){
 					       }else if(form.find("input[name='_target_']").length>0){
 						   id=form.find("input[name='_target_']").attr("value");
 						   if($("#"+id).length>0){
-						       $("#"+id).html(data);						       
+						       $("#" + id).html(data);				       
 						   }
 						   else if($("#append_"+id).length>0){
 						       $(data).appendTo($("#append_"+id));
@@ -204,7 +213,8 @@ function attachFormRemote(){
 					       }else if(form.find("div").length>0){
 						   form.find("div").html(data);
 					       }
-					       addFloater("");
+					       if($(".floatingBox").length>0)
+						   addFloater($(form), $($(".floatingBox")[0]));
 					       $(form).find("input[type='submit']").attr("disabled", "");
 					       $("#spinner").remove();
 					   },
@@ -224,455 +234,455 @@ function attachFormRemote(){
 			    });
 }
 function create_remotes(){
-	$("a._remote_").live('click', function(){			     
-				 href=$(this).attr("href");
-				 method="GET";
-				 if($(this).hasClass("self")){
-				     href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
-				     method="POST";
-				 }
-				 a=$(this);
-				 a.after("<img id='spinner' src='/images/spinner.gif'/>");      
-				 $.ajax({
-					    type: method,
-					    url: href,
-					    success: function(data){
-						if($(a).attr("id") && $("#container_"+$(a).attr("id")).length>0){
-						    $("#container_"+$(a).attr("id")).html(data);
-						}else if($(a).attr("id") && $("#after_"+$(a).attr("id")).length>0){
-						    $("#after_"+$(a).attr("id")).after(data);
-						}else if($(a).attr("id") && $("#"+$(a).attr("id")).length>0){
-						    $("#"+$(a).attr("id")).html(data);
-						}else{
+    $("a._remote_").live('click', function(){			     
+			     href=$(this).attr("href");
+			     method="GET";
+			     if($(this).hasClass("self")){
+				 href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+				 method="POST";
+			     }
+			     a=$(this);
+			     a.after("<img id='spinner' src='/images/spinner.gif'/>");      
+			     $.ajax({
+					type: method,
+					url: href,
+					success: function(data){
+					    if($(a).attr("id") && $("#container_"+$(a).attr("id")).length>0){
+						$("#container_"+$(a).attr("id")).html(data);
+					    }else if($(a).attr("id") && $("#after_"+$(a).attr("id")).length>0){
+						$("#after_"+$(a).attr("id")).after(data);
+					    }else if($(a).attr("id") && $("#"+$(a).attr("id")).length>0){
+						$("#"+$(a).attr("id")).html(data);
+					    }else{
+						$(a).after(data);
+						$(a).remove();
+					    }
+					    floatHeaders();
+					    $("#spinner").remove();
+					},
+					error: function(xhr, text, errorThrown){
+					    txt = "<div class='error'>"+xhr.responseText+"</div>";
+					    $(a).after(txt);
+					    $("#spinner").remove();
+					}
+				    });
+			     return false;
+			 });
+    
+    $("a._customreports_").click(function(){
+				     href=$(this).attr("href");
+				     method="GET"
+				     if($(this).hasClass("self")){
+					 href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+					 method="POST"
+				     }
+				     a=$(this);
+				     $.ajax({
+						type: "POST",
+						url: href,
+						success: function(data){
 						    $(a).after(data);
 						    $(a).remove();
+						    attachCustomTableEvents();
+						},
+						error: function(xhr, text, errorThrown){
+						    txt = "<div class='error'>"+xhr.responseText+"</div>"
+						    $(a).after(txt);
 						}
-						floatHeaders();
-						$("#spinner").remove();
-					    },
-					    error: function(xhr, text, errorThrown){
-						txt = "<div class='error'>"+xhr.responseText+"</div>";
-						$(a).after(txt);
-						$("#spinner").remove();
-					    }
-					});
-				 return false;
+					    });
+				     return false;
+				 });
+    $('.confirm_click').each(function(idx, link){
+				 $(link).unbind();
+				 $(link).click(function(event) {
+						   link = event.currentTarget;
+						   str  = $(link).attr("title") || 'Are you sure?';
+						   var answer = confirm(str);
+						   return answer;
+					       });
 			     });
-	
-	$("a._customreports_").click(function(){
-					 href=$(this).attr("href");
-					 method="GET"
-					 if($(this).hasClass("self")){
-					     href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
-					     method="POST"
-					 }
-					 a=$(this);
+}
+function attachReportingFormEvents(id){
+    $("#reporting_form tr#"+id+" select").change(function(){
+						     if($(this).attr("class")=="more")
+							 return;
+						     var types = ["model", "property", "operator", "span"];
+						     id = $(this).attr("id");
+						     name = $(this).attr("name").split(/\[/)[0];
+						     counter = $(this).attr("name").split(/\[/)[1].split("]")[0];
+						     
+						     $(this).find("option:selected").each(function(){
+											      if(name!="value"){
+												  for(i=types.indexOf(name)+1; i<=types.length; i++){
+												      $("#reporting_form select#"+types[i]+"_"+counter).html("");
+												  }
+											      }
+											      nextType = types[types.indexOf(id.split('_')[0])+1];
+											      $.ajax({
+													 url: "/search/get?counter="+counter+"&"+$("#reporting_form").serialize(),
+													 success: function(data){
+													     if(nextType==="span"){
+														 $("#reporting_form span#"+nextType+'_'+counter).html(data);
+													     }else{
+														 $("#reporting_form select#"+nextType+'_'+counter).html("");
+														 $("#reporting_form select#"+nextType+'_'+counter).append(data);
+													     }
+													 }
+												     });
+											  });
+						 });
+    $("#reporting_form tr#"+id+" select.more").change(function(){
+							  var type = $(this);
+							  var counter = parseInt($(this).attr("name").split(/\[/)[1].split("]")[0]);
+							  if($("#reporting_form select#model_"+counter).length>0){
+							      model=$("#reporting_form select#model_"+counter).val();
+							  }else if($("#reporting_form input#model_"+counter).length>0){
+							      model=$("#reporting_form input#model_"+counter).attr("value");
+							  }else{
+							      model=$("#reporting_form select#model_1").val();
+							  }
+							  $.ajax({
+								     url: "/search/reporting?counter="+(counter+1)+"&model="+model+"&more="+type.val(),
+								     success: function(data){
+									 $("tr#formdiv_"+(counter+1)).unbind().remove();
+									 $("tr#formdiv_"+(counter)).after(data);
+									 attachReportingFormEvents("formdiv_"+(counter+1));
+								     }
+								 });
+						      });
+}
+
+//For Rules Engine
+total_fields = 0;
+total_conditions = 0;
+
+//For Rules Engine
+function cleanUpFields(type, id) {//used in rules form
+    for(i=Number(id)+1; i<total_fields; i++) {
+	$("#"+type+"_select_"+i).remove();
+	$("#"+type+"_selectcomparator_"+i).remove();
+	$("#"+type+"_selectbinaryoperator_"+i).remove();
+	$("#"+type+"_selectboolean_"+i).remove();
+	$("#"+type+"_selectvalue_"+i).remove();
+	$("#"+type+"_selectmore_"+i).remove();
+	$("#"+type+"_textfield_"+i).remove();
+	$("#"+type+"_date_"+i).datepicker("destroy");
+	$("#"+type+"_date_"+i).remove();
+	$("#"+type+"_hidden_"+i).remove();
+    }
+}
+
+//For Rules Engine
+function attachRulesFormEvents(type, id) {//type = {"condition", "precondition"}
+    if(id == 0) {
+	$("#select_0"/*name of the model*/).change(function() {
+	  					       $.ajax({
+		  						  url: "/rules/get?id=1"+"&type="+type+"&for="+document.getElementById("select_0").value+"&condition_id=1&variable_id=1&return_only_models=true",
+								  success: function(data){
+								      $("#"+type+"_select_1").replaceWith(data);
+								      cleanUpFields(type,1);
+								      attachRulesFormEvents(type,1);
+								  }
+  							      });
+						   });
+    }
+    
+    $("#"+type+"_select_"+id).change(function() {
+					 //      alert("called")
+					 if(id+1> total_fields)
+					     total_fields = id+10;//delete some more fields than id+1 since sometimes more than 1 field is returned per request(there is no harm is deleting extra fields anyways)
+					 if(id == 0)
+					     return;//special case to handle that
+					 parent_div_id = document.getElementById(type+"_select_"+id).parentNode.id;//it is of type c1v2=> condition 1, variable 2
+					 condition_id = Number(parent_div_id.substr(1,1));//now this is with assumption that condition_id is single digit (can there be more than 9 conditions ever? if that happens this code fails)
+					 variable_id = Number(parent_div_id.substr(3,1));//since we have only two variables per condition, variable_id will be single digit
+					 prev_field = document.getElementById(type+"_select_"+(Number(id)-1));
+					 if(prev_field == null)//this happens for first select of every extra condition
+					     prev_field = document.getElementById("select_0");
 					 $.ajax({
-						    type: "POST",
-						    url: href,
-						    success: function(data){
-							$(a).after(data);
-							$(a).remove();
-							attachCustomTableEvents();
-						    },
-						    error: function(xhr, text, errorThrown){
-							txt = "<div class='error'>"+xhr.responseText+"</div>"
-							$(a).after(txt);
+						    url: "/rules/get?for="+document.getElementById(type+"_select_"+id).value+
+							"&type="+type+
+							"&id="+(Number(id)+1)+"&prev_field="+prev_field.value+
+							"&condition_id="+condition_id+/*name of div boxes are c1v1, c2v1 ... where the firstnumber refers to condition_id and second to variable number local to that condition*/
+						    "&variable_id="+variable_id+
+							"&return_only_models=true"
+						    ,success: function(data) {
+							cleanUpFields(type,id);
+							$("#"+type+"_select_"+id).after(data);
+							if(data.indexOf("<select") != -1) {
+							    attachRulesFormEvents(type,Number(id)+1);
+							}
+							if(data.indexOf("selectmore_") != -1)
+							    attachRulesFormEventsForSelectMoreField(type, Number(id)+3, condition_id);
+							//alert(data);
+							return true;
 						    }
 						});
-					 return false;
+					 return true;
 				     });
-	$('.confirm_click').each(function(idx, link){
-				     $(link).unbind();
-				     $(link).click(function(event) {
-						       link = event.currentTarget;
-						       str  = $(link).attr("title") || 'Are you sure?';
-						       var answer = confirm(str);
-						       return answer;
-						   });
+}
+
+//For Rules Engine
+function getDiv(divId, div_container) {
+    div1 = document.getElementById(divId);
+    if(div1 != null)
+        return div1;
+    
+    div1 = document.createElement('div');
+    div1.id = divId;
+    div_container.appendChild(div1);
+    return div1;
+}
+
+//For Rules Engine
+function attachRulesFormEventsForSelectMoreField(type, id, condition_id) {
+    condition_id = Number(condition_id)+1; //tis generates the new condition id whichwe are going to add
+    $('#'+type+'_selectmore_'+id).change(function() {
+					     //alert(id+" "+condition_id);
+					     val = document.getElementById(type+"_selectmore_"+id).value;
+					     //alert(val);
+					     if((val == "and") || (val == "or")) {
+						 var div1;
+						 if(type == "condition")
+						     div1 = getDiv("c"+condition_id, document.getElementById("conditions_container"));
+						 else {
+						     div1 = getDiv("p"+condition_id, document.getElementById("preconditions_container"));
+						 }
+						 //new_select = document.getElementById(type+"_select_1").cloneNode(true);
+						 //new_select.id = type+"_select_"+(Number(id)+1);
+						 //new_select.name = "rule["+type+"]["+(Number(condition_id)+1)+"][keys][]";
+						 variable_id = 1;
+						 new_variable_field = document.getElementById(type+"_1_variable_1").cloneNode(true);
+						 new_variable_field.id = type+"_"+condition_id+"_variable_"+variable_id;
+						 new_variable_field.name = "rule["+type+"]["+condition_id+"][variable]["+variable_id+"][complete]";
+						 div1.innerHTML="";
+						 div1.appendChild(new_variable_field);
+						 //div1.appendChild(new_select);
+						 div1.innerHTML += "<a onclick=\"javascript:this.parentNode.innerHTML=''\">Remove</a>";
+						 if(condition_id>total_conditions)
+						     total_conditions = condition_id;
+						 createVariableSelectionDiv(type, id+2, condition_id, variable_id);
+						 attachRulesFormEventsForVariableField(type, condition_id, variable_id);
+					     }
+					 });
+}
+
+//for Rules Engine
+function createVariableSelectionDiv(type, id, condition_id, variable_id) {
+    //id will be the id of new select field to be inserted
+    div_id = type[0]+condition_id+"v"+variable_id;
+    if($("#"+div_id).length == 0) {//div does not exist
+	//alert("creating new div:"+div_id);
+	div1 = document.createElement('div');
+	div1.id = div_id;
+	new_select = document.getElementById(type+"_select_1").cloneNode(true);
+	new_select.id = type+"_select_"+(id);
+	new_select.name = "rule["+type+"]["+condition_id+"][variable]["+variable_id+"][keys][]";
+	if(variable_id>1) {
+	    nilOption = document.createElement("option");
+	    nilOption.value = "0";
+	    nilOption.appendChild(document.createTextNode("0"));
+	    new_select.appendChild(nilOption);
+	}
+	div1.innerHTML = "<b>Condition "+condition_id+" Variable "+variable_id+"</b>";
+	div1.appendChild(new_select);
+	div1.innerHTML += "<a onClick=\"javascript:this.parentNode.style.display='none';fillVariableField('"+type+"',"+condition_id+", "+variable_id+");\"><b>Done</b></a>";
+	div1.style.display = "none";
+	document.getElementById(type[0]+condition_id).appendChild(div1);
+    }
+}
+
+//type is either condition or precondition
+function attachRulesFormEventsForVariableField(type, condition_id, variable_id) {
+    $("#"+type+"_"+condition_id+"_variable_"+variable_id).click( function(event) {
+								     document.getElementById(type[0]+condition_id+"v"+variable_id).style.display = "block";
+								 });
+}
+
+//for rules engine
+function fillVariableField(type, condition_id, variable_id) {
+    children = $(("#"+type[0])+condition_id+"v"+variable_id+" select")
+    str = children[0].value;
+    for(var i=1; i<children.length; i++)
+	str += "."+children[i].value;
+    $("#"+type+"_"+condition_id+"_variable_"+variable_id).attr("value", str);
+    parent_div = $("#"+type+"_"+condition_id+"_variable_"+variable_id).parent();
+
+    last_accessed_id = children[children.length-1].id;//id of the last children
+    //alert("445:"+last_accessed_id);
+    id = Number(last_accessed_id.substring(last_accessed_id.indexOf("_select_")+"_select_".length));//this extracts out the id number at the end
+    for_field = document.getElementById(type+"_select_"+id);
+    for_field_value = for_field.value;
+    prev_field = document.getElementById(type+"_select_"+(id-1));
+    if(prev_field == null)//this happens for first select of every extra condition
+	prev_field = document.getElementById("select_0");
+    single_variable_mode = 0;
+    if(for_field_value == "0" ) {//this handles the case when second variable has been selected to be 0(nil), in that case, we will try to return the value of two fields prior to this (since between these two there is a select field wil binaryoperator)
+	for_field_value = document.getElementById(type+"_select_"+(id-2)).value;
+	single_variable_mode = 1;
+    }
+
+
+    $.ajax({
+	       url: "/rules/get?for="+for_field_value+
+		   "&type="+type+
+		   "&id="+(Number(id)+1)+"&prev_field="+prev_field.value+
+		   "&condition_id="+condition_id+/*name of div boxes are c1v1, c2v1 ... where the firstnumber refers to condition_id and second to variable number local to that condition*/
+	       "&variable_id="+variable_id+
+		   "&single_variable_mode="+single_variable_mode+
+		   "&return_only_models=false"
+	       ,success: function(data) {
+		   //alert("cleaning up from"+id);
+		   //alert("11#"+type+"_"+condition_id+"_variable_"+(Number(variable_id)+1));
+		   cleanUpFields(type,id);
+		   $("#"+type+"_"+condition_id+"_variable_"+(Number(variable_id)+1)).remove();
+		   $("#"+type[0]+condition_id+"v"+(Number(variable_id)+1)).remove();
+		   $("#"+type+"_"+condition_id+"_variable_"+variable_id).after(data);
+		   if(data.indexOf("<select") != -1)
+		       attachRulesFormEvents(type,Number(id)+1);
+		   if(data.indexOf("selectmore_") != -1)
+		       attachRulesFormEventsForSelectMoreField(type, Number(id)+3, condition_id);
+		   if(data.indexOf("_variable_") != -1) {
+		       createVariableSelectionDiv(type, id+2, condition_id, Number(variable_id)+1);
+		       attachRulesFormEventsForVariableField(type, condition_id, Number(variable_id)+1);
+		       attachRulesFormEvents(type, id+2);
+		   }
+		   //alert(data);
+		   return true;
+	       }
+	   });
+}
+
+
+MAX_COLS = 20;
+function attachCustomTableEvents(){
+    $("#reporting_form #customtable .checkbox").click(function() {
+							  var arr=[];
+							  $("#customtable tr select").each(function(idx, select){
+											       if($(select).css("display")!="none")
+												   arr.push(parseInt($(select).val()));
+											   });
+							  var total_cols = arr.sort()[arr.length - 1];
+							  var type = $(this);
+							  selected_field = window.document.getElementById(this.id.replace("fields","precedence"));
+							  if(selected_field == null)
+							      return;
+							  if(total_cols >= MAX_COLS)
+							      return;
+							  if(selected_field.style.display == "none") {
+							      selected_field.style.display = "block";
+							      selected_field.selectedIndex = total_cols;
+							      total_cols++;
+							  }else{
+							      selected_field.style.display = "none";
+							      total_cols--;
+							  }
+						      });
+}
+
+function confirm_for(things) {
+    /* given a hash of ids and values, this function asks a confirmation to proceed if the values of the elements
+     * are not the same as the provided values
+     */
+    errors = [];
+    for (thing in things) {
+	if (($('#'+thing).val() != (things[thing] + "")) && $('#' + thing).val() != null) {
+	    errors.push(thing);
+	}
+    }
+    if (errors.length > 0) {
+	return confirm(errors.join(",") + " are not the standard value. Proceed?");
+    } else {
+	return true;
+    }
+}
+
+function fillCenters(){
+    $("#branch_selector").change(function(){
+				     $.ajax({
+						type: "GET",
+						url: "/branches/centers/"+$("#branch_selector").val(),
+						success: function(data){
+						    $("#center_selector").html(data);
+						}
+					    });
+				 });
+}
+
+function floatHeaders(){
+    if($("table.report").length>0){
+	$('.report').floatHeader({
+				     fadeIn: 250,
+				     fadeOut: 250,
+				     forceClass: true,
+				     recalculate: true,
+				     markerClass: 'header'
 				 });
     }
-    function attachReportingFormEvents(id){
-	$("#reporting_form tr#"+id+" select").change(function(){
-							 if($(this).attr("class")=="more")
-							     return;
-							 var types = ["model", "property", "operator", "span"];
-							 id = $(this).attr("id");
-							 name = $(this).attr("name").split(/\[/)[0];
-							 counter = $(this).attr("name").split(/\[/)[1].split("]")[0];
-
-							 $(this).find("option:selected").each(function(){
-												  if(name!="value"){
-												      for(i=types.indexOf(name)+1; i<=types.length; i++){
-													  $("#reporting_form select#"+types[i]+"_"+counter).html("");
-												      }
-												  }
-												  nextType = types[types.indexOf(id.split('_')[0])+1];
-												  $.ajax({
-													     url: "/search/get?counter="+counter+"&"+$("#reporting_form").serialize(),
-													     success: function(data){
-														 if(nextType==="span"){
-														     $("#reporting_form span#"+nextType+'_'+counter).html(data);
-														 }else{
-														     $("#reporting_form select#"+nextType+'_'+counter).html("");
-														     $("#reporting_form select#"+nextType+'_'+counter).append(data);
-														 }
-													     }
-													 });
-											      });
-						     });
-	$("#reporting_form tr#"+id+" select.more").change(function(){
-							      var type = $(this);
-							      var counter = parseInt($(this).attr("name").split(/\[/)[1].split("]")[0]);
-							      if($("#reporting_form select#model_"+counter).length>0){
-								  model=$("#reporting_form select#model_"+counter).val();
-							      }else if($("#reporting_form input#model_"+counter).length>0){
-								  model=$("#reporting_form input#model_"+counter).attr("value");
-							      }else{
-								  model=$("#reporting_form select#model_1").val();
-							      }
-							      $.ajax({
-									 url: "/search/reporting?counter="+(counter+1)+"&model="+model+"&more="+type.val(),
-									 success: function(data){
-									     $("tr#formdiv_"+(counter+1)).unbind().remove();
-									     $("tr#formdiv_"+(counter)).after(data);
-									     attachReportingFormEvents("formdiv_"+(counter+1));
-									 }
-								     });
-							  });
+    if($("table.floating_header").length>0){
+	$('table.floating_header').floatHeader({
+						   fadeIn: 250,
+						   fadeOut: 250,
+						   forceClass: true,
+						   recalculate: true,
+						   markerClass: 'header'
+					       });
     }
+}
 
-    //For Rules Engine
-    total_fields = 0;
-    total_conditions = 0;
+function portfolioCalculations(){
+    $("table.portfolio input[type='checkbox']").click(function(event){
+							  tr = $(event.currentTarget).parent().parent();
+							  $($(tr).find("td")[4]).html($($(tr).find("td")[1]).html().trim());
+							  $($(tr).find("td")[5]).html($($(tr).find("td")[2]).html().trim());
+							  $($(tr).find("td")[6]).html($($(tr).find("td")[2]).html().trim());
 
-    //For Rules Engine
-    function cleanUpFields(type, id) {//used in rules form
-	for(i=Number(id)+1; i<total_fields; i++) {
-	    $("#"+type+"_select_"+i).remove();
-	    $("#"+type+"_selectcomparator_"+i).remove();
-	    $("#"+type+"_selectbinaryoperator_"+i).remove();
-	    $("#"+type+"_selectboolean_"+i).remove();
-	    $("#"+type+"_selectvalue_"+i).remove();
-	    $("#"+type+"_selectmore_"+i).remove();
-	    $("#"+type+"_textfield_"+i).remove();
-	    $("#"+type+"_date_"+i).datepicker("destroy");
-	    $("#"+type+"_date_"+i).remove();
-	    $("#"+type+"_hidden_"+i).remove();
-	}
-    }
+							  if($(event.currentTarget).attr("checked")){
+							      //setting branch total
+							      [3, 4, 5, 6].forEach(function(td_id){
+										       if(td_id == 3){
+											   var td_val = 1;
+										       }else{
+											   var td = $($(tr).find("td")[td_id]);
+											   var td_val = parseInt(td.html().replace(/\s|\,/g, ''));
+										       }
+										       var branch_val = parseInt($($(tr.nextAll("tr.branch_total")[0]).find("td b")[td_id]).html().replace(/\s|\,/g, '')) || 0;
+										       $($($(tr.nextAll("tr.branch_total")[0]).find("td")[td_id])).html("<b>" + (branch_val + td_val) + "</b>") || 0;
+										   });
+							  }else{
+							      //setting branch total
+							      [3, 4, 5, 6].forEach(function(td_id){
+										       if(td_id == 3){
+											   var td_val = 1;
+										       }else{
+											   var td = $($(tr).find("td")[td_id]);
+											   var td_val = parseInt(td.html().replace(/\s|\,/g, ''));
+										       }
+										       var branch_val = parseInt($($(tr.nextAll("tr.branch_total")[0]).find("td b")[td_id]).html().replace(/\s|\,/g, '')) || 0;
+										       $($($(tr.nextAll("tr.branch_total")[0]).find("td")[td_id])).html("<b>" + (branch_val - td_val) + "</b>") || 0;
+										   });
+							      $($(tr).find("td")[4]).html("0");
+							      $($(tr).find("td")[5]).html("0");
+							      $($(tr).find("td")[6]).html("0");
+							  }
 
-    //For Rules Engine
-    function attachRulesFormEvents(type, id) {//type = {"condition", "precondition"}
-	if(id == 0) {
-	    $("#select_0"/*name of the model*/).change(function() {
-	  						   $.ajax({
-		  						      url: "/rules/get?id=1"+"&type="+type+"&for="+document.getElementById("select_0").value+"&condition_id=1&variable_id=1&return_only_models=true",
-								      success: function(data){
-									  $("#"+type+"_select_1").replaceWith(data);
-									  cleanUpFields(type,1);
-									  attachRulesFormEvents(type,1);
-								      }
-  								  });
-						       });
-	}
-
-	$("#"+type+"_select_"+id).change(function() {
-					     //      alert("called")
-					     if(id+1> total_fields)
-						 total_fields = id+10;//delete some more fields than id+1 since sometimes more than 1 field is returned per request(there is no harm is deleting extra fields anyways)
-					     if(id == 0)
-						 return;//special case to handle that
-					     parent_div_id = document.getElementById(type+"_select_"+id).parentNode.id;//it is of type c1v2=> condition 1, variable 2
-					     condition_id = Number(parent_div_id.substr(1,1));//now this is with assumption that condition_id is single digit (can there be more than 9 conditions ever? if that happens this code fails)
-					     variable_id = Number(parent_div_id.substr(3,1));//since we have only two variables per condition, variable_id will be single digit
-					     prev_field = document.getElementById(type+"_select_"+(Number(id)-1));
-					     if(prev_field == null)//this happens for first select of every extra condition
-						 prev_field = document.getElementById("select_0");
-					     $.ajax({
-							url: "/rules/get?for="+document.getElementById(type+"_select_"+id).value+
-							    "&type="+type+
-							    "&id="+(Number(id)+1)+"&prev_field="+prev_field.value+
-							    "&condition_id="+condition_id+/*name of div boxes are c1v1, c2v1 ... where the firstnumber refers to condition_id and second to variable number local to that condition*/
-							"&variable_id="+variable_id+
-							    "&return_only_models=true"
-							,success: function(data) {
-							    cleanUpFields(type,id);
-							    $("#"+type+"_select_"+id).after(data);
-							    if(data.indexOf("<select") != -1) {
-								attachRulesFormEvents(type,Number(id)+1);
-							    }
-							    if(data.indexOf("selectmore_") != -1)
-								attachRulesFormEventsForSelectMoreField(type, Number(id)+3, condition_id);
-							    //alert(data);
-							    return true;
-							}
-						    });
-					     return true;
-					 });
-    }
-
-    //For Rules Engine
-    function getDiv(divId, div_container) {
-	div1 = document.getElementById(divId);
-	if(div1 != null)
-            return div1;
-
-	div1 = document.createElement('div');
-	div1.id = divId;
-	div_container.appendChild(div1);
-	return div1;
-    }
-
-    //For Rules Engine
-    function attachRulesFormEventsForSelectMoreField(type, id, condition_id) {
-	condition_id = Number(condition_id)+1; //tis generates the new condition id whichwe are going to add
-	$('#'+type+'_selectmore_'+id).change(function() {
-						 //alert(id+" "+condition_id);
-						 val = document.getElementById(type+"_selectmore_"+id).value;
-						 //alert(val);
-						 if((val == "and") || (val == "or")) {
-						     var div1;
-						     if(type == "condition")
-							 div1 = getDiv("c"+condition_id, document.getElementById("conditions_container"));
-						     else {
-							 div1 = getDiv("p"+condition_id, document.getElementById("preconditions_container"));
-						     }
-						     //new_select = document.getElementById(type+"_select_1").cloneNode(true);
-						     //new_select.id = type+"_select_"+(Number(id)+1);
-						     //new_select.name = "rule["+type+"]["+(Number(condition_id)+1)+"][keys][]";
-						     variable_id = 1;
-						     new_variable_field = document.getElementById(type+"_1_variable_1").cloneNode(true);
-						     new_variable_field.id = type+"_"+condition_id+"_variable_"+variable_id;
-						     new_variable_field.name = "rule["+type+"]["+condition_id+"][variable]["+variable_id+"][complete]";
-						     div1.innerHTML="";
-						     div1.appendChild(new_variable_field);
-						     //div1.appendChild(new_select);
-						     div1.innerHTML += "<a onclick=\"javascript:this.parentNode.innerHTML=''\">Remove</a>";
-						     if(condition_id>total_conditions)
-							 total_conditions = condition_id;
-						     createVariableSelectionDiv(type, id+2, condition_id, variable_id);
-						     attachRulesFormEventsForVariableField(type, condition_id, variable_id);
-						 }
-					     });
-    }
-
-    //for Rules Engine
-    function createVariableSelectionDiv(type, id, condition_id, variable_id) {
-	//id will be the id of new select field to be inserted
-	div_id = type[0]+condition_id+"v"+variable_id;
-	if($("#"+div_id).length == 0) {//div does not exist
-	    //alert("creating new div:"+div_id);
-	    div1 = document.createElement('div');
-	    div1.id = div_id;
-	    new_select = document.getElementById(type+"_select_1").cloneNode(true);
-	    new_select.id = type+"_select_"+(id);
-	    new_select.name = "rule["+type+"]["+condition_id+"][variable]["+variable_id+"][keys][]";
-	    if(variable_id>1) {
-		nilOption = document.createElement("option");
-		nilOption.value = "0";
-		nilOption.appendChild(document.createTextNode("0"));
-		new_select.appendChild(nilOption);
-	    }
-	    div1.innerHTML = "<b>Condition "+condition_id+" Variable "+variable_id+"</b>";
-	    div1.appendChild(new_select);
-	    div1.innerHTML += "<a onClick=\"javascript:this.parentNode.style.display='none';fillVariableField('"+type+"',"+condition_id+", "+variable_id+");\"><b>Done</b></a>";
-	    div1.style.display = "none";
-	    document.getElementById(type[0]+condition_id).appendChild(div1);
-	}
-    }
-
-    //type is either condition or precondition
-    function attachRulesFormEventsForVariableField(type, condition_id, variable_id) {
-	$("#"+type+"_"+condition_id+"_variable_"+variable_id).click( function(event) {
-									 document.getElementById(type[0]+condition_id+"v"+variable_id).style.display = "block";
-								     });
-    }
-
-    //for rules engine
-    function fillVariableField(type, condition_id, variable_id) {
-	children = $(("#"+type[0])+condition_id+"v"+variable_id+" select")
-	str = children[0].value;
-	for(var i=1; i<children.length; i++)
-	    str += "."+children[i].value;
-	$("#"+type+"_"+condition_id+"_variable_"+variable_id).attr("value", str);
-	parent_div = $("#"+type+"_"+condition_id+"_variable_"+variable_id).parent();
-
-	last_accessed_id = children[children.length-1].id;//id of the last children
-	//alert("445:"+last_accessed_id);
-	id = Number(last_accessed_id.substring(last_accessed_id.indexOf("_select_")+"_select_".length));//this extracts out the id number at the end
-	for_field = document.getElementById(type+"_select_"+id);
-	for_field_value = for_field.value;
-	prev_field = document.getElementById(type+"_select_"+(id-1));
-	if(prev_field == null)//this happens for first select of every extra condition
-	    prev_field = document.getElementById("select_0");
-	single_variable_mode = 0;
-	if(for_field_value == "0" ) {//this handles the case when second variable has been selected to be 0(nil), in that case, we will try to return the value of two fields prior to this (since between these two there is a select field wil binaryoperator)
-	    for_field_value = document.getElementById(type+"_select_"+(id-2)).value;
-	    single_variable_mode = 1;
-	}
-
-
-	$.ajax({
-		   url: "/rules/get?for="+for_field_value+
-		       "&type="+type+
-		       "&id="+(Number(id)+1)+"&prev_field="+prev_field.value+
-		       "&condition_id="+condition_id+/*name of div boxes are c1v1, c2v1 ... where the firstnumber refers to condition_id and second to variable number local to that condition*/
-		   "&variable_id="+variable_id+
-		       "&single_variable_mode="+single_variable_mode+
-		       "&return_only_models=false"
-		   ,success: function(data) {
-		       //alert("cleaning up from"+id);
-		       //alert("11#"+type+"_"+condition_id+"_variable_"+(Number(variable_id)+1));
-		       cleanUpFields(type,id);
-		       $("#"+type+"_"+condition_id+"_variable_"+(Number(variable_id)+1)).remove();
-		       $("#"+type[0]+condition_id+"v"+(Number(variable_id)+1)).remove();
-		       $("#"+type+"_"+condition_id+"_variable_"+variable_id).after(data);
-		       if(data.indexOf("<select") != -1)
-			   attachRulesFormEvents(type,Number(id)+1);
-		       if(data.indexOf("selectmore_") != -1)
-			   attachRulesFormEventsForSelectMoreField(type, Number(id)+3, condition_id);
-		       if(data.indexOf("_variable_") != -1) {
-			   createVariableSelectionDiv(type, id+2, condition_id, Number(variable_id)+1);
-			   attachRulesFormEventsForVariableField(type, condition_id, Number(variable_id)+1);
-			   attachRulesFormEvents(type, id+2);
-		       }
-		       //alert(data);
-		       return true;
-		   }
-	       });
-    }
-
-
-    MAX_COLS = 20;
-    function attachCustomTableEvents(){
-	$("#reporting_form #customtable .checkbox").click(function() {
-							      var arr=[];
-							      $("#customtable tr select").each(function(idx, select){
-												   if($(select).css("display")!="none")
-												       arr.push(parseInt($(select).val()));
-											       });
-							      var total_cols = arr.sort()[arr.length - 1];
-							      var type = $(this);
-							      selected_field = window.document.getElementById(this.id.replace("fields","precedence"));
-							      if(selected_field == null)
-								  return;
-							      if(total_cols >= MAX_COLS)
-								  return;
-							      if(selected_field.style.display == "none") {
-								  selected_field.style.display = "block";
-								  selected_field.selectedIndex = total_cols;
-								  total_cols++;
-							      }else{
-								  selected_field.style.display = "none";
-								  total_cols--;
-							      }
-							  });
-    }
-
-    function confirm_for(things) {
-	/* given a hash of ids and values, this function asks a confirmation to proceed if the values of the elements
-	 * are not the same as the provided values
-	 */
-	errors = [];
-	for (thing in things) {
-	    if (($('#'+thing).val() != (things[thing] + "")) && $('#' + thing).val() != null) {
-		errors.push(thing);
-	    }
-	}
-	if (errors.length > 0) {
-	    return confirm(errors.join(",") + " are not the standard value. Proceed?");
-	} else {
-	    return true;
-	}
-    }
-
-    function fillCenters(){
-	$("#branch_selector").change(function(){
-					 $.ajax({
-						    type: "GET",
-						    url: "/branches/centers/"+$("#branch_selector").val(),
-						    success: function(data){
-							$("#center_selector").html(data);
-						    }
-						});
-				     });
-    }
-
-    function floatHeaders(){
-	if($("table.report").length>0){
-	    $('.report').floatHeader({
-					 fadeIn: 250,
-					 fadeOut: 250,
-					 forceClass: true,
-					 recalculate: true,
-					 markerClass: 'header'
-				     });
-	}
-	if($("table.floating_header").length>0){
-	    $('table.floating_header').floatHeader({
-						       fadeIn: 250,
-						       fadeOut: 250,
-						       forceClass: true,
-						       recalculate: true,
-						       markerClass: 'header'
-						   });
-	}
-    }
-
-    function portfolioCalculations(){
-	$("table.portfolio input[type='checkbox']").click(function(event){
-							      tr = $(event.currentTarget).parent().parent();
-							      $($(tr).find("td")[4]).html($($(tr).find("td")[1]).html().trim());
-							      $($(tr).find("td")[5]).html($($(tr).find("td")[2]).html().trim());
-							      $($(tr).find("td")[6]).html($($(tr).find("td")[2]).html().trim());
-
-							      if($(event.currentTarget).attr("checked")){
-								  //setting branch total
-								  [3, 4, 5, 6].forEach(function(td_id){
-											   if(td_id == 3){
-											       var td_val = 1;
-											   }else{
-											       var td = $($(tr).find("td")[td_id]);
-											       var td_val = parseInt(td.html().replace(/\s|\,/g, ''));
-											   }
-											   var branch_val = parseInt($($(tr.nextAll("tr.branch_total")[0]).find("td b")[td_id]).html().replace(/\s|\,/g, '')) || 0;
-											   $($($(tr.nextAll("tr.branch_total")[0]).find("td")[td_id])).html("<b>" + (branch_val + td_val) + "</b>") || 0;
-										       });
-							      }else{
-								  //setting branch total
-								  [3, 4, 5, 6].forEach(function(td_id){
-											   if(td_id == 3){
-											       var td_val = 1;
-											   }else{
-											       var td = $($(tr).find("td")[td_id]);
-											       var td_val = parseInt(td.html().replace(/\s|\,/g, ''));
-											   }
-											   var branch_val = parseInt($($(tr.nextAll("tr.branch_total")[0]).find("td b")[td_id]).html().replace(/\s|\,/g, '')) || 0;
-											   $($($(tr.nextAll("tr.branch_total")[0]).find("td")[td_id])).html("<b>" + (branch_val - td_val) + "</b>") || 0;
-										       });
-								  $($(tr).find("td")[4]).html("0");
-								  $($(tr).find("td")[5]).html("0");
-								  $($(tr).find("td")[6]).html("0");
-							      }
-
-							      //setting org total
-							      var org_client_count = 0;
-							      var org_count = 0;
-							      var org_allocated = 0;
-							      var org_current = 0;
-							      $("tr.branch_total").each(function(idx, tr){
-											    org_client_count += parseInt($($(tr).find("td b")[3]).html().replace(/\s|\,/g, '')) || 0;
-											    org_count += parseInt($($(tr).find("td b")[4]).html().replace(/\s|\,/g, '')) || 0;
-											    org_allocated += parseInt($($(tr).find("td b")[5]).html().replace(/\s|\,/g, '')) || 0;
-											    org_current += parseInt($($(tr).find("td b")[6]).html().replace(/\s|\,/g, '')) || 0;
-											});
-							      $($("tr.org_total:first td")[3]).html("<b>" + org_client_count + "</b>");
-							      $($("tr.org_total:first td")[4]).html("<b>" + org_count + "</b>");
-							      $($("tr.org_total:first td")[5]).html("<b>" + org_allocated + "</b>");
-							      $($("tr.org_total:first td")[6]).html("<b>" + org_current + "</b>");
-							  });
-    }
+							  //setting org total
+							  var org_client_count = 0;
+							  var org_count = 0;
+							  var org_allocated = 0;
+							  var org_current = 0;
+							  $("tr.branch_total").each(function(idx, tr){
+											org_client_count += parseInt($($(tr).find("td b")[3]).html().replace(/\s|\,/g, '')) || 0;
+											org_count += parseInt($($(tr).find("td b")[4]).html().replace(/\s|\,/g, '')) || 0;
+											org_allocated += parseInt($($(tr).find("td b")[5]).html().replace(/\s|\,/g, '')) || 0;
+											org_current += parseInt($($(tr).find("td b")[6]).html().replace(/\s|\,/g, '')) || 0;
+										    });
+							  $($("tr.org_total:first td")[3]).html("<b>" + org_client_count + "</b>");
+							  $($("tr.org_total:first td")[4]).html("<b>" + org_count + "</b>");
+							  $($("tr.org_total:first td")[5]).html("<b>" + org_allocated + "</b>");
+							  $($("tr.org_total:first td")[6]).html("<b>" + org_current + "</b>");
+						      });
+}
 $(document).ready(function(){
 		      create_remotes();
 		      attachFormRemote();
@@ -900,12 +910,12 @@ $(document).ready(function(){
 
 							       });
 		      $("#account_account_type_id").live('change', function(select){
-							       val=$("#account_account_type_id").val();
-							       $.ajax({
-									  url: "/accounts?account_type_id="+val,
-									  success: function(data){$("#account_parent_id").html(data);}
-								      });
-							   });
+							     val=$("#account_account_type_id").val();
+							     $.ajax({
+									url: "/accounts?account_type_id="+val,
+									success: function(data){$("#account_parent_id").html(data);}
+								    });
+							 });
 		      attachReportingFormEvents("formdiv_1");
 		      attachRulesFormEvents("condition", 0);
 		      attachRulesFormEvents("condition", 1);
@@ -915,7 +925,7 @@ $(document).ready(function(){
 		      attachRulesFormEventsForVariableField("precondition", 1/*condition_id*/, 1/*variable_id*/);
 		      $("a.enlarge_image").click(function(a){
 						     link=$(a.currentTarget);
-						     addFloater(link);
+						     addFloater(link, $(a));
 						     return(false);
 						 });
 		      if($("#rule_book_action").length>0){
@@ -949,7 +959,12 @@ $(document).ready(function(){
 						     $("#inactive_options").toggle();
 						 });
 		      $("a.expand_collapsed").click(function(a){
-							$(".collapsed").toggle();
+							id = $(a.currentTarget).attr("id");
+							if((id && $("#element_" + id).length > 0)){
+							    $("#element_" + id).toggle();    
+							}else{
+							    $(".collapsed").toggle();
+							}
 							if($(a.currentTarget).css("background-image").indexOf("closed.gif")>0){
 							    $(a.currentTarget).css("background-image", "url(/images/elements/open.gif)");
 							}else{
@@ -1036,5 +1051,8 @@ $(document).ready(function(){
 			  map_initialize();
 		      if($("#map_canvas") && (typeof loadAPI != "undefined"))
 			  loadAPI();
+		      $("a.closeButton").live('click', function(){
+						  $(".floatingBox").remove();
+					      });
 		  });
 

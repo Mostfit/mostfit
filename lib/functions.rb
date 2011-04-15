@@ -1,6 +1,11 @@
 # small monkey patch, real patch is submitted to extlib/merb/dm, hoping for inclusion soon
+class NilClass
+  def to_currency
+    "-"
+  end
+end
+
 class Date
-  WEEKDAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   def inspect
     "<Date: #{self.to_s}>"
   end
@@ -14,12 +19,22 @@ class Date
     Holiday.all.include?(self)
   end
 
-  def holiday_bump
+  def count_weekday_uptil(weekday, d2)
+    debugger
+    return 0 if d2 < self
+    num_weeks = ((d2 - self) / 7).floor
+    d_ = self + num_weeks
+    add_one = ((d_.cwday)..((d2.cwday < d_.cwday ? 7 : d2.cwday))).include?(WEEKDAYS.index(weekday) + 1) ? 1 : 0
+    num_weeks + add_one
+  end
+
+  def holiday_bump(direction = nil)
     hols = $holidays
     new_date = self
     return new_date unless hols
     while hols.keys.include?(new_date)
-      case hols[new_date].shift_meeting
+      direction ||= hols[new_date].shift_meeting
+      case direction
         when :before
           new_date -= 1 
         when :after

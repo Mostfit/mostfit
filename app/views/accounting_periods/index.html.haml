@@ -1,22 +1,35 @@
-%h1 List of Accounting Periods
-%table
-  %tr
-    %th
-      Begins
-    %th
-      Ends
-    %th
-      Duration (in days)
-  %tr
-  - for accounting_period in @accounting_periods
-    %tr
-      %td
-        = accounting_period.begin_date
-      %td
-        = accounting_period.end_date
-      %td
-        = accounting_period.duration
-      %td
-        = link_to 'Edit', url(:edit_accounting_period,  accounting_period)
+- if @accounting_periods.empty?
+  #container_form
+    .notice{:style => "background: none; text-align: center;"} 
+      There are no accounting periods defined
+      = link_to 'Add an Accounting Period', url(:new_accounting_period), :class => '_remote_ add', :id => 'form'
 
-= link_to 'New', url(:new_accounting_period), :class => "_remote_"
+- else
+  = link_to 'Add an accounting period', url(:new_accounting_period), :class => "_remote_ add"
+  %br
+  %br
+  %table.narrow.form
+    %thead
+      %tr
+        %th
+          Name
+        %th
+          Begins
+        %th
+          Ends
+        %th
+          Duration (in days)
+        %th
+          Actions
+    - for accounting_period in @accounting_periods
+      %tr{:class => cycle('odd','even')}
+        %td
+          = accounting_period.name
+        %td
+          = accounting_period.begin_date
+        %td
+          = accounting_period.end_date
+        %td
+          = accounting_period.duration
+        %td
+          = link_to 'Edit', url(:edit_accounting_period,  accounting_period)

@@ -1,0 +1,15 @@
+%h1 
+  New Account Balance for
+  = @account.name
+  (
+  = @accounting_period.name
+  )
+
+= error_messages_for @account_balance
+
+= form_for(@account_balance, :action => resource(@account, @accounting_period, :account_balances) ) do
+  %fieldset
+    = partial "account_balances/fields"
+  = submit "Create"
+
+= link_to 'Back', url(:account_balances)

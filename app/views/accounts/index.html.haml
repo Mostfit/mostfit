@@ -7,10 +7,6 @@
   %ul.tabs
     %li#accounts
       Accounts
-    %li#accounting_period
-      Accounting periods
-    %li#account_types
-      Account types
     %li#new_account
       New account
     %li#accounting_rules
@@ -19,8 +15,10 @@
       New voucher
     %li#journal_entries
       Journal entries
-    %li#branch_accounts
-      Branch accounts
+    %li#misc
+      Miscellaneous
+    %li#reconcile
+      Reconcile
   %div.tab
     %form.floating{:style => "float: right"}
       %b Show accounts of 
@@ -47,16 +45,14 @@
               - accounts.each do |account|
                 = show_accounts(account)
   %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => url(:accounting_periods)}
-  %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => url(:account_types)}
-  %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url(:new_account)}
   %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => url(:rule_books)}
+    %input{:type => "hidden", :name => "_load_remote", :value => url(:rule_books, :return => "/accounts")}
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url({:controller => :journals, :action => :new, :return => url(:accounts)})}
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url(:journals)}
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => url(:action => :duplicate)}
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :journals, :action => :reconcile)}

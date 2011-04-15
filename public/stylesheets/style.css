@@ -269,6 +269,9 @@ input[type="text"], input[type="password"], textarea {
   font-family: sans;
   background: url(/images/fieldbg.gif) repeat-x scroll center top;
 }
+input.disabled[type="submit"] {
+    color: #ccc;
+}
 input.error{
     border-color: red;
     outline: 2px solid red;
@@ -288,9 +291,9 @@ border: solid 1px #33a;
 }
 
 
-span.red   { color: #d33; }
-span.green { color: #3d3; }
-
+span.red   { background-color: #a44848; padding: 3px; color: white;}
+span.green { background-color: #64DE89; padding: 3px; color: black;}
+span.blue  { background-color: #3465a4; padding: 3px; color: white;}
 /**************************************/
 /*               FOOTER               */
 /**************************************/
@@ -422,12 +425,13 @@ a.button:visited {
 }
 
 #header_search_div {
-    position: absolute; 
-    right: -4%;
+    position: relative; 
+    right: -77%;
     padding: 3px;
     padding-bottom: 0px;    
     vertical-align: top;
-    top: -12px;
+    top: -25px;
+    width: 300px;
 }
 #header_search_div input{
     font-size: 1.5em;
@@ -436,7 +440,30 @@ a.button:visited {
 #header_search_div input:first{
     width: 100px;
 }
-
+.bookmark{
+    font-size: 1.2em;
+    padding: 0px;
+    margin: 0px;
+    position: absolute;
+    left: 0px;
+    top: 50%;
+    width: 32px;
+    z-index: 100;
+}
+.bookmark form input[type='submit']{
+    border: 1px solid orange;
+    font-size: 1.5em;
+    color: white;
+    background: orange;
+    z-index: 100;
+    -webkit-transform: rotate(-90deg); 
+    -moz-transform: rotate(-90deg);
+    -moz-transform-origin: top left;
+    -webkit-transform-origin: top left;
+    -o-transform: rotate(-270deg);
+    -o-transform-origin:  bottom left;
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+}
 div.log_box{
     border: 2px solid #8DC73F;
     height: 400px;
@@ -641,6 +668,15 @@ div.tab_container ul.tabs{
     height: 45px;
     border-bottom: 3px solid #CDD3FE;
 }
+
+div.tab_container ul.inner{
+    margin-left: 0px;
+    height: 45px;
+    border-bottom: solid 1px #9e9e8e;
+    background-color: beige;
+}
+
+
 div.tab_container ul.tabs li{
     display: inline;
     padding: 5px;
@@ -656,6 +692,23 @@ div.tab_container ul.tabs li{
     border: 1px solid #EDF3FE;
     font-weight: strong;
 }
+
+div.tab_container div.inner {
+}
+
+div.tab_container ul.inner li{
+    background-color: #9e9e8e;
+    color: white;
+    font-size: 1.2em;
+    position: relative;
+    top: 20px;
+}
+
+div.tab_container ul.inner .active{
+    background-color: lightyellow;
+    color: black;
+}
+
 div.tab_container ul.tabs li.active{
     border-bottom: 3px solid white;
     background-color: white;
@@ -702,8 +755,6 @@ table.comments tr td span{
 form.form {
 /*  background-color: #F6E8B1; */
 /*  background-color: #F5F6D4; */
-  border: solid 2px #696C82;
-  font-family: "Lucida Grande";
   font-size: 14px;
   margin-left: auto;
   margin-right: auto;
@@ -916,15 +967,13 @@ a.expand_collapsed{
     top: 20px;
     display: none;
 }
-.floatingBox{
-    float: right;
-    top: 1px;
+.floatingBox{    
     position: absolute;
     border: 2px solid orange;    
-    right: 100px;
     padding: 5px;
     background: #eee;
     z-index: 1;
+    min-height: 20px;
 }
 .floatingBox table{
     float: left;
@@ -938,6 +987,12 @@ a.expand_collapsed{
     float: right;
     font-weight: bold;
     font-size: 1em;
+}
+.floatingBox h3{
+    font-size: 1.25em;
+}
+.floatingBox h2{
+    font-size: 1.35em;
 }
 span.branchName{
     position: absolute;
@@ -1019,4 +1074,11 @@ ul#tree li.depth_4 span{
 }
 .right{
     float: right;
+}
+ul.bookmarks li{
+    margin-bottom: 5px;
+    padding-bottom: 5px
+    width: 100%;
+    font-size: 1.25em;
+    padding-top: 10px;
 }

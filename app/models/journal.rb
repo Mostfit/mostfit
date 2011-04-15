@@ -27,7 +27,7 @@ class Journal
     return [false, "no credit account posting"] if credit_account_postings.nil? or credit_account_postings.length==0 
     
     #same debit and credit accounts
-    return [false, "same debit and credit accounts"] if (credit_account_postings.map{|x| x.account_id} & debit_account_postings.map{|x| x.account_id}).length > 0
+    return [false, "same debit and credit accounts"] if (credit_account_postings.map{|x| x.account_id} == debit_account_postings.map{|x| x.account_id})
     
     #cross branch posting
     return [false, "cross branch posting"] if self.postings.accounts.map{|x| x.branch_id}.uniq.length > 1
@@ -36,7 +36,7 @@ class Journal
     return [false, "duplicate accounts"] if self.postings.map{|x| x.account_id}.compact.length != self.postings.length
     
     #amount mismatch
-    return [false, "debit and credit amount mismatch"] if credit_account_postings.map{|x| x.amount}.reduce(0){|s,x| s+=x} + debit_account_postings.map{|x| x.amount}.reduce(0){|s,x| s+=x} != 0
+    return [false, "debit and credit amount mismatch"] unless credit_account_postings.map{|x| x.amount * -1}.reduce(0){|s,x| s+=x}  ==  debit_account_postings.map{|x| x.amount}.reduce(0){|s,x| s+=x}
     
     return [true, ""]
   end
@@ -110,10 +110,10 @@ class Journal
   end
   
 
-  def self.xml_tally(hash={})
-    xml_file = '/tmp/voucher.xml'
-    f = File.open(xml_file,'w')
-    x = Builder::XmlMarkup.new(:indent => 1)
+  def self.xml_tally(hash={}, xml_file = nil)
+    xml_file ||= '/tmp/voucher.xml'
+    f = File.open(xml_file,"w")
+    x = Builder::XmlMarkup.new(:target => f,:indent => 1)
     x.ENVELOPE{
       x.HEADER {    
         x.VERSION "1"
@@ -150,7 +150,6 @@ class Journal
         }
       }
     } 
-    f.write(x)
     f.close
   end 
 end

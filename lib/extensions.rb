@@ -53,11 +53,8 @@ module Misfit
           return(@funder.send(model.to_s.snake_case.pluralize, {:id => id}).length>0)
         elsif [Branch, Center, ClientGroup, Client, Loan, StaffMember, FundingLine, Funder, Portfolio].include?(model) and id==0
           return(@funder.send(model.to_s.snake_case.downcase.pluralize).length>0)
-        elsif [Browse, Document, AuditTrail, Attendance, Search].include?(model)
+        elsif [Browse, Document, AuditTrail, Attendance, Search, Bookmark].include?(model)
           return true
-        elsif model == Report
-          return true unless @route[:report_type]
-          return FUNDER_ACCESSIBLE_REPORTS.include?(@route[:report_type])
         end
         return false
      end
@@ -105,7 +102,8 @@ module Misfit
         user_role = self.role
         return true  if user_role == :admin
         return false if route[:controller] == "journals" and route[:action] == "edit"
-        return true  if route[:controller] == "users" and (route[:action] == "change_password")
+        return true  if route[:controller] == "users" and route[:action] == "change_password"
+        return true  if route[:controller] == "reports" and route[:action] == "index" and not user_role == :data_entry
         return false if (user_role == :read_only or user_role == :funder or user_role == :data_entry) and route[:controller] == "payments" and route[:action] == "delete"
         return false if (user_role != :admin) and route[:controller] == "loans" and route[:action] == "write_off_suggested"
 
@@ -115,11 +113,17 @@ module Misfit
         @model = route[:controller].singularize.to_sym
         @action = route[:action]
 
+        # reports access control rules
+        if route[:controller] == "reports" and route[:action] == "show" and route[:report_type] and Mfi.first.report_access_rules.key?(route[:report_type])
+          return Mfi.first.report_access_rules[route[:report_type]].include?(user_role.to_s)
+        end
+
         #read only stuff
         return allow_read_only if user_role == :read_only
 
         #user is a funder
         if user_role == :funder and @funder ||= Funder.first(:user_id => self.id)
+          return true if route[:controller] == "dashboard" or route[:controller] == "graph_data" or route[:controller] == "bookmarks"
           @funding_lines = @funder.funding_lines
           @funding_line_ids = @funder.funding_lines.map{|fl| fl.id}
           return(is_funder? and allow_read_only)
@@ -140,10 +144,6 @@ module Misfit
         if role == :data_entry 
           return ["new", "edit", "create", "update"].include?(@action) if ["clients", "loans", "client_groups"].include?(@controller)
           return (@action == "disbursement_sheet" or @action == "day_sheet") if @controller == "staff_members"
-          
-          if @action == "show" and @controller == "reports"
-            return (@route[:report_type] == "ProjectedReport" or @route[:report_type] == "DailyReport" or @route[:report_type] == "TransactionLedger")
-          end
         end
         
         if @staff

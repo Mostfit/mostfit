@@ -1,7 +1,7 @@
 class Loans < Application
   before :get_context, :exclude => ['redirect_to_show', 'approve', 'disburse', 'reject', 'write_off_reject', 'write_off_suggested', 'collection_sheet']
   provides :xml, :yaml, :js
-
+  
   def index
     @loans = @loans || @client.loans
     display @loans
@@ -28,12 +28,14 @@ class Loans < Application
 
   def new
     only_provides :html
-    if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])
+    if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])      
       if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type)
         klass = Kernel::const_get(@loan_product.loan_type)
         @loan = klass.new
+        set_insurance_policy(@loan_product)
       end
     end
+
     @loan_products = LoanProduct.valid if @loan.nil?
     display [@loan_types, @loan]
   end
@@ -41,11 +43,10 @@ class Loans < Application
   def create
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
-    @loan = klass.new(attrs)
-    raise NotFound if not @loan.client  # should be known though hidden field
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])
-    @loan.loan_product_id = @loan_product.id     
-    @loan.amount          = @loan.amount_applied_for
+    raise BadRequest unless @loan_product
+    @loan = klass.new(attrs)
+    @loan.loan_product = @loan_product
     if @loan.save
       if params[:format] and params[:format] == "xml"
         display @loan
@@ -57,6 +58,7 @@ class Loans < Application
         end
       end
     else
+      set_insurance_policy(@loan_product)
       @loan.interest_rate *= 100
       if params[:format] and params[:format] == "xml"
         display @loan
@@ -66,11 +68,46 @@ class Loans < Application
     end
   end
 
+  def bulk_create
+    klass, attrs = get_loan_and_attrs
+    attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
+    loan_product = LoanProduct.is_valid(params[:loan_product_id])
+    raise BadRequest unless loan_product
+    loans = statuses = []
+
+    # create loans for all the clients
+    Loan.transaction do |t|
+      params[:client_ids].each{|client_id|
+        attrs[:client_id] = client_id.to_i
+        @loan = klass.new(attrs)
+        @loan.loan_product  = loan_product
+        loans.push(@loan)
+      }
+      statuses = loans.map{|l| l.save}
+      t.rollback if statuses.include?(false)
+    end
+
+    if not statuses.include?(false)
+      if params[:return]
+        redirect(params[:return], :message => {:notice => "'#{statuses.count}' loans were successfully created"})
+      else
+        redirect(url(:data_entry), :message => {:notice => "'#{statuses.count}' loans were successfully created"})
+      end
+    else      
+      # on error recreate form with errors
+      @loan_product  = @loan.loan_product if @loan
+      @clients = Client.all(:id => params[:client_ids])
+      display [], "data_entry/loans/bulk_form"
+    end
+  end
+
   def edit(id)
     only_provides :html
     @loan = Loan.get(id)
     @loan_product =  @loan.loan_product
     raise NotFound unless @loan
+
+    set_insurance_policy(@loan_product)
     disallow_updation_of_verified_loans
     @loan.interest_rate*=100
     display @loan
@@ -83,8 +120,17 @@ class Loans < Application
     @loan = klass.get(id)
     raise NotFound unless @loan
     disallow_updation_of_verified_loans
+
+    # if an attached insurance policy then create or update insurance policy
+    if attrs[:insurance_policy]
+      @insurance_policy = @loan.insurance_policy || Insurance.new
+      @insurance_policy.client = @loan.client
+      @insurance_policy.attributes = attrs.delete(:insurance_policy)
+    end
+
     @loan.attributes = attrs
     @loan_product = @loan.loan_product
+    @loan.insurance_policy = @insurance_policy if @loan_product.linked_to_insurance and @insurance_policy   
 
     if @loan.save or @loan.errors.length==0
       if params[:return]
@@ -119,7 +165,7 @@ class Loans < Application
     @branch, @center, @client = @loan.client.center.branch, @loan.client.center, @loan.client
     redirect url_for_loan(@loan)
   end
-  
+
   def disburse
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
     hash   = {:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil}
@@ -177,9 +223,11 @@ class Loans < Application
         next unless @loans_to_approve.include?(loan)
         params[:loans][id].delete("approved?")        
         params[:loans][id][:amount] = params[:loans][id][:amount_sanctioned]
-        loan.update(params[:loans][id])
-        @errors << loan.errors unless loan.save
+        unless loan.update(params[:loans][id])
+          @errors << loan.errors
+        end
       end
+
       if @errors.blank?
         redirect(params[:return]||"/data_entry", :message => {:notice => 'loans approved'})
       else
@@ -331,10 +379,15 @@ class Loans < Application
       @center = @client.center
       @branch = @center.branch
     else
-      @client = Client.get(params[:client_id])
+      if params[:client_id]
+        @client = Client.get(params[:client_id])
+      elsif params[:client_ids]
+        @clients = Client.all(:id => params[:client_id])
+      end
       @center = Center.get(params[:center_id])
       @branch = Branch.get(params[:branch_id])
-      raise NotFound unless @branch and @center and @client
+      raise NotFound unless @branch and @center
+      raise NotFound unless (@client or @clients)
     end
   end
 
@@ -343,7 +396,8 @@ class Loans < Application
   def get_loan_and_attrs   # FIXME: this is a code dup with data_entry/loans
     loan_product = LoanProduct.get(params[:loan_product_id])
     attrs = params[loan_product.loan_type.snake_case.to_sym]
-    attrs[:client_id]=params[:client_id] if params[:client_id]
+    attrs[:client_id] = params[:client_id] if params[:client_id]
+    attrs[:insurance_policy] = params[:insurance_policy] if params[:insurance_policy]
     raise NotFound if not params[:loan_type]
     klass = Kernel::const_get(params[:loan_type])
     [klass, attrs]
@@ -364,6 +418,13 @@ class Loans < Application
       Loan.all(hash)
     else
       Loan.all(hash).paginate(:page => params[:page], :per_page => 10)        
+    end
+  end
+
+  def set_insurance_policy(loan_product)
+    if @loan_product.linked_to_insurance
+      @insurance_policy = @loan.insurance_policy || InsurancePolicy.new
+      @insurance_policy.client = @client
     end
   end
 end # Loans

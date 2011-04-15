@@ -5,6 +5,7 @@ class Center
   
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   after :save, :handle_meeting_date_change
+  before :save, :set_meeting_change_date
   before :create, :set_meeting_change_date
 
   property :id,                   Serial
@@ -37,8 +38,9 @@ class Center
 
   def self.from_csv(row, headers)
     hour, minute = row[headers[:center_meeting_time_in_24h_format]].split(":")
-    branch       = Branch.first(:name => row[headers[:branch_name]].strip)
-    staff_member = StaffMember.first(:name => row[headers[:staff_name]])
+    branch       = Branch.first(:name => row[headers[:branch]].strip)
+    staff_member = StaffMember.first(:name => row[headers[:manager]])
+
     creation_date = ((headers[:creation_date] and row[headers[:creation_date]]) ? row[headers[:creation_date]] : Date.today)
     obj = new(:name => row[headers[:center_name]], :meeting_day => row[headers[:meeting_day]].downcase.to_s.to_sym, :code => row[headers[:code]],
               :meeting_time_hours => hour, :meeting_time_minutes => minute, :branch_id => branch.id, :manager_staff_id => staff_member.id,
@@ -181,9 +183,11 @@ class Center
 
   def handle_meeting_date_change
     self.meeting_day_change_date = parse_date(self.meeting_day_change_date) if self.meeting_day_change_date.class==String and not self.meeting_day_change_date.blank?
-    return if not self.meeting_day_change_date or self.meeting_day_change_date.blank?
-    date = self.meeting_day_change_date||Date.today
+    if not self.meeting_day_change_date or self.meeting_day_change_date.blank? or not self.meeting_day_change_date.is_a?(Date)
+      self.meeting_day_change_date = Date.today
+    end
 
+    date = self.meeting_day_change_date
     if not CenterMeetingDay.first(:center => self)
       CenterMeetingDay.create(:center_id => self.id, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
     elsif self.meeting_day != self.meeting_day_for(date)
@@ -213,7 +217,7 @@ class Center
 
 
   def set_meeting_change_date
-    self.meeting_day_change_date = self.creation_date
+    self.meeting_day_change_date = self.creation_date if self.new?
   end
 
   def get_meeting_date(date, direction)
@@ -221,14 +225,14 @@ class Center
     number = 1
     if direction == :next
       nwday = (date + number).wday
-      while nwday != Center.meeting_days.index(meeting_day_for(date + number))
+      while day = Center.meeting_days.index(meeting_day_for(date + number)) and day > 0 and nwday != day
         number += 1
         nwday = (date + number).wday
         nwday = 7 if nwday == 0
       end
     else
-      nwday = (date + number).wday
-      while (date - number).wday != Center.meeting_days.index(meeting_day_for(date - number))
+      nwday = (date - number).wday
+      while day = Center.meeting_days.index(meeting_day_for(date - number)) and day > 0 and nwday != day
         number += 1
         nwday = (date - number).wday
         nwday = 7 if nwday == 0

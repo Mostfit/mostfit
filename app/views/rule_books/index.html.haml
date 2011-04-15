@@ -28,7 +28,7 @@
           - branch_name = rule_book.branch.name
         = branch_name
       %td 
-        = rule_book.action
+        = rule_book.action.camelcase(' ')
       %td
         = rule_book.from_date
       %td
@@ -44,7 +44,7 @@
           =debit_account.name
           %br
       %td
-        = link_to 'Edit', url(:edit_rule_book,  rule_book)
+        = link_to 'Edit', url(:edit_rule_book,  rule_book, {:return => params[:return]})
 
 = paginate @rule_books
-= link_to 'New', url(:new_rule_book)
+= link_to 'New', url(:new_rule_book, :return => params[:return]), :class => "_remote_"

@@ -1,10 +1,16 @@
+- if @isnurance_policy and @insurance_policy.id and not @insurance_policy.id.blank?
+  = hidden_field :id
 %table
   %tr
     %td
       Insurance Product
     %td
-      = select :insurance_product_id, :collection => InsuranceProduct.all, :prompt => "---", :value_method => :id, :text_method => :name
-      = link_to 'Add a product', resource(:insurance_products, :new, {:return => (@client ? resource(@client, :insurance_policies, :new) : nil)}), :class => "_remote_"
+      - if defined? :product_fixed? and @insurance_policy.insurance_product
+        = @insurance_policy.insurance_product.name
+        = hidden_field :insurance_product_id, :value => @insurance_policy.insurance_product.id
+      - else
+        = select :insurance_product_id, :collection => InsuranceProduct.all, :prompt => "---", :value_method => :id, :text_method => :name
+        = link_to 'Add a product', resource(:insurance_products, :new, {:return => (@client ? resource(@client, :insurance_policies, :new) : nil)}), :class => "_remote_"
   %tr
     %td
       Policy Number
@@ -45,4 +51,4 @@
     %td
       Cover for
     %td
-      = select(:cover_for, :collection => InsurancePolicy::COVER_FOR.map{|x| [x, x]}, :prompt => "---")
+      = select(:cover_for, :collection => InsurancePolicy::COVER_FOR.map{|x| [x, x]})

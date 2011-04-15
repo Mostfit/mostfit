@@ -29,6 +29,7 @@ Spec::Runner.configure do |config|
     mfi = Mfi.first
     mfi.accounting_enabled = false
     mfi.dirty_queue_enabled = false
+    mfi.in_operation_since = Date.new(2000, 01, 01)
     mfi.save
   end
 end

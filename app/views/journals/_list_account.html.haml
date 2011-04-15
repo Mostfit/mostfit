@@ -1,4 +1,4 @@
-%table
+%table.narrow.form
   %tr
     %th
       Date
@@ -16,7 +16,7 @@
     - time_format = Mfi.first.date_format || "%d-%m-%Y"
     - time_format += " %H:%M"
    
-    %tr
+    %tr{:class => cycle('odd','even')}
       %td
         = journal.date.strftime(time_format)
       %td 

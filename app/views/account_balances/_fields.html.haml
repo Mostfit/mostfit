@@ -1,0 +1,17 @@
+%table.form
+  %tr
+    %th
+      Opening Balance
+    %td
+      = text_field :opening_balance
+  %tr
+    %th
+      Closing Balance
+    %td
+      = text_field :closing_balance
+  - if @account_balance and (not @account_balance.verified?) and session.user.role == :admin?
+    %tr
+      %th
+        Verify
+      %td
+        = checkbox :name => verified, :value => @account_balance.verified?

@@ -1,0 +1,45 @@
+= partial :form
+%table.report.nojs
+  %tr.header
+    %th 
+      Funders
+    %th{:colspan => "4"}
+      Portfolio
+  %tr.header
+    %th
+    %th
+      Date of Allocation
+    %th
+      Allocated Value
+    %th
+      Present Value calculated on
+    %th
+      Present Value
+  - funder_id = nil
+  - length = 5
+  - totals = [0,0]
+  - @data.sort_by{|funder, data| funder.name}.each do |funder, data|
+    - if data.length > 0
+      - data.each do |d|
+        %tr
+          %td
+            %b
+              = funder.name
+          %td
+            = d[0].strftime((Mfi.first.date_format) || ('%Y-%m-%d'))
+          %td
+            = (d[1] || 0).to_currency
+            - totals[0] += (d[1] || 0)
+          %td
+            = d[2].strftime((Mfi.first.date_format) || ('%Y-%m-%d'))
+          %td
+            = (d[3] || 0).to_currency
+            - totals[1] += (d[3] || 0)
+  %tr
+    %td
+      %b Total
+    - totals.each do |ele|
+      %td
+      %td
+        %b
+          = ele.to_currency

@@ -18,7 +18,7 @@ class Upload
   end
 
   def process_excel_to_csv
-    `rake 'excel:to_csv[#{directory}, #{filename}]'`
+    `ruby lib/tasks/excel.rb #{directory} #{filename}`
   end
 
   def load_csv(log=nil)

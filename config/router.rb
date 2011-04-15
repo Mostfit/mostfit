@@ -1,5 +1,7 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :account_balances
+  resources :bookmarks
   resources :branch_diaries
   resources :stock_registers
   resources :asset_registers
@@ -10,7 +12,11 @@ Merb::Router.prepare do
   resources :loan_utilizations
   resources :rule_books
   resources :account_types
-  resources :accounts, :id => %r(\d+)
+  resources :accounts, :id => %r(\d+) do
+    resources :accounting_periods do
+      resources :account_balances
+    end
+  end
   resources :rules, :id => %r(\d+)
   resources :bookmarks
   resources :audit_items
@@ -109,7 +115,7 @@ Merb::Router.prepare do
   match('/staff_members/:id/day_sheet.:format').to(:controller => 'staff_members', :action => 'day_sheet', :format => ":format").name(:day_sheet_with_format)
   match('/staff_members/:id/disbursement_sheet').to(:controller => 'staff_members', :action => 'disbursement_sheet').name(:disbursement_sheet)
   match('/staff_members/:id/disbursement_sheet.:format').to(:controller => 'staff_members', :action => 'disbursement_sheet', :format => ":format").name(:disbursement_sheet_with_format)
-  match('/browse(/:action)').to(:controller => 'browse').name(:browse)
+  match('/browse(/:action)(.:format)').to(:controller => 'browse').name(:browse)
   match('/loans/:action').to(:controller => 'loans').name(:loan_actions)
   match('/client/:action').to(:controller => 'clients').name(:client_actions)
   # this uses the redirect_to_show methods on the controllers to redirect some models to their appropriate urls
@@ -147,6 +153,7 @@ Merb::Router.prepare do
     match('/centers.xml', :method => "post").to(:controller => 'centers', :action =>'create', :format => 'xml')
     match('/client_groups.xml', :method => "post").to(:controller => 'client_groups', :action =>'create', :format => 'xml')
   end
+  match('/accounts/:account_id/accounting_periods/:accounting_period_id/account_balances/:id/verify').to(:controller => 'account_balances', :action => 'verify').name(:verify_account_balance)
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')
 end

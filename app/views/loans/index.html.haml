@@ -190,6 +190,7 @@
           - else
             - @client.insurance_policies.each do |ip|
               = link_to ip.description, resource(@client, ip)
+              %br
   %div.tab 
     %input{:type => "hidden", :name => "_load_remote", :value => resource(@branch, @center, @client, :payments)}
   %div.tab 

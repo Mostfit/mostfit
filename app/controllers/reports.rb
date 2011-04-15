@@ -2,8 +2,8 @@ class Reports < Application
   include DateParser
   Types = {
     :periodic     => [DailyReport, WeeklyReport], 
-    :consolidated => [ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, AggregateConsolidatedReport], 
-    :registers    => [TransactionLedger, LoanSanctionRegister, LoanDisbursementRegister, ScheduledDisbursementRegister, ClaimReport, InsuranceRegister], 
+    :consolidated => [DailyTransactionSummary, ConsolidatedReport, GroupConsolidatedReport, StaffConsolidatedReport, QuarterConsolidatedReport, AggregateConsolidatedReport], 
+    :registers    => [TransactionLedger, LoanSanctionRegister, LoanDisbursementRegister, ScheduledDisbursementRegister, ClaimReport, InsuranceRegister, PortfolioAllocationReport], 
     :targets_and_projections  => [ProjectedReport, TargetReport, StaffTargetReport, IncentiveReport],
     :statistics   => [LoanSizePerManagerReport, LoanPurposeReport, ClientOccupationReport, ClosedLoanReport], 
     :exceptions   => [RepaymentOverdue, LateDisbursalsReport, DelinquentLoanReport, ParByCenterReport, ParByStaffReport, ParByLoanAgeingReport, ClientAbsenteeismReport, DuplicateClientsReport, NonDisbursedClientsAfterGroupRecognitionTest],

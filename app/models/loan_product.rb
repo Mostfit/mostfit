@@ -1,6 +1,7 @@
 class LoanProduct
   include DataMapper::Resource  
-  
+  before :save, :convert_blank_to_nil
+
   property :id, Serial, :nullable => false, :index => true
   property :name, String, :nullable => false, :index => true, :min => 3
   property :max_amount, Integer, :nullable => false, :index => true
@@ -12,10 +13,11 @@ class LoanProduct
   property :installment_frequency, Enum.send('[]', *([:any] + INSTALLMENT_FREQUENCIES)), :nullable => true, :index => true
 
   property :max_number_of_installments, Integer, :nullable => false, :index => true, :max => 1000
-  property :min_number_of_installments, Integer, :nullable => false, :index => true, :min => 0  
+  property :min_number_of_installments, Integer, :nullable => false, :index => true, :min => 0
 
   #This property is defined in init.rb after app load as Loan may not have loaded by the time this class initializes
   #  property :loan_type, Enum.send('[]'), :nullable => false, :index => true
+  property :loan_type_string, String
   property :valid_from, Date, :nullable => false, :index => true
   property :valid_upto, Date, :nullable => false, :index => true
   
@@ -24,9 +26,12 @@ class LoanProduct
 
   property :payment_validation_methods, Text
   property :loan_validation_methods, Text
+  property :linked_to_insurance, Boolean, :nullable => false, :index => true, :default => false
+  property :insurance_product_id, Integer, :nullable => true, :index => true
 
   has n, :fees, :through => Resource#, :mutable => true
   has n, :loans
+  belongs_to :insurance_product, :nullable => true
 
   validates_with_method :min_is_less_than_max
   validates_is_unique   :name
@@ -40,7 +45,7 @@ class LoanProduct
               :min_interest_rate => min_interest, :max_interest_rate => max_interest, 
               :min_number_of_installments => row[headers[:min_number_of_installments]], :max_number_of_installments => row[headers[:max_number_of_installments]], 
               :installment_frequency => row[headers[:installment_frequency]].downcase.to_sym,
-              :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]), :loan_type => row[headers[:loan_type]])
+              :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]), :loan_type_string => row[headers[:loan_type]])
     [obj.save, obj]
   end
 
@@ -57,7 +62,11 @@ class LoanProduct
   end
 
   def check_loan_type_correctness
-    if Loan.descendants.collect{|x| x.to_s}.include?(loan_type)
+    if loan_type_string and not loan_type_string.blank? and Loan.descendants.collect{|x| x.to_s}.include?(loan_type_string)
+      self.loan_type = Loan.descendants.find{|x| x.to_s == loan_type_string}
+      return true
+    elsif loan_type_string.blank? and loan_type and Loan.descendants.collect{|x| x.to_s}.include?(loan_type.to_s) 
+      self.loan_type_string = loan_type.to_s
       return true
     else
       return false
@@ -88,4 +97,14 @@ class LoanProduct
   def to_s
     "Loans of Rs. #{(max_amount==min_amount ? max_amount : min_amount.to_s+'-'+max_amount.to_s)} at #{(max_interest_rate==min_interest_rate ? max_interest_rate : min_interest_rate.to_s+'% - '+max_interest_rate.to_s+'%')}"
   end
+
+  private
+  def convert_blank_to_nil
+    self.attributes.each{|k, v|
+      if v.is_a?(String) and v.empty? and self.class.properties.find{|x| x.name == k}.type==Integer
+        self.send("#{k}=", nil)
+      end
+    }
+  end
+
 end

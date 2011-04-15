@@ -100,7 +100,9 @@ class StaffMembers < Application
     #debugger
     if params[:format] == "pdf"
       #some problem not working as of now
-      filename = "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_disbursement_#{@date.strftime('%Y_%m_%d')}.pdf"
+      folder   = File.join(Merb.root, "public", "pdfs")
+      FileUtils.mkdir_p(folder)
+      filename = File.join(folder, "staff_#{@staff_member.id}_disbursement_#{@date.strftime('%Y_%m_%d')}.pdf")
       generate_disbursement_pdf(filename)
       send_data(File.read(filename), :filename => filename)
     else
@@ -174,7 +176,7 @@ class StaffMembers < Application
     if session.user.role == :staff_member or session.user.staff_member
       st = session.user.staff_member
       ids = []
-      [st.branches, st.centers.branches].flatten.uniq.each{|branch|        
+      [st.areas.branches, st.regions.areas.branches, st.branches, st.centers.branches].flatten.uniq.each{|branch|        
         staff_members = StaffMember.related_to(branch)
         ids += ([staff_members, branch.manager.id] << branch.centers.manager.map{|x| x.id}).flatten.uniq        
       }

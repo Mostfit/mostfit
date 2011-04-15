@@ -2,8 +2,9 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe RuleBook do
   before (:all) do
+    load_fixtures :journal_types
     Branch.all.destroy!
-
+    
     @account_type = AccountType.new(:name => 'Assets',:code => 'AST')
     @account_type.save
     @account_type.should be_valid 
@@ -34,6 +35,7 @@ describe RuleBook do
     @rule_book.credit_account_rules << CreditAccountRule.create(:credit_account => @credit_account, :percentage => 100)
     @rule_book.debit_account_rules  << DebitAccountRule.create(:debit_account => @debit_account,  :percentage => 100)
     @rule_book.from_date = "2010.1.1"
+    @rule_book.journal_type = JournalType.first
     @rule_book.to_date = "2010.12.1"
     @rule_book.created_by_user_id = 1
     @rule_book.save
@@ -47,8 +49,8 @@ describe RuleBook do
   end
   
   it "should not be valid if credit account and debit account is same" do
-    @rule_book.credit_accounts << @credit_account
-    @rule_book.debit_accounts  << @credit_account
+    @rule_book.credit_accounts = [@credit_account]
+    @rule_book.debit_accounts  = [@credit_account]
     @rule_book.should_not be_valid
   end
   
@@ -70,7 +72,9 @@ describe RuleBook do
     @rule_book_1.from_date = "2010.10.1"
     @rule_book_1.to_date = "2010.12.1"
     @rule_book_1.created_by_user_id = 1
+    @rule_book_1.journal_type = JournalType.first
     @rule_book_1.save
+    p @rule_book_1.errors
     @rule_book_1.errors.each{|e| puts e}
     @rule_book_1.should be_valid
     @rule_book.to_date = "2010.9.30"

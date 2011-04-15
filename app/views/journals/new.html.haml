@@ -1,18 +1,39 @@
 #voucher_container
-  %h1 New Journal Entry  
-  = error_messages_for @journal
+  %h4
+    New Voucher Entry
+    |
+    %a#new_entry{:href => "#new_voucher", :onclick => "javascript: $('#new_eod_voucher_entry').toggle(); $('#voucher_entry').toggle();"}
+      EOD Voucher Entry
+  %br
 
-  - if session.user.role == :admin and not @branch
-    %div{:style => "padding-left: 25px;"}
+  %div#new_eod_voucher_entry{:style => "display: none; padding-left: 25px;"}
+    %h2 EOD Voucher entry    
+    %form{:class => "_remote_", :method => "GET", :action => url(:controller => :journals, :action => :new_eod, :return => params[:return])}
+      %b Select branch
+      = select :name => :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select branch", :selected => params[:branch_id]
+      = date_select :date, Date.today
+      %input{:type => :hidden, :name => "return", :value => params[:return]}
+      %input{:type => :hidden, :name => "_target_", :value => "eod_voucher_container"}
+      = submit "GO"
+    #eod_voucher_container
+
+  %div#voucher_entry{:style => "display: block; padding-left: 25px;"}
+    %h2 Voucher entry
+    = error_messages_for @journal
+    - if session.user.role == :admin
       %form{:class => "_remote_", :method => "GET", :action => resource(:journals, :new, {:return => params[:return]})}
         %b Select branch
         = select :name => :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Head office accounts", :selected => params[:branch_id]
         %input{:type => :hidden, :name => "_target_", :value => "voucher_container"}
         %input{:type => :hidden, :name => "return", :value => params[:return]}
         = submit "GO"
-  - if @branch
-    %h2
-      = @branch.name
-  = form_for(@journal, :action => resource(:journals, {:branch_id => (@branch ? @branch.id : nil), :return => params[:return]}), :method => :post) do
-    = partial :fields
-  = link_to 'Back', (@branch ? resource(@branch) : url(:accounts))
+    - if @branch
+      %h2
+        = @branch.name
+      = form_for(@journal, :action => resource(:journals, {:branch_id => (@branch ? @branch.id : nil), :return => params[:return]}), :method => :post) do
+        = partial :fields
+    - else
+      %h2
+        HO journal entry
+      = form_for(@journal, :action => resource(:journals, {:return => params[:return]}), :method => :post) do
+        = partial :fields

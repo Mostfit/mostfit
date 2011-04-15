@@ -1,0 +1,56 @@
+- @from_date ||= @account.account_earliest_date - 1
+- @to_date||= Date.today - 1
+- balance = @account.opening_balance_as_of(@from_date) || 0
+%table.form.narrow
+  %tr
+    %thead
+      %th
+        Date
+      %th
+        Particulars
+      %th
+        Vch Type
+      %th
+        Vch. No.
+      %th
+        %b Debit
+      %th
+        %b Credit
+  %tr.total
+    %td
+      = @from_date
+    %td
+      Opening Balance
+    %td
+    %td
+    %td
+      = balance.to_currency
+    %td
+  - posting_hash = Posting.all(:account => @account, "journal.date.lte" => @to_date, "journal.date.gte" => @from_date).map{|p| [p.journal.date, p]}.to_hash
+  - posting_hash.keys.sort.each do |date|
+    %tr{:class => cycle('odd','even')}
+      - posting = posting_hash[date]
+      - balance += posting.amount
+      %td
+        = date
+      %td
+        = posting.journal.comment
+      %td
+      %td
+      %td
+        = posting.amount > 0 ? posting.amount.to_currency : "-"
+      %td
+        = posting.amount < 0 ? posting.amount.abs.to_currency : "-"
+  %tr.total
+    %td
+      = @to_date
+    %td
+      Closing Balance
+    %td
+    %td
+    %td
+      = balance.to_currency
+    %td
+        
+        
+  

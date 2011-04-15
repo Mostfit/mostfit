@@ -8,14 +8,29 @@ class AccountingPeriod
   include DataMapper::Resource
   
   property :id, Serial
+  property :name, String
   property :begin_date, Date, :nullable => false, :default => Date.today
   property :end_date, Date, :nullable => false, :default => Date.today+365
   property :created_at, DateTime, :nullable => false, :default => Time.now 
-  property :created_by_user_id, Integer, :nullable => false
 
-  belongs_to :created_by, :child_key => [:created_by_user_id], :model => 'User'
+
+  has n, :account_balances
+  has n, :accounts, :through => :account_balances
+
+  validates_with_method :cannot_overlap
 
   def duration
     (end_date - begin_date).to_i + 1
   end
+
+  def is_first_period?
+    begin_date == self.model.aggregate(:begin_date).min
+  end
+
+  def cannot_overlap
+    overlaps = AccountingPeriod.all(:end_date.lte => end_date, :end_date.gt => begin_date) or AccountingPeriod.all(:begin_date.gte => begin_date, :begin_date.lt => end_date)
+    return true if overlaps.empty?
+    return [false, "Your accounting period overlaps with other accounting periods"]
+  end
+
 end

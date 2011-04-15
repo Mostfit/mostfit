@@ -24,6 +24,9 @@ class Account
 
   has n, :postings
   has n, :journals, :through => :postings
+  has n, :account_balances
+  has n, :accounting_periods, :through => :account_balances
+  
   is :tree, :order => :name
   
   validates_present   :name 
@@ -38,14 +41,25 @@ class Account
     
   end
 
+  # check if it is a cash account
   def is_cash_account?
     @account_category ? @account_category.eql?('Cash') : false
   end
   
+  # check if it is a bank account
   def is_bank_account?
     @account_category ? @account_category.eql?('Bank') : false
   end
   
+  def opening_balance_as_of(date = Date.today)
+    postings("journal.date.lte" => date).aggregate(:amount.sum)
+  end
+
+  def account_earliest_date
+    # oops! the opening_balance_as_on date is greater than the earliest posting date!!
+    postings("journal.date.lte" => Date.today).map{|p| p.journal.date}.min || opening_balance_on_date || Date.min_date
+  end
+
   def convert_blank_to_nil
     self.attributes.each{|k, v|
       if v.is_a?(String) and v.empty? and self.class.send(k).type==Integer
@@ -54,6 +68,9 @@ class Account
     }
   end
 
+  
+  # generate tree form of accounts based on parent relationships.
+  # TODO: Not working correctly right now
   def self.tree(branch_id = nil)
     data = {}
     Account.all(:order => [:account_type_id.asc], :parent_id => nil).group_by{|account| account.account_type}.each{|account_type, accounts|

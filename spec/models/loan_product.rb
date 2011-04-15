@@ -4,7 +4,9 @@ describe LoanProduct do
 
   before(:each) do
     @loan_product = LoanProduct.new(:name => "Test product", :min_amount => 100, :max_amount => 10000, :min_interest_rate => 8, :max_interest_rate => 10, 
+                                    :max_number_of_installments => 100, :min_number_of_installments => 10, :loan_type_string => "DefaultLoan",
                                     :valid_from => Date.today, :valid_upto => Date.today, :installment_frequency => :weekly)
+    @loan_product.valid?
     @loan_product.should be_valid
   end
   it "should not be valid without min amount" do

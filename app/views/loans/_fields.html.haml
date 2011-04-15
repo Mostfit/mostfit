@@ -1,6 +1,5 @@
 :javascript
-  o = {"applied_by":#{@client.center.manager.id}, "approved_by":#{@client.center.branch.manager.id}, "disbursed_by":#{@client.center.manager.id}}
-
+  o = {"applied_by":#{@center.manager.id}, "approved_by":#{@center.branch.manager.id}, "disbursed_by":#{@center.manager.id}}
 - take_over_loan = /^TakeOver/.match(@loan_product.loan_type)
 = hidden_field :name => "loan_type", :value => @loan.class.to_s
 = hidden_field :name => "loan_product_id", :value => @loan_product.id
@@ -43,6 +42,13 @@
         = @loan_product.installment_frequency.to_s
       - else
         = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
+  - if @loan_product.installment_frequency == :daily
+    %tr
+      %td
+        Weekly Off
+      %td
+        - weekdays = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+        = select :weekly_off, :collection => [["","--"]] + weekdays.map{|w| [(weekdays.index(w) + 1).to_s, w]}
   %tr
     %td
       Number of installments:
@@ -82,13 +88,13 @@
       on&nbsp;&nbsp;
       = date_select_for @loan, :applied_on
       &nbsp;&nbsp;by&nbsp;&nbsp;
-      = select_staff_member_for @loan, :applied_by, :selected => @client.center.manager.id.to_s, :id => "applied_by"
+      = select_staff_member_for @loan, :applied_by, :selected => @center.manager.id.to_s, :id => "applied_by"
   %tr
     %td
       Scheduled disbursal date:
     %td
       on&nbsp;&nbsp;
-      - probable_scheduled_disbursal_date = @client.center.next_meeting_date_from(Date.today)
+      - probable_scheduled_disbursal_date = @center.next_meeting_date_from(Date.today)
       = date_select_for @loan, :scheduled_disbursal_date, :max_date => Date.max_date, :date => (@loan.scheduled_disbursal_date || probable_scheduled_disbursal_date)
   - if @loan_product.installment_frequency == :weekly
     %tr
@@ -96,7 +102,7 @@
         Scheduled first payment:
       %td
         on&nbsp;&nbsp;
-        = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date, :date => (@loan.scheduled_first_payment_date || @client.center.next_meeting_date_from(probable_scheduled_disbursal_date))
+        = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date, :date => (@loan.scheduled_first_payment_date || @center.next_meeting_date_from(probable_scheduled_disbursal_date))
   - else
     %tr
       %td
@@ -138,7 +144,17 @@
       %td
         = text_field :taken_over_on_installment_number, :size => 5
         %span.greytext number of installments already paid
-  -if not @loan.new? and [:admin, :mis_manager].include?(session.user.role)
+  - if @loan_product.linked_to_insurance
+    %tr              
+      %td
+        %b Insurance policy details
+      %td{:colspan => 4}
+        - @insurance_policy.insurance_product = @loan_product.insurance_product
+        = error_messages_for @insurance_policy
+        = form_for(@insurance_policy, :action => resource(@client, :insurance_policies) ) do
+          = partial "insurance_policies/fields"
+
+  - if not @loan.new? and [:admin, :mis_manager].include?(session.user.role)
     %tr
       %td
         Approved Amount:

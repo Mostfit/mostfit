@@ -46,6 +46,8 @@ module Misfit
       return [false, "Number of installments not defined"] if number_of_installments.nil? or number_of_installments.blank?
       return [false, "Amount not defined"] unless amount
       return [false, "Interest rate not defined"] unless interest_rate
+      return [false, "Installment frequency is not defined"] unless installment_frequency
+      return [false, "Scheduled first payment date is not defined"] unless scheduled_first_payment_date
 
       self.payment_schedule.each do |date, val|
         pri = val[:principal]
@@ -61,14 +63,38 @@ module Misfit
       return true
     end
 
-    def scheduled_dates_must_be_center_meeting_days
+    def scheduled_dates_must_be_center_meeting_days #this function is only for repayment dates
+      return [false, "Not client defined"] unless client
+      center = client.center
+      failed = []
+      correct_weekday = nil 
+      ["scheduled_first_payment_date"].each do |d|
+        # if the loan disbursal date is set and it is not being set right now, no need to check as the loan has been already disbursed
+	# hence we need not check it again
+	if self.disbursal_date and not self.dirty_attributes.keys.find{|da| da.name == :disbursal_date} 
+	  return true
+	end
+	  
+	if date = instance_eval(d) and not date.weekday == center.meeting_day_for(date)
+          failed << d.humanize
+          correct_weekday = center.meeting_day_for(date)
+        end
+      end
+      
+      return [false, "#{failed.join(",")} must be #{correct_weekday}"]      unless failed.blank?
+      return true
+    end
+
+    def disbursal_dates_must_be_center_meeting_days #this function is only for disbursal dates
       return [false, "Not client defined"] if not client
       center = client.center
       failed = []
       correct_weekday = nil 
-      ["scheduled_first_payment_date", "scheduled_disbursal_date"].each do |d|
-        next if self.disbursal_date and self.disbursal_date < Date.today
-        if not date = instance_eval(d) or not date.weekday == center.meeting_day_for(date)
+      ["scheduled_disbursal_date", "disbursal_date"].each do |d|
+	# if the loan disbursal date is set and it is not being set right now, no need to check as the loan has been already disbursed
+	next unless instance_eval(d)
+	return true if self.disbursal_date and not self.dirty_attributes.keys.find{|da| da.name == :disbursal_date}
+	if not date = instance_eval(d) or not date.weekday == center.meeting_day_for(date)
           failed << d.humanize
           correct_weekday = center.meeting_day_for(date)
         end
@@ -90,7 +116,15 @@ module Misfit
       end
       return true
     end
-
+    
+    def loans_must_not_be_duplicated
+      if self.new? and Loan.first(:client_id => self.client_id, :applied_on => self.applied_on, :amount => self.amount)
+	return [false, "The Loan seems to be a duplicate entry"]
+      else
+	return true
+      end
+    end
+    
   end    #LoanValidators
 
 end

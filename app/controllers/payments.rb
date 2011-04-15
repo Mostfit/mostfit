@@ -117,6 +117,7 @@ class Payments < Application
   def do_payment(payment)
     amounts = payment[:amount].to_f
     receiving_staff = StaffMember.get(payment[:received_by_staff_id])
+
     if payment[:type] == "total" and @loan
       @payment_type = payment[:type]
     # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
@@ -131,6 +132,7 @@ class Payments < Application
     else
       @payment_type = payment[:type] if payment[:type]
       @payment = Payment.new(payment)
+      @payment.amount = amounts
       @payment.loan = @loan if @loan
       @payment.client = @client if @client
       @payment.created_by = session.user
@@ -140,13 +142,13 @@ class Payments < Application
         if fee = obj.fees_payable_on[@payment.received_on]
           @payment.fee = fee
         else
-          fees = obj.fee_schedule.reject{|d, f| d>@payment.received_on}.values.collect{|x| x.keys}.flatten - obj.fee_payments.values.collect{|x| x.keys}.flatten
+          fees = obj.fee_schedule.reject{|d, f| d > @payment.received_on}.values.collect{|x| x.keys}.flatten - obj.fee_payments.values.collect{|x| x.keys}.flatten
           @payment.fee = fees.first if fees and fees.length>0
         end
       end
       success = @payment.save
       # reloading loan as payments can be stale here
-      Loan.get(@loan.id).update_history if success and @loan
+      Loan.get(@loan.id).update_history if @loan
       return success      
     end
   end

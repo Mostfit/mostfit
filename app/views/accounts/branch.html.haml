@@ -1,5 +1,4 @@
-- @journals = @journals || Account.all(:branch => @branch).postings.journals(:order => [:created_at.desc]).paginate(:per_page => 20, :page => params[:page])
-
+- @journals ||= Journal.all("postings.account.branch_id" => @branch.id, :order => [:created_at.desc]).paginate(:per_page => 20, :page => params[:page] ||1 )
 %div#container_journal_entries
   %h1
     Accounts
@@ -11,5 +10,5 @@
   %div#new_journal_entry{:style => "display: none;"}
     = form_for(@journal, :action => resource(@branch, :journals)) do
       = partial "journals/fields", :branch => @branch
-  %div
+  %div    
     = partial "journals/list", :journals => @journals

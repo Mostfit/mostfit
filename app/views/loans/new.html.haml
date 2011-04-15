@@ -1,9 +1,11 @@
 %h1 Add a new loan
 
 = error_messages_for @loan
+= error_messages_for @insurance_policy
 
 - if @loan.nil?
-  %p== Please select the type of loan product you want to create for #{@client.name}.
+  - if @client
+    %p== Please select the type of loan product you want to create for #{@client.name}.
   .prefix-2.span-16.suffix-6.last
   %table
     - @loan_products.each do |product|

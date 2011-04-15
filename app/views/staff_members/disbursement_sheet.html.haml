@@ -3,10 +3,11 @@
     Change date
     = date_select "date", @date
     =submit "Go"
-    - all_centers = @staff_member.centers
+    - all_centers = @staff_member.centers.aggregate(:id)
     -if all_centers.length>0
-      = link_to 'previous day', url(:disbursement_sheet, :date => Loan.all(:scheduled_disbursal_date.lt => @date).max(:scheduled_disbursal_date))
-      = link_to 'next day', url(:disbursement_sheet, :date => Loan.all(:scheduled_disbursal_date.gt => @date).min(:scheduled_disbursal_date)), :style => "padding-left: 120px;"
+      = link_to 'previous day', url(:disbursement_sheet, :date => Loan.all(:scheduled_disbursal_date.lt => @date, "client.center_id" => all_centers).max(:scheduled_disbursal_date))
+      |
+      = link_to 'next day', url(:disbursement_sheet, :date => Loan.all(:scheduled_disbursal_date.gt => @date, "client.center_id" => all_centers).min(:scheduled_disbursal_date))
 %h1 
   Daily Disbursement Sheet for 
   = @staff_member.name
@@ -44,6 +45,10 @@
           %th
             Amount
           %th
+            Insurance Premium
+          %th
+            Balance to Disburse
+          %th
             First Payment
       - loans_to_disburse.each do |loan|
         - tot_disbursement += loan.amount
@@ -57,6 +62,16 @@
               = loan.loan_product.name
           %td 
             = loan.amount
+            %td
+              - if loan.loan_product.linked_to_insurance and loan.insurance_policy
+                = loan.insurance_policy.premium
+              - else
+                = "-"
+          %td
+            - if loan.loan_product.linked_to_insurance
+              = loan.amount - loan.insurance_policy.premium
+            - else
+              = loan.amount
           %td
             = loan.scheduled_first_payment_date
       %tr{ :style => 'border-bottom: 2px solid;font-weight: bold;border-top: solid 1px #aaa;' }

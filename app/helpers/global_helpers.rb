@@ -66,8 +66,9 @@ module Merb
         collection << ['', branch_name]
         catalog[branch_name].sort_by{|x| x[1]}.each{ |k,v| collection << [k.to_s, "!!!!!!!!!#{v}"] }
       end
+
       selected_id = (obj.send(id_col) ? obj.send(id_col).to_s : nil)
-      selected_id = session[:center_id].to_s unless selected_id and session.key?(:center_id)
+      selected_id = session[:center_id].to_s if not selected_id and session.key?(:center_id)
       
       html = select col,
         :collection   => collection,
@@ -491,6 +492,20 @@ module Merb
         obj.address.blank? ? obj.name : obj.address
       end
     end
+    
+    def get_status_class(idx)
+      case idx
+      when 0
+        'red'
+      when 1
+        'green'
+      when 2
+        'blue'
+      else
+        'grey'
+      end
+    end
+    
 
     private
     def staff_members_collection(allow_unassigned=false, allow_inactive=false)
@@ -500,9 +515,9 @@ module Merb
         cms  = staff.branches.centers.collect{|x| x.manager}               
         managers = [bms, cms, staff].flatten.uniq
         managers+= (StaffMember.all(hash.merge(:order => [:name])) - Branch.all.managers - Center.all.managers - Region.all.managers - Area.all.managers) if allow_unassigned
-        [["0", "<Select a staff member"]] + managers.map{|x| [x.id, x.name]}
+        [["0", "Select a staff member"]] + managers.map{|x| [x.id, x.name]}
       else
-        [["0", "<Select a staff member"]] + StaffMember.all(hash.merge(:order => [:name])).map{|x| [x.id, x.name]}
+        [["0", "Select a staff member"]] + StaffMember.all(hash.merge(:order => [:name])).map{|x| [x.id, x.name]}
       end
     end
     
@@ -516,7 +531,7 @@ module Merb
       controller_name = (params[:action]=="list" or params[:action]=="index") ? controller.join_snake(' ') : controller.singularize.join_snake(' ')
       controller_name = controller_name.map{|x| x.join_snake(' ')}.join(' ')
       prefix  << params[:namespace].join_snake(' ') if params[:namespace]
-      postfix << params[:action].join_snake(' ') if not CRUD_ACTIONS.include?(params[:action])
+      postfix << params[:action].join_snake(' ') if params[:action] and not CRUD_ACTIONS.include?(params[:action])
       prefix  << params[:action].join_snake(' ') if CRUD_ACTIONS[3..-1].include?(params[:action])
       
       return "Loan for #{@loan.client.name}" if controller=="payments" and @loan
@@ -529,7 +544,6 @@ module Merb
 
       #if @<controller> is indeed present
       obj = instance_variable_get("@"+controller.singularize)
-#      prefix  += "New" if obj.new?
       postfix << "for #{@loan.client.name}" if obj.respond_to?(:client)
 
       return join_segments(prefix, controller_name, obj.name, postfix) if obj.respond_to?(:name) and not obj.new?

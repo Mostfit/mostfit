@@ -2,7 +2,7 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Journal do
   before (:all) do
-    load_fixtures :account_type, :account, :currency, :journal_type, :staff_members, :branches
+    load_fixtures :account_type, :account, :currency, :journal_types, :staff_members, :branches
   end
   
   it "should create double entry transactions correctly" do

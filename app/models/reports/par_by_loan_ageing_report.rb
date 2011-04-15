@@ -16,7 +16,7 @@ class ParByLoanAgeingReport < Report
   end
 
   def name
-    "PAR by Loan Ageing report as on #{@date} in intervals of #{@ageing_interval}"
+    "PAR by Loan Ageing report as on #{@date} in #{@ageing_interval} intervals"
   end
 
   def self.name

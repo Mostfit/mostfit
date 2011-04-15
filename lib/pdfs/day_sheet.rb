@@ -97,10 +97,10 @@ module Pdf
           loans_to_disburse.each do |loan|
             table.data.push({"amount" => loan.amount.to_currency, "name" => loan.client.name,
                               "group" => loan.client.client_group.name,
-                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date
+                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date                              ,"spouse name" => loan.client.spouse_name 
                             })
           end
-          table.column_order  = ["name", "group", "amount", "loan product", "first payment"]
+          table.column_order  = ["name", "spouse name", "group", "amount", "loan product", "first payment", "signature"]
           table.show_lines    = :all
           table.shade_rows    = :none
           table.show_headings = true          
@@ -120,7 +120,7 @@ module Pdf
     end
 
     def generate_disbursement_pdf(filename)
-      pdf = PDF::Writer.new(:orientation => :landscape)
+      pdf = PDF::Writer.new(:orientation => :landscape, :paper => "A4")
       pdf.select_font "Times-Roman"
       pdf.text "Daily Disbursement Sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
       pdf.text("\n")
@@ -130,20 +130,32 @@ module Pdf
         pdf.text "Center: #{center.name}, Manager: #{@staff_member.name}, signature: ______________________", :font_size => 12, :justification => :left
         pdf.text("Center leader: #{center.leader.client.name}, signature: ______________________", :font_size => 12, :justification => :left) if center.leader
         pdf.text("Date: #{@date}, Time: #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}", :font_size => 12, :justification => :left)
+        pdf.text("Actual Disbursement on ___________________________, signature: ______________________", :font_size => 12, :justification => :left)
         pdf.text("\n")
         #draw table for scheduled disbursals
-        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil)
+        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => @date) #, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil)
         if center.clients.count>0 and loans_to_disburse.count > 0
           table = PDF::SimpleTable.new
           table.data = []
-
+          tot_amount = 0
           loans_to_disburse.each do |loan|
+            tot_amount += loan.amount
+            premia, amount_to_disburse = 0, nil
+            if loan.loan_product.linked_to_insurance
+               premia = loan.insurance_policy.premium
+               amount_to_disburse = loan.amount - loan.insurance_policy.premium
+            else
+               premia = "NA"
+            end
             table.data.push({"amount" => loan.amount.to_currency, "name" => loan.client.name,
                               "group" => loan.client.client_group.name,
-                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date
+                              "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date, 
+                              "spouse name" => loan.client.spouse_name, "loan status" => loan.status,
+                              "insurance premium" => premia, "balance to disburse" => (amount_to_disburse||loan.amount.to_currency)
                             })
           end
-          table.column_order  = ["name", "group", "amount", "loan product", "first payment", "signature"]
+          table.data.push({"amount" => tot_amount.to_currency})
+          table.column_order  = ["name", "spouse name",  "group", "amount", "insurance premium", "balance to disburse", "loan product", "first payment", "loan status", "signature"]
           table.show_lines    = :all
           table.shade_rows    = :none
           table.show_headings = true          
@@ -151,7 +163,7 @@ module Pdf
           table.orientation   = :center
           table.position      = :center
           table.title_font_size = 16
-          table.header_gap = 10
+          table.header_gap = 20
           pdf.text("\n")
           pdf.text "Disbursements today"
           pdf.text("\n")

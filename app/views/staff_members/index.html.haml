@@ -56,7 +56,8 @@
         %td.text
           %b= link_to staff_member.name, resource(staff_member)
         %td
-          %b= staff_member.active? ? 'active' : 'disabled'
+          %span{:class => staff_member.active? ? '' : 'red'}
+            = staff_member.active? ? 'active' : 'disabled'
         %td
           - hash = {:manager_staff_id => staff_member.id, :creation_date.gte => this_month, :creation_date.lte => this_month_end}
           - item = @branch_managers_thismonth.find{|x| x[0]==staff_member.id}

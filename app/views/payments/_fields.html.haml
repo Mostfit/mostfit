@@ -22,11 +22,10 @@
       on&nbsp;&nbsp;
       = date_select_for @payment, :received_on
       &nbsp;&nbsp;by&nbsp;&nbsp;
-      = select :received_by_staff_id, :collection => StaffMember.all(:active => true), :value_method => :id, :text_method => :name, :prompt => "&lt;select a staff member&gt;"
+      = select :received_by_staff_id, :collection => staff_members_collection()
   %tr
     %td
     %td
       = submit submit_text
       &nbsp;&nbsp;
       = link_to 'cancel', cancel_link
-

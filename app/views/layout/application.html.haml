@@ -3,26 +3,30 @@
   %head
     %meta{ :content => "text/html; charset=utf-8", "http-equiv" => "content-type" }/
     %title
-      = page_title
+      = page_title_str = page_title
     %link{ :rel => "icon", :type => "image/ico", :href => "/favicon.ico" }/
     = css_include_tag :screen, :media => "screen, projection"
     = css_include_tag :print, :media => "print"
     = css_include_tag :style, :media => "screen, projection"
     = css_include_tag "jquery-ui", :media => "screen, projection"
-    = js_include_tag :jquery, :application, :swfobject, "jquery.highlight.js" , "jquery-ui.min.js", "jquery.floatheader.min.js"
+    = js_include_tag :jquery, :application, :swfobject, "jquery.highlight.js", "jquery.floatheader.min.js", "jquery-ui.min.js"
   %body
+    - if session.authenticated?
+      .bookmark
+        = form_for(Bookmark.new, :action => url(:controller => :bookmarks, :action => :system), :class => "_remote_", :onsubmit => "javascript: $('#bookmark_route').val(window.location.pathname+window.location.hash);") do
+          = hidden_field :title, :value => page_title_str
+          %input{:type => 'hidden', :name => "_target_", :value => "bookmark_form_container"}
+          = hidden_field :name, :value => page_title_str
+          = hidden_field :type, :value => :system
+          = hidden_field :route, :value => :system
+          = submit "Bookmarks"
+    #bookmark_form_container
     #header
       #login{:style => 'margin: 2px; float: right; padding: 4px;position:relative; right:150px;'}
         - if Mfi.first.dirty_queue_enabled and count = DirtyLoan.pending.length and count > 0
           %i
             == (#{count} loans in queue)
         - if session.authenticated?
-          - if session.user.role == :admin and Merb.env == "development"
-            %div{:style => "float: left"}
-              %form{:action => "/admin/proxy_logon", :methoid => :post}
-                login as
-                = select :user_id, :collection => User.all(:order => [:login]).map{|u| [u.id, u.login]}
-                = submit "go"
           =link_to 'change password', url(:change_password)
           |
           == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})          
@@ -49,9 +53,9 @@
           = link_to_with_class('Dashboard', url(:dashboard))
           = link_to_with_class('Reports', url(:reports))
           #header_search_div
-            %form._remote_{:action => '/search', :class => 'search', :method => "POST"}
+            %form._remote_{:action => '/search', :class => 'search', :method => "POST", :style => "float:left;"}
               %input{:name => 'query', :value => params[:query], :autocomplete => "off"}
-              %input{:type => 'hidden', :name => '_target_', :value => "content p"}
+              %input{:type => 'hidden', :name => '_target_', :value => "content p:first"}
               %input{:type => 'submit', :value=>'search'}
     #content
       .container
@@ -68,31 +72,11 @@
         = catch_content :for_layout
     #footer
       %p{:style => "position: relative; right: 10%; float: right;"}
+        - if session.authenticated? and session.user.role == :admin and Merb.env == "development"
+          %form{:action => "/admin/proxy_logon", :methoid => :post}
+            login as
+            = select :user_id, :collection => User.all(:order => [:login]).map{|u| [u.id, u.login]}
+            = submit "go"
+      %p{:style => "position: relative; right: 10%; float: right;"}
         =image_tag("/images/mostfit_logo.png", :height => 80)
       == &copy; 2010 Intellecap &mdash; This software is released under the #{link_to 'GNU Affero General Public License', 'http://www.gnu.org/licenses/agpl.html'}.
-      - if Merb::Config[:environment] == 'development'
-        %p
-          %a{ :name => "debug" }/
-          %a{:onclick => "document.getElementsByClassName('debug-info')[0].style.display = '';", :href => '#debug'}
-            debug info
-          .debug-info{:style => 'display: none'}
-            %code
-              - debug_info.each do |i|
-                %p
-                  %a{:onclick => "document.getElementsByClassName('debug_#{i[:name]}')[0].style.display = '';", :href => "#debug_#{i[:name]}"}
-                    = i[:code] + ' =>'
-                  %br/
-                  %span{:class => "debug_#{i[:name]}", :style => 'display: none'}
-                    - if i[:obj].class == Hash
-                      - i[:obj].each do |key, value|
-                        = "#{key.inspect.to_s} => #{value.inspect.to_s}"
-                        %br/
-                    - elsif i[:obj].class == Array
-                      - i[:obj].each do |n|
-                        = n.inspect.to_s
-                        %br/
-                    - else
-                      = i[:obj].inspect.to_s
-                      %br/
-                  %a{ :name => "debug_#{i[:name]}" }/
-

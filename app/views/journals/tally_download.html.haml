@@ -1,0 +1,18 @@
+%h1 Tally voucher download
+%form{:method => "POST", :action => url(:controller => :journals, :action => :tally_download, :return => params[:return])}
+  %table
+    %tr
+      %td
+        From date
+      %td
+        - today = Date.today
+        - month_first = Date.new(today.year, today.month, 1)
+        = date_select :from_date, (params[:from_date] || month_first), :min_date => Date.min_date, :max_date => Date.today      
+    %tr
+      %td
+        To date
+      %td
+        = date_select :to_date, (params[:to_date] || Date.today - 1), :min_date => Date.min_date, :max_date => Date.today      
+    %tr
+      %td
+        = submit "download"

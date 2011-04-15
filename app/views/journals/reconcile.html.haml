@@ -1,0 +1,94 @@
+#reconcile_container
+  %form{:class => "_remote_", :method => "GET", :action => url(:controller => :journals, :action => :reconcile, :return => params[:return])}
+    %b Select branch
+    = select :name => :branch_id, :collection => [["0", "All branches"]] + Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select branch", :selected => params[:branch_id]
+    %b From
+    - today = Date.today
+    - month_first = Date.new(today.year, today.month, 1)
+    = date_select :from_date, (params[:from_date] || month_first), :min_date => Date.min_date, :max_date => Date.today
+    %b To
+    = date_select :to_date, (params[:to_date] || Date.today), :min_date => Date.min_date, :max_date => Date.today
+    %input{:type => :hidden, :name => "return", :value => params[:return]}
+    %input{:type => :hidden, :name => "_target_", :value => "reconcile_container"}
+    = submit "GO"
+  - if @rules
+    - reverses = Journal.all(:comment.like => "%reverse%", :date => (@from_date..@to_date))
+    %table{:width => "30%"}
+      %tr
+        %th
+        %th
+          %b Loan System
+        %th
+          %b Account System
+        %th
+          %b Difference
+      %tr
+        %td
+          %b Disbursement
+        %td
+          = (ls = @disbursement || 0).to_currency
+        %td
+          - account_ids = @rules[:disbursement].map{|x| x.debit_accounts.map{|da| da.id} if x.debit_accounts.length > 0}.flatten
+          - (as = (Posting.all("journal.date" => (@from_date..@to_date), :account_id => account_ids, :amount.lt => 0).aggregate(:amount.sum) || 0) * -1).to_currency
+          - as -= (reverses.postings(:amount.gt => 0, :account_id => account_ids).aggregate(:amount.sum) || 0) if reverses.length>0
+          = (as || 0).to_currency
+        %td
+          %span{:class => "#{(ls - as)!=0 ? 'red' : 'green'}"}
+            = (ls - as).to_currency
+      - ls, as = 0, 0
+      %tr
+        %td
+          %b Principal
+        %td
+          = (ls = @principal||0).to_currency
+        %td
+          - account_ids = []
+          - account_ids += @rules[:principal].map{|x| x.credit_accounts.map{|ca| ca.id}}.flatten
+          - as = (Posting.all("journal.date" => (@from_date..@to_date), :account_id => account_ids, :amount.gt => 0).aggregate(:amount.sum) || 0) if account_ids.length>0
+          - as -= (reverses.postings(:amount.gt => 0, :account_id => account_ids).aggregate(:amount.sum) || 0) if reverses.length>0
+          - account_ids = []
+          - account_ids += @rules[:advance_principal].map{|x| x.credit_account_rules.map{|ca| ca.credit_account_id}}.flatten if @rules[:advance_principal]
+          - as -= (Journal.all(:comment.like => "%reverse%", :date => (@from_date..@to_date)).postings(:amount.gt => 0, :account_id => account_ids).aggregate(:amount.sum) || 0) if @rules[:advance_principal] or @rules[:advance_interest]
+          - as -= (Posting.all("journal.date" => (@from_date..@to_date), :account_id => account_ids, :amount.gt => 0).aggregate(:amount.sum) || 0) unless account_ids.blank?
+          = as.to_currency
+        %td
+          %span{:class => "#{(ls - as)!=0 ? 'red' : 'green'}"}
+            = (ls - as).to_currency
+      %tr
+        %td
+          %b Interest
+        %td
+          = (ls = @interest||0).to_currency
+        %td
+          - account_ids = []
+          - account_ids += @rules[:interest].map{|x| x.credit_accounts.map{|ca| ca.id}}.flatten
+          - as = (Posting.all("journal.date" => (@from_date..@to_date), :account_id => account_ids, :amount.gt => 0).aggregate(:amount.sum) || 0)
+          - # subtracting this figure below as above are debit entries
+          - as -= (reverses.postings(:amount.gt => 0, :account_id => account_ids).aggregate(:amount.sum) || 0) if reverses.length>0
+
+          - account_ids = []
+          - account_ids += @rules[:advance_interest].map{|x| x.credit_account_rules.map{|ca| ca.credit_account_id}}.flatten if @rules[:advance_interest]
+          - as -= (Journal.all(:comment.like => "%reverse%", :date => (@from_date..@to_date)).postings(:amount.gt => 0, :account_id => account_ids).aggregate(:amount.sum) || 0) if @rules[:advance_interest]
+          - as -= (Posting.all("journal.date" => (@from_date..@to_date), :account_id => account_ids, :amount.gt => 0).aggregate(:amount.sum) || 0) unless account_ids.blank?
+          = as.to_currency
+        %td
+          %span{:class => "#{(ls - as)!=0 ? 'red' : 'green'}"}
+            = (ls - as).to_currency
+      - @rules[:fees].group_by{|r| r.credit_accounts}.each do |credit_accounts, rules|        
+        - fid =  rules.map{|r| r.fee_id}
+        %tr
+          %td
+            %b 
+              = Fee.all(:id => fid).aggregate(:name).join(", ")
+          %td
+            = (ls = fid.map{|f| @fees[f]||0}.reduce(0){|s,x| s+=x}).to_currency
+          %td
+            - account_ids = []
+            - account_ids += credit_accounts.map{|ca| ca.id}.flatten
+            - as = (Posting.all("journal.date" => (@from_date..@to_date), :account_id => account_ids, :amount.gt => 0).aggregate(:amount.sum) || 0)
+            - # subtracting this figure below as above are debit entries
+            - as += (reverses.postings(:amount.lt => 0, :account_id => account_ids).aggregate(:amount.sum) || 0) if reverses.length > 0
+            = as.to_currency
+          %td
+            %span{:class => "#{(ls - as)!=0 ? 'red' : 'green'}"}
+              = (ls - as).to_currency

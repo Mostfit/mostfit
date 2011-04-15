@@ -9,7 +9,7 @@
   %p
     Please select a center that you want to edit
   %table.form
-    = form_for(@center, :action => url(:enter_centers, :action => 'edit'), :method => :get) do
+    = form_for(@center, :action => @url || url(:enter_centers, :action => 'edit'), :method => :get) do
       %tr
         %td &nbsp;
       %tr

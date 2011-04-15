@@ -1,9 +1,15 @@
 class Journals < Application
+  include DateParser
   before :get_context
 
   # provides :xml, :yaml, :js
   def index
-    @journals = Journal.all(:order => [:created_at.desc]).paginate(:per_page => 20, :page => params[:page] ||1 )
+    hash = {:order => [:created_at.desc]}
+    hash[:date.gte] = params[:from_date] || Date.today
+    hash[:date.lte] = params[:to_date] || Date.today
+    hash[:journal_type_id] = params[:journal_type_id] if params[:journal_type_id] and not params[:journal_type_id].blank?
+ 
+    @journals = Journal.all(hash).paginate(:per_page => 20, :page => params[:page] ||1 )
     display @journals, :layout => layout?
   end
 
@@ -14,7 +20,7 @@ class Journals < Application
   end
 
   def add_account
-    @branch = (params[:branch_id] ? Branch.get(params[:branch_id]) : nil)
+    @branch = (params[:branch_id] and not params[:branch_id].blank? ? Branch.get(params[:branch_id]) : nil)
     partial :account_amount, :layout => layout?, :last_account => true, :account_type => (params[:account_type]||"credit_account").to_sym, :account => {}
   end
 
@@ -71,7 +77,106 @@ class Journals < Application
     end
   end
 
-private
+  # Action for EOD voucher entry
+  def new_eod
+    @branch = Branch.get(params[:branch_id])
+    raise BadRequest unless @branch
+    @date = Date.parse(params[:date])
+    @journal = Journal.new
+    @rules = RuleBook.all(:branch => @branch, :from_date.lte => @date, :to_date.gte => @date)
+    render :new_eod, :layout => layout?
+  end
+
+  # Action for creatng EOD voucher entry
+  def create_eod(journal)
+    @branch  = Branch.get(params[:branch_id]) if params[:branch_id]
+
+    if params[:debit_accounts] and params[:credit_accounts]
+      #multiple debit and credit accounts
+      debit_accounts, credit_accounts  = {}, {}
+      params[:debit_accounts].each{|debit|
+        debit_accounts[Account.get(debit[:account_id])] ||= 0
+        debit_accounts[Account.get(debit[:account_id])] += debit[:amount].to_i
+      }
+
+      params[:credit_accounts].each{|credit|
+        credit_accounts[Account.get(credit[:account_id])] ||= 0
+        credit_accounts[Account.get(credit[:account_id])] += credit[:amount].to_i      
+      }
+    else
+      raise BadRequest
+    end
+
+    debit_accounts  = debit_accounts.reject{|k, v| v == 0}
+    credit_accounts = credit_accounts.reject{|k, v| v == 0}
+
+    journal[:currency] = Currency.first
+    status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)
+
+    if status
+      if params[:return] and not params[:return].blank?        
+        return_path =  params[:return]
+      elsif @branch
+        return_path = resource(@branch)
+      else
+        return_path =  resource(:accounts)+"#journal_entries"
+      end
+      
+      if request.xhr?
+        render "Journal was successfully created", :layout => layout?
+      else
+        redirect return_path, :message => {:notice => "Journal was successfully created"}
+      end
+    else
+      message[:error] = "Journal failed to be created"
+      render :new, :layout => layout?
+    end
+  end
+  
+  def reconcile
+    if params[:branch_id] and not params[:branch_id].blank?
+
+      if params[:branch_id] == "0"
+        @branch = Branch.all
+      else
+        @branch = Branch.all(:id => params[:branch_id])
+      end
+
+      raise BadRequest unless @branch.length > 0
+
+      @from_date = Date.parse(params[:from_date])
+      @to_date = Date.parse(params[:to_date])
+      
+      # get all the relevant rules
+      @rules = RuleBook.all(:branch => @branch, :from_date.lte => @to_date, :to_date.gte => @to_date).group_by{|x| x.action.to_sym}
+      
+      # get all the relevant figures from the loan system
+      @disbursement = Loan.all("client.center.branch_id" => @branch.map{|b| b.id}, :disbursal_date.gte => @from_date, 
+                               :disbursal_date.lte => @to_date, :rejected_on => nil).aggregate(:amount.sum)
+      @principal    = Payment.all("client.center.branch_id" => @branch.map{|b| b.id}, :received_on.gte => @from_date, 
+                                  :received_on.lte => @to_date, :type => :principal).aggregate(:amount.sum) || 0
+      @interest     = Payment.all("client.center.branch_id" => @branch.map{|b| b.id}, :received_on.gte => @from_date,
+                                  :received_on.lte => @to_date, :type => :interest).aggregate(:amount.sum) || 0
+      @fees         = (Payment.all("client.center.branch_id" => @branch.map{|b| b.id}, :received_on.gte => @from_date,
+                                  :received_on.lte => @to_date, :type => :fees).aggregate(:fee_id, :amount.sum) || []).to_hash
+    end
+    render :layout => layout?
+  end
+
+  def tally_download
+    if params[:from_date] and params[:to_date]
+      from_date = Date.parse(params[:from_date])
+      to_date   = Date.parse(params[:to_date])
+
+      file   = File.join("/", "tmp", "voucher_#{from_date.strftime('%Y-%m-%d')}_#{to_date.strftime('%Y-%m-%d')}_#{Time.now.to_i}.xml")
+      Journal.xml_tally({:date.gte => from_date, :date.lte => to_date}, file)
+      send_data(File.read(file), :filename => file)
+    else
+      render :layout => layout?
+    end
+  end
+
+  private
   def get_context
     @branch       = Branch.get(params[:branch_id]) if params[:branch_id]
   end

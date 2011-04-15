@@ -47,6 +47,7 @@ describe Loan do
     @client.errors.each {|e| puts e}
     @client.should be_valid
     # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
+
     @loan_product = LoanProduct.new
     @loan_product.name = "LP1"
     @loan_product.max_amount = 1000
@@ -56,7 +57,7 @@ describe Loan do
     @loan_product.installment_frequency = :weekly
     @loan_product.max_number_of_installments = 25
     @loan_product.min_number_of_installments = 25
-    @loan_product.loan_type = "DefaultLoan"
+    @loan_product.loan_type_string = "DefaultLoan"
     @loan_product.valid_from = Date.parse('2000-01-01')
     @loan_product.valid_upto = Date.parse('2012-01-01')
     @loan_product.save
@@ -65,18 +66,23 @@ describe Loan do
   end
 
   before(:each) do
+    @loan_product.loan_validation_methods = nil
+    @loan_product.save
+
     @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
+    @loan.discriminator = DefaultLoan
     @loan.history_disabled = true
     @loan.applied_by       = @manager
     @loan.funding_line     = @funding_line
     @loan.client           = @client
-    @loan.loan_product     = @loan_product
+    @loan.loan_product     = @loan_product.reload
     @loan.valid?
     @loan.errors.each {|e| puts e}
     @loan.should be_valid
     @loan.approved_on = "2000-02-03"
     @loan.approved_by = @manager
     @loan.should be_valid
+    @loan_product.errors.each {|e| puts e}
   end
   
   it "should have a discrimintator" do
@@ -86,6 +92,12 @@ describe Loan do
     @loan.client = nil
     @loan.should_not be_valid
   end
+  it "should not give error if amount is blank" do
+    @loan.amount = ''
+    @loan.save.should be_false
+    @loan.should_not be_valid
+  end
+
   it "should not be valid without being approved properly" do
     @loan.applied_by = nil
     @loan.should_not be_valid
@@ -256,8 +268,74 @@ describe Loan do
     @loan.should_not be_valid
   end
   it "should not be valid if scheduled disbursal date and scheduled first payment date are not center meeting dates" do
+#     @loan.scheduled_disbursal_date = @center.meeting_day
+#     @loan.should be_valid
+#     @loan.scheduled_first_payment_date = @center.meeting_day
+#     @loan.should be_valid
+#     @loan.scheduled_disbursal_date = @center.meeting_day + 1
+#     @loan.should_not be_valid
+#     @loan.scheduled_disbursal_date = @center.meeting_day - 1
+#     @loan.should_not be_valid
+#     @loan.scheduled_first_payment_date = @center.meeting_day + 1
+#     @loan.should_not be_valid
+#     @loan.scheduled_first_payment_date = @center.meeting_day - 1
+#     @loan.should_not be_valid
   end
+  
+  it "should not be valid if repayment dates are not center meeting dates" do
+    @loan.scheduled_disbursal_date = Date.new(2000, 11, 30)
+    @loan.should be_valid
 
+    @loan.scheduled_disbursal_date = Date.new(2000, 11, 29)
+    @loan.should be_valid
+
+    @loan.disbursal_date = Date.new(2000, 11, 23)
+    @loan.applied_by     = @manager
+    @loan.disbursed_by   = @manager
+    @loan.valid?
+    @loan.errors.each {|e| puts e}
+    @loan.should be_valid
+
+    @loan.disbursal_date = Date.new(2000, 12, 29)
+    @loan.should be_valid
+
+    @loan.disbursal_date = Date.new(2000, 12, 30)
+    @loan.should be_valid
+
+    @loan_product.loan_validation_methods = "disbursal_dates_must_be_center_meeting_days"
+    @loan_product.save
+
+    @center.meeting_day_for(Date.new(2000, 11, 29)).should == :wednesday
+    @loan.scheduled_disbursal_date = Date.new(2000, 11, 29)
+    @loan.disbursal_date = nil
+    @loan.disbursed_by   = nil
+    @loan.valid?
+    @loan.errors.each {|e| puts e}
+    @loan.should be_valid
+
+    @loan.disbursal_date = Date.new(2000, 11, 30)
+    @loan.disbursed_by   = @manager
+    @loan.valid?
+    @loan.should_not be_valid
+
+    @loan.disbursal_date = Date.new(2000, 11, 02)
+    @loan.disbursed_by   = @manager
+    @loan.valid?
+    @loan.should_not be_valid
+
+    @loan.disbursal_date = Date.new(2000, 11, 27)
+    @loan.disbursed_by   = @manager
+    @loan.should_not be_valid
+
+    @loan.disbursal_date = Date.new(2000, 11, 22)
+    @loan.disbursed_by   = @manager    
+    @loan.should be_valid
+
+#     @loan.scheduled_first_payment_date = @loan.scheduled_first_payment_date + 1
+#     @loan.should_not be_valid
+#     @loan.scheduled_first_payment_date = @loan.scheduled_first_payment_date - 1
+    #     @loan.should_not be_valid
+  end
 
   it ".shift_date_by_installments should shift dates properly, even odd ones.. and backwards." do
     loan = Loan.new(:installment_frequency => :daily)
@@ -546,7 +624,7 @@ describe Loan do
   end
 
   it "should takeover properly" do
-    @loan2 = Object.const_get("TakeOver#{@loan.class}").new
+    @loan2 = Object.const_get("TakeOver#{@loan.discriminator}").new
     @loan2.attributes = @loan.attributes
     @loan_product.min_interest_rate = 0
     @loan_product.min_amount = 0
@@ -563,6 +641,45 @@ describe Loan do
     @loan2.taken_over_on = Date.parse("2001-02-04")
     @loan2.clear_cache
     @loan2.payment_schedule.count.should == @loan.payment_schedule.count - 9
+  end
+
+  it "should have correct takeover schedule and balances" do
+    @loan_product.max_amount = 8000
+    @loan_product.max_number_of_installments = 50
+    @loan1 = Loan.create(:amount => 8000, :interest_rate => 0.15, :installment_frequency => :weekly, :number_of_installments => 46, :discriminator => DefaultLoan,
+                         :scheduled_first_payment_date => "2009-12-28", :applied_on => "2009-12-22", :scheduled_disbursal_date => "2009-12-22", :disbursal_date => "2009-12-22", 
+                         :applied_by       => @manager, :funding_line     => @funding_line, :client => @client, :loan_product => @loan_product, :approved_on => "2009-12-22",
+                         :approved_by => @manager, :disbursed_by => @manager
+                         )
+    @loan1.errors.each {|e| puts e} unless @loan1.valid?
+    @loan1.should be_valid
+    orig_schedule = @loan1.payment_schedule
+
+    @loan_product.min_interest_rate = 0
+    @loan_product.min_amount = 0
+    @loan2 = Object.const_get("TakeOver#{@loan1.discriminator}").new(:interest_rate => 0.15, :installment_frequency => :weekly, :number_of_installments => 46, 
+                                                                     :original_amount => @loan1.amount,
+                                                                     :original_first_payment_date => "2009-12-28", :applied_on => "2009-12-22", :original_disbursal_date => "2009-12-22",
+                                                                     :applied_by       => @manager, :funding_line => @funding_line, :client => @client, :loan_product => @loan_product, 
+                                                                     :approved_on => "2009-12-22", :approved_by => @manager, :disbursed_by => @manager,
+                                                                     :taken_over_on_installment_number => 10, :taken_over_on => "2010-02-28", :scheduled_disbursal_date => "2010-02-28",
+                                                                     :scheduled_first_payment_date => "2010-03-01", :disbursal_date => "2010-02-28", :amount => 8000
+                                                                    )
+    @loan2.save.should be_true
+    @loan2.errors.each {|e| puts e} unless @loan2.valid?
+    @loan2.should be_valid
+#    @loan._show_cf; @loan2._show_cf
+    @loan2.payment_schedule.count.should == @loan1.payment_schedule.count - 9
+    @loan2.amount.should == 6435
+    
+    @loan2.payment_schedule.each{|date, ps|
+      next if date = @loan2.taken_over_on
+      orig_schedule.key?(date).should be_true
+      orig_schedule[date][:balance].round.should == ps[:balance].round
+      orig_schedule[date][:principal].round.should == ps[:principal].round
+      orig_schedule[date][:interest].round.should == ps[:interest].round
+    }
+    @loan_product = @loan_product.reload
   end
 
   it "should do deletion of payment" do 
@@ -644,5 +761,26 @@ describe Loan do
 
     (old_dates.find_all{|x| x <= Date.new(2001, 01, 26)} - new_dates.find_all{|x| x <= Date.new(2001, 01, 26)}).length.should eql(0)
     (old_dates.find_all{|x| x >  Date.new(2001, 01, 26)} - new_dates.find_all{|x| x >  Date.new(2001, 01, 26)}.map{|x| x + 1}).length.should eql(0)
+  end
+  
+  it "should not be valid if duplicated" do
+    @loan_product.loan_validation_methods = "loans_must_not_be_duplicated"
+    @loan_product.save
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", 
+                     :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, 
+                     :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
+    @loan.save.should_not be_true
+    client = Client.new(:name => 'Mary', :reference => Time.now.to_s, :client_type => ClientType.create(:type => "Standard"))
+    client.center  = @center
+    client.date_joined = Date.parse('2006-01-01')
+    client.created_by_user_id = 1
+    client.client_type_id = 1
+    client.save
+    client.errors.each {|e| puts e}
+    client.should be_valid
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", 
+                     :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(client.id), :funding_line => @funding_line, 
+                     :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
+    @loan.save.should be_true
   end
 end

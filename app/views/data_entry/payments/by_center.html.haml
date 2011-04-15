@@ -67,13 +67,15 @@
         Fees payments
         %b
           = "(#{fees_payable})"
+      %li#premia
+        Insurance Premia
       %li#luc
         Loan utilization check 
         %b
           = "(#{@loans_to_utilize.size})"
     %div.tab    
       %h1 Repayments
-      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "if ($('#payments_received_by').val() != '#{@center.manager.id}'){return(confirm('Payment receiver is not center manager. Proceed with payments?'));};", :class => "_disable_button_") do
+      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => params[:return] || resource(@branch, @center)), :onsubmit => "if ($('#payments_received_by').val() != '#{@center.manager.id}'){return(confirm('Payment receiver is not center manager. Proceed with payments?'));};", :class => "_disable_button_") do
         /= hidden_field :name => 'for_date', :value => @date
         = hidden_field :name => 'center_id', :value => @center.id
         = partial :cds
@@ -149,6 +151,8 @@
       - else
         No fees due today
     %div.tab
+      %h1 Insurance Premia
+    %div.tab
       %h1 Loan Utilization Check
       - if @loans_to_utilize.size > 0
         = form_for(@loan, :action => url(:enter_loans, 'make_loan_utilization', :return => resource(@branch, @center)), :class => "_disable_button_") do
@@ -175,4 +179,5 @@
           For Date
         %td
           = text_field :name => 'for_date', :value => @date || Date.today
+          = hidden_field :name => 'return', :value => url(:data_entry)
     = submit 'Submit'
