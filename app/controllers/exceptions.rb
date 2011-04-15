@@ -7,6 +7,7 @@ class Exceptions < Merb::Controller
     elsif request.env['HTTP_REFERER']
       redirect request.env['HTTP_REFERER'], :message => { :error => 'Sorry, page not found' }
     else
+#      only_provides :xml
       render :status => 404
     end
   end
