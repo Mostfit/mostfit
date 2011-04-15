@@ -23,7 +23,7 @@ class Loans < Application
 
   def new
     only_provides :html
-    if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])
+    if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])      
       if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type)
         klass = Kernel::const_get(@loan_product.loan_type)
         @loan = klass.new
@@ -36,7 +36,6 @@ class Loans < Application
   end
 
   def create
-    debugger
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])

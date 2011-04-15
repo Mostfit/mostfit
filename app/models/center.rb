@@ -5,6 +5,7 @@ class Center
   
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   after :save, :handle_meeting_date_change
+  before :save, :set_meeting_change_date
   before :create, :set_meeting_change_date
   before :valid?, :convert_blank_to_nil
 
@@ -183,9 +184,11 @@ class Center
 
   def handle_meeting_date_change
     self.meeting_day_change_date = parse_date(self.meeting_day_change_date) if self.meeting_day_change_date.class==String and not self.meeting_day_change_date.blank?
-    return if not self.meeting_day_change_date or self.meeting_day_change_date.blank?
-    date = self.meeting_day_change_date||Date.today
+    if not self.meeting_day_change_date or self.meeting_day_change_date.blank? or not self.meeting_day_change_date.is_a?(Date)
+      self.meeting_day_change_date = Date.today
+    end
 
+    date = self.meeting_day_change_date
     if not CenterMeetingDay.first(:center => self)
       CenterMeetingDay.create(:center_id => self.id, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
     elsif self.meeting_day != self.meeting_day_for(date)
@@ -215,7 +218,7 @@ class Center
 
 
   def set_meeting_change_date
-    self.meeting_day_change_date = self.creation_date
+    self.meeting_day_change_date = self.creation_date if self.new?
   end
 
   def get_meeting_date(date, direction)
@@ -223,14 +226,14 @@ class Center
     number = 1
     if direction == :next
       nwday = (date + number).wday
-      while nwday != Center.meeting_days.index(meeting_day_for(date + number))
+      while day = Center.meeting_days.index(meeting_day_for(date + number)) and day > 0 and nwday != day
         number += 1
         nwday = (date + number).wday
         nwday = 7 if nwday == 0
       end
     else
       nwday = (date - number).wday
-      while nwday != Center.meeting_days.index(meeting_day_for(date - number))
+      while day = Center.meeting_days.index(meeting_day_for(date - number)) and day > 0 and nwday != day
         number += 1
         nwday = (date - number).wday
         nwday = 7 if nwday == 0
