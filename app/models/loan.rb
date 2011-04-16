@@ -210,13 +210,13 @@ class Loan
     "#{id}:Rs. #{amount} @ #{interest_rate} for client #{client.name}"
   end
 
-  def _show_cf #convenience function to see cashflow in console
+  def _show_cf(width = 10, padding = 4) #convenience function to see cashflow in console
     ps = payment_schedule
-    puts "     date\t| #{ps.first.last.keys.join("\t|  ")}"
-    ps.keys.sort.each {|d| 
-      puts "#{d}\t|  #{ps[d].values.map{|v| "%.2f" % v}.join("\t|  ")}"
-    }
-    puts
+    titles = [:date, :total_balance, :balance, :principal, :interest, :total_principal, :total_interest, :fees]
+    puts titles.map{|t| t.to_s[0..width - 1].rjust(width - padding/2).ljust(width)}.join("|")
+    ps.keys.sort.each do |d| 
+      puts ([d.to_s] + titles[1..-1].map{|t| ps[d][t]}).map{|s| s.to_s.rjust(width - padding/2).ljust(width)}.join("|")
+    end
   end
 
   def self.search(q, per_page)
@@ -925,13 +925,15 @@ class Loan
     @history_array
   end
 
-  def _show_his
-    puts calculate_history.sort_by{|x| x[:date]}.map{|h| 
-      [
-       h[:date], h[:scheduled_outstanding_principal].to_i, h[:scheduled_outstanding_total].to_i, h[:actual_outstanding_principal].to_i, 
-       h[:actual_outstanding_total].to_i, h[:principal_paid].to_i, h[:interest_paid].to_i, h[:principal_due].to_i, h[:interest_due].to_i
-      ].join("\t")
-    }.join("\n")
+  def _show_his(width = 10, padding = 4)
+    titles = {:date => :date, :sched_total => :scheduled_outstanding_total, :sched_bal => :scheduled_outstanding_principal,
+      :prin_paid => :principal_paid, :prin_due => :principal_due, :int_paid => :interest_paid, :int_due => :interest_due}
+    title_order = [:date, :sched_total, :sched_bal, :prin_paid, :prin_due, :int_paid, :int_due]
+    hist = calculate_history.sort_by{|x| x[:date]}
+    puts title_order.map{|t| t.to_s.rjust(width - padding/2).ljust(width)}.join("|")
+    hist.each do |h|
+      puts title_order.map{|t| h[titles[t]]}.map{|v| v.to_s}.map{|s| s.rjust(width - padding/2).ljust(width)}.join("|")
+    end
   end
 
   def update_history_bulk_insert
@@ -1013,7 +1015,8 @@ class Loan
       return 0 if (column == :principal or column == :interest)
       keys = cache.keys.sort
       if date < keys.min
-        rv = (column == :all ? cache[keys.min] : cache[keys.min][column]).merge(:balance => amount)
+        col = cache[keys.min].merge(:balance => amount, :total_balance => total_to_be_received)
+        rv = (column == :all ? col : col[column])
       elsif date >= keys.max
         rv = (column == :all ? cache[keys.max] : cache[keys.max][column])
       else
