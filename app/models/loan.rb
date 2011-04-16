@@ -973,7 +973,7 @@ class Loan
     end
   end
 
-  private
+
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
   include Misfit::LoanValidators
 
@@ -1013,7 +1013,7 @@ class Loan
       return 0 if (column == :principal or column == :interest)
       keys = cache.keys.sort
       if date < keys.min
-        rv = (column == :all ? cache[keys.min] : cache[keys.min][column])
+        rv = (column == :all ? cache[keys.min] : cache[keys.min][column]).merge(:balance => amount)
       elsif date >= keys.max
         rv = (column == :all ? cache[keys.max] : cache[keys.max][column])
       else
