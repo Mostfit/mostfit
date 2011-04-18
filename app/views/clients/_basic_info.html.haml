@@ -1,5 +1,5 @@
 %table.form
-  - if @center.blank?
+  - if @center.blank? or @client.loans.blank?
     %tr
       %td
         For center:
