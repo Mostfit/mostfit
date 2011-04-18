@@ -2,6 +2,8 @@ class Center
   include DataMapper::Resource
   include DateParser
   attr_accessor :meeting_day_change_date
+
+  before :save, :convert_blank_to_nil
   
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   after :save, :handle_meeting_date_change
@@ -189,15 +191,18 @@ class Center
     end
 
     date = self.meeting_day_change_date
+
     if not CenterMeetingDay.first(:center => self)
       CenterMeetingDay.create(:center_id => self.id, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
     elsif self.meeting_day != self.meeting_day_for(date)
       if prev_cm = CenterMeetingDay.first(:center_id => self.id, :valid_from.lte => date, :order => [:valid_from.desc])
         # previous CMD should be valid upto date - 1
-        prev_cm.valid_upto = date - 1
+        prev_cm
+        prev_cm.valid_upto = date - 1        
+        prev_cm
         prev_cm.save!
       end
-
+      
       # next CMD's valid from date should be valid upto limit for this CMD
       if next_cm = CenterMeetingDay.first(:center => self, :valid_from.gt => date, :order => [:valid_from])
         valid_upto = next_cm.valid_from - 1
@@ -222,18 +227,17 @@ class Center
   end
 
   def get_meeting_date(date, direction)
-    return 1 if meeting_day == :none
     number = 1
     if direction == :next
       nwday = (date + number).wday
-      while day = Center.meeting_days.index(meeting_day_for(date + number)) and day > 0 and nwday != day
+      while (meet_day = Center.meeting_days.index(meeting_day_for(date + number)) and meet_day > 0 and nwday != meet_day)
         number += 1
         nwday = (date + number).wday
         nwday = 7 if nwday == 0
       end
     else
       nwday = (date - number).wday
-      while day = Center.meeting_days.index(meeting_day_for(date - number)) and day > 0 and nwday != day
+      while (meet_day = Center.meeting_days.index(meeting_day_for(date - number)) and meet_day > 0 and nwday != meet_day)
         number += 1
         nwday = (date - number).wday
         nwday = 7 if nwday == 0
