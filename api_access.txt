@@ -1,3 +1,5 @@
+#This is example file to acces api using httparty  and check api call response
+
 require "rubygems"
 require "httparty"
 require "base64"
