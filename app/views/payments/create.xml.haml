@@ -1,27 +1,13 @@
 %payment
   -if not @error.blank?
     %error #{@error}
-  - elsif not @payment.blank? and @payment_type != "total"
-    %message "Payment of client '#{@client.name}' has been registered"
-    %id #{@payment.id}
-    %amount #{@payment.amount}
-    %type #{@payment.type}
-    %received_on #{@payment.received_on}
-    %deleted_by_user_id #{@payment.deleted_by_user_id}
-    %created_at #{@payment.created_at}
-    %deleted_at #{@payment.deleted_at}
-    %created_by_user_id #{@payment.created_by_user_id}
-    %verified_by_user_id #{@payment.verified_by_user_id}
-    %loan_id #{@payment.loan_id}
-    %client_id #{@payment.client_id}
-    %fee_id #{@payment.fee_id}
-    %desktop_id #{@payment.desktop_id}
-    %origin #{@payment.origin}
-    %verified_by_user_id #{@payment.verified_by_user_id}
-  - elsif @payment_type == "total"
+  - elsif not @payment_type.blank?
     - if not @payment.errors.blank?
       %error #{@payment.errors}
     - else
+      - @prin = @payment if @payment_type != "total" and @payment_type == "principal"
+      - @int = @payment if @payment_type != "total" and @payment_type == "interest"
+      - @fees = @payment if @payment_type != "total" and @payment_type == "fees"
       - if @prin
         %principal
           %message "Loan principal of client '#{@client.name}' has been registered"
