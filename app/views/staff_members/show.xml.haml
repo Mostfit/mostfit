@@ -64,6 +64,8 @@
             %active #{client.active}
             %date_joined #{client.date_joined}
             %client_group_id #{client.client_group_id}
+            - if client.client_group
+              %client_group_name #{client.client_group.name}
             %center_id #{client.center_id}
     - if (@option == "loans" or @option == "full") and not @staff_member.clients.blank?
       %loans
