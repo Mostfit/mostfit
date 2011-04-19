@@ -28,7 +28,7 @@
       %th paid
   %tbody
     - histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
-    - fees_applicable = Fee.due(loans.map{|x| x.id})
+    - fees_applicable = Fee.due(loans.map{|x| x.id}, @date)
     - fees_paid       = {}
     - Payment.all(:received_on => @date, :type => :fees, :loan_id => loans.map{|x| x.id}, :fields => [:id, :amount]).map{|p| fees_paid[p.loan_id]||=0; fees_paid[p.loan_id] +=  p.amount}
     - tot_amount, tot_outstanding, tot_installments, tot_principal_due, tot_principal_paid, tot_interest_due, tot_interest_paid, tot_fee_due, tot_fee_paid, tot_total_due, tot_total_paid = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -88,7 +88,8 @@
               - tot_interest_paid += ipaid
               - grp_interest_paid += ipaid
             %td.numeric
-              - fee_due = fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
+              - #fee_due = fees_applicable[loan.id] ? fees_applicable[loan.id].due.round : 0
+              - fee_due = lh.loan.total_fees_payable_on(@date)
               = fee_due.to_currency
               - tot_fee_due += fee_due
               - grp_fee_due += fee_due

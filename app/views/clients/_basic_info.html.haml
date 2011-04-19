@@ -1,5 +1,5 @@
 %table.form
-  - if @center.blank?
+  - if @center.blank? or ((not @client.new?) and (@client.loans.select{|l| not l.disbursal_date.nil?}.blank?))
     %tr
       %td
         For center:

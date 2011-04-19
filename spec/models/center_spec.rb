@@ -94,7 +94,6 @@ describe Center do
     center.meeting_day = :tuesday
     center.save
     center = Center.get(center.id)
-    p center.center_meeting_days
 
     center.previous_meeting_date_from(Date.new(2010, 7, 7)).should == Date.new(2010, 6, 30)
     center.previous_meeting_date_from(Date.new(2010, 7, 12)).should == Date.new(2010, 7, 07)
@@ -161,6 +160,19 @@ describe Center do
     center.previous_meeting_date_from(Date.new(2010, 7, 20)).should == Date.new(2010, 7, 12)
     center.previous_meeting_date_from(Date.new(2010, 7, 13)).should == Date.new(2010, 7, 12)
     center.previous_meeting_date_from(Date.new(2010, 7, 14)).should == Date.new(2010, 7, 12)
+
+    center.meeting_day_change_date = Date.new(2010, 8, 1)
+    center.meeting_day = :none
+    center.save
+
+    center = Center.get(center.id)
+    center.next_meeting_date_from(Date.new(2010, 7, 2)).should   == Date.new(2010,  7, 5)
+    center.next_meeting_date_from(Date.new(2010, 7, 1)).should   == Date.new(2010, 7, 5)
+    center.next_meeting_date_from(Date.new(2010, 7, 21)).should  == Date.new(2010, 7, 23)
+    center.next_meeting_date_from(Date.new(2010, 7, 31)).should  == Date.new(2010, 8, 1)
+    center.next_meeting_date_from(Date.new(2010, 8, 1)).should   == Date.new(2010, 8, 2)
+    center.previous_meeting_date_from(Date.new(2010, 8, 2)).should    == Date.new(2010, 8, 1)
+    center.previous_meeting_date_from(Date.new(2010, 8, 10)).should    == Date.new(2010, 8, 9)
   end
 
   it "should not be valid with a name shorter than 3 characters" do

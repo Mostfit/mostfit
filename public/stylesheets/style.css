@@ -243,7 +243,10 @@ table.narrow tr.group td{
 } 
 /* .container .error, .container .notice, .container .success */
 #flash-messages{
-    float: center;
+  width: 80%;
+  position: relative;
+  left: -100px;
+  float: center;
 }
 .flash{
 margin-top: 15px;

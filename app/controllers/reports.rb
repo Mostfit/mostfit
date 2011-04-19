@@ -118,7 +118,7 @@ class Reports < Application
   def get_date(params, col)
     if params and params.key?(col) and params[col] and not params[col].blank?
       date_hash = params[col]
-      return Date.strptime(date_hash, Mfi.first.date_format)
+      return Date.strptime(date_hash, Mfi.first.date_format || ('%Y-%m-%d'))
     end
   end
     

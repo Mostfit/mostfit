@@ -47,8 +47,8 @@
   - @loans_to_utilize = @clients.loans(:loan_utilization_id => nil, :rejected_on => nil, :disbursal_date.not => nil)
   - date_with_holiday = [@date, @date.holidays_shifted_today].max
   - @loans_to_disburse = @clients.loans(:scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil)
-  - @fee_paying_loans   = @loans.collect{|x| {x => x.fees_payable_on(Date.today)}}.inject({}){|s,x| s+=x}
-  - @fee_paying_clients = @clients.collect{|x| {x => x.fees_payable_on(Date.today)}}.inject({}){|s,x| s+=x}
+  - @fee_paying_loans   = @loans.collect{|x| {x => x.fees_payable_on(@date)}}.inject({}){|s,x| s+=x}
+  - @fee_paying_clients = @clients.collect{|x| {x => x.fees_payable_on(@date)}}.inject({}){|s,x| s+=x}
   - @fee_paying_things = @fee_paying_clients + @fee_paying_loans
   - fees_payable       = @fee_paying_things.values.inject({}){|s,x| s+=x}.length
   %div.tab_container

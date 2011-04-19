@@ -1,4 +1,4 @@
-%h2== Repayments &mdash; (#{link_to 'new', url_for_loan(@loan, 'payments/new')})
+%h2== Repayments &mdash; (#{link_to 'new', url_for_loan(nil, 'payments/new')})
 - if @payments.blank?
   %p
     %i No repayments have been made so far.
@@ -45,4 +45,4 @@
       %tr
         %td{ :colspan => 8 }
 
-%p= link_to 'new repayment >>', url_for_loan(@loan, 'payments/new'), :class => "button"
+%p= link_to 'new repayment >>', url_for_loan(nil, 'payments/new'), :class => "button"
