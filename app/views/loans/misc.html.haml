@@ -9,7 +9,10 @@
         %br/
         = submit "Save"
 - if session.user.role==:admin
-  = form_for(@loan, :action => url(:action => :write_off, :id => @loan.id), :method => "POST") do
+  %hr
+    = partial "applicable_fees/form", :layout => false
+  %hr
+  = form_for(@loan, :action => url(:action => :write_off, :id => @loan.id), :method => "POST", :class => "_disable_button_") do
     %table
       %tr
         %td
@@ -33,7 +36,7 @@
         %td
           = submit "Write off"
 - elsif staff_member = session.user.staff_member
-  = form_for(@loan, :action => url(:action => :suggest_write_off, :id => @loan.id), :method => "POST") do
+  = form_for(@loan, :action => url(:action => :suggest_write_off, :id => @loan.id), :method => "POST", :class => "_disable_button_") do
     %table
       %tr
         %td

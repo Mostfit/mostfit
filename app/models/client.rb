@@ -10,6 +10,7 @@ class Client
   before :valid?, :convert_blank_to_nil
   before :valid?, :add_created_by_staff_member
   after  :save,   :check_client_deceased
+  after  :save,   :levy_fees
   
   property :id,              Serial
   property :reference,       String, :length => 100, :nullable => false, :index => true
@@ -91,6 +92,7 @@ class Client
   has n, :attendances
   has n, :claims
   has n, :guarantors
+  has n, :applicable_fees,    :child_key => [:applicable_id], :applicable_type => "Client"
   validates_length :account_number, :max => 20
 
   belongs_to :center
@@ -220,7 +222,7 @@ class Client
     }
     self.type_of_account = 0 if self.type_of_account == nil
     self.occupation = nil if self.occupation.blank?
-    self.type_of_account='' if self.type_of_account.nil? or self.type_of_account=="0"
+    self.type_of_account = '' if self.type_of_account.nil? or self.type_of_account=="0"
   end
 
   def add_created_by_staff_member

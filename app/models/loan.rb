@@ -7,6 +7,7 @@ class Loan
   before :valid?,  :parse_dates
   before :valid?,  :convert_blank_to_nil
   after  :save,    :update_history_caller  # also seems to do updates
+  after  :save,    :levy_fees
   before :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
   #  after  :destroy, :update_history
@@ -92,6 +93,7 @@ class Loan
   has n, :audit_trails,       :child_key => [:auditable_id], :auditable_type => "Loan"
   has n, :portfolio_loans
   has 1, :insurance_policy
+  has n, :applicable_fees,    :child_key => [:applicable_id], :applicable_type => "Loan"
   #validations
 
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
@@ -726,7 +728,6 @@ class Loan
     payments.map { |p| p.received_on }
   end
 
-
   def status(date = Date.today)
     get_status(date)
   end
@@ -800,8 +801,6 @@ class Loan
     @_installment_dates = (0..(number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
   end
 
-   
-
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
   def update_cycle_number
     self.cycle_number=self.client.loans(:id.lt => id, :disbursal_date.not => nil).count+1
@@ -816,11 +815,11 @@ class Loan
   # for brute force iterations and caching => speed
   def update_history(forced=false)
     return true if Mfi.first.dirty_queue_enabled and DirtyLoan.add(self) and not forced
-    return if self.already_updated
+    return if @already_updated
     return if self.history_disabled and not forced# easy when doing mass db modifications (like with fixutes)
     clear_cache
     update_history_bulk_insert
-    already_updated=true
+    @already_updated=true
   end
 
   def calculate_history
@@ -913,9 +912,10 @@ class Loan
   end
 
   def write_off(written_off_on_date, written_off_by_staff)
-    if written_off_on_date and written_off_by_staff
+    if written_off_on_date and written_off_by_staff and not written_off_on_date.blank? and not written_off_by_staff.blank?
       self.written_off_on = written_off_on_date
       self.written_off_by = (written_off_by_staff.class == StaffMember ? written_off_by_staff : StaffMember.get(written_off_by_staff))
+      self.valid?
       self.save_self
     else
       false

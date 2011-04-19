@@ -2,14 +2,12 @@ class ApplicableFee
   include DataMapper::Observer
   include DataMapper::Resource
 
-  observe Loan, Client, InsurancePolicy
-
   FeeApplicableTypes = ['Loan', 'Client', 'InsurancePolicy']
 
   property :id, Serial
   property :applicable_id,   Integer, :index => true, :nullable => false
   property :applicable_type, Enum.send('[]', *FeeApplicableTypes), :index => true, :nullable => false
-  property :applicable_on,    Date, :nullable => true
+  property :applicable_on,   Date, :nullable => true
   property :fee_id,          Integer, :index => true, :nullable => false
   property :amount,          Float,   :index => true, :nullable => false
 
@@ -28,5 +26,9 @@ class ApplicableFee
 
   def parent
     Kernel.const_get(self.applicable_type).get(self.applicable_id)
+  end
+
+  def description
+    "#{self.fee.name} of amount #{amount.round}"
   end
 end

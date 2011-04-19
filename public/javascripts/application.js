@@ -966,7 +966,7 @@ $(document).ready(function(){
 							    showHideFees();
 							});
 		      }
-		      $("form._disable_button_").submit(function(form){
+		      $("form._disable_button_").live('submit', function(form){
 							    $(form.currentTarget).find("input[type='submit']").attr('disabled', true);
 							    return(true);
 							});

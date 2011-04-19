@@ -88,8 +88,7 @@
               - tot_interest_paid += ipaid
               - grp_interest_paid += ipaid
             %td.numeric
-              - #fee_due = fees_applicable[loan.id] ? fees_applicable[loan.id].due.round : 0
-              - fee_due = lh.loan.total_fees_payable_on(@date)
+              - fee_due = fees[loan.id] ? fees[loan.id].due : 0
               = fee_due.to_currency
               - tot_fee_due += fee_due
               - grp_fee_due += fee_due

@@ -10,7 +10,8 @@ class Fee
              [:client_grt_pass_date, Client, :grt_pass_date], 
              [:client_date_joined, Client, :date_joined], 
              [:loan_installment_dates, Loan, :installment_dates],
-             [:policy_issue_date, InsurancePolicy, :issue_date]
+             [:policy_issue_date, InsurancePolicy, :issue_date],
+             [:penalty, Loan, nil]
             ]
   FeeDue        = Struct.new(:applicable, :paid, :due)
   FeeApplicable = Struct.new(:loan_id, :client_id, :fees_applicable)
@@ -85,7 +86,17 @@ class Fee
     end
   end
   
-
+  # find whether the fee is applicable to an object
+  def is_applicable?(obj)
+    if obj.is_a?(Loan)
+      obj.loan_product.fees.include?(self)
+    elsif obj.is_a?(Client)
+      obj.client_type.fees.include?(self)
+    elsif obj.is_a?(InsuranceProduct)
+      obj.fees.include?(self)      
+    end
+  end
+  
   # returns the applicable fees for a list of ids and applicable type. Additional params can be provided by hash 
   def self.applicable(ids, hash = {}, applicable_type = 'Loan')
     date = hash.delete(:date) || Date.today
@@ -102,12 +113,9 @@ class Fee
     if ids.length > 0
       query = {:applicable_id => ids, :applicable_type => 'Loan', :applicable_on.lte => hash[:date] || Date.today}
       query.merge!(hash)
-      query_str = "(#{AppliableFee.all(query).map{|x| [x.fee_id, x.applicable_id].join('), (')}})"
-      if applicable_type = 'Loan'
-        respository.adapter.query("SELECT loan_id, client_id, SUM(amount) FROM payments WHERE (fee_id, loan_id) in (#{query_str})").map{|x| [x[0], x[1]]}.to_hash
-      else
-        respository.adapter.query("SELECT loan_id, client_id, SUM(amount) FROM payments WHERE (fee_id, client_id) in (#{query_str})").map{|x| [x[0], x[1]]}.to_hash
-      end
+      query_str = ApplicableFee.all(query).map{|x| "(#{x.fee_id}, #{x.applicable_id})"}.join(", ")
+      parent_col = ((applicable_type == 'Loan') ? "loan_id" : "client_id")
+      repository.adapter.query("SELECT #{parent_col}, SUM(amount) FROM payments WHERE (fee_id, #{parent_col}) in (#{query_str}) AND deleted_at is NULL  GROUP BY #{parent_col}").map{|x| [x[0], x[1]]}.to_hash
     else
       {}
     end
@@ -115,15 +123,15 @@ class Fee
 
   # returns any due fee for a list of ids and applicable type. Additional params can be provided by hash 
   def self.due(ids, hash={}, applicable_type = 'Loan')
-    fees_applicable = self.applicable(ids, hash, applicable_type).group_by{|x| x.applicable_id}
+    fees_applicable = self.applicable(ids, hash, applicable_type).aggregate(:applicable_id, :amount.sum).to_hash      
     fees_paid       = self.paid(ids, hash, applicable_type)
     fees = {}
 
     ids.each{|lid|
-      applicable = fees_applicable[lid].first if fees_applicable.key?(lid) and fees_applicable[lid].length>0
+      applicable = fees_applicable[lid]||0
       next unless applicable
       paid      = fees_paid.key?(lid) ? fees_paid[lid] : 0
-      fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable.to_f : 0), paid, ((applicable ? applicable.fees_applicable : 0) - paid).to_i)
+      fees[lid]  = FeeDue.new(applicable, paid, ((applicable - paid) > 0 ? (applicable - paid) : 0))
     }
     fees
   end
