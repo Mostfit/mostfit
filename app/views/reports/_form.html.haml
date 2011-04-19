@@ -151,7 +151,7 @@
           - if @report.respond_to?(:type_of_journal)
             %td
               Journal Type:
-              = select(:type_of_journal, :collection => JournalType.all.map{|m| [m.id, m.name]}, :selected => type_of_journal, :include_blank => true)
+              = select(:type_of_journal, :collection => JournalType.all.map{|m| [m.id, m.name]}, :prompt => "All Journal Types", :selected => type_of_journal, :include_blank => true)
         %tr
           %td
             %div{:style => "float: left"}

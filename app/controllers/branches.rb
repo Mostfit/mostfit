@@ -81,6 +81,13 @@ class Branches < Application
     end
   end
 
+  def accounts
+    if params[:id]
+      branch = Branch.get(params[:id])
+      next unless branch
+      return("<option value=''>Select account</option>"+branch.accounts(:order => [:name]).map{|acc| "<option value=#{acc.id}>#{acc.name}</option>"}.join)
+    end
+  end
 
   # this redirects to the proper url, used from the router
   def redirect_to_show(id)

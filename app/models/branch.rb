@@ -19,6 +19,7 @@ class Branch
   belongs_to :area,         :nullable => true
   has n, :centers
   has n, :audit_trails, :auditable_type => "Branch", :child_key => ["auditable_id"]
+  has n, :accounts
 
   validates_is_unique   :code
   validates_length      :code, :min => 1, :max => 10
