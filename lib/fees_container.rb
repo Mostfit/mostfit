@@ -3,14 +3,14 @@ module FeesContainer
   def levy_fees
     existing_fees = self.fees
     @payable_models ||= Fee::PAYABLE.map{|m| [m[0], [m[1], m[2]]]}.to_hash
-
     Fee.all.map{|fee|
-      if @payable_models.key?(fee.payable_on)
+      if @payable_models.key?(fee.payable_on) and fee.is_applicable?(self)
         klass, payable_date_method = @payable_models[fee.payable_on]
         next unless self.respond_to?(payable_date_method)
         date = self.send(payable_date_method)
         amount = fee.amount_for(self)
         next unless amount
+        next unless date        
         unless ApplicableFee.first(:applicable_id => self.id, :applicable_type => klass, :applicable_on => date, :fee => fee)
           af = ApplicableFee.new(:amount => amount, :applicable_on => date, :fee => fee,
                                  :applicable_id => self.id, :applicable_type => klass)
@@ -30,36 +30,30 @@ module FeesContainer
   
   # return total fee due for this client including fees applicable to client, loan and insurance policies
   def total_fees_due(date=Date.today)
-    fees = 0
+    total_fees_applicable(date) - total_fees_paid(date)
+  end
 
-    fees += (ApplicableFee.all(:applicable_type => get_class, :applicable_id => self.id, :applicable_on.lte => date).aggregate(:amount.sum) || 0)
-
-    if self.class == Client
-      if self.loans.length > 0
-        fees += (ApplicableFee.all(:applicable_type => 'Loan',   :applicable_id => self.loans.aggregate(:id), :applicable_on.lte => date).aggregate(:amount.sum) || 0)
-      end
-      
-      if self.insurance_policies.length > 0
-        fees += (ApplicableFee.all(:applicable_type => 'InsurancePolicy', :applicable_id => self.insurance_policies.aggregate(:id), :applicable_on.lte => date).aggregate(:amount.sum) || 0)
-      end
-    end
-    fees
+  def total_fees_applicable(date=Date.today)
+    (ApplicableFee.all(:applicable_type => get_class, :applicable_id => self.id, :applicable_on.lte => date).aggregate(:amount.sum) || 0)
   end
 
   # return total fee paid for this client
   def total_fees_paid(date=Date.today)
-    if self.class == Client
-      Payment.all(:type => :fees, :client => self, :received_on.lte => date).sum(:amount) || 0
+    if self.is_a?(Client)      
+      Payment.all(:type => :fees, :client => self, :received_on.lte => date, :loan_id => nil,
+                  :fee_id => ApplicableFee.all(:applicable_type => self.get_class, :applicable_id => self.id).aggregate(:fee_id)).sum(:amount) || 0
     elsif self.is_a?(Loan)
-      Payment.all(:type => :fees, :loan   => self, :received_on.lte => date).sum(:amount) || 0
+      Payment.all(:type => :fees, :loan => self, :received_on.lte => date,
+                  :fee_id => ApplicableFee.all(:applicable_type => self.get_class, :applicable_id => self.id).aggregate(:fee_id)).sum(:amount) || 0
     elsif self.is_a?(InsurancePolicy)
-      Payment.all(:type => :fees, :client => self.client, :received_on.lte => date, :fee_id => ApplicableFee.all(:applicable_type => 'InsurancePolicy', :applicable_id => self.id).aggregate(:fee_id)).sum(:amount) || 0
-    end
+      Payment.all(:type => :fees, :client => self.client, :received_on.lte => date,
+                  :fee_id => ApplicableFee.all(:applicable_type => self.get_class, :applicable_id => self.id).aggregate(:fee_id)).sum(:amount) || 0
+    end      
   end
 
   def total_fees_payable_on(date = Date.today)
     # returns one consolidated number
-    total_fees_due(date) - total_fees_paid(date)
+    total_fees_applicable(date) - total_fees_paid(date)
   end
 
   def fees_payable_on(date = Date.today)
@@ -69,9 +63,10 @@ module FeesContainer
   end
 
   # returns a hash of fees paid which has keys as dates and values as {fee => amount}  
-  def fees_paid
+  def fees_paid(date = Date.today)
     @fees_payments = {}
-    payments(:type => :fees, :order => [:received_on], :loan => nil).each do |p|
+    Payment.all(:type => :fees, :client => (self.class == Client ? self : self.client), :received_on.lte => date, :order => [:received_on],
+                :fee_id => ApplicableFee.all(:applicable_type => self.get_class, :applicable_id => self.id).aggregate(:fee_id)).each do |p|
       @fees_payments += {p.received_on => {p.fee => p.amount}}
     end
     @fees_payments
@@ -95,7 +90,6 @@ module FeesContainer
     @fees_payments = {}
   end
 
-  private
   def get_class
     if self.is_a?(Client)
       'Client'

@@ -28,20 +28,18 @@ class ApplicableFees < Application
   def create(applicable_fee)
     @applicable_fee = ApplicableFee.new(applicable_fee)
     if @applicable_fee.save
-      redirect resource(@applicable_fee), :message => {:notice => "ApplicableFee was successfully created"}
+      url = (@applicable_fee.parent.is_a?(Loan) ? "/loans/#{@applicable_fee.applicable_id}" : resource(@applicable_fee.parent))
+      if request.xhr?
+        render "<div class='notice'>Fee was successfully levied</div>", :layout => layout?
+      else
+        redirect(url, :message => {:notice => "Fee was successfully levied"})
+      end
     else
-      message[:error] = "ApplicableFee failed to be created"
-      render :new
-    end
-  end
-
-  def update(id, applicable_fee)
-    @applicable_fee = ApplicableFee.get(id)
-    raise NotFound unless @applicable_fee
-    if @applicable_fee.update(applicable_fee)
-       redirect resource(@applicable_fee)
-    else
-      display @applicable_fee, :edit
+      if request.xhr?
+        render(error_messages_for(@applicable_fee), :status => 406, :layout => layout?)
+      else
+        render @applicable_fee.parent
+      end
     end
   end
 end # ApplicableFees
