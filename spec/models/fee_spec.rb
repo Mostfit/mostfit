@@ -277,10 +277,9 @@ describe Fee do
     @fee2.client_types << @client.client_type
     @fee2.save
     
-    @client.applicable_fees.destroy
-    @client.save.should be_true
-    @client.levy_fees
-
+    @client.applicable_fees.destroy!
+    @client.should be_valid
+    @client.save
     @client.fees_payable_on.should == {@fee1 => 20}
     @client.pay_fees(5, Date.today - 1, @manager, @user)
     @client.fees_payable_on.should == {@fee1 => 20 - 5}
