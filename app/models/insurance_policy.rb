@@ -1,5 +1,6 @@
 class InsurancePolicy
   include DataMapper::Resource
+  include FeesContainer
 
   POLICY_STATUSES = [:active, :expired, :claim_pending, :claim_settled]
   COVER_FOR       = [:self, :spouse, :both, :son, :daughter, :mother, :father]
