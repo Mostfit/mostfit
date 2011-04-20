@@ -1,0 +1,8 @@
+%table#applicable_fee_list
+  %tr
+  - for applicable_fee in applicable_fees
+    %tr
+      %td
+        = applicable_fee.description
+      %td
+        = link_to "[delete]", url(:controller => "application", :action => "delete", :id => applicable_fee.id, :model => "applicable_fees", :return => "/loans/#{@loan.id}/applicable_fees/#{applicable_fee.id}")

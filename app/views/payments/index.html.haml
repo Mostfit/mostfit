@@ -108,9 +108,10 @@
     %td
       Fees applicable
     %td
-      - @loan.applicable_fees.each do |f|
-        = f.description
-        %br
+      %ul
+        - @loan.applicable_fees.each do |f|
+          %li
+            = f.description
   %tr.odd
     %td
       Fees paid
