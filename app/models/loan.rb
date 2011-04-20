@@ -420,7 +420,7 @@ class Loan
 
     unless defer_update #i.e. bulk updating loans
       self.history_disabled=false
-      already_updated=false
+      @already_updated=false
       update_history(true)  # update the history if we saved a payment
     end
     if payments.length > 0
@@ -815,7 +815,7 @@ class Loan
   # for brute force iterations and caching => speed
   def update_history(forced=false)
     return true if Mfi.first.dirty_queue_enabled and DirtyLoan.add(self) and not forced
-    return if @already_updated
+    return if @already_updated and not forced
     return if self.history_disabled and not forced# easy when doing mass db modifications (like with fixutes)
     clear_cache
     update_history_bulk_insert
