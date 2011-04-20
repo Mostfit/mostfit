@@ -1,10 +1,17 @@
 %xml
   %payment
-    -if not @error.blank?
-      %error #{@error}
+    -if @payment_type.blank?
+      %error Payment type can't be blank
     - elsif not @payment_type.blank?
       - if not @payment.errors.blank?
-        %error #{@payment.errors}
+        - @payment.errors.map do |e|
+          - if e.instance_variables.include?("@errors")
+            - if e.resource.loan_id
+              %error #{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
+            - else
+              %error #{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
+          - else
+            %error #{e.to_s}
       - else
         - @prin = @payment if @payment_type != "total" and @payment_type == "principal"
         - @int = @payment if @payment_type != "total" and @payment_type == "interest"

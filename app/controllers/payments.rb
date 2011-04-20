@@ -59,8 +59,7 @@ class Payments < Application
       end
     else
       if params[:format] and params[:format] == "xml"
-        @error = "Payment has been failed"
-        display @error
+        display @payment
       else
         render :new
       end
