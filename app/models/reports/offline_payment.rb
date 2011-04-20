@@ -1,4 +1,4 @@
-class OfflinePayment < Report
+class OfflinePayments < Report
   attr_accessor :from_date, :to_date, :staff_member_id
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 7
@@ -8,11 +8,11 @@ class OfflinePayment < Report
   end
 
   def name
-    "Offline Payment"
+    "Offline Payments"
   end
 
   def self.name
-    "Offline Payment"
+    "Offline Payments"
   end
 
   def generate
