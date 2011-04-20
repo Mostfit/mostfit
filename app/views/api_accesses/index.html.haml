@@ -1,0 +1,16 @@
+%h1
+  ApiAccesses controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/api_accesses/index.html.erb
+%table
+  %tr
+  - for api_access in @api_accesses
+    %tr
+      %td
+        = link_to 'Show', url(:api_access, api_access)
+      %td
+        = link_to 'Edit', url(:edit_api_access,  api_access)
+
+= link_to 'New', url(:new_api_access)
