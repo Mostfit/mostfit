@@ -1,16 +1,34 @@
-%h1
-  ApiAccesses controller, index action
+%h1 Api Access
 %p
-  Edit this file in
-  %tt
-    app/views/api_accesses/index.html.erb
-%table
-  %tr
-  - for api_access in @api_accesses
-    %tr
-      %td
-        = link_to 'Show', url(:api_access, api_access)
-      %td
-        = link_to 'Edit', url(:edit_api_access,  api_access)
+  == Manage api access or #{link_to 'create a new api access', resource(:api_accesses, :new), :class => "bold"}.
 
-= link_to 'New', url(:new_api_access)
+- if @api_accesses.blank?
+  %p
+    %i No api access have been created yet.
+- else
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th ID
+        %th Origin
+        %th Description
+        %th Branch
+        %th
+    %tbody
+    - for api_access in @api_accesses
+      %tr{ :class => cycle('odd','') }
+        %td &nbsp;
+        %td
+          = api_access.id
+        %td
+          %b= link_to api_access.origin, resource(api_access)
+        %td
+          %b= api_access.description
+        %td
+          %b= api_access.branch.name
+    %tfoot
+      %tr
+        %td{ :colspan => 6 }
+
+  = link_to_with_rights 'Create a new api access >>', url(:new_api_access), :class => "button"

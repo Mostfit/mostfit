@@ -27,6 +27,7 @@ class ApiAccesses < Application
 
   def create(api_access)
     @api_access = ApiAccess.new(api_access)
+    @api_access.origin = rand(10000000000000).floor.to_s(36)
     if @api_access.save
       redirect resource(@api_access), :message => {:notice => "ApiAccess was successfully created"}
     else

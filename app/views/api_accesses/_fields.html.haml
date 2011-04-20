@@ -1,0 +1,11 @@
+%table
+  %tr
+    %th
+      Description
+    %td
+      = text_area :description
+    %td
+      Branch
+      = select :branch_id, :collection =>  Branch.all.map{|b| [b.id, b.name]}, :prompt => "---"
+
+= submit "Create Api access"

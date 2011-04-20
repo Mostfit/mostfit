@@ -1,13 +1,5 @@
-%h1 ApiAccesses controller, new action
-
-%p 
-  Edit this file in 
-  %tt app/views/api_accesses/new.html.erb
-
+%h1 Create a new api access
 = error_messages_for @api_access
 
-= form_for(@api_access, :action => url(:api_accesses) ) do
-  %p
-    = submit "Create"
-
-= link_to 'Back', url(:api_accesses)
+= form_for(@api_access, :action => url(:api_accesses)) do
+  = partial :fields, :submit_text => "Create api access"

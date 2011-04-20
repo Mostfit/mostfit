@@ -20,6 +20,7 @@ class Branch
   has n, :centers
   has n, :audit_trails, :auditable_type => "Branch", :child_key => ["auditable_id"]
   has n, :accounts
+  has n, :api_accesses
 
   validates_is_unique   :code
   validates_length      :code, :min => 1, :max => 10

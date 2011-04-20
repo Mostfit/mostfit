@@ -1,10 +1,21 @@
-%h1
-  ApiAccesses controller, show action
-%p
-  Edit this file in
-  %tt
-    app/views/api_accesses/show.html.erb
+%h1== Api Access
 
-= link_to 'Edit',  url(:edit_api_access,  @api_access)
-|
+%table.narrow.form{ :style => "width: 40%;" }
+  %tr.odd
+    %td ID
+    %td
+      %b= @api_access.id
+  %tr
+    %td origin
+    %td
+      %b= @api_access.origin
+  %tr.odd
+    %td description
+    %td
+      = @api_access.description
+  %tr
+    %td Branch
+    %td
+      = @api_access.branch.name
 = link_to 'Back', url(:api_accesses)
+
