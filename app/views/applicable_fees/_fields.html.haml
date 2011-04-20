@@ -1,4 +1,3 @@
-%h2 Levy penalty/fee
 %table
   %tr
     %td
@@ -20,3 +19,5 @@
       %td
         = hidden_field :applicable_id, :value => @loan.id
         = hidden_field :applicable_type, :value => 'Loan'          
+        = hidden_field :name => "_target_", :value => "applicable_fee_list"
+        = submit "GO"

@@ -67,7 +67,7 @@
                 %p= value.gsub("\n", "<br/>")
         - if params[:action]=="edit" and session.user.admin?
           %p{:style => "float: right; border: 1px solid orange; padding: 4px;"}
-            =link_to("Delete", url(:controller => "application", :action => "delete", :id => params[:id], :model => params[:controller], :return => request.uri), :class => 'delete')
+            = link_to("Delete", url(:controller => "application", :action => "delete", :id => params[:id], :model => params[:controller], :return => request.uri), :class => 'delete')
         %p
         = catch_content :for_layout
     #footer

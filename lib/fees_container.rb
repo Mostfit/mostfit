@@ -39,15 +39,15 @@ module FeesContainer
 
   # return total fee paid for this client
   def total_fees_paid(date=Date.today)
+    fee_ids = ApplicableFee.all(:applicable_type => self.get_class, :applicable_id => self.id).aggregate(:fee_id)
+    return 0 if fee_ids.length == 0
+
     if self.is_a?(Client)      
-      Payment.all(:type => :fees, :client => self, :received_on.lte => date, :loan_id => nil,
-                  :fee_id => ApplicableFee.all(:applicable_type => self.get_class, :applicable_id => self.id).aggregate(:fee_id)).sum(:amount) || 0
+      Payment.all(:type => :fees, :client => self, :received_on.lte => date, :loan_id => nil, :fee_id => fee_ids).sum(:amount) || 0
     elsif self.is_a?(Loan)
-      Payment.all(:type => :fees, :loan => self, :received_on.lte => date,
-                  :fee_id => ApplicableFee.all(:applicable_type => self.get_class, :applicable_id => self.id).aggregate(:fee_id)).sum(:amount) || 0
+      Payment.all(:type => :fees, :loan => self, :received_on.lte => date, :fee_id => fee_ids).sum(:amount) || 0
     elsif self.is_a?(InsurancePolicy)
-      Payment.all(:type => :fees, :client => self.client, :received_on.lte => date,
-                  :fee_id => ApplicableFee.all(:applicable_type => self.get_class, :applicable_id => self.id).aggregate(:fee_id)).sum(:amount) || 0
+      Payment.all(:type => :fees, :client => self.client, :received_on.lte => date, :fee_id => fee_ids).sum(:amount) || 0
     end      
   end
 
