@@ -533,7 +533,6 @@ class Loan
     # commenting this code so that meeting dates not automatically set
     #ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
-    debugger
     (1..actual_number_of_installments).each do |number|
       date      = installment_dates[number-1] #shift_date_by_installments(scheduled_first_payment_date, number - 1, ensure_meeting_day)
       principal = scheduled_principal_for_installment(number)
@@ -1561,11 +1560,6 @@ private
     balance = amount
     actual_payment = (payment / 5).round * 5
     while not done
-      puts i
-      if i > 139
-        debugger
-        x = 1
-      end
       @rounded_schedule[i] = {}
       @rounded_schedule[i][:interest_payable] = i < @reducing_schedule.count ? @reducing_schedule[i][:interest_payable] : 0
       @rounded_schedule[i][:principal_payable] = [actual_payment - @rounded_schedule[i][:interest_payable], balance].min

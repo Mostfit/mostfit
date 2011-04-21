@@ -91,7 +91,6 @@ class StaffMembers < Application
     @date = @date.holiday_bump
     center_ids = Loan.all(:scheduled_disbursal_date => @date, :approved_on.not => nil, :rejected_on => nil).map{|x| x.client.center_id}.uniq
     @centers = @staff_member.centers(:id => center_ids).sort_by{|x| x.name}
-    #debugger
     if params[:format] == "pdf"
       #some problem not working as of now
       folder   = File.join(Merb.root, "public", "pdfs")
