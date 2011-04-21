@@ -49,9 +49,7 @@ namespace :mostfit do
           prorata_total = prorata_prin + prorata_int
         end
         
-        f.puts("#{lh.client_id}, \"#{Client.get(lh.client_id).name}\", #{lh.loan_id}, #{lh.amount.to_i}, #{lh.actual_outstanding_principal.to_i}, 
-               \"#{(next_ins ? next_ins.date : 'no dues')}\", #{prin_due.to_i},  #{int_due.to_i}, #{total_due.to_i}, 
-               #{days.to_i}, #{prorata_prin.round(2)}, #{prorata_int.round(2)}, #{prorata_total.round(2)}")               
+        f.puts("#{lh.client_id}, \"#{Client.get(lh.client_id).name}\", #{lh.loan_id}, #{lh.amount.to_i}, #{lh.actual_outstanding_principal.to_i}, \"#{(next_ins ? next_ins.date : 'no dues')}\", #{prin_due.to_i},  #{int_due.to_i}, #{total_due.to_i}, #{days.to_i}, #{prorata_prin.round(2)}, #{prorata_int.round(2)}, #{prorata_total.round(2)}")               
       }
       f.close
     end
