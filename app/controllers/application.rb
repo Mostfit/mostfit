@@ -25,6 +25,12 @@ class Application < Merb::Controller
     end
   end
 
+  def ensure_admin
+    unless (session.user and session.user.role == :admin)
+      raise NotPrivileged
+    end
+  end
+
   def determine_layout
     return params[:layout] if params[:layout] and not params[:layout].blank?
   end

@@ -24,7 +24,7 @@ class User
   validates_format :login, :with => /^[A-Za-z0-9_]+$/
   validates_length :login, :min => 3
   validates_is_unique :login
-  validates_length :password, :min => 6  
+  validates_length :password, :min => 6, :if => Proc.new{|u| not u.password.nil?}
   has 1, :staff_member
   has 1, :funder
 
