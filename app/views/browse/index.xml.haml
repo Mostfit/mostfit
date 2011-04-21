@@ -8,8 +8,10 @@
       %password_changed_at #{session.user.password_changed_at}
       %active #{session.user.active}
       %role #{session.user.role}
+      %time_at_server #{DateTime.now.to_s}
       - if session.user.staff_member
         %staff_member_id #{session.user.staff_member.id}
   -else
     %error
       %message "Unauthorized User"
+      %error_code 401
