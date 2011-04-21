@@ -446,7 +446,7 @@ module Merb
       accounts = if branch_id and not branch_id.blank?
                    Account.all(:branch_id => @branch_id, :order => [:name])
                  else
-                   []
+                   Account.all(:branch_id => nil, :order => [:name])
                  end
       accounts.map{|x| [x.id, "#{x.name}"]}
     end
