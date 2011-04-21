@@ -1,0 +1,23 @@
+%table
+  %tr
+    %td
+      %b Fee
+    %td
+      = select :fee_id, :collection => Fee.all.map{|f| [f.id, f.name]}, :prompt => "Select fee"
+    %tr
+      %td          
+        %b Amount
+      %td
+        = text_field :amount
+    %tr
+      %td
+        %b Applicable on
+      %td
+        = date_select_for @applicable_fee, :applicable_on
+    %tr
+      %td
+      %td
+        = hidden_field :applicable_id, :value => @loan.id
+        = hidden_field :applicable_type, :value => 'Loan'          
+        = hidden_field :name => "_target_", :value => "applicable_fee_list"
+        = submit "GO"

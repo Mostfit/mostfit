@@ -7,7 +7,7 @@ class Application < Merb::Controller
   before :desktop_user_log
   
   @@controllers  = ["regions", "area", "branches", "centers", "clients", "loans", "payments", "staff_members", "funders", "portfolios", "funding_lines"]
-  @@dependant_deletable_associations = ["history", "loan_history", "audit_trails", "attendances", "portfolio_loans", "postings", "credit_account_rules", "debit_account_rules", "center_meeting_days"]
+  @@dependant_deletable_associations = ["history", "loan_history", "audit_trails", "attendances", "portfolio_loans", "postings", "credit_account_rules", "debit_account_rules", "center_meeting_days", "applicable_fees"]
 
   def desktop_user_log
     if request.route.to_s.match(/\/api\/v1\/([a-z0-9_\/:]*).xml*/)

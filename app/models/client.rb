@@ -2,6 +2,7 @@ class Client
   include Paperclip::Resource
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
   include DataMapper::Resource
+  include FeesContainer
 
   FLAGS = [:insincere]
 
@@ -9,6 +10,7 @@ class Client
   before :valid?, :convert_blank_to_nil
   before :valid?, :add_created_by_staff_member
   after  :save,   :check_client_deceased
+  after  :save,   :levy_fees
   
   property :id,              Serial
   property :reference,       String, :length => 100, :nullable => false, :index => true
@@ -90,6 +92,7 @@ class Client
   has n, :attendances
   has n, :claims
   has n, :guarantors
+  has n, :applicable_fees,    :child_key => [:applicable_id], :applicable_type => "Client"
   validates_length :account_number, :max => 20
 
   belongs_to :center
@@ -160,66 +163,6 @@ class Client
     end
   end
 
-  def fees
-    # this is hardcoded for the moment. later, when one has more than one client_type and one refactors,
-    # one will have to have this info read from the database
-    client_type ? client_type.fees : Fee.all.select{|f| f.payable_on.to_s.split("_")[0].downcase == "client"} 
-  end
-
-  def total_fees_due
-    total_fees_due = fee_schedule.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
-  end
-
-  def total_fees_paid
-    payments(:type => :fees, :loan_id => nil).sum(:amount) || 0
-  end
-
-  def total_fees_payable_on(date = Date.today)
-    # returns one consolidated number
-    total_fees_due = fee_schedule.select{|k,v| k <= date}.to_hash.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
-    total_fees_due - total_fees_paid
-  end
-
-  def fees_payable_on(date = Date.today)
-    # returns a hash of fee type and amounts
-    #    schedule = fee_schedule.select{|k,v| k <= Date.today}.collect{|k,v| v.to_a}
-    #    scheduled_fees = schedule.size > 0 ? schedule.map{|s| s.flatten}.to_hash : {}
-    #    scheduled_fees - (fees_paid.values.inject({}){|a,b| a.merge(b)})
-    scheduled_fees = fee_schedule.reject{|k,v| k > date}.values.inject({}){|s,x| s+=x}
-    (scheduled_fees - (fees_paid.reject{|k,v| k > date}.values.inject({}){|s,x| s+=x})).reject{|k,v| v<=0}
-  end
-
-  def fees_paid
-    @fees_payments = {}
-    payments(:type => :fees, :order => [:received_on], :loan => nil).each do |p|
-      @fees_payments += {p.received_on => {p.fee => p.amount}}
-    end
-    @fees_payments
-  end
-
-  def fees_paid?
-    total_fees_paid >= total_fees_due
-  end
-
-  def fee_schedule
-    @fee_schedule = {}
-    klass_identifier = self.class.to_s.snake_case
-    (client_type ? client_type.fees : Fee.all).each do |f|
-      type, *payable_on = f.payable_on.to_s.split("_")
-      if type == klass_identifier
-        # after adding the client_type, we should no longer need to check if the fee is for Client or Loan.
-        # However, we have to add the checks to the client type TODO
-        date = send(payable_on.join("_"))
-        @fee_schedule += {date => {f => f.fees_for(self)}} unless date.nil?
-      end
-    end
-    @fee_schedule
-  end
-
-  def fee_payments
-    @fees_payments = {}
-  end
-
   def pay_fees(amount, date, received_by, created_by)
     @errors = []
     fp = fees_payable_on(date)
@@ -283,7 +226,7 @@ class Client
     }
     self.type_of_account = 0 if self.type_of_account == nil
     self.occupation = nil if self.occupation.blank?
-    self.type_of_account='' if self.type_of_account.nil? or self.type_of_account=="0"
+    self.type_of_account = '' if self.type_of_account.nil? or self.type_of_account=="0"
   end
 
   def add_created_by_staff_member
@@ -306,7 +249,7 @@ class Client
     [false, "Verified client. Cannot be deleted"]
   end
 
-  def self.death_cases(obj,from_date, to_date)
+  def self.death_cases(obj, from_date, to_date)
      d2 = to_date.strftime('%Y-%m-%d')
     if obj.class == Branch 
       from  = "branches b, centers c, clients cl, claims cm"
@@ -335,8 +278,7 @@ class Client
                            })
   end
   
-   def self.pending_death_cases(obj,from_date, to_date)
- 
+   def self.pending_death_cases(obj,from_date, to_date) 
      if obj.class == Branch
        repository.adapter.query(%Q{
                                 SELECT COUNT(cl.id)

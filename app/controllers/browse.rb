@@ -30,7 +30,7 @@ class Browse < Application
   def centers_paying_today
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
     hash  = {:date => @date}
-    hash  = {:branch_id => params[:branch_id]} if params[:branch_id] and not params[:branch_id].blank?
+    hash += {:branch_id => params[:branch_id]} if params[:branch_id] and not params[:branch_id].blank?
     center_ids = LoanHistory.all(hash).aggregate(:center_id)
     loans      = LoanHistory.all(hash).aggregate(:loan_id, :center_id).to_hash
 
@@ -45,14 +45,10 @@ class Browse < Application
     end
 
     @fees_due, @fees_paid, @fees_overdue  = Hash.new(0), Hash.new(0), Hash.new(0)
-    Fee.applicable(loans.keys, {:date => @date}).each{|fa|
-      @fees_due[loans[fa.loan_id]] += fa.fees_applicable
+    Fee.due(loans.keys, {:date => @date}).each{|lid, fa|
+      @fees_due[loans[lid]] += fa.due
     }
 
-    Payment.all(:type => :fees, "client.center_id" => center_ids, :received_on.lt => @date).aggregate(:loan_id, :amount.sum).each{|fp|
-      @fees_due[loans[fp[0]]] -= fp[1]
-    } if center_ids.length>0
-    
     Payment.all(:type => :fees, :received_on => @date, "client.center_id" => center_ids).aggregate(:loan_id, :amount.sum).each{|fp|
       @fees_paid[loans[fp[0]]] += fp[1]
     } if center_ids.length>0

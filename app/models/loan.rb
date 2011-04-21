@@ -1,11 +1,13 @@
 class Loan
   include DataMapper::Resource
+  include FeesContainer
 
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
   before :valid?,  :parse_dates
   before :valid?,  :convert_blank_to_nil
   after  :save,    :update_history_caller  # also seems to do updates
+  after  :save,    :levy_fees
   before :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
   #  after  :destroy, :update_history
@@ -91,6 +93,7 @@ class Loan
   has n, :audit_trails,       :child_key => [:auditable_id], :auditable_type => "Loan"
   has n, :portfolio_loans
   has 1, :insurance_policy
+  has n, :applicable_fees,    :child_key => [:applicable_id], :applicable_type => "Loan"
   #validations
 
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
@@ -417,7 +420,7 @@ class Loan
 
     unless defer_update #i.e. bulk updating loans
       self.history_disabled=false
-      already_updated=false
+      @already_updated=false
       update_history(true)  # update the history if we saved a payment
     end
     if payments.length > 0
@@ -499,60 +502,6 @@ class Loan
     else
       nil
     end
-  end
-
-  def total_fees_due
-    total_fees_due = fee_schedule.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
-  end
-
-  def total_fees_paid
-    payments(:type => :fees, :loan_id.not => nil).sum(:amount) || 0
-  end
-
-  def total_fees_payable_on(date = Date.today)
-    # returns one consolidated number
-    _total_fees_due = fee_schedule.select{|k,v| k <= date}.to_hash.values.collect{|h| h.values}.flatten.inject(0){|a,b| a + b}
-    _total_fees_due - total_fees_paid
-  end
-
-  def fees_payable_on(date = Date.today)
-    # returns a hash of fee type and amounts
-    scheduled_fees = fee_schedule.reject{|k,v| k > date}.values.inject({}){|s,x| s+=x}
-    #scheduled_fees = schedule.size > 0 ? schedule.inject({}){|s,x| s+={x.keys.first.downcase => x.values.first}}.to_hash : {}
-    (scheduled_fees - (fees_paid.reject{|k,v| k > date}.values.inject({}){|s,x| s+=x})).reject{|k,v| v<=0}
-  end
-
-  def fees_paid
-    @fees_payments = {}
-    payments(:type => :fees, :order => [:received_on], :amount.gt => 0).each do |p|
-      @fees_payments += {p.received_on => {p.fee => p.amount}}
-    end
-    @fees_payments
-  end
-
-  def fees_paid?
-    total_fees_paid >= total_fees_due
-  end
-
-  def fee_schedule
-    @fee_schedule = {}
-    klass_identifier = "loan"
-    loan_product.fees.each do |f|
-      type, *payable_on = f.payable_on.to_s.split("_")
-      date = send(payable_on.join("_")) if type == klass_identifier
-      if date.class==Date
-        @fee_schedule += {date => {f => f.fees_for(self)}} unless date.nil?
-      elsif date.class==Array
-        date.each{|date|
-          @fee_schedule += {date => {f => f.fees_for(self)}} unless date.nil?
-        }
-      end
-    end
-    @fee_schedule
-  end
-
-  def fee_payments
-    @fees_payments = {}
   end
 
   def payment_schedule
@@ -779,7 +728,6 @@ class Loan
     payments.map { |p| p.received_on }
   end
 
-
   def status(date = Date.today)
     get_status(date)
   end
@@ -853,8 +801,6 @@ class Loan
     @_installment_dates = (0..(number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
   end
 
-   
-
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
   def update_cycle_number
     self.cycle_number=self.client.loans(:id.lt => id, :disbursal_date.not => nil).count+1
@@ -869,11 +815,11 @@ class Loan
   # for brute force iterations and caching => speed
   def update_history(forced=false)
     return true if Mfi.first.dirty_queue_enabled and DirtyLoan.add(self) and not forced
-    return if self.already_updated
+    return if @already_updated and not forced
     return if self.history_disabled and not forced# easy when doing mass db modifications (like with fixutes)
     clear_cache
     update_history_bulk_insert
-    already_updated=true
+    @already_updated=true
   end
 
   def calculate_history
@@ -966,9 +912,10 @@ class Loan
   end
 
   def write_off(written_off_on_date, written_off_by_staff)
-    if written_off_on_date and written_off_by_staff
+    if written_off_on_date and written_off_by_staff and not written_off_on_date.blank? and not written_off_by_staff.blank?
       self.written_off_on = written_off_on_date
       self.written_off_by = (written_off_by_staff.class == StaffMember ? written_off_by_staff : StaffMember.get(written_off_by_staff))
+      self.valid?
       self.save_self
     else
       false

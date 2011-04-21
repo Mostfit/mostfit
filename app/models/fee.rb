@@ -1,7 +1,18 @@
 class Fee
   include DataMapper::Resource
   
-  PAYABLE = [:loan_applied_on, :loan_approved_on, :loan_disbursal_date, :loan_scheduled_first_payment_date, :loan_first_payment_date, :client_grt_pass_date, :client_date_joined, :loan_installment_dates, :policy_issue_date]
+  PAYABLE = [
+             [:loan_applied_on, Loan, :applied_on], 
+             [:loan_approved_on, Loan, :approved_on],
+             [:loan_disbursal_date, Loan, :disbursal_date],
+             [:loan_scheduled_first_payment_date, Loan, :scheduled_first_payment_date], 
+             [:loan_first_payment_date, Loan, :first_payment_date],
+             [:client_grt_pass_date, Client, :grt_pass_date], 
+             [:client_date_joined, Client, :date_joined], 
+             [:loan_installment_dates, Loan, :installment_dates],
+             [:policy_issue_date, InsurancePolicy, :issue_date],
+             [:penalty, Loan, nil]
+            ]
   FeeDue        = Struct.new(:applicable, :paid, :due)
   FeeApplicable = Struct.new(:loan_id, :client_id, :fees_applicable)
   property :id,            Serial
@@ -10,12 +21,21 @@ class Fee
   property :amount,        Integer
   property :min_amount,    Integer
   property :max_amount,    Integer
-  property :payable_on,    Enum.send('[]',*PAYABLE), :nullable => false
+  property :payable_on,    Enum.send('[]',*PAYABLE.map{|m| m[0]}), :nullable => false
+
 
   has n, :loan_products, :through => Resource
   has n, :client_types, :through => Resource
   has n, :insurance_products, :through => Resource
   # anything else will have to be ruby code - sorry
+
+  has n, :applicable_loans,              'ApplicableFee', :applicable_type => 'Loan',            :child_key => [:applicable_id]
+  has n, :applicable_clients,            'ApplicableFee', :applicable_type => 'Client',          :child_key => [:applicable_id]
+  has n, :applicable_insurance_policies, 'ApplicableFee', :applicable_type => 'InsurancePolicy', :child_key => [:applicable_id]
+
+  has n, :loans,              :through => :applicable_loans
+  has n, :clients,            :through => :applicable_clients
+  has n, :insurance_policies, :through => :applicable_insurance_policies
   
   validates_with_method :amount_is_okay
   validates_with_method :min_lte_max
@@ -46,64 +66,72 @@ class Fee
   end
 
   def self.payable_dates
-    PAYABLE
+    PAYABLE.map{|m| m[0]}
   end
 
   def fees_for(loan)
     return amount if amount
     return [[min_amount || 0 , (percentage ? percentage * loan.amount : 0)].max, max_amount || (1.0/0)].min
   end
+
+  # Calculate the amount to be levied depending on the object type
+  def amount_for(obj)
+    return amount if amount
+    if obj.class == Loan or obj.class.superclass == Loan or obj.class.superclass.superclass == Loan and obj.loan_product and obj.loan_product.fees.include?(self)
+      return [[min_amount || 0 , (percentage ? percentage * obj.amount : 0)].max, max_amount || (1.0/0)].min
+    elsif obj.class == Client and obj.client_type and obj.client_type.fees.include?(self)
+      return self.client_types.include?(obj.client_type) ? [min_amount, max_amount].max : nil
+    elsif obj.class == InsurancePolicy
+      return obj.premium
+    end
+  end
   
-  def self.applicable(loan_ids, hash = {})
-    date = hash[:date] || Date.today
-
-    if loan_ids == :all
-      query    = " AND l.disbursal_date is not NULL"
-      query   += " AND l.disbursal_date<='#{date.strftime('%Y-%m-%d')}'"
-    else
-      loan_ids = loan_ids.length>0 ? loan_ids.join(",") : "NULL"
-      query    = "AND l.id IN (#{loan_ids})"
-    end   
-
-    payables = Fee.properties[:payable_on].type.flag_map
-    applicables = repository.adapter.query(%Q{
-                                SELECT l.id loan_id, l.client_id client_id, 
-                                       SUM(if(f.amount>0, convert(f.amount, decimal), l.amount*f.percentage)) fees_applicable, 
-                                       f.payable_on payable_on                                       
-                                FROM loan_products lp, fee_loan_products flp, fees f, loans l 
-                                WHERE flp.fee_id=f.id AND flp.loan_product_id=lp.id AND lp.id=l.loan_product_id #{query}
-                                      AND l.deleted_at is NULL AND l.rejected_on is NULL
-                                GROUP BY l.id;})
-    fees = []
-
-    applicables.each{|fee|
-      if payables[fee.payable_on]==:loan_installment_dates
-        installments = loans.find{|x| x.id==fee.loan_id}.installment_dates.reject{|x| x > date}.length
-        fees.push(FeeApplicable.new(fee.loan_id, fee.client_id, fee.fees_applicable.to_f * installments))
-      else
-        fees.push(FeeApplicable.new(fee.loan_id, fee.client_id, fee.fees_applicable.to_f))
-      end
-    }
-    fees
+  # find whether the fee is applicable to an object
+  def is_applicable?(obj)
+    if obj.is_a?(Loan)
+      obj.loan_product.fees.include?(self)
+    elsif obj.is_a?(Client)
+      obj.client_type.fees.include?(self)
+    elsif obj.is_a?(InsuranceProduct)
+      obj.fees.include?(self)      
+    end
+  end
+  
+  # returns the applicable fees for a list of ids and applicable type. Additional params can be provided by hash 
+  def self.applicable(ids, hash = {}, applicable_type = 'Loan')
+    date = hash.delete(:date) || Date.today
+    
+    query  = {:applicable_on.lte => date}
+    query[:applicable_id] = ids unless ids == :all
+    query[:applicable_type] = applicable_type
+    query.merge!(hash)
+    ApplicableFee.all(query)
   end
 
-  def self.paid(loan_ids, date=Date.today)
-    if loan_ids.length > 0
-      Payment.all(:type => :fees, :loan_id => loan_ids, :received_on.lte => date).aggregate(:loan_id, :amount.sum).to_hash
+  # returns the paid fee for a list of ids and applicable type. Additional params can be provided by hash 
+  def self.paid(ids, hash = {}, applicable_type = 'Loan')
+    if ids.length > 0
+      query = {:applicable_id => ids, :applicable_type => 'Loan', :applicable_on.lte => hash[:date] || Date.today}
+      query.merge!(hash)
+      query_str = ApplicableFee.all(query).map{|x| "(#{x.fee_id}, #{x.applicable_id})"}.join(", ")
+      parent_col = ((applicable_type == 'Loan') ? "loan_id" : "client_id")
+      repository.adapter.query("SELECT #{parent_col}, SUM(amount) FROM payments WHERE (fee_id, #{parent_col}) in (#{query_str}) AND deleted_at is NULL  GROUP BY #{parent_col}").map{|x| [x[0], x[1]]}.to_hash
     else
       {}
     end
   end
 
-  def self.due(loan_ids, date=Date.today)
-    fees_applicable = self.applicable(loan_ids, {:date => date}).group_by{|x| x.loan_id}
-    fees_paid       = self.paid(loan_ids, {:date => date})
+  # returns any due fee for a list of ids and applicable type. Additional params can be provided by hash 
+  def self.due(ids, hash={}, applicable_type = 'Loan')
+    fees_applicable = self.applicable(ids, hash, applicable_type).aggregate(:applicable_id, :amount.sum).to_hash      
+    fees_paid       = self.paid(ids, hash, applicable_type)
     fees = {}
-    loan_ids.each{|lid|
-      applicable = fees_applicable[lid].first if fees_applicable.key?(lid) and fees_applicable[lid].length>0
-      next if not applicable
+
+    ids.each{|lid|
+      applicable = fees_applicable[lid]||0
+      next unless applicable
       paid      = fees_paid.key?(lid) ? fees_paid[lid] : 0
-      fees[lid]  = FeeDue.new((applicable ? applicable.fees_applicable.to_f : 0), paid, ((applicable ? applicable.fees_applicable : 0) - paid).to_i)
+      fees[lid]  = FeeDue.new(applicable, paid, ((applicable - paid) > 0 ? (applicable - paid) : 0))
     }
     fees
   end
@@ -191,6 +219,4 @@ class Fee
                              GROUP BY p.fee_id
                            }).map{|x| [x.name, x.amount.to_i]}.to_hash
   end
-
-
 end

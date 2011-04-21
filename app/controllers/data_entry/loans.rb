@@ -23,16 +23,20 @@ module DataEntry
 
     def edit
       @loan = (params[:loan] and params[:loan][:id]) ? Loan.get(params[:loan][:id]) : Loan.new
+      raise NotFound unless @loan
 
-      @client = @loan.client(:fields => [:id, :name, :center_id, :client_group_id])
-      raise NotFound unless @client
+      unless @loan.new?
+        @client = @loan.client(:fields => [:id, :name, :center_id, :client_group_id])
+        raise NotFound unless @client
+        
+        @center = @client.center
+        raise NotFound unless @center
+        
+        @loan.interest_rate *= 100 if @loan.interest_rate
+        @loan_product = @loan.loan_product
+        set_insurance_policy
+      end
 
-      @center = @client.center
-      raise NotFound unless @center
-
-      @loan.interest_rate *= 100 if @loan.interest_rate
-      @loan_product = @loan.loan_product
-      set_insurance_policy
       render
     end
 

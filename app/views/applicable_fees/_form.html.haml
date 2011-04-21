@@ -1,0 +1,5 @@
+= form_for(@applicable_fee, :action => url(:controller => :applicable_fees, :action => :create), :method => "POST") do
+  %h3 Levy penalty/fee
+  = partial "applicable_fees/fields"
+
+

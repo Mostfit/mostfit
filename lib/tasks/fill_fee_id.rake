@@ -26,4 +26,18 @@ namespace :mostfit do
       repository.adapter.execute("UPDATE payments SET fee_id=2 WHERE id in (#{ids.join(",")})")
     end
   end
+
+  namespace :fees do
+    desc "levy fees on objects"
+    task :levy do
+      Client.all(:fields => [:id]).each{|cid|
+        c = Client.get(cid.id)
+        next unless c
+        c.levy_fees
+        c.loans.each{|l|
+          l.levy_fees
+        }
+      }
+    end
+  end
 end

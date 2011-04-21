@@ -37,7 +37,8 @@ describe Fee do
     @center.errors.each {|e| puts e}
     @center.should be_valid
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => Time.now.to_s, :created_by => @user, :date_joined => Date.parse('2006-01-01'),
+    @client = Client.new(:name => 'Ms C.L. Ient', :reference => Time.now.to_s, :created_by => @user, 
+                         :date_joined => Date.parse('2006-01-01'), :created_by_staff => @center.manager,
                          :client_type => ClientType.create(:type => "Standard"), :center => @center)
     @client.save
     @client.errors.each {|e| puts e}
@@ -69,7 +70,6 @@ describe Fee do
     @loan.should be_valid
     @loan.save
   end
-
 
   before :each do
     @f = Fee.new
@@ -111,11 +111,21 @@ describe Fee do
   it "should return correct fee_schedule for loan" do
     @f.percentage = 0.1
     @loan_product.fees << @f 
+    @loan_product.save
+    @loan.levy_fees
+
     @loan.fee_schedule.should == {@loan.applied_on => {@f => 100}}
     @f2 = Fee.new(:name => "Other Fee")
     @f2.amount = 111
     @f2.payable_on = :loan_scheduled_first_payment_date
+    @f2.save.should be_true
+    @loan.levy_fees
+    @loan.fee_schedule.should == {@loan.applied_on => {@f => 100}}
+    
     @loan_product.fees << @f2
+    @loan_product.save
+    @loan.levy_fees
+
     @loan.fee_schedule.should == {@loan.applied_on => {@f => 100}, @loan.scheduled_first_payment_date => {@f2 => 111}}
   end
   
@@ -123,9 +133,13 @@ describe Fee do
     @f2 = Fee.new(:name => "Other Fee")
     @f2.amount = 111
     @f2.payable_on = :loan_applied_on
-    @f2.should be_valid
+    @f2.save.should be_true
     @f.percentage = 0.1
+    @f.save
     @loan_product.fees = [@f, @f2]
+    @loan.applicable_fees.destroy!
+    @loan.levy_fees
+
     @loan.fee_schedule.should == {@loan.applied_on => {@f => 100, @f2 => 111}}
   end
 
@@ -136,6 +150,9 @@ describe Fee do
     @f2.should be_valid
     @f.percentage = 0.1
     @loan_product.fees = [@f, @f2]
+    @loan_product.save
+    @loan.applicable_fees.destroy!
+    @loan.save
     @loan.fee_schedule[@loan.applied_on].should  == {@f => 100, @f2 => 111}
     @loan.fees_payable_on.should == {@f => 100, @f2 => 111}
   end
@@ -152,23 +169,32 @@ describe Fee do
     @loan_product.fees = []
     @loan_product.fees << @f
     @loan_product.fees << @f2
+    @loan_product.save
+    @loan.applicable_fees.destroy!
+    @loan.save
+
+    @loan.fees_payable_on.should == {@f => 100, @f2 => 111}
+
     @p = Payment.new(:amount => 20, :received_on => '2009-01-01', :type => :fees, :client => @client, :fee => @f,
                      :received_by => @manager, :created_by => @user, :loan => @loan, :comment => "test fee")
     @p.valid?
     @p.errors.each {|e| puts e}
     @p.should be_valid
-    @p.save
+    @p.save.should be_true
 
     @loan.fees_paid.should == {Date.parse('2009-01-01') => {@f => 20}}
-    @loan.total_fees_payable_on.should == 111 + 80
     @loan.fees_payable_on.should == {@f => 80, @f2 => 111}
+    @loan.total_fees_payable_on.should == 111 + 100 - 20
+    @loan.total_fees_due.should == 111 + 100 - 20
+
     @p = Payment.new(:amount => 20, :received_on => '2009-01-01', :type => :fees, :client => @client,
-                     :received_by => @manager, :created_by => @user, :loan => @loan, :comment => "Other Fee")
-    @p.save
+                     :received_by => @manager, :created_by => @user, :loan => @loan, :fee => @f2)
+    @p.save.should be_true
     @loan.total_fees_payable_on.should == 111 + 100 - 40
     @loan.fees_paid.should == {Date.parse('2009-01-01') => {@f => 20, @f2 => 20}}
     @loan.fees_payable_on.should == {@f => 80, @f2 => 91}
-  end    
+    Payment.all.destroy!
+  end
 
   it "should give correct fee schedule for client" do
     @client_fee = Fee.new(:name => "client fee", :amount => 20, :payable_on => :client_date_joined)
@@ -176,10 +202,15 @@ describe Fee do
     @client_fee.save
     @client_fee.errors.each {|e| puts e}
     @client_fee.should be_valid
+    @client.save
 
     @client.fee_schedule.should == {@client.date_joined => {@client_fee => 20}}
-    @client.total_fees_payable_on(@client.date_joined - 1).should == 0
-    @client.total_fees_payable_on(@client.date_joined).should == 20
+    @client.fees_payable_on.should == {@client_fee => 20}
+    @client.fees_payable_on(@client.date_joined - 1).should == {}
+
+    old_dues =  @client.total_fees_due(@client.date_joined - 1)
+    @client.total_fees_payable_on(@client.date_joined - 1).should == old_dues
+    @client.total_fees_payable_on(@client.date_joined).should == 20 + old_dues
     @client.fees_payable_on.should == {@client_fee => 20}
 
     @p = Payment.new(:amount => 10, :received_on => @client.date_joined - 1, :type => :fees, :client => @client,
@@ -195,6 +226,7 @@ describe Fee do
     @client.fees_paid.should == {@client.date_joined => {@client_fee => 10}}
     @client.fees_payable_on.should == {@client_fee => 10}
   end
+
   it "should work just as well for another fee" do
     Payment.all(:client => @client, :loan => nil).destroy!
     ct = ClientType.create(:type => "New")
@@ -245,8 +277,16 @@ describe Fee do
     @fee2.client_types << @client.client_type
     @fee2.save
     
-    @client.grt_pass_date = Date.today - 1
+    @client.applicable_fees.destroy!
+    @client.should be_valid
+    @client.save
+    @client.fees_payable_on.should == {@fee1 => 20}
     @client.pay_fees(5, Date.today - 1, @manager, @user)
+    @client.fees_payable_on.should == {@fee1 => 20 - 5}
+    
+    @client.grt_pass_date = Date.today - 20
+    @client.save!
+    @client.levy_fees
     @client.fees_payable_on.should == {@fee1 => 20 - 5, @fee2 => 10}
   end
 end

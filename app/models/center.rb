@@ -221,7 +221,6 @@ class Center
     return true
   end  
 
-
   def set_meeting_change_date
     self.meeting_day_change_date = self.creation_date if self.new?
   end

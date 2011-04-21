@@ -1,39 +1,43 @@
-%table
-  %tr
-    %td
-      %b Loan Utilization
-    %td
-      = form_for(:loan, :class => "_remote_", :action => url(:controller => :loans, :action => :update_utilization, :id => @loan.id), :method => "POST") do
-        %div
-        = select :loan_utilization_id, :collection => LoanUtilization.all.map{|lu| [lu.id, lu.name]}, :include_blank => true
-        %br/
-        = submit "Save"
+= form_for(:loan, :class => "_remote_", :action => url(:controller => :loans, :action => :update_utilization, :id => @loan.id), :method => "POST") do
+  %div.box
+    %h3 Loan Utilization
+    = select :loan_utilization_id, :collection => LoanUtilization.all.map{|lu| [lu.id, lu.name]}, :include_blank => true
+    = submit "Save"
+- if [:admin, :mis_manager].include?(session.user.role)
+  %hr
+  .box
+    = partial "applicable_fees/form", :layout => false
+  %hr
+  .box
+    %h3 Applicable fees
+    = partial "applicable_fees/list", :layout => false, :applicable_fees => @loan.applicable_fees
 - if session.user.role==:admin
-  = form_for(@loan, :action => url(:action => :write_off, :id => @loan.id), :method => "POST") do
-    %table
-      %tr
-        %td
-          %b Write Off Loan
-      %tr
-        %td
-          Write off Date : 
-        %td
-          = date_select_for @loan, :written_off_on
-      %tr
-        %td
-          Select Staff Member :
-        %td
-          - center = @client.center
-          - branch = center.branch
-          = select :written_off_by_staff_id, :id => "written_off_by_staff_id", :collection => [branch.manager, center.manager].uniq.map{|m| [m.id, m.name]}
-        %td
-          %span.greytext 
-            Pick the staff member who is writing off the loan.Pre-selected is Branch Manager.
+  %hr
+  .box
+    %h3 Write Off Loan
+    = form_for(@loan, :action => url(:action => :write_off, :id => @loan.id), :method => "POST", :class => "_disable_button_") do
+      %table
+        %tr
+          %td
+            Write off Date : 
+          %td
+            = date_select_for @loan, :written_off_on
+        %tr
+          %td
+            Select Staff Member :
+          %td
+            - center = @client.center
+            - branch = center.branch
+            = select :written_off_by_staff_id, :id => "written_off_by_staff_id", :collection => [branch.manager, center.manager].uniq.map{|m| [m.id, m.name]}
+        %tr
+          %td{:colspan => "2"}
+            %span.greytext 
+              Pick the staff member who is writing off the loan.Pre-selected is Branch Manager.
       %tr
         %td
           = submit "Write off"
 - elsif staff_member = session.user.staff_member
-  = form_for(@loan, :action => url(:action => :suggest_write_off, :id => @loan.id), :method => "POST") do
+  = form_for(@loan, :action => url(:action => :suggest_write_off, :id => @loan.id), :method => "POST", :class => "_disable_button_") do
     %table
       %tr
         %td

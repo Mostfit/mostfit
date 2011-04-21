@@ -1,0 +1,7 @@
+%h1 Levy fee
+= error_messages_for @applicable_fee
+
+= form_for(@applicable_fee, :action => resource(:applicable_fees) ) do
+  = partial :fields
+
+= link_to 'Back', url(:controller => @applicable_fee.applicable_type.downcase.pluralize, :action => :show, :id => @applicable_fee.applicable_id) if @applicable_fee.client

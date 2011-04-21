@@ -288,7 +288,9 @@ class Loans < Application
       if @loan.write_off(hash[:written_off_on], hash[:written_off_by_staff_id])
         redirect(resource(@branch, @center, @client), :message => {:notice => "Loan was successfully written off"})
       else
-        render
+        message[:error] = "Please select staff member who writes off the loan and date on which it is written off"
+        @payments = @loan.payments(:order => [:received_on, :id])
+        display [@loan, @payments], 'payments/index'
       end
     end
   end
@@ -345,15 +347,23 @@ class Loans < Application
   
   def misc(id)
     @loan = Loan.get(id)
+    @applicable_fee = ApplicableFee.new(:applicable_type => 'Loan', :applicable_id => @loan.id)
     request.xhr? ? render(:layout => false) : render
   end
   
   def update_utilization(id)
     @loan =  Loan.get(id)    
-    if @loan.update!(:loan_utilization_id => params[:loan][:loan_utilization_id])
+    @loan.history_disabled = true
+    if params[:loan] and params[:loan][:loan_utilization_id] and not params[:loan][:loan_utilization_id].blank?
+      @loan.loan_utilization_id = params[:loan][:loan_utilization_id]
+    else
+      @loan.loan_utilization_id = nil
+    end
+    
+    if @loan.save_self
       request.xhr? ? render("Saved loan utilization", :layout => false) : redirect(resource(@loan))
     else
-      request.xhr? ? render(@loan.errors.to_a.map{|x| x.join(":")}.join(", "), :layout => false, :status => 400) : render(resource(@loan, :edit))
+      request.xhr? ? render(@loan.errors.to_a.map{|x| x.join(":")}.join(", "), :layout => false) : render(resource(@loan, :edit))
     end
   end
 
@@ -363,12 +373,6 @@ class Loans < Application
     loan.update_history
     redirect("/loans/#{loan.id}")
   end
-
-
-  # def make_loan_utilization
-    
-  #   render
-  # end
 
   private
   def get_context

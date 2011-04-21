@@ -113,7 +113,7 @@
               = (tdiff - pdiff).to_currency
               - branch_arr[9] += (tdiff - pdiff)
             %td.numeric
-              = (fbal = (fd>fp ? fd-fp : 0)).to_currency
+              = (fbal = (fd > fp ? fd - fp : 0)).to_currency
               - branch_arr[10] += fbal
             %td.numeric
               = tdiff.to_currency

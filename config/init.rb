@@ -42,8 +42,9 @@ Merb::BootLoader.before_app_loads do
   require 'dm-pagination/pagination_builder'
   require 'lib/string.rb'
   require 'lib/grapher.rb'
-  require("lib/functions.rb")
-  require("lib/core_ext.rb")
+  require 'lib/functions.rb'
+  require 'lib/core_ext.rb'
+  require 'lib/fees_container.rb'
   
   begin
     require "pdf/writer"
