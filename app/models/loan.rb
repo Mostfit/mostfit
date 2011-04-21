@@ -555,6 +555,12 @@ class Loan
     @fees_payments = {}
   end
 
+  def actual_number_of_installments
+    # we need this beacuse in laons with rounding, you may end up with more/less installments than advertised!!
+    # crazy MFI product managers!!!
+    number_of_installments
+  end
+
   def payment_schedule
     # this is the fount of all knowledge regarding the scheduled payments for the loan. 
     # it feeds into every other calculation about the loan schedule such as get_scheduled, calculate_history, etc.
@@ -577,8 +583,8 @@ class Loan
     # commenting this code so that meeting dates not automatically set
     #ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
-
-    (1..number_of_installments).each do |number|
+    debugger
+    (1..actual_number_of_installments).each do |number|
       date      = installment_dates[number-1] #shift_date_by_installments(scheduled_first_payment_date, number - 1, ensure_meeting_day)
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
@@ -1554,6 +1560,10 @@ class EquatedWeeklyRoundedAdjustedLastPayment < Loan
     return reducing_schedule[number][:interest_payable]
   end
 
+  def actual_number_of_installments
+    reducing_schedule.count
+  end
+
   def installment_dates
     insts = reducing_schedule.count
     return @_installment_dates if @_installment_dates
@@ -1604,6 +1614,10 @@ private
     actual_payment = (payment / 5).round * 5
     while not done
       puts i
+      if i > 139
+        debugger
+        x = 1
+      end
       @rounded_schedule[i] = {}
       @rounded_schedule[i][:interest_payable] = i < @reducing_schedule.count ? @reducing_schedule[i][:interest_payable] : 0
       @rounded_schedule[i][:principal_payable] = [actual_payment - @rounded_schedule[i][:interest_payable], balance].min
@@ -1611,7 +1625,7 @@ private
       i += 1
       done = true if balance == 0 
     end
-    self.number_of_installments = i + 1
+    self.number_of_installments = i - 1
     return @rounded_schedule
   end
 
