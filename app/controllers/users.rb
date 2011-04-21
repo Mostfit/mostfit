@@ -1,4 +1,5 @@
 class Users < Application
+  before :ensure_admin, :only => [:edit, :new, :create, :update, :delete, :destroy, :amind_change_password]
 
   def show(id)
     u = User.get(id)
@@ -19,6 +20,7 @@ class Users < Application
   def edit(id)
     only_provides :html
     @user = User.get(id)
+    @user_password = @user
     raise NotFound unless @user
     display @user
   end
@@ -41,7 +43,6 @@ class Users < Application
     @user = User.get(id)
     params[:user][:staff_member] = StaffMember.get(params[:user][:staff_member]) if params[:user][:staff_member]
     params[:user][:funder]       = Funder.get(params[:user][:funder]) if params[:user][:funder]
-    params[:user][:password_changed_at] = Time.now
 
     raise NotFound unless @user
     if @user.update_attributes(user)
@@ -97,12 +98,35 @@ class Users < Application
     end
     render
   end
- 
-=begin 
-  private
-  def ensure_is_admin
-    raise Unauthenticted unless session.user.id == 3
-  end
-=end
 
+  def admin_change_password    
+    user = params[:user]
+    @user = User.get(params[:user_id])
+    raise NotFound unless @user
+
+    @status = false
+    if session.user.role == :admin and request.method==:put and user.key?(:password) and 
+        user.key?(:password_confirmation) and not user[:password].blank? and not user[:password_confirmation].blank?
+      @user.transaction do |t|
+        old_crypt = @user.crypted_password
+        @user.password = user[:password]
+        @user.password_confirmation = user[:password]
+        @user.password_changed_at   = DateTime.now
+        @status = @user.save
+        t.rollback if not status
+        if (@user.crypted_password == old_crypt)
+          t.rollback
+          @status = false
+          @user.errors.add(:password, "Same as old password")
+        end
+      end
+    end
+
+    if @status
+      redirect(resource(:users), :message => {:notice => "Password changed successfully"})
+    else
+      message[:error] = "Password could not be changed"
+      display @user, :edit
+    end
+  end
 end # Users
