@@ -30,7 +30,7 @@
       %td
         = link_to loan_product.name, url(:loan_product, loan_product) 
       %td
-        = Kernel.const_get(loan_product.loan_type).display_name
+        = Kernel.const_get(loan_product.loan_type_string).display_name
       %td
         = loan_product.min_amount!=loan_product.max_amount ? "#{loan_product.min_amount} - #{loan_product.max_amount}" : loan_product.min_amount
       %td
