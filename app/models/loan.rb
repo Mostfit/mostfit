@@ -504,8 +504,6 @@ class Loan
     end
   end
 
-<<<<<<< HEAD
-=======
 
   def actual_number_of_installments
     # we need this beacuse in laons with rounding, you may end up with more/less installments than advertised!!
