@@ -24,8 +24,8 @@ class Loans < Application
   def new
     only_provides :html
     if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])      
-      if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type)
-        klass = Kernel::const_get(@loan_product.loan_type)
+      if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type_string)
+        klass = Kernel::const_get(@loan_product.loan_type_string)
         @loan = klass.new
         set_insurance_policy(@loan_product)
       end
@@ -386,7 +386,7 @@ class Loans < Application
   # this method gets the loans type from a hidden field value and uses that to get the attrs
   def get_loan_and_attrs   # FIXME: this is a code dup with data_entry/loans
     loan_product = LoanProduct.get(params[:loan_product_id])
-    attrs = params[loan_product.loan_type.snake_case.to_sym]
+    attrs = params[loan_product.loan_type_string.snake_case.to_sym]
     attrs[:client_id] = params[:client_id] if params[:client_id]
     attrs[:insurance_policy] = params[:insurance_policy] if params[:insurance_policy]
     raise NotFound if not params[:loan_type]
