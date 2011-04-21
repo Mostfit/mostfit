@@ -55,6 +55,10 @@
     %ul.tabs
       %li#repayments
         Repayments
+        %b
+          (
+          = LoanHistory.all(:date => Date.today).select{|lh| lh.principal_due + lh.interest_due > 0}.count
+          )
       %li#repayments
         Approvals
         %b        

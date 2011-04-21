@@ -32,6 +32,7 @@
     - fees_paid       = {}
     - Payment.all(:received_on => @date, :type => :fees, :loan_id => loans.map{|x| x.id}, :fields => [:id, :amount]).map{|p| fees_paid[p.loan_id]||=0; fees_paid[p.loan_id] +=  p.amount}
     - tot_amount, tot_outstanding, tot_installments, tot_principal_due, tot_principal_paid, tot_interest_due, tot_interest_paid, tot_fee_due, tot_fee_paid, tot_total_due, tot_total_paid = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    - num_loans_to_pay = num_fees_to_pay = 0
     - clients.group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each do |group, client_grouped|
       %tr.group
         %td{:colspan => 14}
@@ -72,6 +73,7 @@
               = pdue.to_currency
               - tot_principal_due += pdue
               - grp_principal_due += pdue
+              - num_loans_to_pay += 1 if pdue > 0
             %td.numeric
               - ppaid = (lh ? lh.principal_paid : 0)
               = ppaid.to_currency
@@ -92,6 +94,7 @@
               = fee_due.to_currency
               - tot_fee_due += fee_due
               - grp_fee_due += fee_due
+              - num_fees_to_pay += 1 if fee_due > 0
             %td.numeric
               - fee_paid = fees_paid[loan.id] ? fees_paid[loan.id] : 0
               = fee_paid.to_currency
@@ -139,27 +142,19 @@
       %td
       %td
       %td.numeric
-        %b= tot_amount.to_currency
       %td.numeric
-        %b= tot_outstanding.to_currency
       %td
       %td
       %td.numeric
-        %b= tot_principal_due.to_currency
+        %b= num_loans_to_pay
       %td.numeric
-        %b= tot_principal_paid.to_currency
       %td.numeric
-        %b= tot_interest_due.to_currency
       %td.numeric
-        %b= tot_interest_paid.to_currency
       %td.numeric
-        %b= tot_fee_due.to_currency
+        %b= num_fees_to_pay
       %td.numeric
-        %b= tot_fee_paid.to_currency
       %td.numeric
-        %b= tot_total_due.to_currency
       %td.numeric
-        %b= tot_total_paid.to_currency
       
   %tfoot    
     %tr
