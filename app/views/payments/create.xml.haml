@@ -1,24 +1,29 @@
 %xml
-  %payment
+  %payments
     -if @payment_type.blank?
-      %error Payment type can't be blank
+      %error 
+        %description Payment type can't be blank
+        %error_code 600
     - elsif not @payment_type.blank?
       - if not @payment.errors.blank?
-        - @payment.errors.map do |e|
-          - if e.instance_variables.include?("@errors")
-            - if e.resource.loan_id
-              %error #{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
+        %error
+          - @payment.errors.map do |e|
+            - if e.instance_variables.include?("@errors")
+              - if e.resource.loan_id
+                %description #{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
+                %error_code 600
+              - else
+                %description #{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
+                %error_code 600
             - else
-              %error #{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
-          - else
-            %error #{e.to_s}
+              %description #{e.to_s}
+              %error_code 600
       - else
         - @prin = @payment if @payment_type != "total" and @payment_type == "principal"
         - @int = @payment if @payment_type != "total" and @payment_type == "interest"
         - @fees = @payment if @payment_type != "total" and @payment_type == "fees"
         - if @prin
-          %principal
-            %message "Loan principal of client '#{@client.name}' has been registered"
+          %payment
             %id #{@prin.id}
             %amount #{@prin.amount}
             %type #{@prin.type}
@@ -34,7 +39,7 @@
             %desktop_id #{@prin.desktop_id}
             %origin #{@prin.origin}
         - if @int
-          %interest
+          %payment
             %message "Loan interest of client '#{@client.name}' has been registered"
             %id #{@int.id}
             %amount #{@int.amount}
@@ -51,7 +56,7 @@
             %desktop_id #{@int.desktop_id}
             %origin #{@int.origin}
         - if @fees
-          %fees
+          %payment
             %message "Loan fees of client '#{@client.name}' has been registered"
             %id #{@fees.id}
             %amount #{@fees.amount}
