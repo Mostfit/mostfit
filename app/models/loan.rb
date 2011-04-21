@@ -504,6 +504,15 @@ class Loan
     end
   end
 
+<<<<<<< HEAD
+=======
+
+  def actual_number_of_installments
+    # we need this beacuse in laons with rounding, you may end up with more/less installments than advertised!!
+    # crazy MFI product managers!!!
+    number_of_installments
+  end
+
   def payment_schedule
     # this is the fount of all knowledge regarding the scheduled payments for the loan. 
     # it feeds into every other calculation about the loan schedule such as get_scheduled, calculate_history, etc.
@@ -526,8 +535,8 @@ class Loan
     # commenting this code so that meeting dates not automatically set
     #ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
-
-    (1..number_of_installments).each do |number|
+    debugger
+    (1..actual_number_of_installments).each do |number|
       date      = installment_dates[number-1] #shift_date_by_installments(scheduled_first_payment_date, number - 1, ensure_meeting_day)
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
@@ -797,7 +806,6 @@ class Loan
     ensure_meeting_day = false
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
-
     @_installment_dates = (0..(number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
   end
 
@@ -1502,15 +1510,46 @@ class EquatedWeeklyRoundedAdjustedLastPayment < Loan
     return reducing_schedule[number][:interest_payable]
   end
 
+  def actual_number_of_installments
+    reducing_schedule.count
+  end
+
+  def installment_dates
+    insts = reducing_schedule.count
+    return @_installment_dates if @_installment_dates
+    if installment_frequency == :daily
+      # we have to br careful that when we do a holiday bump, we do not get stuck in an endless loop
+      ld = scheduled_first_payment_date - 1
+      @_installment_dates = []
+      (1..insts).each do |i|
+        ld += 1
+        if ld.cwday == weekly_off
+          ld +=1
+        end
+        if ld.holiday_bump.cwday == weekly_off # endless loop
+          ld.holiday_bump(:after)
+        end
+        @_installment_dates << ld
+      end
+      return @_installment_dates
+    end
+        
+    ensure_meeting_day = false
+    ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
+    ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
+    @_installment_dates = (0..(insts-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
+  end
+
+
 private
   def reducing_schedule
-    return @reducing_schedule if @reducing_schedule
+    return @rounded_schedule if @rounded_schedule
     @reducing_schedule = {}    
     balance = amount
     payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0).round(0)
     1.upto(number_of_installments){|installment|
       @reducing_schedule[installment] = {}
-      @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider).round(0)
+      @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider)
       if installment == number_of_installments or balance < (payment - @reducing_schedule[installment][:interest_payable])
         @reducing_schedule[installment][:principal_payable] = balance
       else
@@ -1518,7 +1557,26 @@ private
       end
       balance = balance - @reducing_schedule[installment][:principal_payable]
     }
-    return @reducing_schedule
+    done = false
+    i = 1
+    @rounded_schedule = {}
+    balance = amount
+    actual_payment = (payment / 5).round * 5
+    while not done
+      puts i
+      if i > 139
+        debugger
+        x = 1
+      end
+      @rounded_schedule[i] = {}
+      @rounded_schedule[i][:interest_payable] = i < @reducing_schedule.count ? @reducing_schedule[i][:interest_payable] : 0
+      @rounded_schedule[i][:principal_payable] = [actual_payment - @rounded_schedule[i][:interest_payable], balance].min
+      balance -= @rounded_schedule[i][:principal_payable]
+      i += 1
+      done = true if balance == 0 
+    end
+    self.number_of_installments = i - 1
+    return @rounded_schedule
   end
 
   def get_divider

@@ -105,7 +105,7 @@
               = (ppaid + ipaid + fee_paid).to_currency
               - tot_total_paid += (ppaid + ipaid + fee_paid)
               - grp_total_paid += (ppaid + ipaid + fee_paid)
-        - if loan_row_count == 0
+        - if loan_row_count == 0 and not params[:filter]
           %tr{ :class => cycle('odd','') }
             %td
               %b= link_to client.name, resource(branch, center, client)
