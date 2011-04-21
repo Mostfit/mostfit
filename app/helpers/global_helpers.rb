@@ -442,8 +442,13 @@ module Merb
       
   #  end
     
-    def get_accessible_accounts
-      Account.all(:branch_id => @branch_id, :order => [:name])
+    def get_accessible_accounts(branch_id)
+      accounts = if branch_id and not branch_id.blank?
+                   Account.all(:branch_id => @branch_id, :order => [:name])
+                 else
+                   []
+                 end
+      accounts.map{|x| [x.id, "#{x.name}"]}
     end
 
     def select_mass_entry_field(attrs)
