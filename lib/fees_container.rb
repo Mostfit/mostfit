@@ -4,8 +4,10 @@ module FeesContainer
     existing_fees = self.fees
     @payable_models ||= Fee::PAYABLE.map{|m| [m[0], [m[1], m[2]]]}.to_hash
     Fee.all.map{|fee|
+     
       if @payable_models.key?(fee.payable_on) and fee.is_applicable?(self)
         klass, payable_date_method = @payable_models[fee.payable_on]
+        next unless payable_date_method
         next unless self.respond_to?(payable_date_method)
         date = self.send(payable_date_method)
         amount = fee.amount_for(self)
