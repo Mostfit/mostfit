@@ -1,14 +1,17 @@
 %div.form_container
-  .notice
+  .help
     %h3 Loan Product IRR helper
     Use the form below to calculate the IRR on a loan for a particular loan product.
-  = form_for(@loan, :action => url(:design_loan_product)) do
+  - @new_loan = Loan.new(params[:loan] || {})
+  = form_for(@new_loan, :action => url(:design_loan_product)) do
     %table.border
       %tr
         %td.legend
           Loan Product
         %td
           = select :loan_product_id, :collection => LoanProduct.all, :text_method => :name, :value_method => :id, :prompt => 'Please choose a loan product'
+          = check_box :name => "exclude_fees", :checked => params.has_key?("exclude_fees")
+          Exclude fees
         %td
         %td
       %tr
@@ -24,11 +27,11 @@
         %td.legend
           Disbursal Date
         %td
-          = date_select_for @loan, :scheduled_disbursal_date
+          = date_select_for @new_loan, :scheduled_disbursal_date
         %td.legend
           First Payment Date
         %td
-          = date_select_for @loan, :scheduled_first_payment_date
+          = date_select_for @new_loan, :scheduled_first_payment_date
       %tr
       %tr
         %td.legend
@@ -43,20 +46,57 @@
 
 %h1
   This loan has an IRR of
-  - irr = @loan.irr
+  - irr = @loan.irr(params.has_key?("exclude_fees"))
   = irr.is_a?(Numeric) ? ('%.2f' %(irr * 100)).to_s + "%" : irr
 
-- cf = @loan.cash_flow if @loan.loan_product
-- if cf
-  %table
-    %tr
-      %th
-        Date
-      %th
-        Cash flow
-    - cf.each do |c|
+- ps = @loan.payment_schedule if @loan.loan_product
+- if ps
+  %table.narrow.form
+    %thead
       %tr
+        %th
+          Date
+        %th
+          Balance
+        %th
+          Principal
+        %th
+          Interest
+        %th
+          Fees
+        %th Cashflow
+    - fs = @loan.fee_schedule
+    - cf = @loan.cash_flow(:scheduled, params.has_key?(:exclude_fees)).to_hash
+    - fs.keys.select{|d| d < @loan.payment_schedule.keys.min}.each do |date|
+      %tr{:class => cycle('odd','even')}
         %td
-          = c[0]
+          = date
         %td
-          = c[1]
+          = "-"
+        %td
+          = "-"
+        %td
+          = fs[date][:fees]
+    - ps.sort_by{|date, row| date}.each do |date, row|
+      %tr{:class => cycle('odd','even')}
+        %td
+          = date
+        %td
+          = row[:balance].round(2)
+        %td
+          = row[:principal].round(2)
+        %td
+          = row[:interest].round(2)
+        %td
+          = row[:fees].round(2) unless params.has_key?("exclude_fees")
+        %td
+          = cf[date].round(2)
+    %tr.total
+      %td
+      %td
+      %td
+        = ps.map{|p| p[1][:principal]}.reduce(:+).round(2)
+      %td
+        = ps.map{|p| p[1][:interest]}.reduce(:+).round(2)
+      %td
+        = ps.map{|p| p[1][:fees]}.reduce(:+).round(2) unless params.has_key?("exclude_fees")
