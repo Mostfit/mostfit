@@ -59,6 +59,11 @@ describe Fee do
     @loan_product.save
     @loan_product.errors.each {|e| puts e}
     @loan_product.should be_valid
+  end
+
+  before :each do
+    ApplicableFee.all.destroy!
+    Loan.all.destroy!
     @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
     @loan.history_disabled = true
     @loan.applied_by       = @manager
@@ -69,9 +74,6 @@ describe Fee do
     @loan.errors.each {|e| puts e}
     @loan.should be_valid
     @loan.save
-  end
-
-  before :each do
     @f = Fee.new
     @f.name = "Test Fee"
     @f.payable_on = :loan_applied_on
@@ -113,8 +115,8 @@ describe Fee do
     @loan_product.fees << @f 
     @loan_product.save
     @loan.levy_fees
-
     @loan.fee_schedule.should == {@loan.applied_on => {@f => 100}}
+
     @f2 = Fee.new(:name => "Other Fee")
     @f2.amount = 111
     @f2.payable_on = :loan_scheduled_first_payment_date
@@ -128,6 +130,24 @@ describe Fee do
 
     @loan.fee_schedule.should == {@loan.applied_on => {@f => 100}, @loan.scheduled_first_payment_date => {@f2 => 111}}
   end
+
+  it "should return correct fee_schedule for disbursal / scheduled_disbursal_date" do
+    @f = Fee.new
+    @f.name = "Disbursal Fee"
+    @f.payable_on = :loan_disbursal_date
+    @f.amount = 1000
+    @f.should be_valid
+    @loan_product.fees = [@f]
+    @loan_product.save
+    @loan.levy_fees
+
+    @loan.fee_schedule.should == {@loan.scheduled_disbursal_date => {@f => 1000}}
+
+    @loan.disbursal_date = @loan.scheduled_disbursal_date + 10
+    @loan.levy_fees
+
+    @loan.fee_schedule.should == {(@loan.scheduled_disbursal_date  + 10)=> {@f => 1000}}
+  end
   
   it "should return correct fee_schedule for multiple fees even on the same date" do
     @f2 = Fee.new(:name => "Other Fee")
@@ -139,9 +159,62 @@ describe Fee do
     @loan_product.fees = [@f, @f2]
     @loan.applicable_fees.destroy!
     @loan.levy_fees
-
     @loan.fee_schedule.should == {@loan.applied_on => {@f => 100, @f2 => 111}}
   end
+
+  it "should not change when loan product changes" do
+    @f.amount = 100
+    @loan_product.fees = [@f]
+    @loan_product.save
+    @loan.save
+    @loan.fee_schedule.should == {@loan.applied_on => {@f => 100}}
+    @f2 = Fee.new(:name => "Other Fee")
+    @f2.amount = 111
+    @f2.payable_on = :loan_applied_on
+    @f2.save.should be_true
+    @loan_product.fees = [@f2]
+    @loan_product.save
+    @loan.disbursal_date = Date.today
+    @loan.save
+    @loan.fee_schedule.should == {@loan.applied_on => {@f => 100}}
+  end
+
+  it "should change when loan details change" do
+    @f.amount = 100
+    @f.payable_on = :loan_disbursal_date
+    @loan_product.fees = [@f]
+    @loan_product.save
+    @loan.save
+    @loan.fee_schedule.should == {Date.new(2000,6,13) => {@f => 100}}
+    @loan.disbursal_date = Date.today
+    @loan.save
+    @loan.fee_schedule.should == {Date.today => {@f => 100}}
+  end
+
+  it "should change only the loan details if the loan product changes between saves" do
+    # setup the fees
+    @f.amount = 100
+    @f.payable_on = :loan_disbursal_date
+    @loan_product.fees = [@f]
+    @loan_product.save
+    @loan.save
+    @loan.fee_schedule.should == {Date.new(2000,6,13) => {@f => 100}}
+    @f.amount = 10000
+    @f.save
+    @loan.disbursal_date = Date.new(2001,07,01)
+    @loan.save
+    @loan.fee_schedule.should == {Date.new(2001,7,1) => {@f => 100}} #should have the same amount as before
+    @f2 = Fee.new(:name => "Other Fee")
+    @f2.amount = 111
+    @f2.payable_on = :loan_applied_on
+    @f2.save.should be_true
+    @loan_product.fees = [@f2]
+    @loan_product.save
+    @loan.disbursal_date = Date.new(2001,07,01)
+    @loan.save
+    @loan.fee_schedule.should == {Date.new(2000,6,13) => {@f => 100}} # should have same amount and fee as before
+  end
+    
 
   it "should return correct fees payable" do
     @f2 = Fee.new(:name => "Other Fee")
@@ -151,8 +224,7 @@ describe Fee do
     @f.percentage = 0.1
     @loan_product.fees = [@f, @f2]
     @loan_product.save
-    @loan.applicable_fees.destroy!
-    @loan.save
+    @loan.save #calls levy fees automatically
     @loan.fee_schedule[@loan.applied_on].should  == {@f => 100, @f2 => 111}
     @loan.fees_payable_on.should == {@f => 100, @f2 => 111}
   end
@@ -170,7 +242,6 @@ describe Fee do
     @loan_product.fees << @f
     @loan_product.fees << @f2
     @loan_product.save
-    @loan.applicable_fees.destroy!
     @loan.save
 
     @loan.fees_payable_on.should == {@f => 100, @f2 => 111}

@@ -1,28 +1,27 @@
 module FeesContainer
   # levy fees on given object
   def levy_fees
-    existing_fees = self.fees
+    ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class).destroy!
     @payable_models ||= Fee::PAYABLE.map{|m| [m[0], [m[1], m[2]]]}.to_hash
-    Fee.all.map{|fee|
-     
-      if @payable_models.key?(fee.payable_on) and fee.is_applicable?(self)
-        klass, payable_date_method = @payable_models[fee.payable_on]
-        next unless payable_date_method
-        next unless self.respond_to?(payable_date_method)
-        date = self.send(payable_date_method)
-        amount = fee.amount_for(self)
-        next unless amount
-        next unless date        
-        unless ApplicableFee.first(:applicable_id => self.id, :applicable_type => klass, :applicable_on => date, :fee => fee)
-          af = ApplicableFee.new(:amount => amount, :applicable_on => date, :fee => fee,
-                                 :applicable_id => self.id, :applicable_type => klass)
-          af.save
-          af
-        else
-          nil
-        end
+    Fee.all.select{|fee| @payable_models.key?(fee.payable_on)  and fee.is_applicable?(self)}.map{|fee|
+      klass, payable_date_method = @payable_models[fee.payable_on]
+      next unless payable_date_method
+      next unless self.respond_to?(payable_date_method)
+      date = self.send(payable_date_method)
+      unless date
+        scheduled = "scheduled_#{payable_date_method}"
+        date = self.send(scheduled) if self.respond_to?(scheduled)
       end
-    }.compact
+      amount = fee.amount_for(self)
+      next unless amount
+      next unless date        
+      unless ApplicableFee.first(:applicable_id => self.id, :applicable_type => klass, :applicable_on => date, :fee => fee)
+        af = ApplicableFee.new(:amount => amount, :applicable_on => date, :fee => fee,
+                               :applicable_id => self.id, :applicable_type => klass)
+        af.save
+        af
+      end
+    }
   end
 
   # returns fees that are applied for the client
