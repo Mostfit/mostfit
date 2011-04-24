@@ -1,27 +1,37 @@
 module FeesContainer
   # levy fees on given object
-  def levy_fees
-    ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class).destroy!
+  def levy_fees(args = {})
     @payable_models ||= Fee::PAYABLE.map{|m| [m[0], [m[1], m[2]]]}.to_hash
-    Fee.all.select{|fee| @payable_models.key?(fee.payable_on)  and fee.is_applicable?(self)}.map{|fee|
-      klass, payable_date_method = @payable_models[fee.payable_on]
-      next unless payable_date_method
-      next unless self.respond_to?(payable_date_method)
-      date = self.send(payable_date_method)
-      unless date
-        scheduled = "scheduled_#{payable_date_method}"
-        date = self.send(scheduled) if self.respond_to?(scheduled)
-      end
-      amount = fee.amount_for(self)
-      next unless amount
-      next unless date        
-      unless ApplicableFee.first(:applicable_id => self.id, :applicable_type => klass, :applicable_on => date, :fee => fee)
-        af = ApplicableFee.new(:amount => amount, :applicable_on => date, :fee => fee,
-                               :applicable_id => self.id, :applicable_type => klass)
+    apfees = ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class.to_s)
+    apfees.destroy! if args.is_a?(Hash) and args[:override] # don't know why args is true if nothing is sent. data-mapper?
+
+    if self.is_a?(Loan) and (not apfees.empty?) 
+      # if this loan has some applicable fees, then we only update the date, nothing else
+      apfees.each do |af|
+        method = @payable_models[af.fee.payable_on][1]
+        date = (self.send(method) if self.respond_to?(method))|| (self.send("scheduled_#{method}") if self.respond_to?("scheduled_#{method}"))
+        next unless date
+        af.applicable_on = date
         af.save
         af
       end
-    }
+    else
+      Fee.all.select{|fee| @payable_models.key?(fee.payable_on)  and fee.is_applicable?(self)}.map{|fee|
+        klass, payable_date_method = @payable_models[fee.payable_on]
+        next unless payable_date_method
+        next unless self.respond_to?(payable_date_method)
+        date = self.send(payable_date_method) || (self.send("scheduled_#{payable_date_method}") if self.respond_to?("scheduled_#{payable_date_method}"))
+        amount = fee.amount_for(self)
+        next unless amount and date
+        unless ApplicableFee.first(:applicable_id => self.id, :applicable_type => klass, :applicable_on => date, :fee => fee)
+          af = ApplicableFee.new(:amount => amount, :applicable_on => date, :fee => fee,
+                                 :applicable_id => self.id, :applicable_type => klass)
+          af.save
+          af
+        end
+        
+      }
+    end
   end
 
   # returns fees that are applied for the client
@@ -66,7 +76,7 @@ module FeesContainer
   # returns a hash of fees paid which has keys as dates and values as {fee => amount}  
   def fees_paid(date = Date.today)
     @fees_payments = {}
-    Payment.all(:type => :fees, :client => (self.class == Client ? self : self.client), :received_on.lte => date, :order => [:received_on],
+    Payment.all(:type => :fees, :client => (self.class == Client ? self : self.client), :loan => (self.is_a?(Loan) ? self : nil), :received_on.lte => date, :order => [:received_on],
                 :fee_id => ApplicableFee.all(:applicable_type => self.get_class, :applicable_id => self.id).aggregate(:fee_id)).each do |p|
       @fees_payments += {p.received_on => {p.fee => p.amount}}
     end

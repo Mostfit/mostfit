@@ -114,7 +114,6 @@ class Loans < Application
       @insurance_policy.client = @loan.client
       @insurance_policy.attributes = attrs.delete(:insurance_policy)
     end
-    
     @loan.attributes = attrs
     @loan_product = @loan.loan_product
     @loan.insurance_policy = @insurance_policy if @loan_product.linked_to_insurance and @insurance_policy   

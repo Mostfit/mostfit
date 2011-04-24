@@ -38,13 +38,21 @@
         %td{:colspan => 14}
           =group ? group.name : "none"
       - grp_amount, grp_outstanding, grp_installments, grp_principal_paid, grp_principal_due, grp_interest_due, grp_interest_paid, grp_fee_due, grp_fee_paid, grp_total_due, grp_total_paid = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-      -client_grouped.sort_by{|x| x.name}.each do |client| 
+      - client_grouped.sort_by{|x| x.name}.each do |client| 
         - loan_row_count = 0
-        - loans.find_all{|x| x.client_id==client.id and x.disbursal_date}.each do |loan|
+        - loans.find_all{|x| x.client_id==client.id and (x.approved_on || x.disbursal_date)}.each do |loan|
           - lh = histories.find_all{|x| x.loan_id==loan.id}.sort_by{|x| x.created_at}[-1]
-          - next if not lh
-          - next if LOANS_NOT_PAYABLE.include?(lh.status) and not (lh.principal_paid>0 or lh.interest_paid>0)
-          - loan_row_count += 1          
+          - # next if not lh
+          - next if lh and LOANS_NOT_PAYABLE.include?(lh.status) and not (lh.principal_paid>0 or lh.interest_paid>0)
+          - next unless loan.respond_to?(:approved_on) and loan.approved_on <= @date
+          - pdue = [(lh ? lh.principal_due : 0), 0].max
+          - ppaid = (lh ? lh.principal_paid : 0)
+          - idue = [(lh ? lh.interest_due : 0), 0].max
+          - ipaid = [(lh ? lh.interest_paid : 0), 0].max
+          - fee_due = loan.total_fees_payable_on(@date) #fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
+          - fee_paid = fees_paid[loan.id] ? fees_paid[loan.id] : 0
+          - next if (pdue + ppaid + idue + ipaid + fee_due + fee_paid == 0)
+          - loan_row_count += 1
           %tr{ :class => cycle('odd','') }
             - fee = 0
             %td
@@ -69,34 +77,28 @@
               - tot_installments += i
               - grp_installments += i
             %td.numeric
-              - pdue = [(lh ? lh.principal_due : 0), 0].max
               = pdue.to_currency
               - tot_principal_due += pdue
               - grp_principal_due += pdue
               - num_loans_to_pay += 1 if pdue > 0
             %td.numeric
-              - ppaid = (lh ? lh.principal_paid : 0)
               = ppaid.to_currency
               - tot_principal_paid += ppaid
               - grp_principal_paid += ppaid
             %td.numeric
-              - idue = [(lh ? lh.interest_due : 0), 0].max
               = idue.to_currency
               - tot_interest_due += idue
               - grp_interest_due += idue
             %td.numeric
-              - ipaid = [(lh ? lh.interest_paid : 0), 0].max
               = ipaid.to_currency
               - tot_interest_paid += ipaid
               - grp_interest_paid += ipaid
             %td.numeric
-              - fee_due = fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
               = fee_due.to_currency
               - tot_fee_due += fee_due
               - grp_fee_due += fee_due
               - num_fees_to_pay += 1 if fee_due > 0
             %td.numeric
-              - fee_paid = fees_paid[loan.id] ? fees_paid[loan.id] : 0
               = fee_paid.to_currency
               - tot_fee_paid += fee_paid
               - grp_fee_paid += fee_paid

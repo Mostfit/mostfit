@@ -1,2 +1,0 @@
-Fee should change when loan details change
-Fee should change only the loan details if the loan product changes between saves

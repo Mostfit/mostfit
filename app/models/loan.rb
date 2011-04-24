@@ -444,7 +444,9 @@ class Loan
   end
 
   def pay_fees(amount, date, received_by, created_by)
-    @errors = []
+    debugger
+    status = true
+    @fees = []
     fp = fees_payable_on(date)
     fs = fee_schedule
     pay_order = fs.keys.sort.map{|d| fs[d].keys}.flatten.uniq
@@ -456,11 +458,13 @@ class Loan
           amount -= p.amount
           fp[k]  -= p.amount
         else
-          @errors << p.errors
+          status = false
         end
+        @fees << p
+
       end
     end
-    @errors.blank? ? true : @errors
+    [status, @fees]
   end
   # LOAN INFO FUNCTIONS - CALCULATIONS
 
