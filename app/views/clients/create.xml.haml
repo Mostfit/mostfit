@@ -5,7 +5,7 @@
       %error
         %error_code 600
         - error.each_key do |k|
-          %description #{error[k]}
+          %error_message #{error[k]}
     - else
       %id #{@client.id}
       %name #{@client.name}
