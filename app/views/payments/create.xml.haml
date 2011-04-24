@@ -2,7 +2,7 @@
   %payments
     -if @payment_type.blank?
       %error 
-        %description Payment type can't be blank
+        %error_message Payment type can't be blank
         %error_code 600
     - elsif not @payment_type.blank?
       - if not @payment.errors.blank?
@@ -10,13 +10,13 @@
           - @payment.errors.map do |e|
             - if e.instance_variables.include?("@errors")
               - if e.resource.loan_id
-                %description #{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
+                %error_message #{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
                 %error_code 600
               - else
-                %description #{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
+                %error_message #{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
                 %error_code 600
             - else
-              %description #{e.to_s}
+              %error_message #{e.to_s}
               %error_code 600
       - else
         - @prin = @payment if @payment_type != "total" and @payment_type == "principal"
@@ -40,7 +40,6 @@
             %origin #{@prin.origin}
         - if @int
           %payment
-            %message "Loan interest of client '#{@client.name}' has been registered"
             %id #{@int.id}
             %amount #{@int.amount}
             %type #{@int.type}
@@ -57,7 +56,6 @@
             %origin #{@int.origin}
         - if @fees
           %payment
-            %message "Loan fees of client '#{@client.name}' has been registered"
             %id #{@fees.id}
             %amount #{@fees.amount}
             %type #{@fees.type}
@@ -72,4 +70,15 @@
             %fee_id #{@fees.fee_id}
             %desktop_id #{@fees.desktop_id}
             %origin #{@fees.origin}
-        
+        - if @attendance and not @attendance.errors.blank?
+          %error
+            - @attendance.errors.map do |e|
+              %error_message #{e.to_s}
+            %error_code 600
+        - elsif @attendance
+          %attendance
+            %id #{@attendance.id}
+            %status #{@attendance.status}
+            %client_id #{@attendance.client_id}
+            %center_id #{@attendance.center_id}
+            %date #{@attendance.date}

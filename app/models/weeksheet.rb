@@ -3,7 +3,6 @@ class Weeksheet
   attr_accessor :center_id
   attr_accessor :center_name
   attr_accessor :center_meeting_time
-  attr_accessor :group_name
   attr_accessor :client_id
   attr_accessor :client_name
   attr_accessor :loan_id
@@ -14,6 +13,8 @@ class Weeksheet
   attr_accessor :interest
   attr_accessor :fees
   attr_accessor :installment_number
+  attr_accessor :client_group_id
+  attr_accessor :client_group_name
 
   #Get weeksheet of center 
   def self.get_center_sheet(center, date)
@@ -22,7 +23,8 @@ class Weeksheet
     loans = center.loans
 
     histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => date)
-    fees_applicable = Fee.due(loans.map{|x| x.id})
+    #TODO: temporary fix for fees
+    #fees_applicable = Fee.due(loans.map{|x| x.id})
     clients.group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each do |group, clients_grouped|
       clients_grouped.sort_by{|x| x.name}.each do |client|
         loan_row_count = 0
@@ -31,14 +33,16 @@ class Weeksheet
           next if not lh
           next if LOANS_NOT_PAYABLE.include? lh.status
           loan_row_count += 1
-          fee = fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0          
+          #TODO: temporary fix for fees
+          fee = 0#fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0          
 
           weeksheet = Weeksheet.new
           weeksheet.date = date
           weeksheet.center_meeting_time = "#{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}"
           weeksheet.center_id = center.id
           weeksheet.center_name = center.name
-          weeksheet.group_name = group ? group.name : "No group"
+          weeksheet.client_group_name = group ? group.name : "No group"
+          weeksheet.client_group_id = group ? group.id : nil
           weeksheet.client_id = client.id
           weeksheet.client_name = client.name
           weeksheet.loan_id = loan.id
@@ -58,7 +62,8 @@ class Weeksheet
           weeksheet.center_meeting_time = "#{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}"
           weeksheet.center_id = center.id
           weeksheet.center_name = center.name
-          weeksheet.group_name = group ? group.name : "No group"
+          weeksheet.client_group_name = group ? group.name : "No group"
+          weeksheet.client_group_id = group ? group.id : nil
           weeksheet.client_id = client.id
           weeksheet.client_name = client.name
           weeksheet.loan_id = nil

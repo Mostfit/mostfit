@@ -53,6 +53,7 @@ class Payments < Application
     success = do_payment(payment)
     if success  # true if saved
       if params[:format] and params[:format] == "xml"
+        mark_attendance
         display @payment
       else
         redirect url_for_loan(@loan||@client), :message => {:notice => "Payment of #{@payment.id} has been registered"}
@@ -151,4 +152,11 @@ class Payments < Application
       return success      
     end
   end
+
+  def mark_attendance
+    return if not params or not params[:attendance]
+    @attendance = Attendance.new(params[:attendance])
+    @attendance.save
+  end
+
 end # Payments

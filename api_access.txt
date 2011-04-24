@@ -104,8 +104,10 @@ class ApiAccess
   #create client payment
   #branch: 1, center : 11, client :167, loans : 199
   def self.create_payment(branch,center,client,loan)
-    post("/branches/#{branch}/centers/#{center}/clients/#{client}/loans/#{loan}/payments.xml", :query => {:payment => {:amount =>99.06, :type =>:total, :loan_id => loan, :client_id => client, :received_by_staff_id =>1, :received_on => "2010-10-28", :desktop_id => 1, :origin => "abcd"}, :style => "normal"})
-  end
+    post("/branches/#{branch}/centers/#{center}/clients/#{client}/loans/#{loan}/payments.xml", :query => {:payment => {:amount =>2500, :type =>:total, :loan_id => loan, :client_id => client, 
+    :received_by_staff_id =>1, :received_on => "2011-04-19", :desktop_id => 1, :origin => "abcd"}, :style => "normal",
+    :attendance => {:status => :present, :date => "2011-04-19",:client_id => client, :center_id => center, :origin => "ddshdjsh", :desktop_id => 2}})  
+    end
 
   #create client attendance
   def self.create_attendance
@@ -127,5 +129,10 @@ class ApiAccess
   def self.create_client_group
     post("/client_groups.xml", :query => { :client_group =>{"name"=>"Josh", "number_of_members"=>"5", "code"=>"7653", "center_id"=>167 }})
   end
+  
+   def self.weeksheet(center,date)
+    get("/data_entry/payments/by_center.xml", :query => {:center_id => center, :for_date => date, :option => "rows"})
+  end
+
 end
 
