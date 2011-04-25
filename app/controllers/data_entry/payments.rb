@@ -174,14 +174,12 @@ module DataEntry
       @errors = []
       if params[:paid][:loan]
         params[:paid][:loan].keys.each do |k|
-          debugger
           @loan = Loan.get(k.to_i)
           @loan.history_disabled = true
           amounts = params[:paid][:loan][k.to_sym].to_f
           next if amounts<=0
           if params.key?(:payment_type) and params[:payment_type] == "fees"
             @success, @fees = @loan.pay_fees(amounts, @date, @staff, session.user)
-            debugger
             @fees.each{|f| @errors << f.errors}
           else
             @type = params[:payment][:type]

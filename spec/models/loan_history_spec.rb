@@ -64,7 +64,6 @@ describe LoanHistory do
   end
 
   it "should not be valid without scheduled outstanding principal" do
-    # debugger
     @loanhistory.scheduled_outstanding_principal=nil
     @loanhistory.should_not be_valid
   end
