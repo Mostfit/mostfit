@@ -5,4 +5,5 @@
       %td
         = applicable_fee.description
       %td
-        = link_to "[delete]", url(:controller => "application", :action => "delete", :id => applicable_fee.id, :model => "applicable_fees", :return => "/loans/#{@loan.id}/applicable_fees/#{applicable_fee.id}")
+        = link_to "[edit]", resource(applicable_fee, :edit)
+        = link_to "[delete]", url(:controller => "application", :action => "delete", :id => applicable_fee.id, :model => "applicable_fees", :return => "/loans/#{applicable_fee.applicable_id}#misc")

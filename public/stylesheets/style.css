@@ -1085,3 +1085,13 @@ ul.bookmarks li{
     font-size: 1.25em;
     padding-top: 10px;
 }
+
+.help {
+  background-color: #c3ff87;
+  margin: 5px 0px;
+  padding: 5px;
+}
+
+.help h3 {
+  color: black;
+}

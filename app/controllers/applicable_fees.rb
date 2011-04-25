@@ -19,6 +19,7 @@ class ApplicableFees < Application
   end
 
   def edit(id)
+    raise NotPrivileged unless [:admin, :mis_manager].include?(session.user.role)
     only_provides :html
     @applicable_fee = ApplicableFee.get(id)
     raise NotFound unless @applicable_fee
@@ -39,4 +40,16 @@ class ApplicableFees < Application
       end
     end
   end
+
+  def update(id, applicable_fee)
+    @applicable_fee = ApplicableFee.get(id)
+    if @applicable_fee.update(applicable_fee)
+      url = (@applicable_fee.parent.is_a?(Loan) ? "/loans/#{@applicable_fee.applicable_id}" : resource(@applicable_fee.parent))
+      redirect(url, :message => {:notice => "Fee was successfully updated"})
+    else
+      render
+    end
+  end
+
+
 end # ApplicableFees

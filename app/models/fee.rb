@@ -22,7 +22,7 @@ class Fee
   property :min_amount,    Integer
   property :max_amount,    Integer
   property :payable_on,    Enum.send('[]',*PAYABLE.map{|m| m[0]}), :nullable => false
-
+  property :overridable_by, Flag[:data_entry, :mis_manager, :admin,:staff_member]
 
   has n, :loan_products, :through => Resource
   has n, :client_types, :through => Resource

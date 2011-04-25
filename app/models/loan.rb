@@ -238,7 +238,7 @@ class Loan
     when :monthly
       30
     when :biweekly
-      15
+      14
     when :quadweekly
       28
     end
@@ -321,7 +321,7 @@ class Loan
     
     # take care of date changes in weekly schedules
     if [:weekly, :biweekly, :quadweekly].include?(installment_frequency) and cl=self.client(:fields => [:id, :center_id]) and cen=cl.center and cen.meeting_day != :none and ensure_meeting_day
-      unless new_date.weekday == cen.meeting_day_for(new_date)
+      unless (new_date.weekday == cen.meeting_day_for(new_date) or (cen.meeting_day_for(new_date) == :none))
         # got wrong val. recalculate
         next_date = cen.next_meeting_date_from(new_date)
         prev_date = cen.previous_meeting_date_from(new_date)
@@ -444,7 +444,9 @@ class Loan
   end
 
   def pay_fees(amount, date, received_by, created_by)
-    @errors = []
+    debugger
+    status = true
+    @fees = []
     fp = fees_payable_on(date)
     fs = fee_schedule
     pay_order = fs.keys.sort.map{|d| fs[d].keys}.flatten.uniq
@@ -456,40 +458,70 @@ class Loan
           amount -= p.amount
           fp[k]  -= p.amount
         else
-          @errors << p.errors
+          status = false
         end
+        @fees << p
+
       end
     end
-    @errors.blank? ? true : @errors
+    [status, @fees]
   end
   # LOAN INFO FUNCTIONS - CALCULATIONS
 
-  def cash_flow(type = :scheduled)
+  def cash_flow(type = :scheduled, exclude_fees = false)
     # Hash of dates and +/- amounts. 
     # This differs from payment_schedule and payments_hash in that it includes fees. 
     # Perhaps it would be better if those functions returned a comprehensive listing, but for the time being, this is okay
     # TODO : make payments_hash and payment_schedule return comprehensve cashflows (i.e. fees,etc  as well.)
-    fs = type == :scheduled ? fee_schedule : fees_paid
+    fs = type == :scheduled ? product_fee_schedule : fees_paid
     fsh = fs.map{|f,v| [f,{:fees => v.values.inject(0){|a,b| a+b}}]}.to_hash
     cf  = type == :scheduled ? payment_schedule : payments_hash
     #Double counting of fees in case of ssame date first payment is happening here
-    if cf.values.collect{|x| x[:fees]||0}.inject(0){|s,x| s+=x} == 0
+    if (cf.values.collect{|x| x[:fees]||0}.inject(0){|s,x| s+=x} == 0)
       cf  += fsh
     end
     dd  = type == :scheduled ? scheduled_disbursal_date : disbursal_date
     cf  += {dd => {:principal => -amount}}
-    cf  = cf.keys.sort.map{|k| v=cf[k];[k,(v[:principal] || 0) + (v[:interest] || 0) + (v[:fees] || 0)]}
-    return cf
+    rv  = cf.keys.sort.map{|k| v=cf[k];[k,(v[:principal] || 0) + (v[:interest] || 0) + (exclude_fees ? 0 : (v[:fees] || 0))]}
+    return rv
   end
 
-  def irr(iterations = 100)
+  def product_fee_schedule
+    # This is for IRR calculation, so we can get the fee schedule for the loan product
+    # So we don't have to save dummy loans when we design a product.
+    @fee_schedule = {}
+    klass_identifier = "loan"
+    loan_product.fees.each do |f|
+      type, *payable_on = f.payable_on.to_s.split("_")
+      date = send(payable_on.join("_")) if type == klass_identifier
+      if date.class==Date
+        @fee_schedule += {date => {f => f.fees_for(self)}} unless date.nil?
+      elsif date.class==Array
+        date.each{|date|
+          @fee_schedule += {date => {f => f.fees_for(self)}} unless date.nil?
+        }
+      end
+    end
+    @fee_schedule
+  end
+
+
+  def irr(exclude_fees = false,iterations = 100)
     begin
-      cf = cash_flow
+      cf = cash_flow(:scheduled, exclude_fees)
       min_date = cf[0][0]
-      (1..iterations).inject do |rate,|
+      rv = (1..iterations).inject do |rate,|
         # trust me, this is correct. i think
-        npv = cf.map{|x| [1/(1+(x[0]-min_date)/365*rate),x[1]]}.inject(0){|a,b| a + (b[0]*b[1])}
-        rate * (1 - npv / cf.first[1])
+        i = 1
+        npv_map = cf.map do |x| 
+          yn = ((x[0]-min_date) / get_reciprocal).round
+          yd = get_divider
+          yf = yn / yd.to_f
+          df = [1/(1+(yf*rate)),x[1]]
+          df
+        end
+        npv = npv_map.inject(0){|a,b| a + (b[0]*b[1])}
+        rate * (1 - npv / -amount)
       end
     rescue
       "NaN"
@@ -1103,7 +1135,37 @@ class Loan
     return true unless insurance_policy
     return [false, "Insurance Policy is not valid"] unless insurance_policy.valid?
     return true
+
   end
+
+  def get_divider
+    case installment_frequency
+    when :weekly
+      52
+    when :bi_weekly
+      26
+    when :monthly
+      12
+    when :daily
+      365
+    end    
+  end
+
+
+  def get_reciprocal
+    case installment_frequency
+    when :weekly
+      7
+    when :bi_weekly
+      14
+    when :monthly
+      # TODO fix this
+      31
+    when :daily
+      1
+    end    
+  end
+
   
 end
 
@@ -1571,18 +1633,6 @@ private
     return @rounded_schedule
   end
 
-  def get_divider
-    case installment_frequency
-    when :weekly
-      52
-    when :bi_weekly
-      26
-    when :monthly
-      12
-    when :daily
-      365
-    end    
-  end
 end
 
 

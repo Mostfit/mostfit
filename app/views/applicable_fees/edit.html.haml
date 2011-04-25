@@ -1,14 +1,11 @@
 %h1
-  ApplicableFees controller, edit action
-%p
-  Edit this file in
-  %tt
-    app/views/applicable_fees/edit.html.erb
+  Edit Applicable Fee
+
 = error_messages_for @applicable_fee
 
 = form_for(@applicable_fee, :action => url(:applicable_fee, @applicable_fee)) do
-  %p
-    = submit "Update"
+  = partial :fields
+  = submit "Update"
 
 = link_to 'Show', url(:applicable_fee, @applicable_fee)
 |
