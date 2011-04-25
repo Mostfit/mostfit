@@ -47,14 +47,23 @@ namespace :mostfit do
             if ps.length == 1
               errors << ["only one payment found on #{lh.date}"]
             elsif ps.length == 2
-              errors << ["Difference in figures on #{lh.date} of #{ps[0].amount + ps[1].amount - (pdue + idue)}"] if ps[0].amount + ps[1].amount - (pdue + idue) > 0.01
+              if (pdue + idue) > 0
+                div = ((ps[0].amount + ps[1].amount).to_i / (pdue + idue))
+                if ps[0].amount + ps[1].amount - (pdue + idue) > 0.01 and (div - div.to_i) > 0.01
+                  errors << ["Difference in figures on #{lh.date} of #{ps[0].amount + ps[1].amount - (pdue + idue)}"]
+                end
+              end
             elsif ps.length > 2
               errors << ["more than two payments found on #{lh.date}"]
             end
           end
         }
         Loan.get(l.id).update_history
-        f.puts("#{l.id}, #{l.amount}, #{l.interest_rate}, success, \"#{errors.join(';')}\"")
+        if errors.length > 0
+          f.puts("#{l.id}, #{l.amount}, #{l.interest_rate}, errors, #{errors.join(';')}")
+        else
+          f.puts("#{l.id}, #{l.amount}, #{l.interest_rate}, success, #{errors.join(';')}")
+        end
       }
       f.close
     end
