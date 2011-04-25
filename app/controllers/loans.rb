@@ -385,8 +385,13 @@ class Loans < Application
   # the loan is not of type Loan of a derived type, therefor we cannot just assume its name..
   # this method gets the loans type from a hidden field value and uses that to get the attrs
   def get_loan_and_attrs   # FIXME: this is a code dup with data_entry/loans
-    loan_product = LoanProduct.get(params[:loan_product_id])
-    attrs = params[loan_product.loan_type_string.snake_case.to_sym]
+    if params[:id] and not params[:id].blank?
+      loan =  Loan.get(params[:id])      
+      attrs = params[loan.discriminator.to_s.snake_case.to_sym]
+    else
+      loan_product = LoanProduct.get(params[:loan_product_id])
+      attrs = params[loan_product.loan_type_string.snake_case.to_sym]
+    end
     attrs[:client_id] = params[:client_id] if params[:client_id]
     attrs[:insurance_policy] = params[:insurance_policy] if params[:insurance_policy]
     raise NotFound if not params[:loan_type]
