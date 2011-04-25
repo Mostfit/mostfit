@@ -52,7 +52,7 @@ module Misfit
       self.payment_schedule.each do |date, val|
         pri = val[:principal]
         int = val[:interest]
-        return [false, "Amount must yield integer installments"] if (pri+int).to_i != (pri+int)
+        return [false, "Amount must yield integer installments"] if ((pri+int) - (pri+int).to_i).abs > 0.01
       end
       return true
     end
