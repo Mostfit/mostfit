@@ -27,7 +27,7 @@ namespace :mostfit do
         l.interest_rate = 29.2501/100
         l.save!
         loan = Loan.get(l.id)
-        error = []
+        errors = []
         loan.loan_history.each{|lh|
           ps = Payment.all(:type => [:principal, :interest], :received_on => lh.date, :loan_id => lh.loan_id)
           pdue = loan.scheduled_principal_due_on(lh.date)
@@ -45,11 +45,11 @@ namespace :mostfit do
             ps[1].save!            
           else
             if ps.length == 1
-              error << ["only one payment found on #{lh.date}"]
+              errors << ["only one payment found on #{lh.date}"]
             elsif ps.length == 2
-              error << ["Difference in figures on #{lh.date} of #{ps[0].amount + ps[1].amount - (pdue + idue)}"] if ps[0].amount + ps[1].amount - (pdue + idue) > 0.01
+              errors << ["Difference in figures on #{lh.date} of #{ps[0].amount + ps[1].amount - (pdue + idue)}"] if ps[0].amount + ps[1].amount - (pdue + idue) > 0.01
             elsif ps.length > 2
-              error << ["more than two payments found on #{lh.date}"]
+              errors << ["more than two payments found on #{lh.date}"]
             end
           end
         }
