@@ -22,11 +22,12 @@ namespace :mostfit do
       end
 
       Loan.all(hash).each{|l|
-        return unless l.status == :outstanding
+        next unless Loan.get(l.id).status == :outstanding
         l.discriminator = "EquatedWeekly"
         l.interest_rate = 29.2501/100
         l.save!
         loan = Loan.get(l.id)
+        error = []
         loan.loan_history.each{|lh|
           ps = Payment.all(:type => [:principal, :interest], :received_on => lh.date, :loan_id => lh.loan_id)
           pdue = loan.scheduled_principal_due_on(lh.date)
@@ -43,23 +44,17 @@ namespace :mostfit do
             ps[0].save!
             ps[1].save!            
           else
-            error = []
-            if ps.nil?
-              error << ["no payments on #{lh.date}"]
-            elsif ps.length == 0
-              error << ["no payments on #{lh.date}"] 
-            elsif ps.length == 1
+            if ps.length == 1
               error << ["only one payment found on #{lh.date}"]
             elsif ps.length == 2
               error << ["Difference in figures on #{lh.date} of #{ps[0].amount + ps[1].amount - (pdue + idue)}"] if ps[0].amount + ps[1].amount - (pdue + idue) > 0.01
             elsif ps.length > 2
               error << ["more than two payments found on #{lh.date}"]
             end
-            f.puts("#{l.id}, #{l.amount}, #{l.interest_rate}, failed, \"#{error}\"")
           end
         }
         Loan.get(l.id).update_history
-        f.puts("#{l.id}, #{l.amount}, #{l.interest_rate}, success")
+        f.puts("#{l.id}, #{l.amount}, #{l.interest_rate}, success, \"#{errors.join(';')}\"")
       }
       f.close
     end
