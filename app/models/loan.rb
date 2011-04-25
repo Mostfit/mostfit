@@ -570,11 +570,7 @@ class Loan
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
       next if repayed
-      repayed   = true if amount == principal_received_up_to(date)
-      if amount - principal_received_up_to(date) < principal
-        principal = 0
-        interest  = 0        
-      end
+      repayed   = true if amount <= principal_received_up_to(date)
       
       principal_so_far += principal
       interest_so_far  += interest

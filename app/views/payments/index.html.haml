@@ -177,9 +177,9 @@
           %td
             %b= lh.scheduled_outstanding_principal
           %td
-            %b= (scheduled_principal + scheduled_interest).round(2)
+            %b= (scheduled_principal + scheduled_interest).to_currency
             %br/
-            %span.greytext== #{scheduled_principal.round(2)} principal + #{scheduled_interest.round(2)} interest
+            %span.greytext== #{scheduled_principal.to_currency} principal + #{scheduled_interest.to_currency} interest
           %td
             - if last_payment_date and (lh.date <= last_payment_date or lh.date <= Date.today)
               %b= lh.actual_outstanding_principal.to_currency
