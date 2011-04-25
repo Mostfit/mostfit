@@ -22,6 +22,7 @@ namespace :mostfit do
       end
 
       Loan.all(hash).each{|l|
+        return unless l.status == :outstanding
         l.discriminator = "EquatedWeekly"
         l.interest_rate = 29.2501/100
         l.save!
