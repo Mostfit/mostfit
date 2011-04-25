@@ -43,9 +43,11 @@ class LoanProduct
     max_interest = row[headers[:max_interest_rate]].to_f < 1 ? row[headers[:max_interest_rate]].to_f*100 : row[headers[:max_interest_rate]]
     obj = new(:name => row[headers[:name]], :min_amount => row[headers[:min_amount]], :max_amount => row[headers[:max_amount]], 
               :min_interest_rate => min_interest, :max_interest_rate => max_interest, 
-              :min_number_of_installments => row[headers[:min_number_of_installments]], :max_number_of_installments => row[headers[:max_number_of_installments]], 
+              :min_number_of_installments => row[headers[:min_number_of_installments]], 
+              :max_number_of_installments => row[headers[:max_number_of_installments]], 
               :installment_frequency => row[headers[:installment_frequency]].downcase.to_sym,
-              :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]), :loan_type_string => row[headers[:loan_type]])
+              :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]), 
+              :loan_type_string => row[headers[:loan_type]])
     [obj.save, obj]
   end
 
@@ -64,9 +66,11 @@ class LoanProduct
   def check_loan_type_correctness
     if loan_type_string and not loan_type_string.blank? and Loan.descendants.collect{|x| x.to_s}.include?(loan_type_string)
       self.loan_type_string = Loan.descendants.find{|x| x.to_s == loan_type_string}
+      self.loan_type = self.loan_type_string unless (self.loan_type and not self.loan_type.blank?)
       return true
     elsif loan_type_string.blank? and loan_type and Loan.descendants.collect{|x| x.to_s}.include?(loan_type.to_s) 
       self.loan_type_string = loan_type.to_s
+      self.loan_type = self.loan_type_string unless (self.loan_type and not self.loan_type.blank?)
       return true
     else
       return false
