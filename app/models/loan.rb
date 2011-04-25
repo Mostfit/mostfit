@@ -444,7 +444,6 @@ class Loan
   end
 
   def pay_fees(amount, date, received_by, created_by)
-    debugger
     status = true
     @fees = []
     fp = fees_payable_on(date)
