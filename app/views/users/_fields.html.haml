@@ -7,6 +7,17 @@
       %br/
       %span.greytext (only letters and numbers are allowed)
   %tr
+      Password:
+    %td
+      = password_field :password
+  %tr
+    %td
+      Password confirmation:
+    %td
+      = password_field :password_confirmation
+      %br/
+      %span.greytext (password fields must be filled to complete user profile)
+  %tr
     %td
       Select role
     %td
