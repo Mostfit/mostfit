@@ -129,4 +129,11 @@
               %created_by_user_id #{loan.created_by_user_id}
               %created_at #{loan.created_at}
               %updated_at #{loan.updated_at}
+    - if (@option == "client_groups") and not @staff_member.client_groups({"center.manager_staff_id" => @staff_member.id}).blank?
+      %client_groups
+        - @staff_member.client_groups({"center.manager_staff_id" => @staff_member.id}).each do |client_group|
+          %client_group
+            %id #{client_group.id}
+            %name #{client_group.name}
+            %center_id #{client_group.center_id}
 

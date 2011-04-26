@@ -28,3 +28,10 @@
             - if client.client_group
               %client_group_name #{client.client_group.name}
             %center_id #{client.center_id}
+    - if @clients and @option == "client_groups"
+      %client_groups
+        - @center.client_groups.each do |client_group|
+          %client_group
+            %id #{client_group.id}
+            %name #{client_group.name}
+            %center_id #{client_group.center_id}

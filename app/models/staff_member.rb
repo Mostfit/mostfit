@@ -74,7 +74,7 @@ class StaffMember
     end
   end
 
-  def client_groups(hash)
+  def client_groups(hash, owner_type = nil)
     if owner_type == :created
       hash[:created_by_staff_member_id] = self.id
     else
