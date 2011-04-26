@@ -7,7 +7,7 @@
       %center_id #{@center.id}
       %center_name #{@center.name}
       %center_code #{@center.code}
-      %center_address #{@center.address}
+      %center_address #{h(@center.address)}
       %meeting_day #{@center.meeting_day?(@date)? @center.meeting_day : ""}
       %meeting_time_hours #{@center.meeting_day?(@date) ? @center.meeting_time_hours : ""}
       %meeting_time_minutes #{@center.meeting_day?(@date) ? @center.meeting_time_minutes : ""}
