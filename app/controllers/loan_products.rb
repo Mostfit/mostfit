@@ -75,7 +75,8 @@ class LoanProducts < Application
     if request.method == :post
       params[:loan][:disbursal_date] = params[:loan][:scheduled_disbursal_date]
       params[:loan][:interest_rate]   = params[:loan][:interest_rate].to_f / 100
-      @loan = Loan.new(params[:loan])
+      klass = Kernel.const_get(LoanProduct.get(params[:loan][:loan_product_id]).loan_type_string)
+      @loan = klass.new(params[:loan])
     else
       @loan = Loan.new
     end

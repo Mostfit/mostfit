@@ -8,7 +8,7 @@ class Numeric
 
     def self.with_precision(number, format_name = nil, options={})
       format = (formats[format_name] || default_format)[:number].merge(options)      
-      with_delimiter("%01.#{format[:precision]}f" % number.round_orig, format_name, :delimiter => format[:delimiter], :separator => format[:separator])
+      with_delimiter("%01.#{format[:precision]}f" % number.round(format[:precision]), format_name, :delimiter => format[:delimiter], :separator => format[:separator])
     end
 
     def self.to_currency(number, format_name = nil, options = {})

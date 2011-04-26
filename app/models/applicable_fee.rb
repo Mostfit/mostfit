@@ -7,6 +7,7 @@ class ApplicableFee
   property :id, Serial
   property :applicable_id,   Integer, :index => true, :nullable => false
   property :applicable_type, Enum.send('[]', *FeeApplicableTypes), :index => true, :nullable => false
+  property :scheduled_on,    Date, :nullable => true
   property :applicable_on,   Date, :nullable => true
   property :fee_id,          Integer, :index => true, :nullable => false
   property :amount,          Float,   :index => true, :nullable => false

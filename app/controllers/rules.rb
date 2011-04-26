@@ -100,7 +100,6 @@ class Rules < Application
     single_variable_mode = single_variable_mode.to_i
 
     if model
-      #debugger
       name, field, choices = Condition.get_field_choices_and_name(params[:for])
       name = "rule[#{type}][#{condition_id}][variable][#{variable_id}][keys][]"
       return render(select(:name => name, :id => "#{type}_select_#{id}", :class => "rules", :collection => choices), :layout => false)

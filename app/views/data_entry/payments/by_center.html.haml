@@ -55,6 +55,10 @@
     %ul.tabs
       %li#repayments
         Repayments
+        %b
+          (
+          = LoanHistory.all(:date => Date.today).select{|lh| lh.principal_due + lh.interest_due > 0}.count
+          )
       %li#repayments
         Approvals
         %b        
@@ -66,7 +70,7 @@
       %li#fees
         Fees payments
         %b
-          = "(#{fees_payable})"
+          = "(#{@fee_paying_things.count})"
       %li#premia
         Insurance Premia
       %li#luc

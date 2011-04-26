@@ -8,7 +8,26 @@
     = partial 'fields'
     %p
       = submit "Save changes"
-
+  
+  %hr
+  %h2 Change password
+  = form_for(@user, :action => url(:action => :admin_change_password, :user_id => @user.id)) do
+    %table
+      %tr
+        %td
+          Password:
+        %td
+          = password_field :password
+      %tr
+        %td
+          Password confirmation:
+        %td
+          = password_field :password_confirmation
+          %br/
+          %span.greytext (password fields must be filled to complete user profile)
+    %p
+      = submit "Save changes"
+      
   = link_to 'Back', url(:users)
 
   %p

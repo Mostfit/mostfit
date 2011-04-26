@@ -4,12 +4,12 @@ class Center
   attr_accessor :meeting_day_change_date
 
   before :save, :convert_blank_to_nil
-  
-  DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
-  after :save, :handle_meeting_date_change
+  after  :save, :handle_meeting_date_change
   before :save, :set_meeting_change_date
   before :create, :set_meeting_change_date
   before :valid?, :convert_blank_to_nil
+  
+  DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
   property :id,                   Serial
   property :name,                 String, :length => 100, :nullable => false, :index => true
@@ -147,12 +147,13 @@ class Center
     CenterLeader.first(:center => self, :current => true)
   end
   
-  def leader=(id)
-    if id
-      client = Client.get(id)
+  def leader=(cid)
+    if cid
+      client = Client.get(cid)
       return if not client
       client.make_center_leader
     end
+    return true
   end
 
   def location
@@ -185,10 +186,8 @@ class Center
   end
 
   def handle_meeting_date_change
-    self.meeting_day_change_date = parse_date(self.meeting_day_change_date) if self.meeting_day_change_date.class==String and not self.meeting_day_change_date.blank?
-    if not self.meeting_day_change_date or self.meeting_day_change_date.blank? or not self.meeting_day_change_date.is_a?(Date)
-      self.meeting_day_change_date = Date.today
-    end
+    # no need to do all this if meeting date was not changed
+    return true unless self.meeting_day_change_date
 
     date = self.meeting_day_change_date
 
@@ -222,7 +221,22 @@ class Center
   end  
 
   def set_meeting_change_date
-    self.meeting_day_change_date = self.creation_date if self.new?
+    if self.new?
+      self.meeting_day_change_date = self.creation_date
+    else
+      # Check if meeting date was changed. 
+      if self.dirty_attributes.map{|x| x.first.name}.include?(:meeting_day)
+        if self.meeting_day_change_date.class==String and not self.meeting_day_change_date.blank?
+          self.meeting_day_change_date = parse_date(self.meeting_day_change_date)
+        else
+          # if meeting_day was indeed changed and no meeting_change_date is foudn then set it as today's date
+          self.meeting_day_change_date ||= Date.today
+        end
+      else
+        # If meeting_day was not changed then set meeting_day_change_date as nil.
+        self.meeting_day_change_date =  nil        
+      end
+    end
   end
 
   def get_meeting_date(date, direction)

@@ -22,7 +22,7 @@ class Fee
   property :min_amount,    Integer
   property :max_amount,    Integer
   property :payable_on,    Enum.send('[]',*PAYABLE.map{|m| m[0]}), :nullable => false
-
+  property :overridable_by, Flag[:data_entry, :mis_manager, :admin,:staff_member]
 
   has n, :loan_products, :through => Resource
   has n, :client_types, :through => Resource
@@ -90,10 +90,10 @@ class Fee
   def is_applicable?(obj)
     if obj.is_a?(Loan)
       obj.loan_product.fees.include?(self)
-    elsif obj.is_a?(Client)
+    elsif obj.is_a?(Client) and obj.client_type
       obj.client_type.fees.include?(self)
-    elsif obj.is_a?(InsuranceProduct)
-      obj.fees.include?(self)      
+    elsif obj.is_a?(InsurancePolicy) and obj.insurance_product
+      obj.insurance_product.fees.include?(self)
     end
   end
   
