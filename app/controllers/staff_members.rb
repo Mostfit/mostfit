@@ -111,6 +111,7 @@ class StaffMembers < Application
 
   def show(id)
     @staff_member = StaffMember.get(id)
+    @date = params[:date] ? Date.parse(params[:date]) : Date.today
     @option = params[:option]
     raise NotFound unless @staff_member
     @manages = {:regions => @staff_member.regions, :areas => @staff_member.areas, :branches => @staff_member.branches, :centers => @staff_member.centers}
