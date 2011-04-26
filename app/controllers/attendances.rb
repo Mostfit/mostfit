@@ -13,12 +13,8 @@ class Attendances < Application
   
   def create(attendance)
     @attendance = Attendance.new(attendance)
-    if @attendance.save
-      display @attendance
-    else
-      @error = "Attendance has been failed"
-      display @error
-    end
+    @attendance.save
+    display @attendance
   end
 
   private

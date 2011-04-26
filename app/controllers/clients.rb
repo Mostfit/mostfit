@@ -92,7 +92,11 @@ class Clients < Application
         end
       end
     else
-      display @client, :edit  # error messages will be shown
+      if params[:format] and params[:format]=="xml"
+        display @client
+      else
+        display @client, :edit  # error messages will be shown
+      end
     end
   end
 

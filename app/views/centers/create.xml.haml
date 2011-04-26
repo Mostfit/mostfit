@@ -1,8 +1,20 @@
 %xml
   %center
     - if not @center.errors.blank?
-      - @center.errors.map do |e|
-        %error #{e.to_s} 
+      %error 
+        %error_code 600
+        - @center.errors.map do |e|
+          %error_message #{e.to_s} 
     - else    
-      %message Center '#{@center.id}' was successfully created
-      = @center.to_xml
+      %id #{@center.id}
+      %name #{@center.name}
+      %code #{@center.code}
+      %address #{h(@center.address)}
+      %contact_number #{@center.contact_number}
+      %landmark #{@center.landmark}
+      %meeting_day #{@center.meeting_day}
+      %meeting_time_hours #{@center.meeting_time_hours}
+      %meeting_time_minutes #{@center.meeting_time_minutes}
+      %creation_date #{@center.creation_date}
+      %manager_staff_id #{@center.manager_staff_id}
+      %branch_id #{@center.branch_id}

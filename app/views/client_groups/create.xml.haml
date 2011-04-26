@@ -1,8 +1,11 @@
 %xml
   %client_group
     - if not @client_group.errors.blank?
-      - @client_group.errors.map do |e|
-        %error #{e.to_s} 
+      %error
+        %error_code 600
+        - @client_group.errors.map do |e|
+          %error_message #{e.to_s}
     - else    
-      %message Client Group '#{@client_group.id}' was successfully created
-      = @client_group.to_xml
+      %id #{@client_group.id}
+      %name #{@client_group.name}
+      %center_id #{@client_group.center.id}

@@ -1,2 +1,21 @@
 %xml
-  %message uploaded successfully
+  %client
+    -error=@client.errors.instance_variable_get("@errors")
+    - if not error.blank?
+      %error
+        %error_code 600
+        - error.each_key do |k|
+          %error_message #{error[k]}
+    - else
+      %id #{@client.id}
+      %name #{@client.name}
+      %reference #{@client.reference}
+      %date_of_birth #{@client.date_of_birth}
+      %spouse_name #{@client.spouse_name}
+      %address #{@client.address}
+      %active #{@client.active}
+      %date_joined #{@client.date_joined}
+      %client_group_id #{@client.client_group_id}
+      - if @client.client_group
+        %client_group_name #{@client.client_group.name}
+      %center_id #{@client.center_id}
