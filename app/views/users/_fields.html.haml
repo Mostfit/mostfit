@@ -21,6 +21,18 @@
       Is a funder
     %td
       = select :funder, :collection => [["","---"]] + Funder.all(:order => [:name]).map{|s| [s.id.to_s, s.name]}, :selected => (@user.funder ? @user.funder.id.to_s : "")
+  - if @user.new?
+    %tr
+      %td
+        Password:
+      %td
+        = password_field :password
+    %tr
+      %td
+        Password confirmation:
+      %td
+        = password_field :password_confirmation
+
   %tr
     %td
       Active ?
