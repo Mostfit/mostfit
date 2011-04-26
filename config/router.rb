@@ -154,6 +154,7 @@ Merb::Router.prepare do
     match('/branches/:branch_id/centers/:center_id/clients/:client_id/loans.xml', :method => "post").to(:controller => 'loans', :action =>'create', :format => 'xml')
     match('/centers.xml', :method => "post").to(:controller => 'centers', :action =>'create', :format => 'xml')
     match('/client_groups.xml', :method => "post").to(:controller => 'client_groups', :action =>'create', :format => 'xml')
+    match('/holidays.xml', :method => "get").to(:controller => 'holidays', :action =>'index', :format => 'xml')
   end
   match('/accounts/:account_id/accounting_periods/:accounting_period_id/account_balances/:id/verify').to(:controller => 'account_balances', :action => 'verify').name(:verify_account_balance)
   default_routes

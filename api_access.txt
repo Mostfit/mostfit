@@ -130,9 +130,14 @@ class ApiAccess
     post("/client_groups.xml", :query => { :client_group =>{"name"=>"Josh", "number_of_members"=>"5", "code"=>"7653", "center_id"=>167 }})
   end
   
-   def self.weeksheet(center,date)
+  def self.weeksheet(center,date)
     get("/data_entry/payments/by_center.xml", :query => {:center_id => center, :for_date => date, :option => "rows"})
   end
+
+  def self.get_holidays
+    get("/holidays.xml")
+  end
+
 
 end
 
