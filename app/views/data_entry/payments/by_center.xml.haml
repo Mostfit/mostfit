@@ -1,47 +1,36 @@
-- if not @errors.blank?
+-if @center.meeting_day?(@date)
   %xml
-    %message
-      - @errors.map do |e|
-        - if e.instance_variables.include?("@errors")
-          - if e.resource.loan_id
-            %error #{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
-          - else
-            %error #{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}
-        - else
-          %error #{e.to_s}
-- elsif not @message.blank? and @errors.blank?
-  %xml
-    %message 
-      %success #{@message}
+    %weeksheet
+      %staff_member_id #{@center.manager.id}
+      %staff_member_name #{@center.manager.name}
+      %date #{@date}
+      %center_id #{@center.id}
+      %center_name #{@center.name}
+      %center_code #{@center.code}
+      %center_address #{@center.address}
+      %meeting_day #{@center.meeting_day?(@date)? @center.meeting_day : ""}
+      %meeting_time_hours #{@center.meeting_day?(@date) ? @center.meeting_time_hours : ""}
+      %meeting_time_minutes #{@center.meeting_day?(@date) ? @center.meeting_time_minutes : ""}
+      - if @option == "rows"
+        %weeksheet_rows
+          - @weeksheet_rows.each do |weeksheet_row|
+            %weeksheet_row
+              %date #{@date}
+              %center_id #{@center.id}
+              %client_id #{weeksheet_row.client_id}
+              %client_name #{weeksheet_row.client_name}
+              %client_group_id #{weeksheet_row.client_group_id}
+              %client_group_name #{weeksheet_row.client_group_name}
+              %loan_id #{weeksheet_row.loan_id}
+              %loan_amount #{weeksheet_row.loan_amount}
+              %disbursal_date #{weeksheet_row.disbursal_date.to_s}
+              %outstanding #{weeksheet_row.outstanding}
+              %installment #{weeksheet_row.installment_number}
+              %principal #{weeksheet_row.principal} 
+              %interest #{weeksheet_row.interest} 
+              %fees #{weeksheet_row.fees} 
 - else
-  -if @center
-    %xml
-      %weeksheet
-        %staff_member_id #{@center.manager.id}
-        %staff_member_name #{@center.manager.name}
-        %date #{@date}
-        %center_id #{@center.id}
-        %center_name #{@center.name}
-        %center_code #{@center.code}
-        %center_address #{@center.address}
-        %meeting_day #{@center.meeting_day?(@date)? @center.meeting_day : ""}
-        %meeting_time_hours #{@center.meeting_day?(@date) ? @center.meeting_time_hours : ""}
-        %meeting_time_minutes #{@center.meeting_day?(@date) ? @center.meeting_time_minutes : ""}
-        - if @option == "rows"
-          %weeksheet_rows
-            - @weeksheet_rows.each do |weeksheet_row|
-              %weeksheet_row
-                %date #{@date}
-                %center_id #{@center.id}
-                %client_id #{weeksheet_row.client_id}
-                %client_name #{weeksheet_row.client_name}
-                %client_group_id #{weeksheet_row.client_group_id}
-                %client_group_name #{weeksheet_row.client_group_name}
-                %loan_id #{weeksheet_row.loan_id}
-                %loan_amount #{weeksheet_row.loan_amount}
-                %disbursal_date #{weeksheet_row.disbursal_date.to_s}
-                %outstanding #{weeksheet_row.outstanding}
-                %installment #{weeksheet_row.installment_number}
-                %principal #{weeksheet_row.principal} 
-                %interest #{weeksheet_row.interest} 
-                %fees #{weeksheet_row.fees} 
+  %error
+    %error_code 600
+    %error_message No center meeting
+
