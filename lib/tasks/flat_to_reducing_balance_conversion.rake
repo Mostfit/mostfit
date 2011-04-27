@@ -9,6 +9,7 @@ namespace :mostfit do
   namespace :conversion do
     desc "Conversion of Flat to Reducing Balance Loans"
     task :flat_to_reducing, :loan_id do |task, args|
+      last_date = Date.new(2011, 03, 31)
       hash = {:loan_product_id => [2, 13]}
       f = File.open("tmp/flat_to_reducing.csv", "w")
       f.puts("\"Loan Id\",\"Amount\", \"Interest Rate\", \"status\", \"errors\"")
@@ -22,7 +23,9 @@ namespace :mostfit do
       end
 
       Loan.all(hash).each{|l|
-        next unless Loan.get(l.id).status == :outstanding
+        last_history = LoanHistory.first(:loan_id => l.id, :date.lte => last_date, :order => [:date.desc])
+        next unless last_history
+        next unless last_history.status == :outstanding
         l.discriminator = "EquatedWeekly"
         if l.loan_product_id == 13
           l.interest_rate = 31.504/100
