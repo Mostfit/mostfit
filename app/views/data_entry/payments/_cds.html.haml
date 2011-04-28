@@ -16,7 +16,7 @@
         %th interest due
         %th total due
         %th paid
-        %th repayment type
+        %th repay type
         %th attendance
           
     %tbody{:style => "text-align:left;" }
@@ -37,7 +37,7 @@
             - next if not lh
             - next if LOANS_NOT_PAYABLE.include? lh.status
             - loan_row_count += 1
-            %tr{ :class => cycle('odd','') }
+            %tr{ :class => cycle('odd','even') }
               %td.text
                 %b= link_to client.name, resource(@branch, @center, client)
               %td.number
@@ -68,11 +68,11 @@
                 - a = p + i
                 = a.round(2)
                 - tot_total += a
-              %td.number
+              %td.paid
                 - if a > 0.01
                   = text_field :name => "paid[loan][#{loan.id}]", :value => [a,0].max.round(2), :cols => "5", :style => "width:50px;" 
                 - else
-                  0.0
+                  = lh.principal_paid + lh.interest_paid
               %td 
                 = select :name => "payment_style[#{loan.id}]", :collection => [["prorata","pro rata"],["normal","fees=>int=>prin"]]
               %td
