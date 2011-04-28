@@ -64,13 +64,13 @@ module FeesContainer
 
   def total_fees_payable_on(date = Date.today)
     # returns one consolidated number
-    total_fees_applicable(date) - total_fees_paid(date)
+    [total_fees_applicable(date) - total_fees_paid(),0].max
   end
 
   def fees_payable_on(date = Date.today)
     # returns a hash of fee type and amounts
     scheduled_fees = fee_schedule.reject{|k,v| k > date}.values.inject({}){|s,x| s+=x}
-    (scheduled_fees - (fees_paid.reject{|k,v| k > date}.values.inject({}){|s,x| s+=x})).reject{|k,v| v<=0}
+    (scheduled_fees - (fees_paid.values.inject({}){|s,x| s+=x})).reject{|k,v| v<=0}
   end
 
   # returns a hash of fees paid which has keys as dates and values as {fee => amount}  

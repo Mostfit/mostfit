@@ -70,7 +70,7 @@
       %li#fees
         Fees payments
         %b
-          = "(#{@fee_paying_things.count})"
+          = "(#{@fee_paying_things.values.reject{|v| v.empty?}.count})"
       %li#premia
         Insurance Premia
       %li#luc

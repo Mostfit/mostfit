@@ -282,6 +282,18 @@ describe Fee do
     Payment.all.destroy!
   end
 
+  it "should give correct fees overdue" do
+    @f.amount = 100
+    @f.payable_on = :loan_disbursal_date
+    @loan_product.fees = [@f]
+    @loan_product.save
+    @loan.save
+    @loan.fee_schedule.should == {Date.new(2000,6,13) => {@f => 100}}
+    @loan.disbursal_date = @loan.scheduled_disbursal_date + 1
+    @loan.save
+  end
+
+
   it "should give correct fee schedule for client" do
     @client_fee = Fee.new(:name => "client fee", :amount => 20, :payable_on => :client_date_joined)
     @client_fee.client_types << ClientType.first
