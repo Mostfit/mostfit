@@ -69,7 +69,10 @@
                 = a.round(2)
                 - tot_total += a
               %td.number
-                = text_field :name => "paid[loan][#{loan.id}]", :value => [a,0].max.round(2), :cols => "5", :style => "width:50px;" 
+                - if a > 0
+                  = text_field :name => "paid[loan][#{loan.id}]", :value => [a,0].max.round(2), :cols => "5", :style => "width:50px;" 
+                - else
+                  0.0
               %td 
                 = select :name => "payment_style[#{loan.id}]", :collection => [["prorata","pro rata"],["normal","fees=>int=>prin"]]
               %td
