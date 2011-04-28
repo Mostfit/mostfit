@@ -27,7 +27,7 @@
       - loans = @loans||Loan.all(:client_id => clients.map{|x| x.id})
       - histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
       - clients.group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each do |group, clients_grouped|
-        %tr.group
+        %tr.group{:style => 'font-weight: bold; text-align: center; background: grey'}
           %td{:colspan => 12}
             =group ? group.name : "none"
         -clients_grouped.sort_by{|x| x.name}.each do |client|
@@ -69,7 +69,7 @@
                 = a.round(2)
                 - tot_total += a
               %td.number
-                - if a > 0
+                - if a > 0.01
                   = text_field :name => "paid[loan][#{loan.id}]", :value => [a,0].max.round(2), :cols => "5", :style => "width:50px;" 
                 - else
                   0.0

@@ -1,31 +1,24 @@
-%table.report.nojs
-  %thead
-    %tr
-      %th on name
-      %th loan id
-      %th amount
-      %th outstanding
-      %th disbursed on
-      %th installment
-      %th{:colspan => 2} principal
-      %th{:colspan => 2} interest
-      %th{:colspan => 2} fee
-      %th{:colspan => 2} total
-    %tr
-      %th
-      %th
-      %th
-      %th
-      %th
-      %th
-      %th due
-      %th paid
-      %th due
-      %th paid
-      %th due
-      %th paid
-      %th due
-      %th paid
+%table{:style => "margin:auto; border: solid 1px #777;"}
+  %tr{:style => "border: solid 1px black; background: lightyellow"}
+    %th{:rowspan => "2"} on name
+    %th{:rowspan => "2"} loan id
+    %th{:rowspan => "2"} amount
+    %th{:rowspan => "2"} outstanding
+    %th{:rowspan => "2"} disbursed on
+    %th{:rowspan => "2"} installment
+    %th{:colspan => 2, :style => "border: solid black 1px"} principal
+    %th{:colspan => 2, :style => "border: solid black 1px"} interest
+    %th{:colspan => 2, :style => "border: solid black 1px;"} fee
+    %th{:colspan => 2, :style => "border: solid black 1px;"} total
+  %tr{:style => "border: solid 1px black;"}
+    %th.due.left-numeric due
+    %th.paid.right-numeric paid
+    %th.due.left-numeric due
+    %th.paid.right-numeric paid
+    %th.due.left-numeric due
+    %th.paid.right-numeric paid
+    %th.due.left-numeric due
+    %th.paid.right-numeric paid
   %tbody
     - histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
     - fees_applicable = Fee.due(loans.map{|x| x.id}, {:date => @date})
@@ -34,9 +27,17 @@
     - tot_amount, tot_outstanding, tot_installments, tot_principal_due, tot_principal_paid, tot_interest_due, tot_interest_paid, tot_fee_due, tot_fee_paid, tot_total_due, tot_total_paid = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     - num_loans_to_pay = num_fees_to_pay = 0
     - clients.group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each do |group, client_grouped|
-      %tr.group
-        %td{:colspan => 14}
+      %tr.group{:style => 'font-weight: bold; text-align: center; background: #cfcfcf'}
+        %td{:colspan => 6}
           =group ? group.name : "none"
+        %td.left-numeric.due
+        %td.right-numeric.paid
+        %td.left-numeric.due
+        %td.right-numeric.paid
+        %td.left-numeric.due
+        %td.right-numeric.paid
+        %td.left-numeric.due
+        %td.right-numeric.paid
       - grp_amount, grp_outstanding, grp_installments, grp_principal_paid, grp_principal_due, grp_interest_due, grp_interest_paid, grp_fee_due, grp_fee_paid, grp_total_due, grp_total_paid = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
       - client_grouped.sort_by{|x| x.name}.each do |client| 
         - loan_row_count = 0
@@ -53,93 +54,101 @@
           - fee_paid = fees_paid[loan.id] ? fees_paid[loan.id] : 0
           - next if (pdue + ppaid + idue + ipaid + fee_due + fee_paid == 0)
           - loan_row_count += 1
-          %tr{ :class => cycle('odd','') }
+          %tr{ :class => cycle('odd','even') }
             - fee = 0
             %td
               %b= link_to client.name, resource(branch, center, client)            
             %td
               = link_to loan.id, url(:quick_link, "loans", loan.id)
-            %td.numeric
+            %td
               - i = loan.amount
               %b= i.to_currency
               - tot_amount += i
               - grp_amount += i
-            %td.numeric
+            %td
               - i = lh ? lh.actual_outstanding_principal : 0
               %b= i.to_currency
               - tot_outstanding += i
               - grp_outstanding += i
             %td
               = loan.disbursal_date.to_s
-            %td.numeric
+            %td
               - i = loan.number_of_installments_before(date)
               = i
               - tot_installments += i
               - grp_installments += i
-            %td.numeric
-              = pdue.to_currency
+            %td.left-numeric.due
+              = pdue
               - tot_principal_due += pdue
               - grp_principal_due += pdue
               - num_loans_to_pay += 1 if pdue > 0
-            %td.numeric
-              = ppaid.to_currency
+            %td.right-numeric.paid
+              = ppaid
               - tot_principal_paid += ppaid
               - grp_principal_paid += ppaid
-            %td.numeric
-              = idue.to_currency
+            %td.left-numeric.due
+              = idue
               - tot_interest_due += idue
               - grp_interest_due += idue
-            %td.numeric
-              = ipaid.to_currency
+            %td.right-numeric.paid
+              = ipaid
               - tot_interest_paid += ipaid
               - grp_interest_paid += ipaid
-            %td.numeric
-              = fee_due.to_currency
+            %td.left-numeric.due
+              = fee_due
               - tot_fee_due += fee_due
               - grp_fee_due += fee_due
               - num_fees_to_pay += 1 if fee_due > 0
-            %td.numeric
-              = fee_paid.to_currency
+            %td.right-numeric.paid
+              = fee_paid
               - tot_fee_paid += fee_paid
               - grp_fee_paid += fee_paid
-            %td.numeric
-              = (pdue + idue + fee_due).to_currency
+            %td.left-numeric.due
+              = (pdue + idue + fee_due)
               - tot_total_due += (pdue + idue + fee_due)
               - grp_total_due += (pdue + idue + fee_due)
-            %td.numeric
-              = (ppaid + ipaid + fee_paid).to_currency
+            %td.right-numeric.paid
+              = (ppaid + ipaid + fee_paid)
               - tot_total_paid += (ppaid + ipaid + fee_paid)
               - grp_total_paid += (ppaid + ipaid + fee_paid)
         - if loan_row_count == 0 and not params[:filter]
-          %tr{ :class => cycle('odd','') }
+          %tr{ :class => cycle('odd','even') }
             %td
               %b= link_to client.name, resource(branch, center, client)
-            %td{ :colspan => 4 }
+            %td{ :colspan => 5, :style => "text-align: center;" }
               %i nothing outstanding
-      %tr{:style => 'border-bottom: 1px solid;'}
+            %td.left-numeric.due
+            %td.right-numeric.paid
+            %td.left-numeric.due
+            %td.right-numeric.paid
+            %td.left-numeric.due
+            %td.right-numeric.paid
+            %td.left-numeric.due
+            %td.right-numeric.paid
+      %tr{:style => 'border-bottom: 2px solid; border-top: 1px solid;' }  
         %td{:colspan => 2}
         %td.numeric
           %b= grp_amount.to_currency
         %td.numeric
           %b= grp_outstanding.to_currency
         %td{:colspan => 2}
-        %td.numeric
+        %td.left-numeric.due
           %b= grp_principal_due.to_currency
-        %td.numeric
+        %td.right-numeric.paid
           %b= grp_principal_paid.to_currency
-        %td.numeric
+        %td.left-numeric.due
           %b= grp_interest_due.to_currency
-        %td.numeric
+        %td.right-numeric.paid
           %b= grp_interest_paid.to_currency
-        %td.numeric
+        %td.left-numeric.due
           %b= grp_fee_due.to_currency
-        %td.numeric
+        %td.right-numeric.paid
           %b= grp_fee_paid.to_currency
-        %td.numeric
+        %td.left-numeric.due
           %b= grp_total_due.to_currency
-        %td.numeric
+        %td.right-numeric.paid
           %b= grp_total_paid.to_currency
-    %tr{:style => 'border-bottom: 2px solid;' }  
+    %tr{:style => 'border-bottom: 2px solid; border-top: 1px solid;' }  
     %tr
       %td
       %td

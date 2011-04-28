@@ -180,7 +180,7 @@ module DataEntry
           next if amounts<=0
           if params.key?(:payment_type) and params[:payment_type] == "fees"
             @success, @fees = @loan.pay_fees(amounts, @date, @staff, session.user)
-            @fees.each{|f| @errors << f.errors}
+            @fees.each{|f| @errors << f.errors unless f.errors.blank?}
           else
             @type = params[:payment][:type]
             style = params[:payment_style][k.to_sym].to_sym
@@ -191,10 +191,11 @@ module DataEntry
             @loan.history_disabled = false
             @loan.already_updated  = false
             @loan.update_history(true)
+          else
+            @errors << @prin.errors if (@prin and not @prin.errors.blank?)
+            @errors << @int.errors if (@int and not @int.errors.blank? )
+            @errors << @fees.map{|f| f.errors}.flatten
           end
-          @errors << @prin.errors if (@prin and not @prin.errors.blank?)
-          @errors << @int.errors if (@int and not @int.errors.blank? )
-          @errors << @fees.errors if (@fees and not @fees.errors.blank?)
         end
       end
       if params[:paid][:client]

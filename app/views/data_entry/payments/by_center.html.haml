@@ -9,6 +9,7 @@
       )
 
   - if not @errors.blank?
+    - debugger
     .error
       - if @errors.is_a?(Hash)
         - @errors.each do |error|
@@ -57,7 +58,7 @@
         Repayments
         %b
           (
-          = LoanHistory.all(:date => Date.today).select{|lh| lh.principal_due + lh.interest_due > 0}.count
+          = LoanHistory.all(:date => @date).select{|lh| (lh.principal_due + lh.interest_due) > 0.1}.count
           )
       %li#repayments
         Approvals
@@ -109,7 +110,7 @@
     %div.tab
       %h1 Fees
       - unless @fee_paying_things.values.inject({}){|s,x| s+=x}.length==0
-        = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "javascript: return confirm_for({'received_by': #{@center.manager.id};", :class => "_disable_button_") do
+        = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => request.path + "?for_date=#{@date}&center_id=#{@center.id}"), :onsubmit => "javascript: return confirm_for({'received_by': #{@center.manager.id};", :class => "_disable_button_") do
           = hidden_field :name => :payment_type, :value => "fees"
           Fees collected by
           = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'fees_received_by'
