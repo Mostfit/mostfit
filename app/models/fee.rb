@@ -137,7 +137,7 @@ class Fee
   end
 
   def self.overdue(date=Date.today)
-    fees = self.applicable(:all, :date => date).map{|app| [app.loan_id, app.fees_applicable.to_i]}.to_hash
+    fees = self.applicable(:all, :date => date).map{|app| [app.applicable_id, app.amount.to_i]}.to_hash
     paid = Payment.all(:type => :fees, :loan_id.not => nil, :received_on.lte => date).aggregate(:loan_id, :amount.sum).to_hash
     (fees - paid).reject{|lid, a| a<=0}
   end
