@@ -215,12 +215,18 @@ class Loan
 
   def _show_cf(width = 10, padding = 4) #convenience function to see cashflow in console
     ps = payment_schedule
-    titles = [:date, :total_balance, :balance, :principal, :interest, :total_principal, :total_interest, :fees]
+    titles = [:date, :total_balance, :balance, :principal, :interest, :total_paid, :total_principal, :total_interest, :fees]
     puts titles.map{|t| t.to_s[0..width - 1].rjust(width - padding/2).ljust(width)}.join("|")
     ps.keys.sort.each do |d| 
-      puts ([d.to_s] + titles[1..-1].map{|t| ps[d][t]}).map{|s| s.to_s.rjust(width - padding/2).ljust(width)}.join("|")
+      ps[d][:total_paid] = ps[d][:principal] + ps[d][:interest]
+      puts ([d.to_s] + titles[1..-1].map{|t| ps[d][t].round(4)}).map{|s| s.to_s.rjust(width - padding/2).ljust(width)}.join("|")
     end
   end
+
+  def _show_ps
+    puts payment_schedule.sort.map{|d, h| [d, h[:principal], h[:interest], h[:fees], h[:total_principal], h[:total_interest], h[:total]].join("\t")}.join("\n")
+  end
+
 
   def self.search(q, per_page)
     if /^\d+$/.match(q)
@@ -592,9 +598,6 @@ class Loan
     @schedule
   end
 
-  def _show_ps
-    puts payment_schedule.sort.map{|d, h| [d, h[:principal], h[:interest], h[:fees], h[:total_principal], h[:total_interest], h[:total]].join("\t")}.join("\n")
-  end
   
   def payments_hash
     # this is the fount of knowledge for actual payments on the loan
@@ -910,7 +913,7 @@ class Loan
     hist = calculate_history.sort_by{|x| x[:date]}
     puts title_order.map{|t| t.to_s.rjust(width - padding/2).ljust(width)}.join("|")
     hist.each do |h|
-      puts title_order.map{|t| h[titles[t]]}.map{|v| v.to_s}.map{|s| s.rjust(width - padding/2).ljust(width)}.join("|")
+      puts (["#{h[:date]}\t"] + title_order[1..-1].map{|t| h[titles[t]].round(4)}.map{|v| v.to_s}.map{|s| s.rjust(width - padding/2).ljust(width)}).join("|")
     end
   end
 

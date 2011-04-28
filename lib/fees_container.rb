@@ -64,7 +64,7 @@ module FeesContainer
 
   def total_fees_payable_on(date = Date.today)
     # returns one consolidated number
-    total_fees_applicable(date) - total_fees_paid(date)
+    [total_fees_applicable(date) - total_fees_paid(),0].max
   end
 
   def fees_payable_on(date = Date.today)
