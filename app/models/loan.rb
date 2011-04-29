@@ -889,17 +889,17 @@ class Loan
         :loan_id                             => id,
         :date                                => date,
         :status                              => STATUSES.index(get_status(date)) + 1,
-        :scheduled_outstanding_principal     => scheduled[:balance],
-        :scheduled_outstanding_total         => scheduled[:total_balance],
-        :actual_outstanding_principal        => actual[:balance],
-        :actual_outstanding_total            => actual[:total_balance],
-        :amount_in_default                   => actual[:balance] - scheduled[:balance],
+        :scheduled_outstanding_principal     => scheduled[:balance].round(2),
+        :scheduled_outstanding_total         => scheduled[:total_balance].round(2),
+        :actual_outstanding_principal        => actual[:balance].round(2),
+        :actual_outstanding_total            => actual[:total_balance].round(2),
+        :amount_in_default                   => actual[:balance].round(2) - scheduled[:balance].round(2),
         :days_overdue                        => days_overdue, 
         :current                             => current,
-        :principal_due                       => principal_due, 
-        :interest_due                        => interest_due,
-        :principal_paid                      => prin,
-        :interest_paid                       => int
+        :principal_due                       => principal_due.round(2), 
+        :interest_due                        => interest_due.round(2),
+        :principal_paid                      => prin.round(2),
+        :interest_paid                       => int.round(2)
       }
     end
     Merb.logger.info "History calculation took #{Time.now - t} seconds"

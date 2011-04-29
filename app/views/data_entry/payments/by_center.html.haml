@@ -10,7 +10,7 @@
 
   - if not @errors.blank?
     .error
-      - if @errors.is_a?(Hash)
+      - if @errors.is_a?(Array)
         - @errors.each do |error|
           == Loan <b>#{error.resource.class == Payment ? error.resource.loan.id : error.resource.id} :</b>
           = error.values.join("*")
@@ -57,7 +57,7 @@
         Repayments
         %b
           (
-          = LoanHistory.all(:date => Date.today).select{|lh| lh.principal_due + lh.interest_due > 0}.count
+          = LoanHistory.all(:date => @date).select{|lh| (lh.principal_due + lh.interest_due) > 0.1}.count
           )
       %li#repayments
         Approvals
@@ -79,7 +79,7 @@
           = "(#{@loans_to_utilize.size})"
     %div.tab    
       %h1 Repayments
-      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => params[:return] || resource(@branch, @center)), :onsubmit => "if ($('#payments_received_by').val() != '#{@center.manager.id}'){return(confirm('Payment receiver is not center manager. Proceed with payments?'));};", :class => "_disable_button_") do
+      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => params[:return] || (request.path + "?for_date=#{@date}&center_id=#{@center.id}")), :onsubmit => "if ($('#payments_received_by').val() != '#{@center.manager.id}'){return(confirm('Payment receiver is not center manager. Proceed with payments?'));};", :class => "_disable_button_") do
         /= hidden_field :name => 'for_date', :value => @date
         = hidden_field :name => 'center_id', :value => @center.id
         = partial :cds
@@ -87,7 +87,7 @@
     %div.tab
       %h1 Approvals
       - if @loans_to_approve.size > 0
-        = form_for(@loan, :action => url(:loan_actions, 'approve', :return => resource(@branch, @center)), :class => "_disable_button_") do
+        = form_for(@loan, :action => url(:loan_actions, 'approve', :return => (request.path + "?for_date=#{@date}&center_id=#{@center.id}")), :class => "_disable_button_") do
           = partial "loans/approve"
           = submit 'Approve these loans', :name => "approve_loans"
           or
@@ -108,52 +108,74 @@
         No disbursals today
     %div.tab
       %h1 Fees
+      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => request.path + "?for_date=#{@date}&center_id=#{@center.id}"), :onsubmit => "javascript: return confirm_for({'received_by': #{@center.manager.id};", :class => "_disable_button_") do
+        = hidden_field :name => :payment_type, :value => "fees"
+        = hidden_field :name => 'center_id', :value => @center.id
+        Fees collected by
+        = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'fees_received_by'
+        collected on
+        = date_select :for_date, @date, :id => "fees_for_date"
+        = submit 'Pay Fees'
+        %table.report.nojs{:style => "width:100%"}
+          %thead
+            %tr{:style => "font-size: 0.85em"}
+              %th
+                id
+              %th
+                Client
+              %th
+                Loan
+              %th
+                Total Fees Payable
+              %th
+                Fees Already Paid
+              %th
+                Fees Due Today
+              %th
+                Fees      
+          - @fee_paying_things.each do |obj, fee|
+            - next if fee.size==0
+            %tr{:class => cycle('odd','even')}
+              %td
+                = obj.id
+              %td.text
+                = Loan.descendants.include?(obj.class) ? obj.client.name : obj.name
+              %td.text
+                = obj.description if obj.respond_to?("description")
+              %td.text
+                = obj.total_fees_due
+              %td.text
+                = obj.total_fees_paid
+              %td.text
+                - fee.each do |k,v|
+                  ="#{k.name}: #{v}"
+              %td
+                - klass = Loan.descendants.include?(obj.class) ? Loan : obj.class
+                = text_field :name => "paid[#{klass.to_s.snake_case}][#{obj.id}]", :value => fee.values.inject(0){|s,x| s+=x}, :cols => "5", :style => "width:50px;" 
+          - frt = Payment.all(:type => :fees, :received_on => @date)
+          - unless frt.blank?
+            %tr
+              %td{:colspan => "20", :style => "text-align: center"}
+                %b Fees paid today
+          - frt.each do |f|
+            %tr
+              %td.number
+              %td.text
+                = f.client.name
+              %td.text
+                = f.loan.description
+              %td.text
+              %td.number
+                = f.amount
+              %td
+              %td.text
+                = f.fee.description
       - unless @fee_paying_things.values.inject({}){|s,x| s+=x}.length==0
-        = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => resource(@branch, @center)), :onsubmit => "javascript: return confirm_for({'received_by': #{@center.manager.id};", :class => "_disable_button_") do
-          = hidden_field :name => :payment_type, :value => "fees"
-          Fees collected by
-          = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'fees_received_by'
-          collected on
-          = date_select :for_date, @date, :id => "fees_for_date"
-          %table.report.nojs{:style => "width:100%"}
-            %thead
-              %tr{:style => "font-size: 0.85em"}
-                %th
-                  id
-                %th
-                  Client
-                %th
-                  Loan
-                %th
-                  Total Fees Payable
-                %th
-                  Fees Already Paid
-                %th
-                  Fees Due Today
-                %th
-                  Fees      
-            - @fee_paying_things.each do |obj, fee|
-              - next if fee.size==0
-              %tr{:class => cycle('odd','even')}
-                %td
-                  = obj.id
-                %td.text
-                  = Loan.descendants.include?(obj.class) ? obj.client.name : obj.name
-                %td.text
-                  = obj.description if obj.respond_to?("description")
-                %td.text
-                  = obj.total_fees_due
-                %td.text
-                  = obj.total_fees_paid
-                %td.text
-                  - fee.each do |k,v|
-                    ="#{k.name}: #{v}"
-                %td
-                  - klass = Loan.descendants.include?(obj.class) ? Loan : obj.class
-                  = text_field :name => "paid[#{klass.to_s.snake_case}][#{obj.id}]", :value => fee.values.inject(0){|s,x| s+=x}, :cols => "5", :style => "width:50px;" 
-          = submit 'Pay Fees'
-      - else
+
         No fees due today
+
+          
+          
     %div.tab
       %h1 Insurance Premia
     %div.tab

@@ -1095,3 +1095,40 @@ ul.bookmarks li{
 .help h3 {
   color: black;
 }
+
+td.left-numeric {
+  border-left: solid 1px black;
+}  
+
+td.right-numeric {
+  border-right: solid 1px black;
+}  
+tr.even td.paid {
+  background: #E8FFD1;
+}
+tr.odd td.paid {
+  background: #E0F2CE;
+}
+
+tr.odd td.due {
+  background: #F2CED3;
+}
+tr.even td.due {
+  background: #FFD1D8;
+}
+
+
+th.left-numeric {
+  border-left: solid 1px black;
+}  
+
+th.right-numeric {
+  border-right: solid 1px black;
+}  
+th.paid {
+  background: #DBFFB8;
+}
+th.due {
+  background: lightpink;
+}
+
