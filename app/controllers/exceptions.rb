@@ -68,8 +68,9 @@ class Exceptions < Merb::Controller
       render
     end    
   end
-
-  def error_list
+ 
+  #get list of errors handle 
+  def index
     display @template
   end
 end
