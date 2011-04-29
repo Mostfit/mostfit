@@ -68,6 +68,10 @@ class Exceptions < Merb::Controller
       render
     end    
   end
+
+  def error_list
+    display @template
+  end
 end
 
 class NotPrivileged <  Merb::ControllerExceptions::Unauthorized; end
