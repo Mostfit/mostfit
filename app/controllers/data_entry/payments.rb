@@ -10,6 +10,7 @@ module DataEntry
     end
 
     def by_center
+      debugger
       @center = Center.get(params[:center_id]) if params[:center_id]
       if params[:center_text] and not @center
         @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
@@ -40,7 +41,7 @@ module DataEntry
           bulk_payments_and_disbursals
           mark_attendance
         end
-
+        debugger
         if @errors.blank?
           return_url = params[:return]||url(:data_entry)
           notice = 'All payments made succesfully'
@@ -52,19 +53,7 @@ module DataEntry
         elsif params[:format] and params[:format]=="xml"
           display("")
         else
-          params[:return] ? redirect(params[:return], :message => {
-                                       :error => @errors.map{|e| 
-                                         if e.instance_variables.include?("@errors")
-                                           if e.resource.loan_id
-                                             "#{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}"
-                                           else
-                                             "#{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}"
-                                           end
-                                         else
-                                           e.to_s
-                                         end
-                                         }.join("\n")
-                                     }) : render
+          display [@errors, @center, @date]
         end
       else
         render
@@ -186,15 +175,15 @@ module DataEntry
             style = params[:payment_style][k.to_sym].to_sym
             next if amounts<=0
             @success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, true, style)
+            @errors << @prin.errors if (@prin and not @prin.errors.blank?)
+            @errors << @int.errors if (@int and not @int.errors.blank? )
+            @errors << @fees.errors if (@fees and not @fees.errors.blank?)
           end
           if @success 
             @loan.history_disabled = false
             @loan.already_updated  = false
             @loan.update_history(true)
           else
-            @errors << @prin.errors if (@prin and not @prin.errors.blank?)
-            @errors << @int.errors if (@int and not @int.errors.blank? )
-            @errors << @fees.map{|f| f.errors}.flatten
           end
         end
       end

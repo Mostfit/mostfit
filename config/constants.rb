@@ -22,7 +22,7 @@ MASS_ENTRY_FIELDS = {
               :not_irrigated_land_leased_semifertile, :not_irrigated_land_shared_semifertile, :not_irrigated_land_own_wasteland, 
               :not_irrigated_land_leased_wasteland, :not_irrigated_land_shared_wasteland, :caste, :religion, :occupation, 
               :client_type], 
-  :loan => [:loan_utilization, :purpose]
+  :loan => [:loan_utilization, :purpose, :funding_line]
 }
 CLEANER_INTERVAL = 120
 FUNDER_ACCESSIBLE_REPORTS = ["ConsolidatedReport", "GroupConsolidatedReport", "StaffConsolidatedReport", "RepaymentOverdue"]

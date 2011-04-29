@@ -9,9 +9,8 @@
       )
 
   - if not @errors.blank?
-    - debugger
     .error
-      - if @errors.is_a?(Hash)
+      - if @errors.is_a?(Array)
         - @errors.each do |error|
           == Loan <b>#{error.resource.class == Payment ? error.resource.loan.id : error.resource.id} :</b>
           = error.values.join("*")
@@ -111,6 +110,7 @@
       %h1 Fees
       = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => request.path + "?for_date=#{@date}&center_id=#{@center.id}"), :onsubmit => "javascript: return confirm_for({'received_by': #{@center.manager.id};", :class => "_disable_button_") do
         = hidden_field :name => :payment_type, :value => "fees"
+        = hidden_field :name => 'center_id', :value => @center.id
         Fees collected by
         = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'fees_received_by'
         collected on
