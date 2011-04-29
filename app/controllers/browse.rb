@@ -47,9 +47,11 @@ class Browse < Application
     end
 
     @fees_due, @fees_paid, @fees_overdue  = Hash.new(0), Hash.new(0), Hash.new(0)
-    Fee.due(loans.keys, {:date => @date}).each{|lid, fa|
-      @fees_due[loans[lid]] += fa.due
-    }
+    unless loans.empty?
+      Fee.due(loans.keys, {:date => @date}).each{|lid, fa|
+        @fees_due[loans[lid]] += fa.due
+      }
+    end
 
     Payment.all(:type => :fees, :received_on => @date, "client.center_id" => center_ids).aggregate(:loan_id, :amount.sum).each{|fp|
       @fees_paid[loans[fp[0]]] += fp[1]
