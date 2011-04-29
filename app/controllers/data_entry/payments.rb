@@ -10,6 +10,7 @@ module DataEntry
     end
 
     def by_center
+      debugger
       @option = params[:option] if params[:option]
       @center = Center.get(params[:center_id]) if params[:center_id]
       if params[:center_text] and not @center
@@ -41,35 +42,18 @@ module DataEntry
           bulk_payments_and_disbursals
           mark_attendance
         end
+        debugger
         if @errors.blank?
           return_url = params[:return]||url(:data_entry)
           notice = 'All payments made succesfully'
           if(request.xhr?)
             render("<div class='notice'>#{notice}<div>", :layout => layout?)
-          elsif params[:format] and params[:format]=="xml" and @errors.blank?
-            @message = 'All payments made succesfully'         
-            display @message
           else
             redirect(return_url, :message => {:notice => notice})
           end
+        elsif params[:format] and params[:format]=="xml"
+          display("")
         else
-          if params[:format] and params[:format]=="xml"
-            display @errors
-          else
-            params[:return] ? redirect(params[:return], :message => {
-              :error => @errors.map{|e| 
-              if e.instance_variables.include?("@errors")
-                if e.resource.loan_id
-                  "#{e.resource.type} for loan id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}"
-                else
-                  "#{e.resource.type} for client id: #{e.resource.loan_id} -- Error: #{e.instance_variable_get("@errors").values}"
-                end
-              else
-                e.to_s
-              end
-            }.join("\n")
-            }) : render
-          end
           display [@errors, @center, @date]
         end
       else
@@ -81,7 +65,7 @@ module DataEntry
         end
       end
     end
-    
+
     def by_staff_member
       @date = params[:for_date] ? Date.parse(params[:for_date]) : Date.today
       staff_id = params[:staff_member_id] || params[:received_by]
@@ -104,7 +88,7 @@ module DataEntry
         render
       end
     end
-    
+
     def create(payment)
       raise NotFound unless @loan = Loan.get(payment[:loan_id])
       amounts = payment[:amount].to_f
@@ -140,7 +124,7 @@ module DataEntry
         params[:format]=='xml' ? display(@payment, :status => 400) : render(:record)
       end
     end
-    
+
     def delete
       only_provides :html
       if params and params[:loan_id]
