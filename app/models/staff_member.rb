@@ -1,5 +1,6 @@
 class StaffMember
   include DataMapper::Resource
+  include Identified
   
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false
