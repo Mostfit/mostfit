@@ -11,16 +11,48 @@
         %th
           Disbursements Target
         %th
-          Disbursements Variance
+          Disbursements till date
+        %th
+          Variance till date
+        %th
+          Disbursements today
+        %th
+          Variance as of today
+        %th
+          Approved But Not Disbursed
         %th
           Collections Target
-    - @staff_and_targets.each_pair do |key, value|
+        %th
+          Payments received till date
+        %th
+          Variance till date
+        %th
+          Payments received today
+        %th
+          Variance today
+    - @staff_and_targets.each_pair do |staff_member, target|
       %tr
         %td
-          = key
+          = staff_member
         %td
-          = value[:target].disbursements_target
+          = target[:disbursements_target]
         %td
-          = value[:disbursements_variance]
+          = target[:disbursed_till_date]
         %td
-          = value[:target].collections_target
+          = target[:disbursements_variance_till_date]
+        %td
+          = target[:disbursed_today] ? target[:disbursed_today] : "N.A."
+        %td
+          = target[:disbursements_variance_today] ? target[:disbursements_variance_today] : "N.A."
+        %td
+          = target[:approved_not_yet_disbursed]
+        %td
+          = target[:collections_target]
+        %td
+          = target[:payments_till_date]
+        %td
+          = target[:payments_variance_till_date]
+        %td
+          = target[:payments_today] ? target[:payments_today] : "N.A."
+        %td
+          = target[:payments_variance_today] ? target[:payments_variance_today] : "N.A."
