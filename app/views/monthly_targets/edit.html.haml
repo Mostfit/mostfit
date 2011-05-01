@@ -1,0 +1,11 @@
+%h1
+  = @monthly_target.to_s
+= error_messages_for @monthly_target
+
+= form_for(@monthly_target, :action => url(:monthly_target, @monthly_target)) do
+  = partial :fields
+  = submit "Update"
+
+= link_to 'Show', url(:monthly_target, @monthly_target)
+|
+= link_to 'Back', url(:monthly_targets)

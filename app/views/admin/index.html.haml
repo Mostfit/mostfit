@@ -53,6 +53,8 @@
     %li
       = link_to_with_rights 'Assign and view Targets', resource(:targets), :class => 'edit'
     %li
+      = link_to_with_rights 'Monthly Targets', resource(:monthly_targets), :class => 'edit'
+    %li
       = link_to_with_rights 'Perform Audits', resource(:audit_items), :class => 'edit'
     %li
       = link_to_with_rights 'History log', url(:controller => :audit_trails, :action => :show), :class => 'edit'

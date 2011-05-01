@@ -1,0 +1,26 @@
+=partial :form
+- @staff_and_targets = @data
+- if @data.empty?
+  %h3 Nothing to show. Perhaps monthly targets for staff haven't been set for the selected month?
+- else
+  %table.report.nojs
+    %tr.header
+      %thead
+        %th
+          Staff Member
+        %th
+          Disbursements Target
+        %th
+          Disbursements Variance
+        %th
+          Collections Target
+    - @staff_and_targets.each_pair do |key, value|
+      %tr
+        %td
+          = key
+        %td
+          = value[:target].disbursements_target
+        %td
+          = value[:disbursements_variance]
+        %td
+          = value[:target].collections_target

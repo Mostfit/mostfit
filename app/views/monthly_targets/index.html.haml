@@ -1,0 +1,32 @@
+%h1
+  Monthly Targets
+
+%table.narrow
+  %thead
+    %tr
+      %th
+        Staff Member
+      %th
+        For month
+      %th
+        Disbursements Target
+      %th
+        Collections Target
+      %th{ :colspan => 2 }
+        Actions
+  - for monthly_target in @monthly_targets
+    %tr{ :class => cycle('odd', '') }
+      %td
+        = monthly_target.staff_member.name_and_id
+      %td
+        = monthly_target.for_month.strftime("%B %Y")
+      %td
+        = monthly_target.disbursements_target
+      %td
+        = monthly_target.collections_target
+      %td
+        = link_to 'Show', url(:monthly_target, monthly_target)
+      %td
+        = link_to 'Edit', url(:edit_monthly_target,  monthly_target)
+
+= link_to 'New', url(:new_monthly_target)
