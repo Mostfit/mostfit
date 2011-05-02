@@ -24,23 +24,23 @@
     %thead
       %tr.header
         %th
-          name
+          Name (id)
         %th
-          status
+          Status
         %th{:colspan => 2}
-          branches
+          Branches
         %th{:colspan => 2}
-          centers
+          Centers
         %th{:colspan => 2}
-          applied loans
+          Applied loans
         %th{:colspan => 2}
-          approved loans
+          Approved loans
         %th{:colspan => 2}
-          rejected loans
+          Rejected loans
         %th{:colspan => 2}
-          disbursed loans
+          Disbursed loans
         %th{:colspan => 2}
-          wrote off loans
+          Written-off loans
       %tr.header
         %th{:colspan => 2}
         -7.times do
@@ -54,7 +54,7 @@
     - for staff_member in @staff_members
       %tr{ :class => cycle('odd','') }
         %td.text
-          %b= link_to staff_member.name, resource(staff_member)
+          %b= link_to staff_member.name_and_id, resource(staff_member)
         %td
           %span{:class => staff_member.active? ? '' : 'red'}
             = staff_member.active? ? 'active' : 'disabled'

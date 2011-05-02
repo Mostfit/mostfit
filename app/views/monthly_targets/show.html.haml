@@ -1,0 +1,19 @@
+%h1
+  = @monthly_target.to_s
+%table
+  %tr.odd
+    %th
+      Disbursements target
+    %th
+      Collections target
+    %th
+      Actions
+  %tr
+    %td
+      = @monthly_target.disbursements_target
+    %td
+      = @monthly_target.collections_target
+    %td
+      = link_to 'Edit', url(:edit_monthly_target, @monthly_target), :class => "edit"
+
+= link_to 'Back', url(:monthly_targets)

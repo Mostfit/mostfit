@@ -11,6 +11,8 @@
   - account_id = (params[report] and params[report][:account_id] and not params[report][:account_id].blank?) ? params[report][:account_id] : nil
   - type_of_target = (params[report] and params[report][:type_of_target] and not params[report][:type_of_target].blank?) ? params[report][:type_of_target] : nil
   - type_of_journal = (params[report] and params[report][:type_of_journal] and not params[report][:type_of_journal].blank?) ? params[report][:type_of_journal] : nil
+  - month = (params[report] and params[report][:month] and not params[report][:month].blank?) ? params[report][:month] : nil
+  - chosen_year = (params[report] and params[report][:chosen_year] and not params[report][:chosen_year].blank?) ? params[report][:chosen_year] : nil
   - if params[:submit]
     %h3{:style => "margin-bottom: 5px;"}
       - if area_id
@@ -51,6 +53,14 @@
         |
         Journal Type:
         = JournalType.get(type_of_journal).name
+      - if month
+        |
+        Month:
+        = MONTHS[month.to_i]
+      - if chosen_year
+        |
+        Year:
+        = chosen_year
     %a.expand_collapsed{:href => "#"}
       Change parameters
   %div{:class => "#{params[:submit] ? 'collapsed' : ''}"}
@@ -88,6 +98,14 @@
               Absent by more than:
               = text_field(:absent_more_than, :size => 3)
               days
+          - if @report.respond_to?(:month)
+            %td
+              Month:
+              = select(:month, :collection => MONTHS.map{|m| [MONTHS.index(m), m.to_s]}, :selected => month)
+          - if @report.respond_to?(:chosen_year)
+            %td
+              Year:
+              = select(:chosen_year, :collection => ["2010", "2011"])
       %table{:style => "padding-top: 0px;"}
         %tr
           - if @report.respond_to?(:area_id)

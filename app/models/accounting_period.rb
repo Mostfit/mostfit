@@ -33,4 +33,21 @@ class AccountingPeriod
     return [false, "Your accounting period overlaps with other accounting periods"]
   end
 
+=begin
+  def dates_in_order
+    compare_dates = begin_date <=> end_date
+    return true if compare_dates < 0
+    return [false, "Begin date must precede end date"]
+  end
+=end
+
+  def AccountingPeriod.get_accounting_period(for_date = nil)
+    for_date = for_date || Date.today
+    AccountingPeriod.first(:begin_date.lte => for_date, :end_date.gte => for_date)
+  end
+  
+  def AccountingPeriod.get_current_accounting_period
+    get_accounting_period
+  end
+
 end
