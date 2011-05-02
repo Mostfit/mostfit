@@ -12,6 +12,7 @@ module DataEntry
     def by_center
       debugger
       @option = params[:option] if params[:option]
+      @info = params[:info] if params[:info]
       @center = Center.get(params[:center_id]) if params[:center_id]
       if params[:center_text] and not @center
         @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
@@ -58,7 +59,7 @@ module DataEntry
         end
       else
         if params[:format] and params[:format]=="xml"
-          @weeksheet_rows = Weeksheet.get_center_sheet(@center,@date)
+          @weeksheet_rows = Weeksheet.get_center_weeksheet(@center,@date, @info)
           display @weeksheet_rows
         else
           render

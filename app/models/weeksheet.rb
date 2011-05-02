@@ -1,26 +1,48 @@
 class Weeksheet
-  attr_accessor :date
-  attr_accessor :center_id
-  attr_accessor :center_name
-  attr_accessor :center_meeting_time
-  attr_accessor :client_id
-  attr_accessor :client_name
-  attr_accessor :loan_id
-  attr_accessor :loan_amount
-  attr_accessor :disbursal_date
-  attr_accessor :outstanding
-  attr_accessor :principal
-  attr_accessor :interest
-  attr_accessor :fees
-  attr_accessor :installment_number
-  attr_accessor :client_group_id
-  attr_accessor :client_group_name
+  include DataMapper::Resource
+  DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+
+  property :id, Serial
+  property :date, Date
+  property :staff_member_id, Integer
+  property :center_id, Integer
+  property :meeting_day,          Enum.send('[]', *DAYS), :nullable => false, :default => :none, :index => true
+  property :meeting_time_hours,   Integer, :length => 2, :index => true
+  property :meeting_time_minutes, Integer, :length => 2, :index => true
+
+  has n, :weeksheet_rows
+  belongs_to :staff_member
+  belongs_to :center
 
   #Get weeksheet of center 
-  def self.get_center_sheet(center, date)
+  def self.get_center_weeksheet(center, date, option)
+    if option == "data"
+      weeksheet = Weeksheet.first(:center_id => center.id, :date => date)
+      if weeksheet.blank?
+        return Weeksheet.generate_weeksheet(center, date, option) 
+      else
+        return weeksheet.weeksheet_rows
+      end
+    else
+     return Weeksheet.generate_weeksheet(center, date, option)    
+    end
+  end
+
+  private
+  def self.generate_weeksheet(center, date, option)
     collection_of_weeksheet = []
     clients = center.clients
     loans = center.loans
+    
+    weeksheet = Weeksheet.new
+    weeksheet.staff_member_id = center.manager.id
+    weeksheet.date = date
+    weeksheet.center_id = center.id
+    weeksheet.meeting_day = center.meeting_day?(date)? center.meeting_day : ""
+    weeksheet.meeting_time_hours  = center.meeting_day?(date) ? center.meeting_time_hours : ""
+    weeksheet.meeting_time_minutes = center.meeting_day?(date) ? center.meeting_time_minutes : ""
+    #save weeksheet if request for database
+    weeksheet.save! if option == "data"
 
     histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => date)
     #TODO: temporary fix for fees
@@ -35,47 +57,44 @@ class Weeksheet
           loan_row_count += 1
           #TODO: temporary fix for fees
           fee = 0#fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0          
-
-          weeksheet = Weeksheet.new
-          weeksheet.date = date
-          weeksheet.center_meeting_time = "#{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}"
-          weeksheet.center_id = center.id
-          weeksheet.center_name = center.name
-          weeksheet.client_group_name = group ? group.name : "No group"
-          weeksheet.client_group_id = group ? group.id : nil
-          weeksheet.client_id = client.id
-          weeksheet.client_name = client.name
-          weeksheet.loan_id = loan.id
-          weeksheet.loan_amount = loan.amount
-          weeksheet.disbursal_date =  loan.disbursal_date.to_s
-          weeksheet.outstanding = (lh ? lh.actual_outstanding_principal : 0)
-          weeksheet.principal = [(lh ? lh.principal_due : 0), 0].max
-          weeksheet.interest = [(lh ? lh.interest_due : 0), 0].max
-          weeksheet.fees = fee
-          weeksheet.installment_number = loan.number_of_installments_before(date)
-
-          collection_of_weeksheet << weeksheet	      
+          weeksheet_row = weeksheet.weeksheet_rows.new 
+   
+          weeksheet_row.client_group_name = group ? group.name : "No group"
+          weeksheet_row.client_group_id = group ? group.id : nil
+          weeksheet_row.client_id = client.id
+          weeksheet_row.client_name = client.name
+          weeksheet_row.loan_id = loan.id
+          weeksheet_row.loan_amount = loan.amount
+          weeksheet_row.disbursal_date =  loan.disbursal_date.to_s
+          weeksheet_row.outstanding = (lh ? lh.actual_outstanding_principal : 0)
+          weeksheet_row.principal = [(lh ? lh.principal_due : 0), 0].max
+          weeksheet_row.interest = [(lh ? lh.interest_due : 0), 0].max
+          weeksheet_row.fees = fee
+          weeksheet_row.installment = loan.number_of_installments_before(date)
+          
+          #save weeksheet row if request for database
+          weeksheet_row.save! if option == "data"
+          collection_of_weeksheet << weeksheet_row
         end
         if loan_row_count == 0
-          weeksheet = Weeksheet.new
-          weeksheet.date = date
-          weeksheet.center_meeting_time = "#{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}"
-          weeksheet.center_id = center.id
-          weeksheet.center_name = center.name
-          weeksheet.client_group_name = group ? group.name : "No group"
-          weeksheet.client_group_id = group ? group.id : nil
-          weeksheet.client_id = client.id
-          weeksheet.client_name = client.name
-          weeksheet.loan_id = nil
-          weeksheet.loan_amount = 0
-          weeksheet.disbursal_date =  nil
-          weeksheet.outstanding = 0
-          weeksheet.principal = 0
-          weeksheet.interest = 0
-          weeksheet.fees = 0
-          weeksheet.installment_number = 0
+          weeksheet_row = weeksheet.weeksheet_rows.new 
 
-          collection_of_weeksheet << weeksheet	      
+          weeksheet_row.client_group_name = group ? group.name : "No group"
+          weeksheet_row.client_group_id = group ? group.id : nil
+          weeksheet_row.client_id = client.id
+          weeksheet_row.client_name = client.name
+          weeksheet_row.loan_id = nil
+          weeksheet_row.loan_amount = 0
+          weeksheet_row.disbursal_date =  nil
+          weeksheet_row.outstanding = 0
+          weeksheet_row.principal = 0
+          weeksheet_row.interest = 0
+          weeksheet_row.fees = 0
+          weeksheet_row.installment = 0
+
+          #save weeksheet row if request for database
+          weeksheet_row.save if option == "data"
+          collection_of_weeksheet << weeksheet_row	      
         end
       end
     end

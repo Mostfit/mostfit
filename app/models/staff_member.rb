@@ -24,6 +24,7 @@ class StaffMember
   has n, :suggested_written_off_loans, :child_key => [:suggested_written_off_by_staff_id], :model => 'Loan'
   has n, :write_off_rejected_loans,    :child_key => [:write_off_rejected_by_staff_id],    :model => 'Loan'
   has n, :payments, :child_key  => [:received_by_staff_id]
+  has n, :weeksheets
 
   belongs_to :user
 
