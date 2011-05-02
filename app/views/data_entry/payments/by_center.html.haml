@@ -108,7 +108,7 @@
         No disbursals today
     %div.tab
       %h1 Fees
-      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => request.path + "?for_date=#{@date}&center_id=#{@center.id}"), :onsubmit => "javascript: return confirm_for({'received_by': #{@center.manager.id};", :class => "_disable_button_") do
+      = form_for(@payment, :action => url(:enter_payments, :action => 'by_center', :return => request.path + "?for_date=#{@date}&center_id=#{@center.id}#fees"), :onsubmit => "javascript: return confirm_for({'received_by': #{@center.manager.id};", :class => "_disable_button_") do
         = hidden_field :name => :payment_type, :value => "fees"
         = hidden_field :name => 'center_id', :value => @center.id
         Fees collected by

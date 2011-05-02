@@ -1547,6 +1547,7 @@ class EquatedWeeklyRoundedAdjustedLastPayment < Loan
   # these 2 methods define the pay back scheme
   # typically reimplemented in subclasses
   include ExcelFormula
+  property :rounding_factor, Integer
   # property :purpose,  String
 
   def self.display_name
@@ -1603,14 +1604,14 @@ private
     return @rounded_schedule if @rounded_schedule
     @reducing_schedule = {}    
     balance = amount
-    payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0).round(0)
+    payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
     1.upto(number_of_installments){|installment|
       @reducing_schedule[installment] = {}
       @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider)
       if installment == number_of_installments or balance < (payment - @reducing_schedule[installment][:interest_payable])
         @reducing_schedule[installment][:principal_payable] = balance
       else
-        @reducing_schedule[installment][:principal_payable] = (payment - @reducing_schedule[installment][:interest_payable]).round(0)
+        @reducing_schedule[installment][:principal_payable] = (payment - @reducing_schedule[installment][:interest_payable])
       end
       balance = balance - @reducing_schedule[installment][:principal_payable]
     }
@@ -1621,7 +1622,7 @@ private
     actual_payment = (payment / 5).round * 5
     while not done
       @rounded_schedule[i] = {}
-      @rounded_schedule[i][:interest_payable] = i < @reducing_schedule.count ? @reducing_schedule[i][:interest_payable] : 0
+      @rounded_schedule[i][:interest_payable] = i <= @reducing_schedule.count ? @reducing_schedule[i][:interest_payable] : 0
       @rounded_schedule[i][:principal_payable] = [actual_payment - @rounded_schedule[i][:interest_payable], balance].min
       balance -= @rounded_schedule[i][:principal_payable]
       i += 1
