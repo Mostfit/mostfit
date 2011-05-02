@@ -441,6 +441,16 @@ module Merb
   #  def get_accessible_funding_lines(funder_id, user = nil)
       
   #  end
+
+    #this function is for getting the list of accounts whose account_category is Cash and belongs to a particular branch.
+    def get_accessible_cash_accounts(branch_id)
+      acc = if branch_id and not branch_id.blank?
+              Account.all(:branch_id => @branch_id, :account_category => "Cash", :order => [:name])
+            else
+              []
+            end
+      acc.map{|x| [x.id, "#{x.name}"]}
+    end
     
     def get_accessible_accounts(branch_id)
       accounts = if branch_id and not branch_id.blank?
