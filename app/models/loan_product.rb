@@ -18,6 +18,12 @@ class LoanProduct
   #This property is defined in init.rb after app load as Loan may not have loaded by the time this class initializes
   #  property :loan_type, Enum.send('[]'), :nullable => false, :index => true
   property :loan_type_string, String
+
+
+  # this is a dirty hack. all this should go into the RepaymentStyle
+  property :rounding, Integer
+
+
   property :valid_from, Date, :nullable => false, :index => true
   property :valid_upto, Date, :nullable => false, :index => true
   

@@ -17,6 +17,11 @@
       = select :loan_type_string, :collection => Loan.descendants.map{|f| [f, f.respond_to?(:display_name) ? f.display_name : f.to_s.snake_case.camelcase(' ')]}
   %tr
     %th
+      Rounding to
+    %td{:colspan => 2}
+      = text_field :rounding
+  %tr
+    %th
       Valid from
     %td
       = date_select_for @loan_product, :valid_from

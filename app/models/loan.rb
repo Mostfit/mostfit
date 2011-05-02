@@ -1547,7 +1547,6 @@ class EquatedWeeklyRoundedAdjustedLastPayment < Loan
   # these 2 methods define the pay back scheme
   # typically reimplemented in subclasses
   include ExcelFormula
-  property :rounding_factor, Integer
   # property :purpose,  String
 
   def self.display_name
@@ -1619,10 +1618,11 @@ private
     i = 1
     @rounded_schedule = {}
     balance = amount
-    actual_payment = (payment / 5).round * 5
+    rnd = loan_product.rounding
+    actual_payment = (payment / rnd).round * rnd
     while not done
       @rounded_schedule[i] = {}
-      @rounded_schedule[i][:interest_payable] = i <= @reducing_schedule.count ? @reducing_schedule[i][:interest_payable] : 0
+      @rounded_schedule[i][:interest_payable] = (i <= @reducing_schedule.count ? @reducing_schedule[i][:interest_payable] : 0).round(2)
       @rounded_schedule[i][:principal_payable] = [actual_payment - @rounded_schedule[i][:interest_payable], balance].min
       balance -= @rounded_schedule[i][:principal_payable]
       i += 1

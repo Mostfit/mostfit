@@ -64,7 +64,7 @@ Merb::Router.prepare do
       resources :clients do
         resources :payments
         resources :comments        
-        resources :loans  do
+        resources :loans, :member => {:prepay => [:get, :put]}  do
           resources :payments
         end
       end
