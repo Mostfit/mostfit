@@ -1,0 +1,6 @@
+%h1 New Monthly Target
+= form_for(@monthly_target, :action => url(:monthly_targets) ) do
+  = partial :fields
+  = submit "Create"
+
+= link_to 'Back', url(:monthly_targets)

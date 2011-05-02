@@ -1,0 +1,21 @@
+%table.form
+  %tr
+    %th
+      Staff Member
+      %td
+        = select :staff_member_id, :collection => StaffMember.all(:active => true).map{|sm| [sm.id, sm.name_and_id]}, :selected => @monthly_target.staff_member_id ? @monthly_target.staff_member_id.to_s : nil
+  %tr
+    %th
+      For month
+      %td
+        = date_select_for(@monthly_target, "for_month", :date => @monthly_target.for_month)
+  %tr
+    %th
+      Disbursements Target
+      %td
+        = text_field :disbursements_target
+  %tr
+    %th
+      Collections Target
+      %td
+        = text_field :collections_target
