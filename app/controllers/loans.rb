@@ -369,6 +369,7 @@ class Loans < Application
     else
       staff = StaffMember.get(params[:received_by])
       raise ArgumentError.new("No staff member selected") unless staff
+      raise ArgumentError.new("No applicable fee for penalty") if (params[:fee].blank? and (not params[:penalty_amount].blank?))
       @date = Date.parse(params[:date])
       # make new applicable fee for the penalty
       debugger
