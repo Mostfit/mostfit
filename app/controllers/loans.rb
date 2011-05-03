@@ -374,20 +374,37 @@ class Loans < Application
       # make new applicable fee for the penalty
       debugger
       pmt_params = {:received_by => staff, :loan_id => @loan.id, :created_by => session.user, :client => @loan.client, :received_on => @date}
-      af = ApplicableFee.new(:amount => params[:penalty_amount], :applicable_type => 'Loan', :applicable_id => @loan.id, :fee_id => params[:fee], :applicable_on => @date)
-      af.save
-      fee_payments = params[:fees].map do |k,v| 
-        fee = Fee.get(k)
-        Payment.new({:amount => v.to_f, :fee => fee, :comment => fee.name, :type => :fees}.merge(pmt_params))
+      if params[:penalty_amount].to_i > 0
+        af = ApplicableFee.new(:amount => params[:penalty_amount], :applicable_type => 'Loan', :applicable_id => @loan.id, :fee_id => params[:fee], :applicable_on => @date)
+        af.save
+        penalty_pmt =  Payment.new({:amount => params[:penalty_amount].to_f, :fee_id => params[:fee], :comment => af.fee.name, :type => :fees}.merge(pmt_params))
       end
-      penalty_pmt =  Payment.new({:amount => params[:penalty_amount].to_f, :fee_id => params[:fee], :comment => af.fee.name, :type => :fees}.merge(pmt_params))
+      if params[:fees].blank?
+        fee_payments = []
+      else
+        fee_payments = params[:fees].map do |k,v| 
+          fee = Fee.get(k)
+          Payment.new({:amount => v.to_f, :fee => fee, :comment => fee.name, :type => :fees}.merge(pmt_params))
+        end.compact
+      end
       ppmt = Payment.new({:amount => params[:principal].to_f, :type => :principal}.merge(pmt_params))
       ipmt = Payment.new({:amount => params[:interest].to_f, :type => :interest}.merge(pmt_params))
-      success, p, i, f = @loan.make_payments(fee_payments + [penalty_pmt, ppmt, ipmt])
+      pmts = (fee_payments + [penalty_pmt, ppmt, ipmt].compact).select{|p| p.amount > 0}
+      if pmts.blank?
+        success = true
+      else
+        success, @p, @i, @f = @loan.make_payments(pmts)
+      end
       if success
+        debugger
+        if params[:writeoff]
+          @loan.written_off_on = @date
+          @loan.written_off_by = staff
+          @loan.save
+        end
         redirect url_for_loan(@loan), :message => {:notice => "Loan has been prepayed"} 
       else
-        af.destroy!
+        af.destroy! if af
         render
       end
     end
