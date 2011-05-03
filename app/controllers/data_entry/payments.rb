@@ -10,7 +10,6 @@ module DataEntry
     end
 
     def by_center
-      debugger
       @center = Center.get(params[:center_id]) if params[:center_id]
       if params[:center_text] and not @center
         @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
@@ -41,7 +40,6 @@ module DataEntry
           bulk_payments_and_disbursals
           mark_attendance
         end
-        debugger
         if @errors.blank?
           return_url = params[:return]||url(:data_entry)
           notice = 'All payments made succesfully'

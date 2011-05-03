@@ -43,7 +43,8 @@ class Payment
   validates_with_method :deleted_by,  :method => :properly_deleted?
   validates_with_method :deleted_at,  :method => :properly_deleted?
   validates_with_method :not_approved, :method => :not_approved, :on => [:destroy]
-  validates_with_method :not_approved, :method => :not_paying_too_much?
+  validates_with_method :not_approved, :method => :not_paying_too_much?, :when => [:default]
+  validates_with_method :not_approved, :method => :not_paying_too_much_p_and_i?, :when => [:prepay]
   validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
   validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :principal,   :method => :is_positive?
@@ -219,6 +220,21 @@ class Payment
       return true
     end
   end
+
+  def not_paying_too_much_p_and_i?
+    if new?  # do not do this check on updates, it will count itself double
+      if type == :principal
+        a = loan.actual_outstanding_principal_on(received_on)
+      elsif type == :interest
+        a = loan.actual_outstanding_interest_on(received_on)
+      end
+      if (not a.blank?) and amount - a > 0.01
+        return [false, "#{type} is more than the total #{type} due"]
+      end
+    end
+    true
+  end
+
   def not_paying_too_much?
     if new?  # do not do this check on updates, it will count itself double
       if type == :principal

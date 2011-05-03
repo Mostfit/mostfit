@@ -362,10 +362,16 @@ class Loan
   # principal[0] and interest[1].
 
 
-  def repay(input, user, received_on, received_by, defer_update = false, style = :normal)
+  def repay(input, user, received_on, received_by, defer_update = false, style = :normal, context = :default)
+    pmts = get_payments(input, user, received_on, received_by, defer_update, style, context)
+    x = make_payments(pmts, context, defer_update)
+    x
+  end
+
+  def get_payments(input, user, received_on, received_by, defer_update = false, style = :normal, context = :default)
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
-    unless input.is_a? Array or input.is_a? Fixnum or input.is_a? Float
+    unless input.is_a? Array or input.is_a? Fixnum or input.is_a? Float or input.is_a?(Hash)
       raise "the input argument of Loan#repay should be of class Fixnum or Array"
     end
     raise "cannot repay a loan that has not been saved" if new?
@@ -389,36 +395,43 @@ class Loan
       end
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0], input[1]
+    elsif input.is_a? Hash
+      fees_paid = input[:fees]
+      interest = input[:interest]
+      principal = input[:principal]
     end
-
+    
     save_status = nil
-    payments = []
+    pmts = []
+    if fees_paid > 0
+      fee_payment = Payment.new(:loan => self, :created_by => user,
+                                :received_on => received_on, :received_by => received_by,
+                                :amount => fees_paid.round(2), :type => :fees)
+      pmts.push(fee_payment)
+    end
+    if interest > 0
+      int_payment = Payment.new(:loan => self, :created_by => user,
+                                :received_on => received_on, :received_by => received_by,
+                                :amount => interest.round(2), :type => :interest)
+      pmts.push(int_payment)
+    end
+    if principal > 0
+      prin_payment = Payment.new(:loan => self, :created_by => user,
+                                 :received_on => received_on, :received_by => received_by,
+                                 :amount => principal.round(2), :type => :principal)        
+      pmts.push(prin_payment)
+    end
+    pmts             
+  end
+
+  def make_payments(pmts, context = :default, defer_update = :false)
     Payment.transaction do |t|
       self.history_disabled=true
-      if fees_paid > 0
-        fee_payment = Payment.new(:loan => self, :created_by => user,
-                                  :received_on => received_on, :received_by => received_by,
-                                  :amount => fees_paid.round(2), :type => :fees)
-        payments.push(fee_payment)
-      end
-      if interest > 0
-        int_payment = Payment.new(:loan => self, :created_by => user,
-                                  :received_on => received_on, :received_by => received_by,
-                                  :amount => interest.round(2), :type => :interest)
-        payments.push(int_payment)
-      end
-      if principal > 0
-        prin_payment = Payment.new(:loan => self, :created_by => user,
-                                   :received_on => received_on, :received_by => received_by,
-                                   :amount => principal.round(2), :type => :principal)        
-        payments.push(prin_payment)
-      end
-      # do not create accounting entries individually
-      payments.each{|p| p.override_create_observer = true}    
+      pmts.each{|p| p.override_create_observer = true}    
 
-      if payments.collect{|payment| payment.save}.include?(false)
+      if pmts.collect{|payment| payment.save(context)}.include?(false)
         t.rollback
-        return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees},]        
+        return [false, pmts.find{|p| p.type==:principal}, pmts.find{|p| p.type==:interest}, pmts.find{|p| p.type==:fees},]        
       end
 
       AccountPaymentObserver.single_voucher_entry(payments)
@@ -429,8 +442,8 @@ class Loan
       @already_updated=false
       update_history(true)  # update the history if we saved a payment
     end
-    if payments.length > 0
-      return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
+    if pmts.length > 0
+      return [true, pmts.find{|p| p.type==:principal}, pmts.find{|p| p.type==:interest}, pmts.find{|p| p.type==:fees}]
     else
       return [false, nil, nil, nil]
     end
@@ -449,8 +462,7 @@ class Loan
     false
   end
 
-  def pay_fees(amount, date, received_by, created_by)
-    status = true
+  def get_fee_payments(amount, date, received_by, created_by)
     @fees = []
     fp = fees_payable_on(date)
     fs = fee_schedule
@@ -459,16 +471,19 @@ class Loan
       if fp.has_key?(k)
         p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k, :fee => k,
                         :received_by => received_by, :created_by => created_by, :client => client, :loan => self)
-        if p.save
-          amount -= p.amount
-          fp[k]  -= p.amount
-        else
-          status = false
-        end
+        amount -= p.amount
+        fp[k]  -= p.amount
         @fees << p
-
       end
     end
+    @fees
+  end
+    
+
+  def pay_fees(amount, date, received_by, created_by)
+    status = true
+    @fees = get_fee_payments(amount, date, received_by, created_by)
+    @fees.map{|f| f.save}
     [status, @fees]
   end
   # LOAN INFO FUNCTIONS - CALCULATIONS
@@ -555,6 +570,10 @@ class Loan
     return @schedule if @schedule
     @schedule = {}
     return @schedule unless amount.to_f > 0
+
+    #if self.respond_to?(:repayment_style) and self.repayment_style
+    #  extend Kernel.module_eval("Mostfit::RepaymentStyles:#{repayment_style.camel_case}")
+    #end
 
     principal_so_far = interest_so_far = fees_so_far = total = 0
     balance = amount
@@ -1551,50 +1570,6 @@ class EquatedWeeklyRoundedAdjustedLastPayment < Loan
 
   def self.display_name
     "Equated Payments - rounded, adjusted in last payment "
-  end
-
-  def scheduled_principal_for_installment(number)
-    # number unused in this implentation, subclasses may decide differently
-    # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > number_of_installments
-    return reducing_schedule[number][:principal_payable]
-  end
-
-  def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
-    # number unused in this implentation, subclasses may decide differently
-    # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
-    return reducing_schedule[number][:interest_payable]
-  end
-
-  def actual_number_of_installments
-    reducing_schedule.count
-  end
-
-  def installment_dates
-    insts = reducing_schedule.count
-    return @_installment_dates if @_installment_dates
-    if installment_frequency == :daily
-      # we have to br careful that when we do a holiday bump, we do not get stuck in an endless loop
-      ld = scheduled_first_payment_date - 1
-      @_installment_dates = []
-      (1..insts).each do |i|
-        ld += 1
-        if ld.cwday == weekly_off
-          ld +=1
-        end
-        if ld.holiday_bump.cwday == weekly_off # endless loop
-          ld.holiday_bump(:after)
-        end
-        @_installment_dates << ld
-      end
-      return @_installment_dates
-    end
-        
-    ensure_meeting_day = false
-    ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
-    ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
-    @_installment_dates = (0..(insts-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
   end
 
 

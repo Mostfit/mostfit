@@ -1,4 +1,6 @@
 %h2== Repayments &mdash; (#{link_to 'new', url_for_loan(@loan, 'payments/new')})
+%h2
+  = link_to 'Prepay this loan', url(:prepay_loan, @loan)
 - if @payments.blank?
   %p
     %i No repayments have been made so far.
