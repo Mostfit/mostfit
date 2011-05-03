@@ -427,7 +427,6 @@ class Loan
   def make_payments(pmts, context = :default, defer_update = :false)
     Payment.transaction do |t|
       self.history_disabled=true
-      debugger
       pmts.each{|p| p.override_create_observer = true}    
 
       if pmts.collect{|payment| payment.save(context)}.include?(false)
@@ -463,8 +462,7 @@ class Loan
     false
   end
 
-  def pay_fees(amount, date, received_by, created_by)
-    status = true
+  def get_fee_payments(amount, date, received_by, created_by)
     @fees = []
     fp = fees_payable_on(date)
     fs = fee_schedule
@@ -473,16 +471,19 @@ class Loan
       if fp.has_key?(k)
         p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k, :fee => k,
                         :received_by => received_by, :created_by => created_by, :client => client, :loan => self)
-        if p.save
-          amount -= p.amount
-          fp[k]  -= p.amount
-        else
-          status = false
-        end
+        amount -= p.amount
+        fp[k]  -= p.amount
         @fees << p
-
       end
     end
+    @fees
+  end
+    
+
+  def pay_fees(amount, date, received_by, created_by)
+    status = true
+    @fees = get_fee_payments(amount, date, received_by, created_by)
+    @fees.map{|f| f.save}
     [status, @fees]
   end
   # LOAN INFO FUNCTIONS - CALCULATIONS

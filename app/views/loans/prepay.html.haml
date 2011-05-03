@@ -1,15 +1,25 @@
 %h1 Prepay a loan.
 
 - unless params[:date]
-  = form_for(@loan, :action => url(:controller => 'loans', :action => :prepay, :id => @loan.id), :method => :get, :class => "help") do
+  .help{:style => "width: 75%"}
     Please tell us the date you wish to prepay this loan as of, so we can calculate the correct amounts.
-    = date_select(:date)
-    = submit "Submit"
+    = form_for(@loan, :action => url(:controller => 'loans', :action => :prepay, :id => @loan.id), :method => :get, :style => "background: #E3FF99; width: 80%; padding: 10px; margin: 10px; border-radius: 5px;") do
+      = date_select(:date)
+      = submit "Submit"
 - else
   - @date = Date.parse(params[:date])
   - os_prin = @loan.actual_outstanding_principal_on(@date)
   - os_int = @loan.actual_outstanding_interest_on(@date)
-
+  %h2 
+    Loan id
+    = @loan.id
+    (
+    = @loan.description
+    ) for client
+    = @loan.client.name
+    ==. Prepaying on 
+    = @date
+    
   = form_for(@loan, :action => url(:controller => 'loans', :action => :prepay, :id => @loan.id)) do
     %table
       %thead

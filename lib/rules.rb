@@ -149,7 +149,6 @@ module Mostfit
       REJECT_REGEX = /^(Merb|merb)::*/
       
       def self.deploy #apply the business rules
-        #debugger
         begin 
           Rule.all.each do |r|
             r.apply_rule

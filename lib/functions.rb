@@ -20,7 +20,6 @@ class Date
   end
 
   def count_weekday_uptil(weekday, d2)
-    debugger
     return 0 if d2 < self
     num_weeks = ((d2 - self) / 7).floor
     d_ = self + num_weeks

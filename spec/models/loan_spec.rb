@@ -451,7 +451,6 @@ describe Loan do
     @loan.update_history
     # no payments on unsaved (new_record? == true) loans:
     @loan.save.should == true
-    debugger
     r = @loan.repay(@loan.total_to_be_received, @user, Date.today, @manager)
     r[0].should == true
     @loan.status.should == :repaid

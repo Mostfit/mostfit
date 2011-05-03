@@ -1,1 +1,1 @@
-Loan should repay properly
+Fee should repay correctly

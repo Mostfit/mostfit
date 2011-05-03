@@ -372,7 +372,6 @@ class Loans < Application
       raise ArgumentError.new("No applicable fee for penalty") if (params[:fee].blank? and (not params[:penalty_amount].blank?))
       @date = Date.parse(params[:date])
       # make new applicable fee for the penalty
-      debugger
       pmt_params = {:received_by => staff, :loan_id => @loan.id, :created_by => session.user, :client => @loan.client, :received_on => @date}
       if params[:penalty_amount].to_i > 0
         af = ApplicableFee.new(:amount => params[:penalty_amount], :applicable_type => 'Loan', :applicable_id => @loan.id, :fee_id => params[:fee], :applicable_on => @date)
@@ -396,7 +395,6 @@ class Loans < Application
         success, @p, @i, @f = @loan.make_payments(pmts)
       end
       if success
-        debugger
         if params[:writeoff]
           @loan.written_off_on = @date
           @loan.written_off_by = staff
