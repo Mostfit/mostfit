@@ -1,6 +1,6 @@
 = partial :form
 - @accounts = @data
-- balance = @accounts.map{|a| a.opening_balance_as_of(params[:cash_book][:from_date]) || 0}.reduce(:+)
+- balance = @accounts.map{|a| a.opening_balance_as_of(@report.from_date) || 0}.reduce(:+)
 - if @data.empty?
   No data to display. No cash accounts set up yet?
 - else
@@ -10,7 +10,7 @@
         %th
           Date
         %th
-          Particulars
+          Narration
         %th
           Vch Type
         %th
@@ -39,7 +39,9 @@
         %td
           = posting.journal.comment
         %td
+          = posting.journal.journal_type.name
         %td
+          = posting.journal.transaction_id
         %td
           = posting.amount > 0 ? posting.amount.to_currency : "-"
         %td
@@ -54,5 +56,3 @@
       %td
         = balance.to_currency
       %td
-        
-        
