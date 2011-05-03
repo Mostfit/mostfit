@@ -38,7 +38,7 @@ class Weeksheet
     weeksheet.staff_member_id = center.manager.id
     weeksheet.date = date
     weeksheet.center_id = center.id
-    weeksheet.meeting_day = center.meeting_day?(date)? center.meeting_day : ""
+    weeksheet.meeting_day = center.meeting_day?(date)? center.meeting_day : nil
     weeksheet.meeting_time_hours  = center.meeting_day?(date) ? center.meeting_time_hours : ""
     weeksheet.meeting_time_minutes = center.meeting_day?(date) ? center.meeting_time_minutes : ""
     #save weeksheet if request for database
