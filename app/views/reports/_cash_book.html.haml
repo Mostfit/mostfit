@@ -2,7 +2,7 @@
 - @accounts = @data
 - balance = @accounts.map{|a| a.opening_balance_as_of(@report.from_date) || 0}.reduce(:+)
 - if @data.empty?
-  No data to display. No cash accounts set up yet?
+  %h3  Nothing to show. Perhaps no Cash Accounts set up?
 - else
   %table.report.nojs
     %tr.header

@@ -1,6 +1,6 @@
-=partial :form
+= partial :form
 - @accounts = @data
-- balance = @accounts.map{|a| a.opening_balance_as_of(@from_date) || 0}.reduce(:+)
+- balance = @accounts.map{|a| a.opening_balance_as_of(@report.from_date) || 0}.reduce(:+)
 - if @data.empty?
   %h3  Nothing to show. Perhaps no bank accounts set up?
 - else
@@ -10,7 +10,7 @@
         %th
           Date
         %th
-          Particulars
+          Narration
         %th
           Vch Type
         %th
@@ -21,7 +21,7 @@
           %b Credit
     %tr.total
       %td
-        = @from_date
+        = @report.from_date
       %td
         Opening Balance
       %td
@@ -39,14 +39,16 @@
         %td
           = posting.journal.comment
         %td
+          = posting.journal.journal_type.name
         %td
+          = posting.journal.transaction_id
         %td
           = posting.amount > 0 ? posting.amount.to_currency : "-"
         %td
           = posting.amount < 0 ? posting.amount.abs.to_currency : "-"
     %tr.total
       %td
-        = @to_date
+        = @report.to_date
       %td
         Closing Balance
       %td
