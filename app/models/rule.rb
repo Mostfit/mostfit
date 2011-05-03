@@ -40,6 +40,9 @@ class Rule
   end
 
   after :create do
+    # create tmp/ if it does not exist
+    FileUtils.mkdir_p(File.join(Merb.root, 'tmp'))
+
     FileUtils.touch(File.join(Merb.root, "tmp", "restart.txt"))
   end
 
