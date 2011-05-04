@@ -51,8 +51,8 @@
           - idue = [(lh ? lh.interest_due : 0), 0].max
           - ipaid = [(lh ? lh.interest_paid : 0), 0].max
           - fee_due = loan.total_fees_payable_on(@date) #fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
-          - fee_paid = fees_paid[loan.id] ? fees_paid[loan.id] : 0
-          - next if (pdue + ppaid + idue + ipaid + fee_due + fee_paid == 0)
+          - fee_paid = (loan.payments(:type => :fees, :received_on => @date).aggregate(:amount.sum) || 0).round(2)
+          - #next if (pdue + ppaid + idue + ipaid + fee_due + fee_paid == 0)
           - loan_row_count += 1
           %tr{ :class => cycle('odd','even') }
             - fee = 0
