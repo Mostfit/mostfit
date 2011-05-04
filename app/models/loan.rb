@@ -1563,15 +1563,57 @@ class RoundedPrincipalAndInterestLoan < PararthRounded
 end
 
 class EquatedWeeklyRoundedAdjustedLastPayment < Loan
-  # these 2 methods define the pay back scheme
-  # typically reimplemented in subclasses
   include ExcelFormula
+  property :rounding_factor, Integer
   # property :purpose,  String
 
   def self.display_name
     "Equated Payments - rounded, adjusted in last payment "
   end
 
+  def scheduled_principal_for_installment(number)
+    # number unused in this implentation, subclasses may decide differently
+    # therefor always supply number, so it works for all implementations
+    raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > number_of_installments
+    return reducing_schedule[number][:principal_payable]
+  end
+
+  def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
+    # number unused in this implentation, subclasses may decide differently
+    # therefor always supply number, so it works for all implementations
+    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
+    return reducing_schedule[number][:interest_payable]
+  end
+
+  def actual_number_of_installments
+    reducing_schedule.count
+  end
+
+  def installment_dates
+    insts = reducing_schedule.count
+    return @_installment_dates if @_installment_dates
+    if installment_frequency == :daily
+      # we have to br careful that when we do a holiday bump, we do not get stuck in an endless loop
+      ld = scheduled_first_payment_date - 1
+      @_installment_dates = []
+      (1..insts).each do |i|
+        ld += 1
+        if ld.cwday == weekly_off
+          ld +=1
+        end
+        if ld.holiday_bump.cwday == weekly_off # endless loop
+          ld.holiday_bump(:after)
+        end
+        @_installment_dates << ld
+      end
+      return @_installment_dates
+    end
+        
+    ensure_meeting_day = false
+    ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
+    ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
+    @_installment_dates = (0..(insts-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
+  end
 
 private
   def reducing_schedule
