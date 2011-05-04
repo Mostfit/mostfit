@@ -10,10 +10,9 @@ namespace :mostfit do
     desc "Conversion of Flat to Reducing Balance Loans"
     task :flat_to_reducing, :loan_id do |task, args|
       last_date = Date.new(2011, 03, 31)
-      hash = {:loan_product_id => [2, 13]}
-      f = File.open("tmp/flat_to_reducing.csv", "w")
+      hash = {:loan_product_id => [13, 2, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]}
+      f = File.open("tmp/flat_to_reducing_#{DateTime.now.to_s}.csv", "w")
       f.puts("\"Loan Id\",\"Amount\", \"Interest Rate\", \"status\", \"errors\"")
-
 
       if args[:loan_id]
         lid = args[:loan_id].to_i
@@ -31,6 +30,28 @@ namespace :mostfit do
           l.interest_rate = 31.504/100
         elsif l.loan_product_id == 2
           l.interest_rate = 29.2501/100
+        elsif l.loan_product_id == 15
+          l.interest_rate = 14.67/100
+        elsif l.loan_product_id == 16
+          l.interest_rate = 28.74/100
+        elsif l.loan_product_id == 17
+          l.interest_rate = 12.01/100
+        elsif l.loan_product_id == 18
+          l.interest_rate = 15.70/100
+        elsif l.loan_product_id == 19
+          l.interest_rate = 26.89/100
+        elsif l.loan_product_id == 20
+          l.interest_rate = 12.88/100
+        elsif l.loan_product_id == 21
+          l.interest_rate = 17.49/100
+        elsif l.loan_product_id == 22
+          l.interest_rate = 30.04/100
+        elsif l.loan_product_id == 23
+          l.interest_rate = 11.79/100
+        elsif l.loan_product_id == 24
+          l.interest_rate = 15.56/100
+        elsif l.loan_product_id == 25
+          l.interest_rate = 26.76/100
         end
         l.save!
         loan = Loan.get(l.id)
