@@ -621,6 +621,30 @@ function fillAccounts(){
 	                         });
 }
 
+function fillCashAccounts(){
+    $("#branch_selector").change(function(){
+	                             $.ajax({
+					         type: "GET",
+						 url: "/branches/cash_accounts/"+$("#branch_selector").val(),
+						 success: function(data){
+						     $("#cash_account_selector").html(data);
+					     }
+					 });
+	                        });
+}
+
+function fillBankAccounts(){
+    $("#branch_selector").change(function(){
+	                             $.ajax({
+					         type: "GET",
+						 url: "/branches/bank_accounts/"+$("#branch_selector").val(),
+						 success: function(data){
+						     $("#bank_account_selector").html(data);
+					     }
+					 });
+	                       });
+}
+
 function fillFundingLines(){
     $("#funder_selector").change(function(){
 	                             $.ajax({
@@ -713,6 +737,8 @@ $(document).ready(function(){
 		      fillCenters();
 		      fillAccounts();
 		      fillFundingLines();
+		      fillCashAccounts();
+		      fillBankAccounts();
 		      //Handling targets form
 		      $("select#target_attached_to").change(function(){
 								$.ajax({

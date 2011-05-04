@@ -89,6 +89,22 @@ class Branches < Application
     end
   end
 
+  def cash_accounts
+    if params[:id]
+      branch = Branch.get(params[:id])
+      next unless branch
+      return("<option value=''>Select account</option>"+branch.accounts(:account_category => "Cash", :order => [:name]).map{|a| "<option value=#{a.id}>#{a.name}</option>"}.join)
+    end
+  end
+
+  def bank_accounts
+    if params[:id]
+      branch = Branch.get(params[:id])
+      next unless branch
+      return("<option value=''>Select account</option>"+branch.accounts(:account_category => "Bank", :order => [:name]).map{|a| "<option value=#{a.id}>#{a.name}</option>"}.join)
+    end
+  end
+
   # this redirects to the proper url, used from the router
   def redirect_to_show(id)
     raise NotFound unless @branch = Branch.get(id)

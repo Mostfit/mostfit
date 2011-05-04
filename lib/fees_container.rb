@@ -9,7 +9,9 @@ module FeesContainer
       # if this loan has some applicable fees, then we only update the date, nothing else
       apfees.each do |af|
         method = @payable_models[af.fee.payable_on][1]
-        date = (self.send(method) if self.respond_to?(method))|| (self.send("scheduled_#{method}") if self.respond_to?("scheduled_#{method}"))
+        if method
+          date = (self.send(method) if self.respond_to?(method))|| (self.send("scheduled_#{method}") if self.respond_to?("scheduled_#{method}"))
+        end
         next unless date
         af.applicable_on = date
         af.save

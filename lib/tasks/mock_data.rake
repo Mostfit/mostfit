@@ -154,13 +154,15 @@ namespace :mostfit do
       Merb.logger.info! "Start mock:all_payments rake task at #{t0}"
       busy_user = User.get(1)
       count = 0
-      if Payment.all.empty?
-        loan_ids = repository.adapter.query("SELECT id from loans")
+      debugger
+      if 1 #Payment.all.empty?
+        loan_ids = repository.adapter.query("SELECT id from loans WHERE deleted_at IS NULL")
       else
-        loan_ids = repository.adapter.query("SELECT id from loans WHERE id > (select max(loan_id) from payments)")
+        loan_ids = repository.adapter.query("SELECT id from loans WHERE id > (select max(loan_id) from payments) AND deleted_at IS NULL")
       end
       puts "1: #{Time.now - t0}"
       loan_ids.each do |loan_id|
+        debugger
         sql = " INSERT INTO `payments` (`received_by_staff_id`, `amount`, `type`, `created_by_user_id`, `loan_id`, `received_on`, `client_id`) VALUES ";
         _t0 = Time.now
         loan = Loan.get(loan_id)
@@ -168,12 +170,13 @@ namespace :mostfit do
         p "Doing loan No. #{loan.id}...."
         loan.history_disabled = true  # do not update the hisotry for every payment
         dates      = loan.installment_dates.reject { |x| x > Date.today or x < loan.disbursal_date }
-        prin = loan.scheduled_principal_for_installment(1)
-        int = loan.scheduled_interest_for_installment(1)
         values = []
         dates.each do |date|
+          prin = loan.scheduled_principal_for_installment(loan.installment_for_date(date))
+          int = loan.scheduled_interest_for_installment(loan.installment_for_date(date))
           values << "(#{staff_member.id}, #{prin}, 1, 1, #{loan.id}, '#{date}', #{loan.client.id})"
           values << "(#{staff_member.id}, #{int}, 2, 1, #{loan.id}, '#{date}', #{loan.client.id})"
+          count += 1
         end
         puts "done constructing sql in #{Time.now - _t0}"
         if not values.empty?

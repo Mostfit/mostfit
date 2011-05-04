@@ -45,6 +45,11 @@
       Allow this condition?
     %td
       = @rule.permit
+  %tr
+    %td
+      Active
+    %td
+      = @rule.active
 
 = link_to 'Edit',  url(:edit_rule,  @rule)
 |

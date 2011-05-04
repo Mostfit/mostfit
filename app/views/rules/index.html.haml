@@ -14,6 +14,8 @@
       %b Rules
     %td
       %b On match
+    %td
+      %b Active
   - for rule in @rules
     %tr
       %td
@@ -43,4 +45,6 @@
             %br
       %td
         = rule.permit ? 'Allow' : 'Disallow'
+      %td
+        = rule.active ? 'Active' : 'Not Active'
 = link_to 'New', url(:new_rule), :class => "new"
