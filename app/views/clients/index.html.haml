@@ -1,6 +1,6 @@
 .graph
   = ofc2(430, 250, url(:graph_data, :action => 'center', :id => @center.id, :scope_unit => 'months', :scope_size => 3) )
-%h1== Center: <i>#{@center.name}</i>
+%h1== Center: <i>#{@center.name}</i> (#{@clients.count} clients)
 %div.maininfo
   %table.narrow.form{ :style => "width: 40%;" }
     %tr.odd

@@ -59,7 +59,6 @@ class Payments < Application
   end
 
   def delete(id)
-    debugger
     only_provides :html
     @payment = Payment.get(id)
     raise NotFound unless @payment

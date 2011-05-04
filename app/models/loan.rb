@@ -672,7 +672,6 @@ class Loan
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    debugger
     raise "number out of range, got #{number}" if number < 1 or number > actual_number_of_installments
     (amount.to_f / number_of_installments).round(2)
   end
