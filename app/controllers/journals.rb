@@ -20,7 +20,6 @@ class Journals < Application
   end
 
   def add_account
-    @branch = (params[:branch_id] and not params[:branch_id].blank? ? Branch.get(params[:branch_id]) : nil)
     partial :account_amount, :layout => layout?, :last_account => true, :account_type => (params[:account_type]||"credit_account").to_sym, :account => {}
   end
 
@@ -178,6 +177,6 @@ class Journals < Application
 
   private
   def get_context
-    @branch       = Branch.get(params[:branch_id]) if params[:branch_id]
+    @branch       = Branch.get(params[:branch_id]) if params[:branch_id] and params[:branch_id].to_i > 0
   end
 end # Journals
