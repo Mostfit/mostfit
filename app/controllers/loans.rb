@@ -395,6 +395,8 @@ class Loans < Application
         success, @p, @i, @f = @loan.make_payments(pmts)
       end
       if success
+        @loan.history_disabled = false
+        @loan.update_history
         if params[:writeoff]
           @loan.written_off_on = @date
           @loan.written_off_by = staff
