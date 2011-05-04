@@ -13,6 +13,11 @@
       = select :permit, :collection => [[true, "Yes"], [false, "No"]]  
   %tr
     %td
+      %b Activate
+    %td
+      = check_box :active
+  %tr
+    %td
       %b Applicable for
     %td
       = select :model_name, :collection => Mostfit::Business::Rules.all_models.map{|x| [x.to_s, x.to_s.camelcase(' ')]}.sort, :class => "rules", :id => "select_0", :prompt => "Select Applicable Type"

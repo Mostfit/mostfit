@@ -40,6 +40,9 @@ class Rule
   end
 
   after :create do
+    # create tmp/ if it does not exist
+    FileUtils.mkdir_p(File.join(Merb.root, 'tmp'))
+
     FileUtils.touch(File.join(Merb.root, "tmp", "restart.txt"))
   end
 
@@ -47,7 +50,8 @@ class Rule
   def apply_rule
     #puts "Applying Rule #{@name}"
     h = {:name => @name, :on_action => @on_action, :model_name => @model_name, 
-	    :permit => @permit, :condition => @condition, :precondition => @precondition}
+	    :permit => @permit, :condition => @condition, :precondition => @precondition,
+            :active => @active}
     if h[:condition] == nil
       return [false, "no condition given"]
     end
