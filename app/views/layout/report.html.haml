@@ -1,0 +1,33 @@
+!!! Strict
+%html{ "xml:lang" => "en", :lang => "en", :xmlns => "http://www.w3.org/1999/xhtml" }
+  %head
+    %meta{ :content => "text/html; charset=utf-8", "http-equiv" => "content-type" }/
+    %title
+      = page_title_str = page_title
+    %link{ :rel => "icon", :type => "image/ico", :href => "/favicon.ico" }/
+    = css_include_tag :screen, :media => "screen, projection"
+    = css_include_tag :print, :media => "print"
+    = css_include_tag :style, :media => "screen, projection"
+    = js_include_tag :jquery, :application, "jquery.floatheader.min.js"
+  %body.fullwidth
+    - if session.authenticated?
+      #content
+      .container.fullwidth
+        - if message
+          #flash-messages.span-17.prefix-5.suffix-5.last            
+            - message.each do |key, value|
+              .flash{ :class => key.to_s }
+                %p= value.gsub("\n", "<br/>")
+        = link_to("Back to reports", url(:reports), :class => "top_link")
+        %br
+        = catch_content :for_layout
+    #footer
+      %p{:style => "position: relative; right: 10%; float: right;"}
+        - if session.authenticated? and session.user.role == :admin and Merb.env == "development"
+          %form{:action => "/admin/proxy_logon", :methoid => :post}
+            login as
+            = select :user_id, :collection => User.all(:order => [:login]).map{|u| [u.id, u.login]}
+            = submit "go"
+      %p{:style => "position: relative; right: 10%; float: right;"}
+        =image_tag("/images/mostfit_logo.png", :height => 80)
+      == &copy; 2010 Intellecap &mdash; This software is released under the #{link_to 'GNU Affero General Public License', 'http://www.gnu.org/licenses/agpl.html'}.
