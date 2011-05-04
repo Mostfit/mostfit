@@ -34,6 +34,14 @@ describe "Test the API call" do
     res.code.should ==  "200"
   end
 
+  it "Should be get all holidays" do
+    url = URI.parse("#{API_URL}/holidays.xml")
+    res = get_response(url)
+    doc = REXML::Document.new res.body
+    doc.root.elements[1].should_not == nil
+    res.code.should ==  "200"
+  end
+
   it "Should be get staff member details" do
     #get staff member id logged user
     url = URI.parse("#{API_URL}/browse.xml")
