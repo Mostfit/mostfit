@@ -1565,7 +1565,6 @@ end
 
 class EquatedWeeklyRoundedAdjustedLastPayment < Loan
   include ExcelFormula
-  property :rounding_factor, Integer
   # property :purpose,  String
 
   def self.display_name
