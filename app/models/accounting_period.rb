@@ -19,6 +19,11 @@ class AccountingPeriod
 
   validates_with_method :cannot_overlap
 
+  def <=>(other)
+    return (end_date <=> other.begin_date) if other.respond_to?(:begin_date) && other.begin_date
+    return 0
+  end
+
   def duration
     (end_date - begin_date).to_i + 1
   end
@@ -41,13 +46,26 @@ class AccountingPeriod
   end
 =end
 
-  def AccountingPeriod.get_accounting_period(for_date = nil)
-    for_date = for_date || Date.today
+  def AccountingPeriod.get_accounting_period(for_date = Date.today)
     AccountingPeriod.first(:begin_date.lte => for_date, :end_date.gte => for_date)
   end
   
   def AccountingPeriod.get_current_accounting_period
     get_accounting_period
+  end
+
+  def prev
+    all_periods = AccountingPeriod.all.sort
+    return nil if self == all_periods.first
+    idx = all_periods.index(self)
+    all_periods[idx - 1]
+  end
+
+  def next
+    all_periods = AccountingPeriod.all.sort
+    return nil if self == all_periods.last
+    idx = all_periods.index(self)
+    all_periods[idx + 1]
   end
 
 end
