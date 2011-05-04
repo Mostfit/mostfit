@@ -672,13 +672,14 @@ class Loan
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    debugger
+    raise "number out of range, got #{number}" if number < 1 or number > actual_number_of_installments
     (amount.to_f / number_of_installments).round(2)
   end
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    raise "number out of range, got #{number}" if number < 1 or number > actual_number_of_installments
     (amount * interest_rate / number_of_installments).round(2)
   end
 
@@ -735,14 +736,14 @@ class Loan
              then  ((date - scheduled_first_payment_date).to_f / 28).floor + 1
              when  :monthly
              then  count = 1
-               while shift_date_by_installments(date, -count) >= scheduled_first_payment_date and count < number_of_installments
+               while shift_date_by_installments(date, -count) >= scheduled_first_payment_date and count < actual_number_of_installments
                  count += 1
                end
                count
              else
                raise ArgumentError.new("Strange period you got..")
              end
-    [result, number_of_installments].min  # never return more than the number_of_installments
+    [result, actual_number_of_installments].min  # never return more than the number_of_installments
   end
 
 
@@ -827,7 +828,7 @@ class Loan
   def scheduled_repaid_on
     # first payment is on "scheduled_first_payment_date", so number_of_installments-1 periods later
     # we find the scheduled_repaid_on date.
-    shift_date_by_installments(scheduled_first_payment_date, number_of_installments - 1)
+    shift_date_by_installments(scheduled_first_payment_date, actual_number_of_installments - 1)
   end
   # the installment dates
   def installment_dates
@@ -852,7 +853,7 @@ class Loan
     ensure_meeting_day = false
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
-    @_installment_dates = (0..(number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
+    @_installment_dates = (0..(actual_number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
   end
 
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
@@ -1574,14 +1575,14 @@ class EquatedWeeklyRoundedAdjustedLastPayment < Loan
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > number_of_installments
+    raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > actual_number_of_installments
     return reducing_schedule[number][:principal_payable]
   end
 
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
+    raise "number out of range, got #{number}" if number < 0 or number > actual_number_of_installments
     return reducing_schedule[number][:interest_payable]
   end
 
@@ -1645,7 +1646,6 @@ private
       i += 1
       done = true if balance == 0 
     end
-    self.number_of_installments = i - 1
     return @rounded_schedule
   end
 
