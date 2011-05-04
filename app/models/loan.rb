@@ -16,10 +16,17 @@ class Loan
   before :destroy, :verified_cannot_be_deleted
   #  after  :destroy, :update_history
 
+  before :valid?, :set_amount
+  validates_with_method :original_properties_specified?, :when => Proc.new{|l| l.taken_over?}
+  validates_with_method :taken_over_properly?, :when => Proc.new{|l| l.taken_over?}
+
+
+
   attr_accessor :history_disabled  # set to true to disable history writing by this object
   attr_accessor :interest_percentage
   attr_accessor :already_updated
   attr_accessor :orig_attrs
+  attr_accessor :extended          # set to true if you have mixed in the appropriate loan repayment functions
 
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false, :index => true
@@ -617,6 +624,10 @@ class Loan
   end
 
 
+  def taken_over?
+    taken_over_on || taken_over_on_installment_number
+  end
+
   def actual_number_of_installments
     # we need this beacuse in laons with rounding, you may end up with more/less installments than advertised!!
     # crazy MFI product managers!!!
@@ -627,6 +638,15 @@ class Loan
     # this is the fount of all knowledge regarding the scheduled payments for the loan. 
     # it feeds into every other calculation about the loan schedule such as get_scheduled, calculate_history, etc.
     # if this is wrong, everything about this loan is wrong.
+    if self.taken_over?
+      unless self.respond_to?(:taken_over_properly?)
+        extend Loaner::TakeoverLoan 
+      end
+    end
+    actual_payment_schedule
+  end
+
+  def actual_payment_schedule
     return @schedule if @schedule
     @schedule = {}
     return @schedule unless amount.to_f > 0
@@ -983,6 +1003,12 @@ class Loan
         :interest_paid                       => int.round(2)
       }
     end
+
+    if taken_over?
+      applied_on_date = self.applied_on.holiday_bump if self.applied_on
+      @history_array = @history_array.reject{|h| h[:date] < applied_on_date}      
+    end
+
     Merb.logger.info "History calculation took #{Time.now - t} seconds"
     @history_array
   end
@@ -1038,6 +1064,12 @@ class Loan
     end
   end
 
+  def set_amount
+    return unless taken_over?
+    # this sets the amount to be the outstanding amount unless it is already set
+    amount = payment_schedule[payment_schedule.keys.min][:balance]
+    amount_applied_for = amount
+  end
 
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
   include Misfit::LoanValidators
@@ -1476,22 +1508,13 @@ end
 # Remember, the payments on the loan remain exactly the same as before for the customer.
 
 
-(Loan.descendants.to_a - [Loan]).each do |c|
-  k = Class.new(c)
-  Object.const_set "TakeOver#{c.to_s}", k # we have to name it first otherwise DataMapper craps out
-  Kernel.const_get("TakeOver#{c.to_s}").class_eval do
-    before :valid?, :set_amount
-    validates_with_method :original_properties_specified?
-    validates_with_method :taken_over_properly?
+
+module Loaner
+  module TakeoverLoan
     def self.display_name
       "Take over #{super}"
     end
 
-    def set_amount
-      # this sets the amount to be the outstanding amount unless it is already set
-      amount = payment_schedule[payment_schedule.keys.min][:balance]
-      amount_applied_for = amount
-    end
 
     def original_properties_specified?
       blanks = []
@@ -1513,14 +1536,14 @@ end
       end
     end  
 
-    def calculate_history
-      super
-      applied_on_date = self.applied_on.holiday_bump if self.applied_on
-      @history_array = @history_array.reject{|h| h[:date] < applied_on_date}      
-      return @history_array
-    end
+#    def calculate_history
+#      super
+#      applied_on_date = self.applied_on.holiday_bump if self.applied_on
+#      @history_array = @history_array.reject{|h| h[:date] < applied_on_date}      
+#      return @history_array
+#    end
     
-    def payment_schedule
+    def actual_payment_schedule
       return @schedule if @schedule
       raise ArgumentError "This takeover loan is missing takeover information"  unless (self.taken_over_on || self.taken_over_on_installment_number)
       # TODO this exception is raised because we need to respect the first payment date and subsequent dates have to be 
