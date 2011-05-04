@@ -246,8 +246,8 @@ module Mostfit
         end
         function_name = hash[:name].to_s.downcase.gsub(" ", "_")
         hash[:model_name].send(:define_method, function_name) do
-          # no need to do anything if the rule is not active
-          return [false, "#{hash[:name]} not active"] unless hash[:active]
+          # no need to match the rule if it is not active
+          return true unless hash[:active]
 
           if hash.key?(:permit)
             if(hash[:permit] == "false")
