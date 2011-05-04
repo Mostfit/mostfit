@@ -84,7 +84,7 @@ class RuleBook
       raise "NoRuleFoundError" unless rules.compact.length == 1
       return [credit_accounts, debit_accounts, rules]
     end
-    
+
     if rule = first(:action => transaction_type, :branch => branch, :fee => fee, :active => true)
     elsif rule = first(:action => transaction_type, :branch => nil, :fee => nil, :active => true)
     elsif rule = first(:action => transaction_type, :branch => nil, :fee => fee, :active => true)

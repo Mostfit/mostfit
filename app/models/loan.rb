@@ -402,38 +402,37 @@ class Loan
     end
     
     save_status = nil
-    pmts = []
+    payments = []
     if fees_paid > 0
       fee_payment = Payment.new(:loan => self, :created_by => user,
                                 :received_on => received_on, :received_by => received_by,
                                 :amount => fees_paid.round(2), :type => :fees)
-      pmts.push(fee_payment)
+      payments.push(fee_payment)
     end
     if interest > 0
       int_payment = Payment.new(:loan => self, :created_by => user,
                                 :received_on => received_on, :received_by => received_by,
                                 :amount => interest.round(2), :type => :interest)
-      pmts.push(int_payment)
+      payments.push(int_payment)
     end
     if principal > 0
       prin_payment = Payment.new(:loan => self, :created_by => user,
                                  :received_on => received_on, :received_by => received_by,
                                  :amount => principal.round(2), :type => :principal)        
-      pmts.push(prin_payment)
+      payments.push(prin_payment)
     end
-    pmts             
+    payments             
   end
 
-  def make_payments(pmts, context = :default, defer_update = :false)
+  def make_payments(payments, context = :default, defer_update = :false)
     Payment.transaction do |t|
       self.history_disabled=true
-      pmts.each{|p| p.override_create_observer = true}    
+      payments.each{|p| p.override_create_observer = true}    
 
-      if pmts.collect{|payment| payment.save(context)}.include?(false)
+      if payments.collect{|payment| payment.save(context)}.include?(false)
         t.rollback
-        return [false, pmts.find{|p| p.type==:principal}, pmts.find{|p| p.type==:interest}, pmts.find{|p| p.type==:fees},]        
+        return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees},]        
       end
-
       AccountPaymentObserver.single_voucher_entry(payments)
     end
 
@@ -442,8 +441,8 @@ class Loan
       @already_updated=false
       update_history(true)  # update the history if we saved a payment
     end
-    if pmts.length > 0
-      return [true, pmts.find{|p| p.type==:principal}, pmts.find{|p| p.type==:interest}, pmts.find{|p| p.type==:fees}]
+    if payments.length > 0
+      return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
     else
       return [false, nil, nil, nil]
     end
