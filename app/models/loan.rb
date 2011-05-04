@@ -1253,7 +1253,7 @@ private
     case installment_frequency
     when :weekly
       52
-    when :bi_weekly
+    when :biweekly
       26
     when :monthly
       12
