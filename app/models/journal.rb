@@ -89,7 +89,6 @@ class Journal
         journal.errors.add(:postings, reason)
       end
     end
-
     return [status, journal]
   end
   
@@ -128,21 +127,25 @@ class Journal
         x.DATA{
           x.TALLYMESSAGE{
             Journal.all(hash).each do |j|
-              debit_posting, credit_posting = j.postings
+              debit_posting, credit_posting = j.postings.group_by{ |p| p.amount > 0}.values
               x.VOUCHER{
                 x.DATE j.date.strftime("%Y%m%d")
                 x.NARRATION j.comment
                 x.VOUCHERTYPENAME j.journal_type.name
                 x.VOUCHERNUMBER j.id
-                x.tag! 'ALLLEDGERENTRIES.LIST' do
-                  x.LEDGERNAME(credit_posting.account.name)
-                  x.ISDEEMEDPOSITIVE("No")
-                  x.AMOUNT(credit_posting.amount)
+                credit_posting.each do |p|
+                  x.tag! 'ALLLEDGERENTRIES.LIST' do
+                    x.LEDGERNAME(p.account.name)
+                    x.ISDEEMEDPOSITIVE("No")
+                    x.AMOUNT(p.amount)
+                  end
                 end
-                x.tag! 'ALLLEDGERENTRIES.LIST' do
-                  x.LEDGERNAME(debit_posting.account.name)
-                  x.ISDEEMEDPOSITIVE("Yes")
-                  x.AMOUNT(debit_posting.amount)
+                debit_posting.each do |p|
+                  x.tag! 'ALLLEDGERENTRIES.LIST' do
+                    x.LEDGERNAME(p.account.name)
+                    x.ISDEEMEDPOSITIVE("Yes")
+                    x.AMOUNT(p.amount)
+                  end
                 end
               }
             end
