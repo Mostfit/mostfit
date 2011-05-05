@@ -12,7 +12,7 @@ namespace :mostfit do
       last_date = Date.new(2011, 03, 31)
       hash = {:loan_product_id => [13, 2, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]}
       f = File.open("tmp/flat_to_reducing_#{DateTime.now.to_s}.csv", "w")
-      f.puts("\"Loan Id\",\"Amount\", \"Interest Rate\", \"status\", \"errors\"")
+      f.puts("\"Loan Id\", \"Loan Product Id\", \"Loan Product Name\", \"Amount\", \"Interest Rate\", \"status\", \"errors\"")
 
       if args[:loan_id]
         lid = args[:loan_id].to_i
@@ -88,9 +88,9 @@ namespace :mostfit do
         }
         Loan.get(l.id).update_history
         if errors.length > 0
-          f.puts("#{l.id}, #{l.amount}, #{l.interest_rate}, errors, #{errors.join(';')}")
+          f.puts("#{l.id}, #{l.loan_product_id},\"#{l.loan_product.name}\", #{l.amount}, #{l.interest_rate}, errors, #{errors.join(';')}")
         else
-          f.puts("#{l.id}, #{l.amount}, #{l.interest_rate}, success, #{errors.join(';')}")
+          f.puts("#{l.id}, #{l.loan_product_id}, \"#{l.loan_product.name}\", #{l.amount}, #{l.interest_rate}, success, #{errors.join(';')}")
         end
       }
       f.close
