@@ -395,13 +395,12 @@ class Loans < Application
         success, @p, @i, @f = @loan.make_payments(pmts)
       end
       if success
+        if params[:writeoff]
+          @loan.preclosed_on = @date
+          @loan.preclosed_by = staff
+        end
         @loan.history_disabled = false
         @loan.update_history
-        if params[:writeoff]
-          @loan.written_off_on = @date
-          @loan.written_off_by = staff
-          @loan.save
-        end
         redirect url_for_loan(@loan), :message => {:notice => "Loan has been prepayed"} 
       else
         af.destroy! if af

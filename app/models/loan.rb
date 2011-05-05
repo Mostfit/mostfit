@@ -39,6 +39,7 @@ class Loan
   property :suggested_written_off_on,       Date, :auto_validation => false, :index => true
   property :write_off_rejected_on,          Date, :auto_validation => false, :index => true
   property :validated_on,                   Date, :auto_validation => false, :index => true
+  property :preclosed_on,                   Date, :auto_validation => false, :index => true
   
   property :validation_comment,             Text
   property :created_at,                     DateTime, :index => true, :default => Time.now
@@ -51,6 +52,7 @@ class Loan
   property :rejected_by_staff_id,              Integer, :nullable => true, :index => true
   property :disbursed_by_staff_id,             Integer, :nullable => true, :index => true
   property :written_off_by_staff_id,           Integer, :nullable => true, :index => true
+  property :preclosed_by_staff_id,             Integer, :nullable => true, :index => true
   property :suggested_written_off_by_staff_id, Integer, :nullable => true, :index => true
   property :write_off_rejected_by_staff_id,    Integer, :nullable => true, :index => true
   property :validated_by_staff_id,             Integer, :nullable => true, :index => true
@@ -81,6 +83,7 @@ class Loan
   belongs_to :rejected_by,               :child_key => [:rejected_by_staff_id],               :model => 'StaffMember'
   belongs_to :disbursed_by,              :child_key => [:disbursed_by_staff_id],              :model => 'StaffMember'
   belongs_to :written_off_by,            :child_key => [:written_off_by_staff_id],            :model => 'StaffMember'
+  belongs_to :preclosed_by,              :child_key => [:preclosed_by_staff_id],            :model => 'StaffMember'
   belongs_to :suggested_written_off_by,  :child_key => [:suggested_written_off_by_staff_id],  :model => 'StaffMember'
   belongs_to :write_off_rejected_by,     :child_key => [:write_off_rejected_by_staff_id],     :model => 'StaffMember' 
   belongs_to :validated_by,              :child_key => [:validated_by_staff_id],              :model => 'StaffMember'
@@ -799,6 +802,7 @@ class Loan
                                  not (rejected_on and rejected_on.holiday_bump <= date)
     return :rejected             if (rejected_on and rejected_on.holiday_bump <= date)
     return :written_off          if (written_off_on and written_off_on <= date)
+    return :preclosed            if (preclosed_on and preclosed_on <= date)
     return :claim_settlement     if under_claim_settlement and under_claim_settlement.holiday_bump <= date
     total_received ||= total_received_up_to(date)
     principal_received ||= principal_received_up_to(date)

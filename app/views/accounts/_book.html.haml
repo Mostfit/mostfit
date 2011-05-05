@@ -38,9 +38,9 @@
       %td
       %td
       %td
-        = posting.amount > 0 ? posting.amount.to_currency : "-"
-      %td
         = posting.amount < 0 ? posting.amount.abs.to_currency : "-"
+      %td
+        = posting.amount > 0 ? posting.amount.to_currency : "-"
   %tr.total
     %td
       = @to_date

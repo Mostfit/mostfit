@@ -2,13 +2,13 @@ DEFAULT_JOURNAL_TYPES = ['Payment','Receipt','Journal']
 INSTALLMENT_FREQUENCIES = [:daily, :weekly, :biweekly, :monthly, :quadweekly]
 WEEKDAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 MONTHS = ["None", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-STATUSES = [:applied_in_future, :pending_approval, :rejected, :approved, :disbursed, :outstanding, :repaid, :written_off, :claim_settlement]
+STATUSES = [:applied_in_future, :pending_approval, :rejected, :approved, :disbursed, :outstanding, :repaid, :written_off, :claim_settlement, :preclosed]
 EPSILON  = 0.001
 INACTIVE_REASONS = ['', 'no_further_loans', 'death_of_client', 'death_of_spouse']
 ModelsWithDocuments = ['Area', 'Region', 'Branch', 'Center', 'Client', 'Loan', 'ClientGroup', 'StaffMember', 'User', 'Mfi', 'Funder', 
                        'InsuranceCompany', 'InsurancePolicy', 'Claim']
 CLAIM_DOCUMENTS = [:death_certificate, :center_declaration_form, :kyc_document]
-LOANS_NOT_PAYABLE = [nil, :repaid, :pending, :written_off, :claim_settlement]
+LOANS_NOT_PAYABLE = [nil, :repaid, :pending, :written_off, :claim_settlement, :preclosed]
 DUMP_FOLDER      = "db/daily"
 MASS_ENTRY_FIELDS = {
   :client => [:spouse_name, :account_number, :type_of_account, :bank_name, :bank_branch, :join_holder, :number_of_family_members, 

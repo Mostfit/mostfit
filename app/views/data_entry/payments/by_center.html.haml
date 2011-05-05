@@ -57,7 +57,7 @@
         Repayments
         %b
           (
-          = LoanHistory.all(:date => @date).select{|lh| (lh.principal_due + lh.interest_due) > 0.1}.count
+          = LoanHistory.all(:date => @date, :center => @center).select{|lh| (lh.principal_due + lh.interest_due) > 0.1}.count
           )
       %li#repayments
         Approvals
@@ -152,7 +152,7 @@
               %td
                 - klass = Loan.descendants.include?(obj.class) ? Loan : obj.class
                 = text_field :name => "paid[#{klass.to_s.snake_case}][#{obj.id}]", :value => fee.values.inject(0){|s,x| s+=x}, :cols => "5", :style => "width:50px;" 
-          - frt = Payment.all(:type => :fees, :received_on => @date)
+          - frt = @center.clients.payments(:type => :fees, :received_on => @date)
           - unless frt.blank?
             %tr
               %td{:colspan => "20", :style => "text-align: center"}
@@ -170,6 +170,16 @@
               %td
               %td.text
                 = f.fee.description
+          %tr.total
+            %td
+            %td
+              = frt.count
+              fee payments
+            %td
+            %td
+            %td
+              = frt.aggregate(:amount.sum)
+            %td
       - unless @fee_paying_things.values.inject({}){|s,x| s+=x}.length==0
 
         No fees due today

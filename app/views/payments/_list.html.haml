@@ -34,7 +34,7 @@
           %b= payment.type.to_s
         %td
           - if payment.loan_id 
-            = link_to('delete', url_for_loan(payment.loan, "payments/#{payment.id}/delete"), {:class => "confirm_click", :title => "Are you sure you want to delete this payment of #{payment.amount}"}) unless payment.verified_by_user_id
+            = link_to('delete', url_for_loan(payment.loan, "payments/#{payment.id}/delete", :return => url_for_loan(payment.loan) + "#repayments_made"), {:class => "confirm_click", :title => "Are you sure you want to delete this payment of #{payment.amount}"}) unless payment.verified_by_user_id
             - next if session.user.role!=:admin
             |
             = link_to('edit', url_for_loan(payment.loan, "payments/#{payment.id}/edit")) unless payment.verified_by_user_id
