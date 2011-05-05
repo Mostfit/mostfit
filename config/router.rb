@@ -77,7 +77,7 @@ Merb::Router.prepare do
     resources :funding_lines
   end
   resources :center_meeting_days
-
+  resources :repayment_styles
   match('/dashboard/centers/:report_type/:branch_id').to(:controller => 'dashboard', :action => "centers", :branch_id => ":branch_id", :report_type => ":report_type").name(:dashboard_centers)
   match('/design').to(:controller => 'loan_products', :action => 'design').name(:design_loan_product)
   match('/centers/:id/groups(/:group_id).:format').to(:controller => 'centers', :action => 'groups')

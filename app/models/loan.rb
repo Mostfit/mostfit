@@ -14,6 +14,7 @@ class Loan
   before :save,    :update_loan_cache
   after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
+
   #  after  :destroy, :update_history
 
   before :valid?, :set_amount
@@ -26,7 +27,7 @@ class Loan
   attr_accessor :interest_percentage
   attr_accessor :already_updated
   attr_accessor :orig_attrs
-  attr_accessor :extended          # set to true if you have mixed in the appropriate loan repayment functions
+  attr_accessor :loan_extended          # set to true if you have mixed in the appropriate loan repayment functions
 
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false, :index => true
@@ -119,6 +120,7 @@ class Loan
   belongs_to :created_by,                :child_key => [:created_by_user_id],                 :model => 'User'
   belongs_to :loan_utilization
   belongs_to :verified_by,               :child_key => [:verified_by_user_id],                :model => 'User'
+  belongs_to :repayment_style
 
   has n, :loan_history,                                                                       :model => 'LoanHistory'
   has n, :payments
@@ -282,6 +284,7 @@ class Loan
       ps[d][:total_paid] = ps[d][:principal] + ps[d][:interest]
       puts ([d.to_s] + titles[1..-1].map{|t| ps[d][t].round(4)}).map{|s| s.to_s.rjust(width - padding/2).ljust(width)}.join("|")
     end
+    false
   end
 
   def _show_ps
@@ -334,9 +337,9 @@ class Loan
     return nil  # i.e. when status is :applied or :rejected
   end
 
-  def repayment_style
-    :allow_both   # one of [:separated, :aggregated, :allow_both]
-  end
+#  def repayment_style
+#    :allow_both   # one of [:separated, :aggregated, :allow_both]
+#  end
 
   def interest_percentage  # code dup with the FundingLine
     return nil if interest_rate.blank?
@@ -638,10 +641,14 @@ class Loan
     # this is the fount of all knowledge regarding the scheduled payments for the loan. 
     # it feeds into every other calculation about the loan schedule such as get_scheduled, calculate_history, etc.
     # if this is wrong, everything about this loan is wrong.
+    debugger
     if self.taken_over?
       unless self.respond_to?(:taken_over_properly?)
         extend Loaner::TakeoverLoan 
       end
+    end
+    unless @loan_extended
+      extend_loan
     end
     actual_payment_schedule
   end
@@ -650,10 +657,6 @@ class Loan
     return @schedule if @schedule
     @schedule = {}
     return @schedule unless amount.to_f > 0
-
-    #if self.respond_to?(:repayment_style) and self.repayment_style
-    #  extend Kernel.module_eval("Mostfit::RepaymentStyles:#{repayment_style.camel_case}")
-    #end
 
     principal_so_far = interest_so_far = fees_so_far = total = 0
     balance = amount
@@ -746,6 +749,15 @@ class Loan
   
   # LOAN INFO FUNCTIONS - SCHEDULED
 
+  def extend_loan
+    unless @loan_extended
+      if self.repayment_style
+        self.extend(Kernel.module_eval("Mostfit::PaymentStyles::#{repayment_style.to_s}"))
+      end
+      @loan_extended = true
+    end
+  end
+
   # these 2 methods define the pay back scheme
   # These are ONE BASED
   # typically reimplemented in subclasses
@@ -755,6 +767,7 @@ class Loan
     raise "number out of range, got #{number}" if number < 1 or number > actual_number_of_installments
     (amount.to_f / number_of_installments).round(2)
   end
+
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
@@ -1069,6 +1082,10 @@ class Loan
     # this sets the amount to be the outstanding amount unless it is already set
     amount = payment_schedule[payment_schedule.keys.min][:balance]
     amount_applied_for = amount
+  end
+
+  def set_loan_product_parameters
+    repayment_style = self.loan_product.repayment_style
   end
 
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"

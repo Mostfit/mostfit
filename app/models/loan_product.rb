@@ -19,7 +19,6 @@ class LoanProduct
   #  property :loan_type, Enum.send('[]'), :nullable => false, :index => true
   property :loan_type_string, String
 
-
   # this is a dirty hack. all this should go into the RepaymentStyle
   property :rounding, Integer
   property :rounding_style, Enum.send('[]', *['', 'round', 'floor', 'ceil']), :default => 'round', :nullable => true, :index => true
@@ -40,6 +39,7 @@ class LoanProduct
   has n, :audit_trails, :auditable_type => "LoanProduct", :child_key => ["auditable_id"]
   
   belongs_to :insurance_product, :nullable => true
+  belongs_to :repayment_style
 
   validates_with_method :min_is_less_than_max
   validates_is_unique   :name
