@@ -451,6 +451,16 @@ module Merb
             end
       acc.map{|x| [x.id, "#{x.name}"]}
     end
+
+    #this function is for getting the list of accounts whose account_category is Bank and belongs to a particular branch.
+    def get_accessible_bank_accounts(branch_id)
+      acc = if branch_id and not branch_id.blank?
+              Account.all(:branch_id => @branch_id, :account_category => "Bank", :order => [:name])
+            else
+              []
+            end
+      acc.map{|x| [x.id, "#{x.name}"]}
+    end
     
     def get_accessible_accounts(branch_id)
       accounts = if branch_id and not branch_id.blank?

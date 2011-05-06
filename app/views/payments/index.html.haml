@@ -85,7 +85,7 @@
   %tr.odd
     %td First repayment
     %td
-      - if @loan.payments.empty?
+      - if @loan.payments(:type => [:principal, :interest]).empty?
         = @loan.scheduled_first_payment_date
         %br/
         %span.greytext (scheduled, no payments yet)

@@ -39,6 +39,9 @@
     %hr
     %h2 Choose loan product
     = select :name => :loan_product_id, :collection => LoanProduct.all(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :order => [:name], :linked_to_insurance => false).map{|lp| [lp.id, lp.name]}, :prompt => "select loan product"
+    %br
+    %span.greytext Loan Products listed above are valid loan products for today which are not linked to any insurance
+    %br
     = submit "Go"
 - else
   = form_for(@loan, :action => url(:controller => :loans, :action => :bulk_create), :class => "_disable_button_") do

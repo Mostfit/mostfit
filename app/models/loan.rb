@@ -39,6 +39,7 @@ class Loan
   property :suggested_written_off_on,       Date, :auto_validation => false, :index => true
   property :write_off_rejected_on,          Date, :auto_validation => false, :index => true
   property :validated_on,                   Date, :auto_validation => false, :index => true
+  property :preclosed_on,                   Date, :auto_validation => false, :index => true
   
   property :validation_comment,             Text
   property :created_at,                     DateTime, :index => true, :default => Time.now
@@ -51,6 +52,7 @@ class Loan
   property :rejected_by_staff_id,              Integer, :nullable => true, :index => true
   property :disbursed_by_staff_id,             Integer, :nullable => true, :index => true
   property :written_off_by_staff_id,           Integer, :nullable => true, :index => true
+  property :preclosed_by_staff_id,             Integer, :nullable => true, :index => true
   property :suggested_written_off_by_staff_id, Integer, :nullable => true, :index => true
   property :write_off_rejected_by_staff_id,    Integer, :nullable => true, :index => true
   property :validated_by_staff_id,             Integer, :nullable => true, :index => true
@@ -81,6 +83,7 @@ class Loan
   belongs_to :rejected_by,               :child_key => [:rejected_by_staff_id],               :model => 'StaffMember'
   belongs_to :disbursed_by,              :child_key => [:disbursed_by_staff_id],              :model => 'StaffMember'
   belongs_to :written_off_by,            :child_key => [:written_off_by_staff_id],            :model => 'StaffMember'
+  belongs_to :preclosed_by,              :child_key => [:preclosed_by_staff_id],            :model => 'StaffMember'
   belongs_to :suggested_written_off_by,  :child_key => [:suggested_written_off_by_staff_id],  :model => 'StaffMember'
   belongs_to :write_off_rejected_by,     :child_key => [:write_off_rejected_by_staff_id],     :model => 'StaffMember' 
   belongs_to :validated_by,              :child_key => [:validated_by_staff_id],              :model => 'StaffMember'
@@ -362,10 +365,16 @@ class Loan
   # principal[0] and interest[1].
 
 
-  def repay(input, user, received_on, received_by, defer_update = false, style = :normal, desktop_id = nil, origin = nil)
+  def repay(input, user, received_on, received_by, defer_update = false, style = :normal, context = :default, desktop_id = nil, origin = nil)
+    pmts = get_payments(input, user, received_on, received_by, defer_update, style, context, desktop_id, origin)
+    x = make_payments(pmts, context, defer_update)
+    x
+  end
+
+  def get_payments(input, user, received_on, received_by, defer_update = false, style = :normal, context = :default, desktop_id = nil, origin = nil)
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
-    unless input.is_a? Array or input.is_a? Fixnum or input.is_a? Float
+    unless input.is_a? Array or input.is_a? Fixnum or input.is_a? Float or input.is_a?(Hash)
       raise "the input argument of Loan#repay should be of class Fixnum or Array"
     end
     raise "cannot repay a loan that has not been saved" if new?
@@ -389,38 +398,44 @@ class Loan
       end
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0], input[1]
+    elsif input.is_a? Hash
+      fees_paid = input[:fees]
+      interest = input[:interest]
+      principal = input[:principal]
     end
-
+    
     save_status = nil
     payments = []
+    if fees_paid > 0
+      fee_payment = Payment.new(:loan => self, :created_by => user,
+                                :received_on => received_on, :received_by => received_by,
+                                :amount => fees_paid.round(2), :type => :fees, :desktop_id => desktop_id, :origin => origin)
+      payments.push(fee_payment)
+    end
+    if interest > 0
+      int_payment = Payment.new(:loan => self, :created_by => user,
+                                :received_on => received_on, :received_by => received_by,
+                                :amount => interest.round(2), :type => :interest, :desktop_id => desktop_id, :origin => origin)
+      payments.push(int_payment)
+    end
+    if principal > 0
+      prin_payment = Payment.new(:loan => self, :created_by => user,
+                                 :received_on => received_on, :received_by => received_by,
+                                 :amount => principal.round(2), :type => :principal, :desktop_id => desktop_id, :origin => origin)        
+      payments.push(prin_payment)
+    end
+    payments             
+  end
+
+  def make_payments(payments, context = :default, defer_update = :false)
     Payment.transaction do |t|
       self.history_disabled=true
-      if fees_paid > 0
-        fee_payment = Payment.new(:loan => self, :created_by => user,
-                                  :received_on => received_on, :received_by => received_by,
-                                  :amount => fees_paid.round(2), :type => :fees, :desktop_id => desktop_id, :origin => origin)
-        payments.push(fee_payment)
-      end
-      if interest > 0
-        int_payment = Payment.new(:loan => self, :created_by => user,
-                                  :received_on => received_on, :received_by => received_by,
-                                  :amount => interest.round(2), :type => :interest, :desktop_id => desktop_id, :origin => origin)
-        payments.push(int_payment)
-      end
-      if principal > 0
-        prin_payment = Payment.new(:loan => self, :created_by => user,
-                                   :received_on => received_on, :received_by => received_by,
-                                   :amount => principal.round(2), :type => :principal, :desktop_id => desktop_id, :origin => origin)        
-        payments.push(prin_payment)
-      end
-      # do not create accounting entries individually
       payments.each{|p| p.override_create_observer = true}    
 
-      if payments.collect{|payment| payment.save}.include?(false)
+      if payments.collect{|payment| payment.save(context)}.include?(false)
         t.rollback
         return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees},]        
       end
-
       AccountPaymentObserver.single_voucher_entry(payments)
     end
 
@@ -449,8 +464,7 @@ class Loan
     false
   end
 
-  def pay_fees(amount, date, received_by, created_by)
-    status = true
+  def get_fee_payments(amount, date, received_by, created_by)
     @fees = []
     fp = fees_payable_on(date)
     fs = fee_schedule
@@ -459,16 +473,19 @@ class Loan
       if fp.has_key?(k)
         p = Payment.new(:amount => [fp[k],amount].min, :type => :fees, :received_on => date, :comment => k, :fee => k,
                         :received_by => received_by, :created_by => created_by, :client => client, :loan => self)
-        if p.save
-          amount -= p.amount
-          fp[k]  -= p.amount
-        else
-          status = false
-        end
+        amount -= p.amount
+        fp[k]  -= p.amount
         @fees << p
-
       end
     end
+    @fees
+  end
+    
+
+  def pay_fees(amount, date, received_by, created_by)
+    status = true
+    @fees = get_fee_payments(amount, date, received_by, created_by)
+    @fees.map{|f| f.save}
     [status, @fees]
   end
   # LOAN INFO FUNCTIONS - CALCULATIONS
@@ -555,6 +572,10 @@ class Loan
     return @schedule if @schedule
     @schedule = {}
     return @schedule unless amount.to_f > 0
+
+    #if self.respond_to?(:repayment_style) and self.repayment_style
+    #  extend Kernel.module_eval("Mostfit::RepaymentStyles:#{repayment_style.camel_case}")
+    #end
 
     principal_so_far = interest_so_far = fees_so_far = total = 0
     balance = amount
@@ -653,13 +674,13 @@ class Loan
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    raise "number out of range, got #{number}" if number < 1 or number > actual_number_of_installments
     (amount.to_f / number_of_installments).round(2)
   end
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+    raise "number out of range, got #{number}" if number < 1 or number > actual_number_of_installments
     (amount * interest_rate / number_of_installments).round(2)
   end
 
@@ -716,14 +737,14 @@ class Loan
              then  ((date - scheduled_first_payment_date).to_f / 28).floor + 1
              when  :monthly
              then  count = 1
-               while shift_date_by_installments(date, -count) >= scheduled_first_payment_date and count < number_of_installments
+               while shift_date_by_installments(date, -count) >= scheduled_first_payment_date and count < actual_number_of_installments
                  count += 1
                end
                count
              else
                raise ArgumentError.new("Strange period you got..")
              end
-    [result, number_of_installments].min  # never return more than the number_of_installments
+    [result, actual_number_of_installments].min  # never return more than the number_of_installments
   end
 
 
@@ -780,6 +801,7 @@ class Loan
                                  not (rejected_on and rejected_on.holiday_bump <= date)
     return :rejected             if (rejected_on and rejected_on.holiday_bump <= date)
     return :written_off          if (written_off_on and written_off_on <= date)
+    return :preclosed            if (preclosed_on and preclosed_on <= date)
     return :claim_settlement     if under_claim_settlement and under_claim_settlement.holiday_bump <= date
     total_received ||= total_received_up_to(date)
     principal_received ||= principal_received_up_to(date)
@@ -808,7 +830,7 @@ class Loan
   def scheduled_repaid_on
     # first payment is on "scheduled_first_payment_date", so number_of_installments-1 periods later
     # we find the scheduled_repaid_on date.
-    shift_date_by_installments(scheduled_first_payment_date, number_of_installments - 1)
+    shift_date_by_installments(scheduled_first_payment_date, actual_number_of_installments - 1)
   end
   # the installment dates
   def installment_dates
@@ -833,7 +855,7 @@ class Loan
     ensure_meeting_day = false
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
-    @_installment_dates = (0..(number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
+    @_installment_dates = (0..(actual_number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
   end
 
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
@@ -1234,7 +1256,7 @@ private
     case installment_frequency
     when :weekly
       52
-    when :bi_weekly
+    when :biweekly
       26
     when :monthly
       12
@@ -1544,8 +1566,6 @@ class RoundedPrincipalAndInterestLoan < PararthRounded
 end
 
 class EquatedWeeklyRoundedAdjustedLastPayment < Loan
-  # these 2 methods define the pay back scheme
-  # typically reimplemented in subclasses
   include ExcelFormula
   # property :purpose,  String
 
@@ -1556,14 +1576,14 @@ class EquatedWeeklyRoundedAdjustedLastPayment < Loan
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > number_of_installments
+    raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > actual_number_of_installments
     return reducing_schedule[number][:principal_payable]
   end
 
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
+    raise "number out of range, got #{number}" if number < 0 or number > actual_number_of_installments
     return reducing_schedule[number][:interest_payable]
   end
 
@@ -1597,7 +1617,6 @@ class EquatedWeeklyRoundedAdjustedLastPayment < Loan
     @_installment_dates = (0..(insts-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
   end
 
-
 private
   def reducing_schedule
     return @rounded_schedule if @rounded_schedule
@@ -1628,7 +1647,6 @@ private
       i += 1
       done = true if balance == 0 
     end
-    self.number_of_installments = i - 1
     return @rounded_schedule
   end
 

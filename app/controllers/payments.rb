@@ -121,7 +121,7 @@ class Payments < Application
     if payment[:type] == "total" and @loan
       @payment_type = payment[:type]
     # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
-      success, @prin, @int, @fees = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff, true, params[:style].to_sym, payment[:desktop_id], payment[:origin])
+      success, @prin, @int, @fees = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff, true, params[:style].to_sym, context = :default, payment[:desktop_id], payment[:origin])
       @payment = Payment.new
       @prin.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @prin
       @int.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @int

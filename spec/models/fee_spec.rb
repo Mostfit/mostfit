@@ -293,6 +293,22 @@ describe Fee do
     @loan.save
   end
 
+  it "should repay correctly" do
+    @f.amount = 100
+    @f.payable_on = :loan_disbursal_date
+    @f2 = Fee.new(:name => "Other Fee")
+    @f2.amount = 111
+    @f2.payable_on = :loan_applied_on
+    @loan_product.fees = [@f, @f2]
+    @loan_product.save
+    @loan.save
+    @loan.applicable_fees.count.should == 2
+    @loan.fees_payable_on(@loan.applied_on).should == {@f2 => 111}
+    @loan.fees_payable_on(@loan.disbursal_date).should == {@f2 => 111, @f => 100}
+    success, @fees = @loan.pay_fees(105, @loan.disbursal_date, @manager, User.first)
+    success.should == true
+  end
+
 
   it "should give correct fee schedule for client" do
     @client_fee = Fee.new(:name => "client fee", :amount => 20, :payable_on => :client_date_joined)

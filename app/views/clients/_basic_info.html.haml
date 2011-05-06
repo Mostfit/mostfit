@@ -1,10 +1,16 @@
 %table.form
-  - if @center.blank? or ((not @client.new?) and (@client.loans.select{|l| not l.disbursal_date.nil?}.blank?))
+  - if @center.blank? 
     %tr
       %td
         For center:
       %td
         = select_center_for @client, :center
+  - elsif not @client.new? 
+    %tr
+      %td
+        For center:
+      %td
+        = select :center_id, :collection => Center.all(:branch => @client.center.branch), :value_method => :id, :text_method => :name, :selected => @client.center.id.to_s
   -else
     %tr
       %td 

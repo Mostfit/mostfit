@@ -783,4 +783,24 @@ describe Loan do
                      :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
     @loan.save.should be_true
   end
+
+  it "should repay properly" do
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", 
+                     :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, 
+                     :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
+    @loan.save
+    af = ApplicableFee.new(:applicable_id => @loan.id, :applicable_type => 'Loan',
+                           :applicable_on => @loan.scheduled_disbursal_date, :fee_id => 1,
+                           :amount => 100)
+    af.should be_valid
+    @loan.applicable_fees << af
+    @loan.save
+    @loan.disbursal_date = @loan.scheduled_disbursal_date
+    @loan.disbursed_by = @staff_member
+    r = @loan.repay(500, @user, @loan.scheduled_first_payment_date, @manager)
+    r[0].should == true
+    r[2].type.should == :fees
+    r[2].amount.should == 100
+  end
+
 end

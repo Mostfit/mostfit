@@ -3,6 +3,14 @@
     %h3 Loan Utilization
     = select :loan_utilization_id, :collection => LoanUtilization.all.map{|lu| [lu.id, lu.name]}, :include_blank => true
     = submit "Save"
+
+- if @loan.status == :outstanding    
+  .box
+    %hr
+    %h3 Prepay this loan
+    %p
+      = link_to("Calculate prepayment amount",  url(:prepay_loan, @loan.id), :class => "_remote_")
+
 - if [:admin, :mis_manager].include?(session.user.role)
   %hr
   .box

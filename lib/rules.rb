@@ -149,7 +149,6 @@ module Mostfit
       REJECT_REGEX = /^(Merb|merb)::*/
       
       def self.deploy #apply the business rules
-        #debugger
         begin 
           Rule.all.each do |r|
             r.apply_rule
@@ -194,7 +193,8 @@ module Mostfit
       def self.apply_rule(rule)
         h = {:name => rule[:name], :on_action => rule[:on_action], :model_name => rule[:model_name], 
           :permit => rule[:permit], :condition => convert_to_polish_notation(rule[:condition]),
-          :precondition => convert_to_polish_notation(rule[:precondition]) }
+          :precondition => convert_to_polish_notation(rule[:precondition]),
+          :active => rule[:active] }
         self.add h
       end
       
@@ -246,6 +246,9 @@ module Mostfit
         end
         function_name = hash[:name].to_s.downcase.gsub(" ", "_")
         hash[:model_name].send(:define_method, function_name) do
+          # no need to match the rule if it is not active
+          return true unless hash[:active]
+
           if hash.key?(:permit)
             if(hash[:permit] == "false")
               hash1 = {:linking_operator => :not, :first_condition => hash[:condition].dup}

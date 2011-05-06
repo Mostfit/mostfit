@@ -14,6 +14,7 @@
   - month = (params[report] and params[report][:month] and not params[report][:month].blank?) ? params[report][:month] : nil
   - chosen_year = (params[report] and params[report][:chosen_year] and not params[report][:chosen_year].blank?) ? params[report][:chosen_year] : nil
   - cash_account = (params[report] and params[report][:cash_account] and not params[report][:cash_account].blank?) ? params[report][:cash_account] : nil
+  - bank_account = (params[report] and params[report][:bank_account] and not params[report][:bank_account].blank?) ? params[report][:bank_account] : nil
   - if params[:submit]
     %h3{:style => "margin-bottom: 5px;"}
       - if area_id
@@ -66,6 +67,10 @@
         |
         Account:
         = Account.get(cash_account).name
+      - if bank_account
+        |
+        Account:
+        = Account.get(bank_account).name
     %a.expand_collapsed{:href => "#"}
       Change parameters
   %div{:class => "#{params[:submit] ? 'collapsed' : ''}"}
@@ -179,6 +184,10 @@
             %td
               Account:
               = select(:cash_account, :collection => get_accessible_cash_accounts(branch_id), :include_blank => true, :selected => cash_account, :id => "cash_account_selector")
+          - if @report.respond_to?(:bank_account)
+            %td
+              Account:
+              = select(:bank_account, :collection => get_accessible_bank_accounts(branch_id), :include_blank => true, :selected => bank_account, :id => "bank_account_selector")
         %tr
           %td
             %div{:style => "float: left"}

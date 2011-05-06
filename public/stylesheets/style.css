@@ -1087,9 +1087,11 @@ ul.bookmarks li{
 }
 
 .help {
-  background-color: #c3ff87;
+  background-color: #D4EE90;
   margin: 5px 0px;
-  padding: 5px;
+  padding: 15px;
+  font-size: 1.4em;
+  border: solid 1px green;
 }
 
 .help h3 {

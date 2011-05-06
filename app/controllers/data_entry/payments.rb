@@ -10,7 +10,6 @@ module DataEntry
     end
 
     def by_center
-      debugger
       @option = params[:option] if params[:option]
       @info = params[:info] if params[:info]
       @center = Center.get(params[:center_id]) if params[:center_id]
@@ -43,7 +42,6 @@ module DataEntry
           bulk_payments_and_disbursals
           mark_attendance
         end
-        debugger
         if @errors.blank?
           return_url = params[:return]||url(:data_entry)
           notice = 'All payments made succesfully'

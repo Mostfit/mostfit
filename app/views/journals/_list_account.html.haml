@@ -1,9 +1,11 @@
 %table.narrow.form
   %tr
     %th
+      id
+    %th
       Date
     %th 
-      Discription
+      Description
     %th 
       Account
     %th 
@@ -11,12 +13,14 @@
     %th 
       Credit
    
-  - @account.postings.journals(:order => [:date.desc], :order => [:id.desc]).each do |journal|
+  - @account.postings.journals(:order => [:date.desc]).each do |journal|
     - postings = journal.postings.group_by{|x| x.amount>0 ? :credit : :debit}
     - time_format = Mfi.first.date_format || "%d-%m-%Y"
     - time_format += " %H:%M"
    
     %tr{:class => cycle('odd','even')}
+      %td
+        = journal.id
       %td
         = journal.date.strftime(time_format)
       %td 
