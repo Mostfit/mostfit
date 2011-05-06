@@ -54,6 +54,9 @@ class AccountingPeriod
     get_accounting_period
   end
 
+  def AccountingPeriod.get_earliest_period; AccountingPeriod.all.sort.first; end
+  def is_earliest_period?; self == AccountingPeriod.get_earliest_period; end
+
   def prev
     all_periods = AccountingPeriod.all.sort
     return nil if self == all_periods.first
@@ -66,6 +69,10 @@ class AccountingPeriod
     return nil if self == all_periods.last
     idx = all_periods.index(self)
     all_periods[idx + 1]
+  end
+
+  def to_s
+    "Accounting period #{name} beginning #{begin_date.strftime("%d-%B-%Y")} through #{end_date.strftime("%d-%B-%Y")}"
   end
 
 end
