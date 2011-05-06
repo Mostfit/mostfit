@@ -1,0 +1,77 @@
+- unless params[:date]
+  .help{:style => "width: 75%"}
+    Please tell us the date you wish to prepay this loan as of, so we can calculate the correct amounts.
+  %b Prepay date
+  = form_for(@loan, :action => url(:controller => 'loans', :action => :prepay, :id => @loan.id), :method => :get) do
+    = date_select(:date)
+    = submit "Submit"
+- else
+  - @date = Date.parse(params[:date])
+  - os_prin = @loan.actual_outstanding_principal_on(@date)
+  - os_int = @loan.actual_outstanding_interest_on(@date)
+  %h2 
+    Loan id
+    = @loan.id
+    (
+    = @loan.description
+    ) for client
+    = @loan.client.name
+    ==. Prepaying on 
+    = @date
+    
+  = form_for(@loan, :action => url(:controller => 'loans', :action => :prepay, :id => @loan.id)) do
+    %table
+      %thead
+        %tr
+          %th
+            Particulars
+          %th
+            Due
+          %th
+            Paid
+        
+      - @loan.fees_payable_on(@date).each do |f,a|
+        %tr
+          %th
+            = f.name
+          %td
+            = a
+          %td
+            = text_field :name => "fees[#{f.id}]", :value => a 
+      %tr
+        %th
+          Outstanding Principal
+        %td
+          = os_prin
+        %td
+          = text_field :name => :principal, :value => os_prin.round(2)
+          = hidden_field :name => "date", :value => @date
+      %tr
+        %th
+          Outstanding Interest
+        %td
+          = os_int
+        %td
+          = text_field :name => :interest, :value => os_int.round(2)
+      %tr
+        %th
+          Penalty
+        %td
+          = select :name => "fee", :collection => Fee.all, :value_method => :id, :text_method => :name, :prompt => "apply penalty as", :style => 'width:200px;'
+        %td
+          = text_field :name => :penalty_amount
+      %tr
+        %th
+          Received By
+        %td
+          = select :name => "received_by", :collection => staff_members_collection
+      %tr
+        %th
+          Write off?
+        %td
+          = check_box :name => "writeoff"
+          .greytext
+            If the repaid amount is less than the outstanding amount<br> it is recommended to write off the loan
+        
+          
+    = submit 'Make Prepayment'

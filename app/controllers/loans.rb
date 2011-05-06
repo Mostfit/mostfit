@@ -365,12 +365,13 @@ class Loans < Application
     @loan = Loan.get(id)
     raise NotFound unless @loan
     if request.method == :get
-      display @loan
+      display @loan, :layout => layout?
     else
       staff = StaffMember.get(params[:received_by])
       raise ArgumentError.new("No staff member selected") unless staff
       raise ArgumentError.new("No applicable fee for penalty") if (params[:fee].blank? and (not params[:penalty_amount].blank?))
       @date = Date.parse(params[:date])
+
       # make new applicable fee for the penalty
       pmt_params = {:received_by => staff, :loan_id => @loan.id, :created_by => session.user, :client => @loan.client, :received_on => @date}
       if params[:penalty_amount].to_i > 0
@@ -386,25 +387,30 @@ class Loans < Application
           Payment.new({:amount => v.to_f, :fee => fee, :comment => fee.name, :type => :fees}.merge(pmt_params))
         end.compact
       end
+
       ppmt = Payment.new({:amount => params[:principal].to_f, :type => :principal}.merge(pmt_params))
       ipmt = Payment.new({:amount => params[:interest].to_f, :type => :interest}.merge(pmt_params))
       pmts = (fee_payments + [penalty_pmt, ppmt, ipmt].compact).select{|p| p.amount > 0}
+
       if pmts.blank?
         success = true
       else
         success, @p, @i, @f = @loan.make_payments(pmts)
       end
+            
       if success
         if params[:writeoff]
           @loan.preclosed_on = @date
           @loan.preclosed_by = staff
         end
+        @loan.save
         @loan.history_disabled = false
-        @loan.update_history
+        # update history after reloading object
+        Loan.first(:id => @loan.id).reload.update_history(true)
         redirect url_for_loan(@loan), :message => {:notice => "Loan has been prepayed"} 
       else
         af.destroy! if af
-        render
+        render :layout => layout?
       end
     end
   end
