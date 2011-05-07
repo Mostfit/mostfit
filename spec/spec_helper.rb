@@ -13,8 +13,6 @@ require "spec" # Satisfies Autotest and anyone else not using the Rake tasks
 # this loads all plugins required in your init file so don't add them
 # here again, Merb will do it for you
 Merb.start_environment(:testing => true, :adapter => 'runner', :environment => ENV['MERB_ENV'] || 'test')
-DataMapper.auto_upgrade!
-
 Spec::Runner.configure do |config|
 #  config.include(Merb::Test::ViewHelper)
   config.include(Merb::Test::RouteHelper)
@@ -24,6 +22,7 @@ Spec::Runner.configure do |config|
   config.before(:all) do
     if Merb.orm == :datamapper
       DataMapper.auto_migrate!
+      (repository.adapter.query("show tables") - ["payments", "journals", "postings"]).each{|t| repository.adapter.execute("alter table #{t} ENGINE=MYISAM")}
     end
 
     mfi = Mfi.first
@@ -36,6 +35,7 @@ end
 
 def load_fixtures(*files)
   DataMapper.auto_migrate! if Merb.orm == :datamapper
+  (repository.adapter.query("show tables") - ["payments", "journals", "postings"]).each{|t| repository.adapter.execute("alter table #{t} ENGINE=MYISAM")}
   files.each do |name|
     klass = Kernel::const_get(name.to_s.singularize.camel_case)
     yml_file =  "spec/fixtures/#{name}.yml"
