@@ -36,10 +36,6 @@ class Account
   validates_is_unique :name, :scope => :branch
   validates_is_unique :gl_code, :scope => :branch
   validates_is_number :opening_balance
-  
-  def accounts
-    
-  end
 
   # check if it is a cash account
   def is_cash_account?
@@ -57,12 +53,10 @@ class Account
     postings_on_date = postings("journal.date" => for_date).aggregate(:amount.sum)
     closing_balance_on_date = nil
     if postings_on_date.nil?
-       if opening_balance_on_date
-         closing_balance_on_date = opening_balance_on_date
-       end
+      closing_balance_on_date = opening_balance_on_date if opening_balance_on_date
     else
-      opening_balance ||= 0.0
-      closing_balance_on_date = postings_on_date + opening_balance
+      opening_balance_on_date ||= 0.0
+      closing_balance_on_date = postings_on_date + opening_balance_on_date
     end
     [opening_balance_on_date, closing_balance_on_date]
   end
