@@ -1,9 +1,14 @@
 %table
   %tr
     %td
-      Journal Type
+      Voucher Type
     %td
-      = select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select Journal"
+      = select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select voucher"
+  %tr
+    %td
+      Date
+    %td
+      =date_select_for @journal, :date
   - if params[:credit_accounts]
     - params[:credit_accounts].each_with_index do |ca, idx|
       = partial "journals/account_amount", :account => ca, :account_type => :credit_accounts, :last_account => (params[:debit_accounts].length == idx + 1 ? true : false)
@@ -16,12 +21,7 @@
     = partial "journals/account_amount", :account => {}, :account_type => :debit_accounts, :last_account => true
   %tr
     %td
-      Date
-    %td
-      =date_select_for @journal, :date
-  %tr
-    %td
-      Comment
+      Narration
     %td
       =text_field :comment
   %tr

@@ -1,0 +1,106 @@
+- period_open_date = @accounting_period.begin_date
+- period_close_date = @accounting_period.end_date
+- account_balances = @accounting_period.account_balances
+- accounts_with_balances = account_balances.map {|balance| balance.account}
+- balances_header = account_balances.size > 0 ? "Account balances saved for the period" : "No account balances were saved for the period"
+- old_accounts = Account.all(:opening_balance_on_date.lt => period_open_date) - accounts_with_balances
+- old_accounts_header = old_accounts.size > 0 ? "Accounts pre-dating this period" : "No accounts pre-dating this period"
+- new_accounts = Account.all(:opening_balance_on_date.gte => period_open_date, :opening_balance_on_date.lte => period_close_date) - accounts_with_balances
+- new_accounts_header = new_accounts.size > 0 ? "New accounts created this period" : "No new accounts were created this period"
+- any_rows = (account_balances.size || old_accounts.size || new_accounts.size) > 0
+- if !any_rows
+  #container_form
+    .notice{:style => "background: none; text-align: center;"}
+      No accounts or end-of-period balances for the accounting period
+- else
+  %table.report.nojs
+    %tr.header
+      %thead
+        %th
+          Account
+        %th{:colspan => 3, :align => "center"}
+          Opening balances
+        %th{:colspan => 3, :align => "center"}
+          Closing balances
+    %tr.header
+      %thead
+        %th
+          Account
+        %th
+          Computed
+        %th
+          Saved
+        %th
+          Adjust Saved By
+        %th
+          Computed
+        %th
+          Saved
+        %th
+          Adjust Saved By
+    %tr.header
+      %thead
+        %th{:colspan => 7, :align => "center"}
+          = balances_header
+    - for balance in account_balances
+    - computed_opening = balance.account.opening_balance_as_of(period_open_date)
+    - saved_opening = balance.opening_balance
+    - delta_opening = saved_opening ? (computed_opening - saved_opening) : nil
+    - computed_closing = balance.account.closing_balance_as_of(period_close_date)
+    - saved_closing = balance.closing_balance
+    - delta_closing = saved_closing ? (computed_closing - saved_closing) : nil
+      %tr
+        %td
+          = balance.account.name
+        %td
+          = computed_opening.to_account_balance
+        %td
+          = saved_opening.to_account_balance
+        %td
+          = delta_opening.to_account_balance
+        %td
+          = computed_closing.to_account_balance
+        %td
+          = saved_closing.to_account_balance
+        %td
+          = delta_closing.to_account_balance
+    %tr.header
+      %thead
+        %th{:colspan => 7, :align => "center"}
+          = old_accounts_header
+    - for account in old_accounts
+      %tr
+        %td
+          = account.name
+        %td
+          = account.opening_balance_as_of(period_open_date).to_account_balance
+        %td
+          = "-"
+        %td
+          = "N.A."
+        %td
+          = account.closing_balance_as_of(period_close_date).to_account_balance
+        %td
+          = "-"
+        %td
+          = "N.A."
+    %tr.header
+      %thead
+        %th{:colspan => 7, :align => "center"}
+          = new_accounts_header
+    - for account in new_accounts
+      %tr
+        %td
+          = account.name
+        %td
+          = account.opening_balance_as_of(period_open_date).to_account_balance
+        %td
+          = "-"
+        %td
+          = "N.A."
+        %td
+          = account.closing_balance_as_of(period_close_date).to_account_balance
+        %td
+          = "-"
+        %td
+          = "N.A."

@@ -7,12 +7,12 @@
 class AccountingPeriod
   include DataMapper::Resource
   
-  property :id, Serial
-  property :name, String
+  property :id,         Serial
+  property :name,       String
   property :begin_date, Date, :nullable => false, :default => Date.today
-  property :end_date, Date, :nullable => false, :default => Date.today+365
-  property :created_at, DateTime, :nullable => false, :default => Time.now 
-
+  property :end_date,   Date, :nullable => false, :default => Date.today+365
+  property :closed,     Boolean, :nullable => false, :default => false
+  property :created_at, DateTime, :nullable => false, :default => Time.now
 
   has n, :account_balances
   has n, :accounts, :through => :account_balances
@@ -69,6 +69,14 @@ class AccountingPeriod
     return nil if self == all_periods.last
     idx = all_periods.index(self)
     all_periods[idx + 1]
+  end
+  
+  def AccountingPeriod.last_period
+    AccountingPeriod.all.sort.last
+  end
+
+  def AccountingPeriod.first_period
+    AccountingPeriod.all.sort.first
   end
 
   def to_s
