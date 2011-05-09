@@ -5,8 +5,8 @@ class Account
 
   property :id,                     Serial  
   property :name,                   String, :index => true
-  property :opening_balance,        Integer, :nullable => true
-  property :opening_balance_on_date, Date, :nullable => true
+  property :opening_balance,        Integer, :nullable => false, :default => 0
+  property :opening_balance_on_date, Date, :nullable => false, :default => Date.today
   property :gl_code,                String, :index => true
   property :parent_id,              Integer, :index => true
   property :account_id,             Integer, :index => true
@@ -36,10 +36,6 @@ class Account
   validates_is_unique :name, :scope => :branch
   validates_is_unique :gl_code, :scope => :branch
   validates_is_number :opening_balance
-  
-  def accounts
-    
-  end
 
   # check if it is a cash account
   def is_cash_account?
@@ -49,6 +45,29 @@ class Account
   # check if it is a bank account
   def is_bank_account?
     @account_category ? @account_category.eql?('Bank') : false
+  end
+
+  def opening_and_closing_balances_as_of(for_date = Date.today)
+    return [nil, nil] if for_date > Date.today
+    opening_balance_on_date = opening_balance_as_of for_date
+    postings_on_date = postings("journal.date" => for_date).aggregate(:amount.sum)
+    closing_balance_on_date = nil
+    if postings_on_date.nil?
+      closing_balance_on_date = opening_balance_on_date if opening_balance_on_date
+    else
+      opening_balance_on_date ||= 0.0
+      closing_balance_on_date = postings_on_date + opening_balance_on_date
+    end
+    [opening_balance_on_date, closing_balance_on_date]
+  end
+
+  def closing_balance_as_of(for_date = Date.today)
+    return nil if for_date > Date.today
+    opening_balance_on_date = opening_balance_as_of for_date
+    postings_on_date = postings("journal.date" => for_date).aggregate(:amount.sum)
+    return nil if opening_balance_on_date.nil? && postings_on_date.nil?
+    opening_balance_on_date ||= 0.0; postings_on_date ||= 0.0
+    return opening_balance_on_date + postings_on_date
   end
   
   def opening_balance_as_of(for_date = Date.today)

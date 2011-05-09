@@ -5,8 +5,8 @@ class AccountBalances < Application
 
   def index
     opts = {}
-    opts.merge(:account => @account) if @account
-    opts.merge(:account => @accounting_period) if @accounting_period
+    opts[:account] = @account if @account
+    opts[:accounting_period] = @accounting_period if @accounting_period
     @account_balances = AccountBalance.all(opts)
     display @account_balances
   end

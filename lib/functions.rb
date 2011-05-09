@@ -3,6 +3,10 @@ class NilClass
   def to_currency
     "-"
   end
+
+  def to_account_balance
+    "-"
+  end
 end
 
 class Date
@@ -182,6 +186,11 @@ class Numeric
   alias_method :round_orig, :round
   def round(n=0)
     (self * (10.0 ** n)).round_orig * (10.0 ** (-n))
+  end
+
+  def to_account_balance
+    as_currency = self.abs.to_currency
+    (self < 0) ? "#{as_currency} Dr" : (self > 0) ? "#{as_currency} Cr" : "#{as_currency}"
   end
 end
 

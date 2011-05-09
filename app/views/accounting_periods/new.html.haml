@@ -4,7 +4,30 @@
 
 = form_for(@accounting_period, :action => form_url, :class => "form " ) do
   %fieldset
-    %h2 Create a new accounting period
-    = partial "accounting_periods/fields"
-    = submit "Create"
-    = link_to 'Cancel', url(:accounting_periods)
+    - if AccountingPeriod.all.empty?
+      %h2 Create a new accounting period
+      = partial "accounting_periods/fields"
+      = submit "Create"
+      = link_to 'Cancel', url(:accounting_periods)
+    - else
+      - last_period = AccountingPeriod.last_period
+      - next_period_begin_date = last_period ? last_period.end_date + 1 : Date.today
+      %h2 Add the next accounting period
+      %table.form
+        %tr
+          %th Name
+          %td
+            = text_field :name
+        %tr
+          %th
+            Begin date
+          %td
+            = next_period_begin_date.to_s
+            = hidden_field(:begin_date, :value => next_period_begin_date)
+        %tr
+          %th
+            End date
+          %td
+            = date_select_for @accounting_period, :end_date, :nullable => false, :min_date => Date.min_date, :max_date =>  next_period_begin_date+(2*365)
+            = submit "Create"
+            = link_to 'Cancel', url(:accounting_periods)
