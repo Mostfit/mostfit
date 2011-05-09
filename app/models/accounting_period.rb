@@ -7,12 +7,12 @@
 class AccountingPeriod
   include DataMapper::Resource
   
-  property :id, Serial
-  property :name, String
+  property :id,         Serial
+  property :name,       String
   property :begin_date, Date, :nullable => false, :default => Date.today
-  property :end_date, Date, :nullable => false, :default => Date.today+365
-  property :created_at, DateTime, :nullable => false, :default => Time.now 
-
+  property :end_date,   Date, :nullable => false, :default => Date.today+365
+  property :closed,     Boolean, :nullable => false, :default => false
+  property :created_at, DateTime, :nullable => false, :default => Time.now
 
   has n, :account_balances
   has n, :accounts, :through => :account_balances
@@ -54,6 +54,9 @@ class AccountingPeriod
     get_accounting_period
   end
 
+  def AccountingPeriod.get_earliest_period; AccountingPeriod.all.sort.first; end
+  def is_earliest_period?; self == AccountingPeriod.get_earliest_period; end
+
   def prev
     all_periods = AccountingPeriod.all.sort
     return nil if self == all_periods.first
@@ -66,6 +69,32 @@ class AccountingPeriod
     return nil if self == all_periods.last
     idx = all_periods.index(self)
     all_periods[idx + 1]
+  end
+
+  def get_previous_periods
+    AccountingPeriod.get_all_previous_periods(begin_date)
+  end
+
+  # Returns the accounting periods preceding the one that was in effect for the given date
+  def AccountingPeriod.get_all_previous_periods(for_date = Date.today)
+    return nil if for_date <= AccountingPeriod.first_period.end_date
+    all_periods = AccountingPeriod.all.sort
+    return all_periods if for_date > AccountingPeriod.last_period.end_date
+    period_on_date = AccountingPeriod.get_accounting_period(for_date)
+    idx = all_periods.index(period_on_date)
+    idx ? all_periods.shift(idx) : nil
+  end
+  
+  def AccountingPeriod.last_period
+    AccountingPeriod.all.sort.last
+  end
+
+  def AccountingPeriod.first_period
+    AccountingPeriod.all.sort.first
+  end
+
+  def to_s
+    "Accounting period #{name} beginning #{begin_date.strftime("%d-%B-%Y")} through #{end_date.strftime("%d-%B-%Y")}"
   end
 
 end

@@ -5,7 +5,7 @@ class Account
 
   property :id,                     Serial  
   property :name,                   String, :index => true
-  property :opening_balance,        Integer, :default => 0 
+  property :opening_balance,        Integer, :nullable => false, :default => 0
   property :opening_balance_on_date, Date, :nullable => false, :default => Date.today
   property :gl_code,                String, :index => true
   property :parent_id,              Integer, :index => true
@@ -36,10 +36,6 @@ class Account
   validates_is_unique :name, :scope => :branch
   validates_is_unique :gl_code, :scope => :branch
   validates_is_number :opening_balance
-  
-  def accounts
-    
-  end
 
   # check if it is a cash account
   def is_cash_account?
@@ -50,14 +46,85 @@ class Account
   def is_bank_account?
     @account_category ? @account_category.eql?('Bank') : false
   end
+
+  def opening_and_closing_balances_as_of(for_date = Date.today)
+    return [nil, nil] if for_date > Date.today
+    opening_balance_on_date = opening_balance_as_of for_date
+    postings_on_date = postings("journal.date" => for_date).aggregate(:amount.sum)
+    closing_balance_on_date = nil
+    if postings_on_date.nil?
+      closing_balance_on_date = opening_balance_on_date if opening_balance_on_date
+    else
+      opening_balance_on_date ||= 0.0
+      closing_balance_on_date = postings_on_date + opening_balance_on_date
+    end
+    [opening_balance_on_date, closing_balance_on_date]
+  end
+
+  def closing_balance_as_of(for_date = Date.today)
+    return nil if for_date > Date.today
+    opening_balance_on_date = opening_balance_as_of for_date
+    postings_on_date = postings("journal.date" => for_date).aggregate(:amount.sum)
+    return nil if opening_balance_on_date.nil? && postings_on_date.nil?
+    opening_balance_on_date ||= 0.0; postings_on_date ||= 0.0
+    return opening_balance_on_date + postings_on_date
+  end
   
-  def opening_balance_as_of(date = Date.today)
-    postings("journal.date.lte" => date).aggregate(:amount.sum)
+  def opening_balance_as_of(for_date = Date.today)
+    return nil if for_date > Date.today
+    datum_balance = 0.0; datum = nil
+    check_past_period = true
+    
+    if opening_balance_on_date
+      # can't have an opening balance before we're open
+      return nil if (for_date < opening_balance_on_date)
+      period_for_date = AccountingPeriod.get_accounting_period opening_balance_on_date
+      if (period_for_date && for_date  < period_for_date.end_date)
+        check_past_period = false
+        datum_balance = opening_balance ||= 0.0
+        datum = opening_balance_on_date
+      end
+    end
+
+    datum_balance, datum = get_past_period_opening_balance_and_date(for_date) if (check_past_period)
+
+    date_params = {"journal.date.lt" => for_date}
+    date_params["journal.date.gte"] = datum if (datum && (datum < for_date))
+    balance_from_postings = postings(date_params).aggregate(:amount.sum)
+    
+    return nil if (datum_balance.nil? && balance_from_postings.nil?)
+    datum_balance ||= 0.0; balance_from_postings ||= 0.0
+    return datum_balance + balance_from_postings
+  end
+
+  # Retreats backward in time to the earliest accounting period that has a balance
+  # for us, returns the balance and the date
+  def get_past_period_opening_balance_and_date(for_date = Date.today)
+    opening_balance, on_date = nil, nil
+    period = AccountingPeriod.get_accounting_period for_date
+    unless period.nil?
+      period_balance = account_balances.first(:accounting_period => period)
+      
+      if period_balance
+        opening_balance = period_balance.opening_balance
+        on_date = period.begin_date
+      else
+        previous_period = period.prev
+        unless previous_period.nil?
+          previous_date = previous_period.end_date
+          # Recurse until we hit an accounting period in the past that has an opening
+          # balance for us,
+          opening_balance, on_date = get_past_period_opening_balance_and_date(previous_date)
+        end
+      end
+    end
+    [opening_balance, on_date]
   end
 
   def account_earliest_date
     # oops! the opening_balance_as_on date is greater than the earliest posting date!!
-    postings("journal.date.lte" => Date.today).map{|p| p.journal.date}.min || opening_balance_on_date || Date.min_date
+    # TODO: Disallow postings before the date an account is first added to the system
+    opening_balance_on_date || postings("journal.date.lte" => Date.today).map{|p| p.journal.date}.min || Date.min_date
   end
 
   def convert_blank_to_nil
@@ -67,7 +134,7 @@ class Account
       end
     }
   end
-
+  
   
   # generate tree form of accounts based on parent relationships.
   # TODO: Not working correctly right now

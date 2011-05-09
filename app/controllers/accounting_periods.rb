@@ -2,11 +2,17 @@ class AccountingPeriods < Application
   # provides :xml, :yaml, :js
 
   def index
-    @accounting_periods = AccountingPeriod.all(:order => [:begin_date.asc])
+    @accounting_periods = AccountingPeriod.all.sort
     display @accounting_periods, :layout => layout?
   end
 
   def show(id)
+    @accounting_period = AccountingPeriod.get(id)
+    raise NotFound unless @accounting_period
+    display @accounting_period
+  end
+
+  def period_balances(id)
     @accounting_period = AccountingPeriod.get(id)
     raise NotFound unless @accounting_period
     display @accounting_period

@@ -1,5 +1,5 @@
 %h1 
-  Accounting Periods for "
+  End-of-period Balances for "
   = @account.name
   "
 
@@ -18,7 +18,11 @@
         Closing Balance
       %th
         Actions
-  - AccountingPeriod.all.each do |ap|
+  - if @account.opening_balance_on_date
+    - applicable_periods = AccountingPeriod.all(:end_date.gte => @account.opening_balance_on_date)
+  - else
+    - applicable_periods = AccountingPeriod.all
+  - applicable_periods.sort.each do |ap|
     %tr
       %td
         = ap.name

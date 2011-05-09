@@ -3,40 +3,47 @@
   - if @account
     == for #{@account.name} 
   - if @accounting_period
-    == for accounting period #{@accounting_period.name} if @accounting_period
+    == for accounting period #{@accounting_period.name}
 
-%table.narrow
-  %thead
+- if @account_balances.empty?
+  #container_form
+    .notice{:style => "background: none; text-align: center;"}
+      No opening or closing account balances are currently set
+      = link_to 'Set an account balance', url(:new_account_balance), :class => '_remote_ add', :id => 'form'
+
+- else
+  %table.narrow
+    %thead
+      %tr
+        %th
+          id
+        %th
+          Account
+        %th
+          Accounting Period
+        %th
+          Opening Balance
+        %th
+          Closing Balance
+        %th Actions
     %tr
-      %th
-        id
-      %th
-        Account
-      %th
-        Accounting Period
-      %th
-        Opening Balance
-      %th
-        Closing Balance
-      %th Actions
-  %tr
-  - for account_balance in @account_balances
-    %tr{:class => cycle('odd','even')}
-      %td
-        = account_balance.id
-      %td
-        = link_to account_balance.account.name, resource(account_balance.account)
-      %td
-        = link_to account_balance.accounting_period.name, resource(account_balance.accounting_period)
-      %td
-        = account_balance.opening_balance
-      %td
-        = account_balance.closing_balance
-      %td
-        - unless account_balance.verified?
-          = link_to 'Edit', resource(account_balance.account, account_balance.accounting_period, account_balance,:edit)
-          - if session.user.role == :admin
-            = link_to 'Verify', url(:verify_account_balance, account_balance.account, account_balance.accounting_period, account_balance)
+    - for account_balance in @account_balances
+      %tr{:class => cycle('odd','even')}
+        %td
+          = account_balance.id
+        %td
+          = link_to account_balance.account.name, resource(account_balance.account)
+        %td
+          = link_to account_balance.accounting_period.name, resource(account_balance.accounting_period)
+        %td
+          = account_balance.opening_balance
+        %td
+          = account_balance.closing_balance
+        %td
+          - unless account_balance.verified?
+            = link_to 'Edit', resource(account_balance.account, account_balance.accounting_period, account_balance,:edit)
+            - if session.user.role == :admin
+              = link_to 'Verify', url(:verify_account_balance, account_balance.account, account_balance.accounting_period, account_balance)
 
 
 = link_to 'New', url(:new_account_balance)

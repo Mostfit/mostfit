@@ -5,8 +5,8 @@
     = date_select :from_date, (params[:from_date] || today), :min_date => Date.min_date, :max_date => Date.today
     %b To
     = date_select :to_date, (params[:to_date] || today), :min_date => Date.min_date, :max_date => Date.today
-    %b Journal type
-    = select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt => "All types of journals"
+    %b Voucher type
+    = select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt => "Select voucher type"
     %input{:type => :hidden, :name => "return", :value => params[:return]}
     %input{:type => :hidden, :name => "_target_", :value => "journals_container"}
     = submit "GO"  

@@ -18,10 +18,12 @@
         %th
           Ends
         %th
-          Duration (in days)
+          Entries Allowed?
+        %th
+          Account balances
         %th
           Actions
-    - for accounting_period in @accounting_periods
+    - for accounting_period in @accounting_periods.sort
       %tr{:class => cycle('odd','even')}
         %td
           = accounting_period.name
@@ -30,6 +32,8 @@
         %td
           = accounting_period.end_date
         %td
-          = accounting_period.duration
+          = accounting_period.closed ? "Closed" : "Open"
         %td
-          = link_to 'Edit', url(:edit_accounting_period,  accounting_period)
+          = link_to 'Balances', url(:period_balances, accounting_period)
+        %td
+          = link_to 'Edit', url(:edit_accounting_period, accounting_period)

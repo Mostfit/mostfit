@@ -55,6 +55,32 @@ describe Account do
     @account.should_not be_valid
   end
 
+=begin
+Scenario 1: If an account was set with an opening_balance on a particular date
+
+It cannot have any opening balances on dates that are earlier than such date
+
+Scenario 2: Consider a sequence of dates as follows:
+
+a0, a1, a2, etc. are accounting periods; a0b, a0e are accounting period begin and end dates
+a0b, d0, a0e, a1b, ob, d1, a1e, a2b, d2, a2e, a3b, d3, a3e
+Opening balance B is set on date ob
+
+Opening balances on dates is as follows:
+d0 = nil
+d1 = B + sum(postings since ob till d1)
+
+If a2b has opening balance set
+d2 = opening_balance(a2) + sum(postings since a2b till d2)
+
+if a2b has no opening balance set
+d2 = ob + sum(postings since ob till d2)
+
+If an account was not set with an opening_balance on a particular date
+Opening balance on any date = opening balance on the most recent accounting period that has a balance for the account + sum(postings since begin date of such accounting period till date) 
+
+=end
+
   it "should be able to 'have' account" do
     @acc = Account.new(:name => "Income Account", :gl_code => "IA1002", :account_type => @account_type, :opening_balance_on_date => Date.today)
     @acc.save

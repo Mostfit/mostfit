@@ -172,6 +172,12 @@ Merb::BootLoader.after_app_loads do
         DirtyLoan.start_thread
       end
     end
-  end  
-end
+  end
 
+  # This is to save all the loan_products as we have changed loan_type ENUM to loan_type_string.
+  LoanProduct.all.each{ |l| 
+    if l.loan_type.nil? or l.loan_type_string.nil?
+      l.save
+    end
+  } 
+end
