@@ -124,6 +124,17 @@ class RuleBook
     end
   end
 
+  def journals(date)
+    ids = (Posting.all("journal.date" => date, :amount.lt => 0,
+                       :account => self.debit_accounts).aggregate(:journal_id) & Posting.all("journal.date" => date, :amount.gt => 0, 
+                                                                                             :account => self.credit_accounts).aggregate(:journal_id))
+    if ids.length > 0
+      Journal.all(:id => ids)
+    else
+      nil
+    end
+  end
+
   def convert_blank_to_nil
     self.attributes.each{|k, v|
       if v.is_a?(String) and v.empty? and self.class.send(k).type==Integer
