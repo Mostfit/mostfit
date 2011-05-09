@@ -37,11 +37,11 @@
         = rule_book.active
       %td 
         - rule_book.credit_accounts.map do |credit_account|
-          =credit_account.name
+          = credit_account.name
           %br
       %td
         - rule_book.debit_accounts.each do |debit_account|
-          =debit_account.name
+          = debit_account.name
           %br
       %td
         = link_to 'Edit', url(:edit_rule_book,  rule_book, {:return => params[:return]})

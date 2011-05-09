@@ -2,7 +2,7 @@
   %h2
     Duplicate all accounts of      
     %b Branch
-  %form._remote_{:action => url(:action => :duplicate), :method => :get}
+  %form._remote_{:action => url(:controller => :accounts, :action => :duplicate), :method => :get}
     = select :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select a branch", :selected => (@branch ? @branch.id.to_s : "")
     %input{:type => "hidden", :name => "_target_", :value => "form_holder"}
     = submit "GO"
@@ -37,11 +37,12 @@
             %td
               = text_field :name => "account[][opening_balance]", :value => 0
             %td
-              = date_select "account[][opening_balance_on_date]", Date.today, :id => "account_#{idx}_opening_balance_on_date"
+              = date_select "account[][opening_balance_on_date]", Date.today, :id => "account_#{idx}_opening_balance"
       For branch
       = select :branch_id, :collection => Branch.all(:id.not => @branch.id).map{|b| [b.id, b.name]}, :prompt => "Select branch"
       = hidden_field :parent_branch_id, :value => @branch.id
       = submit "Create"
+= partial "rule_books/duplicate"
 - unless @accounts
   %hr
   %div.box

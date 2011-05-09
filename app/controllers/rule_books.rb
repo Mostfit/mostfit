@@ -15,7 +15,7 @@ class RuleBooks < Application
   def new
     only_provides :html
     @rule_book = RuleBook.new
-    @branch    =  Branch.get(params[:branch_id]) if params.key?(:branch_id)
+    @branch    = Branch.get(params[:branch_id]) if params.key?(:branch_id)
     @accounts  = Account.all(:branch_id => params[:branch_id], :order => [:account_type_id]).map{|x| [x.id ,"#{x.account_type.name} -- #{x.name}"]}
     display @rule_book, :layout => layout?
   end
@@ -34,7 +34,6 @@ class RuleBooks < Application
     @rule_book.created_by_user_id = session.user.id
     credit_accounts.each{|ca| @rule_book.credit_account_rules << CreditAccountRule.new(:credit_account => ca[:account], :percentage => ca[:percentage])}
     debit_accounts.each{|da|  @rule_book.debit_account_rules  << DebitAccountRule.new(:debit_account => da[:account], :percentage => da[:percentage])}
-
     if @rule_book.save
       redirect(params[:return]||resource(:rule_books), :message => {:notice => "RuleBook was successfully created"})
     else
@@ -96,6 +95,58 @@ class RuleBooks < Application
     end
   end
 
+  def duplicate
+    if request.method == :post
+      @new_rules = params[:rules].map do |k,v|
+        debit_acc = v.delete(:debit_accounts)
+        credit_acc = v.delete(:credit_accounts)
+        rb = RuleBook.new(v.merge({:created_by_user_id => session.user.id}))
+
+        rb.credit_account_rules = credit_acc.map{|c_key, c_value|
+          CreditAccountRule.new(:credit_account_id => c_value[:account_id], :percentage => c_value[:percentage])
+        }
+
+        rb.debit_account_rules = debit_acc.map{|d_key, d_value|
+          DebitAccountRule.new(:debit_account_id => d_value[:account_id], :percentage => d_value[:percentage])
+        }
+        
+        if v["active"] == "on" 
+          rb.active = true
+        else
+          rb.active = false
+        end
+        
+        rb.branch_id = params[:parent_branch_id]
+        rb
+      end
+
+      RuleBook.transaction do |t|
+        if @new_rules.map{|r|
+            if RuleBook.all(:branch_id => params[:parent_branch_id], :from_date => r.from_date, :to_date => r.to_date, :action => r.action).empty?
+              r.debit_account_rules.each{|x| x.save}
+              r.save
+              r.saved?
+            else
+              false
+            end
+          }.include?(false)
+          t.rollback
+          redirect url(:accounts), :message => {:error => "There were error/s in the creation of RuleBooks."} 
+        else
+          redirect url(:accounts), :message => {:notice => "Rule Books copied succesfully"}
+        end
+      end
+    else
+      unless params[:branch_id].blank?
+        @branch = Branch.get(params[:branch_id])
+        @new_branch = Branch.get(params[:new_branch_id])
+        raise NotFound unless (@branch and @new_branch)
+        @rule_books = RuleBook.all(:branch_id => params[:branch_id])
+      end
+      partial :duplicate
+    end
+  end
+
 private
   def get_credit_and_debit_accounts(rule_book)
     if rule_book[:credit_accounts]
@@ -115,5 +166,4 @@ private
 
     [rule_book, credit_accounts, debit_accounts]
   end
-
 end # RuleBooks
