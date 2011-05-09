@@ -70,6 +70,20 @@ class AccountingPeriod
     idx = all_periods.index(self)
     all_periods[idx + 1]
   end
+
+  def get_previous_periods
+    AccountingPeriod.get_all_previous_periods(begin_date)
+  end
+
+  # Returns the accounting periods preceding the one that was in effect for the given date
+  def AccountingPeriod.get_all_previous_periods(for_date = Date.today)
+    return nil if for_date <= AccountingPeriod.first_period.end_date
+    all_periods = AccountingPeriod.all.sort
+    return all_periods if for_date > AccountingPeriod.last_period.end_date
+    period_on_date = AccountingPeriod.get_accounting_period(for_date)
+    idx = all_periods.index(period_on_date)
+    idx ? all_periods.shift(idx) : nil
+  end
   
   def AccountingPeriod.last_period
     AccountingPeriod.all.sort.last
