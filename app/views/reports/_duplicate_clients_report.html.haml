@@ -39,6 +39,10 @@
             - case_number += 1
         -client1 = clients.find{|x| x.id==dup1[0]}
         -client2 = clients.find{|x| x.id==dup2[0]}
+
+        -# don't render a duplicate pair if one of the client has been deleted
+        -# after report generation
+        - next if client1.nil? or client2.nil?
         %tr
           %td
             =link_to(dup1[0], resource(client1))
@@ -69,4 +73,4 @@
             =client2.center.branch.name
           %td
             =dup1[4]
-          
+
