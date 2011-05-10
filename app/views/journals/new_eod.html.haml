@@ -3,12 +3,9 @@
     %table
       %tr
         %td
-          %b Journal Type
-        %td
-          = select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select Journal", :selected => "3"
-      %tr
-        %td
           %b Action
+        %td
+          %b Journal Type
         %td
           %b Credit account
         %td
@@ -21,6 +18,10 @@
       - if @rules and @rules.length > 0
         - @rules.each do |rule|
           %tr
+            %td
+              = rule.journal_type.name
+              = hidden_field :name => "credit_accounts[][journal_type_id]", :value => rule.journal_type.id
+              = hidden_field :name => "debit_accounts[][journal_type_id]", :value => rule.journal_type.id
             - if rule.credit_account_rules and rule.credit_account_rules.length > 0
               - rule.credit_account_rules.each_with_index do |ca, idx|
                 %td
