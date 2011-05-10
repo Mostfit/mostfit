@@ -1,5 +1,5 @@
 - @from_date ||= @account.account_earliest_date - 1
-- @to_date||= Date.today - 1
+- @to_date||= Date.today
 - balance = @account.opening_balance_as_of(@from_date) || 0
 %table.form.narrow
   %tr

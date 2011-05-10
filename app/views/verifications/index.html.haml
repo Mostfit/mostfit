@@ -13,7 +13,7 @@
 -else
   %br
   %ul
-    -[:clients, :loans, :payments, :portfolios].each do |model|
+    -[:clients, :loans, :payments, :portfolios, :journals].each do |model|
       %li
         =link_to("List unverified #{model}", resource(:verifications, {:model => model}))
         (

@@ -10,11 +10,26 @@ class Journal
   property :transaction_id, String, :index => true  
   property :date,           Date,   :index => true, :default => Date.today
   property :created_at,     DateTime, :index => true  
+  property :deleted_at,     DateTime, :index => true  
   property :batch_id,       Integer, :nullable => true
   belongs_to :batch
   belongs_to :journal_type
   has n, :postings
   has n, :accounts, :through => :postings
+
+  property :verified_by_user_id, Integer, :nullable => true, :index => true
+  belongs_to :verified_by,  :child_key => [:verified_by_user_id],        :model => 'User'
+  validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :on => [:destroy]
+  validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :if => Proc.new{|p| p.deleted_at != nil and p.deleted_by!=nil}
+
+  def verified_cannot_be_deleted
+    return true unless verified_by_user_id
+    [false, "Verified payment. Cannot be deleted"]    
+  end
+
+  def name
+    comment
+  end
   
   def validity_check
     return false if self.postings.length<2 #minimum one posting for credit n one for debit
