@@ -20,13 +20,14 @@ namespace :mostfit do
       else
         hash[:discriminator] = [DefaultLoan, RoundedPrincipalAndInterestLoan] 
       end
+      puts Loan.all(hash).count
 
       Loan.all(hash).each{|l|
         last_history = LoanHistory.first(:loan_id => l.id, :date.lte => Date.today, :order => [:date.desc], :status => [:disbursed, :outstanding])
         next unless last_history
-        next unless last_history.date < last_date
+        next unless last_history.date >= last_date
           
-        l.discriminator = "EquatedWeekly"
+        l.discriminator = EquatedWeekly
         if l.loan_product_id == 13
           l.interest_rate = 31.504/100
         elsif l.loan_product_id == 2
