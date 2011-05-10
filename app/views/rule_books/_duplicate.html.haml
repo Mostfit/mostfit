@@ -1,0 +1,115 @@
+- if @new_rules
+  - @new_rules.each do |nr|
+    = error_messages_for nr
+
+%div.box#accounting_rule
+  %h2
+    Duplicate all accounting rules of      
+    %b Branch
+  %form._remote_{:action => url(:controller => :rule_books, :action => :duplicate), :method => :get}
+    = select :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select a branch", :selected => (@branch ? @branch.id.to_s : "")
+    into
+    %b Branch
+    = select :new_branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select a branch", :selected => (@new_branch ? @new_branch.id.to_s : "")
+    %input{:type => "hidden", :name => "_target_", :value => "accounting_rule"}
+    = submit "GO"
+  /- debugger
+  - if @rule_books
+    - if @rule_books.empty? 
+      %div.error
+        No rule books have been defined for the source branch
+    - elsif @new_branch.accounts.empty?
+      %div.error
+        No accounts have been defined for the destination branch
+    - elsif @rule_books[0].branch_id == @new_branch.id
+      %div.error 
+        Source and Destination branch cannot be the same 
+    - else
+      %form{:action => url(:controller => :rule_books, :action => :duplicate), :method => :post}
+        %table
+          %tr
+            %th 
+              Rule name
+            %th 
+              Action
+            %th
+              From date
+            %th
+              To date
+            %th
+              Active
+            %th
+              Credit accounts
+            %th
+              Percentage Split
+            %th
+              Debit accounts
+            %th
+              Percentage Split          
+          - @rule_books.each_with_index do |rule_book, i|
+            %tr
+              %td
+                = text_field :name => "rules[#{i}][name]", :value => "#{@new_branch.name} - #{rule_book.name}", :size => 10
+              %td 
+                = rule_book.action.camelcase(' ')
+                = hidden_field :name => "rules[#{i}][action]", :value => rule_book.action
+              %td
+                = date_select "rules[#{i}][from_date]", rule_book.from_date, :id => "rule_book_#{i}_from_date", :size => 7
+              %td
+                = date_select "rules[#{i}][to_date]", rule_book.to_date, :id => "rule_book_#{i}_to_date", :size => 7
+              %td
+                = check_box :name => "rules[#{i}][active]", :checked => rule_book.active
+                = hidden_field :name => "rules[#{i}][journal_type_id]", :value => rule_book.journal_type.id
+              %td
+                - credit_accounts = rule_book.credit_accounts
+                - credit_account_rules = rule_book.credit_account_rules
+                - 3.times do |idx|
+                  - selected_val = (credit_accounts[idx] ? credit_accounts[idx].name : "")
+                  - selected_id = Account.all(:name => selected_val, :branch => @new_branch)[0].id
+                  - split_val = (credit_account_rules[idx] ? credit_account_rules[idx].percentage.to_s : "0")
+                  - names_of_branches = @new_branch.accounts.map{|x| x.name}
+                  = select(:name => "rules[#{i}][credit_accounts][#{idx}][account_id]", :collection => @new_branch.accounts, :prompt => "Select credit account #{idx}", :selected => selected_id.to_s, :text_method => :name, :value_method => :id)
+                  - if (not names_of_branches.include?(selected_val)) and split_val != "0" 
+                    %div.error
+                      The corresponding account does not exist. Please select one.
+                  %br 
+              %td
+                - credit_account_rules = rule_book.credit_account_rules
+                - sum = 0
+                - 3.times do |idx|
+                  - split_val = (credit_account_rules[idx] ? credit_account_rules[idx].percentage.to_s : "0")
+                  - split_val = "100" if rule_book.new? and idx==0
+                  - sum += split_val.to_i
+                  = text_field(:name => "rules[#{i}][credit_accounts][#{idx}][percentage]", :size => 3, :value => split_val)
+                  %br
+                - unless sum == 100
+                  %div.error
+                    The percentage ratios do not add up to 100
+              %td
+                - debit_accounts = rule_book.debit_accounts
+                - debit_account_rules = rule_book.debit_account_rules
+                - 3.times do |idx|
+                  - selected_val = (debit_accounts[idx] ? debit_accounts[idx].name : "")
+                  - selected_id = Account.all(:name => selected_val, :branch => @new_branch)[0].id
+                  - split_val = (debit_account_rules[idx] ? debit_account_rules[idx].percentage.to_s : "0")
+                  - names_of_branches = @new_branch.accounts.map{|x| x.name}
+                  = select :name => "rules[#{i}][debit_accounts][#{idx}][account_id]", :collection => @new_branch.accounts, :prompt => "Select debit Account #{idx}", :selected => selected_id.to_s, :text_method => :name, :value_method => :id
+                  - if (not names_of_branches.include?(selected_val)) and split_val != "0"
+                    %div.error
+                      The corresponding account does not exist. Please select one. 
+                  %br
+              %td
+                - debit_account_rules = rule_book.debit_account_rules
+                - sum = 0
+                - 3.times do |idx|
+                  - split_val = (debit_account_rules[idx] ? debit_account_rules[idx].percentage.to_s : "0")
+                  - split_val = "100" if rule_book.new? and idx == 0
+                  - sum += split_val.to_i
+                  = text_field(:name => "rules[#{i}][debit_accounts][#{idx}][percentage]", :size => 3, :value => split_val)
+                  %br
+                - unless sum == 100
+                  %div.error
+                    The percentage ratios do not add up to 100
+        = hidden_field :parent_branch_id, :value => @new_branch.id
+        = submit "Create"
+

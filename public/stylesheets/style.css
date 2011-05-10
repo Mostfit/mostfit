@@ -104,6 +104,7 @@ h1.logo span{
 
 #navigation a {
   background:  #75B516 repeat scroll 0 0;
+  border-radius: 4px 4px 0 0;
   padding: 4px 15px 3px 10px;
   color: white;
   text-decoration: none;
