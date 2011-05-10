@@ -1,10 +1,13 @@
 %h1
-  Journals controller, show action
-%p
-  Edit this file in
-  %tt
-    app/views/journals/show.html.erb
+  Journal
+= link_to 'Delete',  "/application/delete/#{@journal.id}?model=journal&return=/journals/#{@journal.id}//", :class => 'delete'
 
-= link_to 'Edit',  url(:edit_journal,  @journal)
+%h3
+  = @journal.comment
+
+- @journal.postings.each do |p|
+  == #{p.account.name} => #{p.amount}<br>
+        
+
 |
 = link_to 'Back', url(:journals)

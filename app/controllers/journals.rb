@@ -19,6 +19,13 @@ class Journals < Application
     display @journal, :layout => layout?
   end
 
+  def show(id)
+    @journal = Journal.get(id)
+    raise NotFound unless @journal
+    display @journal
+  end
+
+
   def add_account
     partial :account_amount, :layout => layout?, :last_account => true, :account_type => (params[:account_type]||"credit_account").to_sym, :account => {}
   end

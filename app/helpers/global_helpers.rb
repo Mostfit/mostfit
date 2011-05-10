@@ -431,16 +431,23 @@ module Merb
     end
 
     def get_accessible_funders(user=nil)
-      (if user.role == :funder
+      (if session.user.role == :funder
         Funder.all(:user => user)
       else
         Funder.all
       end).map{|x| [x.id, "#{x.name}"]}
     end
 
-  #  def get_accessible_funding_lines(funder_id, user = nil)
-      
-  #  end
+    def get_accessible_funding_lines(funder_id, user = nil)
+      fl = if user or session.user.role == :funder
+             FundingLine.all(:funder => get_accessible_funders)
+           elsif funder_id and not funder_id.blank?
+             FundingLine.all(:funder_id => funder_id)
+           else
+             []
+           end
+      fl.map{|x| [x.id, "#{x.name}"]}
+    end
 
     #this function is for getting the list of accounts whose account_category is Cash and belongs to a particular branch.
     def get_accessible_cash_accounts(branch_id)

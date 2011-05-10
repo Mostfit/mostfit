@@ -13,7 +13,6 @@
     = select :new_branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select a branch", :selected => (@new_branch ? @new_branch.id.to_s : "")
     %input{:type => "hidden", :name => "_target_", :value => "accounting_rule"}
     = submit "GO"
-  /- debugger
   - if @rule_books
     - if @rule_books.empty? 
       %div.error

@@ -19,19 +19,22 @@ class Verifications < Application
       @payments = payments.paginate(:page => params[:page], :per_page => 100)
     when "portfolios"
       @portfolios = portfolios.paginate(:page => params[:page], :per_page => 100)
+    when "journals"
+      @journals = journals.paginate(:page => params[:page], :per_page => 100)
     else
       if @centers.length>0
         @clients_count  = clients.count
         @loans_count    = loans.count
         @payments_count = payments.count
         @portfolios_count = portfolios.count
+        @journals_count = journals.count
       end
     end
     display "verifications/index"
   end
 
   def update(id)
-    if ["clients", "loans", "payments", "portfolios"].include?(id) and params[id]
+    if ["clients", "loans", "payments", "portfolios", "journals"].include?(id) and params[id]
       klass = Kernel.const_get(id.singularize.capitalize)
       verifier_id = session.user.id
       ids = params[id].keys.collect{|x| x.to_i}.join(',')
@@ -91,4 +94,12 @@ class Verifications < Application
     end
     centers
   end
+
+  def journals
+    hash = {:verified_by_user_id => nil}
+    hash[:created_at] = @from_date..@to_date
+    hash[:fields]     = [:id]
+    Journal.all(hash)
+  end
+
 end
