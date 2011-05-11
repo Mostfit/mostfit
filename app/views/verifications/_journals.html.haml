@@ -1,0 +1,38 @@
+%h2
+  Journals
+=form_for(@journals, :action => url("verifications/update/journals")) do
+  - if @journals and @journals.length>0
+    %table{:width => "100%"}
+      %tr{:style => "text-align: left;"}
+        %th
+          id
+        %th
+          Comment
+        %th
+          Debits
+        %th
+          Credits
+        %th
+          %a{:href => "#", :onclick => "$('input.client_approval_box').attr('checked', true);"}
+            Check all
+          ==/
+          %a{:href => "#", :onclick => "$('input.client_approval_box').attr('checked',false);"}
+            Check none
+      -@journals.each do |journal|
+        %tr
+          %td
+            = link_to journal.id, resource(journal)
+          %td
+            = journal.comment
+          %td
+            = journal.postings.select{|p| p.amount > 0}.map{|p| "#{p.account.name} => #{p.amount}<br>"}
+          %td
+            = journal.postings.select{|p| p.amount < 0}.map{|p| "#{p.account.name} => #{p.amount}<br>"}
+          %td
+            =check_box(:name => "journals[#{journal.id}][]", :class => "client_approval_box", :value => 1)
+      %tr
+        %td{:colspan => 8}
+        %td
+          =submit("Approve")
+  -else
+    %i==No pending verifications
