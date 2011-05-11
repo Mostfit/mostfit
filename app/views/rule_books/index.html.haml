@@ -44,7 +44,7 @@
           = debit_account.name
           %br
       %td
-        = link_to 'Edit', url(:edit_rule_book,  rule_book, {:return => params[:return]})
+        = link_to 'Edit', url(:edit_rule_book,  rule_book, {:return => (url(:accounts) + "#accounting_rules")})
 
 = paginate @rule_books
 = link_to 'New', url(:new_rule_book, :return => params[:return]), :class => "_remote_"
