@@ -29,8 +29,8 @@ class RuleBook
   belongs_to :updated_by, :child_key => [:updated_by_user_id], :model => 'User'  
   
   validates_present      :name
-  validates_is_unique    :name
-  validates_length       :name,     :minimum => 3
+  validates_is_unique    :name, :scope => :branch
+  validates_length       :name, :minimum => 3
   validates_with_method  :debit_account,   :method => :credit_account_is_not_same_as_debit_account?
 #  validates_with_method  :action_not_chosen_twice_for_particular_branch
   validates_with_method  :percentage_should_be_100

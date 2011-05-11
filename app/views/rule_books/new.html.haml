@@ -6,14 +6,17 @@
   %h2
     %form{:action => resource(:rule_books, :new, {:return => params[:return]}), :method => :get, :class => (request.xhr? ? "_remote_" : "")} 
       Branch
-      = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select branch", :selected => params[:branch_id]
+      - if @branch
+        - branch_id = @branch.id.to_s
+      - branch_id ||= params[:branch_id]
+      = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select branch", :selected => branch_id
       %input{:type => :hidden, :name => "_target_", :value => "rule_container"}
       = submit "GO"
   - if @branch
     = form_for(@rule_book, :action => form_url, :class => "form") do
       %fieldset
         %h1 Create a Rule
-        = hidden_field :branch_id, :value => params[:branch_id]
+        = hidden_field :branch_id, :value => @branch.id.to_s
         = partial "rule_books/fields"
         = submit "Create"
         = link_to "Cancel", url(:rule_books)

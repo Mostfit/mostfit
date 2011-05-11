@@ -1,50 +1,73 @@
-%table
-  %h1 List of Accounting Rules
-  %tr
-    %th 
-      Rule Name 
-    %th
-      Branch
-    %th 
-      Action
-    %th
-      From date
-    %th
-      To date
-    %th
-      Active
-    %th
-      Credit accounts
-    %th
-      Debit accounts
-  %tr
-  - for rule_book in @rule_books.all(:order => [:branch_id.asc, :action.desc])    
+#accounting_rules_table  
+  %form._remote_{:method => :get, :action => url(:rule_books, :return => "/accounts"), :style => "float: right"}
+    %b Show accounts of 
+    = select :branch_id, :collection => Branch.all.map{|b| [b.id, b.name]}, :prompt => "All rules"
+    = hidden_field :name => "_target_", :value => "accounting_rules_table"
+    = submit "GO"
+  %table.report.nojs
+    %h1 
+      List of Accounting Rules  
+    = link_to "Add a new rule", url(:new_rule_book, :return => params[:return], :branch_id => params[:branch_id]), :class => "_remote_ add"
     %tr
-      %td
-        = rule_book.name
-      %td
-        - branch_name = "No Branch"
-        - if rule_book.branch != nil
-          - branch_name = rule_book.branch.name
-        = branch_name
-      %td 
-        = rule_book.action.camelcase(' ')
-      %td
-        = rule_book.from_date
-      %td
-        = rule_book.to_date
-      %td
-        = rule_book.active
-      %td 
-        - rule_book.credit_accounts.map do |credit_account|
-          = credit_account.name
-          %br
-      %td
-        - rule_book.debit_accounts.each do |debit_account|
-          = debit_account.name
-          %br
-      %td
-        = link_to 'Edit', url(:edit_rule_book,  rule_book, {:return => (url(:accounts) + "#accounting_rules")})
+      %th 
+        Rule Name 
+      %th
+        Branch
+      %th 
+        Action
+      %th
+        Journal type
+      %th
+        Credit accounts
+      %th
+        Debit accounts
+      %th
+        From date
+      %th
+        To date
+      %th
+        Active
+      %th
+    %tr
+    - for rule_book in @rule_books.all(:order => [:branch_id.asc, :action.desc])    
+      %tr
+        %td
+          = rule_book.name
+        %td
+          - branch_name = "No Branch"
+          - if rule_book.branch != nil
+            - branch_name = rule_book.branch.name
+          = branch_name
+        %td 
+          = rule_book.action.camelcase(' ')
+        %td
+          - if rule_book.journal_type
+            - if rule_book.journal_type.name.downcase.to_sym == :payment
+              %span.pink
+                = rule_book.journal_type.name
+            - elsif rule_book.journal_type.name.downcase.to_sym == :receipt
+              %span.green
+                = rule_book.journal_type.name
+            - else
+              %span.blue
+                = rule_book.journal_type.name
+        %td 
+          - rule_book.credit_accounts.map do |credit_account|
+            = credit_account.name
+            %br
+        %td
+          - rule_book.debit_accounts.each do |debit_account|
+            = debit_account.name
+            %br
+        %td
+          = rule_book.from_date
+        %td
+          = rule_book.to_date
+        %td
+          = rule_book.active
+        %td
+          = link_to 'Edit', url(:edit_rule_book,  rule_book, {:return => (url(:accounts) + "#accounting_rules")})
+  
+  = paginate @rule_books
+  %br
 
-= paginate @rule_books
-= link_to 'New', url(:new_rule_book, :return => params[:return]), :class => "_remote_"

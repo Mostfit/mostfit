@@ -2,7 +2,12 @@ class RuleBooks < Application
   # provides :xml, :yaml, :js
 
   def index
-    @rule_books = RuleBook.all.paginate(:page =>params[:page],:per_page => 15)
+    hash = {}
+    if params[:branch_id] and params[:branch_id].to_i > 0
+      hash[:branch_id] = params[:branch_id].to_i
+    end
+
+    @rule_books = RuleBook.all(hash).paginate(:page =>params[:page],:per_page => 15)
     display @rule_books, :layout => layout?
   end
 
@@ -38,6 +43,7 @@ class RuleBooks < Application
       redirect(params[:return]||resource(:rule_books), :message => {:notice => "RuleBook was successfully created"})
     else
       @accounts = Account.all(:branch_id => params[:branch_id], :order => [:account_type_id]).map{|x| [x.id ,"#{x.account_type.name} -- #{x.name}"]}
+      @branch   = @rule_book.branch if @rule_book.branch
       message[:error] = "RuleBook failed to be created"
       render :new
     end
