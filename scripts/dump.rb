@@ -9,7 +9,7 @@ require 'yaml'
 mostfit_dir = File.expand_path(ARGV[0]) rescue Dir.pwd
 
 config  = YAML.load_file(File.join(mostfit_dir, 'config', 'database.yml'))
-db_name = config['rake']['database']
+db_name = config['production']['database']
 
 dump_name = "#{File.basename(mostfit_dir)}-dump-#{Date.today}"
 dump_path = File.join(mostfit_dir, dump_name)
