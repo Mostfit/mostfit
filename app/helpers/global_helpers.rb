@@ -396,14 +396,14 @@ module Merb
       end
     end
 
-    def get_accessible_branches(area_id, staff=nil)
+    # when a staff member logs in
+    # then this function returns the branches controlled or accessible
+    # Otheerwise it returns branches in order by name fashion
+    def get_accessible_branches(staff=nil)
       if staff or staff=session.user.staff_member
-      #  [staff.centers.branches, staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten
-        Branch.all(:area => get_accessible_area, :order => [:name])
-      elsif area_id and not area_id.blank?
-        Branch.all(:area_id => area_id, :order => [:name])
+        [staff.centers.branches, staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten
       else
-        []
+        Branch.all(:order => [:name])
       end
     end
     
