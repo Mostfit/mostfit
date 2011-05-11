@@ -18,6 +18,9 @@
   %hr
   .box
     %h3 Applicable fees
+    - if @loan.applicable_fees.empty?
+      = form_for(@loan, :action => url_for_loan(@loan)) do
+        = submit 'Apply Fees'
     = partial "applicable_fees/list", :layout => false, :applicable_fees => @loan.applicable_fees
 - if session.user.role==:admin
   %hr
