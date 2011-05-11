@@ -95,7 +95,7 @@ module Mostfit
     end
     
     class ComplexCondition
-      attr_accessor :is_basic_condition , :basic_condition #makes sense only if its a basic condition
+      attr_accessor :basic_condition
       attr_accessor :operator #makes sense only if its not a basic condition
       attr_accessor :condition1, :condition2 #makes sense only if its not a basic condition
       
@@ -105,21 +105,22 @@ module Mostfit
           c.operator = :not
           c.condition1 = ComplexCondition.get_condition(cond[:first_condition])
           c.condition2 = nil
-          c.is_basic_condition = false
           return c
         elsif((cond[:linking_operator] != nil) and (cond[:linking_operator].to_sym == :and) || (cond[:linking_operator].to_sym == :or)) then
           c = new
           c.operator = cond[:linking_operator]
           c.condition1 = ComplexCondition.get_condition(cond[:first_condition])
           c.condition2 = ComplexCondition.get_condition(cond[:second_condition])
-          c.is_basic_condition = false
           return c
         else
           c = new
-          c.is_basic_condition = true
           c.basic_condition = BasicCondition.get_basic_condition(cond)
           return c
         end
+      end
+
+      def is_basic_condition
+        !!basic_condition
       end
       
       def check_condition(obj)
