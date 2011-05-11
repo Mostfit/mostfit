@@ -36,7 +36,7 @@
         %td.text
           = journal.date
         %td
-          = journal.id
+          = link_to journal.id, resource(journal)
         - debit_postings, credit_postings = journal.postings.group_by{|x| x.amount>0}.values
         %td.text 
           - debit_postings.each do |p|
