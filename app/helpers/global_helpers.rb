@@ -396,11 +396,14 @@ module Merb
       end
     end
 
-    def get_accessible_branches(staff=nil)
+    def get_accessible_branches(area_id, staff=nil)
       if staff or staff=session.user.staff_member
-        [staff.centers.branches, staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten
+      #  [staff.centers.branches, staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten
+        Branch.all(:area => get_accessible_area, :order => [:name])
+      elsif area_id and not area_id.blank?
+        Branch.all(:area_id => area_id, :order => [:name])
       else
-        Branch.all(:order => [:name])
+        []
       end
     end
     

@@ -609,6 +609,18 @@ function fillCenters(){
 				 });
 }
 
+function fillBranches(){
+    $("#area_selector").change(function(){
+	$.ajax({
+	    type: "GET",
+	    url: "/areas/branches/"+$("#area_selector").val(),
+	    success: function(data){
+		$("#branch_selector").html(data);
+	    }
+	});
+    });
+}
+
 function fillAccounts(){
     $("#branch_selector").change(function(){
 	                             $.ajax({
@@ -734,7 +746,8 @@ function portfolioCalculations(){
 $(document).ready(function(){
 		      create_remotes();
 		      attachFormRemote();
-		      fillCenters();
+                      fillCenters();
+                      fillBranches();
 		      fillAccounts();
 		      fillFundingLines();
 		      fillCashAccounts();
