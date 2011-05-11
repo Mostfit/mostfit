@@ -12,7 +12,7 @@ config  = YAML.load_file(File.join(mostfit_dir, 'config', 'database.yml'))
 db_name = config['production']['database']
 
 d = DateTime.now
-dump_name = "#{File.basename(mostfit_dir)}-dump-#{d.strftime('%F-%H:%M')}"
+dump_name = "#{File.basename(mostfit_dir)}-dump-#{d.strftime('%F-%H:%M')}.sql"
 dump_path = File.join(mostfit_dir, dump_name)
 
 # dump, and compress
