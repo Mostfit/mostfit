@@ -11,7 +11,8 @@ mostfit_dir = File.expand_path(ARGV[0]) rescue Dir.pwd
 config  = YAML.load_file(File.join(mostfit_dir, 'config', 'database.yml'))
 db_name = config['production']['database']
 
-dump_name = "#{File.basename(mostfit_dir)}-dump-#{Date.today}"
+d = DateTime.now
+dump_name = "#{File.basename(mostfit_dir)}-dump-#{d.strftime('%F-%H:%M')}"
 dump_path = File.join(mostfit_dir, dump_name)
 
 # dump, and compress
