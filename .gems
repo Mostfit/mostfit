@@ -6,7 +6,7 @@ merb-mailer -v 1.0.13
 merb-haml -v 1.0.13
 merb-slices -v 1.0.13
 merb-auth-core -v 1.0.13
-merb-auth-more -v 1.0.13
+merb-auth-more -v 1.0.13 --ignore-dependencies
 merb-auth-slice-password -v 1.0.13
 merb-param-protection -v 1.0.13
 merb-exceptions -v 1.0.13
