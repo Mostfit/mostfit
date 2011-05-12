@@ -16,7 +16,7 @@
       Sample schedule
   %div.tab
     %table.form
-      - [:name, :loan_type_string, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments, :installment_frequency, :valid_from, :valid_upto].each do |attr|
+      - [:name, :loan_type_string, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments, :installment_frequency, :rounding, :rounding_style, :valid_from, :valid_upto].each do |attr|
         %tr
           %th{:align => "left"}
             = attr.humanize
@@ -59,7 +59,7 @@
           balance   
       - begin
         - unless /^Take/.match(@loan_product.loan_type.to_s)
-          - loan = Loan.new(:loan_product => @loan_product, :discriminator => @loan_product.loan_type, :amount => @loan_product.min_amount, :interest_rate => @loan_product.min_interest_rate / 100, :disbursal_date => Date.today, :installment_frequency => @loan_product.installment_frequency, :number_of_installments => @loan_product.min_number_of_installments, :applied_by => StaffMember.new, :scheduled_first_payment_date => Date.today + 7, :client => Client.new)
+          - loan = Loan.new(:loan_product => @loan_product, :discriminator => (@loan_product.loan_type_string || @loan_product.loan_type), :amount => @loan_product.min_amount, :interest_rate => @loan_product.min_interest_rate / 100, :disbursal_date => Date.today, :installment_frequency => @loan_product.installment_frequency, :number_of_installments => @loan_product.min_number_of_installments, :applied_by => StaffMember.new, :scheduled_first_payment_date => Date.today + 7, :client => Client.new)
           - paid = 0
           - loan.payment_schedule.sort_by{|date, data| date}.each do |date, ps|      
             %tr

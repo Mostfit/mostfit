@@ -22,7 +22,7 @@ class LoanProduct
 
   # this is a dirty hack. all this should go into the RepaymentStyle
   property :rounding, Integer
-
+  property :rounding_style, Enum.send('[]', *['', 'round', 'floor', 'ceil']), :default => 'round', :nullable => true, :index => true
 
   property :valid_from, Date, :nullable => false, :index => true
   property :valid_upto, Date, :nullable => false, :index => true

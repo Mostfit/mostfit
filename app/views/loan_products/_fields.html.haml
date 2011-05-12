@@ -22,6 +22,12 @@
       = text_field :rounding
   %tr
     %th
+      Rounding Style
+    %td
+      = select :rounding_style, :collection => [[:round, "round"], [:floor, "floor"], [:ceil, "ceil"]]
+      %greytext  By default, round is choosen as the rounding style
+  %tr
+    %th
       Valid from
     %td
       = date_select_for @loan_product, :valid_from
