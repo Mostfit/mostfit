@@ -16,8 +16,21 @@ class CreditAccountRule
       amount = Loan.all("client.center.branch_id" => self.rule_book.branch.id, :disbursal_date => date, :rejected_on => nil).aggregate(:amount.sum) || 0
     when :principal
       amount = Payment.all("client.center.branch_id" => self.rule_book.branch.id, :type => :principal, :received_on => date).aggregate(:amount.sum) || 0
+      advance = LoanHistory.sum_advance_payment(date, date, :branch, ["branch_id = #{self.rule_book.branch.id}"]).first
+      if advance.nil?
+        amount
+      else
+        amount -= advance.advance_principal.to_i
+      end
     when :interest
       amount = Payment.all("client.center.branch_id" => self.rule_book.branch.id, :type => :interest, :received_on => date).aggregate(:amount.sum) || 0
+      advance = LoanHistory.sum_advance_payment(date, date, :branch, ["branch_id = #{self.rule_book.branch.id}"]).first
+      advance_interest  = advance ? (advance.advance_total - advance.advance_principal).to_i : 0
+      if advance_interest == 0
+        amount
+      else
+        amount -= advance_interest
+      end
     when :fees
       amount = Payment.all("client.center.branch_id" => self.rule_book.branch.id, :type => :fees, :fee => self.rule_book.fee, :received_on => date).aggregate(:amount.sum) || 0
     when :advance_principal
