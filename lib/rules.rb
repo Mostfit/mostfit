@@ -191,10 +191,13 @@ module Mostfit
       end
       
       def self.apply_rule(rule)
-        h = {:name => rule[:name], :on_action => rule[:on_action], :model_name => rule[:model_name], 
-          :permit => rule[:permit], :condition => convert_to_polish_notation(rule[:condition]),
-          :precondition => convert_to_polish_notation(rule[:precondition]),
-          :active => rule[:active] }
+        # better not to modify the 'rule' argument
+        h = rule.clone
+
+        # sanitize the (pre-)conditions
+        h[:precondition] = convert_to_polish_notation(h[:precondition])
+        h[:condition]    = convert_to_polish_notation(h[:condition])
+
         self.add h
       end
       
