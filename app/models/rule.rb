@@ -55,7 +55,9 @@ class Rule
     if h[:condition] == nil
       return [false, "no condition given"]
     end
-    Mostfit::Business::Rules.apply_rule h
-  end
 
+    # If apply_rule raises a runtime error, we simply cause the validation to
+    # fail (return 'false').
+    Mostfit::Business::Rules.apply_rule(h) rescue false
+  end
 end
