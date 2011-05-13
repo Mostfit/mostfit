@@ -26,6 +26,11 @@ class Rules < Application
 
   def create(rule)
     rule = fix_conditions(rule)
+
+    # Rule.new fails if on_action is an empty string; make it nil, so this will
+    # be trapped by the validations later.
+    rule[:on_action] = nil if rule[:on_action].empty?
+
     @rule = Rule.new(rule)
     if @rule.save
       redirect resource(@rule), :message => {:notice => "Rule was successfully created"}
