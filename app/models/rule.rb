@@ -48,13 +48,13 @@ class Rule
 
 
   def apply_rule
+    # can't go ahead without a condition
+    return false unless condition
+
     #puts "Applying Rule #{@name}"
     h = {:name => @name, :on_action => @on_action, :model_name => @model_name, 
 	    :permit => @permit, :condition => @condition, :precondition => @precondition,
             :active => @active}
-    if h[:condition] == nil
-      return [false, "no condition given"]
-    end
 
     # If apply_rule raises a runtime error, we simply cause the validation to
     # fail (return 'false').
