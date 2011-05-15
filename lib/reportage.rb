@@ -1,16 +1,21 @@
 # Reportage - the Mostfit Reporting Library
 
-
-
+# TODO - convert LoanBucket into sublass of Bucket
+#      - use aggregate for database fields to speed things up
       
 class LoanBucket < Hash
 
   attr_accessor :_balances
 
   def columns(cols, date)
+    rv = {}
+    self.keys.each{|b| rv[b.to_s] = {}}
     cols.map do |function| 
-      self.send(function, date)
+      self.send(function, date).each do |b,v| 
+        rv[b.to_s] = rv[b.to_s].merge(function => v)
+      end
     end
+    rv
   end
         
   def balances(date)
@@ -19,11 +24,11 @@ class LoanBucket < Hash
   end
     
   def scheduled_outstanding_principal(date)
-    self.map{|bucket, ids| [bucket, {:scheduled_outstanding_principal => balances(date)[bucket][0].scheduled_outstanding_principal.to_f}]}.to_hash
+    self.map{|bucket, ids| [bucket, balances(date)[bucket][0].scheduled_outstanding_principal.to_f]}.to_hash
   end
 
   def actual_outstanding_principal(date)
-    self.map{|bucket, ids| [bucket, {:actual_outstanding_principal => balances(date)[bucket][0].actual_outstanding_principal.to_f}]}.to_hash
+    self.map{|bucket, ids| [bucket, balances(date)[bucket][0].actual_outstanding_principal.to_f]}.to_hash
   end
 
 end
