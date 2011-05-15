@@ -6,6 +6,7 @@ class Loan
 
   before :valid?,  :parse_dates
   before :valid?,  :convert_blank_to_nil
+  before :save,    :update_scheduled_maturity_date
   after  :save,    :update_history_caller  # also seems to do updates
   after  :save,    :levy_fees
   before :create,  :update_cycle_number
@@ -69,6 +70,9 @@ class Loan
 
   property :loan_utilization_id,                Integer, :lazy => true, :nullable => true
   property :under_claim_settlement,             Date, :nullable => true
+
+  property :_scheduled_maturity_date,           Date
+
   
 #  property :taken_over_on,                     Date
 #  property :taken_over_on_installment_number,  Integer 
@@ -825,12 +829,12 @@ class Loan
     shift_date_by_installments(scheduled_first_payment_date, number-1)
   end
   def scheduled_maturity_date
-    shift_date_by_installments(scheduled_first_payment_date, number_of_installments - 1, self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days))
+    payment_schedule.keys.max
   end
   def scheduled_repaid_on
     # first payment is on "scheduled_first_payment_date", so number_of_installments-1 periods later
     # we find the scheduled_repaid_on date.
-    shift_date_by_installments(scheduled_first_payment_date, actual_number_of_installments - 1)
+    scheduled_maturity_date
   end
   # the installment dates
   def installment_dates
@@ -990,6 +994,10 @@ class Loan
       end
     }
     self.amount      ||= self.amount_applied_for
+  end
+
+  def update_scheduled_maturity_date
+    self._scheduled_maturity_date = scheduled_maturity_date if @schedule
   end
 
   # repayment styles
