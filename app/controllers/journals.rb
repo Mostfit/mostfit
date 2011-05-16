@@ -19,6 +19,13 @@ class Journals < Application
     display @journal, :layout => layout?
   end
 
+  def show(id)
+    @journal = Journal.get(id)
+    raise NotFound unless @journal
+    display @journal
+  end
+
+
   def add_account
     partial :account_amount, :layout => layout?, :last_account => true, :account_type => (params[:account_type]||"credit_account").to_sym, :account => {}
   end
@@ -93,26 +100,45 @@ class Journals < Application
     if params[:debit_accounts] and params[:credit_accounts]
       #multiple debit and credit accounts
       debit_accounts, credit_accounts  = {}, {}
-      params[:debit_accounts].each{|debit|
-        debit_accounts[Account.get(debit[:account_id])] ||= 0
-        debit_accounts[Account.get(debit[:account_id])] += debit[:amount].to_i
+      
+      params[:debit_accounts].group_by{|x| x[:journal_type_id]}.each{|jid, debits|
+        debit_accounts[jid] ||= {}
+        debits.each{|debit|
+          debit_accounts[jid][Account.get(debit[:account_id])] ||= 0
+          debit_accounts[jid][Account.get(debit[:account_id])] += debit[:amount].to_i
+        }
       }
 
-      params[:credit_accounts].each{|credit|
-        credit_accounts[Account.get(credit[:account_id])] ||= 0
-        credit_accounts[Account.get(credit[:account_id])] += credit[:amount].to_i      
+      params[:credit_accounts].group_by{|x| x[:journal_type_id]}.each{|jid, credits|
+        credit_accounts[jid] ||= {}
+        credits.each{|credit|
+          credit_accounts[jid][Account.get(credit[:account_id])] ||= 0
+          credit_accounts[jid][Account.get(credit[:account_id])] += credit[:amount].to_i
+        }
       }
+
+      # get the uniq journal types
+      journal_types = debit_accounts.keys
     else
       raise BadRequest
     end
 
-    debit_accounts  = debit_accounts.reject{|k, v| v == 0}
-    credit_accounts = credit_accounts.reject{|k, v| v == 0}
+    statuses, journals = [], []
 
-    journal[:currency] = Currency.first
-    status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)
+    journal_types.each{|journal_type|
+      # reject accounts where amounts are zero
+      debit_accounts[journal_type]  = debit_accounts[journal_type].reject{|k, v| v == 0}
+      credit_accounts[journal_type] = credit_accounts[journal_type].reject{|k, v| v == 0}
 
-    if status
+      journal[:journal_type_id] = journal_type.to_i
+      journal[:currency] = Currency.first
+
+      status, journal_obj = Journal.create_transaction(journal, debit_accounts[journal_type], credit_accounts[journal_type])
+      statuses.push(status)
+      journals.push(journal_obj)
+    }
+
+    if not statuses.include?(false)
       if params[:return] and not params[:return].blank?        
         return_path =  params[:return]
       elsif @branch
@@ -127,7 +153,16 @@ class Journals < Application
         redirect return_path, :message => {:notice => "Journal was successfully created"}
       end
     else
-      message[:error] = "Journal failed to be created"
+      message[:error] = ""
+      statuses.each_with_index{|status, i|
+        unless status
+          if journals[i] and journals[i].journal_type
+            message[:error] += "#{journals[i].journal_type.name} journal failed to be created"
+          else
+            message[:error] += "Journal failed to be created because #{journals[i].errors.to_s}"
+          end
+        end
+      }
       render :new, :layout => layout?
     end
   end

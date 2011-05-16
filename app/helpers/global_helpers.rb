@@ -396,6 +396,9 @@ module Merb
       end
     end
 
+    # when a staff member logs in
+    # then this function returns the branches controlled or accessible
+    # Otheerwise it returns branches in order by name fashion
     def get_accessible_branches(staff=nil)
       if staff or staff=session.user.staff_member
         [staff.centers.branches, staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten
@@ -431,16 +434,23 @@ module Merb
     end
 
     def get_accessible_funders(user=nil)
-      (if user.role == :funder
+      (if session.user.role == :funder
         Funder.all(:user => user)
       else
         Funder.all
       end).map{|x| [x.id, "#{x.name}"]}
     end
 
-  #  def get_accessible_funding_lines(funder_id, user = nil)
-      
-  #  end
+    def get_accessible_funding_lines(funder_id, user = nil)
+      fl = if user or session.user.role == :funder
+             FundingLine.all(:funder => get_accessible_funders)
+           elsif funder_id and not funder_id.blank?
+             FundingLine.all(:funder_id => funder_id)
+           else
+             []
+           end
+      fl.map{|x| [x.id, "#{x.name}"]}
+    end
 
     #this function is for getting the list of accounts whose account_category is Cash and belongs to a particular branch.
     def get_accessible_cash_accounts(branch_id)

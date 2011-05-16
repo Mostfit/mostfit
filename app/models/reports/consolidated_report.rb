@@ -1,5 +1,5 @@
 class ConsolidatedReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :funder, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id, :report_by_loan_disbursed_during_selected_date_range
+  attr_accessor :from_date, :to_date, :branch, :center, :funder, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id, :report_by_loan_disbursed_during_selected_date_range, :funding_line, :funding_line_id, :loan_cycle
 
   validates_with_method :from_date, :date_should_not_be_in_future
 
@@ -34,6 +34,20 @@ class ConsolidatedReport < Report
       funder_loan_ids = @funder.loan_ids
       funder_loan_ids = ["NULL"] if funder_loan_ids.length == 0
       extra    << "l.id in (#{funder_loan_ids.join(", ")})" 
+    end
+
+    #if funding_lines are selected
+    if @funding_line
+      funding_line_ids = @funding_line.funder
+      funding_line_ids = ["NULL"] if funding_line_ids.length == 0
+      extra   << "l.id in (#{funding_line_ids.join(", ")})"
+    end
+
+    #if loan cycle_number is selected
+    if @loan_cycle
+      lc = @loan_cycle
+      lc = ["NULL"] if @loan_cycle.nil?
+      extra   << "l.cycle_number = #{lc}"
     end
 
     histories = (LoanHistory.sum_outstanding_grouped_by(self.to_date, [:branch, :center], extra)||{}).group_by{|x| x.center_id}
@@ -108,7 +122,19 @@ class ConsolidatedReport < Report
       froms += ", loans l" unless froms.include?(", loans l")
       extra_condition += "and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
       extra_condition += " and l.id in (#{funder_loan_ids.join(', ')})"
-    end      
+    end
+
+    if funding_line_ids and funding_line_ids.length > 0
+      froms += ", loans l" unless froms.include?(", loans l")
+      extra_condition += "and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
+      extra_condition += "and l.id in (#{funding_line_ids.join(', ')})"
+    end
+
+    if lc and not lc.nil?
+      froms += ", loans l" unless froms.include?(", loans l")
+      extra_condition += "and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
+      extra_condition += "and l.cycle_number = #{lc}"
+    end
 
     repository.adapter.query(%Q{
                                SELECT p.received_by_staff_id staff_id, c.id center_id, c.branch_id branch_id, type ptype, SUM(p.amount) amount

@@ -15,6 +15,7 @@
   - chosen_year = (params[report] and params[report][:chosen_year] and not params[report][:chosen_year].blank?) ? params[report][:chosen_year] : nil
   - cash_account = (params[report] and params[report][:cash_account] and not params[report][:cash_account].blank?) ? params[report][:cash_account] : nil
   - bank_account = (params[report] and params[report][:bank_account] and not params[report][:bank_account].blank?) ? params[report][:bank_account] : nil
+  - loan_cycle = (params[report] and params[report][:loan_cycle] and not params[report][:loan_cycle].blank?) ? params[report][:loan_cycle] : nil
   - if params[:submit]
     %h3{:style => "margin-bottom: 5px;"}
       - if area_id
@@ -71,6 +72,10 @@
         |
         Account:
         = Account.get(bank_account).name
+      - if loan_cycle
+        |
+        Loan Cycle:
+        = params[report][:loan_cycle]
     %a.expand_collapsed{:href => "#"}
       Change parameters
   %div{:class => "#{params[:submit] ? 'collapsed' : ''}"}
@@ -79,19 +84,19 @@
         %tr
           - if @report.respond_to?(:from_date)
             %td
-              From
+              From:
               = date_select_for(@report, "from_date", :date => @report.from_date)
           - if @report.respond_to?(:to_date)
             %td
-              To
+              To:
               = date_select_for(@report, "to_date", :date => @report.to_date)
           - if @report.respond_to?(:date)
             %td
-              Date
+              Date:
               = date_select_for(@report, "date", :date => @report.date)
           - if @report.respond_to?(:loan_product_id)
             %td
-              Product
+              Product:
               = select(:loan_product_id, :collection => LoanProduct.all.map{|x| [x.id, x.name]}, :include_blank => true, :selected => loan_product_id)
           - if @report.respond_to?(:late_by_more_than_days)
             %td
@@ -162,10 +167,6 @@
             %td
               Group by:
               = select(:name => "#{report}[group_by_types]", :selected => (params[report] and params[report][:group_by_types]), :collection => @report.group_types.map{|name, gt| [name, name.to_s.camelcase(" - ")]}.sort_by{|name, gt| gt}, :prompt => "select grouping")
-          - if @report.respond_to?(:report_by_loan_disbursed_during_selected_date_range)
-            %td
-              = check_box(:name => "#{report}[report_by_loan_disbursed_during_selected_date_range]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loan_disbursed_during_selected_date_range) and params[report][:report_by_loan_disbursed_during_selected_date_range] == "1" ? true : false))
-              Show only those loans which were disbursed during selected date range
           - if @report.respond_to?(:ageing_interval)
             %td
               Ageing intervals:
@@ -188,6 +189,18 @@
             %td
               Account:
               = select(:bank_account, :collection => get_accessible_bank_accounts(branch_id), :include_blank => true, :selected => bank_account, :id => "bank_account_selector")
+      %table{:style => "padding-top: 0px;"}
+        %tr
+          - if @report.respond_to?(:loan_cycle)
+            %td
+              Loan Cycle:
+              - lc = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+              = select(:loan_cycle, :collection => lc, :prompt => "select loan cycle")
+          - if @report.respond_to?(:report_by_loan_disbursed_during_selected_date_range)
+            %td
+              = check_box(:name => "#{report}[report_by_loan_disbursed_during_selected_date_range]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loan_disbursed_during_selected_date_range) and params[report][:report_by_loan_disbursed_during_selected_date_range] == "1" ? true : false))
+              Show loans disbursed during selected date range only
+
         %tr
           %td
             %div{:style => "float: left"}

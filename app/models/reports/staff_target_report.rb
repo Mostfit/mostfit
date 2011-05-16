@@ -2,7 +2,7 @@
 class StaffTargetReport < Report
   attr_accessor :branch_id, :branch, :to_date, :area_id, :area, :type_of_target
 
-  validates_with_method :branch_id, :method => :branch_or_area_present
+  validates_with_method :area_id, :method => :area_should_be_present
 
   def initialize(params, dates, user)
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
@@ -139,8 +139,8 @@ class StaffTargetReport < Report
     return data
   end
 
-  def branch_or_area_present
-    return [false, "Either branch or area should be selected"] if (branch_id and area_id) or (not branch_id and not area_id)
+  def area_should_be_present
+    return [false, "Area cannot be blank"] if area_id.blank?
     return true
   end
   

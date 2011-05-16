@@ -12,7 +12,7 @@ Merb::Router.prepare do
   resources :accounting_periods
   resources :journals, :id => %r(\d+)
   resources :loan_utilizations
-  resources :rule_books
+  resources :rule_books, :id => %r(\d+)
   resources :applicable_fees
   resources :account_types
   resources :accounts, :id => %r(\d+) do

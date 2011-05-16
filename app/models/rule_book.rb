@@ -29,8 +29,8 @@ class RuleBook
   belongs_to :updated_by, :child_key => [:updated_by_user_id], :model => 'User'  
   
   validates_present      :name
-  validates_is_unique    :name
-  validates_length       :name,     :minimum => 3
+  validates_is_unique    :name, :scope => :branch
+  validates_length       :name, :minimum => 3
   validates_with_method  :debit_account,   :method => :credit_account_is_not_same_as_debit_account?
 #  validates_with_method  :action_not_chosen_twice_for_particular_branch
   validates_with_method  :percentage_should_be_100
@@ -121,6 +121,17 @@ class RuleBook
       [false, "Credit and Debit account cannot be same"]
     else
       return true 
+    end
+  end
+
+  def journals(date)
+    ids = (Posting.all("journal.date" => date, :amount.lt => 0,
+                       :account => self.debit_accounts).aggregate(:journal_id) & Posting.all("journal.date" => date, :amount.gt => 0, 
+                                                                                             :account => self.credit_accounts).aggregate(:journal_id))
+    if ids.length > 0
+      Journal.all(:id => ids)
+    else
+      nil
     end
   end
 

@@ -61,6 +61,14 @@ class Areas < Application
     end
   end
 
+  def branches
+    if params[:id]
+      area = Area.get(params[:id])
+      next unless area
+      return("<option value=''>Select branch</option>"+area.branches(:order => [:name]).map{|br| "<option value=#{br.id}>#{br.name}</option>"}.join)
+    end
+  end
+
   private
   def get_region
     @region = params[:region_id] ? Region.get(params[:region_id]) : nil

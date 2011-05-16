@@ -26,6 +26,11 @@ class Rules < Application
 
   def create(rule)
     rule = fix_conditions(rule)
+
+    # Rule.new fails if on_action is an empty string; make it nil, so this will
+    # be trapped by the validations later.
+    rule[:on_action] = nil if rule[:on_action].empty?
+
     @rule = Rule.new(rule)
     if @rule.save
       redirect resource(@rule), :message => {:notice => "Rule was successfully created"}
@@ -73,9 +78,20 @@ class Rules < Application
     if rule[:precondition] == nil then rule[:precondition] = ""
     elsif rule[:precondition]["1"]["const_value"] == nil then rule[:precondition] = ""
     elsif rule[:precondition]["1"]["variable"]["1"]["complete"] == nil or rule[:precondition]["1"]["variable"]["1"]["complete"].length == 0 then rule[:precondition] = "" end
-    
-    rule[:condition] = Marshal.dump(rule[:condition])
     rule[:precondition] = Marshal.dump(rule[:precondition])
+    
+    # the way that the rules UI behaves, there are multiple cases that could
+    # mean that a user has not provided a condition for the rule
+    if rule[:condition][:'1'][:const_value].nil? or
+        rule[:condition][:'1'][:variable][:'1'][:complete].nil?
+
+      rule[:condition] = nil
+    end
+
+    # Marshal.dump(nil) = "\004\b0", which would cause validations to assume
+    # that condition is not empty.
+    rule[:condition] = Marshal.dump(rule[:condition]) unless rule[:condition].nil?
+
     return rule
   end
 

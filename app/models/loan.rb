@@ -6,6 +6,7 @@ class Loan
 
   before :valid?,  :parse_dates
   before :valid?,  :convert_blank_to_nil
+  before :save,    :update_scheduled_maturity_date
   after  :save,    :update_history_caller  # also seems to do updates
   after  :save,    :levy_fees
   before :create,  :update_cycle_number
@@ -69,6 +70,9 @@ class Loan
 
   property :loan_utilization_id,                Integer, :lazy => true, :nullable => true
   property :under_claim_settlement,             Date, :nullable => true
+
+  property :_scheduled_maturity_date,           Date
+
   
 #  property :taken_over_on,                     Date
 #  property :taken_over_on_installment_number,  Integer 
@@ -825,12 +829,12 @@ class Loan
     shift_date_by_installments(scheduled_first_payment_date, number-1)
   end
   def scheduled_maturity_date
-    shift_date_by_installments(scheduled_first_payment_date, number_of_installments - 1, self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days))
+    payment_schedule.keys.max
   end
   def scheduled_repaid_on
     # first payment is on "scheduled_first_payment_date", so number_of_installments-1 periods later
     # we find the scheduled_repaid_on date.
-    shift_date_by_installments(scheduled_first_payment_date, actual_number_of_installments - 1)
+    scheduled_maturity_date
   end
   # the installment dates
   def installment_dates
@@ -990,6 +994,10 @@ class Loan
       end
     }
     self.amount      ||= self.amount_applied_for
+  end
+
+  def update_scheduled_maturity_date
+    self._scheduled_maturity_date = scheduled_maturity_date if @schedule
   end
 
   # repayment styles
@@ -1344,9 +1352,9 @@ class PararthRounded < Loan
     _installment = _total / number_of_installments
     rf = 0;
     (1..number_of_installments).to_a.each do |i| 
-      prin = (_prin_per_installment + rf).round
+      prin = (_prin_per_installment + rf).send(loan_product.rounding_style)
       rf = _prin_per_installment - prin + rf
-      int = (_installment - prin).round
+      int = (_installment - prin).send(loan_product.rounding_style)
       @_rounding_schedule[i] =  {:principal => prin, :interest => int}
     end
     return @_rounding_schedule
@@ -1522,10 +1530,10 @@ class RoundedAtLastInstallmentLoan < Loan
     prin = (amount.to_f / number_of_installments)
 
     if number == number_of_installments
-      ro_factor = prin - prin.round
-      (prin.round + (number_of_installments - 1) * ro_factor).round
+      ro_factor = prin - prin.send(loan_product.rounding_style)
+      (prin.send(loan_product.rounding_style) + (number_of_installments - 1) * ro_factor).send(loan_product.rounding_style)
     else
-      prin.round
+      prin.send(loan_product.rounding_style)
     end
   end
 
@@ -1534,10 +1542,10 @@ class RoundedAtLastInstallmentLoan < Loan
     total = (amount.to_f * (1 + interest_rate) / number_of_installments)
 
     if number == number_of_installments
-      ro_factor = total - total.round
-      (total.round - scheduled_principal_for_installment(number) + (number_of_installments - 1) * ro_factor).round
+      ro_factor = total - total.send(loan_product.rounding_style)
+      (total.send(loan_product.rounding_style) - scheduled_principal_for_installment(number) + (number_of_installments - 1) * ro_factor).send(loan_product.rounding_style)
     else
-      total.round - scheduled_principal_for_installment(number)
+      total.send(loan_product.rounding_style) - scheduled_principal_for_installment(number)
     end       
   end
 end
@@ -1550,22 +1558,23 @@ class RoundedPrincipalAndInterestLoan < PararthRounded
     
   def scheduled_principal_for_installment(number)
     raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-    rounding_schedule[number][:principal].round
+    rounding_schedule[number][:principal].send(loan_product.rounding_style)
   end
 
   def scheduled_interest_for_installment(number)
     raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
     if number == number_of_installments
       int_received_so_far = (1..(number-1)).map{|x| rounding_schedule[x][:interest]}.reduce(0){|s,x| s+=x}
-      (amount * interest_rate - int_received_so_far).round
+      (amount * interest_rate - int_received_so_far).send(loan_product.rounding_style)
     else
-      rounding_schedule[number][:interest].round
+      rounding_schedule[number][:interest].send(loan_product.rounding_style)
     end
   end
   
 end
 
 class EquatedWeeklyRoundedAdjustedLastPayment < Loan
+  # This loan product uses the original interest amounts as per the PMT funtion and adjusts principal accordingly.
   include ExcelFormula
   # property :purpose,  String
 
@@ -1637,8 +1646,8 @@ private
     i = 1
     @rounded_schedule = {}
     balance = amount
-    rnd = loan_product.rounding
-    actual_payment = (payment / rnd).round * rnd
+    rnd = loan_product.rounding || 1
+    actual_payment = (payment / rnd).send(loan_product.rounding_style) * rnd
     while not done
       @rounded_schedule[i] = {}
       @rounded_schedule[i][:interest_payable] = (i <= @reducing_schedule.count ? @reducing_schedule[i][:interest_payable] : 0).round(2)
@@ -1652,5 +1661,58 @@ private
 
 end
 
+class EquatedWeeklyRoundedNewInterest < Loan
+  # This loan product recalculates interest based on the new balances after rounding.
+  include ExcelFormula
+  # property :purpose,  String
+
+  def self.display_name
+    "Reducing balance schedule with new interest (Equated Weekly)"
+  end
+  
+  def scheduled_principal_for_installment(number)
+    # number unused in this implentation, subclasses may decide differently
+    # therefor always supply number, so it works for all implementations
+    raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > number_of_installments
+    return reducing_schedule[number][:principal_payable]
+  end
+
+  def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
+    # number unused in this implentation, subclasses may decide differently
+    # therefor always supply number, so it works for all implementations
+    raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
+    return reducing_schedule[number][:interest_payable]
+  end
+  
+private
+  def reducing_schedule
+    return @reducing_schedule if @reducing_schedule
+    @reducing_schedule = {}    
+    balance = amount
+    payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
+    rnd = loan_product.rounding || 1
+    actual_payment = (payment / rnd).send(loan_product.rounding_style) * rnd
+    1.upto(number_of_installments){|installment|
+      @reducing_schedule[installment] = {}
+      @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider)
+      @reducing_schedule[installment][:principal_payable] = [(actual_payment - @reducing_schedule[installment][:interest_payable]), balance].min
+      balance = balance - @reducing_schedule[installment][:principal_payable]
+    }
+    return @reducing_schedule
+  end
+  
+  def get_divider
+    case installment_frequency
+    when :weekly
+      52
+    when :biweekly
+      26
+    when :monthly
+      12
+    when :daily
+      365
+    end    
+  end
+end
 
 # always add new loan types here i.e. at last

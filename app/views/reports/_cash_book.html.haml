@@ -29,13 +29,13 @@
       %td
         = balance.to_currency
       %td
-    - posting_hash = Posting.all(:account.in => @accounts, "journal.date.lte" => @report.to_date, "journal.date.gte" => @report.from_date).map{|p| [p.journal.date, p]}.to_hash
-    - posting_hash.keys.sort.each do |date|
+    - posting_hash = Posting.all(:account.in => @accounts, "journal.date.lte" => @report.to_date, "journal.date.gte" => @report.from_date).map{|p| [p.journal.date, p]}
+    - posting_hash.sort_by{|p| p[0]}.each do |ph|
       %tr{:class => cycle('odd','even')}
-        - posting = posting_hash[date]
+        - posting = ph[1]
         - balance += posting.amount
         %td
-          = date
+          = ph[0]
         %td
           = posting.journal.comment
         %td

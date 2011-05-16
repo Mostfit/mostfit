@@ -103,7 +103,7 @@ Merb::BootLoader.after_app_loads do
 
   # set the rights
   require 'config/misfit'
-  
+  require 'lib/reportage.rb'
   Mostfit::Business::Rules.deploy
   # enable the extensions
   Misfit::Extensions.hook
@@ -175,9 +175,12 @@ Merb::BootLoader.after_app_loads do
   end
 
   # This is to save all the loan_products as we have changed loan_type ENUM to loan_type_string.
-  LoanProduct.all.each{ |l| 
-    if l.loan_type.nil? or l.loan_type_string.nil?
-      l.save
-    end
-  } 
+  begin
+    LoanProduct.all.each{ |l| 
+      if l.loan_type.nil? or l.loan_type_string.nil?
+        l.save
+      end
+    } 
+  rescue
+  end
 end

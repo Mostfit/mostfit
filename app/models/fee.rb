@@ -115,7 +115,16 @@ class Fee
       query.merge!(hash)
       query_str = ApplicableFee.all(query).map{|x| "(#{x.fee_id}, #{x.applicable_id})"}.join(", ")
       parent_col = ((applicable_type == 'Loan') ? "loan_id" : "client_id")
-      repository.adapter.query("SELECT #{parent_col}, SUM(amount) FROM payments WHERE (fee_id, #{parent_col}) in (#{query_str}) AND deleted_at is NULL  GROUP BY #{parent_col}").map{|x| [x[0], x[1]]}.to_hash
+      if query_str.length > 0
+        repository.adapter.query(%Q{SELECT #{parent_col}, SUM(amount) 
+                                  FROM payments 
+                                  WHERE (fee_id, #{parent_col}) in (#{query_str})
+                                        AND deleted_at is NULL
+                                  GROUP BY #{parent_col}
+                              }).map{|x| [x[0], x[1]]}.to_hash
+      else
+        {}
+      end
     else
       {}
     end

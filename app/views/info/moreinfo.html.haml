@@ -141,11 +141,18 @@
     -@fees.each do |fee, amount|
       %tr
         %td
-          %b=fee
+          %b 
+            = fee
         %td
-          =amount
+          - if amount
+            = amount.to_currency
+          - else
+            0
         %td
-          =@total_fees[fee]
+          - if @total_fees[fee]
+            = @total_fees[fee].to_currency
+          - else
+            0
     %tr
       %td
         Amount Outstanding

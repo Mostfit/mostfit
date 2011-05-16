@@ -46,6 +46,14 @@ class Funders < Application
     end
   end
 
+  def funding_lines
+    if params[:id]
+      funder = Funder.get(params[:id])
+      next unless funder
+      return("<option value=''>Select funding lines</option>"+funder.funding_lines.map{|fl| "<option value=#{fl.id}>#{fl.name}</option>"}.join)
+    end
+  end
+
 #   def destroy(id)
 #     @funder = Funder.get(id)
 #     raise NotFound unless @funder
