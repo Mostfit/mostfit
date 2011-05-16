@@ -15,7 +15,7 @@ class Weeksheet
   belongs_to :center
 
   #Get weeksheet of center 
-  def self.get_center_weeksheet(center, date, option)
+  def self.get_center_weeksheet(center, date, option = nil)
     if option == "data"
       weeksheet = Weeksheet.first(:center_id => center.id, :date => date)
       if weeksheet.blank?

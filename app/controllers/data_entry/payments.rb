@@ -1,5 +1,6 @@
 module DataEntry
   class Payments < DataEntry::Controller
+    include Pdf::DaySheet if PDF_WRITER
     provides :html, :xml
     def record
       @payment = (params and params[:id]) ? Payment.get(params[:id]) : Payment.new
@@ -59,6 +60,10 @@ module DataEntry
         if params[:format] and params[:format]=="xml"
           @weeksheet_rows = Weeksheet.get_center_weeksheet(@center,@date, @info) if @center
           display @weeksheet_rows
+        elsif params[:format] and params[:format] == "pdf"
+          generate_weeksheet_pdf(@center, @date)
+          send_data(File.read("#{Merb.root}/public/pdfs/weeksheet_of_center_#{@center.id}_#{@date.strftime('%Y_%m_%d')}.pdf"),
+                                    :filename => "#{Merb.root}/public/pdfs/weeksheet_of_center_#{@center.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
         else
           render
         end
