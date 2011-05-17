@@ -6,7 +6,7 @@ Merb::Config.use { |c|
   c[:reload_time] = 1
   c[:ignore_tampered_cookies] = true
   c[:log_auto_flush ] = true
-  c[:log_level] = :warn
+  c[:log_level] = :debug
 
   c[:log_stream] = STDOUT
   c[:log_file]   = nil
