@@ -325,7 +325,6 @@ class LoanHistory
     elsif obj.class==Region or obj.class==Area
       ids = (obj.class==Region ? obj.areas.branches(:fields => [:id]).map{|x| x.id} : obj.branches(:fields => [:id]).map{|x| x.id})
       ids = (ids.length==0 ? "NULL" : ids.join(","))
-      q = "lh.branch_id"
       query="branch_id in (#{ids})"
     elsif obj.class==StaffMember
       if loan_type == :created
@@ -346,8 +345,7 @@ class LoanHistory
     group_by = q ? "GROUP BY #{q}" : " LIMIT 1"
     q = ", #{q}" if q
 
-    ids = get_latest_rows_of_loans(to_date, query)
-    return false if ids.length==0
+    subtable       = get_subtable(to_date, query)
 
     select  = %Q{
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
@@ -363,9 +361,9 @@ class LoanHistory
 
     repository.adapter.query(%Q{
       SELECT #{select}
-      FROM loan_history lh, loans l
-      WHERE (lh.loan_id, lh.date) in (#{ids}) AND lh.status in (5,6) AND lh.loan_id=l.id
-            AND l.deleted_at is NULL AND l.rejected_on is NULL
+      FROM #{subtable} dt, loan_history lh, loans l
+      WHERE  lh.loan_id=dt.loan_id AND lh.date=dt.date AND lh.loan_id = l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+            AND lh.status in (5,6) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL            
       #{group_by}
     })
   end
