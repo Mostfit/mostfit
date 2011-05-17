@@ -58,11 +58,11 @@ class Loans < Application
         end
       end
     else
-      set_insurance_policy(@loan_product)
-      @loan.interest_rate *= 100
       if params[:format] and params[:format] == "xml"
         display @loan
       else
+        set_insurance_policy(@loan_product)
+        @loan.interest_rate *= 100
         render :new # error messages will be shown
       end
     end
