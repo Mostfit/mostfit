@@ -1,0 +1,39 @@
+%h1
+  Repayment Styles
+
+= link_to 'New Repayment Style', url(:new_repayment_style), :class => "add"
+
+%table.narrow.form
+  %thead
+    %tr
+      %th
+        id
+      %th
+        Name
+      %th
+        Style
+      %th
+        Round To
+      %th
+        Active
+      %th
+        Actions
+  %tr
+  - for repayment_style in @repayment_styles
+    %tbody
+      %tr{:class => cycle('odd','even')}
+        %td
+          = repayment_style.id
+        %td 
+          = repayment_style.name
+        %td
+          = repayment_style.style
+        %td
+          = repayment_style.round_to
+        %td
+          = repayment_style.active
+        %td
+          = link_to 'Show', url(:repayment_style, repayment_style)
+          |
+          = link_to 'Edit', url(:edit_repayment_style,  repayment_style)
+

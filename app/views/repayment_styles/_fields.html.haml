@@ -1,0 +1,22 @@
+%table.form
+  %tr
+    %th
+      Name
+    %td
+      = text_field :name
+  %tr
+    %th
+      Style
+    %td
+      = select :style, :collection => [['','---']] + Mostfit::PaymentStyles.constants.map{|f| [f,f]}
+  %tr
+    %th
+      Round to
+    %td
+      = text_field :round_to
+  %tr
+    %th
+      Active
+    %td
+      = check_box :active
+  

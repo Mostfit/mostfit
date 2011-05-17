@@ -1,0 +1,9 @@
+%h1 New Repayment Style
+
+= error_messages_for @repayment_style
+
+= form_for(@repayment_style, :action => url(:repayment_styles) ) do
+  = partial :fields
+  = submit "Create"
+
+= link_to 'Back', url(:repayment_styles)
