@@ -8,7 +8,7 @@ module Mostfit
         if(cond.keys.length < 3)
           return nil
         else
-          a = BasicCondition.new
+          a = new
           a.var1 = cond[:var1]
           a.var2 = cond[:var2]
           a.binaryoperator = cond[:binaryoperator].to_s #plus or minus
@@ -87,10 +87,11 @@ module Mostfit
       end
       
       def to_s
-        return "#{@appliesOn} #{@operator} #{@compareWith}"
+        return "#{@var1} #{@binaryoperator} #{@var2} #{@comparator} #{@const_value}"
       end
       
-      private_class_method :initialize #to prevent direct object creation
+      # new should not be used to create a BasicCondition object
+      private_class_method :new
     end
     
     class ComplexCondition
@@ -100,21 +101,21 @@ module Mostfit
       
       def self.get_condition(cond)
         if((cond[:linking_operator] != nil) and (cond[:linking_operator].to_sym == :not)) then
-          c = ComplexCondition.new
+          c = new
           c.operator = :not
           c.condition1 = ComplexCondition.get_condition(cond[:first_condition])
           c.condition2 = nil
           c.is_basic_condition = false
           return c
         elsif((cond[:linking_operator] != nil) and (cond[:linking_operator].to_sym == :and) || (cond[:linking_operator].to_sym == :or)) then
-          c = ComplexCondition.new
+          c = new
           c.operator = cond[:linking_operator]
           c.condition1 = ComplexCondition.get_condition(cond[:first_condition])
           c.condition2 = ComplexCondition.get_condition(cond[:second_condition])
           c.is_basic_condition = false
           return c
         else
-          c = ComplexCondition.new
+          c = new
           c.is_basic_condition = true
           c.basic_condition = BasicCondition.get_basic_condition(cond)
           return c
@@ -141,7 +142,8 @@ module Mostfit
         end
       end
 
-      private :initialize
+      # new should not be used to create a BasicCondition object
+      private_class_method :new
     end
     
     class Rules
