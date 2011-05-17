@@ -301,12 +301,18 @@ describe Fee do
     @f2.payable_on = :loan_applied_on
     @loan_product.fees = [@f, @f2]
     @loan_product.save
-    @loan.save
-    @loan.applicable_fees.count.should == 2
+
+    @loan.save.should be_true
+    @loan.applicable_fees.count.should == 2    
     @loan.fees_payable_on(@loan.applied_on).should == {@f2 => 111}
-    @loan.fees_payable_on(@loan.disbursal_date).should == {@f2 => 111, @f => 100}
+    
+    @loan.fees_payable_on(@loan.scheduled_disbursal_date).should == {@f2 => 111, @f => 100}
     success, @fees = @loan.pay_fees(105, @loan.disbursal_date, @manager, User.first)
     success.should == true
+
+    @loan.disbursal_date = nil
+    @loan.disbursed_by = nil
+    @loan.save
   end
 
 

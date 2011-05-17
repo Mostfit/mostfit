@@ -71,6 +71,11 @@ module FeesContainer
 
   def fees_payable_on(date = Date.today)
     # returns a hash of fee type and amounts
+    
+    unless date.is_a?(Date)
+      date = Date.today #make sure date is present else make it today
+    end
+
     scheduled_fees = fee_schedule.reject{|k,v| k > date}.values.inject({}){|s,x| s+=x}
     (scheduled_fees - (fees_paid.values.inject({}){|s,x| s+=x})).reject{|k,v| v<=0}
   end

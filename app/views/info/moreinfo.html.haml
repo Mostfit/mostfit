@@ -22,7 +22,7 @@
           = @obj.creation_date
         - elsif @obj.respond_to?(:created_at)
           = @obj.created_at.strftime(Mfi.first.date_format)        
-    -if @areas
+    - if @areas
       %tr
         %td
           Number of Areas
@@ -56,27 +56,27 @@
         Number of Groups
       %td
         -if @groups_new_count then
-          =@groups_new_count
+          = @groups_new_count
         -else
-          =0
+          = 0
       %td
         -if @groups_upto_count
-          =@groups_upto_count
+          = @groups_upto_count
         -else
-          =0
+          = 0
     %tr
       %td
         Number of Clients
       %td
-        -if @clients_new_count
-          =@clients_new_count
-        -else
-          =0
+        - if @clients_new_count
+          = @clients_new_count
+        - else
+          = 0
       %td
-        -if @clients_upto_count
-          =@clients_upto_count
-        -else
-          =0
+        - if @clients_upto_count
+          = @clients_upto_count
+        - else
+          = 0
     - if @death_cases
       %tr
         %td
