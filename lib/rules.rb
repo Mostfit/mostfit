@@ -87,7 +87,7 @@ module Mostfit
       end
       
       def to_s
-        return "#{@appliesOn} #{@operator} #{@compareWith}"
+        return "#{@var1} #{@binaryoperator} #{@var2} #{@comparator} #{@const_value}"
       end
       
       # new should not be used to create a BasicCondition object
