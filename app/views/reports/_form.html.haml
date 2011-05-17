@@ -2,6 +2,7 @@
 - unless params[:layout] 
   - report = @report.class.to_s.snake_case
   - area_id = (params[report] and params[report][:area_id] and not params[report][:area_id].blank?) ? params[report][:area_id] : nil
+  - combo_branches = (params[report] and params[report][:combo_branches] and not params[report][:combo_branches].blank?) ? params[report][:combo_branches] : nil
   - branch_id = (params[report] and params[report][:branch_id] and not params[report][:branch_id].blank?) ? params[report][:branch_id] : nil
   - center_id = (params[report] and params[report][:center_id] and not params[report][:center_id].blank?) ? params[report][:center_id] : nil
   - loan_product_id = (params[report] and params[report][:loan_product_id] and not params[report][:loan_product_id].blank?) ? params[report][:loan_product_id] : nil
@@ -21,6 +22,10 @@
       - if area_id
         Area:
         = Area.get(area_id).name
+      - if combo_branches
+        |
+        Branch:
+        = Branch.get(combo_branches).name
       - if branch_id
         Branch:
         = Branch.get(branch_id).name
@@ -127,6 +132,10 @@
             %td
               Area:
               = select(:area_id, :collection => get_accessible_areas(@staff), :value_method => :id, :text_method => :name, :include_blank => true, :selected => area_id, :id => "area_selector")
+          - if @report.respond_to?(:combo_branches)
+            %td
+              Branch:
+              = select(:combo_branches, :collection => get_accessible_combo_branches(area_id), :include_blank => true, :selected => combo_branches, :id => "combo_branch_selector")
           - if @report.respond_to?(:branch_id)
             %td
               Branch: 
