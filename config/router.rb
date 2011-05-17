@@ -1,5 +1,6 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :api_accesses
   resources :monthly_targets
   resources :account_balances
   resources :bookmarks
@@ -124,7 +125,40 @@ Merb::Router.prepare do
   match('/documents/:action(/:id)').to(:controller => "documents").name(:documents_action_link)
   match('/:controller/:id', :id => %r(\d+)).to(:action => 'redirect_to_show').name(:quick_link)
   match('/rules/get').to(:controller => 'rules', :action => 'get') 
-  match('/login.xml').to(:controller => 'merb_auth_slice_password/sessions', :action => 'update', :format => 'xml') 
+  #API Route
+  match('/api/v1') do
+    match('/browse.xml').to(:controller => 'browse', :action => 'index', :format => 'xml')
+    match('/users/:id.xml').to(:controller => 'users', :action => 'show', :format => 'xml')
+    match('/staff_members.xml').to(:controller => 'staff_members', :action =>'index', :format => 'xml')
+    match('/staff_members/:id.xml').to(:controller => 'staff_members', :action =>'show', :format => 'xml')
+    match('/data_entry/payments/by_center.xml').to(:controller => 'data_entry/payments', :action =>'by_center', :format => 'xml')
+    match('/regions.xml').to(:controller => 'regions', :action =>'index', :format => 'xml')
+    match('/regions/:id.xml').to(:controller => 'regions', :action =>'show', :format => 'xml')
+    match('/areas.xml').to(:controller => 'areas', :action =>'index', :format => 'xml')
+    match('/areas/:id.xml').to(:controller => 'areas', :action =>'show', :format => 'xml')
+    match('/branches.xml').to(:controller => 'branches', :action =>'index', :format => 'xml')
+    match('/branches/:id.xml').to(:controller => 'branches', :action =>'show', :format => 'xml')
+    match('/centers.xml', :method => "get").to(:controller => 'centers', :action =>'index', :format => 'xml')
+    match('/centers/:id.xml').to(:controller => 'centers', :action =>'show', :format => 'xml')
+    match('/client_groups.xml', :method => "get").to(:controller => 'client_groups', :action =>'index', :format => 'xml')
+    match('/client_groups/:id.xml').to(:controller => 'client_groups', :action =>'show', :format => 'xml')
+    match('/branches/:branch_id/centers/:center_id/clients/:id.xml', :method => "get").to(:controller => 'clients', :action =>'show', :format => 'xml')
+    match('/branches/:branch_id/centers/:id.xml').to(:controller => 'centers', :action =>'show', :format => 'xml')
+    match('/loans/:id.xml').to(:controller => 'loans', :action =>'show', :format => 'xml')
+    match('/users.xml').to(:controller => 'users', :action =>'index', :format => 'xml')
+    match('/loan_products.xml').to(:controller => 'loan_products', :action =>'index', :format => 'xml')
+    match('/loan_products/:id.xml').to(:controller => 'loan_products', :action =>'show', :format => 'xml')
+    match('/branches/:branch_id/centers/:center_id/clients/:client_id/loans/:loan_id/payments.xml').to(:controller => 'payments', :action =>'create', :format => 'xml')
+    match('/branches/:branch_id/centers/:center_id/clients/:id.xml', :method => "put").to(:controller => 'clients', :action =>'update', :format => 'xml')
+    match('/branches/:branch_id/centers/:center_id/clients.xml', :method => "post").to(:controller => 'clients', :action =>'create', :format => 'xml')
+    match('/attendance.xml', :method => "post").to(:controller => 'attendances', :action =>'create', :format => 'xml')
+    match('/branches/:branch_id/centers/:center_id/clients/:client_id/loans.xml', :method => "post").to(:controller => 'loans', :action =>'create', :format => 'xml')
+    match('/centers.xml', :method => "post").to(:controller => 'centers', :action =>'create', :format => 'xml')
+    match('/client_groups.xml', :method => "post").to(:controller => 'client_groups', :action =>'create', :format => 'xml')
+    match('/holidays.xml', :method => "get").to(:controller => 'holidays', :action =>'index', :format => 'xml')
+    match('/handshake.xml', :method => "get").to(:controller => 'entrance', :action =>'handshake', :format => 'xml')
+    match('/errors.xml', :method => "get").to(:controller => 'exceptions', :action =>'index', :format => 'xml')
+  end
   match('/accounts/:account_id/accounting_periods/:accounting_period_id/account_balances/:id/verify').to(:controller => 'account_balances', :action => 'verify').name(:verify_account_balance)
   match("/accounting_periods/:id/period_balances").to(:controller => "accounting_periods", :action => "period_balances").name(:period_balances)
   default_routes

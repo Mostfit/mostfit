@@ -2,7 +2,7 @@ class StaffMembers < Application
   include Pdf::DaySheet if PDF_WRITER
   include DateParser
   layout :determine_layout
-
+  provides :xml
   def index
     per_page = 25
     @date = params[:date] ? parse_date(params[:date]) : Date.today
@@ -44,6 +44,12 @@ class StaffMembers < Application
     @loan_data     = LoanHistory.sum_outstanding_for(@center, @to_date)
     @defaulted     = LoanHistory.defaulted_loan_info_for(@center, @to_date)
     render :file => 'branches/moreinfo', :layout => false
+  end
+  def show_branches(id)
+    @staff_member = StaffMember.get(id)
+    raise NotFound unless @staff_member
+    @branches = @staff_member.branches
+    display @branches
   end
 
   def show_centers(id)
@@ -105,6 +111,8 @@ class StaffMembers < Application
 
   def show(id)
     @staff_member = StaffMember.get(id)
+    @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    @option = params[:option]
     raise NotFound unless @staff_member
     @manages = {:regions => @staff_member.regions, :areas => @staff_member.areas, :branches => @staff_member.branches, :centers => @staff_member.centers}
     display @staff_member

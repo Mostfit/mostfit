@@ -369,13 +369,13 @@ class Loan
   # principal[0] and interest[1].
 
 
-  def repay(input, user, received_on, received_by, defer_update = false, style = :normal, context = :default)
-    pmts = get_payments(input, user, received_on, received_by, defer_update, style, context)
+  def repay(input, user, received_on, received_by, defer_update = false, style = :normal, context = :default, desktop_id = nil, origin = nil)
+    pmts = get_payments(input, user, received_on, received_by, defer_update, style, context, desktop_id, origin)
     x = make_payments(pmts, context, defer_update)
     x
   end
 
-  def get_payments(input, user, received_on, received_by, defer_update = false, style = :normal, context = :default)
+  def get_payments(input, user, received_on, received_by, defer_update = false, style = :normal, context = :default, desktop_id = nil, origin = nil)
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
     unless input.is_a? Array or input.is_a? Fixnum or input.is_a? Float or input.is_a?(Hash)
@@ -413,19 +413,19 @@ class Loan
     if fees_paid > 0
       fee_payment = Payment.new(:loan => self, :created_by => user,
                                 :received_on => received_on, :received_by => received_by,
-                                :amount => fees_paid.round(2), :type => :fees)
+                                :amount => fees_paid.round(2), :type => :fees, :desktop_id => desktop_id, :origin => origin)
       payments.push(fee_payment)
     end
     if interest > 0
       int_payment = Payment.new(:loan => self, :created_by => user,
                                 :received_on => received_on, :received_by => received_by,
-                                :amount => interest.round(2), :type => :interest)
+                                :amount => interest.round(2), :type => :interest, :desktop_id => desktop_id, :origin => origin)
       payments.push(int_payment)
     end
     if principal > 0
       prin_payment = Payment.new(:loan => self, :created_by => user,
                                  :received_on => received_on, :received_by => received_by,
-                                 :amount => principal.round(2), :type => :principal)        
+                                 :amount => principal.round(2), :type => :principal, :desktop_id => desktop_id, :origin => origin)        
       payments.push(prin_payment)
     end
     payments             

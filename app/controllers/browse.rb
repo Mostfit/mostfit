@@ -1,10 +1,8 @@
 class Browse < Application
-  provides :xml
-
+  provides :xml 
   before :get_centers_and_template
   before :display_from_cache, :only => [:hq_tab]
   after  :store_to_cache,     :only => [:hq_tab]
-  
   Line = Struct.new(:ip, :date_time, :method, :model, :url, :status, :response_time)
   
   def index
@@ -131,7 +129,7 @@ class Browse < Application
 
       }
     }
-    render :template => 'dashboard/today'
+      render :template => 'dashboard/today'
   end
 
   # method to parse log file and show activity. 

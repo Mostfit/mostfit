@@ -1,0 +1,7 @@
+%xml
+  %holidays
+    - @holidays.each do |holiday|
+      %holiday
+        %name #{holiday.name}
+        %date #{holiday.date}
+        %shift_meeting #{holiday.shift_meeting}

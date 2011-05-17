@@ -26,6 +26,7 @@ class StaffMember
   has n, :write_off_rejected_loans,    :child_key => [:write_off_rejected_by_staff_id],    :model => 'Loan'
   has n, :payments, :child_key  => [:received_by_staff_id]
   has n, :monthly_targets
+  has n, :weeksheets
 
   belongs_to :user
 
@@ -76,7 +77,7 @@ class StaffMember
     end
   end
 
-  def client_groups(hash)
+  def client_groups(hash, owner_type = nil)
     if owner_type == :created
       hash[:created_by_staff_member_id] = self.id
     else

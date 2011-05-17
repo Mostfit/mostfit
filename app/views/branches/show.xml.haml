@@ -1,0 +1,27 @@
+%xml
+  %branch
+    %id #{@branch.id}
+    %name #{@branch.name}
+    %code #{@branch.code}
+    %address #{@branch.address}
+    %contact_number #{@branch.contact_number}
+    %landmark #{@branch.landmark}
+    %creation_date #{@branch.creation_date}
+    %area_id #{@branch.area_id}
+    %manager_staff_id #{@branch.manager_staff_id}
+    - if @branch.centers and @option == "centers"
+      %centers
+        - @branch.centers.each do |center|
+          %center
+            %id #{center.id}
+            %name #{center.name}
+            %code #{center.code}
+            %address #{h(center.address)}
+            %contact_number #{center.contact_number}
+            %landmark #{center.landmark}
+            %meeting_day #{center.meeting_day}
+            %meeting_time_hours #{center.meeting_time_hours}
+            %meeting_time_minutes #{center.meeting_time_minutes}
+            %creation_date #{center.creation_date}
+            %manager_staff_id #{center.manager_staff_id}
+            %branch_id #{center.branch_id}

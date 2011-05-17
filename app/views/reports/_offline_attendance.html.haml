@@ -1,0 +1,35 @@
+=partial :form
+- length = 5
+%table.report.nojs
+  %tr.header
+    %th{:width => '20%'}
+      Date
+    %th
+      Attendance Id
+    %th{:width => '20%'}
+      Client Name
+    %th
+      Status
+    %th
+      Center Name
+    %th
+      Desktop Id
+    %th
+      Origin
+  - @data.each do |data|
+    %tr
+      %td
+        = data[0]
+      %td
+        = data[1]
+      %td
+        = data[2]
+      %td
+        = data[3]
+      %td
+        = data[4]
+      %td
+        = data[5]
+      %td
+        = data[6]
+          

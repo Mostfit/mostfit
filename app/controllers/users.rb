@@ -1,9 +1,15 @@
 class Users < Application
   before :ensure_admin, :only => [:edit, :new, :create, :update, :delete, :destroy, :amind_change_password]
-
-  def show(id)
-    u = User.get(id)
-    u ? u : nil
+  provides :xml
+  #API call : after authenticate get user information and send xml response
+  #this change made for testing purpose for dm-rest-adapter
+  def show
+    if params[:id]
+      @user = User.get(params[:id])
+    else
+      @user = session.user
+    end
+    display @user
   end
 
   def index

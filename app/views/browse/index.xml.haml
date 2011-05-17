@@ -1,6 +1,17 @@
 %xml
-  = session.user.to_xml
-  - if session.user.staff_member
-    %centers
-      - session.user.staff_member.centers.each do |center|
-        = center.to_xml
+  -if session.user
+    %user
+      %id  #{session.user.id}
+      %login #{session.user.login}
+      %created_at #{session.user.created_at}
+      %updated_at #{session.user.updated_at}
+      %password_changed_at #{session.user.password_changed_at}
+      %active #{session.user.active}
+      %role #{session.user.role}
+      %time_at_server #{DateTime.now.to_s}
+      - if session.user.staff_member
+        %staff_member_id #{session.user.staff_member.id}
+  -else
+    %error
+      %message "Unauthorized User"
+      %error_code 401
