@@ -398,7 +398,7 @@ module Merb
 
     # when a staff member logs in
     # then this function returns the branches controlled or accessible
-    # Otheerwise it returns branches in order by name fashion
+    # Otherwise it returns branches in order by name fashion
     def get_accessible_branches(staff=nil)
       if staff or staff=session.user.staff_member
         [staff.centers.branches, staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten
@@ -450,6 +450,17 @@ module Merb
              []
            end
       fl.map{|x| [x.id, "#{x.name}"]}
+    end
+
+    #this function is used to get the branches which belong to a particular area if area is selected.
+    #otherwise nothing is displayed.
+    def get_accessible_combo_branches(area_id)
+      br = if area_id and not area_id.blank?
+             Branch.all(:area_id => @area_id, :order => [:name])
+           else
+             []
+           end
+      br.map{|x| [x.id, "#{x.name}"]}
     end
 
     #this function is for getting the list of accounts whose account_category is Cash and belongs to a particular branch.

@@ -1,6 +1,6 @@
 #This report gives the Target Report for the staff members to check their performance on monthly basis.
 class StaffTargetReport < Report
-  attr_accessor :branch_id, :branch, :to_date, :area_id, :area, :type_of_target
+  attr_accessor :combo_branches, :to_date, :area_id, :area, :type_of_target
 
   validates_with_method :area_id, :method => :area_should_be_present
 
