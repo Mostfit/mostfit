@@ -41,10 +41,10 @@ class Journals < Application
       #multiple debit and credit accounts
       debit_accounts, credit_accounts  = {}, {}
       params[:debit_accounts].each{|debit|
-        debit_accounts[Account.get(debit[:account_id])] = debit[:amount].to_i
+        debit_accounts[Account.get(debit[:account_id])] = debit[:amount].to_f
       }
       params[:credit_accounts].each{|credit|
-        credit_accounts[Account.get(credit[:account_id])] = credit[:amount].to_i      
+        credit_accounts[Account.get(credit[:account_id])] = credit[:amount].to_f      
       }
     end
 

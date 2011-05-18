@@ -1,3 +1,4 @@
+- debugger
 - if loans_to_disburse.size > 0
   %table.narrow.form{ :width => '100%'}
     %thead
@@ -8,7 +9,7 @@
           Scheduled Disbursal Date
         %th
           Status
-    - loans_to_disburse.group_by{|x| x.client.client_group}.sort_by{|x| x[0].name}.each do |group, loans|
+    - loans_to_disburse.group_by{|x| x.client.client_group}.sort_by{|x| x[0].nil? ? "no group" : x[0].name}.each do |group, loans|
       %tr.group
         %td{:colspan => 5}
           - if group
@@ -18,7 +19,7 @@
               =link_to('edit', resource(branch, center, group, :edit))
               )
           -else
-            "Not attached to any center"
+            "Not attached to any group"
       -loans.each do |loan|
         %tr
           %td
