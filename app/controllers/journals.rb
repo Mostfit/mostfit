@@ -96,6 +96,7 @@ class Journals < Application
   # Action for creatng EOD voucher entry
   def create_eod(journal)
     @branch  = Branch.get(params[:branch_id]) if params[:branch_id]
+    raise BadRequest unless @branch
 
     if params[:debit_accounts] and params[:credit_accounts]
       #multiple debit and credit accounts
@@ -154,16 +155,23 @@ class Journals < Application
       end
     else
       message[:error] = ""
+      @date = Date.parse(params[:journal][:date]) if params[:journal] and params[:journal][:date]
+      @journal = Journal.new
+      @rules = RuleBook.all(:branch => @branch, :from_date.lte => @date, :to_date.gte => @date)
       statuses.each_with_index{|status, i|
         unless status
           if journals[i] and journals[i].journal_type
-            message[:error] += "#{journals[i].journal_type.name} journal failed to be created"
+            message[:error] += "#{journals[i].journal_type.name} journal failed to be created<br/>"
           else
-            message[:error] += "Journal failed to be created because #{journals[i].errors.to_s}"
+            message[:error] += "Journal failed to be created because #{journals[i].errors.to_s}<br/>"
           end
         end
       }
-      render :new, :layout => layout?
+      if request.xhr?
+        render message[:error], :layout => false, :status => 403
+      else
+        render :new_eod, :layout => layout?
+      end
     end
   end
   
