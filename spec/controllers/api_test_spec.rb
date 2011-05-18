@@ -255,16 +255,20 @@ describe "Test the API call" do
     get_center = doc.root.elements[1].elements["center"]
     if not get_center.blank? 
       center_id =  doc.root.elements[1].elements["center"].get_text("id")
-    url = URI.parse("#{API_URL}/data_entry/payments/by_center.xml?center_id=#{center_id}")
-    res = get_response(url)
-    doc = REXML::Document.new res.body
-    weeksheet = doc.root.elements[1].elements["weeksheet"]
-    if not weeksheet.blank? 
-      doc.root.elements[1].elements["weeksheet"].get_text("center_id").should == center_id
-      res.code.should ==  "200"
-    else
-      doc.root.elements[1].get_text("error_code").should == "601"
-    end
+      params = {'center_id' => center_id }
+      url = URI.parse("#{API_URL}/data_entry/payments/by_center.xml")
+      req = Net::HTTP::Get.new(url.path)
+      req.basic_auth 'admin', 'password'
+      req.set_form_data(params)
+      res = Net::HTTP.new(url.host, url.port).start {|http| http.request(req) }
+      doc = REXML::Document.new res.body
+      weeksheet = doc.root.elements[1].elements["weeksheet"]
+      if not weeksheet.blank? 
+        doc.root.elements[1].elements["weeksheet"].get_text("center_id").should == center_id
+        res.code.should ==  "200"
+      else
+        doc.root.elements[1].get_text("error_code").should == "601"
+      end
     end
   end
 
@@ -279,8 +283,8 @@ describe "Test the API call" do
     if doc.root.elements[1].elements["error"] != nil
       doc.root.elements[1].elements["error"].get_text("error_code").should == "600"
     else
-    res.code.should == "200"
-    doc.root.elements[1].elements["error"].should == nil
+      res.code.should == "200"
+      doc.root.elements[1].elements["error"].should == nil
     end
   end
 
