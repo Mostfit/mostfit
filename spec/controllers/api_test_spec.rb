@@ -263,7 +263,7 @@ describe "Test the API call" do
       doc.root.elements[1].elements["weeksheet"].get_text("center_id").should == center_id
       res.code.should ==  "200"
     else
-      doc.root.elements[1].elements["error"].get_text("error_code").should == "600"
+      doc.root.elements[1].get_text("error_code").should == "601"
     end
     end
   end
