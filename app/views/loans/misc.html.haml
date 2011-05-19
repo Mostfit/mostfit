@@ -39,11 +39,11 @@
           %td
             - center = @client.center
             - branch = center.branch
-            = select :written_off_by_staff_id, :id => "written_off_by_staff_id", :collection => [branch.manager, center.manager].uniq.map{|m| [m.id, m.name]}
+            = select :written_off_by_staff_id, :id => "written_off_by_staff_id", :collection => [branch.manager, center.manager].uniq.map{|m| [m.id, m.name]}, :prompt => "select staff member"
         %tr
           %td{:colspan => "2"}
             %span.greytext 
-              Pick the staff member who is writing off the loan.Pre-selected is Branch Manager.
+              Pick the staff member who is writing off the loan
       %tr
         %td
           = submit "Write off"
