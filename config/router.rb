@@ -45,7 +45,7 @@ Merb::Router.prepare do
   resources :ledger_entries
   resources :loan_products
   resources :users, :id => %r(\d+)
-  resources :staff_members
+  resources :staff_members, :id => %r(\d+) 
   resources :clients, :id => %r(\d+) do
     resources :insurance_policies
     resources :attendances
