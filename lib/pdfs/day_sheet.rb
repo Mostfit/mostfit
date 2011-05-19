@@ -1,6 +1,6 @@
 module Pdf
   module DaySheet
-    def generate_pdf
+    def generate_pdf(filename)
       pdf = PDF::Writer.new(:orientation => :landscape, :paper => "A4")
       pdf.select_font "Times-Roman"
       pdf.text "Daily Collection Sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
@@ -115,7 +115,7 @@ module Pdf
           table.render_on(pdf)
         end        
       } #centers end
-      pdf.save_as("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
+      pdf.save_as(filename)
       return pdf
     end
 

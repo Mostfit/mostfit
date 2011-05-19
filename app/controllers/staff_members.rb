@@ -75,9 +75,11 @@ class StaffMembers < Application
     center_ids = LoanHistory.all(:date => [@date, @date.holidays_shifted_today].uniq, :fields => [:loan_id, :date, :center_id], :status => [:disbursed, :outstanding]).map{|x| x.center_id}.uniq
     @centers   = @staff_member.centers(:id => center_ids).sort_by{|x| x.name}
     if params[:format] == "pdf"
-      generate_pdf
-      send_data(File.read("#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf"),
-                :filename => "#{Merb.root}/public/pdfs/staff_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
+      folder   = File.join(Merb.root, "doc", "pdfs", "staff", @staff_member.name, "collection_sheets")
+      FileUtils.mkdir_p(folder)
+      filename = File.join(folder, "collection_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
+      generate_pdf(filename)
+      send_data(File.read(filename), :filename => filename)
     else
       display @centers
     end
@@ -93,16 +95,16 @@ class StaffMembers < Application
     @centers = @staff_member.centers(:id => center_ids).sort_by{|x| x.name}
     if params[:format] == "pdf"
       #some problem not working as of now
-      folder   = File.join(Merb.root, "public", "pdfs")
+      folder   = File.join(Merb.root, "doc", "pdfs", "staff", @staff_member.name, "disbursement_sheets")
       FileUtils.mkdir_p(folder)
-      filename = File.join(folder, "staff_#{@staff_member.id}_disbursement_#{@date.strftime('%Y_%m_%d')}.pdf")
+      filename = File.join(folder, "disbursement_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
       generate_disbursement_pdf(filename)
       send_data(File.read(filename), :filename => filename)
     else
       display @centers
     end
   end
-
+  
   def show(id)
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
@@ -137,7 +139,7 @@ class StaffMembers < Application
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
     if @staff_member.update_attributes(staff_member)
-       redirect resource(:staff_members)
+      redirect resource(:staff_members)
     else
       display @staff_member, :edit
     end
@@ -151,6 +153,20 @@ class StaffMembers < Application
     else
       raise InternalServerError
     end
+  end
+  
+  def display_sheets(id)
+    @staff_member = StaffMember.get(id)
+    raise NotFound unless @staff_member
+    date =  (Date.strptime(params[:date], Mfi.first.date_format)).strftime('%Y_%m_%d')   
+    type = params[:type_sheet]
+    @folder = File.join(Merb.root, "doc", "pdfs", "staff", @staff_member.name, type)
+    @files = Dir.entries(@folder).select{|f| f.match(/.*#{date}.*pdf$/)} if File.exists?(@folder)
+    display @files, :layout => false
+  end
+
+  def send_sheet(filename)
+    send_data(File.read(filename), :filename => filename)
   end
 
   # this redirects to the proper url, used from the router
