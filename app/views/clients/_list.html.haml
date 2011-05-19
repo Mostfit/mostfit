@@ -13,7 +13,7 @@
         %th
     %tbody
     - group=-1
-    - @clients.sort_by{|x| x.id}.each do |client|
+    - @clients.sort_by{|x| x.client_group.id}.each do |client|
       - if group!=client.client_group_id
         - group = client.client_group_id 
         %tr.group

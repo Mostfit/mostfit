@@ -624,7 +624,10 @@ module Merb
     # get the loans which are accessible by the user
     def get_loans(hash)
       if staff = session.user.staff_member
-        hash["client.center.branch_id"] = [staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten.map{|x| x.id}
+        branch_ids = [staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten.map{|x| x.id}
+        hash["client.center.branch_id"] = branch_ids unless branch_ids.empty?
+        center_ids = staff.centers.aggregate(:id)
+        hash["client.center_id"] = center_ids unless center_ids.empty?
       end
       Loan.all(hash)
     end
