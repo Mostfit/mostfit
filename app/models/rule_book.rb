@@ -46,25 +46,18 @@ class RuleBook
   # advance postings only work from EOD voucher. No automatic postings
   def self.get_accounts(obj, amount = nil)
     return false if not Mfi.first.accounting_enabled
-    if obj.class==Payment
-      transaction_type = obj.type
-      client = obj.client_id > 0 ? obj.client : obj.loan.client
-      branch  = client.center.branch
-      fee     = obj.fee
-      date = obj.received_on
-      #TODO:hack alert! Write it better
-    elsif obj.class==Loan or obj.class.superclass==Loan or obj.class.superclass.superclass==Loan
-      transaction_type = :disbursement
-      branch  = obj.client.center.branch
-      date = obj.disbursal_date
-    elsif obj.class==Array
+
+    # TODO: Needs a re-write, makes too many assumptions, also locating the appropriate rule still does not take into account
+    # the validity of rule by date introduced a while back
+
+     if obj.is_a? Array
       # In case of objects being passed in a set then we give out hashes of credit and debit accounts with values being amount and keys being acocunt
       client = obj.first.client_id > 0 ? obj.first.client : obj.first.loan.client
       branch  = client.center.branch
       date = obj.first.loan.disbursal_date
       credit_accounts, debit_accounts  = {}, {}
       rules = []
-      obj.each{|p|  
+      obj.each{|p|
         rule = if p.type == :fees
                  first(:action => p.type, :branch => branch, :fee => p.fee, :active => true) || first(:action => p.type, :branch => nil, :fee => p.fee, :active => true)
                else
@@ -81,8 +74,20 @@ class RuleBook
         }
         rules.push(rule)
       }
-      raise "NoRuleFoundError" unless rules.compact.length == 1
       return [credit_accounts, debit_accounts, rules]
+    end
+
+    if obj.class==Payment
+      transaction_type = obj.type
+      client = obj.client_id > 0 ? obj.client : obj.loan.client
+      branch  = client.center.branch
+      fee     = obj.fee
+      date = obj.received_on
+      #TODO:hack alert! Write it better
+    elsif obj.class==Loan or obj.class.superclass==Loan or obj.class.superclass.superclass==Loan
+      transaction_type = :disbursement
+      branch  = obj.client.center.branch
+      date = obj.disbursal_date
     end
 
     if rule = first(:action => transaction_type, :branch => branch, :fee => fee, :active => true)

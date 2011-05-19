@@ -23,4 +23,4 @@ fail "Failed to compress. Do you have bzip2 installed?" unless system("bzip2 #{d
 dump_path = "#{dump_path}.bz2"
 
 puts "Database dumped at: #{dump_path}"
-puts "To copy: scp mostfit.in:#{dump_path} ."
+puts "To load: bin/slurp.rb #{dump_path} [db_name]"

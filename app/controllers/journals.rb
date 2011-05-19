@@ -41,10 +41,10 @@ class Journals < Application
       #multiple debit and credit accounts
       debit_accounts, credit_accounts  = {}, {}
       params[:debit_accounts].each{|debit|
-        debit_accounts[Account.get(debit[:account_id])] = debit[:amount].to_i
+        debit_accounts[Account.get(debit[:account_id])] = debit[:amount].to_f
       }
       params[:credit_accounts].each{|credit|
-        credit_accounts[Account.get(credit[:account_id])] = credit[:amount].to_i      
+        credit_accounts[Account.get(credit[:account_id])] = credit[:amount].to_f      
       }
     end
 
@@ -96,6 +96,7 @@ class Journals < Application
   # Action for creatng EOD voucher entry
   def create_eod(journal)
     @branch  = Branch.get(params[:branch_id]) if params[:branch_id]
+    raise BadRequest unless @branch
 
     if params[:debit_accounts] and params[:credit_accounts]
       #multiple debit and credit accounts
@@ -127,8 +128,8 @@ class Journals < Application
 
     journal_types.each{|journal_type|
       # reject accounts where amounts are zero
-      debit_accounts[journal_type]  = debit_accounts[journal_type].reject{|k, v| v == 0}
-      credit_accounts[journal_type] = credit_accounts[journal_type].reject{|k, v| v == 0}
+      debit_accounts[journal_type]  = debit_accounts[journal_type].reject{|k, v| v <= 0}
+      credit_accounts[journal_type] = credit_accounts[journal_type].reject{|k, v| v <= 0}
 
       journal[:journal_type_id] = journal_type.to_i
       journal[:currency] = Currency.first
@@ -148,22 +149,29 @@ class Journals < Application
       end
       
       if request.xhr?
-        render "Journal was successfully created", :layout => layout?
+        render "<div class='success'>Journal was successfully created</div>", :layout => layout?
       else
         redirect return_path, :message => {:notice => "Journal was successfully created"}
       end
     else
       message[:error] = ""
+      @date = Date.parse(params[:journal][:date]) if params[:journal] and params[:journal][:date] and not params[:journal][:date].blank?
+      @journal = Journal.new
+      @rules = RuleBook.all(:branch => @branch, :from_date.lte => @date, :to_date.gte => @date)
       statuses.each_with_index{|status, i|
         unless status
           if journals[i] and journals[i].journal_type
-            message[:error] += "#{journals[i].journal_type.name} journal failed to be created"
+            message[:error] += "#{journals[i].journal_type.name} journal could not be created<br/>"
           else
-            message[:error] += "Journal failed to be created because #{journals[i].errors.to_s}"
+            message[:error] += "Journal failed to be created because #{journals[i].errors.full_messages.join(', ')}<br/>"
           end
         end
       }
-      render :new, :layout => layout?
+      if request.xhr?
+        render :new_eod, :layout => :ajax
+      else
+        render :new_eod, :layout => layout?
+      end
     end
   end
   
