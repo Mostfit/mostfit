@@ -30,7 +30,7 @@ class Journal
   def name
     comment
   end
-  
+    
   def validity_check
     return false if self.postings.length<2 #minimum one posting for credit n one for debit
     debit_account_postings, credit_account_postings = self.postings.group_by{|x| x.amount>0}.values
@@ -51,7 +51,7 @@ class Journal
     return [false, "duplicate accounts"] if self.postings.map{|x| x.account_id}.compact.length != self.postings.length
     
     #amount mismatch
-    return [false, "debit and credit amount mismatch"] unless credit_account_postings.map{|x| x.amount * -1}.reduce(0){|s,x| s+=x}  ==  debit_account_postings.map{|x| x.amount}.reduce(0){|s,x| s+=x}
+    return [false, "debit and credit amount mismatch"] unless ((credit_account_postings.map{|x| x.amount * -1.0}.reduce(0){|s,x| s+=x})  ==  (debit_account_postings.map{|x| x.amount}.reduce(0){|s,x| s+=x}))
     
     return [true, ""]
   end

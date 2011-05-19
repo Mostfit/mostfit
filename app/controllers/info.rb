@@ -9,13 +9,52 @@ class Info < Application
     raise NotFound unless @obj
 
     if @obj.class == Region
-      @areas        = {}
+      @areas, @branches, @centers, @clients = {}, {}, {}, {}
+      new_date_hash ||= {}
+      upto_date_hash ||= {}
+      branch_key = "branch.area.region_id"
+      
       @areas[:new]  = @obj.areas(new_date_hash)
       @areas[:upto] = @obj.areas(upto_date_hash)
+      
+      @branches[:new]  = @obj.areas.branches(new_date_hash)
+      @branches[:upto] = @obj.areas.branches(upto_date_hash)
+
+      @centers[:new]  = Center.all(new_date_hash.merge({branch_key => @obj.id}))
+      @centers[:upto] = Center.all(upto_date_hash.merge({branch_key => @obj.id}))
+
+      @clients[:new]  = Client.all(client_hash(:new).merge({"center.#{branch_key}" => @obj.id, :fields => [:id]}))
+      @clients[:upto] = Client.all(client_hash(:upto).merge({"center.#{branch_key}" => @obj.id, :fields => [:id]}))
+
+      hash = {"center.#{branch_key}" => @obj.id}
+      hash["center.creation_date.lte"] = new_date_hash[:creation_date.lte] if new_date_hash[:creation_date.lte]
+      hash["center.creation_date.gte"] = new_date_hash[:creation_date.gte] if new_date_hash[:creation_date.gte]
+
+      @groups_new_count   = ClientGroup.all(hash).count
+      hash["center.creation_date.lte"] = upto_date_hash[:creation_date.gte] if upto_date_hash[:creation_date.gte]
+      @groups_upto_count  = ClientGroup.all(hash).count
     elsif @obj.class == Area
-      @branches        = {}
+      @branches, @centers, @clients = {}, {}, {}
+      new_date_hash ||= {}
+      upto_date_hash ||= {}
+      branch_key = "branch.area_id"
+      
       @branches[:new]  = @obj.branches(new_date_hash)
       @branches[:upto] = @obj.branches(upto_date_hash)
+
+      @centers[:new]  = Center.all(new_date_hash.merge({branch_key => @obj.id}))
+      @centers[:upto] = Center.all(upto_date_hash.merge({branch_key => @obj.id}))
+
+      @clients[:new]  = Client.all(client_hash(:new).merge({"center.#{branch_key}" => @obj.id, :fields => [:id]}))
+      @clients[:upto] = Client.all(client_hash(:upto).merge({"center.#{branch_key}" => @obj.id, :fields => [:id]}))
+
+      hash = {"center.#{branch_key}" => @obj.id}
+      hash["center.creation_date.lte"] = new_date_hash[:creation_date.lte] if new_date_hash[:creation_date.lte]
+      hash["center.creation_date.gte"] = new_date_hash[:creation_date.gte] if new_date_hash[:creation_date.gte]
+
+      @groups_new_count   = ClientGroup.all(hash).count
+      hash["center.creation_date.lte"] = upto_date_hash[:creation_date.gte] if upto_date_hash[:creation_date.gte]
+      @groups_upto_count  = ClientGroup.all(hash).count
     elsif @obj.class == Branch
       @centers        = {}
       @centers[:new]  = @obj.centers(new_date_hash)
@@ -73,8 +112,8 @@ class Info < Application
       @clients[:upto] = @obj.clients(client_hash(:upto), owner_type)
 
       if owner_type == :created
-        @groups_new_count  = @clients[:new] and @clients[:new].count > 0 ? @clients[:new].client_groups(:created_by_staff => @obj).count : 0
-        @groups_upto_count = @clients[:upto] and @clients[:upto].count > 0 ? @clients[:upto].client_groups(:created_by_staff => @obj).count : 0
+        @groups_new_count  = ((@clients[:new] and @clients[:new].count > 0) ? @clients[:new].client_groups(:created_by_staff => @obj).count : 0)
+        @groups_upto_count = ((@clients[:upto] and @clients[:upto].count > 0) ? @clients[:upto].client_groups(:created_by_staff => @obj).count : 0)
       end
     else
       raise "Unknown obj class"
@@ -95,8 +134,8 @@ class Info < Application
     unless @clients 
       @clients        = {}
       if (@centers.class == Hash) and (@centers[:upto].count == 0)
-        @clients[:new]
-        @clients[:upto]
+        @clients[:new] = 0
+        @clients[:upto] = 0
       else
         @clients[:new]  = (@centers.class == Hash ? @centers[:upto] : @centers).clients(client_hash(:new) + {:fields => [:id]})
         @clients[:upto] = (@centers.class == Hash ? @centers[:upto] : @centers).clients(client_hash(:upto) + {:fields => [:id]})
@@ -164,11 +203,21 @@ private
     @centers_new_count  = @centers.key?(:new) ? @centers[:new].count : 0
     @centers_upto_count = @centers.key?(:upto) ? @centers[:upto].count : 0
 
-    @groups_new_count  = (@centers_new_count>0 and @centers[:new] and not @groups_new_count) ? @centers[:new].client_groups(:fields => [:id]).count : 0 
-    @groups_upto_count = (@centers_upto_count>0 and @centers[:upto] and not @groups_upto_count) ? @centers[:upto].client_groups(:fields => [:id]).count : 0
+    unless @groups_new_count
+      @groups_new_count  = (@centers_new_count  > 0 and @centers[:new]) ? @centers[:new].client_groups(:fields => [:id]).count : 0
+    end
+    
+    unless @groups_upto_count
+      @groups_upto_count = (@centers_upto_count > 0 and @centers[:upto] and not @groups_upto_count) ? @centers[:upto].client_groups(:fields => [:id]).count : 0
+    end
 
-    @clients_new_count  = (@clients and @clients[:new]) ?  @clients[:new].count : 0
-    @clients_upto_count = (@clients and @clients[:upto]) ? @clients[:upto].count : 0
+    unless @clients_new_count
+      @clients_new_count  = (@clients and @clients[:new]) ?  @clients[:new].count : 0
+    end
+    
+    unless @clients_upto_count
+      @clients_upto_count = (@clients and @clients[:upto]) ? @clients[:upto].count : 0
+    end
 
     @payments        = Payment.collected_for(obj, @from_date, @to_date, [1, 2], child_type)
     @total_payments  = Payment.collected_for(obj, Date.min_date, @to_date, [1, 2], child_type)

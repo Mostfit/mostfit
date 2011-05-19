@@ -8,7 +8,7 @@
     %td
       Date
     %td
-      =date_select_for @journal, :date
+      = date_select_for @journal, :date
   - if params[:credit_accounts]
     - params[:credit_accounts].each_with_index do |ca, idx|
       = partial "journals/account_amount", :account => ca, :account_type => :credit_accounts, :last_account => (params[:debit_accounts].length == idx + 1 ? true : false)
