@@ -1,0 +1,55 @@
+=partial :form
+- income_heads_and_change = @data
+- total_expenditure = 0.0; total_income = 0.0
+- non_breaking_space = "&nbsp;"
+- total_cols = 3
+%table.report.nojs
+  %tr.header
+    %th
+      Head
+    %th
+      Account
+    %th
+      Amount
+  %tr
+    %th{:colspan => total_cols}
+      EXPENSES
+  - EXPENSES.each do |expense_head|
+  - expense = income_heads_and_change[expense_head]
+  - total_expenditure += expense.abs if expense
+    %tr
+      %td
+        = expense_head
+      %td
+        = non_breaking_space
+      %td
+        = expense.abs.to_currency
+  %tr
+    %th{:colspan => total_cols - 1}
+      Total Expenditure
+    %th
+      = total_expenditure.to_currency
+  %tr
+    %th{:colspan => total_cols}
+      INCOMES
+  - INCOMES.each do |income_head|
+  - income = income_heads_and_change[income_head]
+  - total_income += income if income
+    %tr
+      %td
+        = income_head
+      %td
+        = non_breaking_space
+      %td
+        = income.abs.to_currency
+  %tr
+    %th{:colspan => total_cols - 1}
+      Total Income
+    %th
+      = total_income.to_currency
+  - difference = total_income - total_expenditure
+  %tr
+    %th{:colspan => total_cols - 1}
+      Net Profit (Loss)
+    %th
+      = difference > 0.0 ? difference.to_currency : "(#{difference.abs.to_currency})"
