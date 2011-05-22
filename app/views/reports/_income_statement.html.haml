@@ -1,8 +1,8 @@
 =partial :form
-- income_heads_and_change = @data
+- income_heads_and_accounts = @data
 - total_expenditure = 0.0; total_income = 0.0
 - non_breaking_space = "&nbsp;"
-- total_cols = 3
+- total_cols = 4
 %table.report.nojs
   %tr.header
     %th
@@ -11,19 +11,37 @@
       Account
     %th
       Amount
+    %th
+      Totals
   %tr
     %th{:colspan => total_cols}
       EXPENSES
   - EXPENSES.each do |expense_head|
-  - expense = income_heads_and_change[expense_head]
-  - total_expenditure += expense.abs if expense
+    - sub_total = 0.0
     %tr
-      %td
+      %td{:colspan => total_cols - 2}
         = expense_head
       %td
         = non_breaking_space
+    - accounts_and_amounts = income_heads_and_accounts[expense_head]
+    - accounts_and_amounts.each_pair do |account, amount|
+      - total_expenditure += amount.abs; sub_total += amount.abs
+      %tr
+        %td
+          = non_breaking_space
+        %td
+          = account.name
+        %td
+          = amount.abs.to_currency
+    %tr
       %td
-        = expense.abs.to_currency
+        = non_breaking_space
+      %td
+        = non_breaking_space
+      %td
+        = sub_total.to_currency
+      %td
+        Sub-total
   %tr
     %th{:colspan => total_cols - 1}
       Total Expenditure
@@ -33,23 +51,39 @@
     %th{:colspan => total_cols}
       INCOMES
   - INCOMES.each do |income_head|
-  - income = income_heads_and_change[income_head]
-  - total_income += income if income
+    - sub_total = 0.0
     %tr
-      %td
+      %td{:colspan => total_cols - 2}
         = income_head
       %td
         = non_breaking_space
+    - accounts_and_amounts = income_heads_and_accounts[income_head]
+    - accounts_and_amounts.each_pair do |account, amount|
+      - total_income += amount.abs; sub_total += amount.abs
+      %tr
+        %td
+          = non_breaking_space
+        %td
+          = account.name
+        %td
+          = amount.abs.to_currency
+    %tr
       %td
-        = income.abs.to_currency
+        = non_breaking_space
+      %td
+        = non_breaking_space
+      %td
+        = sub_total.to_currency
+      %td
+        Sub-total
   %tr
     %th{:colspan => total_cols - 1}
       Total Income
     %th
       = total_income.to_currency
-  - difference = total_income - total_expenditure
+  - net = total_income - total_expenditure
   %tr
     %th{:colspan => total_cols - 1}
       Net Profit (Loss)
     %th
-      = difference > 0.0 ? difference.to_currency : "(#{difference.abs.to_currency})"
+      = net < 0 ? "(#{net.abs.to_currency})" : net.to_currency
