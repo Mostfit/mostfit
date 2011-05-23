@@ -106,7 +106,7 @@ class Loan
   validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
 
   validates_with_method  :amount,                       :method => :amount_greater_than_zero?
-  validates_with_method  :interest_rate,                :method => :interest_rate_greater_than_zero?
+  validates_with_method  :interest_rate,                :method => :interest_rate_greater_than_or_equal_to_zero?
   validates_with_method  :number_of_installments,       :method => :number_of_installments_greater_than_zero?
   validates_with_method  :applied_on,                   :method => :applied_before_appoved?
   validates_with_method  :approved_on,                  :method => :applied_before_appoved?
@@ -1071,9 +1071,9 @@ class Loan
     return true if not amount.blank? and amount > 0
     [false, "Loan amount should be greater than zero"]
   end
-  def interest_rate_greater_than_zero?
-    return true if interest_rate and interest_rate.to_f > 0
-    [false, "Interest rate should be greater than zero"]
+  def interest_rate_greater_than_or_equal_to_zero?
+    return true if interest_rate and interest_rate.to_f >= 0
+    [false, "Interest rate should be greater than or equal to zero"]
   end
   def number_of_installments_greater_than_zero?
     return true if number_of_installments and number_of_installments.to_i > 0
