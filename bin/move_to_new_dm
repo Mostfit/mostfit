@@ -1,0 +1,79 @@
+#!/usr/bin/ruby
+def indentation(line)
+  /^\s+/.match(line)[0].length
+end
+
+
+def remove_function(name, lines)
+  skip = false
+  indent = 0
+  lines.map{|line|
+    if line.include?("def #{name}")
+      skip = true
+      indent = indentation(line)
+    end
+    
+    if skip and line.strip == "end" and indent == indentation(line)
+      skip = false
+      next
+    end
+    
+    next if skip
+    line
+  }.compact
+end
+
+#models
+(Dir.entries("app/models") - [".", ".."]).each{|file|
+  next if File.directory?(File.join("app", "models", file))
+  unless file.match(/\.rb$/)
+    File.delete(File.join("app", "models", file))
+    next
+  end
+  
+  lines = File.readlines(File.join("app", "models", file))
+  f = File.open(File.join("app", "models", file), "w")
+  lines = remove_function("self.default_repository_name", lines)
+  lines = remove_function("method_missing", lines) if file == "user.rb"
+
+  lines.each_with_index{|line, idx|
+    line =  line.gsub(/\:nullable\s*\=\>\s*true/, ":required => false")
+    line =  line.gsub(":nullable => false", ":required => true")
+    line =  line.gsub("validates_is_unique", "validates_uniqueness_of")
+    line =  line.gsub("validates_length", "validates_length_of")
+    line =  line.gsub("validates_present", "validates_presence_of")
+    line =  line.gsub("validates_format", "validates_format_of")
+    line =  line.gsub("validates_is_number", "validates_numericality_of")
+    line =  line.gsub("", "validates_numericality_of")
+    line =  line.gsub("property :key", "property :key1")
+           
+    next if /^require(\s|\()/.match(line)   
+    
+    # string properties with min and max
+    if line.include?("property") and line.include?("String")
+      line = line.gsub(/\,?\s?\:min\s\=\>\s+\d+/, '')
+      line = line.gsub(/\,?\s?\:max\s\=\>\s+\d+/, '')
+    end
+
+    if line.include?("property") and line.include?("Text")
+      line = line.gsub(/\,?\s?\:min\s\=\>\s+\d+/, '')
+      line = line.gsub(/\,?\s?\:max\s\=\>\s+\d+/, '')
+    end
+    
+    if line.include?("property") and line.include?("Date")
+      line = line.gsub(/\,\s+\:length\s+\=\>\s+\d+/, '')
+    end
+
+    if line.include?("property") and line.include?("Integer")
+      line = line.gsub(/\,?\s+\:length\s\=\>\s+\d+/, '')
+    end
+    
+    # disabling a few things for now
+    line = line.gsub("before :valid?, :set_amount", "#before :valid?, :set_amount")
+    line = line.gsub("validates_attachment_thumbnails", "#validates_attachment_thumbnails")
+
+    f.puts line
+  }
+  f.close
+}
+

@@ -133,10 +133,11 @@ class Journals < Application
 
       journal[:journal_type_id] = journal_type.to_i
       journal[:currency] = Currency.first
-
-      status, journal_obj = Journal.create_transaction(journal, debit_accounts[journal_type], credit_accounts[journal_type])
-      statuses.push(status)
-      journals.push(journal_obj)
+      unless debit_accounts[journal_type].empty? and credit_accounts[journal_type].empty?
+        status, journal_obj = Journal.create_transaction(journal, debit_accounts[journal_type], credit_accounts[journal_type])
+        statuses.push(status)
+        journals.push(journal_obj)
+      end
     }
 
     if not statuses.include?(false)

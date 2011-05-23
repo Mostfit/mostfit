@@ -766,9 +766,7 @@ describe Loan do
   it "should not be valid if duplicated" do
     @loan_product.loan_validation_methods = "loans_must_not_be_duplicated"
     @loan_product.save
-    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", 
-                     :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, 
-                     :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
     @loan.save.should_not be_true
     client = Client.new(:name => 'Mary', :reference => Time.now.to_s, :client_type => ClientType.create(:type => "Standard"))
     client.center  = @center
@@ -778,9 +776,7 @@ describe Loan do
     client.save
     client.errors.each {|e| puts e}
     client.should be_valid
-    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", 
-                     :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(client.id), :funding_line => @funding_line, 
-                     :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(client.id), :funding_line => @funding_line, :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
     @loan.save.should be_true
   end
 
@@ -808,4 +804,23 @@ describe Loan do
     r[3].amount.should == 100
   end
 
+  it "should not disburse if loan fees are not paid" do
+    #when fees are not paid
+    @loan_product.loan_validation_methods = "check_payment_of_fees_before_disbursal"
+    @loan_product.fees[0] = Fee.first 
+    @loan_product.save
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
+    @loan.save.should be_true
+    @loan.disbursal_date = @loan.scheduled_disbursal_date
+    @loan.disbursed_by = @manager
+    @loan.save.should be_false
+    
+    #when fees are paid
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
+    @loan.save.should be_true    
+    @loan.pay_fees((@loan.fees[0].amount || 0), @loan.fee_schedule.keys.first, @manager, User.first)
+    @loan.disbursal_date = @loan.scheduled_disbursal_date
+    @loan.disbursed_by = @manager
+    @loan.save.should be_true
+  end
 end

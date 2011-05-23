@@ -9,6 +9,16 @@
       Account Category (if applicable)
     %td
       = select(:account_category, :collection => [[:Cash, "Cash"], [:Bank, "Bank"]] , :prompt => "Select Account Category")
+  %tr
+    %td
+      Asset Class
+    %td
+      = select(:asset_class, :collection => [ASSET_CLASSES, EQUITY].flatten, :prompt => ASSET_CLASS_NOT_CHOSEN)
+  %tr
+    %td
+      Income Head
+    %td
+      = select(:income_head, :collection => INCOME_HEADS, :prompt => INCOME_HEAD_NOT_CHOSEN)
   %tr 
     %td
       Branch

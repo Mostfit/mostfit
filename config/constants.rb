@@ -1,4 +1,23 @@
 DEFAULT_JOURNAL_TYPES = ['Payment','Receipt','Journal']
+
+CASH = 'Cash'; BANK_DEPOSITS = 'Bank Deposits'; SECURITIES = 'Securities'
+LAND = 'Land'; MACHINERY = 'Machinery'
+LOANS_MADE = 'Loans made'; BORROWINGS = 'Borrowings'; TAXES_PAYABLE = "Tax payable"; OTHER_LIABILITIES = "Other liabilities"
+CURRENT_ASSET_HEADS = [CASH, BANK_DEPOSITS, SECURITIES, LOANS_MADE]
+FIXED_ASSET_HEADS = [LAND, MACHINERY]
+LIABILITIES = [BORROWINGS, TAXES_PAYABLE, OTHER_LIABILITIES]
+ASSET_CLASS_NOT_CHOSEN = 'Choose asset or liability class'
+ASSET_CLASSES = [CURRENT_ASSET_HEADS, FIXED_ASSET_HEADS, LIABILITIES].flatten
+CAPITAL = "Capital"; RESERVES = "Reserves"; PROFIT_AND_LOSS_ACCOUNT = "Profit & Loss Account"
+EQUITY = [CAPITAL, RESERVES, PROFIT_AND_LOSS_ACCOUNT]
+
+INTEREST_INCOME = 'Interest Income'; INTEREST_EARNED_ON_DEPOSITS = 'Interest earned on deposits'; FEE_INCOME = 'Fee income'
+INCOMES = [INTEREST_INCOME, INTEREST_EARNED_ON_DEPOSITS, FEE_INCOME]
+SALARIES = 'Salaries'; RENT_AND_TAXES = 'Rent, Rates, and Taxes'; ADMIN_EXPENSES = 'Administration Expenses'; TRAVEL_EXPENSES = 'Travel And Conveyance';
+EXPENSES = [SALARIES, RENT_AND_TAXES, ADMIN_EXPENSES, TRAVEL_EXPENSES]
+INCOME_HEAD_NOT_CHOSEN = 'Choose income or expense head'
+INCOME_HEADS = [INCOMES, EXPENSES].flatten
+
 INSTALLMENT_FREQUENCIES = [:daily, :weekly, :biweekly, :monthly, :quadweekly]
 WEEKDAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 MONTHS = ["None", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]

@@ -11,6 +11,9 @@ class Account
   property :parent_id,              Integer, :index => true
   property :account_id,             Integer, :index => true
   property :account_category,       Enum.send('[]', *['', 'Cash', 'Bank']), :default => '', :nullable => true, :index => true
+  property :asset_class,            Enum.send('[]', *(['', ASSET_CLASSES].flatten)), :default => '', :nullable => true, :index => true
+  property :income_head,           Enum.send('[]', *(['', INCOME_HEADS].flatten)), :default => '', :nullable => true, :index => true
+
   belongs_to :account, :model => 'Account', :child_key => [:parent_id]
   belongs_to :account_type
   
@@ -68,6 +71,15 @@ class Account
     return nil if opening_balance_on_date.nil? && postings_on_date.nil?
     opening_balance_on_date ||= 0.0; postings_on_date ||= 0.0
     return opening_balance_on_date + postings_on_date
+  end
+
+  def change_closing_over_opening_balance_for_period(for_date = Date.today)
+    period = AccountingPeriod.get_accounting_period for_date
+    return nil unless period
+    closing_balance = (period.end_date > Date.today ? closing_balance_as_of : closing_balance_as_of(period.end_date))
+    opening_balance = (period.begin_date < opening_balance_on_date ? opening_balance : opening_balance_as_of(period.begin_date))
+    return nil unless (closing_balance && opening_balance)
+    closing_balance - opening_balance
   end
   
   def opening_balance_as_of(for_date = Date.today)

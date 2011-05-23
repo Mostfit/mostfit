@@ -125,8 +125,17 @@ module Misfit
       end
     end
     
-  end    #LoanValidators
+    def check_payment_of_fees_before_disbursal
+      if self.approved_on and not self.new? 
+        if not self.fees_paid?
+          return [false, "All fees applicable to this loan are not paid yet"] 
+        else
+          return true
+        end
+      else
+        return true
+      end
+    end
 
+  end    #LoanValidators 
 end
-
-

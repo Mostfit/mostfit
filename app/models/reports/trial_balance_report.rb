@@ -11,18 +11,19 @@ class TrialBalanceReport < Report
   end
 
   def name
-    "Trial Balance"
+    "Trial Balance for #{((@branch_id and not @branch_id.blank?) ? Branch.get(@branch_id).name : 'Head office')} from #{@from_date} to #{@to_date}"
   end
 
   def self.name
-    "Trial Balance"
+    "Trial Balance for #{((@branch_id and not @branch_id.blank?) ? Branch.get(@branch_id).name : 'Head office')} from #{@from_date} to #{@to_date}"
   end
   
   def generate(param)
     data = {}
+    hash = {"journal.date.gte" => @from_date, "journal.date.lte" => @to_date}
     @branch_id = @branch_id.to_i if @branch_id 
-    @debit_postings  = Posting.all(:amount.lt => 0).aggregate(:account_id, :amount.sum).to_hash
-    @credit_postings = Posting.all(:amount.gt => 0).aggregate(:account_id, :amount.sum).to_hash
+    @debit_postings  = Posting.all(hash.merge({:amount.lt => 0})).aggregate(:account_id, :amount.sum).to_hash
+    @credit_postings = Posting.all(hash.merge({:amount.gt => 0})).aggregate(:account_id, :amount.sum).to_hash
     
     Account.all(:order => [:account_type_id.asc], :parent_id => nil).group_by{|account| account.account_type}.each{|account_type, accounts|
       data[account_type] = recurse(accounts)    

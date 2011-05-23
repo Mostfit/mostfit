@@ -17,11 +17,12 @@
     %li#manages Manages
     %li#info_created Info (created)
     %li#info_managed Info (managed)
+    %li#sheets Day Sheets
     - if Mfi.first.map_enabled
       %li#map Map
   %div.tab
     - @manages.keys.each do |type|
-      -if @manages[type].length> 0
+      - if @manages[type].length> 0
         %h2
           ="#{type.to_s.capitalize} managed"
         %ul
@@ -32,7 +33,14 @@
     %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@staff_member.id}?for=staff_member&type=created"}
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@staff_member.id}?for=staff_member&type=managed"}
-
+  %div.tab
+    %form._remote_{:action => url(:controller => :staff_members, :action => :display_sheets, :id => @staff_member.id), :method => :get}
+      = select :name => "type_sheet", :collection => [["collection_sheets", "Collection Sheets"], ["disbursement_sheets", "Disbursement Sheets"]]
+      = date_select "date", Date.today, :id => "day_sheet_date" 
+      %input{:type => "hidden", :name => "_target_", :value => "file_list"}
+      = submit "GO"
+    #file_list
+ 
   - if Mfi.first.map_enabled
     %div.tab
       = js_include_tag :map

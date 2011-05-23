@@ -1,0 +1,12 @@
+- if @files
+  - if @files.empty?
+    %h3 
+      == No #{params[:type_sheet]} exist for this staff member
+  - else
+    - @files.each do |f|
+      = link_to f, url(:controller => :staff_members, :action => :send_sheet, :filename => (File.join(@folder, f)))
+      %br
+- else
+  %h3 
+    == No #{params[:type_sheet]} exist for this staff member
+    
