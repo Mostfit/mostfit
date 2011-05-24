@@ -73,8 +73,11 @@ class DailyReport < Report
       }
     }
     
-    hash = {:center_id => @center.map{|c| c.id}}
-    hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
+    hash = {:'lh.center_id' => @center.map{|c| c.id}}
+    if loan_product_id
+      hash[:'lh.loan_id'] = LoanProduct.get(loan_product_id).loans.aggregate(:id)
+    end
+
     payment_type_colum =  {:principal => 3, :interest => 4, :fees => 5}
 
     # principal, interest and fees paid
