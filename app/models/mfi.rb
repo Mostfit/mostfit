@@ -42,6 +42,8 @@ class Mfi
   property :branch_diary_enabled, Boolean, :default => false, :index => true
   property :stock_register_enabled, Boolean, :default => false, :index => true
   property :asset_register_enabled, Boolean, :default => false, :index => true
+ 
+  property :generate_day_sheet_before, Integer, :default => 1, :max => 5
 
   property :currency_format,  String,  :nullable => true, :length => 20
   property :session_expiry,   Integer, :nullable => true, :min => 60, :max => 86400
