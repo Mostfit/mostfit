@@ -17,7 +17,10 @@ class DailyReport < Report
   
   def generate
     branches, centers, data, clients, loans = {}, {}, {}, {}, {}
-    histories = (LoanHistory.sum_outstanding_grouped_by(self.date, [:center], self.loan_product_id)||{}).group_by{|x| x.center_id}
+
+    extra_conditions = ["loan_product_id=#{loan_product_id}"] if loan_product_id
+    histories = (LoanHistory.sum_outstanding_grouped_by(self.date, [:center], extra_conditions)||{}).group_by{|x| x.center_id}
+
     advances  = (LoanHistory.sum_advance_payment(self.date, self.date, :center)||{}).group_by{|x| x.center_id}
     balances  = (LoanHistory.advance_balance(self.date, :center)||{}).group_by{|x| x.center_id}
     old_balances = (LoanHistory.advance_balance(self.date-1, :center)||{}).group_by{|x| x.center_id}
