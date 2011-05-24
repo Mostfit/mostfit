@@ -1,7 +1,7 @@
 class StaffMember
   include DataMapper::Resource
   include Identified
-  include Pdf::DaySheet
+  include Pdf::DaySheet if PDF_WRITER
   
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false
