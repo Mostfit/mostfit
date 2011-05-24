@@ -91,11 +91,13 @@ class DailyReport < Report
     }
     
     # client fee
+    center_ids = @center.map{|c| c.id}.join(', ')
+    center_ids = 'NULL' if center_ids.empty?
     repository.adapter.query(%Q{
                                SELECT c.id center_id, c.branch_id branch_id, SUM(p.amount) amount
                                FROM  payments p, clients cl, centers c
                                WHERE p.received_on = '#{date.strftime('%Y-%m-%d')}' AND p.loan_id is NULL AND p.type=3
-                               AND   p.deleted_at is NULL AND p.client_id=cl.id AND cl.center_id=c.id AND cl.deleted_at is NULL AND c.id in (#{@center.map{|c| c.id}.join(', ')})
+                               AND   p.deleted_at is NULL AND p.client_id=cl.id AND cl.center_id=c.id AND cl.deleted_at is NULL AND c.id in (#{center_ids})
                                GROUP BY branch_id, center_id
                              }).each{|p|
       if branch = branches[p.branch_id] and center = centers[p.center_id]
