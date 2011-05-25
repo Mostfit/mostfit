@@ -97,7 +97,7 @@ class Fee
     end
   end
   
-  # returns the applicable fees for a list of ids and applicable type. Additional params can be provided by hash 
+  # returns the applicable fees for a list of ids and applicable type. Additional params can be provided by hash
   def self.applicable(ids, hash = {}, applicable_type = 'Loan')
     date = hash.delete(:date) || Date.today
     
@@ -132,6 +132,7 @@ class Fee
 
   # returns any due fee for a list of ids and applicable type. Additional params can be provided by hash 
   def self.due(ids, hash={}, applicable_type = 'Loan')
+    return {} if ids.blank?
     fees_applicable = self.applicable(ids, hash, applicable_type).aggregate(:applicable_id, :amount.sum).to_hash      
     fees_paid       = self.paid(ids, hash, applicable_type)
     fees = {}

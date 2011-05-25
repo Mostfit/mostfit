@@ -680,8 +680,6 @@ div.tab_container ul.inner{
     border-bottom: solid 1px #9e9e8e;
     background-color: beige;
 }
-
-
 div.tab_container ul.tabs li{
     display: inline;
     padding: 5px;
@@ -890,12 +888,15 @@ a.expand_collapsed{
     background-color: #F4F4F4;
 }
 .totalinfo{
-    width: 420px;
+    width: 100%;
+    min-width: 200px;
+    max-width: 550px;
     border: 2px solid #3456a4;
     background: #fff;
     border-radius: 10px;
     -moz-border-radius: 10px;
-    margin-top: 25px;
+    margin-top: 5px;
+    margin-right: 25px;
     margin-bottom: 25px;
 }
 .totalinfo h1{
@@ -907,16 +908,44 @@ a.expand_collapsed{
     color: white;
     text-align: center;
 }
-.totalinfo table tr{
+.totalinfo table{
     width: 100%;
+    max-width: 600px;
+    min-width: 200px;
 }
 .totalinfo table tr:nth-child(odd){
-    width: 100%;
     background: #eee;
 }
 .totalinfo table tr td:first-child{ 
     font-weight: bold;
 }
+.totalinfo .numbers{ 
+    width: 99%;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+.totalinfo .numbers .number{ 
+    min-width: 10%;
+    display: inline-block;
+    font-size: 2em;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #eee;
+    border: 1px solid #eee;
+    margin: 2px;
+    font-weight: bold;
+}
+.totalinfo .numbers span.label{
+    font-size: 0.5em;
+}
+.totalinfo table.numbers tr:first-child td{ 
+    font-size: 2em;
+}
+.totalinfo table.numbers tr td{ 
+    background: #eee;
+    width: 20%;
+}
+
 .graphContainer{
     width: 95%;
     margin-top: 10px;
@@ -1079,6 +1108,13 @@ ul#tree li.depth_4 span{
 }
 .right{
     float: right;
+}
+.left_pane{
+    width: 50%;
+}
+.right_pane{
+    float: right;
+    width: 50%;
 }
 ul.bookmarks li{
     margin-bottom: 5px;

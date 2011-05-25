@@ -1,24 +1,32 @@
 module Pdf
   module DaySheet
-    def generate_pdf(filename)
+
+    def generate_collection_pdf(date)
+      folder   = File.join(Merb.root, "doc", "pdfs", "staff", self.name, "collection_sheets")
+      FileUtils.mkdir_p(folder)
+      filename = File.join(folder, "collection_#{self.id}_#{date.strftime('%Y_%m_%d')}.pdf")
+      center_ids = LoanHistory.all(:date => [date, date.holidays_shifted_today].uniq, :fields => [:loan_id, :date, :center_id], :status => [:disbursed, :outstanding]).map{|x| x.center_id}.uniq
+      centers = self.centers(:id => center_ids).sort_by{|x| x.name}
       pdf = PDF::Writer.new(:orientation => :landscape, :paper => "A4")
       pdf.select_font "Times-Roman"
-      pdf.text "Daily Collection Sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
+      pdf.text "Daily Collection Sheet for #{self.name} for #{date}", :font_size => 24, :justification => :center
       pdf.text("\n")
-      days_absent = Attendance.all(:status => "absent", :center => @centers).aggregate(:client_id, :all.count).to_hash 
-      days_present = Attendance.all(:center => @centers).aggregate(:client_id, :all.count).to_hash
-         @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each_with_index{|center, idx|
+      return nil if centers.empty?
+      days_absent = Attendance.all(:status => "absent", :center => centers).aggregate(:client_id, :all.count).to_hash 
+      days_present = Attendance.all(:center => centers).aggregate(:client_id, :all.count).to_hash
+      centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each_with_index{|center, idx|
         pdf.start_new_page if idx > 0
-        pdf.text "Center: #{center.name}, Manager: #{@staff_member.name}, signature: ______________________", :font_size => 12, :justification => :left
+        pdf.text "Center: #{center.name}, Manager: #{self.name}, signature: ______________________", :font_size => 12, :justification => :left
         pdf.text("Center leader: #{center.leader.client.name}, signature: ______________________", :font_size => 12, :justification => :left) if center.leader
-        pdf.text("Date: #{@date}, Time: #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}", :font_size => 12, :justification => :left)
+        pdf.text("Date: #{date}, Time: #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}", :font_size => 12, :justification => :left)
         pdf.text("\n")
         table = PDF::SimpleTable.new
         table.data = []
         tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, total_due = 0, 0, 0, 0, 0, 0
         #Prefecth some data for speed
         loans = center.loans
-        histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
+        puts "#{center.name} : #{loans.aggregate(:id)}"
+        histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => date)
         fees_applicable = Fee.due(loans.map{|x| x.id})
         tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_fee, tot_total = 0, 0, 0, 0, 0, 0, 0
 
@@ -41,7 +49,7 @@ module Pdf
               principal_due      = [(lh ? lh.principal_due : 0), 0].max
               interest_due       = [(lh ? lh.interest_due : 0), 0].max
               total_due          = [(lh ? (fee+lh.principal_due+lh.interest_due): 0), 0].max
-              number_of_installments = loan.number_of_installments_before(@date)
+              number_of_installments = loan.number_of_installments_before(date)
               
               table.data.push({"name" => client.name, "loan id" => loan.id, "amount" => loan.amount.to_currency, 
                                 "outstanding" => actual_outstanding.to_currency, "status" => lh.status.to_s,                                
@@ -89,7 +97,7 @@ module Pdf
         table.render_on(pdf)
         
         #draw table for scheduled disbursals
-        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => @date)
+        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => date)
         if center.clients.count>0 and loans_to_disburse.count > 0
           table = PDF::SimpleTable.new
           table.data = []
@@ -119,21 +127,28 @@ module Pdf
       return pdf
     end
 
-    def generate_disbursement_pdf(filename)
+    def generate_disbursement_pdf(date)
+      folder   = File.join(Merb.root, "doc", "pdfs", "staff", self.name, "disbursement_sheets")
+      FileUtils.mkdir_p(folder)
+      filename = File.join(folder, "disbursement_#{self.id}_#{date.strftime('%Y_%m_%d')}.pdf")
+      center_ids = Loan.all(:scheduled_disbursal_date => date, :approved_on.not => nil, :rejected_on => nil).map{|x| x.client.center_id}.uniq
+      centers = self.centers(:id => center_ids).sort_by{|x| x.name}
+
       pdf = PDF::Writer.new(:orientation => :landscape, :paper => "A4")
       pdf.select_font "Times-Roman"
-      pdf.text "Daily Disbursement Sheet for #{@staff_member.name} for #{@date}", :font_size => 24, :justification => :center
+      pdf.text "Daily Disbursement Sheet for #{self.name} for #{date}", :font_size => 24, :justification => :center
       pdf.text("\n")
-      days_absent = Attendance.all(:status => "absent", :center => @centers).aggregate(:client_id, :all.count).to_hash
-      @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each_with_index{|center, idx|
+      return nil if centers.empty?   
+      days_absent = Attendance.all(:status => "absent", :center => centers).aggregate(:client_id, :all.count).to_hash
+      centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each_with_index{|center, idx|
         pdf.start_new_page if idx > 0
-        pdf.text "Center: #{center.name}, Manager: #{@staff_member.name}, signature: ______________________", :font_size => 12, :justification => :left
+        pdf.text "Center: #{center.name}, Manager: #{self.name}, signature: ______________________", :font_size => 12, :justification => :left
         pdf.text("Center leader: #{center.leader.client.name}, signature: ______________________", :font_size => 12, :justification => :left) if center.leader
-        pdf.text("Date: #{@date}, Time: #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}", :font_size => 12, :justification => :left)
+        pdf.text("Date: #{date}, Time: #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}", :font_size => 12, :justification => :left)
         pdf.text("Actual Disbursement on ___________________________, signature: ______________________", :font_size => 12, :justification => :left)
         pdf.text("\n")
         #draw table for scheduled disbursals
-        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => @date) #, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil)
+        loans_to_disburse = center.clients.loans(:scheduled_disbursal_date => date) #, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil)
         if center.clients.count>0 and loans_to_disburse.count > 0
           table = PDF::SimpleTable.new
           table.data = []

@@ -1,5 +1,4 @@
 class StaffMembers < Application
-  include Pdf::DaySheet if PDF_WRITER
   include DateParser
   layout :determine_layout
 
@@ -75,31 +74,33 @@ class StaffMembers < Application
     center_ids = LoanHistory.all(:date => [@date, @date.holidays_shifted_today].uniq, :fields => [:loan_id, :date, :center_id], :status => [:disbursed, :outstanding]).map{|x| x.center_id}.uniq
     @centers   = @staff_member.centers(:id => center_ids).sort_by{|x| x.name}
     if params[:format] == "pdf"
-      folder   = File.join(Merb.root, "doc", "pdfs", "staff", @staff_member.name, "collection_sheets")
-      FileUtils.mkdir_p(folder)
-      filename = File.join(folder, "collection_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
-      generate_pdf(filename)
-      send_data(File.read(filename), :filename => filename)
+      file = @staff_member.generate_collection_pdf(@date)
+      filename   = File.join(Merb.root, "doc", "pdfs", "staff", @staff_member.name, "collection_sheets", "collection_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
+      if file
+        send_data(File.read(filename), :filename => filename)
+      else
+        redirect resource(@staff_member), :message => {:notice => "No centers for collection today"}
+      end
     else
       display @centers
     end
   end
 
   def disbursement_sheet(id)
-    #make it like day_sheet
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
     @date = params[:date] ? parse_date(params[:date]): Date.today
     @date = @date.holiday_bump
-    center_ids = Loan.all(:scheduled_disbursal_date => @date, :approved_on.not => nil, :rejected_on => nil).map{|x| x.client.center_id}.uniq
-    @centers = @staff_member.centers(:id => center_ids).sort_by{|x| x.name}
+    center_ids = LoanHistory.all(:date => [@date, @date.holidays_shifted_today].uniq, :fields => [:loan_id, :date, :center_id], :status => [:disbursed, :outstanding]).map{|x| x.center_id}.uniq
+    @centers   = @staff_member.centers(:id => center_ids).sort_by{|x| x.name}
     if params[:format] == "pdf"
-      #some problem not working as of now
-      folder   = File.join(Merb.root, "doc", "pdfs", "staff", @staff_member.name, "disbursement_sheets")
-      FileUtils.mkdir_p(folder)
-      filename = File.join(folder, "disbursement_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
-      generate_disbursement_pdf(filename)
-      send_data(File.read(filename), :filename => filename)
+      file = @staff_member.generate_disbursement_pdf(@date)
+      filename   = File.join(Merb.root, "doc", "pdfs", "staff", @staff_member.name, "disbursement_sheets", "disbursement_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
+      if file
+        send_data(File.read(file), :filename => filename)
+      else
+        redirect resource(@staff_member), :message => {:notice => "No centers for collection today"}
+      end
     else
       display @centers
     end
