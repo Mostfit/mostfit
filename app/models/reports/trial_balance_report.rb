@@ -15,7 +15,7 @@ class TrialBalanceReport < Report
   end
 
   def self.name
-    "Trial Balance for #{((@branch_id and not @branch_id.blank?) ? Branch.get(@branch_id).name : 'Head office')} from #{@from_date} to #{@to_date}"
+    "Trial Balance"
   end
   
   def generate(param)

@@ -1,6 +1,7 @@
 class StaffMember
   include DataMapper::Resource
   include Identified
+  include Pdf::DaySheet if PDF_WRITER
   
   property :id,      Serial
   property :name,    String, :length => 100, :nullable => false
@@ -111,4 +112,11 @@ class StaffMember
     staff_members.delete(0)
     return staff_members
   end
+
+  def generate_sheets(date)
+    c_pdf = generate_collection_pdf(date)
+    d_pdf = generate_disbursement_pdf(date)
+    return [c_pdf, d_pdf]
+  end
+
 end

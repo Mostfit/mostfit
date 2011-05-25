@@ -1,22 +1,122 @@
 =partial :form
+- asset_classes_and_accounts = @data
+- total_assets, total_liabilities, total_equity = 0.0, 0.0, 0.0
+- total_cols = 3
+- non_breaking_space = "&nbsp;"
 %table.report
   %tr.header
     %th
-      Account Type
+      Asset Class or GL Code
     %th
       Account
     %th
-      Total Balance
-  - @data.each do |account_type|
+      Balance
     %tr
-      %td
-        = account_type.name
-      %td
-        
-      %td
-        = account_type.accounts.postings.sum(:amount)
-
-
- 
- 
- 
+      %th{:colspan => total_cols}
+        Assets
+  - [CURRENT_ASSET_HEADS, FIXED_ASSET_HEADS].flatten.each do |asset_class|
+    - [asset_class].flatten.each do |asset_class_type|
+      - sub_total = 0.0
+      %tr{:style => "text-align:left"}
+        %td{:colspan => total_cols - 1}
+          = asset_class_type
+        %td
+          = non_breaking_space
+      - accounts_and_balances = asset_classes_and_accounts[asset_class_type]
+      - if accounts_and_balances && !accounts_and_balances.empty?
+        - accounts_and_balances.each_pair do |account, balance|
+          %tr{:style => "text-align:right"}
+            %td
+              = account.gl_code
+            %td
+              = account.name
+            %td
+              - sub_total += balance; total_assets += balance
+              = balance.to_account_balance
+        %tr{:style => "text-align:right"}
+          %td{:colspan => total_cols - 1}
+            Sub-total
+          %td
+            = sub_total.to_account_balance
+  %tr{:style => "text-align:right"}
+    %td{:colspan => total_cols - 1}
+      Total Assets
+    %td
+      = total_assets.to_account_balance
+  %tr
+    %th{:colspan => total_cols}
+      Liabilities
+  - [LIABILITIES].flatten.each do |asset_class|
+    - [asset_class].flatten.each do |asset_class_type|
+      - sub_total = 0.0
+      %tr{:style => "text-align:left"}
+        %td{:colspan => total_cols - 1}
+          = asset_class_type
+        %td
+          = non_breaking_space
+      - accounts_and_balances = asset_classes_and_accounts[asset_class_type]
+      - if accounts_and_balances && !accounts_and_balances.empty?
+        - accounts_and_balances.each_pair do |account, balance|
+          %tr{:style => "text-align:right"}
+            %td
+              = account.gl_code
+            %td
+              = account.name
+            %td
+              - sub_total += balance; total_liabilities += balance
+              = balance.to_account_balance
+        %tr{:style => "text-align:right"}
+          %td{:colspan => total_cols - 1}
+            Sub-total
+          %td
+            = sub_total.to_account_balance
+  %tr{:style => "text-align:right"}
+    %td{:colspan => total_cols - 1}
+      Total Liabilities
+    %td
+      = total_liabilities.to_account_balance
+  %tr
+    %th{:colspan => total_cols}
+      Capital & Reserves
+  - [EQUITY].flatten.each do |asset_class|
+    - [asset_class].flatten.each do |asset_class_type|
+      - sub_total = 0.0
+      %tr{:style => "text-align:left"}
+        %td{:colspan => total_cols - 1}
+          = asset_class_type
+        %td
+          = non_breaking_space
+      - accounts_and_balances = asset_classes_and_accounts[asset_class_type]
+      - if accounts_and_balances && !accounts_and_balances.empty?
+        - accounts_and_balances.each_pair do |account, balance|
+          %tr{:style => "text-align:right"}
+            %td
+              = account.gl_code
+            %td
+              = account.name
+            %td
+              - sub_total += balance; total_equity += balance
+              = balance.to_account_balance
+        %tr{:style => "text-align:right"}
+          %td{:colspan => total_cols - 1}
+            Sub-total
+          %td
+            = sub_total.to_account_balance
+  %tr{:style => "text-align:right"}
+    %td{:colspan => total_cols - 1}
+      Total Equity
+    %td
+      = total_equity.to_account_balance
+  %tr
+    %th{:colspan => total_cols}
+      Totals
+  %tr{:style => "text-align:right"}
+    %td{:colspan => total_cols - 1}
+      Assets
+    %td
+      = total_assets.to_account_balance
+  %tr{:style => "text-align:right"}
+    %td{:colspan => total_cols - 1}
+      Liabilities + Equity
+    %td
+      = (total_liabilities + total_equity).to_account_balance

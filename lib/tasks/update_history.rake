@@ -61,5 +61,10 @@ namespace :mostfit do
     Portfolio.all.each{|p|
       p.update_portfolio_value
     }
+    
+    # create collection sheets and disbursement sheets in advance in pdf format
+    StaffMember.all.each{|s|
+      s.generate_sheets((Date.today + Mfi.first.generate_day_sheet_before)) if not s.centers.empty?
+    }
   end
 end

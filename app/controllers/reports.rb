@@ -7,7 +7,7 @@ class Reports < Application
     :targets_and_projections  => [ProjectedReport, TargetReport, StaffTargetReport, MonthlyTargetReport, IncentiveReport],
     :statistics   => [LoanSizePerManagerReport, LoanPurposeReport, ClientOccupationReport, ClosedLoanReport], 
     :exceptions   => [RepaymentOverdue, LateDisbursalsReport, DelinquentLoanReport, ParByCenterReport, ParByStaffReport, ParByLoanAgeingReport, ClientAbsenteeismReport, DuplicateClientsReport, NonDisbursedClientsAfterGroupRecognitionTest],
-    :accounting   => [GeneralLedgerReport, TrialBalanceReport, DayBook, CashBook, BankBook, IncomeStatement]
+    :accounting   => [GeneralLedgerReport, TrialBalanceReport, DayBook, CashBook, BankBook, IncomeStatement, BalanceSheet]
   }
   Order = [:periodic, :consolidated, :registers, :targets_and_projections, :statistics, :exceptions, :accounting]
   layout :determine_layout
