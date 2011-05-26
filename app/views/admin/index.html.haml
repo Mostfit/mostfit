@@ -1,69 +1,65 @@
 - if session.user.can_access?({:controller => "admin", :action => "index"})
   %h1 Administration
   %h2 Manage organization profile and calendar
-  %ul
+  %ul.icon_links
     %li
-      = link_to_with_rights 'Profile and system-wide policies', url(:controller => "admin", :action => "edit"), :class => 'edit'
+      = link_to_with_rights 'Profile and system-wide policies', url(:controller => "admin", :action => "edit"), :class => 'admin icon'
     %li
-      = link_to_with_rights 'Holidays', url(:controller => 'holidays', :action => "index"), :class => 'edit'
+      = link_to_with_rights 'Holidays', url(:controller => 'holidays', :action => "index"), :class => 'icon holiday'
   %h2 Manage geographical locations
-  %ul
+  %ul.icon_links
     %li
-      = link_to_with_rights 'Regions', resource(:regions), :class => 'edit'
+      = link_to_with_rights 'Regions', resource(:regions), :class => 'org icon'
     %li
-      = link_to_with_rights 'Areas', resource(:areas), :class => 'edit'
+      = link_to_with_rights 'Areas', resource(:areas), :class => 'org icon'
   %h2 Manage staff, users, and roles
-  %ul
+  %ul.icon_links
     %li
-      = link_to_with_rights 'Staff Members', resource(:staff_members), :class => 'edit'
+      = link_to_with_rights 'Staff Members', resource(:staff_members), :class => 'staff icon'
     %li
-      = link_to_with_rights 'Users and roles', resource(:users), :class => 'edit'
+      = link_to_with_rights 'Users and roles', resource(:users), :class => 'user icon'
   %h2 Manage financial products, funds, rules, and accounting
-  %ul
+  %ul.icon_links
     %li
-      = link_to_with_rights 'Funders and funding lines', resource(:funders), :class => 'edit'
+      = link_to_with_rights 'Funders and funding lines', resource(:funders), :class => 'funder icon'
     %li      
-      = link_to_with_rights 'Manage Business Rules', resource(:rules), :class => 'edit'
+      = link_to_with_rights 'Manage Business Rules', resource(:rules), :class => 'rules icon'
     %li
-      = link_to_with_rights 'Manage Targets', resource(:targets), :class => 'edit'
+      = link_to_with_rights 'Manage Targets', resource(:targets), :class => 'icon target'
     %li
-      = link_to_with_rights 'Fees', resource(:fees), :class => 'edit'
+      = link_to_with_rights 'Fees', resource(:fees), :class => 'icon coins'
     %li
-      = link_to_with_rights 'Loan products', resource(:loan_products), :class => 'edit'
+      = link_to_with_rights 'Loan products', resource(:loan_products), :class => 'loan icon'
     %li
-      = link_to_with_rights 'Insurance companies & products', url(:action => :insurance), :class => 'edit'
+      = link_to_with_rights 'Insurance companies & products', url(:action => :insurance), :class => 'insurance icon'
     %li
-      = link_to_with_rights 'Book Keeping', resource(:accounts), :class => 'edit'
+      = link_to_with_rights 'Book Keeping', resource(:accounts), :class => 'book icon'
   %h2 Manage commonly-used lists (masters)
-  %ul
+  %ul.icon_links
     %li
-      = link_to_with_rights 'Client Types', resource(:client_types), :class => 'edit'
+      = link_to_with_rights 'Client Types', resource(:client_types), :class => 'icon client_type'
     %li
       = link_to_with_rights 'Occupations', resource(:occupations), :class => 'edit'
     %li
-      = link_to_with_rights 'Loan Utilizations', resource(:loan_utilizations), :class => 'edit'
+      = link_to_with_rights 'Loan Utilizations', resource(:loan_utilizations), :class => 'icon accept'
     %li
-      = link_to_with_rights 'Document Types', resource(:document_types), :class => 'edit'
+      = link_to_with_rights 'Document Types', resource(:document_types), :class => 'icon documents'
     %li
-      = link_to_with_rights 'Stock Master', resource(:stock_registers), :class => 'edit'
+      = link_to_with_rights 'Stock Master', resource(:stock_registers), :class => 'report icon'
     %li
-      = link_to_with_rights 'Asset Master', resource(:asset_registers), :class => 'edit'
+      = link_to_with_rights 'Asset Master', resource(:asset_registers), :class => 'report icon'
   %h2 Assign targets, perform audits
-  %ul
+  %ul.icon_links
     %li
-      = link_to_with_rights 'Assign and view Targets', resource(:targets), :class => 'edit'
+      = link_to_with_rights 'Perform Audits', resource(:audit_items), :class => 'icon audit'
     %li
-      = link_to_with_rights 'Monthly Targets', resource(:monthly_targets), :class => 'edit'
-    %li
-      = link_to_with_rights 'Perform Audits', resource(:audit_items), :class => 'edit'
-    %li
-      = link_to_with_rights 'History log', url(:controller => :audit_trails, :action => :show), :class => 'edit'
+      = link_to_with_rights 'History log', url(:controller => :audit_trails, :action => :show), :class => 'icon zoom'
   %h2 Data
-  %ul
+  %ul.icon_links
     %li
-      = link_to_with_rights 'Upload data', url(:controller => 'admin', :action => "upload"), :class => 'edit'
+      = link_to_with_rights 'Upload data', url(:controller => 'admin', :action => "upload"), :class => 'upload icon'
     %li
-      = link_to_with_rights 'Download data', url(:controller => 'admin', :action => "download"), :class => 'edit'
+      = link_to_with_rights 'Download data', url(:controller => 'admin', :action => "download"), :class => 'download icon'
     - if Mfi.first.dirty_queue_enabled
       %li
         = link_to_with_rights 'Loan update queue', url(:controller => 'admin', :action => "dirty_loans"), :class => 'edit'
