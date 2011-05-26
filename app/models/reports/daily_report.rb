@@ -17,7 +17,10 @@ class DailyReport < Report
   
   def generate
     branches, centers, data, clients, loans = {}, {}, {}, {}, {}
-    histories = (LoanHistory.sum_outstanding_grouped_by(self.date, [:center], self.loan_product_id)||{}).group_by{|x| x.center_id}
+
+    extra_conditions = ["loan_product_id=#{loan_product_id}"] if loan_product_id
+    histories = (LoanHistory.sum_outstanding_grouped_by(self.date, [:center], extra_conditions)||{}).group_by{|x| x.center_id}
+
     advances  = (LoanHistory.sum_advance_payment(self.date, self.date, :center)||{}).group_by{|x| x.center_id}
     balances  = (LoanHistory.advance_balance(self.date, :center)||{}).group_by{|x| x.center_id}
     old_balances = (LoanHistory.advance_balance(self.date-1, :center)||{}).group_by{|x| x.center_id}
@@ -70,8 +73,11 @@ class DailyReport < Report
       }
     }
     
-    hash = {:center_id => @center.map{|c| c.id}}
-    hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
+    hash = {:'lh.center_id' => @center.map{|c| c.id}}
+    if loan_product_id
+      hash[:'lh.loan_id'] = LoanProduct.get(loan_product_id).loans.aggregate(:id)
+    end
+
     payment_type_colum =  {:principal => 3, :interest => 4, :fees => 5}
 
     # principal, interest and fees paid
@@ -85,11 +91,13 @@ class DailyReport < Report
     }
     
     # client fee
+    center_ids = @center.map{|c| c.id}.join(', ')
+    center_ids = 'NULL' if center_ids.empty?
     repository.adapter.query(%Q{
                                SELECT c.id center_id, c.branch_id branch_id, SUM(p.amount) amount
                                FROM  payments p, clients cl, centers c
                                WHERE p.received_on = '#{date.strftime('%Y-%m-%d')}' AND p.loan_id is NULL AND p.type=3
-                               AND   p.deleted_at is NULL AND p.client_id=cl.id AND cl.center_id=c.id AND cl.deleted_at is NULL AND c.id in (#{@center.map{|c| c.id}.join(', ')})
+                               AND   p.deleted_at is NULL AND p.client_id=cl.id AND cl.center_id=c.id AND cl.deleted_at is NULL AND c.id in (#{center_ids})
                                GROUP BY branch_id, center_id
                              }).each{|p|
       if branch = branches[p.branch_id] and center = centers[p.center_id]
