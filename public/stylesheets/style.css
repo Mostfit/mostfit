@@ -388,7 +388,77 @@ a.browse, a.browse:visited, a.browse:link {
   font-size: 16px;
   font-weight: lighter
 }
-
+a.icon, a.icon:visited, a.icon:link {
+  background-repeat: no-repeat;  
+  padding: 8px 0px 4px 35px;
+  color: black;
+  font-size: 16px;
+  font-weight: normal;
+}
+ul.icon_links li{
+    padding-top: 8px;
+    padding-bottom: 8px;    
+}
+a.holiday, a.holiday:visited, a.holiday:link {
+  background-image: url(/images/icons/calendar.png);
+}
+a.admin, a.admin:visited, a.admin:link {
+  background-image: url(/images/icons/admin.png);
+}
+a.org, a.org:visited, a.org:link {
+  background-image: url(/images/icons/org.png);
+}
+a.staff, a.staff:visited, a.staff:link {
+  background-image: url(/images/icons/staff.png);
+}
+a.user, a.user:visited, a.user:link {
+  background-image: url(/images/icons/user.png);
+}
+a.rules, a.rules:visited, a.rules:link {
+  background-image: url(/images/icons/rules.png);
+}
+a.book, a.book:visited, a.book:link {
+  background-image: url(/images/icons/book.png);
+}
+a.upload, a.upload:visited, a.upload:link {
+  background-image: url(/images/icons/upload.png);
+}
+a.download, a.download:visited, a.download:link {
+  background-image: url(/images/icons/download.png);
+}
+a.audit, a.audit:visited, a.audit:link {
+  background-image: url(/images/icons/audit.png);
+}
+a.coins, a.coins:visited, a.coins:link {
+  background-image: url(/images/icons/coins.png);
+}
+a.funder, a.funder:visited, a.funder:link {
+  background-image: url(/images/icons/money_bag.png);
+}
+a.loan, a.loan:visited, a.loan:link {
+  background-image: url(/images/icons/loan.png);
+}
+a.insurance, a.insurance:visited, a.insurance:link {
+  background-image: url(/images/icons/umbrella.png);
+}
+a.target, a.target:visited, a.target:link {
+  background-image: url(/images/icons/target.png);
+}
+a.client_type, a.client_type:visited, a.client_type:link {
+  background-image: url(/images/icons/group.png);
+}
+a.documents, a.documents:visited, a.documents:link {
+  background-image: url(/images/icons/documents.png);
+}
+a.accept, a.accept:visited, a.accept:link {
+  background-image: url(/images/icons/audit.png);
+}
+a.report, a.report:visited, a.report:link {
+  background-image: url(/images/icons/report.png);
+}
+a.zoom, a.zoom:visited, a.zoom:link {
+  background-image: url(/images/icons/zoom.png);
+}
 a.bold {
   font-weight: bold;
   font-size: 1.2em;
