@@ -1,14 +1,15 @@
-%h1
+%h1{:style => "margin-bottom: 0px;"}
   Reports
 - role = session.user.role.to_s
 - rules = Mfi.first.report_access_rules
 - Reports::Types.to_a.sort_by{|k, v| Reports::Order.index(k)}.each do |report_type, reports|
   - if reports.map{|r| rules[r.to_s] and rules[r.to_s].include?(role)}.include?(true)        
-    %h2
-      = report_type.to_s.camelcase(' ')
-    %ul
+    .reports
+      %h2
+        = report_type.to_s.camelcase(' ')
       - reports.each do |report|
-        %li
-          = link_to_with_rights(report.name, url(:show_report, :report_type => report))
-%h2
-  = link_to_with_rights("Custom reports", resource(:bookmarks, :type => "custom_reports"))
+        = link_to_with_rights(report.name, url(:show_report, :report_type => report), :class => "report_links")
+.reports
+  %h2 Custom
+  .report
+    = link_to_with_rights("Custom reports", resource(:bookmarks, :type => "custom_reports"))
