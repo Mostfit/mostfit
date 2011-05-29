@@ -106,6 +106,16 @@
             = check_box :date_box_editable
         %tr
           %td
+            Default repayment style
+          %td
+            = select :default_repayment_style, :collection => [[NORMAL_REPAYMENT_STYLE,"fees=>int=>prin"], [PRORATA_REPAYMENT_STYLE,"pro rata"]]
+        %tr
+          %td
+            Allow choice of repayment style in weeksheets?
+          %td
+            = check_box :allow_choice_of_repayment_style
+        %tr
+          %td
             Allow GRT date on new client form
           %td
             = check_box :allow_grt_date_on_form

@@ -369,13 +369,13 @@ class Loan
   # principal[0] and interest[1].
 
 
-  def repay(input, user, received_on, received_by, defer_update = false, style = :normal, context = :default)
+  def repay(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default)
     pmts = get_payments(input, user, received_on, received_by, defer_update, style, context)
     x = make_payments(pmts, context, defer_update)
     x
   end
 
-  def get_payments(input, user, received_on, received_by, defer_update = false, style = :normal, context = :default)
+  def get_payments(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default)
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
     unless input.is_a? Array or input.is_a? Fixnum or input.is_a? Float or input.is_a?(Hash)
@@ -389,7 +389,7 @@ class Loan
       # the payment is filed on received_on without knowing about the future
       # it could happen that payment have been made after this payment
       # here the validations on the Payment should
-      if style == :normal
+      if style == NORMAL_REPAYMENT_STYLE
         total        = input
         total_fees_due_on_date = total_fees_payable_on(received_on)
         fees_paid    = [total, total_fees_due_on_date].min
@@ -397,7 +397,7 @@ class Loan
         interest_due = [(-interest_overpaid_on(received_on)), 0].max
         interest     = [interest_due, total].min  # never more than total
         principal    = total - interest
-      elsif style == :prorata #does not pay fees
+      elsif style == PRORATA_REPAYMENT_STYLE #does not pay fees
         interest, principal = pay_prorata(input, received_on)
       end
     elsif input.is_a? Array  # in case principal and interest are specified separately

@@ -85,3 +85,6 @@ REPORT_ACCESS_HASH = {
   "LoanSizePerManagerReport" => ["mis_manager", "admin", "read_only"], 
   "ClientOccupationReport" => ["mis_manager", "admin", "read_only"]
 }
+NORMAL_REPAYMENT_STYLE = :normal
+PRORATA_REPAYMENT_STYLE = :prorata
+REPAYMENT_STYLES = [NORMAL_REPAYMENT_STYLE, PRORATA_REPAYMENT_STYLE]

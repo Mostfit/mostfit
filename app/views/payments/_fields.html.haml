@@ -13,7 +13,7 @@
     %td
       Repayment Style
     %td
-      = select :name => :style, :collection => [["normal","int. then prin."],["prorata","pro rata"]]
+      = select :name => :style, :collection => [[NORMAL_REPAYMENT_STYLE,"int. then prin."],[PRORATA_REPAYMENT_STYLE,"pro rata"]]
       %span.small
         only applies to "total" repayment type
   %tr
