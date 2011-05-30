@@ -1,8 +1,8 @@
-=partial :form
-%table.report
+= partial :form
+%table.report{:class => @data.keys.length == 1 ? "" : "nojs"}
   %tr.header
     %th
-      Center
+      Branch / Center
     %th{:colspan => "3"}
       Loan amount
     %th{:colspan => "4"}
@@ -50,40 +50,71 @@
   - center_id, branch_id = nil, nil
   - length = 16
   - org_total = []
-  -@data.sort_by{|branch, x| branch.name}.each do |branch, centers|
-    -if centers.keys.length>0
-      -branch_total = Array.new(length, 0)
-      %tr.branch
-        %td{:colspan => length+1}
-          %b
-            =branch.name
-      -centers.sort_by{|center, data| center.name}.each do |center, data|
-        -if data.length>0
-          %tr.center
+  - @data.sort_by{|key1, values1| key1.name}.each do |key1, values1|
+    - if values1 and values1.length>0
+      - if values1.is_a?(Hash)
+        %tr.branch
+          %td{:colspan => length+1}
+            %b
+              = key1.name
+        - key1_total ||= []
+        - values1.each{|key2, values2| key2.name}.each do |key2, values2|
+          - if values2.is_a?(Hash) and values2 and values2.keys.length>0
+            %tr.center
+              %td{:colspan => length+1}
+                %b
+                  = key2.name
+            - key2_total = Array.new(length, 0)
+            - values2.sort_by{|key3, values3| key3.name}.each do |key3, values3|
+              %tr.group
+                %td
+                  = key3.name
+                - values3.each_with_index do |row, idx|
+                  %td
+                    - if row
+                      =row.to_currency 
+                      -key2_total[idx]+=row
+            %tr.center_total
+              %td
+                %b==Total:
+              - key1_total.push(key2_total)
+              - key2_total.each do |ele|
+                %td
+                  %b
+                    =ele.to_currency
+          - else
+            %tr.center
+              %td
+                = key2.name
+              - key1_total.push(values2)
+              - values2.each_with_index do |ele, idx|
+                %td.number
+                  %b
+                    = ele.to_currency                    
+        %tr.branch_total
+          %td
+          - if key1_total[0].class == Array
+            - org_total << key1_total.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}
+          - else
+            - org_total << key1_total
+          - org_total.last.each do |ele|
             %td
               %b
-                =center.name
-            -data.each_with_index do |d, idx|
-              %td
-                -if idx==6
-                  = (data[3]+data[4]+data[5]).to_currency
-                  -branch_total[6]+= (data[3]+data[4]+data[5])
-                -else
-                  =d.to_currency
-                  -branch_total[idx]+=d
-      %tr.branch_total
-        %td
-          %b==Branch total:
-        - org_total << branch_total
-        - branch_total.each do |ele|
-          %td
+                =ele.to_currency
+      - else
+        %tr
+          %td.text
             %b
-              =ele.to_currency
+              = key1.name
+          - values1.each_with_index do |ele, idx|
+            %td
+              = ele.to_currency
+          - org_total << values1
+    
   %tr.org_total
-    %td
-      %b==Total
+    %td.text
+      %b Total
     -org_total.find_all{|x| x.length==length}.transpose.collect{|arr| arr.reduce{|s, x| s+=x}}.each do |ele|
       %td
         %b
           =ele.to_currency
-

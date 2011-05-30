@@ -118,11 +118,18 @@
               Late by less than:
               = text_field(:late_by_less_than_days, :size => 10)
               days
-          - if @report.respond_to?(:absent_more_than)
+          - if @report.respond_to?(:attendance_status)
+            - attendance_status_list = Attendance.attendancy_states.map{|a| [(Attendance.attendancy_states.index(a)+1), a.to_s]}
+            - attendance_status_list.delete(attendance_status_list.first)
             %td
-              Absent by more than:
-              = text_field(:absent_more_than, :size => 3)
-              days
+              = select(:attendance_status, :collection => attendance_status_list)
+          - if @report.respond_to?(:more_than)
+            %td
+              by more than:
+              = text_field(:more_than, :size => 3)
+          - if @report.respond_to?(:days_percentage)
+            %td
+              = select(:days_percentage, :collection => [[1, "days"], [2, "%"]])
           - if @report.respond_to?(:month)
             %td
               Month:

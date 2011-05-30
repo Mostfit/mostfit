@@ -26,6 +26,10 @@
       - atts = Attendance.all(:client_id => clients.map{|x| x.id}, :date => @date).map{|x| [x.client_id,x]}.to_hash
       - loans = @loans||Loan.all(:client_id => clients.map{|x| x.id})
       - histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
+      - all_repayment_style_choices = [[NORMAL_REPAYMENT_STYLE,"fees=>int=>prin"], [PRORATA_REPAYMENT_STYLE,"pro rata"]]
+      - default_repayment_style = Mfi.first.default_repayment_style ? Mfi.first.default_repayment_style : NORMAL_REPAYMENT_STYLE
+      - default_repayment_style_choice = all_repayment_style_choices.select {|style| style[0] == default_repayment_style}
+      - repayment_style_choices = Mfi.first.allow_choice_of_repayment_style ? default_repayment_style_choice + (all_repayment_style_choices.reject {|style| style[0] == default_repayment_style}) : default_repayment_style_choice
       - clients.group_by{|x| x.client_group}.sort_by{|x| x[0] ? x[0].name : "none"}.each do |group, clients_grouped|
         %tr.group{:style => 'font-weight: bold; text-align: center; background: grey'}
           %td{:colspan => 12}
@@ -74,7 +78,7 @@
                 - else
                   = lh.principal_paid + lh.interest_paid
               %td 
-                = select :name => "payment_style[#{loan.id}]", :collection => [["prorata","pro rata"],["normal","fees=>int=>prin"]]
+                = select :name => "payment_style[#{loan.id}]", :collection => repayment_style_choices
               %td
                 - att = atts[client.id]
                 = select :name => "attendance[#{client.id}]", :collection => Attendance.attendancy_states, :value_method => :to_s, :selected => (att ? att.status.to_s : "present")
