@@ -1,6 +1,8 @@
 class ClientAbsenteeismReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :absent_more_than, :attendance_status
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :more_than, :attendance_status, :days_percentage
 
+  validates_with_method :branch_id, :branch_should_be_selected  
+ 
   def initialize(params,dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 30
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
@@ -18,15 +20,34 @@ class ClientAbsenteeismReport < Report
 
   def generate
     data, att, client_groups, clients = {}, {}, {}, {}
-    num_absent_more_than = @absent_more_than ? @absent_more_than : 0
-
+    num_more_than = @more_than ? @more_than : 0
+    # debugger
     Attendance.all(:center => @center, :date.gte => @from_date, :date.lte => @to_date).aggregate(:fields => [:center_id, :client_id, :status, :client_id.count]).map{|center_id, client_id, status, count|
       att[client_id]||={}
-      att[client_id][status.to_i]=count 
+      #att[client_id][0] = Client.get(client_id).loans(:disbursal_date => (@from_date..@to_date).to_a).count
+      att[client_id][status.to_i] = count 
     }
-    # att.each{|client_id, statues|
-    #  # att.delete(client_id) if not statues[4] or statues[4] <= num_absent_more_than
-    # }
+
+    if @days_percentage == 2 # if percentage is the selection criteria
+      att.each{|client_id, statuses|
+        if not statuses[@attendance_status] or ((statuses[@attendance_status]/(statuses.values.inject{|sum , x| sum + x}).to_f)*100) <= num_more_than
+          att.delete(client_id)        
+        else
+          att[client_id][0]=Client.get(client_id).loans(:disbursal_date => (@from_date..@to_date).to_a).count
+        end
+     #att.delete(client_id) if not statuses[(@attendance_status)] or statuses[(@attendance_status)] <= num_more_than
+      }
+    else #if number of days is the selection criteria
+      att.each{|client_id, statuses|
+        if not statuses[@attendance_status] or statuses[@attendance_status] <= num_more_than
+          att.delete(client_id)        
+        else
+          att[client_id][0]=Client.get(client_id).loans(:disbursal_date => (@from_date..@to_date).to_a).count
+        end
+     #att.delete(client_id) if not statuses[(@attendance_status)] or statuses[(@attendance_status)] <= num_more_than
+      }
+    end
+
     client_ids = att.keys
     Client.all(:id => client_ids, :fields => [:id, :name, :reference, :client_group_id, :center_id]).each{|c|
       clients[c.center_id]||= []
