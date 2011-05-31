@@ -1,59 +1,132 @@
-%table
-  - [:name, :min_amount, :max_amount, :amount_multiple, :min_interest_rate, :max_interest_rate, :interest_rate_multiple, :min_number_of_installments, :max_number_of_installments].each do |attr|
-    %tr
-      %th
-        = attr.humanize
-        %td
-          = text_field attr
+%table.clearform
+  %tr
+    %th
+      Name
+    %td{:colspan => 4}
+      = text_field :name
+
+  %tr
+    %th
+      Amount Range
+    %td
+      %span.greytext
+        min
+      = text_field :min_amount, :size => 7
+    %td
+      to
+    %td
+      %span.greytext
+        max
+      = text_field :max_amount, :size => 7
+    %td
+      in multiples of
+    %td
+      = text_field :amount_multiple, :size => 7
+
+  %tr
+    %td
+    %td.legend{:colspan => 5}
+      %span.greytext
+        if this loan product doesn't allow amount variations, min and max should be same
+  %tr
+    %th
+      Interest rate range
+    %td
+      %span.greytext
+        min
+      = text_field :min_interest_rate, :size => 7
+    %td
+      to
+    %td
+      %span.greytext
+        max
+      = text_field :max_interest_rate, :size => 7
+    %td
+      in multiples of
+    %td
+      = text_field :interest_rate_multiple, :size => 7
+  %tr
+    %td
+    %td.legend{:colspan => 5}
+      %span.greytext
+        if this loan product doesn't allow interest rate variations, min and max should be same
+
+  %tr
+    %th
+      Installment range
+    %td
+      %span.greytext
+        min
+      = text_field :min_number_of_installments, :size => 7
+    %td
+      to
+    %td
+      %span.greytext
+        max
+      = text_field :max_number_of_installments, :size => 7
+
   %tr
     %th
       Installment Frequency
     %td
       = select :installment_frequency, :collection => [[:any, "Any"]] + Loan.installment_frequencies.map {|f| [f,f.to_s]}
+
   %tr
     %th
       Loan Type
-    %td{:colspan => 2}
+    %td{:colspan => 6}
       = select :loan_type_string, :collection => Loan.descendants.map{|f| [f, f.respond_to?(:display_name) ? f.display_name : f.to_s.snake_case.camelcase(' ')]}
   %tr
     %th
       Rounding to
-    %td{:colspan => 2}
-      = text_field :rounding
+    %td
+      = text_field :rounding, :size => 3
   %tr
     %th
       Rounding Style
-    %td
+    %td{:colspan => 6}
       = select :rounding_style, :collection => [[:round, "round"], [:floor, "floor"], [:ceil, "ceil"]]
-      %greytext  By default, round is choosen as the rounding style
-  %tr
-    %th
-      Valid from
-    %td
-      = date_select_for @loan_product, :valid_from
-  %tr
-    %th
-      Valid upto
-    %td
-      = date_select_for @loan_product, :valid_upto
+      %span.greytext  By default, round is choosen as the rounding style
   %tr
     %th
       Link to an insurance policy ?
     %td
       = check_box :linked_to_insurance, :checked => @loan_product.linked_to_insurance, :onchange => "$('#insurance_product_selector').toggle()"
-    %td#insurance_product_selector{:style => ((@loan_product.linked_to_insurance) ? "display: block" : "display: none")}
+    %td#insurance_product_selector{:style => ((@loan_product.linked_to_insurance) ? "display: block" : "display: none"), :colspan => 3}
       = select :insurance_product_id, :collection => InsuranceProduct.all.map{|ip| [ip.id, ip.name]}, :prompt => "any product"
-%h2 Fees
-- Fee.all.each do |fee|
-  = check_box :name => "fees[#{fee.id}]", :checked => @loan_product.fees.include?(fee)
-  = fee.name
-%h2 Payment Validations
-- Misfit::PaymentValidators.instance_methods.each do |v|
-  = check_box :name => "payment_validations[#{v}]", :checked => @loan_product.payment_validations.include?(v.to_sym)
-  = v.humanize
-%h2 Loan Validations
-- Misfit::LoanValidators.instance_methods.each do |v|
-  = check_box :name => "loan_validations[#{v}]", :checked => @loan_product.loan_validations.include?(v.to_sym)
-  = v.humanize
+
+  %tr
+    %th
+      Validity
+    %td{:colspan => 3}
+      %span.greytext valid from
+      = date_select_for @loan_product, :valid_from, :size => 12
+    %td{:colspan => 3}
+      %span.greytext valid upto
+      = date_select_for @loan_product, :valid_upto, :size => 12
+  %tr
+    %td
+    %td.legend{:colspan => 5}
+      %span.greytext
+        after a loan product expires there cannot be anymore disbursals from that loan
+
+.box
+  %h2 Fees
+  - Fee.all.each do |fee|
+    = check_box :name => "fees[#{fee.id}]", :checked => @loan_product.fees.include?(fee)
+    = fee.name
+    %br
+.box
+  %h2 Payment Validations
+  - Misfit::PaymentValidators.instance_methods.each do |v|
+    = check_box :name => "payment_validations[#{v}]", :checked => @loan_product.payment_validations.include?(v.to_sym)
+    = v.humanize
+    %br
+.box
+  %h2 Loan Validations
+  - Misfit::LoanValidators.instance_methods.each do |v|
+    = check_box :name => "loan_validations[#{v}]", :checked => @loan_product.loan_validations.include?(v.to_sym)  
+    = v.humanize
+    %br
 
 %br

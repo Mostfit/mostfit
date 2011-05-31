@@ -1273,3 +1273,22 @@ th.due {
     background-color: #75B516;
     text-decoration: none;
 } 
+table.clearform{
+    padding: 1;
+}
+table.clearform tr th{
+    text-align: left;
+}
+table.clearform tr td{
+    padding: 1em;
+    padding-top: 2em;
+    padding-bottom: 0em;
+}
+table.clearform tr th{
+    padding: 1em;
+    padding-top: 2em;
+    padding-bottom: 0em;
+}
+table.clearform tr td.legend{
+    padding: 0em;
+}

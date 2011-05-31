@@ -89,14 +89,14 @@ class Report
   end
 
   def get_xls
-    f   = File.read("app/views/reports/_#{name.snake_case.gsub(' ', '_')}.html.haml").gsub("=partial :form\n", "")
+    f   = File.read("app/views/reports/_#{self.class.to_s.snake_case.gsub(' ', '_')}.html.haml").gsub("=partial :form\n", "")
     doc = Hpricot(Haml::Engine.new(f).render(Object.new, "@data" => self.generate))
     headers = doc.search("tr.header").map{|tr|
-      tr.search("th").map{|td| 
-        {td.inner_text.strip => td.attributes["colspan"].blank? ? 1 : td.attributes["colspan"].to_i}
+      tr.search("th").map{|td|
+        [td.inner_text.strip => td.attributes["colspan"].blank? ? 1 : td.attributes["colspan"].to_i]
       }
     }.map{|x| 
-      x.reduce({}){|s,x| s+=x}
+      x.reduce([]){|s,x| s+=x}
     }
     
   end
@@ -226,7 +226,7 @@ class Report
       else
         @center
       end
-    @center = @branch.collect{|b| b.centers}.flatten unless @center
+    @center = @branch.centers if not @center and @branch.length == 1
   end
 
   def set_instance_variables(params)
