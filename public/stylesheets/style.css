@@ -1,9 +1,10 @@
 body {
-    background: #B0AA9A;
+    background: #efefef;
     color: #222;
     font-family: Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
     padding: 0px;
     margin: 0px;
+    size: 16px;
 }
 h1 {
     color: #E88E02;
@@ -29,6 +30,10 @@ h2 {
   padding: 0px 10px 10px 10px;
   min-height: 450px;
   border: 1px solid #c9c9c9;
+  border-top: 2px solid  #ABCF76;
+  box-shadow: 2px 2px 2px #aaa;
+  position: relative;
+  top: -2px;
 
 }
 .container a:link, .container a:visited, .container a:active{
@@ -108,7 +113,7 @@ h1.logo span{
   padding: 4px 15px 3px 10px;
   color: white;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 700;
   font-size: 1.75em;
   margin: 0px;
   border: 1px solid #c9c9c9;
@@ -250,9 +255,10 @@ table.narrow tr.group td{
   float: center;
 }
 .flash{
-margin-top: 15px;
-padding: 0px;
-text-align: center;
+  margin-top: 15px;
+  padding: 0px;
+  text-align: center;
+  box-shadow: 2px 2px 2px #ccc;
 }
 .flash p{
 font-weight: bold;
@@ -491,9 +497,11 @@ a.button:visited {
   background: #fff;
   background-position: 125px 0px;
   height: 100px;
-  border-top: 5px solid #75b516;
+  border-top: 5px solid  #ABCF76;
+  border-bottom: 2px solid  #ABCF76;
   width: 100%;
   position: relative;
+  
 }
 #search_div {
 	display: none;
@@ -1078,6 +1086,7 @@ a.expand_collapsed{
     background: #eee;
     z-index: 1;
     min-height: 20px;
+    box-shadow: 4px 4px 5px #aaa;
 }
 .floatingBox table{
     float: left;
@@ -1242,19 +1251,23 @@ th.due {
   background: lightpink;
 }
 .reports{ 
-    max-width: 25%;
+    width: 25%;
     display: inline-table;
     vertical-align: top;
     margin: 0px;
     margin-right: 15px;
     margin-left: 15px;
-    margin-top: 1px;
+    margin-top: 5px;
     margin-bottom: 10px;
+    box-shadow: 2px 2px 2px #ccc;
+    border: solid 1px #ccc;
 }
 .reports h2{
-    padding: 0px;
-    margin-left: 0px;
+    padding: 5px;
+    margin: 0px;
     text-align: left;
+    background: #e3e3e3;
+    color: black;
 }
 .reports a.report_links{ 
     display: block;
@@ -1264,8 +1277,6 @@ th.due {
     padding-left: 5px;
     padding-right: 5px;
     border-radius: 4px;
-    background-color: #eee;
-    border: 1px solid #eee;
     margin-bottom: 2px;
 }
 .reports a.report_links:hover{
@@ -1273,6 +1284,7 @@ th.due {
     background-color: #75B516;
     text-decoration: none;
 } 
+<<<<<<< Updated upstream
 table.clearform{
     padding: 1;
 }
@@ -1292,3 +1304,47 @@ table.clearform tr th{
 table.clearform tr td.legend{
     padding: 0em;
 }
+
+
+.admin-box { 
+  box-shadow: 2px 2px 2px #ccc;
+  width: 330px;
+  padding: 0px;
+  margin: 10px;
+  border: solid 1px #ccc;
+  display: inline-table;
+  vertical-align: top;
+}
+
+.admin-box h2 {
+  background-color: #e3e3e3;
+  margin: 0px;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+#login {
+  float: right; 
+  padding: 4px;
+  position:relative; 
+  right:4%; 
+  background: #ABCF76; 
+  border-radius: 0px 0px 5px 5px; 
+  color: white;
+  font-size: 1.2em;
+}
+
+#login a {
+  font-weight: bold;
+  color: darkgreen;
+}
+
+#search-form {
+  background: #ABCF76; 
+  padding: 7px;
+  border-radius: 5px 5px 0px 0px;
+  position: relative;
+  left: 9%;
+  top: -4px;
+}
+

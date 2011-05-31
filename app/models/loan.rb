@@ -1170,7 +1170,7 @@ class Loan
     case installment_frequency
     when :weekly
       52
-    when :bi_weekly
+    when :biweekly
       26
     when :monthly
       12
@@ -1184,7 +1184,7 @@ class Loan
     case installment_frequency
     when :weekly
       7
-    when :bi_weekly
+    when :biweekly
       14
     when :monthly
       # TODO fix this
@@ -1706,6 +1706,8 @@ private
     when :weekly
       52
     when :biweekly
+      26
+    when :fortnightly
       26
     when :monthly
       12

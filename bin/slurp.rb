@@ -12,7 +12,8 @@ db_name   = ARGV[1] || File.basename(Dir.pwd)
 # scp, and uncompress the database dump
 fail "Failed to copy." unless system("scp mostfit.in:#{dump_path} .")
 puts "Uncompressing ..."
-fail "Failed to uncompress" unless system("bunzip2 #{dump_path}")
+file_name = dump_path.split("/")[-1]
+fail "Failed to uncompress" unless system("bunzip2 #{file_name}")
 dump_path = File.basename(dump_path, '.bz2')
 
 # backup - defaults to no

@@ -22,7 +22,7 @@
           = submit "Bookmarks"
     #bookmark_form_container
     #header
-      #login{:style => 'margin: 2px; float: right; padding: 4px;position:relative; right:150px;'}
+      #login
         - if Mfi.first.dirty_queue_enabled and count = DirtyLoan.pending.length and count > 0
           %i
             == (#{count} loans in queue)
@@ -53,7 +53,7 @@
           = link_to_with_class('Dashboard', url(:dashboard))
           = link_to_with_class('Reports', url(:reports))
           #header_search_div
-            %form._remote_{:action => '/search', :class => 'search', :method => "POST", :style => "float:left;"}
+            %form._remote_{:action => '/search', :class => 'search', :method => "POST", :style => "float:left;" :id => "search-form"}
               %input{:name => 'query', :value => params[:query], :autocomplete => "off"}
               %input{:type => 'hidden', :name => '_target_', :value => "content p:first"}
               %input{:type => 'submit', :value=>'search'}

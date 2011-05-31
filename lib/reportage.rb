@@ -3,10 +3,8 @@
 # TODO - convert LoanBucket into sublass of Bucket
 #      - use aggregate for database fields to speed things up
       
-class LoanBucket < Hash
 
-  attr_accessor :_balances
-
+class Bucket < Hash
   def columns(cols, date)
     rv = {}
     self.keys.each{|b| rv[b.to_s] = {}}
@@ -17,7 +15,13 @@ class LoanBucket < Hash
     end
     rv
   end
-        
+end
+
+
+class LoanBucket < Bucket
+
+  attr_accessor :_balances
+
   def balances(date)
     return @_balances if @_balances
     @balances = self.map{|bucket, ids| [bucket, LoanHistory.sum_outstanding_for_loans(date, ids)]}.to_hash
@@ -37,7 +41,8 @@ module DataMapper
   class Collection
     
     def bucket_by(buckets = nil)
-      result = LoanBucket.new
+      result = Kernel.const_get("#{self.first.model.to_s}Bucket").new
+        
       self.map do |x| 
         r = yield(x)
         if result.has_key?(r)
@@ -46,6 +51,7 @@ module DataMapper
           result[r] = [x.id]
         end
       end
+      # result looks like this: {1000 => [1,4,5,.....loan_ids], 2000 => [x,y,z...loan_ids]}
       bucketed_results = LoanBucket.new
       if buckets
         buckets.map{|b| bucketed_results[b] = []}
