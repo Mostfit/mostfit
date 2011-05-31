@@ -242,4 +242,86 @@ class Report
     return true
   end
 
+  def get_extra
+    extra     = []
+    extra    << "l.loan_product_id = #{self.loan_product_id}" if loan_product_id
+
+    if @branch.length > 0 and @branch.length != Branch.count
+      extra    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})"
+    end
+
+    if @center and @center.length > 0 and @center.length != Center.count
+      extra    << "lh.center_id in (#{@center.map{|c| c.id}.join(', ')})"
+    end
+
+    if @report_by_loan_disbursed == 1 
+      extra    << "l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
+    end
+
+    # if a funder is selected
+    if @funder
+      funder_loan_ids = @funder.loan_ids
+      funder_loan_ids = ["NULL"] if funder_loan_ids.length == 0
+      extra    << "l.id in (#{funder_loan_ids.join(", ")})" 
+    end
+
+    #if funding_lines are selected
+    if @funding_line
+      funding_line_ids = @funding_line.funder
+      funding_line_ids = ["NULL"] if funding_line_ids.length == 0
+      extra   << "l.id in (#{funding_line_ids.join(", ")})"
+    end
+    
+    #if loan cycle_number is selected
+    if @loan_cycle
+      lc = @loan_cycle
+      lc = ["NULL"] if @loan_cycle.nil?
+      extra   << "l.cycle_number = #{lc}"
+    end
+    [extra, funder_loan_ids]
+  end
+
+  def get_payment_extra_and_froms(centers, funder_loan_ids)
+    extra_condition, extra_selects = "", ""
+    froms = ["payments p", "clients cl", "centers c"]
+
+    if self.branch_id
+      center_ids  = centers.keys.length>0 ? centers.keys.join(',') : "NULL"
+      extra_condition += "AND c.id in (#{center_ids})"
+      extra_selects   += ", c.id center_id"
+    end
+
+    if self.loan_product_id
+      froms << "loans l"
+      extra_condition += " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
+    end
+
+    if report_by_loan_disbursed and report_by_loan_disbursed == 1
+      froms << "loans l"
+      extra_condition += " and p.loan_id=l.id and l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
+    end
+    
+    if @funder
+      froms << "loans l"
+      extra_condition += "and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
+      extra_condition += " and l.id in (#{funder_loan_ids.join(', ')})"
+    end
+
+    if @funding_line
+      froms << "loans l"
+      extra_condition += "and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
+      extra_condition += "and l.id in (#{funding_line_ids.join(', ')})"
+    end
+
+    if @loan_cycle
+      lc = @loan_cycle
+      lc = ["NULL"] if @loan_cycle.nil?
+
+      froms << "loans l"
+      extra_condition += "and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
+      extra_condition += "and l.cycle_number = #{lc}"
+    end
+    [froms.uniq.join(", "), extra_condition, extra_selects]
+  end
+
 end
