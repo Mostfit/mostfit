@@ -120,7 +120,7 @@
               days
           - if @report.respond_to?(:attendance_status)
             - attendance_status_list = Attendance.attendancy_states.map{|a| [(Attendance.attendancy_states.index(a)+1), a.to_s]}
-            - attendance_status_list.delete(attendance_status_list.first)
+            /- attendance_status_list.delete(attendance_status_list.first)
             %td
               = select(:attendance_status, :collection => attendance_status_list)
           - if @report.respond_to?(:more_than)

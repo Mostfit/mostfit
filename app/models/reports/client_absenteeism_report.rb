@@ -21,7 +21,7 @@ class ClientAbsenteeismReport < Report
   def generate
     data, att, client_groups, clients = {}, {}, {}, {}
     num_more_than = @more_than ? @more_than : 0
-    # debugger
+    debugger
     Attendance.all(:center => @center, :date.gte => @from_date, :date.lte => @to_date).aggregate(:fields => [:center_id, :client_id, :status, :client_id.count]).map{|center_id, client_id, status, count|
       att[client_id]||={}
       #att[client_id][0] = Client.get(client_id).loans(:disbursal_date => (@from_date..@to_date).to_a).count
@@ -33,7 +33,8 @@ class ClientAbsenteeismReport < Report
         if not statuses[@attendance_status] or ((statuses[@attendance_status]/(statuses.values.inject{|sum , x| sum + x}).to_f)*100) <= num_more_than
           att.delete(client_id)        
         else
-          att[client_id][0]=Client.get(client_id).loans(:disbursal_date => (@from_date..@to_date).to_a).count
+          att[client_id][0]=Client.get(client_id).loans(:disbursal_date.gte => @from_date, :disbursal_date.lte => @to_date).count
+          #att[client_id][0]=Client.get(client_id).loans(:disbursal_date => (@from_date..@to_date).to_a).count
         end
      #att.delete(client_id) if not statuses[(@attendance_status)] or statuses[(@attendance_status)] <= num_more_than
       }
@@ -42,7 +43,7 @@ class ClientAbsenteeismReport < Report
         if not statuses[@attendance_status] or statuses[@attendance_status] <= num_more_than
           att.delete(client_id)        
         else
-          att[client_id][0]=Client.get(client_id).loans(:disbursal_date => (@from_date..@to_date).to_a).count
+          att[client_id][0]=Client.get(client_id).loans(:disbursal_date.gte => @from_date, :disbursal_date.lte => @to_date).count
         end
      #att.delete(client_id) if not statuses[(@attendance_status)] or statuses[(@attendance_status)] <= num_more_than
       }

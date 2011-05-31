@@ -18,11 +18,12 @@
     %th
       Proxy count
     %th
-      Percentage(%)
+      - attendance_status = params["client_absenteeism_report"]["attendance_status"]
+      #{Attendance.attendancy_states[attendance_status.to_i - 1].capitalize} (%)
   - center_id, branch_id = nil, nil
   - length = 9
   - org_total = []
-  - absent_total, attendance_total = 0, 0
+  - current_status_total, attendance_total = 0, 0
   - summable_columns = [0, 1, 2, 3, 4, 5, 6]
   - @data.each do |branch, centers|
     - if centers.keys.length>0
@@ -59,11 +60,12 @@
                       - i = counter + 1
                       %td
                         = statuses[i]||0
-                        - absent_total+=statuses[i]||0 if st == Attendance.attendancy_states[@attendance_status.to_i - 2]
+                        - current_status_total+=statuses[i]||0 if st == Attendance.attendancy_states[attendance_status.to_i - 1]
                         - attendance_total+=statuses[i]||0
                         - group_total[i+1]+=statuses[i]||0
                     %td
-                      = ((1-(absent_total.to_f/attendance_total.to_f))*100).round(2)
+                      = ((current_status_total.to_f/attendance_total.to_f)*100).round(2)
+                      /= ((1-(absent_total.to_f/attendance_total.to_f))*100).round(2)
                       
               %tr.group_total
                 %td
