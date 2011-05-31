@@ -1707,6 +1707,8 @@ private
       52
     when :biweekly
       26
+    when :fortnightly
+      26
     when :monthly
       12
     when :daily
