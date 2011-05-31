@@ -1,5 +1,5 @@
 class AggregateConsolidatedReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :group_by_types, :report_by_loan_disbursed_during_selected_date_range
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :group_by_types, :report_by_loan_disbursed
 
   Year = Struct.new(:name)
 
@@ -43,7 +43,7 @@ class AggregateConsolidatedReport < Report
     extra    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})" if @branch.length > 0 and self.branch_id
     extra    << "lh.center_id in (#{@center.map{|c| c.id}.join(', ')})" if @center.length > 0
 
-    if @report_by_loan_disbursed_during_selected_date_range == 1
+    if @report_by_loan_disbursed == 1
       extra    << "l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
     end
 

@@ -1,5 +1,5 @@
 class QuarterConsolidatedReport < Report
-  attr_accessor :from_date, :to_date, :branch, :branch_id, :loan_product_id, :report_by_loan_disbursed_during_selected_date_range
+  attr_accessor :from_date, :to_date, :branch, :branch_id, :loan_product_id, :report_by_loan_disbursed
   QUARTERS = {1 => [:april, :may, :june], 2 => [:july, :august, :september], 3 => [:october, :november, :december], 4 => [:january, :february, :march]}
   MONTHS  = [:january, :february, :march, :april, :may, :june, :july, :august, :september, :october, :november, :december]
 
@@ -41,7 +41,7 @@ class QuarterConsolidatedReport < Report
             query = ["l.loan_product_id = #{self.loan_product_id}"] if self.loan_product_id
             query    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})" if @branch.length > 0
 
-            if @report_by_loan_disbursed_during_selected_date_range == 1
+            if @report_by_loan_disbursed == 1
               query    << "l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
             end
 
@@ -102,7 +102,7 @@ class QuarterConsolidatedReport < Report
       extra_condition = " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
     end
 
-    if report_by_loan_disbursed_during_selected_date_range and report_by_loan_disbursed_during_selected_date_range == 1
+    if report_by_loan_disbursed and report_by_loan_disbursed == 1
       froms += ", loans l"
       extra_condition = " and p.loan_id=l.id and l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
     end

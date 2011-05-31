@@ -221,10 +221,9 @@
               Loan Cycle:
               - lc = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
               = select(:loan_cycle, :collection => lc, :prompt => "select loan cycle")
-          - if @report.respond_to?(:report_by_loan_disbursed_during_selected_date_range)
-            %td
-              = check_box(:name => "#{report}[report_by_loan_disbursed_during_selected_date_range]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loan_disbursed_during_selected_date_range) and params[report][:report_by_loan_disbursed_during_selected_date_range] == "1" ? true : false))
-              Show loans disbursed during selected date range only
+          - if @report.respond_to?(:report_by_loan_disbursed)
+            = check_box(:name => "#{report}[report_by_loan_disbursed]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loan_disbursed) and params[report][:report_by_loan_disbursed] == "1" ? true : false))
+            Show loans disbursed during selected date range only
 
         %tr
           %td

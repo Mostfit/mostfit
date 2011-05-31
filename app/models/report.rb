@@ -226,7 +226,7 @@ class Report
       else
         @center
       end
-    @center = @branch.centers if not @center and @branch.length == 1
+    @center = @branch.centers if not @center
   end
 
   def set_instance_variables(params)

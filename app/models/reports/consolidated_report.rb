@@ -1,5 +1,5 @@
 class ConsolidatedReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :funder, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id, :report_by_loan_disbursed_during_selected_date_range, :funding_line, :funding_line_id, :loan_cycle
+  attr_accessor :from_date, :to_date, :branch, :center, :funder, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id, :report_by_loan_disbursed, :funding_line, :funding_line_id, :loan_cycle
 
   validates_with_method :from_date, :date_should_not_be_in_future
 
@@ -19,13 +19,13 @@ class ConsolidatedReport < Report
   end
   
   def generate
-    branches, centers, data, clients, loans = {}, {}, {}, {}, {}
+    branches, centers, data, clients, loans = {}, {}, {}, {}, {}    
     extra     = []
     extra    << "l.loan_product_id = #{loan_product_id}" if loan_product_id
     extra    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})" if @branch.length > 0 and @branch.length != Branch.count
     extra    << "lh.center_id in (#{@center.map{|c| c.id}.join(', ')})" if @center and @center.length > 0 and @center.length != Center.count
 
-    if @report_by_loan_disbursed_during_selected_date_range == 1 
+    if @report_by_loan_disbursed == 1 
       extra    << "l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
     end
 
@@ -51,7 +51,7 @@ class ConsolidatedReport < Report
     end
 
     grouper = [:branch]    
-    grouper.push(:center) if @center
+    grouper.push(:center) if self.branch_id
     group_by_column = (grouper.last.to_s + "_id").to_sym
     
     histories = (LoanHistory.sum_outstanding_grouped_by(self.to_date, grouper, extra)||{}).group_by{|x| x.send(group_by_column)}
@@ -60,12 +60,12 @@ class ConsolidatedReport < Report
     old_balances = (LoanHistory.advance_balance(self.from_date-1, grouper, extra)||{}).group_by{|x| x.send(group_by_column)}
     defaults   = LoanHistory.defaulted_loan_info_by(grouper, @to_date, extra).group_by{|x| x.send(group_by_column)}.map{|cid, row| [cid, row[0]]}.to_hash
     
-    @center.each{|c| centers[c.id] = c} if @center
+    @center.each{|c| centers[c.id] = c} if self.branch_id
 
     @branch.each{|b|
       branches[b.id] = b
       
-      if @center
+      if self.branch_id
         data[b]||= {}
         b.centers.each{|c|
           next unless centers.key?(c.id)
@@ -151,7 +151,7 @@ class ConsolidatedReport < Report
     extra_condition, extra_selects = "", ""
     froms = "payments p, clients cl, centers c"
 
-    if @center
+    if self.branch_id
       center_ids  = centers.keys.length>0 ? centers.keys.join(',') : "NULL"
       extra_condition = "AND c.id in (#{center_ids})"
       extra_selects   = ", c.id center_id"
@@ -162,7 +162,7 @@ class ConsolidatedReport < Report
       extra_condition = " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
     end
 
-    if report_by_loan_disbursed_during_selected_date_range and report_by_loan_disbursed_during_selected_date_range == 1
+    if report_by_loan_disbursed and report_by_loan_disbursed == 1
       froms += ", loans l"
       extra_condition = " and p.loan_id=l.id and l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
     end
@@ -193,7 +193,7 @@ class ConsolidatedReport < Report
                                GROUP BY #{group_by_column}, p.type
                              }).each{|p|      
       if branch = branches[p.branch_id] 
-        if @center and center = centers[p.center_id]        
+        if self.branch_id and center = centers[p.center_id]        
           data[branch][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
           if p.ptype==1
             data[branch][center][3] += p.amount.round(2)
@@ -220,7 +220,7 @@ class ConsolidatedReport < Report
     hash = {:applied_on.gte => from_date, :applied_on.lte => to_date}
     hash[:loan_product_id] = self.loan_product_id if self.loan_product_id
     hash["l.id"]           = funder_loan_ids if funder_loan_ids and funder_loan_ids.length > 0
-    group_by_query = (@center ? "c.branch_id, cl.center_id" : "c.branch_id")
+    group_by_query = (self.branch_id ? "c.branch_id, cl.center_id" : "c.branch_id")
 
     group_loans(group_by_query, "sum(if(amount_applied_for>0, amount_applied_for, amount)) amount", hash).group_by{|x| 
       x.branch_id
@@ -228,7 +228,7 @@ class ConsolidatedReport < Report
       next if not branches.key?(branch_id)
       branch = branches[branch_id]
 
-      if @center
+      if self.branch_id
         center_rows.group_by{|x| x.center_id}.each{|center_id, row|        
           next if not centers.key?(center_id)
           center = centers[center_id]
@@ -251,7 +251,7 @@ class ConsolidatedReport < Report
     }.each{|branch_id, center_rows| 
       next if not branches.key?(branch_id)
       branch = branches[branch_id]
-      if @center
+      if self.branch_id
         center_rows.group_by{|x| x.center_id}.each{|center_id, row|
           next if not centers.key?(center_id)
           center = centers[center_id]
@@ -274,7 +274,7 @@ class ConsolidatedReport < Report
     }.each{|branch_id, center_rows| 
       next if not branches.key?(branch_id)
       branch = branches[branch_id]
-      if @center
+      if self.branch_id
         center_rows.group_by{|x| x.center_id}.each{|center_id, row|        
           next if not centers.key?(center_id)
           center = centers[center_id]

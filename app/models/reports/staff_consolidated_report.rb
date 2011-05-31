@@ -1,5 +1,5 @@
 class StaffConsolidatedReport < Report
-  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id, :report_by_loans_created, :report_by_loan_disbursed_during_selected_date_range, :funding_line, :funding_line_id, :loan_cycle
+  attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id, :report_by_loans_created, :report_by_loan_disbursed, :funding_line, :funding_line_id, :loan_cycle
 
   validates_with_method :from_date, :date_should_not_be_in_future
 
@@ -26,7 +26,7 @@ class StaffConsolidatedReport < Report
     extra    << "lh.branch_id in (#{@branch.map{|b| b.id}.join(', ')})" if @branch.length > 0
     extra    << "lh.center_id in (#{@center.map{|c| c.id}.join(', ')})" if @center.length > 0
 
-    if @report_by_loan_disbursed_during_selected_date_range == 1
+    if @report_by_loan_disbursed == 1
       extra    << "l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
     end
 
@@ -112,7 +112,7 @@ class StaffConsolidatedReport < Report
       extra_condition = " and p.loan_id=l.id and l.loan_product_id=#{self.loan_product_id}"
     end
     
-    if report_by_loan_disbursed_during_selected_date_range and report_by_loan_disbursed_during_selected_date_range == 1
+    if report_by_loan_disbursed and report_by_loan_disbursed == 1
       froms += ", loans l"
       extra_condition = " and p.loan_id=l.id and l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
     end
