@@ -1340,6 +1340,7 @@ table.clearform tr td.legend{
 }
 
 #search-form {
+  float: left;
   background: #ABCF76; 
   padding: 7px;
   border-radius: 5px 5px 0px 0px;
