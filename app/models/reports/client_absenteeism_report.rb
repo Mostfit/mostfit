@@ -21,7 +21,6 @@ class ClientAbsenteeismReport < Report
   def generate
     data, att, client_groups, clients = {}, {}, {}, {}
     num_more_than = @more_than ? @more_than : 0
-    debugger
     Attendance.all(:center => @center, :date.gte => @from_date, :date.lte => @to_date).aggregate(:fields => [:center_id, :client_id, :status, :client_id.count]).map{|center_id, client_id, status, count|
       att[client_id]||={}
       #att[client_id][0] = Client.get(client_id).loans(:disbursal_date => (@from_date..@to_date).to_a).count

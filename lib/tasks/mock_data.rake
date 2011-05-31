@@ -154,7 +154,6 @@ namespace :mostfit do
       Merb.logger.info! "Start mock:all_payments rake task at #{t0}"
       busy_user = User.get(1)
       count = 0
-      debugger
       if 1 #Payment.all.empty?
         loan_ids = repository.adapter.query("SELECT id from loans WHERE deleted_at IS NULL")
       else
@@ -162,7 +161,6 @@ namespace :mostfit do
       end
       puts "1: #{Time.now - t0}"
       loan_ids.each do |loan_id|
-        debugger
         sql = " INSERT INTO `payments` (`received_by_staff_id`, `amount`, `type`, `created_by_user_id`, `loan_id`, `received_on`, `client_id`) VALUES ";
         _t0 = Time.now
         loan = Loan.get(loan_id)
