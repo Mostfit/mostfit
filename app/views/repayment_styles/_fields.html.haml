@@ -16,6 +16,11 @@
       = text_field :round_to
   %tr
     %th
+      Rounding style
+    %td
+      = select :rounding_style, :collection => [['round','round'],['floor','floor'],['ciel','ciel']], :prompt => "---"
+  %tr
+    %th
       Active
     %td
       = check_box :active

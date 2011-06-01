@@ -1,21 +1,4 @@
 module Mostfit
-  module Functions
-
-
-    def get_divider
-      case installment_frequency
-      when :weekly
-        52
-      when :biweekly
-        26
-      when :monthly
-        12
-      when :daily
-        365
-      end    
-    end
-
-  end
 
   module PaymentStyles
 
@@ -29,11 +12,12 @@ module Mostfit
         raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
         (amount * interest_rate / number_of_installments).round(2)
       end
-    end
+    end #Flat
+
 
     module EquatedWeekly
-      
       def reducing_schedule
+        debugger
         return @reducing_schedule if @reducing_schedule
         @reducing_schedule = {}    
         balance = amount
@@ -49,19 +33,14 @@ module Mostfit
       
       def scheduled_principal_for_installment(number)
         raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > number_of_installments
-        return Loaner::Functions.reducing_schedule[number][:principal_payable]
+        return reducing_schedule[number][:principal_payable]
       end
 
-      def scheduled_principal_for_installment(number)
+      def scheduled_interest_for_installment(number)
         raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > number_of_installments
-        return Loaner::Functions.reducing_schedule[number][:interest_payable]
+        return reducing_schedule[number][:interest_payable]
       end
 
-    end
-
-    module EquatedWeeklyRounded
-    end
-
-
+    end #EquatedWeekly
   end
 end

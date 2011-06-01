@@ -18,7 +18,7 @@
       History
   %div.tab
     %table.form
-      - [:name, :loan_type_string, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments, :installment_frequency, :rounding, :rounding_style, :valid_from, :valid_upto].each do |attr|
+      - [:name, :repayment_style, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments, :installment_frequency, :rounding, :rounding_style, :valid_from, :valid_upto].each do |attr|
         %tr
           %th{:align => "left"}
             = attr.humanize

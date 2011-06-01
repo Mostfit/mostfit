@@ -9,6 +9,7 @@ class RepaymentStyle
   property :round_to, Integer
   property :active, Boolean
   property :round_to, Integer
+  property :rounding_style, String
 
   def to_s
     style
