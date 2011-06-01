@@ -73,6 +73,10 @@ module Misfit
       },
       :accountant => {
         :all => [:browse, :branches, :accounts, :journals, :rule_books, :account_types, :accounting_periods, :info, :reports, :reports, :dashboard, :graph_data]
+      },
+      :maintainer => {
+         :all =>
+[:maintain]
       }
     }
 
