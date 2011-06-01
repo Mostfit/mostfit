@@ -62,6 +62,7 @@ class Loan
   property :cheque_number,                     String,  :length => 20, :nullable => true, :index => true
   property :cycle_number,                      Integer, :default => 1, :nullable => false, :index => true
 
+  #these amount and disbursal dates are required for TakeOver loan types. 
   property :original_amount,                    Integer
   property :original_disbursal_date,            Date
   property :original_first_payment_date,        Date
