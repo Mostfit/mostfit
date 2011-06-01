@@ -1,4 +1,4 @@
-class ClientAbsenteeismReport < Report
+class ClientAttendanceReport < Report
   attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :more_than, :attendance_status, :days_percentage
 
   validates_with_method :branch_id, :branch_should_be_selected  
@@ -6,16 +6,16 @@ class ClientAbsenteeismReport < Report
   def initialize(params,dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 30
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
-    @name   = "Client Absenteeism Report as on #{@date}"
+    @name   = "Client Attendance Report as on #{@date}"
     get_parameters(params, user)
   end
 
   def name
-    "Client absenteeism as on #{@to_date}"
+    "Client attendance as on #{@to_date}"
   end
 
   def self.name
-    "Client Absenteeism Report"
+    "Client Attendance Report"
   end
 
   def generate
@@ -29,13 +29,11 @@ class ClientAbsenteeismReport < Report
 
     if @days_percentage == 2 # if percentage is the selection criteria
       att.each{|client_id, statuses|
-        if not statuses[@attendance_status] or ((statuses[@attendance_status]/(statuses.values.inject{|sum , x| sum + x}).to_f)*100) <= num_more_than
+        if not statuses[@attendance_status] or (((statuses[@attendance_status]/(statuses.values.inject{|sum , x| sum + x}).to_f)*100) <= num_more_than)
           att.delete(client_id)        
         else
           att[client_id][0]=Client.get(client_id).loans(:disbursal_date.gte => @from_date, :disbursal_date.lte => @to_date).count
-          #att[client_id][0]=Client.get(client_id).loans(:disbursal_date => (@from_date..@to_date).to_a).count
         end
-     #att.delete(client_id) if not statuses[(@attendance_status)] or statuses[(@attendance_status)] <= num_more_than
       }
     else #if number of days is the selection criteria
       att.each{|client_id, statuses|
