@@ -34,6 +34,7 @@ Merb::BootLoader.before_app_loads do
   Numeric::Transformer.change_default_format(:mostfit_default)
   require 'config/constants.rb'
   require 'lib/rules'
+  require 'lib/reporting'
   require 'uuid'
   require 'ftools'
   require 'logger'
