@@ -93,6 +93,18 @@ class AggregateConsolidatedReport < Report
     return data
   end
 
+  def headers
+    [
+     {self.group_by_types[-1].to_s.camelcase(' ').capitalize.pluralize => [""]}, 
+     {"Disbursement"        => ["No.", "Amount"]},
+     {"Full repayment"      => ["No.", "Amount"]},
+     {"Foreclosure"         => ["No.", "Amount"]},
+     {"Outstanding"         => ["No.", "Amount"]},
+     {"Overdue"             => ["No.", "Amount"]},
+     {"Advance"             => ["No.", "Amount"]}
+    ]
+  end
+
   private
   def group_aggregation(disbursements, outstandings, repaids, foreclosures, overdues, advances, group_by_types)
     disbursements ||= {}
