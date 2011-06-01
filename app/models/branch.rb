@@ -89,9 +89,10 @@ class Branch
   end
 
   def self.for_staff_member(staff_member)
-    Branch.all(:manager => staff_member) or Center.all(:manager => staff_member).branches
+    branches = Branch.all(:manager => staff_member).aggregate(:id) + Branch.all("centers.manager_staff_id" => staff_member.id).aggregate(:id) + 
+      Branch.all("area.manager_id" => staff_member.id).aggregate(:id) + Branch.all("area.region.manager_id" => staff_member.id).aggregate(:id)
+    Branch.all(:id => branches)
   end
-
   
   private
   def manager_is_an_active_staff_member?
