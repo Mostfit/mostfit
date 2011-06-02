@@ -4,11 +4,11 @@ class AccountBalances < Application
 
 
   def index
-    opts = {}
-    opts[:account] = @account if @account
-    opts[:accounting_period] = @accounting_period if @accounting_period
-    @account_balances = AccountBalance.all(opts)
-    display @account_balances
+    @account = Account.get(params[:account_id])
+    hash = {}
+    hash[:account] = @account if @account
+    @account_balances = AccountBalance.all(hash)
+    display @account_balances, :layout => layout?
   end
 
   def show(id)
@@ -18,7 +18,7 @@ class AccountBalances < Application
   def new
     only_provides :html
     @account_balance = AccountBalance.new
-    display @account_balance
+    display @account_balance, :layout => layout?
   end
 
   def edit(id)
@@ -47,8 +47,8 @@ class AccountBalances < Application
     @account_balance.account = @account
     @account_balance.accounting_period = @accounting_period
 
-   if @account_balance.update(account_balance)
-     redirect resource(@account, @accounting_period,:account_balances), :message => {:notice => "Balance updated"}
+    if @account_balance.update(account_balance)
+      redirect resource(@account, @accounting_period,:account_balances), :message => {:notice => "Balance updated"}
     else
       display @account_balance, :edit
     end
@@ -89,7 +89,7 @@ class AccountBalances < Application
       @accounting_period = @account_balance.accounting_period
     else
       @account = Account.get(params[:account_id]) if params[:account_id]
-      @accounting_period = AccountingPeriod.get(params[:accounting_period_id])
+      @accounting_period = AccountingPeriod.get(params[:accounting_period_id] || AccountingPeriod.last.id)
       @account_balance = AccountBalance.all(:account => @account, :accounting_period => @accounting_period)[0]
     end
     raise NotFound unless @account

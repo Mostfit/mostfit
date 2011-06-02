@@ -45,5 +45,7 @@
       Opening Balance
     %td
       =text_field :opening_balance
+      /=radio_button :gl_code, :choose => ["yes", "no"] 
+      /THIS RADIO BUTTON NEEDS TO BE FIXED
     %td
       =date_select_for @account, :opening_balance_on_date 

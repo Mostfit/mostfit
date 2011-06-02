@@ -1,10 +1,33 @@
 %h1
-  AccountingPeriods controller, show action
-%p
-  Edit this file in
-  %tt
-    app/views/accounting_periods/show.html.erb
+  Accounting Period
+%table.narrow.form
+  %thead
+    %tr
+      %th
+        Name
+      %th
+        Begins
+      %th
+        Ends
+      %th
+        Entries Allowed?
+      %th
+        Account balances
+      %th
+        Actions
 
-= link_to 'Edit',  url(:edit_accounting_period,  @accounting_period)
-|
+    %tr{:class => cycle('odd','even')}
+      %td
+        = @accounting_period.name
+      %td
+        = @accounting_period.begin_date
+      %td
+        = @accounting_period.end_date
+      %td
+        = @accounting_period.closed ? "Closed" : "Open"
+      %td
+        = link_to 'Balances', url(:period_balances, @accounting_period)
+      %td
+        = link_to 'Edit', url(:edit_accounting_period, @accounting_period)
+
 = link_to 'Back', url(:accounting_periods)

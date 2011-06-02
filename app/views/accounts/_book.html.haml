@@ -1,56 +1,60 @@
-- @from_date ||= @account.account_earliest_date - 1
-- @to_date||= Date.today
-- balance = @account.opening_balance_as_of(@from_date) || 0
-%table.form.narrow
-  %tr
-    %thead
-      %th
-        Date
-      %th
-        Particulars
-      %th
-        Vch Type
-      %th
-        Vch. No.
-      %th
-        %b Debit
-      %th
-        %b Credit
-  %tr.total
-    %td
-      = @from_date
-    %td
-      Opening Balance
-    %td
-    %td
-    %td
-      = balance.to_currency
-    %td
-  - posting_hash = Posting.all(:account => @account, "journal.date.lte" => @to_date, "journal.date.gte" => @from_date).map{|p| [p.journal.date, p]}
-  - posting_hash.sort_by{|ph| ph[0]}.each do |ph|
-    %tr{:class => cycle('odd','even')}
-      - posting = ph[1]
-      - balance += posting.amount
+#ledger_entry_table
+  %form{:style => "float : right", :method => "post", :action => url(:controller => :accounts, :action => :book, :account_id => @account.id, :date => (params[:date] || Date.today)), :class => "_remote_"}
+    %b Show ledger for accounting period 
+    = select :accounting_period_id, :collection => AccountingPeriod.all.reverse.map{|ap| [ap.id, ap.name]}
+    = hidden_field :name => "_target_", :value => "ledger_entry_table"
+    = submit "GO"
+
+  %b Ledger entries for - 
+  = @accounting_period.name
+  %table.form.narrow
+    %tr.total
       %td
-        = ph[0]
+        Opening Balance
+        %span.greytext
+          [
+          = @from_date
+          ]
+        \=
+        = @account.opening_balance_as_of(@from_date).to_account_balance
       %td
-        = posting.journal.comment
-      %td
-      %td
-      %td
-        = posting.amount < 0 ? posting.amount.abs.to_currency : "-"
-      %td
-        = posting.amount > 0 ? posting.amount.to_currency : "-"
-  %tr.total
-    %td
-      = @to_date
-    %td
-      Closing Balance
-    %td
-    %td
-    %td
-      = balance.to_currency
-    %td
-        
-        
+        Closing Balance
+        %span.greytext
+          [
+          = @to_date
+          ] 
+        \=
+        = @account.opening_balance_as_of(@to_date).to_account_balance
   
+  %table.form.narrow
+    %tr
+      %thead
+        %th
+          Date
+        %th
+          Particulars
+        %th
+          Voucher Type
+        %th
+          Voucher Number
+        %th
+          %b Debit
+        %th
+          %b Credit
+    - @posting_array = @posting_hash.map{|p| [p.journal.date, p]}
+    - @posting_array.sort_by{|pa| pa[0]}.reverse.each do |pa|
+      %tr{:class => cycle('odd','even')}
+        - posting = pa[1]
+        %td
+          = pa[0]
+        %td
+          = posting.journal.comment
+        %td
+          = posting.journal.journal_type.name
+        %td
+          = posting.journal.transaction_id
+        %td
+          = posting.amount < 0 ? posting.amount.abs.to_currency : "-"
+        %td
+          = posting.amount > 0 ? posting.amount.to_currency : "-"
+  = paginate(@posting_hash).to_s.gsub("<a", "<a class='_remote_' id='ledger_entry_table'")
