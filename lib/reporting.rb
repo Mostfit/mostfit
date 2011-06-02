@@ -45,6 +45,16 @@ module Mostfit
         columns << Column.new(column, &block)
       end
 
+      # Returns number of sub-columns, including sub-columns of sub-columns.
+      # So it can be used with the html colspan attribute.
+      def colspan
+        if columns.empty?
+          return 0
+        else
+          return columns.length + columns.inject(0){|s, v| s+= v.colspan}
+        end
+      end
+
       def to_s
         s = "#{name}"
         unless columns.empty?
