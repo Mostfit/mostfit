@@ -12,7 +12,7 @@ module Mostfit
         return 69
       end
 
-      def scheduled_principal_for_installment(number)
+      def scheduled_interest_for_installment(number)
         raise ArgumentError if number < 1 or number > actual_number_of_installments
         return 10 if number <= 5
         return 17 if number > 5 and number <= 32
