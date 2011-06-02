@@ -73,9 +73,25 @@
 
   %tr
     %th
+      Loan Type
+    %td{:colspan => 6}
+      = select :loan_type_string, :collection => Loan.descendants.map{|f| [f, f.respond_to?(:display_name) ? f.display_name : f.to_s.snake_case.camelcase(' ')]}
+  %tr
+    %th
       Repayment Style
     %td{:colspan => 6}
       = select :repayment_style_id, :collection => RepaymentStyle.all, :value_method => :id, :text_method => :name, :prompt => "---"
+  %tr
+    %th
+      Rounding to
+    %td
+      = text_field :rounding, :size => 3
+  %tr
+    %th
+      Rounding Style
+    %td{:colspan => 6}
+      = select :rounding_style, :collection => [[:round, "round"], [:floor, "floor"], [:ceil, "ceil"]]
+      %span.greytext  By default, round is choosen as the rounding style
   %tr
     %th
       Link to an insurance policy ?

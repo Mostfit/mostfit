@@ -9,11 +9,8 @@ module DataEntry
         @center = @client.center
 
         if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])
-          if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type_string)
-            klass = Kernel::const_get(@loan_product.loan_type_string)
-            @loan = klass.new
-            set_insurance_policy
-          end
+          @loan = Loan.new
+          set_insurance_policy
         end
       end
       @loan_types    = Loan.descendants if @loan.nil?

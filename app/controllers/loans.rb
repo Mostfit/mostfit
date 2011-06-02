@@ -479,12 +479,13 @@ class Loans < Application
       klass = loan.class
     else
       loan_product = LoanProduct.get(params[:loan_product_id])
-      attrs = params[loan_product.loan_type_string.snake_case.to_sym]
+      attrs = params[loan_product.loan_type_string.snake_case.to_sym] || params[:loan]
       raise NotFound if not params[:loan_type]
       klass = Kernel::const_get(params[:loan_type])
     end
     attrs[:client_id] = params[:client_id] if params[:client_id]
     attrs[:insurance_policy] = params[:insurance_policy] if params[:insurance_policy]
+    attrs[:repayment_style_id] ||= loan_product.repayment_style.id
     [klass, attrs]
   end
 
