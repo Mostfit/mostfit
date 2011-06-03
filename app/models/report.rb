@@ -282,13 +282,12 @@ class Report
   end
 
   def get_payment_extra_and_froms(centers, funder_loan_ids)
-    extra_condition, extra_selects = "", ""
+    extra_condition = ""
     froms = ["payments p", "clients cl", "centers c"]
 
     if self.branch_id
       center_ids  = centers.keys.length>0 ? centers.keys.join(',') : "NULL"
       extra_condition += "AND c.id in (#{center_ids})"
-      extra_selects   += ", c.id center_id"
     end
 
     if self.loan_product_id
@@ -321,7 +320,7 @@ class Report
       extra_condition += "and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
       extra_condition += "and l.cycle_number = #{lc}"
     end
-    [froms.uniq.join(", "), extra_condition, extra_selects]
+    [froms.uniq.join(", "), extra_condition]
   end
 
   # This function adds corresponding rows of 'obj' in histories, advances, balances etc 
@@ -343,7 +342,7 @@ class Report
     else
       return
     end
-    
+
     add_to_result(data, obj, 7, principal_actual)
     add_to_result(data, obj, 9, total_actual)
     add_to_result(data, obj, 8, total_actual - principal_actual)

@@ -1,9 +1,11 @@
 %tr.header
-  - @report.headers.each do |colgroup|
-    - key, cols = colgroup.keys[0], colgroup.values[0]
-    %th{:colspan => cols.length}
-      = key
+  - @report.columns.each do |column|
+    %th{:colspan => column.colspan}
+      = column.name.to_s.gsub(/_/, ' ').capitalize
 %tr.header
-  - @report.headers.map{|h| h.values}.flatten.each do |col|
-    %th
-      = col
+  - @report.columns.map{|c| pad(c)}.flatten.each do |column|
+    - if column
+      %th{:colspan => column.colspan}
+        = column.name.to_s.capitalize
+    - else
+      %th

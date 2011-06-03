@@ -9,7 +9,7 @@
     %td
       = @account.branch ? @account.branch.name : ""
   %tr
-    %th Opening Balance
+    %th Opening Balance : 
     %td
       = @account.opening_balance 
       %span.greytext 
@@ -17,9 +17,9 @@
         = @account.opening_balance_on_date
         )
   %tr
-    %th Branch : 
+    %th Today's Balance : 
     %td
-      = @account.branch ? @account.branch.name : ""
+      = @account.balance_as_of_now.to_account_balance 
 
 %p
   = link_to_with_rights 'edit this account\'s details ', resource(@account, :edit), :class => "edit"
@@ -27,14 +27,14 @@
 %div.tab_container
   %ul.tabs
     %li#journal Journal
+    %li#book Ledger
     %li#accounting_periods End-of-period Balances
-    %li#book Book
     
   %div.tab
-    = partial "journals/list_account", :accounts => @accounts
+    = partial "journals/list_account", :accounts => @account
   %div.tab{:class => "_load_remote_"}
-    = partial "account_balances/list", :account => @accounts, :date => (params[:date] || Date.today)
+    %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :accounts, :action => :book, :account_id => @account.id, :date => (params[:date] || Date.today))}
   %div.tab{:class => "_load_remote_"}
-    = partial "accounts/book", :account => @accounts, :date => (params[:date] || Date.today)
+    %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :account_balances, :action => :index, :account_id => @account.id, :date => (params[:date] || Date.today))}
 %br
 = link_to 'Back', url(:accounts)
