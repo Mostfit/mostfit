@@ -8,7 +8,7 @@ class ConsolidatedReport < Report
   column :repayment           => [:principal, :interest,   :fee,        :total]
   column :balance_outstanding => [:principal, :interest,   :total             ]
   column :balance_overdue     => [:principal, :interest,   :total             ]
-  column :advance_repayment   => [:collected, :adjusted,   :balanced          ]
+  column :advance_repayment   => [:collected, :adjusted,   :balance           ]
 
   validates_with_method :from_date, :date_should_not_be_in_future
 
