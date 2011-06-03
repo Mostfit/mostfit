@@ -1,6 +1,15 @@
 class ConsolidatedReport < Report
   attr_accessor :from_date, :to_date, :branch, :center, :funder, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id, :report_by_loan_disbursed, :funding_line, :funding_line_id, :loan_cycle
 
+  include Mostfit::Reporting
+
+  column :'branch / center'
+  column :loan_amount         => [:applied,   :sanctioned, :disbursed         ]
+  column :repayment           => [:principal, :interest,   :fee,        :total]
+  column :balance_outstanding => [:principal, :interest,   :total             ]
+  column :balance_overdue     => [:principal, :interest,   :total             ]
+  column :advance_repayment   => [:collected, :adjusted,   :balance           ]
+
   validates_with_method :from_date, :date_should_not_be_in_future
 
   def initialize(params, dates, user)
@@ -124,16 +133,5 @@ class ConsolidatedReport < Report
       }
     end
     return data
-  end
-
-  def headers
-    [
-     {"Branch / Center"     => [""]}, 
-     {"Loan amount"         => ["Applied", "Sanctioned", "Disbursed"]},
-     {"Repayment"           => ["Principal", "Interest", "Fee", "Total"]},
-     {"Balance outstanding" => ["Principal", "Interest", "Total"]},
-     {"Balance overdue"     => ["Principal", "Interest", "Total"]},
-     {"Advance repayment"   => ["Collected", "Adjusted", "Balance"]}
-    ]
   end
 end

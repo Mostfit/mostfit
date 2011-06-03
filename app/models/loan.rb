@@ -813,7 +813,7 @@ class Loan
     return :disbursed            if (date == disbursal_date.holiday_bump) and total_received < total_to_be_received
     if total_received >= total_to_be_received
       @status =  :repaid
-    elsif amount<=principal_received and scheduled_interest_up_to(date)<=interest_received_up_to(Date.today)
+    elsif (amount - principal_received) <= EPSILON and scheduled_interest_up_to(date)<=interest_received_up_to(Date.today)
       @status =  :repaid
     elsif amount<=principal_received
       @status =  :repaid
