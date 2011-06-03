@@ -104,15 +104,4 @@ class ConsolidatedReport < Report
     end          
     return data
   end
-
-  def headers
-    [
-     {"Branch / Center"     => [""]}, 
-     {"Loan amount"         => ["Applied", "Sanctioned", "Disbursed"]},
-     {"Repayment"           => ["Principal", "Interest", "Fee", "Total"]},
-     {"Balance outstanding" => ["Principal", "Interest", "Total"]},
-     {"Balance overdue"     => ["Principal", "Interest", "Total"]},
-     {"Advance repayment"   => ["Collected", "Adjusted", "Balance"]}
-    ]
-  end
 end
