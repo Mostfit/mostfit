@@ -36,6 +36,7 @@ class RuleBook
   validates_with_method  :percentage_should_be_100
   validates_with_method  :expire_old_rule
   validates_with_method  :rule_date_range_validation
+  validates_with_method  :cannot_overlap
 
   # This function is used to get accounts based on the transaction in the loan system.
   # Right now these transactions can be payments, loans, or array of payments or loans.
@@ -162,6 +163,16 @@ class RuleBook
 
   # this function will work  if same rule is been created for same branch 
   #  it will deactivate old rule after creation of new rule for same action like disbursment, interest, fee or principal 
+
+  def cannot_overlap
+    if self.new?
+      overlaps = RuleBook.all(:branch_id => branch_id, :action => action, :journal_type_id => self.journal_type_id, :to_date.lte => self.to_date, :to_date.gte => self.from_date)
+      overlaps = RuleBook.all(:branch_id => branch_id, :action => action, :journal_type_id => self.journal_type_id, :from_date.gte => self.from_date, :from_date.lte => self.to_date) if overlaps.empty?
+      return true if overlaps.empty?
+      return [false, "You rule overlaps with an existing rule #{overlaps.first.name}"]
+    end
+  end
+
   def expire_old_rule
     if self.new?
       RuleBook.all.each do |rule|

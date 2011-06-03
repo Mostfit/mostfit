@@ -12,8 +12,7 @@
       Debit
     %th 
       Credit
-   
-  - @account.postings.journals(:order => [:date.desc]).each do |journal|
+  - Journal.all("postings.account_id" => @account.id, :limit => 25, :order => [:date.desc]).each do |journal|
     - postings = journal.postings.group_by{|x| x.amount>0 ? :credit : :debit}
     - time_format = Mfi.first.date_format || "%d-%m-%Y"
     - time_format += " %H:%M"
@@ -30,10 +29,10 @@
         %br
         = postings[:credit].collect{|p| p.account.name}.join("<br/>")
       %td 
-        - dr_amount = postings[:debit].collect{|p| p.amount.abs}
+        - dr_amount = postings[:debit].collect{|p| p.amount.abs}.join("<br/>")
         = dr_amount
       %td 
         %br
-        - cr_amount = postings[:credit].collect{|p| p.amount.abs}.inject(0){|s,x| s+=x}
+        - cr_amount = postings[:credit].collect{|p| p.amount.abs}.join("<br/>")
         = cr_amount
    
