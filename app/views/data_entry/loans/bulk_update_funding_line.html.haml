@@ -28,4 +28,6 @@
           = select_funding_line_for(loan, :funding_line, {:name => "loan[#{loan.id}]"})
   = submit 'Update Funding Lines'        
       
+
+= paginate @loans
     
