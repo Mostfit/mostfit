@@ -43,19 +43,21 @@ class Loans < Application
     fee_params = params.delete(:fees)
     @loan = klass.new(attrs)
     @loan.loan_product = @loan_product
-    if fee_params[:premium_as_fees]
-      @fee = Fee.get(fee_params[:fee_id])
-      payable_models ||= Fee::PAYABLE.map{|m| [m[0], [m[1], m[2]]]}.to_hash
-      method = payable_models[@fee.payable_on][1] if @fee
+    if params.include?(:premium_as_fees) and fee_params[:premium_as_fees]
+        @fee = Fee.get(fee_params[:fee_id])
+        payable_models ||= Fee::PAYABLE.map{|m| [m[0], [m[1], m[2]]]}.to_hash
+        method = payable_models[@fee.payable_on][1] if @fee
     end
     msg = {}
     if @loan.save
       msg[:notice] = "Loan '#{@loan.id}' was successfully created"
       if @fee
-        if params[:fee_date].empty?
-          date = (@loan.insurance_policy.send(method) if @loan.insurance_policy.respond_to?(method))
-        else
-          date = (Date.strptime(params[:fee_date], Mfi.first.date_format))
+        if params.include?(:fee_date)
+          if params[:fee_date].empty?
+            date = (@loan.insurance_policy.send(method) if @loan.insurance_policy.respond_to?(method))
+          else
+            date = (Date.strptime(params[:fee_date], Mfi.first.date_format))
+          end
         end
         if date
           @app_fee = ApplicableFee.new(:applicable_on => date, :amount => params[:insurance_policy][:premium], :fee => @fee,
