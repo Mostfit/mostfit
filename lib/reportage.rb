@@ -54,6 +54,13 @@ module DataMapper
     def bucket_by(buckets = nil)
       result = Kernel.const_get("#{self.first.model.to_s}Bucket").new {|h, k| h[k] = []}
 
+      if buckets.is_a? Symbol
+        aggregate(buckets, :id).each do |k, v|
+          result[k] << v
+        end
+        return result
+      end
+
       self.map do |x| 
         r = yield(x)
         result[r] << x.id
