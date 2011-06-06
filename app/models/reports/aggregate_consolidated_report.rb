@@ -1,5 +1,6 @@
 class AggregateConsolidatedReport < Report
   attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :group_by_types, :report_by_loan_disbursed
+  attr_reader   :data
 
   include Mostfit::Reporting
 
@@ -99,7 +100,7 @@ class AggregateConsolidatedReport < Report
       
       data = group_aggregation(disbursements, outstandings, repaids, foreclosures, overdues, advances, @group_by_types)
     end
-    return data
+    @data = data
   end
 
   def columns

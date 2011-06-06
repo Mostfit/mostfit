@@ -1,5 +1,6 @@
 class DailyReport < Report
   attr_accessor :date, :loan_product_id, :branch_id, :staff_member_id, :center_id
+  attr_reader   :data
 
   include Mostfit::Reporting
 
@@ -27,6 +28,6 @@ class DailyReport < Report
   end
 
   def generate
-    return @daily_report.generate
+    @data = @daily_report.generate
   end
 end

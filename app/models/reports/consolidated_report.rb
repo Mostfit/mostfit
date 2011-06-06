@@ -1,5 +1,6 @@
 class ConsolidatedReport < Report
   attr_accessor :from_date, :to_date, :branch, :center, :funder, :branch_id, :center_id, :staff_member_id, :loan_product_id, :funder_id, :report_by_loan_disbursed, :funding_line, :funding_line_id, :loan_cycle
+  attr_reader   :data
 
   include Mostfit::Reporting
 
@@ -132,6 +133,6 @@ class ConsolidatedReport < Report
         end
       }
     end
-    return data
+    @data = data
   end
 end
