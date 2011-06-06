@@ -52,7 +52,11 @@ class Loans < Application
     if @loan.save
       msg[:notice] = "Loan '#{@loan.id}' was successfully created"
       if @fee
-        date = (@loan.insurance_policy.send(method) if @loan.insurance_policy.respond_to?(method)) 
+        if params[:fee_date].empty?
+          date = (@loan.insurance_policy.send(method) if @loan.insurance_policy.respond_to?(method))
+        else
+          date = (Date.strptime(params[:fee_date], Mfi.first.date_format))
+        end
         if date
           @app_fee = ApplicableFee.new(:applicable_on => date, :amount => params[:insurance_policy][:premium], :fee => @fee,
                                        :applicable_id => @loan.id, :applicable_type => 'Loan')
