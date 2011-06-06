@@ -15,4 +15,8 @@ class Region
   validates_is_unique :name
   validates_length :name, :max => 20, :min => 1
 
+  def location
+    Location.first(:parent_id => self.id, :parent_type => "region")
+  end
+
 end

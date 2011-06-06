@@ -7,17 +7,20 @@
           %b
             = key1.name
       - key1_total ||= []
-      - values1.each{|key2, values2| key2.name}.each do |key2, values2|
+      - values1.sort_by{|key2, values2| key2.name}.each{|key2, values2| key2.name}.each do |key2, values2|
         - if values2.is_a?(Hash) and values2 and values2.keys.length>0
           %tr.center
             %td{:colspan => length+1}
               %b
                 = key2.name
           - key2_total = Array.new(length, 0)
-          - values2.sort_by{|key3, values3| key3.name}.each do |key3, values3|
+          - values2.sort_by{|key3, values3| key3.respond_to?(:name) ? key3.name : "No group"}.each do |key3, values3|
             %tr.group
               %td
-                = key3.name
+                - if key3.respond_to?(:name)
+                  = key3.name
+                - else
+                  No group
               - values3.each_with_index do |row, idx|
                 %td
                   - if row

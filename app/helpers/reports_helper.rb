@@ -1,5 +1,16 @@
 module Merb
   module ReportsHelper
+    # Our reports DSL allows to columns of any nesting. This helper makes it
+    # easier to generate a padded (with `nil`) list of headers to be used at
+    # each level.
+    #
+    #   # to generate second level headers
+    #   @report.columns.map{|c| pad(c)}.flatten.map{|c| pad(c)}.flatten
+    def pad(c)
+      return nil unless c
+      c.columns.empty? ? nil : c.columns
+    end
+
     def get_printer_url
       request.env["REQUEST_URI"] + (request.env["REQUEST_URI"].index("?") ? "&" : "?") + "layout=printer"
     end    
