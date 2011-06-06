@@ -88,6 +88,8 @@ class Loans < Application
     end
   end
 
+
+
   def edit(id)
     only_provides :html
     @loan = Loan.get(id)
