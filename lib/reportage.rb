@@ -41,15 +41,11 @@ module DataMapper
   class Collection
     
     def bucket_by(buckets = nil)
-      result = Kernel.const_get("#{self.first.model.to_s}Bucket").new
-        
+      result = Kernel.const_get("#{self.first.model.to_s}Bucket").new {|h, k| h[k] = []}
+
       self.map do |x| 
         r = yield(x)
-        if result.has_key?(r)
-          result[r] << x.id
-        else
-          result[r] = [x.id]
-        end
+        result[r] << x.id
       end
       # result looks like this: {1000 => [1,4,5,.....loan_ids], 2000 => [x,y,z...loan_ids]}
       bucketed_results = LoanBucket.new
