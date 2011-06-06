@@ -1,4 +1,4 @@
-- if @isnurance_policy and @insurance_policy.id and not @insurance_policy.id.blank?
+- if @insurance_policy and @insurance_policy.id and not @insurance_policy.id.blank?
   = hidden_field :id
 %table
   %tr
@@ -31,6 +31,16 @@
       Premium
     %td
       = text_field :premium
+  %tr 
+    %td
+      = check_box(:name => "fees[premium_as_fees]", :value => 1)
+      Apply premium as 
+    %td
+      - fee_list = Fee.all.map{|x| [x.id, x.name] if x.payable_on.to_s =~ /policy/}
+      - fee_list.delete(nil)
+      = select(:name => "fees[fee_id]", :collection => fee_list, :prompt => "")
+    %td
+      = date_select :fee_date, nil
   %tr
     %td
       Date from

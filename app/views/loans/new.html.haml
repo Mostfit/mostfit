@@ -2,6 +2,7 @@
 
 = error_messages_for @loan
 = error_messages_for @insurance_policy
+= error_messages_for @af
 
 - if @loan.nil?
   - if @client
@@ -19,9 +20,9 @@
             = product.to_s
           %td
             = submit "Proceed"
-  -if @loan_products.length==0
+  - if @loan_products.length==0
     %div.error
-      =link_to("There are no loan products available. Create one now", resource(:loan_products, :new)) 
+      = link_to("There are no loan products available. Create one now", resource(:loan_products, :new)) 
   = link_to 'cancel', resource(@branch, @center, @client)
 - else
   = form_for(@loan, :action => resource(@branch, @center, @client, :loans, {:return => params[:return]}), :onsubmit => "javascript: return confirm_for(o);") do

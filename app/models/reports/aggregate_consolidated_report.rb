@@ -1,5 +1,15 @@
 class AggregateConsolidatedReport < Report
   attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :group_by_types, :report_by_loan_disbursed
+  attr_reader   :data
+
+  include Mostfit::Reporting
+
+  column :disbursement   => [:'no.', :amount]
+  column :full_repayment => [:'no.', :amount]
+  column :foreclosure    => [:'no.', :amount]
+  column :outstanding    => [:'no.', :amount]
+  column :overdue        => [:'no.', :amount]
+  column :advance        => [:'no.', :amount]
 
   Year = Struct.new(:name)
 
@@ -90,19 +100,13 @@ class AggregateConsolidatedReport < Report
       
       data = group_aggregation(disbursements, outstandings, repaids, foreclosures, overdues, advances, @group_by_types)
     end
-    return data
+    @data = data
   end
 
-  def headers
-    [
-     {self.group_by_types[-1].to_s.camelcase(' ').capitalize.pluralize => [""]}, 
-     {"Disbursement"        => ["No.", "Amount"]},
-     {"Full repayment"      => ["No.", "Amount"]},
-     {"Foreclosure"         => ["No.", "Amount"]},
-     {"Outstanding"         => ["No.", "Amount"]},
-     {"Overdue"             => ["No.", "Amount"]},
-     {"Advance"             => ["No.", "Amount"]}
-    ]
+  def columns
+    group_by = self.group_by_types[-1].to_s.camelcase(' ').capitalize.pluralize
+    @columns = [Mostfit::Reporting::Column.new(group_by)]
+    (@columns << self.class.columns).flatten
   end
 
   private
