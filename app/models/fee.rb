@@ -1,6 +1,14 @@
 class Fee
   include DataMapper::Resource
   
+  # PAYABLE is a hash which enables us to call the correct function on the correct model
+  # to determine which date the fee is payable on.
+  # It is of the format
+  # [[:payable_on, Model, FunctionModel, function]] where Model is the class that it is applicable on and FunctionModel is the class
+  # on which to call the function.
+  # We have this difference to handle cases where the fee is applicable on an Insurance Policy but is payable on the loan application date
+
+
   PAYABLE = [
              [:loan_applied_on, Loan, :applied_on], 
              [:loan_approved_on, Loan, :approved_on],
@@ -10,7 +18,10 @@ class Fee
              [:client_grt_pass_date, Client, :grt_pass_date], 
              [:client_date_joined, Client, :date_joined], 
              [:loan_installment_dates, Loan, :installment_dates],
-             [:policy_issue_date, InsurancePolicy, :issue_date],
+             [:policy_issue_date, InsurancePolicy, :date_from],
+             [:policy_loan_application_date, InsurancePolicy, :loan_applied_on],
+             [:policy_loan_approval_date, InsurancePolicy, :loan_approved_on],
+             [:policy_loan_disbursal_date, InsurancePolicy, :loan_disbursal_date],
              [:penalty, Loan, nil]
             ]
   FeeDue        = Struct.new(:applicable, :paid, :due)
