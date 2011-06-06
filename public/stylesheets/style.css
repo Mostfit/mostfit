@@ -556,6 +556,7 @@ div.log_box{
 }
 table#data_entry_index{
     padding: 0em;   
+    line-height: 2em;
 }
 table#data_entry_index tr td{
     padding: 0em;   
@@ -1276,7 +1277,6 @@ th.due {
     padding: 3px;
     padding-left: 5px;
     padding-right: 5px;
-    border-radius: 4px;
     margin-bottom: 2px;
 }
 .reports a.report_links:hover{
@@ -1348,3 +1348,12 @@ table.clearform tr td.legend{
   top: -4px;
 }
 
+.number-hint {
+  background: #ABCF76; 
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 3px;
+  border-radius: 3px;
+  color: white;
+  margin: 3px;
+}

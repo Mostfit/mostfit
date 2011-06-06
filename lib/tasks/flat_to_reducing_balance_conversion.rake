@@ -36,7 +36,7 @@ namespace :mostfit do
       }
 
       f = File.open("tmp/flat_to_reducing_#{DateTime.now.to_s}.csv", "w")
-      f.puts("\"Loan Id\", \"Loan Product Id\", \"Loan Product Name\", \"Loan Product Type\", \"Loan Product Interest Rate\", \"Loan Discriminator\", \"Amount\", \"Interest Rate\", \"Status\", \"Errors (if any)\"")
+      f.puts("\"Loan Id\", \"Loan Product Id\", \"Loan Product Name\", \"Loan Product Type\", \"Loan Product Interest Rate\", \"Loan Discriminator\", \"Loan Status\", \"Amount\", \"Interest Rate\", \"Status\", \"Errors (if any)\"")
 
       if args[:loan_id]
         lid = args[:loan_id].to_i
@@ -48,6 +48,7 @@ namespace :mostfit do
 
       Loan.all(hash).each{|l|
         last_history = LoanHistory.first(:loan_id => l.id, :date.lte => Date.today, :order => [:date.desc], :status => [:disbursed, :outstanding])
+        puts last_history
         next unless last_history
         next unless last_history.date >= last_date
 
@@ -131,9 +132,9 @@ namespace :mostfit do
         }
         Loan.get(l.id).update_history
         if errors.length > 0
-          f.puts("#{l.id}, #{l.loan_product_id}, \"#{l.loan_product.name}\", \"#{l.loan_product.loan_type_string}\", #{l.loan_product.min_interest_rate}, #{l.discriminator}, #{l.amount}, #{l.interest_rate}, errors, #{errors.join(';')}")
+          f.puts("#{l.id}, #{l.loan_product_id}, \"#{l.loan_product.name}\", \"#{l.loan_product.loan_type_string}\", #{l.loan_product.min_interest_rate}, #{l.discriminator}, \"#{l.status}\", #{l.amount}, #{l.interest_rate}, errors, #{errors.join(';')}")
         else
-          f.puts("#{l.id}, #{l.loan_product_id}, \"#{l.loan_product.name}\", \"#{l.loan_product.loan_type_string}\", #{l.loan_product.min_interest_rate}, #{l.discriminator}, #{l.amount}, #{l.interest_rate}, success, #{errors.join(';')}")
+          f.puts("#{l.id}, #{l.loan_product_id}, \"#{l.loan_product.name}\", \"#{l.loan_product.loan_type_string}\", #{l.loan_product.min_interest_rate}, #{l.discriminator}, \"#{l.status}\", #{l.amount}, #{l.interest_rate}, success, #{errors.join(';')}")
         end
       }
       f.close

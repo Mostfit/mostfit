@@ -16,4 +16,8 @@ class Area
   validates_present :manager, :region
   validates_length :name, :min => 1
 
+  def location
+    Location.first(:parent_id => self.id, :parent_type => "area")
+  end
+
 end

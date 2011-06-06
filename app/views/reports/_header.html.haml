@@ -1,0 +1,11 @@
+%tr.header
+  - @report.columns.each do |column|
+    %th{:colspan => column.colspan}
+      = column.name.to_s.gsub(/_/, ' ').capitalize
+%tr.header
+  - @report.columns.map{|c| pad(c)}.flatten.each do |column|
+    - if column
+      %th{:colspan => column.colspan}
+        = column.name.to_s.capitalize
+    - else
+      %th

@@ -19,6 +19,9 @@
       Branches
     %li#info
       Info
+    - if Mfi.first.map_enabled
+      %li#map
+        Map
   %div.tab
     %h2 Branches in this area
     - if @area.branches.blank?
@@ -39,3 +42,7 @@
             = link_to b.name, resource(b)
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@area.id}?for=area"}
+  - if Mfi.first.map_enabled        
+    %div.tab
+      = js_include_tag :map
+      = partial "locations/map", {:obj => @area}

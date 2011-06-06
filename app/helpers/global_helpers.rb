@@ -89,8 +89,8 @@ module Merb
       end
       html = select col,
         :collection   => collection,
-        :name         => "#{obj.class.to_s.snake_case}[#{id_col}]",
-        :id           => "#{obj.class.to_s.snake_case}_#{id_col}",
+        :name         => attrs[:name] || "#{obj.class.to_s.snake_case}[#{id_col}]",
+        :id           => attrs[:id] || "#{obj.class.to_s.snake_case}_#{id_col}",
         :selected     => (obj.send(id_col) ? obj.send(id_col).to_s : nil),
         :prompt       => (attrs[:prompt] or "&lt;select a funding line&gt;")
       html.gsub('!!!', '&nbsp;')  # otherwise the &nbsp; entities get escaped

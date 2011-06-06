@@ -19,6 +19,9 @@
       Areas
     %li#info
       Info
+    - if Mfi.first.map_enabled
+      %li#map
+        Map
   %div.tab
     %h3
       == Areas under #{@region.name}
@@ -51,3 +54,7 @@
               = link_to 'Edit', resource(a, :edit)
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@region.id}?for=region"}
+  - if Mfi.first.map_enabled        
+    %div.tab
+      = js_include_tag :map
+      = partial "locations/map", {:obj => @region}

@@ -282,13 +282,12 @@ class Report
   end
 
   def get_payment_extra_and_froms(centers, funder_loan_ids)
-    extra_condition, extra_selects = "", ""
+    extra_condition = ""
     froms = ["payments p", "clients cl", "centers c"]
 
     if self.branch_id
       center_ids  = centers.keys.length>0 ? centers.keys.join(',') : "NULL"
       extra_condition += "AND c.id in (#{center_ids})"
-      extra_selects   += ", c.id center_id"
     end
 
     if self.loan_product_id
@@ -321,7 +320,67 @@ class Report
       extra_condition += "and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
       extra_condition += "and l.cycle_number = #{lc}"
     end
-    [froms.uniq.join(", "), extra_condition, extra_selects]
+    [froms.uniq.join(", "), extra_condition]
+  end
+
+  # This function adds corresponding rows of 'obj' in histories, advances, balances etc 
+  # to data hash at key obj.
+  def add_outstanding_to(data, obj, histories, advances, balances, old_balances, defaults)
+    #0              1                 2                3              4              5     6                  7         8    9,10,11     12       
+    #amount_applied,amount_sanctioned,amount_disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults
+    history  = histories[obj.id][0]       if histories.key?(obj.id)
+    advance  = advances[obj.id][0]        if advances.key?(obj.id)
+    balance  = balances[obj.id][0]        if balances.key?(obj.id)
+    old_balance = old_balances[obj.id][0] if old_balances.key?(obj.id)
+    
+    if history
+      principal_scheduled = history.scheduled_outstanding_principal
+      total_scheduled     = history.scheduled_outstanding_total
+      
+      principal_actual    = history.actual_outstanding_principal
+      total_actual        = history.actual_outstanding_total
+    else
+      return
+    end
+
+    add_to_result(data, obj, 7, principal_actual)
+    add_to_result(data, obj, 9, total_actual)
+    add_to_result(data, obj, 8, total_actual - principal_actual)
+
+    #overdue
+    if defaults[obj.id]
+      add_to_result(data, obj, 10, defaults[obj.id].pdiff)
+      add_to_result(data, obj, 12, defaults[obj.id].tdiff)
+      add_to_result(data, obj, 11, defaults[obj.id].tdiff - defaults[obj.id].pdiff)
+    end
+    
+    new_advance         = advance ? advance.advance_total : 0
+    new_advance_balance = balance ? balance.balance_total : 0
+    old_advance_balance = old_balance ? old_balance.balance_total : 0
+    #advance
+    add_to_result(data, obj, 13, new_advance)
+    add_to_result(data, obj, 14, new_advance + old_advance_balance - new_advance_balance )
+    add_to_result(data, obj, 15, new_advance_balance)
+    data
+  end 
+
+  def add_payments_to(data, obj, payment)
+    if payment.ptype==1
+      add_to_result(data, obj, 3, payment.amount.round(2))
+    elsif payment.ptype==2
+      add_to_result(data, obj, 4, payment.amount.round(2))
+    elsif payment.ptype==3
+      add_to_result(data, obj, 5, payment.amount.round(2))
+     end
+    data[obj][6] = data[obj][3] + data[obj][4] + data[obj][5]
+    data
+  end
+
+
+  def add_to_result(data, obj, column, value)
+    data[obj] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    data[obj][column] ||= 0
+    data[obj][column] += value
   end
 
 end

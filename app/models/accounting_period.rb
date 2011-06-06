@@ -33,7 +33,8 @@ class AccountingPeriod
   end
 
   def cannot_overlap
-    overlaps = AccountingPeriod.all(:end_date.lte => end_date, :end_date.gt => begin_date) or AccountingPeriod.all(:begin_date.gte => begin_date, :begin_date.lt => end_date)
+    overlaps = AccountingPeriod.all(:end_date.lte => end_date, :end_date.lgt => begin_date)
+    overlaps = AccountingPeriod.all(:begin_date.gte => begin_date, :begin_date.lt => end_date) if overlaps.empty?
     return true if overlaps.empty?
     return [false, "Your accounting period overlaps with other accounting periods"]
   end

@@ -109,6 +109,13 @@ class Account
     return datum_balance + balance_from_postings
   end
 
+  def balance_as_of_now
+    opening_balance_amount = (opening_balance_as_of Date.today) || 0.0
+    date_params = {"journal.date" => Date.today}
+    balance_from_postings = (postings(date_params).aggregate(:amount.sum)) || 0.0
+    return opening_balance_amount + balance_from_postings
+  end
+
   # Retreats backward in time to the earliest accounting period that has a balance
   # for us, returns the balance and the date
   def get_past_period_opening_balance_and_date(for_date = Date.today)

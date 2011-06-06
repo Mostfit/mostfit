@@ -184,10 +184,6 @@
             %td
               Include unapproved loans ?
               = check_box(:name => "#{report}[include_unapproved_loans]", :value => "1", :checked => (params[report] and params[report].key?(:include_unapproved_loans) and params[report][:include_unapproved_loans] == "1" ? true : false))
-          - if @report.respond_to?(:report_by_loans_created)
-            %td
-              = check_box(:name => "#{report}[report_by_loans_created]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loans_created) and params[report][:report_by_loans_created] == "1" ? true : false))
-              Report by Loans Created
           - if @report.respond_to?(:group_by_types)
             %td
               Group by:
@@ -217,13 +213,17 @@
       %table{:style => "padding-top: 0px;"}
         %tr
           - if @report.respond_to?(:loan_cycle)
-            %td
-              Loan Cycle:
-              - lc = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-              = select(:loan_cycle, :collection => lc, :prompt => "select loan cycle")
-          - if @report.respond_to?(:report_by_loan_disbursed)
-            = check_box(:name => "#{report}[report_by_loan_disbursed]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loan_disbursed) and params[report][:report_by_loan_disbursed] == "1" ? true : false))
-            Show loans disbursed during selected date range only
+            Loan Cycle:
+            - lc = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+            = select(:loan_cycle, :collection => lc, :prompt => "select loan cycle")
+          %td
+            - if @report.respond_to?(:report_by_loan_disbursed)
+              = check_box(:name => "#{report}[report_by_loan_disbursed]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loan_disbursed) and params[report][:report_by_loan_disbursed] == "1" ? true : false))
+              Show loans disbursed during selected date range only
+            - if @report.respond_to?(:report_by_loans_created)
+              = check_box(:name => "#{report}[report_by_loans_created]", :value => "1", :checked => (params[report] and params[report].key?(:report_by_loans_created) and params[report][:report_by_loans_created] == "1" ? true : false))
+              Report by Loans Created
+
 
         %tr
           %td

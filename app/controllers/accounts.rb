@@ -108,6 +108,19 @@ class Accounts < Application
     render :layout => layout?
   end
 
+  def book
+    if params[:accounting_period_id] and not params[:accounting_period_id].blank?
+      @accounting_period = AccountingPeriod.get(params[:accounting_period_id])
+    else
+      @accounting_period = AccountingPeriod.all(:order => [:end_date]).last
+    end
+    @account = Account.get(params[:account_id])
+    @from_date = @accounting_period.begin_date || @account.account_earliest_date - 1
+    @to_date =  @accounting_period.end_date || Date.today
+    @posting_hash = Posting.all(:account => @account, "journal.date.lte" => @to_date, "journal.date.gte" => @from_date).paginate(:page => params[:page], :per_page => 20)
+    partial :book, :layout => layout?
+  end
+
   private
   def get_context
     @branch = Branch.get(params[:branch_id]) if params.key?(:branch_id)
