@@ -6,7 +6,7 @@
     = submit "GO"
 
   %b Ledger entries for - 
-  = @accounting_period.name
+  = @accounting_period.name if @accounting_period
   %table.form.narrow
     %tr.total
       %td

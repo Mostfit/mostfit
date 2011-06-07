@@ -17,6 +17,17 @@ class Bucket < Hash
   end
 end
 
+# Conjure a bucket class on demand ;). So, we don't have to define empty bucket
+# classes for each model that we want to use bucketing with.
+module Kernel
+  def self.const_missing(name)
+    if name.to_s =~ /Bucket\z/
+      const_set(name, Class.new(Bucket))
+    else
+      super
+    end
+  end
+end
 
 class LoanBucket < Bucket
 
@@ -41,15 +52,18 @@ module DataMapper
   class Collection
     
     def bucket_by(buckets = nil)
-      result = Kernel.const_get("#{self.first.model.to_s}Bucket").new
-        
+      result = Kernel.const_get("#{self.first.model.to_s}Bucket").new {|h, k| h[k] = []}
+
+      if buckets.is_a? Symbol
+        aggregate(buckets, :id).each do |k, v|
+          result[k] << v
+        end
+        return result
+      end
+
       self.map do |x| 
         r = yield(x)
-        if result.has_key?(r)
-          result[r] << x.id
-        else
-          result[r] = [x.id]
-        end
+        result[r] << x.id
       end
       # result looks like this: {1000 => [1,4,5,.....loan_ids], 2000 => [x,y,z...loan_ids]}
       bucketed_results = LoanBucket.new
