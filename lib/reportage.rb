@@ -55,7 +55,9 @@ module DataMapper
       result = Kernel.const_get("#{self.first.model.to_s}Bucket").new {|h, k| h[k] = []}
 
       if buckets.is_a? Symbol
-        aggregate(buckets, :id).each do |k, v|
+        # some properties might be lazily loaded, so first make sure they are
+        # available, and then aggregate
+        all(:fields => [buckets, :id]).aggregate(buckets, :id).each do |k, v|
           result[k] << v
         end
         return result
