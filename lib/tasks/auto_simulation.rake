@@ -6,9 +6,9 @@ end
 
 require "merb-core"
 require "fastercsv"
-require "lib/tasks/point.rb"
-require "lib/tasks/cluster.rb"
-require "lib/tasks/kmean.rb"
+require "lib/automater/point.rb"
+require "lib/automater/cluster.rb"
+require "lib/automater/kmean.rb"
 require "pp"
 
 # this loads all plugins required in your init file so don't add them
@@ -45,7 +45,7 @@ namespace :mostfit do
 
     fees = FasterCSV.parse(File.read("db/fees.csv")).flatten
     (0...fees.length/5).each {|i|
-      fee = Fee.create(:name => fees[5*i], :percentage => fees[5*i+1].to_f, :amount => fees[5*i+2].to_i, :min_amount => fees[5*i+3].to_i, :max_amount => fees[5*i+4].to_i, :payable_on => :loan_applied_on)
+      fee = Fee.first(:name => fees[5*i], :percentage => fees[5*i+1].to_f) || Fee.create(:name => fees[5*i], :percentage => fees[5*i+1].to_f, :amount => fees[5*i+2].to_i, :min_amount => fees[5*i+3].to_i, :max_amount => fees[5*i+4].to_i, :payable_on => :loan_applied_on)
       fee.save unless fee.valid? 
     }
 
@@ -83,18 +83,33 @@ namespace :mostfit do
       insurance_product = InsuranceProduct.first(:name => iproducts[2*i]) || InsuranceProduct.create(:name => iproducts[2*i], :insurance_company => InsuranceCompany.first(:name => "#{iproducts[2*i+1]}"))
       insurance_product.save unless insurance_product.valid?
     }
+
+    if Region.all.empty?
+      region_count, branch_count, center_count, ccount, n_center = 0, -1, 0, 0, 0
+    else
+      region_count = Region.count                  # total number of regions
+      branch_count = Area.last.branches.count-1    # total number of branches in the last area - 1
+      center_count = Branch.last.centers.count     # total number of centers in the last branch
+      center_manager = Branch.last.centers.last.manager
+      ccount = Region.last.areas.last.branches.count + Region.last.areas.last.branches.centers.count
+      raw_data = FasterCSV.parse(File.read("db/in_lat_long#{regions[regions.index(Region.last.name)-1]}.csv")).flatten
+      n_center = raw_data.length/3
+      data = []
+      (0...raw_data.length/3).each {|i|
+        point = Point.new(raw_data[3*i], raw_data[3*i+1].to_f, raw_data[3*i+2].to_f)
+        data.push(point)
+      }
+      clusters = kmeans(data, n_center/25 + 1, 10.0)
+      clusters.each{|cluster| cluster.centerize}      
+    end    
     
-    region_count = 0
-    branch_count = 0
-    center_count = 0
-    days = [:monday, :tuesday, :wednesday, :thursday, :friday]
     c_date = Date.today
     c_time = Time.now
     count = 0
+    DAYS = [:monday, :tuesday, :wednesday, :thursday, :friday]
     CASTES = ['sc', 'st', 'obc', 'general']
     RELIGIONS = ['hindu', 'muslim', 'sikh', 'jain', 'buddhist', 'christian']
-    ccount, n_center =0, 0
-
+    
     while true
       region = Region.last if !Region.nil?
       area = Area.last if !Area.nil?
@@ -107,7 +122,7 @@ namespace :mostfit do
           point = Point.new(raw_data[3*i], raw_data[3*i+1].to_f, raw_data[3*i+2].to_f)
           data.push(point)
         }
-        clusters = kmeans(data, n_center/25+1, 10.0)
+        clusters = kmeans(data, n_center/25 + 1, 10.0)
         clusters.each{|cluster| cluster.centerize}
     
         regional_manager = StaffMember.create(:name => names[(rand()*len).to_i], :active => true, :creation_date => c_date)
@@ -125,10 +140,12 @@ namespace :mostfit do
         area_location.save
 
         region_count += 1
+        branch_count = -1
       end
 
-      if Branch.all.empty? or Branch.last.centers.length>=clusters[branch_count].points.length
+      if branch_count==-1 or Branch.last.centers.length>=clusters[branch_count].points.length
         branch_count += 1
+        center_count = 0
         branch_manager = StaffMember.create(:name => names[(rand()*len).to_i], :active => true, :creation_date => c_date)
         branch = Branch.create(:name => clusters[branch_count].center.name, :code => "R#{region.id}A#{area.id}B#{branch_count}", :area => area,
                                :manager => branch_manager, :creation_date => c_date)
@@ -142,7 +159,7 @@ namespace :mostfit do
           center_manager = StaffMember.create(:name => names[(rand()*len).to_i], :active => true, :creation_date => c_date)
         end
         center = Center.create(:branch => branch, :manager => center_manager, :name => clusters[branch_count].points[center_count].name, :code => branch.code+"C#{center_count}",
-                               :meeting_day => days[center_count%5], :meeting_time_hours => "#{7+center_count%5}", :meeting_time_minutes => 0,
+                               :meeting_day => DAYS[center_count%5], :meeting_time_hours => "#{7+center_count%5}", :meeting_time_minutes => 0,
                                :creation_date => c_date)
         center.save!
 
@@ -184,7 +201,7 @@ namespace :mostfit do
             center_manager.save!
           end
           center = Center.create(:branch => branch, :manager => center_manager, :name => clusters[branch_count].points[center_count].name, :code => branch.code+"C#{center_count}",
-                                 :meeting_day => days[center_count%5], :meeting_time_hours => "#{7+center_count%5}", :meeting_time_minutes => 0,
+                                 :meeting_day => DAYS[center_count%5], :meeting_time_hours => "#{7+center_count%5}", :meeting_time_minutes => 0,
                                  :creation_date => c_date)
           center.save
           
@@ -226,11 +243,10 @@ namespace :mostfit do
         }
       end
 
-      Loan.all.each{|loan|
-        loan.payment_schedule.each{|pay|
-          if pay[0]==c_date
-            loan.repay(pay[1][:principal]+pay[1][:interest], User.first, c_date, loan.client.client_group.center.manager, false, NORMAL_REPAYMENT_STYLE, :default)
-          end
+      LoanHistory.all(:date => c_date, :status => :outstanding, :principal_due.gt => 0).each {|loan_his|
+        loan = loan_his.loan
+        loan.payment_schedule.find_all{|pay| pay[0]==c_date}.each{|pay|
+          loan.repay(pay[1][:principal]+pay[1][:interest], User.first, c_date, loan.client.client_group.center.manager, false, NORMAL_REPAYMENT_STYLE, :default)
         }
       }
 

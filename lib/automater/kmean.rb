@@ -4,8 +4,8 @@ def kmeans(data, k, delta=10.0)
   clusters = []
 
   # Assign intial values for all clusters
-  (1..k).each do |point|
-    index = (data.length * rand).to_i
+  (0...k).each do |i|
+    index = (((i*1.0)/k)*data.length).to_i
 
     rand_point = data[index]
     c = Cluster.new(rand_point)
