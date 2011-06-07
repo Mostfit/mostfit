@@ -12,6 +12,7 @@ class Journal
   property :created_at,     DateTime, :index => true  
   property :deleted_at,     DateTime, :index => true  
   property :batch_id,       Integer, :nullable => true
+  property :uuid,           String, :nullable => false
   belongs_to :batch
   belongs_to :journal_type
   has n, :postings
@@ -72,7 +73,8 @@ class Journal
      
       journal = Journal.create(:comment => journal_params[:comment], :date => journal_params[:date]||Date.today,
                                :transaction_id => journal_params[:transaction_id],
-                               :journal_type_id => journal_params[:journal_type_id])
+                               :journal_type_id => journal_params[:journal_type_id],
+                               :uuid => UUID.generate)
       
       amount = journal_params.key?(:amount) ? journal_params[:amount].to_i : nil
 
@@ -148,6 +150,7 @@ class Journal
                 x.NARRATION j.comment
                 x.VOUCHERTYPENAME j.journal_type.name
                 x.VOUCHERNUMBER j.id
+                x.REMOTEID j.uuid
                 credit_posting.each do |p|
                   x.tag! 'ALLLEDGERENTRIES.LIST' do
                     x.LEDGERNAME(p.account.name)
