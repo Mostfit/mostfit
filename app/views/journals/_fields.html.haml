@@ -1,11 +1,6 @@
 %table
   %tr
     %td
-      Voucher Type
-    %td
-      = select :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :prompt=> "Select voucher"
-  %tr
-    %td
       Date
     %td
       = date_select_for @journal, :date
@@ -29,5 +24,7 @@
       Transaction ID
     %td
       =text_field :transaction_id
+      =text_field :journal_type_id, :value => @journal_type.nil? ? 1 : @journal_type.id, :hidden => true
+
 %p
   = submit "Create"

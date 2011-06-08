@@ -222,5 +222,6 @@ class Journals < Application
   private
   def get_context
     @branch       = Branch.get(params[:branch_id]) if params[:branch_id] and params[:branch_id].to_i > 0
+    @journal_type       = JournalType.get(params[:journal_type_id]) if params[:journal_type_id] and params[:journal_type_id].to_i > 0
   end
 end # Journals

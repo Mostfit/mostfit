@@ -516,9 +516,11 @@ module Merb
       }.join(' | ')
     end
 
-    def select_accounts(name, branch=nil, attrs = {})
+    def select_accounts(name, branch=nil, journal_type=nil, attrs = {})
       collection = []
-      Account.all(:branch => branch).group_by{|a| a.account_type}.sort_by{|at, as| at.name}.each do |account_type, accounts|
+      @acc = Account.all(:branch => branch)
+      @acc = @acc.all(:account_category => ["Cash", "Bank"]) if journal_type == JournalType.get(4)
+      @acc.group_by{|a| a.account_type}.sort_by{|at, as| at.name}.each do |account_type, accounts|
         collection << ['', "#{account_type.name}"]
         accounts.sort_by{|a| a.name}.each{|a| collection << [a.id.to_s, "!!!!!!!!!#{a.name}"] }
       end
