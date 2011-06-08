@@ -110,7 +110,7 @@ describe Fee do
     @f.fees_for(@loan).should == 1
   end
 
-
+## start of loan fee spec
   it "should return correct fee_schedule for loan" do
     @f.percentage = 0.1
     @loan_product.fees = [@f]
@@ -314,7 +314,9 @@ describe Fee do
     @loan.disbursed_by = nil
     @loan.save
   end
+ ### end of loan fee spec
 
+### start of client fee spec
 
   it "should give correct fee schedule for client" do
     @client_fee = Fee.new(:name => "client fee", :amount => 20, :payable_on => :client_date_joined)
@@ -409,4 +411,7 @@ describe Fee do
     @client.levy_fees
     @client.fees_payable_on.should == {@fee1 => 20 - 5, @fee2 => 10}
   end
+
+
+### client fees
 end
