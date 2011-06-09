@@ -24,16 +24,20 @@
       %form{:class => "_remote_", :method => "GET", :action => resource(:journals, :new, {:return => params[:return]})}
         %b Select branch
         = select :name => :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Head office accounts", :selected => params[:branch_id]
+        %b Journal Type
+        = select :name => :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :selected => params[:journal_type_id]
         %input{:type => :hidden, :name => "_target_", :value => "voucher_container"}
         %input{:type => :hidden, :name => "return", :value => params[:return]}
         = submit "GO"
+
     - if @branch
       %h2
         = @branch.name
-      = form_for(@journal, :action => resource(:journals, {:branch_id => (@branch ? @branch.id : nil), :return => params[:return]}), :method => :post) do
+      = form_for(@journal, :action => resource(:journals, {:branch_id => (@branch ? @branch.id : nil), :journal_type_id => @journal_type, :return => params[:return]}), :method => :post) do
         = partial :fields
     - else
       %h2
         HO journal entry
       = form_for(@journal, :action => resource(:journals, {:return => params[:return]}), :method => :post) do
         = partial :fields
+

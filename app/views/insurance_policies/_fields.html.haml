@@ -31,7 +31,7 @@
       Premium
     %td
       = text_field :premium
-  %tr 
+  %tr{:style => "background-color:#C0C0C0"} 
     %td
       = check_box(:name => "fees[premium_as_fees]", :value => 1)
       Apply premium as 
@@ -39,6 +39,9 @@
       - fee_list = Fee.all.map{|x| [x.id, x.name] if x.payable_on.to_s =~ /policy/}
       - fee_list.delete(nil)
       = select(:name => "fees[fee_id]", :collection => fee_list, :prompt => "")
+  %tr{:style => "background-color:#C0C0C0"}
+    %td
+      payable on
     %td
       = date_select :fee_date, nil
   %tr

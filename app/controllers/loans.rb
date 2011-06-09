@@ -43,7 +43,8 @@ class Loans < Application
     fee_params = params.delete(:fees)
     @loan = klass.new(attrs)
     @loan.loan_product = @loan_product
-    if params.include?(:premium_as_fees) and fee_params[:premium_as_fees]
+    debugger
+    if (not fee_params.nil?) and fee_params[:premium_as_fees]
         @fee = Fee.get(fee_params[:fee_id])
         payable_models ||= Fee::PAYABLE.map{|m| [m[0], [m[1], m[2]]]}.to_hash
         method = payable_models[@fee.payable_on][1] if @fee
