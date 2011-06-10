@@ -1,9 +1,5 @@
 # Reportage - the Mostfit Reporting Library
 
-# TODO - convert LoanBucket into sublass of Bucket
-#      - use aggregate for database fields to speed things up
-      
-
 class Bucket < Hash
   def columns(cols, date)
     rv = {}

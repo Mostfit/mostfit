@@ -96,37 +96,43 @@ class Rules < Application
   end
 
   def get
-    id = params[:id].to_i
-    type = params[:type]
-    if type != "precondition"
-      type = "condition" #this step sanitizes "type", now this ensures that type is either "precondition" or "condition" and prevents XSS attacks since we will reflect back type to user
-    end
+    # these are required to build forms on fly
+    id            = params[:id].to_i
+    condition_id  = params[:condition_id].to_i
+    variable_id   = params[:variable_id].to_i
+    return_only_models   = params[:return_only_models]
 
-    model, key_type = Condition.get_model(params[:for])
-    condition_id = params[:condition_id]
-    variable_id = params[:variable_id]
-    return_only_models = params[:return_only_models]
-    single_variable_mode = params[:single_variable_mode] #if this is 1, then we are in single veriable mode (this can be absent in which case, we assume more than one variables) - this ugly field is needed only for date since date - date should return int_selector while date - nil returns date_selector
-    if (variable_id == nil) or (condition_id == nil) or (return_only_models == nil)
-      return "problem 001"
-    end
-    condition_id = condition_id.to_i
-    variable_id = variable_id.to_i
-    if single_variable_mode == nil then single_variable_mode = 0 end
-    single_variable_mode = single_variable_mode.to_i
+    # make sure that type is either 'condition', or 'precondition'
+    type = (params[:type] == 'precondition' ? 'precondition' : 'condition')
+
+    # the selected input can be a model, or its properties and associations
+    model = get_model_for(params[:for], params[:prev_field])
 
     if model
-      name, field, choices = Condition.get_field_choices_and_name(params[:for])
+      # the selected field is a model, so we present its properties and
+      # associations to the user for further selection
+
+      choices = get_choices_for(model)
       name = "rule[#{type}][#{condition_id}][variable][#{variable_id}][keys][]"
-      return render(select(:name => name, :id => "#{type}_select_#{id}", :class => "rules", :collection => choices), :layout => false)
-    elsif return_only_models == "true"
-      return "" #this is the situation when someone is when editing a variable
+      return render(select(:name => name, :id => "#{type}_select_#{id}", :class => "rules", :collection => choices, :model => model.to_s.snake_case), :layout => false)
     else
-      model = Kernel.const_get(params["prev_field".to_sym].singularize.camelcase)
-      if model == nil
-        return "nil1"
+      if return_only_models == 'true'
+        return ''
       end
-      property = model.properties.find{|p| p.name.to_s==params[:for]} || model.relationships[params[:for]]
+      # selected field is a property
+
+      single_variable_mode = params[:single_variable_mode] #if this is 1, then we are in single veriable mode (this can be absent in which case, we assume more than one variables) - this ugly field is needed only for date since date - date should return int_selector while date - nil returns date_selector
+      if (variable_id == nil) or (condition_id == nil)# or (return_only_models == nil)
+        return "problem 001"
+      end
+      if single_variable_mode == nil then single_variable_mode = 0 end
+      single_variable_mode = single_variable_mode.to_i
+
+      model = get_model_for(params["prev_field"])
+      #if model == nil
+        #return "nil1"
+      #end
+      property = model.properties.find{|p| p.name.to_s==params[:for]} #|| model.relationships[params[:for]]
       name = "rule[#{type}][#{condition_id}][const_value]"
       type_name = "rule[#{type}][#{condition_id}][valuetype]" #will be either "string", "date" or "int"
       
