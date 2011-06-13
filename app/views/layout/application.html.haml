@@ -73,9 +73,9 @@
     #footer
       %p{:style => "position: relative; right: 10%; float: right;"}
         - if session.authenticated? and session.user.role == :admin and Merb.env == "development"
-          %form{:action => "/admin/proxy_logon", :method => :post}
+          %form{:action => "/admin/proxy_logon", :methoid => :post}
             login as
-            = select :user_id, :collection => User.all(:order => [:login], :role.not => :maintainer).map{|u| [u.id, u.login]}
+            = select :user_id, :collection => User.all(:order => [:login]).map{|u| [u.id, u.login]}
             = submit "go"
       %p{:style => "position: relative; right: 10%; float: right;"}
         =image_tag("/images/mostfit_logo.png", :height => 80)

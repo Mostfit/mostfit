@@ -1,13 +1,5 @@
 class Users < Application
   before :ensure_admin, :only => [:edit, :new, :create, :update, :delete, :destroy, :amind_change_password]
-  before :ensure_not_maintainer
-
-  def ensure_not_maintainer
-    if @user and @user.role == :maintainer
-      raise NotFound
-      throw :halt
-    end
-  end
 
   def show(id)
     u = User.get(id)

@@ -74,7 +74,7 @@ module Misfit
       },
       :maintainer => {
          :all =>
-[:maintainer_maintain]
+[:maintain]
       }
     }
 
