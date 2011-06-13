@@ -1,0 +1,15 @@
+TODO:
+
+- Fix Maintainer.description and Maintainer.version
+- Fix LICENSE with your name
+- Fix Rakefile with your name and contact info
+- Add your code to lib/maintainer.rb
+- Add your Merb rake tasks to lib/maintainer/merbtasks.rb
+
+Remove anything that you don't need:
+
+- app/controllers/main.rb Maintainer::Main controller
+- app/views/layout/maintainer.html.erb
+- spec/controllers/main_spec.rb controller specs
+- public/* any public files
+- stubs/* any stub files

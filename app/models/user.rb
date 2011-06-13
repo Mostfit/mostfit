@@ -16,8 +16,6 @@ class User
   ROLES = [:data_entry, :mis_manager, :admin, :read_only, :staff_member, :funder, :accountant, :maintainer]
   property :role, Enum.send('[]', *ROLES), :nullable => false
 
-  default_scope(:default).update(:role.not => :maintainer)
-
   # it gets                                   
   #   - :password and :password_confirmation accessors
   #   - :crypted_password and :salt db columns        
