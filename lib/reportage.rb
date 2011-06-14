@@ -94,7 +94,7 @@ module DataMapper
   class Collection
     
     def bucket_by(buckets = nil)
-      result = Kernel.const_get("#{self.first.model.to_s}Bucket").new {|h, k| h[k] = []}
+      result = Kernel.const_get("#{model.to_s}Bucket").new {|h, k| h[k] = []}
 
       if buckets.is_a? Symbol
         # some properties might be lazily loaded, so first make sure they are
