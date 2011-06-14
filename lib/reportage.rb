@@ -178,6 +178,7 @@ module DataMapper
       bucketed_results = LoanBucket.new
       if buckets
         buckets.map{|b| bucketed_results[b] = []}
+
         result.map do |k,v|
           bucket_found = false
           buckets.each_with_index do |b,i|
