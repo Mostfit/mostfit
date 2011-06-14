@@ -6,10 +6,6 @@ class RepaymentOverdue < Report
   def initialize(params, dates, user)
     @date   = (dates and dates[:date]) ? dates[:date] : Date.today
     @name   = "Report as of #{@date}"
-    if params
-      @branch_id = params[:branch_id]
-      @center_id = params[:center_id]
-    end
     get_parameters(params, user)
   end
 
@@ -22,7 +18,7 @@ class RepaymentOverdue < Report
   end
 
   def generate
-    data, clients, loans, centers, branches, payments, hash = {}, {}, {}, {}, {}, {}, {}
+    data, clients, loans, centers, branches, payments, hash = {}, {}, {}, {}, {}, {:principal => {}, :interest => {}, :fees => {}}, {}
     hash[:branch_id] = @branch.map{|x| x.id}
     hash[:center_id] = @center.map{|x| x.id}
     hash[:loan_product_id] = self.loan_product_id  if self.loan_product_id
@@ -53,9 +49,12 @@ class RepaymentOverdue < Report
         data[b][c] ||= {}
         histories[c.id].each{|row|
           data[b][c][clients[row.client_id]] ||= []
-          data[b][c][clients[row.client_id]] << [row.loan_id, loans[row.loan_id], payments[:principal][row.loan_id], payments[:interest][row.loan_id], payments[:fees][row.loan_id],
-                                                 payments[:principal][row.loan_id] + payments[:interest][row.loan_id] + payments[:fees][row.loan_id],
-                                                 loans[row.loan_id] - payments[:principal][row.loan_id],
+          prin  = payments[:principal][row.loan_id]||0
+          int   = payments[:interest][row.loan_id]||0
+          fee   = payments[:fees][row.loan_id]||0
+          total = prin + int + fee
+          data[b][c][clients[row.client_id]] << [row.loan_id, loans[row.loan_id], prin, int, fee, total,                                                 
+                                                 loans[row.loan_id] - prin,
                                                  row.pdiff, row.tdiff-row.pdiff, 0]
         } if histories[c.id]
       }
