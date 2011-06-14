@@ -9,8 +9,8 @@
   %br
   %br
   %table.narrow.form
-    - closeAP = AccountingPeriod.all(:closed => false, :order => [:begin_date.asc])
-    - reopenAP = AccountingPeriod.all(:closed => true, :order => [:begin_date.asc])
+    - closeAP = AccountingPeriod.all(:closed => false, :order => [:begin_date.desc])
+    - reopenAP = AccountingPeriod.all(:closed => true, :order => [:begin_date.desc])
     %thead
       %tr
         %th
