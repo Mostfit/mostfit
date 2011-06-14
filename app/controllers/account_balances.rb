@@ -7,7 +7,8 @@ class AccountBalances < Application
     @account = Account.get(params[:account_id])
     hash = {}
     hash[:account] = @account if @account
-    @account_balances = AccountBalance.all(hash)
+    @account_balances = AccountBalance.all(hash).sort_by{|ab| ab.accounting_period.begin_date}
+    #Note: Do not change the ordering of @account_balances
     display @account_balances, :layout => layout?
   end
 
@@ -60,7 +61,7 @@ class AccountBalances < Application
     if request.method == :get
       render
     else
-      @account_balance.verified_on = Date.today
+      @account_balance.verified_on = Time.now
       @account_balance.verified_by = session.user
       if  @account_balance.save
         redirect resource(@account, @accounting_period,:account_balances), :message => {:notice => "Account verified and closed"}
