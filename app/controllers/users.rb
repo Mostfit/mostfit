@@ -2,8 +2,11 @@ class Users < Application
   before :ensure_admin, :only => [:edit, :new, :create, :update, :delete, :destroy, :amind_change_password]
 
   def show(id)
-    u = User.get(id)
-    u ? u : nil
+    @user = User.get(id)
+    raise NotFound unless @user
+    @trails = AuditTrail.all(:auditable_id => @user.id, :auditable_type => "User", :order => [:created_at.desc])
+    @obj = @user
+    display @user
   end
 
   def index

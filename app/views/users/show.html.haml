@@ -1,0 +1,36 @@
+
+- if @user
+  %h1== User: <i>#{@user.login}</i>
+  %table.narrow.form{ :style => "width: 40%;" }
+    %tr.odd
+      %td Login
+      %td
+        %b= @user.login
+    %tr
+      %td Role
+      %td= @user.role.to_s.humanize
+    %tr.odd
+      %td Status
+      %td=@user.active ? "active" : "inactive"
+    %tr
+      %td Created At
+      %td=@user.created_at.to_s
+    %tr.odd
+      %td StaffMember
+      %td=@user.staff_member.name if @user.staff_member
+    %tr
+      %td Funder
+      %td=@user.funder.name if @user.funder
+  %p
+    = link_to_with_rights 'edit this user\'s details ', resource(@user, :edit), :class => "edit"
+
+  %div.tab_container
+    %ul.tabs
+      %li#history
+        History
+    %div.tab
+      = partial "audit_trails/list", :layout => false
+      %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+   
+
+      

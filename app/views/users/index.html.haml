@@ -21,7 +21,7 @@
       %td
         = user.id
       %td
-        %b= user.login
+        %b= link_to user.login, resource(user)
       %td
         = user.role.to_s.humanize
       %td
