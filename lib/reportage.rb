@@ -31,8 +31,9 @@ end #BucketResult
 class Bucket < Hash
   attr_accessor :_balances, :date, :date_from, :date_to
 
-  def initialize(dates = {})
+  def initialize(dates = {}, *args, &blk)
     set_dates(dates)
+    super(*args, &blk)
   end
 
   def set_dates(dates = {})
@@ -93,7 +94,7 @@ module DataMapper
   class Collection
     
     def bucket_by(buckets = nil)
-      result = Kernel.const_get("#{self.first.model.to_s}Bucket").new {|h, k| h[k] = []}
+      result = Kernel.const_get("#{model.to_s}Bucket").new {|h, k| h[k] = []}
 
       if buckets.is_a? Symbol
         # some properties might be lazily loaded, so first make sure they are
