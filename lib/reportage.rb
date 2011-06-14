@@ -2,6 +2,7 @@
 
 class BucketResult < Hash
 
+
   # The results from a Bucket#columns is stored as a BucketResult so that we can
   # print fancy tables and stuff
 
