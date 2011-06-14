@@ -31,8 +31,9 @@ end #BucketResult
 class Bucket < Hash
   attr_accessor :_balances, :date, :date_from, :date_to
 
-  def initialize(dates = {})
+  def initialize(dates = {}, *args, &blk)
     set_dates(dates)
+    super(*args, &blk)
   end
 
   def set_dates(dates = {})
