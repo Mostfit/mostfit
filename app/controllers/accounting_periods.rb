@@ -51,4 +51,19 @@ class AccountingPeriods < Application
     end
   end
 
+  def close(id)
+    raise NotPrivileged unless  session.user.role == :admin
+    @accounting_period = AccountingPeriod.get params[:id]
+    raise NotFound unless @accounting_period
+    if request.method == :get
+      render
+    else
+      @accounting_period.closed = !@accounting_period.closed
+      if @accounting_period.save
+        redirect url(:accounting_period), :message => {:notice => "Accounting Period #{@accounting_period.closed ? 'closed' : 'reopened'}"}
+      else
+        redirect resource(@accounting_period), :message => {:error => "Could not be verified"}
+      end
+    end
+  end
 end # AccountingPeriods
