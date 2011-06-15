@@ -2,25 +2,31 @@
 - if @user
   %h1== User: <i>#{@user.login}</i>
   %table.narrow.form{ :style => "width: 40%;" }
+    - counter = 1
     %tr.odd
       %td Login
       %td
         %b= @user.login
+    - counter+= 1
     %tr
-      %td Status
-      %td=@user.active ? "active" : "inactive"
-    %tr.odd
       %td Role
       %td= @user.role.to_s.humanize
     - if @user.staff_member
-      %tr
+      - counter+= 1
+      %tr{:class=>"#{'odd' if counter % 2 == 1}"}
         %td Staff Member
         %td=@user.staff_member.name 
     - if @user.funder
-      %tr{:class=>"#{'odd' if @user.staff_member}"}
+      - counter+= 1
+      %tr{:class=>"#{'odd' if counter % 2 == 1}"}
         %td Funder
         %td=@user.funder.name
-    %tr{:class=>"#{'odd' if @user.staff_member and not @user.funder}"}
+    - counter+= 1
+    %tr{:class=>"#{'odd' if counter % 2 == 1}"}
+      %td Status
+      %td=@user.active ? "active" : "inactive"
+    - counter+= 1
+    %tr{:class=>"#{'odd' if counter % 2 == 1}"}
       %td Created At
       %td=@user.created_at.to_s
   %p
