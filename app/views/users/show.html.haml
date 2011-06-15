@@ -2,15 +2,6 @@
 - if @user
   %h1== User: <i>#{@user.login}</i>
   %table.narrow.form{ :style => "width: 40%;" }
-<<<<<<< HEAD
-    - counter = 1
-=======
->>>>>>> Added User audit view and showing user details
-    %tr.odd
-      %td Login
-      %td
-        %b= @user.login
-<<<<<<< HEAD
     - counter+= 1
     %tr
       %td Role
@@ -44,34 +35,12 @@
             = select :preferred_locale, :collection => [["","---"]] + LOCALES.map{|s| [s[0].to_s, s[1].to_s]}, :selected => (@user.preferred_locale ? @user.preferred_locale : ""), :style => "margin-left: 20px; height: 20px; padding-top: 1px;"
             = submit "Update Locale", :style => "margin-left: 20px; height: 25px; padding-top: 1px;"
 
-=======
-    %tr
-      %td Status
-      %td=@user.active ? "active" : "inactive"
-    %tr.odd
-      %td Role
-      %td= @user.role.to_s.humanize
-    - if @user.staff_member
-      %tr
-        %td Staff Member
-        %td=@user.staff_member.name 
-    - if @user.funder
-      %tr{:class=>"#{'odd' if @user.staff_member}"}
-        %td Funder
-        %td=@user.funder.name
-    %tr{:class=>"#{'odd' if @user.staff_member and not @user.funder}"}
-      %td Created At
-      %td=@user.created_at.to_s
-<<<<<<< HEAD
     %tr.odd
       %td StaffMember
       %td=@user.staff_member.name if @user.staff_member
     %tr
       %td Funder
       %td=@user.funder.name if @user.funder
->>>>>>> Added User audit view and showing user details
-=======
->>>>>>> Made changes for user audit ticket #846
   %p
     = link_to_with_rights 'edit this user\'s details ', resource(@user, :edit), :class => "edit"
 
