@@ -42,12 +42,11 @@ class Bucket < Hash
     dates.each{|k,v| instance_variable_set("@#{k.to_s}",v)}
   end
 
-  # for now, lets bucket only by properties defined on the model
-  def group_by(group_by)
+  def group_by(group_by = nil, &blk)
     result = self.class.new
 
     each do |key, value|
-      result[key] = value.group_by(group_by)
+      result[key] = value.group_by(group_by, &blk)
     end
 
     result
