@@ -1,5 +1,23 @@
 # Reportage - the Mostfit Reporting Library
 
+class Array
+  # Find the smallest element in the array greater, than or equal to value.
+  # This assumes the array to be sorted
+  #
+  #   a = [10, 20, 30, 40, 50]
+  #   a.ceil(4)  #=> 10
+  #   a.ceil(10) #=> 10
+  #   a.ceil(12) #=> 20
+  #   a.ceil(60) #=> nil
+  def ceil(value)
+    each_cons(2) do |l, h|
+      return l if value == l
+      return h if value > l and value < h
+    end
+    return first if value < first
+  end
+end
+
 class BucketResult < Hash
 
 
