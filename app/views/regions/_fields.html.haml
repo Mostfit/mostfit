@@ -1,31 +1,31 @@
 %table
   %tr
     %td
-      Region Name
+      = I18n.t "region.fields.region_name", :default => "Region Name"
     %td
       = text_field :name
   %tr
     %td
-      Manager
+      = I18n.t "region.fields.manager", :default => "Manager"
     %td
       = select :manager_id, :collection => StaffMember.all.map{|s| [s.id, s.name]}, :prompt => "---"
   %tr
     %td
-      Address:
+      = I18n.t("region.fields.address", :default => "Address")
     %td
       ~ text_area :address, :rows => 6, :cols => 38
   %tr
     %td
-      Contact phone number:
+      = I18n.t("region.fields.contact_phone_number", :default => "Contact phone number")
     %td
       = text_field :contact_number, :size => 15
   %tr
     %td
-      Landmark:
+      = I18n.t("region.fields.landmark", :default => "Landmark")
     %td
       = text_field :landmark, :size => 25
   %tr
     %td
-      Creation date:
+      = I18n.t("region.fields.creation_date", :default => "Creation date")
     %td
       = date_select_for @region,  :creation_date

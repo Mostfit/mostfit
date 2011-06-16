@@ -1,0 +1,316 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"X-Language: en\n"
+
+msgctxt "center.approval.label"
+msgid "Approvals"
+msgstr "Approvals"
+
+msgctxt "center.approval.no_center"
+msgid "Not attached to any center"
+msgstr "Not attached to any center"
+
+msgctxt "center.approval.not_approval"
+msgid "No approvals today"
+msgstr "No approvals today"
+
+msgctxt "center.approval.on_time"
+msgid "on time"
+msgstr "on time"
+
+msgctxt "center.approval.table.name"
+msgid "Name"
+msgstr "Name"
+
+msgctxt "center.approval.table.sch_date"
+msgid "Scheduled Disbursal Date"
+msgstr "Scheduled Disbursal Date"
+
+msgctxt "center.approval.table.status"
+msgid "Status"
+msgstr "Status"
+
+msgctxt "center.disbursal.label"
+msgid "Disbursals"
+msgstr "Disbursals"
+
+msgctxt "center.disbursal.no_group"
+msgid "Not attached to any group"
+msgstr "Not attached to any group"
+
+msgctxt "center.disbursal.not_disbursal"
+msgid "No disbursals today"
+msgstr "No disbursals today"
+
+msgctxt "center.disbursal.on_time"
+msgid "on time"
+msgstr "on time"
+
+msgctxt "center.disbursal.table.name"
+msgid "Name"
+msgstr "Name"
+
+msgctxt "center.disbursal.table.sch_date"
+msgid "Scheduled Disbursal Date"
+msgstr "Scheduled Disbursal Date"
+
+msgctxt "center.disbursal.table.status"
+msgid "Status"
+msgstr "Status"
+
+msgctxt "center.payment.label"
+msgid "Repayments"
+msgstr "Repayments"
+
+msgctxt "center.payment.table.amount"
+msgid "amount"
+msgstr "amount"
+
+msgctxt "center.payment.table.disbursed_on"
+msgid "disbursed on"
+msgstr "disbursed on"
+
+msgctxt "center.payment.table.due"
+msgid "due"
+msgstr "due"
+
+msgctxt "center.payment.table.fee"
+msgid "fee"
+msgstr "fee"
+
+msgctxt "center.payment.table.installment"
+msgid "installment"
+msgstr "installment"
+
+msgctxt "center.payment.table.interest"
+msgid "interest"
+msgstr "interest"
+
+msgctxt "center.payment.table.loan_id"
+msgid "loan id"
+msgstr "loan id"
+
+msgctxt "center.payment.table.on_name"
+msgid "on name"
+msgstr "on name"
+
+msgctxt "center.payment.table.outstanding"
+msgid "outstanding"
+msgstr "outstanding"
+
+msgctxt "center.payment.table.paid"
+msgid "paid"
+msgstr "paid"
+
+msgctxt "center.payment.table.principal"
+msgid "principal"
+msgstr "principal"
+
+msgctxt "center.payment.table.total"
+msgid "total"
+msgstr "total"
+
+msgctxt "center.weeksheet.meeting.at"
+msgid "meeting at"
+msgstr "meeting at"
+
+msgctxt "center.weeksheet.meeting.center_man"
+msgid "center manager"
+msgstr "center manager"
+
+msgctxt "center.weeksheet.meeting.go"
+msgid "Go!"
+msgstr "Go!"
+
+msgctxt "center.weeksheet.meeting.hide_client"
+msgid "hide inactive clients"
+msgstr "hide inactive clients"
+
+msgctxt "center.weeksheet.meeting.next_meeting"
+msgid "next meeting"
+msgstr "next meeting"
+
+msgctxt "center.weeksheet.meeting.no_meeting"
+msgid "no meeting today"
+msgstr "no meeting today"
+
+msgctxt "center.weeksheet.meeting.pre_meeting"
+msgid "previous meeting"
+msgstr "previous meeting"
+
+msgctxt "center.weeksheet.meeting.today"
+msgid "today"
+msgstr "today"
+
+msgctxt "center.weeksheet.no_meeting"
+msgid "This day is not a meeting day"
+msgstr "This day is not a meeting day"
+
+msgctxt "center.weeksheet.record_link"
+msgid "Record these activities"
+msgstr "Record these activities"
+
+msgctxt "center.weeksheet.title"
+msgid "Week %{week} meeting sheet for center %{name}"
+msgstr "Week %{week} meeting sheet for center %{name}"
+
+msgctxt "region.error.manager"
+msgid "Manager must not be blank"
+msgstr "Manager must not be blank"
+
+msgctxt "region.error.validation.name_length"
+msgid "Name must be between %{min} and %{max} characters long"
+msgstr "Name must be between %{min} and %{max} characters long"
+
+msgctxt "region.error.validation.name_not_unique"
+msgid "Name must not be blank"
+msgstr "Name must not be blank"
+
+msgctxt "region.fields.address"
+msgid "Address"
+msgstr "Address"
+
+msgctxt "region.fields.back"
+msgid "Back"
+msgstr "Back"
+
+msgctxt "region.fields.contact_phone_number"
+msgid "Contact phone number"
+msgstr "Contact phone number"
+
+msgctxt "region.fields.create"
+msgid "Create"
+msgstr "Create"
+
+msgctxt "region.fields.creation_date"
+msgid "Creation date"
+msgstr "Creation date"
+
+msgctxt "region.fields.edit"
+msgid "Region"
+msgstr "Region"
+
+msgctxt "region.fields.landmark"
+msgid "Landmark"
+msgstr "Landmark"
+
+msgctxt "region.fields.manager"
+msgid "Manager"
+msgstr "Manager"
+
+msgctxt "region.fields.region_name"
+msgid "Region Name"
+msgstr "Region Name"
+
+msgctxt "region.fields.show"
+msgid "Show"
+msgstr "Show"
+
+msgctxt "region.fields.title"
+msgid "New Region"
+msgstr "New Region"
+
+msgctxt "region.fields.update"
+msgid "Update"
+msgstr "Update"
+
+msgctxt "region.index.edit"
+msgid "Edit"
+msgstr "Edit"
+
+msgctxt "region.index.new"
+msgid "New"
+msgstr "New"
+
+msgctxt "region.index.table.areas"
+msgid "areas"
+msgstr "areas"
+
+msgctxt "region.index.table.edit"
+msgid "edit"
+msgstr "edit"
+
+msgctxt "region.index.table.id"
+msgid "id"
+msgstr "id"
+
+msgctxt "region.index.table.name"
+msgid "name"
+msgstr "name"
+
+msgctxt "region.index.title"
+msgid "Regions"
+msgstr "Regions"
+
+msgctxt "region.message.error"
+msgid "Region failed to be created"
+msgstr "Region failed to be created"
+
+msgctxt "region.message.notice"
+msgid "Region was successfully created"
+msgstr "Region was successfully created"
+
+msgctxt "region.show.address"
+msgid "Address"
+msgstr "Address"
+
+msgctxt "region.show.areas.add_area"
+msgid "Click here"
+msgstr "Click here"
+
+msgctxt "region.show.areas.no_area_msg"
+msgid "does not have any Areas."
+msgstr "does not have any Areas."
+
+msgctxt "region.show.areas.table.action"
+msgid "action"
+msgstr "action"
+
+msgctxt "region.show.areas.table.branches"
+msgid "branches"
+msgstr "branches"
+
+msgctxt "region.show.areas.table.id"
+msgid "id"
+msgstr "id"
+
+msgctxt "region.show.areas.table.name"
+msgid "name"
+msgstr "name"
+
+msgctxt "region.show.areas.title"
+msgid "Areas under"
+msgstr "Areas under"
+
+msgctxt "region.show.areas.to_add_one"
+msgid "to add one"
+msgstr "to add one"
+
+msgctxt "region.show.contact_phone_number"
+msgid "Contact phone number"
+msgstr "Contact phone number"
+
+msgctxt "region.show.landmark"
+msgid "Landmark"
+msgstr "Landmark"
+
+msgctxt "region.show.name"
+msgid "Region"
+msgstr "Region"
+
+msgctxt "region.show.new_link"
+msgid "Add a new area"
+msgstr "Add a new area"
+
+msgctxt "region.show.tab.areas"
+msgid "Areas"
+msgstr "Areas"
+
+msgctxt "region.show.tab.info"
+msgid "Info"
+msgstr "Info"
+
+msgctxt "region.show.tab.map"
+msgid "Map"
+msgstr "Map"

@@ -1,47 +1,47 @@
 %h1
-  == Region #{@region.name}
-  = link_to 'Edit',  url(:edit_region,  @region), :class => "edit"
+  == #{I18n.t "region.show.name", :default => "Region"} #{@region.name}
+  = link_to I18n.t("region.index.edit", :default => "Edit"), url(:edit_region,  @region), :class => "edit"
 %table
   %tr.odd
-    %td Address
+    %td=I18n.t "region.show.address", :default => "Address"
     %td=@region.address
   %tr
-    %td Contact number
+    %td=I18n.t "region.show.contact_phone_number", :default => "Contact phone number"
     %td=@region.contact_number
   %tr.odd
-    %td Landmark
+    %td=I18n.t "region.show.landmark", :default => "Landmark"
     %td=@region.landmark
 
-= link_to 'Add a new area', resource(@region, :areas, :new), :class => "add"
+= link_to I18n.t("region.show.new_link", :default => "Add a new area" ), resource(@region, :areas, :new), :class => "add"
 %div.tab_container
   %ul.tabs
     %li#areas
-      Areas
+      = I18n.t "region.show.tab.areas", :default => "Areas"
     %li#info
-      Info
+      = I18n.t "region.show.tab.info", :default => "Info"
     - if Mfi.first.map_enabled
       %li#map
-        Map
+        = I18n.t "region.show.tab.map", :default => "Map"
   %div.tab
     %h3
-      == Areas under #{@region.name}
+      == #{I18n.t "region.show.areas.title", :default => "Areas under" } #{@region.name}
     - if @region.areas.count == 0
       .flash.notice
-        == #{@region.name} does not have any Areas. 
-        = link_to 'Click here', resource(@region, :areas, :new) 
-        to add one
+        == #{@region.name} #{I18n.t 'region.show.areas.no_area_msg', :default => 'does not have any Areas.'}
+        = link_to I18n.t('region.show.areas.add_area', :default => "Click here"), resource(@region, :areas, :new) 
+        = I18n.t 'region.show.areas.to_add_one', :default => "to add one"
     - else 
       %table.narrow
         %thead
           %tr
             %th
-              id
+              = I18n.t 'region.show.areas.table.id', :default => "id"
             %th
-              name
+              = I18n.t 'region.show.areas.table.name', :default => "name"
             %th
-              branches
+              = I18n.t 'region.show.areas.table.branches', :default => "branches" 
             %th
-              action
+              = I18n.t 'region.show.areas.table.action', :default => "action"
         - @region.areas.each do |a|
           %tr
             %td
@@ -51,7 +51,7 @@
             %td
               = link_to a.branches.count, resource(a)
             %td
-              = link_to 'Edit', resource(a, :edit)
+              = link_to I18n.t('region.index.edit', :default => "Edit"), resource(a, :edit)
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@region.id}?for=region"}
   - if Mfi.first.map_enabled        

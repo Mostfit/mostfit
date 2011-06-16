@@ -21,6 +21,11 @@
       Is a funder
     %td
       = select :funder, :collection => [["","---"]] + Funder.all(:order => [:name]).map{|s| [s.id.to_s, s.name]}, :selected => (@user.funder ? @user.funder.id.to_s : "")
+  %tr
+    %td
+      Preferred Locale
+    %td
+      = select :preferred_locale, :collection => [["","---"]] + LOCALES.map{|s| [s[0].to_s, s[1].to_s]}, :selected => (@user.preferred_locale ? @user.preferred_locale : "")
   - if @user.new?
     %tr
       %td

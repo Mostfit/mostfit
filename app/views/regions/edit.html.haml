@@ -1,12 +1,12 @@
 %h1
-  Region
+  = I18n.t "region.fields.edit", :default => "Region"
   = @region.name
 = error_messages_for @region
 
 = form_for(@region, :action => url(:region, @region)) do
   = partial :fields
-  = submit "Update"
+  = submit I18n.t "region.fields.update", :default => "Update"
 
-= link_to 'Show', url(:region, @region)
+= link_to I18n.t("region.fields.show", :default => "Show"), url(:region, @region)
 |
-= link_to 'Back', url(:regions)
+= link_to I18n.t("region.fields.back", :default => "Back"), url(:regions)
