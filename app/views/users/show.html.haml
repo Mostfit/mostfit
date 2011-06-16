@@ -1,0 +1,44 @@
+
+- if @user
+  %h1== User: <i>#{@user.login}</i>
+  %table.narrow.form{ :style => "width: 40%;" }
+    - counter = 1
+    %tr.odd
+      %td Login
+      %td
+        %b= @user.login
+    - counter+= 1
+    %tr
+      %td Role
+      %td= @user.role.to_s.humanize
+    - if @user.staff_member
+      - counter+= 1
+      %tr{:class=>"#{'odd' if counter % 2 == 1}"}
+        %td Staff Member
+        %td=@user.staff_member.name 
+    - if @user.funder
+      - counter+= 1
+      %tr{:class=>"#{'odd' if counter % 2 == 1}"}
+        %td Funder
+        %td=@user.funder.name
+    - counter+= 1
+    %tr{:class=>"#{'odd' if counter % 2 == 1}"}
+      %td Status
+      %td=@user.active ? "active" : "inactive"
+    - counter+= 1
+    %tr{:class=>"#{'odd' if counter % 2 == 1}"}
+      %td Created At
+      %td=@user.created_at.to_s
+  %p
+    = link_to_with_rights 'edit this user\'s details ', resource(@user, :edit), :class => "edit"
+
+  %div.tab_container
+    %ul.tabs
+      %li#history
+        History
+    %div.tab
+      = partial "audit_trails/list", :layout => false
+      %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+   
+
+      

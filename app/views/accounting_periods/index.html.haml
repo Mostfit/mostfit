@@ -9,6 +9,8 @@
   %br
   %br
   %table.narrow.form
+    - closeAP = AccountingPeriod.all(:closed => false, :order => [:begin_date.asc])
+    - reopenAP = AccountingPeriod.all(:closed => true, :order => [:begin_date.asc])
     %thead
       %tr
         %th
@@ -26,7 +28,7 @@
     - for accounting_period in @accounting_periods.sort
       %tr{:class => cycle('odd','even')}
         %td
-          = accounting_period.name
+          = link_to accounting_period.name, resource(accounting_period)
         %td
           = accounting_period.begin_date
         %td
@@ -36,4 +38,14 @@
         %td
           = link_to 'Balances', url(:period_balances, accounting_period)
         %td
-          = link_to 'Edit', url(:edit_accounting_period, accounting_period)
+          - if session.user.role == :admin
+            - if (not reopenAP.empty?) and  accounting_period.id. == reopenAP.last.id
+              = link_to 'Reopen' , url(:close_accounting_period, {:id => accounting_period.id})
+            - elsif (not closeAP.empty?) and accounting_period.id == closeAP.first.id
+              = link_to 'Close' , url(:close_accounting_period, {:id => accounting_period.id})
+            - elsif closeAP.map{|cap| cap.id}.include?(accounting_period.id)
+              %span{:class => 'red'}
+                = 'Cannot close'
+            - elsif reopenAP.map{|roap| roap.id}.include?(accounting_period.id)
+              %span{:class => 'green'}
+                = 'Cannot reopen'

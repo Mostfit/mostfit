@@ -5,6 +5,7 @@ module DataEntry
     def new
       if params[:client_id]
         @client = Client.get(params[:client_id]) || Client.first(:name => params[:client_id]) || Client.first(:reference => params[:client_id])
+        raise NotFound unless @client
         @center = @client.center
 
         if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])

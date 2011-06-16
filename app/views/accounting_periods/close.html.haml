@@ -1,0 +1,39 @@
+%h1 Close Accounting Period
+
+%h3 
+  This will close and lock the accounting period 
+  = @accounting_period.name
+
+= form_for(@accounting_period, :action => url(:close_accounting_period, {id=>@accounting_period.id})) do
+  %table.narrow.form
+    %thead
+      %tr
+        %th
+          Name
+        %th
+          Begins
+        %th
+          Ends
+        %th
+          Entries Allowed?
+        %th
+          Account balances
+        %th
+          Actions
+  
+      %tr{:class => cycle('odd','even')}
+        %td
+          = @accounting_period.name
+        %td
+          = @accounting_period.begin_date
+        %td
+          = @accounting_period.end_date
+        %td
+          = @accounting_period.closed ? "Closed" : "Open"
+        %td
+          = link_to 'Balances', url(:period_balances, @accounting_period)
+
+  - if @accounting_period.closed
+    = submit 'Reopen this Accounting Period'
+  - else
+    = submit 'Close this Accounting Period'

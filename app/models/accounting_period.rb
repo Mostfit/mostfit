@@ -33,6 +33,8 @@ class AccountingPeriod
   end
 
   def cannot_overlap
+    @changed_attr_with_original_val = self.original_attributes.map{|k,v| {k.name => (k.lazy? ? obj.send(k.name) : v)}}.inject({}){|s,x| s+=x}
+    return true if @changed_attr_with_original_val.keys.size == 1 and @changed_attr_with_original_val.keys.include?(:closed)
     overlaps = AccountingPeriod.all(:end_date.lte => end_date, :end_date.gt => begin_date)
     overlaps = AccountingPeriod.all(:begin_date.gte => begin_date, :begin_date.lt => end_date) if overlaps.empty?
     return true if overlaps.empty?
