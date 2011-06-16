@@ -1,5 +1,5 @@
 class Application < Merb::Controller
-  before :desktop_user_log
+  #before :desktop_user_log
   before :ensure_authenticated
   before :ensure_password_fresh
   before :ensure_can_do

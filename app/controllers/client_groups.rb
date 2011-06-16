@@ -47,13 +47,13 @@ class ClientGroups < Application
     only_provides :html, :json, :xml
     @client_group = ClientGroup.new(client_group)
     if @client_group.save
-      if params[:format] and params[:format] == "xml"
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @client_group
       else
         request.xhr? ? display(@client_group) : redirect(url(:data_entry), :message => {:notice => "Group was successfully created"})
       end
     else
-      if params[:format] and params[:format] == "xml"
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @client_group
       else
         message[:error] = "Group failed to be created"

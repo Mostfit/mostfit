@@ -24,7 +24,7 @@ class Centers < Application
     raise NotFound unless @center
     @branch  =  @center.branch if not @branch
     @clients =  grouped_clients
-    if params[:format] and params[:format] == "xml"
+    if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
       display [@center, @clients, @date]
     else
       display [@center, @clients, @date], 'clients/index'
@@ -98,14 +98,14 @@ class Centers < Application
       @center.branch = @branch  # set direct context
     end
     if @center.save
-      if params[:format] and params[:format] == "xml"
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @center
       else
         redirect(params[:return]||resource(@center), :message => {:notice => "Center '#{@center.name}' successfully created"})
       end
     else
       #       message[:error] = "Center failed to be created"
-      if params[:format] and params[:format] == "xml"
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @center
       else
         render :new  # error messages will be shown

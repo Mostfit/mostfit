@@ -51,13 +51,13 @@ module DataEntry
           else
             redirect(return_url, :message => {:notice => notice})
           end
-        elsif params[:format] and params[:format]=="xml"
+        elsif params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
           display("")
         else
           display [@errors, @center, @date]
         end
       else
-        if params[:format] and params[:format]=="xml"
+        if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
           @weeksheet_rows = Weeksheet.get_center_weeksheet(@center,@date, @info) if @center
           display @weeksheet_rows
         elsif params[:format] and params[:format] == "pdf"

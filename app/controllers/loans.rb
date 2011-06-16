@@ -19,7 +19,7 @@ class Loans < Application
     @loan = Loan.get(id)
     raise NotFound unless @loan
     @payments = @loan.payments(:order => [:received_on, :id])
-    if params[:format] and params[:format] == "xml"
+    if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
       display [@loan, @payments]
     else
       display [@loan, @payments], 'payments/index'
@@ -48,7 +48,7 @@ class Loans < Application
     @loan = klass.new(attrs)
     @loan.loan_product = @loan_product
     if @loan.save
-      if params[:format] and params[:format] == "xml"
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @loan
       else
         if params[:return]
@@ -58,7 +58,7 @@ class Loans < Application
         end
       end
     else
-      if params[:format] and params[:format] == "xml"
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @loan
       else
         set_insurance_policy(@loan_product)

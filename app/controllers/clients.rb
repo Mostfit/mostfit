@@ -38,13 +38,13 @@ class Clients < Application
     @client.center = @center if @center# set direct context
     @client.created_by_user_id = session.user.id
     if @client.save
-      if params[:format] and params[:format]=="xml"
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @client
       else
         redirect(params[:return]||resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' successfully created"})
       end
     else
-      if params[:format] and params[:format]=="xml"
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @client
       else
         render :new  # error messages will be shown
@@ -71,7 +71,7 @@ class Clients < Application
         @client.tags = []
       end
       @client.save
-      if params[:format] and params[:format]=="xml"
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         if params[:client] and params[:client][:fingerprint]
           doc = Base64.decode64(params[:client][:fingerprint]) 
           temp = File.new("tmp/client_#{@client.id}_fingerprint.fpt", "w")
@@ -92,7 +92,7 @@ class Clients < Application
         end
       end
     else
-      if params[:format] and params[:format]=="xml"
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @client
       else
         display @client, :edit  # error messages will be shown
