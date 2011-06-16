@@ -3,6 +3,7 @@
     %th{:colspan => column.colspan}
       = column.name.to_s.gsub(/_/, ' ').capitalize
 %tr.header
+  %th
   - @report.columns.map{|c| pad(c)}.flatten.each do |column|
     - if column
       %th{:colspan => column.colspan}
