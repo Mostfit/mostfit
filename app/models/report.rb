@@ -302,7 +302,7 @@ class Report
     
     if @funder
       froms << "loans l"
-      extra_condition += "and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
+      extra_condition += " and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
       extra_condition += " and l.id in (#{funder_loan_ids.join(', ')})"
     end
 
@@ -317,8 +317,8 @@ class Report
       lc = ["NULL"] if @loan_cycle.nil?
 
       froms << "loans l"
-      extra_condition += "and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
-      extra_condition += "and l.cycle_number = #{lc}"
+      extra_condition += " and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
+      extra_condition += " and l.cycle_number = #{lc}"
     end
     [froms.uniq.join(", "), extra_condition]
   end
