@@ -37,7 +37,7 @@ class Report
     set_centers(params, user, staff)
     @funder = Funder.get(params[:funder_id]) if not @funder and params and params[:funder_id] and not params[:funder_id].blank?
 
-    [:loan_product_id, :late_by_more_than_days, :more_than, :late_by_less_tehan_days, :attendance_status, :include_past_data, :include_unapproved_loans].each{|key|
+    [:loan_product_id, :late_by_more_than_days, :more_than, :late_by_less_than_days, :attendance_status, :include_past_data, :include_unapproved_loans].each{|key|
       if params and params[key] and params[key].to_i>0
         instance_variable_set("@#{key}", params[key].to_i)
       end
