@@ -21,7 +21,8 @@ class AccountBalance
   belongs_to :account
 
   def verified?
-    verified_by and verified_on
+    return true if (verified_by and verified_on)
+    return false
   end
 
   def verified_cannot_be_deleted
@@ -47,6 +48,7 @@ class AccountBalance
   end
 
   def verification_done_sequentially
+    return true unless self.verified?
     previous_account_balances = AccountBalance.all(:account => account).collect{|x| x if x.accounting_period.end_date < self.accounting_period.begin_date}.delete_if{|x| x.nil?}
     previous_account_balances.each{|pab|
       return [false, "Previous account(s) not verified"] unless pab.verified?
