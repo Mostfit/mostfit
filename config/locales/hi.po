@@ -8,12 +8,12 @@ msgid "मंजूर\340\245\200"
 msgstr "मंजूर\340\245\200"
 
 msgctxt "center.approval.no_center"
-msgid "किसी भी केन्द्र से जुड़\340\245\200"
-msgstr "किसी भी केन्द्र से जुड़\340\245\200"
+msgid "किसी भी केंद्र से जुड़ा  नहीं "
+msgstr "किसी भी केंद्र से जुड़ा  नहीं "
 
 msgctxt "center.approval.not_approval"
 msgid "कोई मंजूरी आ\340\244\234"
-msgstr "कोई मंजूरी आ\340\244\234"
+msgstr "आज कोई  मंजूरी नहीं  "
 
 msgctxt "center.approval.on_time"
 msgid "समय प\340\244\260"
@@ -33,7 +33,7 @@ msgstr "स्थित\340\244\277"
 
 msgctxt "center.disbursal.label"
 msgid "प्रार्थनापत्रो\340\244\202"
-msgstr "प्रार्थनापत्रो\340\244\202"
+msgstr "वितरण "
 
 msgctxt "center.disbursal.no_group"
 msgid "नहीं किसी भी समूह से जुड़\340\245\207"
@@ -41,7 +41,7 @@ msgstr "नहीं किसी भी समूह से जुड़\340\24
 
 msgctxt "center.disbursal.not_disbursal"
 msgid "आज कोई प्रार्थनापत्रो\340\244\202"
-msgstr "आज कोई प्रार्थनापत्रो\340\244\202"
+msgstr "आज कोई वितरण नहीं "
 
 msgctxt "center.disbursal.on_time"
 msgid "समय प\340\244\260"
@@ -104,8 +104,8 @@ msgid "भुगता\340\244\250"
 msgstr "भुगता\340\244\250"
 
 msgctxt "center.payment.table.principal"
-msgid "प्रधानाचार्\340\244\257"
-msgstr "प्रधानाचार्\340\244\257"
+msgid "मूल धन"
+msgstr "मूल धन"
 
 msgctxt "center.payment.table.total"
 msgid "कु\340\244\262"
@@ -149,11 +149,11 @@ msgstr "इस दिन एक बैठक दा नहीं ह\340\245\210
 
 msgctxt "center.weeksheet.record_link"
 msgid "इन गतिविधियों रिकार्\340\244\241"
-msgstr "इन गतिविधियों रिकार्\340\244\241"
+msgstr "इन गतिविधिवोको रिकॉर्ड की जी ये "
 
 msgctxt "center.weeksheet.title"
 msgid "सप्ताह  %{week} बैठक मेनू  केंद्र के लिए  %{name}"
-msgstr "सप्ताह  %{week} बैठक मेनू  केंद्र के लिए  %{name}"
+msgstr "केंद्र %{name} के लिए  मीटिंग   : सप्ताह क्रं . %{week}"
 
 msgctxt "region.error.validation.manager_not_present"
 msgid "प्रबंधक रिक्त नहीं होना चाहि\340\244\217"
@@ -232,8 +232,8 @@ msgid "संपादन करन\340\244\276"
 msgstr "संपादन करन\340\244\276"
 
 msgctxt "region.index.table.id"
-msgid "इन ना\340\244\256"
-msgstr "इन ना\340\244\256"
+msgid "अनुक्रमाणिका "
+msgstr "अनुक्रमाणिका "
 
 msgctxt "region.index.table.name"
 msgid "ना\340\244\256"
