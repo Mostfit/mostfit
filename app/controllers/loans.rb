@@ -73,7 +73,7 @@ class Loans < Application
         end
         result = @app_fees.map{|f| f.save}
         msg[:error] =  "However, #{result.select{|r| false}.count} insurance premium could not be applied as a fee" if result.include?[false]
-      end
+      end if params[:fees]
       if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @loan
       else
@@ -88,58 +88,58 @@ class Loans < Application
         render :new # error messages will be shown
       end
     end
+  end
+  def bulk_create
+    klass, attrs = get_loan_and_attrs
+    attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
+    loan_product = LoanProduct.is_valid(params[:loan_product_id])
+    raise BadRequest unless loan_product
+    loans = statuses = []
 
-    def bulk_create
-      klass, attrs = get_loan_and_attrs
-      attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
-      loan_product = LoanProduct.is_valid(params[:loan_product_id])
-      raise BadRequest unless loan_product
-      loans = statuses = []
-
-      # create loans for all the clients
-      Loan.transaction do |t|
-        params[:client_ids].each{|client_id|
-          attrs[:client_id] = client_id.to_i
-          @loan = klass.new(attrs)
-          @loan.loan_product  = loan_product
-          loans.push(@loan)
-        }
-        statuses = loans.map{|l| l.save}
-        t.rollback if statuses.include?(false)
-      end
-
-      if not statuses.include?(false)
-        if params[:return]
-          redirect(params[:return], :message => {:notice => "'#{statuses.count}' loans were successfully created"})
-        else
-          redirect(url(:data_entry), :message => {:notice => "'#{statuses.count}' loans were successfully created"})
-        end
-      else      
-        # on error recreate form with errors
-        @loan_product  = @loan.loan_product if @loan
-        @clients = Client.all(:id => params[:client_ids])
-        display [], "data_entry/loans/bulk_form"
-      end
+    # create loans for all the clients
+    Loan.transaction do |t|
+      params[:client_ids].each{|client_id|
+        attrs[:client_id] = client_id.to_i
+        @loan = klass.new(attrs)
+        @loan.loan_product  = loan_product
+        loans.push(@loan)
+      }
+      statuses = loans.map{|l| l.save}
+      t.rollback if statuses.include?(false)
     end
 
-
-
-    def edit(id)
-      only_provides :html
-      @loan = Loan.get(id)
-      @loan_product =  @loan.loan_product
-      raise NotFound unless @loan
-
-      set_insurance_policy(@loan_product)
-      disallow_updation_of_verified_loans
-      @loan.interest_rate*=100
-      display @loan
+    if not statuses.include?(false)
+      if params[:return]
+        redirect(params[:return], :message => {:notice => "'#{statuses.count}' loans were successfully created"})
+      else
+        redirect(url(:data_entry), :message => {:notice => "'#{statuses.count}' loans were successfully created"})
+      end
+    else      
+      # on error recreate form with errors
+      @loan_product  = @loan.loan_product if @loan
+      @clients = Client.all(:id => params[:client_ids])
+      display [], "data_entry/loans/bulk_form"
     end
+  end
 
-    def update(id)
-      klass, attrs = get_loan_and_attrs
-      attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
-      attrs[:occupation_id] = nil if attrs[:occupation_id] == ''
+
+
+  def edit(id)
+    only_provides :html
+    @loan = Loan.get(id)
+    @loan_product =  @loan.loan_product
+    raise NotFound unless @loan
+
+    set_insurance_policy(@loan_product)
+    disallow_updation_of_verified_loans
+    @loan.interest_rate*=100
+    display @loan
+  end
+
+  def update(id)
+    klass, attrs = get_loan_and_attrs
+    attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
+    attrs[:occupation_id] = nil if attrs[:occupation_id] == ''
     @loan = klass.get(id)
     raise NotFound unless @loan
     disallow_updation_of_verified_loans
