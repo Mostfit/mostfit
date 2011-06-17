@@ -1,16 +1,16 @@
 %h1
-  == <a name = 'weeksheet'>Week #{@date.cweek} meeting sheet for center #{@center.name}</a>
-  = link_to 'Record these activities', url(:enter_payments, :action => 'by_center', :center_id => @center.id, :for_date => @date), :class => "add"
+  == <a name = 'weeksheet'> #{I18n.t("center.weeksheet.title", :default => "Week #{@date.cweek} meeting sheet for center #{@center.name}", :week => @date.cweek, :name =>@center.name)}</a>
+  = link_to I18n.t("center.weeksheet.record_link", :default => "Record these activities"), url(:enter_payments, :action => 'by_center', :center_id => @center.id, :for_date => @date), :class => "add"
 =partial "centers/meeting_selector_form"
 %a{:name => "weeksheet"}
-%h2 Approvals
+%h2=I18n.t "center.approval.label", :default => "Approvals"
 =partial "centers/approvals", {:loans_to_approve => Loan.all(:client_id => @clients.map{|x| x.id}, :approved_on => nil, :rejected_on => nil)}
 
 - if @center.meeting_day?(@date)
-  %h2 Disbursals
+  %h2=I18n.t "center.disbursal.label", :default => "Disbursals"
   - date_with_holiday = [@date, @date.holidays_shifted_today].max
   =partial "centers/disbursals", {:loans_to_disburse => Loan.all(:client_id => @clients.map{|x| x.id}, :scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil), :center => @center, :branch => @center.branch, :date => @date}
-  %h2 Repayments
+  %h2=I18n.t "center.payment.label", :default => "Repayments"
   =partial "centers/payments", {:loans => Loan.all(:client_id => @clients.map{|x| x.id}), :clients => @clients_grouped, :branch => @center.branch, :center => @center, :date => @date}
 - else
-  %i This day is not a meeting day
+  %i=I18n.t "center.weeksheet.no_meeting", :default => "This day is not a meeting day"

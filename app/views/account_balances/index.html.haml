@@ -21,8 +21,14 @@
           Opening Balance
         %th
           Closing Balance
-        %th Actions
+        %th
+          Status
+        %th
+          Actions
     %tr
+    - verifyAB = @account_balances.sort_by{|a| a.accounting_period.begin_date}.collect{|a| a if !a.verified?}.delete_if{|x| x.nil?}
+    - to_be_verified = verifyAB.delete_if{|x| x.accounting_period.closed}.first
+    - reverifyAB = @account_balances.sort_by{|a| a.accounting_period.begin_date}.collect{|a| a if a.verified?}.delete_if{|x| x.nil?}
     - for account_balance in @account_balances
       %tr{:class => cycle('odd','even')}
         %td
@@ -32,6 +38,13 @@
         %td
           = account_balance.closing_balance.to_account_balance
         %td
-          - unless account_balance.verified?
-            - if session.user.role == :admin
+          - if account_balance.verified?
+            %span{:class => 'green'} Verified
+          - else
+            %span{:class => 'red'} Not Verified
+        %td
+          - if session.user.role == :admin and (not account_balance.accounting_period.closed)
+            - if account_balance == to_be_verified
               = link_to 'Verify', url(:verify_account_balance, account_balance.account, account_balance.accounting_period, account_balance)
+            - elsif reverifyAB.include?(account_balance)
+              = link_to 'Reverify', url(:verify_account_balance, account_balance.account, account_balance.accounting_period, account_balance)

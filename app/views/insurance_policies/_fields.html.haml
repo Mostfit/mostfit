@@ -1,4 +1,4 @@
-- if @isnurance_policy and @insurance_policy.id and not @insurance_policy.id.blank?
+- if @insurance_policy and @insurance_policy.id and not @insurance_policy.id.blank?
   = hidden_field :id
 %table
   %tr
@@ -31,6 +31,20 @@
       Premium
     %td
       = text_field :premium
+  %tr{:style => "background-color:#fff370"} 
+    %td
+      Apply premium as 
+    %td
+      - @loan_product.insurance_product.fees.each do |f|
+        %ul
+          %li
+            = check_box(:name => "fee_#{f.id}", :checked => true)
+            = f.name
+  %tr{:style => "background-color:#fff370"}
+    %td
+      payable on
+    %td
+      = date_select :fee_date, nil
   %tr
     %td
       Date from

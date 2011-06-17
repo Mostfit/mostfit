@@ -42,7 +42,8 @@
       = select :branch_id, :collection => Branch.all(:id.not => @branch.id).map{|b| [b.id, b.name]}, :prompt => "Select branch"
       = hidden_field :parent_branch_id, :value => @branch.id
       = submit "Create"
-= partial "rule_books/duplicate"
+- unless @accounts
+  = partial "rule_books/duplicate"
 - unless @accounts
   %hr
   %div.box

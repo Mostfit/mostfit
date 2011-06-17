@@ -27,7 +27,5 @@
         = @accounting_period.closed ? "Closed" : "Open"
       %td
         = link_to 'Balances', url(:period_balances, @accounting_period)
-      %td
-        = link_to 'Edit', url(:edit_accounting_period, @accounting_period)
 
 = link_to 'Back', url(:accounting_periods)

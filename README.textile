@@ -28,4 +28,10 @@ We use github, that means you can easily host your own branch of this software. 
  * easily contribute your changes back to the community
  * incorporate community innovation
 
-Which brings us to our goals of sharing costs, being flexible and delivering the best --free for all-- though open innovation. The license is MIT.
+Which brings us to our goals of sharing costs, being flexible and delivering the best --free for all-- though open innovation.
+
+h2. Copyright and License
+
+Copyright (C) 2009-2011 Intellecap.
+
+Mostfit is available under the GNU AFFERO GENERAL PUBLIC LICENSE version 3 or (at your option) any later version. You should have received a file named COPYING along with Mostfit. COPYING is the complete text of the license. If you did not receive this file, see [[http://www.gnu.org/licenses/]].

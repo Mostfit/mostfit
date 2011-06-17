@@ -1,14 +1,12 @@
 class Users < Application
   before :ensure_admin, :only => [:edit, :new, :create, :update, :delete, :destroy, :amind_change_password]
   provides :xml
-  #API call : after authenticate get user information and send xml response
-  #this change made for testing purpose for dm-rest-adapter
-  def show
-    if params[:id]
-      @user = User.get(params[:id])
-    else
-      @user = session.user
-    end
+
+  def show(id)
+    @user = User.get(id)
+    raise NotFound unless @user
+    @trails = AuditTrail.all(:auditable_id => @user.id, :auditable_type => "User", :order => [:created_at.desc])
+    @obj = @user
     display @user
   end
 

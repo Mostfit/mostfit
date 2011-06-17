@@ -1,5 +1,5 @@
 - org_total = []
-- @data.sort_by{|key1, values1| key1.name}.each do |key1, values1|
+- @report.data.sort_by{|key1, values1| key1.name}.each do |key1, values1|
   - if values1 and values1.length>0
     - if values1.is_a?(Hash)
       %tr.branch

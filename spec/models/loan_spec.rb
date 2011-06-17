@@ -781,6 +781,7 @@ describe Loan do
   end
 
   it "should repay properly" do
+    # this test is failing.
     @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, 
                      :scheduled_first_payment_date => "2000-12-06", 
                      :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", 

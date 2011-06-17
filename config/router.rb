@@ -164,6 +164,7 @@ Merb::Router.prepare do
     match('/errors.:format', :method => "get").to(:controller => 'exceptions', :action =>'index')
   end
   match('/accounts/:account_id/accounting_periods/:accounting_period_id/account_balances/:id/verify').to(:controller => 'account_balances', :action => 'verify').name(:verify_account_balance)
+  match('/accounting_periods/:id/close').to(:controller => 'accounting_periods', :action => 'close').name(:close_accounting_period)
   match("/accounting_periods/:id/period_balances").to(:controller => "accounting_periods", :action => "period_balances").name(:period_balances)
   default_routes
   match('/').to(:controller => 'entrance', :action =>'root')

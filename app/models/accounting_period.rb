@@ -18,6 +18,7 @@ class AccountingPeriod
   has n, :accounts, :through => :account_balances
 
   validates_with_method :cannot_overlap
+  validates_with_method :closing_done_sequentially
 
   def <=>(other)
     return (end_date <=> other.begin_date) if other.respond_to?(:begin_date) && other.begin_date
@@ -33,10 +34,20 @@ class AccountingPeriod
   end
 
   def cannot_overlap
-    overlaps = AccountingPeriod.all(:end_date.lte => end_date, :end_date.lgt => begin_date)
+    @changed_attr_with_original_val = self.original_attributes.map{|k,v| {k.name => (k.lazy? ? obj.send(k.name) : v)}}.inject({}){|s,x| s+=x}
+    return true if @changed_attr_with_original_val.keys.size == 1 and @changed_attr_with_original_val.keys.include?(:closed)
+    overlaps = AccountingPeriod.all(:end_date.lte => end_date, :end_date.gt => begin_date)
     overlaps = AccountingPeriod.all(:begin_date.gte => begin_date, :begin_date.lt => end_date) if overlaps.empty?
     return true if overlaps.empty?
     return [false, "Your accounting period overlaps with other accounting periods"]
+  end
+
+  def closing_done_sequentially
+    closedAP = AccountingPeriod.all(:closed => true, :order => [:begin_date.asc])
+    openAP = AccountingPeriod.all(:closed => false, :order => [:begin_date.asc])
+    return true if self.id == openAP.first.id and self.closed == true
+    return true if self.id == closedAP.last.id and self.closed == false
+    return [false, "This Cannot be closed"]
   end
 
 =begin

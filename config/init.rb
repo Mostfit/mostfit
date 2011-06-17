@@ -46,7 +46,16 @@ Merb::BootLoader.before_app_loads do
   require 'lib/functions.rb'
   require 'lib/core_ext.rb'
   require 'lib/fees_container.rb'
-  
+
+  #initialize i18n
+  require 'i18n'
+  require 'i18n-translate'
+  #load all localize file
+  I18n::Backend::Simple.send(:include, I18n::Backend::Translate)
+  I18n::Backend::Simple.send(:include, I18n::Backend::PO)
+  I18n.load_path << "#{Merb.root}/config/locales/hi.po"
+  I18n.load_path << "#{Merb.root}/config/locales/en.po"
+
   begin
     require "pdf/writer"
     require "pdf/simpletable"

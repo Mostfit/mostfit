@@ -1,9 +1,9 @@
-%h1 New Region
-
+%h1 
+  =I18n.t "region.fields.title", :default => "New Region"
 = error_messages_for @region
 
 = form_for(@region, :action => url(:regions) ) do
   = partial :fields
-  = submit "Create"
+  = submit I18n.t "region.fields.create", :default => "create"
 
-= link_to 'Back', url(:regions)
+= link_to I18n.t("region.fields.back", :default => "Back"), url(:regions)

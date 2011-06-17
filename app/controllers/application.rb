@@ -1,5 +1,6 @@
 class Application < Merb::Controller
   #before :desktop_user_log
+  before :set_locale
   before :ensure_authenticated
   before :ensure_password_fresh
   before :ensure_can_do
@@ -17,6 +18,20 @@ class Application < Merb::Controller
       api_log.info("-------------- User api access log------------ ")
       api_log.info("----User: #{session.user.login}  ------  Access Time: #{DateTime.now.to_s} ----------") if session and session.user
       api_log.info("#{request.inspect}") 
+    end
+  end
+
+  def set_locale
+    if params[:locale]
+      I18n.locale = params[:locale]
+    elsif session[:locale]
+      I18n.locale = session[:locale]
+    elsif session.user and not session.user.preferred_locale.blank?
+      I18n.locale = session.user.preferred_locale
+    elsif Mfi.first and not Mfi.first.org_locale.blank?
+      I18n.locale = Mfi.first.org_locale
+    else
+      I18n.locale = DEFAULT_LOCALE
     end
   end
 
