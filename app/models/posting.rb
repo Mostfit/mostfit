@@ -25,7 +25,6 @@ class Posting
       if account_balance and account_balance.verified?
         account_balance.verified_by = nil
         account_balance.verified_on = nil
-        debugger
         return [false, "Error, Account was not Un-Verfied"] unless account_balance.save
       end
     end
