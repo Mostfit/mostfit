@@ -42,7 +42,6 @@ class InsuranceProducts < Application
   end
 
   def update(id, insurance_product)
-    debugger
     @insurance_product = InsuranceProduct.get(id)
     raise NotFound unless @insurance_product
     fees = []

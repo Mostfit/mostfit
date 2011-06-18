@@ -45,10 +45,8 @@ class Loans < Application
     @loan.loan_product = @loan_product
     msg = {}
     if @loan.save
-      debugger
       msg[:notice] = "Loan '#{@loan.id}' was successfully created"
       params[:fees].keys.each do |fee_id|
-        debugger
         @app_fee = []
         @fee = Fee.get(fee_id)
         if @fee
