@@ -178,6 +178,7 @@ class Loan
   validates_with_method  :clients,                      :method => :check_client_sincerity
   validates_with_method  :insurance_policy,             :method => :check_insurance_policy    
 
+
   def update_loan_cache(force = false)
     @orig_attrs = self.original_attributes
     t = Time.now
