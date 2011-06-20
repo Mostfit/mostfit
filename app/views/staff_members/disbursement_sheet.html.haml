@@ -37,9 +37,13 @@
       %tr
         %thead
           %th
+            Client Id
+          %th
             Client Name
           %th
             Spouse Name
+          %th
+            Loan Purpose
           %th
             Loan Product
           %th
@@ -54,9 +58,13 @@
         - tot_disbursement += loan.amount
         %tr
           %td 
+            = loan.client.id
+          %td
             = loan.client.name
           %td
             = loan.client.spouse_name
+          %td
+            = loan.occupation.name
           %td
             %b
               = loan.loan_product.name
@@ -75,13 +83,13 @@
           %td
             = loan.scheduled_first_payment_date
       %tr{ :style => 'border-bottom: 2px solid;font-weight: bold;border-top: solid 1px #aaa;' }
-        %td{ :colspan => 3 }
+        %td{ :colspan => 5 }
           Total Disbursement
         %td
           = tot_disbursement
       %tfoot    
         %tr
-          %td{ :colspan => 5 }
+          %td{ :colspan => 9 }
   - else
     No disbursements today
   %hr
