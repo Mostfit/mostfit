@@ -74,6 +74,21 @@ class Loan
 
   property :_scheduled_maturity_date,           Date
 
+  # Caching baby!
+
+  property :staleness_frequency, Integer
+
+  property :center_id, Integer
+  property :branch_id, Integer
+  property :c_scheduled_maturity_date, Date
+  property :c_maturity_date, Date
+  property :c_actual_first_payment_date, Date
+  property :c_last_status, Integer
+  property :c_principal_received, Float
+  property :c_interest_received, Float
+  property :c_last_payment_received_on, Date
+  property :c_last_payment_id, Integer
+  property :c_stale?, Boolean
   
 #  property :taken_over_on,                     Date
 #  property :taken_over_on_installment_number,  Integer 
