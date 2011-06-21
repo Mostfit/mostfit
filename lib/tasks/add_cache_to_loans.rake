@@ -37,7 +37,7 @@ namespace :mostfit do
               GROUP BY loan_id) AS fp_dates 
           WHERE fp_dates.loan_id = loans.id)})
       puts "adding scheduled_maturity_date..."
-      repository.adapter.execute("update loans set c_scheduled_maturity_date = (SELECT max(date) from loan_history where loan_id = id)"
+      repository.adapter.execute("update loans set c_scheduled_maturity_date = (SELECT max(date) from loan_history where loan_id = id)")
       puts "marking last_payment_received_on"
       repository.adapter.execute(%Q{
          UPDATE loans SET c_last_payment_received_on = 
