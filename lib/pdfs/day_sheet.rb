@@ -162,15 +162,15 @@ module Pdf
             else
                premia = "NA"
             end
-            table.data.push({"amount" => loan.amount.to_currency, "id" => loan.client.id, "name" => loan.client.name,
-                              "group" => loan.client.client_group.name, "loan purpose" => loan.occupation.name,
+            table.data.push({"amount" => loan.amount.to_currency, "name" => loan.client.name,
+                              "group" => loan.client.client_group.name,
                               "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date, 
                               "spouse name" => loan.client.spouse_name, "loan status" => loan.status,
                               "insurance premium" => premia, "balance to disburse" => (amount_to_disburse||loan.amount.to_currency)
                             })
           end
           table.data.push({"amount" => tot_amount.to_currency})
-          table.column_order  = ["id", "name", "spouse name",  "group", "amount", "insurance premium", "balance to disburse", "loan purpose", "loan product", "first payment", "loan status", "signature"]
+          table.column_order  = ["name", "spouse name",  "group", "amount", "insurance premium", "balance to disburse", "loan product", "first payment", "loan status", "signature"]
           table.show_lines    = :all
           table.shade_rows    = :none
           table.show_headings = true          
@@ -178,7 +178,7 @@ module Pdf
           table.orientation   = :center
           table.position      = :center
           table.title_font_size = 16
-          table.header_gap = 24
+          table.header_gap = 20
           pdf.text("\n")
           pdf.text "Disbursements today"
           pdf.text("\n")
