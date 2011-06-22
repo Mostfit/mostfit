@@ -9,7 +9,7 @@ class Loan
   before :save,    :update_scheduled_maturity_date
   after  :save,    :update_history_caller  # also seems to do updates
   after  :save,    :levy_fees
-  before :create,  :update_cycle_number
+  after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
   #  after  :destroy, :update_history
 
