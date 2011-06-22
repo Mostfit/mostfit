@@ -194,6 +194,11 @@
             Application revision
           %td
             = revision
+        %tr
+          %td
+            Organization Locale
+          %td
+            = select :org_locale, :collection => LOCALES.map{|s| [s[0].to_s, s[1].to_s]}
     %div.tab
       %table
         %tr

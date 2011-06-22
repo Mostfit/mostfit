@@ -1,24 +1,24 @@
 %table.narrow.form{ :style => "width: 100%;" }
   %tr.odd
-    %td meeting at
+    %td=I18n.t "center.weeksheet.meeting.at", :default => "meeting at"
     %td
       - if @date.weekday==@center.meeting_day
         %b== #{@date} #{@center.meeting_time}
       - else
-        %i no meeting today
+        %i=I18n.t "center.weeksheet.meeting.no_meeting", :default => "no meeting today"
     %td
-      = link_to 'today', resource(@branch, @center, :date => Date.today) + '#weeksheet'
+      = link_to I18n.t("center.weeksheet.meeting.today", :default => "today"), resource(@branch, @center, :date => Date.today) + '#weeksheet'
       &nbsp;|&nbsp;
-      = link_to 'previous meeting', resource(@branch, @center, :date => @center.previous_meeting_date_from(@date)) + '#weeksheet'
+      = link_to I18n.t("center.weeksheet.meeting.pre_meeting", :default => "previous meeting"), resource(@branch, @center, :date => @center.previous_meeting_date_from(@date)) + '#weeksheet'
       &nbsp;|&nbsp;
-      = link_to 'next meeting', resource(@branch, @center, :date => @center.next_meeting_date_from(@date)) + '#weeksheet'
+      = link_to I18n.t("center.weeksheet.meeting.next_meeting", :default => "next meeting"), resource(@branch, @center, :date => @center.next_meeting_date_from(@date)) + '#weeksheet'
   %tr
-    %td center manager
+    %td=I18n.t "center.weeksheet.meeting.center_man", :default => "center manager"
     %td= link_to @center.manager.name, resource(@center.manager)
     %td
       %form{ :action => resource(@branch, @center) + '#weeksheet', :method => 'GET', :style => 'margin: 0px; padding: 0px;'  }
         = date_select 'date', @date
         %br
-        hide inactive clients
+        =I18n.t "center.weeksheet.meeting.hide_client", :default => "hide inactive clients"
         = check_box :name => 'filter'
-        = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
+        = submit I18n.t("center.weeksheet.meeting.go", :default => "Go!"),  :style => 'margin: 0px; padding: 0px;'

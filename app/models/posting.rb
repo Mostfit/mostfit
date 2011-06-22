@@ -1,6 +1,8 @@
 class Posting
   include DataMapper::Resource
   
+  before :create,  :unverify_account_balances
+
   property :id,           Serial
   property :amount,       Float,   :index => true   
   property :journal_id,   Integer, :index => true  
@@ -14,6 +16,19 @@ class Posting
   def journal_date_of_posting_is_after_account_opening_date
     return [false, "Account #{@account.name} does not exists on this date"] if @account.opening_balance_on_date > Journal.get(journal_id).date
     return true
+  end
+
+  def unverify_account_balances
+    accounting_period = AccountingPeriod.all(:end_date.gte => self.journal.date)
+    accounting_period.each do |ap|
+      account_balance = AccountBalance.first(:account => self.account, :accounting_period => ap)
+      if account_balance and account_balance.verified?
+        account_balance.verified_by = nil
+        account_balance.verified_on = nil
+        return [false, "Error, Account was not Un-Verfied"] unless account_balance.save
+      end
+    end
+    return
   end
 
 end

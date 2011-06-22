@@ -1,17 +1,17 @@
 %h1
-  Regions
+  = I18n.t "region.index.title", :default => "Regions"
 
 %table.narrow.form{:width=>"100%"}
   %thead
     %tr
       %th
-        id
+        = I18n.t "region.index.table.id", :default => "id"
       %th
-        name
+        = I18n.t "region.index.table.name", :default => "name"
       %th
-        areas
+        = I18n.t "region.index.table.areas", :default => "area"
       %th
-        edit
+        = I18n.t "region.index.table.edit", :default => "edit"
   - for region in @regions
     %tr{:class => cycle('odd','even')}
       %td
@@ -21,6 +21,6 @@
       %td
         = region.areas.count
       %td
-        = link_to 'Edit', url(:edit_region,  region)
+        = link_to I18n.t("region.index.edit", :default => "Edit"), url(:edit_region,  region)
 
-= link_to 'New', url(:new_region)
+= link_to I18n.t("region.index.new", :default => "New"), url(:new_region)

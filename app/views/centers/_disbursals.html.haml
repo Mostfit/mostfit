@@ -3,11 +3,11 @@
     %thead
       %tr{:style => "font-size: 0.85em;"}
         %th
-          Name
+          =I18n.t "center.disbursal.table.name", :default => "Name"
         %th
-          Scheduled Disbursal Date
+          =I18n.t "center.disbursal.table.sch_date", :default => "Scheduled Disbursal Date"
         %th
-          Status
+          =I18n.t "center.disbursal.table.status", :default => "Status"
     - loans_to_disburse.group_by{|x| x.client.client_group}.sort_by{|x| x[0].nil? ? "no group" : x[0].name}.each do |group, loans|
       %tr.group
         %td{:colspan => 5}
@@ -18,7 +18,7 @@
               =link_to('edit', resource(branch, center, group, :edit))
               )
           -else
-            "Not attached to any group"
+            =I18n.t "center.disbursal.no_group", :default => "Not attached to any group"
       -loans.each do |loan|
         %tr
           %td
@@ -30,6 +30,6 @@
             - if late > 0
               == "#{late} days late"
             - else
-              on time
+              =I18n.t "center.disbursal.on_time", :default => "on time"
 - else
-  No disbursals today
+  =I18n.t "center.disbursal.not_disbursal", :default => "No disbursals today"

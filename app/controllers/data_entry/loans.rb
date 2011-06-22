@@ -133,7 +133,6 @@ module DataEntry
         @loans = Loan.all(:funding_line => nil).paginate(:page => params[:page], :per_page => 20)
         display @loans
       else
-        debugger
         @results = {}
         @loans = Loan.all(:id => params[:loan].keys)
         @loans.each do |loan| 
