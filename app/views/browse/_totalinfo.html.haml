@@ -33,7 +33,11 @@
       %td{:colspan => 3}
         - absent_count = Attendance.all(:status => "absent").count.to_f
         - total_count = Attendance.all.count.to_f
-        = ((1 - (absent_count/total_count))*100).round(2)
+        - attendance = (1 - (absent_count/total_count))*100
+        - if attendance > 0
+          = (attendance).round(2)
+        - else
+          = "-"
     %tr
       %td
         Closed/repaid loans (number)
