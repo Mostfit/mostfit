@@ -31,7 +31,22 @@
       Premium
     %td
       = text_field :premium
-  - unless @insurance_policy.loan.nil?
+  - if @insurance_policy.id.nil?
+    %tr{:style => "background-color:#fff370"} 
+      %td
+        Apply premium as 
+      %td
+        - @loan_product.insurance_product.fees.each do |f|
+          %ul
+            %li
+              = check_box(:name => "fee_#{f.id}", :checked => true)
+              = f.name
+    %tr{:style => "background-color:#fff370"}
+      %td
+        payable on
+      %td
+        = date_select :fee_date, nil
+  - elsif not @insurance_policy.loan.nil?
     %tr{:style => "background-color:#fff370"} 
       %td
         Apply premium as 
