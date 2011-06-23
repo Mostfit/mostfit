@@ -31,11 +31,11 @@
       Premium
     %td
       = text_field :premium
-  - if @insurance_policy.id.nil?
+  - if @insurance_policy.id.nil? and @loan_product
     %tr{:style => "background-color:#fff370"} 
       %td
         Apply premium as 
-      %td
+      %td        
         - @loan_product.insurance_product.fees.each do |f|
           %ul
             %li
