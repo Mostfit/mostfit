@@ -78,8 +78,8 @@ class Loan
 
   property :staleness_frequency, Integer
 
-  property :center_id, Integer
-  property :branch_id, Integer
+  property :c_center_id, Integer
+  property :c_branch_id, Integer
   property :c_scheduled_maturity_date, Date
   property :c_maturity_date, Date
   property :c_actual_first_payment_date, Date
