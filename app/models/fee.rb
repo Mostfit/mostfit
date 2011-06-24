@@ -73,7 +73,7 @@ class Fee
   end
 
   def Fee.fees_for_insurance_products(fees)
-    fees.select {|fee| fee.payable_on == :policy_issue_date}
+    fees.select {|fee| fee.payable_on.to_s =~ /policy/}
   end
 
   def self.payable_dates
