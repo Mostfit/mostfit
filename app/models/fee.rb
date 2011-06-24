@@ -19,9 +19,9 @@ class Fee
              [:client_date_joined, Client, :date_joined], 
              [:loan_installment_dates, Loan, :installment_dates],
              [:policy_issue_date, InsurancePolicy, :date_from],
-             [:policy_loan_application_date, InsurancePolicy, :loan_applied_on],
-             [:policy_loan_approval_date, InsurancePolicy, :loan_approved_on],
-             [:policy_loan_disbursal_date, InsurancePolicy, :loan_disbursal_date],
+             #[:policy_loan_application_date, InsurancePolicy, :loan_applied_on],
+             #[:policy_loan_approval_date, InsurancePolicy, :loan_approved_on],
+             #[:policy_loan_disbursal_date, InsurancePolicy, :loan_disbursal_date],
              [:penalty, Loan, nil]
             ]
   FeeDue        = Struct.new(:applicable, :paid, :due)
