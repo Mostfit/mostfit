@@ -202,6 +202,16 @@
         %span.greytext these fields are optional so may be specified later
   %tr
     %td
+      %b Applicable Fees
+    %td
+      %b The following fees will be applied to this loan as per the loan product
+      %ul
+        -  @loan_product.fees.each do |f|
+          %li
+            = f.description
+          
+  %tr
+    %td
     %td
       = submit submit_text
       &nbsp;&nbsp;
