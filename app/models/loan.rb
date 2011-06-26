@@ -72,8 +72,6 @@ class Loan
   property :loan_utilization_id,                Integer, :lazy => true, :nullable => true
   property :under_claim_settlement,             Date, :nullable => true
 
-  property :_scheduled_maturity_date,           Date
-
   # Caching baby!
 
   property :staleness_frequency, Integer
