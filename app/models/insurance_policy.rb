@@ -33,11 +33,11 @@ class InsurancePolicy
     "#{insurance_product.name}: Rs.#{sum_insured}"
   end
 
-  [:applied_on, :approved_on, :disbursal_date].each do |p|
-    define_method "loan_#{p}" do 
-      loan.send(p) if loan
-    end
-  end
+  # [:applied_on, :approved_on, :disbursal_date].each do |p|
+  #   define_method "loan_#{p}" do 
+  #     loan.send(p) if loan
+  #   end
+  # end
 
   private
   def set_status

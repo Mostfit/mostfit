@@ -300,9 +300,14 @@ module Merb
     end
 
     def centers_paying_today_collection(date)
-      [["","---"]] + Center.paying_today(session.user, date).map {|c| [c.id.to_s,c.name]}
+      Center.paying_today(session.user, date).reduce({}) do |h, c|
+        key   = "Branch: #{c.branch.name}"
+        value = [c.id.to_s, c.name]
+        (h[key] ||= []) << value
+        h
+      end
     end
-    
+
     def audit_trail_url
       "/audit_trails?"+params.to_a.map{|x| "audit_for[#{x[0]}]=#{x[1]}"}.join("&")
     end

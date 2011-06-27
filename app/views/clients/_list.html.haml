@@ -64,3 +64,4 @@
   = @clients.count
   clients in this center
   = link_to 'Create new client', resource(@branch, @center, :clients, :new), :class => "add"
+  = link_to "Bulk entry of loans", url(:enter_loans, :action => :bulk_form, :query => @center), :class => "edit"
