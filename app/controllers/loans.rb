@@ -88,6 +88,7 @@ class Loans < Application
         end
       end
     end
+  end
     def bulk_create
       klass, attrs = get_loan_and_attrs
       attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
