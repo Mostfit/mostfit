@@ -1,5 +1,56 @@
--error=@payment.errors.instance_variable_get("@errors") if @payment
--if error
-  %error
-    - error.each_key do |k|
-      =error[k]
+-if @center.blank?
+  %xml
+    %error
+      %error_code 400
+      %error_message Not Found
+-elsif @center.meeting_day?(@date)
+  %xml
+    %weeksheet
+      %staff_member_id #{@center.manager.id}
+      %staff_member_name #{@center.manager.name}
+      %date #{@date}
+      %center_id #{@center.id}
+      %center_name #{@center.name}
+      %center_code #{@center.code}
+      %center_address #{h(@center.address)}
+      %meeting_day #{@center.meeting_day?(@date)? @center.meeting_day : ""}
+      %meeting_time_hours #{@center.meeting_day?(@date) ? @center.meeting_time_hours : ""}
+      %meeting_time_minutes #{@center.meeting_day?(@date) ? @center.meeting_time_minutes : ""}
+      - if @option == "rows"
+        %weeksheet_rows
+          - @weeksheet_rows.each do |weeksheet_row|
+            %weeksheet_row
+              %date #{@date}
+              %center_id #{@center.id}
+              %client_id #{weeksheet_row.client_id}
+              %client_name #{weeksheet_row.client_name}
+              %client_group_id #{weeksheet_row.client_group_id}
+              %client_group_name #{weeksheet_row.client_group_name}
+              %loan_id #{weeksheet_row.loan_id}
+              %loan_amount #{weeksheet_row.loan_amount}
+              %disbursal_date #{weeksheet_row.disbursal_date.to_s}
+              %outstanding #{weeksheet_row.outstanding}
+              %installment #{weeksheet_row.installment}
+              %principal #{weeksheet_row.principal} 
+              %interest #{weeksheet_row.interest} 
+              %fees #{weeksheet_row.fees} 
+- else
+  %xml
+    %error
+      %error_code 601
+      %error_message No center meeting
+    %center
+      %id #{@center.id}
+      %name #{@center.name}
+      %code #{@center.code}
+      %address #{h(@center.address)}
+      %contact_number #{@center.contact_number}
+      %landmark #{@center.landmark}
+      %meeting_day #{@center.meeting_day}
+      %meeting_time_hours #{@center.meeting_time_hours}
+      %meeting_time_minutes #{@center.meeting_time_minutes}
+      %creation_date #{@center.creation_date}
+      %manager_staff_id #{@center.manager_staff_id}
+      %branch_id #{@center.branch_id}
+
+

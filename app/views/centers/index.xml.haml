@@ -1,0 +1,18 @@
+%xml
+  %centers
+    - if @centers
+      - @centers.each do |center|
+        %center
+          %id #{center.id}
+          %name #{center.name}
+          %code #{center.code}
+          %address #{h(center.address)}
+          %contact_number #{center.contact_number}
+          %landmark #{center.landmark}
+          %meeting_day #{center.meeting_day}
+          %meeting_time_hours #{center.meeting_time_hours}
+          %meeting_time_minutes #{center.meeting_time_minutes}
+          %creation_date #{center.creation_date}
+          %manager_staff_id #{center.manager_staff_id}
+          %branch_id #{center.branch_id}
+    

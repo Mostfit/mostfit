@@ -1,0 +1,20 @@
+0:
+  :loan_id: 1
+  :date:  "2011-03-22"
+  :current: false 
+  :amount_in_default: 0.0 
+  :days_overdue: 0 
+  :week_id: 549 
+  :scheduled_outstanding_total: 11500.0 
+  :scheduled_outstanding_principal: 10000.0 
+  :actual_outstanding_total: 11500.0 
+  :actual_outstanding_principal: 10000.0 
+  :principal_due: 80.0 
+  :interest_due: 20.0 
+  :principal_paid: 80.0 
+  :interest_paid: 20.0 
+  :status: :outstanding
+  :client_id: 1 
+  :client_group_id: 2 
+  :center_id: 1 
+  :branch_id: 1

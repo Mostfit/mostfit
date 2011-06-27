@@ -1,5 +1,5 @@
 class Exceptions < Merb::Controller
-  
+  provides :xml, :yaml, :js  
   # handle NotFound exceptions (404)
   def not_found
     if request.xhr?
@@ -7,6 +7,7 @@ class Exceptions < Merb::Controller
     elsif request.env['HTTP_REFERER']
       redirect request.env['HTTP_REFERER'], :message => { :error => 'Sorry, page not found' }
     else
+#      only_provides :xml
       render :status => 404
     end
   end
@@ -65,8 +66,12 @@ class Exceptions < Merb::Controller
       redirect request.env['HTTP_REFERER'], :message => { :error => 'Sorry, Not allowed to change verified data.' }
     else
       render
-    end
-    
+    end    
+  end
+ 
+  #get list of errors handle 
+  def index
+    display @template
   end
 end
 

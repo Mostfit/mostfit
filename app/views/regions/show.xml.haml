@@ -1,0 +1,19 @@
+%xml
+  %region
+    - if @region
+      %id #{@region.id}
+      %name #{@region.name}
+      %address #{@region.address}
+      %contact_number #{@region.contact_number}
+      %landmark #{@region.landmark}
+      %creation_date #{@region.creation_date}
+      - if @region.areas and @option == "areas"
+        %areas
+          - @region.areas.each do |area|
+            %area
+              %id #{area.id}
+              %name #{area.name}
+              %address #{h(area.address)}
+              %contact_number #{area.contact_number}
+              %landmark #{area.landmark}
+              %creation_date #{area.creation_date}
