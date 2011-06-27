@@ -9,7 +9,7 @@ class Loan
   before :save,    :update_scheduled_maturity_date
   after  :save,    :update_history_caller  # also seems to do updates
   after  :save,    :levy_fees
-  before :create,  :update_cycle_number
+  after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
   #  after  :destroy, :update_history
 
@@ -74,6 +74,21 @@ class Loan
 
   property :_scheduled_maturity_date,           Date
 
+  # Caching baby!
+
+  property :staleness_frequency, Integer
+
+  property :c_center_id, Integer
+  property :c_branch_id, Integer
+  property :c_scheduled_maturity_date, Date
+  property :c_maturity_date, Date
+  property :c_actual_first_payment_date, Date
+  property :c_last_status, Integer
+  property :c_principal_received, Float
+  property :c_interest_received, Float
+  property :c_last_payment_received_on, Date
+  property :c_last_payment_id, Integer
+  property :c_stale?, Boolean
   
 #  property :taken_over_on,                     Date
 #  property :taken_over_on_installment_number,  Integer 

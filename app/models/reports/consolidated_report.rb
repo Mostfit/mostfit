@@ -47,6 +47,7 @@ class ConsolidatedReport < Report
 
     if self.center_id
       groups = {}
+      @center = Center.get(center_id)
       @center.client_groups.each{|g|
         groups[g.id] = g
       }

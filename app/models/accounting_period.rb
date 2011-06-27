@@ -19,6 +19,7 @@ class AccountingPeriod
 
   validates_with_method :cannot_overlap
   validates_with_method :closing_done_sequentially
+  validates_with_method :all_account_balances_are_verified_before_closing_accounting_period
 
   def <=>(other)
     return (end_date <=> other.begin_date) if other.respond_to?(:begin_date) && other.begin_date
@@ -110,4 +111,11 @@ class AccountingPeriod
     "Accounting period #{name} beginning #{begin_date.strftime("%d-%B-%Y")} through #{end_date.strftime("%d-%B-%Y")}"
   end
 
+  def all_account_balances_are_verified_before_closing_accounting_period
+    return true unless self.closed
+    AccountBalance.all(:accounting_period => self).each do |ab|
+      return [false,"#{ab.account.name} has not been verified for this period"] unless ab.verified?
+    end
+    return true
+  end
 end
