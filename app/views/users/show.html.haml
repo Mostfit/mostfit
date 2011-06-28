@@ -29,6 +29,17 @@
     %tr{:class=>"#{'odd' if counter % 2 == 1}"}
       %td Created At
       %td=@user.created_at.to_s
+    - unless session.user.role == :admin
+      = form_for(@user, :action => "/preferred_locale") do
+        = error_messages_for @user
+        %tr
+          %td
+            Preferred Locale
+          %td
+            = select :preferred_locale, :collection => [["","---"]] + LOCALES.map{|s| [s[0].to_s, s[1].to_s]}, :selected => (@user.preferred_locale ? @user.preferred_locale : "")
+          %td
+            = submit "Update Locale"
+
   %p
     = link_to_with_rights 'edit this user\'s details ', resource(@user, :edit), :class => "edit"
 
