@@ -217,13 +217,13 @@ module Merb
         url  << '/' + part
         if part.to_i.to_s.length == part.length  # true when a number (id)
           o = instance_variable_get('@'+url.split('/')[-2].singular)  # get the object (@branch)
-          s = (o.respond_to?(:name) ? link_to(o.name, url) : link_to('#'+o.object_id.to_s, url))
-          crums[-1] += ": <b><i>#{s}</i></b>"  # merge the instance names (or numbers)
+          s = (o.respond_to?(:name) ? link_to(o.name, url) : link_to('#'+o.id.to_s, url))
+          crums <<  "#{s}"  # merge the instance names (or numbers)
         else  # when not a number (id)
-          crums << link_to(part.gsub('_', ' '), url)  # add the resource name
+          crums << link_to(part.gsub('_', ' '), url)  unless ['centers','clients'].include?(part) # add the resource name
         end
       end
-      ['You are here', crums].join('&nbsp;<b>&gt;&gt;</b>&nbsp;')  # fancy separator
+      '<ul id="crumbs"><li>' + ['<a href="/">Home</a>', crums].join('</li><li>') + '</li></ul>'  # fancy separator
     end
 
     def format_currency(i)

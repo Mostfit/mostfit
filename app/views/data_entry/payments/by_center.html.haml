@@ -197,9 +197,9 @@
       - else
         No LUC pending
 - else
-  Choose a center to record a repayment for
+  %h1  Choose a center to record a repayment for
   = form_for(@payment, :action => url(:enter_payments, :action => 'by_center'), :method => :get) do
-    %table
+    %table.form
       %tr
         %th
           Centers repaying today
@@ -214,6 +214,8 @@
         %th
           For Date
         %td
-          = text_field :name => 'for_date', :value => @date || Date.today
+          = date_select :name => 'for_date', :value => @date || Date.today
           = hidden_field :name => 'return', :value => url(:data_entry)
-    = submit 'Submit'
+      %tr
+        %td{:colspan => "2"}
+          = submit 'Submit'
