@@ -1,6 +1,10 @@
 %h1 Insurance Product: #{@insurance_product.name} 
 %h2 Insurance Company: #{@insurance_product.insurance_company.name}
-
+- if @insurance_product.fees.empty?
+  %h3
+    No fees attached to this product
+- @insurance_product.fees.each do |f|
+  = f.description
 = link_to 'Edit',  url(:edit_insurance_product,  @insurance_product)
 |
 = link_to 'Back', url(:insurance_products)
