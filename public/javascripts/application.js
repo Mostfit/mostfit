@@ -388,7 +388,6 @@ function attachRulesFormEvents(type, id) {//type = {"condition", "precondition"}
     }
     
     $("#"+type+"_select_"+id).change(function() {
-					 //      alert("called")
 					 if(id+1> total_fields)
 					     total_fields = id+10;//delete some more fields than id+1 since sometimes more than 1 field is returned per request(there is no harm is deleting extra fields anyways)
 					 if(id == 0)
@@ -396,13 +395,11 @@ function attachRulesFormEvents(type, id) {//type = {"condition", "precondition"}
 					 parent_div_id = document.getElementById(type+"_select_"+id).parentNode.id;//it is of type c1v2=> condition 1, variable 2
 					 condition_id = Number(parent_div_id.substr(1,1));//now this is with assumption that condition_id is single digit (can there be more than 9 conditions ever? if that happens this code fails)
 					 variable_id = Number(parent_div_id.substr(3,1));//since we have only two variables per condition, variable_id will be single digit
-					 prev_field = document.getElementById(type+"_select_"+(Number(id)-1));
-					 if(prev_field == null)//this happens for first select of every extra condition
-					     prev_field = document.getElementById("select_0");
+           for_element = $('#' + type + '_select_' + id);
 					 $.ajax({
-						    url: "/rules/get?for="+document.getElementById(type+"_select_"+id).value+
+						    url: "/rules/get?for="+for_element.val()+
 							"&type="+type+
-							"&id="+(Number(id)+1)+"&prev_field="+prev_field.value+
+							"&id="+(Number(id)+1)+"&prev_field="+for_element.attr('model')+
 							"&condition_id="+condition_id+/*name of div boxes are c1v1, c2v1 ... where the firstnumber refers to condition_id and second to variable number local to that condition*/
 						    "&variable_id="+variable_id+
 							"&return_only_models=true"
@@ -522,11 +519,12 @@ function fillVariableField(type, condition_id, variable_id) {
 	single_variable_mode = 1;
     }
 
+    prev_value = $('#' + type + '_select_' + id).attr('model')
 
     $.ajax({
 	       url: "/rules/get?for="+for_field_value+
 		   "&type="+type+
-		   "&id="+(Number(id)+1)+"&prev_field="+prev_field.value+
+		   "&id="+(Number(id)+1)+"&prev_field="+prev_value+
 		   "&condition_id="+condition_id+/*name of div boxes are c1v1, c2v1 ... where the firstnumber refers to condition_id and second to variable number local to that condition*/
 	       "&variable_id="+variable_id+
 		   "&single_variable_mode="+single_variable_mode+

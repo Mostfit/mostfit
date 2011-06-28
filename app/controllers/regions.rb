@@ -29,9 +29,9 @@ class Regions < Application
   def create(region)
     @region = Region.new(region)
     if @region.save
-      redirect resource(:regions), :message => {:notice => "Region was successfully created"}
+      redirect resource(:regions), :message => {:notice => I18n.t("region.message.notice", :default => "Region was successfully created")}
     else
-      message[:error] = "Region failed to be created"
+      message[:error] = I18n.t("region.message.error", :default => "Region failed to be created")
       render :new
     end
   end

@@ -1,24 +1,24 @@
 %table{:style => "margin:auto; border: solid 1px #777;"}
   %tr{:style => "border: solid 1px black; background: lightyellow"}
-    %th{:rowspan => "2"} on name
-    %th{:rowspan => "2"} loan id
-    %th{:rowspan => "2"} amount
-    %th{:rowspan => "2"} outstanding
-    %th{:rowspan => "2"} disbursed on
-    %th{:rowspan => "2"} installment
-    %th{:colspan => 2, :style => "border: solid black 1px"} principal
-    %th{:colspan => 2, :style => "border: solid black 1px"} interest
-    %th{:colspan => 2, :style => "border: solid black 1px;"} fee
-    %th{:colspan => 2, :style => "border: solid black 1px;"} total
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.on_name", :default => "on name"
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.loan_id", :default => "loan id"
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.amount", :default => "amount"
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.outstanding", :default => "outstanding"
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.disbursed_on", :default => "disbursed on" 
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.installment", :default => "installment" 
+    %th{:colspan => 2, :style => "border: solid black 1px"}=I18n.t "center.payment.table.principal", :default => "principal"
+    %th{:colspan => 2, :style => "border: solid black 1px"}=I18n.t "center.payment.table.interest", :default => "intrest"
+    %th{:colspan => 2, :style => "border: solid black 1px;"}=I18n.t "center.payment.table.fee", :default => "fee"
+    %th{:colspan => 2, :style => "border: solid black 1px;"}=I18n.t "center.payment.table.total", :default => "total"
   %tr{:style => "border: solid 1px black;"}
-    %th.due.left-numeric due
-    %th.paid.right-numeric paid
-    %th.due.left-numeric due
-    %th.paid.right-numeric paid
-    %th.due.left-numeric due
-    %th.paid.right-numeric paid
-    %th.due.left-numeric due
-    %th.paid.right-numeric paid
+    %th.due.left-numeric=I18n.t "center.payment.table.due", :default => "due"
+    %th.paid.right-numeric=I18n.t "center.payment.table.paid", :default => "paid" 
+    %th.due.left-numeric=I18n.t "center.payment.table.due", :default => "due"
+    %th.paid.right-numeric=I18n.t "center.payment.table.paid", :default => "paid"
+    %th.due.left-numeric=I18n.t "center.payment.table.due", :default => "due" 
+    %th.paid.right-numeric=I18n.t "center.payment.table.paid", :default => "paid"
+    %th.due.left-numeric=I18n.t "center.payment.table.due", :default => "due"
+    %th.paid.right-numeric=I18n.t "center.payment.table.paid", :default => "paid"
   %tbody
     - histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
     - fees_applicable = Fee.due(loans.map{|x| x.id}, {:date => @date})

@@ -9,41 +9,42 @@
   #container_form
     .notice{:style => "background: none; text-align: center;"}
       No opening or closing account balances are currently set
-      = link_to 'Set an account balance', url(:new_account_balance), :class => '_remote_ add', :id => 'form'
+      /= link_to 'Set an account balance', url(:new_account_balance, :account_id => @account.id), :class => '_remote_ add', :id => 'form'
 
 - else
   %table.narrow
     %thead
       %tr
         %th
-          id
-        %th
-          Account
-        %th
           Accounting Period
         %th
           Opening Balance
         %th
           Closing Balance
-        %th Actions
+        %th
+          Status
+        %th
+          Actions
     %tr
+    - verifyAB = @account_balances.sort_by{|a| a.accounting_period.begin_date}.collect{|a| a if !a.verified?}.delete_if{|x| x.nil?}
+    - to_be_verified = verifyAB.delete_if{|x| x.accounting_period.closed}.first
+    - reverifyAB = @account_balances.sort_by{|a| a.accounting_period.begin_date}.collect{|a| a if a.verified?}.delete_if{|x| x.nil?}
     - for account_balance in @account_balances
       %tr{:class => cycle('odd','even')}
         %td
-          = account_balance.id
-        %td
-          = link_to account_balance.account.name, resource(account_balance.account)
-        %td
           = link_to account_balance.accounting_period.name, resource(account_balance.accounting_period)
         %td
-          = account_balance.opening_balance
+          = account_balance.opening_balance.to_account_balance
         %td
-          = account_balance.closing_balance
+          = account_balance.closing_balance.to_account_balance
         %td
-          - unless account_balance.verified?
-            = link_to 'Edit', resource(account_balance.account, account_balance.accounting_period, account_balance,:edit)
-            - if session.user.role == :admin
+          - if account_balance.verified?
+            %span{:class => 'green'} Verified
+          - else
+            %span{:class => 'red'} Not Verified
+        %td
+          - if session.user.role == :admin and (not account_balance.accounting_period.closed)
+            - if account_balance == to_be_verified
               = link_to 'Verify', url(:verify_account_balance, account_balance.account, account_balance.accounting_period, account_balance)
-
-
-= link_to 'New', url(:new_account_balance)
+            - elsif reverifyAB.include?(account_balance)
+              = link_to 'Reverify', url(:verify_account_balance, account_balance.account, account_balance.accounting_period, account_balance)

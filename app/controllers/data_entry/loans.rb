@@ -5,6 +5,7 @@ module DataEntry
     def new
       if params[:client_id]
         @client = Client.get(params[:client_id]) || Client.first(:name => params[:client_id]) || Client.first(:reference => params[:client_id])
+        raise NotFound unless @client
         @center = @client.center
 
         if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])
@@ -127,6 +128,30 @@ module DataEntry
       end
     end
     
+    def bulk_update_funding_line
+      if request.method == :get
+        @loans = Loan.all(:funding_line => nil).paginate(:page => params[:page], :per_page => 20)
+        display @loans
+      else
+        @results = {}
+        @loans = Loan.all(:id => params[:loan].keys)
+        @loans.each do |loan| 
+          loan.funding_line_id = params[:loan][loan.id.to_s].to_i unless params[:loan][loan.id.to_s].blank?
+          loan.history_disabled = true
+          @results[loan] = loan.save
+        end
+        @loans = Loan.all(:funding_line => nil).paginate(:page => params[:page], :per_page => 20)
+        if @loans.count > 0
+          render
+        else
+          c = @results.select{|k,v| v}.count
+          redirect url(:data_entry), :message => {:notice => "#{c} Funding Lines updated succesfully"}
+        end
+      end
+    end
+    
+
+
     private
     def set_insurance_policy
       if @loan_product and @loan_product.linked_to_insurance

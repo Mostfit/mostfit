@@ -1,0 +1,34 @@
+= partial :form
+%table.report{:class => @data.empty? ? "" : "nojs"}
+  = partial :header
+  - buckets = []
+  - total_provisioning = @data[:total_provisioning] || 0.0
+  - (LOAN_AGEING_BUCKETS).each do |bucket|
+    - buckets << bucket
+    - row = @data[bucket]
+    - total_loan_amount = row[:total_loan_amount]
+    - total_outstanding_principal = row[:total_outstanding_principal]
+    - outstanding_as_percentage_of_total = row[:outstanding_as_percentage_of_total]
+    - total_par = bucket == 0 ? 0.0 : total_outstanding_principal
+    - provisioning_percentage = row[:provisioning_percentage]
+    - provisioning = row[:provisioning]
+    %tr
+      %td
+        = bucket.is_a?(Fixnum) ? bucket > 0 ? "#{buckets[buckets.index(bucket) -1] + 1} to #{bucket} days" : "#{bucket} days" : bucket.to_s
+      %td
+        = total_loan_amount.to_currency
+      %td
+        = total_outstanding_principal.to_currency
+      %td
+        = outstanding_as_percentage_of_total.round(2)
+      %td
+        = total_par.to_currency
+      %td
+        = provisioning_percentage
+      %td
+        = provisioning.to_currency
+  %tr
+    %td{:colspan => 6}
+      Total Provisioning
+    %td
+      = total_provisioning.to_currency

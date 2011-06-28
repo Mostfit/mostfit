@@ -4,7 +4,7 @@
 = hidden_field :name => "loan_type", :value => @loan.class.to_s
 = hidden_field :name => "loan_product_id", :value => @loan_product.id
 %h3
-  ="This loan will be dispensed by loan product: #{@loan_product.name}"
+  = "This loan will be dispensed by loan product: #{@loan_product.name}"
 %table.form
   - if not take_over_loan
     %tr

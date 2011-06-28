@@ -1,12 +1,12 @@
 #accounting_rules_table  
   %form._remote_{:method => :get, :action => url(:rule_books, :return => "/accounts"), :style => "float: right"}
-    %b Show accounts of 
+    %b Show accounting rules of 
     = select :branch_id, :collection => Branch.all.map{|b| [b.id, b.name]}, :prompt => "All rules"
     = hidden_field :name => "_target_", :value => "accounting_rules_table"
     = submit "GO"
   %table.report.nojs
     %h1 
-      List of Accounting Rules  
+    List of Accounting Rules  
     = link_to "Add a new rule", url(:new_rule_book, :return => params[:return], :branch_id => params[:branch_id]), :class => "_remote_ add"
     %tr
       %th 
@@ -29,7 +29,9 @@
         Active
       %th
     %tr
-    - for rule_book in @rule_books.all(:order => [:branch_id.asc, :action.desc])    
+    - for rule_book in @rule_books.all(:order => [:branch_id.asc, :from_date.asc, :action.desc])    
+    - car = CreditAccountRule.all(:rule_book_id => rule_book.id)
+    - dar = DebitAccountRule.all(:rule_book_id => rule_book.id)
       %tr
         %td
           = rule_book.name
@@ -53,11 +55,15 @@
                 = rule_book.journal_type.name
         %td 
           - rule_book.credit_accounts.map do |credit_account|
-            = credit_account.name
+            = credit_account.name 
+            | 
+            = car.first(:credit_account_id => credit_account.id).percentage
             %br
         %td
           - rule_book.debit_accounts.each do |debit_account|
             = debit_account.name
+            | 
+            = dar.first(:debit_account_id => debit_account.id).percentage
             %br
         %td
           = rule_book.from_date

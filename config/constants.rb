@@ -22,7 +22,7 @@ INSTALLMENT_FREQUENCIES = [:daily, :weekly, :biweekly, :monthly, :quadweekly]
 WEEKDAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 MONTHS = ["None", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 STATUSES = [:applied_in_future, :pending_approval, :rejected, :approved, :disbursed, :outstanding, :repaid, :written_off, :claim_settlement, :preclosed]
-EPSILON  = 0.001
+EPSILON  = 0.01
 INACTIVE_REASONS = ['', 'no_further_loans', 'death_of_client', 'death_of_spouse']
 ModelsWithDocuments = ['Area', 'Region', 'Branch', 'Center', 'Client', 'Loan', 'ClientGroup', 'StaffMember', 'User', 'Mfi', 'Funder', 
                        'InsuranceCompany', 'InsurancePolicy', 'Claim']
@@ -88,3 +88,7 @@ REPORT_ACCESS_HASH = {
 NORMAL_REPAYMENT_STYLE = :normal
 PRORATA_REPAYMENT_STYLE = :prorata
 REPAYMENT_STYLES = [NORMAL_REPAYMENT_STYLE, PRORATA_REPAYMENT_STYLE]
+LOAN_AGEING_BUCKETS = [0, 30, 60, 90, 180, 365, :older]
+LOSS_PROVISION_PERCENTAGES_BY_BUCKET = [0, 10, 25, 50, 75, 90, 100]
+DEFAULT_LOCALE = 'en'
+LOCALES = [["en","English"],["hi","Hindi"]]

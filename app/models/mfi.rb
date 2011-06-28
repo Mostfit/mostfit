@@ -50,6 +50,7 @@ class Mfi
   property :currency_format,  String,  :nullable => true, :length => 20
   property :session_expiry,   Integer, :nullable => true, :min => 60, :max => 86400
   property :password_change_in, Integer, :nullable => true
+  property :org_locale, String
 
   property :report_access_rules, Yaml, :nullable => true, :default => {}
 

@@ -9,7 +9,7 @@ class Loan
   before :save,    :update_scheduled_maturity_date
   after  :save,    :update_history_caller  # also seems to do updates
   after  :save,    :levy_fees
-  before :create,  :update_cycle_number
+  after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
   #  after  :destroy, :update_history
 
@@ -62,6 +62,7 @@ class Loan
   property :cheque_number,                     String,  :length => 20, :nullable => true, :index => true
   property :cycle_number,                      Integer, :default => 1, :nullable => false, :index => true
 
+  #these amount and disbursal dates are required for TakeOver loan types. 
   property :original_amount,                    Integer
   property :original_disbursal_date,            Date
   property :original_first_payment_date,        Date
@@ -73,13 +74,28 @@ class Loan
 
   property :_scheduled_maturity_date,           Date
 
+  # Caching baby!
+
+  property :staleness_frequency, Integer
+
+  property :c_center_id, Integer
+  property :c_branch_id, Integer
+  property :c_scheduled_maturity_date, Date
+  property :c_maturity_date, Date
+  property :c_actual_first_payment_date, Date
+  property :c_last_status, Integer
+  property :c_principal_received, Float
+  property :c_interest_received, Float
+  property :c_last_payment_received_on, Date
+  property :c_last_payment_id, Integer
+  property :c_stale?, Boolean
   
 #  property :taken_over_on,                     Date
 #  property :taken_over_on_installment_number,  Integer 
 
   # associations
   belongs_to :client
-  belongs_to :funding_line
+  belongs_to :funding_line, :nullable => true
   belongs_to :loan_product
   belongs_to :occupation,                :nullable  => true
   belongs_to :applied_by,                :child_key => [:applied_by_staff_id],                :model => 'StaffMember'
@@ -103,7 +119,7 @@ class Loan
   has n, :applicable_fees,    :child_key => [:applicable_id], :applicable_type => "Loan"
   #validations
 
-  validates_present      :client, :funding_line, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
+  validates_present      :client, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
 
   validates_with_method  :amount,                       :method => :amount_greater_than_zero?
   validates_with_method  :interest_rate,                :method => :interest_rate_greater_than_or_equal_to_zero?
@@ -812,7 +828,7 @@ class Loan
     return :disbursed            if (date == disbursal_date.holiday_bump) and total_received < total_to_be_received
     if total_received >= total_to_be_received
       @status =  :repaid
-    elsif amount<=principal_received and scheduled_interest_up_to(date)<=interest_received_up_to(Date.today)
+    elsif (amount - principal_received) <= EPSILON and scheduled_interest_up_to(date)<=interest_received_up_to(Date.today)
       @status =  :repaid
     elsif amount<=principal_received
       @status =  :repaid
@@ -1120,6 +1136,7 @@ class Loan
     [false, "The scheduled first payment date cannot precede the scheduled disbursal date"]
   end
   def properly_approved?
+    return [false, "Funding Line must be set before approval"] unless funding_line
     return true if (approved_on and (approved_by or approved_by_staff_id)) or (approved_on.blank? and (approved_by.blank? or approved_by_staff_id.blank?))
     [false, "The approval date and the staff member that approved the loan should both be given"]
   end

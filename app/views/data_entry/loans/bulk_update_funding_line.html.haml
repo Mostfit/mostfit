@@ -1,0 +1,33 @@
+%h1 Bulk Update Funding Line
+
+= form_for (@loan, :action => url(:controller => 'data_entry/loans', :action => :bulk_update_funding_line)) do
+  
+  %table.report.nojs
+    %tr.header
+      %th
+        Id
+      %th
+        Loan
+      %th
+        Client
+      %th
+        Center
+      %th
+        Funding Line
+    - @loans.each do |loan|
+      %tr
+        %td
+          = loan.id
+        %td
+          = loan.description
+        %td
+          = loan.client.name
+        %td
+          = loan.client.center.name
+        %td
+          = select_funding_line_for(loan, :funding_line, {:name => "loan[#{loan.id}]"})
+  = submit 'Update Funding Lines'        
+      
+
+= paginate @loans
+    

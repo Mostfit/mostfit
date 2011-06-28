@@ -17,6 +17,6 @@
     %i No fees defined for insurance products
 - else
   - for fee in fees_for_insurance
-    = check_box :name => "#{fee}", :checked => @insurance_product.fees.include?(fee)
+    = check_box :name => "fees[#{fee.id}]", :checked => @insurance_product.fees.include?(fee)
     = fee.name
   %br

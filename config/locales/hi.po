@@ -1,0 +1,316 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"X-Language: hi\n"
+
+msgctxt "center.approval.label"
+msgid "मंजूर\340\245\200"
+msgstr "मंजूर\340\245\200"
+
+msgctxt "center.approval.no_center"
+msgid "किसी भी केंद्र से जुड़ा  नहीं "
+msgstr "किसी भी केंद्र से जुड़ा  नहीं "
+
+msgctxt "center.approval.not_approval"
+msgid "कोई मंजूरी आ\340\244\234"
+msgstr "आज कोई  मंजूरी नहीं  "
+
+msgctxt "center.approval.on_time"
+msgid "समय प\340\244\260"
+msgstr "समय प\340\244\260"
+
+msgctxt "center.approval.table.name"
+msgid "ना\340\244\256"
+msgstr "ना\340\244\256"
+
+msgctxt "center.approval.table.sch_date"
+msgid "वितरण तिथि अनुसूचि\340\244\244"
+msgstr "वितरण तिथि अनुसूचि\340\244\244"
+
+msgctxt "center.approval.table.status"
+msgid "स्थित\340\244\277"
+msgstr "स्थित\340\244\277"
+
+msgctxt "center.disbursal.label"
+msgid "प्रार्थनापत्रो\340\244\202"
+msgstr "वितरण "
+
+msgctxt "center.disbursal.no_group"
+msgid "नहीं किसी भी समूह से जुड़\340\245\207"
+msgstr "नहीं किसी भी समूह से जुड़\340\245\207"
+
+msgctxt "center.disbursal.not_disbursal"
+msgid "आज कोई प्रार्थनापत्रो\340\244\202"
+msgstr "आज कोई वितरण नहीं "
+
+msgctxt "center.disbursal.on_time"
+msgid "समय प\340\244\260"
+msgstr "समय प\340\244\260"
+
+msgctxt "center.disbursal.table.name"
+msgid "ना\340\244\256"
+msgstr "ना\340\244\256"
+
+msgctxt "center.disbursal.table.sch_date"
+msgid "वितरण तिथि अनुसूचि\340\244\244"
+msgstr "वितरण तिथि अनुसूचि\340\244\244"
+
+msgctxt "center.disbursal.table.status"
+msgid "स्थित\340\244\277"
+msgstr "स्थित\340\244\277"
+
+msgctxt "center.payment.label"
+msgid "भुगता\340\244\250"
+msgstr "भुगता\340\244\250"
+
+msgctxt "center.payment.table.amount"
+msgid "राश\340\244\277"
+msgstr "राश\340\244\277"
+
+msgctxt "center.payment.table.disbursed_on"
+msgid "पर संवितरि\340\244\244"
+msgstr "पर संवितरि\340\244\244"
+
+msgctxt "center.payment.table.due"
+msgid "कार\340\244\243"
+msgstr "कार\340\244\243"
+
+msgctxt "center.payment.table.fee"
+msgid "शुल्\340\244\225"
+msgstr "शुल्\340\244\225"
+
+msgctxt "center.payment.table.installment"
+msgid "किस्\340\244\244"
+msgstr "किस्\340\244\244"
+
+msgctxt "center.payment.table.interest"
+msgid "ब्या\340\244\234"
+msgstr "ब्या\340\244\234"
+
+msgctxt "center.payment.table.loan_id"
+msgid "ऋण आईड\340\245\200"
+msgstr "ऋण आईड\340\245\200"
+
+msgctxt "center.payment.table.on_name"
+msgid "नाम प\340\244\260"
+msgstr "नाम प\340\244\260"
+
+msgctxt "center.payment.table.outstanding"
+msgid "बकाय\340\244\276"
+msgstr "बकाय\340\244\276"
+
+msgctxt "center.payment.table.paid"
+msgid "भुगता\340\244\250"
+msgstr "भुगता\340\244\250"
+
+msgctxt "center.payment.table.principal"
+msgid "मूल धन"
+msgstr "मूल धन"
+
+msgctxt "center.payment.table.total"
+msgid "कु\340\244\262"
+msgstr "कु\340\244\262"
+
+msgctxt "center.weeksheet.meeting.at"
+msgid "पर बैठ\340\244\225"
+msgstr "पर बैठ\340\244\225"
+
+msgctxt "center.weeksheet.meeting.center_man"
+msgid "केंद्र प्रबंध\340\244\225"
+msgstr "केंद्र प्रबंध\340\244\225"
+
+msgctxt "center.weeksheet.meeting.go"
+msgid "जाने दो!"
+msgstr "जाने दो!"
+
+msgctxt "center.weeksheet.meeting.hide_client"
+msgid "निष्क्रिय ग्राहकों को छिपान\340\245\207"
+msgstr "निष्क्रिय ग्राहकों को छिपान\340\245\207"
+
+msgctxt "center.weeksheet.meeting.next_meeting"
+msgid "अगली बैठ\340\244\225"
+msgstr "अगली बैठ\340\244\225"
+
+msgctxt "center.weeksheet.meeting.no_meeting"
+msgid "no meeting today"
+msgstr "no meeting today"
+
+msgctxt "center.weeksheet.meeting.pre_meeting"
+msgid "पिछली बैठ\340\244\225"
+msgstr "पिछली बैठ\340\244\225"
+
+msgctxt "center.weeksheet.meeting.today"
+msgid "कोई बैठक आ\340\244\234"
+msgstr "कोई बैठक आ\340\244\234"
+
+msgctxt "center.weeksheet.no_meeting"
+msgid "इस दिन एक बैठक दा नहीं ह\340\245\210"
+msgstr "इस दिन एक बैठक दा नहीं ह\340\245\210"
+
+msgctxt "center.weeksheet.record_link"
+msgid "इन गतिविधियों रिकार्\340\244\241"
+msgstr "इन गतिविधिवोको रिकॉर्ड की जी ये "
+
+msgctxt "center.weeksheet.title"
+msgid "सप्ताह  %{week} बैठक मेनू  केंद्र के लिए  %{name}"
+msgstr "केंद्र %{name} के लिए  मीटिंग   : सप्ताह क्रं . %{week}"
+
+msgctxt "region.error.validation.manager_not_present"
+msgid "प्रबंधक रिक्त नहीं होना चाहि\340\244\217"
+msgstr "प्रबंधक रिक्त नहीं होना चाहि\340\244\217"
+
+msgctxt "region.error.validation.name_length"
+msgid "नाम के बीच %{min} और %{max} अक्षर का होना चाहि\340\244\217"
+msgstr "नाम के बीच %{min} और %{max} अक्षर का होना चाहि\340\244\217"
+
+msgctxt "region.error.validation.name_not_unique"
+msgid "नाम रिक्त नहीं होना चाहि\340\244\217"
+msgstr "नाम रिक्त नहीं होना चाहि\340\244\217"
+
+msgctxt "region.fields.address"
+msgid "पत\340\244\276"
+msgstr "पत\340\244\276"
+
+msgctxt "region.fields.back"
+msgid "पीछे की ओ\340\244\260"
+msgstr "पीछे की ओ\340\244\260"
+
+msgctxt "region.fields.contact_phone_number"
+msgid "संपर्क फ़ोन नंब\340\244\260"
+msgstr "संपर्क फ़ोन नंब\340\244\260"
+
+msgctxt "region.fields.create"
+msgid "उत्पन्न करन\340\244\276"
+msgstr "उत्पन्न करन\340\244\276"
+
+msgctxt "region.fields.creation_date"
+msgid "निर्माण तिथ\340\244\277"
+msgstr "निर्माण तिथ\340\244\277"
+
+msgctxt "region.fields.edit"
+msgid "संपादन करन\340\244\276"
+msgstr "संपादन करन\340\244\276"
+
+msgctxt "region.fields.landmark"
+msgid "सीमाचिह्\340\244\250"
+msgstr "सीमाचिह्\340\244\250"
+
+msgctxt "region.fields.manager"
+msgid "प्रबंध\340\244\225"
+msgstr "प्रबंध\340\244\225"
+
+msgctxt "region.fields.region_name"
+msgid "क्षेत्र का ना\340\244\256"
+msgstr "क्षेत्र का ना\340\244\256"
+
+msgctxt "region.fields.show"
+msgid "दिखान\340\244\276"
+msgstr "दिखान\340\244\276"
+
+msgctxt "region.fields.title"
+msgid "नया क्षेत्\340\244\260"
+msgstr "नया क्षेत्\340\244\260"
+
+msgctxt "region.fields.update"
+msgid "नयी-नय\340\245\200"
+msgstr "नयी-नय\340\245\200"
+
+msgctxt "region.index.edit"
+msgid "संपादन करन\340\244\276"
+msgstr "संपादन करन\340\244\276"
+
+msgctxt "region.index.new"
+msgid "न\340\244\217"
+msgstr "न\340\244\217"
+
+msgctxt "region.index.table.areas"
+msgid "क्षेत्रों मे\340\244\202"
+msgstr "क्षेत्रों मे\340\244\202"
+
+msgctxt "region.index.table.edit"
+msgid "संपादन करन\340\244\276"
+msgstr "संपादन करन\340\244\276"
+
+msgctxt "region.index.table.id"
+msgid "अनुक्रमाणिका "
+msgstr "अनुक्रमाणिका "
+
+msgctxt "region.index.table.name"
+msgid "ना\340\244\256"
+msgstr "ना\340\244\256"
+
+msgctxt "region.index.title"
+msgid "क्षेत्रों मे\340\244\202"
+msgstr "क्षेत्रों मे\340\244\202"
+
+msgctxt "region.message.error"
+msgid "क्षेत्र में पैदा किए जाने में विफ\340\244\262"
+msgstr "क्षेत्र में पैदा किए जाने में विफ\340\244\262"
+
+msgctxt "region.message.notice"
+msgid "क्षेत्र सफलतापूर्वक बनाया गय\340\244\276"
+msgstr "क्षेत्र सफलतापूर्वक बनाया गय\340\244\276"
+
+msgctxt "region.show.address"
+msgid "पत\340\244\276"
+msgstr "पत\340\244\276"
+
+msgctxt "region.show.areas.add_area"
+msgid "यहां खटखट~की~आवा\340\245\233"
+msgstr "यहां खटखट~की~आवा\340\245\233"
+
+msgctxt "region.show.areas.no_area_msg"
+msgid "कोई नहीं क्षेत्रों में है \340\245\244"
+msgstr "कोई नहीं क्षेत्रों में है \340\245\244"
+
+msgctxt "region.show.areas.table.action"
+msgid "कार्रवा\340\244\210"
+msgstr "कार्रवा\340\244\210"
+
+msgctxt "region.show.areas.table.branches"
+msgid "शाखाए\340\244\202"
+msgstr "शाखाए\340\244\202"
+
+msgctxt "region.show.areas.table.id"
+msgid "इन ना\340\244\256"
+msgstr "इन ना\340\244\256"
+
+msgctxt "region.show.areas.table.name"
+msgid "ना\340\244\256"
+msgstr "ना\340\244\256"
+
+msgctxt "region.show.areas.title"
+msgid "के अधीन क्षेत्रो\340\244\202"
+msgstr "के अधीन क्षेत्रो\340\244\202"
+
+msgctxt "region.show.areas.to_add_one"
+msgid "जोड. को ए\340\244\225"
+msgstr "जोड. को ए\340\244\225"
+
+msgctxt "region.show.contact_phone_number"
+msgid "दूरभाष नंबर संपर्\340\244\225"
+msgstr "दूरभाष नंबर संपर्\340\244\225"
+
+msgctxt "region.show.landmark"
+msgid "सीमाचिह्\340\244\250"
+msgstr "सीमाचिह्\340\244\250"
+
+msgctxt "region.show.name"
+msgid "क्षेत्\340\244\260"
+msgstr "क्षेत्\340\244\260"
+
+msgctxt "region.show.new_link"
+msgid "जोड. एक नया क्षेत्\340\244\260"
+msgstr "जोड. एक नया क्षेत्\340\244\260"
+
+msgctxt "region.show.tab.areas"
+msgid "क्षेत्रों मे\340\244\202"
+msgstr "क्षेत्रों मे\340\244\202"
+
+msgctxt "region.show.tab.info"
+msgid "जानकार\340\245\200"
+msgstr "जानकार\340\245\200"
+
+msgctxt "region.show.tab.map"
+msgid "Map"
+msgstr "नक्षा"

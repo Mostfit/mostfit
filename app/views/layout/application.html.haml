@@ -53,7 +53,7 @@
           = link_to_with_class('Dashboard', url(:dashboard))
           = link_to_with_class('Reports', url(:reports))
           #header_search_div
-            %form._remote_{:action => '/search', :class => 'search', :method => "POST",  :id => "search-form"}
+            %form._remote_{:action => '/search', :class => 'search', :method => "POST", :style => "float:left;", :id => "search-form"}
               %input{:name => 'query', :value => params[:query], :autocomplete => "off"}
               %input{:type => 'hidden', :name => '_target_', :value => "content p:first"}
               %input{:type => 'submit', :value=>'search'}

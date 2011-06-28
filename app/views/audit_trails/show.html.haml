@@ -4,7 +4,7 @@
     = select :name => "user", :collection => [["", "All users"]] + User.all.map{|u| [u.id, u.name]}, :selected => params[:user]
 
     %b in
-    = select :name => "auditable_type", :collection => ["", "Branch", "Center", "Client", "Loan"], :selected => params[:auditable_type], :class => "_remote_", :id => "auditable_type"
+    = select :name => "auditable_type", :collection => ["", "Branch", "Center", "Client", "Loan", "User"], :selected => params[:auditable_type], :class => "_remote_", :id => "auditable_type"
     - if params[:auditable_type] and params[:col] and @properties
       = select :name => "col", :id => "audit_col", :collection => @properties.map{|x| [x.to_s, x.to_s]}, :prompt => "select column", :selected => params[:col]
 

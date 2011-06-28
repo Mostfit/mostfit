@@ -1,4 +1,5 @@
 class Application < Merb::Controller
+  before :set_locale
   before :ensure_authenticated
   before :ensure_password_fresh
   before :ensure_can_do
@@ -7,6 +8,20 @@ class Application < Merb::Controller
   
   @@controllers  = ["regions", "area", "branches", "centers", "clients", "loans", "payments", "staff_members", "funders", "portfolios", "funding_lines"]
   @@dependant_deletable_associations = ["history", "loan_history", "audit_trails", "attendances", "portfolio_loans", "postings", "credit_account_rules", "debit_account_rules", "center_meeting_days", "applicable_fees"]
+
+  def set_locale
+    if params[:locale]
+      I18n.locale = params[:locale]
+    elsif session[:locale]
+      I18n.locale = session[:locale]
+    elsif session.user and not session.user.preferred_locale.blank?
+      I18n.locale = session.user.preferred_locale
+    elsif Mfi.first and not Mfi.first.org_locale.blank?
+      I18n.locale = Mfi.first.org_locale
+    else
+      I18n.locale = DEFAULT_LOCALE
+    end
+  end
 
   def ensure_password_fresh
     if session.key?(:change_password) and session[:change_password] and not params[:action] == "change_password"
