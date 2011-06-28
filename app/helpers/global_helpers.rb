@@ -12,6 +12,13 @@ module Merb
       end
     end
 
+    def current_user_info
+      staff_or_funder = ""
+      staff_or_funder = "#{session.user.staff_member.name}" if session.user.staff_member 
+      staff_or_funder += " #{session.user.funder.name}" if session.user.funder
+      "#{staff_or_funder} logged in as <b>#{link_to session.user.login, resource(session.user)}</b> (#{session.user.role.to_s.humanize}) | #{link_to 'log out', url(:logout)}"
+    end
+
     def link_to_with_class(name, url)
       link_to_with_rights(name, url, :class => ((request.uri==(url) or request.uri.index(url)==0) ? "selected" : ""))
     end
@@ -209,8 +216,8 @@ module Merb
       HTML
     end
 
-    def breadcrums
-      # breadcrums use the request.uri and the instance vars of the parent
+    def breadcrumbs
+      # breadcrumbs use the request.uri and the instance vars of the parent
       # resources (@branch, @center) that are available -- so no db queries
       crums, url = [], ''
       request.uri.split("?")[0][1..-1].split('/').each_with_index do |part, index|
@@ -220,7 +227,7 @@ module Merb
           s = (o.respond_to?(:name) ? link_to(o.name, url) : link_to('#'+o.id.to_s, url))
           crums <<  "#{s}"  # merge the instance names (or numbers)
         else  # when not a number (id)
-          crums << link_to(part.gsub('_', ' '), url)  unless ['centers','clients'].include?(part) # add the resource name
+          crums << link_to(I18n.t("breadcrumb.#{part}", :default => part.gsub('_', ' ')), url) unless ['centers','clients'].include?(part) # add the resource name
         end
       end
       '<ul id="crumbs"><li>' + ['<a href="/">Home</a>', crums].join('</li><li>') + '</li></ul>'  # fancy separator
