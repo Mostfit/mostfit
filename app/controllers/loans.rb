@@ -45,8 +45,10 @@ class Loans < Application
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])
     raise BadRequest unless @loan_product
+    fee_params = params.delete(:fees)
     @loan = klass.new(attrs)
     @loan.loan_product = @loan_product
+    msg = {}
     if @loan.save
       msg[:notice] = "Loan '#{@loan.id}' was successfully created"
       if params[:fees]

@@ -27,7 +27,7 @@ class Payment
   property :client_id,           Integer, :nullable => true, :index => true
   property :fee_id,              Integer, :nullable => true, :index => true
   property :desktop_id,          Integer
-  property :origin,              String, :default => "server"
+  property :origin,              String, :default => DEFAULT_ORIGIN
 
   belongs_to :loan, :nullable => true
   belongs_to :client

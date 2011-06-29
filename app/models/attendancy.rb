@@ -7,7 +7,7 @@ class Attendance
   property :date,            Date
   property :status,          Enum.send('[]', *ATTENDANCY_STATES), :nullable => false
   property :desktop_id,          Integer
-  property :origin,              String
+  property :origin,              String, :default => DEFAULT_ORIGIN
 
   belongs_to :client
   belongs_to :center
