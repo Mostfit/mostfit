@@ -1,8 +1,9 @@
-.right
-  = link_to 'New', url(:new_target), :class => "add"
-  = link_to "Monthly bulk target entry", url(:action => :bulk_entry_new), :class => "add"
 %h1
   Targets
+
+.menu-strip{:style => "margin: 10px;"}
+  = link_to 'Add a target', url(:new_target), :class => "add"
+  = link_to "Monthly bulk target entry", url(:action => :bulk_entry_new), :class => "add"
 
 %table.narrow
   %thead

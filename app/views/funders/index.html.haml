@@ -1,6 +1,6 @@
 %h1 Overview of all funders
-%p
-  == Manage existing funders or #{link_to 'create a new funder', resource(:funders, :new), :class => "bold"}.
+.menu-strip{:style => "margin: 10px;"}
+  = link_to_with_rights 'Create a new funder', url(:new_funder), :class => "add"
 
 - if @funders.blank?
   %p
@@ -36,4 +36,3 @@
       %tr
         %td{ :colspan => 6 }
 
-  = link_to_with_rights 'Create a new funder >>', url(:new_funder), :class => "button"

@@ -26,7 +26,7 @@
       - atts = Attendance.all(:client_id => clients.map{|x| x.id}, :date => @date).map{|x| [x.client_id,x]}.to_hash
       - loans = @loans||Loan.all(:client_id => clients.map{|x| x.id})
       - histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
-      - all_repayment_style_choices = [[PRORATA_REPAYMENT_STYLE,"pro rata"], [NORMAL_REPAYMENT_STYLE,"fees=>int=>prin"]]
+      - all_repayment_style_choices = [[NORMAL_REPAYMENT_STYLE,"fees=>int=>prin"], [PRORATA_REPAYMENT_STYLE,"pro rata"]]
       - default_repayment_style = Mfi.first.default_repayment_style ? Mfi.first.default_repayment_style : NORMAL_REPAYMENT_STYLE
       - default_repayment_style_choice = all_repayment_style_choices.select {|style| style[0] == default_repayment_style}
       - repayment_style_choices = Mfi.first.allow_choice_of_repayment_style ? default_repayment_style_choice + (all_repayment_style_choices.reject {|style| style[0] == default_repayment_style}) : default_repayment_style_choice
