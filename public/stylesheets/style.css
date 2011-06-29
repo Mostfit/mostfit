@@ -4,7 +4,6 @@ body {
     font-family: Arial,Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
     padding: 0px;
     margin: 0px;
-    size: 16px;
 }
 h1 {
     color: #E88E02;
@@ -378,7 +377,7 @@ a.add_small, a.add_small:visited, a.add_small:link {
 a.edit, a.edit:visited, a.edit:link {
   background-image: url(/images/edit.png);
   background-repeat: no-repeat;
-  padding: 3px 0px 4px 30px;
+  padding: 3px 10px 4px 30px;
   color: black;
   font-size: 16px;
   font-weight: normal;
@@ -492,20 +491,6 @@ a.bold:visited {
   font-size: 1.2em;
   color: #2b2214;
   text-decoration: underline;
-}
-a.button:link {
-  background-color: darkorange;
-  color: white;
-  padding: 4px;
-  border: orange solid 1px;
-  margin: 3px;
-}
-a.button:visited {
-  background-color: darkorange;
-  color: white;
-  padding: 4px;
-  border: orange solid 1px;
-  margin: 3px;
 }
 
 #header
@@ -1393,10 +1378,11 @@ table.clearform tr td.legend{
 .menu-strip {
   width: 560px;
   padding: 7px; 
-  border: solid 2px #ABCF76; 
-  -moz-box-shadow: 2px 2px 4px #c9c9c9;
-  box-shadow: 2px 2px 4px #c9c9c9;
+  border: solid 1px #cfcfcf;
+  /* -moz-box-shadow: 2px 2px 4px #c9c9c9; */
+  /* box-shadow: 2px 2px 4px #c9c9c9; */
   margin: 5px;
+  font-size: 1.2em;
 } 
 
 #breadcrums {
@@ -1481,3 +1467,12 @@ table.clearform tr td.legend{
 
 .breadcrumb li a:hover { background: hsla(85,93%,25%,1); }
 .breadcrumb li a:hover:after { border-left-color: hsla(85,93%,25%,1) !important; }
+
+.applied { font-weight: bold; color: blue;}
+.approved { font-weight: bold; color: grey;}
+.outstanding { font-weight: bold; color: darkgreen;}
+.repaid { font-weight: bold; color: brown;}
+.arrears { font-weight: bold; color: red;}
+.written-off { font-weight: bold; color: black;}
+.preclosed { font-weight: bold; color: orange;}
+
