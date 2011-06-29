@@ -103,6 +103,20 @@ class Loan
 #  property :taken_over_on,                     Date
 #  property :taken_over_on_installment_number,  Integer 
 
+  property :c_center_id, Integer
+  property :c_branch_id, Integer
+  property :c_scheduled_maturity_date, Date
+  property :c_maturity_date, Date
+  property :c_actual_first_payment_date, Date
+  property :c_last_status, Integer
+  property :c_principal_received, Float
+  property :c_interest_received, Float
+  property :c_last_payment_received_on, Date
+  property :c_last_payment_id, Integer
+
+
+  property :converted, Boolean
+
   # associations
   belongs_to :client
   belongs_to :funding_line, :nullable => true
@@ -276,13 +290,13 @@ class Loan
     LoanHistory.first(:loan_id => id, :date.lte => date, :order => [:date.desc], :limit => 1)
   end
 
-  def _show_cf(width = 10, padding = 4) #convenience function to see cashflow in console
-    ps = payment_schedule
+  def _show_cf(width = 10, padding = 4, actual = false, round = 4) #convenience function to see cashflow in console
+    ps = actual ? payments_hash : payment_schedule
     titles = [:date, :total_balance, :balance, :principal, :interest, :total_paid, :total_principal, :total_interest, :fees]
     puts titles.map{|t| t.to_s[0..width - 1].rjust(width - padding/2).ljust(width)}.join("|")
     ps.keys.sort.each do |d| 
       ps[d][:total_paid] = ps[d][:principal] + ps[d][:interest]
-      puts ([d.to_s] + titles[1..-1].map{|t| ps[d][t].round(4)}).map{|s| s.to_s.rjust(width - padding/2).ljust(width)}.join("|")
+      puts ([d.to_s] + titles[1..-1].map{|t| (ps[d][t] ? ps[d][t].round(round) : 0)}).map{|s| s.to_s.rjust(width - padding/2).ljust(width)}.join("|")
     end
     false
   end
@@ -1106,14 +1120,17 @@ class Loan
     i = used = prin = int = 0.0
     d = received_on
     total = total.to_f
+    debugger if self.id == 5547
     while used < total
       prin += scheduled_principal_for_installment(installment_for_date(d))
       int  += scheduled_interest_for_installment(installment_for_date(d))
       used  = (prin + int)
       d = shift_date_by_installments(d, 1)
     end
-    interest  = total * int/(prin + int)
-    principal = total * prin/(prin + int)
+    prin = [0,prin].max
+    int = [0,int].max
+    interest  = [0,total * int/(prin + int)].max
+    principal = [0,total * prin/(prin + int)].max
     [interest, principal]
   end
 

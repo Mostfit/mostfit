@@ -7,137 +7,183 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'production')
 
 namespace :mostfit do
   namespace :conversion do
-    desc "Conversion of Flat to Reducing Balance Loans"
-    task :flat_to_reducing, :loan_id do |task, args|
-      last_date = Date.new(2011, 03, 31)
-      hash = {:loan_product_id => [2, 3, 9, 10, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]}
-      loan_product_id = [2, 3, 9, 10, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
-      interest_rate = [29.2501, 31.744, 31.504, 31.02, 31.504, 14.67, 28.74, 12.01, 15.70, 26.89, 12.88, 17.49, 30.04, 11.79, 15.56, 26.76]
-
+    task :prepare_db do
+      Rake::Task['db:autoupgrade'].invoke
+      puts "modifying loan_history table..."
+      repository.adapter.execute("alter table loan_history modify scheduled_outstanding_principal float not null, modify scheduled_outstanding_total float not null, modify actual_outstanding_principal float not null, modify actual_outstanding_total float not null, modify principal_due float not null, modify interest_due float not null, modify principal_paid float not null, modify interest_paid float not null;")
+      puts "modifying payments table.."
+      repository.adapter.execute('alter table payments modify amount float not null;')
+      Rake::Task['mostfit:conversion:update_loan_cache']
       i = 0    #increment operator for intrest_rate array.
       #updating all the loan_products.
+      
+      loan_product_id = [2, 3, 9, 10, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+      interest_rate = [29.2501, 31.744, 31.504, 31.02, 31.504, 14.67, 28.74, 12.01, 15.70, 26.89, 12.88, 17.49, 30.04, 11.79, 15.56, 26.76]
       LoanProduct.all(:id => loan_product_id).each{|lp|
         puts i
         puts lp.id
-        puts lp.loan_type, lp.loan_type_string
-        if (lp.loan_type == "DefaultLoan" or lp.loan_type_string == "DefaultLoan")
-          lp.loan_type = lp.loan_type_string = "EquatedWeekly"
-        elsif (lp.loan_type == "RoundedPrincipalAndInterestLoan" or lp.loan_type_string == "RoundedPrincipalAndInterestLoan")
-          lp.loan_type = lp.loan_type_string = "EquatedWeeklyRoundedAdjustedLastPayment"
-        elsif (lp.loan_type == "PararthRounded" or lp.loan_type_string == "PararthRounded")
-          lp.loan_type = lp.loan_type_string = "EquatedWeeklyRoundedAdjustedLastPayment"
-        end
-        puts lp.loan_type, lp.loan_type_string
-        lp.min_interest_rate = lp.max_interest_rate = interest_rate[i]
+        lp.min_interest_rate = 0
+        lp.max_interest_rate = 100
         i += 1      #increment operator to get next interest_rate for next loan_product_id.
         lp.save!
         puts "next loan product"
         puts i
       }
 
-      f = File.open("tmp/flat_to_reducing_#{DateTime.now.to_s}.csv", "w")
-      f.puts("\"Loan Id\", \"Loan Product Id\", \"Loan Product Name\", \"Loan Product Type\", \"Loan Product Interest Rate\", \"Loan Discriminator\", \"Loan Status\", \"Amount\", \"Interest Rate\", \"Status\", \"Errors (if any)\"")
+      StaffMember.all(:active => false).each{|sm| sm.active = true; sm.save}
+      User.all(:active => false).each{|sm| sm.active = true; sm.save}
+      repository.adapter.execute('update loans set discriminator="Loan";')
 
-      if args[:loan_id]
-        lid = args[:loan_id].to_i
-        hash[:id] = lid
-      else
-        hash[:discriminator] = [DefaultLoan, RoundedPrincipalAndInterestLoan, PararthRounded] 
-      end
-      puts Loan.all(hash).count
-
-      Loan.all(hash).each{|l|
-        last_history = LoanHistory.first(:loan_id => l.id, :date.lte => Date.today, :order => [:date.desc], :status => [:disbursed, :outstanding])
-        puts last_history
-        next unless last_history
-        next unless last_history.date >= last_date
-
-        #updatiing the discriminator of loans.
-        if l.discriminator == DefaultLoan
-          l.discriminator = EquatedWeekly
-        elsif l.discriminator == RoundedPrincipalAndInterestLoan
-          l.discriminator = EquatedWeeklyRoundedAdjustedLastPayment
-        elsif l.discriminator == PararthRounded
-          l.discriminator = EquatedWeeklyRoundedAdjustedLastPayment
-        end
-
-        #updating the interest_rate according to loan_products. TODO: do away with if-else ladder. Left intentionally.
-        if l.loan_product_id == 2
-          l.interest_rate = 29.2501/100
-        elsif l.loan_product_id == 3
-          l.interest_rate = 31.744/100
-        elsif l.loan_product_id == 9
-          l.interest_rate = 31.504/100
-        elsif l.loan_product_id == 10
-          l.interest_rate = 31.02/100
-        elsif l.loan_product_id == 13
-          l.interest_rate = 31.504/100
-        elsif l.loan_product_id == 15
-          l.interest_rate = 14.67/100
-        elsif l.loan_product_id == 16
-          l.interest_rate = 28.74/100
-        elsif l.loan_product_id == 17
-          l.interest_rate = 12.01/100
-        elsif l.loan_product_id == 18
-          l.interest_rate = 15.70/100
-        elsif l.loan_product_id == 19
-          l.interest_rate = 26.89/100
-        elsif l.loan_product_id == 20
-          l.interest_rate = 12.88/100
-        elsif l.loan_product_id == 21
-          l.interest_rate = 17.49/100
-        elsif l.loan_product_id == 22
-          l.interest_rate = 30.04/100
-        elsif l.loan_product_id == 23
-          l.interest_rate = 11.79/100
-        elsif l.loan_product_id == 24
-          l.interest_rate = 15.56/100
-        elsif l.loan_product_id == 25
-          l.interest_rate = 26.76/100
-        end
-        
-        l.save!
-        loan = Loan.get(l.id)
-        errors = []
-
-        loan.loan_history.each{|lh|
-          ps = Payment.all(:type => [:principal, :interest], :received_on => lh.date, :loan_id => lh.loan_id)
-          pdue = loan.scheduled_principal_due_on(lh.date)
-          idue = loan.scheduled_interest_due_on(lh.date)
-          if ps.length==2 and loan.payment_schedule[lh.date] and pdue + idue > 0 and (1..10).to_a.include?((ps[0].amount + ps[1].amount).to_i / (pdue + idue).to_i)
-            installments_paid = (ps[0].amount + ps[1].amount).to_i / (pdue + idue).to_i
-            ps[0].amount = ps[1].amount = 0
-            date = lh.date
-            installments_paid.times{
-              ps[0].amount += loan.send("scheduled_#{ps[0].type}_due_on", date)
-              ps[1].amount += loan.send("scheduled_#{ps[1].type}_due_on", date)
-              date = loan.shift_date_by_installments(date, 1)
-            }
-            ps[0].save!
-            ps[1].save!            
-          else
-            if ps.length == 1
-              errors << ["only one payment found on #{lh.date}"]
-            elsif ps.length == 2
-              if (pdue + idue) > 0
-                div = ((ps[0].amount + ps[1].amount).to_i / (pdue + idue))
-                if ps[0].amount + ps[1].amount - (pdue + idue) > 0.01 and (div - div.to_i) > 0.01
-                  errors << ["Difference in figures on #{lh.date} of #{ps[0].amount + ps[1].amount - (pdue + idue)}"]
-                end
-              end
-            elsif ps.length > 2
-              errors << ["more than two payments found on #{lh.date}"]
-            end
-          end
-        }
-        Loan.get(l.id).update_history
-        if errors.length > 0
-          f.puts("#{l.id}, #{l.loan_product_id}, \"#{l.loan_product.name}\", \"#{l.loan_product.loan_type_string}\", #{l.loan_product.min_interest_rate}, #{l.discriminator}, \"#{l.status}\", #{l.amount}, #{l.interest_rate}, errors, #{errors.join(';')}")
-        else
-          f.puts("#{l.id}, #{l.loan_product_id}, \"#{l.loan_product.name}\", \"#{l.loan_product.loan_type_string}\", #{l.loan_product.min_interest_rate}, #{l.discriminator}, \"#{l.status}\", #{l.amount}, #{l.interest_rate}, success, #{errors.join(';')}")
-        end
-      }
-      f.close
     end
+
+    task :add_maturity_dates do
+      Branch.all.each do |branch|
+        puts "starting branch #{branch.name}"
+        branch.centers.clients.loans(:_scheduled_maturity_date => nil).each do |l|
+          l._scheduled_maturity_date = l.scheduled_maturity_date
+          l.history_disabled = true
+          l.save
+          puts l.id
+        end
+        puts "done branch #{branch.name}"
+      end
+    end
+
+    desc "run convert script for all branches"
+    task :convert_all_branches do
+      Branch.all.aggregate(:id).each do |branch_id|
+        puts "-------------------------------------"
+        puts "Doing branch #{branch_id}"
+        Rake::Task["mostfit:conversion:f2ew"].execute(:branch_id => branch_id)
+        #Rake::Task["mostfit:conversion:print_branch"].execute(:branch_id => branch_id)
+      end
+    end
+    
+
+
+    desc "convert using repayment_styles"
+    task :f2ew, :branch_id, :loan_id do |task, args|
+      debugger
+      @failures = File.open("tmp/failures_#{args[:branch_id]}", "w")
+      @log = File.open("tmp/conversion_log_#{args[:brnch_id]}","w")
+      loan_product_id = [2, 3, 9, 10, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+      d = Date.new(2011,3,31)
+      if args.is_a? Rake::TaskArguments or args.is_a? Hash
+        loans = (not args[:branch_id].blank?) ? Branch.get(args[:branch_id]).centers.clients.loans(:loan_product_id => loan_product_id, :c_scheduled_maturity_date.gt => d, :converted => false) : (args[:loan_id] ? Loan.all(:id => args[:loan_id]) : [])
+      elsif args.is_a? Fixnum
+        loans = Branch.get(args).centers.clients.loans(:loan_product_id => loan_product_id, :c_scheduled_maturity_date.gt => d, :converted => false)
+      elsif args.is_a? Array
+        loans = Loan.all(:id => args, :loan_product_id => loan_product_id, :c_scheduled_maturity_date.gt => d, :converted => false)
+      else
+        loans = []
+      end
+      # loans = Loan.all(:id => [3378, 5782, 3815, 3817, 3818, 3819, 4770, 4811, 3820, 7259, 3383, 3188, 3550])
+      interest_rate = [29.2501, 31.744, 31.504, 31.7164, 31.504, 29.3399, 28.74, 12.01, 15.70, 26.89, 12.88, 17.49, 30.04, 11.79, 15.56, 26.76]
+      h = loan_product_id.zip(interest_rate).to_hash
+
+      count = loans.count
+      curr = 0
+      loans.each do |l|
+        curr += 1
+        begin        
+          t0 = Time.now
+          old_prin = old_int = new_prin = new_int = 0
+          pmt = l.scheduled_principal_for_installment(1) + l.scheduled_interest_for_installment(1)
+          int_rate = (h[l.loan_product_id]/100)/ l.send(:get_divider)
+          curr_cf = {}
+          ph = l.payments(:type => [:principal, :interest]).group_by{|p| p.received_on}.to_hash
+          next if ph.empty?
+          sql = "INSERT INTO payments(loan_id, type, received_on, created_at, client_id, received_by_staff_id, created_by_user_id, amount) values ("
+          values = []
+          curr_bal = l.amount
+          ph.keys.sort.each_with_index do |date, i|
+            debugger if date == Date.new(2010,11,02)
+            prins = ph[date].select{|p| p.type == :principal}
+            ints = ph[date].select{|p| p.type == :interest}
+            p_amt = prins.reduce(0){|s,p| s + p.amount} || 0
+            i_amt = ints.reduce(0){|s,p| s + p.amount} || 0
+            total_amt = p_amt + i_amt
+            old_prin += p_amt
+            old_int += i_amt
+            amt = total_amt
+            int_pmt = prin_pmt = 0
+            while (amt > 0 and curr_bal > 0)
+              _ipmt = [amt, curr_bal * int_rate].min
+              int_pmt += _ipmt
+              amt -= _ipmt
+              _ppmt = [amt, curr_bal, pmt - _ipmt].min
+              prin_pmt += _ppmt
+              amt -= _ppmt
+              curr_bal -= _ppmt
+            end
+            me = ph[date][0]
+            new_prin += prin_pmt
+            new_int += int_pmt
+            # puts "#{date} #{i} #{curr_bal} [#{p_amt}, #{i_amt}] => [#{prin_pmt}, #{int_pmt}]"
+            [prin_pmt, int_pmt].each_with_index do |a,i|
+              vals = [me.loan_id, i + 1, "'#{me.received_on.strftime('%Y-%m-%d')}'" , 
+                    "'#{DateTime.now.strftime("%Y-%m-%d %H:%M:%S")}'", me.client_id, me.received_by_staff_id, me.created_by_user_id]
+              val_string = vals.push(a).join(",")
+              values.push(val_string)
+            end
+            curr_cf[date] = [int_pmt, prin_pmt, curr_bal]
+          end
+          old_total = old_prin + old_int
+          new_total = new_prin + new_int
+          if (old_total - new_total).abs > 10
+            s = "*#{l.id}: #{Time.now - t0} (#{curr}/#{count}).[#{old_prin.round(2)}+#{old_int.round(2)}=#{old_total.round(2)}] => [#{new_prin.round(2)}+#{new_int.round(2)}=#{new_total.round(2)}]\n"
+            puts s
+            @failures.write("#{l.id} - total mismatch\n")
+            next
+          end
+          sql += values.join("),(")
+          sql += ")"
+          debugger
+          discriminator = l.discriminator == "DefaultLoan" ?  "EquatedWeekly" : "EquatedWeeklyRoundedAdjustedLastPayment"
+          repository.adapter.execute("update loans set discriminator='#{discriminator}' where id = #{l.id}")
+          l = Loan.get(l.id)
+          h = loan_product_id.zip(interest_rate).to_hash
+          l.interest_rate = h[l.loan_product_id]/100
+          l.converted = true
+          l.save!
+          repository.adapter.execute("delete from payments where loan_id = #{l.id} and type in (1,2)")
+          repository.adapter.execute(sql)
+          l.update_history(true)
+          s = "#{l.id} #{Time.now - t0} (#{curr}/#{count})\n"
+          @log.write(s)
+          puts s
+        rescue => e
+          puts e
+          @failures.write("#{l.id}\n")
+          puts "#{l.id} failed! (#{curr}/#{count})"
+         end
+      end
+      @failures.close
+      @log.close
+    end
+
+
+    desc "print all branch ceonversion results"
+    task :print_results do
+      Branch.all.aggregate(:id).each do |id|
+        Rake::Task['mostfit:conversion:print_branch'].execute(id)
+      end
+    end
+
+    desc "prints out conversion stats per branch for quick comparison"
+    task :print_branch, :branch_id do |task, args|
+      @file = File.new("tmp/branch_#{args}", "w")
+      puts "doing branch #{args}"
+      Branch.get(args).centers.each do |center|
+        center.clients.loans.each do |l| 
+          payments_recd_on_loan = loan.payments(:type => [:principal, :interest]).aggregate(:amount.sum)
+          repaid_loan_balance =  l.c_scheduled_maturity_date < Date.today ? LoanHistory.first(:loan_id => l.id, :date => l.c_scheduled_maturity_date).actual_outstanding_balance : 0
+          @file.write "#{l.id} : #{l.payments_recd_on_loan} : #{repaid_loan_balance}\n"
+        end
+      end
+      @file.close
+    end
+
+
   end
 end
