@@ -1,7 +1,7 @@
 %h1
   LoanProducts
-= link_to 'New Loan Product', url(:new_loan_product), :class => 'add'
-= link_to 'Design a Product', url(:design_loan_product), :class => 'edit'
+  = link_to 'New Loan Product', url(:new_loan_product), :class => 'add'
+  = link_to 'Design a Product', url(:design_loan_product), :class => 'edit'
 - if @loan_products.length == 0
   %h3
     No Loan Products defined. 

@@ -1,7 +1,7 @@
 body {
     background: #efefef;
     color: #222;
-    font-family: Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
+    font-family: Arial,Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
     padding: 0px;
     margin: 0px;
     size: 16px;
@@ -151,14 +151,46 @@ h1.logo span{
   float: left;
   margin: 20px;
 }
+#crumbs {
+  -moz-box-shadow: 1px 1px 1px #ccc;
+  box-shadow: 2px 2px 1px #abcf76;
+}
+  
+
+ul#crumbs, ul#crumbs li {
+    list-style-type:none;
+    padding:0;
+    margin:0;
+}
+#crumbs {
+    height:2.3em;
+    border:1px solid #dedede;
+    background: #c9fb24;
+    }
+#crumbs li {
+    float:left;
+    line-height:2.3em;
+    color:#777;
+    padding-left:1.75em;
+}
+#crumbs li a {
+    background:url(/images/crumbs.gif) no-repeat right center;
+    display:block;
+    padding: 0 15px 0 10px;
+    color: black;
+    font-size: 1em;
+}
+#crumbs li a:hover,
+#crumbs li a:focus {
+    color:#dd2c0d;
+}
 
 #breadcrums {
-  font-size: 13px;
+  font-size: 1.2em;
   font-weight: bold;
-  margin: 3px;
+  padding: 5px;
 }
 #breadcrums a{
-  font-size: 13px;
 }
 
 .box
@@ -180,10 +212,29 @@ h1.logo span{
 #content h4{
   font-size: 110%;
 }
-table.form, table.form td{
+
+table.form{
   border: 0px;
   font-family: Helvetica;
+  padding: 10px;
 }
+
+.shaded {
+  -moz-box-shadow: 2px 2px 7px #999;
+  box-shadow: 2px 2px 7px #999;
+  padding: 5px; 
+  margin-bottom: 10px;
+}
+
+table.form tr:hover {
+  background: #efefef;
+}
+
+table.form td{
+  border: 0px;
+  vertical-align: middle;
+}
+
 table.border{
   width: 90%;
   border: 1px solid orange;
@@ -231,6 +282,7 @@ td.numeric {
 }
 table.narrow {
   width: 100%;
+  border-bottom: solid 1px #ababab;
 }
 table.narrow td, table.narrow th{
   padding: 2px;
@@ -277,10 +329,15 @@ margin: 0px;
 input[type="text"], input[type="password"], textarea {
   font-size: 100%;
   font-family: sans;
-  background: url(/images/fieldbg.gif) repeat-x scroll center top;
+  background: #fbfbfb;
+  border: 1px solid #E5E5E5;
 }
 input.disabled[type="submit"] {
     color: #ccc;
+}
+select {
+  background: #fbfbfb;
+  border: 1px solid #E5E5E5;
 }
 input.error{
     border-color: red;
@@ -842,6 +899,7 @@ form.form {
   margin-right: auto;
   width: 95%;
   padding: 0px;
+  border: solid 1px #ababab;
 
 }
 
@@ -1339,6 +1397,21 @@ table.clearform tr td.legend{
   color: darkgreen;
 }
 
+#login-form {
+  width:40%;
+  margin: auto;
+  padding: 20px;
+  -moz-border-radius: 5px;
+  -moz-box-shadow: 3px 3px 7px #ccc;
+}
+
+#login-form form {
+  font-size: 1.5em;
+  color: #6c6c6c;
+  line-height: 1.8em;
+  font-weight: bold;
+}
+
 #search-form {
   float: left;
   background: #ABCF76; 
@@ -1358,3 +1431,12 @@ table.clearform tr td.legend{
   color: white;
   margin: 3px;
 }
+
+.menu-strip {
+  width: 560px;
+  padding: 7px; 
+  border: solid 2px #ABCF76; 
+  -moz-box-shadow: 2px 2px 4px #c9c9c9;
+  box-shadow: 2px 2px 4px #c9c9c9;
+  margin: 5px;
+} 
