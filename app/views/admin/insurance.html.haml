@@ -1,11 +1,14 @@
 %h1 Insurance masters  
-%h2
-  Insurance companies
-  |
-  = link_to "New insurance company", url(:new_insurance_company), :class => "add"
-= partial "insurance_companies/list"
-%h2
-  Insurance products
-  |
-  = link_to "New insurance product", url(:new_insurance_product), :class => "add"
-= partial "insurance_products/list"
+.shaded
+  %h2
+    Insurance companies
+  .menu-strip
+    = link_to "New insurance company", url(:new_insurance_company), :class => "add"
+  = partial "insurance_companies/list"
+
+.shaded
+  %h2
+    Insurance products
+    .menu-strip
+      = link_to "New insurance product", url(:new_insurance_product), :class => "add"
+  = partial "insurance_products/list"

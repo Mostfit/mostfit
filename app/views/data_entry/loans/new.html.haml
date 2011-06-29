@@ -26,7 +26,7 @@
       - else
         = @loan.fields_partial
 - else
-  %p
+  %h3
     Please select the client that you want to create a loan for by entering its client ID.
 
   %table.form
@@ -36,8 +36,9 @@
       %tr
         %td &nbsp;
         %td
-          Client ID, Name or Ref.:
+          %b
+            Client ID, Name or Ref.:
         %td
-          = text_field :client_id, :size => 8
+          = text_field :client_id, :size => 25, :style => "height: 20px"
         %td
           = submit "Proceed..."

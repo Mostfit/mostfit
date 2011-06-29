@@ -1,208 +1,220 @@
-:javascript
-  o = {"applied_by":#{@center.manager.id}, "approved_by":#{@center.branch.manager.id}, "disbursed_by":#{@center.manager.id}}
-- take_over_loan = /^TakeOver/.match(@loan_product.loan_type_string)
-= hidden_field :name => "loan_type", :value => @loan.class.to_s
-= hidden_field :name => "loan_product_id", :value => @loan_product.id
-%h3
-  = "This loan will be dispensed by loan product: #{@loan_product.name}"
-%table.form
-  - if not take_over_loan
+.shaded
+  :javascript
+    o = {"applied_by":#{@center.manager.id}, "approved_by":#{@center.branch.manager.id}, "disbursed_by":#{@center.manager.id}}
+  - take_over_loan = /^TakeOver/.match(@loan_product.loan_type_string)
+  = hidden_field :name => "loan_type", :value => @loan.class.to_s
+  = hidden_field :name => "loan_product_id", :value => @loan_product.id
+  %h3
+    = "This loan will be dispensed by loan product: #{@loan_product.name}"
+  %table.form
+    - if not take_over_loan
+      %tr
+        %td
+          Applied Amount:
+        %td
+          - if @loan_product.min_amount!=@loan_product.max_amount
+            = text_field :amount_applied_for, :size => 15
+            %span.greytext in Rupees
+            = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
+          - else
+            = @loan_product.min_amount
+            %span.greytext Rupees
+            = hidden_field :amount_applied_for, :value => @loan_product.min_amount
     %tr
       %td
-        Applied Amount:
+        Interest rate:
       %td
-        - if @loan_product.min_amount!=@loan_product.max_amount
-          = text_field :amount_applied_for, :size => 15
+        - if @loan_product.min_interest_rate != @loan_product.max_interest_rate 
+          = text_field :interest_rate, :size => 15
           %span.greytext in Rupees
-          = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
+          = " (#{@loan_product.min_interest_rate} % - #{@loan_product.max_interest_rate} %)"
         - else
-          = @loan_product.min_amount
-          %span.greytext Rupees
-          = hidden_field :amount_applied_for, :value => @loan_product.min_amount
-  %tr
-    %td
-      Interest rate:
-    %td
-      - if @loan_product.min_interest_rate != @loan_product.max_interest_rate 
-        = text_field :interest_rate, :size => 15
-        %span.greytext in Rupees
-        = " (#{@loan_product.min_interest_rate} % - #{@loan_product.max_interest_rate} %)"
-      - else
-        = @loan_product.min_interest_rate
-        %span.greytext %
-        = hidden_field :interest_rate, :value => @loan_product.min_interest_rate
-      %br/
-      %span.greytext the interest rate as a percentage
-  %tr
-    %td
-      Installment frequency:
-    %td
-      - if INSTALLMENT_FREQUENCIES.include?(@loan_product.installment_frequency)
-        = hidden_field :installment_frequency, :value => @loan_product.installment_frequency.to_s
-        = @loan_product.installment_frequency.to_s
-      - else
-        = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
-  - if @loan_product.installment_frequency == :daily
-    %tr
-      %td
-        Weekly Off
-      %td
-        - weekdays = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
-        = select :weekly_off, :collection => [["","--"]] + weekdays.map{|w| [(weekdays.index(w) + 1).to_s, w]}
-  %tr
-    %td
-      Number of installments:
-    %td
-      - if @loan_product.min_number_of_installments==@loan_product.max_number_of_installments
-        = @loan_product.min_number_of_installments
-        = hidden_field :number_of_installments, :value => @loan_product.min_number_of_installments
-      - else
-        = text_field :number_of_installments, :size => 4
-        = " (#{@loan_product.min_number_of_installments} - #{@loan_product.max_number_of_installments})"
-  %tr
-    %td
-      Loan Purpose:
-    %td
-      = select :occupation_id, :collection => Occupation.all.map{|x| [x.id, x.name]}, :prompt => "----"
-  %tr
-    %td
-      Funding Line
-    %td
-      = select_funding_line_for @loan, :funding_line
-  - if Funder.count==0 and session.user.role==:admin
-    %tr
-      %td{:colspan => 2}
-        %div.error
-          You do not have any funder created yet. Create them                 
-          =link_to("here", resource(:funders, :new))
-  - elsif FundingLine.count==0 and session.user.role==:admin
-    %tr
-      %td{:colspan => 2}
-        %div.error
-          You do not have any funding line created yet. Create them                 
-          =link_to("here", resource(:funders))
-  %tr
-    %td
-      Application:
-    %td
-      on&nbsp;&nbsp;
-      = date_select_for @loan, :applied_on
-      &nbsp;&nbsp;by&nbsp;&nbsp;
-      = select_staff_member_for @loan, :applied_by, :selected => @center.manager.id.to_s, :id => "applied_by"
-  %tr
-    %td
-      Scheduled disbursal date:
-    %td
-      on&nbsp;&nbsp;
-      - probable_scheduled_disbursal_date = @center.next_meeting_date_from(Date.today)
-      = date_select_for @loan, :scheduled_disbursal_date, :max_date => Date.max_date, :date => (@loan.scheduled_disbursal_date || probable_scheduled_disbursal_date)
-  - if @loan_product.installment_frequency == :weekly
-    %tr
-      %td
-        Scheduled first payment:
-      %td
-        on&nbsp;&nbsp;
-        = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date, :date => (@loan.scheduled_first_payment_date || @center.next_meeting_date_from(probable_scheduled_disbursal_date))
-  - else
-    %tr
-      %td
-        Scheduled first payment:
-      %td
-        on&nbsp;&nbsp;
-        = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date
-  - if take_over_loan
-    %tr
-      %td{:colspan => 2}
-        %b This is a take over loan product and needs details of the takeover
-    %tr
-      %td
-        Original amount:
-      %td
-        = text_field :original_amount, :size => 15
-        %span.greytext the amount which originally disbursed
-    %tr
-      %td
-        Original disbursal date:
-      %td
-        = date_select_for @loan, :original_disbursal_date, :max_date => Date.max_date, :min_date => Date.min_date
-        %span.greytext the date on which this loan originally disbursed
-    %tr
-      %td
-        Original first payment date:
-      %td
-        = date_select_for @loan, :original_first_payment_date, :max_date => Date.max_date, :min_date => Date.min_date
-        %span.greytext the date on which first payment was made for this loan
-    %tr
-      %td
-        Taken over on:
-      %td
-        = date_select_for @loan, :taken_over_on, :max_date => Date.max_date, :min_date => Date.min_date
-        %span.greytext the date on which this loan was taken over
-    %tr
-      %td
-        Taken installment number:
-      %td
-        = text_field :taken_over_on_installment_number, :size => 5
-        %span.greytext number of installments already paid
-  - if @loan_product.linked_to_insurance
-    %tr              
-      %td
-        %b Insurance policy details
-      %td{:colspan => 4}
-        - @insurance_policy.insurance_product = @loan_product.insurance_product
-        = error_messages_for @insurance_policy
-        = form_for(@insurance_policy, :action => resource(@client, :insurance_policies) ) do
-          = partial "insurance_policies/fields"
-
-  - if not @loan.new? and [:admin, :mis_manager].include?(session.user.role)
-    %tr
-      %td
-        Approved Amount:
-      %td
-        - if @loan_product.min_amount!=@loan_product.max_amount
-          = text_field :amount_sanctioned, :size => 15
-          %span.greytext in Rupees
-          = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
-        - else
-          = @loan_product.min_amount
-          %span.greytext Rupees
-          = hidden_field :amount_applied_for, :value => @loan_product.min_amount
-    %tr
-      %td
-        Approval date:
-      %td
-        on&nbsp;&nbsp;
-        = date_select_for @loan, :approved_on, :nullable => true
-        &nbsp;&nbsp;by&nbsp;&nbsp;
-        = select_staff_member_for @loan, :approved_by, :id => "approved_by"
+          = @loan_product.min_interest_rate
+          %span.greytext %
+          = hidden_field :interest_rate, :value => @loan_product.min_interest_rate
         %br/
-        %span.greytext these fields are optional so may be specified later
-
+        %span.greytext the interest rate as a percentage
     %tr
       %td
-        Disbursed Amount:
+        Installment frequency:
       %td
-        - if @loan_product.min_amount!=@loan_product.max_amount
-          = text_field :amount, :size => 15
-          %span.greytext in Rupees
-          = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
+        - if INSTALLMENT_FREQUENCIES.include?(@loan_product.installment_frequency)
+          = hidden_field :installment_frequency, :value => @loan_product.installment_frequency.to_s
+          = @loan_product.installment_frequency.to_s
         - else
-          = @loan_product.min_amount
-          %span.greytext Rupees
-          = hidden_field :amount_applied_for, :value => @loan_product.min_amount
+          = select :installment_frequency, :collection =>  Loan.installment_frequencies.map { |x| [x.to_s, x.to_s] }
+    - if @loan_product.installment_frequency == :daily
+      %tr
+        %td
+          Weekly Off
+        %td
+          - weekdays = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+          = select :weekly_off, :collection => [["","--"]] + weekdays.map{|w| [(weekdays.index(w) + 1).to_s, w]}
     %tr
       %td
-        Disbursal date:
+        Number of installments:
+      %td
+        - if @loan_product.min_number_of_installments==@loan_product.max_number_of_installments
+          = @loan_product.min_number_of_installments
+          = hidden_field :number_of_installments, :value => @loan_product.min_number_of_installments
+        - else
+          = text_field :number_of_installments, :size => 4
+          = " (#{@loan_product.min_number_of_installments} - #{@loan_product.max_number_of_installments})"
+    %tr
+      %td
+        Loan Purpose:
+      %td
+        = select :occupation_id, :collection => Occupation.all.map{|x| [x.id, x.name]}, :prompt => "----"
+    %tr
+      %td
+        Funding Line
+      %td
+        = select_funding_line_for @loan, :funding_line
+    - if Funder.count==0 and session.user.role==:admin
+      %tr
+        %td{:colspan => 2}
+          %div.error
+            You do not have any funder created yet. Create them                 
+            =link_to("here", resource(:funders, :new))
+    - elsif FundingLine.count==0 and session.user.role==:admin
+      %tr
+        %td{:colspan => 2}
+          %div.error
+            You do not have any funding line created yet. Create them                 
+            =link_to("here", resource(:funders))
+    %tr
+      %td
+        Application:
       %td
         on&nbsp;&nbsp;
-        = date_select_for @loan, :disbursal_date, :nullable => true
+        = date_select_for @loan, :applied_on
         &nbsp;&nbsp;by&nbsp;&nbsp;
-        = select_staff_member_for @loan, :disbursed_by, :id => "disbursed_by"
-        %br/
-        %span.greytext these fields are optional so may be specified later
-  %tr
-    %td
-    %td
-      = submit submit_text
-      &nbsp;&nbsp;
-      = link_to 'cancel', cancel_link
+        = select_staff_member_for @loan, :applied_by, :selected => @center.manager.id.to_s, :id => "applied_by"
+    %tr
+      %td
+        Scheduled disbursal date:
+      %td
+        on&nbsp;&nbsp;
+        - probable_scheduled_disbursal_date = @center.next_meeting_date_from(Date.today)
+        = date_select_for @loan, :scheduled_disbursal_date, :max_date => Date.max_date, :date => (@loan.scheduled_disbursal_date || probable_scheduled_disbursal_date)
+    - if @loan_product.installment_frequency == :weekly
+      %tr
+        %td
+          Scheduled first payment:
+        %td
+          on&nbsp;&nbsp;
+          = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date, :date => (@loan.scheduled_first_payment_date || @center.next_meeting_date_from(probable_scheduled_disbursal_date))
+    - else
+      %tr
+        %td
+          Scheduled first payment:
+        %td
+          on&nbsp;&nbsp;
+          = date_select_for @loan, :scheduled_first_payment_date, :max_date => Date.max_date
+    - if take_over_loan
+      %tr
+        %td{:colspan => 2}
+          %b This is a take over loan product and needs details of the takeover
+      %tr
+        %td
+          Original amount:
+        %td
+          = text_field :original_amount, :size => 15
+          %span.greytext the amount which originally disbursed
+      %tr
+        %td
+          Original disbursal date:
+        %td
+          = date_select_for @loan, :original_disbursal_date, :max_date => Date.max_date, :min_date => Date.min_date
+          %span.greytext the date on which this loan originally disbursed
+      %tr
+        %td
+          Original first payment date:
+        %td
+          = date_select_for @loan, :original_first_payment_date, :max_date => Date.max_date, :min_date => Date.min_date
+          %span.greytext the date on which first payment was made for this loan
+      %tr
+        %td
+          Taken over on:
+        %td
+          = date_select_for @loan, :taken_over_on, :max_date => Date.max_date, :min_date => Date.min_date
+          %span.greytext the date on which this loan was taken over
+      %tr
+        %td
+          Taken installment number:
+        %td
+          = text_field :taken_over_on_installment_number, :size => 5
+          %span.greytext number of installments already paid
+    - if @loan_product.linked_to_insurance
+      %tr              
+        %td
+          %b Insurance policy details
+        %td{:colspan => 4}
+          - @insurance_policy.insurance_product = @loan_product.insurance_product
+          = error_messages_for @insurance_policy
+          = form_for(@insurance_policy, :action => resource(@client, :insurance_policies) ) do
+            = partial "insurance_policies/fields"
+  
+    - if not @loan.new? and [:admin, :mis_manager].include?(session.user.role)
+      %tr
+        %td
+          Approved Amount:
+        %td
+          - if @loan_product.min_amount!=@loan_product.max_amount
+            = text_field :amount_sanctioned, :size => 15
+            %span.greytext in Rupees
+            = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
+          - else
+            = @loan_product.min_amount
+            %span.greytext Rupees
+            = hidden_field :amount_applied_for, :value => @loan_product.min_amount
+      %tr
+        %td
+          Approval date:
+        %td
+          on&nbsp;&nbsp;
+          = date_select_for @loan, :approved_on, :nullable => true
+          &nbsp;&nbsp;by&nbsp;&nbsp;
+          = select_staff_member_for @loan, :approved_by, :id => "approved_by"
+          %br/
+          %span.greytext these fields are optional so may be specified later
+  
+      %tr
+        %td
+          Disbursed Amount:
+        %td
+          - if @loan_product.min_amount!=@loan_product.max_amount
+            = text_field :amount, :size => 15
+            %span.greytext in Rupees
+            = " (#{@loan_product.min_amount} - #{@loan_product.max_amount}) in multiples of Rs. #{@loan_product.amount_multiple}"
+          - else
+            = @loan_product.min_amount
+            %span.greytext Rupees
+            = hidden_field :amount_applied_for, :value => @loan_product.min_amount
+      %tr
+        %td
+          Disbursal date:
+        %td
+          on&nbsp;&nbsp;
+          = date_select_for @loan, :disbursal_date, :nullable => true
+          &nbsp;&nbsp;by&nbsp;&nbsp;
+          = select_staff_member_for @loan, :disbursed_by, :id => "disbursed_by"
+          %br/
+          %span.greytext these fields are optional so may be specified later
+    %tr
+      %td
+        %b Applicable Fees
+      %td
+        %b The following fees will be applied to this loan as per the loan product
+        %ul
+          -  @loan_product.fees.each do |f|
+            %li
+              = f.description
+            
+    %tr
+      %td
+      %td
+        = submit submit_text
+        &nbsp;&nbsp;
+        = link_to 'cancel', cancel_link
+  

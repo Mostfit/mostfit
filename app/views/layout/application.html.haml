@@ -29,7 +29,7 @@
         - if session.authenticated?
           =link_to 'change password', url(:change_password)
           |
-          == logged in as <b>#{session.user.login}</b> (#{link_to 'log out', url(:logout)})          
+          = current_user_info
         - else
           existing users can
           %b= link_to 'login', url(:login)
@@ -59,7 +59,7 @@
               %input{:type => 'submit', :value=>'search'}
     #content
       .container
-        #breadcrums= breadcrums
+        #breadcrums= breadcrumbs
         - if message
           #flash-messages.span-17.prefix-5.suffix-5.last            
             - message.each do |key, value|
