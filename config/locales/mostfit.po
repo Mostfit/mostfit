@@ -323,3 +323,6 @@ msgctxt "breadcrumb.browse"
 msgid "browse"
 msgstr 
 
+msgctxt "page.title.login"
+msgid "Mostfit - Login"
+msgstr 

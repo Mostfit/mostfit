@@ -38,7 +38,7 @@ class MerbAuthSlicePassword::Sessions < MerbAuthSlicePassword::Application
   # @overwritable
   def redirect_after_logout
     message[:notice] = "Logged Out"
-    redirect "/", :message => message
+    redirect "/login", :message => message
   end  
 
   # @private
