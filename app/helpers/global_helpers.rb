@@ -230,7 +230,7 @@ module Merb
           crums << link_to(I18n.t("breadcrumb.#{part}", :default => part.gsub('_', ' ')), url) unless ['centers','clients'].include?(part) # add the resource name
         end
       end
-      '<ul id="crumbs"><li>' + ['<a href="/">Home</a>', crums].join('</li><li>') + '</li></ul>'  # fancy separator
+      '<ul class="breadcrumb"><li>' + ['<a href="/">Home</a>', crums].join('</li><li>') + '</li></ul>'  # fancy separator
     end
 
     def format_currency(i)
