@@ -282,7 +282,6 @@ td.numeric {
 }
 table.narrow {
   width: 100%;
-  border-bottom: solid 1px #ababab;
 }
 table.narrow td, table.narrow th{
   padding: 2px;
