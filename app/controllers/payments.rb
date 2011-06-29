@@ -52,9 +52,18 @@ class Payments < Application
     raise NotFound unless (@loan or @client)
     success = do_payment(payment)
     if success  # true if saved
-      redirect url_for_loan(@loan||@client), :message => {:notice => "Payment of ##{@payment.id} has been registered"}
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+        mark_attendance
+        display @payment
+      else
+        redirect url_for_loan(@loan||@client), :message => {:notice => "Payment of #{@payment.id} has been registered"}
+      end
     else
-      render :new
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+        display @payment
+      else
+        render :new
+      end
     end
   end
 
@@ -110,8 +119,9 @@ class Payments < Application
     receiving_staff = StaffMember.get(payment[:received_by_staff_id])
 
     if payment[:type] == "total" and @loan
+      @payment_type = payment[:type]
     # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
-      success, @prin, @int, @fees = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff, true, params[:style].to_sym)
+      success, @prin, @int, @fees = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff, true, params[:style].to_sym, context = :default, payment[:desktop_id], payment[:origin])
       @payment = Payment.new
       @prin.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @prin
       @int.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @int
@@ -120,6 +130,7 @@ class Payments < Application
       Loan.get(@loan.id).update_history(true) if success and @loan
       return success
     else
+      @payment_type = payment[:type] if payment[:type]
       @payment = Payment.new(payment)
       @payment.amount = amounts
       @payment.loan = @loan if @loan
@@ -141,4 +152,11 @@ class Payments < Application
       return success      
     end
   end
+
+  def mark_attendance
+    return if not params or not params[:attendance]
+    @attendance = Attendance.new(params[:attendance])
+    @attendance.save
+  end
+
 end # Payments

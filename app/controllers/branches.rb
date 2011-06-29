@@ -12,10 +12,15 @@ class Branches < Application
   end
 
   def show(id)
+    @option = params[:option] if params[:option]
     @branch = Branch.get(id)
     raise NotFound unless @branch
     @centers = @branch.centers_with_paginate({:meeting_day => params[:meeting_day]}, session.user)
-    display [@branch, @centers], 'centers/index', :layout => layout?
+    if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+      display [@branch, @centers]
+    else
+      display [@branch, @centers], 'centers/index', :layout => layout?
+    end
   end
   
   def today(id)

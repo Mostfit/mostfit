@@ -38,7 +38,6 @@ class AccountPaymentObserver
   end
   
   def self.reverse_posting_entries(obj)
-    debugger
     credit_accounts, debit_accounts, rule = RuleBook.get_accounts(obj)
     # j = Journal.first(:transaction_id => obj.id, :journal_type_id => 1, :order => [:created_at.desc]) if obj.type == :principal
     # j = Journal.first(:transaction_id => obj.id, :journal_type_id => 2, :order => [:created_at.desc]) if obj.type == :interest or obj.type == :fees
@@ -59,7 +58,7 @@ class AccountPaymentObserver
     debit_accounts.each{|account, amount|  debit_accounts[account] = amount * -1}     if debit_accounts.is_a?(Hash)
     credit_accounts.each{|account, amount| credit_accounts[account] = amount * -1}    if credit_accounts.is_a?(Hash)
     
-    journal[:journal_type_id]=  j.journal_type.id
+    journal[:journal_type_id]=  rule.journal_type.id
     status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)
   end
   
