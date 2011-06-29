@@ -20,24 +20,24 @@ namespace :mostfit do
   task :simulate do
     Merb.logger.info "Simulating the natural activity in a pattern"
     names = []
-    CSV.foreach("simulation_data/names.csv") {|name| names << name[0]}
+    CSV.foreach("db/names.csv") {|name| names << name[0]}
     len = names.length
     counter = 1
     user = User.first
 
     regions = []
-    CSV.foreach("simulation_data/in_lat_long.csv") {|row| regions << row[0] << row[1] << row[2] << row[3]}
+    CSV.foreach("db/in_lat_long.csv") {|row| regions << row[0] << row[1] << row[2] << row[3]}
     nregions = regions.length/4
 
     areas = []
-    CSV.foreach("simulation_data/in_lat_long1.csv") {|row| areas << row[0] << row[1] << row[2]}
+    CSV.foreach("db/in_lat_long1.csv") {|row| areas << row[0] << row[1] << row[2]}
     nareas = areas.length/3
 
     dobs = []
-    CSV.foreach("simulation_data/date_of_births.csv") {|dob| dobs << dob[0]}
+    CSV.foreach("db/date_of_births.csv") {|dob| dobs << dob[0]}
     dob_len = dobs.length
 
-    CSV.foreach("simulation_data/funders.csv") do |row|
+    CSV.foreach("db/funders.csv") do |row|
       f_name = row[0]
       funder = Funder.first(:name => f_name) || Funder.create(:name => f_name)
       funder.save unless funder.valid?
@@ -47,18 +47,18 @@ namespace :mostfit do
       end
     end
 
-    CSV.foreach("simulation_data/fees.csv") do |row|
+    CSV.foreach("db/fees.csv") do |row|
       fee = Fee.first(:name => row[0], :percentage => row[1].to_f) || Fee.create(:name => row[0], :percentage => row[1].to_f, :amount => row[2].to_i, :min_amount => row[3].to_i, :max_amount => row[4].to_i, :payable_on => :loan_applied_on)
       fee.save unless fee.valid? 
     end
 
-    CSV.foreach("simulation_data/client_types.csv") do |row|
+    CSV.foreach("db/client_types.csv") do |row|
       type = row[0]
       client_type = ClientType.first(:type => type) || ClientType.create(:type => type)
       client_type.save unless client_type.valid?
     end
 
-    CSV.foreach("simulation_data/loan_products.csv") do |row|
+    CSV.foreach("db/loan_products.csv") do |row|
       if(Date.parse(row[9])>Date.today)
         loan_product = LoanProduct.first(:name => row[0]) || LoanProduct.create(:name => row[0], :max_amount => row[1].to_i, :min_amount => row[2].to_i, :max_interest_rate => row[3].to_f, :min_interest_rate => row[4].to_f,
                                                                                    :installment_frequency => :weekly, :max_number_of_installments => row[5].to_i, :min_number_of_installments => row[6].to_i,
@@ -68,19 +68,19 @@ namespace :mostfit do
       end
     end
 
-    CSV.foreach("simulation_data/occupations.csv") do |row|
+    CSV.foreach("db/occupations.csv") do |row|
       occ = row[0]
       occupation = Occupation.first(:name => occ) || Occupation.create(:name => occ)
       occupation.save unless occupation.valid?
     end
 
-    CSV.foreach("simulation_data/insurance_companies.csv") do |row|
+    CSV.foreach("db/insurance_companies.csv") do |row|
       company = row[0]
       insurance_company = InsuranceCompany.first(:name => company) || InsuranceCompany.create(:name => company)
       insurance_company.save unless insurance_company.valid?
     end
 
-    CSV.foreach("simulation_data/insurance_products.csv") do |row|
+    CSV.foreach("db/insurance_products.csv") do |row|
       insurance_product = InsuranceProduct.first(:name => row[0]) || InsuranceProduct.create(:name => row[0], :insurance_company => InsuranceCompany.first(:name => "#{row[1]}"))
       insurance_product.save unless insurance_product.valid?
     end
@@ -94,7 +94,7 @@ namespace :mostfit do
       center_manager = Branch.last.centers.last.manager
       ccount = Region.last.areas.last.branches.count + Region.last.areas.last.branches.centers.count
       raw_data = []
-      CSV.foreach("simulation_data/in_lat_long#{regions[regions.index(Region.last.name)-1]}.csv") {|row| raw_data << row[0] << row[1] << row[2]}
+      CSV.foreach("db/in_lat_long#{regions[regions.index(Region.last.name)-1]}.csv") {|row| raw_data << row[0] << row[1] << row[2]}
       n_center = raw_data.length/3
       data = []
       (0...raw_data.length/3).each {|i|
@@ -118,7 +118,7 @@ namespace :mostfit do
       if ccount >=n_center
         ccount = 0
         raw_data = []
-        CSV.foreach("simulation_data/in_lat_long#{regions[4*region_count]}.csv") {|row| raw_data << row[0] << row[1] << row[2]}
+        CSV.foreach("db/in_lat_long#{regions[4*region_count]}.csv") {|row| raw_data << row[0] << row[1] << row[2]}
         n_center = raw_data.length/3
         data = []
         (0...raw_data.length/3).each {|i|
@@ -258,7 +258,7 @@ namespace :mostfit do
       c_date = Date.new(c_time.year, c_time.month, c_time.day) 
       Merb.logger.info "Current date -> #{c_date}\nNumber of regions -> #{Region.count}\nNumber of areas -> #{Area.count}\nNumber of branches -> #{Branch.count}\nNumber of centers -> #{Center.count}\nNumber of ClientGruops -> #{ClientGroup.count}\nNumber of Clients -> #{Client.count}\nNumber of loans -> #{Loan.count}\nNumber of payments made -> #{Payment.count}\nIteration count -> #{count}"
       Merb.logger.info "========================================================================================================================================================="
-      sleep(86400)
+      sleep(2)
     end
   end
 end
