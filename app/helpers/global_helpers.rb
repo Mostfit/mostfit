@@ -600,7 +600,7 @@ module Merb
       prefix  << params[:action].join_snake(' ') if CRUD_ACTIONS[3..-1].include?(params[:action])
       
       return "Loan for #{@loan.client.name}" if controller=="payments" and @loan
-      return "Mostfit - Login" if (controller == "exceptions" and params[:action] == "unauthenticated") or (controller == "sessions" and params[:action] == "update")
+      return I18n.t("page.title.login", :default => "Mostfit - Login") if (controller == "exceptions" and params[:action] == "unauthenticated") or (controller == "sessions" and params[:action] == "update")
       return params[:report_type] if controller=="reports" and params[:report_type]
 
       #Check if @<controller> is available
