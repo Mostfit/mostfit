@@ -12,7 +12,7 @@ require "base64"
 #end
 #end
 
-class ApiAccess
+class ApiAccessTest
   include HTTParty
   base_uri 'http://localhost:4000/api/v1'
   basic_auth 'admin', 'password'
@@ -98,36 +98,36 @@ class ApiAccess
 
   #create client
   def self.create_client(branch,center)
-    post("/branches/#{branch}/centers/#{center}/clients.xml", :query => {:client => {:name => "my new client", :reference => "BS0999", :date_joined => "2011-04-05", :client_type_id => 1}})
+    post("/branches/#{branch}/centers/#{center}/clients.xml", :query => {:client => {:name => "my new client", :reference => "BS0999", :date_joined => "2011-06-17", :client_type_id => 1}})
   end
 
   #create client payment
   #branch: 1, center : 11, client :167, loans : 199
   def self.create_payment(branch,center,client,loan)
     post("/branches/#{branch}/centers/#{center}/clients/#{client}/loans/#{loan}/payments.xml", :query => {:payment => {:amount =>2500, :type =>:total, :loan_id => loan, :client_id => client, 
-    :received_by_staff_id =>1, :received_on => "2011-04-19", :desktop_id => 1, :origin => "abcd"}, :style => "normal",
-    :attendance => {:status => :present, :date => "2011-04-19",:client_id => client, :center_id => center, :origin => "ddshdjsh", :desktop_id => 2}})  
+    :received_by_staff_id =>1, :received_on => "2011-06-17", :desktop_id => 1, :origin => "abcd"}, :style => "normal",
+    :attendance => {:status => :present, :date => "2011-06-17",:client_id => client, :center_id => center, :origin => "ddshdjsh", :desktop_id => 2}})  
     end
 
   #create client attendance
   def self.create_attendance
-    post("/attendance.xml", :query => {:attendance => {:status => :present, :client_id => 167, :center_id => 11,:date => "2011-03-28"}})
+    post("/attendance.xml", :query => {:attendance => {:status => :present, :client_id => 629, :center_id => 1,:date => "2011-06-17"}})
   end
 
   #create loan
   #branch: 1, center : 11, client :167
   def self.create_loan(branch,center,client)
-    post("/branches/#{branch}/centers/#{center}/clients/#{client}/loans.xml", :query => {:equated_weekly =>{:interest_rate =>31.7444, :number_of_installments => 46, :scheduled_first_payment_date =>"18-04-2011", :installment_frequency => "weekly",:applied_by_staff_id =>5, :amount_applied_for => 8000, :occupation_id => 20, :funding_line_id =>1, :scheduled_disbursal_date =>"11-04-2011", :applied_on =>"08-04-2011"}, :loan_product_id => 1, :loan_type=>"EquatedWeekly"})
+    post("/branches/#{branch}/centers/#{center}/clients/#{client}/loans.xml", :query => {:equated_weekly =>{:interest_rate =>31.7444, :number_of_installments => 46, :scheduled_first_payment_date =>"04-07-2011", :installment_frequency => "weekly",:applied_by_staff_id =>5, :amount_applied_for => 8000, :occupation_id => 20, :funding_line_id =>1, :scheduled_disbursal_date =>"27-06-2011", :applied_on =>"27-06-2011"}, :loan_product_id => 1, :loan_type=>"EquatedWeekly"})
   end
 
   #create centers
   def self.create_center
-    post("/centers.xml", :query => { :center =>{:name =>"Josh", :code => "987", :manager_staff_id => 4, :creation_date=>"2011-04-12",:branch_id => 1}})
+    post("/centers.xml", :query => { :center =>{:name =>"Josh", :code => "987", :manager_staff_id => 4, :creation_date=>"2011-06-17",:branch_id => 1}})
   end
 
   #create client Group
   def self.create_client_group
-    post("/client_groups.xml", :query => { :client_group =>{"name"=>"Josh", "number_of_members"=>"5", "code"=>"7653", "center_id"=>167 }})
+    post("/client_groups.xml", :query => { :client_group =>{"name"=>"Josh", "number_of_members"=>"5", "code"=>"7653", "center_id"=>629, :created_by_staff_member_id => 4 }})
   end
   
   def self.weeksheet(center,date)
