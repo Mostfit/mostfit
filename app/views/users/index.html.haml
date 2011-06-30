@@ -1,10 +1,7 @@
-%h1
-  Users
-%p
-  Manage existing users accounts or
-  = link_to 'create a new user', resource(:users, :new)
-  account.
-%table.narrow.form{ :width => '100%' }
+%h1  Users
+.menu-strip
+  = link_to 'create a new user', resource(:users, :new), :class => "add"
+%table.shaded{ :width => '100%' }
   %thead
     %tr
       %th

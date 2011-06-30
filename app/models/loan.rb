@@ -236,6 +236,14 @@ class Loan
     "#{id}:Rs. #{amount} @ #{interest_rate} for client #{client.name}"
   end
 
+  def short_tag
+    "#{id}:Rs. #{amount} @ #{interest_rate}"
+  end
+
+  def info(date = Date.today)
+    LoanHistory.first(:loan_id => id, :date.lte => date, :order => [:date.desc], :limit => 1)
+  end
+
   def _show_cf(width = 10, padding = 4) #convenience function to see cashflow in console
     ps = payment_schedule
     titles = [:date, :total_balance, :balance, :principal, :interest, :total_paid, :total_principal, :total_interest, :fees]
