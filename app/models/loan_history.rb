@@ -208,9 +208,9 @@ class LoanHistory
     })
   end
 
-  def self.sum_outstanding_by_month(month, year, branch, extra = [])
+  def self.sum_outstanding_by_month(month, year, branch = nil, extra = [])
     date = Date.new(year, month, -1)
-    extra << ["lh.branch_id=#{branch.id}"]    
+    extra << ["lh.branch_id=#{branch.id}"]   if branch
     sum_outstanding_grouped_by(date, :branch, extra.join(" AND "))
   end
 
