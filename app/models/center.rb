@@ -29,6 +29,7 @@ class Center
   has n, :client_groups
   has n, :loan_history
   has n, :center_meeting_days
+  has n, :weeksheets
   
   validates_is_unique   :code, :scope => :branch_id
   validates_length      :code, :min => 1, :max => 12

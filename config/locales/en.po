@@ -314,3 +314,15 @@ msgstr "Info"
 msgctxt "region.show.tab.map"
 msgid "Map"
 msgstr "Map"
+
+msgctxt "breadcrumb.start"
+msgid "You are here"
+msgstr "You are here"
+
+msgctxt "breadcrumb.browse"
+msgid "browse"
+msgstr "browse"
+
+msgctxt "page.title.login"
+msgid "Mostfit - Login"
+msgstr "Mostfit - Login"

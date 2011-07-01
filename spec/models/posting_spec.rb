@@ -6,54 +6,58 @@ describe Posting do
     Payment.all.destroy! if Payment.all.count > 0
     Journal.all.destroy!
     mfi = Mfi.first
-    mfi.accounting_enabled = true
+    mfi.accounting_enabled = true    
     mfi.save
-    
-    @rule_book_1 =  RuleBook.new(:name => "Loan", :action => :disbursement, :branch_id => 1)
-    @rule_book_1.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(2), :percentage => 100)
-    @rule_book_1.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(1), :percentage => 100)
-    @rule_book_1.created_by_user_id = 1
-    @rule_book_1.journal_type = JournalType.first
-    @rule_book_1.save
-    @rule_book_1.errors.each{|e| puts e}
-    @rule_book_1.should be_valid
-
-    @rule_book_2 =  RuleBook.new(:name => "Principal", :action => :principal, :branch_id => 1)
-    @rule_book_2.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(3), :percentage => 100)
-    @rule_book_2.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(4), :percentage => 100)
-    @rule_book_2.created_by_user_id = 1
-    @rule_book_2.journal_type = JournalType.last
-    @rule_book_2.save
-    @rule_book_2.errors.each{|e| puts e}
-    @rule_book_2.should be_valid
-
-    @rule_book_3 =  RuleBook.new(:name => "Interest", :action => :interest, :branch_id => 1)
-    @rule_book_3.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(1), :percentage => 100)
-    @rule_book_3.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(4), :percentage => 100)
-    @rule_book_3.created_by_user_id = 1
-    @rule_book_3.journal_type = JournalType.last
-    @rule_book_3.save
-    @rule_book_3.errors.each{|e| puts e}
-    @rule_book_3.should be_valid
-
-    @rule_book_4 =  RuleBook.new(:name => "Fees", :action => :fees, :branch_id => 1)
-    @rule_book_4.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(2), :percentage => 100)
-    @rule_book_4.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(3), :percentage => 100)
-    @rule_book_4.created_by_user_id = 1
-    @rule_book_4.journal_type = JournalType.last
-    @rule_book_4.save
-    @rule_book_4.errors.each{|e| puts e}
-    @rule_book_4.should be_valid
-
-    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin)
-    @user.save
-    @user.errors
-    @user.should be_valid
+    mfi.accounting_enabled.should be_true    
 
     @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
     @manager.save
     @manager.errors
     @manager.should be_valid
+
+    @branch = Branch.new(:name => "Kerela branch")
+    @branch.manager = @manager
+    @branch.code = "ker"
+    @branch.save
+    @branch.errors
+    @branch.should be_valid
+
+    @rule_book_1 =  RuleBook.new(:name => "Loan", :action => :disbursement, :branch_id => @branch.id)
+    @rule_book_1.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(2), :percentage => 100)
+    @rule_book_1.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(1), :percentage => 100)
+    @rule_book_1.created_by_user_id = 1
+    @rule_book_1.journal_type = JournalType.first
+    @rule_book_1.save.should be_true
+    @rule_book_1.errors.each{|e| puts e}
+
+    @rule_book_2 =  RuleBook.new(:name => "Principal", :action => :principal, :branch_id => @branch.id)
+    @rule_book_2.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(3), :percentage => 100)
+    @rule_book_2.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(4), :percentage => 100)
+    @rule_book_2.created_by_user_id = 1
+    @rule_book_2.journal_type = JournalType.last
+    @rule_book_2.save.should be_true
+    @rule_book_2.errors.each{|e| puts e}
+
+    @rule_book_3 =  RuleBook.new(:name => "Interest", :action => :interest, :branch_id => @branch.id)
+    @rule_book_3.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(1), :percentage => 100)
+    @rule_book_3.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(4), :percentage => 100)
+    @rule_book_3.created_by_user_id = 1
+    @rule_book_3.journal_type = JournalType.last
+    @rule_book_3.save.should be_true
+    @rule_book_3.errors.each{|e| puts e}
+
+    @rule_book_4 =  RuleBook.new(:name => "Fees", :action => :fees, :branch_id => @branch.id)
+    @rule_book_4.credit_account_rules << CreditAccountRule.new(:credit_account => Account.get(2), :percentage => 100)
+    @rule_book_4.debit_account_rules  << DebitAccountRule.new(:debit_account => Account.get(3), :percentage => 100)
+    @rule_book_4.created_by_user_id = 1
+    @rule_book_4.journal_type = JournalType.last
+    @rule_book_4.save.should be_true
+    @rule_book_4.errors.each{|e| puts e}
+
+    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin)
+    @user.save
+    @user.errors
+    @user.should be_valid
 
     @funder = Funder.new(:name => "FWWB")
     @funder.save
@@ -65,13 +69,6 @@ describe Posting do
     @funding_line.funder = @funder
     @funding_line.save
     @funding_line.should be_valid
-
-    @branch = Branch.new(:name => "Kerela branch")
-    @branch.manager = @manager
-    @branch.code = "ker"
-    @branch.save
-    @branch.errors
-    @branch.should be_valid
 
     @center = Center.new(:name => "Munnar hill center")
     @center.manager = @manager
@@ -101,32 +98,33 @@ describe Posting do
     @loan_product.min_number_of_installments = 25
     @loan_product.loan_type = "DefaultLoan"
     @loan_product.valid_from = Date.parse('2000-01-01')
-    @loan_product.valid_upto = Date.parse('2012-01-01')
+    @loan_product.valid_upto = Date.parse('2020-01-01')
     @loan_product.save
     @loan_product.errors.each {|e| puts e}
     @loan_product.should be_valid
 
     @loan = DefaultLoan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :funding_line => @funding_line,
-                            :scheduled_first_payment_date => Date.parse("2000-12-06"), :applied_on => Date.parse("2000-02-01"), :client => @client,
-                            :scheduled_disbursal_date => Date.parse("2000-06-13"), :loan_product => @loan_product)
+                            :scheduled_first_payment_date => Date.parse("2010-12-06"), :applied_on => Date.parse("2010-02-01"), :client => @client,
+                            :scheduled_disbursal_date => Date.parse("2010-06-13"), :loan_product => @loan_product)
     @loan.history_disabled = true
     @loan.applied_by       = @manager
     @loan.should be_valid
-    @loan.save
+    @loan.save.should be_true
     @loan.errors.each {|e| puts e}
-    @loan.approved_on = "2000-02-03"
+    @loan.approved_on = "2010-02-03"
     @loan.approved_by = @manager
     @loan.should be_valid
 
-    @loan.disbursal_date = "2000-03-04"
+    @loan.disbursal_date = "2010-03-04"
     @loan.disbursed_by = @manager
-    @loan.save
+    @loan.save.should be_true
     @loan.errors
     @loan.should be_valid
   end
   
   before(:each) do
-    status, *payments = @loan.repay(120, @user, Date.parse("2000-04-05"), @manager)
+    status, *payments = @loan.repay(120, @user, Date.parse("2010-04-05"), @manager)
+    status.should be_true
     @payment = payments.first
   end
 
@@ -142,6 +140,7 @@ describe Posting do
     @journal.should_not == nil
     @postings = @journal.postings.group_by{|x| x.amount < 0 ? :credit : :debit}
     @loan.amount.should == @postings[:debit].map{|x| x.amount}.reduce(0){|s,x| s+=x}
+
     @postings[:credit].each{|ca| ca.should be_valid}
     @postings[:debit].each{|da|  da.should be_valid}
     
@@ -172,7 +171,7 @@ describe Posting do
     @postings[:credit].each{|ca| ca.should be_valid}
     @postings[:debit].each{|da|  da.should be_valid}
 
-    @loan.disbursal_date = "2000-03-04"
+    @loan.disbursal_date = "2010-03-04"
     @loan.disbursed_by = @manager
     @loan.save
     @postings = @journal.postings.group_by{|x| x.amount < 0 ? :credit : :debit}
@@ -233,7 +232,7 @@ describe Posting do
     before_entries  =  Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).length
     before_postings = Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id).postings.length
 
-    @loan.disbursal_date = "2000-04-05"
+    @loan.disbursal_date = "2010-04-05"
     @loan.save
     @journal = Journal.all(:transaction_id => @loan.id, :journal_type_id => JournalType.first.id)
     @postings = @journal.postings.group_by{|x| x.amount < 0 ? :credit : :debit}

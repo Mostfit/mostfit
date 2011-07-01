@@ -38,14 +38,14 @@ class AccountPaymentObserver
   end
   
   def self.reverse_posting_entries(obj)
-    #credit_accounts, debit_accounts, rule = RuleBook.get_accounts(obj)
-    j = Journal.first(:transaction_id => obj.id, :journal_type_id => 1, :order => [:created_at.desc]) if obj.type == :principal
-    j = Journal.first(:transaction_id => obj.id, :journal_type_id => 2, :order => [:created_at.desc]) if obj.type == :interest or obj.type == :fees
-    credit_accounts, debit_accounts  = {}, {}
-    j.postings.each{|p|
-      credit_accounts[p.account] = p.amount if p.amount >= 0
-      debit_accounts[p.account] = p.amount * -1 if p.amount < 0 #we keep every amount positive here, similar to forward entry. Rest is taken care off later.
-    }
+    credit_accounts, debit_accounts, rule = RuleBook.get_accounts(obj)
+    # j = Journal.first(:transaction_id => obj.id, :journal_type_id => 1, :order => [:created_at.desc]) if obj.type == :principal
+    # j = Journal.first(:transaction_id => obj.id, :journal_type_id => 2, :order => [:created_at.desc]) if obj.type == :interest or obj.type == :fees
+    # credit_accounts, debit_accounts  = {}, {}
+    # j.postings.each{|p|
+    #   credit_accounts[p.account] = p.amount if p.amount >= 0
+    #   debit_accounts[p.account] = p.amount * -1 if p.amount < 0 #we keep every amount positive here, similar to forward entry. Rest is taken care off later.
+    # }
 
     # do not do accounting if no matching accounts
     return unless (credit_accounts and debit_accounts)
@@ -58,7 +58,7 @@ class AccountPaymentObserver
     debit_accounts.each{|account, amount|  debit_accounts[account] = amount * -1}     if debit_accounts.is_a?(Hash)
     credit_accounts.each{|account, amount| credit_accounts[account] = amount * -1}    if credit_accounts.is_a?(Hash)
     
-    journal[:journal_type_id]=  j.journal_type.id
+    journal[:journal_type_id]=  rule.journal_type.id
     status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)
   end
   

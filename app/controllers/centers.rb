@@ -19,11 +19,16 @@ class Centers < Application
   end
 
   def show(id)
+    @option = params[:option] if params[:option]
     @center = Center.get(id)
     raise NotFound unless @center
     @branch  =  @center.branch if not @branch
     @clients =  grouped_clients
-    display [@center, @clients, @date], 'clients/index'
+    if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+      display [@center, @clients, @date]
+    else
+      display [@center, @clients, @date], 'clients/index'
+    end
   end
 
   def today(id)
@@ -93,10 +98,18 @@ class Centers < Application
       @center.branch = @branch  # set direct context
     end
     if @center.save
-      redirect(params[:return]||resource(@center), :message => {:notice => "Center '#{@center.name}' successfully created"})
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+        display @center
+      else
+        redirect(params[:return]||resource(@center), :message => {:notice => "Center '#{@center.name}' successfully created"})
+      end
     else
-#       message[:error] = "Center failed to be created"
-      render :new  # error messages will be shown
+      #       message[:error] = "Center failed to be created"
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+        display @center
+      else
+        render :new  # error messages will be shown
+      end
     end
   end
 

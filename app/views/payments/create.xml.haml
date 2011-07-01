@@ -1,2 +1,76 @@
-%status
-  = @payment.status
+%xml
+  %payments
+    -if @payment_type.blank?
+      %error 
+        %error_message Payment type can't be blank
+        %error_code 600
+    - elsif not @payment_type.blank?
+      - if not @payment.errors.blank?
+        %error
+          - @payment.errors.map do |e|
+            %error_message #{e.to_s}
+          %error_code 600
+      - else
+        - @prin = @payment if @payment_type != "total" and @payment_type == "principal"
+        - @int = @payment if @payment_type != "total" and @payment_type == "interest"
+        - @fees = @payment if @payment_type != "total" and @payment_type == "fees"
+        - if @prin
+          %payment
+            %id #{@prin.id}
+            %amount #{@prin.amount}
+            %type #{@prin.type}
+            %received_on #{@prin.received_on}
+            %deleted_by_user_id #{@prin.deleted_by_user_id}
+            %created_at #{@prin.created_at}
+            %deleted_at #{@prin.deleted_at}
+            %created_by_user_id #{@prin.created_by_user_id}
+            %verified_by_user_id #{@prin.verified_by_user_id}
+            %loan_id #{@prin.loan_id}
+            %client_id #{@prin.client_id}
+            %fee_id #{@prin.fee_id}
+            %desktop_id #{@prin.desktop_id}
+            %origin #{@prin.origin}
+        - if @int
+          %payment
+            %id #{@int.id}
+            %amount #{@int.amount}
+            %type #{@int.type}
+            %received_on #{@int.received_on}
+            %deleted_by_user_id #{@int.deleted_by_user_id}
+            %created_at #{@int.created_at}
+            %deleted_at #{@int.deleted_at}
+            %created_by_user_id #{@int.created_by_user_id}
+            %verified_by_user_id #{@int.verified_by_user_id}
+            %loan_id #{@int.loan_id}
+            %client_id #{@int.client_id}
+            %fee_id #{@int.fee_id}
+            %desktop_id #{@int.desktop_id}
+            %origin #{@int.origin}
+        - if @fees
+          %payment
+            %id #{@fees.id}
+            %amount #{@fees.amount}
+            %type #{@fees.type}
+            %received_on #{@fees.received_on}
+            %deleted_by_user_id #{@fees.deleted_by_user_id}
+            %created_at #{@fees.created_at}
+            %deleted_at #{@fees.deleted_at}
+            %created_by_user_id #{@fees.created_by_user_id}
+            %verified_by_user_id #{@fees.verified_by_user_id}
+            %loan_id #{@fees.loan_id}
+            %client_id #{@fees.client_id}
+            %fee_id #{@fees.fee_id}
+            %desktop_id #{@fees.desktop_id}
+            %origin #{@fees.origin}
+        - if @attendance and not @attendance.errors.blank?
+          %error
+            - @attendance.errors.map do |e|
+              %error_message #{e.to_s}
+            %error_code 600
+        - elsif @attendance
+          %attendance
+            %id #{@attendance.id}
+            %status #{@attendance.status}
+            %client_id #{@attendance.client_id}
+            %center_id #{@attendance.center_id}
+            %date #{@attendance.date}

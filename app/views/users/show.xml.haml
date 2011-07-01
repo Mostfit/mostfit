@@ -1,0 +1,11 @@
+%xml
+  %user
+    %id  #{@user.id}
+    %login #{@user.login}
+    %created_at #{@user.created_at}
+    %updated_at #{@user.updated_at}
+    %password_changed_at #{@user.password_changed_at}
+    %active #{@user.active}
+    %role #{@user.role}
+    - if @user.staff_member
+      %staff_member_id #{@user.staff_member.id}

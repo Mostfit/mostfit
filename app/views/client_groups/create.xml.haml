@@ -1,0 +1,11 @@
+%xml
+  %client_group
+    - if not @client_group.errors.blank?
+      %error
+        %error_code 600
+        - @client_group.errors.map do |e|
+          %error_message #{e.to_s}
+    - else    
+      %id #{@client_group.id}
+      %name #{@client_group.name}
+      %center_id #{@client_group.center.id}

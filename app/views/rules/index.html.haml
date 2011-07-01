@@ -1,23 +1,27 @@
 %h1
   Rules
-%table
-  %tr
-    %td
-      %b Name
-    %td
-      %b Applicable to
-    %td
-      %b On action
-    %td
-      %b Pre conditions
-    %td
-      %b Rules
-    %td
-      %b On match
-    %td
-      %b Active
-  - for rule in @rules
+.menu-strip{:style => "margin: 10px;"}
+  = link_to 'Add another rule', url(:new_rule), :class => "add"
+
+%table.shaded.narrow.form
+  %thead
     %tr
+      %th
+        %b Name
+      %th
+        %b Applicable to
+      %th
+        %b On action
+      %th
+        %b Pre conditions
+      %th
+        %b Rules
+      %th
+        %b On match
+      %th
+        %b Active
+  - for rule in @rules
+    %tr{:class => cycle('odd','even')}
       %td
         = link_to rule.name, url(:rule, rule)
       %td
@@ -47,4 +51,4 @@
         = rule.permit ? 'Allow' : 'Disallow'
       %td
         = rule.active ? 'Active' : 'Not Active'
-= link_to 'New', url(:new_rule), :class => "new"
+

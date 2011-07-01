@@ -1,95 +1,102 @@
-.graph
-  = ofc2(430, 250, url(:graph_data, :action => 'center', :id => @center.id, :scope_unit => 'months', :scope_size => 3) )
-%h1== Center: <i>#{@center.name}</i> (#{@clients.count} clients)
-%div.maininfo
-  %table.narrow.form{ :style => "width: 40%;" }
-    %tr.odd
-      %td Name
-      %td
-        %b= @center.name
-        == (code: #{@center.code}, id: #{@center.id})
-    %tr
-      %td Manager
-      %td= link_to @center.manager.name, resource(@center.manager)
-    %tr.odd
-      %td In branch
-      %td
-        = link_to @branch.name, resource(@center.branch)
-        %br/
-        %span.greytext
-          Managed by:
-          = link_to @center.branch.manager.name, resource(@center.manager)
-    %tr
-      %td Meeting
-      %td== #{@center.meeting_day.to_s.capitalize}#{(@center.meeting_time_hours and @center.meeting_time_minutes) ? ", #{@center.meeting_time_hours}:#{@center.meeting_time_minutes}" : ''}
-    %tr.odd
-      %td Address
-      %td=@center.address
-    %tr
-      %td Contact number
-      %td=@center.contact_number
-    %tr.odd
-      %td Landmark
-      %td=@center.landmark
-    %tr
-      %td Center leader
-      - leader = @center.leader
-      %td=leader.client.name if leader
-    - if total_attendance_at_branch = Attendance.count("client.center_id" => @center.id) and total_attendance_at_branch > 0
-      %tr
-        %td
-          Attendance
-        %td
-          = (Attendance.count("client.center_id" => @center.id, :status => "present") * 100.0 / total_attendance_at_branch).round(2)
-          = "%"
-  %p
+.shaded{:style => "padding: 5px; margin-bottom: 10px;"}
+  .graph
+    = ofc2(530, 300, url(:graph_data, :action => 'center', :id => @center.id, :scope_unit => 'months', :scope_size => 3) )
+  %h1== Center: <i>#{@center.name}</i> (#{@clients.count} clients)
+  .menu-strip
     = link_to 'edit this center\'s details', resource(@branch, @center, :edit), :class => "edit"
-    = link_to 'add a new client', resource(@branch, @center, :clients, :new), :class => "add"
+    = link_to 'add a new client', resource(@branch, @center, :clients, :new), :class => "add", :style => "margin: 0px; padding-right: 3px;"
     = link_to "Bulk entry of loans", url(:enter_loans, :action => :bulk_form, :query => @center), :class => "edit"
-%div.tab_container
-  %ul.tabs
-    %li#centers
-      Clients
-    %li#info
-      Info
-    %li#weeksheet
-      Weeksheet
-    %li#documents
-      Documents
-    %li#audit
-      Audit
-    %li#data_entry
-      Data Entry
-    %li#history
-      History
-    %li#miscellaneous
-      Miscellaneous
-    - if Mfi.first.map_enabled
-      %li#map
-        Map
-  %div.tab    
-    =partial "clients/list", :center_leader => leader
-  %div.tab    
-    %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@center.id}?for=center"}
-  %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => url(:weeksheet, :center_id => @center.id, :branch_id => @branch.id, :date => @date)}
-    /=partial "centers/weeksheet"
-  %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @center.id, :parent_model => Center)}
-  %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :id => @center.id, :model => "Center")}
-  %div.tab
-    %form._remote_{:action => url(:action => "bulk_data_entry", :controller => "centers", :id => @center.id, :branch_id => @branch.id), :method => :get}
-      %b &nbsp; Select field to do mass entry
-      =select_mass_entry_field(:name => "field_name")
-      %input{:type => "hidden", :name => "_target_", :value => "bulk_form"}
-      = submit "GO"
-    %div#bulk_form
-  %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
-  %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :centers, :id => @center.id, :action => :misc)}
-  - if Mfi.first.map_enabled
+
+  %div.maininfo
+    %table.narrow.form{ :style => "width: 40%;" }
+      %tr.odd
+        %td Name
+        %td
+          %b= @center.name
+          == (code: #{@center.code}, id: #{@center.id})
+      %tr
+        %td Manager
+        %td= link_to @center.manager.name, resource(@center.manager)
+      %tr.odd
+        %td In branch
+        %td
+          = link_to @branch.name, resource(@center.branch)
+          %br/
+          %span.greytext
+            Managed by:
+            = link_to @center.branch.manager.name, resource(@center.manager)
+      %tr
+        %td Meeting
+        %td== #{@center.meeting_day.to_s.capitalize}#{(@center.meeting_time_hours and @center.meeting_time_minutes) ? ", #{@center.meeting_time_hours}:#{@center.meeting_time_minutes}" : ''}
+      %tr.odd
+        %td Address
+        %td=@center.address
+      %tr
+        %td Contact number
+        %td=@center.contact_number
+      %tr.odd
+        %td Landmark
+        %td=@center.landmark
+      %tr
+        %td Center leader
+        - leader = @center.leader
+        %td=leader.client.name if leader
+      - if total_attendance_at_branch = Attendance.count("client.center_id" => @center.id) and total_attendance_at_branch > 0
+        %tr
+          %td
+            Attendance
+          %td
+            = (Attendance.count("client.center_id" => @center.id, :status => "present") * 100.0 / total_attendance_at_branch).round(2)
+            = "%"
+.shaded
+  %div.tab_container
+    %ul.tabs
+      %li#centers
+        Clients
+      %li#info
+        Info
+      %li#weeksheet
+        Weeksheet
+      %li#documents
+        Documents
+      %li#audit
+        Audit
+      %li#data_entry
+        Data Entry
+      %li#history
+        History
+      %li#miscellaneous
+        Miscellaneous
+      - if Mfi.first.map_enabled
+        %li#map
+          Map
+    %div.tab    
+      =partial "clients/list", :center_leader => leader
+      %p.menu-strip 
+        = link_to 'Create new client', resource(@branch, @center, :clients, :new), :class => "add"
+        = link_to "Bulk entry of loans", url(:enter_loans, :action => :bulk_form, :query => @center), :class => "edit"
+    %div.tab    
+      %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@center.id}?for=center"}
     %div.tab
-      = js_include_tag :map
-      =partial "locations/map", {:obj => @center}
+      %input{:type => "hidden", :name => "_load_remote", :value => url(:weeksheet, :center_id => @center.id, :branch_id => @branch.id, :date => @date)}
+      /=partial "centers/weeksheet"
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @center.id, :parent_model => Center)}
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :id => @center.id, :model => "Center")}
+    %div.tab
+      %form._remote_{:action => url(:action => "bulk_data_entry", :controller => "centers", :id => @center.id, :branch_id => @branch.id), :method => :get}
+        %b &nbsp; Select field to do mass entry
+        =select_mass_entry_field(:name => "field_name")
+        %input{:type => "hidden", :name => "_target_", :value => "bulk_form"}
+        = submit "GO"
+      %div#bulk_form
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :centers, :id => @center.id, :action => :misc)}
+    - if Mfi.first.map_enabled
+      %div.tab
+        = js_include_tag :map
+        =partial "locations/map", {:obj => @center}
+  

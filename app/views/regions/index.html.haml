@@ -1,7 +1,9 @@
 %h1
   = I18n.t "region.index.title", :default => "Regions"
+.menu-strip
+  = link_to I18n.t("region.index.new", :default => "Add a Region"), url(:new_region), :class => "add"
 
-%table.narrow.form{:width=>"100%"}
+%table.shaded{:width=>"100%"}
   %thead
     %tr
       %th
@@ -23,4 +25,4 @@
       %td
         = link_to I18n.t("region.index.edit", :default => "Edit"), url(:edit_region,  region)
 
-= link_to I18n.t("region.index.new", :default => "New"), url(:new_region)
+

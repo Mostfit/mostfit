@@ -15,10 +15,15 @@ class Loans < Application
   end
 
   def show(id)
+    @option = params[:option] if params[:option]
     @loan = Loan.get(id)
     raise NotFound unless @loan
     @payments = @loan.payments(:order => [:received_on, :id])
-    display [@loan, @payments], 'payments/index'
+    if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+      display [@loan, @payments]
+    else
+      display [@loan, @payments], 'payments/index'
+    end
   end
 
   def new
@@ -40,21 +45,50 @@ class Loans < Application
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     @loan_product = LoanProduct.is_valid(params[:loan_product_id])
     raise BadRequest unless @loan_product
+    fee_params = params.delete(:fees)
     @loan = klass.new(attrs)
     @loan.loan_product = @loan_product
+    msg = {}
     if @loan.save
-      if params[:return]
-        redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' was successfully created"})
+      msg[:notice] = "Loan '#{@loan.id}' was successfully created"
+      if params[:fees]
+        params[:fees].keys.each do |fee_id|
+          @app_fee = []
+          @fee = Fee.get(fee_id)
+          if @fee
+            payable_models ||= Fee::PAYABLE.map{|m| [m[0], [m[1], m[2]]]}.to_hash
+            method = payable_models[@fee.payable_on][1] if @fee
+            if params.include?(:fee_date)
+              if params[:fee_date].empty?
+                date = (@loan.insurance_policy.send(method) if @loan.insurance_policy.respond_to?(method))
+              else
+                date = (Date.strptime(params[:fee_date], Mfi.first.date_format))
+              end
+            end
+            if date
+              @app_fees << ApplicableFee.new(:applicable_on => date, :amount => params[:insurance_policy][:premium], :fee => @fee,
+                                             :applicable_id => @loan.id, :applicable_type => 'Loan')
+            end
+          end
+          result = @app_fees.map{|f| f.save}
+          msg[:error] =  "However, #{result.select{|r| false}.count} insurance premium could not be applied as a fee" if result.include?[false]
+        end if params[:fees]
+        if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+          display @loan
+        else
+          redirect(params[:return] || resource(@branch, @center, @client), :message => msg)
+        end
       else
-        redirect resource(@branch, @center, @client), :message => {:notice => "Loan '#{@loan.id}' was successfully created"}
+        if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+          display @loan
+        else
+          set_insurance_policy(@loan_product)
+          @loan.interest_rate *= 100 if @loan.interest_rate
+          render :new # error messages will be shown
+        end
       end
-    else
-      set_insurance_policy(@loan_product)
-      @loan.interest_rate *= 100
-      render :new # error messages will be shown
     end
   end
-
   def bulk_create
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
@@ -73,7 +107,7 @@ class Loans < Application
       statuses = loans.map{|l| l.save}
       t.rollback if statuses.include?(false)
     end
-    
+
     if not statuses.include?(false)
       if params[:return]
         redirect(params[:return], :message => {:notice => "'#{statuses.count}' loans were successfully created"})
@@ -153,7 +187,7 @@ class Loans < Application
     @branch, @center, @client = @loan.client.center.branch, @loan.client.center, @loan.client
     redirect url_for_loan(@loan)
   end
-  
+
   def disburse
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
     hash   = {:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil}

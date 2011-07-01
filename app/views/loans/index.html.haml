@@ -1,197 +1,200 @@
-.tab      
-  - if @client.loans.size > 0
-    .graph
-      = ofc2(450, 250, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'client', :id => @client.id, :scope_unit => 'months', :scope_size => 3) )
-  %h1{:width => '50%' }== Client: <i>#{@client.name}</i>
-  %table.narrow.form{ :style =>'width:50%' }
-    %tr.odd
-      %td{:rowspan => "15"}
-        - if @client.picture.url=="/images/no_photo.jpg"
-          = image_tag @client.picture.url(:thumb)
-        - else
-          %a.enlarge_image{:href => @client.picture.url(:original)}
+.shaded
+  .tab      
+    - if @client.loans.size > 0
+      .graph
+        = ofc2(550, 300, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'client', :id => @client.id, :scope_unit => 'months', :scope_size => 3) )
+    %h1{:width => '50%' }== Client: <i>#{@client.name}</i>
+    %p.menu-strip
+      = link_to('edit client details', params[:controller]=="data_entry/clients" ? url(:enter_clients, :action => 'edit', :id => @client) : resource(@branch, @center, @client, :edit), :class => "edit")
+      - if @client.tags and @client.tags.include?(:insincere)
+        %h3.blocked
+          This client is insincere and is not elgible for a loan
+      - elsif not @client.active
+        %h3.blocked
+          This client is not active anymore. 
+          -if @client.inactive_reason=='death_of_client' or @client.inactive_reason=='death_of_spouse'
+            =link_to('Click here for claim processing', resource(@client, :claims))
+      - else
+        = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
+
+    %table.narrow.form{ :style =>'width:50%' }
+      %tr.odd
+        %td{:rowspan => "15"}
+          - if @client.picture.url=="/images/no_photo.jpg"
             = image_tag @client.picture.url(:thumb)
-      %td 
-        Name
-      %td
-        %b
-          = @client.name
-        == (id: #{@client.id}, ref: #{@client.reference})
-    %tr
-      %td Spouse name
-      %td
-        = @client.spouse_name
-    %tr.odd
-      %td Manager
-      %td= link_to @center.manager.name, resource(@center.manager)
-    %tr
-      %td At center
-      %td
-        = link_to @center.name, resource(@branch, @center)
-        == (of branch #{link_to @branch.name, resource(@branch)})
-        %br/
-        %span.greytext
-          center managed by:
-          = link_to @center.branch.manager.name, resource(@center.manager)
-    %tr.odd
-      %td
-        Group
-      %td
-        -if @client.client_group
-          =@client.client_group.name
-        -else
-          Not associated with a group yet (
-          =link_to('Edit', resource(@branch, @center, @client, :edit))
-          to change)
-    %tr
-      %td
-        Fees applicable
-      %td
-        - @client.fee_schedule.each do |date, fees|
-          - fees.each do |fee, amount|
-            = fee.description
-    %tr.odd
-      %td
-        Fees paid
-      %td
-        == #{(@client.total_fees_paid).to_currency} / #{(@client.total_fees_applicable).to_currency}
-        - if @client.fees_paid?
-          %span.green Paid
-        - total_attendance_client = @client.attendances.count
-        - total_absent_client = @client.attendances(:status => "absent").count
-        - if total_attendance_client > 0
-          %tr
-            %td
-              Attendance(%)
-            %td
-              = ((1-(total_absent_client.to_f/total_attendance_client.to_f)) * 100).round(2)
-  %p
-    = link_to('edit client details', params[:controller]=="data_entry/clients" ? url(:enter_clients, :action => 'edit', :id => @client) : resource(@branch, @center, @client, :edit), :class => "button")
-    - if @client.tags and @client.tags.include?(:insincere)
-      %h3.blocked
-        This client is insincere and is not elgible for a loan
-    - elsif not @client.active
-      %h3.blocked
-        This client is not active anymore. 
-        -if @client.inactive_reason=='death_of_client' or @client.inactive_reason=='death_of_spouse'
-          =link_to('Click here for claim processing', resource(@client, :claims))
-    - else
-      = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
-  
-%div.tab_container
-  %ul.tabs
-    %li#loans Loans
-    %li#comments Comments
-    %li#audit Audits
-    %li#trail History
-    %li#documents Documents
-    %li#insurance Insurance
-    %li#payments Repayments
-    %li#attendance Attendance
-  %div.tab
-    %h2== Loans for client <i>#{@client.name}</i>
-    
-    - if @loans.blank?
-      %p
-        %i== #{@client.name} has no loans yet.
-    - else
-      %table.narrow.form{ :width => '100%' }
-        %thead
-          %tr
-            %th
-            %th id
-            %th amount
-            %th interest
-            %th installments
-            %th disbursement
-            %th repaid
-            %th status
-            %th actions
-        %tbody
-        - for loan in @loans
-          %tr{ :class => cycle('odd','') }
-            %td &nbsp;
-            %td
-              = link_to loan.id, url(:quick_link, "loans", loan.id)
-            %td
-              %b= (loan.amount).to_currency
-            %td
-              %b= format("%.2f%", loan.interest_rate * 100)
-            %td
-              == #{loan.number_of_installments}, #{loan.installment_frequency.to_s}
-            %td
-              - if loan.disbursal_date
-                = loan.disbursal_date
-                %br/
-                %span.greytext
-                  - if loan.scheduled_disbursal_date == loan.disbursal_date
-                    as scheduled
-                  - else
-                    = difference_in_days(loan.scheduled_disbursal_date, loan.disbursal_date, ['days earlier', 'days later'])
-                    == (#{loan.scheduled_disbursal_date})
-              - else
-                %i not disbursed yet
-                %br/
-                %span.greytext
-                  scheduled for
-                  = loan.scheduled_disbursal_date
-            %td
-              = format("%.2f%", loan.principal_received_up_to(Date.today).to_f / loan.amount * 100)
-            %td
-              - if loan.get_status == :written_off
-                %b written off
-                %br/
-                %span.greytext
-                  by
-                  = link_to loan.written_off_by.name, resource(loan.written_off_by)
-                  on
-                  = loan.written_off_on
-              - else
-                = loan.status.to_s.camelcase(' ')
-                %br/
-                %span.greytext
-                  - if loan.payments.empty?
-                    nothing repaid yet
-                  - else
-                    last repayment on
-                    = loan.payments.last(:order => [:received_on]).received_on
-                  
-            %td
-              = link_to 'view details', url_for_loan(loan)
-              &nbsp;|&nbsp;
-              = link_to 'edit', url_for_loan(loan, 'edit')
-              &nbsp;|&nbsp;
-              = link_to 'record repayment', url_for_loan(loan, "payments/new")
-    
-        %tfoot
-          %tr
-            %td{ :colspan => 9 }
-  %div.tab  
-    = partial 'comments/index', :object => @client
-    %p
-      %h3 Add a comment
-      = partial 'comments/form'
-  %div.tab 
-    %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :id => @client.id, :model => "Client")}
-    
-  %div.tab 
-    %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
-  %div.tab 
-    %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @client.id, :parent_model => Client)}
-  %div.tab
-    %table
+          - else
+            %a.enlarge_image{:href => @client.picture.url(:original)}
+              = image_tag @client.picture.url(:thumb)
+        %td 
+          Name
+        %td
+          %b
+            = @client.name
+          == (id: #{@client.id}, ref: #{@client.reference})
+      %tr
+        %td Spouse name
+        %td
+          = @client.spouse_name
+      %tr.odd
+        %td Manager
+        %td= link_to @center.manager.name, resource(@center.manager)
+      %tr
+        %td At center
+        %td
+          = link_to @center.name, resource(@branch, @center)
+          == (of branch #{link_to @branch.name, resource(@branch)})
+          %br/
+          %span.greytext
+            center managed by:
+            = link_to @center.branch.manager.name, resource(@center.manager)
+      %tr.odd
+        %td
+          Group
+        %td
+          -if @client.client_group
+            =@client.client_group.name
+          -else
+            Not associated with a group yet (
+            =link_to('Edit', resource(@branch, @center, @client, :edit))
+            to change)
       %tr
         %td
-          = link_to "Insurance Policies", resource(@client, :insurance_policies)
+          Fees applicable
         %td
-          - if @client.insurance_policies.blank?
-            No insurance policies.
-            = link_to "[Add one]", resource(@client, :insurance_policies, :new)
-          - else
-            - @client.insurance_policies.each do |ip|
-              = link_to ip.description, resource(@client, ip)
-              %br
-  %div.tab 
-    %input{:type => "hidden", :name => "_load_remote", :value => resource(@branch, @center, @client, :payments)}
-  %div.tab 
-    %input{:type => "hidden", :name => "_load_remote", :value => resource( @client, :attendances)}
+          - @client.fee_schedule.each do |date, fees|
+            - fees.each do |fee, amount|
+              = fee.description
+      %tr.odd
+        %td
+          Fees paid
+        %td
+          == #{(@client.total_fees_paid).to_currency} / #{(@client.total_fees_applicable).to_currency}
+          - if @client.fees_paid?
+            %span.green Paid
+          - total_attendance_client = @client.attendances.count
+          - total_absent_client = @client.attendances(:status => "absent").count
+          - if total_attendance_client > 0
+            %tr
+              %td
+                Attendance(%)
+              %td
+                = ((1-(total_absent_client.to_f/total_attendance_client.to_f)) * 100).round(2)
+
+.shaded    
+  %div.tab_container
+    %ul.tabs
+      %li#loans Loans
+      %li#comments Comments
+      %li#audit Audits
+      %li#trail History
+      %li#documents Documents
+      %li#insurance Insurance
+      %li#payments Repayments
+      %li#attendance Attendance
+    %div.tab
+      %h2== Loans for client <i>#{@client.name}</i>
+      
+      - if @loans.blank?
+        %p
+          %i== #{@client.name} has no loans yet.
+      - else
+        %table.narrow.form{ :width => '100%' }
+          %thead
+            %tr
+              %th
+              %th id
+              %th amount
+              %th interest
+              %th installments
+              %th disbursement
+              %th repaid
+              %th status
+              %th actions
+          %tbody
+          - for loan in @loans
+            %tr{ :class => cycle('odd','') }
+              %td &nbsp;
+              %td
+                = link_to loan.id, url(:quick_link, "loans", loan.id)
+              %td
+                %b= (loan.amount).to_currency
+              %td
+                %b= format("%.2f%", loan.interest_rate * 100)
+              %td
+                == #{loan.number_of_installments}, #{loan.installment_frequency.to_s}
+              %td
+                - if loan.disbursal_date
+                  = loan.disbursal_date
+                  %br/
+                  %span.greytext
+                    - if loan.scheduled_disbursal_date == loan.disbursal_date
+                      as scheduled
+                    - else
+                      = difference_in_days(loan.scheduled_disbursal_date, loan.disbursal_date, ['days earlier', 'days later'])
+                      == (#{loan.scheduled_disbursal_date})
+                - else
+                  %i not disbursed yet
+                  %br/
+                  %span.greytext
+                    scheduled for
+                    = loan.scheduled_disbursal_date
+              %td
+                = format("%.2f%", loan.principal_received_up_to(Date.today).to_f / loan.amount * 100)
+              %td
+                - if loan.get_status == :written_off
+                  %b written off
+                  %br/
+                  %span.greytext
+                    by
+                    = link_to loan.written_off_by.name, resource(loan.written_off_by)
+                    on
+                    = loan.written_off_on
+                - else
+                  = loan.status.to_s.camelcase(' ')
+                  %br/
+                  %span.greytext
+                    - if loan.payments.empty?
+                      nothing repaid yet
+                    - else
+                      last repayment on
+                      = loan.payments.last(:order => [:received_on]).received_on
+                    
+              %td
+                = link_to 'view details', url_for_loan(loan)
+                &nbsp;|&nbsp;
+                = link_to 'edit', url_for_loan(loan, 'edit')
+                &nbsp;|&nbsp;
+                = link_to 'record repayment', url_for_loan(loan, "payments/new")
+      
+          %tfoot
+            %tr
+              %td{ :colspan => 9 }
+    %div.tab  
+      = partial 'comments/index', :object => @client
+      %p
+        %h3 Add a comment
+        = partial 'comments/form'
+    %div.tab 
+      %input{:type => "hidden", :name => "_load_remote", :value => resource(:audit_items, :id => @client.id, :model => "Client")}
+      
+    %div.tab 
+      %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+    %div.tab 
+      %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @client.id, :parent_model => Client)}
+    %div.tab
+      %h3 Insurance Policies
+      = link_to "Add an insurance policy", resource(@client, :insurance_policies, :new), :class => "add"
+      %table
+        %tr
+          %td
+            - if @client.insurance_policies.blank?
+              No insurance policies.
+            - else
+              - @client.insurance_policies.each do |ip|
+                = link_to ip.description, resource(@client, ip)
+                %br
+    %div.tab 
+      %input{:type => "hidden", :name => "_load_remote", :value => resource(@branch, @center, @client, :payments)}
+    %div.tab 
+      %input{:type => "hidden", :name => "_load_remote", :value => resource( @client, :attendances)}
+  

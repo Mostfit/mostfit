@@ -21,5 +21,8 @@ class Entrance < Merb::Controller  # not inherit from Application as that thing 
     end
   end
 
-
+  def handshake
+    only_provides :xml
+    display @template
+  end
 end

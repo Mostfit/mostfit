@@ -1,4 +1,5 @@
 class Application < Merb::Controller
+  #before :desktop_user_log
   before :set_locale
   before :ensure_authenticated
   before :ensure_password_fresh
@@ -8,6 +9,17 @@ class Application < Merb::Controller
   
   @@controllers  = ["regions", "area", "branches", "centers", "clients", "loans", "payments", "staff_members", "funders", "portfolios", "funding_lines"]
   @@dependant_deletable_associations = ["history", "loan_history", "audit_trails", "attendances", "portfolio_loans", "postings", "credit_account_rules", "debit_account_rules", "center_meeting_days", "applicable_fees"]
+
+  def desktop_user_log
+    if request.route.to_s.match(/\/api\/v1\/([a-z0-9_\/:]*).xml*/)
+      logfile = File.open(Merb.root + '/log/api.log', 'a')  #create log file
+      logfile.sync = true  #automatically flushes data to file
+      api_log = Merb::Logger.new(logfile)  #constant accessible anywhere
+      api_log.info("-------------- User api access log------------ ")
+      api_log.info("----User: #{session.user.login}  ------  Access Time: #{DateTime.now.to_s} ----------") if session and session.user
+      api_log.info("#{request.inspect}") 
+    end
+  end
 
   def set_locale
     if params[:locale]

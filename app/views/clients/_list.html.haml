@@ -1,4 +1,15 @@
-%h2== Clients of the #{@center.name} center
+%span{:style => "font-family: Georgia; font-size: 2em;"} 
+  == #{@clients.count} clients in this center
+
+.menu-strip
+  %b Key =>
+  %span.applied applied
+  %span.approved approved
+  %span.outstanding outstanding
+  %span.repaid repaid
+  %span.arrears in arrears
+  %span.written-off written-off
+  %span.preclosed preclosed
 - if @clients.blank? and @center.client_groups.length==0
   %p
     %i== No clients for the #{@branch.name} branch yet.
@@ -39,8 +50,8 @@
         %td
           %b= link_to client.name, resource(@branch, @center, client)
         %td
-          %b= client.loans.size
-          == (#{link_to 'view', resource(@branch, @center, client, :loans)})
+          - client.loans.each do |l|
+            = link_to l.short_tag, url_for_loan(l), :class => l.info[:status]
         %td
           = link_to 'edit', resource(@branch, @center, client, :edit)
           &nbsp;|&nbsp;
@@ -60,8 +71,3 @@
       %tr
         %td{ :colspan => 7 }
 
-%h2 
-  = @clients.count
-  clients in this center
-  = link_to 'Create new client', resource(@branch, @center, :clients, :new), :class => "add"
-  = link_to "Bulk entry of loans", url(:enter_loans, :action => :bulk_form, :query => @center), :class => "edit"

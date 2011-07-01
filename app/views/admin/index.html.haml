@@ -72,3 +72,8 @@
       - if Mfi.first.dirty_queue_enabled
         %li
           = link_to_with_rights 'Loan update queue', url(:controller => 'admin', :action => "dirty_loans"), :class => 'edit'
+  .admin-box
+    %h2 API Use
+    %ul
+      %li 
+        = link_to_with_rights "API Access", resource(:api_accesses), :class => 'edit'
