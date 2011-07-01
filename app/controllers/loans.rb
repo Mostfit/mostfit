@@ -375,6 +375,17 @@ class Loans < Application
     redirect("/loans/#{loan.id}")
   end
 
+  def repayment_sheet(id)
+    @loan = Loan.get(id)
+    raise NotFound unless @loan
+    file = @loan.generate_loan_schedule
+    if file
+      send_data(file.to_s, :filename => "repayment_schedule_loan_#{@loan.id}.pdf")
+    else
+      redirect resource(@loan) 
+    end
+  end
+
   def prepay(id)
     @loan = Loan.get(id)
     raise NotFound unless @loan
