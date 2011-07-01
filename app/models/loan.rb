@@ -1197,6 +1197,8 @@ class Loan
       52
     when :biweekly
       26
+    when :bi_weekly
+      26
     when :monthly
       12
     when :daily
