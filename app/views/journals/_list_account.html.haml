@@ -6,33 +6,37 @@
       Date
     %th 
       Description
-    %th 
-      Account
-    %th 
-      Debit
-    %th 
-      Credit
+    %th{:colspan => 2} 
+      Account Debit
+    %th{:colspan => 2}
+      Account Credit
+  - counter = 0
   - Journal.all("postings.account_id" => @account.id, :limit => 25, :order => [:date.desc]).each do |journal|
     - postings = journal.postings.group_by{|x| x.amount>0 ? :credit : :debit}
     - time_format = Mfi.first.date_format || "%d-%m-%Y"
     - time_format += " %H:%M"
-   
-    %tr{:class => cycle('odd','even')}
-      %td
+    - counter += 1 
+    - set_class = counter % 2 == 1 ? 'odd' : 'even'
+    - rowspan_count = journal.postings.size + 1
+    %tr{:class => set_class}
+      %td{:rowspan => rowspan_count}
         = journal.id
-      %td
+      %td{:rowspan => rowspan_count}
         = journal.date.strftime(time_format)
-      %td 
-        = journal.comment     
-      %td 
-        = postings[:debit].collect{|p| p.account.name}.join("<br/>")
-        %br
-        = postings[:credit].collect{|p| p.account.name}.join("<br/>")
-      %td 
-        - dr_amount = postings[:debit].collect{|p| p.amount.abs}.join("<br/>")
-        = dr_amount
-      %td 
-        %br
-        - cr_amount = postings[:credit].collect{|p| p.amount.abs}.join("<br/>")
-        = cr_amount
+      %td{:rowspan => rowspan_count} 
+        = journal.comment
+    - postings[:debit].each do |p|
+      %tr{:class => set_class}
+        %td 
+          = p.account.name
+        %td
+          = p.amount.to_account_balance
+        %td{:colspan => 2}
+    - postings[:credit].each do |p|
+      %tr{:class => set_class}
+        %td{:colspan => 2}
+        %td
+          = p.account.name
+        %td
+          = p.amount.to_account_balance
    
