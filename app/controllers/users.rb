@@ -1,12 +1,17 @@
 class Users < Application
   before :ensure_admin, :only => [:edit, :new, :create, :update, :delete, :destroy, :amind_change_password]
+  provides :xml
 
   def show(id)
     @user = User.get(id)
     raise NotFound unless @user
-    @trails = AuditTrail.all(:auditable_id => @user.id, :auditable_type => "User", :order => [:created_at.desc])
-    @obj = @user
-    display @user
+    if session.user.role == :admin or session.user.id == @user.id
+      @trails = AuditTrail.all(:auditable_id => @user.id, :auditable_type => "User", :order => [:created_at.desc])
+      @obj = @user
+      display @user
+    else
+      raise NotPrivileged
+    end
   end
 
   def index
@@ -100,6 +105,21 @@ class Users < Application
       end
     end
     render
+  end
+
+  def preferred_locale  
+    user = params[:user]
+    @user = session.user
+    if request.method==:put and user.key?(:preferred_locale)
+      @user.preferred_locale = user[:preferred_locale]
+      if @user.save
+        redirect resource(@user), :message => {:notice => "Preferred locale successfully updated"}
+      else
+        redirect resource(@user), :message => {:error => "Preferred locale not updated successfully."}
+      end
+    else
+      redirect resource(@user), :message => {:error => "Preferred locale not updated successfully."}
+    end
   end
 
   def admin_change_password    

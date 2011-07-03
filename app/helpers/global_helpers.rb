@@ -12,6 +12,13 @@ module Merb
       end
     end
 
+    def current_user_info
+      staff_or_funder = ""
+      staff_or_funder = "#{session.user.staff_member.name}" if session.user.staff_member 
+      staff_or_funder += " #{session.user.funder.name}" if session.user.funder
+      "#{staff_or_funder} logged in as <b>#{link_to session.user.login, resource(session.user)}</b> (#{session.user.role.to_s.humanize}) | #{link_to 'log out', url(:logout)}"
+    end
+
     def link_to_with_class(name, url)
       link_to_with_rights(name, url, :class => ((request.uri==(url) or request.uri.index(url)==0) ? "selected" : ""))
     end
@@ -209,21 +216,21 @@ module Merb
       HTML
     end
 
-    def breadcrums
-      # breadcrums use the request.uri and the instance vars of the parent
+    def breadcrumbs
+      # breadcrumbs use the request.uri and the instance vars of the parent
       # resources (@branch, @center) that are available -- so no db queries
       crums, url = [], ''
       request.uri.split("?")[0][1..-1].split('/').each_with_index do |part, index|
         url  << '/' + part
         if part.to_i.to_s.length == part.length  # true when a number (id)
           o = instance_variable_get('@'+url.split('/')[-2].singular)  # get the object (@branch)
-          s = (o.respond_to?(:name) ? link_to(o.name, url) : link_to('#'+o.object_id.to_s, url))
-          crums[-1] += ": <b><i>#{s}</i></b>"  # merge the instance names (or numbers)
+          s = (o.respond_to?(:name) ? link_to(o.name, url) : link_to('#'+o.id.to_s, url))
+          crums <<  "#{s}"  # merge the instance names (or numbers)
         else  # when not a number (id)
-          crums << link_to(part.gsub('_', ' '), url)  # add the resource name
+          crums << link_to(I18n.t("breadcrumb.#{part}", :default => part.gsub('_', ' ')), url) unless ['centers','clients'].include?(part) # add the resource name
         end
       end
-      ['You are here', crums].join('&nbsp;<b>&gt;&gt;</b>&nbsp;')  # fancy separator
+      '<ul class="breadcrumb"><li>' + ['<a href="/">Home</a>', crums].join('</li><li>') + '</li></ul>'  # fancy separator
     end
 
     def format_currency(i)
@@ -593,6 +600,7 @@ module Merb
       prefix  << params[:action].join_snake(' ') if CRUD_ACTIONS[3..-1].include?(params[:action])
       
       return "Loan for #{@loan.client.name}" if controller=="payments" and @loan
+      return I18n.t("page.title.login", :default => "Mostfit - Login") if (controller == "exceptions" and params[:action] == "unauthenticated") or (controller == "sessions" and params[:action] == "update")
       return params[:report_type] if controller=="reports" and params[:report_type]
 
       #Check if @<controller> is available

@@ -45,13 +45,17 @@ class InsuranceProducts < Application
     @insurance_product = InsuranceProduct.get(id)
     raise NotFound unless @insurance_product
     fees = []
-    if params[:fees]
-      fees = params[:fees].keys.map{ |k,v| Fee.get(k.to_i) }
-    end
+    debugger
+
     @insurance_product.update_attributes(insurance_product)
-    @insurance_product.fees = fees
-    if @insurance_product.save or @insurance_product.errors.empty?
-       redirect resource(@insurance_product)
+    if params[:fees]
+      params[:fees].keys.map do |k,v| 
+        @insurance_product.fees << Fee.get(k.to_i) 
+      end
+    end
+    @insurance_product.fees.save
+    if @insurance_product.errors.empty?
+      redirect resource(@insurance_product)
     else
       display @insurance_product, :edit
     end

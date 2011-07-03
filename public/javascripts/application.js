@@ -12,7 +12,7 @@ function addFloater(link, form){
 	}else{
 	    var top = link.offset().top - form.height();
 	}
-	$(form).offset({top: top, left: left});	
+	$(form).offset({top: top, left: left});
     }
 
     if($(".floater").length>0){
@@ -188,7 +188,7 @@ function dateFromAge(ageYear, ageMonth, ageDay){
     return birthDate;
 }
 function attachFormRemote(){
-    $("form._remote_").live('submit', function(f){    	   
+    $("form._remote_").live('submit', function(f){
 				form=$(f.currentTarget);
 				$(form).find("input[type='submit']").attr("disabled", true);
 				$(form).after("<img id='spinner' src='/images/spinner.gif' />");
@@ -203,7 +203,7 @@ function attachFormRemote(){
 					       }else if(form.find("input[name='_target_']").length>0){
 						   id=form.find("input[name='_target_']").attr("value");
 						   if($("#"+id).length>0){
-						       $("#" + id).html(data);				       
+						       $("#" + id).html(data);
 						   }
 						   else if($("#append_"+id).length>0){
 						       $(data).appendTo($("#append_"+id));
@@ -234,7 +234,7 @@ function attachFormRemote(){
 			    });
 }
 function create_remotes(){
-    $("a._remote_").live('click', function(){			     
+    $("a._remote_").live('click', function(){
 			     href=$(this).attr("href");
 			     method="GET";
 			     if($(this).hasClass("self")){
@@ -242,7 +242,7 @@ function create_remotes(){
 				 method="POST";
 			     }
 			     a=$(this);
-			     a.after("<img id='spinner' src='/images/spinner.gif'/>");      
+			     a.after("<img id='spinner' src='/images/spinner.gif'/>");
 			     $.ajax({
 					type: method,
 					url: href,
@@ -268,7 +268,7 @@ function create_remotes(){
 				    });
 			     return false;
 			 });
-    
+
     $("a._customreports_").click(function(){
 				     href=$(this).attr("href");
 				     method="GET"
@@ -310,7 +310,7 @@ function attachReportingFormEvents(id){
 						     id = $(this).attr("id");
 						     name = $(this).attr("name").split(/\[/)[0];
 						     counter = $(this).attr("name").split(/\[/)[1].split("]")[0];
-						     
+
 						     $(this).find("option:selected").each(function(){
 											      if(name!="value"){
 												  for(i=types.indexOf(name)+1; i<=types.length; i++){
@@ -386,7 +386,7 @@ function attachRulesFormEvents(type, id) {//type = {"condition", "precondition"}
   							      });
 						   });
     }
-    
+
     $("#"+type+"_select_"+id).change(function() {
 					 if(id+1> total_fields)
 					     total_fields = id+10;//delete some more fields than id+1 since sometimes more than 1 field is returned per request(there is no harm is deleting extra fields anyways)
@@ -424,7 +424,7 @@ function getDiv(divId, div_container) {
     div1 = document.getElementById(divId);
     if(div1 != null)
         return div1;
-    
+
     div1 = document.createElement('div');
     div1.id = divId;
     div_container.appendChild(div1);
@@ -750,6 +750,7 @@ $(document).ready(function(){
 		      fillFundingLines();
 		      fillCashAccounts();
 		      fillBankAccounts();
+		      $('form').highlight();
 		      //Handling targets form
 		      $("select#target_attached_to").change(function(){
 								$.ajax({
@@ -1024,7 +1025,7 @@ $(document).ready(function(){
 		      $("a.expand_collapsed").click(function(a){
 							id = $(a.currentTarget).attr("id");
 							if((id && $("#element_" + id).length > 0)){
-							    $("#element_" + id).toggle();    
+							    $("#element_" + id).toggle();
 							}else{
 							    $(".collapsed").toggle();
 							}

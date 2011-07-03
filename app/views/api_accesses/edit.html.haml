@@ -1,0 +1,15 @@
+%h1
+  ApiAccesses controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/api_accesses/edit.html.erb
+= error_messages_for @api_access
+
+= form_for(@api_access, :action => url(:api_access, @api_access)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:api_access, @api_access)
+|
+= link_to 'Back', url(:api_accesses)

@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="xml">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="user"/>
+				<xs:element ref="error"/>
+				<xs:element ref="staff_member"/>
+				<xs:element ref="center"/>
+				<xs:element ref="client"/>
+				<xs:element ref="loan"/>
+				<xs:element ref="branch"/>
+				<xs:element ref="client_group"/>
+				<xs:element ref="center_meeting"/>
+				<xs:element ref="region"/>
+				<xs:element ref="area"/>
+				<xs:element ref="loan_product"/>
+				<xs:element ref="error"/>
+				<xs:element ref="holiday"/>
+				<xs:element ref="handshake"/>
+				<xs:element ref="weeksheet"/>
+				<xs:element ref="weeksheet_row"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="user">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="xs:integer"/>
+				<xs:element name="login" type="xs:string"/>
+				<xs:element name="time_at_server" type="xs:dateTime"/>
+				<xs:element name="created_at" type="xs:dateTime"/>
+				<xs:element name="updated_at" type="xs:dateTime"/>
+				<xs:element name="password_changed_at" type="xs:string"/>
+				<xs:element name="active" type="xs:boolean"/>
+				<xs:element name="role" type="xs:string"/>
+				<xs:element name="staff_member_id" type="xs:integer"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="error">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="error_message" type="xs:string"/>
+				<xs:element name="error_code" type="xs:integer"/>
+			</xs:sequence>
+		</xs:complexType>
+    </xs:element>
+    <xs:element name="staff_member">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:integer" />
+                <xs:element name="name" type="xs:string" />
+                <xs:element name="mobile_number" type="xs:decimal" />
+                <xs:element name="creation_date" type="xs:dateTime" />
+                <xs:element name="active" type="xs:boolean" />
+                <xs:element name="user_id" type="xs:string" />
+                <xs:element name="clients" ref="client" maxOccuer="unbounded"/>
+                <xs:element name="centers" ref="center" maxOccuer="unbounded"/>
+                <xs:element name="branches" ref="branches" maxOccuer="unbounded" />
+                <xs:element name="loans" ref="loan" maxOccuer="unbounded"/>
+                <xs:element name="client_groups" ref="client_group" maxOccuer="unbounded"/>
+                <xs:element name="center_meetings" ref="center_meeting" maxOccuer="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+	<xs:element name="center">
+		<xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:integer" />
+                <xs:element name="name" type="xs:string" />
+                <xs:element name="code" type="xs:integer" />
+                <xs:element name="address" type="xs:string" />
+                <xs:element name="contact_number" type="xs:string" />
+                <xs:element name="landmark" type="xs:string" />
+                <xs:element name="meeting_day" type="xs:string" />
+                <xs:element name="meeting_time_hours" type="xs:integer" />
+                <xs:element name="meeting_time_minutes" type="xs:integer" />
+                <xs:element name="creation_date" type="xs:dateTime" />
+                <xs:element name="manager_staff_id" type="xs:integer" />
+                <xs:element name="branch_id" type="xs:integer" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="client">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:integer" />
+                <xs:element name="name" type="xs:string" />
+                <xs:element name="reference" type="xs:string" />
+                <xs:element name="date_of_birth" type="xs:dateTime" />
+                <xs:element name="spouse_name" type="xs:string" />
+                <xs:element name="address" type="xs:string" />
+                <xs:element name="active" type="xs:boolean" />
+                <xs:element name="date_joined" type="xs:string" />
+                <xs:element name="client_group_id" type="xs:int" />
+                <xs:element name="client_group_name" type="xs:string" />
+                <xs:element name="center_id" type="xs:integer" />
+                <xs:element name="loans" ref="loan" maxOccuer="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="loans">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:integer" />
+                <xs:element name="amount" type="xs:decimal" />
+                <xs:element name="interest_rate" type="xs:decimal" />
+                <xs:element name="installment_frequency" type="xs:string" />
+                <xs:element name="number_of_installments" type="xs:integer" />
+                <xs:element name="client_id" type="xs:integer" />
+                <xs:element name="applied_on" type="xs:string" />
+                <xs:element name="approved_on" type="xs:string" />
+                <xs:element name="disbursal_date" type="xs:string" />
+                <xs:element name="loan_product_id" type="xs:integer" />
+                <xs:element name="loan_product_name" type="xs:string" />
+                <xs:element name="applied_by_staff_id" type="xs:integer" />
+                <xs:element name="disbursed_by_staff_id" type="xs:integer" />
+                <xs:element name="loan_type" type="xs:string" />
+                <xs:element name="approved_by_staff_id" type="xs:integer" />
+                <xs:element name="taken_over_on" type="xs:string" />
+                <xs:element name="taken_over_on_installment_number" type="xs:string" />
+                <xs:element name="original_amount" type="xs:string" />
+                <xs:element name="original_disbursal_date" type="xs:string" />
+                <xs:element name="original_first_payment_date" type="xs:string" />
+                <xs:element name="created_by_user_id" type="xs:string" />
+                <xs:element name="created_at" type="xs:dateTime" />
+                <xs:element name="updated_at" type="xs:dateTime" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="branch">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:integer" />
+                <xs:element name="name" type="xs:string" />
+                <xs:element name="code" type="xs:string" />
+                <xs:element name="address" type="xs:string" />
+                <xs:element name="contact_number" type="xs:decimal" />
+                <xs:element name="landmark" type="xs:string" />
+                <xs:element name="creation_date" type="xs:string" />
+                <xs:element name="area_id" type="xs:integer" />
+                <xs:element name="manager_staff_id" type="xs:integer" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="client_group">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:integer" />
+                <xs:element name="name" type="xs:string" />
+                <xs:element name="center_id" type="xs:integer" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="center_meeting">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:integer" />
+                <xs:element name="name" type="xs:string" />
+                <xs:element name="code" type="xs:integer" />
+                <xs:element name="address" type="xs:string" />
+                <xs:element name="contact_number" type="xs:string" />
+                <xs:element name="landmark" type="xs:string" />
+                <xs:element name="meeting_day" type="xs:string" />
+                <xs:element name="meeting_time_hours" type="xs:integer" />
+                <xs:element name="meeting_time_minutes" type="xs:integer" />
+                <xs:element name="creation_date" type="xs:dateTime" />
+                <xs:element name="manager_staff_id" type="xs:integer" />
+                <xs:element name="branch_id" type="xs:integer" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="region">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:integer" />
+                <xs:element name="name" type="xs:string" />
+                <xs:element name="address" type="xs:string" />
+                <xs:element name="contact_number" type="xs:string" />
+                <xs:element name="landmark" type="xs:string" />
+                <xs:element name="creation_date" type="xs:string" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="area">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:int" />
+                <xs:element name="name" type="xs:string" />
+                <xs:element name="address" type="xs:string" />
+                <xs:element name="contact_number" type="xs:string" />
+                <xs:element name="landmark" type="xs:string" />
+                <xs:element name="creation_date" type="xs:string" />
+                <xs:element name="region_id" type="xs:integer" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="loan_product">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:integer" />
+                <xs:element name="name" type="xs:string" />
+                <xs:element name="max_amount" type="xs:integer" />
+                <xs:element name="min_amount" type="xs:integer" />
+                <xs:element name="amount_multiple" type="xs:decimal" />
+                <xs:element name="max_interest_rate" type="xs:decimal" />
+                <xs:element name="min_interest_rate" type="xs:decimal" />
+                <xs:element name="interest_rate_multiple" type="xs:decimal" />
+                <xs:element name="installment_frequency" type="xs:string" />
+                <xs:element name="max_number_of_installments" type="xs:integer" />
+                <xs:element name="min_number_of_installments" type="xs:integer" />
+                <xs:element name="valid_from" type="xs:dateTime" />
+                <xs:element name="valid_upto" type="xs:dateTime" />
+                <xs:element name="payment_validation_methods" type="xs:string" />
+                <xs:element name="loan_validation_methods" type="xs:string" />
+                <xs:element name="insurance_product_id" type="xs:string" />
+                <xs:element name="loan_type" type="xs:string" />
+                <xs:element name="created_at" type="xs:dateTime" />
+                <xs:element name="updated_at" type="xs:dateTime" />
+                <xs:element name="linked_to_insurance" type="xs:boolean" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="holiday">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" type="xs:string" />
+                <xs:element name="date" type="xs:dateTime" />
+                <xs:element name="shift_meeting" type="xs:string" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="handshake">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="product_name" type="xs:string" />
+                <xs:element name="org_name" type="xs:string" />
+                <xs:element name="api_version" type="xs:string" />
+                <xs:element name="server_name" type="xs:string" />
+                <xs:element name="current_time" type="xs:dateTime" />
+                <xs:element name="currency_format" type="xs:string" />
+                <xs:element name="date_time_format" type="xs:string" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="weeksheet">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="staff_member_id" type="xs:integer" />
+                <xs:element name="staff_member_name" type="xs:string" />
+                <xs:element name="date" type="xs:string" />
+                <xs:element name="center_id" type="xs:integer" />
+                <xs:element name="center_name" type="xs:string" />
+                <xs:element name="center_code" type="xs:integer" />
+                <xs:element name="center_address" type="xs:string" />
+                <xs:element name="meeting_day" type="xs:string" />
+                <xs:element name="meeting_time_hours" type="xs:integer" />
+                <xs:element name="meeting_time_minutes" type="xs:integer" />
+                <xs:element name="weeksheet_rows" ref="weeksheet_row" maxOccuer="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="weeksheet_row">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="date" type="xs:string" />
+                <xs:element name="center_id" type="xs:integer" />
+                <xs:element name="client_id" type="xs:integer" />
+                <xs:element name="client_name" type="xs:string" />
+                <xs:element name="client_group_id" type="xs:integer" />
+                <xs:element name="client_group_name" type="xs:string" />
+                <xs:element name="loan_id" type="xs:integer" />
+                <xs:element name="loan_amount" type="xs:decimal" />
+                <xs:element name="disbursal_date" type="xs:string" />
+                <xs:element name="outstanding" type="xs:decimal" />
+                <xs:element name="installment" type="xs:intteger" />
+                <xs:element name="principal" type="xs:decimal" />
+                <xs:element name="interest" type="xs:decimal" />
+                <xs:element name="fees" type="xs:decimal" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

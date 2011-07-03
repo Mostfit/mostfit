@@ -1,5 +1,5 @@
 class ClientGroups < Application
-  # provides :xml, :yaml, :js
+  provides :xml
   before :get_context, :only => ['edit', 'update', 'index']
 
   def index
@@ -44,13 +44,21 @@ class ClientGroups < Application
   end
 
   def create(client_group)
-    only_provides :html, :json
+    only_provides :html, :json, :xml
     @client_group = ClientGroup.new(client_group)
     if @client_group.save
-      request.xhr? ? display(@client_group) : redirect(url(:data_entry), :message => {:notice => "Group was successfully created"})
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+        display @client_group
+      else
+        request.xhr? ? display(@client_group) : redirect(url(:data_entry), :message => {:notice => "Group was successfully created"})
+      end
     else
-      message[:error] = "Group failed to be created"
-      request.xhr? ? display(@client_group.errors, :status => 406) : render(:new)
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+        display @client_group
+      else
+        message[:error] = "Group failed to be created"
+        request.xhr? ? display(@client_group.errors, :status => 406) : render(:new)
+      end
     end
   end
 

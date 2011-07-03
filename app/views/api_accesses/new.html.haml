@@ -1,0 +1,5 @@
+%h1 Register for API access
+= error_messages_for @api_access
+
+= form_for(@api_access, :action => url(:api_accesses)) do
+  = partial :fields, :submit_text => "Register"

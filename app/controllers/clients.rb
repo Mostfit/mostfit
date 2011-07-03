@@ -15,12 +15,13 @@ class Clients < Application
   end
 
   def show(id)
+    @option = params[:option] if params[:option]    
     @client = Client.get(id)
     raise NotFound unless @client
     
     if @center
       @loans = @loans ? @loans.find_all{|l| l.client_id == @client.id} : @client.loans
-      display [@client, @loans], 'loans/index'
+      display [@client, @loans, @option], 'loans/index'
     else
       redirect_to_show(params[:id])
     end
@@ -37,9 +38,17 @@ class Clients < Application
     @client.center = @center if @center# set direct context
     @client.created_by_user_id = session.user.id
     if @client.save
-      redirect(params[:return]||resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' successfully created"})
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+        display @client
+      else
+        redirect(params[:return]||resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' successfully created"})
+      end
     else
-      render :new  # error messages will be shown
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+        display @client
+      else
+        render :new  # error messages will be shown
+      end
     end
   end
 
@@ -62,13 +71,32 @@ class Clients < Application
         @client.tags = []
       end
       @client.save
-      if @branch and @center
-        redirect(params[:return]||resource(@branch, @center, @client), :message => {:notice => "Client '#{@client.name}' has been edited"})
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+        if params[:client] and params[:client][:fingerprint]
+          doc = Base64.decode64(params[:client][:fingerprint]) 
+          temp = File.new("tmp/client_#{@client.id}_fingerprint.fpt", "w")
+          File.open( temp.path, 'wb') do |f|
+            f.write(doc)
+          end
+          doc_file = File.open(temp.path, 'rb')
+          @client.fingerprint = doc_file
+          @client.save
+          File.delete("tmp/client_#{@client.id}_fingerprint.fpt")
+        end
+        display @client
       else
-        redirect(resource(@client, :edit), :message => {:notice => "Client '#{@client.name}' has been edited"})
+        if @branch and @center
+          redirect(params[:return]||resource(@branch, @center, @client), :message => {:notice => "Client '#{@client.name}' has been edited"})
+        else
+          redirect(resource(@client, :edit), :message => {:notice => "Client '#{@client.name}' has been edited"})
+        end
       end
     else
-      display @client, :edit  # error messages will be shown
+      if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+        display @client
+      else
+        display @client, :edit  # error messages will be shown
+      end
     end
   end
 

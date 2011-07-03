@@ -1,5 +1,6 @@
 module DataEntry
   class Payments < DataEntry::Controller
+    include Pdf::DaySheet if PDF_WRITER
     provides :html, :xml
     def record
       @payment = (params and params[:id]) ? Payment.get(params[:id]) : Payment.new
@@ -10,6 +11,8 @@ module DataEntry
     end
 
     def by_center
+      @option = params[:option] if params[:option]
+      @info = params[:info] if params[:info]
       @center = Center.get(params[:center_id]) if params[:center_id]
       if params[:center_text] and not @center
         @center = Center.get(params[:center_text]) || Center.first(:name => params[:center_text]) || Center.first(:code => params[:center_text])
@@ -48,16 +51,25 @@ module DataEntry
           else
             redirect(return_url, :message => {:notice => notice})
           end
-        elsif params[:format] and params[:format]=="xml"
+        elsif params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
           display("")
         else
           display [@errors, @center, @date]
         end
       else
-        render
+        if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+          @weeksheet_rows = Weeksheet.get_center_weeksheet(@center,@date, @info) if @center
+          display @weeksheet_rows
+        elsif params[:format] and params[:format] == "pdf"
+          generate_weeksheet_pdf(@center, @date)
+          send_data(File.read("#{Merb.root}/public/pdfs/weeksheet_of_center_#{@center.id}_#{@date.strftime('%Y_%m_%d')}.pdf"),
+                                    :filename => "#{Merb.root}/public/pdfs/weeksheet_of_center_#{@center.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
+        else
+          render
+        end
       end
     end
-    
+
     def by_staff_member
       @date = params[:for_date] ? Date.parse(params[:for_date]) : Date.today
       staff_id = params[:staff_member_id] || params[:received_by]
@@ -80,7 +92,7 @@ module DataEntry
         render
       end
     end
-    
+
     def create(payment)
       raise NotFound unless @loan = Loan.get(payment[:loan_id])
       amounts = payment[:amount].to_f
@@ -116,7 +128,7 @@ module DataEntry
         params[:format]=='xml' ? display(@payment, :status => 400) : render(:record)
       end
     end
-    
+
     def delete
       only_provides :html
       if params and params[:loan_id]

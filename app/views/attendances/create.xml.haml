@@ -1,0 +1,15 @@
+%xml
+  %attendance
+    -if not @attendance.errors.blank?
+      %error 
+        %error_code 600 
+        - @attendance.errors.map do |e|
+          %error_message #{e.to_s}
+    - else
+      %id #{@attendance.id}
+      %center_id #{@attendance.center_id}
+      %client_id #{@attendance.client_id}
+      %status #{@attendance.status}
+      %date #{@attendance.date}
+  
+  

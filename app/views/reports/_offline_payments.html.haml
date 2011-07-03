@@ -1,0 +1,43 @@
+=partial :form
+- length = 6
+%table.report.nojs
+  %tr.header
+    %th{:width => '20%'}
+      Received Date
+    %th
+      Payment Id
+    %th{:width => '20%'}
+      Amount
+    %th
+      Type
+    %th
+      Loan Id
+    %th
+      Client Id
+    %th
+      Desktop Id
+    %th
+      Origin
+    %th
+      Received staffmember
+  - @data.each do |data|
+    %tr
+      %td
+        = data[0]
+      %td
+        = data[1]
+      %td
+        = data[2]
+      %td
+        = data[3]
+      %td
+        = data[4]
+      %td
+        = data[5]
+      %td
+        = data[6]
+      %td
+        = data[7]
+      %td
+        = data[8]
+          

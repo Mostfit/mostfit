@@ -1,0 +1,156 @@
+%xml
+  %staff_member
+    %id #{@staff_member.id}
+    %name #{@staff_member.name}
+    %mobile_number #{@staff_member.mobile_number}
+    %creation_date #{@staff_member.creation_date}
+    %active #{@staff_member.active}
+    %user_id #{@staff_member.user_id}
+    - if (@option == "regions" or @option == "all") and not @staff_member.regions.blank?
+      %regions
+        - @staff_member.regions.each do |region|
+          %region
+            %id #{region.id}
+            %name #{region.name}
+            %address #{h(region.address)}
+            %contact_number #{region.contact_number}
+            %landmark #{region.landmark}
+            %creation_date #{region.creation_date}
+    - if (@option == "areas" or @option == "all") and not @staff_member.areas.blank?
+      %areas
+        - @staff_member.areas.each do |area|
+          %area
+            %id #{area.id}
+            %name #{area.name}
+            %address #{area.address}
+            %contact_number #{area.contact_number}
+            %landmark #{area.landmark}
+            %creation_date #{area.creation_date}
+            %region_id #{area.region_id}
+    - if (@option == "branches" or @option == "all") and not @staff_member.branches.blank?
+      %branches
+        - @staff_member.branches.each do |branch|
+          %branch
+            %id #{branch.id}
+            %name #{branch.name}
+            %code #{branch.code}
+            %address #{h(branch.address)}
+            %contact_number #{branch.contact_number}
+            %landmark #{branch.landmark}
+            %creation_date #{branch.creation_date}
+            %area_id #{branch.manager_staff_id}
+            %manager_staff_id #{branch.manager_staff_id}
+    - if (@option == "centers" or @option == "all") and not @staff_member.centers.blank?
+      %centers
+        - @staff_member.centers.each do |center|
+          %center
+            %id #{center.id}
+            %name #{center.name}
+            %code #{center.code}
+            %address #{h(center.address)}
+            %contact_number #{center.contact_number}
+            %landmark #{center.landmark}
+            %meeting_day #{center.meeting_day}
+            %meeting_time_hours #{center.meeting_time_hours}
+            %meeting_time_minutes #{center.meeting_time_minutes}
+            %creation_date #{center.creation_date}
+            %manager_staff_id #{center.manager_staff_id}
+            %branch_id #{center.branch_id}
+    - if (@option == "clients" or @option == "all") and not @staff_member.clients.blank?
+      %clients
+        - @staff_member.clients.each do |client|
+          %client
+            %id #{client.id}
+            %name #{client.name}
+            %reference #{client.reference}
+            %date_of_birth #{client.date_of_birth}
+            %spouse_name #{client.spouse_name}
+            %address #{h(client.address)}
+            %active #{client.active}
+            %date_joined #{client.date_joined}
+            %client_group_id #{client.client_group_id}
+            - if client.client_group
+              %client_group_name #{client.client_group.name}
+            %center_id #{client.center_id}
+            - if client.loans
+              %loans
+                - client.loans.each do |loan|
+                  %loan
+                    %id #{loan.id}
+                    %amount #{loan.amount}
+                    %interest_rate #{loan.interest_rate}
+                    %installment_frequency #{loan.installment_frequency}
+                    %number_of_installments #{loan.number_of_installments}
+                    %client_id #{loan.client_id}
+                    %applied_on #{loan.applied_on}
+                    %approved_on #{loan.approved_on}
+                    %disbursal_date #{loan.disbursal_date}
+                    %loan_product_id #{loan.loan_product_id}
+                    - if loan.loan_product
+                      %loan_product_name #{loan.loan_product.name}
+                    %applied_by_staff_id #{loan.applied_by_staff_id}
+                    %disbursed_by_staff_id #{loan.disbursed_by_staff_id}
+                    %loan_type #{loan.discriminator}
+                    %approved_by_staff_id #{loan.approved_by_staff_id}
+                    %taken_over_on #{loan.taken_over_on}
+                    %taken_over_on_installment_number #{loan.taken_over_on_installment_number}
+                    %original_amount #{loan.original_amount}
+                    %original_disbursal_date #{loan.original_disbursal_date}
+                    %original_first_payment_date #{loan.original_first_payment_date}
+                    %created_by_user_id #{loan.created_by_user_id}
+                    %created_at #{loan.created_at}
+                    %updated_at #{loan.updated_at}
+    - if (@option == "loans") and not @staff_member.clients.blank?
+      %loans
+        - @staff_member.clients.each do |client|
+          - client.loans.each do |loan|
+            %loan
+              %id #{loan.id}
+              %amount #{loan.amount}
+              %interest_rate #{loan.interest_rate}
+              %installment_frequency #{loan.installment_frequency}
+              %number_of_installments #{loan.number_of_installments}
+              %client_id #{loan.client_id}
+              %applied_on #{loan.applied_on}
+              %approved_on #{loan.approved_on}
+              %disbursal_date #{loan.disbursal_date}
+              %loan_product_id #{loan.loan_product_id}
+              - if loan.loan_product
+                %loan_product_name #{loan.loan_product.name}
+              %applied_by_staff_id #{loan.applied_by_staff_id}
+              %disbursed_by_staff_id #{loan.disbursed_by_staff_id}
+              %loan_type #{loan.discriminator}
+              %approved_by_staff_id #{loan.approved_by_staff_id}
+              %taken_over_on #{loan.taken_over_on}
+              %taken_over_on_installment_number #{loan.taken_over_on_installment_number}
+              %original_amount #{loan.original_amount}
+              %original_disbursal_date #{loan.original_disbursal_date}
+              %original_first_payment_date #{loan.original_first_payment_date}
+              %created_by_user_id #{loan.created_by_user_id}
+              %created_at #{loan.created_at}
+              %updated_at #{loan.updated_at}
+    - if (@option == "client_groups") and not @staff_member.client_groups({"center.manager_staff_id" => @staff_member.id}).blank?
+      %client_groups
+        - @staff_member.client_groups({"center.manager_staff_id" => @staff_member.id}).each do |client_group|
+          %client_group
+            %id #{client_group.id}
+            %name #{client_group.name}
+            %center_id #{client_group.center_id}
+
+    - if (@option == "center_meetings" or @option == "all") and not @staff_member.centers.blank?
+      %center_meetings
+        - @staff_member.centers.each do |center|
+          - if center.meeting_day?(@date)
+            %center_meeting
+              %id #{center.id}
+              %name #{center.name}
+              %code #{center.code}
+              %address #{h(center.address)}
+              %contact_number #{center.contact_number}
+              %landmark #{center.landmark}
+              %meeting_day #{center.meeting_day}
+              %meeting_time_hours #{center.meeting_time_hours}
+              %meeting_time_minutes #{center.meeting_time_minutes}
+              %creation_date #{center.creation_date}
+              %manager_staff_id #{center.manager_staff_id}
+              %branch_id #{center.branch_id}

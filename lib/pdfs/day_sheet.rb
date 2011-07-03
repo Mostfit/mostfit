@@ -188,5 +188,41 @@ module Pdf
       pdf.save_as(filename)
       return pdf
     end
+    def generate_weeksheet_pdf(center, date)
+      weeksheet_rows = Weeksheet.get_center_weeksheet(center, date, "data") if center
+      if not weeksheet_rows.blank?
+      pdf = PDF::Writer.new(:orientation => :landscape, :paper => "A4")
+      pdf.select_font "Times-Roman"
+      pdf.text "Weeksheet of #{center.name} for #{date}", :font_size => 24, :justification => :center
+      pdf.text("\n")
+      pdf.text "Center: #{center.name}, Manager: #{center.manager.name}, signature: ______________________", :font_size => 12, :justification => :left
+      pdf.text("Center leader: #{center.leader.client.name}, signature: ______________________", :font_size => 12, :justification => :left) if center.leader
+      pdf.text("Date: #{date}, Time: #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}", :font_size => 12, :justification => :left)
+      pdf.text("\n")
+      table = PDF::SimpleTable.new
+      table.data = []
+      old_group = ""
+      weeksheet_rows.each do |row|
+      table.data.push({"disbursed on" => row.client_group_name}) if old_group != row.client_group_name
+      table.data.push({"name" => row.client_name, "loan id" => row.loan_id, "amount" => row.loan_amount.to_currency,
+                      "outstanding" => row.outstanding.to_currency, "disbursed on" => row.disbursal_date.to_s, "installment" =>  row.installment,
+                      "principal due" => row.principal.to_currency, "interest due" => row.interest.to_currency, "total due" =>  row.principal + row.interest, "signature" => "" })
+      old_group = row.client_group_name
+      end
+      table.column_order  = ["name", "loan id" , "amount", "outstanding", "disbursed on", "installment", "principal due", "interest due",  "total due", "signature"]
+      table.show_lines    = :all
+      table.show_headings = true
+      table.shade_rows    = :none
+      table.shade_headings = true
+      table.orientation   = :center
+      table.position      = :center
+      table.title_font_size = 16
+      table.header_gap = 10
+      table.render_on(pdf)
+
+      pdf.save_as("#{Merb.root}/public/pdfs/weeksheet_of_center_#{center.id}_#{date.strftime('%Y_%m_%d')}.pdf")
+      return pdf
+      end
+    end
   end
 end

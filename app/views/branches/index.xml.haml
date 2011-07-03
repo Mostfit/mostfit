@@ -1,0 +1,14 @@
+%xml
+  %branches
+    - if @branches
+      - @branches.each do |branch|
+        %branch
+          %id #{branch.id}
+          %name #{branch.name}
+          %code #{branch.code}
+          %address #{branch.address}
+          %contact_number #{branch.contact_number}
+          %landmark #{branch.landmark}
+          %creation_date #{branch.creation_date}
+          %area_id #{branch.area_id}
+          %manager_staff_id #{branch.manager_staff_id}

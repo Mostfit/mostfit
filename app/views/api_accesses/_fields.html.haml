@@ -1,0 +1,13 @@
+%table
+  %tr
+    %th
+      At Branch
+    %th
+      Description
+  %tr
+    %td
+      = select :branch_id, :collection =>  Branch.all.map{|b| [b.id, b.name]}, :prompt => "---"
+    %td
+      = text_area :description
+
+= submit "Register for API access"

@@ -1,0 +1,26 @@
+%xml
+  %loan_products
+    - if @loan_products
+      - @loan_products.each do |loan_product|
+        %loan_product
+          %id #{loan_product.id}
+          %name #{loan_product.name}
+          %max_amount #{loan_product.max_amount}
+          %min_amount #{loan_product.min_amount}
+          %amount_multiple #{loan_product.amount_multiple}
+          %max_interest_rate #{loan_product.max_interest_rate}
+          %min_interest_rate #{loan_product.min_interest_rate}
+          %interest_rate_multiple #{loan_product.interest_rate_multiple}
+          %installment_frequency #{loan_product.installment_frequency}
+          %max_number_of_installments #{loan_product.max_number_of_installments}
+          %min_number_of_installments #{loan_product.min_number_of_installments}
+          %valid_from #{loan_product.valid_from}
+          %valid_upto #{loan_product.valid_upto}
+          %payment_validation_methods #{loan_product.payment_validation_methods}
+          %loan_validation_methods #{loan_product.loan_validation_methods}
+          %insurance_product_id #{loan_product.insurance_product_id}
+          %loan_type #{loan_product.loan_type}
+          %created_at #{loan_product.created_at}
+          %updated_at #{loan_product.updated_at}
+          %linked_to_insurance #{loan_product.linked_to_insurance}
+          %insurance_product_id #{loan_product.insurance_product_id}
