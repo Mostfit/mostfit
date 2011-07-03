@@ -403,7 +403,6 @@ class Loans < Application
     if request.method == :get
       display @loan, :layout => layout?
     else
-      debugger
       staff = StaffMember.get(params[:received_by])
       raise ArgumentError.new("No staff member selected") unless staff
       raise ArgumentError.new("No applicable fee for penalty") if (params[:fee].blank? and (not params[:penalty_amount].blank?))
