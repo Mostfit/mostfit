@@ -41,7 +41,7 @@ legend { font-weight: bold; font-size:1.2em; }
 label { font-weight: bold; }
 textarea, input[type='text'], input[type='password'], select { border: 1px solid #ccc; background: #fff; }
 textarea:hover, input[type='text']:hover, input[type='password']:hover, select:hover { border-color: #aaa; }
-textarea:focus, input[type='text']:focus, input[type='password']:focus, select:focus { border-color: #888; outline: 2px solid #ffffaa; }
+textarea:focus, input[type='text']:focus, input[type='password']:focus, select:focus { border-color: #888; outline: 2px solid #9ef621; }
 input, select { cursor: pointer; }
 input[type='text'] { cursor: text; }
 
