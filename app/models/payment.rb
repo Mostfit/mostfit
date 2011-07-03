@@ -258,7 +258,7 @@ class Payment
         a = loan_fees_amount + client_fees_amount
       end      
       if (not a.blank?) and amount - a > 0.01
-        return [false, "#{type} is more than the total #{type} due"]
+        return [false, "#{type} (#{amount}) is more than the total #{type} due (#{a})"]
       end
     end
     true
