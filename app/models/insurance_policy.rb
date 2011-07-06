@@ -3,7 +3,7 @@ class InsurancePolicy
   include FeesContainer
 
   POLICY_STATUSES = [:active, :expired, :claim_pending, :claim_settled]
-  COVER_FOR       = [:self, :spouse, :both, :son, :daughter, :mother, :father]
+  COVER_FOR       = [:self, :spouse, :both, :son, :daughter, :mother, :father, :other]
   property :id, Serial
   property :application_number, String, :nullable => true
   property :policy_no, String, :nullable => true
@@ -14,6 +14,7 @@ class InsurancePolicy
   property :nominee, String, :nullable => true
   property :status, Enum.send("[]", *POLICY_STATUSES), :nullable => true
   property :cover_for, Enum.send("[]", *COVER_FOR), :nullable => true, :default => 'self'
+  property :beneficiary_name, Text
 
   belongs_to :insurance_product
   belongs_to :client

@@ -52,3 +52,8 @@
       Cover for
     %td
       = select(:cover_for, :collection => InsurancePolicy::COVER_FOR.map{|x| [x, x]})
+  %tr
+    %td
+      Beneficiary Name
+    %td
+      = text_field :beneficiary_name
