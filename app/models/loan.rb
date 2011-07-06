@@ -1031,8 +1031,8 @@ class Loan
     d = received_on
     total = total.to_f
     while used < total
-      prin -= principal_overpaid_on(d).round(2)
-      int  -= interest_overpaid_on(d).round(2)
+      prin += scheduled_principal_for_installment(installment_for_date(d))
+      int  += scheduled_interest_for_installment(installment_for_date(d))
       used  = (prin + int)
       d = shift_date_by_installments(d, 1)
     end
@@ -1253,6 +1253,32 @@ class EquatedWeeklyRounded < Loan
     "Reducing balance schedule (Equated Weekly)"
   end
 
+  def equated_payment
+    pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
+  end
+
+  def pay_prorata(total, received_on)
+    i = used = prin = int = 0.0
+    d = received_on
+    total = total.to_f
+    pmnt = equated_payment
+    d = received_on
+    curr_bal = actual_outstanding_principal_on(d)
+    while (total - used) >= 0.01
+      i_pmt = interest_rate/get_divider * curr_bal 
+      int += i_pmt
+      p_pmt = pmnt - i_pmt
+      prin += p_pmt
+      curr_bal -= p_pmt
+      used  = (prin + int)
+      d = shift_date_by_installments(d, 1)
+    end
+    interest  = total * int/(prin + int)
+    principal = total * prin/(prin + int)
+    [interest, principal]
+
+  end
+
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
@@ -1290,34 +1316,4 @@ class EquatedWeeklyRounded < Loan
     end
     return reducing_schedule[number][:interest_payable]
   end
-
-private
-  def reducing_schedule
-    return @reducing_schedule if @reducing_schedule
-    @reducing_schedule = {}    
-    balance = amount
-    payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
-    1.upto(number_of_installments){|installment|
-      @reducing_schedule[installment] = {}
-      @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider).round
-      @reducing_schedule[installment][:principal_payable] = (payment - @reducing_schedule[installment][:interest_payable]).round
-      balance = balance - @reducing_schedule[installment][:principal_payable]
-    }
-    return @reducing_schedule
-  end
-
-  def get_divider
-    case installment_frequency
-    when :weekly
-      52
-    when :biweekly
-      26
-    when :monthly
-      12
-    when :daily
-      365
-    end    
-  end
 end
-
-
