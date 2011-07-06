@@ -51,6 +51,9 @@ class Mfi
   property :session_expiry,   Integer, :nullable => true, :min => 60, :max => 86400
   property :password_change_in, Integer, :nullable => true
   property :org_locale, String
+  property :prefered_date_pattern, String, :nullable => true
+  property :prefered_date_separator, String, :nullable => true
+  property :prefered_date_style, String, :nullable => true
 
   property :report_access_rules, Yaml, :nullable => true, :default => {}
 
