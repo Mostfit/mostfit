@@ -230,9 +230,9 @@ module Pdf
     def generate_loan_schedule
       loan_history = self.loan_history
       return nil if loan_history.empty?
-      pdf =  PDF::Writer.new(:orientation => :landscape, :paper => "A4")
+      pdf =  PDF::Writer.new(:orientation => :portrait, :paper => "A4")
       pdf.select_font "Times-Roman"
-      pdf.text "Repayment Schedule of Loan ID #{self.id} for client #{self.client.name} (ID: #{self.id})", :font_size => 22, :justification => :center
+      pdf.text "Repayment Schedule of Loan ID #{self.id} for client #{self.client.name} (ID: #{self.id})", :font_size => 18, :justification => :center
       pdf.text("\n")
       client_info = PDF::SimpleTable.new
       client_info.data = []
@@ -252,7 +252,7 @@ module Pdf
       client_info.shade_headings = false
       client_info.orientation   = :center
       client_info.position      = :center
-      client_info.title_font_size = 14
+      client_info.title_font_size = 13
       client_info.header_gap = 10
       client_info.render_on(pdf)
       pdf.text("\n")
@@ -265,6 +265,7 @@ module Pdf
                           "Scheduled Principal" => scheduled_principal.to_currency,
                           "Scheduled Interest" => scheduled_interest.to_currency, 
                           "Scheduled Total" => (scheduled_principal + scheduled_interest).to_currency,
+                          "RO Signature" => "",
                         })
         # if 
         # table.data.push({ "actual balance" => "",
@@ -272,14 +273,14 @@ module Pdf
         #                 })
         # end
       end
-      table.column_order  = ["Date Due", "Scheduled Balance", "Scheduled Principal", "Scheduled Interest", "Scheduled Total"]
+      table.column_order  = ["Date Due", "Scheduled Balance", "Scheduled Principal", "Scheduled Interest", "Scheduled Total", "RO Signature"]
       table.show_lines    = :all
       table.show_headings = true
       table.shade_rows    = :none
       table.shade_headings = true
       table.orientation   = :center
       table.position      = :center
-      table.title_font_size = 16
+      table.title_font_size = 14
       table.header_gap = 10
       table.render_on(pdf)
       return pdf
