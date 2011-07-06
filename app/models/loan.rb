@@ -100,21 +100,6 @@ class Loan
   property :c_last_payment_id, Integer
   property :c_stale?, Boolean
   
-#  property :taken_over_on,                     Date
-#  property :taken_over_on_installment_number,  Integer 
-
-  property :c_center_id, Integer
-  property :c_branch_id, Integer
-  property :c_scheduled_maturity_date, Date
-  property :c_maturity_date, Date
-  property :c_actual_first_payment_date, Date
-  property :c_last_status, Integer
-  property :c_principal_received, Float
-  property :c_interest_received, Float
-  property :c_last_payment_received_on, Date
-  property :c_last_payment_id, Integer
-
-
   property :converted, Boolean
 
   # associations
@@ -404,6 +389,7 @@ class Loan
     end
     
     # take care of date changes in weekly schedules
+    debugger
     if [:weekly, :biweekly, :quadweekly].include?(installment_frequency) and cl=self.client(:fields => [:id, :center_id]) and cen=cl.center and cen.meeting_day != :none and ensure_meeting_day
       unless (new_date.weekday == cen.meeting_day_for(new_date) or (cen.meeting_day_for(new_date) == :none))
         # got wrong val. recalculate
@@ -939,6 +925,7 @@ class Loan
   end
   # the installment dates
   def installment_dates
+    debugger
     return @_installment_dates if @_installment_dates
     if installment_frequency == :daily
       # we have to br careful that when we do a holiday bump, we do not get stuck in an endless loop
