@@ -280,3 +280,4 @@ input.error, textarea.error, select.error {background:#FBE3E4;}
 .container .notice a {color:#514721; background:none; padding:0; margin:0; }
 .container .success a {color:#264409; background:none; padding:0; margin:0; }
 .container .center {text-align: center;}
+.holiday_indicator, .ui-datepicker .holiday_indicator a { background-color:red;color:red }

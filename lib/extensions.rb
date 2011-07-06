@@ -92,10 +92,18 @@ module Misfit
         end
       end
       
+      def rights_from_access_rules
+        if access_rights.key?(@action.to_s.to_sym) and access_rights[@action.to_s.to_sym].include?(@controller.to_sym)
+          return true
+        elsif r = access_rights[:all]
+          r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
+        end
+      end
+      
       def allow_read_only
         return false if CUD_Actions.include?(@action)
         return true if @controller=="admin" and @action=="index"
-        return access_rights[:all].include?(@controller.to_sym)
+        return rights_from_access_rules
       end
       
       def _can_access?(route, params = nil)       
@@ -140,9 +148,7 @@ module Misfit
           return true  if params[:parent_model]=="Branch" and (role==:staff_member and Branch.get(params[:parent_id]).manager==@staff)
           return false
         end
-
-        r = (access_rights[@action.to_s.to_sym] or access_rights[:all])
-              
+        
         if role == :data_entry 
           return ["new", "edit", "create", "update"].include?(@action) if ["clients", "loans", "client_groups"].include?(@controller)
           return (@action == "disbursement_sheet" or @action == "day_sheet") if @controller == "staff_members"
@@ -197,9 +203,20 @@ module Misfit
             end
           end
 
+          if not (access_rights.key?(@action.to_s.to_sym) and access_rights[@action.to_s.to_sym].include?(@controller.to_sym))
+            if r = access_rights[:all]
+              return false unless r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
+            end
+          end
+
           return is_manager_of?(Kernel.const_get(route[:for].camelcase).get(route[:id])) if @controller == "info" and route[:for] and route[:id]
         end
-        r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
+
+        if access_rights.key?(@action.to_s.to_sym) and access_rights[@action.to_s.to_sym].include?(@controller.to_sym)
+          return true
+        elsif r = access_rights[:all]
+          r.include?(@controller.to_sym) || r.include?(@controller.split("/")[0].to_sym)
+        end        
       end
     end #User
 

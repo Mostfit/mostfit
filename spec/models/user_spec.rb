@@ -813,7 +813,7 @@ describe User do
     user.can_access?({:action => "index", :controller => "admin"}).should be_false
     user.can_access?({:action => "edit", :controller => "admin"}).should be_false
 
-    user.can_access?({:action => "index", :controller => "holidays"}).should be_false
+    user.can_access?({:action => "index", :controller => "holidays"}).should be_true
     user.can_access?({:action => "create", :controller => "holidays"}).should be_false
     user.can_access?({:action => "update", :controller => "holidays"}).should be_false
 
@@ -862,7 +862,7 @@ describe User do
     user.can_access?({:action => "create", :controller => "fees"}).should be_false
     user.can_access?({:action => "update", :controller => "fees"}).should be_false
 
-    user.can_access?({:action => "index", :controller => "loan_products"}).should be_false
+    user.can_access?({:action => "index", :controller => "loan_products"}).should be_true
     user.can_access?({:action => "create", :controller => "loan_products"}).should be_false
     user.can_access?({:action => "update", :controller => "loan_products"}).should be_false
 
@@ -1066,7 +1066,7 @@ describe User do
     user.can_access?({:action => "index", :controller => "admin"}).should be_false
     user.can_access?({:action => "edit", :controller => "admin"}).should be_false
 
-    user.can_access?({:action => "index", :controller => "holidays"}).should be_false
+    user.can_access?({:action => "index", :controller => "holidays"}).should be_true
     user.can_access?({:action => "create", :controller => "holidays"}).should be_false
     user.can_access?({:action => "update", :controller => "holidays"}).should be_false
 
@@ -1112,7 +1112,7 @@ describe User do
     user.can_access?({:action => "create", :controller => "fees"}).should be_false
     user.can_access?({:action => "update", :controller => "fees"}).should be_false
 
-    user.can_access?({:action => "index", :controller => "loan_products"}).should be_false
+    user.can_access?({:action => "index", :controller => "loan_products"}).should be_true
     user.can_access?({:action => "create", :controller => "loan_products"}).should be_false
     user.can_access?({:action => "update", :controller => "loan_products"}).should be_false
 
@@ -1299,7 +1299,7 @@ describe User do
     user.can_access?({:action => "index", :controller => "admin"}).should be_false
     user.can_access?({:action => "edit", :controller => "admin"}).should be_false
 
-    user.can_access?({:action => "index", :controller => "holidays"}).should be_false
+    user.can_access?({:action => "index", :controller => "holidays"}).should be_true
     user.can_access?({:action => "create", :controller => "holidays"}).should be_false
     user.can_access?({:action => "update", :controller => "holidays"}).should be_false
 
@@ -1348,7 +1348,7 @@ describe User do
     user.can_access?({:action => "create", :controller => "fees"}).should be_false
     user.can_access?({:action => "update", :controller => "fees"}).should be_false
 
-    user.can_access?({:action => "index", :controller => "loan_products"}).should be_false
+    user.can_access?({:action => "index", :controller => "loan_products"}).should be_true
     user.can_access?({:action => "create", :controller => "loan_products"}).should be_false
     user.can_access?({:action => "update", :controller => "loan_products"}).should be_false
 
@@ -1514,7 +1514,7 @@ describe User do
     user.can_access?({:action => "index", :controller => "admin"}).should be_false
     user.can_access?({:action => "edit", :controller => "admin"}).should be_false
 
-    user.can_access?({:action => "index", :controller => "holidays"}).should be_false
+    user.can_access?({:action => "index", :controller => "holidays"}).should be_true
     user.can_access?({:action => "create", :controller => "holidays"}).should be_false
     user.can_access?({:action => "update", :controller => "holidays"}).should be_false
 
@@ -1560,7 +1560,7 @@ describe User do
     user.can_access?({:action => "create", :controller => "fees"}).should be_false
     user.can_access?({:action => "update", :controller => "fees"}).should be_false
 
-    user.can_access?({:action => "index", :controller => "loan_products"}).should be_false
+    user.can_access?({:action => "index", :controller => "loan_products"}).should be_true
     user.can_access?({:action => "create", :controller => "loan_products"}).should be_false
     user.can_access?({:action => "update", :controller => "loan_products"}).should be_false
 

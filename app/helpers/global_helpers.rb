@@ -143,7 +143,16 @@ module Merb
         <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}" size="#{attrs[:size]}" #{attrs[:nullable] ? "" : "readonly='true'"}>
         <script type="text/javascript">
           $(function(){
-            $("##{attrs[:id]}").datepicker('destroy').datepicker({altField: '##{attrs[:id]}', buttonImage: "/images/calendar.png", changeYear: true, buttonImageOnly: true,
+            var holidays= #{Holiday.get_list.to_json};
+              function nonWorkingDays(date) {
+                for (var j = 0; j < holidays.length; j++) {
+                  if (date.getMonth() == holidays[j][1] - 1 && date.getDate() == holidays[j][0]) {
+                    return [true, 'holiday_indicator'];
+                  }
+                }
+                return [true, ''];
+              }
+            $("##{attrs[:id]}").datepicker('destroy').datepicker({beforeShowDay: nonWorkingDays, altField: '##{attrs[:id]}', buttonImage: "/images/calendar.png", changeYear: true, buttonImageOnly: true,
                                             yearRange: '#{attrs[:min_date].year}:#{attrs[:max_date].year}',
                                             dateFormat: '#{datepicker_dateformat}', altFormat: '#{datepicker_dateformat}', minDate: '#{attrs[:min_date]}',
                                             maxDate: '#{attrs[:max_date]}', showOn: 'both', setDate: "#{attrs[:date]}" })
