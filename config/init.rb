@@ -60,6 +60,7 @@ Merb::BootLoader.before_app_loads do
     require "pdf/writer"
     require "pdf/simpletable"
     require("lib/pdfs/day_sheet.rb")
+    require("lib/pdfs/loan_schedule.rb")
     PDF_WRITER = true
   rescue LoadError
     PDF_WRITER = false
