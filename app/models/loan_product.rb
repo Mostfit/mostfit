@@ -37,6 +37,8 @@ class LoanProduct
 
   has n, :fees, :through => Resource#, :mutable => true
   has n, :loans
+  has n, :audit_trails, :auditable_type => "LoanProduct", :child_key => ["auditable_id"]
+  
   belongs_to :insurance_product, :nullable => true
 
   validates_with_method :min_is_less_than_max

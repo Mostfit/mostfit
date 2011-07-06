@@ -1,6 +1,8 @@
 class Loan
   include DataMapper::Resource
   include FeesContainer
+  include Identified
+  include Pdf::LoanSchedule if PDF_WRITER
 
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
