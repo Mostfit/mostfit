@@ -1023,8 +1023,8 @@ class Loan
     d = received_on
     total = total.to_f
     while used < total
-      prin -= principal_overpaid_on(d).round(2)
-      int  -= interest_overpaid_on(d).round(2)
+      prin += scheduled_principal_for_installment(installment_for_date(d))
+      int  += scheduled_interest_for_installment(installment_for_date(d))
       used  = (prin + int)
       d = shift_date_by_installments(d, 1)
     end
@@ -1246,6 +1246,32 @@ class EquatedWeekly < Loan
 
   def self.display_name
     "Reducing balance schedule (Equated Weekly)"
+  end
+
+  def equated_payment
+    pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
+  end
+
+  def pay_prorata(total, received_on)
+    i = used = prin = int = 0.0
+    d = received_on
+    total = total.to_f
+    pmnt = equated_payment
+    d = received_on
+    curr_bal = actual_outstanding_principal_on(d)
+    while (total - used) >= 0.01
+      i_pmt = interest_rate/get_divider * curr_bal 
+      int += i_pmt
+      p_pmt = pmnt - i_pmt
+      prin += p_pmt
+      curr_bal -= p_pmt
+      used  = (prin + int)
+      d = shift_date_by_installments(d, 1)
+    end
+    interest  = total * int/(prin + int)
+    principal = total * prin/(prin + int)
+    [interest, principal]
+
   end
 
   def scheduled_principal_for_installment(number)
@@ -1590,7 +1616,7 @@ class RoundedPrincipalAndInterestLoan < PararthRounded
   
 end
 
-class EquatedWeeklyRoundedAdjustedLastPayment < Loan
+class EquatedWeeklyRoundedAdjustedLastPayment < EquatedWeekly
   # This loan product uses the original interest amounts as per the PMT funtion and adjusts principal accordingly.
   include ExcelFormula
   # property :purpose,  String
@@ -1643,6 +1669,12 @@ class EquatedWeeklyRoundedAdjustedLastPayment < Loan
     @_installment_dates = (0..(insts-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
   end
 
+  def equated_payment
+    payment = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
+    rnd = loan_product.rounding || 1
+    actual_payment = (payment / rnd).send(loan_product.rounding_style) * rnd
+  end
+
 private
   def reducing_schedule
     return @rounded_schedule if @rounded_schedule
@@ -1663,8 +1695,7 @@ private
     i = 1
     @rounded_schedule = {}
     balance = amount
-    rnd = loan_product.rounding || 1
-    actual_payment = (payment / rnd).send(loan_product.rounding_style) * rnd
+    actual_payment = equated_payment
     while not done
       @rounded_schedule[i] = {}
       @rounded_schedule[i][:interest_payable] = (i <= @reducing_schedule.count ? @reducing_schedule[i][:interest_payable] : 0).round(2)
@@ -1678,7 +1709,7 @@ private
 
 end
 
-class EquatedWeeklyRoundedNewInterest < Loan
+class EquatedWeeklyRoundedNewInterest < EquatedWeekly
   # This loan product recalculates interest based on the new balances after rounding.
   include ExcelFormula
   # property :purpose,  String
@@ -1700,15 +1731,19 @@ class EquatedWeeklyRoundedNewInterest < Loan
     raise "number out of range, got #{number}" if number < 0 or number > number_of_installments
     return reducing_schedule[number][:interest_payable]
   end
+
+  def equated_payment
+    payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
+    rnd = loan_product.rounding || 1
+    (payment / rnd).send(loan_product.rounding_style) * rnd
+  end    
   
 private
   def reducing_schedule
     return @reducing_schedule if @reducing_schedule
     @reducing_schedule = {}    
     balance = amount
-    payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
-    rnd = loan_product.rounding || 1
-    actual_payment = (payment / rnd).send(loan_product.rounding_style) * rnd
+    payment = equated_payment
     1.upto(number_of_installments){|installment|
       @reducing_schedule[installment] = {}
       @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider)
