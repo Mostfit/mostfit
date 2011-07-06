@@ -165,12 +165,20 @@ class RuleBook
   #  it will deactivate old rule after creation of new rule for same action like disbursment, interest, fee or principal 
 
   def cannot_overlap
-    if self.new?
-      overlaps = RuleBook.all(:branch_id => branch_id, :action => action, :journal_type_id => self.journal_type_id, :to_date.lte => self.to_date, :to_date.gte => self.from_date)
-      overlaps = RuleBook.all(:branch_id => branch_id, :action => action, :journal_type_id => self.journal_type_id, :from_date.gte => self.from_date, :from_date.lte => self.to_date) if overlaps.empty?
-      return true if overlaps.empty?
-      return [false, "You rule overlaps with an existing rule #{overlaps.first.name}"]
+    unless self.new?
+      @changed_attr_with_original_val = self.original_attributes.map{|k,v| {k.name => (k.lazy? ? obj.send(k.name) : v)}}.inject({}){|s,x| s+=x}
+      return true unless @changed_attr_with_original_val.keys.include?(:from_date) or @changed_attr_with_original_val.keys.include?(:to_date)
     end
+    
+    overlaps = RuleBook.all(:branch_id => branch_id, :action => action, :journal_type_id => self.journal_type_id, :fee_id => fee_id, :to_date.lte => self.to_date, :to_date.gte => self.from_date)
+    overlaps = RuleBook.all(:branch_id => branch_id, :action => action, :journal_type_id => self.journal_type_id, :fee_id => fee_id, :from_date.gte => self.from_date, :from_date.lte => self.to_date) if overlaps.empty?
+
+    if self.new?
+      return true if overlaps.empty?
+    else
+      return true if overlaps.count <= 1 #because it certainly gonna check with itself so overlaps inlcudes self
+    end
+    return [false, "Rule overlaps with an existing rule #{overlaps.first.name}"]
   end
 
   def expire_old_rule
