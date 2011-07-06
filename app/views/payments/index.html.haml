@@ -143,7 +143,9 @@
       %li#history History
       
     %div.tab
-      %h2== Repayment schedule
+      %h2 
+        Repayment schedule
+        = link_to "Download pdf", url(:action =>'repayment_sheet', :controller => 'loans', :format => "pdf", :id =>@loan.id), :style => "float: right; margin-right: 25px", :class => "button"
       %table.narrow.form{ :width => '100%' }
         %thead
           %tr

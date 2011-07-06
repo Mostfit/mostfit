@@ -1,5 +1,5 @@
 class Holidays < Application
-  # provides :xml, :yaml, :js
+  provides :xml, :yaml, :js
 
   def index
     @holidays = Holiday.all

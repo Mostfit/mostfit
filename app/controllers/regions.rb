@@ -1,5 +1,5 @@
 class Regions < Application
-  # provides :xml, :yaml, :js
+  provides :xml
   include DateParser
 
   def index
@@ -8,6 +8,7 @@ class Regions < Application
   end
 
   def show(id)
+    @option = params[:option] if params[:option]
     @region = Region.get(id)
     raise NotFound unless @region
     display @region

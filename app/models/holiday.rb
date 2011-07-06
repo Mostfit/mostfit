@@ -12,4 +12,12 @@ class Holiday
     $holidays = Holiday.all.map{|h| [h.date, h]}.to_hash
     repository.adapter.execute("update loan_history set date='#{date.holiday_bump.strftime('%Y-%m-%d')}' where date='#{date.strftime('%Y-%m-%d')}'")
   end
+
+  def self.get_list
+    list = []
+    Holiday.all.each do |h|
+      list << [h.date.day, h.date.month]
+    end
+    return list
+  end
 end

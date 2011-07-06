@@ -1,4 +1,4 @@
-=partial :form
+= partial :form
 %table.report.nojs
   %tr.header
     %th{:width => "10px"}
@@ -14,71 +14,73 @@
     %th
       Age
     %th
-      Date of Birth (dd/mm/yyyy) or Age
+      Date of Birth
     %th
-      Date of Disbursement (dd/mm/yyyy)
+      Date of Disbursement
     %th
-      Location - Branch Name
+      Branch Name
     %th
-      Occupation of the member
+      Occupation
     %th
       Member(M)/ Guarantor(G)
-  - clients = @data
-  - clients_and_loans = {} 
-  - clients_and_loans = Hash[*clients.collect { |client| [client.loans.first, client] }.flatten]
-  - guarantors_and_loans = {} 
-  - guarantors_and_loans = Hash[*clients.collect { |client| [client.loans.first, client.guarantors.first]}.flatten]
-  - guarantors_and_loans.each { |k, v| guarantors_and_loans.delete(k) unless v }
-  - clients_and_loans.each do |loan, client| 
+  - @data.each do  |row|
     %tr 
       %td{:width => "10px"}
-        = loan.id.to_s
+        = row[:loan_id]
       %td
-        = client.id
+        = row[:client_id]
       %td
-        = loan.amount
+        = row[:amount]
       %td
-        = client.name
+        = row[:client_name]
       %td
-        - gender = client.respond_to?(:gender) ? client.gender.to_s.capitalize : ""  
-        = gender
+        - if row[:client_gender] == 3
+          = "Male"
+        - elsif row[:client_gender] == 2
+          = "Female"
+        - else
+          = "-"
       %td
-        - age = client.date_of_birth ? (Time.now.year - client.date_of_birth.year) : "" 
+        - age = row[:c_date_of_birth] ? (Time.now.year - row[:c_date_of_birth].year) : ""
         = age
       %td
-        = client.date_of_birth
+        = row[:c_date_of_birth]
       %td
-        = loan.disbursal_date
+        = row[:disbursal_date]
       %td
-        = client.center.branch.name
+        = row[:branch_name]
       %td
-        - occupation_name = client.occupation ? client.occupation.name : ""
-        = occupation_name
+        - occupation = row[:c_occupation_id] ? Occupation.get(row[:c_occupation_id]).name : "-"
+        = occupation
       %td
-        = "M" 
-  - guarantors_and_loans.each do |loan, guarantor| 
-    %tr 
+        = "M"
+    %tr
+      %td{:width => "10px"}
+        = row[:loan_id]
       %td
-        = loan.id.to_s
+        = "G-" + row[:guarantor_id].to_s
       %td
-        = "G-" + guarantor.id.to_s
+        = row[:amount]
       %td
-        = loan.amount
+        = row[:guarantor_name]
       %td
-        = guarantor.name
+        - if row[:g_gender] == 3
+          = "Male"
+        - elsif row[:g_gender] == 2
+          = "Female"
+        - else
+          = "-"
       %td
-        = guarantor.gender.to_s.capitalize
-      %td
-        - age = guarantor.date_of_birth ? (Time.now.year - guarantor.date_of_birth.year) : "" 
+        - age = row[:g_date_of_birth] ? (Time.now.year - row[:g_date_of_birth].year) : ""
         = age
       %td
-        = guarantor.date_of_birth
+        = row[:g_date_of_birth]
       %td
-        = loan.disbursal_date
+        = row[:disbursal_date]
       %td
-        = guarantor.client.center.branch.name
+        = row[:branch_name]
       %td
-        - occupation_name = guarantor.guarantor_occupation ? guarantor.guarantor_occupation.name : ""
-        = occupation_name
+        - occcupation = row[:g_occupation_id] ? (Occupation.get(row[:g_occupation_id]).name) : "-"
+        = occupation
       %td
-        = "G" 
+        = "G"

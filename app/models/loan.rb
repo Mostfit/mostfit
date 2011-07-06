@@ -1,6 +1,8 @@
 class Loan
   include DataMapper::Resource
   include FeesContainer
+  include Identified
+  include Pdf::LoanSchedule if PDF_WRITER
 
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
@@ -236,6 +238,14 @@ class Loan
     "#{id}:Rs. #{amount} @ #{interest_rate} for client #{client.name}"
   end
 
+  def short_tag
+    "#{id}:Rs. #{amount} @ #{interest_rate}"
+  end
+
+  def info(date = Date.today)
+    LoanHistory.first(:loan_id => id, :date.lte => date, :order => [:date.desc], :limit => 1)
+  end
+
   def _show_cf(width = 10, padding = 4) #convenience function to see cashflow in console
     ps = payment_schedule
     titles = [:date, :total_balance, :balance, :principal, :interest, :total_paid, :total_principal, :total_interest, :fees]
@@ -385,13 +395,13 @@ class Loan
   # principal[0] and interest[1].
 
 
-  def repay(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default)
-    pmts = get_payments(input, user, received_on, received_by, defer_update, style, context)
+  def repay(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default, desktop_id = nil, origin = nil)
+    pmts = get_payments(input, user, received_on, received_by, defer_update, style, context, desktop_id, origin)
     x = make_payments(pmts, context, defer_update)
     x
   end
 
-  def get_payments(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default)
+  def get_payments(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default, desktop_id = nil, origin = nil)
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
     unless input.is_a? Array or input.is_a? Fixnum or input.is_a? Float or input.is_a?(Hash)
@@ -429,19 +439,19 @@ class Loan
     if fees_paid > 0
       fee_payment = Payment.new(:loan => self, :created_by => user,
                                 :received_on => received_on, :received_by => received_by,
-                                :amount => fees_paid.round(2), :type => :fees)
+                                :amount => fees_paid.round(2), :type => :fees, :desktop_id => desktop_id, :origin => origin)
       payments.push(fee_payment)
     end
     if interest > 0
       int_payment = Payment.new(:loan => self, :created_by => user,
                                 :received_on => received_on, :received_by => received_by,
-                                :amount => interest.round(2), :type => :interest)
+                                :amount => interest.round(2), :type => :interest, :desktop_id => desktop_id, :origin => origin)
       payments.push(int_payment)
     end
     if principal > 0
       prin_payment = Payment.new(:loan => self, :created_by => user,
                                  :received_on => received_on, :received_by => received_by,
-                                 :amount => principal.round(2), :type => :principal)        
+                                 :amount => principal.round(2), :type => :principal, :desktop_id => desktop_id, :origin => origin)        
       payments.push(prin_payment)
     end
     payments             
@@ -1188,6 +1198,8 @@ class Loan
     when :weekly
       52
     when :biweekly
+      26
+    when :bi_weekly
       26
     when :monthly
       12

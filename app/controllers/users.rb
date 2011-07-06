@@ -1,5 +1,6 @@
 class Users < Application
   before :ensure_admin, :only => [:edit, :new, :create, :update, :delete, :destroy, :amind_change_password]
+  provides :xml
 
   def show(id)
     @user = User.get(id)

@@ -1,0 +1,17 @@
+%h1== API Access
+
+%table.narrow.form{ :style => "width: 40%;" }
+  %tr.odd
+    %td Branch
+    %td
+      = @api_access.branch.name
+  %tr
+    %td description
+    %td
+      = @api_access.description
+  %tr.odd
+    %td origin
+    %td
+      %b= @api_access.origin
+= link_to 'Back', url(:api_accesses)
+

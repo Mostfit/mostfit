@@ -1,6 +1,7 @@
 %h1 Manage Holidays
-  
-%table{:width => "100%"}
+.menu-strip
+  = link_to 'Add a holiday', url(:new_holiday), :class => "add"  
+%table.shaded{:width => "100%"}
   %thead
     %tr
       %th
@@ -24,4 +25,3 @@
         |
         = link_to 'Edit', url(:edit_holiday,  holiday)
 
-= link_to 'New', url(:new_holiday)

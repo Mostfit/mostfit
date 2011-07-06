@@ -1,0 +1,32 @@
+%xml
+  %loan
+    - if not @loan.errors.blank?
+      %error
+        %error_code 600
+        - @loan.errors.map do |e|
+          %error_message #{e.to_s}
+    - else    
+      %id #{@loan.id}
+      %amount #{@loan.amount}
+      %interest_rate #{@loan.interest_rate}
+      %installment_frequency #{@loan.installment_frequency}
+      %number_of_installments #{@loan.number_of_installments}
+      %client_id #{@loan.client_id}
+      %applied_on #{@loan.applied_on}
+      %approved_on #{@loan.approved_on}
+      %disbursal_date #{@loan.disbursal_date}
+      %loan_product_id #{@loan.loan_product_id}
+      - if @loan.loan_product
+        %loan_product_name #{@loan.loan_product.name}
+      %applied_by_staff_id #{@loan.applied_by_staff_id}
+      %disbursed_by_staff_id #{@loan.disbursed_by_staff_id}
+      %loan_type #{@loan.discriminator}
+      %approved_by_staff_id #{@loan.approved_by_staff_id}
+      %taken_over_on #{@loan.taken_over_on}
+      %taken_over_on_installment_number #{@loan.taken_over_on_installment_number}
+      %original_amount #{@loan.original_amount}
+      %original_disbursal_date #{@loan.original_disbursal_date}
+      %original_first_payment_date #{@loan.original_first_payment_date}
+      %created_by_user_id #{@loan.created_by_user_id}
+      %created_at #{@loan.created_at}
+      %updated_at #{@loan.updated_at}

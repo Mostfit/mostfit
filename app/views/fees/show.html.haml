@@ -8,3 +8,12 @@
 = link_to 'Edit',  url(:edit_fee,  @fee)
 |
 = link_to 'Back', url(:fees)
+
+%div.tab_container
+  %ul.tabs
+    %li#history
+      History
+%div.tab
+  = partial "audit_trails/list", :layout => false
+  %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+

@@ -1,5 +1,6 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :api_accesses
   resources :monthly_targets
   resources :account_balances
   resources :bookmarks
@@ -125,7 +126,44 @@ Merb::Router.prepare do
   match('/documents/:action(/:id)').to(:controller => "documents").name(:documents_action_link)
   match('/:controller/:id', :id => %r(\d+)).to(:action => 'redirect_to_show').name(:quick_link)
   match('/rules/get').to(:controller => 'rules', :action => 'get') 
-  match('/login.xml').to(:controller => 'merb_auth_slice_password/sessions', :action => 'update', :format => 'xml') 
+  #API Route
+  match('/api/v1') do
+    match('/browse.:format').to(:controller => 'browse', :action => 'index')
+    match('/users/:id.:format').to(:controller => 'users', :action => 'show')
+    match('/staff_members.:format').to(:controller => 'staff_members', :action =>'index')
+    match('/staff_members/:id.:format').to(:controller => 'staff_members', :action =>'show')
+    match('/data_entry/payments/by_center.:format').to(:controller => 'data_entry/payments', :action =>'by_center')
+    match('/regions.:format').to(:controller => 'regions', :action =>'index')
+    match('/regions/:id.:format').to(:controller => 'regions', :action =>'show')
+    match('/areas.:format').to(:controller => 'areas', :action =>'index')
+    match('/areas/:id.:format').to(:controller => 'areas', :action =>'show')
+    match('/branches') do
+      match('.:format').to(:controller => 'branches', :action =>'index')
+      match('/:id.:format').to(:controller => 'branches', :action =>'show')
+      match('/:branch_id/centers', :method => "get") do 
+        match('.:format').to(:controller => 'centers', :action =>'index')
+        match('/:id.:format').to(:controller => 'centers', :action =>'show')
+      end
+    end
+    match('/client_groups.:format', :method => "get").to(:controller => 'client_groups', :action =>'index')
+    match('/client_groups/:id.:format').to(:controller => 'client_groups', :action =>'show')
+    match('/branches/:branch_id/centers/:center_id/clients/:id.:format', :method => "get").to(:controller => 'clients', :action =>'show')
+    match('/branches/:branch_id/centers/:id.:format').to(:controller => 'centers', :action =>'show')
+    match('/loans/:id.:format').to(:controller => 'loans', :action =>'show')
+    match('/users.:format').to(:controller => 'users', :action =>'index')
+    match('/loan_products.:format').to(:controller => 'loan_products', :action =>'index')
+    match('/loan_products/:id.:format').to(:controller => 'loan_products', :action =>'show')
+    match('/branches/:branch_id/centers/:center_id/clients/:client_id/loans/:loan_id/payments.:format').to(:controller => 'payments', :action =>'create')
+    match('/branches/:branch_id/centers/:center_id/clients/:id.:format', :method => "put").to(:controller => 'clients', :action =>'update')
+    match('/branches/:branch_id/centers/:center_id/clients.:format', :method => "post").to(:controller => 'clients', :action =>'create')
+    match('/attendance.:format', :method => "post").to(:controller => 'attendances', :action =>'create')
+    match('/branches/:branch_id/centers/:center_id/clients/:client_id/loans.:format', :method => "post").to(:controller => 'loans', :action =>'create')
+    match('/centers.:format', :method => "post").to(:controller => 'centers', :action =>'create')
+    match('/client_groups.:format', :method => "post").to(:controller => 'client_groups', :action =>'create')
+    match('/holidays.:format', :method => "get").to(:controller => 'holidays', :action =>'index')
+    match('/handshake.:format', :method => "get").to(:controller => 'entrance', :action =>'handshake')
+    match('/errors.:format', :method => "get").to(:controller => 'exceptions', :action =>'index')
+  end
   match('/accounts/:account_id/accounting_periods/:accounting_period_id/account_balances/:id/verify').to(:controller => 'account_balances', :action => 'verify').name(:verify_account_balance)
   match('/accounting_periods/:id/close').to(:controller => 'accounting_periods', :action => 'close').name(:close_accounting_period)
   match("/accounting_periods/:id/period_balances").to(:controller => "accounting_periods", :action => "period_balances").name(:period_balances)

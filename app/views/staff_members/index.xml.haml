@@ -1,0 +1,12 @@
+%xml
+  %staff_members
+    - if @staff_members
+      - @staff_members.each do |staff_member|
+        %staff_member
+          %id #{staff_member.id}
+          %name #{staff_member.name}
+          %mobile_number #{staff_member.mobile_number}
+          %creation_date #{staff_member.creation_date}
+          %active #{staff_member.active}
+          %user_id #{staff_member.user_id}
+    

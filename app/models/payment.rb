@@ -26,6 +26,8 @@ class Payment
   property :loan_id,             Integer, :nullable => true, :index => true
   property :client_id,           Integer, :nullable => true, :index => true
   property :fee_id,              Integer, :nullable => true, :index => true
+  property :desktop_id,          Integer
+  property :origin,              String, :default => DEFAULT_ORIGIN
 
   belongs_to :loan, :nullable => true
   belongs_to :client
@@ -46,6 +48,7 @@ class Payment
   validates_with_method :not_approved, :method => :not_paying_too_much?, :when => [:default]
   validates_with_method :not_approved, :method => :not_paying_too_much_p_and_i?, :when => [:prepay]
   validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
+  validates_with_method :received_on, :method => :not_received_with_past_date?, :unless => Proc.new{|t| Merb.env=="test"}
   validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :principal,   :method => :is_positive?
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :on => [:destroy]
@@ -213,6 +216,12 @@ class Payment
     return true if received_on <= Date.today
     [false, "Payments cannot be received in the future"]
   end
+
+  def not_received_with_past_date?
+    return true if received_on > Date.today - 7
+    [false, "Seven days ago payments cannot be received"]
+  end
+
   def not_received_before_loan_is_disbursed?
     if loan
       return [false, "Payments cannot be received before the loan is disbursed"] if loan.disbursal_date.blank?

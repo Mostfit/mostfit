@@ -1,0 +1,9 @@
+%xml
+  %client_groups
+    - for client_group in @client_groups
+      %client_group
+        %id #{client_group.id}
+        %name #{client_group.name}
+        %center_id #{client_group.center.id}
+      
+
