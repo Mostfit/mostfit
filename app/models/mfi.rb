@@ -1,6 +1,5 @@
 class Mfi
   include DataMapper::Resource
-  DateFormats = ["%d-%m-%Y", "%Y-%m-%d", "%Y-%d-%m", "%d/%m/%Y", "%m/%d/%Y", "%d-%m-%y", "%y-%m-%d", "%y-%d-%m", "%d/%m/%y", "%m/%d/%y", "%d %B, %Y", "%d %B, %Y", "%A, %d %B %Y", "%A, %d %m %Y"]
   MinDateFrom = {:in_operation_since => "In operation since date", :today => "Today's date"}
 
   def self.default_repository_name
@@ -35,7 +34,6 @@ class Mfi
   property :created, Boolean, :nullable => false, :index => true, :default => false
   property :color, String, :nullable => true
   property :logo_name,  String, :nullable => true
-  property :date_format, Enum.send('[]', *DateFormats), :nullable => true, :index => true
   property :accounting_enabled, Boolean, :default => false, :index => true
   property :dirty_queue_enabled, Boolean, :default => false, :index => true
   property :map_enabled, Boolean, :default => false, :index => true
@@ -116,4 +114,23 @@ class Mfi
     set_currency_format
     DirtyLoan.start_thread
   end
+
+  def date_format
+    mfi = Mfi.first
+    style = mfi.prefered_date_style || DEFAULT_DATE_STYLE
+    case style
+    when "medium"
+      return MEDIUM_DATE_PATTERN
+    when "long"
+      return LONG_DATE_PATTERN
+    when "full"
+      return FULL_DATE_PATTERN
+    else
+      pattern =  (mfi.prefered_date_pattern if not mfi.prefered_date_pattern.blank?) || DEFAULT_DATE_PATTERN
+      separator = (mfi.prefered_date_separator if not mfi.prefered_date_separator.blank?) || DEFAULT_DATE_SEPARATOR
+      pattern = pattern.to_s.gsub(FORMAT_REG_EXP, separator.to_s)
+      return pattern
+    end
+  end
+
 end

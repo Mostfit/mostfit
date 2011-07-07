@@ -14,7 +14,7 @@ class Date
     mfi = Mfi.first
     style = style || mfi.prefered_date_style || DEFAULT_DATE_STYLE
     if pattern
-      raise NotSupportedPattern unless PREFERED_DATE_PATTERNS.include?(pattern)
+      raise NotSupportedPattern if style == DEFAULT_DATE_STYLE and not PREFERED_DATE_PATTERNS.include?(pattern)
       self.strftime(pattern)
     else
       case style
