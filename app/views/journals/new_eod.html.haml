@@ -26,6 +26,8 @@
               = hidden_field :name => "debit_accounts[][journal_type_id]", :value => rule.journal_type.id
             %td
               %b= rule.action.camelcase(' ')
+              - if rule.fee
+                = rule.fee.name
             %td
               - if rule.credit_account_rules and rule.credit_account_rules.length > 0
                 %table{:style => "width: 100%"}
