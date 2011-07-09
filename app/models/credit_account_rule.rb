@@ -46,6 +46,7 @@ class CreditAccountRule
     end
 
     # subtract the amount for which the posting has already been made
+    amount = amount * percentage / 100.0
     journals = self.rule_book.journals(date)
     amount  -= (journals.postings(:account_id => self.credit_account_id, :amount.gt => 0).aggregate(:amount.sum) || 0) if journals
     amount #[(amount > 0 ? amount : 0), false]    
