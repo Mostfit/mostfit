@@ -1,0 +1,3 @@
+development: &defaults
+  adapter: sqlite3
+  database: maintainer.db

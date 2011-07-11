@@ -1,0 +1,82 @@
+%script{:src => javascript_path('tasks.js'), :type => "text/javascript"}
+
+- months = Merb::Maintainer::Constants::MONTHS
+- weekdays = Merb::Maintainer::Constants::WEEKDAYS
+
+- components = %w(minute hour day month weekday)
+- if @task_name
+  #task-data
+    %input{:type => "hidden", :value => @task_name, :name => "task_name"}
+    %input{:type => "hidden", :value => @task[:command], :name => "task_command"}
+    - components.each do |component|
+      %input.component{:type => "hidden", :value => @task[component.to_sym], :name => "#{component+'_data'}"}
+
+#time-section
+  Schedule:
+  #schedule-type
+    %input{:type => "radio", :checked => "checked", :name => "schedule-type", :value => "simple"} Simple
+    %input{:type => "radio", :name => "schedule-type", :value => "custom"} Custom
+
+  #schedule-simple
+    %select{:name => "schedule-simple"}
+      %option{:value => "hourly"} Hourly (0th minute of each hour)
+      %option{:value => "daily", :selected => "selected"} Daily (everyday at 00:00)
+      %option{:value => "weekly"} Weekly (every Sunday at 00:00)
+      %option{:value => "monthly"} Monthly (at 00:00 on the 1st day of every month)
+
+  #schedule-custom
+    %table.spacious
+      %thead
+        %tr
+          %th Minutes
+          %th Hours
+          %th Days
+          %th Months
+          %th Weekdays
+      %tbody
+        %tr
+          %td#minutes
+            %input{:type => "radio", :checked => "checked", :name => "minutes-selected", :value => "0"} All
+            %br
+            %input.select-enabler{:type => "radio", :name => "minutes-selected", :value => "1"} Selected
+            %br
+            - (0..4).each do |i|
+              %select{:multiple => "multiple", :name => "minute[]", :disabled => "disabled"}
+                - (0..11).each do |j|
+                  %option{:value => "#{12*i+j}"}= "#{12*i+j}"
+          %td#hours
+            %input{:type => "radio", :checked => "checked", :name => "hours-selected", :value => "0"} All
+            %br
+            %input.select-enabler{:type => "radio", :name => "hours-selected", :value => "1"} Selected
+            %br
+            - (0..1).each do |i|
+              %select{:multiple => "multiple", :name => "hour[]", :disabled => "disabled"}
+                - (0..11).each do |j|
+                  %option{:value => "#{12*i+j}"}= "#{12*i+j}"
+          %td#days
+            %input{:type => "radio", :checked => "checked", :name => "days-selected", :value => "0"} All
+            %br
+            %input.select-enabler{:type => "radio", :name => "days-selected", :value => "1"} Selected
+            %br
+            - (0..2).each do |i|
+              %select{:multiple => "multiple", :name => "day[]", :disabled => "disabled"}
+                - (1..12).each do |j|
+                  - if (12*i+j) > 31
+                    - break
+                  %option{:value => "#{12*i+j}"}= "#{12*i+j}"
+          %td#months
+            %input{:type => "radio", :checked => "checked", :name => "months-selected", :value => "0"} All
+            %br
+            %input.select-enabler{:type => "radio", :name => "months-selected", :value => "1"} Selected
+            %br
+            %select{:multiple => "multiple", :name => "month[]", :disabled => "disabled"}
+              - (0..11).each do |i|
+                %option{:value => "#{i+1}"}= "#{months[i]}"
+          %td#weekdays
+            %input{:type => "radio", :checked => "checked", :name => "weekdays-selected", :value => "0"} All
+            %br
+            %input.select-enabler{:type => "radio", :name => "weekdays-selected", :value => "1"} Selected
+            %br
+            %select{:multiple => "multiple", :name => "weekday[]", :disabled => "disabled"}
+              - (0..6).each do |i|
+                %option{:value => "#{i}"}= "#{weekdays[i]}"

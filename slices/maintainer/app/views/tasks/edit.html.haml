@@ -1,0 +1,7 @@
+#edit-task
+  %form{:action => "/maintain/tasks/update",:method => "POST"}
+    
+    = partial :fields
+    
+    %input.form-submit{:type => "submit", :value => "Submit"}
+    %input.ajax-fetch{:type => "button", :value => "Cancel", :url => "/maintain/tasks"}

@@ -46,3 +46,8 @@ dependency "uuid"
 dependency "builder"
 #dependency "dm-is-paginated"
 dependency "mongrel", "1.1.5"
+
+# dependencies for maintainer slice
+dependency "maintainer", "1.0.13"
+dependency "cronedit", "0.3.0"
+dependency "git", "1.2.5"

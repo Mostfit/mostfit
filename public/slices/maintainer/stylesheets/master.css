@@ -1,0 +1,307 @@
+html, body {
+    margin:0; padding:0;
+    font-family:Helvetica Neue,Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif !important; 
+    font-size:14px;
+    background-color:#414B52 !important;
+    color:#BBB !important;
+}
+#container {
+    min-width:800px; max-width:1024px;
+    margin:0 auto;
+    margin-bottom:40px;
+}
+
+/* general style rules */
+a {
+    color:white !important;
+    text-decoration:none;
+}
+a:hover {
+    text-decoration:underline;
+}
+a:visited {
+    color:#6B7CFC;
+}
+select {
+    height:22px;
+}
+ul {
+    list-style-type:none;
+}
+hr {
+    border:0;
+    width:100%;
+    height:1px;
+    background-color:#999;
+}
+input[type=text] {
+    background-color:#f7f7f7 !important;
+    border:1px solid grey;
+    height:20px;
+    border-radius:3px;
+}
+input[type=text]:hover {
+    border-color:black;
+}
+input[type=text]:focus {
+    outline:0;
+    background-color:#FCFCFC !important;
+}
+
+/* general classes */
+/* spacious table */
+table.spacious {
+    width:100%;
+}
+table.spacious thead tr {
+    background:transparent !important;
+}
+table.spacious thead tr th {
+    color:#BBB !important;
+    border-bottom:2px solid #888;
+}
+table.spacious th, table.spacious td {
+    padding:5px;
+}
+table.spacious tbody tr:hover {
+    background-color:#4B5359;
+}
+
+/* Dark Button CSS */
+input[type=button], input[type=submit] {
+    outline: 0;
+    padding: 5px 12px;
+    display: block;
+    color: #9fa8b0;
+    /*color:white;*/
+    font-weight: bold;
+    text-shadow: 1px 1px #1f272b;
+    border: 1px solid #1c252b;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    background: #232B30; /* old browsers */
+    background: -moz-linear-gradient(top, #3D4850 3%, #313d45 4%, #232B30 100%); /* firefox */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(3%,#3D4850), color-stop(4%,#313d45), color-stop(100%,#232B30)); /* webkit */
+    box-shadow: 1px 1px 1px rgba(0,0,0,0.2); /* CSS3 */
+    -moz-box-shadow: 1px 1px 1px rgba(0,0,0,0.2); /* Firefox */
+    -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,0.2); /* Safari, Chrome */
+    -webkit-transition:0.5s linear;
+    -webkit-transition-property:color;
+}
+input[type=button]:hover, input[type=submit]:hover {
+    color: #fff;
+    background: #4C5A64; /* old browsers */
+    background: -moz-linear-gradient(top, #4C5A64 3%, #404F5A 4%, #2E3940 100%); /* firefox */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(3%,#4C5A64), color-stop(4%,#404F5A), color-stop(100%,#2E3940)); /* webkit */
+    cursor:pointer;
+}
+input[type=button]:active, input[type=submit]:active {
+    background-position: 0 top;
+    position: relative;
+    top: 1px;
+    color: #fff;
+    padding: 6px 12px 4px;
+    background: #20282D; /* old browsers */
+    background: -moz-linear-gradient(top, #20282D 3%, #252E34 51%, #222A30 100%); /* firefox */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(3%,#20282D), color-stop(51%,#252E34), color-stop(100%,#222A30)); /* webkit */
+    -moz-box-shadow: 1px 1px 1px rgba(255,255,255,0.1); /* Firefox */
+    -webkit-box-shadow: 1px 1px 1px rgba(255,255,255,0.1); /* Safari, Chrome */
+    box-shadow: 1px 1px 1px rgba(255,255,255,0.1); /* CSS3 */
+}
+
+/* specific style rules */
+/* main layout */
+#container #desc p {
+    font-size:17px;
+}
+/* deployment tab */
+#deploy form input[type=radio] {
+    position:relative;
+    top:2px;
+}
+#deploy form #branch-type-local {
+    height:24px;
+}
+#deploy form #branch-type-remote {
+    height:20px;
+}
+#deployment-log table td:nth-child(4) {
+    min-width:180px;
+}
+#rake-tasks input[type=button] {
+    margin-top:10px;
+}
+
+/* database tab  */
+#snapshots {
+    margin-top:20px;
+}
+
+/* tasks tab */
+#make-task input {
+    margin-bottom:10px;
+}
+#tasks table td:first-child {
+    width:30px;
+}
+#add-task table, #edit-task table {
+    border-spacing:0;
+    width:100%;
+}
+#command-section select {
+    margin:10px 0px;
+}
+#add-task input[type=submit], #edit-task input[type=submit]{
+    float:left;
+    margin-right:5px;
+}
+#time-section #schedule-type {
+    margin-top:5px;
+}
+#time-section #schedule-simple select {
+    margin:10px 0px;
+}
+#time-section span {
+    padding-bottom:20px !important;
+}
+#time-section table tr:hover {
+    background-color:transparent;
+}
+#time-section table select {
+    height:208px;
+    padding:0 2px;
+}
+#time-section table td#weekdays select {
+    height:125px;
+}
+#time-section table select::-webkit-scrollbar {
+    width:0px;
+}
+
+/* history tab */
+#history ul {
+    font-size:14px;
+    text-indent:-60px;
+}
+#history ul li {
+    margin-bottom:10px;
+}
+#history ul li a.time {
+    float:right;
+    font-size:11px;
+    text-align:right;
+}
+
+/* reporting tab */
+#metrics {
+    position:relative;
+    float:left;
+    height:100%;
+    width:150px;
+}
+#metrics ul {
+    -webkit-padding-start:0;
+}
+#graph {
+    position:relative;
+    height:100%;
+    margin-left:170px;
+}
+
+/* overlay */
+#overlay {
+    position:absolute;
+    top:0px; left:0px;
+    height:100%; width:100%;
+    z-index:-1;
+    background:rgba(0,0,0,0.7);
+    display:none;
+    position:fixed;
+}
+
+/* bottom message panel */
+#bottom-message-drawer {
+    position:fixed;
+    bottom:0px;
+    display:none;
+    height:34px;
+    z-index:999;
+    text-align:center;
+    width:100%;
+}
+#bottom-message-drawer #bottom-message {
+    border-radius:5px 5px 0px 0px;
+    /*box-shadow:0 0 10px rgb(205,211,254);*/
+    box-shadow:0px 0px 12px #000;
+    /*background:rgba(205,211,254,1.0);*/
+    background:rgba(32,40,45,0.8);
+    min-width:100px;
+    max-width:490px;
+    width:auto;
+    display:inline-block;
+    margin:0 auto;
+    padding:5px 6px 0px 6px;
+    border:0;
+    font-size:13px;
+    line-height:13px;
+    clear:both;
+    position:relative;
+}
+#bottom-message-drawer #bottom-message #bottom-message-inside {
+    background:#29333A;
+    padding:8px 12px 8px 16px;
+    display:inline-block;
+    font-size:13px;
+    min-width:100px;
+    border-radius:3px 3px 0px 0px;
+}
+#bottom-message-drawer #bottom-message #bottom-message-inside span {
+    display:inline-block;
+    color:#CCC;
+    max-width:440px;
+    vertical-align:middle;
+    font-size:13px;
+}
+
+/* default layout style */
+.tab_container {
+    border:1px solid #1c252b !important;
+}
+.tab {
+    position:relative !important;
+    padding:20px;
+    z-index:10 !important;
+    clear:both;
+}
+.tabs {
+    margin-top:0 !important;
+    text-indent:-33px;
+    background-color:#29333A !important;
+    border-bottom:1px solid #1c252b !important;
+    -webkit-margin-after:0;
+}
+.tabs li {
+    font-size:15px;
+    border:0px solid black !important;
+    color:#9fa8b0 !important;
+    background:#20282D !important;
+    margin-bottom:1px !important;
+    top:23px !important;
+    border-radius:3px 3px 0 0;
+    -webkit-transition:0.5s linear;
+    -webkit-transition-property:color;
+    z-index:0;
+    position:relative !important;
+}
+.tabs li:hover {
+    color:#eee !important;
+}
+.tabs li.active {
+    top:22px !important;
+    font-size:17px;
+    background:#414B52 !important;
+    border:1px solid #1C252B !important;
+    border-bottom:0 !important;
+    color:white !important;
+}

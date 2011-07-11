@@ -1,0 +1,38 @@
+- @tabs = %w(deployment database tasks history)
+- @tabs_views = ["Deployment", "Database Snapshots", "Scheduled Tasks", "History"]
+!!!
+%html
+  %head
+    %title Maintenance
+    
+    %link{:href => stylesheet_path('master.css'), :type => "text/css", :rel => "stylesheet"}
+    %link{:href => stylesheet_path('notify-osd.css'), :type => "text/css", :rel => "stylesheet"}
+    %link{:href => "../stylesheets/style.css", :type => "text/css" , :rel => "stylesheet"}
+    
+    %script{:src => "../javascripts/jquery.js", :type => "text/javascript"}
+    %script{:src => javascript_path('notify-osd.js'), :type => "text/javascript"}    
+    %script{:src => javascript_path('master.js'), :type => "text/javascript"}
+    %script{:src => "../javascripts/application.js", :type => "text/javascript"}
+
+  %body
+    #overlay
+    
+    #container
+      #desc
+        %p
+          Mostfit Maintainer
+      .tab_container
+        %ul.tabs
+          - @tabs.each do |tab|
+            %li{ :id => "#{tab}"}
+              = @tabs_views[@tabs.index(tab)]
+
+        - @tabs.each do |tab|
+          - url = '/maintain/'+tab
+          .tab
+            %input{:type => "hidden", :name => "_load_remote", :value => "#{url}"}
+
+    #bottom-message-drawer
+      #bottom-message
+        #bottom-message-inside
+          %span
