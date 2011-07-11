@@ -821,6 +821,7 @@ class Loan
                                                           # considerably by passing total_received, i.e. from history_for
     #return @status if @status
     date = Date.parse(date)      if date.is_a? String
+
     return :applied_in_future    if applied_on.holiday_bump > date  # non existant
     return :pending_approval     if applied_on.holiday_bump <= date and
                                  not (approved_on and approved_on.holiday_bump <= date) and
@@ -1058,7 +1059,8 @@ class Loan
       else
         keys.each_with_index do |k,i|
           if keys[[i+1,keys.size - 1].min] > date
-            rv = (column == :all ? cache[k] : cache[k][column])
+            # http://thingsaaronmade.com/blog/ruby-shallow-copy-surprise.html
+            rv = (column == :all ? Marshal.load(Marshal.dump(cache[k])) : cache[k][column])
             break
           end
         end
