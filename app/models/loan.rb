@@ -389,7 +389,6 @@ class Loan
     end
     
     # take care of date changes in weekly schedules
-    debugger
     if [:weekly, :biweekly, :quadweekly].include?(installment_frequency) and cl=self.client(:fields => [:id, :center_id]) and cen=cl.center and cen.meeting_day != :none and ensure_meeting_day
       unless (new_date.weekday == cen.meeting_day_for(new_date) or (cen.meeting_day_for(new_date) == :none))
         # got wrong val. recalculate
@@ -925,7 +924,6 @@ class Loan
   end
   # the installment dates
   def installment_dates
-    debugger
     return @_installment_dates if @_installment_dates
     if installment_frequency == :daily
       # we have to br careful that when we do a holiday bump, we do not get stuck in an endless loop
@@ -1107,7 +1105,6 @@ class Loan
     i = used = prin = int = 0.0
     d = received_on
     total = total.to_f
-    debugger if self.id == 5547
     while used < total
       prin += scheduled_principal_for_installment(installment_for_date(d))
       int  += scheduled_interest_for_installment(installment_for_date(d))
