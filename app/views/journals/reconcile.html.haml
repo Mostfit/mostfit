@@ -13,15 +13,16 @@
     = submit "GO"
   - if @rules
     - reverses = Journal.all(:comment.like => "%reverse%", :date => (@from_date..@to_date))
-    %table{:width => "30%"}
-      %tr
-        %th
-        %th
-          %b Loan System
-        %th
-          %b Account System
-        %th
-          %b Difference
+    %table.report.nojs
+      %thead
+        %tr
+          %th
+            %th
+              Loan System
+            %th
+              Account System
+            %th
+              Difference
       %tr
         %td
           %b Disbursement
@@ -74,7 +75,8 @@
         %td
           %span{:class => "#{(ls - as)!=0 ? 'red' : 'green'}"}
             = (ls - as).to_currency
-      - @rules[:fees].group_by{|r| r.credit_accounts}.each do |credit_accounts, rules|        
+      - rs  = @rules[:fees].group_by{|r| r.credit_accounts}
+      - rs.each do |credit_accounts, rules|        
         - fid =  rules.map{|r| r.fee_id}
         %tr
           %td

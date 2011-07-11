@@ -46,3 +46,6 @@ daily_log.rb
 *bak
 oink.sed
 *sql
+*bz2
+*xls*
+*csv

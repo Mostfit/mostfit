@@ -457,7 +457,7 @@ class Loan
     payments             
   end
 
-  def make_payments(payments, context = :default, defer_update = :false)
+  def make_payments(payments, context = :default, defer_update = false)
     Payment.transaction do |t|
       self.history_disabled=true
       payments.each{|p| p.override_create_observer = true}    
@@ -468,7 +468,7 @@ class Loan
       end
       AccountPaymentObserver.single_voucher_entry(payments)
     end
-
+    debugger
     unless defer_update #i.e. bulk updating loans
       self.history_disabled=false
       @already_updated=false
@@ -489,13 +489,13 @@ class Loan
     if payment.destroy
       update_history
       clear_cache
-      return true
+      return [true, payment]
     end
-    false
+    [false, payment]
   end
 
   def get_fee_payments(amount, date, received_by, created_by)
-    @fees = []
+    fees = []
     fp = fees_payable_on(date)
     fs = fee_schedule
     pay_order = fs.keys.sort.map{|d| fs[d].keys}.flatten.uniq
@@ -505,18 +505,16 @@ class Loan
                         :received_by => received_by, :created_by => created_by, :client => client, :loan => self)
         amount -= p.amount
         fp[k]  -= p.amount
-        @fees << p
+        fees << p if p.amount > 0
       end
     end
-    @fees
+    fees
   end
     
 
   def pay_fees(amount, date, received_by, created_by)
-    status = true
-    @fees = get_fee_payments(amount, date, received_by, created_by)
-    @fees.map{|f| f.save}
-    [status, @fees]
+    success, @prin, @int, @fees = make_payments(get_fee_payments(amount, date, received_by, created_by))
+    return success, @fees
   end
   # LOAN INFO FUNCTIONS - CALCULATIONS
 
@@ -1755,7 +1753,7 @@ private
     return @reducing_schedule if @reducing_schedule
     @reducing_schedule = {}    
     balance = amount
-    payment = equated_payment
+    actual_payment = equated_payment
     1.upto(number_of_installments){|installment|
       @reducing_schedule[installment] = {}
       @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider)
