@@ -17,7 +17,7 @@ h2, h3, h4, h5, h6 {
     margin: 0.4em;
 }
 h1 {
-  margin: 10px 4px 20px 4px;
+  margin: 10px 4px 10px 4px;
 }
 h2 {
   margin: 16px;
@@ -144,7 +144,7 @@ h1.logo span{
 
 .graph{
   float: right;
-  margin-top: 0px;
+  margin-top: 40px;
 }
 .graph_page{
   float: left;
@@ -239,6 +239,23 @@ td.numeric {
   border-right: 1px solid #999;
   border-left: 1px solid #999;
 }
+
+
+table.loan td, table.loan th{
+  padding: 2px;
+}
+table.loan th.odd {
+  background: hsla(85,93%,85%,0.8);
+  font-weight: bold;
+  vertical-align: middle;
+}
+table.loan th.even {
+  background: hsla(85,93%,75%,0.8);
+  font-weight: bold;
+  vertical-align: middle;
+}
+
+
 table.narrow {
   width: 100%;
 }
@@ -1379,10 +1396,11 @@ table.clearform tr td.legend{
   width: 560px;
   padding: 7px; 
   border: solid 1px #cfcfcf;
-  /* -moz-box-shadow: 2px 2px 4px #c9c9c9; */
-  /* box-shadow: 2px 2px 4px #c9c9c9; */
+  /* -moz-box-shadow: 2px 2px 4px #c9c9c9; *\/ */
+  /* box-shadow: 2px 2px 4px #c9c9c9; *\/ */
   margin: 5px;
   font-size: 1.2em;
+  background: #efefef;
 } 
 
 #breadcrums {

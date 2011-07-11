@@ -73,10 +73,14 @@ class Payments < Application
     raise NotFound unless @payment
     disallow_updation_of_verified_payments
     if @loan
-      if @loan.delete_payment(@payment, session.user)
+      status, payment = @loan.delete_payment(@payment, session.user)
+      if status
         redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
       else
-        redirect url_for_loan(@loan, 'payments'), :message => {:error => "Could not delete payment '#{@payment.id}'"}
+        msg = "Could not delete payment '#{@payment.id}' => "
+        debugger
+        msg += payment.errors.to_a.flatten.uniq.join("/")
+        redirect url_for_loan(@loan, 'payments'), :message => {:error => msg}
       end
     else
       @client = @payment.client
@@ -115,20 +119,22 @@ class Payments < Application
   end
 
   def do_payment(payment)
+    debugger
     amounts = payment[:amount].to_f
     receiving_staff = StaffMember.get(payment[:received_by_staff_id])
-
-    if payment[:type] == "total" and @loan
+    date = parse_date(payment[:received_on])
+    if ["total","fees"].include?(payment[:type]) and @loan
       @payment_type = payment[:type]
-    # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
-      success, @prin, @int, @fees = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff, true, params[:style].to_sym, context = :default, payment[:desktop_id], payment[:origin])
+      # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
+      if payment[:type] == "total"
+        success, @prin, @int, @fees = @loan.repay(amounts, session.user, date, receiving_staff, true, params[:style].to_sym, context = :default, payment[:desktop_id], payment[:origin])
+      else
+        success, @fees = @loan.pay_fees(amounts, date, receiving_staff, session.user)
+      end
       @payment = Payment.new
       @prin.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @prin
       @int.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @int
       @fees.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @fees
-      # reloading loan as payments can be stale here
-      Loan.get(@loan.id).update_history(true) if success and @loan
-      return success
     else
       @payment_type = payment[:type] if payment[:type]
       @payment = Payment.new(payment)
@@ -136,21 +142,12 @@ class Payments < Application
       @payment.loan = @loan if @loan
       @payment.client = @client if @client
       @payment.created_by = session.user
-      @payment.received_on = payment[:received_on]
-      if payment[:type]=="fees" and @payment.received_on
-        obj = @loan || @client
-        if fee = obj.fees_payable_on[@payment.received_on]
-          @payment.fee = fee
-        else
-          fees = obj.fee_schedule.reject{|d, f| d > @payment.received_on}.values.collect{|x| x.keys}.flatten - obj.fee_payments.values.collect{|x| x.keys}.flatten
-          @payment.fee = fees.first if fees and fees.length>0
-        end
-      end
+      @payment.received_on = date
       success = @payment.save
       # reloading loan as payments can be stale here
-      Loan.get(@loan.id).update_history if @loan
-      return success      
     end
+    Loan.get(@loan.id).update_history if @loan
+    return success      
   end
 
   def mark_attendance
