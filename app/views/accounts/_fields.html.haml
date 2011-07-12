@@ -45,5 +45,11 @@
       Opening Balance
     %td
       = text_field :opening_balance
+<<<<<<< HEAD
       on
+=======
+      /=radio_button :gl_code, :choose => ["yes", "no"] 
+      /THIS RADIO BUTTON NEEDS TO BE FIXED
+    %td
+>>>>>>> Bug #939: Now accounts are listed according to the branch selected when creating new accounts
       = date_select_for @account, :opening_balance_on_date 
