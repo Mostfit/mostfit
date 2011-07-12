@@ -750,7 +750,6 @@ $(document).ready(function(){
 		      fillFundingLines();
 		      fillCashAccounts();
 		      fillBankAccounts();
-		      $('form').highlight();
 		      //Handling targets form
 		      $("select#target_attached_to").change(function(){
 								$.ajax({

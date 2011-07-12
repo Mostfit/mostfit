@@ -33,7 +33,7 @@ class Maintainer::HistoryItem
         desc += "(#{data}) "
       end
     end
-    desc += "from #{ip} <a href='#' title='#{time.strftime(DATE_FORMAT_READABLE)}' class='time'>#{time_lost_in_words(time).sub(/\.0+/,"")} ago</a>"
+    desc += "from #{ip} <a href='#' title='#{time.strftime(DATE_TIME_FORMAT_READABLE)}' class='time'>#{time_lost_in_words(time).sub(/\.0+/,"")} ago</a>"
   end
   
 end

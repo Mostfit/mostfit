@@ -194,7 +194,7 @@ input[type=button]:active, input[type=submit]:active {
 }
 
 /* reporting tab */
-#metrics {
+/* #metrics {
     position:relative;
     float:left;
     height:100%;
@@ -207,7 +207,9 @@ input[type=button]:active, input[type=submit]:active {
     position:relative;
     height:100%;
     margin-left:170px;
-}
+} */
+
+/* billing tab */
 
 /* overlay */
 #overlay {

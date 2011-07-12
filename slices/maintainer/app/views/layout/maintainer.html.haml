@@ -1,5 +1,5 @@
-- @tabs = %w(deployment database tasks history)
-- @tabs_views = ["Deployment", "Database Snapshots", "Scheduled Tasks", "History"]
+- @tabs = %w(deployment database tasks history billing)
+- @tabs_views = ["Deployment", "Database Snapshots", "Scheduled Tasks", "History", "Billing"]
 !!!
 %html
   %head
@@ -10,7 +10,7 @@
     %link{:href => "../stylesheets/style.css", :type => "text/css" , :rel => "stylesheet"}
     
     %script{:src => "../javascripts/jquery.js", :type => "text/javascript"}
-    %script{:src => javascript_path('notify-osd.js'), :type => "text/javascript"}    
+    %script{:src => javascript_path('notify-osd.js'), :type => "text/javascript"}
     %script{:src => javascript_path('master.js'), :type => "text/javascript"}
     %script{:src => "../javascripts/application.js", :type => "text/javascript"}
 

@@ -99,7 +99,8 @@ function ajax_call(params) {
 	error : function() {
 	    hide_overlay();
 	    $.notify_osd.new({text: "An error occurred."});
-	}
+	},
+	dataType : params.dataType || null
     });
 }
 

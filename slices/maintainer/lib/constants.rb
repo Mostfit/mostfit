@@ -17,7 +17,8 @@ module Merb
       MONTHS = %w(January February March April May June July August September October November December)
       WEEKDAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
 
-      DATE_FORMAT_READABLE = "%l:%M:%S %p, %d %b, %Y"
+      DATE_FORMAT_READABLE = "%d %b, %Y"
+      DATE_TIME_FORMAT_READABLE = "%l:%M:%S %p, %d %b, %Y"
 
     end
   end
