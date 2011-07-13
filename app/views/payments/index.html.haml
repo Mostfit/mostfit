@@ -15,7 +15,7 @@
     by client
     = link_to "#{@client.name}", resource(@branch, @center, @client)
   - @history = @loan.loan_history
-  %p.menu-strip{:style => "margin-bottom: 0.5em; margin-left: 0px; margin-top: 0px"}
+  .menu-strip{:style => "margin-bottom: 0.5em; margin-left: 0px; margin-top: 0px"}
     = link_to 'edit this loan', url_for_loan(@loan, 'edit'), :class => "edit"
     = link_to 'make repayment', url_for_loan(@loan, 'payments/new'), :class => "add"
   
