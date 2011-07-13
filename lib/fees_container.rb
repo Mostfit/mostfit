@@ -91,7 +91,7 @@ module FeesContainer
   end
 
   def fees_paid?
-    total_fees_paid >= total_fees_due
+    total_fees_paid >= total_fees_applicable
   end
   
   # returns a hash of fee schedule which has keys as dates and values as {fee => amount}

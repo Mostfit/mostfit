@@ -35,12 +35,18 @@ namespace :mostfit do
     end
   end
 
-  desc "Make account entries for previous Loans and Payments"
-  task :recreate_accounts do
+  desc "Make account entries for previous Payments"
+  task :recreate_payment_accounts do
     puts "Making account entries for Payments"
-    Payment.all.each do |p|
+    ids = Branch.get(1).loans.payments(:received_on => Date.new(2011,06,8)).aggregate(:id)
+    Payment.all(:id => ids).each_with_index do |p,i|
+      puts "doing #{i} of #{ids.count}"
       AccountPaymentObserver.make_posting_entries(p)
     end
+  end
+
+  desc "Make account entries for previous Loans"
+  task :recreate_loans_accounts do
     puts "Making account entries for Loans"
     Loan.all(:disbursal_date.not => nil).each do |l|
       AccountLoanObserver.make_posting_entries_on_update(l)
