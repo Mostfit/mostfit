@@ -92,39 +92,55 @@ module DataEntry
     end
 
     def create(payment)
-      raise NotFound unless @loan = Loan.get(payment[:loan_id])
-      amounts = payment[:amount].to_f
-      receiving_staff = StaffMember.get(payment[:received_by]||payment[:received_by_staff_id])
-      # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
-
-      if payment[:type] == "total"
-        succes, @prin, @int, @fees  = @loan.repay(amounts, session.user, parse_date(payment[:received_on]), receiving_staff)
-      else
-        payment[:created_by] = session.user
-        @payment = Payment.new(payment)
-        if payment[:type]=="fees" and @payment.received_on
-          obj = @loan || @client
-          if fee = obj.fees_payable_on[@payment.received_on]
-            @payment.fee = fee
-          else
-            fees = obj.fee_schedule.reject{|d, f| d>@payment.received_on}.values.collect{|x| x.keys}.flatten - obj.fee_payments.values.collect{|x| x.keys}.flatten
-            @payment.fee = fees.first if fees and fees.length>0
-          end
-        end
-        succes = @payment.save
-        @loan.update_history if succes
-      end
-      if succes  # true if saved
-        if params[:format]=='xml'
-          display [@prin, @int, @fees], ""
+      @loan = Loan.get(payment[:loan_id])
+      @client = @loan.client
+      raise NotFound unless (@loan or @client)
+      success = do_payment(payment)
+      if success  # true if saved
+        if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+          display @payment
         else
-          redirect(params[:return] || url(:enter_payments, :action => 'record'), :message => {:notice => "Payment ##{@payment.id} has been registered"})
+          redirect url(:data_entry), :message => {:notice => "Payment of #{@payment.id} has been registered"}
         end
       else
-        @payment ||= Payment.new
-        [@prin, @int, @fees].each {|o| o.errors.keys.each {|k| @payment.errors[k] = o.errors[k]} if o}
-        params[:format]=='xml' ? display(@payment, :status => 400) : render(:record)
+        if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
+          display @payment
+        else
+          render :record
+        end
       end
+    end
+
+    def do_payment(payment)
+      debugger
+      amounts = payment[:amount].to_f
+      receiving_staff = StaffMember.get(payment[:received_by_staff_id])
+      date = parse_date(payment[:received_on])
+      if ["total","fees"].include?(payment[:type]) and @loan
+        @payment_type = payment[:type]
+        # we create payment through the loan, so subclasses of the loan can take full responsibility for it (validations and such)
+        if payment[:type] == "total"
+          success, @prin, @int, @fees = @loan.repay(amounts, session.user, date, receiving_staff, true, params[:style].to_sym, context = :default, payment[:desktop_id], payment[:origin])
+        else
+          success, @fees = @loan.pay_fees(amounts, date, receiving_staff, session.user)
+        end
+        @payment = Payment.new
+        @prin.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @prin
+        @int.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @int
+        @fees.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @fees
+      else
+        @payment_type = payment[:type] if payment[:type]
+        @payment = Payment.new(payment)
+        @payment.amount = amounts
+        @payment.loan = @loan if @loan
+        @payment.client = @client if @client
+        @payment.created_by = session.user
+        @payment.received_on = date
+        success = @payment.save
+        # reloading loan as payments can be stale here
+      end
+      Loan.get(@loan.id).update_history if @loan
+      return success      
     end
 
     def delete
