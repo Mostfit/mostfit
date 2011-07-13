@@ -69,7 +69,7 @@ function setup_ajax_fetch_handlers() {
 function handle(data) {
     hide_overlay();
     if(data.response == "true") {
-	(data.arg.success_text) ? $.notify_osd.new({text: data.arg.success_text || "Done.", icon: data.arg.icon || ""}) : $.notify_osd.dismiss();
+	(data.arg.success_text) ? $.notify_osd.create({text: data.arg.success_text || "Done.", icon: data.arg.icon || ""}) : $.notify_osd.dismiss();
 	if(data.arg.callback)
 	    eval(data.arg.callback);
 	if(data.arg.url)
@@ -79,7 +79,7 @@ function handle(data) {
 	    });
     }
     else {
-	$.notify_osd.new({text: "An error occurred."});
+	$.notify_osd.create({text: "An error occurred."});
     }
 }
 function render(data) {
@@ -98,7 +98,7 @@ function ajax_call(params) {
 	},
 	error : function() {
 	    hide_overlay();
-	    $.notify_osd.new({text: "An error occurred."});
+	    $.notify_osd.create({text: "An error occurred."});
 	},
 	dataType : params.dataType || null
     });

@@ -24,6 +24,6 @@
             %td= snapshot[:date].strftime(DATE_TIME_FORMAT_READABLE)
             %td= "%.2f MB" % (snapshot[:size]/1024.0/1024.0)
             %td
-              %a.confirm{:href => "#", :url => "/maintain/database/delete?file=#{snapshot[:name]}", :reload_url => "/maintain/database", :message => "Are you sure you want to delete the database dump \"#{snapshot[:name]}\"?", :success => "Database dump deleted.", :icon => "slices/maintainer/images/database.png", :before => "show_overlay(); $.notify_osd.new({ text: 'Deleting database dump...', icon: $(this).attr('icon'), sticky: true, dismissable: false })"} Delete
+              %a.confirm{:href => "#", :url => "/maintain/database/delete?file=#{snapshot[:name]}", :reload_url => "/maintain/database", :message => "Are you sure you want to delete the database dump \"#{snapshot[:name]}\"?", :success => "Database dump deleted.", :icon => "slices/maintainer/images/database.png", :before => "show_overlay(); $.notify_osd.create({ text: 'Deleting database dump...', icon: $(this).attr('icon'), sticky: true, dismissable: false })"} Delete
   - else
     You have not taken any database snapshots as yet.

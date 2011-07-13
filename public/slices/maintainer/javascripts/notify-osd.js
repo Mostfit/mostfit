@@ -14,7 +14,7 @@
     
     $.notify_osd = {
 	defaults : defaults,
-	new : function(options) {
+	create : function(options) {
 	    var opts = $.extend({}, defaults, options);
 	    var mouse, notification, buffer;
 

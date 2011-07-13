@@ -13,8 +13,8 @@ $(function() {
 	}
 	else {
 	    show_overlay();
-	    $.notify_osd.new({
-		text : 'Fetching '+metric.toLowerCase()+' for day '+day_of_month+' of every month...',
+	    $.notify_osd.create({
+		text : 'Fetching '+form.find("select[name=metric] option:selected").html().toLowerCase()+' for day '+day_of_month+' of every month...',
 		sticky : true,
 		icon : 'slices/maintainer/images/gears.png'
 	    });

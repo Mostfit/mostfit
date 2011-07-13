@@ -1,7 +1,7 @@
 $(function() {
     $("#deploy input[type=submit]").click(function() {
 	show_overlay();
-	$.notify_osd.new({ text: "Deploying...", icon: "slices/maintainer/images/gears.png", dismissable: false });
+	$.notify_osd.create({ text: "Deploying...", icon: "slices/maintainer/images/gears.png", dismissable: false });
     });
 
     $("input[name=upgrade_db]").next("span").hide().end().change(function() {
