@@ -1,0 +1,10 @@
+%script{:src => javascript_path('logs.js'), :type => "text/javascript"}
+
+#logs
+  #files
+    %select{:name => "file"}
+      %option{:value => "none"} Select a file to watch...
+      - @watchable_files.each do |file|
+        %option{:value => file}= file
+    
+  #log

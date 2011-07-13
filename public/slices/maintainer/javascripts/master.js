@@ -105,8 +105,11 @@ function ajax_call(params) {
 }
 
 /* display an ajax loader in the currently active tab */
-function show_loader() {
-    $(".tab:visible").html("<div class='loader'><img src='slices/maintainer/images/progress-dots.gif' /></div>");
+function show_loader(div) {
+    if(div != null)
+	$(div).html("<div class='loader'><img src='slices/maintainer/images/progress-dots.gif' /></div>");
+    else
+	$(".tab:visible").html("<div class='loader'><img src='slices/maintainer/images/progress-dots.gif' /></div>");
 }
 
 function notify_bottom(notification) {
