@@ -14,7 +14,7 @@ class AccountPaymentObserver
 
     journal[:journal_type_id]=  2
 
-    status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)
+    status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts, rules)
   end
 
   def self.single_voucher_entry(payments)
@@ -35,7 +35,7 @@ class AccountPaymentObserver
       journal[:comment] = "Payments: #{payments.map{|x| x.id}.join(',')}"
     end
     journal[:journal_type_id]=  rules.first.journal_type.id
-    status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)
+    status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts, rules)
   end
   
   def self.reverse_posting_entries(obj)

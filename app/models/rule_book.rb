@@ -51,7 +51,7 @@ class RuleBook
     # TODO: Needs a re-write, makes too many assumptions, also locating the appropriate rule still does not take into account
     # the validity of rule by date introduced a while back
 
-     if obj.is_a? Array
+    if obj.is_a? Array
       # In case of objects being passed in a set then we give out hashes of credit and debit accounts with values being amount and keys being acocunt
       client = obj.first.client_id > 0 ? obj.first.client : obj.first.loan.client
       branch  = client.center.branch
