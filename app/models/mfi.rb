@@ -119,11 +119,11 @@ class Mfi
     mfi = Mfi.first
     style = mfi.prefered_date_style || DEFAULT_DATE_STYLE
     case style
-    when "medium"
+    when "MEDIUM"
       return MEDIUM_DATE_PATTERN
-    when "long"
+    when "LONG"
       return LONG_DATE_PATTERN
-    when "full"
+    when "FULL"
       return FULL_DATE_PATTERN
     else
       pattern =  (mfi.prefered_date_pattern if not mfi.prefered_date_pattern.blank?) || DEFAULT_DATE_PATTERN

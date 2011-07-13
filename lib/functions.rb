@@ -18,11 +18,11 @@ class Date
       self.strftime(pattern)
     else
       case style
-      when "medium"
+      when "MEDIUM"
         self.strftime(MEDIUM_DATE_PATTERN)
-      when "long"
+      when "LONG"
         self.strftime(LONG_DATE_PATTERN)
-      when "full"
+      when "FULL"
         self.strftime(FULL_DATE_PATTERN)
       else
         # default short style

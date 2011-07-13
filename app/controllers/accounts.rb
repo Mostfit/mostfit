@@ -4,7 +4,13 @@ class Accounts < Application
 
   def index
     if request.xhr? and params[:account_type_id] and not params[:account_type_id].blank?
-      @accounts = Account.all(:account_type_id => params[:account_type_id])
+      @account_type_id = params[:account_type_id]
+      if params[:branch_id] and not params[:branch_id].blank?
+        @branch = Branch.get(params[:branch_id])
+        @accounts = Account.all(:branch_id => @branch.id, :account_type_id => @account_type_id)
+      else
+        @accounts = Account.all(:branch_id => nil, :account_type_id => @account_type_id)
+      end
       partial :accounts_selection
     else
       if params[:branch_id] and not params[:branch_id].blank?
@@ -33,7 +39,8 @@ class Accounts < Application
     only_provides :html
     @account = Account.get(id)
     if @account.account_type
-      @parent_accounts = (Account.all(:account_type => @account.account_type)-[@account])
+      @branch = Branch.get(@account.branch_id) if @account.branch_id
+      @parent_accounts = (Account.all(:branch_id => (@branch ? @branch.id : nil) , :account_type => @account.account_type)-[@account])
     end
     raise NotFound unless @account
     display @account, :layout => layout?

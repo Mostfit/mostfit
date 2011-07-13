@@ -38,7 +38,7 @@ module DataEntry
 
       if request.method == :post
         if Date.min_transaction_date > @date or Date.max_transaction_date < @date
-          @errors = ["Transactions attempted are outside allowed dates"]
+          @errors = "Transactions attempted are outside allowed dates"
         else
           bulk_payments_and_disbursals
           mark_attendance
@@ -51,8 +51,6 @@ module DataEntry
           else
             redirect(return_url, :message => {:notice => notice})
           end
-        elsif params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
-          display("")
         else
           display [@errors, @center, @date]
         end

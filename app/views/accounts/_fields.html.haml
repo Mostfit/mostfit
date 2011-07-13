@@ -3,7 +3,7 @@
     %td
       Account Type
     %td
-      =select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
+      = select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
   %tr
     %td
       Account Category (if applicable)
@@ -23,29 +23,29 @@
     %td
       Branch
     %td
-      =select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
+      = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
   %tr
     %td
       Parent Account
     %td 
-      =select :parent_id, :collection => (@parent_accounts||[]).map{|x| [x.id, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account"
+      = select :parent_id, :collection => (@parent_accounts||[]).map{|x| [x.id, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account"
 
   %tr  
     %td
       Name
     %td
-      =text_field :name
+      = text_field :name
   %tr
     %td
       GL Code
     %td
-      =text_field :gl_code
+      = text_field :gl_code
   %tr
     %td 
       Opening Balance
     %td
-      =text_field :opening_balance
+      = text_field :opening_balance
       /=radio_button :gl_code, :choose => ["yes", "no"] 
       /THIS RADIO BUTTON NEEDS TO BE FIXED
     %td
-      =date_select_for @account, :opening_balance_on_date 
+      = date_select_for @account, :opening_balance_on_date 
