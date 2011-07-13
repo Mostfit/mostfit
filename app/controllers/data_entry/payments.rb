@@ -112,7 +112,6 @@ module DataEntry
     end
 
     def do_payment(payment)
-      debugger
       amounts = payment[:amount].to_f
       receiving_staff = StaffMember.get(payment[:received_by_staff_id])
       date = parse_date(payment[:received_on])

@@ -77,7 +77,6 @@ class Payments < Application
         redirect url_for_loan(@loan, 'payments'), :message => {:notice => "Payment '#{@payment.id}' has been deleted"}
       else
         msg = "Could not delete payment '#{@payment.id}' => "
-        debugger
         msg += payment.errors.to_a.flatten.uniq.join("/")
         redirect url_for_loan(@loan, 'payments'), :message => {:error => msg}
       end
@@ -118,7 +117,6 @@ class Payments < Application
   end
 
   def do_payment(payment)
-    debugger
     amounts = payment[:amount].to_f
     receiving_staff = StaffMember.get(payment[:received_by_staff_id])
     date = parse_date(payment[:received_on])

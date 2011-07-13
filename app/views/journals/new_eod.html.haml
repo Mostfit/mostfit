@@ -37,7 +37,6 @@
                         = ca.credit_account.name                  
                         = hidden_field :name => "credit_accounts[][account_id]", :value => ca.credit_account.id
                       %td
-                        - debugger if ca.id == 103
                         - amount, changable = ca.amount(@date)
                         - credit_total += amount
                         - if false
