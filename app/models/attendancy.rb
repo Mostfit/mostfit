@@ -4,8 +4,8 @@ class Attendance
   ATTENDANCY_STATES = ["present", "late", "on leave", "absent", "proxy"]
 
   property :id,              Serial
-  property :date,            Date
-  property :status,          Enum.send('[]', *ATTENDANCY_STATES), :nullable => false
+  property :date,            Date, :index => true
+  property :status,          Enum.send('[]', *ATTENDANCY_STATES), :nullable => false, :index => true
   property :desktop_id,          Integer
   property :origin,              String, :default => DEFAULT_ORIGIN
 

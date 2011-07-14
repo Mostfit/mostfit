@@ -131,7 +131,7 @@ class Payments < Application
       @payment = Payment.new
       @prin.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @prin
       @int.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @int
-      @fees.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}  if @fees
+      @fees.map{|f| f.errors.to_hash.each{|k,v| @payment.errors.add(k,v)}}  if @fees
     else
       @payment_type = payment[:type] if payment[:type]
       @payment = Payment.new(payment)

@@ -200,7 +200,7 @@ module DataEntry
             @success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, true, style)
             @errors << @prin.errors if (@prin and not @prin.errors.blank?)
             @errors << @int.errors if (@int and not @int.errors.blank? )
-            @errors << @fees.errors if (@fees and not @fees.errors.blank?)
+            @fees.each{|f| @errors << f.errors unless f.errors.blank?}
           end
           if @success 
             @loan.history_disabled = false

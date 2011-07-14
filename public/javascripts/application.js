@@ -620,39 +620,45 @@ function fillComboBranches(){
 }
 
 function fillAccounts(){
-    $("#branch_selector").change(function(){
-	                             $.ajax({
-					         type: "GET",
-						 url: "/branches/accounts/"+$("#branch_selector").val(),
-						 success: function(data){
-						     $("#account_selector").html(data);
-					     }
-					 });
-	                         });
+    if($("#account_selector").length > 0){
+	$("#branch_selector").change(function(){
+					 $.ajax({
+					            type: "GET",
+						    url: "/branches/accounts/"+$("#branch_selector").val(),
+						    success: function(data){
+							$("#account_selector").html(data);
+						    }
+						});
+	                             });
+    }
 }
 
 function fillCashAccounts(){
-    $("#branch_selector").change(function(){
-	                             $.ajax({
-					         type: "GET",
-						 url: "/branches/cash_accounts/"+$("#branch_selector").val(),
-						 success: function(data){
-						     $("#cash_account_selector").html(data);
-					     }
-					 });
-	                        });
+    if($("#cash_account_selector").length > 0){
+	$("#branch_selector").change(function(){
+					 $.ajax({
+					            type: "GET",
+						    url: "/branches/cash_accounts/"+$("#branch_selector").val(),
+						    success: function(data){
+							$("#cash_account_selector").html(data);
+						    }
+						});
+	                             });
+    }
 }
 
 function fillBankAccounts(){
-    $("#branch_selector").change(function(){
-	                             $.ajax({
-					         type: "GET",
-						 url: "/branches/bank_accounts/"+$("#branch_selector").val(),
-						 success: function(data){
-						     $("#bank_account_selector").html(data);
-					     }
-					 });
-	                       });
+    if($("#bank_account_selector").length > 0){
+	$("#branch_selector").change(function(){
+					 $.ajax({
+					            type: "GET",
+						    url: "/branches/bank_accounts/"+$("#branch_selector").val(),
+						    success: function(data){
+							$("#bank_account_selector").html(data);
+						    }
+						});
+				     });	
+    }
 }
 
 function fillFundingLines(){
