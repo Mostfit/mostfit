@@ -1,7 +1,7 @@
 $(function() {
     setup_ajax_fetch_handlers();
     setup_confirmation_handlers();
-    check_if_deployment_possible();
+    setTimeout(function() { check_if_deployment_possible(); }, 1000);
 
     $.fn.extend({
 	disable : function() { $(this).attr('disabled','disabled'); },
@@ -22,6 +22,7 @@ $(function() {
 
 /* check if deployment is possible */
 function check_if_deployment_possible() {
+    notify_bottom({text : "Checking deployment status..."});
     ajax_call({
 	url: '/maintain/deployment/check_if_deployment_possible',
 	handler: function(data) {

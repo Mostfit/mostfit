@@ -9,6 +9,10 @@ module Merb
       # DEPLOYMENT
       GIT_REPO = '.'
 
+      # DATABASE SNAPSHOTS
+      DUMP_FOLDER = File.join(Merb.root,"db/daily/")
+      DB_FOLDER = File.join(Merb.root,"db/")
+
       # HISTORY / DEPLOYMENT
       DM_REPO = DataMapper.repository(:maintainer)
 
@@ -20,9 +24,6 @@ module Merb
       # array of "watchable" file paths (either absolute or relative to the application root)
       WATCHABLE_FILES = ["log/*"]
       DEFAULT_MAX_LINE_COUNT = 40
-
-      DUMP_FOLDER = File.join(Merb.root,"db/daily/")
-      DB_FOLDER = File.join(Merb.root,"db/")
 
       MONTHS = %w(January February March April May June July August September October November December)
       WEEKDAYS = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
