@@ -468,7 +468,6 @@ class Loan
       end
       AccountPaymentObserver.single_voucher_entry(payments)
     end
-    debugger
     unless defer_update #i.e. bulk updating loans
       self.history_disabled=false
       @already_updated=false
