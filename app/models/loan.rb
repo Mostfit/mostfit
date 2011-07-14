@@ -458,13 +458,14 @@ class Loan
   end
 
   def make_payments(payments, context = :default, defer_update = false)
+    return [false, nil, nil, nil] if payments.empty?
     Payment.transaction do |t|
       self.history_disabled=true
       payments.each{|p| p.override_create_observer = true}    
 
       if payments.collect{|payment| payment.save(context)}.include?(false)
         t.rollback
-        return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees},]        
+        return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
       end
       AccountPaymentObserver.single_voucher_entry(payments)
     end
@@ -513,7 +514,14 @@ class Loan
     
 
   def pay_fees(amount, date, received_by, created_by)
-    success, @prin, @int, @fees = make_payments(get_fee_payments(amount, date, received_by, created_by))
+    pmts_to_make = get_fee_payments(amount, date, received_by, created_by)
+    if pmts_to_make.empty?
+      @fee = Payment.new
+      @fee.errors.add(:fee_error,"Payment cannot be made because no Fee-Repayment is pending")
+      @fees = [@fee]
+    else
+      success, @prin, @int, @fees = make_payments(pmts_to_make)
+    end
     return success, @fees
   end
   # LOAN INFO FUNCTIONS - CALCULATIONS
