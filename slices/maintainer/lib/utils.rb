@@ -71,7 +71,7 @@ module Merb::Maintainer::Utils
 
       username = DB_CONFIG[Merb.env]["username"]
       password = DB_CONFIG[Merb.env]["password"]
-      database = "intaglio" #DB_CONFIG[Merb.env]["database"]
+      database = DB_CONFIG[Merb.env]["database"]
       today = `date +%H:%M:%S.%Y-%m-%d`.chomp
       snapshot_path = File.join(DUMP_FOLDER,"#{database.sub(/^mostfit_/,'')}.#{today}.sql")
 

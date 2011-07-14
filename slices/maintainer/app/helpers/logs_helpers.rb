@@ -1,9 +1,5 @@
 module Merb::Maintainer::LogsHelper
 
-  MAX_LINE_COUNT = 10
-  # array of "watchable" file paths (either absolute or relative to the application root)
-  WATCHABLE_FILES = []
-
   def get_log(file, is_first_request)
     return get_log_content(file) if is_first_request == "true"
 
