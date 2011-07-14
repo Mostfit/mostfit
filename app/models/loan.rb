@@ -471,6 +471,7 @@ class Loan
     unless defer_update #i.e. bulk updating loans
       self.history_disabled=false
       @already_updated=false
+      self.reload if payments.map{|p| p.received_on}.map{|d| installment_dates.include?(d)}.include?(false)
       update_history(true)  # update the history if we saved a payment
     end
     if payments.length > 0
