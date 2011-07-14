@@ -139,9 +139,9 @@
               %td
                 = obj.id
               %td.text
-                = Loan.descendants.include?(obj.class) ? obj.client.name : obj.name
+                = link_to obj.client.name, resource(obj.client)
               %td.text
-                = obj.description if obj.respond_to?("description")
+                = (link_to obj.description, url_for_loan(obj)) if obj.respond_to?("description")
               %td.text
                 = obj.total_fees_due
               %td.text
@@ -161,9 +161,9 @@
             %tr
               %td.number
               %td.text
-                = f.client.name
+                = link_to f.client.name, resource(f.client)
               %td.text
-                = f.loan.description
+                = link_to f.loan.description, url_for_loan(f.loan)
               %td.text
               %td.number
                 = f.amount

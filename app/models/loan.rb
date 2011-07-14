@@ -475,7 +475,7 @@ class Loan
       update_history(true)  # update the history if we saved a payment
     end
     if payments.length > 0
-      return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
+      return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find_all{|p| p.type==:fees}]
     else
       return [false, nil, nil, nil]
     end

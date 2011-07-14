@@ -18,6 +18,7 @@ class AccountPaymentObserver
   end
 
   def self.single_voucher_entry(payments)
+    debugger
     obj = payments.first
     # This function will make entries to the posting database when save, update or delete envent triggers  
     credit_accounts, debit_accounts, rules = RuleBook.get_accounts(payments)
@@ -55,8 +56,8 @@ class AccountPaymentObserver
     journal[:comment] = "Payment: #{obj.type} - #{obj.amount} - Reverse entry"
 
     #reverse the signs
-    debit_accounts.each{|account, amount|  debit_accounts[account] = amount * -1}     if debit_accounts.is_a?(Hash)
-    credit_accounts.each{|account, amount| credit_accounts[account] = amount * -1}    if credit_accounts.is_a?(Hash)
+    debit_accounts.each{|r, val|  val.each{|account, amount| val[account] = amount * -1}}     if debit_accounts.is_a?(Hash)
+    credit_accounts.each{|r, val| val.each{|account, amount| val[account] = amount * -1}}    if credit_accounts.is_a?(Hash)
     
     journal[:journal_type_id]=  rule.journal_type.id
     status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)
