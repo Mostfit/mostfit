@@ -193,23 +193,17 @@ input[type=button]:active, input[type=submit]:active {
     text-align:right;
 }
 
-/* reporting tab */
-/* #metrics {
-    position:relative;
-    float:left;
-    height:100%;
-    width:150px;
-}
-#metrics ul {
-    -webkit-padding-start:0;
-}
-#graph {
-    position:relative;
-    height:100%;
-    margin-left:170px;
-} */
-
 /* billing tab */
+
+/* logs tab */
+#logs table td {
+    vertical-align:middle;
+}
+#logs table td select, #logs table td input {
+    width:200px;
+    border-width:0;
+    height:20px;
+}
 
 /* overlay */
 #overlay {

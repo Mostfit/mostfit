@@ -18,8 +18,8 @@ module Merb
 
       # LOGS
       # array of "watchable" file paths (either absolute or relative to the application root)
-      WATCHABLE_FILES = []
-      MAX_LINE_COUNT = 10
+      WATCHABLE_FILES = ["log/*"]
+      DEFAULT_MAX_LINE_COUNT = 40
 
       DUMP_FOLDER = File.join(Merb.root,"db/daily/")
       DB_FOLDER = File.join(Merb.root,"db/")

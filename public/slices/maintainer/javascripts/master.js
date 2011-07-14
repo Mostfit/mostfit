@@ -90,7 +90,7 @@ function render(data) {
 function ajax_call(params) {
     if(params.handler == render)
 	show_loader();
-    $.ajax({
+    var xhr = $.ajax({
 	url : params.url,
 	data : (params.data) ? (params.data) : (""),
 	success : function(response) {
@@ -102,6 +102,7 @@ function ajax_call(params) {
 	},
 	dataType : params.dataType || null
     });
+    return xhr; // return xhr object so the request can be aborted later, if needed
 }
 
 /* display an ajax loader in the currently active tab */

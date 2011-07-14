@@ -75,7 +75,11 @@ module Merb::Maintainer::Utils
       today = `date +%H:%M:%S.%Y-%m-%d`.chomp
       snapshot_path = File.join(DUMP_FOLDER,"#{database.sub(/^mostfit_/,'')}.#{today}.sql")
 
-      `mysqldump -u #{username} -p#{password} #{database} > #{snapshot_path}; bzip2 #{snapshot_path}` unless File.exists?(snapshot_path+".bz2")
+      if password.nil? or password.blank?
+        `mysqldump -u #{username} #{database} > #{snapshot_path}; bzip2 #{snapshot_path}` unless File.exists?(snapshot_path+".bz2")
+      else
+        `mysqldump -u #{username} -p#{password} #{database} > #{snapshot_path}; bzip2 #{snapshot_path}` unless File.exists?(snapshot_path+".bz2")
+      end
 
       return snapshot_path
     end

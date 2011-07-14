@@ -32,7 +32,7 @@ if defined?(Merb::Plugins)
     
     # Slice metadata
     self.description = "Maintainer is a chunky Merb slice!"
-    self.version = "0.0.1"
+    self.version = "1.0.0"
     self.author = "Vicky Chijwani"
     
     # Stub classes loaded hook - runs before LoadClasses BootLoader
@@ -49,6 +49,9 @@ if defined?(Merb::Plugins)
     
     # Activation hook - runs after AfterAppLoads BootLoader
     def self.activate
+      User.create(:login => "maintainer", :password => "password", :password_confirmation => "password", :role => :maintainer) if User.all(:role => :maintainer).length == 0
+      DM_REPO.scope { Maintainer::DeploymentItem.auto_upgrade! }
+      DM_REPO.scope { Maintainer::HistoryItem.auto_upgrade! }
       DM_REPO.scope { Maintainer::DeploymentItem.create_from_last_commit if Maintainer::DeploymentItem.all.empty? }
     end
     
