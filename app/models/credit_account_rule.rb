@@ -20,12 +20,12 @@ class CreditAccountRule
       if advance.nil?
         amount
       else
-        amount -= advance.advance_principal.to_i
+        amount -= advance.advance_principal.to_f
       end
     when :interest
       amount = Payment.all("client.center.branch_id" => self.rule_book.branch.id, :type => :interest, :received_on => date).aggregate(:amount.sum) || 0
       advance = LoanHistory.sum_advance_payment(date, date, :branch, ["branch_id = #{self.rule_book.branch.id}"]).first
-      advance_interest  = advance ? (advance.advance_total - advance.advance_principal).to_i : 0
+      advance_interest  = advance ? (advance.advance_total - advance.advance_principal).to_f : 0
       if advance_interest == 0
         amount
       else
@@ -35,10 +35,10 @@ class CreditAccountRule
       amount = Payment.all("client.center.branch_id" => self.rule_book.branch.id, :type => :fees, :fee => self.rule_book.fee, :received_on => date).aggregate(:amount.sum) || 0
     when :advance_principal
       advance = LoanHistory.sum_advance_payment(date, date, :branch, ["branch_id = #{self.rule_book.branch.id}"]).first
-      amount  = advance ? advance.advance_principal.to_i : 0
+      amount  = advance ? advance.advance_principal.to_f : 0
     when :advance_interest
       advance = LoanHistory.sum_advance_payment(date, date, :branch, ["branch_id = #{self.rule_book.branch.id}"]).first
-      amount  = advance ? (advance.advance_total - advance.advance_principal).to_i : 0
+      amount  = advance ? (advance.advance_total - advance.advance_principal).to_f : 0
     when :advance_principal_adjusted
       amount = advance_adjustment(:principal, date)
     when :advance_interest_adjusted
@@ -59,7 +59,7 @@ class CreditAccountRule
     advance_collected   = LoanHistory.sum_advance_payment(date, date, :branch, ["branch_id = #{self.rule_book.branch.id}"]).first
     
     #Formula for advance adjusted : adjusted  = old_balance - balance_today + collected_advance
-    amount = ((advance_old_balance ? advance_old_balance.send("balance_#{ptype}") : 0) - (advance_balance ? advance_balance.send("balance_#{ptype}") : 0) + (advance_collected ? advance_collected.send("advance_#{ptype}") : 0)).to_i
+    amount = ((advance_old_balance ? advance_old_balance.send("balance_#{ptype}") : 0) - (advance_balance ? advance_balance.send("balance_#{ptype}") : 0) + (advance_collected ? advance_collected.send("advance_#{ptype}") : 0)).to_f
   end
 
 end
