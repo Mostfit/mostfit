@@ -112,8 +112,18 @@ input[type=button]:active, input[type=submit]:active {
 
 /* specific style rules */
 /* main layout */
-#container #desc p {
-    font-size:17px;
+#container #desc {
+    font-size:30px;
+    margin:10px 0;
+    color:white;
+    font-weight:bold;
+}
+#container #logout {
+    font-size:15px;
+    color:white;
+    float:right;
+    position:relative;
+    top:-50px;
 }
 /* deployment tab */
 #deploy form input[type=radio] {

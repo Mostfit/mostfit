@@ -19,8 +19,12 @@
     
     #container
       #desc
+        Mostfit Maintainer
+      #logout
         %p
-          Mostfit Maintainer
+          == Welcome, #{session.user.login} (#{session.user.role})
+          |
+          %a{:href => "/logout", :title => "Logout"} Logout
       .tab_container
         %ul.tabs
           - @tabs.each do |tab|
