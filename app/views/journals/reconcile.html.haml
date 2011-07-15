@@ -77,6 +77,8 @@
           %td
             %b 
               = Fee.all(:id => fid).aggregate(:name).join(", ")
+              %br
+              = "(#{rules.first.branch.name})" if @branch.count > 1
           %td
             = (ls = fid.map{|f| @fees[f]||0}.reduce(0){|s,x| s+=x}).to_currency
           %td
