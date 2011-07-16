@@ -432,7 +432,10 @@ class Loan
     x
   end
 
-  def get_payments(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default, desktop_id = nil, origin = nil)
+  def get_payments(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default, desktop_id = nil, origin = nil, curr_bal = nil) 
+    # we need this dirty curr_bal hack in order to reallocate without rewriting history after each payment
+
+    # ALSO
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
     unless input.is_a? Array or input.is_a? Fixnum or input.is_a? Float or input.is_a?(Hash)
@@ -455,7 +458,7 @@ class Loan
         interest     = [interest_due, total].min  # never more than total
         principal    = total - interest
       elsif style == PRORATA_REPAYMENT_STYLE #does not pay fees
-        interest, principal = pay_prorata(input, received_on)
+        interest, principal = pay_prorata(input, received_on, curr_bal)
       end
     elsif input.is_a? Array  # in case principal and interest are specified separately
       principal, interest = input[0], input[1]
@@ -1119,6 +1122,7 @@ class Loan
     ph = _ps.group_by{|p| p.received_on}.to_hash
     _pmts = []
     self.payments_hash([])
+    bal = amount
     ph.keys.sort.each_with_index do |date, i|
       prins = ph[date].select{|p| p.type == :principal}
       ints = ph[date].select{|p| p.type == :interest}
@@ -1128,7 +1132,8 @@ class Loan
       ref_payment = (prins[0] ? prins[0] : ints[0])
       user = ref_payment.created_by
       received_by = ref_payment.received_by
-      _pmts << get_payments(total_amt, user, date, received_by, true, style)
+      _pmts << get_payments(total_amt, user, date, received_by, true, style, :default, nil, nil, bal)
+      bal -= p_amt
     end
     _pmts = _pmts.flatten
     Payment.transaction do |t|

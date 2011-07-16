@@ -44,15 +44,15 @@ module Mostfit
         reducing_schedule.count
       end
 
-      def pay_prorata(total, received_on)
+      def pay_prorata(total, received_on, curr_bal = nil)
         i = used = prin = int = 0.0
         d = received_on
         total = total.to_f
         pmnt = equated_payment
         d = received_on
-        curr_bal = actual_outstanding_principal_on(d)
+        curr_bal ||= actual_outstanding_principal_on(d)
         while (total - used) >= 0.01
-          i_pmt = (interest_rate/get_divider * curr_bal).round(2)
+          i_pmt = interest_calculation(curr_bal)
           int += i_pmt
           p_pmt = pmnt - i_pmt
           prin += p_pmt
@@ -66,6 +66,11 @@ module Mostfit
 
       end
 
+      def interest_calculation(balance)
+        ((balance * interest_rate) / get_divider).round(2).round_to_nearest(self.repayment_style.round_interest_to, self.repayment_style.rounding_style)
+      end
+
+
       def reducing_schedule
         return @_reducing_schedule if @_reducing_schedule
         @_reducing_schedule = {}    
@@ -74,7 +79,7 @@ module Mostfit
         installment = 1
         while balance > 0
           @_reducing_schedule[installment] = {}
-          @_reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider).round(2).round_to_nearest(self.repayment_style.round_interest_to, self.repayment_style.rounding_style)
+          @_reducing_schedule[installment][:interest_payable]  = interest_calculation(balance)
           @_reducing_schedule[installment][:principal_payable] = [(payment - @_reducing_schedule[installment][:interest_payable]).round(2), balance].min
           balance = balance - @_reducing_schedule[installment][:principal_payable]
           installment += 1

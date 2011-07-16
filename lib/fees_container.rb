@@ -1,7 +1,6 @@
 module FeesContainer
   # levy fees on given object
   def levy_fees(keep = true)
-    debugger if $debug
     @payable_models ||= Fee::PAYABLE.map{|m| [m[0], [m[1], m[2]]]}.to_hash
     apfees = ApplicableFee.with_deleted{ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class.to_s)}
     cur_fees = ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class.to_s)
