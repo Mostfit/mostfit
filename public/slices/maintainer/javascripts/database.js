@@ -1,4 +1,5 @@
 $(function() {
+    setup_ajax_forms();
     setup_snapshot_form_handler();
 });
 

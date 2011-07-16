@@ -1,4 +1,6 @@
 $(function() {
+    setup_ajax_forms();
+
     $('.pagination a').click(function(e) {
 	// make pagination ajaxy
 	var parse_url = /^\/maintainer\/history\?page=(\d+)$/;

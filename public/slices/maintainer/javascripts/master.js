@@ -1,7 +1,9 @@
 $(function() {
     setup_ajax_fetch_handlers();
+    setup_ajax_forms();
     setup_confirmation_handlers();
-    setTimeout(function() { check_if_deployment_possible(); }, 1000);
+   // fix_history_tab_freshness();
+    setTimeout(function() { check_if_deployment_possible(); }, 3000);
 
     $.fn.extend({
 	disable : function() { $(this).attr('disabled','disabled'); },
@@ -20,6 +22,16 @@ $(function() {
     });
 });
 
+function fix_history_tab_freshness() {
+    $("ul.tabs li#history").click(function() {
+	show_loader();
+	ajax_call({
+	    url: '/maintain/history',
+	    handler: render
+	});
+    });
+}
+
 /* check if deployment is possible */
 function check_if_deployment_possible() {
     notify_bottom({text : "Checking deployment status..."});
@@ -31,6 +43,33 @@ function check_if_deployment_possible() {
             else if(data.response == "false")
 		notify_bottom({text : "Deployed code in current branch is up-to-date."});
 	}
+    });
+}
+
+function setup_ajax_forms() {
+    $("form.ajaxy input[type!=button]").keyup(function(e) {
+	if(e.keyCode === 13) // 13 is the key code for the Enter key
+	    $(this).parents('form.ajaxy').find('input[name=submit]').click();
+    });
+    $("form.ajaxy input[name=submit]").click(function(e) {
+	var form = $(this).parents('form');
+	show_overlay();
+	$.notify_osd.create({ text : form.attr('processing'), icon : form.attr('icon'), sticky : true, dismissable : false });
+	data = form.serialize();
+	ajax_call({
+	    url: form.attr("action"),
+	    data: data,
+	    handler: function(resp) {
+		hide_overlay();
+		ajax_call({
+		    url: form.attr('reload_url'),
+		    handler: render
+		});
+		$.notify_osd.create({ text : form.attr(resp.response) || "An error occurred.", icon : form.attr('icon') || "" });
+	    }
+	});
+	e.preventDefault();
+	return false;
     });
 }
 

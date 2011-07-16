@@ -1,4 +1,6 @@
 $(function() {
+    setup_ajax_forms();
+
     $("#time-section table input[type=radio]").change(function() { setup_select_enabler($(this).parent()) });
 
     $("#schedule-custom").hide();

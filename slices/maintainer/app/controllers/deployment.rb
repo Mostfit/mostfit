@@ -10,8 +10,8 @@ class Maintainer::Deployment < Maintainer::Application
   end
 
   def deploy
-    deploy_code(params)
-    (request.xhr?) ? (return "true") : redirect('/maintain#deployment')
+    ret = deploy_code(params)
+    (request.xhr?) ? ret : redirect('/maintain#deployment')
   end
 
   def rollback

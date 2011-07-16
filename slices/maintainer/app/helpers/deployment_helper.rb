@@ -6,8 +6,6 @@ module Merb::Maintainer::DeploymentHelper
     @branches = @git.branches.local.map(&:full)
     @current_branch = @git.current_branch
 
-    database_backup
-
     # fetch all remote branches
     @git.fetch('origin')
 
@@ -16,9 +14,13 @@ module Merb::Maintainer::DeploymentHelper
      
     if params[:branch_type] == "local"
       # local branch change
-      @git.checkout(branch) if branch_changed
-      # pull = fetch (done above) + merge (the git gem's pull() method is buggy, DON'T use it)
-      msg = @git.remote('origin').merge(branch)
+      if branch_changed
+        @git.checkout(branch)
+        # pull = fetch (done above) + merge (the git gem's pull() method is buggy, DON'T use it)
+        @git.remote('origin').merge(branch)
+      else
+        msg = @git.remote('origin').merge(branch)
+      end
     elsif params[:branch_type] == "remote"
       # switch to the specified remote branch, ...
       @git.checkout('origin/'+branch)
@@ -29,6 +31,8 @@ module Merb::Maintainer::DeploymentHelper
     end
 
     if (params[:branch_type] == "local" and not branch_changed and not msg.nil? and not msg == "Already up-to-date.") or (params[:branch_type] == "local" and branch_changed) or (params[:branch_type] == "remote")
+      database_backup
+
       # record deployment in deployment and action histories
       DM_REPO.scope { Maintainer::DeploymentItem.create_from_last_commit }
       log(
@@ -46,6 +50,9 @@ module Merb::Maintainer::DeploymentHelper
       end
 
       refresh_rake_tasks_file
+      return "true"
+    else
+      return "no_effect"
     end
 
   end

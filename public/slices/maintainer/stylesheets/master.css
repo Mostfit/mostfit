@@ -49,6 +49,15 @@ input[type=text]:focus {
 }
 
 /* general classes */
+/* horizontal button group */
+.button-group input {
+    float:left;
+    display:inline !important;
+    margin-bottom:10px;
+}
+.button-group input:last-child {
+    float:none !important;
+}
 /* spacious table */
 table.spacious {
     width:100%;
@@ -115,7 +124,7 @@ input[type=button]:active, input[type=submit]:active {
 #container #desc {
     font-size:30px;
     margin:10px 0;
-    color:white;
+    color:#ddd;
     font-weight:bold;
 }
 #container #logout {
@@ -161,10 +170,6 @@ input[type=button]:active, input[type=submit]:active {
 }
 #command-section select {
     margin:10px 0px;
-}
-#add-task input[type=submit], #edit-task input[type=submit]{
-    float:left;
-    margin-right:5px;
 }
 #time-section #schedule-type {
     margin-top:5px;
@@ -238,9 +243,11 @@ input[type=button]:active, input[type=submit]:active {
 }
 #bottom-message-drawer #bottom-message {
     border-radius:5px 5px 0px 0px;
-    /*box-shadow:0 0 10px rgb(205,211,254);*/
+    -moz-border-radius:5px 5px 0px 0px;
+    -webkit-border-radius:5px 5px 0px 0px;
     box-shadow:0px 0px 12px #000;
-    /*background:rgba(205,211,254,1.0);*/
+    -moz-box-shadow:0px 0px 12px #000;
+    -webkit-box-shadow:0px 0px 12px #000;
     background:rgba(32,40,45,0.8);
     min-width:100px;
     max-width:490px;
@@ -261,6 +268,8 @@ input[type=button]:active, input[type=submit]:active {
     font-size:13px;
     min-width:100px;
     border-radius:3px 3px 0px 0px;
+    -moz-border-radius:3px 3px 0px 0px;
+    -webkit-border-radius:3px 3px 0px 0px;
 }
 #bottom-message-drawer #bottom-message #bottom-message-inside span {
     display:inline-block;
@@ -295,6 +304,8 @@ input[type=button]:active, input[type=submit]:active {
     margin-bottom:1px !important;
     top:23px !important;
     border-radius:3px 3px 0 0;
+    -moz-border-radius:3px 3px 0 0;
+    -webkit-border-radius:3px 3px 0 0;
     -webkit-transition:0.5s linear;
     -webkit-transition-property:color;
     z-index:0;

@@ -12,7 +12,12 @@ class Maintainer::HistoryItem
     'deleted_task'            => 'deleted a scheduled task',
     'deployed'                => 'performed a deployment',
     'deployed_and_upgraded'   => 'performed a database upgrade and deployment',
-    'rollback'                => 'performed a rollback'
+    'rollback'                => 'performed a rollback',
+    'changed_password'        => 'changed their password',
+    'added_maintainer'        => 'added a new user',
+    'enabled_maintainer'      => 'enabled a user',
+    'disabled_maintainer'     => 'disabled a user',
+    'deleted_maintainer'      => 'deleted a user'
   }
   
   property :id,         Serial

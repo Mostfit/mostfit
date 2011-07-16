@@ -1,4 +1,6 @@
 $(function() {
+    setup_ajax_forms();
+
     var xhr;
 
     $("#logs #input select, #logs #input input").change(function() {

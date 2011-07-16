@@ -1,4 +1,6 @@
 $(function() {
+    setup_ajax_forms();
+
     var result_table = $("#result table");
     var result_table_body = result_table.find("tbody");
     var form = $("form");
