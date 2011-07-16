@@ -28,8 +28,9 @@ class ApplicableFees < Application
 
   def create(applicable_fee)
     @applicable_fee = ApplicableFee.new(applicable_fee)
+    debugger
     if @applicable_fee.save
-      url = (@applicable_fee.parent.is_a?(Loan) ? "/loans/#{@applicable_fee.applicable_id}" : resource(@applicable_fee.parent))
+      url = (@applicable_fee.parent.is_a?(Loan) ? url_for_loan(@applicable_fee.parent) : resource(@applicable_fee.parent))  + "#misc"
       redirect(url, :message => {:notice => "Fee was successfully levied"})
     else
       if request.xhr?

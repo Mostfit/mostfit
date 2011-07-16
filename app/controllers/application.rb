@@ -111,12 +111,11 @@ class Application < Merb::Controller
         DebitAccountRule.all(:rule_book_id => obj.id).destroy!
       end
 
-
-      return_url = params[:return].split("/")[0..-3].join("/")
-      redirect(return_url, :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
+      # return_url = params[:return].split("/")[0..-3].join("/")
+      redirect(params[:return], :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
     else
       if model == ApplicableFee
-        obj.destroy! #skip validations. they fail on the duplicate one
+        obj.destroy #skip validations. they fail on the duplicate one
         redirect(params[:return], :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
       end
 

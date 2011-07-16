@@ -17,7 +17,7 @@
     %tr
       %td
       %td
-        = hidden_field :applicable_id, :value => @loan.id
-        = hidden_field :applicable_type, :value => 'Loan'          
+        = hidden_field :applicable_id, :value => object.id
+        = hidden_field :applicable_type, :value => object.class.to_s          
         = hidden_field :name => "_target_", :value => "applicable_fee_list"
         = submit "GO"

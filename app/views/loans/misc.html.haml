@@ -14,14 +14,14 @@
 - if [:admin, :mis_manager].include?(session.user.role)
   %hr
   .box
-    = partial "applicable_fees/form", :layout => false
+    = partial "applicable_fees/form", :layout => false, :object => @loan
   %hr
   .box
     %h3 Applicable fees
     - if @loan.applicable_fees.empty?
-      = form_for(@loan, :action => url_for_loan(@loan)) do
+      = form_for(@loan, :action => url(:controller => :loans, :action => :levy_fees, :id => @loan.id)) do
         = submit 'Apply Fees'
-    = partial "applicable_fees/list", :layout => false, :applicable_fees => @loan.applicable_fees
+    = partial "applicable_fees/list", :layout => false, :applicable_fees => @loan.applicable_fees, :return_url => url_for_loan(@loan) + "#misc"
 - if session.user.role==:admin
   %hr
   .box
