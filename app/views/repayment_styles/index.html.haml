@@ -1,9 +1,10 @@
 %h1
   Repayment Styles
 
-= link_to 'New Repayment Style', url(:new_repayment_style), :class => "add"
+.menu-strip
+  = link_to 'New Repayment Style', url(:new_repayment_style), :class => "add"
 
-%table.narrow.form
+%table.narrow.form.shaded
   %thead
     %tr
       %th
@@ -29,7 +30,9 @@
         %td
           = repayment_style.style
         %td
-          = repayment_style.round_total_to
+          = (repayment_style.round_total_to ? "Total rounded to nearest #{repayment_style.round_total_to}" : "Total not rounded")
+          %br
+          = repayment_style.round_interest_to ? "Interest rounded to nearest #{repayment_style.round_interest_to}" : "Interest not rounded"
         %td
           = repayment_style.active
         %td

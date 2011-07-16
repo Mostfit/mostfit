@@ -3,7 +3,7 @@
     %th{:width => "45%"}
       Name
     %td
-      = text_field :name
+      = text_field :name, :style => "width: 300px"
   %tr
     %th
       Style
@@ -17,7 +17,7 @@
         leave blank for no rounding, else enter an integer value to round to the nearest multiple thereof
         
     %td
-      = text_field :round_total_to
+      = text_field :round_total_to, :style => "width: 3em;"
   %tr
     %th
       Round Interest Payment To
@@ -27,7 +27,7 @@
         Principal will be calculated as total payment minus interest
         
     %td
-      = text_field :round_interest_to
+      = text_field :round_interest_to, :style => "width: 3em;"
 
   %tr
     %th

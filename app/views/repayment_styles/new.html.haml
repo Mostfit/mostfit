@@ -4,6 +4,6 @@
 
 = form_for(@repayment_style, :action => url(:repayment_styles) ) do
   = partial :fields
-  = submit "Create"
+  = submit "Create", :class => "grey_button"
 
 = link_to 'Back', url(:repayment_styles)
