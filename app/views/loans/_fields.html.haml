@@ -7,7 +7,7 @@
   = "This loan will be dispensed by loan product: #{@loan_product.name}"
 
 %table.tall.shaded{:style => "margin-left:3%"}
-  - if session.user.role == :admin
+  - if session.user.role == :admin and (not @loan.new?)
     %tr
       %th
         Repayment Style

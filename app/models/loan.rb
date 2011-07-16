@@ -15,6 +15,15 @@ class Loan
   after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
 
+  before :save, :set_bullet_installments
+
+  def set_bullet_installments
+    debugger
+    rs = self.repayment_style or self.loan_product.repayment_style
+    number_of_installments = 1 if rs.style == "BulletLoan"
+  end
+
+
   #  after  :destroy, :update_history
 
   before :valid?, :set_amount

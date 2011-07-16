@@ -100,7 +100,7 @@ module Mostfit
     end #EquatedWeekly
 
     module BulletLoan
-      before :save, :set_installments_to_1
+
   
       def self.display_name
         "Single shot repayment (Bullet Loan)"
@@ -137,7 +137,7 @@ module Mostfit
     module BulletLoanWithPeriodicInterest
 
       def self.extended(base)
-        extend Mostfit::PaymentStyles::BulletLoan
+        base.extend Mostfit::PaymentStyles::BulletLoan
       end
 
       def self.display_name
