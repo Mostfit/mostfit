@@ -84,10 +84,10 @@ input[type='text'] { cursor: text; }
 .container fieldset { padding: 0 1em 1em 1em; margin: 1.6em 0; } /* padding-top is margin-top for fieldsets in Opera */
 .container legend { padding-left: .8em; padding-right: .8em; display: block;}
 .container legend+* { margin-top: 1em; } /* compensates for the opera margin bug */
-.container textarea, .container input { padding: .3em .4em .15em .4em; }
+/*.container textarea, .container input { padding: .3em .4em .15em .4em; }*/
 .container select { padding: .1em .2em 0 .2em; }
 .container option { padding: 0 .4em; }
-.container a { position: relative; padding: 0.3em 0 .1em 0; } /* for larger click-area */
+/*.container a { position: relative; padding: 0.3em 0 .1em 0; } /* for larger click-area */
 .container dt { margin-top: .8em; margin-bottom: .4em; }
 .container ul { margin-left: 1.5em; }
 .container ol { margin-left: 2.35em; }

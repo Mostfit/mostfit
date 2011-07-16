@@ -381,8 +381,23 @@ class Loans < Application
     loan = Loan.get(id)
     raise NotFound unless loan
     loan.update_history
-    redirect("/loans/#{loan.id}")
+    redirect url_for_loan(loan)
   end
+
+  def reallocate(id)
+    debugger
+    @loan = Loan.get(id)
+    raise NotFound unless @loan
+    debugger
+    status, @payments = @loan.reallocate(params[:style].to_sym, session.user)
+    if status
+      redirect url_for_loan(@loan), :message => {:notice => "Loan payments succesfully reallocated"}
+    else
+      render 
+    end
+  end
+    
+
 
   def repayment_sheet(id)
     @loan = Loan.get(id)

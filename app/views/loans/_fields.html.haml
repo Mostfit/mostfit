@@ -7,6 +7,15 @@
   = "This loan will be dispensed by loan product: #{@loan_product.name}"
 
 %table.form.shaded{:style => "margin-left:3%"}
+  - if session.user.role == :admin
+    %tr
+      %th
+        Repayment Style
+      %td
+        = select :repayment_style_id, :collection => RepaymentStyle.all, :value_method => :id, :text_method => :name
+  %tr
+    %th
+      
   - if not take_over_loan
     %tr
       %th

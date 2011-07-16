@@ -1,6 +1,6 @@
-%table.form
+%table.tall.shaded{:width => "60%"}
   %tr
-    %th
+    %th{:width => "45%"}
       Name
     %td
       = text_field :name
@@ -11,9 +11,24 @@
       = select :style, :collection => [['','---']] + Mostfit::PaymentStyles.constants.map{|f| [f,f]}
   %tr
     %th
-      Round to
+      Round Equated Payment To
+      %br
+      %span.greytext
+        leave blank for no rounding, else enter an integer value to round to the nearest multiple thereof
+        
     %td
-      = text_field :round_to
+      = text_field :round_total_to
+  %tr
+    %th
+      Round Interest Payment To
+      %br
+      %span.greytext
+        leave blank for no rounding, else enter an integer value to round to the nearest multiple thereof.
+        Principal will be calculated as total payment minus interest
+        
+    %td
+      = text_field :round_interest_to
+
   %tr
     %th
       Rounding style

@@ -153,6 +153,7 @@
       %li#audit Audits
       %li#misc Miscellaneous
       %li#history History
+      %li#deleted_payments Deleted payments
       
     %div.tab
       %h2 
@@ -221,7 +222,12 @@
           %tr
             %td{ :colspan => 7 }
     %div.tab
-      = partial "payments/list"
+      %h2== Repayments #{link_to 'new repayment', url_for_loan(@loan, 'payments/new'), :class => "add grey_button"}
+      - if @payments.blank?
+        %p
+          %i No repayments have been made so far.
+      - else
+        = partial "payments/list", {:pmts => @payments, :context => :received}
     - if @loan.insurance_policy
       %div.tab
         %input{:type => "hidden", :name => "_load_remote", :value => resource(@loan.insurance_policy)}
@@ -231,4 +237,12 @@
       %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :loans, :action => "misc", :id => @loan.id)}
     %div.tab 
       %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+    %div.tab
+      - deleted_payments = Payment.with_deleted{ Payment.all(:loan_id => @loan.id, :deleted_at.not => nil) }
+      - if @payments.blank?
+        %p
+          %i No deleted payments
+      - else
+        = partial "payments/list", {:pmts => deleted_payments, :context => :deleted}
+
   

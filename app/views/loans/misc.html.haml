@@ -1,70 +1,32 @@
-%div{:style => "float: left; width: 55%"}
+.box
+  %fieldset
+    %legend Loan Utilization
+    = form_for(:loan, :class => "_remote_", :action => url(:controller => :loans, :action => :update_utilization, :id => @loan.id), :method => "POST") do
+      %h3 Update Loan Utilization
+      = select :loan_utilization_id, :collection => LoanUtilization.all.map{|lu| [lu.id, lu.name]}, :include_blank => true
+      = submit "Save"
+
+- if session.user.role == :admin
   .box
     %fieldset
-      %legend Loan Utilization
-      = form_for(:loan, :class => "_remote_", :action => url(:controller => :loans, :action => :update_utilization, :id => @loan.id), :method => "POST") do
-        %h3 Update Loan Utilization
-        = select :loan_utilization_id, :collection => LoanUtilization.all.map{|lu| [lu.id, lu.name]}, :include_blank => true
-        = submit "Save"
-  
-  
-  - if @loan.status == :outstanding    
-    .box
-      %fieldset
-        %legend Pay
-        = link_to("Prepay This Loan",  url(:prepay_loan, @loan.id), :class => "_remote_")
-  
-        - if [:admin, :mis_manager].include?(session.user.role)
-          .box
-            %fieldset
-              %legend Levy Penalty/Fee
-              = partial "applicable_fees/form", :layout => false, :object => @loan
-  
-  - if session.user.role==:admin
-    .box
-      %fieldset
-        %legend Write Off Loan
-        = form_for(@loan, :action => url(:action => :write_off, :id => @loan.id), :method => "POST", :class => "_disable_button_") do
-          %table.tall.shaded
-            %tr
-              %th
-                Write off Date : 
-              %td
-                = date_select_for @loan, :written_off_on
-            %tr
-              %th
-                Select Staff Member :
-              %td
-                - center = @client.center
-                - branch = center.branch
-                = select :written_off_by_staff_id, :id => "written_off_by_staff_id", :collection => [branch.manager, center.manager].uniq.map{|m| [m.id, m.name]}, :prompt => "select staff member"
-            %tr
-              %td{:colspan => "2"}
-                %span.greytext 
-                  Pick the staff member who is writing off the loan
-                = submit "Write off"
-  - elsif staff_member = session.user.staff_member
-    = form_for(@loan, :action => url(:action => :suggest_write_off, :id => @loan.id), :method => "POST", :class => "_disable_button_") do
-      %table
-        %tr
-          %td
-            %b Suggest to Write Off this Loan
-        %tr
-          %td
-            suggested write off Date :
-          %td
-            = date_select_for @loan, :suggested_written_off_on
-        %tr
-          %td
-            Suggested by staff member :
-          %td
-            = staff_member.name
-          %td
-        %tr
-          %td
-            = submit "Send suggestion"
+      %legend Manipulate Loan Schedule
+      = link_to("Repair history", url(:controller => "loans", :id => @loan.id, :action => "repair"), :class => "grey_button")
+      = form_for(@loan, :action => url(:controller => "loans", :id => @loan.id, :action => "reallocate"), :class => "") do
+        = submit 'reallocate loans with style', :class => "grey_button", :style => "margin: 4px"
+        = repayment_style_select
 
-%div{:style => "float: left; width: 40%"}
+- if @loan.status == :outstanding    
+  .box
+    %fieldset
+      %legend Pay
+      = link_to("Prepay This Loan",  url(:prepay_loan, @loan.id), :class => "_remote_ grey_button")
+
+      - if [:admin, :mis_manager].include?(session.user.role)
+        .box
+          %fieldset
+            %legend Levy Penalty/Fee
+            = partial "applicable_fees/form", :layout => false
+
   .box
     %fieldset
       %legend Applicable fees
@@ -96,3 +58,48 @@
             Branch
           %td
             = @loan.c_branch_id
+- if session.user.role==:admin
+  .box
+    %fieldset
+      %legend Write Off Loan
+      = form_for(@loan, :action => url(:action => :write_off, :id => @loan.id), :method => "POST", :class => "_disable_button_") do
+        %table.tall.shaded
+          %tr
+            %th
+              Write off Date : 
+            %td
+              = date_select_for @loan, :written_off_on
+          %tr
+            %th
+              Select Staff Member :
+            %td
+              - center = @client.center
+              - branch = center.branch
+              = select :written_off_by_staff_id, :id => "written_off_by_staff_id", :collection => [branch.manager, center.manager].uniq.map{|m| [m.id, m.name]}, :prompt => "select staff member"
+          %tr
+            %td{:colspan => "2"}
+              %span.greytext 
+                Pick the staff member who is writing off the loan
+              = submit "Write off"
+- elsif staff_member = session.user.staff_member
+  = form_for(@loan, :action => url(:action => :suggest_write_off, :id => @loan.id), :method => "POST", :class => "_disable_button_") do
+    %table
+      %tr
+        %td
+          %b Suggest to Write Off this Loan
+      %tr
+        %td
+          suggested write off Date :
+        %td
+          = date_select_for @loan, :suggested_written_off_on
+      %tr
+        %td
+          Suggested by staff member :
+        %td
+          = staff_member.name
+        %td
+      %tr
+        %td
+          = submit "Send suggestion"
+  
+

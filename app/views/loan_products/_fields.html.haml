@@ -83,17 +83,6 @@
       = select :repayment_style_id, :collection => RepaymentStyle.all, :value_method => :id, :text_method => :name, :prompt => "---"
   %tr
     %th
-      Rounding to
-    %td
-      = text_field :rounding, :size => 3
-  %tr
-    %th
-      Rounding Style
-    %td{:colspan => 6}
-      = select :rounding_style, :collection => [[:round, "round"], [:floor, "floor"], [:ceil, "ceil"]]
-      %span.greytext  By default, round is choosen as the rounding style
-  %tr
-    %th
       Link to an insurance policy ?
     %td
       = check_box :linked_to_insurance, :checked => @loan_product.linked_to_insurance, :onchange => "$('#insurance_product_selector').toggle()"

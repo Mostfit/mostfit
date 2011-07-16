@@ -198,6 +198,7 @@ class Loan
     true
   end
 
+
   def self.display_name
     "Loan"
   end
@@ -526,6 +527,29 @@ class Loan
     [false, payment]
   end
 
+  def delete_payments(payments, user)
+    return false if payments.map{|p| p.loan.id != self.id}
+    payments.map{|p| p.deleted_by = user}
+    unless payments.map{|p| p.destroy}.include?(false)
+      return [true, payments]
+    else
+      return [false, payments]
+    end
+  end
+
+  def restore_payments(payments)
+    payments.each{|p| p.deleted_at = nil; p.deleted_by = nil;}
+    Payment.transaction do |t|
+      if payments.map{|p| p.save}.include?(false)
+        t.rollback
+        return [false, payments]
+      else
+        return [true, payments]
+      end
+    end
+  end
+
+
   def get_fee_payments(amount, date, received_by, created_by)
     fees = []
     fp = fees_payable_on(date)
@@ -699,17 +723,19 @@ class Loan
   end
 
   
-  def payments_hash
+  def payments_hash(structs = nil)
     # this is the fount of knowledge for actual payments on the loan
-    return @payments_cache if @payments_cache
-    sql = %Q{
+    unless structs
+      return @payments_cache if @payments_cache
+      sql = %Q{
         SELECT SUM(amount * IF(type=1,1,0)) AS principal,
                SUM(amount * IF(type=2,1,0)) AS interest,
                received_on
         FROM payments
         WHERE (deleted_at IS NULL) AND (loan_id = #{self.id})
         GROUP BY received_on ORDER BY received_on}
-    structs = id ? repository.adapter.query(sql) : []
+      structs = id ? repository.adapter.query(sql) : []
+    end
     @payments_cache = {}
     total_balance = total_to_be_received
     @payments_cache[disbursal_date || scheduled_disbursal_date] = {
@@ -1083,8 +1109,46 @@ class Loan
   end
 
   def set_loan_product_parameters
-    repayment_style = self.loan_product.repayment_style
+    repayment_style = self.loan_product.repayment_style unless repayment_style
   end
+
+  def reallocate(style, user)
+    debugger
+    return false unless REPAYMENT_STYLES.include?(style)
+    _ps  = self.payments(:type => [:principal, :interest])
+    ph = _ps.group_by{|p| p.received_on}.to_hash
+    _pmts = []
+    self.payments_hash([])
+    ph.keys.sort.each_with_index do |date, i|
+      prins = ph[date].select{|p| p.type == :principal}
+      ints = ph[date].select{|p| p.type == :interest}
+      p_amt = prins.reduce(0){|s,p| s + p.amount} || 0
+      i_amt = ints.reduce(0){|s,p| s + p.amount} || 0
+      total_amt = p_amt + i_amt
+      ref_payment = (prins[0] ? prins[0] : ints[0])
+      user = ref_payment.created_by
+      received_by = ref_payment.received_by
+      _pmts << get_payments(total_amt, user, date, received_by, true, style)
+    end
+    _pmts = _pmts.flatten
+    Payment.transaction do |t|
+      _t = Time.now
+      ds = _ps.map{|p| p.deleted_by = user; p.deleted_at = _t; p.destroy}
+      statii =  _pmts.map do |p| 
+        p.created_at = _t
+        p.save
+      end
+      debugger
+      if statii.include?(false) or ds.include?(false)
+        t.rollback
+        return false, _pmts
+      end
+    end
+    self.reload
+    update_history(true)
+    return true, _pmts
+  end
+
 
   include DateParser  # mixin for the hook "before :valid?, :parse_dates"
   include Misfit::LoanValidators
@@ -1100,23 +1164,6 @@ class Loan
 
 
   # repayment styles
-  def pay_prorata(total, received_on)
-    #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
-    i = used = prin = int = 0.0
-    d = received_on
-    total = total.to_f
-    while used < total
-      prin += scheduled_principal_for_installment(installment_for_date(d))
-      int  += scheduled_interest_for_installment(installment_for_date(d))
-      used  = (prin + int)
-      d = shift_date_by_installments(d, 1)
-    end
-    prin = [0,prin].max
-    int = [0,int].max
-    interest  = [0,total * int/(prin + int)].max
-    principal = [0,total * prin/(prin + int)].max
-    [interest, principal]
-  end
 
   # TODO these should logically be private.
   def get_from_cache(cache, column, date)
@@ -1298,6 +1345,9 @@ class Loan
       1
     end    
   end
+
+  
+
 
   
 end

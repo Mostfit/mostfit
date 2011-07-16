@@ -6,9 +6,9 @@ class RepaymentStyle
   property :id,       Serial
   property :name,     String
   property :style,    String
-  property :round_to, Integer
+  property :round_total_to, Integer
+  property :round_interest_to, Integer
   property :active, Boolean
-  property :round_to, Integer
   property :rounding_style, String
 
   def to_s
