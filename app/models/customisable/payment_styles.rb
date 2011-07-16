@@ -98,5 +98,66 @@ module Mostfit
       end
 
     end #EquatedWeekly
+
+    module BulletLoan
+      before :save, :set_installments_to_1
+  
+      def self.display_name
+        "Single shot repayment (Bullet Loan)"
+      end
+      
+      def scheduled_interest_for_installment(number = 1)
+        amount * interest_rate
+      end
+  
+      def scheduled_principal_for_installment(number = 1)
+        amount
+      end
+
+      def scheduled_interest_up_to(date)
+        return scheduled_interest_for_installment(1) if date > scheduled_first_payment_date
+        scheduled_interest_for_installment(1) * (1 - (scheduled_first_payment_date - date) / (scheduled_first_payment_date - disbursal_date||scheduled_disbursal_date))
+      end
+      
+      def pay_prorata(total, received_on)
+        #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
+        int  = scheduled_interest_up_to(received_on)
+        int -= interest_received_up_to(received_on)
+        prin = total - int
+        [int, prin]
+      end
+
+  
+      private
+      def set_installments_to_1
+        number_of_installments = 1
+      end
+    end #BulletLoan
+
+    module BulletLoanWithPeriodicInterest
+
+      def self.extended(base)
+        extend Mostfit::PaymentStyles::BulletLoan
+      end
+
+      def self.display_name
+        "Single shot principal with periodic interest (Bullet Loan With Periodic Interest)"
+      end
+  
+      def scheduled_interest_for_installment(number)
+        raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
+        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(self.repayment_style.round_interest_to, self.repayment_style.rounding_style)
+      end
+
+      def scheduled_principal_for_installment(number)
+        return 0 if number < number_of_installments
+        return amount if number == number_of_installments
+      end
+  
+      def scheduled_interest_up_to(date);  get_scheduled(:total_interest,  date); end
+    end #BulletLoanWithPeriodicInterest
+
+
+
   end
 end
