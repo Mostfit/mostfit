@@ -51,7 +51,6 @@ class AccountPaymentObserver
     # do not do accounting if no matching accounts
     return unless (credit_accounts and debit_accounts)
     return unless (credit_accounts.length>=0 and debit_accounts.length>=0)
-    
     journal = {:date => obj.received_on, :transaction_id => obj.id.to_s, :currency => Currency.first, :amount => obj.amount * -1}
     journal[:comment] = "Payment: #{obj.type} - #{obj.amount} - Reverse entry"
 
