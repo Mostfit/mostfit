@@ -52,5 +52,36 @@ namespace :mostfit do
       AccountLoanObserver.make_posting_entries_on_update(l)
     end
   end
+
+  desc "Migrating the Accounting Database to new style"
+  task :accounts_migration_add_branch do
+    parents_list = Account.all().map{|x| x.parent_id}.uniq
+    parents_list.delete(nil)
+    
+    Account.all(:id.not => parents_list, :branch_id => nil).each{|x|
+       x.branch_id = 0
+       x.save
+       }
+    errors = []
+    accounts = Account.all(:id => parents_list, :branch_id => nil)
+    Branch.all.each{|branch|
+      accounts.each{|account|
+        account.id = nil 
+        new_account = Account.new(account.attributes)
+        new_account.branch = branch
+        unless new_account.save
+          new_account.valid?
+          errors.push(new_account.errors)
+          exit
+        end
+        child_accounts = account.children(:branch_id => branch.id)
+        child_accounts.each{|child| 
+          child.parent = Account.get(new_account.id)
+          child.save
+        }
+      }
+    }
+  end
+
 end
 
