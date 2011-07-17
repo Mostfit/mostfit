@@ -39,7 +39,8 @@ class Account
   validates_is_unique :name, :scope => :branch
   validates_is_unique :gl_code, :scope => :branch
   validates_is_number :opening_balance
-
+  validates_with_method :parent_id, :method => :parent_belongs_to_same_branch?
+  
   # check if it is a cash account
   def is_cash_account?
     @account_category ? @account_category.eql?('Cash') : false
@@ -48,6 +49,18 @@ class Account
   # check if it is a bank account
   def is_bank_account?
     @account_category ? @account_category.eql?('Bank') : false
+  end
+
+  # check if parent belongs to the same branch
+  def parent_belongs_to_same_branch?
+    debugger
+    if self.parent_id == ""
+      true
+    elsif self.parent.branch_id == self.branch_id
+      true
+    else
+      false
+    end
   end
 
   def opening_and_closing_balances_as_of(for_date = Date.today)
