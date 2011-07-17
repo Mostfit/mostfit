@@ -23,7 +23,7 @@
     %td
       Branch
     %td
-      = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
+      = select :branch_id, :collection => @branches_list, :prompt => "Select Branch"
   %tr
     %td
       Parent Account

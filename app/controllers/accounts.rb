@@ -4,12 +4,10 @@ class Accounts < Application
 
   def index
     if request.xhr? and params[:account_type_id] and not params[:account_type_id].blank?
-      @account_type_id = params[:account_type_id]
       if params[:branch_id] and not params[:branch_id].blank?
-        @branch = Branch.get(params[:branch_id])
-        @accounts = Account.all(:branch_id => @branch.id, :account_type_id => @account_type_id)
+        @accounts = Account.all(:branch_id => params[:branch_id].to_i, :account_type_id => params[:account_type_id].to_i)
       else
-        @accounts = Account.all(:branch_id => nil, :account_type_id => @account_type_id)
+        @accounts = Account.all(:branch_id => nil, :account_type_id => params[:account_type_id].to_i)
       end
       partial :accounts_selection
     else
@@ -130,6 +128,8 @@ class Accounts < Application
 
   private
   def get_context
+    @branches_list = Branch.all.map{ |x| [x.id, x.name]}
+    @branches_list.unshift([0, 'Head Office Accounts'])
     @branch = Branch.get(params[:branch_id]) if params.key?(:branch_id)
   end
 
