@@ -65,6 +65,10 @@ class Center
     DAYS
   end
 
+  def loans
+    clients.loans
+  end
+
   # a simple catalog (Hash) of center names and ids grouped by branches
   # returns some like: {"One branch" => {1 => 'center1', 2 => 'center2'}, "b2" => {3 => 'c3', 4 => 'c4'}} 
   def self.catalog(user=nil)

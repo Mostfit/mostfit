@@ -22,7 +22,7 @@
   %div.tab
     %form.floating{:style => "float: right"}
       %b Show accounts of 
-      = select :branch_id, :collection => Branch.all.map{|b| [b.id, b.name]}, :prompt => "Head office accounts"
+      = select :branch_id, :collection => @branches_list, :selected => (params[:branch_id] || 0).to_s
       = submit "GO"
     %h1 List of Account
     %div#sidetreecontrol

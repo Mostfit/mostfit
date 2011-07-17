@@ -1,6 +1,6 @@
 class ProjectedReport < Report
   attr_accessor :from_date, :to_date, :branch, :center, :branch_id, :center_id, :staff_member_id, :loan_product_id, :include_past_data
-  validates_with_method :branch_id, :branch_should_be_selected
+#  validates_with_method :branch_id, :branch_should_be_selected
 
   def initialize(params, dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today + 1
@@ -18,6 +18,7 @@ class ProjectedReport < Report
   end
   
   def generate
+    debugger
     #0              1                2              3                 4                 5,                  6                    7      
     #amount_applied,amount_santioned,outstanding(p),outstanding(i),outstanding(fee),Outstanding(total),principal(scheduled),interest(scheudled),fee(scheduled)
     branches, centers, data = {}, {}, {}
