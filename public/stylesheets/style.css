@@ -1485,11 +1485,19 @@ table.clearform tr td.legend{
 .breadcrumb li a:hover { background: hsla(85,93%,25%,1); }
 .breadcrumb li a:hover:after { border-left-color: hsla(85,93%,25%,1) !important; }
 
-.applied { font-weight: bold; color: blue;}
-.approved { font-weight: bold; color: grey;}
-.outstanding { font-weight: bold; color: darkgreen;}
-.repaid { font-weight: bold; color: brown;}
-.arrears { font-weight: bold; color: red;}
-.written-off { font-weight: bold; color: black;}
-.preclosed { font-weight: bold; color: orange;}
+.container a.applied { font-weight: bold; color: blue;}
+.container a.approved { font-weight: bold; color: orange;}
+.container a.outstanding { font-weight: bold; color: darkgreen;}
+.container a.repaid { font-weight: bold; color: brown;}
+.container a.arrears { font-weight: bold; color: red;}
+.container a.written-off { font-weight: bold; color: black;}
+.container a.preclosed { font-weight: bold; color: grey;}
 
+ul.inline {
+  display: inline;
+}
+
+ul.inline li {
+  display: inline;
+  list-style: circle;
+}
