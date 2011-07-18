@@ -99,24 +99,6 @@ class Journals < Application
     raise BadRequest unless @branch
 
     if params[:debit_accounts] and params[:credit_accounts]
-      #multiple debit and credit accounts
-      debit_accounts, credit_accounts  = {}, {}
-      
-      params[:debit_accounts].group_by{|x| x[:journal_type_id]}.each{|jid, debits|
-        debit_accounts[jid] ||= {}
-        debits.each{|debit|
-          debit_accounts[jid][Account.get(debit[:account_id])] ||= 0
-          debit_accounts[jid][Account.get(debit[:account_id])] += debit[:amount].to_i
-        }
-      }
-
-      params[:credit_accounts].group_by{|x| x[:journal_type_id]}.each{|jid, credits|
-        credit_accounts[jid] ||= {}
-        credits.each{|credit|
-          credit_accounts[jid][Account.get(credit[:account_id])] ||= 0
-          credit_accounts[jid][Account.get(credit[:account_id])] += credit[:amount].to_i
-        }
-      }
       # get the uniq journal types
       journal_types = params["debit_accounts"].keys
     else
