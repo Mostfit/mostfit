@@ -43,7 +43,7 @@
                           = text_field :name => "credit_accounts[][amount]", :value => (amount || 0)
                         - else
                           = (amount || 0).to_currency
-                          = hidden_field :name => "credit_accounts[][amount]", :value => (amount||0)
+                          = hidden_field :name => "credit_accounts[#{rule.journal_type.id}][#{rule.id}][#{ca.credit_account.id}]", :value => amount if amount != 0.0
             %td
               - if rule.debit_account_rules and rule.debit_account_rules.length > 0
                 %table{:style => "width: 100%"}
@@ -59,7 +59,7 @@
                           = text_field :name => "debit_accounts[][amount]", :value => (amount || 0)
                         - else
                           = (amount || 0).to_currency
-                          = hidden_field :name => "debit_accounts[][amount]", :value => (amount||0)
+                          = hidden_field :name => "debit_accounts[#{rule.journal_type.id}][#{rule.id}][#{da.debit_account.id}]", :value => amount if amount != 0.0
       %tr.total
         %td
         %td
