@@ -92,7 +92,7 @@ class Journal
         }
       elsif debit_accounts.is_a?(Hash)  # for entries of the form {Account => amount}
         debit_accounts.each{|debit_account, debit_amount|
-          Posting.create(:amount => (debit_amount||amount) * -1, :journal_id => journal.id, :account => debit_account, :currency => journal_params[:currency], :fee_id => rules.first.fee_id, :action => rules.first.action)
+          Posting.create(:amount => (debit_amount||amount) * -1, :journal_id => journal.id, :account => debit_account, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
         }
       else
         Posting.create(:amount => amount * -1, :journal_id => journal.id, :account => debit_accounts, :currency => journal_params[:currency], :fee_id => rules.first.fee_id, :action => rules.first.action)
@@ -112,7 +112,7 @@ class Journal
         }
       elsif credit_accounts.is_a?(Hash) # for entries of the form {Account => amount}
         credit_accounts.each{|credit_account, credit_amount|
-          Posting.create(:amount => (credit_amount||amount), :journal_id => journal.id, :account => credit_account, :currency => journal_params[:currency], :fee_id => rules.first.fee_id, :action => rules.first.action)
+          Posting.create(:amount => (credit_amount||amount), :journal_id => journal.id, :account => credit_account, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
         }
       else
 
