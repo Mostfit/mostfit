@@ -155,7 +155,6 @@ module DataMapper
       result = Kernel.const_get("#{model.to_s}Bucket").new {|h, k| h[k] = []}
       
       if buckets == :nothing
-        debugger
         rv = LoanBucket.new
         rv["nothing"] = nil
         return rv

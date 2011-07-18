@@ -82,7 +82,6 @@ class Journal
       # TODO: fix this
       if debit_accounts.is_a?(Hash) and debit_accounts.values.first.is_a?(Hash)  # for EOD Entries
         debit_accounts.each{|rule_id, account_amount|
-          debugger
           rule = RuleBook.get(rule_id)
           account_amount.each{|acc, amt|
             debit_amount = amt.to_f

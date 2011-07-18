@@ -18,7 +18,6 @@ class ProjectedReport < Report
   end
   
   def generate
-    debugger
     #0              1                2              3                 4                 5,                  6                    7      
     #amount_applied,amount_santioned,outstanding(p),outstanding(i),outstanding(fee),Outstanding(total),principal(scheduled),interest(scheudled),fee(scheduled)
     branches, centers, data = {}, {}, {}
