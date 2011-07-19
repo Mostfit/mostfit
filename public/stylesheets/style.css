@@ -1501,3 +1501,11 @@ ul.inline li {
   display: inline;
   list-style: circle;
 }
+
+
+.depth-1 {
+  margin-left: 2em;
+}
+.depth-2 {
+  margin-left: 4em;
+}

@@ -50,6 +50,10 @@ class Account
     @account_category ? @account_category.eql?('Bank') : false
   end
 
+
+        
+      
+
   def opening_and_closing_balances_as_of(for_date = Date.today)
     return [nil, nil] if for_date > Date.today
     opening_balance_on_date = opening_balance_as_of for_date

@@ -25,39 +25,14 @@ class Accounts < Application
   # end
 
   def index
-    if request.xhr? and params[:account_type_id] and not params[:account_type_id].blank?
-      if params[:branch_id] and not params[:branch_id].blank?
-        @accounts = Account.all(:branch_id => params[:branch_id].to_i, :account_type_id => params[:account_type_id].to_i, :parent_id => nil)
-        # @hash_list = {}
-        @list = []
-        @accounts.each{|account|
-          # hash_creation(account, @hash_list)
-          # list_creation(account, @list)
-          @list << account
-          if account.children 
-            account.children.each{|c|
-              @list << c
-              if c.children
-                c.children.each{|grand_child| @list << grand_child}
-              end
-            }
-          end
-        }
-        # @hash_list
-        @list
-      else
-        @accounts = Account.all(:branch_id => nil, :account_type_id => params[:account_type_id].to_i)
-      end
-      partial :accounts_selection
+    if params[:branch_id] and not params[:branch_id].blank?
+      @branch =  Branch.get(params[:branch_id])
     else
-      if params[:branch_id] and not params[:branch_id].blank?
-        @branch =  Branch.get(params[:branch_id])
-      else
-        @branch = nil
-      end
-      @accounts = Account.tree((params[:branch_id] and not params[:branch_id].blank?) ? params[:branch_id].to_i : nil )
-      display @accounts, :layout => layout?
+      @branch = nil
     end
+    @accounts = Account.tree((params[:branch_id] and not params[:branch_id].blank?) ? params[:branch_id].to_i : nil )
+    template = request.xhr? ? 'accounts/select' : 'accounts/index'
+    display @accounts, template, :layout => layout?
   end
 
   def show(id)
