@@ -11,24 +11,28 @@
       to repair
   %h1
     Loan
-    = link_to "##{@loan.id}", url_for_loan(@loan)
+    = link_to "#{@loan.description}", url_for_loan(@loan)
     by client
-    = link_to "<i>#{@client.name}</i>", resource(@branch, @center, @client)
+    = link_to "#{@client.name}", resource(@branch, @center, @client)
   - @history = @loan.loan_history
-  %p.menu-strip
+  .menu-strip{:style => "margin-bottom: 0.5em; margin-left: 0px; margin-top: 0px"}
     = link_to 'edit this loan', url_for_loan(@loan, 'edit'), :class => "edit"
+    = link_to 'make repayment', url_for_loan(@loan, 'payments/new'), :class => "add"
   
-  %table.narrow.form{ :style => 'width : 50%' }
-    %tr.odd
-      %td{ :width => '30%' } Amount disbursed
-      %td
-        -if @loan.disbursal_date
-          == <b>#{(@loan.amount).to_currency}</b> @
-          %b= format("%.2f%", @loan.interest_rate*100)
-        -else
-          Not disbursed yet
+  %table.loan{ :style => 'width : 50%; border: solid 1px #c9c9c9' }
     %tr
-      %td{ :width => '30%' } Amount sanctioned
+      %th.odd{ :width => '30%', :rowspan => "2" } Application
+      %td
+        == <b>#{@loan.amount_applied_for}</b> @
+        %b= format("%.2f%", @loan.interest_rate*100)
+    %tr
+      %td
+        on
+        = @loan.applied_on
+        by
+        %b= link_to @loan.applied_by.name, resource(@loan.applied_by)
+    %tr
+      %th.even{ :width => '30%', :rowspan => "2" } Sanction
       %td
         -if @loan.approved_on
           == <b>#{@loan.amount_sanctioned}</b> @
@@ -36,31 +40,6 @@
         -else
           Not approved yet
     %tr
-      %td{ :width => '30%' } Amount applied
-      %td
-        == <b>#{@loan.amount_applied_for}</b> @
-        %b= format("%.2f%", @loan.interest_rate*100)
-    %tr
-      %td Product
-      %td= @loan.loan_product.name
-    %tr
-      %td Type
-      %td= @loan.discriminator.display_name
-    %tr.odd
-      %td Installments
-      %td
-        = @loan.number_of_installments
-        = @loan.installment_frequency
-        == (#{@loan.number_of_installments_before(Date.today)} past installments)
-    %tr
-      %td Application
-      %td
-        on
-        = @loan.applied_on
-        by
-        %b= link_to @loan.applied_by.name, resource(@loan.applied_by)
-    %tr.odd
-      %td Approval
       %td
         - if @loan.approved_on
           on
@@ -69,8 +48,16 @@
           %b= link_to @loan.approved_by.name, resource(@loan.approved_by)
         - else
           %i approval is pending
+
     %tr
-      %td Disbursed
+      %th.odd{ :width => '30%', :rowspan => "2" } Disbursal
+      %td
+        -if @loan.disbursal_date
+          == <b>#{(@loan.amount).to_currency}</b> @
+          %b= format("%.2f%", @loan.interest_rate*100)
+        -else
+          Not disbursed yet
+    %tr
       %td
         - if @loan.disbursal_date
           on
@@ -85,8 +72,20 @@
           %i 
             original loan disbursed on
             = @loan.original_disbursal_date
-    %tr.odd
-      %td First repayment
+    %tr
+      %th.even Product
+      %td
+        = @loan.loan_product.name
+        %br
+        = @loan.discriminator.display_name
+    %tr
+      %th.odd Installments
+      %td
+        = @loan.number_of_installments
+        = @loan.installment_frequency
+        == (#{@loan.number_of_installments_before(Date.today)} past installments)
+    %tr
+      %th.even First repayment
       %td
         - if @loan.payments(:type => [:principal, :interest]).empty?
           = @loan.scheduled_first_payment_date
@@ -108,24 +107,37 @@
             Original first payment date
             = @loan.original_first_payment_date
     %tr
-      %td
-        Fees applicable
+      %th.odd
+        Fees
       %td
         %ul
           - @loan.applicable_fees.each do |f|
             %li
               = f.description
-    %tr.odd
-      %td
-        Fees paid
-      %td
-        == #{(@loan.total_fees_paid).to_currency} / #{(@loan.total_fees_applicable).to_currency}
-        - if @loan.fees_paid?
-          %span.green Paid
+              - fpaid = @loan.payments(:fee_id => f.fee_id).reduce(0){|s,p| s + p.amount}
+              - if fpaid == f.amount
+                %span.green 
+                  Paid
+                  = fpaid
+              - else
+                %span.red
+                  Paid
+                  = fpaid
+          %li
+            %b
+              Total
+              == #{(@loan.total_fees_paid).to_currency} / #{(@loan.total_fees_applicable).to_currency}
+            - if @loan.fees_paid?
+              %span.green Paid
+            - else
+              %span.red Unpaid fees exist
     %tr
-      %td Status
+      %th.even
+        Status
       %td
-        %b= status = @loan.status.to_s.gsub('_', ' ')
+        - st = @loan.status
+        %h2{:class => st}
+          = st.to_s.gsub('_', ' ')
         - if @status == :written_off
           by
           %b= link_to @loan.written_off_by.name, resource(@loan.written_off_by)
@@ -143,7 +155,9 @@
       %li#history History
       
     %div.tab
-      %h2== Repayment schedule
+      %h2 
+        Repayment schedule
+        = link_to "Download pdf", url(:action =>'repayment_sheet', :controller => 'loans', :format => "pdf", :id =>@loan.id), :style => "float: right; margin-right: 25px", :class => "button"
       %table.narrow.form{ :width => '100%' }
         %thead
           %tr

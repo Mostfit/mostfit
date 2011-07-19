@@ -78,37 +78,37 @@
               - tot_installments += i
               - grp_installments += i
             %td.left-numeric.due
-              = pdue
+              = pdue.to_currency
               - tot_principal_due += pdue
               - grp_principal_due += pdue
               - num_loans_to_pay += 1 if pdue > 0
             %td.right-numeric.paid
-              = ppaid
+              = ppaid.to_currency
               - tot_principal_paid += ppaid
               - grp_principal_paid += ppaid
             %td.left-numeric.due
-              = idue
+              = idue.to_currency
               - tot_interest_due += idue
               - grp_interest_due += idue
             %td.right-numeric.paid
-              = ipaid
+              = ipaid.to_currency
               - tot_interest_paid += ipaid
               - grp_interest_paid += ipaid
             %td.left-numeric.due
-              = fee_due
+              = fee_due.to_currency
               - tot_fee_due += fee_due
               - grp_fee_due += fee_due
               - num_fees_to_pay += 1 if fee_due > 0
             %td.right-numeric.paid
-              = fee_paid
+              = fee_paid.to_currency
               - tot_fee_paid += fee_paid
               - grp_fee_paid += fee_paid
             %td.left-numeric.due
-              = (pdue + idue + fee_due)
+              = (pdue + idue + fee_due).to_currency
               - tot_total_due += (pdue + idue + fee_due)
               - grp_total_due += (pdue + idue + fee_due)
             %td.right-numeric.paid
-              = (ppaid + ipaid + fee_paid)
+              = (ppaid + ipaid + fee_paid).to_currency
               - tot_total_paid += (ppaid + ipaid + fee_paid)
               - grp_total_paid += (ppaid + ipaid + fee_paid)
         - if loan_row_count == 0 and not params[:filter]

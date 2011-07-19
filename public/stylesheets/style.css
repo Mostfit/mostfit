@@ -17,7 +17,7 @@ h2, h3, h4, h5, h6 {
     margin: 0.4em;
 }
 h1 {
-  margin: 10px 4px 20px 4px;
+  margin: 10px 4px 10px 4px;
 }
 h2 {
   margin: 16px;
@@ -144,7 +144,6 @@ h1.logo span{
 
 .graph{
   float: right;
-  margin-top: 0px;
 }
 .graph_page{
   float: left;
@@ -239,6 +238,23 @@ td.numeric {
   border-right: 1px solid #999;
   border-left: 1px solid #999;
 }
+
+
+table.loan td, table.loan th{
+  padding: 2px;
+}
+table.loan th.odd {
+  background: hsla(85,93%,85%,0.8);
+  font-weight: bold;
+  vertical-align: middle;
+}
+table.loan th.even {
+  background: hsla(85,93%,75%,0.8);
+  font-weight: bold;
+  vertical-align: middle;
+}
+
+
 table.narrow {
   width: 100%;
 }
@@ -1379,10 +1395,11 @@ table.clearform tr td.legend{
   width: 560px;
   padding: 7px; 
   border: solid 1px #cfcfcf;
-  /* -moz-box-shadow: 2px 2px 4px #c9c9c9; */
-  /* box-shadow: 2px 2px 4px #c9c9c9; */
+  /* -moz-box-shadow: 2px 2px 4px #c9c9c9; *\/ */
+  /* box-shadow: 2px 2px 4px #c9c9c9; *\/ */
   margin: 5px;
   font-size: 1.2em;
+  background: #efefef;
 } 
 
 #breadcrums {
@@ -1468,11 +1485,27 @@ table.clearform tr td.legend{
 .breadcrumb li a:hover { background: hsla(85,93%,25%,1); }
 .breadcrumb li a:hover:after { border-left-color: hsla(85,93%,25%,1) !important; }
 
-.applied { font-weight: bold; color: blue;}
-.approved { font-weight: bold; color: grey;}
-.outstanding { font-weight: bold; color: darkgreen;}
-.repaid { font-weight: bold; color: brown;}
-.arrears { font-weight: bold; color: red;}
-.written-off { font-weight: bold; color: black;}
-.preclosed { font-weight: bold; color: orange;}
+.container a.applied { font-weight: bold; color: blue;}
+.container a.approved { font-weight: bold; color: orange;}
+.container a.outstanding { font-weight: bold; color: darkgreen;}
+.container a.repaid { font-weight: bold; color: brown;}
+.container a.arrears { font-weight: bold; color: red;}
+.container a.written-off { font-weight: bold; color: black;}
+.container a.preclosed { font-weight: bold; color: grey;}
 
+ul.inline {
+  display: inline;
+}
+
+ul.inline li {
+  display: inline;
+  list-style: circle;
+}
+
+
+.depth-1 {
+  margin-left: 2em;
+}
+.depth-2 {
+  margin-left: 4em;
+}

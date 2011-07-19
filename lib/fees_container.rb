@@ -1,11 +1,12 @@
 module FeesContainer
   # levy fees on given object
-  def levy_fees(args = {})
+  def levy_fees(keep = true)
+    debugger
     @payable_models ||= Fee::PAYABLE.map{|m| [m[0], [m[1], m[2]]]}.to_hash
-    apfees = ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class.to_s)
-    apfees.destroy! if args.is_a?(Hash) and args[:override] # don't know why args is true if nothing is sent. data-mapper?
+    apfees = ApplicableFee.with_deleted{ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class.to_s)}
+    ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class.to_s).destroy unless keep
 
-    if self.is_a?(Loan) and (not apfees.empty?) 
+    if self.is_a?(Loan) and keep
       # if this loan has some applicable fees, then we only update the date, nothing else
       apfees.each do |af|
         method = @payable_models[af.fee.payable_on][1]
@@ -17,8 +18,9 @@ module FeesContainer
         af.save
         af
       end
-    else
+    elsif apfees.empty? || (not keep)
       Fee.all.select{|fee| @payable_models.key?(fee.payable_on)  and fee.is_applicable?(self)}.map{|fee|
+        debugger
         klass, payable_date_method = @payable_models[fee.payable_on]
         next unless payable_date_method
         next unless self.respond_to?(payable_date_method)
@@ -35,6 +37,13 @@ module FeesContainer
       }
     end
   end
+
+  def levy_fees_new
+    # don't ask!
+
+    self.levy_fees(false)
+  end
+
 
   # returns fees that are applied for the client
   def fees
@@ -91,7 +100,7 @@ module FeesContainer
   end
 
   def fees_paid?
-    total_fees_paid >= total_fees_due
+    total_fees_paid >= total_fees_applicable
   end
   
   # returns a hash of fee schedule which has keys as dates and values as {fee => amount}

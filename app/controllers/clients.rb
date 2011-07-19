@@ -114,6 +114,13 @@ class Clients < Application
       raise InternalServerError
     end
   end
+
+  def levy_fees(id)
+    @client = Client.get(id)
+    raise NotFound unless @client
+    @client.levy_fees(false)
+    redirect resource(@client) + "#misc", :message => {:notice => 'Fees levied'}
+  end
   
   def make_center_leader(id)
     @client = Client.get(id)

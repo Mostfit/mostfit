@@ -11,5 +11,11 @@ class Holiday
   def update_loan_history
     $holidays = Holiday.all.map{|h| [h.date, h]}.to_hash
     repository.adapter.execute("update loan_history set date='#{date.holiday_bump.strftime('%Y-%m-%d')}' where date='#{date.strftime('%Y-%m-%d')}'")
+    holiday = [date.day, date.month, date.strftime('%y')]
+    if $holidays_list.include?(holiday)
+      $holidays_list.delete(holiday)
+    else
+      $holidays_list << holiday 
+    end
   end
 end

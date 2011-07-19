@@ -1,0 +1,8 @@
+.container .applied { font-weight: bold; color: blue;}
+.container .approved { font-weight: bold; color: orange;}
+.container .outstanding { font-weight: bold; color: darkgreen;}
+.container .repaid { font-weight: bold; color: brown;}
+.container .arrears { font-weight: bold; color: red;}
+.container .written-off { font-weight: bold; color: black;}
+.container .preclosed { font-weight: bold; color: grey;}
+

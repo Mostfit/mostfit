@@ -45,8 +45,6 @@ class InsuranceProducts < Application
     @insurance_product = InsuranceProduct.get(id)
     raise NotFound unless @insurance_product
     fees = []
-    debugger
-
     @insurance_product.update_attributes(insurance_product)
     if params[:fees]
       params[:fees].keys.map do |k,v| 

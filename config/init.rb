@@ -60,6 +60,7 @@ Merb::BootLoader.before_app_loads do
     require "pdf/writer"
     require "pdf/simpletable"
     require("lib/pdfs/day_sheet.rb")
+    require("lib/pdfs/loan_schedule.rb")
     PDF_WRITER = true
   rescue LoadError
     PDF_WRITER = false
@@ -193,4 +194,6 @@ Merb::BootLoader.after_app_loads do
     } 
   rescue
   end
+  $holidays_list = []
+  Holiday.all.each{|h| $holidays_list << [h.date.day, h.date.month, h.date.strftime('%y')]}
 end

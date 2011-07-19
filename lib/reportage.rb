@@ -33,6 +33,7 @@ class Bucket < Hash
 
   def initialize(dates = {}, *args, &blk)
     set_dates(dates)
+    @_balances = {}
     super(*args, &blk)
   end
 
@@ -44,12 +45,16 @@ class Bucket < Hash
     rv = BucketResult.new
     self.keys.each{|b| rv[b.to_s] = {}}
     cols.map do |function|
-      dates = case method(function).arity
-              when 0; []
-              when 1; [@date]
-              when 2; [@date_from, @date_to]
-              end
-      self.send(function, *dates).each do |b,v| 
+      ds = []
+      case method(function).arity
+      when 0
+        ds = []
+      when 1
+        ds = [@date]
+      when 2
+        ds = [@date_from, @date_to]
+      end
+      self.send(function, *ds).each do |b,v| 
         rv[b.to_s] = rv[b.to_s].merge(function => v)
       end
     end
@@ -71,21 +76,74 @@ end
 
 class LoanBucket < Bucket
 
-
-  def balances(date)
-    return @_balances if @_balances
-    @balances = self.map{|bucket, ids| [bucket, LoanHistory.sum_outstanding_for_loans(date, ids)]}.to_hash
+  def balances(d, group_by = nil)
+    return @_balances[d] if @_balances[d]
+    @_balances[d] = self.map{|bucket, ids| 
+      ec = ids ? "l.id in (#{ids.join(',')})" : []
+      [bucket, LoanHistory.sum_outstanding_grouped_by(d, group_by, ec)]
+    }.to_hash
   end
-    
+
+  
+  
   def scheduled_outstanding_principal(date)
     self.map{|bucket, ids| [bucket, balances(date)[bucket][0].scheduled_outstanding_principal.to_f]}.to_hash
+  end
+
+  def scheduled_outstanding_total(date)
+    self.map{|bucket, ids| [bucket, balances(date)[bucket][0].scheduled_outstanding_total.to_f]}.to_hash
+  end
+
+  def actual_outstanding_total(date)
+    self.map{|bucket, ids| [bucket, balances(date)[bucket][0].actual_outstanding_total.to_f]}.to_hash
   end
 
   def actual_outstanding_principal(date)
     self.map{|bucket, ids| [bucket, balances(date)[bucket][0].actual_outstanding_principal.to_f]}.to_hash
   end
+  
+  def principal_received(from_date, to_date)
+    self.map{|bucket, ids| [bucket, Payment.all(:received_on => from_date..to_date, :type => :principal).aggregate(:amount.sum)]}.to_hash
+  end
 
+  def interest_received(from_date, to_date)
+    self.map{|bucket, ids| [bucket, Payment.all(:received_on => from_date..to_date, :type => :interest).aggregate(:amount.sum)]}.to_hash
+  end
+
+  def interest_received(from_date, to_date)
+    self.map{|bucket, ids| [bucket, balances(date)[bucket][0].principal_received.to_f]}.to_hash
+  end
+
+  def principal_expected_to_be_received(from_date, to_date)
+    from_buckets = actual_outstanding_principal(from_date)
+    to_buckets = scheduled_outstanding_principal(to_date)
+    xv = from_buckets.keys.map{|k|
+      [k,from_buckets[k] - to_buckets[k]]
+    }.to_hash
+    return xv
+  end
+
+
+  def interest_expected_to_be_received(from_date, to_date)
+    from_buckets = actual_outstanding_total(from_date)
+    to_buckets = scheduled_outstanding_total(to_date)
+    prin_expected = principal_expected_to_be_received(from_date, to_date)
+    xv = from_buckets.keys.map{|k|
+      [k,from_buckets[k] - to_buckets[k] - prin_expected[k]]
+    }.to_hash
+    return xv
+  end
+
+  def expected_disbursals(from_date, to_date)
+    self.map{|bucket, ids| Loan.all(:id => ids, :disbursal_date => nil, :approved_on.not => nil).aggregate(:amount_applied_for.sum, :amount_sanctioned.sum)}
+  end
+    
 end
+
+
+class LoanHistoryBucket < LoanBucket
+end
+
 
 module DataMapper
   
@@ -93,13 +151,19 @@ module DataMapper
   
   class Collection
     
-    def bucket_by(buckets = nil)
+    def bucket_by(buckets = nil, value_method = :id)
       result = Kernel.const_get("#{model.to_s}Bucket").new {|h, k| h[k] = []}
+      
+      if buckets == :nothing
+        rv = LoanBucket.new
+        rv["nothing"] = nil
+        return rv
+      end
 
       if buckets.is_a? Symbol
         # some properties might be lazily loaded, so first make sure they are
         # available, and then aggregate
-        all(:fields => [buckets, :id]).aggregate(buckets, :id).each do |k, v|
+        all(:fields => [buckets, value_method]).aggregate(buckets, value_method).each do |k, v|
           result[k] << v
         end
         return result

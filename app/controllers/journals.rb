@@ -99,42 +99,19 @@ class Journals < Application
     raise BadRequest unless @branch
 
     if params[:debit_accounts] and params[:credit_accounts]
-      #multiple debit and credit accounts
-      debit_accounts, credit_accounts  = {}, {}
-      
-      params[:debit_accounts].group_by{|x| x[:journal_type_id]}.each{|jid, debits|
-        debit_accounts[jid] ||= {}
-        debits.each{|debit|
-          debit_accounts[jid][Account.get(debit[:account_id])] ||= 0
-          debit_accounts[jid][Account.get(debit[:account_id])] += debit[:amount].to_i
-        }
-      }
-
-      params[:credit_accounts].group_by{|x| x[:journal_type_id]}.each{|jid, credits|
-        credit_accounts[jid] ||= {}
-        credits.each{|credit|
-          credit_accounts[jid][Account.get(credit[:account_id])] ||= 0
-          credit_accounts[jid][Account.get(credit[:account_id])] += credit[:amount].to_i
-        }
-      }
-
       # get the uniq journal types
-      journal_types = debit_accounts.keys
+      journal_types = params["debit_accounts"].keys
     else
       raise BadRequest
     end
 
     statuses, journals = [], []
 
-    journal_types.each{|journal_type|
-      # reject accounts where amounts are zero
-      debit_accounts[journal_type]  = debit_accounts[journal_type].reject{|k, v| v <= 0}
-      credit_accounts[journal_type] = credit_accounts[journal_type].reject{|k, v| v <= 0}
-
-      journal[:journal_type_id] = journal_type.to_i
+    journal_types.each{|jid|
+      journal[:journal_type_id] = jid.to_i
       journal[:currency] = Currency.first
-      unless debit_accounts[journal_type].empty? and credit_accounts[journal_type].empty?
-        status, journal_obj = Journal.create_transaction(journal, debit_accounts[journal_type], credit_accounts[journal_type])
+      unless params["debit_accounts"][jid].empty? and params["credit_accounts"][jid].empty?
+        status, journal_obj = Journal.create_transaction(journal, params["debit_accounts"][jid], params["credit_accounts"][jid])
         statuses.push(status)
         journals.push(journal_obj)
       end

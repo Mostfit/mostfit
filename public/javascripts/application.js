@@ -620,39 +620,45 @@ function fillComboBranches(){
 }
 
 function fillAccounts(){
-    $("#branch_selector").change(function(){
-	                             $.ajax({
-					         type: "GET",
-						 url: "/branches/accounts/"+$("#branch_selector").val(),
-						 success: function(data){
-						     $("#account_selector").html(data);
-					     }
-					 });
-	                         });
+    if($("#account_selector").length > 0){
+	$("#branch_selector").change(function(){
+					 $.ajax({
+					            type: "GET",
+						    url: "/branches/accounts/"+$("#branch_selector").val(),
+						    success: function(data){
+							$("#account_selector").html(data);
+						    }
+						});
+	                             });
+    }
 }
 
 function fillCashAccounts(){
-    $("#branch_selector").change(function(){
-	                             $.ajax({
-					         type: "GET",
-						 url: "/branches/cash_accounts/"+$("#branch_selector").val(),
-						 success: function(data){
-						     $("#cash_account_selector").html(data);
-					     }
-					 });
-	                        });
+    if($("#cash_account_selector").length > 0){
+	$("#branch_selector").change(function(){
+					 $.ajax({
+					            type: "GET",
+						    url: "/branches/cash_accounts/"+$("#branch_selector").val(),
+						    success: function(data){
+							$("#cash_account_selector").html(data);
+						    }
+						});
+	                             });
+    }
 }
 
 function fillBankAccounts(){
-    $("#branch_selector").change(function(){
-	                             $.ajax({
-					         type: "GET",
-						 url: "/branches/bank_accounts/"+$("#branch_selector").val(),
-						 success: function(data){
-						     $("#bank_account_selector").html(data);
-					     }
-					 });
-	                       });
+    if($("#bank_account_selector").length > 0){
+	$("#branch_selector").change(function(){
+					 $.ajax({
+					            type: "GET",
+						    url: "/branches/bank_accounts/"+$("#branch_selector").val(),
+						    success: function(data){
+							$("#bank_account_selector").html(data);
+						    }
+						});
+				     });	
+    }
 }
 
 function fillFundingLines(){
@@ -973,13 +979,32 @@ $(document).ready(function(){
 								   }
 
 							       });
+		      /*sample = function(select){
+			  val=$("#account_branch_id").val();
+			  val1=$("#account_account_type_id").val();
+			  $.ajax({
+				  url: "/accounts?branch_id="+val+"&account_type_id="+val1,
+				      success: function(data){$("#account_parent_id").html(data);}
+			      });
+		      }
+		      $("#account_account_type_id").live('change', sample);
+		      $("#account_branch_type_id").live('change', sample);*/
 		      $("#account_account_type_id").live('change', function(select){
-							     val=$("#account_account_type_id").val();
+							     val=$("#account_branch_id").val();
+							     val1=$("#account_account_type_id").val();
 							     $.ajax({
-									url: "/accounts?account_type_id="+val,
-									success: function(data){$("#account_parent_id").html(data);}
-								    });
-							 });
+								     url: "/accounts?branch_id="+val+"&account_type_id="+val1,
+									 success: function(data){$("#account_parent_id").html(data);}
+								 });
+			  });
+		      $("#account_branch_id").live('change', function(select){
+							     val=$("#account_branch_id").val();
+							     val1=$("#account_account_type_id").val();
+							     $.ajax({
+								     url: "/accounts?branch_id="+val+"&account_type_id="+val1,
+									 success: function(data){$("#account_parent_id").html(data);}
+								 });
+			  });
 		      attachReportingFormEvents("formdiv_1");
 		      attachRulesFormEvents("condition", 0);
 		      attachRulesFormEvents("condition", 1);
