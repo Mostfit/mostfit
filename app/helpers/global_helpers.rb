@@ -143,10 +143,10 @@ module Merb
         <input type='text' name="#{attrs[:name]}" id="#{attrs[:id]}" value="#{attrs[:date]}" size="#{attrs[:size]}" #{attrs[:nullable] ? "" : "readonly='true'"}>
         <script type="text/javascript">
           $(function(){
-            var holidays= #{Holiday.get_list.to_json};
+            var holidays= #{$holidays_list.to_json};
               function nonWorkingDays(date) {
                 for (var j = 0; j < holidays.length; j++) {
-                  if (date.getMonth() == holidays[j][1] - 1 && date.getDate() == holidays[j][0]) {
+                  if (date.getMonth() == holidays[j][1] - 1 && date.getDate() == holidays[j][0] && date.getYear() - 100 == holidays[j][2]) {
                     return [true, 'holiday_indicator'];
                   }
                 }
