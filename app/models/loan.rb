@@ -10,6 +10,7 @@ class Loan
   before :valid?,  :convert_blank_to_nil
   before :save,    :update_scheduled_maturity_date
   after  :save,    :update_history_caller  # also seems to do updates
+  after  :create, :levy_fees_new
   after  :save,    :levy_fees
   after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
