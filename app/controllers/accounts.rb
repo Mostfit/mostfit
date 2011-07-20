@@ -31,6 +31,9 @@ class Accounts < Application
       @branch = nil
     end
     @accounts = Account.tree((params[:branch_id] and not params[:branch_id].blank?) ? params[:branch_id].to_i : nil )
+    if params[:account_type_id] and (not params[:account_type_id].blank?)
+      @accounts = @accounts.delete(AccountType.get(params[:account_type_id])).to_hash
+    end
     template = request.xhr? ? 'accounts/select' : 'accounts/index'
     display @accounts, template, :layout => layout?
   end
