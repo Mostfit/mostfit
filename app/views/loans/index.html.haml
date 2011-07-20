@@ -41,7 +41,7 @@
       %tr
         %td At center
         %td
-          = link_to @center.name, resource(@branch, @center)
+          = link_to @client.center.name, resource(@client.center)
           == (of branch #{link_to @branch.name, resource(@branch)})
           %br/
           %span.greytext

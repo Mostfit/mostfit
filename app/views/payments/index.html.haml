@@ -1,6 +1,6 @@
 .shaded
   - if @loan and @loan.disbursal_date
-    .graph
+    .graph{:style => "position: relative; top: 60px"}
       = ofc2(550, 430, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
   
   = error_messages_for @payment
@@ -144,7 +144,7 @@
   
   
 .shaded
-  %div.tab_container
+  %div.tab_container.clearfix
     %ul.tabs
       %li#repayment_schedule Repayment Schedule
       %li#repayments_made Repayments made

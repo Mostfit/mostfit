@@ -12,6 +12,7 @@ class Loan
   after  :save,    :update_history_caller  # also seems to do updates
   after  :create, :levy_fees_new
   after  :save,    :levy_fees
+  before :save,    :update_loan_cache
   after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
   #  after  :destroy, :update_history
@@ -169,6 +170,30 @@ class Loan
   validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
   validates_with_method  :clients,                      :method => :check_client_sincerity
   validates_with_method  :insurance_policy,             :method => :check_insurance_policy    
+
+
+  def update_loan_cache(force = false)
+    t = Time.now
+    self.c_center_id = self.client.center.id if force
+    self.c_branch_id = self.client.center.branch.id if force
+    self.c_scheduled_maturity_date = scheduled_maturity_date
+    # avoid SQL calls
+    first_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}[0]
+    self.c_actual_first_payment_date = first_payment.received_on if first_payment
+    st = self.get_status
+    self.c_last_status = st
+    self.c_principal_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
+    self.c_interest_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
+    last_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}.reverse[0]
+    self.c_last_payment_received_on = last_payment.received_on if last_payment
+    self.c_maturity_date = c_last_payment_received_on if (STATUSES.index(st) > 5 and last_payment)
+    self.c_last_payment_id = last_payment.id if last_payment
+    puts Time.now - t
+    true
+  end
+
+
+  
 
   def self.display_name
     "Loan"
@@ -476,6 +501,7 @@ class Loan
       self.reload if payments.map{|p| p.received_on}.map{|d| installment_dates.include?(d)}.include?(false)
       update_history(true)  # update the history if we saved a payment
     end
+    update_loan_cache
     if payments.length > 0
       return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find_all{|p| p.type==:fees}]
     else
@@ -490,6 +516,7 @@ class Loan
     payment.deleted_by = user
     if payment.destroy
       update_history
+      update_loan_cache
       clear_cache
       return [true, payment]
     end

@@ -14,11 +14,12 @@ class DataAccessObserver
   
   def self.log(obj)
     f = File.open("log/#{obj.class}.log","a")
+    debugger
     begin
       if obj
         attributes = obj.attributes
         if @ributes
-          diff = @ributes.diff(attributes)
+          diff = @ributes.diff(attributes).reject{|x| x.to_s.match(/^c_/)} # reject the caching properties, defined by c_xxxx
           diff = diff.map{|k| 
             {k => [@ributes[k],attributes[k]]} if k != :updated_at and not (@ributes[k].nil? and attributes[k].class==String and attributes[k].blank?)
           }
@@ -26,7 +27,6 @@ class DataAccessObserver
         else
           diff = [attributes.select{|k, v| v and not v.blank? and not v==0}.to_hash]
         end
-
         if diff.length>0 and diff.find{|x| x.keys.include?(:discriminator)}
           index = diff.index(diff.find{|x| x.keys.include?(:discriminator)})
           diff[index][:discriminator] = diff[index][:discriminator].map{|x| x.to_s if x}

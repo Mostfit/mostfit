@@ -64,7 +64,9 @@ class Clients < Application
     @client = Client.get(id)
     raise NotFound unless @client
     disallow_updation_of_verified_clients
-    if @client.update_attributes(client)      
+    debugger
+    @client.update_attributes(client)      
+    if @client.errors.blank?
       if params[:tags]
         @client.tags = params[:tags].keys.map{|k| k.to_sym} 
       else
