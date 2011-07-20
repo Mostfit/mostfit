@@ -28,7 +28,7 @@
     %td
       Parent Account
     %td 
-      = select :parent_id, :collection => (@parent_accounts||[]).map{|x| [x.id, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account"
+      = select :parent_id, :collection => (@accounts||[]).map{|x| [x.id.to_s, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account", :selected => @account.parent_id
 
   %tr  
     %td

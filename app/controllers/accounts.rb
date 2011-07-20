@@ -54,7 +54,7 @@ class Accounts < Application
  
     if @account.account_type
       @branch = Branch.get(@account.branch_id) if @account.branch_id
-      @parent_accounts = (Account.all(:branch_id => (@branch ? @branch.id : nil) , :account_type => @account.account_type)-[@account])
+      @accounts = Account.tree(@account.branch_id || nil)
     end
     display @account, :layout => layout?
   end

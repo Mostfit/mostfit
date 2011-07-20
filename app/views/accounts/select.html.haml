@@ -1,4 +1,1 @@
-- @accounts.sort_by{|account_type, accounts| account_type.name}.each do |account_type, accounts|
-  - if accounts
-    - accounts.each do |account|
-      = show_accounts(account, 0, 'select')
+= show_accounts_selector(@accounts)

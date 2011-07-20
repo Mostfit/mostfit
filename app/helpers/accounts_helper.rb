@@ -34,9 +34,23 @@ module Merb
       if tag == 'ul'
         return ( account.branch_edge ? "<li>#{link_to(account.name, resource(account))}#{"<span class=\"branchName\">" + account.branch.name + '</span>' if account.branch}#{emit_closing ? '</li>' : ''}" : "")
       else
-        return (account.branch_edge ? "<option class='depth-#{depth}'>#{account.name} : #{account.branch.name if account.branch}</option>" : "")
+        prefix = (0..depth*2).map{|d| "&nbsp;"}.join
+        return (account.branch_edge ? "<option value='#{account.id}' class='depth-#{depth}'>#{prefix}#{account.name} : #{account.branch.name if account.branch}</option>" : "")
       end
     end
+
+    def show_accounts_selector(accounts)
+      rv = ""
+      accounts.sort_by{|account_type, accounts| account_type.name}.each do |account_type, as|
+        if as
+          as.each do |account|
+            rv += show_accounts(account, 0, 'select')
+          end
+        end
+      end
+      return rv
+    end
+
 
 
   end
