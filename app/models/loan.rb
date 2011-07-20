@@ -8,7 +8,6 @@ class Loan
 
   before :valid?,  :parse_dates
   before :valid?,  :convert_blank_to_nil
-  before :save,    :update_scheduled_maturity_date
   after  :save,    :update_history_caller  # also seems to do updates
   after  :create, :levy_fees_new
   after  :save,    :levy_fees
@@ -75,8 +74,6 @@ class Loan
 
   property :loan_utilization_id,                Integer, :lazy => true, :nullable => true
   property :under_claim_settlement,             Date, :nullable => true
-
-  property :_scheduled_maturity_date,           Date
 
   # Caching baby!
 
@@ -1057,9 +1054,6 @@ class Loan
     self.amount      ||= self.amount_applied_for
   end
 
-  def update_scheduled_maturity_date
-    self._scheduled_maturity_date = scheduled_maturity_date if @schedule
-  end
 
   # repayment styles
   def pay_prorata(total, received_on)

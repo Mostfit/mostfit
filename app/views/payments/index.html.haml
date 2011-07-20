@@ -187,8 +187,9 @@
                 %td{ :colspan => 6, :style => "text-align: center;" }
                   %span.greytext== today (#{Date.today})
           - first = false
-          %tr{ :class => cycle('odd','') }
-            %td &nbsp;
+          %tr{ :class => cycle('odd','even') }
+            %td.paid
+              = [i - 1,0].max
             %td
               = lh.date
             %td
