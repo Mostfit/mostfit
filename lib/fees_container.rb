@@ -1,23 +1,29 @@
 module FeesContainer
   # levy fees on given object
   def levy_fees(keep = true)
+    debugger if $debug
     @payable_models ||= Fee::PAYABLE.map{|m| [m[0], [m[1], m[2]]]}.to_hash
     apfees = ApplicableFee.with_deleted{ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class.to_s)}
-    ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class.to_s).destroy unless keep
+    cur_fees = ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class.to_s)
+    cur_fees.destroy unless keep
 
-    if self.is_a?(Loan) and keep
-      # if this loan has some applicable fees, then we only update the date, nothing else
-      apfees.each do |af|
+    if self.is_a?(Loan) and keep and (not cur_fees.empty?)
+      # if this loan has some applicable fees, then we update the date and the amount, nothing else
+      cur_fees.each do |af|
+        next unless @orig_attrs
+        debugger if $debug
         method = @payable_models[af.fee.payable_on][1]
         if method
           date = (self.send(method) if self.respond_to?(method))|| (self.send("scheduled_#{method}") if self.respond_to?("scheduled_#{method}"))
         end
         next unless date
         af.applicable_on = date
+        fee = af.fee
+        af.amount = fee.amount_for(self) if @orig_attrs and @orig_attrs.map{|x| x[0].name}.include?(:amount)
         af.save
         af
       end
-    elsif apfees.empty? || (not keep)
+    elsif cur_fees.empty? || (not keep)
       Fee.all.select{|fee| @payable_models.key?(fee.payable_on)  and fee.is_applicable?(self)}.map{|fee|
         klass, payable_date_method = @payable_models[fee.payable_on]
         next unless payable_date_method

@@ -1,4 +1,4 @@
-bclass AccountPaymentObserver
+class AccountPaymentObserver
   include DataMapper::Observer
   observe Payment
   

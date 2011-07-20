@@ -10,7 +10,7 @@ class Loan
   before :valid?,  :convert_blank_to_nil
   after  :save,    :update_history_caller  # also seems to do updates
   after  :create, :levy_fees_new
-  after  :save,    :levy_fees
+  before :save,    :levy_fees
   before :save,    :update_loan_cache
   after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
@@ -19,6 +19,7 @@ class Loan
   attr_accessor :history_disabled  # set to true to disable history writing by this object
   attr_accessor :interest_percentage
   attr_accessor :already_updated
+  attr_accessor :orig_attrs
 
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false, :index => true
@@ -170,6 +171,7 @@ class Loan
 
 
   def update_loan_cache(force = false)
+    @orig_attrs = self.original_attributes
     t = Time.now
     self.c_center_id = self.client.center.id if force
     self.c_branch_id = self.client.center.branch.id if force
@@ -185,12 +187,8 @@ class Loan
     self.c_last_payment_received_on = last_payment.received_on if last_payment
     self.c_maturity_date = c_last_payment_received_on if (STATUSES.index(st) > 5 and last_payment)
     self.c_last_payment_id = last_payment.id if last_payment
-    puts Time.now - t
     true
   end
-
-
-  
 
   def self.display_name
     "Loan"
@@ -485,8 +483,9 @@ class Loan
     Payment.transaction do |t|
       self.history_disabled=true
       payments.each{|p| p.override_create_observer = true}    
-
+      debugger
       if payments.collect{|payment| payment.save(context)}.include?(false)
+        debugger
         t.rollback
         return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
       end
@@ -499,6 +498,7 @@ class Loan
       update_history(true)  # update the history if we saved a payment
     end
     update_loan_cache
+    debugger
     if payments.length > 0
       return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find_all{|p| p.type==:fees}]
     else
