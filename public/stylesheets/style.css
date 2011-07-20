@@ -787,9 +787,10 @@ div.tab_container ul.tabs li{
     padding-right: 10px;
     background-color: #CDD3FE;
     position: relative;
-    top: 25px;
+    top: 23px;
     border: 1px solid #EDF3FE;
     font-weight: strong;
+    font-size: 1.3em;
 }
 
 div.tab_container div.inner {
@@ -859,14 +860,12 @@ form.form {
   margin-right: auto;
   width: 95%;
   padding: 0px;
-  border: solid 1px #ababab;
 
 }
 
 form h1 {
   font-family: "Lucida Grande", Helvetica, sans;
-   background-color: #CEFF85;
-  line-height: 2em;
+  line-height: 1.2em;
   margin: 0px;
   color: #3c3c3c;
   text-indent: 15px;
@@ -943,8 +942,13 @@ table.tall th {
   background-color: #FBF8F1;
   padding: 10px 10px 10px 40px;
   text-align: right;
-  font-size: 0.9em;
+  font-size: 0.8em;
 }
+
+table.tall input {
+  font-size: 0.8em;
+}
+  
 .floating_form{
     position: absolute;
     background: lightyellow;
@@ -1534,7 +1538,7 @@ table.tall input.disabled[type="submit"] {
 table.tall select {
   background: #fbfbfb;
   border: 1px solid #E5E5E5;
-  font-size: 1.1em;
+  font-size: 0.9em;
 }
 
 
@@ -1659,3 +1663,7 @@ a.cancelButton a.cancelButton:visited{
     }
 * html .clearfix             { zoom: 1; } /* IE6 */
 *:first-child+html .clearfix { zoom: 1; } /* IE7 */
+
+#sidetreecontrol {
+  font-size: 1.2em;
+}

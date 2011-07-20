@@ -20,11 +20,11 @@
     %li#reconcile
       Reconcile
   %div.tab
-    %form.floating{:style => "float: right"}
+    %h1 List of Account
+    %form.menu-strip{:style => "height: 30px;"}
       %b Show accounts of 
       = select :branch_id, :collection => @branches_list, :selected => (params[:branch_id] || 0).to_s
       = submit "GO", :class => "grey_button"
-    %h1 List of Account
     %div#sidetreecontrol
       %a{:href => "?#"}
         Collapse All
