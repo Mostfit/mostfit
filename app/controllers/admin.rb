@@ -5,7 +5,6 @@ class Admin < Application
   end
 
   def upload 
-    debugger
     erase = params.has_key?(:erase)
     if params[:file] and params[:file][:filename] and params[:file][:tempfile]
       file      = Upload.new(params[:file][:filename])

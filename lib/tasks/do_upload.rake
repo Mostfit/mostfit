@@ -6,7 +6,6 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'production')
 namespace :mostfit do
   desc "Create DB from excel sheet"
   task :upload, :directory, :filename, :erase do |task, args|
-    debugger
     require "log4r"
     #    include Log4r
     filename  = args[:filename]
