@@ -1,9 +1,14 @@
 %h1== Account: <i>#{@account.name}</i>
-%table.narrow.form{ :style => "width: 40%;" }
+%table.tall{ :style => "width: 40%;" }
   %tr
     %th GL Code : 
     %td
       = @account.gl_code
+  %tr
+    %th
+      Parent
+    %td
+      = @account.parent.name if @account.parent
   %tr
     %th Branch : 
     %td
