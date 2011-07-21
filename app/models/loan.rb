@@ -1125,7 +1125,6 @@ class Loan
   end
 
   def reallocate(style, user)
-    debugger
     return false unless REPAYMENT_STYLES.include?(style)
     _ps  = self.payments(:type => [:principal, :interest])
     ph = _ps.group_by{|p| p.received_on}.to_hash
@@ -1150,7 +1149,7 @@ class Loan
       ds = _ps.map{|p| p.deleted_by = user; p.deleted_at = _t; p.destroy}
       statii =  _pmts.map do |p| 
         p.created_at = _t
-        p.save
+        p.save(:reallocate)
       end
       debugger
       if statii.include?(false) or ds.include?(false)

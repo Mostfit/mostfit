@@ -41,7 +41,7 @@ class Payment
   validates_with_method :loan_or_client_present?,  :method => :loan_or_client_present?
   validates_with_method :only_take_payments_on_disbursed_loans?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :created_by,  :method => :created_by_active_user?, :if => Proc.new{|p| p.deleted_at == nil}
-  validates_with_method :received_by, :method => :received_by_active_staff_member?
+  validates_with_method :received_by, :method => :received_by_active_staff_member?, :when => [:default, :reallocate]
   validates_with_method :deleted_by,  :method => :properly_deleted?
   validates_with_method :deleted_at,  :method => :properly_deleted?
   validates_with_method :not_approved, :method => :not_approved, :on => [:destroy]
@@ -186,6 +186,8 @@ class Payment
     [false, "Payments can only be created if an active user is supplied"]
   end
   def received_by_active_staff_member?
+    debugger if $debug
+    return true if self.send(:current_validation_context) == :reallocate
     return true if deleted_at
     return true if received_by and received_by.active
     [false, "Receiving staff member is currently not active"]
