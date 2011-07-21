@@ -318,7 +318,6 @@ it "should change when loan amount changes" do
     @loan.fees_payable_on(@loan.applied_on).should == {@f2 => 111}
     
     @loan.fees_payable_on(@loan.scheduled_disbursal_date).should == {@f2 => 111, @f => 100}
-    debugger
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @loan.applied_by
     success, @fees = @loan.pay_fees(105, @loan.disbursal_date, @manager, User.first)

@@ -483,9 +483,7 @@ class Loan
     Payment.transaction do |t|
       self.history_disabled=true
       payments.each{|p| p.override_create_observer = true}    
-      debugger
       if payments.collect{|payment| payment.save(context)}.include?(false)
-        debugger
         t.rollback
         return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
       end
@@ -498,7 +496,6 @@ class Loan
       update_history(true)  # update the history if we saved a payment
     end
     update_loan_cache
-    debugger
     if payments.length > 0
       return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find_all{|p| p.type==:fees}]
     else
