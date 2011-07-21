@@ -3,7 +3,6 @@
 = error_messages_for @repayment_style
 
 = form_for(@repayment_style, :action => url(:repayment_styles) ) do
-  = partial :fields
-  = submit "Create", :class => "grey_button"
+  = partial :fields, :button_text => "Create"
 
 = link_to 'Back', url(:repayment_styles)

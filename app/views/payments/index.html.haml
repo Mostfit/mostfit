@@ -75,7 +75,7 @@
     %tr
       %th.even Product
       %td
-        = @loan.loan_product.name
+        = link_to @loan.loan_product.name, resource(@loan.loan_product)
         %br
         = @loan.discriminator.display_name
     %tr

@@ -36,7 +36,18 @@
       = select :rounding_style, :collection => [['round','round'],['floor','floor'],['ciel','ciel']], :prompt => "---"
   %tr
     %th
+      Force Max Installments?
+      %span.greytext
+        This will enusre that inspite of rounding the loan will not go beyond the specified number of installments
+    %td
+      = check_box :force_num_installments
+  %tr
+    %th
       Active
     %td
       = check_box :active
+  %tr
+    %td
+    %td{:style => 'text-align: center'}
+      = submit button_text
   

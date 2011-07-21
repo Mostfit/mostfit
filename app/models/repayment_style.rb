@@ -10,6 +10,7 @@ class RepaymentStyle
   property :round_interest_to, Integer
   property :active, Boolean
   property :rounding_style, String
+  property :force_num_installments, Boolean
 
   def to_s
     style

@@ -36,6 +36,7 @@ class RepaymentStyles < Application
   end
 
   def update(id, repayment_style)
+    debugger
     @repayment_style = RepaymentStyle.get(id)
     raise NotFound unless @repayment_style
     if @repayment_style.update(repayment_style) || @repayment_style.errors.blank?

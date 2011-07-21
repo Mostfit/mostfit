@@ -80,7 +80,11 @@ module Mostfit
         while balance > 0
           @_reducing_schedule[installment] = {}
           @_reducing_schedule[installment][:interest_payable]  = interest_calculation(balance)
-          @_reducing_schedule[installment][:principal_payable] = [(payment - @_reducing_schedule[installment][:interest_payable]).round(2), balance].min
+          if self.repayment_style.force_num_installments and installment == number_of_installments
+            @_reducing_schedule[installment][:principal_payable] = balance
+          else
+            @_reducing_schedule[installment][:principal_payable] = [(payment - @_reducing_schedule[installment][:interest_payable]).round(2), balance].min
+          end
           balance = balance - @_reducing_schedule[installment][:principal_payable]
           installment += 1
         end

@@ -4,8 +4,7 @@
 = error_messages_for @repayment_style
 
 = form_for(@repayment_style, :action => url(:repayment_style, @repayment_style)) do
-  = partial :fields
-  = submit "Update"
+  = partial :fields, :button_text => "Update"
 
 = link_to 'Show', url(:repayment_style, @repayment_style)
 |
