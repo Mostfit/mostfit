@@ -14,6 +14,7 @@ class Loan
   before :save,    :update_loan_cache
   after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
+
   #  after  :destroy, :update_history
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
