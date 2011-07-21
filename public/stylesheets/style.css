@@ -6,10 +6,11 @@ body {
     margin: 0px;
 }
 h1 {
-    color: #E88E02;
-    font-family: Helvetica;
-    font-size: 45px;
-    font-weight: 300;
+  color: #E68c00;
+  font-family: "Lucida Grande";
+  letter-spacing: -0.07em;
+  font-size: 45px;
+  font-weight: 300;
 }
 h2, h3, h4, h5, h6 {
     color: #444;

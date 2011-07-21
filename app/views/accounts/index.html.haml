@@ -20,8 +20,8 @@
     %li#reconcile
       Reconcile
   %div.tab
-    %h1 List of Account
-    %form.menu-strip{:style => "height: 30px;"}
+    %h1 Chart of Accounts
+    %form.menu-strip{:style => "height: 40px;"}
       %b Show accounts of 
       = select :branch_id, :collection => @branches_list, :selected => (params[:branch_id] || 0).to_s
       = submit "GO", :class => "grey_button"
