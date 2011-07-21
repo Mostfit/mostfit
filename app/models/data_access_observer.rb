@@ -1,10 +1,7 @@
 class DataAccessObserver
   include DataMapper::Observer
-<<<<<<< HEAD
   observe Branch, Center, Client, Loan, AccountingPeriod, User, Fee, LoanProduct
-=======
-  observe Branch, Center, Client, Loan, AccountingPeriod, User
->>>>>>> Added User audit view and showing user details
+
   
   def self.insert_session(id)
     @_session = ObjectSpace._id2ref(id)
