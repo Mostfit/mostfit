@@ -6,10 +6,11 @@ body {
     margin: 0px;
 }
 h1 {
-    color: #E88E02;
-    font-family: Helvetica;
-    font-size: 45px;
-    font-weight: 300;
+  color: #E68c00;
+  font-family: "Lucida Grande";
+  letter-spacing: -0.07em;
+  font-size: 45px;
+  font-weight: 300;
 }
 h2, h3, h4, h5, h6 {
     color: #444;
@@ -184,6 +185,12 @@ table.form{
   margin-bottom: 10px;
 }
 
+thead tr.shaded {
+  -moz-box-shadow: 0px 2px 2px #cfcfcf;
+  box-shadow: 0px 2px 2px #cfcfcf;
+  background: #CDD3FE;
+}
+
 table.form tr:hover {
   background: #efefef;
 }
@@ -263,8 +270,8 @@ table.narrow td, table.narrow th{
   margin-top: 4px;
 }
 table.narrow th{
-    background-color: #ccc;
-    color: black;   
+  color: black;   
+  padding-bottom: 4px;
 }
 table.narrow tr.group{
     text-align: center;
@@ -787,7 +794,7 @@ div.tab_container ul.tabs li{
     padding-right: 10px;
     background-color: #CDD3FE;
     position: relative;
-    top: 23px;
+    top: 24px;
     border: 1px solid #EDF3FE;
     font-weight: strong;
     font-size: 1.3em;
@@ -1259,6 +1266,12 @@ tr.odd td.due {
 tr.even td.due {
   background: #FFD1D8;
 }
+tr.odd td.overpaid {
+  background: #E0E3FE;
+}
+tr.even td.overpaid {
+  background: #F1F3FE;
+}
 
 
 th.left-numeric {
@@ -1609,13 +1622,13 @@ table.tall select {
     text-decoration:none;
     text-shadow:1px 1px 0px #689324;
 }
-.container input[type="submit"]  {
+.container input[type="submit"]:hover  {
     background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #8cb82b), color-stop(1, #9dce2c) );
     background:-moz-linear-gradient( center top, #8cb82b 5%, #9dce2c 100% );
     filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#8cb82b', endColorstr='#9dce2c');
     background-color:#8cb82b;
 }
-.container input[type="submit"]  {
+.container input[type="submit"]:active  {
     position:relative;
     top:1px;
 }
