@@ -24,6 +24,7 @@ class ApplicableFee
   
   validates_with_method :fee_id, :method => :should_not_be_duplicate, :if => Proc.new{|f| f.deleted_at == nil}
 
+
   def loan
     Loan.get(self.applicable_id) if applicable_type == 'Loan'
   end
