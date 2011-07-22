@@ -21,6 +21,7 @@ class ApplicableFees < Application
   def edit(id)
     raise NotPrivileged unless [:admin, :mis_manager].include?(session.user.role)
     only_provides :html
+    debugger
     @applicable_fee = ApplicableFee.get(id)
     raise NotFound unless @applicable_fee
     display @applicable_fee
