@@ -10,6 +10,30 @@ class NilClass
 end
 
 class Date
+  def display(style = nil, pattern = nil)
+    mfi = Mfi.first
+    style = style || mfi.prefered_date_style || DEFAULT_DATE_STYLE
+    if pattern
+      raise NotSupportedPattern if style == DEFAULT_DATE_STYLE and not PREFERED_DATE_PATTERNS.include?(pattern)
+      self.strftime(pattern)
+    else
+      case style
+      when "MEDIUM"
+        self.strftime(MEDIUM_DATE_PATTERN)
+      when "LONG"
+        self.strftime(LONG_DATE_PATTERN)
+      when "FULL"
+        self.strftime(FULL_DATE_PATTERN)
+      else
+        # default short style
+        pattern =  (mfi.prefered_date_pattern if not mfi.prefered_date_pattern.blank?) || DEFAULT_DATE_PATTERN
+        separator = (mfi.prefered_date_separator if not mfi.prefered_date_separator.blank?) || DEFAULT_DATE_SEPARATOR
+        pattern = pattern.to_s.gsub(FORMAT_REG_EXP, separator.to_s)
+        self.strftime(pattern)
+      end
+    end
+  end
+
   def inspect
     "<Date: #{self.to_s}>"
   end

@@ -101,6 +101,15 @@ class Loans < Application
   end
 
 
+  def levy_fees(id)
+    @loan = Loan.get(id)
+    raise NotFound unless @loan
+    @loan.levy_fees(false)
+    redirect url_for_loan(@loan) + "#misc", :message => {:notice => 'Fees levied'}
+  end
+
+
+
 
   def edit(id)
     only_provides :html
@@ -136,7 +145,7 @@ class Loans < Application
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' has been edited"})
       else
-        redirect resource(@branch, @center, @client), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
+        redirect url_for_loan(@loan), :message => {:notice => "Loan '#{@loan.id}' has been edited"}
       end
     else
       @loan.interest_rate*=100

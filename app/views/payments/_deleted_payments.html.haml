@@ -1,0 +1,50 @@
+/ %a{:href => "#", :onclick => "javascript:$('.checkbox').attr('checked',true); return false"} check all
+/ %a{:href => "#", :onclick => "javascript:$('.checkbox').attr('checked',false); return false"} uncheck all
+
+%table.narrow.form{ :width => '100%' }
+  %thead
+    %tr
+      %th
+      %th id
+      %th received on
+      %th received by
+      %th amount
+      %th type
+      %th created at
+      - if context == :deleted
+        %th deleted at
+      %th
+  %tbody
+  - @client = @payments.first.client unless @client
+  - @center = @client.center unless @center
+  - @branch = @center.branch unless @branch 
+  - cls = 'odd'
+  - gpmts = pmts.group_by{|p| p.deleted_at}.to_hash
+  - gpmts.keys.sort.each do |d|
+    - clss = cycle('odd','even')
+    - if gpmts[d].count > 1
+      %fieldset{:class => clss}
+        %table
+          - gpmts[d].each_with_index do |payment, pi|
+            %tr{ :class => clss }
+              %td &nbsp;
+              %td
+                = check_box :name => "payments[#{payment.id}]", :id => "payments[#{payment.id}]"
+                = payment.id
+              %td
+                %i= payment.received_on
+              %td
+                %b= link_to payment.received_by.name, resource(payment.received_by)
+              %td
+                %b= payment.amount.to_currency
+              %td
+                %b= payment.type.to_s
+              %td
+                = payment.created_at
+              %td
+                = payment.deleted_at
+              %td
+                - if payment.loan_id 
+                  restore
+
+%p= link_to 'new repayment >>', url_for_loan(@loan, 'payments/new'), :class => "button"

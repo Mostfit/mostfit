@@ -14,7 +14,7 @@ class AccountPaymentObserver
 
     journal[:journal_type_id]=  2
 
-    status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)
+    status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts, rules)
   end
 
   def self.single_voucher_entry(payments)
@@ -34,7 +34,7 @@ class AccountPaymentObserver
       journal[:comment] = "Payments: #{payments.map{|x| x.id}.join(',')}"
     end
     journal[:journal_type_id]=  rules.first.journal_type.id
-    status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)
+    status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts, rules)
   end
   
   def self.reverse_posting_entries(obj)
@@ -50,13 +50,12 @@ class AccountPaymentObserver
     # do not do accounting if no matching accounts
     return unless (credit_accounts and debit_accounts)
     return unless (credit_accounts.length>=0 and debit_accounts.length>=0)
-    
     journal = {:date => obj.received_on, :transaction_id => obj.id.to_s, :currency => Currency.first, :amount => obj.amount * -1}
     journal[:comment] = "Payment: #{obj.type} - #{obj.amount} - Reverse entry"
 
     #reverse the signs
-    debit_accounts.each{|account, amount|  debit_accounts[account] = amount * -1}     if debit_accounts.is_a?(Hash)
-    credit_accounts.each{|account, amount| credit_accounts[account] = amount * -1}    if credit_accounts.is_a?(Hash)
+    debit_accounts.each{|r, val|  val.each{|account, amount| val[account] = amount * -1}}     if debit_accounts.is_a?(Hash)
+    credit_accounts.each{|r, val| val.each{|account, amount| val[account] = amount * -1}}    if credit_accounts.is_a?(Hash)
     
     journal[:journal_type_id]=  rule.journal_type.id
     status, @journal = Journal.create_transaction(journal, debit_accounts, credit_accounts)

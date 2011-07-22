@@ -19,12 +19,12 @@ namespace :mostfit do
       puts "marking centers..."
       repository.adapter.execute(%Q{
           UPDATE loans 
-          SET center_id = (SELECT cn.id from centers cn, clients cs
+          SET c_center_id = (SELECT cn.id from centers cn, clients cs
              WHERE loans.client_id = cs.id AND cs.center_id = cn.id)})
       puts "marking branches..."
       repository.adapter.execute(%Q{
           UPDATE loans 
-          SET branch_id = 
+          SET c_branch_id = 
              (SELECT b.id from centers cn, clients cs, branches b
              WHERE loans.client_id = cs.id AND cs.center_id = cn.id AND cn.branch_id = b.id)})
       puts "marking actual_first_payment_date"

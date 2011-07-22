@@ -45,7 +45,7 @@
               %td.text
                 %b= link_to client.name, resource(@branch, @center, client)
               %td.number
-                = loan.id
+                = link_to loan.id, url_for_loan(loan)
               %td.number
                 - amt = loan.amount
                 %b= amt.to_currency

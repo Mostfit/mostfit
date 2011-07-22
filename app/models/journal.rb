@@ -52,50 +52,71 @@ class Journal
     return [false, "duplicate accounts"] if self.postings.map{|x| x.account_id}.compact.length != self.postings.length
     
     #amount mismatch
-    return [false, "debit and credit amount mismatch"] unless ((credit_account_postings.map{|x| x.amount * -1.0}.reduce(0){|s,x| s+=x})  ==  (debit_account_postings.map{|x| x.amount}.reduce(0){|s,x| s+=x}))
+    return [false, "debit and credit amount mismatch"] unless ((credit_account_postings.map{|x| x.amount * -1.0}.reduce(0){|s,x| s+=x}).round(2)  ==  (debit_account_postings.map{|x| x.amount}.reduce(0){|s,x| s+=x}).round(2))
     
     return [true, ""]
   end
 
-
-  def self.create_transaction(journal_params, debit_accounts, credit_accounts)
+  def self.create_transaction(journal_params, debit_accounts, credit_accounts, rules = nil)
     # debit and credit accounts can be either hashes or objects
     # In case of hashes, this is the structure
     # debit_accounts =>  {Account.get(1) => 100, Account.get(2) => 30}
     # credit_accounts => {Account.get(3) => 200}
     # Otherwise we have account object as credit_account & debit_account 
     # and we have a amount key in journal_params which has the amount
-    
+
     status = false
     journal = nil
 
     transaction do |t|
-     
+
       journal = Journal.create(:comment => journal_params[:comment], :date => journal_params[:date]||Date.today,
                                :transaction_id => journal_params[:transaction_id],
                                :journal_type_id => journal_params[:journal_type_id],
                                :uuid => UUID.generate)
       
-      amount = journal_params.key?(:amount) ? journal_params[:amount].to_i : nil
+      amount = journal_params.key?(:amount) ? journal_params[:amount].to_f : nil
 
       #debit entries
       # when a voucher is created manually, debit_accounts and credit_accounts are not hasahes.
       # TODO: fix this
-      if debit_accounts.is_a?(Hash)
+      if debit_accounts.is_a?(Hash) and debit_accounts.values.first.is_a?(Hash)  # for EOD Entries
+        debit_accounts.each{|rule_id, account_amount|
+          rule = RuleBook.get(rule_id)
+          account_amount.each{|acc, amt|
+            debit_amount = amt.to_f
+            debit_account = Account.get(acc.to_i)
+            next if debit_amount == 0
+            Posting.create(:amount => (debit_amount||amount) * -1, :journal_id => journal.id, :account => debit_account, :currency => journal_params[:currency], :fee_id => rule.fee_id, :action => rule.action)
+          }
+        }
+      elsif debit_accounts.is_a?(Hash)  # for entries of the form {Account => amount}
         debit_accounts.each{|debit_account, debit_amount|
-          Posting.create(:amount => (debit_amount||amount) * -1, :journal_id => journal.id, :account => debit_account, :currency => journal_params[:currency])
+          Posting.create(:amount => (debit_amount||amount) * -1, :journal_id => journal.id, :account => debit_account, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
         }
       else
-        Posting.create(:amount => amount * -1, :journal_id => journal.id, :account => debit_accounts, :currency => journal_params[:currency])
+        Posting.create(:amount => amount * -1, :journal_id => journal.id, :account => debit_accounts, :currency => journal_params[:currency], :fee_id => rules.first.fee_id, :action => rules.first.action)
       end
       
+
       #credit entries
-      if credit_accounts.is_a?(Hash)
+      if credit_accounts.is_a?(Hash) and credit_accounts.values.first.is_a?(Hash) # for EOD Entries
+        credit_accounts.each{|rule_id, account_amount|
+          rule = RuleBook.get(rule_id)
+          account_amount.each{|acc, amt|
+            credit_amount = amt.to_f
+            credit_account = Account.get(acc.to_i)
+            next if credit_amount == 0
+            Posting.create(:amount => (credit_amount||amount), :journal_id => journal.id, :account => credit_account, :currency => journal_params[:currency], :fee_id => rule.fee_id, :action => rule.action)
+          }
+        }
+      elsif credit_accounts.is_a?(Hash) # for entries of the form {Account => amount}
         credit_accounts.each{|credit_account, credit_amount|
-          Posting.create(:amount => (credit_amount||amount), :journal_id => journal.id, :account => credit_account, :currency => journal_params[:currency])
+          Posting.create(:amount => (credit_amount||amount), :journal_id => journal.id, :account => credit_account, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
         }
       else
-        Posting.create(:amount => amount, :journal_id => journal.id, :account => credit_accounts, :currency => journal_params[:currency])
+
+        Posting.create(:amount => amount, :journal_id => journal.id, :account => credit_accounts, :currency => journal_params[:currency], :fee_id => rules.first.fee_id, :action => rules.first.action)
       end
       
       # Rollback in case of both accounts being the same      

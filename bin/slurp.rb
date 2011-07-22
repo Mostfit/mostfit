@@ -25,4 +25,11 @@ choice = $stdin.gets.chomp.downcase
 system('./bin/dump.rb') if choice == 'y'
 
 # now load the db
-fail "Failed to load database dump." unless system("mysql -p -u root #{db_name} < #{sql_filename}")
+if `pv -V`.empty?
+  puts "no pv...sorry. continuing without progress bar"
+  fail "Failed to load database dump." unless system("mysql -p -u root #{db_name} < #{sql_filename}")
+else
+  cmd = "pv #{sql_filename} | mysql -phatstars -u root #{db_name}"
+  puts "using #{cmd}"
+  fail "Failed to load database dump." unless system(cmd)
+end

@@ -1,51 +1,49 @@
-%table
+%table.tall.shaded
   %tr
-    %td
+    %th
       Account Type
     %td
-      =select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
+      = select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
   %tr
-    %td
+    %th
       Account Category (if applicable)
     %td
       = select(:account_category, :collection => [[:Cash, "Cash"], [:Bank, "Bank"]] , :prompt => "Select Account Category")
   %tr
-    %td
+    %th
       Asset Class
     %td
       = select(:asset_class, :collection => [ASSET_CLASSES, EQUITY].flatten, :prompt => ASSET_CLASS_NOT_CHOSEN)
   %tr
-    %td
+    %th
       Income Head
     %td
       = select(:income_head, :collection => INCOME_HEADS, :prompt => INCOME_HEAD_NOT_CHOSEN)
   %tr 
-    %td
+    %th
       Branch
     %td
-      =select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
+      = select :branch_id, :collection => @branches_list, :prompt => "Select Branch"
   %tr
-    %td
+    %th
       Parent Account
     %td 
-      =select :parent_id, :collection => (@parent_accounts||[]).map{|x| [x.id, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account"
+      = select :parent_id, :collection => (@accounts||[]).map{|x| [x.id.to_s, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account", :selected => @account.parent_id
 
   %tr  
-    %td
+    %th
       Name
     %td
-      =text_field :name
+      = text_field :name
   %tr
-    %td
+    %th
       GL Code
     %td
-      =text_field :gl_code
+      = text_field :gl_code
   %tr
-    %td 
+    %th 
       Opening Balance
     %td
-      =text_field :opening_balance
-      /=radio_button :gl_code, :choose => ["yes", "no"] 
-      /THIS RADIO BUTTON NEEDS TO BE FIXED
-    %td
-      =date_select_for @account, :opening_balance_on_date 
+      = text_field :opening_balance
+      on
+      = date_select_for @account, :opening_balance_on_date 

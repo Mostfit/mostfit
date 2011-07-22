@@ -44,6 +44,11 @@ class Exceptions < Merb::Controller
     end
   end
 
+  def not_supported_pattern
+    render :status => 403
+  end
+
+
   def not_authorized
     return "Not privileged" if request.xhr?
     render :status => 403
@@ -78,3 +83,4 @@ end
 class NotPrivileged <  Merb::ControllerExceptions::Unauthorized; end
 class NotChangeable <  Merb::ControllerExceptions::Unauthorized; end
 class SessionExpired < Merb::ControllerExceptions::Unauthorized; end
+class NotSupportedPattern < Merb::ControllerExceptions::Unauthorized; end

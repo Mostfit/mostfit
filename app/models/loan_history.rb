@@ -45,7 +45,7 @@ class LoanHistory
   
   # Provides outstanding amount of loans given as ids on a particular date
   def self.sum_outstanding_for_loans(date, loan_ids)
-    loan_ids = loan_ids.length > 0 ? loan_ids.join(', ') : "NULL"
+    loan_ids = loan_ids ? (loan_ids.length > 0 ? loan_ids.join(', ') : "NULL") : nil
     repository.adapter.query(%Q{
       SELECT
         SUM(scheduled_outstanding_principal) AS scheduled_outstanding_principal,
@@ -54,7 +54,7 @@ class LoanHistory
         SUM(actual_outstanding_total)        AS actual_outstanding_total
       FROM
       (select scheduled_outstanding_principal,scheduled_outstanding_total, actual_outstanding_principal, actual_outstanding_total from
-        (select loan_id, max(date) as date from loan_history where date <= '#{date.strftime('%Y-%m-%d')}' and loan_id in (#{loan_ids}) and status in (5,6,7,8) group by loan_id) as dt, 
+        (select loan_id, max(date) as date from loan_history where date <= '#{date.strftime('%Y-%m-%d')}' #{ loan_ids.nil? ? "" : "and loan_id in (#{loan_ids})"} group by loan_id having max(status) in (5,6)) as dt, 
         loan_history lh
       where lh.loan_id = dt.loan_id and lh.date = dt.date) as dt1;})
   end
@@ -725,6 +725,7 @@ class LoanHistory
   
   # gives back group by clause for SQL GROUP BY
   def self.get_group_by(group_by)
+    return "" unless group_by
     group_by = get_columns(group_by)
     group_by ? "GROUP BY #{group_by.gsub("date_id", "date").gsub("lh.staff_member_id", "l.disbursed_by_staff_id")}" : ""
   end
@@ -756,7 +757,7 @@ class LoanHistory
     elsif group_by.class==Array
       group_by = group_by.map{|x| get_columns(x)}.join(", ")
     else
-      "1"
+      group_by = "1"
     end
     return group_by
   end

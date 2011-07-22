@@ -22,7 +22,8 @@ class ApplicableFee
   belongs_to :client,           'Client',          :child_key => [:applicable_id]
   belongs_to :insurance_policy, 'InsurancePolicy', :child_key => [:applicable_id]
   
-  validates_with_method :fee_id, :method => :should_not_be_duplicate
+  validates_with_method :fee_id, :method => :should_not_be_duplicate, :if => Proc.new{|f| f.deleted_at == nil}
+
 
   def loan
     Loan.get(self.applicable_id) if applicable_type == 'Loan'

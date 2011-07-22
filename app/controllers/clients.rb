@@ -64,7 +64,8 @@ class Clients < Application
     @client = Client.get(id)
     raise NotFound unless @client
     disallow_updation_of_verified_clients
-    if @client.update_attributes(client)      
+    @client.update_attributes(client)      
+    if @client.errors.blank?
       if params[:tags]
         @client.tags = params[:tags].keys.map{|k| k.to_sym} 
       else
@@ -113,6 +114,13 @@ class Clients < Application
     else
       raise InternalServerError
     end
+  end
+
+  def levy_fees(id)
+    @client = Client.get(id)
+    raise NotFound unless @client
+    @client.levy_fees(false)
+    redirect resource(@client) + "#misc", :message => {:notice => 'Fees levied'}
   end
   
   def make_center_leader(id)

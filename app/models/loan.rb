@@ -8,16 +8,19 @@ class Loan
 
   before :valid?,  :parse_dates
   before :valid?,  :convert_blank_to_nil
-  before :save,    :update_scheduled_maturity_date
   after  :save,    :update_history_caller  # also seems to do updates
-  after  :save,    :levy_fees
+  after  :create,  :levy_fees_new          # we need a separate one for create for a variety of reasons to  do with overwriting old fees
+  before :save,    :levy_fees
+  before :save,    :update_loan_cache
   after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
+
   #  after  :destroy, :update_history
 
   attr_accessor :history_disabled  # set to true to disable history writing by this object
   attr_accessor :interest_percentage
   attr_accessor :already_updated
+  attr_accessor :orig_attrs
 
   property :id,                             Serial
   property :discriminator,                  Discriminator, :nullable => false, :index => true
@@ -166,6 +169,27 @@ class Loan
   validates_with_method  :number_of_installments,       :method => :is_valid_loan_product_number_of_installments
   validates_with_method  :clients,                      :method => :check_client_sincerity
   validates_with_method  :insurance_policy,             :method => :check_insurance_policy    
+
+
+  def update_loan_cache(force = false)
+    @orig_attrs = self.original_attributes
+    t = Time.now
+    self.c_center_id = self.client.center.id if force
+    self.c_branch_id = self.client.center.branch.id if force
+    self.c_scheduled_maturity_date = scheduled_maturity_date
+    # avoid SQL calls
+    first_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}[0]
+    self.c_actual_first_payment_date = first_payment.received_on if first_payment
+    st = self.get_status
+    self.c_last_status = st
+    self.c_principal_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
+    self.c_interest_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
+    last_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}.reverse[0]
+    self.c_last_payment_received_on = last_payment.received_on if last_payment
+    self.c_maturity_date = c_last_payment_received_on if (STATUSES.index(st) > 5 and last_payment)
+    self.c_last_payment_id = last_payment.id if last_payment
+    true
+  end
 
   def self.display_name
     "Loan"
@@ -455,25 +479,26 @@ class Loan
     payments             
   end
 
-  def make_payments(payments, context = :default, defer_update = :false)
+  def make_payments(payments, context = :default, defer_update = false)
+    return [false, nil, nil, nil] if payments.empty?
     Payment.transaction do |t|
       self.history_disabled=true
       payments.each{|p| p.override_create_observer = true}    
-
       if payments.collect{|payment| payment.save(context)}.include?(false)
         t.rollback
-        return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees},]        
+        return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
       end
       AccountPaymentObserver.single_voucher_entry(payments)
     end
-
     unless defer_update #i.e. bulk updating loans
       self.history_disabled=false
       @already_updated=false
+      self.reload if payments.map{|p| p.received_on}.map{|d| installment_dates.include?(d)}.include?(false)
       update_history(true)  # update the history if we saved a payment
     end
+    update_loan_cache
     if payments.length > 0
-      return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
+      return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find_all{|p| p.type==:fees}]
     else
       return [false, nil, nil, nil]
     end
@@ -486,14 +511,15 @@ class Loan
     payment.deleted_by = user
     if payment.destroy
       update_history
+      update_loan_cache
       clear_cache
-      return true
+      return [true, payment]
     end
-    false
+    [false, payment]
   end
 
   def get_fee_payments(amount, date, received_by, created_by)
-    @fees = []
+    fees = []
     fp = fees_payable_on(date)
     fs = fee_schedule
     pay_order = fs.keys.sort.map{|d| fs[d].keys}.flatten.uniq
@@ -503,18 +529,23 @@ class Loan
                         :received_by => received_by, :created_by => created_by, :client => client, :loan => self)
         amount -= p.amount
         fp[k]  -= p.amount
-        @fees << p
+        fees << p if p.amount > 0
       end
     end
-    @fees
+    fees
   end
     
 
   def pay_fees(amount, date, received_by, created_by)
-    status = true
-    @fees = get_fee_payments(amount, date, received_by, created_by)
-    @fees.map{|f| f.save}
-    [status, @fees]
+    pmts_to_make = get_fee_payments(amount, date, received_by, created_by)
+    if pmts_to_make.empty?
+      @fee = Payment.new
+      @fee.errors.add(:fee_error,"Payment cannot be made because no Fee-Repayment is pending")
+      @fees = [@fee]
+    else
+      success, @prin, @int, @fees = make_payments(pmts_to_make)
+    end
+    return success, @fees
   end
   # LOAN INFO FUNCTIONS - CALCULATIONS
 
@@ -821,6 +852,7 @@ class Loan
                                                           # considerably by passing total_received, i.e. from history_for
     #return @status if @status
     date = Date.parse(date)      if date.is_a? String
+
     return :applied_in_future    if applied_on.holiday_bump > date  # non existant
     return :pending_approval     if applied_on.holiday_bump <= date and
                                  not (approved_on and approved_on.holiday_bump <= date) and
@@ -1020,9 +1052,6 @@ class Loan
     self.amount      ||= self.amount_applied_for
   end
 
-  def update_scheduled_maturity_date
-    self._scheduled_maturity_date = scheduled_maturity_date if @schedule
-  end
 
   # repayment styles
   def pay_prorata(total, received_on)
@@ -1058,7 +1087,8 @@ class Loan
       else
         keys.each_with_index do |k,i|
           if keys[[i+1,keys.size - 1].min] > date
-            rv = (column == :all ? cache[k] : cache[k][column])
+            # http://thingsaaronmade.com/blog/ruby-shallow-copy-surprise.html
+            rv = (column == :all ? Marshal.load(Marshal.dump(cache[k])) : cache[k][column])
             break
           end
         end
@@ -1315,5 +1345,41 @@ class EquatedWeeklyRounded < Loan
       reducing_schedule[number][:interest_payable]
     end
     return reducing_schedule[number][:interest_payable]
+  end
+
+  def equated_payment
+    payment            = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
+    rnd = loan_product.rounding || 1
+    (payment / rnd).send(loan_product.rounding_style) * rnd
+  end    
+  
+private
+  def reducing_schedule
+    return @reducing_schedule if @reducing_schedule
+    @reducing_schedule = {}    
+    balance = amount
+    actual_payment = equated_payment
+    1.upto(number_of_installments){|installment|
+      @reducing_schedule[installment] = {}
+      @reducing_schedule[installment][:interest_payable]  = ((balance * interest_rate) / get_divider)
+      @reducing_schedule[installment][:principal_payable] = [(actual_payment - @reducing_schedule[installment][:interest_payable]), balance].min
+      balance = balance - @reducing_schedule[installment][:principal_payable]
+    }
+    return @reducing_schedule
+  end
+  
+  def get_divider
+    case installment_frequency
+    when :weekly
+      52
+    when :biweekly
+      26
+    when :fortnightly
+      26
+    when :monthly
+      12
+    when :daily
+      365
+    end    
   end
 end

@@ -3,7 +3,7 @@ class RuleBook
   before :save, :convert_blank_to_nil
   ACTIONS = [
              'principal', 'interest', 'fees', 'disbursement', 'advance_principal', 
-             'advance_interest', 'advance_principal_adjusted', 'advance_interest_adjusted'
+             'advance_interest', 'advance_principal_adjusted', 'advance_interest_adjusted', 'journal'
             ]
 
   property :id,     Serial
@@ -51,7 +51,7 @@ class RuleBook
     # TODO: Needs a re-write, makes too many assumptions, also locating the appropriate rule still does not take into account
     # the validity of rule by date introduced a while back
 
-     if obj.is_a? Array
+    if obj.is_a? Array
       # In case of objects being passed in a set then we give out hashes of credit and debit accounts with values being amount and keys being acocunt
       client = obj.first.client_id > 0 ? obj.first.client : obj.first.loan.client
       branch  = client.center.branch
@@ -65,27 +65,28 @@ class RuleBook
                  first(:action => p.type, :branch => branch, :active => true) || first(:action => p.type, :branch => nil, :active => true)
                end
         rule.credit_account_rules.each{|car|
-          credit_accounts[car.credit_account] ||= 0
-          credit_accounts[car.credit_account] += (p.amount * (car.percentage)/100)
+          credit_accounts[rule.id] ||= {}
+          credit_accounts[rule.id][car.credit_account.id] ||= 0
+          credit_accounts[rule.id][car.credit_account.id] += (p.amount * (car.percentage)/100).round(2)
         }
 
         rule.debit_account_rules.each{|dar|
-          debit_accounts[dar.debit_account] ||= 0
-          debit_accounts[dar.debit_account] += (p.amount * (dar.percentage)/100)
+          debit_accounts[rule.id] ||= {}
+          debit_accounts[rule.id][dar.debit_account.id] ||= 0
+          debit_accounts[rule.id][dar.debit_account.id] += (p.amount * (dar.percentage)/100).round(2)
         }
         rules.push(rule)
       }
       return [credit_accounts, debit_accounts, rules]
     end
 
-    if obj.class==Payment
+    if obj.is_a? Payment
       transaction_type = obj.type
       client = obj.client_id > 0 ? obj.client : obj.loan.client
       branch  = client.center.branch
       fee     = obj.fee
       date = obj.received_on
-      #TODO:hack alert! Write it better
-    elsif obj.class==Loan or obj.class.superclass==Loan or obj.class.superclass.superclass==Loan
+    elsif obj.is_a? Loan
       transaction_type = :disbursement
       branch  = obj.client.center.branch
       date = obj.disbursal_date
@@ -101,13 +102,15 @@ class RuleBook
 
     credit_accounts, debit_accounts  = {}, {}
     rule.credit_account_rules.each{|car|
-      credit_accounts[car.credit_account] ||= 0
-      credit_accounts[car.credit_account] += (obj.amount * (car.percentage)/100)
+      credit_accounts[rule.id] ||= {}
+      credit_accounts[rule.id][car.credit_account.id] ||= 0
+      credit_accounts[rule.id][car.credit_account.id] += (obj.amount * (car.percentage)/100).round(2)
     }
 
     rule.debit_account_rules.each{|dar|        
-      debit_accounts[dar.debit_account] ||= 0
-      debit_accounts[dar.debit_account] += (obj.amount * (dar.percentage)/100)
+      debit_accounts[rule.id] ||= {}
+      debit_accounts[rule.id][dar.debit_account.id] ||= 0
+      debit_accounts[rule.id][dar.debit_account.id] += (obj.amount * (dar.percentage)/100).round(2)
     }    
     [credit_accounts, debit_accounts, rule]
   end
@@ -131,8 +134,8 @@ class RuleBook
   end
 
   def journals(date)
-    ids = (Posting.all("journal.date" => date, :amount.lt => 0,
-                       :account => self.debit_accounts).aggregate(:journal_id) & Posting.all("journal.date" => date, :amount.gt => 0, 
+    ids = (Posting.all("journal.date" => date,
+                       :account => self.debit_accounts).aggregate(:journal_id) & Posting.all("journal.date" => date,
                                                                                              :account => self.credit_accounts).aggregate(:journal_id))
     if ids.length > 0
       Journal.all(:id => ids)
@@ -165,12 +168,20 @@ class RuleBook
   #  it will deactivate old rule after creation of new rule for same action like disbursment, interest, fee or principal 
 
   def cannot_overlap
-    if self.new?
-      overlaps = RuleBook.all(:branch_id => branch_id, :action => action, :journal_type_id => self.journal_type_id, :to_date.lte => self.to_date, :to_date.gte => self.from_date)
-      overlaps = RuleBook.all(:branch_id => branch_id, :action => action, :journal_type_id => self.journal_type_id, :from_date.gte => self.from_date, :from_date.lte => self.to_date) if overlaps.empty?
-      return true if overlaps.empty?
-      return [false, "You rule overlaps with an existing rule #{overlaps.first.name}"]
+    unless self.new?
+      @changed_attr_with_original_val = self.original_attributes.map{|k,v| {k.name => (k.lazy? ? obj.send(k.name) : v)}}.inject({}){|s,x| s+=x}
+      return true unless @changed_attr_with_original_val.keys.include?(:from_date) or @changed_attr_with_original_val.keys.include?(:to_date)
     end
+    
+    overlaps = RuleBook.all(:branch_id => branch_id, :action => action, :journal_type_id => self.journal_type_id, :fee_id => fee_id, :to_date.lte => self.to_date, :to_date.gte => self.from_date)
+    overlaps = RuleBook.all(:branch_id => branch_id, :action => action, :journal_type_id => self.journal_type_id, :fee_id => fee_id, :from_date.gte => self.from_date, :from_date.lte => self.to_date) if overlaps.empty?
+
+    if self.new?
+      return true if overlaps.empty?
+    else
+      return true if overlaps.count <= 1 #because it certainly gonna check with itself so overlaps inlcudes self
+    end
+    return [false, "Rule overlaps with an existing rule #{overlaps.first.name}"]
   end
 
   def expire_old_rule
