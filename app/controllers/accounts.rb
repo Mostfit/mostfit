@@ -124,8 +124,10 @@ class Accounts < Application
 
   def duplicate
     unless params[:branch_id].blank?
+      debugger
       @branch = Branch.get(params[:branch_id])
-      raise NotFound unless @branch
+      raise NotFound unless (@branch or params[:branch_id] == "0")
+      params[:branch_id] = nil if params[:branch_id] == "0"
       @accounts = Account.all(:branch_id => params[:branch_id])
     end
     render :layout => layout?
@@ -152,6 +154,7 @@ class Accounts < Application
   end
 
   def bulk_create_for(branch, accounts)
+    debugger
     errors = []
     accounts.each{|a|
       new_account = Account.new(a)

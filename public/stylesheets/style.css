@@ -1680,3 +1680,15 @@ a.cancelButton a.cancelButton:visited{
 #sidetreecontrol {
   font-size: 1.2em;
 }
+
+option.depth-1 {
+  padding-left: 3em;
+}
+
+option.depth-2 {
+  padding-left: 6em;
+}
+
+option.depth-3 {
+  padding-left: 9em;
+}
