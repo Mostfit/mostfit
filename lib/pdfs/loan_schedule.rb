@@ -38,7 +38,7 @@ module Pdf
       table.data = []
       loan_history.each_with_index do |lh, i|
         scheduled_principal = i > 0 ? (loan_history[i-1].scheduled_outstanding_principal - lh.scheduled_outstanding_principal) : 0
-        scheduled_interest =  i > 0 ? loan_history[i-1].scheduled_outstanding_total - lh.scheduled_outstanding_total - scheduled_principal : 0
+        scheduled_interest =  i > 0 ? (loan_history[i-1].scheduled_outstanding_total - lh.scheduled_outstanding_total - scheduled_principal) : 0
         table.data.push({"Date Due" => lh.date, "Scheduled Balance" => lh.scheduled_outstanding_principal.to_currency, 
                           "Scheduled Principal" => scheduled_principal.to_currency,
                           "Scheduled Interest" => scheduled_interest.to_currency, 
