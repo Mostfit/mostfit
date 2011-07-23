@@ -10,6 +10,7 @@ module Mostfit
         d = received_on
         total = total.to_f
         while used < total
+          debugger
           prin += scheduled_principal_for_installment(installment_for_date(d)).round(2)
           int  += scheduled_interest_for_installment(installment_for_date(d)).round(2)
           used  = (prin + int)
@@ -20,6 +21,9 @@ module Mostfit
         [interest, principal]
       end
 
+      def pay_normal
+        
+      end
 
       def scheduled_principal_for_installment(number)
         raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
@@ -63,13 +67,10 @@ module Mostfit
         interest  = total * int/(prin + int)
         principal = total * prin/(prin + int)
         [interest, principal]
-
       end
 
-      def interest_calculation(balance)
-        ((balance * interest_rate) / get_divider).round(2).round_to_nearest(self.repayment_style.round_interest_to, self.repayment_style.rounding_style)
-      end
-
+        
+        
 
       def reducing_schedule
         return @_reducing_schedule if @_reducing_schedule

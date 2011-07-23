@@ -463,7 +463,8 @@ class Loan
         total_fees_due_on_date = total_fees_payable_on(received_on)
         fees_paid    = [total, total_fees_due_on_date].min
         total        = input - fees_paid
-        interest_due = [(-interest_overpaid_on(received_on)), 0].max
+        curr_bal ||= actual_outstanding_principal_on(d)
+        interest_due = interest_calculation(curr_bal)         
         interest     = [interest_due, total].min  # never more than total
         principal    = total - interest
       elsif style == PRORATA_REPAYMENT_STYLE #does not pay fees
@@ -1139,6 +1140,21 @@ class Loan
     repayment_style = self.loan_product.repayment_style unless repayment_style
   end
 
+  def interest_calculation(balance)
+    # need to have this is one place because a lot of functions need to know how interest is calculated given a balance
+    # this is bound to become more complex as we add all kinds of dates 
+    ((balance * interest_rate) / get_divider).round(2).round_to_nearest(self.repayment_style.round_interest_to, self.repayment_style.rounding_style)
+  end
+
+  def pay_normal(total, received_on, curr_bal = nil)
+    curr_bal ||= actual_outstanding_principal_on(d)
+    int = [total,interest_calculation(curr_bal)].min
+    prin = total - int
+    [int, prin]
+  end
+
+
+
   def reallocate(style, user)
     return false unless REPAYMENT_STYLES.include?(style)
     _ps  = self.payments(:type => [:principal, :interest])
@@ -1155,8 +1171,10 @@ class Loan
       ref_payment = (prins[0] ? prins[0] : ints[0])
       user = ref_payment.created_by
       received_by = ref_payment.received_by
-      _pmts << get_payments(total_amt, user, date, received_by, true, style, :default, nil, nil, bal)
-      bal -= p_amt
+      pmts = get_payments(total_amt, user, date, received_by, true, style, :default, nil, nil, bal)
+      _pp = pmts.find{|_p| _p.type == :principal}
+      bal -= _pp.amount if _pp
+      _pmts << pmts
     end
     _pmts = _pmts.flatten
     Payment.transaction do |t|
