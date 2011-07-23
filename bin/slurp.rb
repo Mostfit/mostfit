@@ -13,7 +13,7 @@ db_name   = ARGV[1] || File.basename(Dir.pwd)
 sql_filename = File.basename(dump_path,".bz2")
 bz2_filename = dump_path.split("/")[-1]
 unless (File.exists?(sql_filename) or File.exists?(bz2_filename))
-  fail "Failed to copy." unless system("scp mostfit.in:#{dump_path} .")
+  fail "Failed to copy." unless system("scp #{dump_path} .")
 end
 unless File.exists?(sql_filename)
   puts "Uncompressinging #{bz2_filename} ..."

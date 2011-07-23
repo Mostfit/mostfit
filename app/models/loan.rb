@@ -955,9 +955,9 @@ class Loan
                    (i == dates.size - 1 and dates[i] < Date.today)))
       scheduled = get_scheduled(:all, date)
       actual    = get_actual(:all, date)
-      prin      = principal_received_on(date)
+      prin      = principal_received_on(date).round(2)
       total_principal_paid += prin
-      int       = interest_received_on(date)
+      int       = interest_received_on(date).round(2)
       total_interest_paid += int
       if (actual[:total_balance] - scheduled[:total_balance] > prin + int) and date >= scheduled_first_payment_date # there is a default
         last_paid_date ||= dates[[i,dates.size-1].min];        days_overdue = [0,date - last_paid_date].max
@@ -965,10 +965,10 @@ class Loan
         last_paid_date = nil;        days_overdue = 0
       end
       next if repayed
-      principal_due  = actual[:balance] - scheduled[:balance]
-      interest_due   = actual[:total_balance] - scheduled[:total_balance] - (actual[:balance] - scheduled[:balance])
-      total_principal_due += scheduled[:principal]
-      total_interest_due += scheduled[:interest]
+      principal_due  = actual[:balance].round(2) - scheduled[:balance].round(2)
+      interest_due   = actual[:total_balance].round(2) - scheduled[:total_balance].round(2) - (actual[:balance].round(2) - scheduled[:balance].round(2))
+      total_principal_due += scheduled[:principal].round(2)
+      total_interest_due += scheduled[:interest].round(2)
       repayed = true if actual[:balance]<=0 and interest_due<=0
 
       @history_array << {
@@ -999,13 +999,16 @@ class Loan
 
   def _show_his(width = 10, padding = 4)
     titles = {:date => :date, :sched_total => :scheduled_outstanding_total, :sched_bal => :scheduled_outstanding_principal,
-      :prin_paid => :principal_paid, :prin_due => :principal_due, :int_paid => :interest_paid, :int_due => :interest_due}
-    title_order = [:date, :sched_total, :sched_bal, :prin_paid, :prin_due, :int_paid, :int_due]
+      :act_total => :actual_outstanding_total, :act_bal => :actual_outstanding_principal,
+      :prin_paid => :principal_paid, :prin_due => :principal_due, :int_paid => :interest_paid, :int_due => :interest_due,
+       :tot_p_pd => :total_principal_paid, :tot_i_pd => :total_interest_paid, :tot_p_due => :total_principal_due, :tot_i_due => :total_interest_due}
+    title_order = [:date, :sched_total, :sched_bal, :act_total, :act_bal, :prin_paid, :prin_due, :int_paid, :int_due, :tot_p_pd, :tot_p_due]
     hist = calculate_history.sort_by{|x| x[:date]}
     puts title_order.map{|t| t.to_s.rjust(width - padding/2).ljust(width)}.join("|")
     hist.each do |h|
-      puts (["#{h[:date]}\t"] + title_order[1..-1].map{|t| h[titles[t]].round(4)}.map{|v| v.to_s}.map{|s| s.rjust(width - padding/2).ljust(width)}).join("|")
+      puts (["#{h[:date]}"] + title_order[1..-1].map{|t| h[titles[t]].round(4)}.map{|v| v.to_s}.map{|s| s.rjust(width - padding/2).ljust(width)}).join("|")
     end
+    false
   end
 
   def update_history_bulk_insert

@@ -1,6 +1,6 @@
 - if @md
   Payments collected by 
-  = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'payments_received_by'
+  = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'payments_received_by', :class => "chosen"
   collected on
   = date_select "received_on", @date
   %table.report.nojs
@@ -27,7 +27,7 @@
       - loans = @loans||Loan.all(:client_id => clients.map{|x| x.id})
       - lids = loans.map{|x| x.id}
       - histories = LoanHistory.all(:loan_id => lids, :date => @date)
-      - histories += (lids - histories.aggregate(:loan_id)).map{|lid| Loan.get(lid).loan_history.last}
+      - histories += (lids - histories.aggregate(:loan_id)).map{|lid| Loan.get(lid).loan_history.last}.select{|lh| lh.date < @date}
       - all_repayment_style_choices = [[NORMAL_REPAYMENT_STYLE,"fees=>int=>prin"], [PRORATA_REPAYMENT_STYLE,"pro rata"]]
       - default_repayment_style = Mfi.first.default_repayment_style ? Mfi.first.default_repayment_style : NORMAL_REPAYMENT_STYLE
       - default_repayment_style_choice = all_repayment_style_choices.select {|style| style[0] == default_repayment_style}

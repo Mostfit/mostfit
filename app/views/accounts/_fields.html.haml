@@ -28,7 +28,8 @@
     %th
       Parent Account
     %td 
-      = select :parent_id, :collection => (@accounts||[]).map{|x| [x.id.to_s, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account", :selected => @account.parent_id
+      /= select :parent_id, :collection => (@accounts||[]).map{|x| [x.id.to_s, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account", :selected => @account.parent_id
+      = show_accounts_selector(@accounts, {:selected_id => @account.parent_id, :tag => true, :id => "account_parent_id", :name => "account[parent_id]", :prompt => "Choose parent account"})
 
   %tr  
     %th

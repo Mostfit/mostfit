@@ -756,6 +756,7 @@ $(document).ready(function(){
 		      fillFundingLines();
 		      fillCashAccounts();
 		      fillBankAccounts();
+		    $('.chosen').chosen();
 		      //Handling targets form
 		      $("select#target_attached_to").change(function(){
 								$.ajax({
@@ -1114,7 +1115,7 @@ $(document).ready(function(){
 		      floatHeaders();
 		      if($("#tree").length>0){
 			  $("#tree").treeview({
-						  collapsed: true,
+						  collapsed: false,
 						  animated: "medium",
 						  control:"#sidetreecontrol"
 					      });
