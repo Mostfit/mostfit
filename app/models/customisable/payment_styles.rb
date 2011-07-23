@@ -4,7 +4,7 @@ module Mostfit
 
     module Flat
 
-      def pay_prorata(total, received_on)
+      def pay_prorata(total, received_on, curr_bal = nil)
         #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
         i = used = prin = int = 0.0
         d = received_on
