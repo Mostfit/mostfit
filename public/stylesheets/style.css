@@ -7,11 +7,16 @@ body {
 }
 h1 {
   color: #E68c00;
-  font-family: "Lucida Grande";
+  font-family: "Lucida Grande", Helvetica;
   letter-spacing: -0.07em;
   font-size: 45px;
   font-weight: 300;
 }
+
+.container h1 a {
+  letter-spacing: -0.1em;
+}
+
 h2, h3, h4, h5, h6 {
     color: #444;
     font-family: Arial,Helvetica,FreeSans,Arial,sans-serif;
@@ -263,7 +268,7 @@ table.loan th.even {
 
 
 table.narrow {
-  width: 100%;
+  width: 95%;
 }
 table.narrow td, table.narrow th{
   padding: 2px;
@@ -272,6 +277,8 @@ table.narrow td, table.narrow th{
 table.narrow th{
   color: black;   
   padding-bottom: 4px;
+  background-color: #dadeff;
+
 }
 table.narrow tr.group{
     text-align: center;
@@ -1680,4 +1687,25 @@ a.cancelButton a.cancelButton:visited{
 
 #sidetreecontrol {
   font-size: 1.2em;
+}
+
+option.depth-1 {
+  padding-left: 3em;
+}
+
+option.depth-2 {
+  padding-left: 6em;
+}
+
+option.depth-3 {
+  padding-left: 9em;
+
+ul.inline {
+  margin: 3px;
+  display: inline
+}
+
+ul.inline li {
+  display: inline;
+
 }

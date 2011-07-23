@@ -159,6 +159,10 @@ class Account
   end
   
   
+  def self.put_tree(accounts)
+    
+  end
+
   # generate tree form of accounts based on parent relationships.
   # TODO: Not working correctly right now
   def self.tree(branch_id = nil)

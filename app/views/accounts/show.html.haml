@@ -1,5 +1,8 @@
 %h1== Account: <i>#{@account.name}</i>
-%table.narrow.form{ :style => "width: 40%;" }
+.menu-strip
+  = link_to_with_rights 'edit this account\'s details ', resource(@account, :edit), :class => "edit"
+
+%table.tall.shaded{ :style => "width: 40%;" }
   %tr
     %th GL Code : 
     %td
@@ -9,6 +12,12 @@
     %td
       = @account.branch ? @account.branch.name : ""
   %tr
+    %th
+      Parent Account
+    %td
+      = @account.parent.name if @account.parent
+
+  %tr
     %th Opening Balance : 
     %td
       = @account.opening_balance 
@@ -17,12 +26,9 @@
         = @account.opening_balance_on_date
         )
   %tr
-    %th Today's Balance : 
+    %th Today's Balance
     %td
       = @account.balance_as_of_now.to_account_balance 
-
-%p
-  = link_to_with_rights 'edit this account\'s details ', resource(@account, :edit), :class => "edit"
 
 %div.tab_container
   %ul.tabs

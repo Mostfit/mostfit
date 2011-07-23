@@ -1,4 +1,4 @@
-
+- debugger
 - if @center.meeting_day? @date
   Payments collected by 
   = select :received_by, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :selected => @center.manager.id.to_s

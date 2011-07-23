@@ -204,7 +204,7 @@
         %th
           Centers repaying today
         %td
-          = select :name => 'center_id', :collection => centers_paying_today_collection(@date), :selected => session[:center_id], :prompt => 'Select a center'
+          = select :name => 'center_id', :collection => centers_paying_today_collection(@date), :selected => session[:center_id], :prompt => 'Select a center', :class => "chosen"
       %tr
         %th
           or any other center

@@ -153,7 +153,7 @@
       %li#audit Audits
       %li#misc Miscellaneous
       %li#history History
-      %li#deleted_payments Deleted payments
+      %li#deleted Deleted Payments
       
     %div.tab
       %h2 
@@ -243,8 +243,7 @@
     %div.tab
       - deleted_payments = Payment.with_deleted{ Payment.all(:loan_id => @loan.id, :deleted_at.not => nil) }
       - if @payments.blank?
-        %p
-          %i No deleted payments
+        %h3 No deleted payments
       - else
         = partial "payments/deleted_payments", {:pmts => deleted_payments, :context => :deleted}
 

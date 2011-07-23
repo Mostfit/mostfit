@@ -47,6 +47,7 @@ class Accounts < Application
   def new
     only_provides :html
     @account = Account.new
+    @accounts = Account.tree(nil)
     display @account, :layout => layout?
   end
 
@@ -63,6 +64,7 @@ class Accounts < Application
   end
 
   def create(account)
+    debugger
     if account.is_a?(Hash)
       @account = Account.new(account)
       if @account.save
@@ -101,7 +103,7 @@ class Accounts < Application
     @account = Account.get(id)
     raise NotFound unless @account
     if @account.update(account)
-       redirect resource(:accounts)
+       redirect resource(:accounts, :branch_id => @account.branch_id)
     else
       display @account, :edit
     end
@@ -124,7 +126,12 @@ class Accounts < Application
 
   def duplicate
     unless params[:branch_id].blank?
-      @branch = Branch.get(params[:branch_id])
+      debugger
+      if params[:branch_id] == "0"
+        @branch = Branch.new(:name => "HO", :id => 0)
+      else
+        @branch = Branch.get(params[:branch_id])
+      end
       raise NotFound unless @branch
       @accounts = Account.all(:branch_id => params[:branch_id])
     end
@@ -152,6 +159,7 @@ class Accounts < Application
   end
 
   def bulk_create_for(branch, accounts)
+    debugger
     errors = []
     accounts.each{|a|
       new_account = Account.new(a)

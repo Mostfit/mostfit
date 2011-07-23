@@ -21,6 +21,10 @@ class LoanHistory
   property :interest_due,                    Float, :nullable => false, :index => true
   property :principal_paid,                  Float, :nullable => false, :index => true
   property :interest_paid,                   Float, :nullable => false, :index => true
+  property :total_principal_due,             Float, :nullable => false, :index => true
+  property :total_interest_due,              Float, :nullable => false, :index => true
+  property :total_principal_paid,            Float, :nullable => false, :index => true
+  property :total_interest_paid,             Float, :nullable => false, :index => true
 
   property :status,                          Enum.send('[]', *STATUSES)
 
