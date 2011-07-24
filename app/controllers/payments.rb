@@ -141,9 +141,8 @@ class Payments < Application
       @payment.created_by = session.user
       @payment.received_on = date
       success = @payment.save
-      # reloading loan as payments can be stale here
     end
-    Loan.get(@loan.id).update_history if @loan
+    Loan.get(@loan.id).update_history(true) if @loan
     return success      
   end
 
