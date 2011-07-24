@@ -256,12 +256,12 @@ table.loan td, table.loan th{
   padding: 2px;
 }
 table.loan th.odd {
-  background: hsla(85,93%,85%,0.8);
+  background: hsla(85,93%,75%,0.8);
   font-weight: bold;
   vertical-align: middle;
 }
 table.loan th.even {
-  background: hsla(85,93%,75%,0.8);
+  background: hsla(85,93%,85%,0.8);
   font-weight: bold;
   vertical-align: middle;
 }
@@ -1373,8 +1373,11 @@ table.clearform tr td.legend{
   right:4%; 
   background: #ABCF76; 
   border-radius: 0px 0px 5px 5px; 
+  -moz-border-radius: 0px 0px 5px 5px; 
   color: white;
   font-size: 1.2em;
+  box-shadow: 1px 1px 2px #ccc;
+  -moz-box-shadow: 1px 1px 2px #ccc;
 }
 
 #login a {
@@ -1401,6 +1404,9 @@ table.clearform tr td.legend{
   background: #ABCF76; 
   padding: 7px;
   border-radius: 5px 5px 0px 0px;
+  -moz-border-radius: 5px 5px 0px 0px;
+  box-shadow: 1px 1px 2px #ccc;
+  -moz-box-shadow: 1px 1px 2px #ccc;
   position: relative;
   left: 9%;
   top: -4px;
@@ -1607,7 +1613,7 @@ table.tall select {
     top:1px;
 }
 
-.container input[type="submit"] {
+.greenButton {
     -moz-box-shadow:inset 0px 1px 0px 0px #c1ed9c;
     -webkit-box-shadow:inset 0px 1px 0px 0px #c1ed9c;
     box-shadow:inset 0px 1px 0px 0px #c1ed9c;
@@ -1628,15 +1634,18 @@ table.tall select {
     text-decoration:none;
     text-shadow:1px 1px 0px #689324;
 }
-.container input[type="submit"]:hover  {
+.greenButton:hover  {
     background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #8cb82b), color-stop(1, #9dce2c) );
     background:-moz-linear-gradient( center top, #8cb82b 5%, #9dce2c 100% );
     filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#8cb82b', endColorstr='#9dce2c');
     background-color:#8cb82b;
 }
-.container input[type="submit"]:active  {
+.greenButton:active  {
     position:relative;
     top:1px;
+}
+.greenButton a {
+  color: white;
 }
 
 a.cancelButton a.cancelButton:visited{
@@ -1698,6 +1707,7 @@ option.depth-2 {
 
 option.depth-3 {
   padding-left: 9em;
+}
 
 ul.inline {
   margin: 3px;
@@ -1707,4 +1717,33 @@ ul.inline {
 ul.inline li {
   display: inline;
 
+}
+    
+#moreinfo {
+  border-radius: 10px;
+  width: 80%;
+  margin: auto;
+}
+
+table.moreinfo {
+  font-size: 0.9em;
+  font-weight: bold;
+}
+	
+table.moreinfo td {
+  text-align: center;
+}
+
+table.moreinfo thead th {
+  color: white;
+  text-shadow: 1px 1px 1px #444654;
+  text-align: center;
+}
+
+.lightpurple {
+  background: #E0E3FE;
+}
+.purple
+ {
+  background: #C6CCF5;
 }
