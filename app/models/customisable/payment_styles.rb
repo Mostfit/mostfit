@@ -10,7 +10,6 @@ module Mostfit
         d = received_on
         total = total.to_f
         while used < total
-          debugger
           prin += scheduled_principal_for_installment(installment_for_date(d)).round(2)
           int  += scheduled_interest_for_installment(installment_for_date(d)).round(2)
           used  = (prin + int)
@@ -41,7 +40,8 @@ module Mostfit
 
       def equated_payment
         ep = pmt(interest_rate/get_divider, number_of_installments, amount, 0, 0)
-        ep.round_to_nearest(self.repayment_style.round_total_to, self.repayment_style.rounding_style)
+        rs = self.repayment_style || self.loan_product.repayment_style
+        ep.round_to_nearest(rs.round_total_to, rs.rounding_style)
       end
 
       def actual_number_of_installments
@@ -78,10 +78,12 @@ module Mostfit
         balance = amount
         payment            = equated_payment
         installment = 1
+        rs = self.repayment_style || self.loan_product.repayment_style
+        
         while balance > 0
           @_reducing_schedule[installment] = {}
           @_reducing_schedule[installment][:interest_payable]  = interest_calculation(balance)
-          if self.repayment_style.force_num_installments and installment == number_of_installments
+          if rs.force_num_installments and installment == number_of_installments
             @_reducing_schedule[installment][:principal_payable] = balance
           else
             @_reducing_schedule[installment][:principal_payable] = [(payment - @_reducing_schedule[installment][:interest_payable]).round(2), balance].min

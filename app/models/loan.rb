@@ -3,6 +3,7 @@ class Loan
   include FeesContainer
   include Identified
   include Pdf::LoanSchedule if PDF_WRITER
+  include ExcelFormula
 
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
@@ -18,7 +19,6 @@ class Loan
   before :save, :set_bullet_installments
 
   def set_bullet_installments
-    debugger
     rs = self.repayment_style or self.loan_product.repayment_style
     number_of_installments = 1 if rs.style == "BulletLoan"
   end
@@ -788,10 +788,13 @@ class Loan
 
   def extend_loan
     unless @loan_extended
-      if self.repayment_style
-        self.extend(Kernel.module_eval("Mostfit::PaymentStyles::#{repayment_style.to_s}"))
+      rp = self.repayment_style || self.loan_product.repayment_style
+      if rp
+        self.extend(Kernel.module_eval("Mostfit::PaymentStyles::#{rp.style.to_s}"))
+        @loan_extended = true
+      else
+        raise ArgumentError, "No repayment style specified"
       end
-      @loan_extended = true
     end
   end
 
@@ -1143,7 +1146,8 @@ class Loan
   def interest_calculation(balance)
     # need to have this is one place because a lot of functions need to know how interest is calculated given a balance
     # this is bound to become more complex as we add all kinds of dates 
-    ((balance * interest_rate) / get_divider).round(2).round_to_nearest(self.repayment_style.round_interest_to, self.repayment_style.rounding_style)
+    rs = self.repayment_style || self.loan_product.repayment_style
+    ((balance * interest_rate) / get_divider).round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
   end
 
   def pay_normal(total, received_on, curr_bal = nil)
@@ -1156,6 +1160,7 @@ class Loan
 
 
   def reallocate(style, user)
+    self.extend_loan
     return false unless REPAYMENT_STYLES.include?(style)
     _ps  = self.payments(:type => [:principal, :interest])
     ph = _ps.group_by{|p| p.received_on}.to_hash
@@ -1397,6 +1402,8 @@ class Loan
 
   
 end
+
+
 
 
 module Loaner
