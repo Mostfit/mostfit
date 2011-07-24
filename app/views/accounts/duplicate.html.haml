@@ -35,7 +35,7 @@
               = hidden_field :name => "account[][account_type_id]", :value => account.account_type_id
               = hidden_field :name => "account[][parent_id]", :value => account.parent_id
             %td
-              = text_field :name => "account[][name]", :value => account.name + "(copied from #{@branch.name})"
+              = text_field :name => "account[][name]", :value => account.name
             %td
               = text_field :name => "account[][gl_code]", :value => account.gl_code + "(copied from #{@branch.name})"
             %td

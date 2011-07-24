@@ -28,7 +28,7 @@
     - postings[:debit].each do |p|
       %tr{:class => set_class}
         %td 
-          = p.account.name
+          = p.account.name if p.account
         %td
           = p.amount.to_account_balance
         %td{:colspan => 2}
@@ -36,7 +36,7 @@
       %tr{:class => set_class}
         %td{:colspan => 2}
         %td
-          = p.account.name
+          = p.account.name if p.account
         %td
           = p.amount.to_account_balance
    
