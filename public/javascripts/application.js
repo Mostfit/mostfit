@@ -756,7 +756,9 @@ $(document).ready(function(){
 		      fillFundingLines();
 		      fillCashAccounts();
 		      fillBankAccounts();
-		    $('.chosen').chosen();
+		      $('.chosen').chosen();
+		    $('input#submit').addClass("greenButton");
+		    $('button.add').addClass("greenButton");
 		      //Handling targets form
 		      $("select#target_attached_to").change(function(){
 								$.ajax({
