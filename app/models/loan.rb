@@ -188,6 +188,7 @@ class Loan
 
 
   def update_loan_cache(force = false)
+    self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
     @orig_attrs = self.original_attributes
     t = Time.now
     self.c_center_id = self.client.center.id if force
