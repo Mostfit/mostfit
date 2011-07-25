@@ -53,7 +53,7 @@ module Merb
           end
         end
       end
-      rv = "<option value='nil'>#{prompt}</option>#{rv}" if prompt
+      rv = "<option value=''>#{prompt}</option>#{rv}" if prompt
       if selected_id
         rv = rv.gsub("value='#{selected_id}'", "value='#{selected_id}' selected='selected'")
       end
