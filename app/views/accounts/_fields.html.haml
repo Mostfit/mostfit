@@ -1,9 +1,16 @@
+- if params[:parent_id]
+  - @parent = Account.get(params[:parent_id])
+
 %table.tall.shaded
   %tr
     %th
       Account Type
     %td
-      = select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
+      - if @parent
+        = hidden_field :account_type_id, :value => @parent.account_type_id
+        = @parent.account_type.name
+      - else
+        = select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
   %tr
     %th
       Account Category (if applicable)
@@ -23,13 +30,20 @@
     %th
       Branch
     %td
-      = select :branch_id, :collection => @branches_list, :prompt => "Select Branch"
+      - if @parent
+        = hidden_field :branch_id, :value => @parent.branch_id
+        = @parent.branch.name
+      - else
+        = select :branch_id, :collection => @branches_list, :prompt => "Select Branch"
   %tr
     %th
       Parent Account
     %td 
-      /= select :parent_id, :collection => (@accounts||[]).map{|x| [x.id.to_s, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account", :selected => @account.parent_id
-      = show_accounts_selector(@accounts, {:selected_id => @account.parent_id, :tag => true, :id => "account_parent_id", :name => "account[parent_id]", :prompt => "Choose parent account"})
+      - if @parent
+        = @parent.name
+        = hidden_field :parent_id, :value => @parent.id
+      - else
+        = show_accounts_selector(@accounts, {:selected_id => @account.parent_id, :tag => true, :id => "account_parent_id", :name => "account[parent_id]", :prompt => "Choose parent account"})
 
   %tr  
     %th
