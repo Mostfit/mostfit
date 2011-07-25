@@ -28,6 +28,7 @@ class Accounts < Application
     if params[:branch_id] and not params[:branch_id].blank?
       @branch =  Branch.get(params[:branch_id])
     else
+      params[:branch_id] = "0"
       @branch = nil
     end
     @accounts = Account.tree((params[:branch_id] and not params[:branch_id].blank?) ? params[:branch_id].to_i : nil )
