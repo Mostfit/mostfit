@@ -69,7 +69,7 @@ class Accounts < Application
     if account.is_a?(Hash)
       @account = Account.new(account)
       if @account.save
-        redirect resource(:accounts), :message => {:notice => "Account was successfully created"}
+        redirect resource(:accounts, :branch_id => account[:branch_id] || 0), :message => {:notice => "Account was successfully created"}
       else
         message[:error] = "Account failed to be created"
         render :new
