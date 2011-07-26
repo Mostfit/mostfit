@@ -1,0 +1,16 @@
+%table
+  %tr
+    %th
+      Name 
+    %td
+      = text_field :name
+  %tr
+    %th
+      Code
+    %td
+      = text_field :code
+  %tr
+    %th
+      Classified Under
+    %td
+      = select :parent_id, :collection => @parents.map{|x| [x.id, x.name]}, :prompt => "Choose a loan purpose "
