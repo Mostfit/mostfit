@@ -5,16 +5,16 @@
   %thead
     %tr
       %th
-        id
+        Id
       %th
-        occupation
+        Occupation
       %th
-        code
+        Code
       %th
-        actions
+        Actions
 
   - for occupation in @occupations
-    %tr
+    %tr{:class => cycle('odd', '')}
       %td
         = occupation.id
       %td
