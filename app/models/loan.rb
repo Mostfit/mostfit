@@ -1316,12 +1316,15 @@ class EquatedWeeklyRounded < Loan
     principal_array_8000 = [151, 152, 153, 154, 155, 156, 157, 157, 159, 160, 160, 162, 163, 163, 165, 165, 167, 168, 168, 170, 171, 172, 172, 174, 175, 176, 177, 178, 180, 180, 182, 182, 184, 185, 185, 187, 189, 189, 191, 191, 193, 194, 195, 196, 198, 199]
     principal_array_6000 = [113, 114, 115, 116, 116, 117, 117, 119, 119, 119, 121, 121, 122, 123, 123, 124, 125, 126, 127, 127, 128, 129, 129, 131, 131, 132, 133, 133, 135, 135, 136, 137, 138, 138, 140, 140, 141, 142, 143, 144, 145, 145, 146, 148, 148, 149]
     principal_array_10000 = [189, 190, 191, 192, 194, 195, 196, 197, 198, 200, 201, 202, 203, 205, 206, 207, 208, 210, 211, 212, 213, 215, 216, 217, 219, 220, 221, 223, 224, 225, 227, 228, 230, 231, 232, 234, 235, 237, 238, 240, 241, 243, 244, 245, 247, 248]
+    principal_array_5000 = [94, 96, 96, 96, 97, 97, 98, 99, 99, 100, 100, 101, 102, 102, 103, 104, 104, 105, 105, 106, 107, 107, 108, 109, 109, 110, 111, 111, 112, 113, 113, 114, 115, 115, 116, 117, 118, 118, 119, 120, 121, 121, 122, 123, 123, 124]
     if self.amount == 8000
       reducing_schedule[number][:principal_payable] = principal_array_8000[number-1]
     elsif self.amount == 6000
       reducing_schedule[number][:principal_payable] = principal_array_6000[number-1]
     elsif self.amount == 10000
       reducing_schedule[number][:principal_payable] = principal_array_10000[number-1]
+    elsif self.amount == 5000
+      reducing_schedule[number][:principal_payable] = principal_array_5000[number-1]
     else
       reducing_schedule[number][:principal_payable]
     end
@@ -1335,12 +1338,15 @@ class EquatedWeeklyRounded < Loan
     interest_array_8000 = [49, 48, 47, 46, 45, 44, 43, 43, 41, 40, 40, 38, 37, 37, 35, 35, 33, 32, 32, 30, 29, 28, 28, 26, 25, 24, 23, 22, 20, 20, 18, 18, 16, 15, 15, 13, 11, 11, 9, 9, 7, 6, 5, 4, 2, 1]
     interest_array_6000 = [37, 36, 35, 34, 34, 33, 33, 31, 31, 31, 29, 29, 28, 27, 27, 26, 25, 24, 23, 23, 22, 21, 21, 19, 19, 18, 17, 17, 15, 15, 14, 13, 12, 12, 10, 10, 9, 8, 7, 6, 5, 5, 4, 2, 2, 1]
     interest_array_10000 = [61, 60, 59, 58, 56, 55, 54, 53, 52, 50, 49, 48, 47, 45, 44, 43, 42, 40, 39, 38, 37, 35, 34, 33, 31, 30, 29, 27, 26, 25, 23, 22, 20, 19, 18, 16, 15, 13, 12, 10, 9, 7, 6, 5, 3, 2]
+    interest_array_5000 = [31, 29, 29, 29, 28, 28, 27, 26, 26, 25, 25, 24, 23, 23, 22, 21, 21, 20, 20, 19, 18, 18, 17, 16, 16, 15, 14, 14, 13, 12, 12, 11, 10, 10, 9, 8, 7, 7, 6, 5, 4, 4, 3, 2, 2, 1]
     if self.amount == 8000
       reducing_schedule[number][:interest_payable] = interest_array_8000[number-1]
     elsif self.amount == 6000
       reducing_schedule[number][:interest_payable] = interest_array_6000[number-1]
     elsif self.amount == 10000
       reducing_schedule[number][:interest_payable] = interest_array_10000[number-1]
+    elsif self.amount == 5000
+      reducing_schedule[number][:interest_payable] = interest_array_5000[number-1]
     else
       reducing_schedule[number][:interest_payable]
     end
