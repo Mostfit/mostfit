@@ -28,6 +28,7 @@ class Accounts < Application
     if params[:branch_id] and not params[:branch_id].blank?
       @branch =  Branch.get(params[:branch_id])
     else
+      params[:branch_id] = "0"
       @branch = nil
     end
     @accounts = Account.tree((params[:branch_id] and not params[:branch_id].blank?) ? params[:branch_id].to_i : nil )
@@ -47,6 +48,7 @@ class Accounts < Application
   def new
     only_provides :html
     @account = Account.new
+    @accounts = Account.tree(nil)
     display @account, :layout => layout?
   end
 
@@ -66,7 +68,7 @@ class Accounts < Application
     if account.is_a?(Hash)
       @account = Account.new(account)
       if @account.save
-        redirect resource(:accounts), :message => {:notice => "Account was successfully created"}
+        redirect resource(:accounts, :branch_id => account[:branch_id] || 0), :message => {:notice => "Account was successfully created"}
       else
         message[:error] = "Account failed to be created"
         render :new
@@ -101,7 +103,7 @@ class Accounts < Application
     @account = Account.get(id)
     raise NotFound unless @account
     if @account.update(account)
-       redirect resource(:accounts)
+       redirect resource(:accounts, :branch_id => @account.branch_id)
     else
       display @account, :edit
     end
@@ -124,7 +126,11 @@ class Accounts < Application
 
   def duplicate
     unless params[:branch_id].blank?
-      @branch = Branch.get(params[:branch_id])
+      if params[:branch_id] == "0"
+        @branch = Branch.new(:name => "HO", :id => 0)
+      else
+        @branch = Branch.get(params[:branch_id])
+      end
       raise NotFound unless @branch
       @accounts = Account.all(:branch_id => params[:branch_id])
     end
