@@ -1,11 +1,11 @@
 %h1
-  Edit Occupation
+  = I18n.t "occupation.edit.title", :default => "Edit Occupation"
 
-= link_to 'Back', url(:occupations)
+= link_to I18n.t("occupation.edit.back", :default => "Back"), url(:occupations)
 = error_messages_for @occupation
 
 = form_for(@occupation, :action => url(:occupation, @occupation)) do
   = partial :fields
-  = submit "Update"
+  = submit I18n.t "occupation.edit.update", :default => "Update"
 
-= link_to 'Show', url(:occupation, @occupation)
+= link_to I18n.t("occupation.edit.show", :default => "Show"), url(:occupation, @occupation)

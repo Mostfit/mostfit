@@ -1,17 +1,17 @@
 %h1
-  Loan Purpose
-= link_to "Add a loan purpose", url(:new_loan_purpose), :class => 'add'
+  = I18n.t "loan_purpose.index.loan_purpose", :default => "Loan Purpose"
+= link_to I18n.t("loan_purpose.index.new", :default => "Add a loan purpose"), url(:new_loan_purpose), :class => 'add'
 %table.narrow
   %thead
     %tr
       %th
-        Loan Purpose
+        = I18n.t "loan_purpose.index.loan_purpose", :default => "Loan Purpose"
       %th
-        Code
+        = I18n.t "loan_purpose.index.code", :default => "Code"
       %th
-        Classified As
+        = I18n.t "loan_purpose.index.classified_as", :default => "Classified As"
       %th
-        Actions
+        = I18n.t "loan_purpose.index.actions", :default => "Actions"
   - for loan_purpose in @loan_purposes
     %tr{:class => cycle('odd', '')}
       %td
@@ -21,6 +21,6 @@
       %td
         = loan_purpose.parent_id != 0 ? LoanPurpose.get(loan_purpose.parent_id).name : '-'
       %td
-        = link_to 'Show', url(:loan_purpose, loan_purpose)
+        = link_to I18n.t("loan_purpose.index.show", :default => "Show"), url(:loan_purpose, loan_purpose)
         |
-        = link_to 'Edit', url(:edit_loan_purpose,  loan_purpose)
+        = link_to I18n.t("loan_purpose.index.edit", :default => "Edit"), url(:edit_loan_purpose, loan_purpose)

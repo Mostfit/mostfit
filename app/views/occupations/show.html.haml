@@ -1,15 +1,18 @@
 %h1
-  Occupations
+  = I18n.t "occupation.show.title", :default => "Occupation"
 %table
   %tr.odd
-    %td Id
+    %td
+      = I18n.t"occupation.show.id", :default => "Id"   
     %td=@occupation.id
   %tr
-    %td Value
+    %td
+      = I18n.t"occupation.show.name", :default => "Name"   
     %td=@occupation.name
   %tr.odd
-    %td Code
+    %td
+      = I18n.t"occupation.show.code", :default => "Code"   
     %td=@occupation.code.blank? ? '-' : @occupation.code
-= link_to 'Edit',  url(:edit_occupation,  @occupation)
+= link_to I18n.t("occupation.show.edit", :default => "Edit"),  url(:edit_occupation,  @occupation)
 |
-= link_to 'Back', url(:occupations)
+= link_to I18n.t("occupation.show.back", :default => "Back"), url(:occupations)

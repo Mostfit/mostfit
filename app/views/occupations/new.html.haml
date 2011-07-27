@@ -1,9 +1,10 @@
-%h1 New Occupation
+%h1 
+  = I18n.t "occupation.new.title", :default => "New Occupation"
 
 = error_messages_for @occupation
 
 = form_for(@occupation, :action => url(:occupations) ) do
   = partial :fields
-  = submit "Create"
+  = submit I18n.t "occupation.new.create", :default => "Create"
 
-= link_to 'Back', url(:occupations)
+= link_to I18n.t("occupation.new.back", :default => "Back"), url(:occupations)

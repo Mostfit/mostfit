@@ -64,7 +64,7 @@
     %th
       Loan Purpose:
     %td
-      = select :loan_purpose_id, :collection => LoanPurpose.all.map{|x| [x.id, x.value]}, :prompt => "----"
+      = select :loan_purpose_id, :collection => LoanPurpose.all.map{|x| [x.id, x.name]}, :prompt => "----"
   %tr
     %th
       Funding Line

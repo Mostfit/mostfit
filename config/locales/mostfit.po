@@ -326,3 +326,199 @@ msgstr
 msgctxt "page.title.login"
 msgid "Mostfit - Login"
 msgstr 
+
+msgctxt "loan_purpose.edit.edit"
+msgid "Edit Loan Purpose"
+msgstr 
+
+msgctxt "loan_purpose.edit.update"
+msgid "Update"
+msgstr 
+
+msgctxt "loan_purpose.edit.show"
+msgid "Show"
+msgstr 
+
+msgctxt "loan_purpose.edit.back"
+msgid "Back"
+msgstr 
+
+msgctxt "loan_purpose.fields.name"
+msgid "Name"
+msgstr 
+
+msgctxt "loan_purpose.fields.code"
+msgid "Code"
+msgstr 
+
+msgctxt "loan_purpose.fields.classified_under"
+msgid "Classified Under"
+msgstr 
+
+msgctxt "loan_purpose.fields.choose_a_loan_purpose"
+msgid "Choose a loan purpose"
+msgstr 
+
+msgctxt "loan_purpose.index.loan_purpose"
+msgid "Loan Purpose"
+msgstr 
+
+msgctxt "loan_purpose.index.new"
+msgid "Add a loan purpose"
+msgstr 
+
+msgctxt "loan_purpose.index.loan_purpose"
+msgid "Loan Purpose"
+msgstr 
+
+msgctxt "loan_purpose.index.code"
+msgid "Code"
+msgstr 
+
+msgctxt "loan_purpose.index.classified_as"
+msgid "Classified As"
+msgstr 
+
+msgctxt "loan_purpose.index.actions"
+msgid "Actions"
+msgstr 
+
+msgctxt "loan_purpose.index.show"
+msgid "Show"
+msgstr 
+
+msgctxt "loan_purpose.index.edit"
+msgid "Edit"
+msgstr 
+
+msgctxt "loan_purpose.new.title"
+msgid "New Loan Purpose"
+msgstr 
+
+msgctxt "loan_purpose.new.create"
+msgid "Create"
+msgstr 
+
+msgctxt "loan_purpose.new.back"
+msgid "Back"
+msgstr 
+
+msgctxt "loan_purpose.show.title"
+msgid "Loan Purpose"
+msgstr 
+
+msgctxt "loan_purpose.show.id"
+msgid "Id"
+msgstr 
+
+msgctxt "loan_purpose.show.name"
+msgid "Name"
+msgstr 
+
+msgctxt "loan_purpose.show.code"
+msgid "Code"
+msgstr 
+
+msgctxt "loan_purpose.show.classified_under"
+msgid "Classified Under"
+msgstr 
+
+msgctxt "loan_purpose.show.edit"
+msgid "Edit"
+msgstr 
+
+msgctxt "loan_purpose.show.back"
+msgid "Back"
+msgstr 
+
+msgctxt "occupation.edit.title"
+msgid "Edit Occupation"
+msgstr 
+
+msgctxt "occupation.edit.back"
+msgid "Back"
+msgstr 
+
+msgctxt "occupatio.edit.update"
+msgid "Update"
+msgstr 
+
+msgctxt "occupation.edit.show"
+msgid "Show"
+msgstr 
+
+msgctxt "occupation.fields.name"
+msgid "Name"
+msgstr 
+
+msgctxt "occupation.fields.code"
+msgid "Code"
+msgstr 
+
+msgctxt "occupation.index.title"
+msgid "Occupations"
+msgstr 
+
+msgctxt "occupation.index.add_an_occupation"
+msgid "Add an occupation"
+msgstr 
+
+msgctxt "occupation.index.id"
+msgid "Id"
+msgstr 
+
+msgctxt "occupation.index.occupation"
+msgid "Occupation"
+msgstr 
+
+msgctxt "occupation.index.code"
+msgid "Code"
+msgstr 
+
+msgctxt "occupation.index.actions"
+msgid "Actions"
+msgstr 
+
+msgctxt "occupation.index.show"
+msgid "Show"
+msgstr 
+
+msgctxt "occupation.index.edit"
+msgid "Edit"
+msgstr 
+
+msgctxt "occupation.new.create"
+msgid "Create"
+msgstr 
+
+msgctxt "occupation.new.back"
+msgid "Back"
+msgstr 
+
+msgctxt "occupation.new.title"
+msgid "New Occupation"
+msgstr 
+
+msgctxt "occupation.show.title"
+msgid "Occupation"
+msgstr 
+
+msgctxt "occupation.show.id"
+msgid "Id"
+msgstr 
+
+msgctxt "occupation.show.name"
+msgid "Name"
+msgstr 
+
+msgctxt "occupation.show.code"
+msgid "Code"
+msgstr 
+
+msgctxt "occupation.show.edit"
+msgid "Edit"
+msgstr 
+
+msgctxt "occupation.show.back"
+msgid "Back"
+msgstr 
