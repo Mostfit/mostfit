@@ -26,8 +26,11 @@
       - atts = Attendance.all(:client_id => clients.map{|x| x.id}, :date => @date).map{|x| [x.client_id,x]}.to_hash
       - loans = @loans||Loan.all(:client_id => clients.map{|x| x.id})
       - lids = loans.map{|x| x.id}
-      - histories = LoanHistory.all(:loan_id => lids, :date => @date)
-      - histories += (lids - histories.aggregate(:loan_id)).map{|lid| Loan.get(lid).loan_history.last}.select{|lh| lh.date < @date}
+      - if lids.empty?
+        - histories = []
+      - else
+        - histories = LoanHistory.all(:loan_id => lids, :date => @date)
+        - histories += (lids - histories.aggregate(:loan_id)).map{|lid| Loan.get(lid).loan_history.last}.compact.select{|lh| lh.date < @date}
       - all_repayment_style_choices = [[NORMAL_REPAYMENT_STYLE,"fees=>int=>prin"], [PRORATA_REPAYMENT_STYLE,"pro rata"]]
       - default_repayment_style = Mfi.first.default_repayment_style ? Mfi.first.default_repayment_style : NORMAL_REPAYMENT_STYLE
       - default_repayment_style_choice = all_repayment_style_choices.select {|style| style[0] == default_repayment_style}
