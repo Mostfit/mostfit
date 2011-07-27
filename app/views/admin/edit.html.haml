@@ -180,9 +180,44 @@
             %hr
         %tr
           %td
-            Specify prefered date format
+            %h3 Choose formatting of dates
+        %tr
+          %td 
+            Date styles 
           %td
-            = select :date_format, :collection => Mfi::DateFormats.map{|x| [x, Date.today.strftime(x)]}
+            - PREFERED_DATE_STYLES.each do |s|
+              = "#{s[0].to_s.capitalize} : &nbsp #{s[1]}"
+              = "<b>(default)</b>" if s[0].to_s == @mfi.prefered_date_style || (s[0].to_s ==  DEFAULT_DATE_STYLE and @mfi.prefered_date_style.blank?)
+              <br/>
+        %tr
+          %td
+            Specify prefered date style
+          %td
+            = select :prefered_date_style, :collection => PREFERED_DATE_STYLES.collect{|x| [x[0].to_s,x[0].to_s]}, :selected => (@mfi.prefered_date_style if @mfi.prefered_date_style)|| DEFAULT_DATE_STYLE
+        %tr
+          %td{:colspan => 2}
+            Currently choosen default date display (
+            = (@mfi.prefered_date_style if @mfi.prefered_date_style)|| DEFAULT_DATE_STYLE  
+            ) : &nbsp;
+            = Date.new(2001, 12, 31).display
+        %tr
+          %td{:colspan => 2}
+            %hr
+        %tr
+          %td{:colspan => 2}
+            %h3 Choose formating for short date style
+        %tr
+          %td
+            Prefered date pattern
+          %td{:width => "30"}
+            = select :prefered_date_pattern, :collection => PREFERED_DATE_PATTERNS.map{|x| [x, Date.new(2001, 12, 31).strftime(x)]}, :selected => (@mfi.prefered_date_pattern if @mfi.prefered_date_pattern) || DEFAULT_DATE_PATTERN
+          %td
+            Prefered date separator
+          %td
+            = select :prefered_date_separator, :collection => PREFERED_DATE_SEPARATORS.collect{ |x| [x[1], "#{x[1]}  ( #{x[0].to_s} )"] }, :selected => (@mfi.prefered_date_separator if @mfi.prefered_date_separator)|| DEFAULT_DATE_SEPARATOR
+        %tr
+          %td{:colspan => 2}
+            %hr
         %tr
           %td
             Currency formats
@@ -198,7 +233,7 @@
           %td
             Organization Locale
           %td
-            = select :org_locale, :collection => LOCALES.map{|s| [s[0].to_s, s[1].to_s]}
+            = select :org_locale, :collection => LOCALES.map{|s| [s[0].to_s, s[1].to_s]}, :selected => @mfi.org_locale || DEFAULT_LOCALE
     %div.tab
       %table
         %tr

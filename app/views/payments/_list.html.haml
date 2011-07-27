@@ -1,4 +1,4 @@
-%h2== Repayments &mdash; (#{link_to 'new', url_for_loan(@loan, 'payments/new')})
+%h2== Repayments #{link_to 'new repayment', url_for_loan(@loan, 'payments/new'), :class => "add"}
 - if @payments.blank?
   %p
     %i No repayments have been made so far.

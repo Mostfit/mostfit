@@ -1,0 +1,94 @@
+=partial :form
+%table.report.nojs#branch
+  %tr.header
+    %th
+      Branch
+    %th{:colspan => "2"}
+      Disbursals delayed
+    %th{:colspan => "2"}
+      Disbursals scheduled
+    %th{:colspan => "3"}
+      Repayments
+    %th
+      Net
+  %tr.header
+    %th
+    %th
+      Applied
+    %th
+      Sanctioned
+    %th
+      Applied
+    %th
+      Sanctioned
+    %th
+      Principal
+    %th
+      Interest
+    %th
+      Total
+    %th
+      Net
+  - @data.sort_by{|k,v| k}.each do |date, values| 
+    - item_total = prin_total = int_total = tee_total = applied_total = sanctioned_total = late_applied_total = late_sanctioned_total = 0
+    - next if values.empty?
+    %tr
+      %th{:colspan => 9}
+        = date
+    - item = params[:cash_projected_report][:branch_id].blank? ?  Branch : Center
+    - values.map{|k,v| [item.get(k), v]}.to_hash.sort_by{|k,v| k.name}.each do |b,_v|
+      - prin = _v[:principal_expected_to_be_received]
+      - int = _v[:interest_expected_to_be_received]
+      - next if prin + int == 0
+      %tr
+        - row_total = 0
+        %td
+          = link_to(b.name, resource(b)) if b
+        - late_disbursals = Loan.all(:scheduled_disbursal_date.lt => @report.from_date, :approved_on.not => nil, :disbursal_date => nil, "c_#{item.to_s.snake_case}_id".to_sym => b.id).aggregate(:amount_applied_for.sum, :amount_sanctioned.sum)
+        - late_applied_total += (late_disbursals[0] || 0)
+        - late_sanctioned_total += (late_disbursals[1] || 0)
+        - late_disbursals.each do |x|
+          %td
+            = x.to_currency || 0.00
+        - disbursals = Loan.all(:scheduled_disbursal_date => date, :approved_on.not => nil, "c_#{item.to_s.snake_case}_id".to_sym => b.id).aggregate(:amount_applied_for.sum, :amount_sanctioned.sum)
+        - applied_total += disbursals[0] || 0
+        - sanctioned_total += disbursals[1] || 0
+        - disbursals.each do |x|
+          %td
+            = x.to_currency || 0.00
+        %td
+          = prin.to_currency
+          - row_total += prin
+          - prin_total += prin
+        %td
+          = int.to_currency
+          - row_total += int
+          - int_total += int
+        %td
+          = (prin + int).to_currency
+          - tee_total += (prin + int)
+        %td.total
+          = row_total.to_currency
+          - item_total += row_total
+    %tr.total
+      %td
+      %td
+        = late_applied_total.to_currency
+      %td
+        = late_sanctioned_total.to_currency
+      %td
+        = applied_total.to_currency
+      %td
+        = sanctioned_total.to_currency
+      %td
+        = prin_total.to_currency
+      %td
+        = int_total.to_currency
+      %td
+        = tee_total.to_currency
+      %td
+        = item_total.to_currency
+
+                
+        
+  

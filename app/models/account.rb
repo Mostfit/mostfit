@@ -14,6 +14,9 @@ class Account
   property :asset_class,            Enum.send('[]', *(['', ASSET_CLASSES].flatten)), :default => '', :nullable => true, :index => true
   property :income_head,           Enum.send('[]', *(['', INCOME_HEADS].flatten)), :default => '', :nullable => true, :index => true
 
+  property :created_at,            DateTime
+  property :deleted_at,            DateTime
+
   belongs_to :account, :model => 'Account', :child_key => [:parent_id]
   belongs_to :account_type
   
@@ -39,7 +42,7 @@ class Account
   validates_is_unique :name, :scope => :branch
   validates_is_unique :gl_code, :scope => :branch
   validates_is_number :opening_balance
-
+  
   # check if it is a cash account
   def is_cash_account?
     @account_category ? @account_category.eql?('Cash') : false
@@ -49,6 +52,10 @@ class Account
   def is_bank_account?
     @account_category ? @account_category.eql?('Bank') : false
   end
+
+
+        
+      
 
   def opening_and_closing_balances_as_of(for_date = Date.today)
     return [nil, nil] if for_date > Date.today
@@ -155,6 +162,10 @@ class Account
   end
   
   
+  def self.put_tree(accounts)
+    
+  end
+
   # generate tree form of accounts based on parent relationships.
   # TODO: Not working correctly right now
   def self.tree(branch_id = nil)

@@ -1,7 +1,7 @@
 .shaded
   - if @loan and @loan.disbursal_date
-    .graph
-      = ofc2(550, 430, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
+    .graph{:style => "position: relative; top: 50px"}
+      = ofc2(550, 400, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
   
   = error_messages_for @payment
   - if @loan.loan_history.length == 0 or (@loan.disbursal_date and @loan.payments.count > 0  and @loan.loan_history.max(:created_at).to_time < @loan.payments.max(:created_at).to_time)
@@ -11,24 +11,28 @@
       to repair
   %h1
     Loan
-    = link_to "##{@loan.id}", url_for_loan(@loan)
+    = link_to "#{@loan.description}", url_for_loan(@loan)
     by client
-    = link_to "<i>#{@client.name}</i>", resource(@branch, @center, @client)
+    = link_to "#{@client.name}", resource(@branch, @center, @client)
   - @history = @loan.loan_history
-  %p.menu-strip
+  .menu-strip{:style => "margin-bottom: 0.5em; margin-left: 0px; margin-top: 0px"}
     = link_to 'edit this loan', url_for_loan(@loan, 'edit'), :class => "edit"
+    = link_to 'make repayment', url_for_loan(@loan, 'payments/new'), :class => "add"
   
-  %table.narrow.form{ :style => 'width : 50%' }
-    %tr.odd
-      %td{ :width => '30%' } Amount disbursed
-      %td
-        -if @loan.disbursal_date
-          == <b>#{(@loan.amount).to_currency}</b> @
-          %b= format("%.2f%", @loan.interest_rate*100)
-        -else
-          Not disbursed yet
+  %table.loan{ :style => 'width : 50%; border: solid 1px #c9c9c9' }
     %tr
-      %td{ :width => '30%' } Amount sanctioned
+      %th.odd{ :width => '30%', :rowspan => "2" } Application
+      %td
+        == <b>#{@loan.amount_applied_for}</b> @
+        %b= format("%.2f%", @loan.interest_rate*100)
+    %tr
+      %td
+        on
+        = @loan.applied_on
+        by
+        %b= link_to @loan.applied_by.name, resource(@loan.applied_by)
+    %tr
+      %th.even{ :width => '30%', :rowspan => "2" } Sanction
       %td
         -if @loan.approved_on
           == <b>#{@loan.amount_sanctioned}</b> @
@@ -36,31 +40,6 @@
         -else
           Not approved yet
     %tr
-      %td{ :width => '30%' } Amount applied
-      %td
-        == <b>#{@loan.amount_applied_for}</b> @
-        %b= format("%.2f%", @loan.interest_rate*100)
-    %tr
-      %td Product
-      %td= @loan.loan_product.name
-    %tr
-      %td Type
-      %td= @loan.discriminator.display_name
-    %tr.odd
-      %td Installments
-      %td
-        = @loan.number_of_installments
-        = @loan.installment_frequency
-        == (#{@loan.number_of_installments_before(Date.today)} past installments)
-    %tr
-      %td Application
-      %td
-        on
-        = @loan.applied_on
-        by
-        %b= link_to @loan.applied_by.name, resource(@loan.applied_by)
-    %tr.odd
-      %td Approval
       %td
         - if @loan.approved_on
           on
@@ -69,8 +48,16 @@
           %b= link_to @loan.approved_by.name, resource(@loan.approved_by)
         - else
           %i approval is pending
+
     %tr
-      %td Disbursed
+      %th.odd{ :width => '30%', :rowspan => "2" } Disbursal
+      %td
+        -if @loan.disbursal_date
+          == <b>#{(@loan.amount).to_currency}</b> @
+          %b= format("%.2f%", @loan.interest_rate*100)
+        -else
+          Not disbursed yet
+    %tr
       %td
         - if @loan.disbursal_date
           on
@@ -85,8 +72,20 @@
           %i 
             original loan disbursed on
             = @loan.original_disbursal_date
-    %tr.odd
-      %td First repayment
+    %tr
+      %th.even Product
+      %td
+        = @loan.loan_product.name
+        %br
+        = @loan.discriminator.display_name
+    %tr
+      %th.odd Installments
+      %td
+        = @loan.number_of_installments
+        = @loan.installment_frequency
+        == (#{@loan.number_of_installments_before(Date.today)} past installments)
+    %tr
+      %th.even First repayment
       %td
         - if @loan.payments(:type => [:principal, :interest]).empty?
           = @loan.scheduled_first_payment_date
@@ -108,31 +107,44 @@
             Original first payment date
             = @loan.original_first_payment_date
     %tr
-      %td
-        Fees applicable
+      %th.odd
+        Fees
       %td
         %ul
           - @loan.applicable_fees.each do |f|
             %li
               = f.description
-    %tr.odd
-      %td
-        Fees paid
-      %td
-        == #{(@loan.total_fees_paid).to_currency} / #{(@loan.total_fees_applicable).to_currency}
-        - if @loan.fees_paid?
-          %span.green Paid
+              - fpaid = @loan.payments(:fee_id => f.fee_id).reduce(0){|s,p| s + p.amount}
+              - if fpaid == f.amount
+                %span.green 
+                  Paid
+                  = fpaid
+              - else
+                %span.red
+                  Paid
+                  = fpaid
+          %li
+            %b
+              Total
+              == #{(@loan.total_fees_paid).to_currency} / #{(@loan.total_fees_applicable).to_currency}
+            - if @loan.fees_paid?
+              %span.green Paid
+            - else
+              %span.red Unpaid fees exist
     %tr
-      %td Status
+      %th.even
+        Status
       %td
-        %b= status = @loan.status.to_s.gsub('_', ' ')
+        - st = @loan.status
+        %h2{:class => st}
+          = st.to_s.gsub('_', ' ')
         - if @status == :written_off
           by
           %b= link_to @loan.written_off_by.name, resource(@loan.written_off_by)
   
   
 .shaded
-  %div.tab_container
+  %div.tab_container.clearfix
     %ul.tabs
       %li#repayment_schedule Repayment Schedule
       %li#repayments_made Repayments made
@@ -141,12 +153,15 @@
       %li#audit Audits
       %li#misc Miscellaneous
       %li#history History
+      %li#deleted Deleted Payments
       
     %div.tab
-      %h2== Repayment schedule
-      %table.narrow.form{ :width => '100%' }
+      %h2 
+        Repayment schedule
+        = link_to "Download pdf", url(:action =>'repayment_sheet', :controller => 'loans', :format => "pdf", :id =>@loan.id), :style => "float: right; margin-right: 25px", :class => "button"
+      %table{ :style => 'width:98%; margin: auto' }
         %thead
-          %tr
+          %tr{:style => "box-shadow: 0px 2px 2px #cfcfcf; -moz-box-shadow: 0px 2px 2px #cfcfcf;"}
             %th
             %th date due
             %th scheduled balance
@@ -173,8 +188,12 @@
                 %td{ :colspan => 6, :style => "text-align: center;" }
                   %span.greytext== today (#{Date.today})
           - first = false
-          %tr{ :class => cycle('odd','') }
-            %td &nbsp;
+          - if lh.date <= Date.today
+            - default =  lh.actual_outstanding_total - lh.scheduled_outstanding_total
+            - default_class = default ? (default > 0 ? 'due' : (default < 0 ? 'overpaid' : 'paid')) : ""
+          %tr{ :class => cycle('odd','even') }
+            %td{:class => default_class}
+              = [i - 1,0].max
             %td
               = lh.date
             %td
@@ -192,16 +211,16 @@
                 %br/
                 %span.greytext
                   == #{lh.principal_paid.to_currency} principal + #{lh.interest_paid.to_currency} interest
-            %td
-              - if lh.date <= Date.today
-                - default =  lh.actual_outstanding_total - lh.scheduled_outstanding_total
+            - if default
+              %td{:class => (default > 0 ? 'due' : (default < 0 ? 'overpaid' : 'paid')) }
                 %b
-                  %span{:class => (default > 0 ? 'red' : (default < 0 ? 'blue' : 'green')) }
-                    = default.to_currency
+                  = default.to_currency
                 %br/
                 %span.greytext
                   = format("%.0f%", (default.abs.to_f / @loan.total_to_be_received) * 100)
                   = default <= 0 ? 'overpaid' : 'shortfall'
+            - else
+              %td
         %tfoot
           %tr
             %td{ :colspan => 7 }
@@ -216,4 +235,11 @@
       %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :loans, :action => "misc", :id => @loan.id)}
     %div.tab 
       %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+    %div.tab
+      - deleted_payments = Payment.with_deleted{ Payment.all(:loan_id => @loan.id, :deleted_at.not => nil) }
+      - if @payments.blank?
+        %h3 No deleted payments
+      - else
+        = partial "payments/deleted_payments", {:pmts => deleted_payments, :context => :deleted}
+
   

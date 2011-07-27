@@ -47,6 +47,8 @@ class Fee
   has n, :loans,              :through => :applicable_loans
   has n, :clients,            :through => :applicable_clients
   has n, :insurance_policies, :through => :applicable_insurance_policies
+  has n, :audit_trails, :auditable_type => "Fee", :child_key => ["auditable_id"]
+
   
   validates_with_method :amount_is_okay
   validates_with_method :min_lte_max

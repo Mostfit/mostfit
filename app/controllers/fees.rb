@@ -8,6 +8,8 @@ class Fees < Application
   def show(id)
     @fee = Fee.get(id)
     raise NotFound unless @fee
+    @trails = AuditTrail.all(:auditable_id => @fee.id, :auditable_type => "Fee", :order => [:created_at.desc])
+    @obj = @fee
     display @fee
   end
 

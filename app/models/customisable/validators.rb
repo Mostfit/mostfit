@@ -39,6 +39,51 @@ module Misfit
       return true
     end
 
+    def not_paying_too_much_p_and_i?
+      if new?  # do not do this check on updates, it will count itself double
+        if type == :principal
+          a = loan.actual_outstanding_principal_on(received_on)
+        elsif type == :interest
+          a = loan.actual_outstanding_interest_on(received_on)
+        end
+        if (not a.blank?) and amount - a > 0.01
+          return [false, "#{type} is more than the total #{type} due"]
+        end
+      end
+      true
+    end
+
+    def not_paying_too_much?
+      if new?  # do not do this check on updates, it will count itself double
+        if type == :principal
+          a = loan.actual_outstanding_principal_on(received_on)
+        elsif type == :interest
+          a = loan.actual_outstanding_interest_on(received_on)
+        elsif type == :fees
+          loan_fees = loan.total_fees_payable_on(received_on) if loan
+          loan_fees_amount = loan_fees ? loan_fees : 0
+          client_fees = client.total_fees_payable_on(received_on) if client and not loan
+          client_fees_amount = client_fees ? client_fees : 0
+          a = loan_fees_amount + client_fees_amount
+        end      
+        if (not a.blank?) and amount - a > 0.01
+          return [false, "#{type} is more than the total #{type} due"]
+        end
+      end
+      true
+    end
+    def not_paying_too_much_in_total?
+      if new?   # do not do this check on updates, it will count itself double
+        a = loan.actual_outstanding_total_on(received_on)
+        if total > a
+          return [false, "Total is more than the loans outstanding total"]
+        end
+      end
+      true
+    end
+
+
+
   end    #PaymentValidators
 
   module LoanValidators

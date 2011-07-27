@@ -13,7 +13,7 @@ db_name   = ARGV[1] || File.basename(Dir.pwd)
 sql_filename = File.basename(dump_path,".bz2")
 bz2_filename = dump_path.split("/")[-1]
 unless (File.exists?(sql_filename) or File.exists?(bz2_filename))
-  fail "Failed to copy." unless system("scp mostfit.in:#{dump_path} .")
+  fail "Failed to copy." unless system("scp #{dump_path} .")
 end
 unless File.exists?(sql_filename)
   puts "Uncompressinging #{bz2_filename} ..."
@@ -25,4 +25,11 @@ choice = $stdin.gets.chomp.downcase
 system('./bin/dump.rb') if choice == 'y'
 
 # now load the db
-fail "Failed to load database dump." unless system("mysql -p -u root #{db_name} < #{sql_filename}")
+if `pv -V`.empty?
+  puts "no pv...sorry. continuing without progress bar"
+  fail "Failed to load database dump." unless system("mysql -p -u root #{db_name} < #{sql_filename}")
+else
+  cmd = "pv #{sql_filename} | mysql -phatstars -u root #{db_name}"
+  puts "using #{cmd}"
+  fail "Failed to load database dump." unless system(cmd)
+end

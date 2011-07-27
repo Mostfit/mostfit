@@ -14,6 +14,8 @@
       Validations
     %li#sample
       Sample schedule
+    %li#history
+      History
   %div.tab
     %table.form
       - [:name, :loan_type_string, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments, :installment_frequency, :rounding, :rounding_style, :valid_from, :valid_upto].each do |attr|
@@ -78,3 +80,6 @@
                 = ps[:balance]
       - rescue Exception => e
         Cannot generate schedule as some parameters are missing
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+

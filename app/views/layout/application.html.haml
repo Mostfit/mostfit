@@ -8,8 +8,10 @@
     = css_include_tag :screen, :media => "screen, projection"
     = css_include_tag :print, :media => "print"
     = css_include_tag :style, :media => "screen, projection"
+    = css_include_tag :extra
     = css_include_tag "jquery-ui", :media => "screen, projection"
-    = js_include_tag :jquery, :application, :swfobject, "jquery.highlight.js", "jquery.floatheader.min.js", "jquery-ui.min.js"
+    = css_include_tag :chosen
+    = js_include_tag :jquery, :application, :swfobject, "jquery.highlight.js", "jquery.floatheader.min.js", "jquery-ui.min.js", "chosen/chosen/chosen.jquery.js"
   %body
     - if session.authenticated?
       .bookmark
@@ -50,6 +52,7 @@
           = link_to_with_class('Home', url(:browse))
           = link_to_with_class('Data entry', url(:data_entry))
           = link_to_with_class('Admin', url(:admin))
+          = link_to_with_class('Accounts', url(:accounts))
           = link_to_with_class('Dashboard', url(:dashboard))
           = link_to_with_class('Reports', url(:reports))
           #header_search_div
@@ -59,6 +62,7 @@
               %input{:type => 'submit', :value=>'search'}
     #content
       .container
+        %p
         #breadcrums= breadcrumbs
         - if message
           #flash-messages.span-17.prefix-5.suffix-5.last            
@@ -68,7 +72,6 @@
         - if params[:action]=="edit" and session.user.admin?
           %p{:style => "float: right; border: 1px solid orange; padding: 4px;"}
             = link_to("Delete", url(:controller => "application", :action => "delete", :id => params[:id], :model => params[:controller], :return => request.uri), :class => 'delete')
-        %p
         = catch_content :for_layout
     #footer
       %p{:style => "position: relative; right: 10%; float: right;"}
