@@ -25,7 +25,7 @@ class TrialBalanceReport < Report
     @debit_postings  = Posting.all(hash.merge({:amount.lt => 0})).aggregate(:account_id, :amount.sum).to_hash
     @credit_postings = Posting.all(hash.merge({:amount.gt => 0})).aggregate(:account_id, :amount.sum).to_hash
     
-    Account.all(:order => [:account_type_id.asc], :parent_id => nil).group_by{|account| account.account_type}.each{|account_type, accounts|
+    Account.all(:order => [:account_type_id.asc], :parent_id => nil, :branch_id => @branch_id).group_by{|account| account.account_type}.each{|account_type, accounts|
       data[account_type] = recurse(accounts)    
 
       account_type.opening_balance_debit  = aggregates(data[account_type], :opening_balance_debit).reduce(0){|s, x| s+=x} || 0

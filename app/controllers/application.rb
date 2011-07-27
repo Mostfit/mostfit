@@ -98,7 +98,6 @@ class Application < Merb::Controller
       error += "verified data cannot be deleted"
     end
 
-    debugger
       # if flag is still set to true delete the object
     if flag == true and obj.destroy
       # delete all the loan history
@@ -112,8 +111,6 @@ class Application < Merb::Controller
         DebitAccountRule.all(:rule_book_id => obj.id).destroy!
       end
       if model == Account
-        obj.postings.destroy
-        obj.journals.destroy
         redirect(params[:return], :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
       else
         return_url = params[:return].split("/")[0..-3].join("/")
