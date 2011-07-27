@@ -18,8 +18,11 @@ class Loan
 
   before :save, :set_bullet_installments
 
+  def rs
+    self.repayment_style or self.loan_product.repayment_style
+  end
+
   def set_bullet_installments
-    rs = self.repayment_style or self.loan_product.repayment_style
     number_of_installments = 1 if rs.style == "BulletLoan"
   end
 
@@ -1397,15 +1400,7 @@ class Loan
       1
     end    
   end
-
-  
-
-
-  
 end
-
-
-
 
 module Loaner
   module TakeoverLoan
@@ -1519,6 +1514,5 @@ module Loaner
       self.amount = _original_amount
     end
 
-  end # Class.new
-end # each
-
+  end 
+end 

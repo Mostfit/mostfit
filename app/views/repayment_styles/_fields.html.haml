@@ -8,7 +8,7 @@
     %th
       Style
     %td
-      = select :style, :collection => [['','---']] + Mostfit::PaymentStyles.constants.map{|f| [f,f]}
+      = select :style, :collection => [['','---']] + Mostfit::PaymentStyles.constants.sort.map{|f| [f,f]}
   %tr
     %th
       Round Equated Payment To
@@ -46,6 +46,17 @@
       Active
     %td
       = check_box :active
+  %tr
+    %th
+      Custom Principal Schedule
+    %td
+      = text_area :custom_principal_schedule
+  %tr
+    %th
+      Custom Interest Schedule
+    %td
+      = text_area :custom_interest_schedule
+  
   %tr
     %td
     %td{:style => 'text-align: center'}

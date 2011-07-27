@@ -164,6 +164,50 @@ module Mostfit
       def scheduled_interest_up_to(date);  get_scheduled(:total_interest,  date); end
     end #BulletLoanWithPeriodicInterest
 
+    module CustomPrincipal
+      
+      def reducing_schedule
+        return @_reducing_schedule if @_reducing_schedule
+        @_reducing_schedule = {}    
+        balance = amount
+        installment = 1
+        while balance > 0
+          @_reducing_schedule[installment] = {}
+          @_reducing_schedule[installment][:interest_payable]  = interest_calculation(balance)
+          if rs.force_num_installments and installment == number_of_installments
+            @_reducing_schedule[installment][:principal_payable] = balance
+          else
+            @_reducing_schedule[installment][:principal_payable] = scheduled_principal_for_installment(installment)
+          end
+          balance = balance - @_reducing_schedule[installment][:principal_payable]
+          installment += 1
+        end
+        return @_reducing_schedule
+      end        
+      
+      def scheduled_principal_for_installment(number)
+        rs.principal_schedule[number - 1]
+      end
+
+      def scheduled_interest_for_installment(number)
+        reducing_schedule[number]
+      end
+
+
+    end
+
+    module CustomPrincipalAndInterest
+      def scheduled_principal_for_installment(number)
+        rs.principal_schedule(amount.to_i)[number - 1]
+      end
+
+      def scheduled_interest_for_installment(number)
+        rs.interest_schedule(amount.to_i)[number - 1]
+      end
+
+    end
+      
+
 
 
   end
