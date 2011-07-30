@@ -2,15 +2,21 @@ class Posting
   include DataMapper::Resource
   
   before :create,  :unverify_account_balances
+  ACTIONS = [
+             'principal', 'interest', 'fees', 'disbursement', 'advance_principal',
+             'advance_interest', 'advance_principal_adjusted', 'advance_interest_adjusted', 'journal'
+            ]
 
   property :id,           Serial
   property :amount,       Float,   :index => true   
   property :journal_id,   Integer, :index => true  
   property :account_id,   Integer, :index => true  
-  property :currency_id,  Integer, :index => true  
+  property :currency_id,  Integer, :index => true
+  property :action,       Enum.send('[]',*ACTIONS), :nullable => true
   belongs_to :journal
   belongs_to :account
   belongs_to :currency
+  belongs_to :fee,        Fee, :nullable => true
   validates_with_method :journal_date_of_posting_is_after_account_opening_date
   
   def journal_date_of_posting_is_after_account_opening_date

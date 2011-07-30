@@ -3,7 +3,7 @@ class RuleBook
   before :save, :convert_blank_to_nil
   ACTIONS = [
              'principal', 'interest', 'fees', 'disbursement', 'advance_principal', 
-             'advance_interest', 'advance_principal_adjusted', 'advance_interest_adjusted'
+             'advance_interest', 'advance_principal_adjusted', 'advance_interest_adjusted', 'journal'
             ]
 
   property :id,     Serial
@@ -134,8 +134,8 @@ class RuleBook
   end
 
   def journals(date)
-    ids = (Posting.all("journal.date" => date, :amount.lt => 0,
-                       :account => self.debit_accounts).aggregate(:journal_id) & Posting.all("journal.date" => date, :amount.gt => 0, 
+    ids = (Posting.all("journal.date" => date,
+                       :account => self.debit_accounts).aggregate(:journal_id) & Posting.all("journal.date" => date,
                                                                                              :account => self.credit_accounts).aggregate(:journal_id))
     if ids.length > 0
       Journal.all(:id => ids)

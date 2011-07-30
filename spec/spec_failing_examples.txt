@@ -1,0 +1,4 @@
+Fee should repay correctly
+Fee should give correct fee schedule for client
+Fee should work just as well for another fee
+Fee should pay client fees correctly

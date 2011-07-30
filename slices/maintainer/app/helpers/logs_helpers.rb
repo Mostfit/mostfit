@@ -11,6 +11,7 @@ module Merb::Maintainer::LogsHelper
     end
   end
 
+
   def get_log_content(file, max_line_count)
     content = File.readlines(file) || []
     (content.length > max_line_count) ? content[-max_line_count..-1].to_json : content.to_json

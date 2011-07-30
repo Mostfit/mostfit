@@ -1,51 +1,64 @@
-%table
+- if params[:parent_id]
+  - @parent = Account.get(params[:parent_id])
+
+%table.tall.shaded
   %tr
-    %td
+    %th
       Account Type
     %td
-      = select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
+      - if @parent
+        = hidden_field :account_type_id, :value => @parent.account_type_id
+        = @parent.account_type.name
+      - else
+        = select :account_type_id, :collection => AccountType.all.map{ |a| [a.id, a.name]}, :prompt => "Select Account"
   %tr
-    %td
+    %th
       Account Category (if applicable)
     %td
       = select(:account_category, :collection => [[:Cash, "Cash"], [:Bank, "Bank"]] , :prompt => "Select Account Category")
   %tr
-    %td
+    %th
       Asset Class
     %td
       = select(:asset_class, :collection => [ASSET_CLASSES, EQUITY].flatten, :prompt => ASSET_CLASS_NOT_CHOSEN)
   %tr
-    %td
+    %th
       Income Head
     %td
       = select(:income_head, :collection => INCOME_HEADS, :prompt => INCOME_HEAD_NOT_CHOSEN)
   %tr 
-    %td
+    %th
       Branch
     %td
-      = select :branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch"
+      - if @parent
+        = hidden_field :branch_id, :value => @parent.branch_id
+        = @parent.branch.name
+      - else
+        = select :branch_id, :collection => @branches_list, :prompt => "Select Branch"
   %tr
-    %td
+    %th
       Parent Account
     %td 
-      = select :parent_id, :collection => (@parent_accounts||[]).map{|x| [x.id, "#{x.name} (#{x.gl_code})"]}, :prompt => "Select Parent Account"
+      - if @parent
+        = @parent.name
+        = hidden_field :parent_id, :value => @parent.id
+      - else
+        = show_accounts_selector(@accounts, {:selected_id => @account.parent_id, :tag => true, :id => "account_parent_id", :name => "account[parent_id]", :prompt => "Choose parent account"})
 
   %tr  
-    %td
+    %th
       Name
     %td
       = text_field :name
   %tr
-    %td
+    %th
       GL Code
     %td
       = text_field :gl_code
   %tr
-    %td 
+    %th 
       Opening Balance
     %td
       = text_field :opening_balance
-      /=radio_button :gl_code, :choose => ["yes", "no"] 
-      /THIS RADIO BUTTON NEEDS TO BE FIXED
-    %td
+      on
       = date_select_for @account, :opening_balance_on_date 

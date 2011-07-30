@@ -1,4 +1,13 @@
 %option
-- @accounts.each do |account|
-  %option{:value => account.id}
-    = account.name
+- @list.each do |account|
+  - if account.parent_id == nil
+    %option{:value => account.id, :style => "font-weight: bold"}
+      = account.name
+  - else
+    %option{:value => account.id}
+      - if account.children.empty?
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        = account.name
+      - else 
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        = account.name

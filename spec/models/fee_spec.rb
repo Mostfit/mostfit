@@ -46,7 +46,7 @@ describe Fee do
     # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
     @loan_product = LoanProduct.new
     @loan_product.name = "LP1"
-    @loan_product.max_amount = 1000
+    @loan_product.max_amount = 2000
     @loan_product.min_amount = 1000
     @loan_product.max_interest_rate = 100
     @loan_product.min_interest_rate = 0.1
@@ -130,7 +130,7 @@ describe Fee do
     # the fees have already been levied so this should not change
     @loan.fee_schedule.should == {@loan.applied_on => {@f => 100}}
 
-    @loan.levy_fees(:override => true)
+    @loan.levy_fees(false)
     @loan.fee_schedule.should == {@loan.applied_on => {@f => 100}, @loan.scheduled_first_payment_date => {@f2 => 111}}
   end
 
@@ -147,6 +147,17 @@ describe Fee do
     @loan.should be_valid
     @loan.save.should == true
     @loan.fee_schedule.should == {Date.new(2000,6,15) => {@f => 100}}
+  end
+
+it "should change when loan amount changes" do
+    @f.percentage = 0.1
+    @loan_product.fees = [@f]
+    @loan_product.save
+    @loan.levy_fees
+    @loan.fee_schedule.should == {@loan.applied_on => {@f => 100}}
+    @loan.amount = 1100
+    @loan.save
+    @loan.fee_schedule.should == {@loan.applied_on => {@f => 110}}
   end
 
   it "should return correct fee_schedule for disbursal / scheduled_disbursal_date" do
@@ -307,6 +318,8 @@ describe Fee do
     @loan.fees_payable_on(@loan.applied_on).should == {@f2 => 111}
     
     @loan.fees_payable_on(@loan.scheduled_disbursal_date).should == {@f2 => 111, @f => 100}
+    @loan.disbursal_date = @loan.scheduled_disbursal_date
+    @loan.disbursed_by = @loan.applied_by
     success, @fees = @loan.pay_fees(105, @loan.disbursal_date, @manager, User.first)
     success.should == true
 

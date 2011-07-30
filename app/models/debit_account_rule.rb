@@ -62,4 +62,3 @@ class DebitAccountRule
     amount = ((advance_old_balance ? advance_old_balance.send("balance_#{ptype}") : 0) - (advance_balance ? advance_balance.send("balance_#{ptype}") : 0) + (advance_collected ? advance_collected.send("advance_#{ptype}") : 0)).to_f
   end
 end
-
