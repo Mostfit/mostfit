@@ -3,7 +3,7 @@
     Duplicate all accounts of      
     %b Branch
   %form._remote_{:action => url(:controller => :accounts, :action => :duplicate), :method => :get}
-    = select :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Select a branch", :selected => (@branch ? @branch.id.to_s : "")
+    = select :branch_id, :collection => @branches_list, :prompt => "Select a branch", :selected => (@branch ? @branch.id.to_s : "")
     %input{:type => "hidden", :name => "_target_", :value => "form_holder"}
     = submit "GO"
   - if @accounts
@@ -11,6 +11,8 @@
       %table
         %tr
           %th        
+          %th
+            Copy?
           %th
             Account type
           %th
@@ -22,10 +24,12 @@
           %th
             Opening balance on
           %th
-        - @accounts.each_with_index do |account, idx|
+        - @accounts.sort_by{|a| a.account_type}.each_with_index do |account, idx|
           %tr
             %td
               = idx + 1
+            %td
+              = check_box :name => "cb_#{account.id}", :checked => "checked"
             %td
               = account.account_type.name
               = hidden_field :name => "account[][account_type_id]", :value => account.account_type_id

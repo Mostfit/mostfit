@@ -1,4 +1,5 @@
-%table.report.nojs{:width => "100%"}
+=link_to("Add a document", resource(:documents, :new, {:parent_id => @parent.id, :parent_model => @parent.class}), :class => (request.xhr? ? "_remote_ add greenButton" : "add greenButton"))
+%table.narrow{:width => "100%"}
   %tr    
     %th
       Type
@@ -54,4 +55,4 @@
             = link_to 'download page 4', document.document_4.url, :target => "BLANK"
       %td
         = link_to_with_rights('Edit', url(:action => :edit, :id => document, :parent_id => @parent.id, :parent_model => @parent.class), :class => (request.xhr? ? "_remote_" : ""))
-=link_to("New", resource(:documents, :new, {:parent_id => @parent.id, :parent_model => @parent.class}), :class => (request.xhr? ? "_remote_ add" : "add"))
+

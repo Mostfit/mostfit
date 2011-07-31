@@ -23,7 +23,7 @@
     - if session.user.role == :admin
       %form{:class => "_remote_", :method => "GET", :action => resource(:journals, :new, {:return => params[:return]})}
         %b Select branch
-        = select :name => :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}, :prompt => "Head office accounts", :selected => params[:branch_id]
+        = select :name => :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}.unshift([0, 'Head Office Accounts']), :prompt => "Select Account", :selected => params[:branch_id]
         %b Journal Type
         = select :name => :journal_type_id, :collection => JournalType.all.map{|x| [x.id, x.name]}, :selected => params[:journal_type_id]
         %input{:type => :hidden, :name => "_target_", :value => "voucher_container"}

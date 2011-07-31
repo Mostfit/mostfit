@@ -1,0 +1,61 @@
+%table.narrow{ :style => "width:95%; margin: auto" }
+  %thead
+    %tr.shaded
+      %th
+      %th id
+      %th received on
+      %th received by
+      %th amount
+      %th type
+      %th created at
+      - if context == :deleted
+        %th deleted at
+      %th
+  %tbody
+  - @client = @payments.first.client unless @client
+  - @center = @client.center unless @center
+  - @branch = @center.branch unless @branch 
+  - gpmts = pmts.group_by{|p| p.deleted_at}.to_hash
+  - gpmts.keys.sort.each_with_index do |d,i|
+    - dh = d.to_s.gsub(":","-").gsub("+","-")
+    - clss = cycle('odd','even')
+    - if gpmts[d].count > 1
+      %tr{:class => clss, :style => "border-top: 2px grey solid"}
+        %td{:colspan => "9", :style => "padding-left: 2%"}
+          %span{:style => "font-size: 118%; color: #5C8F11;letter-spacing: 0.02em;"}
+            == #{gpmts[d].count} payments deleted on #{d.to_s}
+          %a{:href => "#", :onclick => "javascript:$('.tr#{dh}').hide(); return false"} hide all
+          |
+          %a{:href => "#", :onclick => "javascript:$('.tr#{dh}').show(); return false"} show all
+          |
+          %a{:href => "#", :onclick => "javascript:$('.#{dh}').attr('checked',true); return false"} check all
+          |
+          %a{:href => "#", :onclick => "javascript:$('.#{dh}').attr('checked',false); return false"} uncheck all
+          |
+          = link_to 'restore all', :action => url(:controller => :loans, :action => :bulk_restore_payments, :date => "#{d.to_s}")
+
+    - gpmts[d].each_with_index do |payment, pi|
+      - tr_style = (pi == 0) ? "border-top: solid 1px grey;" : ""
+      - tr_style += "display: none;" if gpmts[d].count > 1
+      %tr{ :class => "#{clss} tr#{dh}", :style => tr_style }
+        %td &nbsp;
+        %td
+          = check_box :name => "payments[#{payment.id}]", :id => "payments[#{payment.id}]", :class => dh
+          = payment.id
+        %td
+          %i= payment.received_on
+        %td
+          %b= link_to payment.received_by.name, resource(payment.received_by)
+        %td
+          %b= payment.amount.to_currency
+        %td
+          %b= payment.type.to_s
+        %td
+          = payment.created_at
+        %td
+          = payment.deleted_at
+        %td
+          - if payment.loan_id 
+            restore
+
+%p= link_to 'new repayment >>', url_for_loan(@loan, 'payments/new'), :class => "button"

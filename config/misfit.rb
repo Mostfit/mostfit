@@ -57,13 +57,15 @@ module Misfit
       },
       :read_only => {
         :all => [:searches, :browse, :branches, :centers, :payments, :clients, :loans, :dashboard, :regions, :reports, :documents, :comments, :insurance_policies, :audit_trails, :info,
-                 :insurance_companies, :areas, :staff_members, :loan_products, :holidays, :document_types, :occupations, :client_types, :fees, :funders, :attendances, :dashboard, :graph_data,
-                :locations, :branch_diaries, :stock_registers, :asset_registers]
+                 :insurance_companies, :areas, :staff_members, :document_types, :occupations, :client_types, :fees, :funders, :attendances, :dashboard, :graph_data,
+                 :locations, :branch_diaries, :stock_registers, :asset_registers], 
+        :index => [:holidays, :loan_products]
       },
       :staff_member => {
-        :all => [:documents, :searches, :browse, :branches, :centers, :payments, :clients, :client_groups, :groups, :audit_trails, :comments, :insurance_policies, 
-                 :reports, :"data_entry/centers", :"data_entry/client_groups", :"data_entry/payments", :"data_entry/clients", :staff_members, :audit_items, :locations,
-                 :"data_entry/loans", :"data_entry/index", :insurance_companies, :info, :dashboard, :graph_data, :branch_diaries, :stock_registers, :asset_registers, :bookmarks, :loan_products, :holidays]
+        :all => [:documents, :searches, :browse, :branches, :centers, :payments, :clients, :client_groups, :groups, :audit_trails, :comments, :insurance_policies, :bookmarks, 
+                 :reports, :"data_entry/centers", :"data_entry/client_groups", :"data_entry/payments", :"data_entry/clients", :staff_members, :audit_items, :locations, :loans,
+                 :"data_entry/loans", :"data_entry/index", :insurance_companies, :info, :dashboard, :graph_data, :branch_diaries, :stock_registers, :asset_registers], 
+        :index => [:holidays, :loan_products]
       },
       :funder => {
         :all => [:searches, :browse, :branches, :centers, :client_groups, :payments, :clients, :loans, :dashboard, :regions, :documents, :comments, :areas, :info, :locations,
@@ -84,12 +86,9 @@ module Misfit
     
     module DateFormat
       def self.compile(mfi = Mfi.first)
-        if format = mfi.date_format and not format.blank? and Mfi::DateFormats.include?(format)
-          Date.class_eval do
-            format = mfi.date_format
-            define_method :to_s do
-              self.strftime(format)
-            end
+        Date.class_eval do
+          define_method :to_s do
+            self.display
           end
         end
         

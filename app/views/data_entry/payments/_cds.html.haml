@@ -1,6 +1,6 @@
 - if @md
   Payments collected by 
-  = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'payments_received_by'
+  = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'payments_received_by', :class => "chosen"
   collected on
   = date_select "received_on", @date
   %table.report.nojs
@@ -25,7 +25,12 @@
       - clients = Client.all(:center_id => @center.id, :active => true, :date_joined.lte => @date, :fields => [:id, :name, :client_group_id, :center_id])
       - atts = Attendance.all(:client_id => clients.map{|x| x.id}, :date => @date).map{|x| [x.client_id,x]}.to_hash
       - loans = @loans||Loan.all(:client_id => clients.map{|x| x.id})
-      - histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
+      - lids = loans.map{|x| x.id}
+      - if lids.empty?
+        - histories = []
+      - else
+        - histories = LoanHistory.all(:loan_id => lids, :date => @date)
+        - histories += (lids - histories.aggregate(:loan_id)).map{|lid| Loan.get(lid).loan_history.last}.compact.select{|lh| lh.date < @date}
       - all_repayment_style_choices = [[NORMAL_REPAYMENT_STYLE,"fees=>int=>prin"], [PRORATA_REPAYMENT_STYLE,"pro rata"]]
       - default_repayment_style = Mfi.first.default_repayment_style ? Mfi.first.default_repayment_style : NORMAL_REPAYMENT_STYLE
       - default_repayment_style_choice = all_repayment_style_choices.select {|style| style[0] == default_repayment_style}
@@ -41,19 +46,30 @@
             - next if not lh
             - next if LOANS_NOT_PAYABLE.include? lh.status
             - loan_row_count += 1
+            - if lh
+              - if lh.total_principal_due > 0
+                - p = lh.total_principal_due - lh.total_principal_paid
+                - i = lh.total_interest_due - lh.total_interest_paid
+              - else
+                - p = [lh.principal_due, 0].max
+                - i = [lh.interest_due,0].max
+            - else
+              - p = 0
+              - i = 0
+
             %tr{ :class => cycle('odd','even') }
               %td.text
                 %b= link_to client.name, resource(@branch, @center, client)
               %td.number
-                = loan.id
+                = link_to loan.id, url_for_loan(loan)
               %td.number
                 - amt = loan.amount
                 %b= amt.to_currency
                 - tot_amount += amt
               %td.number
-                - p = lh.nil? ? 0 : lh.actual_outstanding_principal
-                %b= p.to_currency
-                - tot_outstanding += p
+                - prin = lh.nil? ? 0 : lh.actual_outstanding_principal
+                %b= prin.to_currency
+                - tot_outstanding += prin
               %td.text
                 = loan.disbursal_date.to_s
               %td.number
@@ -61,11 +77,9 @@
                 = ins
                 - tot_installments += ins
               %td.number
-                - p = lh.nil? ? 0 : [lh.principal_due, 0].max
                 = p.round(2)
                 - tot_principal += p
               %td.number
-                - i = lh.nil? ? 0 : [lh.interest_due,0].max
                 = i.round(2)
                 - tot_interest += i
               %td.number

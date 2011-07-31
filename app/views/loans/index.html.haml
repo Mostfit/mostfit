@@ -41,7 +41,7 @@
       %tr
         %td At center
         %td
-          = link_to @center.name, resource(@branch, @center)
+          = link_to @client.center.name, resource(@client.center)
           == (of branch #{link_to @branch.name, resource(@branch)})
           %br/
           %span.greytext
@@ -91,6 +91,7 @@
       %li#insurance Insurance
       %li#payments Repayments
       %li#attendance Attendance
+      %li#misc Miscellaneous
     %div.tab
       %h2== Loans for client <i>#{@client.name}</i>
       
@@ -197,4 +198,19 @@
       %input{:type => "hidden", :name => "_load_remote", :value => resource(@branch, @center, @client, :payments)}
     %div.tab 
       %input{:type => "hidden", :name => "_load_remote", :value => resource( @client, :attendances)}
+    %div.tab
+      %fieldset
+        %legend Applicable Fees
+        - if @client.applicable_fees.empty?
+          = form_for(@loan, :action => url(:controller => 'clients', :action => :levy_fees, :id => @client.id)) do
+            = submit 'Re-apply Fees'
+        - else
+          = partial "applicable_fees/list", :layout => false, :applicable_fees => @client.applicable_fees, :return_url => resource(@branch, @center, @client) + "#misc"
+      - if [:admin, :mis_manager].include?(session.user.role)
+        .box
+          - @applicable_fee = ApplicableFee.new(:applicable_type => 'Client', :applicable_id => @client.id)
+          = partial "applicable_fees/form", :layout => false, :object => @client
+
+
+
   

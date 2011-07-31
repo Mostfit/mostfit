@@ -11,6 +11,7 @@ class Client
   before :valid?, :add_created_by_staff_member
   after  :save,   :check_client_deceased
   after  :save,   :levy_fees
+  after  :save,   :update_loan_cache
   
   property :id,              Serial
   property :reference,       String, :length => 100, :nullable => false, :index => true
@@ -126,6 +127,10 @@ class Client
   validates_attachment_thumbnails :picture
   validates_with_method :date_joined, :method => :dates_make_sense
   validates_with_method :inactive_reason, :method => :cannot_have_inactive_reason_if_active
+
+  def update_loan_cache
+    loans.each{|l| l.update_loan_cache(true); l.save}
+  end
 
   def self.from_csv(row, headers)
     if center_attr = row[headers[:center]].strip
