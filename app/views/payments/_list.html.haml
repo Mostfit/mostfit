@@ -11,8 +11,6 @@
       %th amount
       %th type
       %th created at
-      - if context == :deleted
-        %th deleted at
       %th
   %tbody
   - @client = @payments.first.client unless @client
@@ -38,23 +36,14 @@
         %b= payment.type.to_s
       %td
         = payment.created_at
-      - if context == :deleted
-        %td
-          = payment.deleted_at
       %td
         - if payment.loan_id 
-          - if context == :deleted
-            restore
-          - else
-            = link_to('delete', url_for_loan(payment.loan, "payments/#{payment.id}/delete", :return => url_for_loan(payment.loan) + "#repayments_made"), {:class => "confirm_click", :title => "Are you sure you want to delete this payment of #{payment.amount}"}) unless payment.verified_by_user_id
+          = link_to('delete', url_for_loan(payment.loan, "payments/#{payment.id}/delete", :return => url_for_loan(payment.loan) + "#repayments_made"), {:class => "confirm_click", :title => "Are you sure you want to delete this payment of #{payment.amount}"}) unless payment.verified_by_user_id
           - next if session.user.role!=:admin
           |
           = link_to('edit', url_for_loan(payment.loan, "payments/#{payment.id}/edit")) unless payment.verified_by_user_id
         - else
-          - if context == :deleted
-            restore
-          - else
-            = link_to('delete', resource(@branch, @center, payment.client, payment, :delete), {:class => "confirm_click", :title => "Are you sure you want to delete this payment of #{payment.amount}"}) unless payment.verified_by_user_id
+          = link_to('delete', resource(@branch, @center, payment.client, payment, :delete), {:class => "confirm_click", :title => "Are you sure you want to delete this payment of #{payment.amount}"}) unless payment.verified_by_user_id
           - next if session.user.role!=:admin
           |
           = link_to('edit', resource(@branch, @center, payment.client, payment, :edit)) unless payment.verified_by_user_id
