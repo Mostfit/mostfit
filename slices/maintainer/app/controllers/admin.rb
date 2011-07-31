@@ -9,6 +9,17 @@ class Maintainer::Admin < Maintainer::Application
   def new
     render :layout => false
   end
+  
+  def stop
+    `touch tmp/stop.txt`
+    render :index, :layout => false
+  end
+
+  def start
+    `rm tmp/stop.txt`
+    render :index, :layout => false
+  end
+
 
   def create
     ret = create_user

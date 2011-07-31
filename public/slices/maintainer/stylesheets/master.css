@@ -285,7 +285,7 @@ input[type=button]:active, input[type=submit]:active {
 }
 .tab {
     position:relative !important;
-    padding:20px;
+    padding:5px;
     z-index:10 !important;
     clear:both;
 }
@@ -321,4 +321,141 @@ input[type=button]:active, input[type=submit]:active {
     border:1px solid #1C252B !important;
     border-bottom:0 !important;
     color:white !important;
+}
+
+input.stopButton {
+    -moz-box-shadow:inset 0px 1px 0px 0px #f29c93;
+    -webkit-box-shadow:inset 0px 1px 0px 0px #f29c93;
+    box-shadow:inset 0px 1px 0px 0px #f29c93;
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fe1a00), color-stop(1, #ce0100) );
+    background:-moz-linear-gradient( center top, #fe1a00 5%, #ce0100 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fe1a00', endColorstr='#ce0100');
+    background-color:#fe1a00;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    border:1px solid #d83526;
+    display:inline-block;
+    color:#ffffff;
+    font-family:arial;
+    font-size:15px;
+    font-weight:bold;
+    padding:6px 24px;
+    text-decoration:none;
+    text-shadow:1px 1px 0px #b23e35;
+}
+input.stopButton:hover {
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ce0100), color-stop(1, #fe1a00) );
+    background:-moz-linear-gradient( center top, #ce0100 5%, #fe1a00 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ce0100', endColorstr='#fe1a00');
+    background-color:#ce0100;
+}
+input.stopButton:active {
+    position:relative;
+    top:1px;
+}
+
+input.startButton {
+    -moz-box-shadow:inset 0px 1px 0px 0px #c1ed9c;
+    -webkit-box-shadow:inset 0px 1px 0px 0px #c1ed9c;
+    box-shadow:inset 0px 1px 0px 0px #c1ed9c;
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #9dce2c), color-stop(1, #8cb82b) );
+    background:-moz-linear-gradient( center top, #9dce2c 5%, #8cb82b 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#9dce2c', endColorstr='#8cb82b');
+    background-color:#9dce2c;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    border:1px solid #83c41a;
+    display:inline-block;
+    color:#ffffff;
+    font-family:arial;
+    font-size:15px;
+    font-weight:bold;
+    padding:6px 24px;
+    text-decoration:none;
+    text-shadow:1px 1px 0px #689324;
+}
+input.startButton:hover {
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #8cb82b), color-stop(1, #9dce2c) );
+    background:-moz-linear-gradient( center top, #8cb82b 5%, #9dce2c 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#8cb82b', endColorstr='#9dce2c');
+    background-color:#8cb82b;
+}
+input.startButton:active {
+    position:relative;
+    top:1px;
+}
+
+.msg {
+  font-size: 1.2em;
+  text-align: center;
+  color: black;
+  margin: 5px;
+}
+
+.msg .error {
+  background: lightpink;
+  border: solid 2px maroon;
+  padding: 5px;
+}
+
+.msg .notice {
+  background: lightgreen;
+  border: solid 2px darkgreen;
+  padding: 5px;
+}
+
+div.tab_container{
+    border: 1px solid #CDD3FE;
+}
+div.tab_container ul.tabs{
+    margin-left: 0px;
+    background-color: #CDD3FE;
+    height: 45px;
+    border-bottom: 3px solid #CDD3FE;
+}
+
+div.tab_container ul.inner{
+    margin-left: 0px;
+    height: 45px;
+    border-bottom: solid 1px #9e9e8e;
+    background-color: beige;
+}
+div.tab_container ul.tabs li{
+    display: inline;
+    padding: 5px;
+    cursor: pointer;   
+    margin-top: 25px;
+    margin-right: 5px;
+    list-style-type: none;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #CDD3FE;
+    position: relative;
+    top: 24px;
+    border: 1px solid #EDF3FE;
+    font-weight: strong;
+    font-size: 1.3em;
+}
+
+div.tab_container div.inner {
+}
+
+div.tab_container ul.inner li{
+    background-color: #9e9e8e;
+    color: white;
+    font-size: 1.2em;
+    position: relative;
+    top: 20px;
+}
+
+div.tab_container ul.inner .active{
+    background-color: lightyellow;
+    color: black;
+}
+
+div.tab_container ul.tabs li.active{
+    border-bottom: 3px solid white;
+    background-color: white;
 }
