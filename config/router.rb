@@ -82,6 +82,9 @@ Merb::Router.prepare do
   match('/design').to(:controller => 'loan_products', :action => 'design').name(:design_loan_product)
   match('/centers/:id/groups(/:group_id).:format').to(:controller => 'centers', :action => 'groups')
 
+  # maintainer slice
+  slice(:maintainer, :path_prefix => "maintain")
+
   slice(:merb_auth_slice_password, :name_prefix => nil, :path_prefix => "")
   match('/search(/:action)').to(:controller => 'searches')
   match('/searches(/:action)').to(:controller => 'searches')

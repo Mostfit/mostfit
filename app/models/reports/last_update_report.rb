@@ -17,7 +17,9 @@ class LastUpdateReport < Report
   
   def generate
     data = []
-    if @branch_id
+    if @branch_id and Branch.get(@branch_id).centers.empty?
+      data = nil
+    elsif @branch_id
       grouper = Branch.get(@branch_id).centers.aggregate(:id)
       d1 = Loan.all(:c_center_id => grouper).aggregate(:c_center_id, :c_last_payment_received_on.max, :created_at.max).group_by{|x| Center.get(x[0]).name}.to_hash
       d2 = Client.all(:center_id => grouper).aggregate(:center_id, :created_at.max).group_by{|x| Center.get(x[0]).name}.to_hash
@@ -34,8 +36,10 @@ class LastUpdateReport < Report
       #   datum.unshift(Branch.get(datum[0]).name)
       # }
     end
-    groups = d2.keys
-    data = groups.map{|group| [group, d1[group], d2[group]]}
+    unless data == nil
+      groups = d2.keys
+      data = groups.map{|group| [group, d1[group], d2[group]]}
+    end
     return data
   end
 end 

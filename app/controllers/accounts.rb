@@ -65,7 +65,6 @@ class Accounts < Application
   end
 
   def create(account)
-    debugger
     if account.is_a?(Hash)
       @account = Account.new(account)
       if @account.save
@@ -127,7 +126,6 @@ class Accounts < Application
 
   def duplicate
     unless params[:branch_id].blank?
-      debugger
       if params[:branch_id] == "0"
         @branch = Branch.new(:name => "HO", :id => 0)
       else
@@ -160,7 +158,6 @@ class Accounts < Application
   end
 
   def bulk_create_for(branch, accounts)
-    debugger
     errors = []
     accounts.each{|a|
       new_account = Account.new(a)

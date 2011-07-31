@@ -1,0 +1,20 @@
+%script{:src => javascript_path('logs.js'), :type => "text/javascript"}
+
+#logs
+  #input
+    %table
+      %tr
+        %td
+          File:
+        %td
+          %select{:name => "file"}
+            %option{:value => "none"} Select a file to watch...
+            - @watchable_files.each do |file|
+              %option{:value => file}= file            
+      %tr
+        %td
+          No. of lines:
+        %td
+          %input{:type => "number", :min => "10", :max => "500", :step => "10", :value => DEFAULT_MAX_LINE_COUNT, :name => "max_line_count"}
+    
+  #log

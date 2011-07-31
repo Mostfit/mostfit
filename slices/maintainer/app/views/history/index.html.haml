@@ -1,0 +1,15 @@
+%script{:src => javascript_path('history.js'), :type => "text/javascript"}
+
+- @history_items = DM_REPO.scope { Maintainer::HistoryItem.all(:order => [:time.desc]).paginate(:page => params[:page], :per_page => 15) }
+
+#history
+  - if @history_items.length > 0
+    .pagination
+      = paginate @history_items
+    %ul
+      - @history_items.each do |item|
+        %li.history-item= item.stringify
+    .pagination
+      = paginate @history_items
+  - else
+    %p Any actions performed in Mostfit Maintainer will be logged here.
