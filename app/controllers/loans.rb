@@ -226,7 +226,7 @@ class Loans < Application
     else
       @errors = []
       loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
-      @loans_to_approve = get_loans({:approved_on => nil, :rejected_on => nil})
+      @loans_to_approve = get_loans({:approved_on => nil, :rejected_on => nil}, false)
 
       loans.keys.each do |id|
         loan = Loan.get(id)
@@ -500,12 +500,12 @@ class Loans < Application
   end
   
   # set the loans which are accessible by the user
-  def get_loans(hash)
+  def get_loans(hash, paginate = true)
     if staff = session.user.staff_member
       hash["client.center.branch_id"] = [staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten.map{|x| x.id}
       Loan.all(hash)
     else
-      Loan.all(hash).paginate(:page => params[:page], :per_page => 10)        
+      paginate ? Loan.all(hash).paginate(:page => params[:page], :per_page => 10)  : Loan.all(hash)
     end
   end
 

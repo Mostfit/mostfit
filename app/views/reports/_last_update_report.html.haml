@@ -1,33 +1,51 @@
 = partial :form
-%table.report.nojs
-  %tr.header
-    %th
-      Branch
-    %th
-      Last Payment created at
-    %th
-      Last Loan created at
-    %th
-      Last Client created at
-  - branch_id = nil
-  - length = 4
-  - @data.each do |datum|
-    %tr.branch
-      %td
-        %b
-          = datum[0]
-      %td
-        - if datum[1]
-          = datum[1][0][1]
+- if @data
+  %table.report.nojs
+    %tr.header
+      %th
+        - if params[:last_update_report][:branch_id].empty?
+          Branch
         - else
-          NA
-      %td
-        - if datum[1]
-          = datum[1][0][2].ctime
-        - else
-          NA
-      %td
-        - if datum[2]
-          = datum[2][0][1].ctime
-        - else
-          NA
+          Center
+      %th
+        Last Payment created at
+      %th
+        Last Loan created at
+      %th
+        Last Client created at
+    - branch_id = nil
+    - length = 4
+    - @data.each do |datum|
+      %tr.branch
+        %td
+          - if params[:last_update_report][:branch_id].empty?
+            %b
+              = link_to "#{datum[0]}", url(:submit => 'go', :last_update_report => {:branch_id => datum[2][0][0]}, :action => 'show', :controller => 'reports', :report_type => 'LastUpdateReport', :branch_id => datum[2][0][0])
+          - else
+            %b 
+              = datum[0]
+        %td
+          - if datum[1]
+            = datum[1][0][1]
+          - else
+            NA
+        %td
+          - if datum[1]
+            - if datum[1][0][2]
+              = datum[1][0][2].ctime
+            - else
+              NA
+          - else
+            NA
+        %td
+          - if datum[2]
+            - if datum[2][0][1]
+              = datum[2][0][1].ctime
+            - else
+              NA
+          - else
+            NA
+- else
+  %br
+    %h2
+      No centers exist for this branch
