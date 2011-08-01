@@ -25,7 +25,8 @@
           |
           %a{:href => "/logout", :title => "Logout"} Logout
       #w
-        - `w`.split("\n")[0]
+        %pre
+          = `w`.split("\n")[0]
       .tab_container
         %ul.tabs
           - @tabs.each do |tab|
