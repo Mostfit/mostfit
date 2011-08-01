@@ -37,6 +37,7 @@ class RuleBook
   validates_with_method  :expire_old_rule
   validates_with_method  :rule_date_range_validation
   validates_with_method  :cannot_overlap
+  validates_with_method  :fees_selected
 
   # This function is used to get accounts based on the transaction in the loan system.
   # Right now these transactions can be payments, loans, or array of payments or loans.
@@ -119,6 +120,11 @@ class RuleBook
   def percentage_should_be_100
     return [false, "Credit account split is not 100%"] if credit_account_rules.map{|a| a.percentage}.inject(0){|s,x| s+=x||0}!=100
     return [false, "Debit account split is not 100%"]  if debit_account_rules.map{|a| a.percentage}.inject(0){|s,x| s+=x||0}!=100
+    return true
+  end
+
+  def fees_selected
+    return [false, "fee must be selected for fee action"] if action == 'fees' and fee_id == nil
     return true
   end
 
