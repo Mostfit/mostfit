@@ -1,0 +1,37 @@
+#make-task
+  %input.ajax-fetch{:type => "button", :value => "Add Task", :url => "/maintain/tasks/new"}
+%hr
+#tasks
+  - crontab = CronEdit::Crontab.new(`echo $USER`.chomp)
+  - @tasks, @tasks_keys = [], []
+  - crontab.list_maintainer.each do |k,v|
+    - @tasks.push(v.to_task)
+    - @tasks_keys.push(k)
+  - if @tasks.length > 0
+    List of active tasks:
+    %table.spacious
+      %thead
+        %tr
+          %th No.
+          %th Task
+          %th Schedule
+          %th
+      %tbody
+        - @tasks.each_with_index do |task,index|
+          %tr
+            %td= index+1
+            %td= task[:rake_task]
+            %td= task[:schedule]
+            %td
+              %a.ajax-fetch{:href => "#",
+                            :url => "/maintain/tasks/edit?task=#{@tasks_keys[index]}"} Edit
+              |
+              %a.confirm{:href => "#",
+                         :url => "/maintain/tasks/delete?task=#{@tasks_keys[index]}",
+                         :reload_url => "/maintain/tasks",
+                         :message => "Are you sure you want to delete the scheduled task \"#{task[:rake_task]}\"?",
+                         :success => "Scheduled task deleted.",
+                         :icon => image_path('calendar.png'),
+                         :before => "show_overlay(); $.notify_osd.create({ text: 'Deleting scheduled task...', icon: $(this).attr('icon'), sticky: true, dismissable: false })"} Delete
+  - else
+    You do not have any tasks scheduled.

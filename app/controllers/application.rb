@@ -98,7 +98,6 @@ class Application < Merb::Controller
       error += "verified data cannot be deleted"
     end
 
-    debugger
       # if flag is still set to true delete the object
     if flag == true and obj.destroy
       # delete all the loan history

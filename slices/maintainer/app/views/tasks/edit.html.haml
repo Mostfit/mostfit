@@ -1,0 +1,13 @@
+#edit-task
+  %form.ajaxy{:action => "/maintain/tasks/update",
+              :method => "POST",
+              :reload_url => "/maintain/tasks",
+              :icon => image_path('calendar.png'),
+              :processing => "Updating scheduled task...",
+              :true => "Scheduled task updated."}
+    
+    = partial :fields
+
+    .button-group
+      %input.form-submit{:type => "button", :name => "submit", :value => "Submit"}
+      %input.ajax-fetch{:type => "button", :value => "Cancel", :url => "/maintain/tasks"}

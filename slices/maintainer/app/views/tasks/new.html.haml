@@ -1,0 +1,19 @@
+#add-task
+  %form.ajaxy{:action => "/maintain/tasks/create",
+              :method => "POST",
+              :reload_url => "/maintain/tasks",
+              :icon => image_path('calendar.png'),
+              :processing => "Creating scheduled task...",
+              :true => "Scheduled task created."}
+    #command-section
+      - @rake_tasks = get_mostfit_rake_tasks
+      Task: 
+      %select{:name => "task"}
+        - @rake_tasks.each do |task,desc|
+          %option{:value => task}= task + ' -- ' + desc
+        
+    = partial :fields
+
+    .button-group
+      %input{:type => "button", :name => "submit", :value => "Submit"}
+      %input.ajax-fetch{:type => "button", :value => "Cancel", :url => "/maintain/tasks"}

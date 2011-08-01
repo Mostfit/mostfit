@@ -22,7 +22,6 @@
   %tbody
     - lids = loans.map{|x| x.id}
     - histories = LoanHistory.all(:loan_id => lids, :date => @date)
-    - debugger
     - histories += (lids - histories.map{|lh| lh.loan_id}).map{|lid| Loan.get(lid).loan_history.last}.compact.select{|lh| lh.date < @date}
     - fees_applicable = Fee.due(loans.map{|x| x.id}, {:date => @date})
     - fees_paid       = {}
