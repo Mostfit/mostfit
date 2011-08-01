@@ -13,7 +13,7 @@
     - os_int = @loan.actual_outstanding_interest_on(@date)
     - info = @loan.info(@date)
     - missed_int = info.total_interest_due - info.total_interest_paid
-    - accrued_int = @date > info.date ? info.actual_outstanding_principal * @loan.interest_rate * (@date - info.date) / 365 : 0
+    - accrued_int = @date > info.date ? info.actual_outstanding_principal * @loan.interest_rate * ((@date - info.date) - 1) / 365 : 0
     - allow_override = (not @loan.loan_product.loan_validation_methods.split(",").include?("prepayment_must_be_per_system_numbers"))
     %h2
       Loan id
@@ -78,7 +78,12 @@
             - else
               = (missed_int + accrued_int).to_currency
               = hidden_field :name => :interest, :value => (missed_int + accrued_int).to_currency
-
+        %tr.total
+          %th
+            Total P and I due
+          %td
+          %td
+            = (missed_int + accrued_int + os_prin).to_currency
         %tr
           %th
             Penalty

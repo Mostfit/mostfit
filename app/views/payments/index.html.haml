@@ -225,7 +225,7 @@
           %tr
             %td{ :colspan => 7 }
     %div.tab
-      = partial "payments/list"
+      = partial "payments/list", :pmts => @payments
     - if @loan.insurance_policy
       %div.tab
         %input{:type => "hidden", :name => "_load_remote", :value => resource(@loan.insurance_policy)}
