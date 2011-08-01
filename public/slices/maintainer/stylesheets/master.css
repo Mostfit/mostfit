@@ -429,8 +429,6 @@ div.tab_container ul.tabs li{
     margin-top: 25px;
     margin-right: 5px;
     list-style-type: none;
-    padding-left: 10px;
-    padding-right: 10px;
     background-color: #CDD3FE;
     position: relative;
     top: 24px;
@@ -459,3 +457,4 @@ div.tab_container ul.tabs li.active{
     border-bottom: 3px solid white;
     background-color: white;
 }
+

@@ -1162,10 +1162,18 @@ class Loan
   end
 
 
+  def correct_prepayments
+    
+  end
+
 
   def reallocate(style, user)
     self.extend_loan
     return false unless REPAYMENT_STYLES.include?(style)
+    if style == :correct_prepayments
+      status, _pmts = correct_prepayments
+      return status, _pmts
+    end
     _ps  = self.payments(:type => [:principal, :interest])
     ph = _ps.group_by{|p| p.received_on}.to_hash
     _pmts = []
