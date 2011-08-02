@@ -143,9 +143,6 @@ module Mostfit
 
     module BulletLoanWithPeriodicInterest
 
-      def self.extended(base)
-        base.extend Mostfit::PaymentStyles::BulletLoan
-      end
 
       def self.display_name
         "Single shot principal with periodic interest (Bullet Loan With Periodic Interest)"
