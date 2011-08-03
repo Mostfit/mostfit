@@ -3,7 +3,6 @@
 = error_messages_for @client_type
 
 = form_for(@client_type, :action => url(:client_types), :class => "form" ) do
-  = partial :fields
-  %button{:type => "submit", :class => "add"} "Create a new Client Type"
+  = partial :fields, :button_text => "Create a new Client Type"
 
 = link_to 'Back', url(:client_types)

@@ -195,5 +195,8 @@ Merb::BootLoader.after_app_loads do
   rescue
   end
   $holidays_list = []
-  Holiday.all.each{|h| $holidays_list << [h.date.day, h.date.month, h.date.strftime('%y')]}
+  begin
+    Holiday.all.each{|h| $holidays_list << [h.date.day, h.date.month, h.date.strftime('%y')]}
+  rescue
+  end
 end

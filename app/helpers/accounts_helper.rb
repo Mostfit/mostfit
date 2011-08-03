@@ -30,15 +30,17 @@ module Merb
     
     def output_li(account, depth, tag, emit_closing=true, selected = nil)
       if tag == 'ul'
-        return ( account.branch_edge ? "<li>#{link_to(account.name, resource(account))}#{"<span class=\"branchName\">" + account.branch.name + '</span>' if account.branch}#{emit_closing ? '</li>' : ''}" : "")
+        return ( (account.branch_edge) ? "<li>#{link_to(account.name, resource(account))}#{"<span class=\"branchName\">" + account.branch.name + '</span>' if account.branch}#{emit_closing ? '</li>' : ''}" : "")
       else
-        prefix = (0..(depth*4)).map{|d| "&nbsp;"}.join
-        s = account.id == selected ? "selected='selected'" : ""
-        return (account.branch_edge ? "<option value='#{account.id}' #{s} class='depth-#{depth}'>#{prefix}#{account.name} <b>#{account.branch.name if account.branch}</b></option>" : "")
+        prefix = '' #(0..depth*2).map{|d| "&nbsp;"}.join
+        return ( (account.branch_edge) ? "<option value='#{account.id}' class='depth-#{depth}'>#{prefix}#{account.name} : #{account.branch.name if account.branch}</option>" : "")
       end
     end
 
-    def show_accounts_selector(accounts, selected = nil)
+    def show_accounts_selector(accounts, opts = {})
+      selected_id = opts.delete(:selected_id)
+      tag = opts.delete(:tag)
+      prompt = opts.delete(:prompt)
       rv = ""
       if accounts
         accounts.sort_by{|account_type, accounts| account_type.name}.each do |account_type, as|
@@ -49,6 +51,12 @@ module Merb
           end
         end
       end
+      rv = "<option value=''>#{prompt}</option>#{rv}" if prompt
+      if selected_id
+        rv = rv.gsub("value='#{selected_id}'", "value='#{selected_id}' selected='selected'")
+      end
+      attrs = opts.map{|k,v| "#{k}='#{v}'"}.join(" ")
+      rv = "<select #{attrs}>#{rv}</select>" if tag
       return rv
     end
 

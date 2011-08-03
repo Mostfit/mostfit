@@ -108,7 +108,8 @@ class Loans < Application
     redirect url_for_loan(@loan) + "#misc", :message => {:notice => 'Fees levied'}
   end
 
-
+  def bulk_restore_payments(id)
+  end
 
 
   def edit(id)
@@ -225,7 +226,7 @@ class Loans < Application
     else
       @errors = []
       loans = params[:loans].select{|k,v| v[:approved?] == "on"}.to_hash
-      @loans_to_approve = get_loans({:approved_on => nil, :rejected_on => nil})
+      @loans_to_approve = get_loans({:approved_on => nil, :rejected_on => nil}, false)
 
       loans.keys.each do |id|
         loan = Loan.get(id)
@@ -401,6 +402,7 @@ class Loans < Application
     if request.method == :get
       display @loan, :layout => layout?
     else
+      debugger
       staff = StaffMember.get(params[:received_by])
       raise ArgumentError.new("No staff member selected") unless staff
       raise ArgumentError.new("No applicable fee for penalty") if (params[:fee].blank? and (not params[:penalty_amount].blank?))
@@ -408,23 +410,25 @@ class Loans < Application
 
       # make new applicable fee for the penalty
       pmt_params = {:received_by => staff, :loan_id => @loan.id, :created_by => session.user, :client => @loan.client, :received_on => @date}
-      if params[:penalty_amount].to_i > 0
-        af = ApplicableFee.new(:amount => params[:penalty_amount], :applicable_type => 'Loan', :applicable_id => @loan.id, :fee_id => params[:fee], :applicable_on => @date)
-        af.save
-        penalty_pmt =  Payment.new({:amount => params[:penalty_amount].to_f, :fee_id => params[:fee], :comment => af.fee.name, :type => :fees}.merge(pmt_params))
+      unless params[:fee].blank?
+        if params[:penalty_amount].to_i > 0
+          af = ApplicableFee.new(:amount => params[:penalty_amount], :applicable_type => 'Loan', :applicable_id => @loan.id, :fee_id => params[:fee], :applicable_on => @date)
+          af.save
+          penalty_pmt =  Payment.new({:amount => params[:penalty_amount].to_f, :fee_id => params[:fee], :comment => af.fee.name, :type => :fees}.merge(pmt_params))
+        end
+        if params[:fees].blank?
+          fee_payments = []
+        else
+          fee_payments = params[:fees].map do |k,v| 
+            fee = Fee.get(k)
+            Payment.new({:amount => v.to_f, :fee => fee, :comment => fee.name, :type => :fees}.merge(pmt_params))
+          end.compact
+        end
       end
-      if params[:fees].blank?
-        fee_payments = []
-      else
-        fee_payments = params[:fees].map do |k,v| 
-          fee = Fee.get(k)
-          Payment.new({:amount => v.to_f, :fee => fee, :comment => fee.name, :type => :fees}.merge(pmt_params))
-        end.compact
-      end
-
       ppmt = Payment.new({:amount => params[:principal].to_f, :type => :principal}.merge(pmt_params))
       ipmt = Payment.new({:amount => params[:interest].to_f, :type => :interest}.merge(pmt_params))
-      pmts = (fee_payments + [penalty_pmt, ppmt, ipmt].compact).select{|p| p.amount > 0}
+      
+      pmts = ((fee_payments || []) + [penalty_pmt, ppmt, ipmt].compact).select{|p| p.amount > 0}
 
       if pmts.blank?
         success = true
@@ -497,12 +501,12 @@ class Loans < Application
   end
   
   # set the loans which are accessible by the user
-  def get_loans(hash)
+  def get_loans(hash, paginate = true)
     if staff = session.user.staff_member
       hash["client.center.branch_id"] = [staff.branches, staff.areas.branches, staff.regions.areas.branches].flatten.map{|x| x.id}
       Loan.all(hash)
     else
-      Loan.all(hash).paginate(:page => params[:page], :per_page => 10)        
+      paginate ? Loan.all(hash).paginate(:page => params[:page], :per_page => 10)  : Loan.all(hash)
     end
   end
 

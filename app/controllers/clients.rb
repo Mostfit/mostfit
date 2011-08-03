@@ -64,7 +64,6 @@ class Clients < Application
     @client = Client.get(id)
     raise NotFound unless @client
     disallow_updation_of_verified_clients
-    debugger
     @client.update_attributes(client)      
     if @client.errors.blank?
       if params[:tags]

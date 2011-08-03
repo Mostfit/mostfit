@@ -1,19 +1,26 @@
 %h1
   Client Types
-
-= link_to 'New Client Type', url(:new_client_type), :class => "add"
+.menu-strip
+  = link_to 'New Client Type', url(:new_client_type), :class => "add"
 %br
-%table.form.narrow{:style => "margin-top: 10px;"}
+%table.narrow.shaded
   %thead
-    %tr
+    %tr.shaded
       %th
         Name
       %th
+        Fees Applicable
+      %th
         Action
   - for client_type in @client_types
-    %tr
+    %tr{:class => cycle('odd','even')}
       %td
         = client_type.type
+      %td
+        %ul.inline
+          - client_type.fees each do |f|
+            %li
+              = link_to f.name.humanize, resource(f)
       %td
         = link_to 'Show', url(:client_type, client_type)
         |

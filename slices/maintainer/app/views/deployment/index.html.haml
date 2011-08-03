@@ -1,0 +1,68 @@
+%script{:src => javascript_path('deployment.js'), :type => "text/javascript"}
+
+#branch-data
+  %input{:type => "hidden", :value => @current_branch}
+
+#deploy
+  %form.ajaxy{:action => "/maintain/deployment/deploy",
+              :method => "POST",
+              :reload_url => "/maintain/deployment",
+              :icon => image_path('gears.png'),
+              :processing => "Deploying...",
+              :true => "Code deployed.",
+              :no_effect => "Deployment with those parameters will have no effect."}
+    #branch-type
+      Deploy a:
+      %input{:type => "radio", :name => "branch_type", :value => "local", :checked => "checked"} local branch  
+      %input{:type => "radio", :name => "branch_type", :value => "remote"} remote branch
+    %br
+
+    #branch
+      Branch: 
+      %select#branch-type-local{:name => "local_branch"}
+        - @branches.each do |branch|
+          - if branch == @current_branch
+            %option{:value => branch, :selected => "selected"}= branch
+          - else
+            %option{:value => branch}= branch
+      %input#branch-type-remote{:type => "text", :name => "remote_branch", :style => "display:none;"}
+    %br
+
+    #upgrade-db
+      Upgrade Database?
+      %input{:type => "checkbox", :name => "upgrade_db", :value => "yes"}
+      %span NOTE: The site will be taken down for a few hours for the database upgrade.
+    %br
+    
+    %input{:type => "button", :name => "submit", :value => "Deploy"}
+
+- @deployments = DM_REPO.scope { Maintainer::DeploymentItem.all(:order => [:time.desc]) }
+- if @deployments.length > 0
+  %hr
+
+  #deployment-log
+    %table.spacious
+      %thead
+        %tr
+          %th SHA
+          %th Branch
+          %th Commit Message
+          %th Deployed on
+          %th
+      %tbody
+        - @deployments.each do |deployment|
+          %tr
+            %td
+              %a{:href => "#", :title => deployment.sha}= deployment.sha.truncate(10)
+            %td= deployment.branch
+            %td= deployment.message
+            %td= deployment.time.strftime(DATE_TIME_FORMAT_READABLE)
+            %td
+              %a.confirm{:href => "#",
+                         :url => "/maintain/deployment/rollback?sha=#{deployment.sha}",
+                         :reload_url => "/maintain/deployment",
+                         :icon => "slices/maintainer/images/gears.png",
+                         :message => "Are you sure you want to rollback to commit #{deployment.sha.truncate(10)}? (You can undo this by deploying again later.)",
+                         :success => "Rollback successful.",
+                         :callback => "check_if_deployment_possible()",
+                         :before => "show_overlay(); $.notify_osd.create({ text:'Rolling back...', icon: $(this).attr('icon'), sticky: true, dismissable: false })"} Rollback

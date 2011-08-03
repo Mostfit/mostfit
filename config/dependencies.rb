@@ -23,7 +23,6 @@ dependency "merb-exceptions", merb_gems_version
 dependency "merb_datamapper", merb_gems_version
 
 dependency "data_objects", do_gems_version
-#dependency "do_sqlite3", do_gems_version  # most development
 dependency "do_mysql", do_gems_version    # most production
 
 dependency "dm-core", dm_gems_version
@@ -46,5 +45,13 @@ dependency "uuid"
 dependency "builder"
 #dependency "dm-is-paginated"
 dependency "mongrel", "1.1.5"
-dependency "ya2yaml", "0.30"
-dependency "i18n", "0.6.0"
+# <<<<<<< HEAD
+# dependency "ya2yaml", "0.30"
+# dependency "i18n", "0.6.0"
+# =======
+
+# dependencies for maintainer slice
+dependency "cronedit", "0.3.0"
+dependency "git", "1.2.5"
+dependency "do_sqlite3", do_gems_version
+# >>>>>>> master
