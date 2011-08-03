@@ -45,8 +45,9 @@ class AccountLoanObserver
   end
   
   def self.reverse_entry(obj, old_attributes)
-    #credit_account, debit_account, rule = RuleBook.get_accounts(obj)
+    credit_account, debit_account, rule = RuleBook.get_accounts(obj)
     # do not do accounting if no matching accounts
+    return unless (credit_account and debit_account)
     j = Journal.first(:transaction_id => obj.id, :journal_type_id => 1, :order => [:created_at.desc])
     credit_account, debit_account = {}, {}
     j.postings.each{|p|

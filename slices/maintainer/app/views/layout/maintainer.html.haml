@@ -1,0 +1,44 @@
+- @tabs = %w(deployment database tasks history billing logs admin status)
+- @tabs_views = ["Deployment", "Database", "Tasks", "History", "Billing", "Logs", "Administration", "Status"]
+!!!
+%html
+  %head
+    %title Maintenance
+    
+    %link{:href => stylesheet_path('master.css'), :type => "text/css", :rel => "stylesheet"}
+    %link{:href => stylesheet_path('notify-osd.css'), :type => "text/css", :rel => "stylesheet"}
+    
+    %script{:src => "../javascripts/jquery.js", :type => "text/javascript"}
+    %script{:src => javascript_path('notify-osd.js'), :type => "text/javascript"}
+    %script{:src => javascript_path('master.js'), :type => "text/javascript"}
+    %script{:src => javascript_path("application.js"), :type => "text/javascript"}
+
+  %body
+    #overlay
+    
+    #container
+      #desc
+        Mostfit Maintainer
+      #logout
+        %p
+          == Welcome, #{session.user.login} (#{session.user.role})
+          |
+          %a{:href => "/logout", :title => "Logout"} Logout
+      #w
+        %pre
+          = `w`.split("\n")[0]
+      .tab_container
+        %ul.tabs
+          - @tabs.each do |tab|
+            %li{ :id => "#{tab}"}
+              = @tabs_views[@tabs.index(tab)]
+
+        - @tabs.each do |tab|
+          - url = '/maintain/'+tab
+          .tab
+            %input{:type => "hidden", :name => "_load_remote", :value => "#{url}"}
+
+    #bottom-message-drawer
+      #bottom-message
+        #bottom-message-inside
+          %span

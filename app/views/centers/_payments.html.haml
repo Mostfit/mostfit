@@ -20,7 +20,9 @@
     %th.due.left-numeric=I18n.t "center.payment.table.due", :default => "due"
     %th.paid.right-numeric=I18n.t "center.payment.table.paid", :default => "paid"
   %tbody
-    - histories = LoanHistory.all(:loan_id => loans.map{|x| x.id}, :date => @date)
+    - lids = loans.map{|x| x.id}
+    - histories = LoanHistory.all(:loan_id => lids, :date => @date)
+    - histories += (lids - histories.map{|lh| lh.loan_id}).map{|lid| Loan.get(lid).loan_history.last}.compact.select{|lh| lh.date < @date}
     - fees_applicable = Fee.due(loans.map{|x| x.id}, {:date => @date})
     - fees_paid       = {}
     - Payment.all(:received_on => @date, :type => :fees, :loan_id => loans.map{|x| x.id}, :fields => [:id, :amount]).map{|p| fees_paid[p.loan_id]||=0; fees_paid[p.loan_id] +=  p.amount}
@@ -46,9 +48,13 @@
           - # next if not lh
           - next if lh and LOANS_NOT_PAYABLE.include?(lh.status) and not (lh.principal_paid>0 or lh.interest_paid>0)
           - next unless loan.respond_to?(:approved_on) and loan.approved_on <= @date
-          - pdue = [(lh ? lh.principal_due : 0), 0].max
+          - if lh and lh.total_principal_due and lh.total_principal_due > 0
+            - pdue = lh.total_principal_due - lh.total_principal_paid
+            - idue = lh.total_interest_due - lh.total_interest_paid
+          - else
+            - pdue = [(lh ? lh.principal_due : 0), 0].max
+            - idue = [(lh ? lh.interest_due : 0), 0].max
           - ppaid = (lh ? lh.principal_paid : 0)
-          - idue = [(lh ? lh.interest_due : 0), 0].max
           - ipaid = [(lh ? lh.interest_paid : 0), 0].max
           - fee_due = loan.total_fees_payable_on(@date) #fees_applicable[loan.id] ? fees_applicable[loan.id].due : 0
           - fee_paid = fees_paid[loan.id] || 0

@@ -1,0 +1,8 @@
+%h2 System Status
+
+- {"w" => "w", "free" => "free", "sql" => "mysql -u #{@mysql_user} -p#{@mysql_password} -e 'show processlist' | grep #{@db}"}.each do |title,cmd|
+  %fieldset
+    %legend 
+      = title
+    %pre
+      = `#{cmd}`.gsub("\n","<br>")

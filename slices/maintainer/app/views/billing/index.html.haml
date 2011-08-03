@@ -1,0 +1,30 @@
+%script{:src => javascript_path('billing.js'), :type => "text/javascript"}
+  
+#billing
+  %form
+    %table
+      %tr
+        %td Metric:
+        %td
+          %select{:name => "metric"}
+            %option{:value => "none"} Select a metric...
+            %option{:value => "active_loans"} Active Loan Counts
+            %option{:value => "total_loans"} Total Loan Counts
+            %option{:value => "total_clients"} Total Client Counts
+      %tr
+        %td Day of month:
+        %td
+          %select{:name => "day_of_month"}
+            %option{:value => "none"} Select a date...
+            - 1.upto(31) do |i|
+              %option{:value => i}= i
+          
+    %input{:type => "button", :value => "Submit"}
+
+  #result
+    %table.spacious
+      %thead
+        %tr
+          %th Date
+          %th Count
+      %tbody

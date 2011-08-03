@@ -1,0 +1,46 @@
+.notify-osd {
+    font-family:Helvetica Neue,Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
+    font-size:14px;
+    position:fixed;
+    top:20px;
+    right:20px;
+    width:350px;
+    background-color:#222222;
+    color:#ffffff;
+    border-radius:4px;
+    box-shadow:0 0 10px #222;
+    -webkit-border-radius:4px;
+    -moz-border-radius:4px;
+    z-index:900;
+}
+.notify-osd:hover {
+    cursor:default !important;
+}
+.notify-osd > div {
+    padding:10px;
+    position:relative;
+}
+.notify-osd table {
+    width:100%;
+    padding:0;
+    -webkit-border-horizontal-spacing:0;
+    -webkit-border-vertical-spacing:0;
+}
+.notify-osd .notify-osd-dismiss {
+    color:#ccc;
+    font-size:13px;
+    position:absolute;
+    top:3px;
+    right:10px;
+    text-decoration:none;
+    z-index:999;
+}
+.notify-osd td.notify-osd-icon {
+    height:48px;
+    width:48px;
+    vertical-align:top;
+}
+.notify-osd td.notify-osd-content {
+    padding-left:10px;
+    vertical-align:center;
+}

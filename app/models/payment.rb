@@ -186,6 +186,7 @@ class Payment
     [false, "Payments can only be created if an active user is supplied"]
   end
   def received_by_active_staff_member?
+    return true if deleted_at
     return true if received_by and received_by.active
     [false, "Receiving staff member is currently not active"]
   end

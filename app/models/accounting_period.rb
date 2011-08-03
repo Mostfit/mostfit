@@ -67,6 +67,15 @@ class AccountingPeriod
     get_accounting_period
   end
 
+  def get_last_accounting_period_before(date = Date.today)
+    AccountingPeriod.all(:to_date.lt => date, :order_by => [:to_date]).last
+  end
+
+
+  def self.get_current_accounting_period!
+    get_accounting_period || get_last_accounting_period_before
+  end
+
   def AccountingPeriod.get_earliest_period; AccountingPeriod.all.sort.first; end
   def is_earliest_period?; self == AccountingPeriod.get_earliest_period; end
 

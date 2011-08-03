@@ -1,10 +1,10 @@
 .shaded
   - if @loan and @loan.disbursal_date
-    .graph{:style => "position: relative; top: 60px"}
-      = ofc2(550, 430, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
+    .graph{:style => "position: relative; top: 50px"}
+      = ofc2(550, 400, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
   
   = error_messages_for @payment
-  - if @loan.loan_history.length == 0 or (@loan.disbursal_date and @loan.payments.count > 0  and @loan.loan_history.max(:created_at).to_time < @loan.payments.max(:created_at).to_time)
+  - if @loan.loan_history.length == 0 or (@loan.disbursal_date and @loan.payments.count > 0  and @loan.loan_history.max(:created_at).to_time < @loan.payments.max(:created_at).to_time) or (@loan.loan_history.last.total_principal_due == 0)
     .error
       History of this loan is not updated. Click
       =link_to("here", url(:controller => "loans", :id => @loan.id, :action => "repair"))
@@ -153,14 +153,15 @@
       %li#audit Audits
       %li#misc Miscellaneous
       %li#history History
+      %li#deleted Deleted Payments
       
     %div.tab
       %h2 
         Repayment schedule
         = link_to "Download pdf", url(:action =>'repayment_sheet', :controller => 'loans', :format => "pdf", :id =>@loan.id), :style => "float: right; margin-right: 25px", :class => "button"
-      %table.narrow.form{ :width => '100%' }
+      %table{ :style => 'width:98%; margin: auto' }
         %thead
-          %tr
+          %tr{:style => "box-shadow: 0px 2px 2px #cfcfcf; -moz-box-shadow: 0px 2px 2px #cfcfcf;"}
             %th
             %th date due
             %th scheduled balance
@@ -187,8 +188,12 @@
                 %td{ :colspan => 6, :style => "text-align: center;" }
                   %span.greytext== today (#{Date.today})
           - first = false
-          %tr{ :class => cycle('odd','') }
-            %td &nbsp;
+          - if lh.date <= Date.today
+            - default =  lh.actual_outstanding_total - lh.scheduled_outstanding_total
+            - default_class = default ? (default > 0 ? 'due' : (default < 0 ? 'overpaid' : 'paid')) : ""
+          %tr{ :class => cycle('odd','even') }
+            %td{:class => default_class}
+              = [i - 1,0].max
             %td
               = lh.date
             %td
@@ -206,21 +211,21 @@
                 %br/
                 %span.greytext
                   == #{lh.principal_paid.to_currency} principal + #{lh.interest_paid.to_currency} interest
-            %td
-              - if lh.date <= Date.today
-                - default =  lh.actual_outstanding_total - lh.scheduled_outstanding_total
+            - if default
+              %td{:class => (default > 0 ? 'due' : (default < 0 ? 'overpaid' : 'paid')) }
                 %b
-                  %span{:class => (default > 0 ? 'red' : (default < 0 ? 'blue' : 'green')) }
-                    = default.to_currency
+                  = default.to_currency
                 %br/
                 %span.greytext
                   = format("%.0f%", (default.abs.to_f / @loan.total_to_be_received) * 100)
                   = default <= 0 ? 'overpaid' : 'shortfall'
+            - else
+              %td
         %tfoot
           %tr
             %td{ :colspan => 7 }
     %div.tab
-      = partial "payments/list"
+      = partial "payments/list", :pmts => @payments
     - if @loan.insurance_policy
       %div.tab
         %input{:type => "hidden", :name => "_load_remote", :value => resource(@loan.insurance_policy)}
@@ -230,4 +235,11 @@
       %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :loans, :action => "misc", :id => @loan.id)}
     %div.tab 
       %input{:type => "hidden", :name => "_load_remote", :value => audit_trail_url}
+    %div.tab
+      - deleted_payments = Payment.with_deleted{ Payment.all(:loan_id => @loan.id, :deleted_at.not => nil) }
+      - if @payments.blank?
+        %h3 No deleted payments
+      - else
+        = partial "payments/deleted_payments", {:pmts => deleted_payments, :context => :deleted}
+
   

@@ -14,7 +14,7 @@ class User
 
   # permissions
   # to add to this, only add at the back of the array
-  ROLES = [:data_entry, :mis_manager, :admin, :read_only, :staff_member, :funder, :accountant]
+  ROLES = [:data_entry, :mis_manager, :admin, :read_only, :staff_member, :funder, :accountant, :maintainer]
   property :role, Enum.send('[]', *ROLES), :nullable => false
 
   # it gets                                   

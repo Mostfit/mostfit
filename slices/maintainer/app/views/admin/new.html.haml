@@ -1,0 +1,29 @@
+%script{:src => javascript_path('admin.js'), :type => "text/javascript"}
+
+#add-user
+  %form.ajaxy{:action => "/maintain/admin/create",
+              :method => "POST",
+              :reload_url => "/maintain/admin",
+              :icon => image_path('user.png'),
+              :processing => "Adding user...",
+              :true => "User added.",
+              :user_exists => "That username is not available.",
+              :different_passwords => "The password and password confirmation did not match."}
+    #fields
+      %table
+        %tbody
+          %tr
+            %td Username:
+            %td
+              %input{:type => "text", :name => "login"}
+          %tr
+            %td Password:
+            %td
+              %input{:type => "password", :name => "password"}
+          %tr
+            %td Confirm password:
+            %td
+              %input{:type => "password", :name => "password_confirmation"}        
+    .button-group
+      %input{:type => "button", :name => "submit", :value => "Submit"}
+      %input.ajax-fetch{:type => "button", :value => "Cancel", :url => "/maintain/admin"}

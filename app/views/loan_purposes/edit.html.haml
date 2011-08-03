@@ -1,11 +1,12 @@
 %h1
-  Edit LoanPurpose
+  = I18n.t "loan_purpose.edit.edit", :default => "Edit Loan Purpose"
 
-= link_to 'Back', url(:loan_purposes)
 = error_messages_for @loan_purpose
 
 = form_for(@loan_purpose, :action => url(:loan_purpose, @loan_purpose)) do
   = partial :fields
-  = submit "Update"
+  = submit I18n.t "loan_purpose.edit.update", :default => "Update"
 
-= link_to 'Show', url(:loan_purpose, @loan_purpose)
+= link_to I18n.t("loan_purpose.edit.show", :default => "Show"), url(:loan_purpose, @loan_purpose)
+|
+= link_to I18n.t("loan_purpose.edit.back", :default => "Back"), url(:loan_purposes)

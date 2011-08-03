@@ -14,7 +14,6 @@ class DataAccessObserver
   
   def self.log(obj)
     f = File.open("log/#{obj.class}.log","a")
-    debugger
     begin
       if obj
         attributes = obj.attributes

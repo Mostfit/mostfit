@@ -1,7 +1,7 @@
 class LoanPurposes < Application
   # provides :xml, :yaml, :js
 
-  before :load_parent, :only => [:new, :create, :update]
+  before :all_loan_purposes, :only => [:new, :create, :update]
   def index
     @loan_purposes = LoanPurpose.all
     display @loan_purposes
@@ -40,7 +40,7 @@ class LoanPurposes < Application
 
   def update(id, loan_purpose)
     @loan_purpose = LoanPurpose.get(id)
-    @loan_purpose.parent_id = 0 if @loan_purpose.parent_id.blank?
+    loan_purpose['parent_id'] = 0 if loan_purpose['parent_id'].blank?
     raise NotFound unless @loan_purpose
     if @loan_purpose.update(loan_purpose)
        redirect resource(@loan_purpose)
@@ -59,8 +59,7 @@ class LoanPurposes < Application
     end
   end
 
-  def load_parent
+  def all_loan_purposes
     @parents = LoanPurpose.all
   end
-
 end # LoanPurposes

@@ -182,5 +182,9 @@ module Misfit
       end
     end
 
+    def prepayment_must_be_per_system_numbers
+      return true
+    end
+
   end    #LoanValidators 
 end

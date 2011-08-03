@@ -1,0 +1,43 @@
+%script{:src => javascript_path('admin.js'), :type => "text/javascript"}
+
+.msg
+  - if Dir.entries(Merb.root + "/tmp").include?("stop.txt")
+    .error
+      Instance is stopped
+      %input.ajax-fetch.startButton{:type => "button", :value => "Start Instance", :url => "/maintain/admin/start"}
+  - else
+    .notice
+      Instance is running fine.
+      %input.ajax-fetch.stopButton{:type => "button", :value => "Stop Instance", :url => "/maintain/admin/stop"}
+
+#add-maintainer.button-group
+  %input.ajax-fetch{:type => "button", :value => "Add a Maintainer", :url => "/maintain/admin/new"}
+  %input.ajax-fetch{:type => "button", :value => "Change password", :url => "/maintain/admin/change_password"}
+%hr
+#maintainers
+  List of maintainers:
+  
+  %table.spacious
+    %thead
+      %tr
+        %th User
+        %th
+    %tbody
+      - @maintainers.each do |maintainer|
+        %tr
+          %td= maintainer.login
+          %td
+            - operation = (maintainer.active?) ? "disable" : "enable"
+            %a.confirm{:href => "#",
+                       :url => "/maintain/admin/#{operation}?user=#{maintainer.login}",
+                       :reload_url => "/maintain/admin",
+                       :icon => image_path('user.png'),
+                       :message => "Are you sure you want to #{operation} the user \"#{maintainer.login}\"?",
+                       :success => "User #{operation}d."}= operation.capitalize
+            |
+            %a.confirm{:href => "#",
+                       :url => "/maintain/admin/delete?user=#{maintainer.login}",
+                       :reload_url => "/maintain/admin",
+                       :icon => image_path('user.png'),
+                       :message => "Are you sure you want to delete the user \"#{maintainer.login}\"?",
+                       :success => "User deleted."} Delete

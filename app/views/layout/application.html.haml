@@ -10,7 +10,8 @@
     = css_include_tag :style, :media => "screen, projection"
     = css_include_tag :extra
     = css_include_tag "jquery-ui", :media => "screen, projection"
-    = js_include_tag :jquery, :application, :swfobject, "jquery.highlight.js", "jquery.floatheader.min.js", "jquery-ui.min.js"
+    = css_include_tag :chosen
+    = js_include_tag :jquery, :application, :swfobject, "jquery.highlight.js", "jquery.floatheader.min.js", "jquery-ui.min.js", "chosen/chosen/chosen.jquery.js"
   %body
     - if session.authenticated?
       .bookmark
