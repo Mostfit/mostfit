@@ -143,17 +143,13 @@ module Mostfit
 
     module BulletLoanWithPeriodicInterest
 
-      def self.extended(base)
-        base.extend Mostfit::PaymentStyles::BulletLoan
-      end
-
       def self.display_name
         "Single shot principal with periodic interest (Bullet Loan With Periodic Interest)"
       end
   
       def scheduled_interest_for_installment(number)
         raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(self.repayment_style.round_interest_to, self.repayment_style.rounding_style)
+        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
       end
 
       def scheduled_principal_for_installment(number)
@@ -162,6 +158,16 @@ module Mostfit
       end
   
       def scheduled_interest_up_to(date);  get_scheduled(:total_interest,  date); end
+
+      def pay_prorata(total, received_on)
+        #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
+        int  = scheduled_interest_up_to(received_on)
+        int -= interest_received_up_to(received_on)
+        prin = total - int
+        [int, prin]
+      end
+
+
     end #BulletLoanWithPeriodicInterest
 
     module CustomPrincipal
