@@ -17,7 +17,7 @@ class PaymentObserver
         
     transaction = TransactionLog.create(
       :txn_id => payment.id,
-      :txn_guid => nil,
+      :txn_guid => payment.guid,
       :txn_update_type => action,
       :txn_type => :receipt,
       :nature_of_transaction => "#{payment.type}_received".to_sym,

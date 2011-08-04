@@ -12,7 +12,7 @@ class TransactionLog
   
   property :id,                    Serial
   property :txn_id,                Integer
-  property :txn_guid,              Integer
+  property :txn_guid,              String
   property :txn_update_type,       Enum.send('[]', *UPDATE_TYPES)
   property :txn_type,              Enum.send('[]', *TRANSACTION_TYPE)
   property :nature_of_transaction, Enum.send('[]', *NATURE_OF_TRANSACTION)
@@ -35,7 +35,7 @@ class TransactionLog
   property :txn_received_by_id,   Integer
   property :txn_received_by_name, String
   
-  property :txn_transacted_at_type,       Enum.send('[]', *LOCATION_TYPES)
+  property :txn_transacted_at_type,  Enum.send('[]', *LOCATION_TYPES)
   property :txn_transacted_at_id,    Integer
   property :txn_transacted_at_name,  String
 end
