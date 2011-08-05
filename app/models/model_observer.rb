@@ -2,6 +2,7 @@ class ModelObserver
   include DataMapper::Observer
   
   OBJECTS_UNDER_OBSERVATION = [Client, Loan, LoanProduct]
+  ANOMALIES = [Client, Loan]
   
   observe *OBJECTS_UNDER_OBSERVATION
   
@@ -19,7 +20,6 @@ class ModelObserver
                                :event_accounting_action => :allow, 
                                :event_accounting_action_effective_date => nil
                                )
-    puts log
   end
 
   after :create do
@@ -27,7 +27,15 @@ class ModelObserver
   end
 
   after :update do
-    ModelObserver.make_event_entry(self, :update)
+    action = :update
+    class_of_self = nil
+    ANOMALIES.each{|x|
+      class_of_self =  x.to_s.downcase.to_sym if self.is_a?(x)
+    }
+    unless class_of_self.nil?
+      action = :destroy unless self.deleted_at.nil?
+    end
+    ModelObserver.make_event_entry(self, action)
   end
 
   after :destroy do
