@@ -28,7 +28,7 @@ class PaymentObserver
       :txn_effective_date => payment.received_on,
       :txn_record_date => payment.created_at,
       :txn_updated_at_time => nil,
-      :txn_verifed_at_time => nil,
+      :txn_verified_at_time => nil,
       :txn_deleted_at_time => nil,
       :txn_paid_by_type => :client,
       :txn_paid_by_id => payment.client_id,

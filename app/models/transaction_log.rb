@@ -24,7 +24,7 @@ class TransactionLog
   property :txn_effective_date,  Date
   property :txn_record_date,     DateTime
   property :txn_updated_at_time, DateTime
-  property :txn_verifed_at_time, DateTime
+  property :txn_verified_at_time, DateTime
   property :txn_deleted_at_time, DateTime
   
   property :txn_paid_by_type,     Enum.send('[]', *PAYOR_TYPES) 
