@@ -31,7 +31,7 @@ module Mostfit
 
       def scheduled_interest_for_installment(number) 
         raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        (amount * interest_rate / number_of_installments).round(2)
+        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
       end
     end #Flat
 
