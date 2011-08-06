@@ -26,12 +26,14 @@ module Mostfit
 
       def scheduled_principal_for_installment(number)
         raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        (amount.to_f / number_of_installments).round(2)
+        idiff = (amount * interest_rate / number_of_installments).round(2) - scheduled_interest_for_installment(number) 
+        (amount.to_f / number_of_installments).round(2) + idiff
       end
 
       def scheduled_interest_for_installment(number) 
         raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
+        return @ival if @ival
+        @ival = (amount * interest_rate / number_of_installments).round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
       end
     end #Flat
 
