@@ -24,17 +24,49 @@ module Mostfit
         
       end
 
-      def scheduled_principal_for_installment(number)
-        raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        idiff = (amount * interest_rate / number_of_installments).round(2) - scheduled_interest_for_installment(number) 
-        (amount.to_f / number_of_installments).round(2) + idiff
+      def actual_number_of_installments
+        reducing_schedule.count
       end
 
-      def scheduled_interest_for_installment(number) 
-        raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        return @ival if @ival
-        @ival = (amount * interest_rate / number_of_installments).round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
+
+      def reducing_schedule
+        return @_reducing_schedule if @_reducing_schedule
+        @_reducing_schedule = {}    
+        balance = amount
+        payment            = amount * (1 + interest_rate) / number_of_installments
+        total_int_paid  = 0
+        installment = 1
+        while balance > 0
+          @_reducing_schedule[installment] = {}
+          int_paid = [interest_calculation, (amount * interest_rate) - total_int_paid].min
+          @_reducing_schedule[installment][:interest_payable]  = int_paid
+          total_int_paid += int_paid
+          if rs.force_num_installments and installment == number_of_installments
+            prin_paid = balance
+          else
+            prin_paid = [payment - int_paid, balance].min
+          end
+          @_reducing_schedule[installment][:principal_payable] = prin_paid
+          balance = balance - prin_paid
+          installment += 1
+        end
+        return @_reducing_schedule
       end
+
+      def interest_calculation
+        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
+      end
+
+      def scheduled_principal_for_installment(number)
+        raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > actual_number_of_installments
+        return reducing_schedule[number][:principal_payable]
+      end
+
+      def scheduled_interest_for_installment(number)
+        raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > actual_number_of_installments
+        return reducing_schedule[number][:interest_payable]
+      end
+
     end #Flat
 
 
