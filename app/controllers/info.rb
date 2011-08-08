@@ -212,11 +212,11 @@ private
     end
 
     unless @clients_new_count
-      @clients_new_count  = (@clients and @clients[:new]) ?  @clients[:new].count : 0
+      @clients_new_count  = (@clients and @clients[:new]) ?  (@clients[:new].is_a?(Array) ? @clients[:new].count : 0) : 0
     end
     
     unless @clients_upto_count
-      @clients_upto_count = (@clients and @clients[:upto]) ? @clients[:upto].count : 0
+      @clients_upto_count = (@clients and @clients[:upto]) ? (@clients[:upto].is_a?(Array) ? @clients[:upto].count : 0) : 0
     end
 
     @payments        = Payment.collected_for(obj, @from_date, @to_date, [1, 2], child_type)
