@@ -24,15 +24,49 @@ module Mostfit
         
       end
 
-      def scheduled_principal_for_installment(number)
-        raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        (amount.to_f / number_of_installments).round(2)
+      def actual_number_of_installments
+        reducing_schedule.count
       end
 
-      def scheduled_interest_for_installment(number) 
-        raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        (amount * interest_rate / number_of_installments).round(2)
+
+      def reducing_schedule
+        return @_reducing_schedule if @_reducing_schedule
+        @_reducing_schedule = {}    
+        balance = amount
+        payment            = amount * (1 + interest_rate) / number_of_installments
+        total_int_paid  = 0
+        installment = 1
+        while balance > 0
+          @_reducing_schedule[installment] = {}
+          int_paid = [interest_calculation, (amount * interest_rate) - total_int_paid].min
+          @_reducing_schedule[installment][:interest_payable]  = int_paid
+          total_int_paid += int_paid
+          if rs.force_num_installments and installment == number_of_installments
+            prin_paid = balance
+          else
+            prin_paid = [payment - int_paid, balance].min
+          end
+          @_reducing_schedule[installment][:principal_payable] = prin_paid
+          balance = balance - prin_paid
+          installment += 1
+        end
+        return @_reducing_schedule
       end
+
+      def interest_calculation
+        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
+      end
+
+      def scheduled_principal_for_installment(number)
+        raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > actual_number_of_installments
+        return reducing_schedule[number][:principal_payable]
+      end
+
+      def scheduled_interest_for_installment(number)
+        raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > actual_number_of_installments
+        return reducing_schedule[number][:interest_payable]
+      end
+
     end #Flat
 
 
@@ -126,7 +160,7 @@ module Mostfit
         scheduled_interest_for_installment(1) * (1 - (scheduled_first_payment_date - date) / (scheduled_first_payment_date - disbursal_date||scheduled_disbursal_date))
       end
       
-      def pay_prorata(total, received_on)
+      def pay_prorata(total, received_on, cur_bal = 0)
         #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
         int  = scheduled_interest_up_to(received_on)
         int -= interest_received_up_to(received_on)
@@ -143,17 +177,22 @@ module Mostfit
 
     module BulletLoanWithPeriodicInterest
 
-      def self.extended(base)
-        base.extend Mostfit::PaymentStyles::BulletLoan
-      end
-
       def self.display_name
         "Single shot principal with periodic interest (Bullet Loan With Periodic Interest)"
       end
   
+      def pay_prorata(total, received_on, curbal = 0)
+        #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
+        int  = scheduled_interest_up_to(received_on)
+        int -= interest_received_up_to(received_on)
+        prin = total - int
+        [int, prin]
+      end
+
+
       def scheduled_interest_for_installment(number)
         raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(self.repayment_style.round_interest_to, self.repayment_style.rounding_style)
+        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
       end
 
       def scheduled_principal_for_installment(number)
@@ -162,6 +201,7 @@ module Mostfit
       end
   
       def scheduled_interest_up_to(date);  get_scheduled(:total_interest,  date); end
+
     end #BulletLoanWithPeriodicInterest
 
     module CustomPrincipal

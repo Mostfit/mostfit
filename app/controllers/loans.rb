@@ -29,11 +29,8 @@ class Loans < Application
   def new
     only_provides :html
     if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])      
-      if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type_string)
-        klass = Kernel::const_get(@loan_product.loan_type_string)
-        @loan = klass.new
-        set_insurance_policy(@loan_product)
-      end
+      @loan = Loan.new
+      set_insurance_policy(@loan_product)
     end
 
     @loan_products = LoanProduct.valid if @loan.nil?

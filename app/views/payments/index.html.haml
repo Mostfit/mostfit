@@ -193,7 +193,7 @@
             - default_class = default ? (default > 0 ? 'due' : (default < 0 ? 'overpaid' : 'paid')) : ""
           %tr{ :class => cycle('odd','even') }
             %td{:class => default_class}
-              = [i - 1,0].max
+              = [i - 2,0].max
             %td
               = lh.date
             %td
