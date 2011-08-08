@@ -468,7 +468,7 @@ class Loan
         total_fees_due_on_date = total_fees_payable_on(received_on)
         fees_paid    = [total, total_fees_due_on_date].min
         total        = input - fees_paid
-        curr_bal ||= actual_outstanding_principal_on(d)
+        curr_bal ||= actual_outstanding_principal_on(received_on)
         interest_due = interest_calculation(curr_bal)         
         interest     = [interest_due, total].min  # never more than total
         principal    = total - interest
