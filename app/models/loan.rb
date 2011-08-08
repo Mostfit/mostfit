@@ -254,8 +254,8 @@ class Loan
     {:min => :minimum, :max => :maximum}.each{|k, v|
       product_attr = product.send("#{k}_#{method}")
       if method==:interest_rate
-        product_attr = product_attr.to_f/100
-        loan_attr    = loan_attr.to_f
+        product_attr = product_attr.to_f/100.round(6)
+        loan_attr    = loan_attr.to_f.round(6)
       end
 
       if k==:min and loan_attr and product_attr and  loan_attr < product_attr
@@ -1202,7 +1202,6 @@ class Loan
         p.created_at = _t
         p.save(:reallocate)
       end
-      debugger
       if statii.include?(false) or ds.include?(false)
         t.rollback
         return false, _pmts
