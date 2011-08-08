@@ -32,7 +32,7 @@
     %td
       - if @parent
         = hidden_field :branch_id, :value => @parent.branch_id
-        = @parent.branch.name
+        = @parent.branch.name if @parent.branch
       - else
         = select :branch_id, :collection => @branches_list, :prompt => "Select Branch"
   %tr
