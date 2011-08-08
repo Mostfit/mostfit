@@ -254,8 +254,8 @@ class Loan
     {:min => :minimum, :max => :maximum}.each{|k, v|
       product_attr = product.send("#{k}_#{method}")
       if method==:interest_rate
-        product_attr = product_attr.to_f/100
-        loan_attr    = loan_attr.to_f
+        product_attr = product_attr.to_f/100.round(6)
+        loan_attr    = loan_attr.to_f.round(6)
       end
 
       if k==:min and loan_attr and product_attr and  loan_attr < product_attr
@@ -468,7 +468,7 @@ class Loan
         total_fees_due_on_date = total_fees_payable_on(received_on)
         fees_paid    = [total, total_fees_due_on_date].min
         total        = input - fees_paid
-        curr_bal ||= actual_outstanding_principal_on(d)
+        curr_bal ||= actual_outstanding_principal_on(received_on)
         interest_due = interest_calculation(curr_bal)         
         interest     = [interest_due, total].min  # never more than total
         principal    = total - interest
@@ -1202,7 +1202,6 @@ class Loan
         p.created_at = _t
         p.save(:reallocate)
       end
-      debugger
       if statii.include?(false) or ds.include?(false)
         t.rollback
         return false, _pmts

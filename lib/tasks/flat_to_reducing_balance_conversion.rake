@@ -63,7 +63,6 @@ namespace :mostfit do
 
     desc "convert using repayment_styles"
     task :f2ew, :branch_id, :loan_id do |task, args|
-      debugger
       @failures = File.open("tmp/failures_#{args[:branch_id]}", "w")
       @log = File.open("tmp/conversion_log_#{args[:brnch_id]}","w")
       loan_product_id = [2, 3, 9, 10, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
@@ -138,7 +137,6 @@ namespace :mostfit do
           end
           sql += values.join("),(")
           sql += ")"
-          debugger
           discriminator = l.discriminator == "DefaultLoan" ?  "EquatedWeekly" : "EquatedWeeklyRoundedAdjustedLastPayment"
           repository.adapter.execute("update loans set discriminator='#{discriminator}' where id = #{l.id}")
           l = Loan.get(l.id)
