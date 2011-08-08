@@ -1202,7 +1202,6 @@ class Loan
         p.created_at = _t
         p.save(:reallocate)
       end
-      debugger
       if statii.include?(false) or ds.include?(false)
         t.rollback
         return false, _pmts
