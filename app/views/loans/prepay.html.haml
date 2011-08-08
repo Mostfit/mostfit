@@ -49,7 +49,7 @@
             %td
               = select :name => "fee", :collection => Fee.all, :value_method => :id, :text_method => :name, :prompt => "Apply penalty as", :style => 'width:200px;'
             %td
-              = text_field :name => "fees[#{f.id}]", :value => a 
+              = text_field :name => :penalty_amount
         %tr
           %th
             Outstanding Principal
