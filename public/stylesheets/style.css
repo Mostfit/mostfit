@@ -237,6 +237,10 @@ table tfoot td {
 tr.odd {
   background: #fbf8f1;
 }
+td.odd {
+  background: #fbf8f1;
+}
+
 tr.total {
    border-top: 2px solid black;
    border-bottom: 2px solid black;
