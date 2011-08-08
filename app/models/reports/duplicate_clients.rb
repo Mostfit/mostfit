@@ -57,9 +57,9 @@ class DuplicateClientsReport < Report
 
       #duplicate account number
       if client.account_number and client.account_number.length>0 and client.account_number.to_i>0
-
+        puts client.id
         if account_numbers.key?(client.account_number)
-          duplicates[:same_account_number].push([client, account_numbers[client.account_number][:client]])
+          duplicates[:same_account_number].push([client, account_numbers[client.account_number]])
         else
           account_numbers[client.account_number] = client
         end

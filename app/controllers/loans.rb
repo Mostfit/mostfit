@@ -29,11 +29,8 @@ class Loans < Application
   def new
     only_provides :html
     if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])      
-      if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type_string)
-        klass = Kernel::const_get(@loan_product.loan_type_string)
-        @loan = klass.new
-        set_insurance_policy(@loan_product)
-      end
+      @loan = Loan.new
+      set_insurance_policy(@loan_product)
     end
 
     @loan_products = LoanProduct.valid if @loan.nil?
@@ -386,10 +383,8 @@ class Loans < Application
   end
 
   def reallocate(id)
-    debugger
     @loan = Loan.get(id)
     raise NotFound unless @loan
-    debugger
     status, @payments = @loan.reallocate(params[:style].to_sym, session.user)
     if status
       redirect url_for_loan(@loan), :message => {:notice => "Loan payments succesfully reallocated"}
@@ -417,7 +412,6 @@ class Loans < Application
     if request.method == :get
       display @loan, :layout => layout?
     else
-      debugger
       staff = StaffMember.get(params[:received_by])
       raise ArgumentError.new("No staff member selected") unless staff
       raise ArgumentError.new("No applicable fee for penalty") if (params[:fee].blank? and (not params[:penalty_amount].blank?))
@@ -505,7 +499,6 @@ class Loans < Application
     end
     attrs[:client_id] = params[:client_id] if params[:client_id]
     attrs[:insurance_policy] = params[:insurance_policy] if params[:insurance_policy]
-    debugger
     attrs[:repayment_style_id] ||= loan_product.repayment_style.id
     [klass, attrs]
   end

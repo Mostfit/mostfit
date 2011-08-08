@@ -24,15 +24,49 @@ module Mostfit
         
       end
 
-      def scheduled_principal_for_installment(number)
-        raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        (amount.to_f / number_of_installments).round(2)
+      def actual_number_of_installments
+        reducing_schedule.count
       end
 
-      def scheduled_interest_for_installment(number) 
-        raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        (amount * interest_rate / number_of_installments).round(2)
+
+      def reducing_schedule
+        return @_reducing_schedule if @_reducing_schedule
+        @_reducing_schedule = {}    
+        balance = amount
+        payment            = amount * (1 + interest_rate) / number_of_installments
+        total_int_paid  = 0
+        installment = 1
+        while balance > 0
+          @_reducing_schedule[installment] = {}
+          int_paid = [interest_calculation, (amount * interest_rate) - total_int_paid].min
+          @_reducing_schedule[installment][:interest_payable]  = int_paid
+          total_int_paid += int_paid
+          if rs.force_num_installments and installment == number_of_installments
+            prin_paid = balance
+          else
+            prin_paid = [payment - int_paid, balance].min
+          end
+          @_reducing_schedule[installment][:principal_payable] = prin_paid
+          balance = balance - prin_paid
+          installment += 1
+        end
+        return @_reducing_schedule
       end
+
+      def interest_calculation
+        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
+      end
+
+      def scheduled_principal_for_installment(number)
+        raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > actual_number_of_installments
+        return reducing_schedule[number][:principal_payable]
+      end
+
+      def scheduled_interest_for_installment(number)
+        raise "number out of range, got #{number} but max is #{number_of_installments}" if number < 0 or number > actual_number_of_installments
+        return reducing_schedule[number][:interest_payable]
+      end
+
     end #Flat
 
 
@@ -143,7 +177,6 @@ module Mostfit
 
     module BulletLoanWithPeriodicInterest
 
-
       def self.display_name
         "Single shot principal with periodic interest (Bullet Loan With Periodic Interest)"
       end
@@ -159,7 +192,7 @@ module Mostfit
 
       def scheduled_interest_for_installment(number)
         raise "number out of range, got #{number}" if number < 1 or number > number_of_installments
-        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(self.repayment_style.round_interest_to, self.repayment_style.rounding_style)
+        (amount * interest_rate / number_of_installments).round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
       end
 
       def scheduled_principal_for_installment(number)
@@ -168,6 +201,7 @@ module Mostfit
       end
   
       def scheduled_interest_up_to(date);  get_scheduled(:total_interest,  date); end
+
     end #BulletLoanWithPeriodicInterest
 
     module CustomPrincipal
@@ -203,6 +237,22 @@ module Mostfit
     end
 
     module CustomPrincipalAndInterest
+      def pay_prorata(total, received_on, curr_bal = nil)
+        #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
+        i = used = prin = int = 0.0
+        d = received_on
+        total = total.to_f
+        while used < total
+          prin += scheduled_principal_for_installment(installment_for_date(d)).round(2)
+          int  += scheduled_interest_for_installment(installment_for_date(d)).round(2)
+          used  = (prin + int)
+          d = shift_date_by_installments(d, 1)
+        end
+        interest  = total * int/(prin + int)
+        principal = total * prin/(prin + int)
+        [interest, principal]
+      end
+
       def scheduled_principal_for_installment(number)
         rs.principal_schedule(amount.to_i)[number - 1]
       end
