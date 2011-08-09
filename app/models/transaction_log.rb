@@ -38,4 +38,6 @@ class TransactionLog
   property :txn_transacted_at_type,  Enum.send('[]', *LOCATION_TYPES)
   property :txn_transacted_at_id,    Integer
   property :txn_transacted_at_name,  String
+
+  has n, :extended_info_items, :model => 'ExtendedInfoItem'
 end

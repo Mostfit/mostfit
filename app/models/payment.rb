@@ -154,6 +154,29 @@ class Payment
                            }).map{|x| {Payment.types[x.payment_type-1] => x.amount.to_i}}.inject({}){|s,x| s+=x}
   end
 
+  def extended_info
+    info_items = []
+    loan_product = self.loan ? self.loan.loan_product : nil
+    funding_line = self.loan ? self.loan.funding_line : nil
+        
+    if loan_product
+      info = {}
+      info[:item_type] = loan_product.class.to_s
+      info[:item_id] = loan_product.id
+      info[:item_value] = loan_product.name
+      info_items << info
+    end
+    
+    if funding_line
+      info = {}
+      info[:item_type] = funding_line.class.to_s
+      info[:item_id] = funding_line.id
+      info[:item_value] = funding_line.name
+      info_items << info
+    end
+    info_items
+  end
+
   private
   include DateParser  # mixin for the hook "before: valid?, :parse_dates"
   include Misfit::PaymentValidators

@@ -23,4 +23,12 @@
     %txn_received_by_name #{@transaction_log.txn_received_by_name}
     %txn_transacted_at_type #{@transaction_log.txn_transacted_at_type}  
     %txn_transacted_at_id #{@transaction_log.txn_transacted_at_id}    
-    %txn_transactied_at_name #{@transaction_log.txn_transacted_at_name}  
+    %txn_transactied_at_name #{@transaction_log.txn_transacted_at_name}
+    - if @transaction_log.extended_info_items
+      %extended_info_items
+        - @transaction_log.extended_info_items.each do |e|
+          %extended_info_item
+            %type #{e.item_type}
+            %id #{e.item_id}
+            %value #{e.item_value}
+	   
