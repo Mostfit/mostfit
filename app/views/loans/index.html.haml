@@ -32,6 +32,15 @@
             = @client.name
           == (id: #{@client.id}, ref: #{@client.reference})
       %tr
+        %td
+          Date of Birth
+        %td
+          - if @client.date_of_birth
+            = @client.date_of_birth
+            ( Age :
+            = Time.now.year - @client.date_of_birth.year
+            yrs.)
+      %tr
         %td Spouse name
         %td
           = @client.spouse_name
