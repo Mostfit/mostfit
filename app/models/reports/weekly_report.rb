@@ -5,6 +5,10 @@ class WeeklyReport < Report
     @name = "weekly report"
   end
 
+  def self.name
+    "Weekly Report"
+  end
+
   def name
     "Week starting #{self.start_date} upto #{self.end_date}"
   end
