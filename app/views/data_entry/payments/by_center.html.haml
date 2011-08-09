@@ -139,7 +139,7 @@
               %td
                 = obj.id
               %td.text
-                =   obj.is_a? Loan ? link_to(obj.client.name, url_for_loan(obj)) : link_to(obj.name, resource(obj))
+                = obj.is_a?(Loan) ? link_to(obj.client.name, url_for_loan(obj)) : link_to(obj.name, resource(obj))
               %td.text
                 = (link_to obj.description, url_for_loan(obj)) if obj.respond_to?("description")
               %td.text
