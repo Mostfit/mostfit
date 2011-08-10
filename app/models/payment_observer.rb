@@ -14,7 +14,9 @@ class PaymentObserver
     staff_member = payment.received_by_staff_id ? StaffMember.get(payment.received_by_staff_id) : nil
     staff_member_name = staff_member ? staff_member.name : nil
     fee_name = payment.fee ? payment.fee.name : nil
-        
+    
+    extended_info = payment.extended_info
+    
     transaction = TransactionLog.create(
       :txn_id => payment.id,
       :txn_guid => payment.guid,
@@ -38,7 +40,8 @@ class PaymentObserver
       :txn_received_by_name => staff_member_name,
       :txn_transacted_at_type => :center,
       :txn_transacted_at_id => center_id,
-      :txn_transacted_at_name => center_name
+      :txn_transacted_at_name => center_name,
+      :extended_info_items => extended_info  
     )
   end
 
@@ -54,6 +57,8 @@ class PaymentObserver
   after :update do
     PaymentObserver.make_transaction_entry(self, :delete)
   end
+  
+  
 end
 
 
