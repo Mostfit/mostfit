@@ -1,8 +1,8 @@
 class ModelEventLog
   include DataMapper::Resource
   
-  ACCOUNTING_ACTIONS = [:allow, :disallow, :no_change]
-  CHANGES = [:create, :update, :destroy]
+  ACCOUNTING_ACTIONS = [:create, :allow, :disallow, :no_change]
+  MODEL_CHANGES = [:create, :update, :destroy]
   # class.to_s.downcase.to_sym
   OBSERVED_MODELS = [:client, :loan, :loanproduct, :fee, :branch, :funder, :fundingline]
   
