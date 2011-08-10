@@ -150,32 +150,31 @@ describe PaymentObserver do
     staff_member_name = staff_member ? staff_member.name : nil
     #fee_name = payment.fee ? payment.fee.name : nil
 
-    transactions = TransactionLog.all(:txn_id => payment.id)
+    transactions = TransactionLog.all(:txn_guid => payment.guid)
     transactions.count.should == 1
     transaction = transactions[0]
-    transaction.txn_id.should == payment.id
     transaction.txn_guid.should == payment.guid
-    #transaction.txn_update_type.should == action
+    #transaction.update_type.should == action
     transaction.txn_type.should == :receipt
     transaction.nature_of_transaction.should == "#{payment.type}_received".to_sym
-    transaction.txn_sub_type_id.should == payment.fee_id
-    transaction.txn_sub_type_name.should == (payment.fee_id ? Fee.get(payment.fee_id).name : nil)
-    transaction.txn_amount.should == payment.amount
-    transaction.txn_currency.should == :INR
-    transaction.txn_effective_date.should == payment.received_on
-    transaction.txn_record_date.should == payment.created_at
-    transaction.txn_updated_at_time.should == nil
-    transaction.txn_verified_at_time.should == nil
-    transaction.txn_deleted_at_time.should == nil
-    transaction.txn_paid_by_type.should == :client
-    transaction.txn_paid_by_id.should == payment.client_id
-    transaction.txn_paid_by_name.should == client_name
-    transaction.txn_received_by_type.should == :staff_member
-    transaction.txn_received_by_id.should == payment.received_by_staff_id
-    transaction.txn_received_by_name.should == staff_member_name
-    transaction.txn_transacted_at_type.should == :center
-    transaction.txn_transacted_at_id.should == center_id
-    transaction.txn_transacted_at_name.should == center_name
+    transaction.sub_type_id.should == payment.fee_id
+    transaction.sub_type_name.should == (payment.fee_id ? Fee.get(payment.fee_id).name : nil)
+    transaction.amount.should == payment.amount
+    transaction.currency.should == :INR
+    transaction.effective_date.should == payment.received_on
+    transaction.record_date.should == payment.created_at
+    transaction.updated_at_time.should == nil
+    transaction.verified_at_time.should == nil
+    transaction.deleted_at_time.should == nil
+    transaction.paid_by_type.should == :client
+    transaction.paid_by_id.should == payment.client_id
+    transaction.paid_by_name.should == client_name
+    transaction.received_by_type.should == :staff_member
+    transaction.received_by_id.should == payment.received_by_staff_id
+    transaction.received_by_name.should == staff_member_name
+    transaction.transacted_at_type.should == :center
+    transaction.transacted_at_id.should == center_id
+    transaction.transacted_at_name.should == center_name
     extended_info = payment.extended_info
     if transaction.extended_info_items
       transaction.extended_info_items.each_with_index do |item, idx|
@@ -192,34 +191,33 @@ describe PaymentObserver do
     # payment 
   end
 
-  # it "should create one entry in transaction log when a payment is deleted" do
-  #   payment = Payment.last
-  #   payment = Payment.
-  #   transactions = TransactionLog.all(:txn_id => payment.id)
-  #   transactions.count.should == 1
-  #   transaction = transactions[0]
-  #   transaction.txn_id.should == payment.id
-  #   transaction.txn_guid.should == payment.guid
-  #   #transaction.txn_update_type.should == action
-  #   transaction.txn_type.should == :receipt
-  #   transaction.nature_of_transaction.should == "#{payment.type}_received".to_sym
-  #   transaction.txn_sub_type_id.should == payment.fee_id
-  #   transaction.txn_sub_type_name.should == (payment.fee_id ? Fee.get(payment.fee_id).name : nil)
-  #   transaction.txn_amount.should == payment.amount
-  #   transaction.txn_currency.should == :INR
-  #   transaction.txn_effective_date.should == payment.received_on
-  #   transaction.txn_record_date.should == payment.created_at
-  #   transaction.txn_updated_at_time.should == nil
-  #   transaction.txn_verifed_at_time.should == nil
-  #   transaction.txn_deleted_at_time.should == nil
-  #   transaction.txn_paid_by_type.should == :client
-  #   transaction.txn_paid_by_id.should == payment.client_id
-  #   transaction.txn_paid_by_name.should == client_name
-  #   transaction.txn_received_by_type.should == :staff_member
-  #   transaction.txn_received_by_id.should == payment.received_by_staff_id
-  #   transaction.txn_received_by_name.should == staff_member_name
-  #   transaction.txn_transacted_at_type.should == :center
-  #   transaction.txn_transacted_at_id.should == center_id
-  #   transaction.txn_transacted_at_name.should == center_name
-  # end
+  it "should create one entry in transaction log when a payment is deleted" do
+    # payment = Payment.last
+    # payment = Payment.destroy
+    # transactions = TransactionLog.all(:txn_guid => payment.guid)
+    # transactions.count.should == 1
+    # transaction = transactions[0]
+    # transaction.txn_guid.should == payment.guid
+    # #transaction.update_type.should == action
+    # transaction.type.should == :receipt
+    # transaction.nature_of_transaction.should == "#{payment.type}_received".to_sym
+    # transaction.sub_type_id.should == payment.fee_id
+    # transaction.sub_type_name.should == (payment.fee_id ? Fee.get(payment.fee_id).name : nil)
+    # transaction.amount.should == payment.amount
+    # transaction.currency.should == :INR
+    # transaction.effective_date.should == payment.received_on
+    # transaction.record_date.should == payment.created_at
+    # transaction.updated_at_time.should == nil
+    # transaction.verifed_at_time.should == nil
+    # transaction.deleted_at_time.should == nil
+    # transaction.paid_by_type.should == :client
+    # transaction.paid_by_id.should == payment.client_id
+    # transaction.paid_by_name.should == client_name
+    # transaction.received_by_type.should == :staff_member
+    # transaction.received_by_id.should == payment.received_by_staff_id
+    # transaction.received_by_name.should == staff_member_name
+    # transaction.transacted_at_type.should == :center
+    # transaction.transacted_at_id.should == center_id
+    # transaction.transacted_at_name.should == center_name
+  end
 end

@@ -1,34 +1,35 @@
 %xml
   %transaction_log
     %id #{@transaction_log.id}
-    %txn_id #{@transaction_log.txn_id}
     %txn_guid #{@transaction_log.txn_guid}      
-    %txn_update_type #{@transaction_log.txn_update_type}
+    %txn_log_guid #{@transaction_log.txn_log_guid}      
+    %update_type #{@transaction_log.update_type}
     %txn_type #{@transaction_log.txn_type}         
     %nature_of_transaction #{@transaction_log.nature_of_transaction} 
-    %txn_sub_type_id #{@transaction_log.txn_sub_type_id}       
-    %txn_sub_type_name #{@transaction_log.txn_sub_type_name}     
-    %txn_amount #{@transaction_log.txn_amount}          
-    %txn_currency #{@transaction_log.txn_currency}        
-    %txn_effective_date #{@transaction_log.txn_effective_date}  
-    %txn_record_date #{@transaction_log.txn_record_date}     
-    %txn_updated_at_time #{@transaction_log.txn_updated_at_time} 
-    %txn_verified_at_time #{@transaction_log.txn_verified_at_time} 
-    %txn_deleted_at_time #{@transaction_log.txn_deleted_at_time} 
-    %txn_paid_by_type #{@transaction_log.txn_paid_by_type}    
-    %txn_paid_by_id #{@transaction_log.txn_paid_by_id}      
-    %txn_paid_by_name #{@transaction_log.txn_paid_by_name}    
-    %txn_received_by_type #{@transaction_log.txn_received_by_type}
-    %txn_received_by_id #{@transaction_log.txn_received_by_id}  
-    %txn_received_by_name #{@transaction_log.txn_received_by_name}
-    %txn_transacted_at_type #{@transaction_log.txn_transacted_at_type}  
-    %txn_transacted_at_id #{@transaction_log.txn_transacted_at_id}    
-    %txn_transactied_at_name #{@transaction_log.txn_transacted_at_name}
+    %sub_type_id #{@transaction_log.sub_type_id}       
+    %sub_type_name #{@transaction_log.sub_type_name}     
+    %amount #{@transaction_log.amount}          
+    %currency #{@transaction_log.currency}        
+    %effective_date #{@transaction_log.effective_date}  
+    %record_date #{@transaction_log.record_date}     
+    %updated_at_time #{@transaction_log.updated_at_time} 
+    %verified_at_time #{@transaction_log.verified_at_time} 
+    %deleted_at_time #{@transaction_log.deleted_at_time} 
+    %paid_by_type #{@transaction_log.paid_by_type}    
+    %paid_by_id #{@transaction_log.paid_by_id}      
+    %paid_by_name #{@transaction_log.paid_by_name}    
+    %received_by_type #{@transaction_log.received_by_type}
+    %received_by_id #{@transaction_log.received_by_id}  
+    %received_by_name #{@transaction_log.received_by_name}
+    %transacted_at_type #{@transaction_log.transacted_at_type}  
+    %transacted_at_id #{@transaction_log.transacted_at_id}    
+    %transactied_at_name #{@transaction_log.transacted_at_name}
     - if @transaction_log.extended_info_items
       %extended_info_items
         - @transaction_log.extended_info_items.each do |e|
           %extended_info_item
             %type #{e.item_type}
             %id #{e.item_id}
+            %parent_guid #{e.parent_guid}
             %value #{e.item_value}
 	   
