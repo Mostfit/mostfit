@@ -35,6 +35,8 @@ class Mfi
   property :color, String, :nullable => true
   property :logo_name,  String, :nullable => true
   property :accounting_enabled, Boolean, :default => false, :index => true
+  property :transaction_logging_enabled, Boolean, :default => false, :index => true
+  property :event_model_logging_enabled, Boolean, :default => false, :index => true
   property :dirty_queue_enabled, Boolean, :default => false, :index => true
   property :map_enabled, Boolean, :default => false, :index => true
   property :branch_diary_enabled, Boolean, :default => false, :index => true

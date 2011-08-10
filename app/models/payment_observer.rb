@@ -51,10 +51,12 @@ class PaymentObserver
   # In case of a payment getting updated (i.e. some of the details of the payment are changed and then saved) then the current payment is deleted and a new copy with the updated details is saved with a new payment id
 
   after :create do
+    return false unless Mfi.first.transaction_logging_enabled
     PaymentObserver.make_transaction_entry(self, :create)
   end
 
   after :update do
+    return false unless Mfi.first.transaction_logging_enabled
     PaymentObserver.make_transaction_entry(self, :delete)
   end
   

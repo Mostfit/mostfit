@@ -23,10 +23,12 @@ class ModelObserver
   end
 
   after :create do
+    return false unless Mfi.first.event_model_logging_enabled
     ModelObserver.make_event_entry(self, :create)
   end
 
   after :update do
+    return false unless Mfi.first.event_model_logging_enabled
     action = :update
     class_of_self = nil
     ANOMALIES.each{|x|
@@ -39,6 +41,7 @@ class ModelObserver
   end
 
   after :destroy do
+    return false unless Mfi.first.event_model_logging_enabled
     ModelObserver.make_event_entry(self, :destroy)
   end
 end
