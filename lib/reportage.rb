@@ -171,6 +171,18 @@ end
 
 
 class LoanHistoryBucket < LoanBucket
+  
+  def composite_balances
+    return @_composite_balances if @_composite_balances
+    @_composite_balances = self.map{|bucket, ids| 
+      [bucket, LoanHistory.composite_key_sum(ids)]
+    }.to_hash
+  end
+
+  def latest_scheduled_outstanding_total
+    self.map{|bucket, ids| [bucket, composite_balances(ids)[:scheduled_outstanding_total].to_f]}.to_hash
+  end    
+  
 end
 
 

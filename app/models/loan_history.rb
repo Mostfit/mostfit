@@ -33,6 +33,8 @@ class LoanHistory
   property :center_id,                   Integer, :index => true
   property :branch_id,                   Integer, :index => true
 
+  property :composite_key, String, :index => true
+
   belongs_to :loan#, :index => true
   belongs_to :client         # speed up reports
   belongs_to :client_group, :nullable => true   # by avoiding 
@@ -680,6 +682,21 @@ class LoanHistory
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.mdate.strftime('%Y-%m-%d')}')"}.join(",")
   end
+
+  def self.latest(date = Date.today, hash = {})
+    composite_keys = repository.adapter.query("select loan_id, max(date) from loan_history where date < '2011-05-01' group by loan_id;").map{|x| "#{x[0]}_#{x[1].strftime('%Y-%m-%d')}"}
+    LoanHistory.all(hash.merge(:composite_key => composite_keys))
+  end
+
+  def self.composite_key_sum(keys)
+    cols = [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total, 
+            :principal_due, :principal_paid, :interest_due, :interest_paid, :total_interest_due, :total_interest_paid, 
+            :total_principal_due, :total_principal_paid]
+    agg_cols = cols.map{|c| DataMapper::Query::Operator.new(c, :sum)}
+    vals = LoanHistory.all(:composite_key => keys).aggregate(*agg_cols)
+    cols.zip(vals)
+  end
+
 
   def self.build_extra(query)
     query = query.to_a.map{|k, v| 
