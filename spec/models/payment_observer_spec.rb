@@ -178,7 +178,6 @@ describe PaymentObserver do
     extended_info = payment.extended_info
     if transaction.extended_info_items
       transaction.extended_info_items.each_with_index do |item, idx|
-        debugger
         item[:item_type].should == extended_info[idx][:item_type]
         item[:item_id].should == extended_info[idx][:item_id]
         item[:item_value].should == extended_info[idx][:item_value]

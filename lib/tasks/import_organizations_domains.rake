@@ -18,9 +18,7 @@ namespace :mostfit do
     task :format_yml do
       filename = File.join(Merb.root, 'doc', 'input', 'organizations.yml')
       # File.open(filename, 'r') do |file|
-      debugger
       YAML::load(File.read(filename)).each do |record|
-	debugger
         Organization.create(:guid => record["guid"], 
                             :name => record["name"],
                             :domains => record["domains"])
