@@ -13,6 +13,8 @@ class TransactionLog
   property :id,                    Serial
   property :txn_log_guid,          String, :default => lambda{ |obj, p| UUID.generate }
   property :txn_guid,              String
+  property :parent_org_guid,       String
+  property :parent_domain_guid,    String         
 
   property :update_type,           Enum.send('[]', *UPDATE_TYPES)
   property :txn_type,              Enum.send('[]', *TRANSACTION_TYPE)

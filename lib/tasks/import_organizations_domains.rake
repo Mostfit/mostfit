@@ -17,18 +17,31 @@ namespace :mostfit do
     desc "This rake task imports organization and domains data from an yml file"
     task :format_yml do
       filename = File.join(Merb.root, 'doc', 'input', 'organizations.yml')
-      # File.open(filename, 'r') do |file|
-      YAML::load(File.read(filename)).each do |record|
-        Organization.create(:guid => record["guid"], 
-                            :name => record["name"],
-                            :domains => record["domains"])
+      file = File.read(filename)
+      if file
+        YAML::load(File.read(filename)).each do |record|
+          org = Organization.create(:org_guid => record["org_guid"], 
+                                    :name => record["name"],
+                                    :domains => record["domains"])
+        end
+      else
+        puts "The organizations.yml file is not in its proper location or does not have the correct name. Please put the file in #{Merb.root}/doc/input and rename it as organizations.yml"
       end
-      #end
     end
 
     desc "This rake task imports organization and domains data from a xml file"
     task :format_xml do
-            
+      filename = File.join(Merb.root, 'doc', 'input', 'organizations.xml')
+      file = File.read(filename)
+      unless file
+        # YAML::load(File.read(filename)).each do |record|
+        #   Organization.create(:org_guid => record["guid"], 
+        #                       :name => record["name"],
+        #                       :domains => record["domains"])
+        # end
+      else
+        puts "The organizations.xml file is not in its proper location or does not have the correct name. Please put the file in #{Merb.root}/doc/input and rename it as organizations.xml"
+      end
     end
   end
 end
