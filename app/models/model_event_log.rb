@@ -8,6 +8,8 @@ class ModelEventLog
   
   property :id,                                     Serial
   property :event_guid,                             String, :default => lambda{ |obj, p| UUID.generate }
+  property :parent_org_guid,                        String
+  property :parent_domain_guid,                     String         
   property :event_change,                           Enum.send('[]', *MODEL_CHANGES)
   property :event_changed_at,                       DateTime
   property :event_on_type,                          Enum.send('[]', *OBSERVED_MODELS)

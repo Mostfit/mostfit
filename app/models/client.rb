@@ -87,6 +87,12 @@ class Client
   validates_length :school_distance, :max => 200
   validates_length :phc_distance, :max => 500
 
+  belongs_to :organization, :parent_key => [:org_guid], :child_key => [:parent_org_guid], :required => false
+  property   :parent_org_guid, String, :nullable => true
+  
+  belongs_to :domain, :parent_key => [:dmn_guid], :child_key => [:parent_domain_guid], :required => false
+  property   :parent_domain_guid, String, :nullable => true
+
   has n, :loans
   has n, :payments
   has n, :insurance_policies

@@ -12,6 +12,8 @@ class ModelObserver
       obj_class =  x.to_s.downcase.to_sym if obj.is_a?(x)
     }
     log = ModelEventLog.create(
+                               :parent_org_guid => obj.parent_org_guid,
+                               :parent_domain_guid => obj.parent_domain_guid,
                                :event_change => action, 
                                :event_changed_at => DateTime.now,
                                :event_on_type => obj_class,     
@@ -20,6 +22,11 @@ class ModelObserver
                                :event_accounting_action => :allow, 
                                :event_accounting_action_effective_date => nil
                                )
+  end
+
+  before :create do
+    created_on = Date.new(self.created_at.year, self.created_at.month, self.created_at.mday)
+    self.parent_org_guid = Organization.get_organization(created_on)
   end
 
   after :create do
