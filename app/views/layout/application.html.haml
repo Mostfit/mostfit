@@ -7,11 +7,12 @@
     %link{ :rel => "icon", :type => "image/ico", :href => "/favicon.ico" }/
     = css_include_tag :screen, :media => "screen, projection"
     = css_include_tag :print, :media => "print"
-    = css_include_tag :style, :media => "screen, projection"
+    /= css_include_tag :style, :media => "screen, projection"
+    %link{:rel => "stylesheet/less", :type => "text/css", :href => "/stylesheets/style.less"}
     = css_include_tag :extra
     = css_include_tag "jquery-ui", :media => "screen, projection"
     = css_include_tag :chosen
-    = js_include_tag :jquery, :application, :swfobject, "jquery.highlight.js", "jquery.floatheader.min.js", "jquery-ui.min.js", "chosen/chosen/chosen.jquery.js"
+    = js_include_tag :jquery, :application, :swfobject, "jquery.highlight.js", "jquery.floatheader.min.js", "jquery-ui.min.js", "chosen/chosen/chosen.jquery.js", "less.js"
   %body
     - if session.authenticated?
       .bookmark
@@ -24,18 +25,6 @@
           = submit "Bookmarks"
     #bookmark_form_container
     #header
-      #login
-        - if Mfi.first.dirty_queue_enabled and count = DirtyLoan.pending.length and count > 0
-          %i
-            == (#{count} loans in queue)
-        - if session.authenticated?
-          =link_to 'change password', url(:change_password)
-          |
-          = current_user_info
-        - else
-          existing users can
-          %b= link_to 'login', url(:login)
-          to proceed
       %h1.logo
         -if mfi = Mfi.first
           %span{:style => "color: #{mfi.color||'green'};"}
@@ -47,7 +36,7 @@
               MOSTFIT
         -else
           MOSTFIT
-      - if session.authenticated?
+      #green-header
         #navigation
           = link_to_with_class('Home', url(:browse))
           = link_to_with_class('Data entry', url(:data_entry))
@@ -55,15 +44,28 @@
           = link_to_with_class('Accounts', url(:accounts))
           = link_to_with_class('Dashboard', url(:dashboard))
           = link_to_with_class('Reports', url(:reports))
-          #header_search_div
-            %form._remote_{:action => '/search', :class => 'search', :method => "POST", :style => "float:left;", :id => "search-form"}
-              %input{:name => 'query', :value => params[:query], :autocomplete => "off"}
-              %input{:type => 'hidden', :name => '_target_', :value => "content p:first"}
-              %input{:type => 'submit', :value=>'search'}
+        #header_search_div
+          %form._remote_{:action => '/search', :class => 'search', :method => "POST", :style => "float:left;", :id => "search-form"}
+            %input{:name => 'query', :value => params[:query], :autocomplete => "off"}
+            %input{:type => 'hidden', :name => '_target_', :value => "content p:first"}
+        - if Mfi.first.dirty_queue_enabled and count = DirtyLoan.pending.length and count > 0
+          %i
+            == (#{count} loans in queue)
     #content
       .container
+        #breadcrums
+          = breadcrumbs
+          #login
+            - if session.authenticated?
+              =link_to 'change password', url(:change_password)
+              |
+              = current_user_info
+            - else
+              existing users can
+              %b= link_to 'login', url(:login)
+              to proceed
+
         %p
-        #breadcrums= breadcrumbs
         - if message
           #flash-messages.span-17.prefix-5.suffix-5.last            
             - message.each do |key, value|
@@ -72,7 +74,8 @@
         - if params[:action]=="edit" and session.user.admin?
           %p{:style => "float: right; border: 1px solid orange; padding: 4px;"}
             = link_to("Delete", url(:controller => "application", :action => "delete", :id => params[:id], :model => params[:controller], :return => request.uri), :class => 'delete')
-        = catch_content :for_layout
+        .inner_container
+          = catch_content :for_layout
     #footer
       %p{:style => "position: relative; right: 10%; float: right;"}
         - if session.authenticated? and session.user.role == :admin and Merb.env == "development"
