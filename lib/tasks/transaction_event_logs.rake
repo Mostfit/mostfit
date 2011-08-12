@@ -60,7 +60,7 @@ namespace :mostfit do
                 x.received_by_name transaction_log.received_by_name
                 x.transacted_at_type transaction_log.transacted_at_type.to_s  
                 x.transacted_at_id transaction_log.transacted_at_id    
-                x.transactied_at_name transaction_log.transacted_at_name
+                x.transacted_at_name transaction_log.transacted_at_name
                 x.parent_org_guid transaction_log.parent_org_guid
                 x.parent_domain_guid transaction_log.parent_domain_guid
                 if transaction_log.extended_info_items
@@ -87,14 +87,14 @@ namespace :mostfit do
           mel.event_logs{
             ModelEventLog.all(:event_changed_at.gte => begin_date_time, :event_changed_at.lte => end_date_time).each do |model_event_log|
               mel.event_log{
-                mel.event_guid model_event_log.event_guid 
-                mel.event_change model_event_log.event_change.to_s                           
-                mel.event_changed_at model_event_log.event_changed_at                       
-                mel.event_on_type model_event_log.event_on_type.to_s                          
-                mel.event_on_id model_event_log.event_on_id                            
-                mel.event_on_name model_event_log.event_on_name                          
-                mel.event_accounting_action model_event_log.event_accounting_action.to_s                
-                mel.event_accounting_effective_date model_event_log.event_accounting_action_effective_date
+                mel.event_log_guid model_event_log.event_guid 
+                mel.change model_event_log.event_change.to_s                           
+                mel.changed_at model_event_log.event_changed_at                       
+                mel.on_type model_event_log.event_on_type.to_s                          
+                mel.on_id model_event_log.event_on_id                            
+                mel.on_name model_event_log.event_on_name                          
+                mel.accounting_action model_event_log.event_accounting_action.to_s                
+                mel.accounting_action_effective_date model_event_log.event_accounting_action_effective_date
                 mel.parent_org_guid model_event_log.parent_org_guid
                 mel.parent_domain_guid model_event_log.parent_domain_guid   
               }
@@ -110,7 +110,21 @@ namespace :mostfit do
     end
 
     desc "This rake task re-generates transaction logs and event logs for the given date range"
-    task :regenerate_logs do
+    task :regenerate_logs, :begin_date, :end_date do |t, args|
+      begin_date = Date.strptime(args[:begin_date], "%Y%m%d")
+      if args[:end_date].nil?
+        end_date = Date.today
+      else
+        end_date = Date.strptime(args[:end_date], "%Y%m%d")
+      end
+      if begin_date.nil? or end_date.nil?
+        puts "ERROR: Please give the arguments in the proper format. For 6th August 2011 it shall be 20110806"
+      elsif begin_date <= end_date 
+        puts
+        puts "The transaction logs and event logs have been repopulated"
+      else
+        puts "ERROR: The begin date #{begin_date} is greater than the end date #{end_date}." 
+      end
     end
   end
 end
