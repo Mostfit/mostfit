@@ -335,7 +335,7 @@ class GraphData < Application
   end
 
   def render_graph(vals, type = "bar", labels = [], steps = 10)
-    x = { :elements => [{:type => type, :values => vals}]}
+    x = { :elements => [{:type => type, :values => vals}], :bg_colour => "#d6d6d6"}
     x_axis = {:labels => {:labels => labels.to_json, :steps => steps}}
     x[:x_axis] = x_axis
     return x.to_json

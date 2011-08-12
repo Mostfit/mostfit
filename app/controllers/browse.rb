@@ -6,7 +6,9 @@ class Browse < Application
   Line = Struct.new(:ip, :date_time, :method, :model, :url, :status, :response_time)
   
   def index
-    display @template
+    @branch_data = LoanHistory.latest(:status => [:disbursed, :outstanding]).bucket_by(:branch_id, :composite_key).composite_balances
+    @branch_names = Branch.all.aggregate(:name, :id).to_hash
+    display [@branch_data, @branch_names], @template
   end
 
   def branches
