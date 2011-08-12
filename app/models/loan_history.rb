@@ -683,18 +683,19 @@ class LoanHistory
                                  }).collect{|x| "(#{x.loan_id}, '#{x.mdate.strftime('%Y-%m-%d')}')"}.join(",")
   end
 
-  def self.latest(date = Date.today, hash = {})
-    composite_keys = repository.adapter.query("select loan_id, max(date) from loan_history where date < '2011-05-01' group by loan_id;").map{|x| "#{x[0]}_#{x[1].strftime('%Y-%m-%d')}"}
+  def self.latest(hash = {}, date = Date.today)
+    composite_keys = repository.adapter.query("select concat(loan_id,'_',max(date)) from loan_history where date < '#{date.strftime('%Y-%m-%d')}' group by loan_id;")
     LoanHistory.all(hash.merge(:composite_key => composite_keys))
   end
 
-  def self.composite_key_sum(keys)
+  def self.composite_key_sum(keys, group_by = [])
     cols = [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total, 
             :principal_due, :principal_paid, :interest_due, :interest_paid, :total_interest_due, :total_interest_paid, 
             :total_principal_due, :total_principal_paid]
     agg_cols = cols.map{|c| DataMapper::Query::Operator.new(c, :sum)}
-    vals = LoanHistory.all(:composite_key => keys).aggregate(*agg_cols)
-    cols.zip(vals)
+    vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
+    vals = vals.group_by{|v| v[0..(group_by.count-1)]} if group_by.count > 0
+    vals.to_hash.map{|k,v| [k,cols.zip(v.flatten[group_by.count..-1]).to_hash]}.to_hash
   end
 
 

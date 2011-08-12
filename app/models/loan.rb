@@ -201,7 +201,7 @@ class Loan
     first_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}[0]
     self.c_actual_first_payment_date = first_payment.received_on if first_payment
     st = self.get_status
-    self.c_last_status = st
+    self.c_last_status = STATUSES.index(st) + 1
     self.c_principal_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
     self.c_interest_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
     last_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}.reverse[0]
