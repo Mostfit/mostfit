@@ -29,8 +29,8 @@
       %extended_info_items
         - @transaction_log.extended_info_items.each do |e|
           %extended_info_item
-            %type #{e.item_type}
-            %id #{e.item_id}
+            %item_type #{e.item_type}
+            %item_id #{e.item_id}
+            %item_value #{e.item_value}
             %parent_guid #{e.parent_guid}
-            %value #{e.item_value}
 	   
