@@ -50,4 +50,3 @@ dependency "mongrel", "1.1.5"
 dependency "cronedit", "0.3.0"
 dependency "git", "1.2.5"
 dependency "do_sqlite3", do_gems_version
-dependency "tlsmail"
