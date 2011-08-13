@@ -1067,7 +1067,7 @@ class Loan
         :total_interest_due                  => total_interest_due.round(2),
         :total_principal_paid                => total_principal_paid.round(2),
         :total_interest_paid                 => total_interest_paid.round(2),
-        
+        :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f
       }
     end
 
@@ -1103,7 +1103,7 @@ class Loan
                                        actual_outstanding_principal, actual_outstanding_total, current, amount_in_default, client_group_id, center_id, client_id, 
                                        branch_id, days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid, 
                                        total_principal_due, total_interest_due, total_principal_paid, total_interest_paid, 
-                                       created_at)
+                                       created_at, composite_key)
               VALUES }
     values = []
     calculate_history.each do |history|
@@ -1113,7 +1113,7 @@ class Loan
                           #{client.center.id},#{client.id},#{client.center.branch.id}, #{history[:days_overdue]}, #{((history[:date] - d0) / 7).to_i + 1},
                           #{history[:principal_due]},#{history[:interest_due]}, #{history[:principal_paid]},#{history[:interest_paid]}, 
                           #{history[:total_principal_due]},#{history[:total_interest_due]}, #{history[:total_principal_paid]},#{history[:total_interest_paid]}, 
-                          '#{DateTime.now.strftime("%Y-%m-%d %H:%M:%S")}')}
+                          '#{DateTime.now.strftime("%Y-%m-%d %H:%M:%S")}', #{history[:composite_key]})}
      values << value
     end
     sql += values.join(",") + ";"
