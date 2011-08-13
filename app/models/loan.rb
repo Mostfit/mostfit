@@ -15,7 +15,7 @@ class Loan
   before :save,    :update_loan_cache
   after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
-
+  before :valid?,    :set_loan_product_parameters
   before :save, :set_bullet_installments
 
   def rs
@@ -201,12 +201,12 @@ class Loan
     first_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}[0]
     self.c_actual_first_payment_date = first_payment.received_on if first_payment
     st = self.get_status
-    self.c_last_status = st
+    self.c_last_status = STATUSES.index(st) + 1
     self.c_principal_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
     self.c_interest_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
     last_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}.reverse[0]
     self.c_last_payment_received_on = last_payment.received_on if last_payment
-    self.c_maturity_date = c_last_payment_received_on if (STATUSES.index(st) > 5 and last_payment)
+    self.c_maturity_date = (STATUSES.index(st) > 5 and last_payment) ? c_last_payment_received_on : nil
     self.c_last_payment_id = last_payment.id if last_payment
     true
   end
@@ -1145,7 +1145,8 @@ class Loan
   end
 
   def set_loan_product_parameters
-    repayment_style = self.loan_product.repayment_style unless repayment_style
+    debugger
+    self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
   end
 
   def interest_calculation(balance)

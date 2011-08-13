@@ -98,7 +98,7 @@
     %div.tab        
       %h1 Disbursal
       - if @loans_to_disburse.size > 0
-        = form_for(@loan, :action => url(:loan_actions, :action => 'disburse', :return => resource(@branch, @center)), :class => "_disable_button_") do
+        = form_for(@loan, :action => url(:loan_actions, :action => 'disburse', :return => (request.path + "?for_date=#{@date}&center_id=#{@center.id}#dishbursals")), :class => "_disable_button_") do
           = partial "loans/disburse", {:loans_to_disburse => @loans_to_disburse, :date => @date}
           = submit 'Disburse these loans', :name => "disburse_loans"
           or

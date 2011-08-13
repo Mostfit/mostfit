@@ -58,7 +58,7 @@ namespace :mostfit do
         UPDATE loans SET c_interest_received = (SELECT SUM(amount) FROM payments WHERE loan_id = id and type = 2)})
       puts "updating maturiy date"
       repository.adapter.execute(%Q{
-         update loans l set c_maturity_date = (select min(date) from loan_history lh where loan_id = l.id and status > 6;})
+         update loans l set c_maturity_date = (select min(date) from loan_history lh where loan_id = l.id and status > 6)})
       
       
     end
