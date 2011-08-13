@@ -207,12 +207,11 @@ namespace :mostfit do
         loan_ids = repository.adapter.query("SELECT id from loans")
       end
       t0 = Time.now
-      loan_ids.each do |loan_id|
+      co = loan_ids.count
+      loan_ids.each_with_index do |loan_id, idx|
         loan = Loan.get(loan_id)
-        puts "1: #{Time.now - t0}"
         loan.update_history_bulk_insert
-        puts "2: #{Time.now - t0}"
-        print "Did loan #{loan.id}  (total = #{Time.now - t0} secs)\n"
+        print "Did loan #{loan.id} (#{idx}/#{co} or #{idx/co.to_f*100.round}%) in #{Time.now - t0} secs)\n"
       end
       t1 = Time.now
       secs = (t1 - t0).round

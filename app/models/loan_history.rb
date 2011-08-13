@@ -33,7 +33,7 @@ class LoanHistory
   property :center_id,                   Integer, :index => true
   property :branch_id,                   Integer, :index => true
 
-  property :composite_key, String, :index => true
+  property :composite_key, Float, :index => true
 
   belongs_to :loan#, :index => true
   belongs_to :client         # speed up reports
