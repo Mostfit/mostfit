@@ -17,6 +17,8 @@ class LoanHistory
   property :scheduled_outstanding_principal, Float, :nullable => false, :index => true
   property :actual_outstanding_total,        Float, :nullable => false, :index => true
   property :actual_outstanding_principal,    Float, :nullable => false, :index => true
+  property :scheduled_principal_due,         Float, :nullable => false, :index => true
+  property :scheduled_interest_due,          Float, :nullable => false, :index => true
   property :principal_due,                   Float, :nullable => false, :index => true
   property :interest_due,                    Float, :nullable => false, :index => true
   property :principal_paid,                  Float, :nullable => false, :index => true
@@ -25,6 +27,11 @@ class LoanHistory
   property :total_interest_due,              Float, :nullable => false, :index => true
   property :total_principal_paid,            Float, :nullable => false, :index => true
   property :total_interest_paid,             Float, :nullable => false, :index => true
+  property :advance_principal_paid,          Float, :nullable => false, :index => true
+  property :advance_interest_paid,           Float, :nullable => false, :index => true
+  property :principal_in_default,          Float, :nullable => false, :index => true
+  property :interest_in_default,           Float, :nullable => false, :index => true
+  
 
   property :status,                          Enum.send('[]', *STATUSES)
 

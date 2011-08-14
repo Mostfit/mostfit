@@ -234,12 +234,12 @@ module Merb
         if part.to_i.to_s.length == part.length  # true when a number (id)
           o = instance_variable_get('@'+url.split('/')[-2].singular)  # get the object (@branch)
           s = (o.respond_to?(:name) ? link_to(o.name, url) : link_to('#'+o.id.to_s, url))
-          crums <<  "#{s} >> "  # merge the instance names (or numbers)
+          crums <<  "#{s} "  # merge the instance names (or numbers)
         else  # when not a number (id)
           crums << link_to(I18n.t("breadcrumb.#{part}", :default => part.gsub('_', ' ')), url) unless ['centers','clients'].include?(part) # add the resource name
         end
       end
-      '<ul class="breadcrumb"><li>' + ['<a href="/">Home >> </a>', crums].join('</li><li>') + '</li></ul>'  # fancy separator
+      ['<a href="/">Home  </a>', crums].join(' > ')   # fancy separator
     end
 
     def format_currency(i)

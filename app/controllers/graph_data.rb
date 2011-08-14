@@ -269,6 +269,7 @@ class GraphData < Application
   end
 
   def dashboard
+    debugger
     labels = []
     if params[:id] == "branch_pie"
       vals = repository.adapter.query(%Q{SELECT SUM(l.amount) amount, b.name name
@@ -327,7 +328,11 @@ class GraphData < Application
         color = (255 - 255 * color_ratio).to_i.to_s(16) + (255 * color_ratio).to_i.to_s(16) + "00"
         color = color + "0" * (6 - color.length) if color.length < 6
         percent = (paid*100/(paid + due)).to_i
-        {:value => (paid + due).to_i, :label => "#{objs.find{|x| x.id ==  oid}.name} -  (paid: #{percent}%)", :colour => color}
+        if true
+          {:value => (paid + due).to_i, :label => "", :colour => color}
+        else
+          {:value => (paid + due).to_i, :label => "#{objs.find{|x| x.id ==  oid}.name} -  (paid: #{percent}%)", :colour => color}
+        end
       end
       type="pie"
     end

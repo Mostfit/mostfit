@@ -1,5 +1,6 @@
+- debugger
 - bnames = @branch_names.keys.sort
-- bvalues = @branch_names.map{|name, id| @branch_data[id][:principal_paid]}
+- bvalues = @branch_names.map{|name, id| @branch_data[id][:principal_paid] if @branch_data[id]}
 %script{:type => "text/javascript"}
   == names=['#{bnames.join("','")}']
   == values = ['#{bvalues.join("','")}']
@@ -50,7 +51,7 @@
 
             
       .chart
-        = ofc2(400, 320, url(:graph_data, :action => 'dashboard', :id => 'branch_day'))
+        = ofc2(400, 320, url(:graph_data, :action => 'dashboard', :id => 'branch_day', :date => params[:date]))
       
         
         

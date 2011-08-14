@@ -52,20 +52,21 @@
         - if Mfi.first.dirty_queue_enabled and count = DirtyLoan.pending.length and count > 0
           %i
             == (#{count} loans in queue)
+    #breadcrums
+      = breadcrumbs
+      #login
+        - if session.authenticated?
+          =link_to 'change password', url(:change_password)
+          |
+          = current_user_info
+        - else
+          existing users can
+          %b= link_to 'login', url(:login)
+          to proceed
+
+
     #content
       .container
-        #breadcrums
-          = breadcrumbs
-          #login
-            - if session.authenticated?
-              =link_to 'change password', url(:change_password)
-              |
-              = current_user_info
-            - else
-              existing users can
-              %b= link_to 'login', url(:login)
-              to proceed
-
         %p
         - if message
           #flash-messages.span-17.prefix-5.suffix-5.last            
@@ -75,8 +76,7 @@
         - if params[:action]=="edit" and session.user.admin?
           %p{:style => "float: right; border: 1px solid orange; padding: 4px;"}
             = link_to("Delete", url(:controller => "application", :action => "delete", :id => params[:id], :model => params[:controller], :return => request.uri), :class => 'delete')
-        .inner_container
-          = catch_content :for_layout
+        = catch_content :for_layout
     #footer
       %p{:style => "position: relative; right: 10%; float: right;"}
         - if session.authenticated? and session.user.role == :admin and Merb.env == "development"
