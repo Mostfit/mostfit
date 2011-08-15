@@ -18,8 +18,7 @@ class LoanProduct
   #This property is defined in init.rb after app load as Loan may not have loaded by the time this class initializes
   #  property :loan_type, Enum.send('[]'), :nullable => false, :index => true
   property :loan_type_string, String
-
-
+ 
   # this is a dirty hack. all this should go into the RepaymentStyle
   property :rounding, Integer
   property :rounding_style, Enum.send('[]', *['', 'round', 'floor', 'ceil']), :default => 'round', :nullable => true, :index => true
@@ -40,11 +39,12 @@ class LoanProduct
   has n, :audit_trails, :auditable_type => "LoanProduct", :child_key => ["auditable_id"]
   
   belongs_to :insurance_product, :nullable => true
+  belongs_to :repayment_style
 
   validates_with_method :min_is_less_than_max
   validates_is_unique   :name
   validates_is_number   :max_amount, :min_amount
-  validates_with_method :check_loan_type_correctness
+  # validates_with_method :check_loan_type_correctness
   
   def self.from_csv(row, headers)
     min_interest = row[headers[:min_interest_rate]].to_f < 1 ? row[headers[:min_interest_rate]].to_f*100 : row[headers[:min_interest_rate]]

@@ -230,6 +230,13 @@ class Float
   def round(n=0)
     (self * (10.0 ** n)).round_orig * (10.0 ** (-n))
   end
+  
+  def round_to_nearest(i = nil, style = :round)
+    return self if i.nil?
+    return self unless self.respond_to?(style)
+    (self / i).send(style) * i
+  end
+
 end
 
 class Array

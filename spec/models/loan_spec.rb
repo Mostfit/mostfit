@@ -624,7 +624,7 @@ describe Loan do
   end
 
   it "should takeover properly" do
-    @loan2 = Object.const_get("TakeOver#{@loan.discriminator}").new
+    @loan2 = Object.const_get("#{@loan.discriminator}").new
     @loan2.attributes = @loan.attributes
     @loan_product.min_interest_rate = 0
     @loan_product.min_amount = 0
@@ -657,7 +657,7 @@ describe Loan do
 
     @loan_product.min_interest_rate = 0
     @loan_product.min_amount = 0
-    @loan2 = Object.const_get("TakeOver#{@loan1.discriminator}").new(:interest_rate => 0.15, :installment_frequency => :weekly, :number_of_installments => 46, 
+    @loan2 = Object.const_get("#{@loan1.discriminator}").new(:interest_rate => 0.15, :installment_frequency => :weekly, :number_of_installments => 46, 
                                                                      :original_amount => @loan1.amount,
                                                                      :original_first_payment_date => "2009-12-28", :applied_on => "2009-12-22", :original_disbursal_date => "2009-12-22",
                                                                      :applied_by       => @manager, :funding_line => @funding_line, :client => @client, :loan_product => @loan_product, 
@@ -782,10 +782,15 @@ describe Loan do
 
   it "should repay properly" do
     # this test is failing.
+<<<<<<< HEAD
     @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, 
                      :scheduled_first_payment_date => "2000-12-06", 
                      :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", 
                      :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, 
+=======
+    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", 
+                     :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, 
+>>>>>>> takeoverness fixed
                      :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
     @loan.save
     fee =  Fee.create(:amount => 100, :name => "processing fee", :payable_on => :loan_disbursal_date)
@@ -800,9 +805,12 @@ describe Loan do
     @loan.disbursed_by = @manager
 
     r = @loan.repay(500, @user, @loan.scheduled_first_payment_date, @manager)
+<<<<<<< HEAD
     r[0].should == true
     r[3].type.should == :fees
     r[3].amount.should == 100
+=======
+>>>>>>> takeoverness fixed
   end
 
   it "should not disburse if loan fees are not paid" do

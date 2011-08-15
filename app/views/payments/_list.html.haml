@@ -1,51 +1,3 @@
-<<<<<<< HEAD
-%h2== Repayments #{link_to 'new repayment', url_for_loan(@loan, 'payments/new'), :class => "add"}
-- if @payments.blank?
-  %p
-    %i No repayments have been made so far.
-- else
-  %table.narrow.form{ :width => '100%' }
-    %thead
-      %tr
-        %th
-        %th id
-        %th received on
-        %th received by
-        %th amount
-        %th type
-        %th
-    %tbody
-    - @client = @payments.first.client unless @client
-    - @center = @client.center unless @center
-    - @branch = @center.branch unless @branch 
-    - for payment in @payments
-      %tr{ :class => cycle('odd','') }
-        %td &nbsp;
-        %td
-          = payment.id
-        %td
-          %i= payment.received_on
-        %td
-          %b= link_to payment.received_by.name, resource(payment.received_by)
-        %td
-          %b= payment.amount.to_currency
-        %td
-          %b= payment.type.to_s
-        %td
-          - if payment.loan_id 
-            = link_to('delete', url_for_loan(payment.loan, "payments/#{payment.id}/delete", :return => url_for_loan(payment.loan) + "#repayments_made"), {:class => "confirm_click", :title => "Are you sure you want to delete this payment of #{payment.amount}"}) unless payment.verified_by_user_id
-            - next if session.user.role!=:admin
-            |
-            = link_to('edit', url_for_loan(payment.loan, "payments/#{payment.id}/edit")) unless payment.verified_by_user_id
-          - else
-            = link_to('delete', resource(@branch, @center, payment.client, payment, :delete), {:class => "confirm_click", :title => "Are you sure you want to delete this payment of #{payment.amount}"}) unless payment.verified_by_user_id
-            - next if session.user.role!=:admin
-            |
-            = link_to('edit', resource(@branch, @center, payment.client, payment, :edit)) unless payment.verified_by_user_id
-    %tfoot
-      %tr
-        %td{ :colspan => 8 }
-=======
 / %a{:href => "#", :onclick => "javascript:$('.checkbox').attr('checked',true); return false"} check all
 / %a{:href => "#", :onclick => "javascript:$('.checkbox').attr('checked',false); return false"} uncheck all
 
@@ -98,6 +50,6 @@
   %tfoot
     %tr
       %td{ :colspan => 8 }
->>>>>>> d1ef06e... repayments bug
+
 
 %p= link_to 'new repayment >>', url_for_loan(@loan, 'payments/new'), :class => "button"

@@ -142,6 +142,7 @@ class Payments < Application
       @payment.received_on = date
       success = @payment.save
     end
+    # reloading loan as payments can be stale here
     Loan.get(@loan.id).update_history(true) if @loan
     return success      
   end

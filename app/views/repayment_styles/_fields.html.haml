@@ -1,0 +1,64 @@
+%table.tall.shaded{:width => "60%"}
+  %tr
+    %th{:width => "45%"}
+      Name
+    %td
+      = text_field :name, :style => "width: 300px"
+  %tr
+    %th
+      Style
+    %td
+      = select :style, :collection => [['','---']] + Mostfit::PaymentStyles.constants.sort.map{|f| [f,f]}
+  %tr
+    %th
+      Round Equated Payment To
+      %br
+      %span.greytext
+        leave blank for no rounding, else enter an integer value to round to the nearest multiple thereof
+        
+    %td
+      = text_field :round_total_to, :style => "width: 3em;"
+  %tr
+    %th
+      Round Interest Payment To
+      %br
+      %span.greytext
+        leave blank for no rounding, else enter an integer value to round to the nearest multiple thereof.
+        Principal will be calculated as total payment minus interest
+        
+    %td
+      = text_field :round_interest_to, :style => "width: 3em;"
+
+  %tr
+    %th
+      Rounding style
+    %td
+      = select :rounding_style, :collection => [['round','round'],['floor','floor'],['ciel','ciel']], :prompt => "---"
+  %tr
+    %th
+      Force Max Installments?
+      %span.greytext
+        This will enusre that inspite of rounding the loan will not go beyond the specified number of installments
+    %td
+      = check_box :force_num_installments
+  %tr
+    %th
+      Active
+    %td
+      = check_box :active
+  %tr
+    %th
+      Custom Principal Schedule
+    %td
+      = text_area :custom_principal_schedule
+  %tr
+    %th
+      Custom Interest Schedule
+    %td
+      = text_area :custom_interest_schedule
+  
+  %tr
+    %td
+    %td{:style => 'text-align: center'}
+      = submit button_text
+  

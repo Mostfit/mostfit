@@ -20,7 +20,7 @@
       This Staff Manager has no collection today.
 %br
 %br
-- @centers.sort_by{|x| x.meeting_time_hours*60 + x.meeting_time_minutes}.each do |center|
+- @centers.sort_by{|x| (x.meeting_time_hours || 0)*60 + (x.meeting_time_minutes || 0)}.each do |center|
   %h2
     = center.name
     (

@@ -1,12 +1,7 @@
-
+- counter = 0
 - if @user
   %h1== User: <i>#{@user.login}</i>
   %table.narrow.form{ :style => "width: 40%;" }
-    - counter = 1
-    %tr.odd
-      %td Login
-      %td
-        %b= @user.login
     - counter+= 1
     %tr
       %td Role
@@ -40,6 +35,12 @@
             = select :preferred_locale, :collection => [["","---"]] + LOCALES.map{|s| [s[0].to_s, s[1].to_s]}, :selected => (@user.preferred_locale ? @user.preferred_locale : ""), :style => "margin-left: 20px; height: 20px; padding-top: 1px;"
             = submit "Update Locale", :style => "margin-left: 20px; height: 25px; padding-top: 1px;"
 
+    %tr.odd
+      %td StaffMember
+      %td=@user.staff_member.name if @user.staff_member
+    %tr
+      %td Funder
+      %td=@user.funder.name if @user.funder
   %p
     = link_to_with_rights 'edit this user\'s details ', resource(@user, :edit), :class => "edit"
 

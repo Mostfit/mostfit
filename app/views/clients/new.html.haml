@@ -7,6 +7,6 @@
 = form_for(@client, :action => form_url, :multipart => true) do
   = partial("clients/fields")
 
-  = submit "Add client"
+  = submit "Add client", :class => "grey_button"
 = link_to 'cancel', cancel_url
 

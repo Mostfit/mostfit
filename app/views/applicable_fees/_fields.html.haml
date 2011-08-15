@@ -1,17 +1,17 @@
-%table
+%table.tall.shaded
   %tr
-    %td
-      %b Fee
+    %th
+      Fee
     %td
       = select :fee_id, :collection => Fee.all.map{|f| [f.id, f.name]}, :prompt => "Select fee"
     %tr
-      %td          
-        %b Amount
+      %th          
+        Amount
       %td
         = text_field :amount
     %tr
-      %td
-        %b Applicable on
+      %th
+        Applicable on
       %td
         = date_select_for @applicable_fee, :applicable_on
     %tr
@@ -20,4 +20,4 @@
         = hidden_field :applicable_id, :value => @applicable_fee.applicable_id
         = hidden_field :applicable_type, :value => @applicable_fee.applicable_type
         = hidden_field :name => "_target_", :value => "applicable_fee_list"
-        = submit "GO"
+        = submit "Apply Penalty/Fee"

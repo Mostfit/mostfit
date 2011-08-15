@@ -6,7 +6,13 @@
 %h3
   = "This loan will be dispensed by loan product: #{@loan_product.name}"
 
-%table.form.shaded{:style => "margin-left:3%"}
+%table.tall.shaded{:style => "margin-left:3%"}
+  - if session.user.role == :admin and (not @loan.new?)
+    %tr
+      %th
+        Repayment Style
+      %td
+        = select :repayment_style_id, :collection => RepaymentStyle.all, :value_method => :id, :text_method => :name
   - if not take_over_loan
     %tr
       %th
@@ -214,6 +220,6 @@
   %tr
     %td
     %td
-      = submit submit_text
+      = submit submit_text, :class => "grey_button"
       &nbsp;&nbsp;
       = link_to 'cancel', cancel_link

@@ -70,6 +70,7 @@
           %tr.center_total
             %td
               %b==Center total:
+
             %td
             - branch_total.push(center_total.reject{|x| x.class!=Array}.transpose.collect{|x| x.inject(0){|sum, x| sum+=x}})
             - 1.upto(length-2).each do |col|

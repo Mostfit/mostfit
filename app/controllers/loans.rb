@@ -29,11 +29,8 @@ class Loans < Application
   def new
     only_provides :html
     if params[:product_id] and @loan_product = LoanProduct.is_valid(params[:product_id])      
-      if Loan.descendants.map{|x| x.to_s}.include?(@loan_product.loan_type_string)
-        klass = Kernel::const_get(@loan_product.loan_type_string)
-        @loan = klass.new
-        set_insurance_policy(@loan_product)
-      end
+      @loan = Loan.new
+      set_insurance_policy(@loan_product)
     end
 
     @loan_products = LoanProduct.valid if @loan.nil?
@@ -177,13 +174,15 @@ class Loans < Application
   end
 
   def disburse
+    debugger
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
     hash   = {:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil}
-    @loans = get_loans(hash)
-
     if request.method == :get
+      @loans = get_loans(hash)
       render
     else
+      @loans = get_loans(hash, false)
+      loan_ids = @loans.aggregate(:id)
       @errors = []
       cheque_numbers = params[:loans].select{|k,v| v[:disbursed?]!= "on" and not v[:cheque_number].blank?}.to_hash
       #save cheque numbers
@@ -197,7 +196,7 @@ class Loans < Application
       disbursal_loans = params[:loans].select{|k,v| v[:disbursed?] == "on"}.to_hash
       disbursal_loans.keys.each do |id|        
         loan = Loan.get(id.to_i)
-        next unless @loans.include?(loan)
+        next unless loan_ids.include?(loan.id)
         loan.disbursal_date = params[:loans][id][:disbursal_date]
         loan.cheque_number  = params[:loans][id][:cheque_number] and params[:loans][id][:cheque_number].to_i>0 ? params[:loans][id][:cheque_number] : nil
         loan.scheduled_first_payment_date = params[:loans][id][:scheduled_first_payment_date] if params[:loans][id][:scheduled_first_payment_date]
@@ -205,10 +204,11 @@ class Loans < Application
         loan.disbursed_by   = StaffMember.get(params[:loans][id][:disbursed_by_staff_id])
         @errors << loan.errors if not loan.save
       end
+      rurl = (params[:return]||url(:data_entry))
       if @errors.blank?
-        redirect params[:return]||url(:data_entry),{:message => {:notice => "#{disbursal_loans.size} loans disbursed. #{params[:loans].size - disbursal_loans.size} loans not disbursed."}}
+        redirect rurl, :message => {:notice => "#{disbursal_loans.size} loans disbursed. #{params[:loans].size - disbursal_loans.size} loans not disbursed."}
       else
-        render
+        redirect rurl, :message => {:notice => "#{disbursal_loans.size} loans disbursed. #{params[:loans].size - disbursal_loans.size} loans not disbursed."}
       end
     end
   end
@@ -382,8 +382,21 @@ class Loans < Application
     loan = Loan.get(id)
     raise NotFound unless loan
     loan.update_history
-    redirect("/loans/#{loan.id}")
+    redirect url_for_loan(loan)
   end
+
+  def reallocate(id)
+    @loan = Loan.get(id)
+    raise NotFound unless @loan
+    status, @payments = @loan.reallocate(params[:style].to_sym, session.user)
+    if status
+      redirect url_for_loan(@loan), :message => {:notice => "Loan payments succesfully reallocated"}
+    else
+      render 
+    end
+  end
+    
+
 
   def repayment_sheet(id)
     @loan = Loan.get(id)
@@ -478,16 +491,18 @@ class Loans < Application
   def get_loan_and_attrs   # FIXME: this is a code dup with data_entry/loans
     if params[:id] and not params[:id].blank?
       loan =  Loan.get(params[:id])      
+      loan_product = loan.loan_product
       attrs = params[loan.discriminator.to_s.snake_case.to_sym] || {}
       klass = loan.class
     else
       loan_product = LoanProduct.get(params[:loan_product_id])
-      attrs = params[loan_product.loan_type_string.snake_case.to_sym]
+      attrs = params[loan_product.loan_type_string.snake_case.to_sym] || params[:loan]
       raise NotFound if not params[:loan_type]
       klass = Kernel::const_get(params[:loan_type])
     end
     attrs[:client_id] = params[:client_id] if params[:client_id]
     attrs[:insurance_policy] = params[:insurance_policy] if params[:insurance_policy]
+    attrs[:repayment_style_id] ||= loan_product.repayment_style.id
     [klass, attrs]
   end
 

@@ -35,3 +35,4 @@ h2. Copyright and License
 Copyright (C) 2009-2011 Intellecap.
 
 Mostfit is available under the GNU AFFERO GENERAL PUBLIC LICENSE version 3 or (at your option) any later version. You should have received a file named COPYING along with Mostfit. COPYING is the complete text of the license. If you did not receive this file, see [[http://www.gnu.org/licenses/]].
+

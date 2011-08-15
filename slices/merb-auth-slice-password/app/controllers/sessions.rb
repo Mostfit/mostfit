@@ -30,6 +30,8 @@ class MerbAuthSlicePassword::Sessions < MerbAuthSlicePassword::Application
       redirect url(:data_entry)
     when :staff_member
       redirect(url(:browse))
+    when :maintainer
+      redirect("/maintain#deployment")
     else
       redirect_back_or(url(:browse), :message => message, :ignore => [slice_url(:login), slice_url(:logout)])
     end

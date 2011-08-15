@@ -10,24 +10,18 @@
       Paramaters
     %li#info
       Info
-    %li#validations
-      Validations
     %li#sample
       Sample schedule
     %li#history
       History
   %div.tab
-    %table.form
-      - [:name, :loan_type_string, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments, :installment_frequency, :rounding, :rounding_style, :valid_from, :valid_upto].each do |attr|
+    %table.tall.shaded{:style => "margin-left: 50px;"}
+      - [:name, :repayment_style, :min_amount, :max_amount, :min_interest_rate, :max_interest_rate, :min_number_of_installments, :max_number_of_installments, :installment_frequency, :rounding, :rounding_style, :valid_from, :valid_upto].each do |attr|
         %tr
           %th{:align => "left"}
             = attr.humanize
           %td
             = @loan_product.send(attr)
-  %div.tab
-    %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@loan_product.id}?for=loan_product"}
-  %div.tab
-    %table.form
       - [:payment_validation_methods, :loan_validation_methods].each do |attr|
         %tr
           %th{:align => "left"}
@@ -44,6 +38,9 @@
             %ul
               %li
                 = fee.description
+
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@loan_product.id}?for=loan_product"}
   %div.tab
     %table.report.nojs
       %tr

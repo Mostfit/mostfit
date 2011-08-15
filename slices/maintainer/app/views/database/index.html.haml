@@ -1,0 +1,29 @@
+%script{:src => javascript_path('database.js'), :type => "text/javascript"}
+
+#take-snapshot
+  %form
+    %input{:type => "button", :value => "Take Snapshot"}
+%hr    
+#snapshots
+  - @snapshots = get_snapshots()
+  - if @snapshots.length > 0
+    List of snapshots:
+    %table.spacious
+      %thead
+        %tr
+          %th Filename
+          %th Created at
+          %th Size (bzipped)
+          %th
+      %tbody
+        - @snapshots.each do |snapshot|
+          %tr
+            %td
+              %a{:name => snapshot[:name], :href => "/maintain/database/download_dump?file=#{snapshot[:name]}", :title => "Download"}= snapshot[:name]
+              = #"<a name href='/maintain/database/download_dump?file=#{snapshot[:name]}' title='Download this database dump'>#{snapshot[:name]}</a>"
+            %td= snapshot[:date].strftime(DATE_TIME_FORMAT_READABLE)
+            %td= "%.2f MB" % (snapshot[:size]/1024.0/1024.0)
+            %td
+              %a.confirm{:href => "#", :url => "/maintain/database/delete?file=#{snapshot[:name]}", :reload_url => "/maintain/database", :message => "Are you sure you want to delete the database dump \"#{snapshot[:name]}\"?", :success => "Database dump deleted.", :icon => "slices/maintainer/images/database.png", :before => "show_overlay(); $.notify_osd.create({ text: 'Deleting database dump...', icon: $(this).attr('icon'), sticky: true, dismissable: false })"} Delete
+  - else
+    You have not taken any database snapshots as yet.

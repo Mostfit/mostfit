@@ -1,33 +1,33 @@
-%table
+%table.tall.shaded
   %tr
-    %td{:colspan => '2'}
-      %h1==Bank account data
+    %th{:colspan => '2'}
+      %h3 Bank account data
   %tr
-    %td
+    %th
       Account number:
     %td
       = text_field(:account_number, :size => 20)
       %br/
   %tr
-    %td
+    %th
       Type of account:
     %td
       = select(:type_of_account, :collection => [[:savings, "Savings"], [:current, "Current"], [:no_frill, "No frill"], [:fixed_deposit, "Fixed deposit"], [:loan, "Loan"], [:other, "Other"]] , :prompt => "Select account type")
       %br/
   %tr
-    %td
+    %th
       Bank name:
     %td
       = text_field(:bank_name, :size => 20)
       %br/
   %tr
-    %td
+    %th
       Branch:
     %td
       = text_field(:bank_branch, :size => 20)
       %br/
   %tr
-    %td
+    %th
       Join holder:
     %td
       = text_field(:join_holder, :size => 20)

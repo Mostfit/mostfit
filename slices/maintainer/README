@@ -1,0 +1,76 @@
+Maintainer
+==========
+
+A slice for the Merb framework.
+
+------------------------------------------------------------------------------
+   
+
+To see all available tasks for Maintainer run:
+
+rake -T slices:maintainer
+
+------------------------------------------------------------------------------
+
+Instructions for installation:
+
+file: config/init.rb
+
+# add the slice as a regular dependency
+
+dependency 'maintainer'
+
+# if needed, configure which slices to load and in which order
+
+Merb::Plugins.config[:merb_slices] = { :queue => ["Maintainer", ...] }
+
+# optionally configure the plugins in a before_app_loads callback
+
+Merb::BootLoader.before_app_loads do
+  
+  Merb::Slices::config[:maintainer][:option] = value
+  
+end
+
+file: config/router.rb
+
+# example: /maintainer/:controller/:action/:id
+
+add_slice(:Maintainer)
+
+# example: /:lang/:controller/:action/:id
+
+add_slice(:Maintainer, :path => ':lang')
+
+# example: /:controller/:action/:id
+
+slice(:Maintainer)
+
+Normally you should also run the following rake task:
+
+rake slices:maintainer:install
+
+------------------------------------------------------------------------------
+
+You can put your application-level overrides in:
+
+host-app/slices/maintainer/app - controllers, models, views ...
+
+Templates are located in this order:
+
+1. host-app/slices/maintainer/app/views/*
+2. gems/maintainer/app/views/*
+3. host-app/app/views/*
+
+You can use the host application's layout by configuring the
+maintainer slice in a before_app_loads block:
+
+Merb::Slices.config[:maintainer] = { :layout => :application }
+
+By default :maintainer is used. If you need to override
+stylesheets or javascripts, just specify your own files in your layout
+instead/in addition to the ones supplied (if any) in 
+host-app/public/slices/maintainer.
+
+In any case don't edit those files directly as they may be clobbered any time
+rake maintainer:install is run.
