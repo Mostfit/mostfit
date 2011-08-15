@@ -125,7 +125,7 @@ class Center
 
 
   def meeting_day?(date)
-    x = LoanHistory.all(:date => date).map{|x| x.center_id}.uniq.include?(self.id)
+    x = LoanHistory.all(:date => date).aggregate(:center_id).include?(self.id)
     return x
   end
 

@@ -173,7 +173,7 @@ module Misfit
             return false if @controller == "regions"
             return(@staff.regions.length > 0) if @controller == "areas" 
           end
-          
+          debugger
           if [:branches, :centers, :clients, :loans].include?(@controller.to_sym) and params
             params = params.merge(@route)
             

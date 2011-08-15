@@ -4,6 +4,10 @@ class IncentiveReport < Report
     self.end_date   = Date.new(self.start_date.year, self.start_date.month, -1).strftime('%Y-%m-%d')
     @name = "Incentive report"
   end
+
+  def self.name
+    "Incentive Report"
+  end
   
   def name
     "Month starting #{self.start_date} upto #{self.end_date}"

@@ -174,13 +174,15 @@ class Loans < Application
   end
 
   def disburse
+    debugger
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
     hash   = {:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil}
-    @loans = get_loans(hash)
-
     if request.method == :get
+      @loans = get_loans(hash)
       render
     else
+      @loans = get_loans(hash, false)
+      loan_ids = @loans.aggregate(:id)
       @errors = []
       cheque_numbers = params[:loans].select{|k,v| v[:disbursed?]!= "on" and not v[:cheque_number].blank?}.to_hash
       #save cheque numbers
@@ -194,7 +196,7 @@ class Loans < Application
       disbursal_loans = params[:loans].select{|k,v| v[:disbursed?] == "on"}.to_hash
       disbursal_loans.keys.each do |id|        
         loan = Loan.get(id.to_i)
-        next unless @loans.include?(loan)
+        next unless loan_ids.include?(loan.id)
         loan.disbursal_date = params[:loans][id][:disbursal_date]
         loan.cheque_number  = params[:loans][id][:cheque_number] and params[:loans][id][:cheque_number].to_i>0 ? params[:loans][id][:cheque_number] : nil
         loan.scheduled_first_payment_date = params[:loans][id][:scheduled_first_payment_date] if params[:loans][id][:scheduled_first_payment_date]
@@ -202,10 +204,11 @@ class Loans < Application
         loan.disbursed_by   = StaffMember.get(params[:loans][id][:disbursed_by_staff_id])
         @errors << loan.errors if not loan.save
       end
+      rurl = (params[:return]||url(:data_entry))
       if @errors.blank?
-        redirect params[:return]||url(:data_entry),{:message => {:notice => "#{disbursal_loans.size} loans disbursed. #{params[:loans].size - disbursal_loans.size} loans not disbursed."}}
+        redirect rurl, :message => {:notice => "#{disbursal_loans.size} loans disbursed. #{params[:loans].size - disbursal_loans.size} loans not disbursed."}
       else
-        render
+        redirect rurl, :message => {:notice => "#{disbursal_loans.size} loans disbursed. #{params[:loans].size - disbursal_loans.size} loans not disbursed."}
       end
     end
   end
@@ -383,10 +386,8 @@ class Loans < Application
   end
 
   def reallocate(id)
-    debugger
     @loan = Loan.get(id)
     raise NotFound unless @loan
-    debugger
     status, @payments = @loan.reallocate(params[:style].to_sym, session.user)
     if status
       redirect url_for_loan(@loan), :message => {:notice => "Loan payments succesfully reallocated"}
@@ -414,7 +415,6 @@ class Loans < Application
     if request.method == :get
       display @loan, :layout => layout?
     else
-      debugger
       staff = StaffMember.get(params[:received_by])
       raise ArgumentError.new("No staff member selected") unless staff
       raise ArgumentError.new("No applicable fee for penalty") if (params[:fee].blank? and (not params[:penalty_amount].blank?))
@@ -502,7 +502,6 @@ class Loans < Application
     end
     attrs[:client_id] = params[:client_id] if params[:client_id]
     attrs[:insurance_policy] = params[:insurance_policy] if params[:insurance_policy]
-    debugger
     attrs[:repayment_style_id] ||= loan_product.repayment_style.id
     [klass, attrs]
   end

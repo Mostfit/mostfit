@@ -12,7 +12,7 @@
       %legend Manipulate Loan Schedule
       = link_to("Repair history", url(:controller => "loans", :id => @loan.id, :action => "repair"), :class => "grey_button")
       = form_for(@loan, :action => url(:controller => "loans", :id => @loan.id, :action => "reallocate"), :class => "") do
-        = submit 'reallocate loans with style', :class => "grey_button", :style => "margin: 4px"
+        = submit 'Reallocate loans with style', :class => "grey_button", :style => "margin: 4px"
         = repayment_style_select
 
 - if @loan.status == :outstanding    
@@ -76,10 +76,11 @@
               - center = @client.center
               - branch = center.branch
               = select :written_off_by_staff_id, :id => "written_off_by_staff_id", :collection => [branch.manager, center.manager].uniq.map{|m| [m.id, m.name]}, :prompt => "select staff member"
-          %tr
-            %td{:colspan => "2"}
+              %br
               %span.greytext 
                 Pick the staff member who is writing off the loan
+          %tr
+            %td{:colspan => "2"}
               = submit "Write off"
 - elsif staff_member = session.user.staff_member
   = form_for(@loan, :action => url(:action => :suggest_write_off, :id => @loan.id), :method => "POST", :class => "_disable_button_") do

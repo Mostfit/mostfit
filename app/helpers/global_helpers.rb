@@ -660,7 +660,7 @@ module Merb
     def repayment_style_select(name = "style")
       all_repayment_style_choices = REPAYMENT_STYLES.map{|x| [x.to_s, x.to_s]}
       default_repayment_style = Mfi.first.default_repayment_style ? Mfi.first.default_repayment_style : NORMAL_REPAYMENT_STYLE
-      default_repayment_style_choice = all_repayment_style_choices.select {|style| style[0] == default_repayment_style}
+      default_repayment_style_choice = all_repayment_style_choices.select {|style| style[0] == default_repayment_style.to_s}
       repayment_style_choices = Mfi.first.allow_choice_of_repayment_style ? default_repayment_style_choice + (all_repayment_style_choices.reject {|style| style[0] == default_repayment_style}) : default_repayment_style_choice
       select :name => name, :collection => repayment_style_choices
     end

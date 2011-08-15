@@ -41,7 +41,7 @@ class Clients < Application
       if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @client
       else
-        redirect(params[:return]||resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' successfully created"})
+        redirect(params[:return]||resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' (Id:#{@client.id}) successfully created"})
       end
     else
       if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
@@ -87,9 +87,9 @@ class Clients < Application
         display @client
       else
         if @branch and @center
-          redirect(params[:return]||resource(@branch, @center, @client), :message => {:notice => "Client '#{@client.name}' has been edited"})
+          redirect(params[:return]||resource(@branch, @center, @client), :message => {:notice => "Client '#{@client.name}' (Id:#{@client.id}) has been edited"})
         else
-          redirect(resource(@client, :edit), :message => {:notice => "Client '#{@client.name}' has been edited"})
+          redirect(resource(@client, :edit), :message => {:notice => "Client '#{@client.name}' (Id:#{@client.id}) has been edited"})
         end
       end
     else
@@ -110,7 +110,7 @@ class Clients < Application
     raise NotFound unless @client
     disallow_updation_of_verified_clients
     if @client.destroy
-      redirect resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' has been deleted"}
+      redirect resource(@branch, @center, :clients), :message => {:notice => "Client '#{@client.name}' (Id:#{@client.id}) has been deleted"}
     else
       raise InternalServerError
     end

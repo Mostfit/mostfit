@@ -1,8 +1,14 @@
 module DataEntry
   class Centers < DataEntry::Controller
     def new
-      @center = Center.new
-      redirect(resource(:centers, :new, {:return => :data_entry}))
+      if request.method == :post
+        @branch = Branch.get(params[:branch_id])
+        raise NotFound unless @branch
+        redirect resource(@branch, :centers, :new)
+      else
+        @center = Center.new
+        display [@center]
+      end
     end
     
     def edit
