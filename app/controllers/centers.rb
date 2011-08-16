@@ -101,7 +101,7 @@ class Centers < Application
       if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @center
       else
-        redirect(params[:return]||resource(@center), :message => {:notice => "Center '#{@center.name}' successfully created"})
+        redirect(params[:return]||resource(@center), :message => {:notice => "Center '#{@center.name}' (Id:#{@center.id}) successfully created"})
       end
     else
       #       message[:error] = "Center failed to be created"
@@ -126,7 +126,7 @@ class Centers < Application
     @center.attributes = center
 
     if @center.save
-      redirect(params[:return]||resource(@center), :message => {:notice => "Center '#{@center.name}' has been successfully edited"})
+      redirect(params[:return]||resource(@center), :message => {:notice => "Center '#{@center.name}' (Id:#{@center.id}) has been successfully edited"})
     else
       display @center, :edit  # error messages will be shown
     end
@@ -140,7 +140,7 @@ class Centers < Application
     @center = Center.get(id)
     raise NotFound unless @center
     if @center.destroy
-      redirect resource(@branch, :centers), :message => {:notice => "Center '#{@center.name}' has been deleted"}
+      redirect resource(@branch, :centers), :message => {:notice => "Center '#{@center.name}' (Id:#{@center.id}) has been deleted successfully"}
     else
       raise InternalServerError
     end

@@ -137,7 +137,7 @@ class StaffMembers < Application
   def create(staff_member)
     @staff_member = StaffMember.new(staff_member)
     if @staff_member.save
-      redirect resource(:staff_members), :message => {:notice => "StaffMember was successfully created"}
+      redirect resource(:staff_members), :message => {:notice => "StaffMember '#{@staff_member.name}' (Id:#{@staff_member.id}) was successfully created"}
     else
       message[:error] = "StaffMember failed to be created"
       render :new
