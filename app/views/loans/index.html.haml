@@ -33,6 +33,14 @@
           == (id: #{@client.id}, ref: #{@client.reference})
       %tr
         %td
+          Date Joined
+        %td
+          = @client.date_joined
+          (
+          = @client.date_joined.strftime('%A')
+          )
+      %tr.odd
+        %td
           Date of Birth
         %td
           - if @client.date_of_birth
@@ -56,6 +64,10 @@
         %td Manager
         %td= link_to @center.manager.name, resource(@center.manager)
       %tr
+        %td Occupation
+        %td
+          = @client.occupation.name if @client.occupation
+      %tr.odd
         %td At center
         %td
           = link_to @client.center.name, resource(@client.center)
@@ -64,7 +76,7 @@
           %span.greytext
             center managed by:
             = link_to @center.branch.manager.name, resource(@center.manager)
-      %tr.odd
+      %tr
         %td
           Group
         %td
@@ -74,7 +86,7 @@
             Not associated with a group yet (
             =link_to('Edit', resource(@branch, @center, @client, :edit))
             to change)
-      %tr
+      %tr.odd
         %td
           Fees applicable
         %td
