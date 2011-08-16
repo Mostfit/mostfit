@@ -14,27 +14,34 @@
           %b= @branch.name
           == (code: #{@branch.code}, id: #{@branch.id})
       %tr
-        %th.even Manager
+        %th.even Creation Date
+        %td
+          = @branch.creation_date
+          (
+          = @branch.creation_date.strftime('%A')
+          )
+      %tr
+        %th.odd Manager
         %td= link_to @branch.manager.name, resource(@branch.manager)
-      %tr.odd
-        %th.odd No. of centers
+      %tr.even
+        %th.even No. of centers
         %td=@branch.centers.count
       %tr
-        %th.even Address
+        %th.odd Address
         %td=@branch.address
-      %tr.odd
-        %th.odd Contact number
+      %tr.even
+        %th.even Contact number
         %td=@branch.contact_number
       %tr
-        %th.even Landmark
+        %th.odd Landmark
         %td=@branch.landmark
-      %tr.odd
-        %th.odd Area
+      %tr.even
+        %th.even Area
         - area = @branch.area
         %td=link_to(area.name, resource(area)) if area
       - if total_attendance_at_branch = Attendance.count("client.center.branch_id" => @branch.id) and total_attendance_at_branch > 0
         %tr
-          %th.even
+          %th.odd
             Attendance
           %td
             = (Attendance.count("client.center.branch_id" => @branch.id, :status => "present") * 100.0 / total_attendance_at_branch).round(2)
