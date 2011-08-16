@@ -1145,7 +1145,6 @@ class Loan
   end
 
   def set_loan_product_parameters
-    debugger
     self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
   end
 
@@ -1509,6 +1508,7 @@ module Loaner
       _scheduled_disbursal_date = scheduled_disbursal_date
       _fp_date = scheduled_first_payment_date
       _original_amount = amount
+
       # recreate the original loan
       self.scheduled_first_payment_date = original_first_payment_date
       self.amount = original_amount
