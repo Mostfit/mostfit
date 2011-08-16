@@ -138,6 +138,9 @@
           - @loan.applicable_fees.each do |f|
             %li
               = f.description
+              (
+              = f.applicable_on.strftime('%A')
+              )
               - fpaid = @loan.payments(:fee_id => f.fee_id).reduce(0){|s,p| s + p.amount}
               - if fpaid == f.amount
                 %span.green 
