@@ -1,3 +1,5 @@
+- @journals = Journal.all("postings.account_id" => @account.id, :order => [:date.desc]).paginate(:page => params[:page], :per_page => 25)
+= paginate @journals
 %table.narrow.form
   %tr
     %th
@@ -11,7 +13,7 @@
     %th{:colspan => 2}
       Account Credit
   - counter = 0
-  - Journal.all("postings.account_id" => @account.id, :limit => 25, :order => [:date.desc]).each do |journal|
+  - @journals.each do |journal|
     - postings = journal.postings.group_by{|x| x.amount>0 ? :credit : :debit}
     - time_format = Mfi.first.date_format || "%d-%m-%Y"
     - time_format += " %H:%M"
@@ -40,3 +42,4 @@
         %td
           = p.amount.to_account_balance
    
+= paginate @journals
