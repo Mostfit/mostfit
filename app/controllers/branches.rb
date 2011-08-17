@@ -40,7 +40,7 @@ class Branches < Application
   def create(branch)
     @branch = Branch.new(branch)
     if @branch.save
-      redirect(params[:return]||resource(:branches), :message => {:notice => "Branch '#{@branch.name}' successfully created"})
+      redirect(params[:return]||resource(:branches), :message => {:notice => "Branch '#{@branch.name}' (Id:#{@branch.id}) successfully created"})
     else
       message[:error] = "Branch failed to be created"
       render :new  # error messages will show
@@ -58,7 +58,7 @@ class Branches < Application
     @branch = Branch.get(id)
     raise NotFound unless @branch
     if @branch.update_attributes(branch)
-      redirect(params[:return]||resource(:branches), :message => {:notice => "Branch '#{@branch.name}' has been edited"})
+      redirect(params[:return]||resource(:branches), :message => {:notice => "Branch '#{@branch.name}' (Id:#{@branch.id}) has been edited successfully"})
     else
       display @branch, :edit  # error messages will show
     end
@@ -72,7 +72,7 @@ class Branches < Application
     @branch = Branch.get(id)
     raise NotFound unless @branch
     if @branch.destroy
-      redirect resource(:branches), :message => {:notice => "Branch '#{@branch.name}' has been deleted"}
+      redirect resource(:branches), :message => {:notice => "Branch '#{@branch.name}' (Id:#{@branch.id}) has been deleted successfully"}
     else
       raise InternalServerError
     end
