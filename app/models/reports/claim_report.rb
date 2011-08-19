@@ -15,7 +15,7 @@ class ClaimReport < Report
   def generate
     branches, centers, claims = {}, {}, {}
     params = {:claim_submission_date.gte => from_date, :claim_submission_date.lte => to_date, :order => [:claim_submission_date]}
-    Claim.all(params) + Claim.all(:claim_submission_date => nil, :order => [:claim_submission_date])
-    Claim.all.group_by{ |claim| claim.client.center.branch} 
+    claims = (Claim.all(params) + Claim.all(:claim_submission_date => nil, :order => [:claim_submission_date]))
+    claims.group_by{ |claim| claim.client.center.branch} 
   end
 end
