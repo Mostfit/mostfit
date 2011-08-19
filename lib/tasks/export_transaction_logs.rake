@@ -16,11 +16,19 @@ namespace :mostfit do
   namespace :export do
     desc "This rake task exports transaction logs"
     task :transaction_logs, :begin_date, :end_date do |t, args|
-      debugger
       if args[:begin_date].nil?
         puts
-        puts "ERROR: Please give atleast one date as an argument." 
+        puts "USAGE: rake mostfit:regenerate:transaction_logs[<from_date>,<to_date>]"
+        puts
+        puts "NOTE: Make sure there are no spaces after and before the comma separating the two arguments." 
+        puts "      The from_date has to be supplied. If the to_date is not supplied it is assumed to be today."
+        puts "      The format for the date is DD-MM-YYYY. The date has to be enclosed in single quotes. For 6th August 2011 it shall be '06-08-2011'."
+        puts
+        puts "EXAMPLE: rake mostfit:export:transaction_logs['06-07-2011']"
+        puts "         rake mostfit:export:transaction_logs['06-07-2011','13-07-2011']"
+        flag = 0
       else
+        flag = 1
         begin_date = Date.strptime(args[:begin_date], "%d-%m-%Y")
       end
       
@@ -30,8 +38,11 @@ namespace :mostfit do
         end_date = Date.strptime(args[:end_date], "%d-%m-%Y")
       end
       if begin_date.nil? or end_date.nil?
-        puts
-        puts "ERROR: Please give the arguments in the proper format. For 6th August 2011 it shall be '06-08-2011' "
+        # Dont display this ERROR message if you have already displayed the USAGE message
+        if flag == 1
+          puts
+          puts "ERROR: Please give the arguments in the proper format. For 6th August 2011 it shall be '06-08-2011' "
+        end
       elsif begin_date <= end_date 
         org_guid = Organization.get_organization(end_date)
         begin_date_time = DateTime.new(begin_date.year, begin_date.month, begin_date.day)
@@ -49,52 +60,13 @@ namespace :mostfit do
           x.xml{
             x.transaction_logs{
               transaction_logs.each do |transaction_log|
-                x.transaction_log{
-                  x.txn_log_GUID transaction_log.txn_log_guid
-                  x.txn_log_guid transaction_log.txn_log_guid      
-                  x.txn_guid transaction_log.txn_guid
-                  x.update_type transaction_log.update_type.to_s
-                  x.txn_type transaction_log.txn_type.to_s         
-                  x.nature_of_transaction transaction_log.nature_of_transaction.to_s
-                  x.sub_type_id transaction_log.sub_type_id       
-                  x.sub_type_name transaction_log.sub_type_name     
-                  x.amount transaction_log.amount          
-                  x.currency transaction_log.currency.to_s        
-                  x.effective_date transaction_log.effective_date  
-                  x.record_date transaction_log.record_date     
-                  x.updated_at_time transaction_log.updated_at_time 
-                  x.verified_at_time transaction_log.verified_at_time 
-                  x.deleted_at_time transaction_log.deleted_at_time 
-                  x.paid_by_type transaction_log.paid_by_type.to_s    
-                  x.paid_by_id transaction_log.paid_by_id      
-                  x.paid_by_name transaction_log.paid_by_name    
-                  x.received_by_type transaction_log.received_by_type.to_s
-                  x.received_by_id transaction_log.received_by_id  
-                  x.received_by_name transaction_log.received_by_name
-                  x.transacted_at_type transaction_log.transacted_at_type.to_s  
-                  x.transacted_at_id transaction_log.transacted_at_id    
-                  x.transacted_at_name transaction_log.transacted_at_name
-                  x.parent_org_guid transaction_log.parent_org_guid
-                  x.parent_domain_guid transaction_log.parent_domain_guid
-                  if transaction_log.extended_info_items
-                    x.extended_info_items{
-                      transaction_log.extended_info_items.each do |e|
-                        x.extended_info_item{
-                          x.item_type e.item_type
-                          x.item_id e.item_id
-                          x.item_value e.item_value
-                          x.parent_guid e.parent_guid
-                        }
-                      end
-                    }
-                  end
-                }
+                transaction_log.to_xml(x).call
               end
             }
           }
           f.close
           puts
-          puts "The xml files generated are saved in the folder #{folder}"
+          puts "The xml files generated are saved as #{filename}"
         end
       end
     end

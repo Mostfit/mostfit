@@ -18,8 +18,17 @@ namespace :mostfit do
     task :event_logs, :begin_date, :end_date do |t, args|
       if args[:begin_date].nil?
         puts
-        puts "ERROR: Please give atleast one date as an argument." 
+        puts "USAGE: rake mostfit:export:event_logs[<from_date>,<to_date>]"
+        puts
+        puts "NOTE: Make sure there are no spaces after and before the comma separating the two arguments." 
+        puts "      The from_date has to be supplied. If the to_date is not supplied it is assumed to be today."
+        puts "      The format for the date is DD-MM-YYYY. The date has to be enclosed in single quotes. For 6th August 2011 it shall be '06-08-2011'."
+        puts
+        puts "EXAMPLE: rake mostfit:export:event_logs['06-07-2011']"
+        puts "         rake mostfit:export:event_logs['06-07-2011','13-07-2011']"
+        flag = 0
       else
+        flag = 1
         begin_date = Date.strptime(args[:begin_date], "%d-%m-%Y")
       end
       
@@ -30,8 +39,11 @@ namespace :mostfit do
       end
       
       if begin_date.nil? or end_date.nil?
-        puts
-        puts "ERROR: Please give the arguments in the proper format. For 6th August 2011 it shall be '06-08-2011'"
+        # Dont display this ERROR message if you have already displayed the USAGE message
+        if flag == 1
+          puts
+          puts "ERROR: Please give the arguments in the proper format. For 6th August 2011 it shall be '06-08-2011'"
+        end
       elsif begin_date <= end_date 
         org_guid = Organization.get_organization(end_date)
         begin_date_time = DateTime.new(begin_date.year, begin_date.month, begin_date.day)
@@ -43,30 +55,19 @@ namespace :mostfit do
           puts
           puts "ERROR: The event logs are empty"
         else
-          filename2 = File.join(folder, "event_log.#{org_guid}.from.#{begin_date.strftime("%d-%m-%Y")}.to.#{end_date.strftime("%d-%m-%Y")}.xml")
-          f2 = File.open(filename2,"w")
-          mel = Builder::XmlMarkup.new(:target => f2,:indent => 1)
+          filename = File.join(folder, "event_log.#{org_guid}.from.#{begin_date.strftime("%d-%m-%Y")}.to.#{end_date.strftime("%d-%m-%Y")}.xml")
+          f = File.open(filename,"w")
+          mel = Builder::XmlMarkup.new(:target => f,:indent => 1)
           mel.xml{
             mel.event_logs{
               model_event_logs.each do |model_event_log|
-                mel.event_log{
-                  mel.event_log_guid model_event_log.event_guid 
-                  mel.change model_event_log.event_change.to_s                           
-                  mel.changed_at model_event_log.event_changed_at                       
-                  mel.on_type model_event_log.event_on_type.to_s                          
-                  mel.on_id model_event_log.event_on_id                            
-                  mel.on_name model_event_log.event_on_name                          
-                  mel.accounting_action model_event_log.event_accounting_action.to_s                
-                  mel.accounting_action_effective_date model_event_log.event_accounting_action_effective_date
-                  mel.parent_org_guid model_event_log.parent_org_guid
-                  mel.parent_domain_guid model_event_log.parent_domain_guid   
-                }
+                model_event_log.to_xml(mel).call
               end
             }
           }
-          f2.close
+          f.close
           puts
-          puts "The xml files generated are saved in the folder #{folder}"
+          puts "The xml files generated are saved as #{filename}"
         end
       else
         puts

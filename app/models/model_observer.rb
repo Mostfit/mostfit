@@ -1,27 +1,16 @@
 class ModelObserver
   include DataMapper::Observer
   
-  OBJECTS_UNDER_OBSERVATION = [Client, Loan, LoanProduct]
   ANOMALIES = [Client, Loan]
   
-  observe *OBJECTS_UNDER_OBSERVATION
+  observe *ModelEventLog::MODELS_UNDER_OBSERVATION
   
   def self.make_event_entry(obj, action)
-    obj_class = nil
-    OBJECTS_UNDER_OBSERVATION.each{|x|
-      obj_class =  x.to_s.downcase.to_sym if obj.is_a?(x)
-    }
-    log = ModelEventLog.create(
-                               :parent_org_guid => obj.parent_org_guid,
-                               :parent_domain_guid => obj.parent_domain_guid,
-                               :event_change => action, 
-                               :event_changed_at => DateTime.now,
-                               :event_on_type => obj_class,     
-                               :event_on_id => obj.id,    
-                               :event_on_name => ((obj.respond_to?(:name)) ? obj.name : nil),
-                               :event_accounting_action => :allow, 
-                               :event_accounting_action_effective_date => nil
-                               )
+    log = ModelEventLog.new
+    log.obj2model_event_log(obj)
+    log.event_change = action
+    log.event_changed_at = DateTime.now
+    log.save
   end
 
   before :create do

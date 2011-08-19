@@ -1,5 +1,3 @@
-OBJECTS_UNDER_OBSERVATION = [Client, Loan, LoanProduct]
-
 require "rubygems"
 
 # Add the local gems dir if found within the app root; any dependencies loaded
@@ -20,8 +18,17 @@ namespace :mostfit do
     task :event_logs, :begin_date, :end_date do |t, args|
       if args[:begin_date].nil?
         puts
-        puts "ERROR: Please give atleast one date as an argument" 
-      else
+        puts "USAGE: rake mostfit:regenerate:event_logs[<from_date>,<to_date>]"
+        puts
+        puts "NOTE: Make sure there are no spaces after and before the comma separating the two arguments." 
+        puts "      The from_date has to be supplied. If the to_date is not supplied it is assumed to be today."
+        puts "      The format for the date is DD-MM-YYYY. The date has to be enclosed in single quotes. For 6th August 2011 it shall be '06-08-2011'."
+        puts
+        puts "EXAMPLE: rake mostfit:regenerate:event_logs['06-07-2011']"
+        puts "         rake mostfit:regenerate:event_logs['06-07-2011','13-07-2011']"
+        flag = 0
+       else
+        flag = 1
         begin_date = Date.strptime(args[:begin_date], "%d-%m-%Y")
       end
 
@@ -32,30 +39,22 @@ namespace :mostfit do
       end
       
       if begin_date.nil? or end_date.nil?
-        puts 
-        puts "ERROR: Please give the arguments in the proper format. For 6th August 2011 it shall be '06-08-2011'"
+        # Dont display this ERROR message if you have already displayed the USAGE message
+        if flag == 1
+          puts 
+          puts "ERROR: Please give the arguments in the proper format. For 6th August 2011 it shall be '06-08-2011'"
+        end
       elsif begin_date <= end_date
-        clients = Client.all(:created_at.gte => begin_date, :created_at.lte => end_date)
-        loan_products = LoanProduct.all(:created_at.gte => begin_date, :created_at.lte => end_date)
-        loans = Loan.all(:created_at.gte => begin_date, :created_at.lte => end_date)
-        everyone = clients + loan_products + loans
-        everyone_sorted = everyone.sort_by{|x| x.created_at}
+        everyone = []
+        ModelEventLog::MODELS_UNDER_OBSERVATION.each{|x|
+          everyone += x.all(:created_at.gte => begin_date, :created_at.lte => end_date)
+        }
         everyone.each do |obj|
-          obj_class = nil
-          OBJECTS_UNDER_OBSERVATION.each{|x|
-            obj_class =  x.to_s.downcase.to_sym if obj.is_a?(x)
-          }
-          log = ModelEventLog.create(
-                                     :parent_org_guid => obj.parent_org_guid,
-                                     :parent_domain_guid => obj.parent_domain_guid,
-                                     :event_change => :create, 
-                                     :event_changed_at => DateTime.now,
-                                     :event_on_type => obj_class,     
-                                     :event_on_id => obj.id,    
-                                     :event_on_name => ((obj.respond_to?(:name)) ? obj.name : nil),
-                                     :event_accounting_action => :allow, 
-                                     :event_accounting_action_effective_date => nil
-                                     )
+          log = ModelEventLog.new
+          log.obj2model_event_log(obj)
+          log.event_change = :create
+          log.event_changed_at = obj.created_at
+          log.save 
         end
         puts
         puts "The event logs have been repopulated"
