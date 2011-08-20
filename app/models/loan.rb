@@ -15,7 +15,7 @@ class Loan
   before :save,    :update_loan_cache
   after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
-
+  before :valid?,    :set_loan_product_parameters
   before :save, :set_bullet_installments
 
   def rs
@@ -206,7 +206,7 @@ class Loan
     self.c_interest_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
     last_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}.reverse[0]
     self.c_last_payment_received_on = last_payment.received_on if last_payment
-    self.c_maturity_date = c_last_payment_received_on if (STATUSES.index(st) > 5 and last_payment)
+    self.c_maturity_date = (STATUSES.index(st) > 5 and last_payment) ? c_last_payment_received_on : nil
     self.c_last_payment_id = last_payment.id if last_payment
     true
   end
@@ -254,8 +254,8 @@ class Loan
     {:min => :minimum, :max => :maximum}.each{|k, v|
       product_attr = product.send("#{k}_#{method}")
       if method==:interest_rate
-        product_attr = product_attr.to_f/100
-        loan_attr    = loan_attr.to_f
+        product_attr = product_attr.to_f/100.round(6)
+        loan_attr    = loan_attr.to_f.round(6)
       end
 
       if k==:min and loan_attr and product_attr and  loan_attr < product_attr
@@ -468,7 +468,7 @@ class Loan
         total_fees_due_on_date = total_fees_payable_on(received_on)
         fees_paid    = [total, total_fees_due_on_date].min
         total        = input - fees_paid
-        curr_bal ||= actual_outstanding_principal_on(d)
+        curr_bal ||= actual_outstanding_principal_on(received_on)
         interest_due = interest_calculation(curr_bal)         
         interest     = [interest_due, total].min  # never more than total
         principal    = total - interest
@@ -1042,8 +1042,13 @@ class Loan
         last_paid_date = nil;        days_overdue = 0
       end
       next if repayed
+      i_num = installment_for_date(date)
+      scheduled_principal_due = scheduled_principal_for_installment(i_num)
+      scheduled_interest_due = scheduled_interest_for_installment(i_num)
       principal_due  = actual[:balance].round(2) - scheduled[:balance].round(2)
       interest_due   = actual[:total_balance].round(2) - scheduled[:total_balance].round(2) - (actual[:balance].round(2) - scheduled[:balance].round(2))
+      advance_principal_paid = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max,
+      advance_interest_paid = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max,
       total_principal_due += scheduled[:principal].round(2)
       total_interest_due += scheduled[:interest].round(2)
       repayed = true if actual[:balance]<=0 and interest_due<=0
@@ -1057,8 +1062,12 @@ class Loan
         :actual_outstanding_principal        => actual[:balance].round(2),
         :actual_outstanding_total            => actual[:total_balance].round(2),
         :amount_in_default                   => actual[:balance].round(2) - scheduled[:balance].round(2),
+        :principal_in_default                => date <= Date.today ? [0,total_principal_paid.round(2) - total_principal_due.round(2)].min : 0,
+        :interest_in_default                 => date <= Date.today ? [0,total_interest_paid.round(2) - total_interest_due.round(2)].min : 0,
         :days_overdue                        => days_overdue, 
         :current                             => current,
+        :scheduled_principal_due             => scheduled_principal_due,
+        :scheduled_interest_due             => scheduled_interest_due,
         :principal_due                       => principal_due.round(2), 
         :interest_due                        => interest_due.round(2),
         :principal_paid                      => prin.round(2),
@@ -1067,6 +1076,10 @@ class Loan
         :total_interest_due                  => total_interest_due.round(2),
         :total_principal_paid                => total_principal_paid.round(2),
         :total_interest_paid                 => total_interest_paid.round(2),
+        :advance_principal_paid              => advance_principal_paid,
+        :advance_interest_paid               => advance_interest_paid,
+        :advance_principal_adjusted          => [0,@history_array.last[:advance_principal_paid] - advance_principal_paid].max,
+        :advance_interest_adjusted           => [0,@history_array.last[:advance_interest_paid] - advance_interest_paid].max,
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f
       }
     end
@@ -1080,12 +1093,19 @@ class Loan
     @history_array
   end
 
-  def _show_his(width = 10, padding = 4)
-    titles = {:date => :date, :sched_total => :scheduled_outstanding_total, :sched_bal => :scheduled_outstanding_principal,
-      :act_total => :actual_outstanding_total, :act_bal => :actual_outstanding_principal,
-      :prin_paid => :principal_paid, :prin_due => :principal_due, :int_paid => :interest_paid, :int_due => :interest_due,
-       :tot_p_pd => :total_principal_paid, :tot_i_pd => :total_interest_paid, :tot_p_due => :total_principal_due, :tot_i_due => :total_interest_due}
-    title_order = [:date, :sched_total, :sched_bal, :act_total, :act_bal, :prin_paid, :prin_due, :int_paid, :int_due, :tot_p_pd, :tot_p_due]
+  def _show_his(width = 10, padding = 4, fields = :basic)
+    if fields == :basic
+      titles = {:date => :date, :s_total => :scheduled_outstanding_total, :s_bal => :scheduled_outstanding_principal,
+        :a_total => :actual_outstanding_total, :_bal => :actual_outstanding_principal,
+        :p_paid => :principal_paid, :p_due => :principal_due, :i_paid => :interest_paid, :i_due => :interest_due,
+        :tot_p_pd => :total_principal_paid, :tot_i_pd => :total_interest_paid, :tot_p_due => :total_principal_due, :tot_i_due => :total_interest_due}
+      title_order = [:date, :s_total, :s_bal, :a_total, :a_bal, :p_paid, :p_due, :i_paid, :i_due, :tot_p_pd, :tot_p_due]
+    else
+      titles = {:date => :date, :tp_due => :total_principal_due, :tp_paid => :total_principal_paid, :ti_due => :total_interest_due,
+        :ti_paid => :total_interest_paid, :adv_p => :advance_principal_paid, :adv_i => :advance_interest_paid, :def_p => :principal_in_default, 
+        :def_i => :interest_in_default}
+      title_order = [:date, :tp_due, :tp_paid, :ti_due, :ti_paid, :adv_p, :adv_i, :def_p, :def_i]
+    end
     hist = calculate_history.sort_by{|x| x[:date]}
     puts title_order.map{|t| t.to_s.rjust(width - padding/2).ljust(width)}.join("|")
     hist.each do |h|
@@ -1103,7 +1123,9 @@ class Loan
                                        actual_outstanding_principal, actual_outstanding_total, current, amount_in_default, client_group_id, center_id, client_id, 
                                        branch_id, days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid, 
                                        total_principal_due, total_interest_due, total_principal_paid, total_interest_paid, 
-                                       created_at, composite_key)
+                                       created_at, composite_key, scheduled_principal_due, scheduled_interest_due, 
+                                       advance_principal_paid, advance_interest_paid, advance_principal_adjusted, advance_interest_adjusted,
+                                       principal_in_default, interest_in_default)
               VALUES }
     values = []
     calculate_history.each do |history|
@@ -1113,7 +1135,10 @@ class Loan
                           #{client.center.id},#{client.id},#{client.center.branch.id}, #{history[:days_overdue]}, #{((history[:date] - d0) / 7).to_i + 1},
                           #{history[:principal_due]},#{history[:interest_due]}, #{history[:principal_paid]},#{history[:interest_paid]}, 
                           #{history[:total_principal_due]},#{history[:total_interest_due]}, #{history[:total_principal_paid]},#{history[:total_interest_paid]}, 
-                          '#{DateTime.now.strftime("%Y-%m-%d %H:%M:%S")}', #{history[:composite_key]})}
+                          '#{DateTime.now.strftime("%Y-%m-%d %H:%M:%S")}', #{history[:composite_key]},
+                           #{history[:scheduled_principal_due]}, #{history[:scheduled_interest_due]}, 
+                           #{history[:advance_principal_paid]}, #{history[:advance_interest_paid]},#{history[:advance_principal_adjusted]}, #{history[:advance_interest_adjusted]},
+                           #{history[:principal_in_default]},#{history[:interest_in_default]})}
      values << value
     end
     sql += values.join(",") + ";"
@@ -1145,7 +1170,8 @@ class Loan
   end
 
   def set_loan_product_parameters
-    repayment_style = self.loan_product.repayment_style unless repayment_style
+    debugger
+    self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
   end
 
   def interest_calculation(balance)
@@ -1202,7 +1228,6 @@ class Loan
         p.created_at = _t
         p.save(:reallocate)
       end
-      debugger
       if statii.include?(false) or ds.include?(false)
         t.rollback
         return false, _pmts
@@ -1525,3 +1550,4 @@ module Loaner
 
   end 
 end 
+

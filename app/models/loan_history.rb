@@ -17,6 +17,8 @@ class LoanHistory
   property :scheduled_outstanding_principal, Float, :nullable => false, :index => true
   property :actual_outstanding_total,        Float, :nullable => false, :index => true
   property :actual_outstanding_principal,    Float, :nullable => false, :index => true
+  property :scheduled_principal_due,         Float, :nullable => false, :index => true
+  property :scheduled_interest_due,          Float, :nullable => false, :index => true
   property :principal_due,                   Float, :nullable => false, :index => true
   property :interest_due,                    Float, :nullable => false, :index => true
   property :principal_paid,                  Float, :nullable => false, :index => true
@@ -25,6 +27,13 @@ class LoanHistory
   property :total_interest_due,              Float, :nullable => false, :index => true
   property :total_principal_paid,            Float, :nullable => false, :index => true
   property :total_interest_paid,             Float, :nullable => false, :index => true
+  property :advance_principal_paid,          Float, :nullable => false, :index => true
+  property :advance_interest_paid,           Float, :nullable => false, :index => true
+  property :advance_principal_adjusted,      Float, :nullable => false, :index => true
+  property :advance_principal_adjusted,      Float, :nullable => false, :index => true
+  property :principal_in_default,            Float, :nullable => false, :index => true
+  property :interest_in_default,             Float, :nullable => false, :index => true
+  
 
   property :status,                          Enum.send('[]', *STATUSES)
 
@@ -684,18 +693,25 @@ class LoanHistory
   end
 
   def self.latest(hash = {}, date = Date.today)
-    composite_keys = repository.adapter.query("select concat(loan_id,'_',max(date)) from loan_history where date < '#{date.strftime('%Y-%m-%d')}' group by loan_id;")
+    composite_keys = LoanHistory.all(hash.merge(:date.lte => date)).aggregate(:composite_key)
     LoanHistory.all(hash.merge(:composite_key => composite_keys))
   end
 
   def self.composite_key_sum(keys, group_by = [])
-    cols = [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total, 
-            :principal_due, :principal_paid, :interest_due, :interest_paid, :total_interest_due, :total_interest_paid, 
-            :total_principal_due, :total_principal_paid]
+    cols = LoanHistory.sum_cols
     agg_cols = cols.map{|c| DataMapper::Query::Operator.new(c, :sum)}
     vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
     vals = vals.group_by{|v| v[0..(group_by.count-1)]} if group_by.count > 0
     vals.to_hash.map{|k,v| [k,cols.zip(v.flatten[group_by.count..-1]).to_hash]}.to_hash
+  end
+
+  def self.sum_cols
+    # only some columns make sense to add while aggregating LoanHistory rows.
+    # namely the ones below
+    # this method is purely for DRY
+    [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total, 
+     :principal_due, :principal_paid, :interest_due, :interest_paid, :total_interest_due, :total_interest_paid, 
+     :total_principal_due, :total_principal_paid, :advance_principal_paid, :advance_interest_paid]
   end
 
 
