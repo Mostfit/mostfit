@@ -1043,16 +1043,15 @@ class Loan
       end
       next if repayed
       i_num = installment_for_date(date)
-      scheduled_principal_due = scheduled_principal_for_installment(i_num)
-      scheduled_interest_due = scheduled_interest_for_installment(i_num)
+      scheduled_principal_due = i_num > 0 ? scheduled_principal_for_installment(i_num) : 0
+      scheduled_interest_due = i_num > 0 ? scheduled_interest_for_installment(i_num) : 0
       principal_due  = actual[:balance].round(2) - scheduled[:balance].round(2)
       interest_due   = actual[:total_balance].round(2) - scheduled[:total_balance].round(2) - (actual[:balance].round(2) - scheduled[:balance].round(2))
-      advance_principal_paid = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max,
-      advance_interest_paid = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max,
+      advance_principal_paid = [0,(total_principal_paid.round(2) - total_principal_due.round(2))].max
+      advance_interest_paid = [0,(total_interest_paid.round(2) - total_interest_due.round(2))].max
       total_principal_due += scheduled[:principal].round(2)
       total_interest_due += scheduled[:interest].round(2)
       repayed = true if actual[:balance]<=0 and interest_due<=0
-
       @history_array << {
         :loan_id                             => id,
         :date                                => date,
@@ -1078,8 +1077,8 @@ class Loan
         :total_interest_paid                 => total_interest_paid.round(2),
         :advance_principal_paid              => advance_principal_paid,
         :advance_interest_paid               => advance_interest_paid,
-        :advance_principal_adjusted          => [0,@history_array.last[:advance_principal_paid] - advance_principal_paid].max,
-        :advance_interest_adjusted           => [0,@history_array.last[:advance_interest_paid] - advance_interest_paid].max,
+        :advance_principal_adjusted          => @history_array.last ? [0,@history_array.last[:advance_principal_paid] - advance_principal_paid].max : 0,
+        :advance_interest_adjusted           => @history_array.last ? [0,@history_array.last[:advance_interest_paid] - advance_interest_paid].max : 0,
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f
       }
     end
@@ -1170,7 +1169,6 @@ class Loan
   end
 
   def set_loan_product_parameters
-    debugger
     self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
   end
 
@@ -1190,7 +1188,25 @@ class Loan
 
 
   def correct_prepayments
-    
+    update_loan_cache
+    prins = payments(:type => :principal).sort_by{|p| p.received_on}.reverse
+    ints = payments(:type => :interest).sort_by{|p| p.received_on}.reverse
+    total = 0
+    diff = amount - c_principal_received
+    ints.each do |i|
+      transfer = [i.amount, diff - total].min
+      p = prins.find{|_p| _p.received_on == i.received_on}
+      p.amount += transfer
+      i.amount -= transfer
+      puts "transferred #{transfer}"
+      p.amount = p.amount.round(2)
+      i.amount = i.amount.round(2)
+      total += transfer
+      p.save!
+      i.save!
+    end
+    puts total
+    self.update_history
   end
 
 
@@ -1256,6 +1272,7 @@ class Loan
 
   # TODO these should logically be private.
   def get_from_cache(cache, column, date)
+    debugger if $debug
     date = Date.parse(date) if date.is_a? String
     return 0 if cache.blank?
     if cache.has_key?(date)
@@ -1265,9 +1282,9 @@ class Loan
       keys = cache.keys.sort
       if date < keys.min
         col = cache[keys.min].merge(:balance => amount, :total_balance => total_to_be_received)
-        rv = (column == :all ? col : col[column])
+        rv = (column == :all ? Marshal.load(Marshal.dump(col)) : Marshal.load(Marshal.dump(col[column])))
       elsif date >= keys.max
-        rv = (column == :all ? cache[keys.max] : cache[keys.max][column])
+        rv = (column == :all ? Marshal.load(Marshal.dump(cache[keys.max])) : Marshal.load(Marshal.dump(cache[keys.max][column])))
       else
         keys.each_with_index do |k,i|
           if keys[[i+1,keys.size - 1].min] > date
@@ -1534,6 +1551,7 @@ module Loaner
       _scheduled_disbursal_date = scheduled_disbursal_date
       _fp_date = scheduled_first_payment_date
       _original_amount = amount
+
       # recreate the original loan
       self.scheduled_first_payment_date = original_first_payment_date
       self.amount = original_amount
