@@ -189,7 +189,10 @@ module DataEntry
           @loan = Loan.get(k.to_i)
           @loan.history_disabled = true
           amounts = params[:paid][:loan][k.to_sym].to_f
-          next if amounts<=0
+          if amounts<=0
+            @loan.update_history
+            next
+          end
           if params.key?(:payment_type) and params[:payment_type] == "fees"
             @success, @fees = @loan.pay_fees(amounts, @date, @staff, session.user)
             @fees.each{|f| @errors << f.errors unless f.errors.blank?}

@@ -28,7 +28,7 @@ var Log = {
 
 
 
-function init(data){
+function init_treemap(data){
   //init data
   var json = {
     "children": [
@@ -895,7 +895,7 @@ function init(data){
     //parent box title heights
     titleHeight: 15,
     //enable animations
-    animate: animate,
+    animate: false,
     //box offsets
     offset: 1,
     //Attach left and right click events

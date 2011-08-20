@@ -7,6 +7,12 @@
 @lightgreen-text: @darkgreen;
 @header: @pastel-yellow;
 @header-text: @lightgreen * 0.5;
+
+@report-background: #cfcfcf;
+@report-header-color: @darkgreen;
+@report-color: black;
+
+
 .header-bg{
   background: @lightgreen;
 }
@@ -1678,58 +1684,75 @@ table.moreinfo thead th {
   background: #C6CCF5;
 }
 
+.red {
+    color: #a44848;
+    background: transparent;
+}
+ .green {
+     color: @darkgreen;
+     background: transparent;
+ }
 
-#stats {
-  @stats-highlight: #efefef;
-  @stats-highlight-text: black;
-  @stats-highlight-shadow: white;
-  @stats-bg: @lightgreen;
-  @stats-bg-text: @darkgreen;
-  @stats-bg-shadow: @stats-bg * 1.2;
-  padding: 25px;
-  width: 95%;
-  margin: auto;
-  min-height: 500px;
-  .white-shadow-text;
-  .rounded;
-  table {
-      tr {
+
+
+ table.new-report {
+     thead {
+       tr {
+	 th {
+	     .purple;
+	 }
+       }
+     }
+     th {
+	 .lightpurple
+     }
+     td {
+	 text-align: center;
+	 border: 1px solid #91d3ff;
+	 background: white;
+     }
+ }
+
+
+ #stats {
+   @stats-highlight: #efefef;
+   @stats-highlight-text: black;
+   @stats-highlight-shadow: white;
+   @stats-bg: #dfdfdf;
+   @stats-bg-text: #999;
+   @stats-bg-shadow: @stats-bg * 1.2;
+   padding: 25px;
+   width: 95%;
+   margin: auto;
+   min-height: 500px;
+   .rounded;
+   table#menu {
+     margin-bottom: 0.2em;
+     tr {
+       h1 {
+	   font-weight: bold;
+	   letter-spacing: -0.03em;
+	   color: @stats-bg-text;
+	   text-shadow: @stats-bg-shadow;
+	   margin: 0px;
+
+	   .red-text {
+	       .red;
+	   }
+
+      }
+    }
+    tr {
       background: @stats-bg;
       text-shadow: 1px 1px @stats-bg-shadow;
       color: @stats-bg-text;
       border-bottom: solid 1px @stats-bg-text;
       box-shadow: 0px 1px @stats-bg-shadow;
       }
-  }
-  table#menu {
-    margin-bottom: 0.2em;
-    tr {
-	border-right: solid 1px @darkgreen;
-      h1 {
-	  font-size: 1.5em;
-	  font-family: Helvetica;
-	  font-weight: bold;
-	  letter-spacing: -0.03em;
-	  color: @stats-bg-text;
-	  text-shadow: @stats-bg-shadow;
-	  margin: 0px;
-	  .red {
-	      color: #a44848;
-	      background: transparent;
-	  }
-	  .green {
-	      color: @darkgreen;
-	      background: transparent;
-	  }
 
-      }
-    }
     tr.selected {
       background: @stats-highlight;
       color: @stats-highlight-text;
-      border-right: 1px solid @stats-highlight;
-      border-top: 1px solid @darkgreen;
-      border-left: 1px solid @darkgreen;
       box-shadow: none;
       z-index: 10;
       width: 110%;
@@ -1737,39 +1760,49 @@ table.moreinfo thead th {
       h1 {
 	  color: @orange;
 	  text-shadow: 1px 1px @stats-highlight-shadow;
-	  .red {
-	      color: #a44848;
-	      background: transparent;
-	  }
       }
     }
     .th {
       vertical-align: middle;
     }
   }
+  table#menu {
+      tr.selected {
+	  border-right: 1px solid @stats-highlight;
+	  border-top: 1px solid @darkgreen;
+	  border-left: 1px solid @darkgreen;
+	  h1.green {
+	      .green;
+	  }
+	  h1.red {
+	      .red;
+	  }
+
+      }
+      tr {
+	border-right: solid 1px @darkgreen;
+      }
+
+  }
+
   .number {
     vertical-align: top;
     text-align: center;
     p {
 	font-size: 1.1em; font-weight: bold; text-align: center;
     }
+
   }
   .detail {
     font-family: Helvetica;
     font-weight: bold;
-    font-size: 1.1em;
+    font-size: 1em;
     float: left;
     background: #efefef;
     border: solid 1px @darkgreen;
-    padding: 10px;
+    padding: 0px 10px;
     min-height: 400px;
     min-width: 60%;
-    tr {
-	line-height: 0.2em;
-    }
-    td {
-	background: @stats-highlight;
-    }
   }
   .chart {
     background: #efefef;
@@ -1786,4 +1819,7 @@ table.moreinfo thead th {
   
 }
 	     
-      
+#today {
+  #stats;
+  padding: 0px;
+}      

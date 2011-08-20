@@ -6,7 +6,6 @@ class Browse < Application
   Line = Struct.new(:ip, :date_time, :method, :model, :url, :status, :response_time)
   
   def index
-    debugger
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
     @branch_data = LoanHistory.composite_key_sum(LoanHistory.all(:date => @date).aggregate(:composite_key), [:branch_id]).map{|k,v| [k.first, v]}.to_hash
     @branch_names = Branch.all.aggregate(:name, :id).to_hash

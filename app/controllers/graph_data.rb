@@ -1,8 +1,28 @@
 class GraphData < Application
   COLORS = ["edd400", "f57900", "c17d11", "73d216", "3465a4", "75507b", "cc0000", "fce94f", "3465a4", "fcaf3e", "204a87", "ad7fa8", "875678", "456789", "234567"]
   include Grapher
-  before :display_from_cache, :exclude => [:dashboard]
-  after  :store_to_cache, :exclude => [:dashboard]
+  before :display_from_cache, :exclude => [:dashboard, :tm_collections]
+  after  :store_to_cache, :exclude => [:dashboard, :tm_collections]
+
+  
+
+  def tm_collections
+    @date = begin; Date.parse(params[:date]); rescue; Date.today; end
+    @histories = LoanHistory.all(:date => @date)
+    @branch_histories = LoanHistory.composite_key_sum(@histories.aggregate(:composite_key),[:branch_id])
+    @history_sum = @branch_histories.reduce({}){|s,h| s + h[1]}
+    treemap = {:children => @branch_histories.map{|k,v| [k.first, v]}.to_hash.map do |k,v|
+        pd = v[:principal_paid]
+        due = v[:principal_due]
+        tot = pd + due
+        color = "#" + (prorata_color(0, tot, pd) || "000000")
+        b = Branch.get(k);{"id" => b.name, "name" => b.name, "data" => {"$area" => (v[:principal_due] || 0).round(2), :"$color" => color}}
+      end
+    }
+    keys = [:advance_interest, :advance_principal, :principal_paid, :principal_due, :interest_paid, :interest_due, :fees_paid, :fees_due]
+    barchart = { 'label' => keys, 'values' => [{'label' => "", 'values' => keys.map{|k| (@history_sum[k] || 0).round(2)}}]}
+    {'treemap' => treemap, 'pmts_barchart' => barchart}.to_json
+  end
 
   def loan(id)
     @loan      = Loan.get(id)
@@ -269,7 +289,6 @@ class GraphData < Application
   end
 
   def dashboard
-    debugger
     labels = []
     if params[:id] == "branch_pie"
       vals = repository.adapter.query(%Q{SELECT SUM(l.amount) amount, b.name name
@@ -340,13 +359,22 @@ class GraphData < Application
   end
 
   def render_graph(vals, type = "bar", labels = [], steps = 10)
-    x = { :elements => [{:type => type, :values => vals}], :bg_colour => "#d6d6d6"}
-    x_axis = {:labels => {:labels => labels.to_json, :steps => steps}}
+    x = { :elements => [{:type => type, :values => vals}], :bg_colour => "#efefef"}
+    x_axis = {} # {:labels => {:labels => labels.to_json, :steps => steps}}
     x[:x_axis] = x_axis
     return x.to_json
   end
 
   private
+
+  def prorata_color(start_val, end_val, val, r1 = 164, r2 = 100, g1 = 72, g2 = 222, b1 = 72, b2 = 137)
+    color_ratio = (start_val + val)/(start_val + end_val).to_f
+    color_ratio = 0 if color_ratio < 0
+    color = (r1 - (r1 - r2) * color_ratio).to_i.to_s(16) + (g1 + (g2 - g1) * color_ratio).to_i.to_s(16) + (b1 + (b2 - b1)*color_ratio).to_i.to_s(16)
+    color = color + "0" * (6 - color.length) if color.length < 6
+    return color
+  end
+  
   def display_from_cache
     return false if params[:action]=="dashboard" and (params[:id]=="center_day" or params[:id] == "branch_day")
     file = get_cached_filename

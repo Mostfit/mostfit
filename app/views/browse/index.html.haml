@@ -1,58 +1,120 @@
-- debugger
+= js_include_tag 'Jit/jit-yc'
+= js_include_tag :treemap, :hbarchart
+
+= css_include_tag 'jit-base','treemap'
+:javascript
+  $(document).ready(function(){
+    $.get('/graph_data/tm_collections?date=#{@date.strftime("%Y-%m-%d")}','', function(data){
+      init_barchart($.parseJSON(data).pmts_barchart);
+      init_treemap($.parseJSON(data).treemap);
+      });
+    });
+
 - bnames = @branch_names.keys.sort
 - bvalues = @branch_names.map{|name, id| @branch_data[id][:principal_paid] if @branch_data[id]}
+- keys = [:advance_principal_paid, :advance_interest_paid, :principal_paid, :principal_due, :interest_paid, :interest_due]
 %script{:type => "text/javascript"}
   == names=['#{bnames.join("','")}']
   == values = ['#{bvalues.join("','")}']
 #stats
-  #tabs{:style => "float:left; min-height: 400px; background: #dfdfdf; padding: 10px;"}
-    %ul
-      %li
+  - array = @branch_data.reduce({}){|s,a| s + a[1]}
+  %table#menu{:style => "float:left; position: relative; left: 1px;"}
+    %tr.selected
+      %th
         %h1
           today
-
-  #today
-    .top-line
-      .number{:style => "margin-left: 8%"}
+      %td.number
+        %h1.green
+          = keys.select{|k| k.to_s.match(/paid/)}.map{|k| array[k] || 0}.reduce(:+).to_currency
+        %p collected
+      %td.number
         %h1
-          = Branch.all.count
-        %p{:style => ""} branches
-      .number
-        %h1
-          = LoanHistory.latest.aggregate(:center_id.count)
-        %p centers
-      .number
-        %h1{:style => 'float:left'}
-          %span.red
-            = @branch_data.map{|b,v| v[:principal_paid]}.reduce(:+).to_currency
-            = "/"
-            = @branch_data.map{|b,v| v[:principal_due]}.reduce(:+).to_currency
-        %p collected / due
-    .detail.clearfix
-      %table{:style => "display:inline-table; vertical-align: top; margin: 30px;"}
-        %tr
-          %td Applied
-          %td.green 100 000
-        %tr
-          %td Sanctioned
-          %td 200 000
-        %tr
-          %td Disbursed
-          %td 300 000
-        %tr
-          %td Sanctioned
-          %td 400 000
-        %tr
-          %td Sanctioned
-          %td 500 000
-        %tr
-          %td Sanctioned
-          %td 600 000
-
-            
-      .chart
-        = ofc2(400, 320, url(:graph_data, :action => 'dashboard', :id => 'branch_day', :date => params[:date]))
-      
+          = keys.select{|k| k.to_s.match(/due/)}.map{|k| array[k] || 0}.reduce(:+).to_currency
+        %p due
+      %td.number
+        %h1.red
+          1,745
+        %p
+          missed
         
+    %tr
+      %th
+        %h1 meetings
+        - pt = Center.paying_today(session.user) 
+      %td.number
+        %h1
+          = pt.count
+        %p 
+          mtngs
+          %br
+          today
+      %td.number
+        %h1
+          = pt.select{|c| c.meeting_time_hours.to_i <= DateTime.now.hour}.count
+        %p
+          mtngs
+          %br
+          by now
+      %td.number
+        %h1
+          = Payment.all(:received_on => @date, :center_id => pt.aggregate(:id)).aggregate(:center_id).count
+        %p
+          meetings
+          %br
+          done
+    %tr
+      %th
+        %h1 ytd
+      %td.number{:colspan => "4"}
+        %h1 0
+        %p PAR
+        
+
+      
+  .detail
+    #today
+      %table.new-report{:style => "margin: auto; width: 90%"}
+        %thead
+          %tr
+            %th.purple
+            - ["adv", "prin", "int", "default","total"].each do |k|
+              %th
+                = k
+        %tr
+          %th
+            Paid
+          - t = 0
+          - keys.map{|k| k.to_s.split("_")[0..-2].join("_")}.uniq.each do |k|
+            %td.green
+              - value = array["#{k}_paid".to_sym] || 0
+              - t += value
+              = value.to_currency.split(".")[0]
+          %th
+            = t.to_currency.split(".")[0]
+        %tr
+          %th
+            Due
+          - t = 0
+          - keys.map{|k| k.to_s.split("_")[0..-2].join("_")}.uniq.each do |k|
+            %td.red
+              - value = array["#{k}_due".to_sym] || 0
+              - t += value
+              = value.to_currency.split(".")[0]
+          %th
+            = t.to_currency.split(".")[0]
+      %h1.green
+        See a more detailed report
+      #hbarchart{:style => "width: 92%;  height: 30px; margin-left: 3%"}
+      #infovis{:style => "width: 90%; height: 400px; margin: auto"}
+      
+ 
+            
+    #staff
+      %h1 Staff Members
+    
+    %table
+      %tr
+        %th
+          
         
     

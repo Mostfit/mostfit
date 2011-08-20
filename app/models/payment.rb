@@ -8,6 +8,7 @@ class Payment
   # before :valid?, :add_loan_product_validations
   # after :valid?, :after_valid
   before :save, :put_fee
+  before :save, :add_center
   attr_writer :total
   attr_accessor :override_create_observer  # just to be used in the form
 
@@ -25,12 +26,14 @@ class Payment
   property :verified_by_user_id, Integer, :nullable => true, :index => true
   property :loan_id,             Integer, :nullable => true, :index => true
   property :client_id,           Integer, :nullable => true, :index => true
+  property :center_id,           Integer, :nullable => true, :index => true
   property :fee_id,              Integer, :nullable => true, :index => true
   property :desktop_id,          Integer
   property :origin,              String, :default => DEFAULT_ORIGIN
 
   belongs_to :loan, :nullable => true
   belongs_to :client
+  belongs_to :center, :nullable => true
   belongs_to :fee
   belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
   belongs_to :received_by, :child_key => [:received_by_staff_id], :model => 'StaffMember'

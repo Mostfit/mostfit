@@ -1047,6 +1047,8 @@ class Loan
       scheduled_interest_due = scheduled_interest_for_installment(i_num)
       principal_due  = actual[:balance].round(2) - scheduled[:balance].round(2)
       interest_due   = actual[:total_balance].round(2) - scheduled[:total_balance].round(2) - (actual[:balance].round(2) - scheduled[:balance].round(2))
+      advance_principal_paid = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max,
+      advance_interest_paid = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max,
       total_principal_due += scheduled[:principal].round(2)
       total_interest_due += scheduled[:interest].round(2)
       repayed = true if actual[:balance]<=0 and interest_due<=0
@@ -1060,8 +1062,8 @@ class Loan
         :actual_outstanding_principal        => actual[:balance].round(2),
         :actual_outstanding_total            => actual[:total_balance].round(2),
         :amount_in_default                   => actual[:balance].round(2) - scheduled[:balance].round(2),
-        :principal_in_default                => [0,total_principal_paid.round(2) - total_principal_due.round(2)].min,
-        :interest_in_default                 => [0,total_interest_paid.round(2) - total_interest_due.round(2)].min,
+        :principal_in_default                => date <= Date.today ? [0,total_principal_paid.round(2) - total_principal_due.round(2)].min : 0,
+        :interest_in_default                 => date <= Date.today ? [0,total_interest_paid.round(2) - total_interest_due.round(2)].min : 0,
         :days_overdue                        => days_overdue, 
         :current                             => current,
         :scheduled_principal_due             => scheduled_principal_due,
@@ -1074,8 +1076,10 @@ class Loan
         :total_interest_due                  => total_interest_due.round(2),
         :total_principal_paid                => total_principal_paid.round(2),
         :total_interest_paid                 => total_interest_paid.round(2),
-        :advance_principal_paid              => [0,total_principal_paid.round(2) - total_principal_due.round(2)].max,
-        :advance_interest_paid               => [0,total_interest_paid.round(2) - total_interest_due.round(2)].max,
+        :advance_principal_paid              => advance_principal_paid,
+        :advance_interest_paid               => advance_interest_paid,
+        :advance_principal_adjusted          => [0,@history_array.last[:advance_principal_paid] - advance_principal_paid].max,
+        :advance_interest_adjusted           => [0,@history_array.last[:advance_interest_paid] - advance_interest_paid].max,
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f
       }
     end
@@ -1120,7 +1124,8 @@ class Loan
                                        branch_id, days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid, 
                                        total_principal_due, total_interest_due, total_principal_paid, total_interest_paid, 
                                        created_at, composite_key, scheduled_principal_due, scheduled_interest_due, 
-                                       advance_principal_paid, advance_interest_paid, principal_in_default, interest_in_default)
+                                       advance_principal_paid, advance_interest_paid, advance_principal_adjusted, advance_interest_adjusted,
+                                       principal_in_default, interest_in_default)
               VALUES }
     values = []
     calculate_history.each do |history|
@@ -1131,7 +1136,8 @@ class Loan
                           #{history[:principal_due]},#{history[:interest_due]}, #{history[:principal_paid]},#{history[:interest_paid]}, 
                           #{history[:total_principal_due]},#{history[:total_interest_due]}, #{history[:total_principal_paid]},#{history[:total_interest_paid]}, 
                           '#{DateTime.now.strftime("%Y-%m-%d %H:%M:%S")}', #{history[:composite_key]},
-                           #{history[:scheduled_principal_due]}, #{history[:scheduled_interest_due]}, #{history[:advance_principal_paid]}, #{history[:advance_interest_paid]},
+                           #{history[:scheduled_principal_due]}, #{history[:scheduled_interest_due]}, 
+                           #{history[:advance_principal_paid]}, #{history[:advance_interest_paid]},#{history[:advance_principal_adjusted]}, #{history[:advance_interest_adjusted]},
                            #{history[:principal_in_default]},#{history[:interest_in_default]})}
      values << value
     end

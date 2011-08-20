@@ -82,7 +82,7 @@ Merb::BootLoader.before_app_loads do
   Merb::Plugins.config[:exceptions] = {
     :email_addresses => [''],
     :app_name        => "Mostfit",
-    :environments    => ['production', 'development'],
+    :environments    => ['production'],
     :email_from      => "",
     :mailer_config => {
       :host   => 'smtp.gmail.com',
