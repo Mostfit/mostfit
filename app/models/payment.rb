@@ -53,6 +53,7 @@ class Payment
   validates_with_method :deleted_at,  :method => :properly_deleted?
   validates_with_method :not_approved, :method => :not_approved, :on => [:destroy]
   validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
+  validates_with_method :received_on, :method => :not_received_in_past_upto?, :unless => Proc.new{|t| Merb.env=="test"}
   validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :principal,   :method => :is_positive?
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :on => [:destroy]
@@ -244,6 +245,17 @@ class Payment
     return true if received_on <= Date.today + Mfi.first.number_of_future_days
     [false, "Payments cannot be received in the future"]
   end
+  def not_received_in_past_upto?
+    past_days = Mfi.first.number_of_past_days
+    if Mfi.first.min_date_from == :in_operation_since
+      eligible_date = Mfi.first.in_operation_since - past_days
+    else
+      eligible_date = Date.today- past_days
+    end 
+    return true if received_on >= eligible_date
+    [false, "Payments cannot be received in past date"]
+  end
+
 
   def not_received_before_loan_is_disbursed?
     if loan
