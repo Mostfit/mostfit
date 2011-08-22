@@ -1340,7 +1340,7 @@ msgstr ""
 
 #: app/views/areas/index.html.haml:2 app/views/browse/_totalinfo.html.haml:112
 msgid "Areas"
-msgstr "SSSSSSSSSSSSS"
+msgstr ""
 
 #: app/views/areas/index.html.haml:8
 msgid "No areas"
