@@ -1,22 +1,35 @@
 class GraphData < Application
   COLORS = ["edd400", "f57900", "c17d11", "73d216", "3465a4", "75507b", "cc0000", "fce94f", "3465a4", "fcaf3e", "204a87", "ad7fa8", "875678", "456789", "234567"]
   include Grapher
+
   before :display_from_cache, :exclude => [:dashboard, :tm_collections]
   after  :store_to_cache, :exclude => [:dashboard, :tm_collections]
 
   
 
   def tm_collections
+    hash = {:status => [:disbursed, :outstanding]}
+    if (params[:branch_id] and not params[:branch_id].blank?) 
+      hash = hash.merge({:branch_id => params[:branch_id]})
+      @branch = Branch.get(params[:branch_id])
+    end
     @date = begin; Date.parse(params[:date]); rescue; Date.today; end
-    @histories = LoanHistory.all(:date => @date)
-    @branch_histories = LoanHistory.composite_key_sum(@histories.aggregate(:composite_key),[:branch_id])
-    @history_sum = @branch_histories.reduce({}){|s,h| s + h[1]}
-    treemap = {:children => @branch_histories.map{|k,v| [k.first, v]}.to_hash.map do |k,v|
+    debugger
+    @histories = LoanHistory.latest(hash.merge(:date => @date)) 
+    @history_totals = LoanHistory.composite_key_sum(@histories.aggregate(:composite_key),hash[:branch_id] ? [:center_id] : [:branch_id])
+    @history_sum = @history_totals.reduce({}){|s,h| s + h[1]}
+    treemap = {:children => @history_totals.map{|k,v| [k.first, v]}.to_hash.map do |k,v|
         pd = v[:principal_paid]
         due = v[:principal_due]
         tot = pd + due
         color = "#" + (prorata_color(0, tot, pd) || "000000")
-        b = Branch.get(k);{"id" => b.name, "name" => b.name, "data" => {"$area" => (v[:principal_due] || 0).round(2), :"$color" => color}}
+        center = hash[:branch_id] ? Center.get(k) : nil
+        branch = @branch || Branch.get(k) 
+        id = center ? center.id : branch.id
+        name = center ? center.name : branch.name
+        data = {"$area" => tot, :"$color" => color,"branch_id" => branch.id, "branch_name" => branch.name, 
+          "center_id" => (center ? center.id : 0), "center_name" => (center ? center.name : ""), "amounts" => v}
+        {"id" => id, "name" => name, "data" => data}
       end
     }
     keys = [:advance_interest, :advance_principal, :principal_paid, :principal_due, :interest_paid, :interest_due, :fees_paid, :fees_due]

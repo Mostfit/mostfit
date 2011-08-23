@@ -1,6 +1,8 @@
 class Center
   include DataMapper::Resource
   include DateParser
+  include Mostfit::Caching
+
   attr_accessor :meeting_day_change_date
 
   before :save, :convert_blank_to_nil
@@ -8,6 +10,7 @@ class Center
   before :save, :set_meeting_change_date
   before :create, :set_meeting_change_date
   before :valid?, :convert_blank_to_nil
+
   
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
@@ -39,6 +42,7 @@ class Center
   validates_present     :branch
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
   validates_with_method :meeting_time_minutes, :method => :minutes_valid?
+
 
   def self.from_csv(row, headers)
     hour, minute = row[headers[:center_meeting_time_in_24h_format]].split(":")

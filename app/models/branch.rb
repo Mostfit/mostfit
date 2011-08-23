@@ -2,6 +2,7 @@ class Branch
   include DataMapper::Resource
   include Comparable
   extend Reporting::BranchReports
+  include Mostfit::Caching
 
   before :save, :convert_blank_to_nil
   
