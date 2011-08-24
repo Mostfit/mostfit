@@ -186,7 +186,6 @@ class Payment
     [false, "Payments can only be created if an active user is supplied"]
   end
   def received_by_active_staff_member?
-    debugger if $debug
     return true if self.send(:current_validation_context) == :reallocate
     return true if deleted_at
     return true if received_by and received_by.active

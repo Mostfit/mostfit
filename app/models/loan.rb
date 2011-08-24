@@ -809,15 +809,15 @@ class Loan
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 1 or number > actual_number_of_installments
-    (amount.to_f / number_of_installments).round(2)
+    extend_loan
+    scheduled_principal_for_installment(number)
   end
 
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 1 or number > actual_number_of_installments
-    (amount * interest_rate / number_of_installments).round(2)
+    extend_loan
+    scheduled_interest_for_installment(number)
   end
 
   # These info functions need not be overridden in derived classes.
@@ -1008,6 +1008,7 @@ class Loan
   # Moved this method here from instead of the LoanHistory model for purposes of speed. We sacrifice a bit of readability
   # for brute force iterations and caching => speed
   def update_history(forced=false)
+    extend_loan
     return true if Mfi.first.dirty_queue_enabled and DirtyLoan.add(self) and not forced
     return if @already_updated and not forced
     return if self.history_disabled and not forced# easy when doing mass db modifications (like with fixutes)
@@ -1145,7 +1146,6 @@ class Loan
   end
 
   def set_loan_product_parameters
-    debugger
     self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
   end
 
