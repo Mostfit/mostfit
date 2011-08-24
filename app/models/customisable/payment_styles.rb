@@ -242,6 +242,13 @@ module Mostfit
         i = used = prin = int = 0.0
         d = received_on
         total = total.to_f
+        prin_due = info(d)[:principal_due]
+        int_due  = info(d)[:interest_due]
+        if prin_due and int_due
+          prin = prin_due
+          int = int_due
+          used += (int + prin)
+        end
         while used < total
           prin += scheduled_principal_for_installment(installment_for_date(d)).round(2)
           int  += scheduled_interest_for_installment(installment_for_date(d)).round(2)
