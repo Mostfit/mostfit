@@ -5,10 +5,6 @@ class DuplicateClientsReport < Report
     self.date = Date.today
   end
 
-  def self.name
-    "Duplicate Clients Report"
-  end
-
   def name
     "Duplicate clients as of #{self.start_date}"
   end
