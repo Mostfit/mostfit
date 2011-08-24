@@ -15,6 +15,13 @@
           %b= @center.name
           == (code: #{@center.code}, id: #{@center.id})
       %tr
+        %td Creation Date
+        %td
+          = @center.creation_date
+          (
+          = @center.creation_date.strftime('%A')
+          )
+      %tr
         %td Manager
         %td= link_to @center.manager.name, resource(@center.manager)
       %tr.odd

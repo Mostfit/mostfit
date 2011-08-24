@@ -1029,6 +1029,8 @@ class Loan
     total_principal_due = total_interest_due = total_principal_paid = total_interest_paid = 0
     repayed=false
     dates.each_with_index do |date,i|
+      $debug = true if i == 53
+      debugger if $debug
       current   = date == Date.today ? true : (((dates[[i,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or 
                    (i == dates.size - 1 and dates[i] < Date.today)))
       scheduled = get_scheduled(:all, date)
@@ -1231,6 +1233,7 @@ class Loan
 
   # TODO these should logically be private.
   def get_from_cache(cache, column, date)
+    debugger if $debug
     date = Date.parse(date) if date.is_a? String
     return 0 if cache.blank?
     if cache.has_key?(date)
@@ -1240,9 +1243,9 @@ class Loan
       keys = cache.keys.sort
       if date < keys.min
         col = cache[keys.min].merge(:balance => amount, :total_balance => total_to_be_received)
-        rv = (column == :all ? col : col[column])
+        rv = (column == :all ? Marshal.load(Marshal.dump(col)) : Marshal.load(Marshal.dump(col[column])))
       elsif date >= keys.max
-        rv = (column == :all ? cache[keys.max] : cache[keys.max][column])
+        rv = (column == :all ? Marshal.load(Marshal.dump(cache[keys.max])) : Marshal.load(Marshal.dump(cache[keys.max][column])))
       else
         keys.each_with_index do |k,i|
           if keys[[i+1,keys.size - 1].min] > date
@@ -1509,6 +1512,7 @@ module Loaner
       _scheduled_disbursal_date = scheduled_disbursal_date
       _fp_date = scheduled_first_payment_date
       _original_amount = amount
+
       # recreate the original loan
       self.scheduled_first_payment_date = original_first_payment_date
       self.amount = original_amount

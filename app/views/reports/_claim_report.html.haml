@@ -1,9 +1,11 @@
 =partial :form
-- length = 8
+- length = 9
 %table.report
   %tr.header
     %th{:width => '20%'}
       Client
+    %th{:width => "2%"}
+      id
     %th{:width => '10%'}
       Reason
     %th{:width => '10%'}
@@ -12,6 +14,8 @@
       Date of Claim
     %th{:width => '10%'}
       Pending Documents
+    %th{:width => "2%"}
+      Loan id
     %th{:width => '10%'}
       Amount Disbursed
     %th{:width => '10%'}
@@ -28,8 +32,10 @@
     - claims.each do |claim|      
       %tr.claim
         %td
-          = claim.client.name
+          = link_to claim.client.name, resource(claim.client)
           - branch_total[0] += 1
+        %td
+          = claim.client.id
         %td
           = claim.client.inactive_reason.to_s.camelcase(' ')
         %td
@@ -41,22 +47,23 @@
           - documents.each do |doc| 
             = doc.to_s.camelcase(' ')
             %br
+        - loans = claim.client.loans(:under_claim_settlement.not => nil)
         %td
-          - loan = claim.client.loans
-          - loan.each do |l|
+          - loans.each do |l|
+            = link_to l.id, url_for_loan(l)
+        %td
+          - loans.each do |l|
             = l.amount.to_currency
             - branch_total[1] += l.amount
             %br
         %td
-          - loan = claim.client.loans
-          - loan.each do |l|
+          - loans.each do |l|
             - prin = l.principal_received_up_to(Date.today)
             = prin.to_currency
             - branch_total[2] += prin
             %br
         %td
-          - loan = claim.client.loans
-          - loan.each do |l|
+          - loans.each do |l|
             - repaid = l.amount - l.principal_received_up_to(Date.today)
             = repaid.to_currency
             %br

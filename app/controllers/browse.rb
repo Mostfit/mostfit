@@ -29,7 +29,7 @@ class Browse < Application
 
   def centers_paying_today
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
-    hash  = {:date => @date}
+    hash  = {:date => @date, :status.not => [:rejected]}
     hash += {:branch_id => params[:branch_id]} if params[:branch_id] and not params[:branch_id].blank?
     center_ids = LoanHistory.all(hash).aggregate(:center_id)
     loans      = LoanHistory.all(hash).aggregate(:loan_id, :center_id).to_hash
