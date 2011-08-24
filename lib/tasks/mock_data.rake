@@ -193,6 +193,7 @@ namespace :mostfit do
 
     desc "Recreate the whole history"
     task :update_history do
+      log = File.open(Merb.root + "/log/update_history.log","w")
       t0 = Time.now
       Merb.logger.info! "Start mock:history rake task at #{t0}"
       puts "finding unhistorified loans"
@@ -207,16 +208,19 @@ namespace :mostfit do
         loan_ids = repository.adapter.query("SELECT id from loans")
       end
       t0 = Time.now
-      loan_ids.each do |loan_id|
+      co = loan_ids.count
+      loan_ids.each_with_index do |loan_id, idx|
         loan = Loan.get(loan_id)
-        puts "1: #{Time.now - t0}"
+        next unless loan
         loan.update_history_bulk_insert
-        puts "2: #{Time.now - t0}"
-        print "Did loan #{loan.id}  (total = #{Time.now - t0} secs)\n"
+        status_line = "Did loan #{loan.id} (#{idx}/#{co} or #{idx/co.to_f*100.round(2)}%) in #{Time.now - t0} secs)\n"
+        log.write status_line
+        print status_line if idx%50 == 0
       end
       t1 = Time.now
       secs = (t1 - t0).round
       Merb.logger.info! "Finished mock:history rake task in #{secs} secs for #{Loan.all.size} loans with #{Payment.all.size} payments, at #{t1}"
+      log.close
     end
 
     desc "Recreate all history"
