@@ -809,15 +809,15 @@ class Loan
   def scheduled_principal_for_installment(number)
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 1 or number > actual_number_of_installments
-    (amount.to_f / number_of_installments).round(2)
+    extend_loan
+    scheduled_principal_for_installment(number)
   end
 
   def scheduled_interest_for_installment(number)  # typically reimplemented in subclasses
     # number unused in this implentation, subclasses may decide differently
     # therefor always supply number, so it works for all implementations
-    raise "number out of range, got #{number}" if number < 1 or number > actual_number_of_installments
-    (amount * interest_rate / number_of_installments).round(2)
+    extend_loan
+    scheduled_interest_for_installment(number)
   end
 
   # These info functions need not be overridden in derived classes.
@@ -1011,6 +1011,7 @@ class Loan
   # Moved this method here from instead of the LoanHistory model for purposes of speed. We sacrifice a bit of readability
   # for brute force iterations and caching => speed
   def update_history(forced=false)
+    extend_loan
     return true if Mfi.first.dirty_queue_enabled and DirtyLoan.add(self) and not forced
     return if @already_updated and not forced
     return if self.history_disabled and not forced# easy when doing mass db modifications (like with fixutes)
@@ -1170,7 +1171,6 @@ class Loan
   end
 
   def set_loan_product_parameters
-    debugger
     self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
   end
 
@@ -1256,6 +1256,7 @@ class Loan
 
   # TODO these should logically be private.
   def get_from_cache(cache, column, date)
+    debugger if $debug
     date = Date.parse(date) if date.is_a? String
     return 0 if cache.blank?
     if cache.has_key?(date)
@@ -1265,9 +1266,9 @@ class Loan
       keys = cache.keys.sort
       if date < keys.min
         col = cache[keys.min].merge(:balance => amount, :total_balance => total_to_be_received)
-        rv = (column == :all ? col : col[column])
+        rv = (column == :all ? Marshal.load(Marshal.dump(col)) : Marshal.load(Marshal.dump(col[column])))
       elsif date >= keys.max
-        rv = (column == :all ? cache[keys.max] : cache[keys.max][column])
+        rv = (column == :all ? Marshal.load(Marshal.dump(cache[keys.max])) : Marshal.load(Marshal.dump(cache[keys.max][column])))
       else
         keys.each_with_index do |k,i|
           if keys[[i+1,keys.size - 1].min] > date
@@ -1534,6 +1535,7 @@ module Loaner
       _scheduled_disbursal_date = scheduled_disbursal_date
       _fp_date = scheduled_first_payment_date
       _original_amount = amount
+
       # recreate the original loan
       self.scheduled_first_payment_date = original_first_payment_date
       self.amount = original_amount

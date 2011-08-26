@@ -26,27 +26,28 @@ class RepaymentStyle
     }
   end
 
-  def return_schedule(type, amount = nil)
+  def return_schedule(type)
     raise ArgumentError ("type must be :principal or :interest") unless [:principal, :interest].include? type
     s = self.send("custom_#{type}_schedule")
     if s.index("?").nil? # only one amount
       rv = s.split(",").map{|a| a.to_f}
     else
       r_hash = s.gsub("\r\n","\n").split("\n").map{|x| x.split("?")}.to_hash.map{|k,v| [k.strip, v.split(",").map{|i| i.to_f}]}.to_hash
-      raise ArgumentError("Must specify an amount as repayment style requires it") unless amount
-      rv = r_hash[amount.to_s]
+      rv = r_hash
     end
     rv
   end
 
   def principal_schedule(amount = nil)
-    return @custom_prin_sched if @custom_prin_sched
-    @custom_prin_sched = return_schedule(:principal, amount)
+    return @custom_prin_sched[amount.to_s] if @custom_prin_sched
+    @custom_prin_sched = return_schedule(:principal)
+    return @custom_prin_sched[amount.to_s]
   end
 
   def interest_schedule(amount = nil)
-    return @custom_int_sched if @custom_int_sched
-    @custom_int_sched = return_schedule(:interest,amount)
+    return @custom_int_sched[amount.to_s] if @custom_int_sched
+    @custom_int_sched = return_schedule(:interest)
+    return @custom_int_sched[amount.to_s]
   end
 
 

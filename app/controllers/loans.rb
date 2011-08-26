@@ -382,7 +382,9 @@ class Loans < Application
     loan = Loan.get(id)
     raise NotFound unless loan
     loan.update_history
-    redirect url_for_loan(loan)
+    loan.update_loan_cache
+    message = {:error => loan.errors.values.join("<br>")} unless loan.save
+    redirect url_for_loan(loan, :message => message)
   end
 
   def reallocate(id)

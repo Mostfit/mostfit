@@ -37,27 +37,13 @@
   .box
     %fieldset
       %legend Values
-      %table.tall
-        %tr
-          %th
-            Branch
-          %td
-            = @loan.c_branch_id
-        %tr
-          %th
-            Center
-          %td
-            = @loan.c_center_id
-        %tr
-          %th
-            Scheduled Maturity Date
-          %td
-            = @loan.c_scheduled_maturity_date
-        %tr
-          %th
-            Branch
-          %td
-            = @loan.c_branch_id
+      %table.narrow{:style =>" width: 40%"}
+        - [:c_branch_id, :c_center_id, :c_scheduled_maturity_date, :c_maturity_date, :c_actual_first_payment_date, :c_last_status, :c_principal_received, :c_interest_received, :c_last_payment_received_on, :c_last_payment_id].each do |a|
+          %tr
+            %th
+              = a
+            %td
+              = @loan.send(a)
 - if session.user.role==:admin
   .box
     %fieldset

@@ -52,13 +52,13 @@ namespace :mostfit do
         UPDATE loans l SET c_last_status = (SELECT status FROM loan_history lh WHERE lh.loan_id = l.id and current = 1)})
       puts "updating principal received"
       repository.adapter.execute(%Q{
-        UPDATE loans SET c_principal_received = (SELECT SUM(amount) FROM payments WHERE loan_id = loans.id and type = 1)})
+        UPDATE loans SET c_principal_received = (SELECT SUM(amount) FROM payments WHERE loan_id = loans.id and type = 1 and deleted_at is null)})
       puts "updating interest received"
       repository.adapter.execute(%Q{
-        UPDATE loans SET c_interest_received = (SELECT SUM(amount) FROM payments WHERE loan_id = loans.id and type = 2)})
+        UPDATE loans SET c_interest_received = (SELECT SUM(amount) FROM payments WHERE loan_id = loans.id and type = 2 and deleted_at is null)})
       puts "updating maturiy date"
       repository.adapter.execute(%Q{
-         update loans l set c_maturity_date = (select min(date) from loan_history lh where loan_id = l.id and status > 6)})
+        UPDATE loans SET c_maturity_date = c_last_payment_received_on WHERE c_last_status > 6})
       
       
     end
