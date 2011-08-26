@@ -55,6 +55,10 @@ class Payment
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :on => [:destroy]
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :if => Proc.new{|p| p.deleted_at != nil and p.deleted_by!=nil}
   
+  def add_center
+    self.center = self.loan.client.center
+  end
+
   def self.from_csv(row, headers, loans)
     if row[headers[:principal]]
       obj = new(:received_by => StaffMember.first(:name => row[headers[:received_by_staff]]), :loan => loans[row[headers[:loan_serial_number]]], 

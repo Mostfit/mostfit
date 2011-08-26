@@ -30,7 +30,7 @@ class LoanHistory
   property :advance_principal_paid,          Float, :nullable => false, :index => true
   property :advance_interest_paid,           Float, :nullable => false, :index => true
   property :advance_principal_adjusted,      Float, :nullable => false, :index => true
-  property :advance_interest_adjusted,      Float, :nullable => false, :index => true
+  property :advance_interest_adjusted,       Float, :nullable => false, :index => true
   property :principal_in_default,            Float, :nullable => false, :index => true
   property :interest_in_default,             Float, :nullable => false, :index => true
   
@@ -57,7 +57,52 @@ class LoanHistory
   @@models = [Region, Area, Branch, Center, ClientGroup, Client, Loan]
   @@optionals = [ClientGroup]
 
-  
+  ########### NICE NEW FUNCTIONS ###########################
+
+  def self.latest_keys(hash = {}, date = Date.today)
+    # returns the composite key for the last row before date per loan from loan history and filters by hash
+    LoanHistory.all(hash.merge(:date.lte => date)).aggregate(:loan_id,:composite_key.max).map{|x| x[1]}
+  end
+
+  def self.latest(hash = {}, date = Date.today)
+    # returns the last LoanHistory per loan before date
+    LoanHistory.all(:composite_key => LoanHistory.latest_keys(hash, date))
+  end
+
+  def self.latest_sum(hash = {}, date = Date.today, group_by = [])
+    # sums up the latest loan_history row per loan, even groups by any attribute
+    LoanHistory.composite_key_sum(LoanHistory.latest_keys(hash,date),group_by)
+  end
+
+  def self.composite_key_sum(keys, group_by = [])
+    # returns a row which is the sum of various conmposite keys. even does grouping.
+    # i.e. LoanHistory.composite_key_sum(LoanHistory.latest_keys, [:branch_id, :center_id]) will give you the current situation grouped by branch and center
+    cols = LoanHistory.sum_cols
+    agg_cols = cols.map{|c| DataMapper::Query::Operator.new(c, :sum)}
+    vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
+    if group_by.count > 0
+      vals = vals.group_by{|v| v[0..(group_by.count-1)]} 
+      return vals.to_hash.map{|k,v| [k,cols.zip(v.flatten[group_by.count..-1]).to_hash]}.to_hash
+    else
+      return cols.zip(vals).to_hash
+    end
+  end
+
+
+
+  def self.sum_cols
+    # only some columns make sense to add while aggregating LoanHistory rows.
+    # namely the ones below
+    # this method is purely for DRY
+    [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total, 
+     :principal_due, :principal_paid, :interest_due, :interest_paid, :total_interest_due, :total_interest_paid, 
+     :total_principal_due, :total_principal_paid, :advance_principal_paid, :advance_interest_paid, :principal_in_default, :interest_in_default,
+     :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted]
+  end
+
+  ######################## END NICE NEW FUNCTIONS ####################################
+
+
   # Provides outstanding amount of loans given as ids on a particular date
   def self.sum_outstanding_for_loans(date, loan_ids)
     loan_ids = loan_ids ? (loan_ids.length > 0 ? loan_ids.join(', ') : "NULL") : nil
@@ -690,28 +735,6 @@ class LoanHistory
                                        #{query}
                                  GROUP BY lh.loan_id
                                  }).collect{|x| "(#{x.loan_id}, '#{x.mdate.strftime('%Y-%m-%d')}')"}.join(",")
-  end
-
-  def self.latest(hash = {}, date = Date.today)
-    composite_keys = LoanHistory.all(hash.merge(:date.lte => date)).aggregate(:composite_key)
-    LoanHistory.all(hash.merge(:composite_key => composite_keys))
-  end
-
-  def self.composite_key_sum(keys, group_by = [])
-    cols = LoanHistory.sum_cols
-    agg_cols = cols.map{|c| DataMapper::Query::Operator.new(c, :sum)}
-    vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
-    vals = vals.group_by{|v| v[0..(group_by.count-1)]} if group_by.count > 0
-    vals.to_hash.map{|k,v| [k,cols.zip(v.flatten[group_by.count..-1]).to_hash]}.to_hash
-  end
-
-  def self.sum_cols
-    # only some columns make sense to add while aggregating LoanHistory rows.
-    # namely the ones below
-    # this method is purely for DRY
-    [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total, 
-     :principal_due, :principal_paid, :interest_due, :interest_paid, :total_interest_due, :total_interest_paid, 
-     :total_principal_due, :total_principal_paid, :advance_principal_paid, :advance_interest_paid]
   end
 
 

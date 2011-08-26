@@ -1077,8 +1077,8 @@ class Loan
         :total_interest_due                  => total_interest_due.round(2),
         :total_principal_paid                => total_principal_paid.round(2),
         :total_interest_paid                 => total_interest_paid.round(2),
-        :advance_principal_paid              => (advance_principal_paid || 0),
-        :advance_interest_paid               => (advance_interest_paid || 0),
+        :advance_principal_paid              => advance_principal_paid,
+        :advance_interest_paid               => advance_interest_paid,
         :advance_principal_adjusted          => @history_array.last ? [0,@history_array.last[:advance_principal_paid] - advance_principal_paid].max : 0,
         :advance_interest_adjusted           => @history_array.last ? [0,@history_array.last[:advance_interest_paid] - advance_interest_paid].max : 0,
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f
@@ -1190,7 +1190,25 @@ class Loan
 
 
   def correct_prepayments
-    
+    update_loan_cache
+    prins = payments(:type => :principal).sort_by{|p| p.received_on}.reverse
+    ints = payments(:type => :interest).sort_by{|p| p.received_on}.reverse
+    total = 0
+    diff = amount - c_principal_received
+    ints.each do |i|
+      transfer = [i.amount, diff - total].min
+      p = prins.find{|_p| _p.received_on == i.received_on}
+      p.amount += transfer
+      i.amount -= transfer
+      puts "transferred #{transfer}"
+      p.amount = p.amount.round(2)
+      i.amount = i.amount.round(2)
+      total += transfer
+      p.save!
+      i.save!
+    end
+    puts total
+    self.update_history
   end
 
 
