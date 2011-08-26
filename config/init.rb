@@ -46,6 +46,7 @@ Merb::BootLoader.before_app_loads do
   require 'lib/functions.rb'
   require 'lib/core_ext.rb'
   require 'lib/fees_container.rb'
+  require 'lib/caching.rb'
 
   #initialize i18n
   require 'i18n'
