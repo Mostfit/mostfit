@@ -6,12 +6,12 @@ class ClientAttendanceReport < Report
   def initialize(params,dates, user)
     @from_date = (dates and dates[:from_date]) ? dates[:from_date] : Date.today - 30
     @to_date   = (dates and dates[:to_date]) ? dates[:to_date] : Date.today
-    @name   = "Client Attendance Report as on #{@date}"
+    @name   = "Client Attendance Report from #{@from_date} to #{@to_date}"
     get_parameters(params, user)
   end
 
   def name
-    "Client attendance as on #{@to_date}"
+    "Client attendance from #{@from_date} to #{@to_date}"
   end
 
   def self.name
