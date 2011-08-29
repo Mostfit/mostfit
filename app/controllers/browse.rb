@@ -7,8 +7,12 @@ class Browse < Application
   
   def index
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
-    debugger
-    @branch_data = Cacher.all(:model_name => "Branch", :date => @date).map{|c| [c.model_id, c]}.to_hash
+    branch_caches = Cacher.all(:model_name => "Branch", :date => @date) 
+    if branch_caches.empty?
+      Branch.all.aggregate(:id).each {|bid| Cacher.update_branch_cache(bid, @date)}
+      branch_caches = Cacher.all(:model_name => "Branch", :date => @date) 
+    end
+    @branch_data = branch_caches.map{|c| [c.model_id, c]}.to_hash
     @branch_names = Branch.all.aggregate(:name, :id).to_hash
     display [@branch_data, @branch_names], @template
   end

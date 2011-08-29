@@ -1027,8 +1027,13 @@ class Loan
   def calculate_history
     return @history_array if @history_array
     # Crazy heisenbug is fixed by prefetching payments hash
-    payments_hash
     t = Time.now; @history_array = []
+    payments_hash
+    fee_payments= Payment.all(:loan_id => id, :type => :fees).group_by{|p| p.received_on}.map do |k,v| 
+      amt = v.is_a?(Array) ? (v.reduce(0){|s,h| s + h.amount} || 0) : v.amount
+      [k,amt]
+    end.to_hash
+    ap_fees = fee_schedule.map{|k,v| [k,v.values.sum]}.to_hash
     dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on, scheduled_first_payment_date].map{|d|
                d.holiday_bump if d.is_a?(Date)
              } + payment_dates + installment_dates).compact.uniq.sort
@@ -1054,6 +1059,10 @@ class Loan
       repayed = true if actual[:balance]<=0 and interest_due<=0
       advance_principal_paid = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max
       advance_interest_paid = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
+      total_fees_due = ap_fees.select{|dt,af| dt <= date}.to_hash.values.sum || 0
+      total_fees_paid = fee_payments.select{|dt,fp| dt <= date}.to_hash.values.sum || 0
+      fees_due_today = ap_fees[date] || 0
+      fees_paid_today = fee_payments[date] || 0
       @history_array << {
         :loan_id                             => id,
         :date                                => date,
@@ -1079,6 +1088,10 @@ class Loan
         :advance_interest_paid               => advance_interest_paid,
         :advance_principal_adjusted          => @history_array.last ? [0,@history_array.last[:advance_principal_paid] - advance_principal_paid].max : 0,
         :advance_interest_adjusted           => @history_array.last ? [0,@history_array.last[:advance_interest_paid] - advance_interest_paid].max : 0,
+        :total_fees_due                      => total_fees_due,
+        :total_fees_paid                     => total_fees_paid,
+        :fees_due_today                      => fees_due_today,
+        :fees_paid_today                     => fees_paid_today,
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f
       }
     end
@@ -1125,12 +1138,10 @@ class Loan
                                        total_principal_due, total_interest_due, total_principal_paid, total_interest_paid, 
                                        created_at, composite_key, scheduled_principal_due, scheduled_interest_due, 
                                        advance_principal_paid, advance_interest_paid, advance_principal_adjusted, advance_interest_adjusted,
-                                       principal_in_default, interest_in_default)
+                                       principal_in_default, interest_in_default, total_fees_due, total_fees_paid, fees_due_today, fees_paid_today)
               VALUES }
     values = []
-    $debug = true
     calculate_history.each do |history|
-      debugger if $debug
       value = %Q{(#{id}, '#{history[:date].strftime('%Y-%m-%d')}', #{history[:status]}, #{history[:scheduled_outstanding_principal]},
                           #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
                           #{history[:actual_outstanding_total]},#{history[:current] ? 1 : 0}, #{history[:amount_in_default]}, #{client.client_group_id || "NULL"}, 
@@ -1140,7 +1151,8 @@ class Loan
                           '#{DateTime.now.strftime("%Y-%m-%d %H:%M:%S")}', #{history[:composite_key]},
                            #{history[:scheduled_principal_due]}, #{history[:scheduled_interest_due]}, 
                            #{history[:advance_principal_paid]}, #{history[:advance_interest_paid]},#{history[:advance_principal_adjusted]}, #{history[:advance_interest_adjusted]},
-                           #{history[:principal_in_default]},#{history[:interest_in_default]})}
+                           #{history[:principal_in_default]},#{history[:interest_in_default]},
+                           #{history[:total_fees_due]},#{history[:total_fees_paid]},#{history[:fees_due_today]},#{history[:fees_paid_today]})}
      values << value
     end
     sql += values.join(",") + ";"

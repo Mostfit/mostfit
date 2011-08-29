@@ -11,7 +11,7 @@ class GraphData < Application
     @date = begin; Date.parse(params[:date]); rescue; Date.today; end
     debugger
     @history_totals = Cacher.all(:model_name => "Branch", :date => @date)
-    keys = [:advance_interest_paid, :advance_principal_paid, :principal_paid, :principal_due, :interest_paid, :interest_due, :fees_paid, :fees_due]
+    keys = [:advance_interest_paid, :advance_principal_paid, :principal_paid, :principal_due, :interest_paid, :interest_due, :fees_paid_today, :fees_due_today]
     @history_sum = @history_totals.map{|ht| keys.map{|k| [k,ht.send(k)]}.to_hash}.reduce({}){|s,h| s + h}
     treemap = {:children => @history_totals.map { |v|
         pd = v.principal_paid
@@ -25,8 +25,7 @@ class GraphData < Application
         data = {"$area" => tot, :"$color" => color,"branch_id" => branch.id, "branch_name" => branch.name, 
           "center_id" => (center ? center.id : 0), "center_name" => (center ? center.name : ""), "amounts" => v}
         {"id" => id, "name" => name, "data" => data}
-      }
-    }
+      }, :name => "Branches"}
     barchart = { 'label' => keys, 'values' => [{'label' => "", 'values' => keys.map{|k| (@history_sum[k] || 0).round(2)}}]}
     {'treemap' => treemap, 'pmts_barchart' => barchart}.to_json
   end

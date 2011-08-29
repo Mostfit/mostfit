@@ -1,14 +1,14 @@
 body {
   color: black;
+  font-size: 16px;
 }
 table.diags {
   font-family: monospace;
-  width: 4000px;
+  min-width: 2000px;
+  font-size: 0.8em;
 }
 
 table.diags td {
-  width: 200px;
-  font-weight: bold;
   text-align: center;
   margin: 0px;
   border: 0px;
@@ -22,3 +22,9 @@ table.diags tr.odd {
 tr.total {
   background: #cdcdcd;
 }
+
+th.headerSortUp { 
+    background-position: 15px 15px;
+    background-color: #3399FF; 
+    background-image: url(/images/asc.gif) no-repeat;
+} 

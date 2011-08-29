@@ -33,7 +33,10 @@ class LoanHistory
   property :advance_interest_adjusted,       Float, :nullable => false, :index => true
   property :principal_in_default,            Float, :nullable => false, :index => true
   property :interest_in_default,             Float, :nullable => false, :index => true
-  
+  property :total_fees_due,                  Float, :nullable => false, :index => true
+  property :total_fees_paid,                 Float, :nullable => false, :index => true
+  property :fees_due_today,                  Float, :nullable => false, :index => true
+  property :fees_paid_today,                 Float, :nullable => false, :index => true
 
   property :status,                          Enum.send('[]', *STATUSES)
 

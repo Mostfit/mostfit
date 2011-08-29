@@ -27,8 +27,10 @@ class Cacher
   property :advance_interest_adjusted,       Float, :nullable => false, :index => true
   property :principal_in_default,            Float, :nullable => false, :index => true
   property :interest_in_default,             Float, :nullable => false, :index => true
-  property :fees_due,                        Float, :nullable => false, :index => true
-  property :fees_paid,                        Float, :nullable => false, :index => true
+  property :total_fees_due,                  Float, :nullable => false, :index => true
+  property :total_fees_paid,                 Float, :nullable => false, :index => true
+  property :fees_due_today,                  Float, :nullable => false, :index => true
+  property :fees_paid_today,                 Float, :nullable => false, :index => true
 
   property :created_at,                      DateTime
   property :updated_at,                      DateTime
@@ -50,10 +52,10 @@ class Cacher
     group_by = hash.delete(:group_by) || []
     cols = hash.delete(:cols) ||  [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total, 
                                     :total_interest_due, :total_interest_paid, :total_principal_due, :total_principal_paid, 
-                                   :principal_in_default, :interest_in_default]
+                                   :principal_in_default, :interest_in_default, :total_fees_due, :total_fees_paid]
     flow_cols = [:principal_due, :principal_paid, :interest_due, :interest_paid,
                  :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted,
-                 :advance_principal_paid, :advance_interest_paid]
+                 :advance_principal_paid, :advance_interest_paid, :fees_due_today, :fees_paid_today]
     balances = LoanHistory.latest_sum(hash,date, group_by, cols)
     pmts = LoanHistory.composite_key_sum(LoanHistory.all(hash.merge(:date => date)).aggregate(:composite_key), group_by, flow_cols)
     # if there are no loan history rows that match today, then pmts is just a single hash, else it is a hash of hashes
@@ -88,6 +90,7 @@ class Cacher
   end
 
   def self.update_centers_cache(hash = {})
+    debugger
     date = hash.delete(:date) || Date.today
     hash = hash.select{|k,v| [:branch_id, :center_id].include?(k)}.to_hash
     # creates a cache per center for branches and centers per the hash passed as argument
@@ -100,6 +103,7 @@ class Cacher
     Cacher.transaction do |t|
       r = cs.map{|c| [c,c.save]}
       if r.map{|x| x[1]}.include?(false)
+        debugger
         t.rollback
       end
     end
