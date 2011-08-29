@@ -150,6 +150,28 @@ module Misfit
 end
 
 class Hash
+
+  # a function to turn {[:a, :b, :c] => 123, [:a, :b, :d] => 456} into {:a => {:b => {:c => 123, :d => 456}}}
+  # very useful when bucketing and dealing with composite_key_sum group by from LoanHistory
+  def deepen
+    result = self.class.new
+
+    each do |key, value|
+      if key.is_a? Array and key.length > 1
+        if result[key[0]]
+          result[key[0]] += {key[1..-1] => value}.deepen
+        else 
+          result[key[0]] = {key[1..-1] => value}.deepen
+        end
+      else
+        result[key.is_a?(Array) ? key[0] : key] = value
+      end
+    end
+
+    result
+  end
+
+
   #Hash diffs are easy
   def diff(other)
     keys = self.keys
@@ -193,6 +215,8 @@ class Hash
     end
     rhash
   end
+
+
 
 end
 
@@ -250,6 +274,11 @@ class Array
        }]
     }.sort_by{|x| x[0]}
   end
+
+  def sum
+    self.reduce(:+)
+  end
+  
 end
 
 module ExcelFormula

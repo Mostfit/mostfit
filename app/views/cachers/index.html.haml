@@ -1,0 +1,39 @@
+= css_include_tag :diags
+- keys = [:date, :branch_id, :center_id, :scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid]
+
+%table.diags{:style => "width: 1400px;"}
+  %thead
+    %tr
+      - keys.each do |at|
+        %th
+          = at.to_s.gsub("_","<br>")
+  - if params  and params[:center_id] and params[:date]
+    - total = {}
+    - cen = Center.get(params[:center_id])
+    - date = Date.parse(params[:date])
+    - histories = LoanHistory.latest({:center_id => cen.id}, date)
+    - histories.each do |h|
+      %tr
+        - keys.each do |at|
+          %td
+            = h.send(at)
+            - total[at] ||= 0
+            - total[at] += h.send(at) if h.send(at).is_a? Numeric
+        %td{:style => "background: #aaee00"}
+          = link_to h.composite_key, "/loans/#{h.composite_key.floor}"
+    %tr.total
+      - keys.each do |at|
+        %td
+          = total[at]
+  - @cachers.sort_by{|c| [c.branch_id,c.center_id]}.each do |c|
+    %tr{:class => cycle('odd','even')}
+      - keys.each do |at|
+        %td
+          - if at == :date
+            = link_to c.send(at), resource(:cachers, request.send(:query_params).merge(:date => c.send(at)))
+          - elsif at == :center_id
+            - cen = Center.get(c.send(at))
+            = link_to ((cen ? cen.id : 0), resource(:cachers, request.send(:query_params).merge(:center_id => cen)))
+          - else
+            = c.send(at)
+

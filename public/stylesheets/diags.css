@@ -1,0 +1,24 @@
+body {
+  color: black;
+}
+table.diags {
+  font-family: monospace;
+  width: 4000px;
+}
+
+table.diags td {
+  width: 200px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0px;
+  border: 0px;
+  cell-spacing: 0px;
+}
+
+table.diags tr.odd {
+  background: #efefef;
+}
+
+tr.total {
+  background: #cdcdcd;
+}

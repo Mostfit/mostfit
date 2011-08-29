@@ -10,14 +10,18 @@
       });
     });
 
+- debugger
 - bnames = @branch_names.keys.sort
-- bvalues = @branch_names.map{|name, id| @branch_data[id][:principal_paid] if @branch_data[id]}
 - keys = [:advance_principal_paid, :advance_interest_paid, :principal_paid, :principal_due, :interest_paid, :interest_due]
 %script{:type => "text/javascript"}
   == names=['#{bnames.join("','")}']
-  == values = ['#{bvalues.join("','")}']
+  == values = ['#{@branch_names.values.join("','")}']
 #stats
-  - array = @branch_data.reduce({}){|s,a| s + a[1]}
+  - total = {}
+  - @branch_data.each do |bid, bv|
+    - keys.each do |k|
+      - total[k] ||= 0
+      - total[k] += bv.send(k)
   %table#menu{:style => "float:left; position: relative; left: 1px;"}
     %tr.selected
       %th
@@ -25,18 +29,18 @@
           today
       %td.number
         %h1.green
-          = keys.select{|k| k.to_s.match(/paid/)}.map{|k| array[k] || 0}.reduce(:+).to_currency
+          = total[:principal_paid] + total[:interest_paid]
         %p collected
       %td.number
         %h1
-          = keys.select{|k| k.to_s.match(/due/)}.map{|k| array[k] || 0}.reduce(:+).to_currency
+          = total[:principal_due] + total[:interest_due]
         %p due
       %td.number
         %h1.red
           1,745
         %p
           missed
-        
+    - debugger
     %tr
       %th
         %h1 meetings
@@ -57,7 +61,10 @@
           by now
       %td.number
         %h1
-          = Payment.all(:received_on => @date, :center_id => pt.aggregate(:id)).aggregate(:center_id).count
+          - if pt.empty?
+            0
+          - else
+            = Payment.all(:received_on => @date, :center_id => pt.aggregate(:id)).aggregate(:center_id).count
         %p
           meetings
           %br
@@ -86,7 +93,7 @@
           - t = 0
           - keys.map{|k| k.to_s.split("_")[0..-2].join("_")}.uniq.each do |k|
             %td.green
-              - value = array["#{k}_paid".to_sym] || 0
+              - value = total["#{k}_paid".to_sym] || 0
               - t += value
               = value.to_currency.split(".")[0]
           %th
@@ -97,7 +104,7 @@
           - t = 0
           - keys.map{|k| k.to_s.split("_")[0..-2].join("_")}.uniq.each do |k|
             %td.red
-              - value = array["#{k}_due".to_sym] || 0
+              - value = total["#{k}_due".to_sym] || 0
               - t += value
               = value.to_currency.split(".")[0]
           %th

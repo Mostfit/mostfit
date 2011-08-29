@@ -8,31 +8,25 @@ class GraphData < Application
   
 
   def tm_collections
-    hash = {:status => [:disbursed, :outstanding]}
-    if (params[:branch_id] and not params[:branch_id].blank?) 
-      hash = hash.merge({:branch_id => params[:branch_id]})
-      @branch = Branch.get(params[:branch_id])
-    end
     @date = begin; Date.parse(params[:date]); rescue; Date.today; end
     debugger
-    @histories = LoanHistory.latest(hash.merge(:date => @date)) 
-    @history_totals = LoanHistory.composite_key_sum(@histories.aggregate(:composite_key),hash[:branch_id] ? [:center_id] : [:branch_id])
-    @history_sum = @history_totals.reduce({}){|s,h| s + h[1]}
-    treemap = {:children => @history_totals.map{|k,v| [k.first, v]}.to_hash.map do |k,v|
-        pd = v[:principal_paid]
-        due = v[:principal_due]
+    @history_totals = Cacher.all(:model_name => "Branch", :date => @date)
+    keys = [:advance_interest_paid, :advance_principal_paid, :principal_paid, :principal_due, :interest_paid, :interest_due, :fees_paid, :fees_due]
+    @history_sum = @history_totals.map{|ht| keys.map{|k| [k,ht.send(k)]}.to_hash}.reduce({}){|s,h| s + h}
+    treemap = {:children => @history_totals.map { |v|
+        pd = v.principal_paid
+        due = v.principal_due
         tot = pd + due
         color = "#" + (prorata_color(0, tot, pd) || "000000")
-        center = hash[:branch_id] ? Center.get(k) : nil
-        branch = @branch || Branch.get(k) 
+        center = params[:branch_id] ? Center.get(v.center_id) : nil
+        branch = Branch.get(v.branch_id)
         id = center ? center.id : branch.id
         name = center ? center.name : branch.name
         data = {"$area" => tot, :"$color" => color,"branch_id" => branch.id, "branch_name" => branch.name, 
           "center_id" => (center ? center.id : 0), "center_name" => (center ? center.name : ""), "amounts" => v}
         {"id" => id, "name" => name, "data" => data}
-      end
+      }
     }
-    keys = [:advance_interest, :advance_principal, :principal_paid, :principal_due, :interest_paid, :interest_due, :fees_paid, :fees_due]
     barchart = { 'label' => keys, 'values' => [{'label' => "", 'values' => keys.map{|k| (@history_sum[k] || 0).round(2)}}]}
     {'treemap' => treemap, 'pmts_barchart' => barchart}.to_json
   end
@@ -381,7 +375,9 @@ class GraphData < Application
   private
 
   def prorata_color(start_val, end_val, val, r1 = 164, r2 = 100, g1 = 72, g2 = 222, b1 = 72, b2 = 137)
+    debugger
     color_ratio = (start_val + val)/(start_val + end_val).to_f
+    color_ratio = 1 if color_ratio.nan?
     color_ratio = 0 if color_ratio < 0
     color = (r1 - (r1 - r2) * color_ratio).to_i.to_s(16) + (g1 + (g2 - g1) * color_ratio).to_i.to_s(16) + (b1 + (b2 - b1)*color_ratio).to_i.to_s(16)
     color = color + "0" * (6 - color.length) if color.length < 6

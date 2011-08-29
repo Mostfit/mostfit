@@ -69,22 +69,25 @@ class LoanHistory
     LoanHistory.all(:composite_key => LoanHistory.latest_keys(hash, date))
   end
 
-  def self.latest_sum(hash = {}, date = Date.today, group_by = [])
+  def self.latest_sum(hash = {}, date = Date.today, group_by = [], cols = [])
     # sums up the latest loan_history row per loan, even groups by any attribute
-    LoanHistory.composite_key_sum(LoanHistory.latest_keys(hash,date),group_by)
+    LoanHistory.composite_key_sum(LoanHistory.latest_keys(hash,date),group_by, cols)
   end
 
-  def self.composite_key_sum(keys, group_by = [])
+  def self.composite_key_sum(keys, group_by = [], my_cols = [])
     # returns a row which is the sum of various conmposite keys. even does grouping.
     # i.e. LoanHistory.composite_key_sum(LoanHistory.latest_keys, [:branch_id, :center_id]) will give you the current situation grouped by branch and center
-    cols = group_by + LoanHistory.sum_cols
-    agg_cols = cols.map{|c| DataMapper::Query::Operator.new(c, :sum)}
+    debugger
+    cols = group_by + (my_cols.empty? ? LoanHistory.sum_cols : my_cols)
+    ng = {group_by.map{|g| :no_group} => cols.map{|c| [c,0]}.to_hash}
+    return ng if keys.blank?
+    agg_cols = cols[group_by.length..-1].map{|c| DataMapper::Query::Operator.new(c, :sum)}
     vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
     if group_by.count > 0
       vals = vals.group_by{|v| v[0..(group_by.count-1)]} 
       return vals.to_hash.map{|k,v| [k,cols.zip(v.flatten).to_hash]}.to_hash
     else
-      return cols.zip(vals).to_hash
+      return {:no_group => cols.zip(vals).to_hash}
     end
   end
 

@@ -7,7 +7,8 @@ class Browse < Application
   
   def index
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
-    @branch_data = LoanHistory.composite_key_sum(LoanHistory.all(:date => @date).aggregate(:composite_key), [:branch_id]).map{|k,v| [k.first, v]}.to_hash
+    debugger
+    @branch_data = Cacher.all(:model_name => "Branch", :date => @date).map{|c| [c.model_id, c]}.to_hash
     @branch_names = Branch.all.aggregate(:name, :id).to_hash
     display [@branch_data, @branch_names], @template
   end
