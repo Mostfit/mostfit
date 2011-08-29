@@ -81,6 +81,11 @@
       = text_field :spouse_name, :size => 40
   %tr
     %th
+      Spouse Date of Birth:
+    %td
+      = date_select_for @client, :spouse_date_of_birth, :nullable => true, :min_date => Date.today-36500, :max_date => Date.today-1000
+  %tr
+    %th
       Address:
     %td
       ~ text_area :address, :rows => 6, :cols => 38

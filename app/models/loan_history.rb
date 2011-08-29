@@ -269,7 +269,7 @@ class LoanHistory
         COUNT(lh.loan_id) loan_count,
         #{selects}
       FROM #{subtable} as dt, loan_history lh, loans l
-      WHERE lh.loan_id=dt.loan_id AND lh.date=dt.date AND lh.status in (5,6) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+      WHERE lh.loan_id=dt.loan_id AND lh.date=dt.date AND lh.status in (5,6) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL 
       #{group_by_query};
     })
   end
@@ -833,7 +833,7 @@ class LoanHistory
     query = build_extra(query)    
     return "(SELECT max(lh.date) date, lh.loan_id loan_id
      FROM loan_history lh, loans l
-     WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (5,6,7,8,9) AND lh.date<='#{date.strftime('%Y-%m-%d')}' #{query}
+     WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (5,6,7,8,9,10) AND lh.date<='#{date.strftime('%Y-%m-%d')}' #{query}
      GROUP BY lh.loan_id
      )"
   end

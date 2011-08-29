@@ -1,4 +1,3 @@
-- debugger
 %h1
   == <a name = 'weeksheet'> #{I18n.t("center.weeksheet.title", :default => "Week #{@date.cweek} meeting sheet for center #{@center.name}", :week => @date.cweek, :name =>@center.name)}</a>
   = link_to I18n.t("center.weeksheet.record_link", :default => "Record these activities"), url(:enter_payments, :action => 'by_center', :center_id => @center.id, :for_date => @date), :class => "add"

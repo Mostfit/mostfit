@@ -163,7 +163,7 @@
               %td.text
                 = link_to f.client.name, resource(f.client)
               %td.text
-                = link_to f.loan.description, url_for_loan(f.loan)
+                = (link_to f.loan.description, url_for_loan(f.loan)) if f.loan
               %td.text
               %td.number
                 = f.amount
