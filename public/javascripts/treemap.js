@@ -28,25 +28,31 @@ var Log = {
 
 
 
-function init_treemap(data){
+function init_treemap(data,date){
   //init TreeMap
-  tm = new $jit.TM.Squarified({
+  x = 1;
+  if (!(typeof(tm) == 'undefined')) {
+    tm.loadJSON(data);
+    tm.refresh();
+  }
+  else {
+      tm = new $jit.TM.Squarified({
     //where to inject the visualization
     injectInto: 'infovis',
     //parent box title heights
     titleHeight: 15,
     //enable animations
-    animate: false,
+    animate: true,
     //box offsets
     offset: 1,
     //Attach left and right click events
     Events: {
       enable: true,
       onClick: function(node) {
-        if(node) tm.enter(node);
+        if(node) get_charts('date=' + date_string + '&branch_id=' + node.data.branch_id);
       },
       onRightClick: function() {
-        tm.out();
+	get_charts('date=' + date_string);
       }
     },
     duration: 1000,
@@ -63,12 +69,13 @@ function init_treemap(data){
         var html = "<div class=\"tip-title\">" + node.name
           + "</div><div class=\"tip-text\">";
         var data = node.data;
-        if(data.playcount) {
-          html += "play count: " + data.playcount;
-        }
-        if(data.image) {
-          html += "<img src=\""+ data.image +"\" class=\"album\" />";
-        }
+        html += "branch: " + data.branch_name + "<br>";
+	html += "balance outstanding:" + data.amounts.actual_outstanding_principal + "<br>";
+	html += "principal paid:" + data.amounts.principal_paid + "<br>";
+	html += "principal due:" + data.amounts.principal_due + "<br>";
+	html += "interest paid:" + data.amounts.interest_paid + "<br>";
+	html += "interest due:" + data.amounts.interest_due + "<br>";
+	html += "amount in default" + (-(data.amounts.interest_in_default + data.amounts.principal_in_default)) + "<br>";
         tip.innerHTML =  html;
       }
     },
@@ -90,6 +97,9 @@ function init_treemap(data){
 
   tm.loadJSON(data);
   tm.refresh();
+
+
+  }
   //end
   //add events to radio buttons
   var sq = $jit.id('r-sq'),

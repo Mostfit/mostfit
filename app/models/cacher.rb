@@ -38,13 +38,26 @@ class Cacher
   property :stale,                           Boolean, :default => false
 
 
-  def stale
-    cacher_update_times = self.model.all(:model_name => "Center").aggregate(:model_id, :updated_at.max)
+  def self.stalify
+    stale_branches = Center.all(:id => self.stale_centers.keys).aggregate(:branch_id)
+  end
+    
+  def self.stale_items
+    debugger
+    cacher_update_times = self.all(:model_name => "Center").aggregate(:model_id, :updated_at.max)
     last_updated_at = cacher_update_times.map{|x| x[1]}.min
     payments_after_last_update = Payment.all(:created_at.gt => last_updated_at)
+    centers_with_last_payment = payments_after_last_update.aggregate(:center_id, :received_on)
+    # [[:center_id, :relevant_date]...]
     loans_after_last_update = Loan.all(:updated_at.gt => last_updated_at)
-    stale_centers = payments_after_last_update.aggregate(:center_id) + loans_after_last_update.aggregate(:c_center_id)
-    stale_caches = Cacher.all(:model_name => "Center", 
+    centers_with_updated_loans = loans_after_last_update.aggregate(:c_center_id, :applied_on)
+    # [[:center_id, :relevant_date]...]
+    centers_to_update = (centers_with_last_payment.to_hash + centers_with_updated_loans.to_hash).map{|k,v| [k,v.is_a?(Array) ? v.min : v]}
+    # now we have the centers, we can do the branches as well
+    sc_by_date = centers_to_update.group_by{|x| x[1]}
+    stale_centers = sc_by_date.map{|d, vs| [d,vs.map{|v| v[0]}]}.to_hash
+    stale_branches = stale_centers.map{|d, cs| [d, Center.all(:id => cs).aggregate(:branch_id)]}.to_hash
+    {:branches => stale_branches, :centers => stale_centers}
   end
 
   def self.create(hash = {})
