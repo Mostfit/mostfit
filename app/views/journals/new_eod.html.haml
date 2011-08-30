@@ -19,6 +19,7 @@
         = hidden_field :name => "_target_", :value => "eod_voucher_form"
       - if @rules and @rules.length > 0
         - @rules.each do |rule|
+          - $debug = true if rule.name.match(/nterest/)
           %tr{:class => cycle('odd','even')}
             %td
               = rule.journal_type.name
@@ -34,6 +35,7 @@
                       %td{:width => "80%"}
                         = ca.credit_account.name                  
                       %td
+                        - debugger
                         - amount, changable = ca.amount(@date)
                         - credit_total += amount
                         - if false

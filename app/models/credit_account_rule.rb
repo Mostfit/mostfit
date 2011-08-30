@@ -11,25 +11,30 @@ class CreditAccountRule
   # Returns amount to be credited and whether amount can be changed or not.
   # amounts are changable to counter the fact that VAR not identified right now
   def amount(date)
+    debugger if $debug
     case self.rule_book.action.to_sym
     when :disbursement
       amount = Loan.all("client.center.branch_id" => self.rule_book.branch.id, :disbursal_date => date, :rejected_on => nil).aggregate(:amount.sum) || 0
     when :principal
       amount = Payment.all("client.center.branch_id" => self.rule_book.branch.id, :type => :principal, :received_on => date).aggregate(:amount.sum) || 0
-      advance = LoanHistory.sum_advance_payment(date, date, :branch, ["branch_id = #{self.rule_book.branch.id}"]).first
-      if advance.nil?
-        amount
-      else
-        amount -= advance.advance_principal.to_f
+      if RuleBook.all(:branch => self.rule_book.branch).map{|r| r.action}.include?("advance_principal")
+        advance = LoanHistory.sum_advance_payment(date, date, :branch, ["branch_id = #{self.rule_book.branch.id}"]).first
+        if advance.nil?
+          amount
+        else
+          amount -= advance.advance_principal.to_f
+        end
       end
     when :interest
       amount = Payment.all("client.center.branch_id" => self.rule_book.branch.id, :type => :interest, :received_on => date).aggregate(:amount.sum) || 0
       advance = LoanHistory.sum_advance_payment(date, date, :branch, ["branch_id = #{self.rule_book.branch.id}"]).first
-      advance_interest  = advance ? (advance.advance_total - advance.advance_principal).to_f : 0
-      if advance_interest == 0
-        amount
-      else
-        amount -= advance_interest
+      if RuleBook.all(:branch => self.rule_book.branch).map{|r| r.action}.include?("advance_interest")
+        advance_interest  = advance ? (advance.advance_total - advance.advance_principal).to_f : 0
+        if advance_interest == 0
+          amount
+        else
+          amount -= advance_interest
+        end
       end
     when :fees
       amount = Payment.all("client.center.branch_id" => self.rule_book.branch.id, :type => :fees, :fee => self.rule_book.fee, :received_on => date).aggregate(:amount.sum) || 0
