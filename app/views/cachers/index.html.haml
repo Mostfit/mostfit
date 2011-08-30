@@ -1,7 +1,26 @@
 = css_include_tag :screen, :diags
 = js_include_tag :jquery, 'jquery.tablesorter.min'
 :javascript
-  $(document).ready(function(){$($('table')[0]).tablesorter()});
+  $.tablesorter.addParser({ 
+  id: 'mostfit_currency', 
+  is: function(s) { 
+  return false; 
+  }, 
+  format: function(s) { 
+  return parseFloat(s.replace(/ /g, ''))
+  }, 
+  type: 'numeric' 
+  }); 
+     
+  $(document).ready(function(){
+    $($('table')[0]).tablesorter({headers: { 
+    0: { sorter: 'date' },
+    3: { sorter: 'mostfit_currency' },
+    4: { sorter: 'mostfit_currency' },
+    5: { sorter: 'mostfit_currency' },
+    6: { sorter: 'mostfit_currency' },
+    7: { sorter: 'mostfit_currency' }
+    }} )});
 
 - keys = [:date, :branch_id, :center_id, :scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid, :fees_due_today, :fees_paid_today, :total_fees_due, :total_fees_paid]
 - query_params = request.send(:query_params)
@@ -9,7 +28,7 @@
   %li
     = link_to "Caches Home", resource(:cachers)
   %li
-    = link_to "#{Cacher.all(:stale => true).count} stale caches", resource(:cachers, :stale => true)
+    = link_to "#{Cacher.stale.count} stale caches", resource(:cachers, :stale => true)
 Filter Dates:
 - if query_params[:date]
   = link_to 'remove date filter', resource(:cachers, query_params.dup.delete_if{|k,v| k == "date"} || {})

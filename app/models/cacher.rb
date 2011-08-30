@@ -38,12 +38,14 @@ class Cacher
   property :stale,                           Boolean, :default => false
 
 
-  def self.bulk_update_caches(set,where)
-    Cacher.all(where).update(set)
+  def stale
+    cacher_update_times = self.model.all(:model_name => "Center").aggregate(:model_id, :updated_at.max)
+    last_updated_at = cacher_update_times.map{|x| x[1]}.min
+    payments_after_last_update = Payment.all(:created_at.gt => last_updated_at)
+    loans_after_last_update = Loan.all(:updated_at.gt => last_updated_at)
+    stale_centers = payments_after_last_update.aggregate(:center_id) + loans_after_last_update.aggregate(:c_center_id)
+    stale_caches = Cacher.all(:model_name => "Center", 
   end
-
-  def self.lock_caches(hash = {})
-  end    
 
   def self.create(hash = {})
     # creates a cacher for any arbitrary condition. Also does grouping
@@ -109,6 +111,17 @@ class Cacher
     end
      
   end
+
+
+  def self.bulk_update_caches(set,where)
+    #  not working
+    Cacher.all(where).update(set)
+  end
+
+  def self.lock_caches(hash = {})
+    #  not working
+  end    
+
 
 
 
