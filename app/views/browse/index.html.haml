@@ -84,16 +84,17 @@
         %thead
           %tr
             %th.purple
-            - ["adv", "prin", "int", "default","total"].each do |k|
+            - ["adv", "prin", "int", "fees","default","total"].each do |k|
               %th
                 = k
         %tr
           %th
             Paid
           - t = 0
-          - keys.map{|k| k.to_s.split("_")[0..-2].join("_")}.uniq.each do |k|
+          - paid_values = [:total_advance_paid_today, :principal_paid, :interest_paid, :fees_paid_today]
+          - keys.map do |k| 
             %td.green
-              - value = total["#{k}_paid".to_sym] || 0
+              - value = total[k] || 0
               - t += value
               = value.to_currency.split(".")[0]
           %th

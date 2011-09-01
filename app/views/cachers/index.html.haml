@@ -76,10 +76,10 @@ Filter Branches
             = link_to val, resource(:cachers, request.send(:query_params).merge(:date => val))
           - elsif at == :branch_id
             - br = Branch.get(val)
-            = link_to ((br ? br.name : "-"), resource(:cachers, request.send(:query_params).merge(:branch_id => br.id)))
+            = link_to((br ? br.name : "-"), resource(:cachers, request.send(:query_params).merge(:branch_id => br.id)))
           - elsif at == :center_id
             - cen = Center.get(val)
-            = link_to ((cen ? cen.name[0..10] : "-"), resource(:cachers, request.send(:query_params).merge(:center_id => cen, :date => c.date)))
+            = link_to((cen ? cen.name[0..10] : "-"), resource(:cachers, request.send(:query_params).merge(:center_id => cen, :date => c.date)))
           - else
             = val == 0 ? "-" : val.to_currency(:mostfit_default)
 

@@ -43,7 +43,7 @@ Merb::Router.prepare do
   resources :targets, :id => %r(\d+)
   resources :holidays
   resources :fees
-  resources :verifications
+#  resources :verifications
   resources :ledger_entries
   resources :loan_products
   resources :users, :id => %r(\d+)

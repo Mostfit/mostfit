@@ -1,7 +1,5 @@
 class Bookmark
   include DataMapper::Resource
-  Types   = [:custom_reports, :system]
-  Methods = [:get, :post, :put, :delete]
   attr_accessor :url
   #ShareWith = [:none, :all, :admin, :staff_member, :mis_manager, :data_entry, :read_only]
 

@@ -1,7 +1,5 @@
 class Target
   include DataMapper::Resource
-  TargetOf    = [:center_creation, :group_creation, :client_registration, :loan_disbursement_by_amount, :loan_disbursements_by_number]
-  TargetType  = [:relative, :absolute]
   TypeClasses = [Center, ClientGroup, Client, Loan, Loan]
   ValidAttaches = [:branch, :center, :staff_member]
 

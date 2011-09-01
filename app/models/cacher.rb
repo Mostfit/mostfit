@@ -38,8 +38,16 @@ class Cacher
   property :stale,                           Boolean, :default => false
 
 
+  def self.stale
+    self.all(:stale => true)
+  end
+
   def self.stalify
-    stale_branches = Center.all(:id => self.stale_centers.keys).aggregate(:branch_id)
+    self.stale_items[:centers].each do |date, centers|
+      sql = "UPDATE cachers SET stale = 1 WHERE model_name = 'Center' and model_id in (#{centers.join(',')}) and date >= '#{date.strftime('%Y-%m-%d')}'"
+      puts sql
+      repository.adapter.execute(sql)
+    end
   end
     
   def self.stale_items

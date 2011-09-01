@@ -1086,6 +1086,10 @@ class Loan
         :total_interest_paid                 => total_interest_paid.round(2),
         :advance_principal_paid              => advance_principal_paid,
         :advance_interest_paid               => advance_interest_paid,
+        :total_advance_paid                  => advance_principal_paid + advance_interest_paid,
+        :advance_principal_paid_today        => (appt = @history_array.last ? [0,advance_principal_paid - (@history_array.last[:advance_principal_paid] || 0)].max : 0),
+        :advance_interest_paid_today         => (aipt = @history_array.last ? [0,advance_interest_paid - (@history_array.last[:advance_interest_paid] || 0)].max : 0),
+        :total_advance_paid_today            => appt + aipt,
         :advance_principal_adjusted          => @history_array.last ? [0,@history_array.last[:advance_principal_paid] - advance_principal_paid].max : 0,
         :advance_interest_adjusted           => @history_array.last ? [0,@history_array.last[:advance_interest_paid] - advance_interest_paid].max : 0,
         :total_fees_due                      => total_fees_due,
@@ -1131,29 +1135,23 @@ class Loan
     # this gets the history from calculate_history and does one single insert into the database
     t = Time.now
     Merb.logger.error! "could not destroy the history" unless self.loan_history.destroy!
+    history = calculate_history
+    keys = history.first.keys
     d0 = Date.parse('2000-01-03')
-    sql = %Q{ INSERT INTO loan_history(loan_id, date, status, scheduled_outstanding_principal, scheduled_outstanding_total,
-                                       actual_outstanding_principal, actual_outstanding_total, current, amount_in_default, client_group_id, center_id, client_id, 
-                                       branch_id, days_overdue, week_id, principal_due, interest_due, principal_paid, interest_paid, 
-                                       total_principal_due, total_interest_due, total_principal_paid, total_interest_paid, 
-                                       created_at, composite_key, scheduled_principal_due, scheduled_interest_due, 
-                                       advance_principal_paid, advance_interest_paid, advance_principal_adjusted, advance_interest_adjusted,
-                                       principal_in_default, interest_in_default, total_fees_due, total_fees_paid, fees_due_today, fees_paid_today)
-              VALUES }
+    sql = "INSERT INTO loan_history(#{keys.join(',')} )
+              VALUES "
     values = []
-    calculate_history.each do |history|
-      value = %Q{(#{id}, '#{history[:date].strftime('%Y-%m-%d')}', #{history[:status]}, #{history[:scheduled_outstanding_principal]},
-                          #{history[:scheduled_outstanding_total]}, #{history[:actual_outstanding_principal]},
-                          #{history[:actual_outstanding_total]},#{history[:current] ? 1 : 0}, #{history[:amount_in_default]}, #{client.client_group_id || "NULL"}, 
-                          #{client.center.id},#{client.id},#{client.center.branch.id}, 0, #{((history[:date] - d0) / 7).to_i + 1},
-                          #{history[:principal_due]},#{history[:interest_due]}, #{history[:principal_paid]},#{history[:interest_paid]}, 
-                          #{history[:total_principal_due]},#{history[:total_interest_due]}, #{history[:total_principal_paid]},#{history[:total_interest_paid]}, 
-                          '#{DateTime.now.strftime("%Y-%m-%d %H:%M:%S")}', #{history[:composite_key]},
-                           #{history[:scheduled_principal_due]}, #{history[:scheduled_interest_due]}, 
-                           #{history[:advance_principal_paid]}, #{history[:advance_interest_paid]},#{history[:advance_principal_adjusted]}, #{history[:advance_interest_adjusted]},
-                           #{history[:principal_in_default]},#{history[:interest_in_default]},
-                           #{history[:total_fees_due]},#{history[:total_fees_paid]},#{history[:fees_due_today]},#{history[:fees_paid_today]})}
-     values << value
+    history.each do |hist|
+      value = keys.map do |k| 
+        if hist[k].class == Date
+          "'#{hist[k].strftime('%Y-%m-%d')}'"
+        elsif hist[k] == DateTime
+          "'#{hist[k].strftime('%Y-%m-%d %H:%M:%S')}'"
+        else
+          hist[k]
+        end
+      end
+      values << "(#{value.join(',')})"
     end
     sql += values.join(",") + ";"
     repository.adapter.execute(sql)

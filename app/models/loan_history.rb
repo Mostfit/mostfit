@@ -29,6 +29,10 @@ class LoanHistory
   property :total_interest_paid,             Float, :nullable => false, :index => true
   property :advance_principal_paid,          Float, :nullable => false, :index => true
   property :advance_interest_paid,           Float, :nullable => false, :index => true
+  property :total_advance_paid,              Float, :nullable => false, :index => true
+  property :advance_principal_paid_today,    Float, :nullable => false, :index => true
+  property :advance_interest_paid_today,     Float, :nullable => false, :index => true
+  property :total_advance_paid_today,        Float, :nullable => false, :index => true
   property :advance_principal_adjusted,      Float, :nullable => false, :index => true
   property :advance_interest_adjusted,       Float, :nullable => false, :index => true
   property :principal_in_default,            Float, :nullable => false, :index => true

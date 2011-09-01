@@ -12,8 +12,6 @@ class Payment
   attr_writer :total
   attr_accessor :override_create_observer  # just to be used in the form
 
-  PAYMENT_TYPES = [:principal, :interest, :fees]
-  
   property :id,                  Serial
   property :amount,              Float, :nullable => false, :index => true
   property :type,                Enum.send('[]',*PAYMENT_TYPES), :index => true
