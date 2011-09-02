@@ -54,6 +54,11 @@ namespace :mostfit do
           log.obj2model_event_log(obj)
           log.event_change = :create
           log.event_changed_at = obj.created_at
+          if log.parent_org_guid == nil 
+            org = Organization.get_organization(obj.created_at)
+            log.parent_org_guid = org.org_guid
+            log.parent_domain_guid = org.domains.first.dmn_guid
+          end
           log.save 
         end
         puts

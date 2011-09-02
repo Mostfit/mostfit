@@ -45,7 +45,7 @@ namespace :mostfit do
           puts "ERROR: Please give the arguments in the proper format. For 6th August 2011 it shall be '06-08-2011'"
         end
       elsif begin_date <= end_date 
-        org_guid = Organization.get_organization(end_date)
+        org_guid = Organization.get_organization(end_date).org_guid
         begin_date_time = DateTime.new(begin_date.year, begin_date.month, begin_date.day)
         end_date_time = DateTime.new(end_date.year, end_date.month, end_date.day, 23, 59, 59)
         folder = File.join(Merb.root, "doc", "transaction_event_logs")

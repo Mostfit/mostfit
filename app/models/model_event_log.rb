@@ -5,7 +5,7 @@ class ModelEventLog
   MODEL_CHANGES = [:create, :update, :destroy]
   # class.to_s.downcase.to_sym
   OBSERVED_MODELS = [:client, :loan, :loanproduct, :fee, :branch, :funder, :fundingline]
-  MODELS_UNDER_OBSERVATION = [Client, Loan, LoanProduct]
+  MODELS_UNDER_OBSERVATION = [Client, Loan, LoanProduct, Branch]
 
   property :id,                                     Serial
   property :event_guid,                             String, :default => lambda{ |obj, p| UUID.generate }
@@ -42,16 +42,18 @@ class ModelEventLog
   
   def to_xml(mel)
     block_of_code = Proc.new do
-      mel.event_log_guid                   self.event_guid 
-      mel.change                           self.event_change.to_s                           
-      mel.changed_at                       self.event_changed_at                       
-      mel.on_type                          self.event_on_type.to_s                          
-      mel.on_id                            self.event_on_id                            
-      mel.on_name                          self.event_on_name                          
-      mel.accounting_action                self.event_accounting_action.to_s                
-      mel.accounting_action_effective_date self.event_accounting_action_effective_date
-      mel.parent_org_guid                  self.parent_org_guid
-      mel.parent_domain_guid               self.parent_domain_guid   
+      mel.event_log{
+        mel.event_log_guid                   self.event_guid 
+        mel.change                           self.event_change.to_s                           
+        mel.changed_at                       self.event_changed_at                       
+        mel.on_type                          self.event_on_type.to_s                          
+        mel.on_id                            self.event_on_id                            
+        mel.on_name                          self.event_on_name                          
+        mel.accounting_action                self.event_accounting_action.to_s                
+        mel.accounting_action_effective_date self.event_accounting_action_effective_date
+        mel.parent_org_guid                  self.parent_org_guid
+        mel.parent_domain_guid               self.parent_domain_guid   
+      }
     end
   return block_of_code
   end

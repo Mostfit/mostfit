@@ -100,7 +100,6 @@ class TransactionLog
   def to_xml(tl)
     block_of_code = Proc.new do
       tl.transaction_log{
-        tl.txn_log_GUID          self.txn_log_guid
         tl.txn_log_guid          self.txn_log_guid      
         tl.txn_guid              self.txn_guid
         tl.update_type           self.update_type.to_s

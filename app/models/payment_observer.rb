@@ -17,7 +17,7 @@ class PaymentObserver
   # In case of a payment getting updated (i.e. some of the details of the payment are changed and then saved) then the current payment is deleted and a new copy with the updated details is saved with a new payment id
 
   before :create do
-    self.parent_org_guid = Organization.get_organization(self.received_on)
+    self.parent_org_guid = Organization.get_organization(self.received_on).org_guid
   end
   
   after :create do
