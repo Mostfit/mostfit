@@ -165,7 +165,16 @@ class Payment
     info_items = []
     loan_product = self.loan ? self.loan.loan_product : nil
     funding_line = self.loan ? self.loan.funding_line : nil
-        
+    branch = self.loan ? self.loan.client.center.branch : nil
+
+    if branch
+      info = {}
+      info[:item_type] = branch.class.to_s
+      info[:item_id] = branch.id
+      info[:item_value] = branch.name
+      info_items << info
+    end
+    
     if loan_product
       info = {}
       info[:item_type] = loan_product.class.to_s
