@@ -90,7 +90,7 @@ class Client
   belongs_to :organization, :parent_key => [:org_guid], :child_key => [:parent_org_guid], :required => false
   property   :parent_org_guid, String, :nullable => true
   
-  belongs_to :domain, :parent_key => [:dmn_guid], :child_key => [:parent_domain_guid], :required => false
+  belongs_to :domain, :parent_key => [:domain_guid], :child_key => [:parent_domain_guid], :required => false
   property   :parent_domain_guid, String, :nullable => true
 
   has n, :loans

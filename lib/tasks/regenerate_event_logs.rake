@@ -47,7 +47,7 @@ namespace :mostfit do
       elsif begin_date <= end_date
         everyone = []
         ModelEventLog::MODELS_UNDER_OBSERVATION.each{|x|
-          everyone += x.all(:created_at.gte => begin_date, :created_at.lte => end_date)
+          everyone += x.all(:fields => [:id, :created_at, :parent_org_guid, :parent_domain_guid], :created_at.gte => begin_date, :created_at.lte => end_date)
         }
         everyone.each do |obj|
           log = ModelEventLog.new
@@ -57,7 +57,7 @@ namespace :mostfit do
           if log.parent_org_guid == nil 
             org = Organization.get_organization(obj.created_at)
             log.parent_org_guid = org.org_guid
-            log.parent_domain_guid = org.domains.first.dmn_guid
+            log.parent_domain_guid = org.domains.first.domain_guid unless org.domains.empty?
           end
           log.save 
         end

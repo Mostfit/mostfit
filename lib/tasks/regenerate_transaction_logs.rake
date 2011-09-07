@@ -55,8 +55,8 @@ namespace :mostfit do
           transaction_log.update_type = :create
           if transaction_log.parent_org_guid == nil 
             org = Organization.get_organization(payment.created_at)
-            transaction_log.parent_org_guid = org.org_guid
-            transaction_log.parent_domain_guid = org.domains.first.dmn_guid
+            transaction_log.parent_org_guid = org.org_guid 
+            transaction_log.parent_domain_guid = org.domains.first.domain_guid unless org.domains.empty?
           end
           transaction_log.save
           unless payment.deleted_at.nil?
@@ -66,7 +66,7 @@ namespace :mostfit do
             if transaction_log.parent_org_guid == nil 
               org = Organization.get_organization(payment.effective_date)
               transaction_log.parent_org_guid = org.org_guid
-              transaction_log.parent_domain_guid = org.domains.first.dmn_guid
+              transaction_log.parent_domain_guid = org.domains.first.domain_guid unless org.domains.empty?
             end
             transaction_log.save
           end
