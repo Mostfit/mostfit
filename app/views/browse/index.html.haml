@@ -3,12 +3,16 @@
 
 = css_include_tag 'jit-base','treemap'
 :javascript
-  $(document).ready(function(){
-    $.get('/graph_data/tm_collections?date=#{@date.strftime("%Y-%m-%d")}','', function(data){
+  var date = new Date('#{@date.strftime("%Y-%m-%d")}')
+  var date_string = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+  function get_charts(q) {
+    $.get('/graph_data/tm_collections?' + q,'', function(data){
       init_barchart($.parseJSON(data).pmts_barchart);
       init_treemap($.parseJSON(data).treemap);
       });
-    });
+    }
+
+  $(document).ready(function(){ get_charts('date=' + date_string)});
 
 - debugger
 - bnames = @branch_names.keys.sort
@@ -111,7 +115,7 @@
           %th
             = t.to_currency.split(".")[0]
       %h1.green
-        See a more detailed report
+        = link_to "See a more detailed report", url(:controller => :browse, :action => :centers_paying_today)
       #hbarchart{:style => "width: 92%;  height: 30px; margin-left: 3%"}
       #infovis{:style => "width: 90%; height: 400px; margin: auto"}
       

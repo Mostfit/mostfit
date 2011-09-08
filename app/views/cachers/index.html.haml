@@ -1,6 +1,6 @@
-= css_include_tag :screen, :diags
-= js_include_tag :jquery, 'jquery.tablesorter.min'
+= js_include_tag 'jquery.tablesorter.min'
 :javascript
+  $('.chosen').chosen();
   $.tablesorter.addParser({ 
   id: 'mostfit_currency', 
   is: function(s) { 
@@ -23,25 +23,16 @@
     }} )});
 
 - keys = [:date, :branch_id, :center_id, :scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid, :fees_due_today, :fees_paid_today, :total_fees_due, :total_fees_paid]
+- total_keys = [:scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid, :fees_due_today, :fees_paid_today, :total_fees_due, :total_fees_paid]
 - query_params = request.send(:query_params)
-%ul
-  %li
-    = link_to "Caches Home", resource(:cachers)
-  %li
-    = link_to "#{Cacher.stale.count} stale caches", resource(:cachers, :stale => true)
-Filter Dates:
-- if query_params[:date]
-  = link_to 'remove date filter', resource(:cachers, query_params.dup.delete_if{|k,v| k == "date"} || {})
-- else
-  - @cachers.aggregate(:date).each do |d|
-    = link_to d, resource(:cachers, query_params.merge(:date => d))
-%br
-Filter Branches
-- if query_params[:branch_id]
-  = link_to 'remove branch filter', resource(:cachers, query_params.dup.delete_if{|k,v| k == "branch_id"} || {})
-- else
-  - @cachers.aggregate(:branch_id).each do |d|
-    = link_to Branch.get(d).name, resource(:cachers, query_params.merge(:branch_id => d))
+%h3
+  = link_to "#{Cacher.stale.count} stale caches", resource(:cachers, :stale => true)
+= form(:method => :get, :action => resource(:cachers)) do
+  = date_select_old_html(:name => 'date', :id => 'date', :min_date => Cacher.aggregate(:date.min), :max_date => Cacher.aggregate(:date.max), :date => @date)
+  = select :name => 'branch_id', :id => "branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch', :class => 'chosen'
+  = select :name => 'center_id', :id => 'center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center', :class => 'chosen'
+  = submit 'apply filter'
+
 %table.diags{:style => "width: 1400px;"}
   %thead
     %tr
@@ -51,8 +42,7 @@ Filter Branches
   - if params  and params[:center_id] and params[:date]
     - total = {}
     - cen = Center.get(params[:center_id])
-    - date = Date.parse(params[:date])
-    - histories = LoanHistory.latest({:center_id => cen.id}, date)
+    - histories = LoanHistory.latest({:center_id => cen.id}, @date)
     - histories.each do |h|
       %tr
         - keys.each do |at|
@@ -66,7 +56,8 @@ Filter Branches
     %tr.total
       - keys.each do |at|
         %td
-          = total[at].to_currency(:mostfit_default)
+          = total[at].to_i.to_currency(:mostfit_default)
+  - total_row = {}
   - @cachers.sort_by{|c| [c.branch_id,c.center_id]}.each do |c|
     %tr{:class => cycle('odd','even')}
       - keys.each do |at|
@@ -82,4 +73,16 @@ Filter Branches
             = link_to((cen ? cen.name[0..10] : "-"), resource(:cachers, request.send(:query_params).merge(:center_id => cen, :date => c.date)))
           - else
             = val == 0 ? "-" : val.to_currency(:mostfit_default)
+          - if total_keys.include?(at)
+            - total_row[at] ||= 0
+            - total_row[at] += val unless c.center_id == 0
+  %tfoot
+    %tr.total
+      - keys.each do |k|
+        %th{:style => "text-align: right"}
+          - if total_keys.include?(k)
+            = total_row[k].to_currency
+          - else
+            &nbsp;
+      
 

@@ -197,16 +197,10 @@ namespace :mostfit do
       t0 = Time.now
       Merb.logger.info! "Start mock:history rake task at #{t0}"
       puts "finding unhistorified loans"
-      if LoanHistory.all.count == 0
-        loan_ids = repository.adapter.query("SELECT id from loans")
-      else
-        loan_ids = repository.adapter.query("SELECT id from loans WHERE id > (select max(loan_id) from loan_history)")
-      end
+      lids = Loan.all.aggregate(:id)
+      hids = LoanHistory.all.aggregate(:loan_id)
+      loan_ids = lids - hids
       puts "got loan ids"
-      if loan_ids.empty?
-        puts "loan_ids empty. getting all"
-        loan_ids = repository.adapter.query("SELECT id from loans")
-      end
       t0 = Time.now
       co = loan_ids.count
       loan_ids.each_with_index do |loan_id, idx|

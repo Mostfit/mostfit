@@ -6,6 +6,7 @@ class Browse < Application
   Line = Struct.new(:ip, :date_time, :method, :model, :url, :status, :response_time)
   
   def index
+    debugger
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
     branch_caches = Cacher.all(:model_name => "Branch", :date => @date) 
     if branch_caches.empty?

@@ -1028,6 +1028,7 @@ class Loan
     return @history_array if @history_array
     # Crazy heisenbug is fixed by prefetching payments hash
     t = Time.now; @history_array = []
+    dt = DateTime.now
     payments_hash
     fee_payments= Payment.all(:loan_id => id, :type => :fees).group_by{|p| p.received_on}.map do |k,v| 
       amt = v.is_a?(Array) ? (v.reduce(0){|s,h| s + h.amount} || 0) : v.amount
@@ -1064,7 +1065,7 @@ class Loan
       fees_due_today = ap_fees[date] || 0
       fees_paid_today = fee_payments[date] || 0
       @history_array << {
-        :loan_id                             => id,
+        :loan_id                             => self.id,
         :date                                => date,
         :status                              => STATUSES.index(st) + 1,
         :scheduled_outstanding_principal     => scheduled[:balance].round(2),
@@ -1096,7 +1097,10 @@ class Loan
         :total_fees_paid                     => total_fees_paid,
         :fees_due_today                      => fees_due_today,
         :fees_paid_today                     => fees_paid_today,
-        :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f
+        :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f,
+        :branch_id                           => c_branch_id,
+        :center_id                           => c_center_id,
+        :created_at                          => dt
       }
     end
 
@@ -1145,7 +1149,7 @@ class Loan
       value = keys.map do |k| 
         if hist[k].class == Date
           "'#{hist[k].strftime('%Y-%m-%d')}'"
-        elsif hist[k] == DateTime
+        elsif hist[k].class == DateTime
           "'#{hist[k].strftime('%Y-%m-%d %H:%M:%S')}'"
         else
           hist[k]

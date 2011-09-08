@@ -1,4 +1,5 @@
 function init_barchart(data) {
+  $('#hbarchart').html('');
   var barChart = new $jit.BarChart({
     //id of the visualization container
     injectInto: 'hbarchart',

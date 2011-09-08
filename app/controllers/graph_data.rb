@@ -10,7 +10,11 @@ class GraphData < Application
   def tm_collections
     @date = begin; Date.parse(params[:date]); rescue; Date.today; end
     debugger
-    @history_totals = Cacher.all(:model_name => "Branch", :date => @date)
+    if params[:branch_id]
+      @history_totals = Cacher.all(:model_name => "Center", :date => @date, :branch_id => params[:branch_id])
+    else
+      @history_totals = Cacher.all(:model_name => "Branch", :date => @date)
+    end
     keys = [:advance_interest_paid, :advance_principal_paid, :principal_paid, :principal_due, :interest_paid, :interest_due, :fees_paid_today, :fees_due_today]
     @history_sum = @history_totals.map{|ht| keys.map{|k| [k,ht.send(k)]}.to_hash}.reduce({}){|s,h| s + h}
     treemap = {:children => @history_totals.map { |v|
