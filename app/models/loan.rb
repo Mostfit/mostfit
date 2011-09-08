@@ -1050,8 +1050,8 @@ class Loan
       int       = interest_received_on(date).round(2)
       total_interest_paid += int
       st = get_status(date)
-      scheduled_principal_due = scheduled_principal_for_installment(i_num)
-      scheduled_interest_due = scheduled_interest_for_installment(i_num)
+      scheduled_principal_due = i_num > 0 ? scheduled_principal_for_installment(i_num) : 0
+      scheduled_interest_due = i_num > 0 ? scheduled_interest_for_installment(i_num) : 0
       outstanding = loan_outstanding_on?(date)
       principal_due  =  outstanding ? actual[:balance].round(2) - scheduled[:balance].round(2) : 0
       interest_due   = outstanding ? actual[:total_balance].round(2) - scheduled[:total_balance].round(2) - (actual[:balance].round(2) - scheduled[:balance].round(2)) : 0
