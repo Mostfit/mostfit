@@ -57,7 +57,6 @@ namespace :mostfit do
           if log.parent_org_guid == nil 
             org = Organization.get_organization(obj.created_at)
             log.parent_org_guid = org.org_guid
-            log.parent_domain_guid = org.domains.first.domain_guid unless org.domains.empty?
           end
           log.save 
         end
