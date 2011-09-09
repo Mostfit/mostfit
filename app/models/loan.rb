@@ -1139,25 +1139,7 @@ class Loan
     # this gets the history from calculate_history and does one single insert into the database
     t = Time.now
     Merb.logger.error! "could not destroy the history" unless self.loan_history.destroy!
-    history = calculate_history
-    keys = history.first.keys
-    d0 = Date.parse('2000-01-03')
-    sql = "INSERT INTO loan_history(#{keys.join(',')} )
-              VALUES "
-    values = []
-    history.each do |hist|
-      value = keys.map do |k| 
-        if hist[k].class == Date
-          "'#{hist[k].strftime('%Y-%m-%d')}'"
-        elsif hist[k].class == DateTime
-          "'#{hist[k].strftime('%Y-%m-%d %H:%M:%S')}'"
-        else
-          hist[k]
-        end
-      end
-      values << "(#{value.join(',')})"
-    end
-    sql += values.join(",") + ";"
+    sql = get_bulk_insert_sql(calculate_history)
     repository.adapter.execute(sql)
     Merb.logger.info "update_history_bulk_insert done in #{Time.now - t}"
     return true

@@ -84,7 +84,6 @@ class LoanHistory
   def self.composite_key_sum(keys, group_by = [], my_cols = [])
     # returns a row which is the sum of various conmposite keys. even does grouping.
     # i.e. LoanHistory.composite_key_sum(LoanHistory.latest_keys, [:branch_id, :center_id]) will give you the current situation grouped by branch and center
-    debugger
     cols = group_by + (my_cols.empty? ? LoanHistory.sum_cols : my_cols)
     ng = {group_by.map{|g| :no_group} => cols.map{|c| [c,0]}.to_hash}
     return ng if keys.blank?

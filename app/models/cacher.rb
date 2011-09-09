@@ -169,25 +169,21 @@ class CenterCache < Cacher
 
   def self.update(hash = {})
     # creates a cache per center for branches and centers per the hash passed as argument
-    debugger
     date = hash.delete(:date) || Date.today
     hash = hash.select{|k,v| [:branch_id, :center_id].include?(k)}.to_hash
     centers_data = CenterCache.create(hash.merge(:date => date, :group_by => [:branch_id,:center_id])).deepen.values.sum
     centers_data.delete(:no_group)
     cs = centers_data.keys.flatten.map do |center_id|
-      cc = CenterCache.first_or_new({:model_name => "Center", :model_id => center_id, :date => date})
-      centers_data[center_id].each{|k,v| cc.send("#{k}=".to_sym, v) if cc.respond_to?(k)}
-      cc.stale = false
-      cc
+      # cc = CenterCache.first_or_new({:model_name => "Center", :model_id => center_id, :date => date})
+      # centers_data[center_id].each{|k,v| cc.send("#{k}=".to_sym, v) if cc.respond_to?(k)}
+      # cc.stale = false
+      # cc
+      centers_data[center_id].merge({:model_name => "Center", :model_id => center_id, :date => date})
     end
-    CenterCache.transaction do |t|
-      r = cs.map{|c| [c,c.save]}
-      if r.map{|x| x[1]}.include?(false)
-        debugger
-        t.rollback
-      end
-    end
-     
+    debugger
+    sql = get_bulk_insert_sql("cachers", cs)
+    CenterCache.all(:date => date, :id => centers_data.keys).destroy!
+    repository.adapter.execute(sql)
   end
 
 end

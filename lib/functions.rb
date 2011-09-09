@@ -1,4 +1,7 @@
 # small monkey patch, real patch is submitted to extlib/merb/dm, hoping for inclusion soon
+
+
+
 class NilClass
   def to_currency
     "-"
@@ -310,3 +313,29 @@ module DmPagination
     end
   end
 end
+
+
+def get_bulk_insert_sql(table_name, data)
+  keys = data.first.keys
+  sql = "INSERT INTO #{table_name}(#{keys.join(',')} )
+              VALUES "
+  values = []
+  data.each do |row|
+    value = keys.map do |k| 
+      v = row[k]
+      if v.class == Date
+        "'#{v.strftime('%Y-%m-%d')}'"
+      elsif v.class == DateTime
+        "'#{v.strftime('%Y-%m-%d %H:%M:%S')}'"
+      elsif row[k].class == String
+        "'#{v}'"
+      else
+        v
+      end
+    end
+    values << "(#{value.join(',')})"
+  end
+  sql += values.join(",") + ";"
+  
+end
+
