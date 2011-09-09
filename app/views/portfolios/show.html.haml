@@ -57,7 +57,7 @@
       Payments
   - length = 10
   - org_total = []
-  - @portfolio.portfolio_loans.group_by{|pf| pf.loan.client.center}.sort_by{|center, pf| center.name}.each do |center, portfolio_loans|
+  - @portfolio.portfolio_loans.select{|pf| pf.loan}.group_by{|pf| pf.loan.client.center}.sort_by{|center, pf| center.name}.each do |center, portfolio_loans|
     %tr.branch#loan
       %td{:colspan => length}
         %b
