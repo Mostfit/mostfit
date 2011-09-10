@@ -1139,7 +1139,7 @@ class Loan
     # this gets the history from calculate_history and does one single insert into the database
     t = Time.now
     Merb.logger.error! "could not destroy the history" unless self.loan_history.destroy!
-    sql = get_bulk_insert_sql(calculate_history)
+    sql = get_bulk_insert_sql("loan_history",calculate_history)
     repository.adapter.execute(sql)
     Merb.logger.info "update_history_bulk_insert done in #{Time.now - t}"
     return true
