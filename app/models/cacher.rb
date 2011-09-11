@@ -154,8 +154,7 @@ class BranchCache < Cacher
     end
   end
 
-  def self.missing(branch_ids = nil)
-    hash = {}
+  def self.missing(branch_ids = nil, hash = {})
     hash = hash.merge(:branch_id => branch_ids) if branch_ids
     history_dates = LoanHistory.all(hash).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
     cache_dates = BranchCache.all.aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
@@ -172,13 +171,14 @@ class CenterCache < Cacher
     date = hash.delete(:date) || Date.today
     hash = hash.select{|k,v| [:branch_id, :center_id].include?(k)}.to_hash
     centers_data = CenterCache.create(hash.merge(:date => date, :group_by => [:branch_id,:center_id])).deepen.values.sum
+    now = DateTime.now
     centers_data.delete(:no_group)
     cs = centers_data.keys.flatten.map do |center_id|
       # cc = CenterCache.first_or_new({:model_name => "Center", :model_id => center_id, :date => date})
       # centers_data[center_id].each{|k,v| cc.send("#{k}=".to_sym, v) if cc.respond_to?(k)}
       # cc.stale = false
       # cc
-      centers_data[center_id].merge({:model_name => "Center", :model_id => center_id, :date => date})
+      centers_data[center_id].merge({:type => "CenterCache",:model_name => "Center", :model_id => center_id, :date => date, :updated_at => now})
     end
     debugger
     sql = get_bulk_insert_sql("cachers", cs)

@@ -382,8 +382,8 @@ class Loans < Application
     raise NotFound unless loan
     loan.update_history
     loan.update_loan_cache
-    message = {:error => loan.errors.values.join("<br>")} unless loan.save
-    redirect url_for_loan(loan, :message => message)
+    message = {:error => loan.errors.values.join("<br>")} unless (loan.save || loan.errors.empty?)
+    redirect url_for_loan(loan), :message => message
   end
 
   def reallocate(id)

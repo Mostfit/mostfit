@@ -44,42 +44,6 @@
           1,745
         %p
           missed
-    - debugger
-    %tr
-      %th
-        %h1 meetings
-        - pt = Center.paying_today(session.user) 
-      %td.number
-        %h1
-          = pt.count
-        %p 
-          mtngs
-          %br
-          today
-      %td.number
-        %h1
-          = pt.select{|c| c.meeting_time_hours.to_i <= DateTime.now.hour}.count
-        %p
-          mtngs
-          %br
-          by now
-      %td.number
-        %h1
-          - if pt.empty?
-            0
-          - else
-            = Payment.all(:received_on => @date, :center_id => pt.aggregate(:id)).aggregate(:center_id).count
-        %p
-          meetings
-          %br
-          done
-    %tr
-      %th
-        %h1 ytd
-      %td.number{:colspan => "4"}
-        %h1 0
-        %p PAR
-        
 
       
   .detail

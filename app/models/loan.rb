@@ -1028,7 +1028,7 @@ class Loan
     return @history_array if @history_array
     # Crazy heisenbug is fixed by prefetching payments hash
     t = Time.now; @history_array = []
-    dt = DateTime.now
+    now = DateTime.now
     payments_hash
     fee_payments= Payment.all(:loan_id => id, :type => :fees).group_by{|p| p.received_on}.map do |k,v| 
       amt = v.is_a?(Array) ? (v.reduce(0){|s,h| s + h.amount} || 0) : v.amount
@@ -1100,7 +1100,7 @@ class Loan
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f,
         :branch_id                           => c_branch_id,
         :center_id                           => c_center_id,
-        :created_at                          => dt
+        :created_at                          => now
       }
     end
 
