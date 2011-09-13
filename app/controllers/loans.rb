@@ -307,14 +307,14 @@ class Loans < Application
   end
 
   def reverse_write_off(id)
-    loan = Loan.get(id)
-    raise NotFound unless loan
-    loan.written_off_by = nil
-    loan.written_off_on = nil
-    loan.save!
-    loan.errors.values.join("<br>")
-    loan.update_history
-    loan.update_loan_cache
+    @loan = Loan.get(id)
+    raise NotFound unless @loan
+    @loan.written_off_by = nil
+    @loan.written_off_on = nil
+    @loan.save!
+    @loan.errors.values.join("<br>")
+    @loan.update_history
+    @loan.update_loan_cache
     redirect(resource(@branch, @center, @client, @loan), :message => {:notice => "Loan was successfully reversed from written off"})
   end
   
