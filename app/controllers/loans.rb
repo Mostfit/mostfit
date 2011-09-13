@@ -307,15 +307,19 @@ class Loans < Application
   end
 
   def reverse_write_off(id)
+    debugger
     @loan = Loan.get(id)
     raise NotFound unless @loan
     @loan.written_off_by = nil
     @loan.written_off_on = nil
-    @loan.save!
-    @loan.errors.values.join("<br>")
-    @loan.update_history
-    @loan.update_loan_cache
-    redirect(resource(@branch, @center, @client, @loan), :message => {:notice => "Loan was successfully reversed from written off"})
+    if @loan.save
+      @loan.update_history
+      @loan.update_loan_cache
+      msg = {:notice => "Loan was successfully reversed from written off"}
+    else
+      msg = {:error => "Loan could not be reversed because #{@loan.errors.values.join(',')}"}
+    end
+    redirect(resource(@branch, @center, @client, @loan) + "#misc", msg) 
   end
   
   def write_off_suggested
@@ -396,7 +400,7 @@ class Loans < Application
     loan.update_history
     loan.update_loan_cache
     message = {:error => loan.errors.values.join("<br>")} unless loan.save
-    redirect url_for_loan(loan, :message => message)
+    redirect url_for_loan(loan), :message => message
   end
 
   def reallocate(id)
