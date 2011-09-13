@@ -191,19 +191,27 @@ class Loan
 
 
   def update_loan_cache(force = false)
+    update_non_history_attributes(force)
+    update_history_attributes
+  end
+  
+  def update_non_history_attributes(force)
     self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
     @orig_attrs = self.original_attributes
     t = Time.now
     self.c_center_id = self.client.center.id if force
     self.c_branch_id = self.client.center.branch.id if force
     self.c_scheduled_maturity_date = scheduled_maturity_date
+  end
+
+  def update_history_attributes
     # avoid SQL calls
     first_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}[0]
     self.c_actual_first_payment_date = first_payment.received_on if first_payment
     st = self.get_status
     self.c_last_status = STATUSES.index(st) + 1
     self.c_principal_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
-    self.c_interest_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
+    self.c_interest_received = payments.select{|p| p.type == :interest}.reduce(0){|s,p| s + p.amount}
     last_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}.reverse[0]
     self.c_last_payment_received_on = last_payment.received_on if last_payment
     self.c_maturity_date = (STATUSES.index(st) > 5 and last_payment) ? c_last_payment_received_on : nil
@@ -1008,13 +1016,21 @@ class Loan
   # Moved this method here from instead of the LoanHistory model for purposes of speed. We sacrifice a bit of readability
   # for brute force iterations and caching => speed
   def update_history(forced=false)
+    t = Time.now
+    reload
+    puts "RELOAD: #{Time.now - t} secs"
     extend_loan
     return true if Mfi.first.dirty_queue_enabled and DirtyLoan.add(self) and not forced
     return if @already_updated and not forced
     return if self.history_disabled and not forced# easy when doing mass db modifications (like with fixutes)
     clear_cache
     update_history_bulk_insert
+    Merb.logger.info "HISTORY EXEC TIME: #{(Time.now - t).round(4)} secs"
     @already_updated=true
+    t = Time.now
+    update_history_attributes
+    self.save!
+    Merb.logger.info "LOAN CACHE UPDATE TIME: #{(Time.now - t).round(4)} secs"
   end
 
   def calculate_history
@@ -1029,8 +1045,6 @@ class Loan
     total_principal_due = total_interest_due = total_principal_paid = total_interest_paid = 0
     repayed=false
     dates.each_with_index do |date,i|
-      $debug = true if i == 53
-      debugger if $debug
       current   = date == Date.today ? true : (((dates[[i,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or 
                    (i == dates.size - 1 and dates[i] < Date.today)))
       scheduled = get_scheduled(:all, date)
@@ -1233,7 +1247,6 @@ class Loan
 
   # TODO these should logically be private.
   def get_from_cache(cache, column, date)
-    debugger if $debug
     date = Date.parse(date) if date.is_a? String
     return 0 if cache.blank?
     if cache.has_key?(date)
