@@ -1,0 +1,18 @@
+- if params  and params[:center_id] and params[:date]
+  - total = {}
+  - cen = Center.get(params[:center_id])
+  - histories = LoanHistory.latest({:center_id => cen.id}, @date)
+  - histories.each do |h|
+    %tr
+      - keys.each do |at|
+        - val = h.send(at)
+        %td
+          = val.is_a?(Numeric) ? val.to_currency(:mostfit_default) : val
+          - total[at] ||= 0
+          - total[at] += h.send(at) if h.send(at).is_a? Numeric
+      %td{:style => "background: #aaee00"}
+        = link_to h.composite_key, "/loans/#{h.composite_key.floor}"
+  %tr.total
+    - keys.each do |at|
+      %td
+        = total[at].to_i.to_currency(:mostfit_default)

@@ -155,13 +155,20 @@ class BranchCache < Cacher
   end
 
   def self.missing(branch_ids = nil, hash = {})
+    debugger
     hash = hash.merge(:branch_id => branch_ids) if branch_ids
     history_dates = LoanHistory.all(hash).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
-    cache_dates = BranchCache.all.aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
+    cache_dates = BranchCache.all(hash).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
     # hopefully we now have {:branch_id => :dates}
     missing_dates = history_dates - cache_dates
   end
   
+  def self.missing_for_date(date = Date.today, branch_ids = nil, hash = {})
+    BranchCache.missing(branch_ids, hash.merge(:date => date))
+  end
+
+  def self.stale_for_date(date = Date.today, branch_ids = nil, hash = {})
+  end
 end
 
 class CenterCache < Cacher

@@ -7,7 +7,7 @@
   return false; 
   }, 
   format: function(s) { 
-  return parseFloat(s.replace(/ /g, ''))
+  return parseFloat(s.replace(/ /g, '').replace("-","0"))
   }, 
   type: 'numeric' 
   }); 
@@ -22,7 +22,7 @@
     7: { sorter: 'mostfit_currency' }
     }} )});
 
-- keys = [:date, :branch_id, :center_id, :scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid, :fees_due_today, :fees_paid_today, :total_fees_due, :total_fees_paid]
+- keys = [:date, :branch_id, :center_id,  :scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid, :fees_due_today, :fees_paid_today, :total_fees_due, :total_fees_paid]
 - total_keys = [:scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid, :fees_due_today, :fees_paid_today, :total_fees_due, :total_fees_paid]
 - query_params = request.send(:query_params)
 %h3
@@ -33,30 +33,17 @@
   = select :name => 'center_id', :id => 'center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center', :class => 'chosen'
   = submit 'apply filter'
 
+- if @cachers.count == 0
+  %h3 No caches found. 
+  = link_to 'generate?', url(:controller => :cachers, :action => :generate, :date => @date)
+
 %table.diags{:style => "width: 1400px;"}
   %thead
     %tr
       - keys.each do |at|
         %th
           = at.to_s.gsub("_","<br>")
-  - if params  and params[:center_id] and params[:date]
-    - total = {}
-    - cen = Center.get(params[:center_id])
-    - histories = LoanHistory.latest({:center_id => cen.id}, @date)
-    - histories.each do |h|
-      %tr
-        - keys.each do |at|
-          - val = h.send(at)
-          %td
-            = val.is_a?(Numeric) ? val.to_currency(:mostfit_default) : val
-            - total[at] ||= 0
-            - total[at] += h.send(at) if h.send(at).is_a? Numeric
-        %td{:style => "background: #aaee00"}
-          = link_to h.composite_key, "/loans/#{h.composite_key.floor}"
-    %tr.total
-      - keys.each do |at|
-        %td
-          = total[at].to_i.to_currency(:mostfit_default)
+  = partial :loans, :keys => keys
   - total_row = {}
   - @cachers.sort_by{|c| [c.branch_id,c.center_id]}.each do |c|
     %tr{:class => cycle('odd','even')}
@@ -72,7 +59,7 @@
             - cen = Center.get(val)
             = link_to((cen ? cen.name[0..10] : "-"), resource(:cachers, request.send(:query_params).merge(:center_id => cen, :date => c.date)))
           - else
-            = val == 0 ? "-" : val.to_currency(:mostfit_default)
+            = (val == 0 or val.blank?) ? "-" : (val.respond_to?(:to_currency) ? val.to_currency(:mostfit_default) : val)
           - if total_keys.include?(at)
             - total_row[at] ||= 0
             - total_row[at] += val unless c.center_id == 0

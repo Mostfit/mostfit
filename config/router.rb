@@ -1,6 +1,6 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
-  resources :cachers
+  resources :cachers, :id => %r(\d+)
   resources :api_accesses
   resources :monthly_targets
   resources :account_balances
@@ -130,6 +130,10 @@ Merb::Router.prepare do
   match('/documents/:action(/:id)').to(:controller => "documents").name(:documents_action_link)
   match('/:controller/:id', :id => %r(\d+)).to(:action => 'redirect_to_show').name(:quick_link)
   match('/rules/get').to(:controller => 'rules', :action => 'get') 
+
+  #cachers
+  match('/cachers/:action').to(:controller => 'cachers').name(:caches)
+
   #API Route
   match('/api/v1') do
     match('/browse.:format').to(:controller => 'browse', :action => 'index')
