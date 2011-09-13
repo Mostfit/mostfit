@@ -297,13 +297,25 @@ class Loans < Application
       raise NotFound unless @loan
       hash = params[@loan.class.to_s.snake_case]
       if @loan.write_off(hash[:written_off_on], hash[:written_off_by_staff_id])
-        redirect(resource(@branch, @center, @client), :message => {:notice => "Loan was successfully written off"})
+        redirect(resource(@branch, @center, @client, @loan), :message => {:notice => "Loan was successfully written off"})
       else
         message[:error] = "Please select staff member who writes off the loan and date on which it is written off"
         @payments = @loan.payments(:order => [:received_on, :id])
         display [@loan, @payments], 'payments/index'
       end
     end
+  end
+
+  def reverse_write_off(id)
+    loan = Loan.get(id)
+    raise NotFound unless loan
+    loan.written_off_by = nil
+    loan.written_off_on = nil
+    loan.save!
+    loan.errors.values.join("<br>")
+    loan.update_history
+    loan.update_loan_cache
+    redirect(resource(@branch, @center, @client, @loan), :message => {:notice => "Loan was successfully reversed from written off"})
   end
   
   def write_off_suggested

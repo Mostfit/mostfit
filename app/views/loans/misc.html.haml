@@ -4,7 +4,7 @@
     = form_for(:loan, :class => "_remote_", :action => url(:controller => :loans, :action => :update_utilization, :id => @loan.id), :method => "POST") do
       %h3 Update Loan Utilization
       = select :loan_utilization_id, :collection => LoanUtilization.all.map{|lu| [lu.id, lu.name]}, :include_blank => true
-      = submit "Save"
+      = submit "Save", :class => "grey_button", :style => "margin: 4px"
 
 - if session.user.role == :admin
   .box
@@ -67,7 +67,9 @@
                 Pick the staff member who is writing off the loan
           %tr
             %td{:colspan => "2"}
-              = submit "Write off"
+              = submit "Write off", :class => "grey_button", :style => "margin: 4px"
+              - if @loan.status == :written_off
+                = link_to("Reverse Write Off", url(:controller => "loans", :id => @loan.id, :action => "reverse_write_off"), :class => "grey_button")
 - elsif staff_member = session.user.staff_member
   = form_for(@loan, :action => url(:action => :suggest_write_off, :id => @loan.id), :method => "POST", :class => "_disable_button_") do
     %table
