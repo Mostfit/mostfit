@@ -59,7 +59,7 @@
                   WHERE lh.client_id=cl.id AND cl.date_joined <= '#{date.strftime('%Y-%m-%d')}' AND lh.status in (5,6,7,8,9)
                         AND lh.loan_id=l.id AND l.rejected_on is NULL AND l.deleted_at is NULL
                   GROUP BY loan_id}).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
-      return false if ids.length==0     
+      return {} if ids.length==0     
       query_as_hash(%Q{
         SELECT branch_id, count(DISTINCT(client_id))
         FROM loan_history lh
