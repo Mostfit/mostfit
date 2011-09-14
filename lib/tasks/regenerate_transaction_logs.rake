@@ -60,7 +60,7 @@ namespace :mostfit do
           transaction_log.save
           unless payment.deleted_at.nil?
             transaction_log = TransactionLog.new
-            transaction_log.payment2transaction_log(payment.effective_date)
+            transaction_log.payment2transaction_log(payment)
             transaction_log.update_type = :delete 
             if transaction_log.parent_org_guid == nil 
               org = Organization.get_organization(payment.effective_date)
