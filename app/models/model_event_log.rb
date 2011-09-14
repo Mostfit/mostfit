@@ -35,7 +35,7 @@ class ModelEventLog
     self.attributes = event_log_attributes
     self.event_on_name = ((obj.respond_to?(:name)) ? obj.name : nil)
     self.event_on_type = obj_class
-    self.event_accounting_action = :allow
+    self.event_accounting_action = :allow_posting
     self.event_accounting_action_effective_date = nil
     return event_log_attributes
   end

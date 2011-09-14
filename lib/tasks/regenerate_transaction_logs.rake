@@ -16,6 +16,7 @@ namespace :mostfit do
   namespace :regenerate do
     desc "This rake task re-generates transaction logs for the given date range"
     task :transaction_logs, :begin_date, :end_date do |t, args|
+      t1 = Time.now
       if args[:begin_date].nil?
         puts
         puts "USAGE: rake mostfit:regenerate:transaction_logs[<from_date>,<to_date>]"
@@ -69,8 +70,10 @@ namespace :mostfit do
             transaction_log.save
           end
         end
+        t2 =  Time.now
         puts
         puts "The transaction logs have been repopulated"
+        puts "Time taken: #{t2-t1} seconds"
       else
         puts "ERROR: The begin date #{begin_date} is greater than the end date #{end_date}." 
       end

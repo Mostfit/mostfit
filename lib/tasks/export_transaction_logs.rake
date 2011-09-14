@@ -16,6 +16,7 @@ namespace :mostfit do
   namespace :export do
     desc "This rake task exports transaction logs"
     task :transaction_logs, :begin_date, :end_date do |t, args|
+      t1 = Time.now
       if args[:begin_date].nil?
         puts
         puts "USAGE: rake mostfit:regenerate:transaction_logs[<from_date>,<to_date>]"
@@ -65,8 +66,10 @@ namespace :mostfit do
             }
           }
           f.close
+          t2 = Time.now
           puts
           puts "The xml files generated are saved as #{filename}"
+          puts "Time taken: #{t2-t1} seconds"
         end
       end
     end
