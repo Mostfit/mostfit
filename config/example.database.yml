@@ -1,0 +1,27 @@
+---
+# This is a sample database file for the DataMapper ORM
+development: &defaults
+  # These are the settings for repository :default
+
+  # WARNING: Do not use sqlite3. This is a FINANCIAL application, it needs a real database.
+
+  adapter:  mysql 
+  database: nfl
+  username: root
+  password: hatstars
+  host:     localhost
+
+test:
+  <<:       *defaults
+  database: db/test.db
+ 
+production:
+  adapter:  mysql
+  database: nfl
+  username: root
+  password: hatstars
+  host:     localhost
+
+ 
+rake:
+  <<: *defaults

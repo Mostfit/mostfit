@@ -15,7 +15,8 @@ module Merb
     def current_user_info
       staff_or_funder = ""
       staff_or_funder = "#{session.user.staff_member.name}" if session.user.staff_member 
-      staff_or_funder += " #{session.user.funder.name}" if session.user.funder
+      f = Funder.first(:user_id => session.user.id)
+      staff_or_funder += " #{f.name}" if f
       "#{staff_or_funder} logged in as <b>#{link_to session.user.login, resource(session.user)}</b> (#{session.user.role.to_s.humanize}) | #{link_to 'log out', url(:logout)}"
     end
 

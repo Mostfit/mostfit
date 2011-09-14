@@ -6,7 +6,7 @@ class WeeklyReport < Report
   end
 
   def self.name
-    "Weekly Report"
+    "WeeklyReport"
   end
 
   def name
