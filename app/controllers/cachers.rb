@@ -6,9 +6,9 @@ class Cachers < Application
     q = {}
     q[:branch_id] = params[:branch_id] unless params[:branch_id].blank? 
     if (not params[:branch_id].blank?)
-      q[:center_id] = params[:center_id] unless params[:center_id].blank?
+      q[:center_id] = params[:center_id] unless (params[:center_id].blank? or params[:center_id].to_i == 0)
     else
-      q[:center_id] = 0
+      q[:model_name] = "Branch"
     end
     q[:date] = @date
     @cachers = Cacher.all(q)
@@ -16,13 +16,19 @@ class Cachers < Application
   end
   
   def generate
-    debugger
     BranchCache.missing_for_date(@date).keys.each do |b|
       BranchCache.update(b, @date)
     end
     redirect resource(:cachers, :date => @date)
   end
   
+  def update
+    debugger
+    bids = BranchCache.all(:date => @date).get_stale
+    bids.each{|bid| BranchCache.update(bid, @date)}
+    
+  end
+
   private
   
   def parse_date

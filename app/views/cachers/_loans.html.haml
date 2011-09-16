@@ -1,9 +1,11 @@
 - if params  and params[:center_id] and params[:date]
+  = link_to 'weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet"
   - total = {}
-  - cen = Center.get(params[:center_id])
-  - histories = LoanHistory.latest({:center_id => cen.id}, @date)
+  - histories = LoanHistory.latest({:center_id => params[:center_id]}, @date)
   - histories.each do |h|
-    %tr
+    - cls = h.status == :outstanding ? "" : "closed"
+    - next if (params[:show_all].blank? and h.status != :outstanding)
+    %tr{:class => cls}
       - keys.each do |at|
         - val = h.send(at)
         %td

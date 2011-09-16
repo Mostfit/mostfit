@@ -518,7 +518,8 @@ class Loan
     return [false, nil, nil, nil] if payments.empty?
     Payment.transaction do |t|
       self.history_disabled=true
-      payments.each{|p| p.override_create_observer = true}    
+      t = DateTime.now
+      payments.each{|p| p.override_create_observer = true; p.created_at = t}    
       if payments.collect{|payment| payment.save(context)}.include?(false)
         t.rollback
         return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]

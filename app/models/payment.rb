@@ -5,10 +5,10 @@ class Payment
   include DataMapper::Resource
   before :valid?, :parse_dates
   before :valid?, :check_client
+  before :valid?, :add_center_and_branch
   # before :valid?, :add_loan_product_validations
   # after :valid?, :after_valid
   before :save, :put_fee
-  before :save, :add_center
   attr_writer :total
   attr_accessor :override_create_observer  # just to be used in the form
 
@@ -18,13 +18,14 @@ class Payment
   property :comment,             String, :length => 50
   property :received_on,         Date,    :nullable => false, :index => true
   property :deleted_by_user_id,  Integer, :nullable => true, :index => true
-  property :created_at,          DateTime,:nullable => false, :default => Time.now, :index => true
+  property :created_at,          DateTime,:nullable => false, :index => true
   property :deleted_at,          ParanoidDateTime, :nullable => true, :index => true
   property :created_by_user_id,  Integer, :nullable => false, :index => true
   property :verified_by_user_id, Integer, :nullable => true, :index => true
   property :loan_id,             Integer, :nullable => true, :index => true
   property :client_id,           Integer, :nullable => true, :index => true
   property :center_id,           Integer, :nullable => true, :index => true
+  property :branch_id,           Integer, :nullable => false, :index => true
   property :fee_id,              Integer, :nullable => true, :index => true
   property :desktop_id,          Integer
   property :origin,              String, :default => DEFAULT_ORIGIN
@@ -32,6 +33,7 @@ class Payment
   belongs_to :loan, :nullable => true
   belongs_to :client
   belongs_to :center, :nullable => true
+  belongs_to :branch, :nullable => true
   belongs_to :fee
   belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
   belongs_to :received_by, :child_key => [:received_by_staff_id], :model => 'StaffMember'
@@ -53,8 +55,9 @@ class Payment
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :on => [:destroy]
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :if => Proc.new{|p| p.deleted_at != nil and p.deleted_by!=nil}
   
-  def add_center
+  def add_center_and_branch
     self.center = self.loan.client.center
+    self.branch = self.loan.client.center.branch
   end
 
   def self.from_csv(row, headers, loans)
