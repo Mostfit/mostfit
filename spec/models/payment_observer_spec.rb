@@ -31,6 +31,13 @@ describe PaymentObserver do
     @fee.errors.each{|e| puts e}
     @fee.should be_valid
 
+    @organization = Organization.new(:name => "Organization", :org_guid => "63416690-b6c1-012e-8195-002170a9c469")
+    @organization.save
+    @organization.should be_valid
+    
+    @accounting_period = AccountingPeriod.new(:name => "Organization", :begin_date => (@date - 100), :end_date => (Date.today + 100), :organization_id => Organization.first.id)
+    @accounting_period.save!
+    
     @loan_product = LoanProduct.new
     @loan_product.name = "LP1"
     @loan_product.max_amount = 10000
