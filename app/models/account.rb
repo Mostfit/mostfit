@@ -90,6 +90,7 @@ class Account
   end
   
   def opening_balance_as_of(for_date = Date.today)
+    debugger
     return nil if for_date > Date.today
     datum_balance = 0.0; datum = nil
     check_past_period = true
@@ -113,7 +114,7 @@ class Account
     
     return nil if (datum_balance.nil? && balance_from_postings.nil?)
     datum_balance ||= 0.0; balance_from_postings ||= 0.0
-    return datum_balance + balance_from_postings
+    return datum_balance.to_f + balance_from_postings.to_f
   end
 
   def balance_as_of_now
