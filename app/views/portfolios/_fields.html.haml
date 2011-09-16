@@ -28,7 +28,7 @@
     %th
       Current outstanding
   - org_total = []
-  - center_loans = @portfolio.portfolio_loans.group_by{|pl| pl.loan.client.center}
+  - center_loans = @portfolio.portfolio_loans.select{|pl| pl.loan}.group_by{|pl| pl.loan.client.center}
 
   - @data.sort_by{|branch, centers| branch.name}.each do |branch, centers|
     %tr.branch

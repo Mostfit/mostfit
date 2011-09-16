@@ -21,7 +21,6 @@ class TrialBalanceReport < Report
   def generate(param)
     data = {}
     hash = {"journal.date.gte" => @from_date, "journal.date.lte" => @to_date}
-    debugger
     @branch_id = @branch_id.to_i if @branch_id 
     @debit_postings  = Posting.all(hash.merge({:amount.lt => 0})).aggregate(:account_id, :amount.sum).to_hash
     @credit_postings = Posting.all(hash.merge({:amount.gt => 0})).aggregate(:account_id, :amount.sum).to_hash

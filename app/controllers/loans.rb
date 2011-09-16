@@ -174,7 +174,6 @@ class Loans < Application
   end
 
   def disburse
-    debugger
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
     hash   = {:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil}
     if request.method == :get
@@ -297,13 +296,29 @@ class Loans < Application
       raise NotFound unless @loan
       hash = params[@loan.class.to_s.snake_case]
       if @loan.write_off(hash[:written_off_on], hash[:written_off_by_staff_id])
-        redirect(resource(@branch, @center, @client), :message => {:notice => "Loan was successfully written off"})
+        redirect(resource(@branch, @center, @client, @loan), :message => {:notice => "Loan was successfully written off"})
       else
         message[:error] = "Please select staff member who writes off the loan and date on which it is written off"
         @payments = @loan.payments(:order => [:received_on, :id])
         display [@loan, @payments], 'payments/index'
       end
     end
+  end
+
+  def reverse_write_off(id)
+    @loan = Loan.get(id)
+    raise NotFound unless @loan
+    @loan.written_off_by = @loan.suggested_written_off_by_staff_id = @loan.write_off_rejected_by_staff_id = nil
+    @loan.written_off_on = @loan.suggested_written_off_on = @loan.write_off_rejected_on = nil
+    msg = {}
+    if @loan.save
+      @loan.update_history
+      @loan.update_loan_cache
+      msg = {:notice => "Loan was successfully reversed from written off"}
+    else
+      msg = {:error => "Loan could not be reversed because #{@loan.errors.values.join(',')}"}
+    end
+    redirect(resource(@branch, @center, @client, @loan) + "#misc", :message => msg) 
   end
   
   def write_off_suggested
@@ -384,7 +399,7 @@ class Loans < Application
     loan.update_history
     loan.update_loan_cache
     message = {:error => loan.errors.values.join("<br>")} unless loan.save
-    redirect url_for_loan(loan, :message => message)
+    redirect url_for_loan(loan), :message => message
   end
 
   def reallocate(id)
