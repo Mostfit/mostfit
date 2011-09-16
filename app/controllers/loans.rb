@@ -174,7 +174,6 @@ class Loans < Application
   end
 
   def disburse
-    debugger
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
     hash   = {:scheduled_disbursal_date.lte => @date, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil}
     if request.method == :get
@@ -319,7 +318,6 @@ class Loans < Application
     else
       msg = {:error => "Loan could not be reversed because #{@loan.errors.values.join(',')}"}
     end
-    debugger
     redirect(resource(@branch, @center, @client, @loan) + "#misc", :message => msg) 
   end
   
