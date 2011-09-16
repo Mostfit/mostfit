@@ -8,6 +8,7 @@ class ModelObserver
   def self.make_event_entry(obj, action)
     log = ModelEventLog.new
     log.obj2model_event_log(obj)
+    log.event_accounting_action = :create if action == :create
     log.event_change = action
     log.event_changed_at = DateTime.now
     log.save
