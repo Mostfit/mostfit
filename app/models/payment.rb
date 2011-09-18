@@ -17,7 +17,7 @@ class Payment
   property :type,                Enum.send('[]',*PAYMENT_TYPES), :index => true
   property :comment,             String, :length => 50
   property :received_on,         Date,    :nullable => false, :index => true
-  property :deleted_by_user_id,  Integer, :nullable => true, :index => true
+  property :deleted_by_user_id,  Integer, :nullable => true
   property :created_at,          DateTime,:nullable => false, :index => true
   property :deleted_at,          ParanoidDateTime, :nullable => true, :index => true
   property :created_by_user_id,  Integer, :nullable => false, :index => true
@@ -36,7 +36,7 @@ class Payment
   belongs_to :branch, :nullable => true
   belongs_to :fee
   belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
-  belongs_to :received_by, :child_key => [:received_by_staff_id], :model => 'StaffMember'
+  belongs_to :received_by, :child_key => [:received_by_staff_id], :model => 'StaffMember', :index =>true
   belongs_to :deleted_by,  :child_key => [:deleted_by_user_id],   :model => 'User'
   belongs_to :verified_by,  :child_key => [:verified_by_user_id],        :model => 'User'
 

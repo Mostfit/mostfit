@@ -45,15 +45,6 @@ class Cacher
   FLOW_COLS = [:principal_due, :principal_paid, :interest_due, :interest_paid,
                  :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted,
                  :advance_principal_paid, :advance_interest_paid, :fees_due_today, :fees_paid_today]
-
-
-  # TODO for the moment we are writing very stupid kind of caching.
-  # what we should perhaps do is give caches the ability to generate themselves and to roll up into their parents
-  # typically we will cache based on center, staff member and funding line and roll up to aggregate at branch level
-  # for this we can do the following
-  # create subclasses called CentreCache, StaffMemberCache, and FundingLineCache. 
-  # Then create caches called BranchCenterCache, BranchStaffMemberCache and BranchFundingLineCache which roll up the balances
-
   def self.stale
     self.all(:stale => true)
   end
@@ -61,7 +52,8 @@ class Cacher
   def self.get_stale(what)
     raise ArgumentError unless [:center, :branch].include?(what)
     # get the last update time per cacher as an array [[model_id, updated_at]...]
-    cacher_update_times = self.all(:model_name => what.to_s.camel_case).aggregate(:model_id, :updated_at.max).to_hash
+    objs = self.all(:model_name => what.to_s.camel_case)
+    cacher_update_times = objs.blank? ? {} : objs.aggregate(:model_id, :updated_at.max).to_hash
     model_ids = cacher_update_times.map{|x| x[0]}
     return {} if model_ids.empty?
     # get the absolutely lowest last update time
@@ -79,6 +71,15 @@ class Cacher
     models_with_loan_update = models_with_loan_update.map{|x| {x[1] => [x[0]]}}.reduce({}){|s,h| s + h}
     # and sum the two
     models_with_payment_update + models_with_loan_update
+  end
+  
+  def self.get_missing_centers
+    return [] if self.all.empty?
+    branch_ids = self.aggregate(:branch_id)
+    dates = self.aggregate(:date)
+    branch_centers = Branch.all(:id => branch_ids).centers(:creation_date.lte => dates.min).aggregate(:branch_id, :id).group_by{|x| x[0]}.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
+    cached_centers = Cacher.all(:model_name => "Center", :branch_id => branch_ids, :date => dates).aggregate(:branch_id, :center_id).group_by{|x| x[0]}.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
+    branch_centers - cached_centers
   end
 
   def self.create(hash = {})
@@ -121,49 +122,83 @@ class Cacher
 end
 
 class BranchCache < Cacher
-  def self.update(branch_id = nil, date = Date.today)
+
+  def self.recreate(date = Date.today, branch_ids = nil)
+    self.update(date, branch_ids, true)
+  end
+
+  def self.update(date = Date.today, branch_ids = nil, force = false)
     # updates the cache object for a branch
     # first create caches for the centers that do not have them
-    debugger
-    raise ArgumentError "multiple branches not supported for the moment" if branch_id.is_a? Array
+    t0 = Time.now; t = Time.now;
     branch_ids = Branch.all.aggregate(:id) unless branch_ids
-    ccs = Cacher.all(:model_name => "Center", :branch_id => branch_id, :date => date, :center_id.gt => 0)
-    cached_centers = ccs.aggregate(:center_id)
-    branch_centers = Branch.all(:id => branch_id).centers.aggregate(:id)
-    stale_centers = ccs.get_stale(:center).values.flatten
-    cids = (branch_centers - cached_centers) + stale_centers
-    return true if cids.blank?
-    return false unless (CenterCache.update(:center_id => cids, :date => date))
+    branch_centers = Branch.all(:id => branch_ids).centers(:creation_date.lte => date).aggregate(:id)
+ 
+    # unless we are forcing an update, only work with the missing and stale centers
+    unless force
+      ccs = Cacher.all(:model_name => "Center", :branch_id => branch_ids, :date => date, :center_id.gt => 0)
+      cached_centers = ccs.blank? ? [] : ccs.aggregate(:center_id)
+      stale_centers = ccs.get_stale(:center).values.flatten
+      cids = (branch_centers - cached_centers) + stale_centers
+      puts "#{cached_centers.count} cached centers; #{branch_centers.count} total centers; #{stale_centers.count} stale; #{cids.count} to update"
+    else
+      cids = branch_centers
+      puts " #{cids.count} to update"
+    end
+    return true if cids.blank? #nothing to do
 
-    # then add up all the cached centers
-    branch_data = CenterCache.all(:model_name => "Center", :branch_id => branch_id, :date => date).map{|c| c.attributes.select{|k,v| v.is_a? Numeric}.to_hash}.reduce({}){|s,h| s+h}
+    # update all the centers for today
+    return false unless (CenterCache.update(:center_id => cids, :date => date))
+    puts "UPDATED CENTER CACHES in #{(Time.now - t).round} secs"
+    t = Time.now
+    # then add up all the cached centers by branch
+    branch_data_hash = CenterCache.all(:model_name => "Center", :branch_id => branch_ids, :date => date).group_by{|x| x.branch_id}.to_hash
+    puts "READ CENTER CACHES in #{(Time.now - t).round} secs"
+    t = Time.now
+    
+    # we now have {:branch => [{...center data...}, {...center data...}]}, ...
+    # we have to convert this to {:branch => { sum of centers data }, ...}
+   
+    branch_data = branch_data_hash.map do |bid,ccs| 
+      sum_centers = ccs.map do |c| 
+        center_sum_attrs = c.attributes.select{|k,v| v.is_a? Numeric}.to_hash
+      end
+      [bid, sum_centers.reduce({}){|s,h| s+h}]
+    end.to_hash
 
     # TODO then add the loans that do not belong to any center
     # this does not exist right now so there is no code here.
     # when you add clients directly to the branch, do also update the code here
-
-    bc = BranchCache.first_or_new({:model_name => "Branch", :model_id => branch_id, :date => date})
-    attrs = branch_data.merge(:branch_id => branch_id, :center_id => 0, :model_id => branch_id, :stale => false, :updated_at => DateTime.now)
-    if bc.new?
-      bc.attributes = attrs.merge(:id => nil, :updated_at => DateTime.now)
-      bc.save
-    else
-      bc.update(attrs.merge(:id => bc.id))
+    
+    puts "CONSOLIDATED CENTER CACHES in #{(Time.now - t).round} secs"
+    t = Time.now
+    branch_data.map do |bid, c|
+      bc = BranchCache.first_or_new({:model_name => "Branch", :model_id => bid, :date => date})
+      attrs = c.merge(:branch_id => bid, :center_id => 0, :model_id => bid, :stale => false, :updated_at => DateTime.now)
+      if bc.new?
+        bc.attributes = attrs.merge(:id => nil, :updated_at => DateTime.now)
+        bc.save
+      else
+        bc.update(attrs.merge(:id => bc.id))
+      end
     end
+    puts "WROTE BRANCH CACHES in #{(Time.now - t).round} secs"
+    t = Time.now
+    puts "COMPLETED IN #{(Time.now - t0).round} secs"
   end
 
-    
-
-  def self.missing(branch_ids = nil, hash = {})
+  def self.missing_dates(branch_ids = nil, hash = {})
     hash = hash.merge(:branch_id => branch_ids) if branch_ids
     history_dates = LoanHistory.all(hash).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
     cache_dates = BranchCache.all(hash).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
     # hopefully we now have {:branch_id => :dates}
     missing_dates = history_dates - cache_dates
   end
+
+
   
   def self.missing_for_date(date = Date.today, branch_ids = nil, hash = {})
-    BranchCache.missing(branch_ids, hash.merge(:date => date))
+    BranchCache.missing_dates(branch_ids, hash.merge(:date => date))
   end
 
   def self.stale_for_date(date = Date.today, branch_ids = nil, hash = {})
@@ -171,28 +206,21 @@ class BranchCache < Cacher
 end
 
 class CenterCache < Cacher
-
   def self.update(hash = {})
       # creates a cache per center for branches and centers per the hash passed as argument
       date = hash.delete(:date) || Date.today
       hash = hash.select{|k,v| [:branch_id, :center_id].include?(k)}.to_hash
-      debugger
       centers_data = CenterCache.create(hash.merge(:date => date, :group_by => [:branch_id,:center_id])).deepen.values.sum
       return false if centers_data == nil
       now = DateTime.now
       centers_data.delete(:no_group)
       return true if centers_data.empty?
       cs = centers_data.keys.flatten.map do |center_id|
-        # cc = CenterCache.first_or_new({:model_name => "Center", :model_id => center_id, :date => date})
-        # centers_data[center_id].each{|k,v| cc.send("#{k}=".to_sym, v) if cc.respond_to?(k)}
-        # cc.stale = false
-        # cc
         centers_data[center_id].merge({:type => "CenterCache",:model_name => "Center", :model_id => center_id, :date => date, :updated_at => now})
       end
       return false if cs.nil?
       sql = get_bulk_insert_sql("cachers", cs)
-      raise unless CenterCache.all(:date => date, :id => centers_data.keys).destroy!
+      raise unless CenterCache.all(:date => date, :center_id => centers_data.keys).destroy!
       repository.adapter.execute(sql)
   end
-
 end

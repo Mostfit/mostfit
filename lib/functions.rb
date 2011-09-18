@@ -282,6 +282,10 @@ class Array
     self.reduce(:+)
   end
   
+  def grp_by
+    # a proper group_by
+    # group by returns
+  end
 end
 
 module ExcelFormula

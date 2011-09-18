@@ -7,7 +7,7 @@
   return false; 
   }, 
   format: function(s) { 
-  return parseFloat(s.replace(/ /g, '').replace("-","0"))
+  return isNaN(parseFloat(s.replace(/ /g, ''))) ? 0 : parseFloat(s.replace(/ /g, ''));
   }, 
   type: 'numeric' 
   }); 
@@ -29,12 +29,15 @@
 - query_params = request.send(:query_params)
 - @stale_centers = @cachers.get_stale(:center)
 - @stale_branches = @cachers.get_stale(:branch)
+- @missing_centers = @cachers.get_missing_centers
 - @last_cache_update = @cachers.aggregate(:updated_at.min)
-- unless @stale_centers.empty? and @stale_branches.empty?
+- unless @stale_centers.empty? and @stale_branches.empty? and @missing_centers.empty?
   .nb
     = link_to "#{@stale_centers.values.flatten.count} stale centers", resource(:cachers, query_params.merge(:model_name => "Center", :stale => true, :date => @date))
     and
     = link_to "#{@stale_branches.values.flatten.count} stale branches", resource(:cachers, query_params.merge(:model_name => "Branch", :stale => true, :date => @date))
+    in current selection.
+    = "#{@missing_centers.values.flatten.count} missing centers"
     in current selection.
     = link_to "update", url({:controller => :cachers, :action => :update, :date => @date, :branch_id => params[:branch_id]}), :class => "green_button"
 = form(:method => :get, :action => resource(:cachers)) do
@@ -85,7 +88,7 @@
       - keys.each do |k|
         %th{:style => "text-align: right"}
           - if total_keys.include?(k)
-            = total_row[k].to_currency(:mostfit_default)
+            = total_row[k].to_currency
           - else
             &nbsp;
       

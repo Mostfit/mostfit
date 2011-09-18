@@ -8,12 +8,6 @@ class Browse < Application
   def index
     debugger
     @date = params[:date] ? Date.parse(params[:date]) : Date.today
-    missing_branch_caches = BranchCache.missing(nil, :date => @date)
-    missing_branch_caches.each do |bid, dates|
-      dates.each do |date|
-        BranchCache.update(bid, date)
-      end
-    end
     @branch_data = BranchCache.all(:date => @date).map{|c| [c.model_id, c]}.to_hash
     @branch_names = Branch.all.aggregate(:name, :id).to_hash
     display [@branch_data, @branch_names], @template
