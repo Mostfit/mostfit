@@ -30,13 +30,13 @@ namespace :mostfit do
         flag = 0
       else
         flag = 1
-        begin_date = Date.strptime(args[:begin_date], "%d-%m-%Y")
+        begin_date = Date.parse(args[:begin_date])
       end
       
       if args[:end_date].nil?
         end_date = Date.today
       else
-        end_date = Date.strptime(args[:end_date], "%d-%m-%Y")
+        end_date = Date.parse(args[:end_date])
       end
       if begin_date.nil? or end_date.nil?
         # Dont display this ERROR message if you have already displayed the USAGE message
