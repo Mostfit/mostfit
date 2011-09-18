@@ -53,10 +53,6 @@ class Account
     @account_category ? @account_category.eql?('Bank') : false
   end
 
-
-        
-      
-
   def opening_and_closing_balances_as_of(for_date = Date.today)
     return [nil, nil] if for_date > Date.today
     opening_balance_on_date = opening_balance_as_of for_date
@@ -173,7 +169,7 @@ class Account
     data = {}
     Account.all(:order => [:account_type_id.asc], :parent_id => nil).group_by{|account| account.account_type}.each{|account_type, accounts|
       accounts.each{|account| 
-        account.branch_edge = (account.branch_id == branch_id)
+        account.branch_edge = (account.branch_id == branch_id || account.branch_id == nil)
       }
       # recurse the tree: climb
       data[account_type] = climb(accounts, branch_id)
@@ -185,10 +181,53 @@ class Account
     data
   end
 
+  def self.put_tree(accounts)
+      rv = ""
+      if accounts
+        accounts.sort_by{|account_type, accounts| account_type.name}.each do |account_type, as|
+          if as
+            puts "------------------------------------ #{account_type.name}------------------------------"
+            as.each do |account|
+              rv += show_accounts(account, 0)
+            end
+          end
+        end
+      end
+      return rv
+  end
+
+  def self.show_accounts(accounts, depth)
+    if accounts.is_a?(Array)
+      return if accounts.length == 0
+      first_account, rest_accounts = accounts[0], accounts[1..-1]||[]
+      rv = ((first_account.is_a?(Account) ? output_li(first_account, depth) : show_accounts(first_account, depth)) + rest_accounts.map{|account|
+              if account.is_a?(Account)
+                output_li(account, depth)
+              elsif account.is_a?(Array) and account.length == 1 and account.first.is_a?(Account)
+                output_li(account.first, depth)
+              elsif account.is_a?(Array) and account.length > 0
+                show_accounts(account, depth + 1)
+              end
+            }.join)
+    else
+      rv = output_li(accounts, depth)
+    end
+    return rv
+  end
+
+  def self.output_li(account, depth)
+    # debugger if account.id == 32
+    puts "#{account.id} : #{account.name} : #{account.branch_id}"
+    prefix = (0..(depth*4)).map{|d| "-"}.join
+    return (account.branch_edge ? "#{prefix}#{account.id} : #{account.name}  Branch: #{account.branch.name if account.branch} Parent: #{account.parent_id} #{Account.get(account.parent_id).name if account.parent_id}\n" : "(#{account.branch_id} #{account.name})\n")
+  end
+
   private
   def self.climb(accounts, branch_id)
     # mark branch edges
-    accounts.each{|account| account.branch_edge = (account.branch_id == branch_id)}
+    accounts.each{|account| 
+      account.branch_edge = (account.branch_id == branch_id || account.branch_id == nil)
+    }
     #make tree
     accounts.map{|account|
       account.children.length>0 ? [account, climb(account.children, branch_id)] : [account]

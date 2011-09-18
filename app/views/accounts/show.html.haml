@@ -10,6 +10,11 @@
     %td
       = @account.gl_code
   %tr
+    %th
+      Parent
+    %td
+      = @account.parent.name if @account.parent
+  %tr
     %th Branch : 
     %td
       = @account.branch ? @account.branch.name : ""

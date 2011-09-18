@@ -1,0 +1,5832 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Mostfit 1.1.0\n"
+"POT-Creation-Date: 2011-08-22 18:44+0530\n"
+"PO-Revision-Date: 2011-08-22 18:44+0530\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: app/views/staff_members/new.html.haml:1
+msgid "Create a new staff member"
+msgstr ""
+
+#: app/views/staff_members/_fields.html.haml:4 app/views/bookmarks/edit.html.haml:7
+msgid "Name:"
+msgstr ""
+
+#: app/views/staff_members/_fields.html.haml:8
+msgid "the screen name of the staff member"
+msgstr ""
+
+#: app/views/staff_members/_fields.html.haml:12
+msgid "Mobile number:"
+msgstr ""
+
+#: app/views/staff_members/_fields.html.haml:16
+msgid "mobile number of the staff member so that he/she can make mobile updates from this number"
+msgstr ""
+
+#: app/views/staff_members/_fields.html.haml:20
+msgid "Joining date:"
+msgstr ""
+
+#: app/views/staff_members/_fields.html.haml:23 app/views/staff_members/_fields.html.haml:32
+#: app/views/staff_members/_fields.html.haml:39 app/views/clients/edit.html.haml:14
+#: app/views/data_entry/payments/delete.html.haml:10 app/views/payments/_fields.html.haml:31
+#: app/views/centers/_fields.html.haml:36 app/views/branches/_fields.html.haml:52
+#: app/views/branches/_fields.html.haml:56
+msgid "&nbsp;&nbsp;"
+msgstr ""
+
+#: app/views/staff_members/_fields.html.haml:25
+msgid "date this staff member joined active duty"
+msgstr ""
+
+#: app/views/staff_members/_fields.html.haml:29 app/views/rule_books/_fields.html.haml:24
+msgid "Active:"
+msgstr ""
+
+#: app/views/staff_members/_fields.html.haml:34
+msgid "only active staff members can be marked as managers, approve loans, or receive payments"
+msgstr ""
+
+#: app/views/staff_members/show.html.haml:11
+msgid "Manages"
+msgstr ""
+
+#: app/views/staff_members/show.html.haml:13
+msgid "Info (created)"
+msgstr ""
+
+#: app/views/staff_members/show.html.haml:15
+msgid "Info (managed)"
+msgstr ""
+
+#: app/views/staff_members/show.html.haml:17
+msgid "Day Sheets"
+msgstr ""
+
+#: app/views/staff_members/show.html.haml:26 app/views/areas/show.html.haml:30
+#: app/views/dashboard/today.html.haml:23 app/views/centers/index.html.haml:94
+msgid "Map"
+msgstr ""
+
+#: app/views/staff_members/show.html.haml:60
+msgid "Filter centers by weekdays"
+msgstr ""
+
+#: app/views/staff_members/show.html.haml:65
+msgid "Centers meeting on different days are shown in different colors. Numbers indicate the order in which they meetings are held. Click on a center pin to know more"
+msgstr ""
+
+#: app/views/staff_members/index.html.haml:4
+msgid "Overview of all staff members"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:5 app/views/staff_members/show_clients.html.haml:17
+#: app/views/insurance_policies/index.html.haml:11 app/views/repayment_styles/index.html.haml:11
+#: app/views/cgts/_cgts.html.haml:12 app/views/areas/show.html.haml:43
+#: app/views/areas/index.html.haml:15 app/views/verifications/_journals.html.haml:9
+#: app/views/clients/today.html.haml:42 app/views/journals/_list_account.html.haml:5
+#: app/views/insurance_companies/_list.html.haml:5 app/views/data_entry/payments/by_center.html.haml:146
+#: app/views/data_entry/payments/_cds.html.haml:11 app/views/data_entry/payments/delete.html.haml:24
+#: app/views/data_entry/loans/_make_loan_utilization.html.haml:6 app/views/insurance_products/_list.html.haml:5
+#: app/views/grts/_grts.html.haml:11 app/views/funding_lines/show.html.haml:8
+#: app/views/payments/_deleted_payments.html.haml:5 app/views/loans/_approve.html.haml:5
+#: app/views/loans/_disburse.html.haml:6 app/views/client_groups/show.html.haml:10
+msgid "id"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:7 app/views/data_entry/payments/_cds.html.haml:13
+#: app/views/data_entry/payments/delete.html.haml:30 app/views/funding_lines/show.html.haml:12
+#: app/views/payments/_deleted_payments.html.haml:11 app/views/centers/_cds.html.haml:13
+msgid "amount"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:9 app/views/loan_products/show.html.haml:64
+#: app/views/funding_lines/show.html.haml:16
+msgid "interest"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:11
+msgid "installments"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:13
+msgid "disbursement"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:15 app/views/clients/_list.html.haml:14
+msgid "repaid"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:17 app/views/centers/_cds.html.haml:17
+#: app/views/claims/_fields.html.haml:65
+msgid "status"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:22 app/views/info/moreinfo.html.haml:37
+#: app/views/funders/index.html.haml:27 app/views/clients/search.html.haml:9
+#: app/views/clients/search.html.haml:27 app/views/clients/search.html.haml:30
+#: app/views/clients/search.html.haml:38 app/views/clients/search.html.haml:44
+#: app/views/clients/today.html.haml:57 app/views/branch_diaries/index.html.haml:36
+#: app/views/data_entry/payments/delete.html.haml:37 app/views/data_entry/payments/delete.html.haml:65
+#: app/views/data_entry/payments/delete.html.haml:68 app/views/data_entry/payments/record.html.haml:19
+#: app/views/data_entry/payments/record.html.haml:22 app/views/payments/_deleted_payments.html.haml:57
+#: app/views/users/index.html.haml:23 app/views/client_groups/search.html.haml:9
+#: app/views/client_groups/search.html.haml:27 app/views/client_groups/search.html.haml:30
+#: app/views/client_groups/search.html.haml:38 app/views/client_groups/search.html.haml:44
+#: app/views/centers/search.html.haml:17 app/views/centers/search.html.haml:20
+#: app/views/centers/_cds.html.haml:46 app/views/exceptions/unauthenticated.html.haml:29
+#: app/views/exceptions/session_expired.html.haml:29 app/views/exceptions/session_expired.html.haml:35
+#: app/views/exceptions/session_expired.html.haml:38 app/views/entrance/index.html.haml:10
+#: app/views/entrance/index.html.haml:16 app/views/branches/index.html.haml:31
+#: app/views/branches/search.html.haml:17 app/views/branches/search.html.haml:20
+#: app/views/branches/today.html.haml:27
+msgid "&nbsp;"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:39 app/views/payments/index.html.haml:125
+msgid "as scheduled"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:46
+msgid "not disbursed yet"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:50
+msgid "scheduled for"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:57
+msgid "written off"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:61 app/views/comments/_index.html.haml:8
+#: app/views/payments/index.html.haml:37 app/views/payments/index.html.haml:58
+#: app/views/payments/index.html.haml:82 app/views/payments/index.html.haml:180
+msgid "by"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:63 app/views/cgts/index.html.haml:12
+#: app/views/holidays/show.html.haml:5 app/views/accounts/_fields.html.haml:69
+#: app/views/payments/index.html.haml:35 app/views/payments/index.html.haml:56
+#: app/views/payments/index.html.haml:80 app/views/admin/dirty_loans.html.haml:25
+msgid "on"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:72
+msgid "nothing repaid yet"
+msgstr ""
+
+#: app/views/staff_members/show_disbursed.html.haml:75
+msgid "last payment on"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:3 app/views/staff_members/day_sheet.html.haml:3
+msgid "Change date"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:9 app/views/document_types/show.html.haml:11
+#: app/views/document_types/index.html.haml:15 app/views/document_types/edit.html.haml:8
+#: app/views/insurance_policies/index.html.haml:30 app/views/insurance_policies/edit.html.haml:11
+#: app/views/repayment_styles/index.html.haml:40 app/views/cgts/show.html.haml:11 app/views/areas/index.html.haml:29
+#: app/views/rule_books/show.html.haml:11 app/views/rule_books/index.html.haml:70
+#: app/views/rule_books/index.html.haml:77 app/views/client_types/show.html.haml:13
+#: app/views/client_types/index.html.haml:29 app/views/client_types/edit.html.haml:11
+#: app/views/loan_products/show.html.haml:2 app/views/journals/new.html.haml:5
+#: app/views/stock_registers/show.html.haml:11 app/views/reports/_trial_balance_report.html.haml:9
+#: app/views/reports/_form.html.haml:28 app/views/reports/_form.html.haml:38
+#: app/views/reports/_form.html.haml:44 app/views/reports/_form.html.haml:50
+#: app/views/reports/_form.html.haml:56 app/views/reports/_form.html.haml:62
+#: app/views/reports/_form.html.haml:68 app/views/reports/_form.html.haml:74
+#: app/views/reports/_form.html.haml:80 app/views/reports/_form.html.haml:86
+#: app/views/reports/_form.html.haml:92 app/views/reports/_form.html.haml:98
+#: app/views/reports/_form.html.haml:104 app/views/reports/_form.html.haml:110
+#: app/views/reports/_form.html.haml:116 app/views/reports/edit.html.haml:16
+#: app/views/occupations/show.html.haml:9 app/views/occupations/index.html.haml:22
+#: app/views/insurance_companies/show.html.haml:7 app/views/insurance_companies/edit.html.haml:11
+#: app/views/branch_diaries/branch.html.haml:7 app/views/branch_diaries/show.html.haml:5
+#: app/views/comments/show.html.haml:11 app/views/comments/edit.html.haml:16
+#: app/views/fees/show.html.haml:9 app/views/fees/edit.html.haml:13
+#: app/views/holidays/show.html.haml:11 app/views/holidays/index.html.haml:26
+#: app/views/documents/show.html.haml:35 app/views/regions/edit.html.haml:10
+#: app/views/applicable_fees/show.html.haml:11 app/views/applicable_fees/edit.html.haml:11
+#: app/views/locations/edit.html.haml:16 app/views/layout/application.html.haml:33
+#: app/views/insurance_products/edit.html.haml:12 app/views/account_types/show.html.haml:11
+#: app/views/account_types/edit.html.haml:11 app/views/accounts/branch.html.haml:9
+#: app/views/accounts/index.html.haml:43 app/views/accounts/edit.html.haml:12
+#: app/views/account_balances/show.html.haml:11 app/views/grts/show.html.haml:11
+#: app/views/loan_purposes/show.html.haml:11 app/views/loan_purposes/index.html.haml:21
+#: app/views/loan_purposes/edit.html.haml:10 app/views/asset_registers/show.html.haml:11
+#: app/views/audit_items/show.html.haml:32 app/views/audit_items/index.html.haml:35
+#: app/views/audit_items/edit.html.haml:10 app/views/payments/_deleted_payments.html.haml:37
+#: app/views/payments/_deleted_payments.html.haml:41 app/views/payments/_deleted_payments.html.haml:45
+#: app/views/payments/_deleted_payments.html.haml:49 app/views/api_accesses/edit.html.haml:16
+#: app/views/loan_utilizations/show.html.haml:11 app/views/loan_utilizations/edit.html.haml:14
+#: app/views/ledger_entries/show.html.haml:11 app/views/ledger_entries/edit.html.haml:16
+#: app/views/targets/show.html.haml:11 app/views/targets/edit.html.haml:11
+#: app/views/claims/show.html.haml:11 app/views/bookmarks/show.html.haml:11
+#: app/views/rules/show.html.haml:58 app/views/accounting_periods/edit.html.haml:11
+#: app/views/monthly_targets/edit.html.haml:9
+msgid "|"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:14
+msgid "Daily Disbursement Sheet for"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:16 app/views/staff_members/day_sheet.html.haml:14
+#: app/views/account_balances/edit.html.haml:5
+msgid "for"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:25
+msgid "This Staff Manager has no disbursement today."
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:31 app/views/staff_members/day_sheet.html.haml:29
+#: app/views/clients/show.html.haml:11 app/views/clients/_list.html.haml:83
+#: app/views/account_balances/new.html.haml:4 app/views/loans/prepay.html.haml:23
+#: app/views/loans/_prepay.html.haml:17 app/views/centers/_disbursals.html.haml:16
+#: app/views/centers/_approvals.html.haml:16
+msgid "("
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:33 app/views/staff_members/day_sheet.html.haml:31
+msgid ") at"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:47 app/views/verifications/_loans.html.haml:12
+#: app/views/verifications/_payments.html.haml:12 app/views/reports/_closed_loan_report.html.haml:11
+#: app/views/reports/_offline_attendance.html.haml:12 app/views/data_entry/payments/_disbursals.html.haml:7
+#: app/views/data_entry/loans/_make_loan_utilization.html.haml:9 app/views/loans/_approve.html.haml:8
+#: app/views/loans/_write_off_suggested.html.haml:8 app/views/loans/_disburse.html.haml:9
+msgid "Client Name"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:50 app/views/reports/_duplicate_clients_report.html.haml:19
+msgid "Spouse Name"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:53 app/views/loan_products/_irr_fields.html.haml:30
+#: app/views/loan_products/design.html.haml:12 app/views/reports/_delinquent_loan_report.html.haml:10
+msgid "Loan Product"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:56 app/views/verifications/_loans.html.haml:15
+#: app/views/verifications/_payments.html.haml:15 app/views/loan_products/index.html.haml:24
+#: app/views/loan_products/_irr_fields.html.haml:5 app/views/loan_products/design.html.haml:21
+#: app/views/journals/_list.html.haml:36 app/views/journals/_account_amount.html.haml:6
+#: app/views/journals/edit.html.haml:38 app/views/reports/_scheduled_disbursement_register.html.haml:22
+#: app/views/reports/_loan_disbursement_register.html.haml:23 app/views/reports/_income_statement.html.haml:15
+#: app/views/reports/_daily_transaction_summary.html.haml:27 app/views/reports/_staff_target_report.html.haml:77
+#: app/views/reports/_staff_target_report.html.haml:83 app/views/reports/_offline_payments.html.haml:12
+#: app/views/reports/_loan_sanction_register.html.haml:22 app/views/applicable_fees/_fields.html.haml:9
+#: app/views/data_entry/loans/_make_loan_utilization.html.haml:15 app/views/funding_lines/_fields.html.haml:4
+#: app/views/payments/_fields.html.haml:4 app/views/loans/_approve.html.haml:14
+#: app/views/loans/_write_off_suggested.html.haml:14 app/views/loans/_disburse.html.haml:12
+#: app/views/portfolios/show.html.haml:55
+msgid "Amount"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:59
+msgid "Insurance Premium"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:62
+msgid "Balance to Disburse"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:65
+msgid "First Payment"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:93 app/views/staff_members/day_sheet.html.haml:56
+msgid "Total Disbursement"
+msgstr ""
+
+#: app/views/staff_members/disbursement_sheet.html.haml:101 app/views/staff_members/day_sheet.html.haml:64
+msgid "No disbursements today"
+msgstr ""
+
+#: app/views/staff_members/show_clients.html.haml:4 app/views/staff_members/show_clients.html.haml:19
+#: app/views/areas/show.html.haml:46 app/views/areas/index.html.haml:18
+#: app/views/funders/show.html.haml:4 app/views/clients/show.html.haml:5
+#: app/views/clients/today.html.haml:4 app/views/clients/today.html.haml:44
+#: app/views/data_entry/payments/_cds.html.haml:9 app/views/branches/today.html.haml:13
+msgid "name"
+msgstr ""
+
+#: app/views/staff_members/show_clients.html.haml:21 app/views/browse/_totalinfo.html.haml:22
+msgid "loans"
+msgstr ""
+
+#: app/views/staff_members/day_sheet.html.haml:12
+msgid "Daily Collection Sheet for"
+msgstr ""
+
+#: app/views/staff_members/day_sheet.html.haml:23
+msgid "This Staff Manager has no collection today."
+msgstr ""
+
+#: app/views/staff_members/day_sheet.html.haml:45
+msgid "Disbursements"
+msgstr ""
+
+#: app/views/staff_members/show_centers.html.haml:2
+msgid "Centers for"
+msgstr ""
+
+#: app/views/staff_members/show_centers.html.haml:8 app/views/document_types/_fields.html.haml:3
+#: app/views/repayment_styles/index.html.haml:14 app/views/areas/_fields.html.haml:4
+#: app/views/funders/index.html.haml:17 app/views/verifications/_portfolios.html.haml:9
+#: app/views/verifications/_clients.html.haml:9 app/views/clients/index.html.haml:8
+#: app/views/clients/inactive_client_count.html.haml:9 app/views/clients/death_count.html.haml:9
+#: app/views/client_types/index.html.haml:10 app/views/loan_products/_fields.html.haml:4
+#: app/views/reports/_incentive_report.html.haml:6 app/views/reports/_repayment_overdue.html.haml:23
+#: app/views/reports/_non_disbursed_clients_after_group_recognition_test.html.haml:12 app/views/reports/_duplicate_clients_report.html.haml:16
+#: app/views/insurance_companies/_list.html.haml:8 app/views/branch_diaries/_fields.html.haml:4
+#: app/views/fees/index.html.haml:11 app/views/holidays/_fields.html.haml:4
+#: app/views/data_entry/payments/_approvals.html.haml:5 app/views/data_entry/loans/bulk_form.html.haml:22
+#: app/views/insurance_products/_fields.html.haml:4 app/views/insurance_products/_list.html.haml:8
+#: app/views/account_types/_fields.html.haml:4 app/views/accounts/_fields.html.haml:56
+#: app/views/accounts/duplicate.html.haml:23 app/views/loans/index.html.haml:31
+#: app/views/client_groups/show.html.haml:13 app/views/portfolios/_fields.html.haml:4
+#: app/views/portfolios/show.html.haml:8 app/views/loan_utilizations/new.html.haml:6
+#: app/views/loan_utilizations/edit.html.haml:8 app/views/centers/bulk_data_entry.html.haml:10
+#: app/views/centers/index.html.haml:12 app/views/centers/_list.html.haml:23
+#: app/views/bookmarks/_fields.html.haml:3 app/views/rules/_fields.html.haml:5
+#: app/views/rules/index.html.haml:10 app/views/branches/index.html.haml:18
+#: app/views/accounting_periods/new.html.haml:20 app/views/accounting_periods/close.html.haml:14
+#: app/views/accounting_periods/_fields.html.haml:3 app/views/accounting_periods/show.html.haml:8
+#: app/views/accounting_periods/index.html.haml:18
+msgid "Name"
+msgstr ""
+
+#: app/views/staff_members/show_centers.html.haml:11 app/views/verifications/_clients.html.haml:2
+#: app/views/dashboard/index.html.haml:12 app/views/client_groups/show.html.haml:4
+#: app/views/admin/upload.html.haml:29 app/views/centers/_list.html.haml:29
+msgid "Clients"
+msgstr ""
+
+#: app/views/staff_members/show_centers.html.haml:14 app/views/verifications/_loans.html.haml:2
+#: app/views/dashboard/index.html.haml:14 app/views/funding_lines/show.html.haml:37
+#: app/views/loans/index.html.haml:115 app/views/admin/upload.html.haml:32
+msgid "Loans"
+msgstr ""
+
+#: app/views/staff_members/show_centers.html.haml:17 app/views/reports/_death_claim_report.html.haml:22
+#: app/views/reports/_loan_size_per_manager_report.html.haml:33 app/views/reports/_staff_consolidated_report.html.haml:30
+#: app/views/reports/_loan_disbursement_register.html.haml:38 app/views/reports/_loan_purpose_report.html.haml:18
+#: app/views/reports/_quarter_consolidated_report.html.haml:30 app/views/reports/_staff_target_report.html.haml:95
+#: app/views/reports/_group_consolidated_report.html.haml:30 app/views/reports/_transaction_ledger.html.haml:10
+msgid "Disbursed"
+msgstr ""
+
+#: app/views/staff_members/show_centers.html.haml:20
+msgid "Repaid"
+msgstr ""
+
+#: app/views/staff_members/show_centers.html.haml:23
+msgid "Amount In Default"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:5 app/views/journals/_list.html.haml:3
+#: app/views/journals/reconcile.html.haml:5
+msgid "From"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:7 app/views/journals/_list.html.haml:6
+#: app/views/journals/reconcile.html.haml:10
+msgid "To"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:40
+msgid "New"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:43 app/views/reports/_par_by_staff_report.html.haml:12
+#: app/views/reports/_trial_balance_report.html.haml:74 app/views/reports/_projected_report.html.haml:39
+#: app/views/reports/_par_by_center_report.html.haml:35 app/views/reports/_par_by_center_report.html.haml:83
+#: app/views/reports/_cash_projected_report.html.haml:39 app/views/reports/_death_claim_report.html.haml:49
+#: app/views/reports/_staff_consolidated_report.html.haml:42 app/views/reports/_staff_consolidated_report.html.haml:51
+#: app/views/reports/_staff_consolidated_report.html.haml:60 app/views/reports/_repayment_overdue.html.haml:36
+#: app/views/reports/_repayment_overdue.html.haml:51 app/views/reports/_general_ledger_report.html.haml:72
+#: app/views/reports/_closed_loan_report.html.haml:65 app/views/reports/_par_by_loan_ageing_report.html.haml:12
+#: app/views/reports/_weekly_report.html.haml:11 app/views/reports/_late_disbursals_report.html.haml:75
+#: app/views/reports/_loan_purpose_report.html.haml:24 app/views/reports/_client_occupation_report.html.haml:36
+#: app/views/reports/_claim_report.html.haml:90 app/views/reports/_portfolio_allocation_report.html.haml:46
+#: app/views/reports/_quarter_consolidated_report.html.haml:42 app/views/reports/_quarter_consolidated_report.html.haml:51
+#: app/views/reports/_quarter_consolidated_report.html.haml:60 app/views/reports/_daily_transaction_summary.html.haml:42
+#: app/views/reports/_daily_transaction_summary.html.haml:51 app/views/reports/_daily_transaction_summary.html.haml:60
+#: app/views/reports/_daily_transaction_summary.html.haml:69 app/views/reports/_daily_transaction_summary.html.haml:78
+#: app/views/reports/_staff_target_report.html.haml:92 app/views/reports/_group_consolidated_report.html.haml:42
+#: app/views/reports/_group_consolidated_report.html.haml:51 app/views/reports/_group_consolidated_report.html.haml:60
+#: app/views/reports/_transaction_ledger.html.haml:29 app/views/reports/_results.html.haml:69
+#: app/views/reports/_monthly_report.html.haml:11 app/views/dashboard/today.html.haml:59
+#: app/views/dashboard/today.html.haml:71 app/views/dashboard/today.html.haml:83
+#: app/views/funding_lines/show.html.haml:75 app/views/payments/index.html.haml:161
+msgid "Total"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:48
+msgid "Number of Branches"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:57
+msgid "Number of Centers"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:65
+msgid "Number of Groups"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:79
+msgid "Number of Clients"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:94
+msgid "Number of death Cases"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:103
+msgid "Number of pending death Cases"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:111 app/views/reports/_loan_size_per_manager_report.html.haml:10
+#: app/views/dashboard/index.html.haml:34
+msgid "Borrower clients"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:117
+msgid "Number of Loans"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:123
+msgid "Number of loans Repaid"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:129 app/views/reports/_claim_report.html.haml:21
+msgid "Amount Disbursed"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:135
+msgid "Principal Received"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:141
+msgid "Interest Received"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:147
+msgid "Fee Received"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:172 app/views/info/moreinfo.html.haml:178
+#: app/views/info/moreinfo.html.haml:200 app/views/info/exceptions.html.haml:60
+#: app/views/reports/_death_claim_report.html.haml:92 app/views/portfolios/show.html.haml:20
+msgid "0"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:182
+msgid "Amount Outstanding"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:187
+msgid "Total Principal Overdue"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:192
+msgid "Total Interest Overdue"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:205
+msgid "Number of center managers"
+msgstr ""
+
+#: app/views/info/moreinfo.html.haml:212
+msgid "Center Managers"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:5
+msgid "GRT failures"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:11
+msgid "Unverified clients"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:21
+msgid "Unverified loans"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:28
+msgid "Unverified payments"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:35
+msgid "Difference in amount applied and disbursed"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:40
+msgid "Difference in amount approved and disbursed"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:45
+msgid "Delayed disbursements"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:50
+msgid "Delayed repayments"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:64
+msgid "Loans created by admin"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:69
+msgid "Loans edited by admin"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:74
+msgid "Loans deleted by admin"
+msgstr ""
+
+#: app/views/info/exceptions.html.haml:79
+msgid "Clients without insurance"
+msgstr ""
+
+#: app/views/document_types/new.html.haml:1 app/views/document_types/index.html.haml:2
+#: app/views/document_types/edit.html.haml:2
+msgid "Document Types"
+msgstr ""
+
+#: app/views/document_types/_fields.html.haml:7 app/views/rules/index.html.haml:13
+msgid "Applicable to"
+msgstr ""
+
+#: app/views/document_types/show.html.haml:2
+msgid "DocumentTypes controller, show action"
+msgstr ""
+
+#: app/views/document_types/show.html.haml:5 app/views/cgts/new.html.haml:5 app/views/cgts/show.html.haml:5
+#: app/views/rule_books/show.html.haml:5 app/views/stock_registers/show.html.haml:5
+#: app/views/reports/edit.html.haml:5 app/views/comments/new.html.haml:5
+#: app/views/comments/show.html.haml:5 app/views/comments/index.html.haml:5
+#: app/views/comments/edit.html.haml:5 app/views/applicable_fees/show.html.haml:5
+#: app/views/locations/new.html.haml:5 app/views/locations/edit.html.haml:5
+#: app/views/account_types/show.html.haml:5 app/views/account_balances/show.html.haml:5
+#: app/views/grts/new.html.haml:5 app/views/grts/show.html.haml:5
+#: app/views/asset_registers/show.html.haml:5 app/views/portfolios/index.html.haml:5
+#: app/views/api_accesses/edit.html.haml:5 app/views/loan_utilizations/show.html.haml:5
+#: app/views/ledger_entries/new.html.haml:5 app/views/ledger_entries/show.html.haml:5
+#: app/views/ledger_entries/index.html.haml:5 app/views/ledger_entries/edit.html.haml:5
+#: app/views/targets/show.html.haml:5 app/views/claims/show.html.haml:5
+#: app/views/bookmarks/show.html.haml:5
+msgid "Edit this file in"
+msgstr ""
+
+#: app/views/document_types/show.html.haml:8
+msgid "app/views/document_types/show.html.erb"
+msgstr ""
+
+#: app/views/insurance_policies/_fields.html.haml:6 app/views/insurance_policies/index.html.haml:17
+msgid "Insurance Product"
+msgstr ""
+
+#: app/views/insurance_policies/_fields.html.haml:17
+msgid "Policy Number"
+msgstr ""
+
+#: app/views/insurance_policies/_fields.html.haml:22
+msgid "Application number"
+msgstr ""
+
+#: app/views/insurance_policies/_fields.html.haml:27
+msgid "Sum Insured"
+msgstr ""
+
+#: app/views/insurance_policies/_fields.html.haml:32 app/views/insurance_policies/show.html.haml:17
+msgid "Premium"
+msgstr ""
+
+#: app/views/insurance_policies/_fields.html.haml:37
+msgid "Date from"
+msgstr ""
+
+#: app/views/insurance_policies/_fields.html.haml:42
+msgid "Date to"
+msgstr ""
+
+#: app/views/insurance_policies/_fields.html.haml:47 app/views/insurance_policies/show.html.haml:33
+#: app/views/cgts/_cgts.html.haml:21 app/views/cgts/edit.html.haml:21
+#: app/views/reports/_target_report.html.haml:28 app/views/reports/_late_disbursals_report.html.haml:21
+#: app/views/reports/_offline_attendance.html.haml:15 app/views/data_entry/payments/_disbursals.html.haml:16
+#: app/views/data_entry/payments/_approvals.html.haml:11 app/views/account_balances/index.html.haml:32
+#: app/views/grts/_grts.html.haml:17 app/views/grts/edit.html.haml:16
+#: app/views/audit_items/_fields.html.haml:19 app/views/audit_items/show.html.haml:23
+#: app/views/audit_items/index.html.haml:19 app/views/payments/index.html.haml:173
+#: app/views/users/show.html.haml:30 app/views/users/index.html.haml:16
+#: app/views/loans/_approve.html.haml:23 app/views/loans/_write_off_suggested.html.haml:23
+#: app/views/loans/_disburse.html.haml:21 app/views/browse/show_log.html.haml:16
+#: app/views/attendances/_index.html.haml:8 app/views/attendances/index.html.haml:12
+msgid "Status"
+msgstr ""
+
+#: app/views/insurance_policies/_fields.html.haml:52 app/views/insurance_policies/show.html.haml:29
+msgid "Cover for"
+msgstr ""
+
+#: app/views/insurance_policies/show.html.haml:9
+msgid "Policy number"
+msgstr ""
+
+#: app/views/insurance_policies/show.html.haml:13
+msgid "Sum insured"
+msgstr ""
+
+#: app/views/insurance_policies/show.html.haml:21 app/views/centers/_misc.html.haml:9
+msgid "Valid from"
+msgstr ""
+
+#: app/views/insurance_policies/show.html.haml:25 app/views/documents/index.html.haml:13
+#: app/views/centers/_misc.html.haml:12
+msgid "Valid upto"
+msgstr ""
+
+#: app/views/insurance_policies/index.html.haml:2 app/views/loans/index.html.haml:246
+msgid "Insurance Policies"
+msgstr ""
+
+#: app/views/insurance_policies/index.html.haml:14
+msgid "policy details"
+msgstr ""
+
+#: app/views/insurance_policies/index.html.haml:20 app/views/areas/index.html.haml:21
+msgid "actions"
+msgstr ""
+
+#: app/views/insurance_policies/edit.html.haml:2
+msgid "Edit Insurance Policy"
+msgstr ""
+
+#: app/views/repayment_styles/index.html.haml:2
+msgid "Repayment Styles"
+msgstr ""
+
+#: app/views/repayment_styles/index.html.haml:17
+msgid "Style"
+msgstr ""
+
+#: app/views/repayment_styles/index.html.haml:20
+msgid "Round To"
+msgstr ""
+
+#: app/views/repayment_styles/index.html.haml:23 app/views/rule_books/index.html.haml:36
+#: app/views/rule_books/_duplicate.html.haml:50 app/views/rules/show.html.haml:54
+#: app/views/rules/index.html.haml:28
+msgid "Active"
+msgstr ""
+
+#: app/views/repayment_styles/index.html.haml:26 app/views/cgts/_cgts.html.haml:24
+#: app/views/insurance_companies/_list.html.haml:11 app/views/holidays/index.html.haml:17
+#: app/views/insurance_products/_list.html.haml:14 app/views/account_types/index.html.haml:13
+#: app/views/account_balances/index.html.haml:35 app/views/account_balances/_list.html.haml:26
+#: app/views/grts/_grts.html.haml:20 app/views/payments/show.html.haml:44
+#: app/views/accounting_periods/close.html.haml:29 app/views/accounting_periods/show.html.haml:23
+#: app/views/accounting_periods/index.html.haml:33 app/views/monthly_targets/show.html.haml:11
+#: app/views/monthly_targets/index.html.haml:21
+msgid "Actions"
+msgstr ""
+
+#: app/views/cgts/new.html.haml:1
+msgid "Cgts controller, new action"
+msgstr ""
+
+#: app/views/cgts/new.html.haml:7
+msgid "app/views/cgts/new.html.erb"
+msgstr ""
+
+#: app/views/cgts/show.html.haml:2
+msgid "Cgts controller, show action"
+msgstr ""
+
+#: app/views/cgts/show.html.haml:8
+msgid "app/views/cgts/show.html.erb"
+msgstr ""
+
+#: app/views/cgts/_cgts.html.haml:4
+msgid "No CGTs scheduled yet"
+msgstr ""
+
+#: app/views/cgts/_cgts.html.haml:15 app/views/cgts/edit.html.haml:11
+#: app/views/loan_products/design.html.haml:69 app/views/journals/_fields.html.haml:4
+#: app/views/journals/_list.html.haml:21 app/views/journals/_list_account.html.haml:8
+#: app/views/journals/edit.html.haml:33 app/views/reports/_projected_report.html.haml:18
+#: app/views/reports/_death_claim_report.html.haml:4 app/views/reports/_general_ledger_report.html.haml:4
+#: app/views/reports/_cash_book.html.haml:12 app/views/reports/_late_disbursals_report.html.haml:6
+#: app/views/reports/_offline_attendance.html.haml:6 app/views/reports/_transaction_ledger.html.haml:4
+#: app/views/reports/_bank_book.html.haml:12 app/views/branch_diaries/_fields.html.haml:15
+#: app/views/branch_diaries/index.html.haml:20 app/views/branch_diaries/_list.html.haml:4
+#: app/views/holidays/_fields.html.haml:9 app/views/holidays/index.html.haml:11
+#: app/views/accounts/_book.html.haml:35 app/views/grts/_grts.html.haml:14 app/views/grts/edit.html.haml:11
+#: app/views/audit_trails/_list.html.haml:13 app/views/attendances/_index.html.haml:5
+#: app/views/attendances/index.html.haml:9
+msgid "Date"
+msgstr ""
+
+#: app/views/cgts/_cgts.html.haml:18
+msgid "CGT Day Number"
+msgstr ""
+
+#: app/views/cgts/index.html.haml:10
+msgid "Add a CGT day number"
+msgstr ""
+
+#: app/views/cgts/edit.html.haml:2
+msgid "Edit CGT"
+msgstr ""
+
+#: app/views/cgts/edit.html.haml:16
+msgid "Day number"
+msgstr ""
+
+#: app/views/areas/new.html.haml:1
+msgid "New Area"
+msgstr ""
+
+#: app/views/areas/_fields.html.haml:9
+msgid "Region"
+msgstr ""
+
+#: app/views/areas/_fields.html.haml:21 app/views/clients/index.html.haml:14
+#: app/views/reports/_loan_size_per_manager_report.html.haml:4 app/views/loans/index.html.haml:55
+#: app/views/centers/index.html.haml:18 app/views/centers/_list.html.haml:25
+#: app/views/branches/index.html.haml:20
+msgid "Manager"
+msgstr ""
+
+#: app/views/areas/_fields.html.haml:26 app/views/centers/_fields.html.haml:59
+#: app/views/branches/_fields.html.haml:12
+msgid "Address:"
+msgstr ""
+
+#: app/views/areas/_fields.html.haml:32 app/views/centers/_fields.html.haml:62
+#: app/views/branches/_fields.html.haml:15
+msgid "Contact phone number:"
+msgstr ""
+
+#: app/views/areas/_fields.html.haml:37 app/views/centers/_fields.html.haml:65
+msgid "Landmark:"
+msgstr ""
+
+#: app/views/areas/show.html.haml:2 app/views/areas/edit.html.haml:2
+#: app/views/centers/index.html.haml:33 app/views/branches/_fields.html.haml:46
+#: app/views/branches/index.html.haml:22
+msgid "Area"
+msgstr ""
+
+#: app/views/areas/show.html.haml:6 app/views/clients/index.html.haml:28
+#: app/views/locations/_map.html.haml:20 app/views/centers/index.html.haml:24
+msgid "Address"
+msgstr ""
+
+#: app/views/areas/show.html.haml:9 app/views/clients/index.html.haml:31
+#: app/views/centers/index.html.haml:27
+msgid "Contact number"
+msgstr ""
+
+#: app/views/areas/show.html.haml:12 app/views/clients/index.html.haml:34
+#: app/views/centers/index.html.haml:30 app/views/branches/_fields.html.haml:19
+msgid "Landmark"
+msgstr ""
+
+#: app/views/areas/show.html.haml:18 app/views/dashboard/index.html.haml:8
+#: app/views/admin/upload.html.haml:23
+msgid "Branches"
+msgstr ""
+
+#: app/views/areas/show.html.haml:21 app/views/loan_products/show.html.haml:11
+#: app/views/funding_lines/show.html.haml:40 app/views/centers/index.html.haml:60
+msgid "Info"
+msgstr ""
+
+#: app/views/areas/show.html.haml:33
+msgid "Branches in this area"
+msgstr ""
+
+#: app/views/areas/show.html.haml:36
+msgid "No branches"
+msgstr ""
+
+#: app/views/areas/index.html.haml:2 app/views/browse/_totalinfo.html.haml:112
+msgid "Areas"
+msgstr ""
+
+#: app/views/areas/index.html.haml:8
+msgid "No areas"
+msgstr ""
+
+#: app/views/funders/new.html.haml:1
+msgid "Create a new funder"
+msgstr ""
+
+#: app/views/funders/_fields.html.haml:4
+msgid "Funder Name"
+msgstr ""
+
+#: app/views/funders/show.html.haml:10 app/views/funders/show.html.haml:30
+#: app/views/funders/index.html.haml:19
+msgid "Funding lines"
+msgstr ""
+
+#: app/views/funders/show.html.haml:14
+msgid "First disbursement"
+msgstr ""
+
+#: app/views/funders/show.html.haml:18
+msgid "Last disbursement"
+msgstr ""
+
+#: app/views/funders/show.html.haml:22 app/views/funders/show.html.haml:33
+#: app/views/funders/index.html.haml:21 app/views/verifications/_portfolios.html.haml:2
+msgid "Portfolios"
+msgstr ""
+
+#: app/views/funders/index.html.haml:1
+msgid "Overview of all funders"
+msgstr ""
+
+#: app/views/funders/index.html.haml:8
+msgid "No funders have been created yet."
+msgstr ""
+
+#: app/views/funders/index.html.haml:15 app/views/verifications/_loans.html.haml:9
+#: app/views/verifications/_payments.html.haml:9 app/views/clients/inactive_client_count.html.haml:6
+#: app/views/clients/death_count.html.haml:6 app/views/reports/_repayment_overdue.html.haml:20
+#: app/views/reports/_duplicate_clients_report.html.haml:13 app/views/data_entry/payments/staff_collection_sheet.html.haml:6
+#: app/views/data_entry/loans/staff_disbursement_sheet.html.haml:7 app/views/data_entry/loans/bulk_form.html.haml:16
+#: app/views/audit_trails/show.html.haml:32 app/views/users/index.html.haml:8
+#: app/views/centers/bulk_data_entry.html.haml:6 app/views/centers/_list.html.haml:21
+#: app/views/searches/index.html.haml:18 app/views/branches/index.html.haml:16
+msgid "ID"
+msgstr ""
+
+#: app/views/funders/index.html.haml:34 app/views/branches/index.html.haml:41
+msgid "&nbsp;|&nbsp"
+msgstr ""
+
+#: app/views/rule_books/new.html.haml:8 app/views/rule_books/index.html.haml:15
+#: app/views/rule_books/_duplicate.html.haml:9 app/views/rule_books/_duplicate.html.haml:14
+#: app/views/verifications/_loans.html.haml:24 app/views/verifications/_clients.html.haml:18
+#: app/views/verifications/_payments.html.haml:24 app/views/clients/inactive_client_count.html.haml:21
+#: app/views/clients/death_count.html.haml:21 app/views/stock_registers/_fields.html.haml:4
+#: app/views/stock_registers/index.html.haml:16 app/views/reports/_cash_projected_report.html.haml:4
+#: app/views/reports/_last_update_report.html.haml:7 app/views/reports/_daily_transaction_summary.html.haml:4
+#: app/views/branch_diaries/_fields.html.haml:22 app/views/branch_diaries/index.html.haml:18
+#: app/views/branch_diaries/_list.html.haml:7 app/views/dashboard/today.html.haml:8
+#: app/views/locations/index.html.haml:9 app/views/accounts/_fields.html.haml:32
+#: app/views/accounts/index.html.haml:53 app/views/accounts/duplicate.html.haml:5
+#: app/views/asset_registers/_edit_fields.html.haml:4 app/views/asset_registers/_fields.html.haml:4
+#: app/views/asset_registers/index.html.haml:16 app/views/loans/misc.html.haml:93
+#: app/views/loans/misc.html.haml:108 app/views/admin/dirty_loans.html.haml:12
+#: app/views/portfolios/_form.html.haml:9 app/views/api_accesses/show.html.haml:4
+#: app/views/api_accesses/index.html.haml:15 app/views/centers/_fields.html.haml:2
+#: app/views/claims/_fields.html.haml:14
+msgid "Branch"
+msgstr ""
+
+#: app/views/rule_books/new.html.haml:19
+msgid "Create a Rule"
+msgstr ""
+
+#: app/views/rule_books/_fields.html.haml:4 app/views/rule_books/index.html.haml:12
+msgid "Rule Name"
+msgstr ""
+
+#: app/views/rule_books/_fields.html.haml:9
+msgid "Rule begin date"
+msgstr ""
+
+#: app/views/rule_books/_fields.html.haml:14
+msgid "Rule end date"
+msgstr ""
+
+#: app/views/rule_books/_fields.html.haml:19 app/views/rule_books/index.html.haml:21
+msgid "Journal type"
+msgstr ""
+
+#: app/views/rule_books/_fields.html.haml:29 app/views/rule_books/index.html.haml:18
+#: app/views/rule_books/_duplicate.html.haml:41 app/views/client_types/index.html.haml:16
+#: app/views/journals/new_eod.html.haml:12 app/views/audit_items/index.html.haml:25
+#: app/views/audit_trails/show.html.haml:35 app/views/audit_trails/_list.html.haml:7
+#: app/views/browse/show_log.html.haml:10
+msgid "Action"
+msgstr ""
+
+#: app/views/rule_books/_fields.html.haml:40
+msgid "Fee Type:"
+msgstr ""
+
+#: app/views/rule_books/_fields.html.haml:45
+msgid "Credit Accounts"
+msgstr ""
+
+#: app/views/rule_books/show.html.haml:2
+msgid "RuleBooks controller, show action"
+msgstr ""
+
+#: app/views/rule_books/show.html.haml:8
+msgid "app/views/rule_books/show.html.erb"
+msgstr ""
+
+#: app/views/rule_books/index.html.haml:3
+msgid "List of Accounting Rules"
+msgstr ""
+
+#: app/views/rule_books/index.html.haml:6
+msgid "Show accounting rules of"
+msgstr ""
+
+#: app/views/rule_books/index.html.haml:24 app/views/rule_books/_duplicate.html.haml:53
+#: app/views/journals/edit.html.haml:16
+msgid "Credit accounts"
+msgstr ""
+
+#: app/views/rule_books/index.html.haml:27 app/views/rule_books/_duplicate.html.haml:59
+#: app/views/journals/edit.html.haml:25
+msgid "Debit accounts"
+msgstr ""
+
+#: app/views/rule_books/index.html.haml:30 app/views/rule_books/_duplicate.html.haml:44
+#: app/views/journals/tally_download.html.haml:7
+msgid "From date"
+msgstr ""
+
+#: app/views/rule_books/index.html.haml:33 app/views/rule_books/_duplicate.html.haml:47
+#: app/views/journals/tally_download.html.haml:14
+msgid "To date"
+msgstr ""
+
+#: app/views/rule_books/_duplicate.html.haml:7
+msgid "Duplicate all accounting rules of"
+msgstr ""
+
+#: app/views/rule_books/_duplicate.html.haml:12
+msgid "into"
+msgstr ""
+
+#: app/views/rule_books/_duplicate.html.haml:23
+msgid "No rule books have been defined for the source branch"
+msgstr ""
+
+#: app/views/rule_books/_duplicate.html.haml:27
+msgid "No accounts have been defined for the destination branch"
+msgstr ""
+
+#: app/views/rule_books/_duplicate.html.haml:31
+msgid "Source and Destination branch cannot be the same"
+msgstr ""
+
+#: app/views/rule_books/_duplicate.html.haml:38
+msgid "Rule name"
+msgstr ""
+
+#: app/views/rule_books/_duplicate.html.haml:56 app/views/rule_books/_duplicate.html.haml:62
+msgid "Percentage Split"
+msgstr ""
+
+#: app/views/rule_books/edit.html.haml:5
+msgid "Edit a Rule"
+msgstr ""
+
+#: app/views/verifications/_journals.html.haml:2
+msgid "Journals"
+msgstr ""
+
+#: app/views/verifications/_journals.html.haml:12 app/views/journals/_list.html.haml:39
+#: app/views/journals/edit.html.haml:43 app/views/payments/show.html.haml:29
+msgid "Comment"
+msgstr ""
+
+#: app/views/verifications/_journals.html.haml:15 app/views/journals/new_eod.html.haml:18
+msgid "Debits"
+msgstr ""
+
+#: app/views/verifications/_journals.html.haml:18 app/views/journals/new_eod.html.haml:15
+msgid "Credits"
+msgstr ""
+
+#: app/views/verifications/_journals.html.haml:22 app/views/verifications/_portfolios.html.haml:22
+#: app/views/verifications/_loans.html.haml:40 app/views/verifications/_clients.html.haml:34
+#: app/views/verifications/_payments.html.haml:40
+msgid "Check all"
+msgstr ""
+
+#: app/views/verifications/_journals.html.haml:24 app/views/verifications/_portfolios.html.haml:24
+#: app/views/verifications/_loans.html.haml:42 app/views/verifications/_clients.html.haml:36
+#: app/views/verifications/_payments.html.haml:42
+msgid "/"
+msgstr ""
+
+#: app/views/verifications/_journals.html.haml:27 app/views/verifications/_portfolios.html.haml:27
+#: app/views/verifications/_loans.html.haml:45 app/views/verifications/_clients.html.haml:39
+#: app/views/verifications/_payments.html.haml:45
+msgid "Check none"
+msgstr ""
+
+#: app/views/verifications/index.html.haml:2
+msgid "Pending approval"
+msgstr ""
+
+#: app/views/verifications/index.html.haml:8
+msgid "Date range:"
+msgstr ""
+
+#: app/views/verifications/index.html.haml:10
+msgid "--"
+msgstr ""
+
+#: app/views/verifications/_portfolios.html.haml:12 app/views/users/show.html.haml:25
+msgid "Funder"
+msgstr ""
+
+#: app/views/verifications/_portfolios.html.haml:15 app/views/verifications/_loans.html.haml:33
+#: app/views/verifications/_clients.html.haml:27 app/views/verifications/_payments.html.haml:30
+msgid "Created by"
+msgstr ""
+
+#: app/views/verifications/_portfolios.html.haml:18 app/views/verifications/_loans.html.haml:36
+#: app/views/verifications/_clients.html.haml:30 app/views/verifications/_payments.html.haml:36
+#: app/views/reports/_target_report.html.haml:4
+msgid "Creation date"
+msgstr ""
+
+#: app/views/verifications/_loans.html.haml:18
+msgid "Appication date"
+msgstr ""
+
+#: app/views/verifications/_loans.html.haml:21
+msgid "Disbursal date"
+msgstr ""
+
+#: app/views/verifications/_loans.html.haml:27 app/views/verifications/_clients.html.haml:21
+#: app/views/verifications/_payments.html.haml:27 app/views/clients/inactive_client_count.html.haml:18
+#: app/views/clients/death_count.html.haml:18 app/views/reports/_par_by_center_report.html.haml:6
+#: app/views/reports/_last_update_report.html.haml:10 app/views/dashboard/today.html.haml:30
+#: app/views/data_entry/loans/bulk_update_funding_line.html.haml:18 app/views/data_entry/loans/_make_loan_utilization.html.haml:18
+#: app/views/funding_lines/show.html.haml:46 app/views/loans/_approve.html.haml:17
+#: app/views/loans/_write_off_suggested.html.haml:17 app/views/loans/misc.html.haml:98
+#: app/views/client_groups/index.html.haml:10 app/views/portfolios/_fields.html.haml:20
+#: app/views/claims/_fields.html.haml:19
+msgid "Center"
+msgstr ""
+
+#: app/views/verifications/_loans.html.haml:30 app/views/verifications/_clients.html.haml:24
+#: app/views/clients/inactive_client_count.html.haml:15 app/views/clients/death_count.html.haml:15
+#: app/views/reports/_projected_report.html.haml:4 app/views/reports/_closed_loan_report.html.haml:8
+#: app/views/reports/_group_consolidated_report.html.haml:4 app/views/loans/index.html.haml:69
+#: app/views/client_groups/index.html.haml:7 app/views/claims/_fields.html.haml:24
+msgid "Group"
+msgstr ""
+
+#: app/views/verifications/_clients.html.haml:12
+#: app/views/reports/_non_disbursed_clients_after_group_recognition_test.html.haml:9 app/views/data_entry/loans/bulk_form.html.haml:19
+#: app/views/centers/bulk_data_entry.html.haml:8
+msgid "Reference"
+msgstr ""
+
+#: app/views/verifications/_clients.html.haml:15
+msgid "Joining date"
+msgstr ""
+
+#: app/views/verifications/_payments.html.haml:2 app/views/admin/upload.html.haml:35
+#: app/views/portfolios/show.html.haml:70
+msgid "Payments"
+msgstr ""
+
+#: app/views/verifications/_payments.html.haml:18 app/views/client_types/_fields.html.haml:3
+#: app/views/reports/_offline_payments.html.haml:15 app/views/documents/index.html.haml:4
+#: app/views/audit_trails/show.html.haml:29 app/views/payments/_fields.html.haml:9
+#: app/views/payments/show.html.haml:24
+msgid "Type"
+msgstr ""
+
+#: app/views/verifications/_payments.html.haml:21 app/views/reports/_closed_loan_report.html.haml:5
+#: app/views/admin/dirty_loans.html.haml:3 app/views/portfolios/show.html.haml:49
+msgid "Loan ID"
+msgstr ""
+
+#: app/views/verifications/_payments.html.haml:33
+msgid "Collected by"
+msgstr ""
+
+#: app/views/clients/_basic_info.html.haml:5 app/views/clients/_basic_info.html.haml:12
+#: app/views/client_groups/_fields.html.haml:4
+msgid "For center:"
+msgstr ""
+
+#: app/views/clients/_basic_info.html.haml:19
+msgid "For center"
+msgstr ""
+
+#: app/views/clients/_basic_info.html.haml:26
+msgid "Group name"
+msgstr ""
+
+#: app/views/clients/_basic_info.html.haml:31
+msgid "Select the group for this person"
+msgstr ""
+
+#: app/views/clients/new.html.haml:1
+msgid "Add a new client"
+msgstr ""
+
+#: app/views/clients/_income_information.html.haml:6 app/views/clients/_extra_fields.html.haml:142
+msgid "Other productive asset:"
+msgstr ""
+
+#: app/views/clients/_income_information.html.haml:12 app/views/clients/_extra_fields.html.haml:148
+msgid "Income regular:"
+msgstr ""
+
+#: app/views/clients/_income_information.html.haml:18 app/views/clients/_extra_fields.html.haml:154
+msgid "Client migration:"
+msgstr ""
+
+#: app/views/clients/_income_information.html.haml:24
+msgid "Pre loan amount:"
+msgstr ""
+
+#: app/views/clients/_income_information.html.haml:30 app/views/clients/_extra_fields.html.haml:166
+msgid "Other income:"
+msgstr ""
+
+#: app/views/clients/_fields.html.haml:3
+msgid "Basic info"
+msgstr ""
+
+#: app/views/clients/_fields.html.haml:5
+msgid "Bank Account Data"
+msgstr ""
+
+#: app/views/clients/_fields.html.haml:7
+msgid "Family Details"
+msgstr ""
+
+#: app/views/clients/_fields.html.haml:9
+msgid "Income Information"
+msgstr ""
+
+#: app/views/clients/_fields.html.haml:11
+msgid "Poverty Overview"
+msgstr ""
+
+#: app/views/clients/_fields.html.haml:13
+msgid "Demographic Data"
+msgstr ""
+
+#: app/views/clients/show.html.haml:13 app/views/clients/_list.html.haml:85
+#: app/views/reports/_loan_size_per_manager_report.html.haml:63 app/views/accounts/show.html.haml:30
+#: app/views/account_balances/new.html.haml:6 app/views/centers/bulk_data_entry.html.haml:42
+#: app/views/centers/_disbursals.html.haml:18 app/views/centers/_approvals.html.haml:18
+msgid ")"
+msgstr ""
+
+#: app/views/clients/show.html.haml:16
+msgid "spouse name"
+msgstr ""
+
+#: app/views/clients/show.html.haml:20 app/views/clients/today.html.haml:10
+msgid "manager"
+msgstr ""
+
+#: app/views/clients/show.html.haml:23
+msgid "at center"
+msgstr ""
+
+#: app/views/clients/show.html.haml:30 app/views/loans/index.html.haml:65
+msgid "center managed by:"
+msgstr ""
+
+#: app/views/clients/show.html.haml:33
+msgid "group name1"
+msgstr ""
+
+#: app/views/clients/show.html.haml:46 app/views/loans/index.html.haml:79
+msgid "Not associated with a group yet ("
+msgstr ""
+
+#: app/views/clients/show.html.haml:48 app/views/loans/index.html.haml:81
+msgid "to change)"
+msgstr ""
+
+#: app/views/clients/index.html.haml:17
+msgid "In branch"
+msgstr ""
+
+#: app/views/clients/index.html.haml:22 app/views/centers/_fields.html.haml:49
+#: app/views/branches/_fields.html.haml:40
+msgid "Managed by:"
+msgstr ""
+
+#: app/views/clients/index.html.haml:25 app/views/centers/_list.html.haml:27
+msgid "Meeting"
+msgstr ""
+
+#: app/views/clients/index.html.haml:37
+msgid "Center leader"
+msgstr ""
+
+#: app/views/clients/index.html.haml:109
+msgid "&nbsp; Select field to do mass entry"
+msgstr ""
+
+#: app/views/clients/_poverty_overview.html.haml:6 app/views/clients/_extra_fields.html.haml:177
+msgid "Total income:"
+msgstr ""
+
+#: app/views/clients/_poverty_overview.html.haml:12 app/views/clients/_extra_fields.html.haml:183
+msgid "Poverty status:"
+msgstr ""
+
+#: app/views/clients/_poverty_overview.html.haml:18 app/views/clients/_extra_fields.html.haml:189
+msgid "Irrigated land:"
+msgstr ""
+
+#: app/views/clients/_poverty_overview.html.haml:24 app/views/clients/_poverty_overview.html.haml:65
+msgid "(in acres)"
+msgstr ""
+
+#: app/views/clients/_poverty_overview.html.haml:27 app/views/clients/_poverty_overview.html.haml:68
+#: app/views/clients/_extra_fields.html.haml:196 app/views/clients/_extra_fields.html.haml:235
+msgid "own"
+msgstr ""
+
+#: app/views/clients/_poverty_overview.html.haml:30 app/views/clients/_poverty_overview.html.haml:71
+#: app/views/clients/_extra_fields.html.haml:199 app/views/clients/_extra_fields.html.haml:238
+msgid "leased"
+msgstr ""
+
+#: app/views/clients/_poverty_overview.html.haml:33 app/views/clients/_poverty_overview.html.haml:74
+#: app/views/clients/_extra_fields.html.haml:202 app/views/clients/_extra_fields.html.haml:241
+msgid "shared"
+msgstr ""
+
+#: app/views/clients/_poverty_overview.html.haml:37 app/views/clients/_poverty_overview.html.haml:78
+#: app/views/clients/_extra_fields.html.haml:206 app/views/clients/_extra_fields.html.haml:245
+msgid "Fertile"
+msgstr ""
+
+#: app/views/clients/_poverty_overview.html.haml:44 app/views/clients/_poverty_overview.html.haml:85
+#: app/views/clients/_extra_fields.html.haml:213 app/views/clients/_extra_fields.html.haml:252
+msgid "Semifertile"
+msgstr ""
+
+#: app/views/clients/_poverty_overview.html.haml:51 app/views/clients/_poverty_overview.html.haml:92
+#: app/views/clients/_extra_fields.html.haml:220 app/views/clients/_extra_fields.html.haml:259
+msgid "Wasteland"
+msgstr ""
+
+#: app/views/clients/_poverty_overview.html.haml:59 app/views/clients/_extra_fields.html.haml:228
+msgid "Not irrigated land:"
+msgstr ""
+
+#: app/views/clients/search.html.haml:3 app/views/clients/search.html.haml:47
+#: app/views/reports/_form.html.haml:40 app/views/reports/_form.html.haml:209
+#: app/views/client_groups/search.html.haml:3 app/views/client_groups/search.html.haml:47
+#: app/views/portfolios/show.html.haml:86
+msgid "Center:"
+msgstr ""
+
+#: app/views/clients/search.html.haml:19
+msgid "Edit client"
+msgstr ""
+
+#: app/views/clients/search.html.haml:22
+msgid "Please select a client that you want to edit, either by its client ID, or through the center it belongs to."
+msgstr ""
+
+#: app/views/clients/search.html.haml:33
+msgid "Client ID, Name or Ref.:"
+msgstr ""
+
+#: app/views/clients/_bank_account_data.html.haml:6 app/views/clients/_extra_fields.html.haml:5
+msgid "Account number:"
+msgstr ""
+
+#: app/views/clients/_bank_account_data.html.haml:12 app/views/clients/_extra_fields.html.haml:11
+msgid "Type of account:"
+msgstr ""
+
+#: app/views/clients/_bank_account_data.html.haml:18 app/views/clients/_extra_fields.html.haml:17
+msgid "Bank name:"
+msgstr ""
+
+#: app/views/clients/_bank_account_data.html.haml:24 app/views/clients/_extra_fields.html.haml:23
+#: app/views/reports/_form.html.haml:30 app/views/reports/_form.html.haml:34
+#: app/views/reports/_form.html.haml:199 app/views/reports/_form.html.haml:204
+#: app/views/dashboard/_form.html.haml:12 app/views/portfolios/show.html.haml:82
+msgid "Branch:"
+msgstr ""
+
+#: app/views/clients/_bank_account_data.html.haml:30 app/views/clients/_extra_fields.html.haml:29
+msgid "Join holder:"
+msgstr ""
+
+#: app/views/clients/inactive_client_count.html.haml:1
+msgid "List of Inactive clients"
+msgstr ""
+
+#: app/views/clients/inactive_client_count.html.haml:12 app/views/clients/death_count.html.haml:12
+#: app/views/reports/_insurance_register.html.haml:22 app/views/loans/index.html.haml:39
+msgid "Date of Birth"
+msgstr ""
+
+#: app/views/clients/_list.html.haml:6
+msgid "Key =>"
+msgstr ""
+
+#: app/views/clients/_list.html.haml:8
+msgid "applied"
+msgstr ""
+
+#: app/views/clients/_list.html.haml:10
+msgid "approved"
+msgstr ""
+
+#: app/views/clients/_list.html.haml:12 app/views/data_entry/payments/_cds.html.haml:15
+#: app/views/centers/_cds.html.haml:15
+msgid "outstanding"
+msgstr ""
+
+#: app/views/clients/_list.html.haml:16
+msgid "in arrears"
+msgstr ""
+
+#: app/views/clients/_list.html.haml:18
+msgid "written-off"
+msgstr ""
+
+#: app/views/clients/_list.html.haml:20
+msgid "preclosed"
+msgstr ""
+
+#: app/views/clients/_list.html.haml:65
+msgid "inactive"
+msgstr ""
+
+#: app/views/clients/_list.html.haml:75 app/views/insurance_products/_list.html.haml:23
+#: app/views/centers/_list.html.haml:54
+msgid "&nbsp;|&nbsp;"
+msgstr ""
+
+#: app/views/clients/_list.html.haml:91
+msgid "No clients yet in this group"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:40 app/views/clients/_family_details.html.haml:6
+msgid "Number of family members:"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:46 app/views/clients/_family_details.html.haml:12
+msgid "Children:"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:52 app/views/clients/_family_details.html.haml:18
+msgid "Girls under 5 years"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:55 app/views/clients/_family_details.html.haml:21
+msgid "Girls 5 to 15 years"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:58
+msgid "Girls over 5 years"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:66
+msgid "Sons under 5 years"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:69
+msgid "Sons 5 to 15 years"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:72
+msgid "Sons over 5 years"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:81 app/views/clients/_family_details.html.haml:47
+msgid "Not in school:"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:87 app/views/clients/_family_details.html.haml:53
+msgid "Working girls"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:90 app/views/clients/_family_details.html.haml:56
+msgid "Bonded girls"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:97
+msgid "Working sons"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:100
+msgid "Bonded sons"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:108 app/views/clients/_family_details.html.haml:74
+msgid "School distance:"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:114 app/views/clients/_family_details.html.haml:80
+msgid "Phc distance:"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:125 app/views/clients/_demographic_data.html.haml:18
+msgid "Member literate:"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:131 app/views/clients/_demographic_data.html.haml:24
+msgid "Husband litrate:"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:160
+msgid "Pr loan amount:"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:272 app/views/clients/_demographic_data.html.haml:12
+msgid "Caste:"
+msgstr ""
+
+#: app/views/clients/_extra_fields.html.haml:278 app/views/clients/_demographic_data.html.haml:6
+msgid "Religion:"
+msgstr ""
+
+#: app/views/clients/today.html.haml:13
+msgid "in branch"
+msgstr ""
+
+#: app/views/clients/today.html.haml:18
+msgid "managed by:"
+msgstr ""
+
+#: app/views/clients/today.html.haml:21
+msgid "meeting"
+msgstr ""
+
+#: app/views/clients/today.html.haml:46
+msgid "prin_due"
+msgstr ""
+
+#: app/views/clients/today.html.haml:48
+msgid "int_due"
+msgstr ""
+
+#: app/views/clients/today.html.haml:50
+msgid "total_due"
+msgstr ""
+
+#: app/views/clients/today.html.haml:52 app/views/data_entry/payments/_cds.html.haml:27
+#: app/views/centers/_cds.html.haml:31
+msgid "paid"
+msgstr ""
+
+#: app/views/clients/today.html.haml:62
+msgid "aaa"
+msgstr ""
+
+#: app/views/clients/_family_details.html.haml:24
+msgid "Girls over 15 years"
+msgstr ""
+
+#: app/views/clients/_family_details.html.haml:32
+msgid "Boys under 5 years"
+msgstr ""
+
+#: app/views/clients/_family_details.html.haml:35
+msgid "Boys 5 to 15 years"
+msgstr ""
+
+#: app/views/clients/_family_details.html.haml:38
+msgid "Boys over 15 years"
+msgstr ""
+
+#: app/views/clients/_family_details.html.haml:63
+msgid "Working boys"
+msgstr ""
+
+#: app/views/clients/_family_details.html.haml:66
+msgid "Bonded boys"
+msgstr ""
+
+#: app/views/clients/death_count.html.haml:1
+msgid "List of dead clients"
+msgstr ""
+
+#: app/views/client_types/new.html.haml:1
+msgid "New Client Type"
+msgstr ""
+
+#: app/views/client_types/_fields.html.haml:7 app/views/applicable_fees/index.html.haml:2
+#: app/views/insurance_products/_fields.html.haml:13 app/views/loans/index.html.haml:265
+msgid "Applicable Fees"
+msgstr ""
+
+#: app/views/client_types/show.html.haml:2 app/views/reports/_death_claim_report.html.haml:7
+#: app/views/reports/_repayment_overdue.html.haml:4 app/views/reports/_late_disbursals_report.html.haml:12
+#: app/views/reports/_claim_report.html.haml:6 app/views/reports/_transaction_ledger.html.haml:7
+#: app/views/data_entry/payments/by_center.html.haml:149 app/views/data_entry/loans/bulk_update_funding_line.html.haml:15
+#: app/views/payments/show.html.haml:19 app/views/admin/dirty_loans.html.haml:6
+#: app/views/admin/dirty_loans.html.haml:9 app/views/centers/bulk_loan_entry_form.html.haml:6
+msgid "Client"
+msgstr ""
+
+#: app/views/client_types/show.html.haml:5
+msgid "The following fees are applicable on this client type:"
+msgstr ""
+
+#: app/views/client_types/index.html.haml:2
+msgid "Client Types"
+msgstr ""
+
+#: app/views/client_types/index.html.haml:13
+msgid "Fees Applicable"
+msgstr ""
+
+#: app/views/client_types/edit.html.haml:2
+msgid "Edit client type"
+msgstr ""
+
+#: app/views/loan_products/new.html.haml:1
+msgid "New Loan Product"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:10
+msgid "Amount Range"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:14 app/views/loan_products/_fields.html.haml:44
+#: app/views/loan_products/_fields.html.haml:73
+msgid "min"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:17 app/views/loan_products/_fields.html.haml:47
+#: app/views/loan_products/_fields.html.haml:76
+msgid "to"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:21 app/views/loan_products/_fields.html.haml:51
+#: app/views/loan_products/_fields.html.haml:80
+msgid "max"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:24 app/views/loan_products/_fields.html.haml:54
+msgid "in multiples of"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:36
+msgid "if this loan product doesn't allow amount variations, min and max should be same"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:40
+msgid "Interest rate range"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:64
+msgid "if this loan product doesn't allow interest rate variations, min and max should be same"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:69
+msgid "Installment range"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:85 app/views/loan_products/design.html.haml:44
+msgid "Installment Frequency"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:91
+msgid "Loan Type"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:99
+msgid "Rounding to"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:104
+msgid "Rounding Style"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:109
+msgid "By default, round is choosen as the rounding style"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:113
+msgid "Link to an insurance policy ?"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:122 app/views/loan_products/index.html.haml:30
+msgid "Validity"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:126 app/views/claims/_fields.html.haml:50
+msgid "valid from"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:130 app/views/claims/_fields.html.haml:53
+msgid "valid upto"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:137
+msgid "after a loan product expires there cannot be anymore disbursals from that loan"
+msgstr ""
+
+#: app/views/loan_products/_fields.html.haml:141 app/views/loan_products/show.html.haml:47
+#: app/views/loan_products/design.html.haml:81 app/views/fees/index.html.haml:2
+#: app/views/data_entry/payments/by_center.html.haml:135 app/views/data_entry/payments/by_center.html.haml:164
+#: app/views/funding_lines/show.html.haml:72 app/views/payments/index.html.haml:141
+#: app/views/browse/_totalinfo.html.haml:87
+msgid "Fees"
+msgstr ""
+
+#: app/views/loan_products/show.html.haml:8
+msgid "Paramaters"
+msgstr ""
+
+#: app/views/loan_products/show.html.haml:14
+msgid "Validations"
+msgstr ""
+
+#: app/views/loan_products/show.html.haml:17
+msgid "Sample schedule"
+msgstr ""
+
+#: app/views/loan_products/show.html.haml:20 app/views/fees/show.html.haml:15
+#: app/views/payments/index.html.haml:199 app/views/users/show.html.haml:55
+#: app/views/loans/index.html.haml:121 app/views/centers/index.html.haml:75
+msgid "History"
+msgstr ""
+
+#: app/views/loan_products/show.html.haml:44
+msgid ").join().capitalize}.join("
+msgstr ""
+
+#: app/views/loan_products/show.html.haml:58
+msgid "date"
+msgstr ""
+
+#: app/views/loan_products/show.html.haml:61
+msgid "principal"
+msgstr ""
+
+#: app/views/loan_products/show.html.haml:67
+msgid "total"
+msgstr ""
+
+#: app/views/loan_products/show.html.haml:70
+msgid "total paid"
+msgstr ""
+
+#: app/views/loan_products/show.html.haml:73
+msgid "balance"
+msgstr ""
+
+#: app/views/loan_products/show.html.haml:95
+msgid "Cannot generate schedule as some parameters are missing"
+msgstr ""
+
+#: app/views/loan_products/index.html.haml:2
+msgid "LoanProducts"
+msgstr ""
+
+#: app/views/loan_products/index.html.haml:8
+msgid "No Loan Products defined."
+msgstr ""
+
+#: app/views/loan_products/index.html.haml:10
+msgid "to add one"
+msgstr ""
+
+#: app/views/loan_products/index.html.haml:18
+msgid "Product name"
+msgstr ""
+
+#: app/views/loan_products/index.html.haml:21
+msgid "Loan type"
+msgstr ""
+
+#: app/views/loan_products/index.html.haml:27
+msgid "Interest ()"
+msgstr ""
+
+#: app/views/loan_products/index.html.haml:34
+msgid "Current products"
+msgstr ""
+
+#: app/views/loan_products/_irr_fields.html.haml:10 app/views/loan_products/design.html.haml:30
+#: app/views/funding_lines/_fields.html.haml:14
+msgid "Disbursal Date"
+msgstr ""
+
+#: app/views/loan_products/_irr_fields.html.haml:15 app/views/loan_products/design.html.haml:34
+#: app/views/funding_lines/_fields.html.haml:19
+msgid "First Payment Date"
+msgstr ""
+
+#: app/views/loan_products/_irr_fields.html.haml:20 app/views/loan_products/_irr_fields.html.haml:25
+#: app/views/loan_products/design.html.haml:25 app/views/funding_lines/_fields.html.haml:9
+msgid "Interest Rate"
+msgstr ""
+
+#: app/views/loan_products/design.html.haml:3
+msgid "Loan Product IRR helper"
+msgstr ""
+
+#: app/views/loan_products/design.html.haml:5
+msgid "Use the form below to calculate the IRR on a loan for a particular loan product."
+msgstr ""
+
+#: app/views/loan_products/design.html.haml:15
+msgid "Exclude fees"
+msgstr ""
+
+#: app/views/loan_products/design.html.haml:40
+msgid "Number of Installments"
+msgstr ""
+
+#: app/views/loan_products/design.html.haml:58
+msgid "This loan has an IRR of"
+msgstr ""
+
+#: app/views/loan_products/design.html.haml:72 app/views/reports/_staff_consolidated_report.html.haml:69
+#: app/views/reports/_balance_sheet.html.haml:15 app/views/reports/_repayment_overdue.html.haml:13
+#: app/views/reports/_quarter_consolidated_report.html.haml:69 app/views/reports/_group_consolidated_report.html.haml:69
+#: app/views/dashboard/today.html.haml:92
+msgid "Balance"
+msgstr ""
+
+#: app/views/loan_products/design.html.haml:75 app/views/journals/reconcile.html.haml:48
+#: app/views/reports/_projected_report.html.haml:33 app/views/reports/_par_by_center_report.html.haml:26
+#: app/views/reports/_cash_projected_report.html.haml:33 app/views/reports/_death_claim_report.html.haml:40
+#: app/views/reports/_staff_consolidated_report.html.haml:33 app/views/reports/_staff_consolidated_report.html.haml:45
+#: app/views/reports/_staff_consolidated_report.html.haml:54 app/views/reports/_repayment_overdue.html.haml:27
+#: app/views/reports/_repayment_overdue.html.haml:42 app/views/reports/_quarter_consolidated_report.html.haml:33
+#: app/views/reports/_quarter_consolidated_report.html.haml:45 app/views/reports/_quarter_consolidated_report.html.haml:54
+#: app/views/reports/_daily_transaction_summary.html.haml:30 app/views/reports/_daily_transaction_summary.html.haml:45
+#: app/views/reports/_daily_transaction_summary.html.haml:54 app/views/reports/_daily_transaction_summary.html.haml:63
+#: app/views/reports/_daily_transaction_summary.html.haml:72 app/views/reports/_group_consolidated_report.html.haml:33
+#: app/views/reports/_group_consolidated_report.html.haml:45 app/views/reports/_group_consolidated_report.html.haml:54
+#: app/views/reports/_transaction_ledger.html.haml:20 app/views/dashboard/today.html.haml:50
+#: app/views/dashboard/today.html.haml:62 app/views/dashboard/today.html.haml:74
+#: app/views/funding_lines/show.html.haml:66 app/views/browse/_totalinfo.html.haml:74
+msgid "Principal"
+msgstr ""
+
+#: app/views/loan_products/design.html.haml:78 app/views/journals/reconcile.html.haml:64
+#: app/views/reports/_projected_report.html.haml:36 app/views/reports/_par_by_center_report.html.haml:29
+#: app/views/reports/_cash_projected_report.html.haml:36 app/views/reports/_death_claim_report.html.haml:43
+#: app/views/reports/_staff_consolidated_report.html.haml:36 app/views/reports/_staff_consolidated_report.html.haml:48
+#: app/views/reports/_staff_consolidated_report.html.haml:57 app/views/reports/_repayment_overdue.html.haml:30
+#: app/views/reports/_repayment_overdue.html.haml:45 app/views/reports/_quarter_consolidated_report.html.haml:36
+#: app/views/reports/_quarter_consolidated_report.html.haml:48 app/views/reports/_quarter_consolidated_report.html.haml:57
+#: app/views/reports/_daily_transaction_summary.html.haml:33 app/views/reports/_daily_transaction_summary.html.haml:48
+#: app/views/reports/_daily_transaction_summary.html.haml:57 app/views/reports/_daily_transaction_summary.html.haml:66
+#: app/views/reports/_daily_transaction_summary.html.haml:75 app/views/reports/_group_consolidated_report.html.haml:36
+#: app/views/reports/_group_consolidated_report.html.haml:48 app/views/reports/_group_consolidated_report.html.haml:57
+#: app/views/reports/_transaction_ledger.html.haml:23 app/views/dashboard/today.html.haml:53
+#: app/views/dashboard/today.html.haml:65 app/views/dashboard/today.html.haml:77
+#: app/views/funding_lines/show.html.haml:69 app/views/centers/bulk_loan_entry_form.html.haml:10
+#: app/views/browse/_totalinfo.html.haml:80
+msgid "Interest"
+msgstr ""
+
+#: app/views/loan_products/design.html.haml:83
+msgid "Cashflow"
+msgstr ""
+
+#: app/views/loan_products/edit.html.haml:1
+msgid "Edit Loan Product"
+msgstr ""
+
+#: app/views/journals/new.html.haml:3
+msgid "New Voucher Entry"
+msgstr ""
+
+#: app/views/journals/new.html.haml:8
+msgid "EOD Voucher Entry"
+msgstr ""
+
+#: app/views/journals/new.html.haml:13
+msgid "EOD Voucher entry"
+msgstr ""
+
+#: app/views/journals/new.html.haml:16 app/views/journals/new.html.haml:31
+#: app/views/journals/reconcile.html.haml:3 app/views/data_entry/index/index.html.haml:3
+msgid "Select branch"
+msgstr ""
+
+#: app/views/journals/new.html.haml:25
+msgid "Voucher entry"
+msgstr ""
+
+#: app/views/journals/new.html.haml:33 app/views/journals/new_eod.html.haml:9
+#: app/views/journals/edit.html.haml:11
+msgid "Journal Type"
+msgstr ""
+
+#: app/views/journals/new.html.haml:48
+msgid "HO journal entry"
+msgstr ""
+
+#: app/views/journals/_fields.html.haml:20 app/views/reports/_cash_book.html.haml:15
+#: app/views/reports/_bank_book.html.haml:15
+msgid "Narration"
+msgstr ""
+
+#: app/views/journals/_fields.html.haml:25 app/views/journals/edit.html.haml:48
+msgid "Transaction ID"
+msgstr ""
+
+#: app/views/journals/show.html.haml:2 app/views/accounts/show.html.haml:39
+msgid "Journal"
+msgstr ""
+
+#: app/views/journals/_list.html.haml:8
+msgid "Voucher type"
+msgstr ""
+
+#: app/views/journals/_list.html.haml:18
+msgid "Created at"
+msgstr ""
+
+#: app/views/journals/_list.html.haml:24
+msgid "Journal ID"
+msgstr ""
+
+#: app/views/journals/_list.html.haml:27
+msgid "Debit Account"
+msgstr ""
+
+#: app/views/journals/_list.html.haml:30
+msgid "Credit Account"
+msgstr ""
+
+#: app/views/journals/_list.html.haml:33
+msgid "Breakup"
+msgstr ""
+
+#: app/views/journals/_list.html.haml:61
+msgid "De"
+msgstr ""
+
+#: app/views/journals/_list.html.haml:64 app/views/reports/_general_ledger_report.html.haml:61
+msgid "Cr"
+msgstr ""
+
+#: app/views/journals/_list_account.html.haml:11 app/views/fees/index.html.haml:14
+#: app/views/documents/index.html.haml:19 app/views/api_accesses/_fields.html.haml:7
+#: app/views/api_accesses/index.html.haml:17
+msgid "Description"
+msgstr ""
+
+#: app/views/journals/_list_account.html.haml:15
+msgid "Account Debit"
+msgstr ""
+
+#: app/views/journals/_list_account.html.haml:18
+msgid "Account Credit"
+msgstr ""
+
+#: app/views/journals/reconcile.html.haml:24
+msgid "Loan System"
+msgstr ""
+
+#: app/views/journals/reconcile.html.haml:27
+msgid "Account System"
+msgstr ""
+
+#: app/views/journals/reconcile.html.haml:30
+msgid "Difference"
+msgstr ""
+
+#: app/views/journals/reconcile.html.haml:34 app/views/reports/_daily_transaction_summary.html.haml:7
+#: app/views/reports/_staff_target_report.html.haml:10
+msgid "Disbursement"
+msgstr ""
+
+#: app/views/journals/tally_download.html.haml:1
+msgid "Tally voucher download"
+msgstr ""
+
+#: app/views/journals/edit.html.haml:1
+msgid "Edit Journal Entry"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:14 app/views/stock_registers/index.html.haml:18
+msgid "Stock Code"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:17
+msgid "enter the code of the stock"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:21 app/views/stock_registers/index.html.haml:20
+msgid "Stock Name"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:24
+msgid "enter the stock name"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:28 app/views/stock_registers/index.html.haml:22
+msgid "Quantity"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:31
+msgid "enter the stock quantity"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:35 app/views/stock_registers/index.html.haml:24
+msgid "Invoice Number"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:38
+msgid "enter the bill number of stock"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:42 app/views/stock_registers/index.html.haml:26
+msgid "Invoice Date"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:45
+msgid "select the bill date of stock"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:49
+msgid "Date of Stock Entry"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:52
+msgid "select date of stock entry"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:56
+msgid "Stock Details Entered By"
+msgstr ""
+
+#: app/views/stock_registers/_fields.html.haml:69
+msgid "select the person who is entering the details"
+msgstr ""
+
+#: app/views/stock_registers/show.html.haml:2
+msgid "StockRegisters controller, show action"
+msgstr ""
+
+#: app/views/stock_registers/show.html.haml:8
+msgid "app/views/stock_registers/show.html.erb"
+msgstr ""
+
+#: app/views/stock_registers/index.html.haml:2
+msgid "Stock Details"
+msgstr ""
+
+#: app/views/stock_registers/index.html.haml:8
+msgid "No data to display. Please enter the data to view the Stock Register."
+msgstr ""
+
+#: app/views/stock_registers/index.html.haml:14 app/views/branch_diaries/index.html.haml:15
+#: app/views/data_entry/loans/bulk_update_funding_line.html.haml:9 app/views/asset_registers/index.html.haml:14
+#: app/views/audit_items/_fields.html.haml:5
+msgid "Id"
+msgstr ""
+
+#: app/views/stock_registers/index.html.haml:28
+msgid "Date Of Stock Entry"
+msgstr ""
+
+#: app/views/stock_registers/index.html.haml:30
+msgid "Entered By"
+msgstr ""
+
+#: app/views/stock_registers/index.html.haml:32 app/views/insurance_companies/edit.html.haml:2
+#: app/views/branch_diaries/index.html.haml:30 app/views/fees/index.html.haml:20
+#: app/views/centers/_list.html.haml:31
+msgid "Edit"
+msgstr ""
+
+#: app/views/stock_registers/edit.html.haml:6
+msgid "Edit the Stock details"
+msgstr ""
+
+#: app/views/reports/_par_by_staff_report.html.haml:6 app/views/reports/_par_by_loan_ageing_report.html.haml:6
+#: app/views/reports/_staff_target_report.html.haml:4
+msgid "Center Manager"
+msgstr ""
+
+#: app/views/reports/_par_by_staff_report.html.haml:9
+msgid "Days"
+msgstr ""
+
+#: app/views/reports/_par_by_staff_report.html.haml:17
+msgid "less than 30"
+msgstr ""
+
+#: app/views/reports/_par_by_staff_report.html.haml:20
+msgid "between 30 - 60"
+msgstr ""
+
+#: app/views/reports/_par_by_staff_report.html.haml:23
+msgid "between 60 - 90"
+msgstr ""
+
+#: app/views/reports/_par_by_staff_report.html.haml:26
+msgid "more than 90"
+msgstr ""
+
+#: app/views/reports/_par_by_staff_report.html.haml:60 app/views/reports/_par_by_center_report.html.haml:74
+#: app/views/reports/_closed_loan_report.html.haml:55 app/views/reports/_late_disbursals_report.html.haml:65
+msgid "Branch total"
+msgstr ""
+
+#: app/views/reports/_day_book.html.haml:4 app/views/reports/_trial_balance_report.html.haml:17
+#: app/views/reports/_balance_sheet.html.haml:12 app/views/reports/_income_statement.html.haml:12
+#: app/views/accounting_periods/period_balances.html.haml:21 app/views/accounting_periods/period_balances.html.haml:32
+msgid "Account"
+msgstr ""
+
+#: app/views/reports/_day_book.html.haml:7
+msgid "Net credit"
+msgstr ""
+
+#: app/views/reports/_day_book.html.haml:10
+msgid "Net debit"
+msgstr ""
+
+#: app/views/reports/_day_book.html.haml:36
+msgid "Totals of credits and debits"
+msgstr ""
+
+#: app/views/reports/_trial_balance_report.html.haml:7 app/views/accounts/index.html.haml:41
+msgid "Collapse All"
+msgstr ""
+
+#: app/views/reports/_trial_balance_report.html.haml:12 app/views/accounts/index.html.haml:46
+msgid "Expand All"
+msgstr ""
+
+#: app/views/reports/_trial_balance_report.html.haml:20 app/views/reports/_cash_book.html.haml:32
+#: app/views/reports/_bank_book.html.haml:32 app/views/accounts/_fields.html.haml:66
+#: app/views/accounts/_book.html.haml:11 app/views/account_balances/_fields.html.haml:4
+#: app/views/account_balances/verify.html.haml:16 app/views/account_balances/index.html.haml:26
+#: app/views/account_balances/_list.html.haml:20
+msgid "Opening Balance"
+msgstr ""
+
+#: app/views/reports/_trial_balance_report.html.haml:23
+msgid "Transations"
+msgstr ""
+
+#: app/views/reports/_trial_balance_report.html.haml:26 app/views/reports/_cash_book.html.haml:60
+#: app/views/reports/_bank_book.html.haml:60 app/views/accounts/_book.html.haml:21
+#: app/views/account_balances/_fields.html.haml:9 app/views/account_balances/verify.html.haml:21
+#: app/views/account_balances/index.html.haml:29 app/views/account_balances/_list.html.haml:23
+msgid "Closing Balance"
+msgstr ""
+
+#: app/views/reports/_trial_balance_report.html.haml:31 app/views/reports/_trial_balance_report.html.haml:37
+#: app/views/reports/_trial_balance_report.html.haml:43 app/views/reports/_cash_book.html.haml:24
+#: app/views/reports/_bank_book.html.haml:24 app/views/accounts/_book.html.haml:47
+msgid "Debit"
+msgstr ""
+
+#: app/views/reports/_trial_balance_report.html.haml:34 app/views/reports/_trial_balance_report.html.haml:40
+#: app/views/reports/_trial_balance_report.html.haml:46 app/views/reports/_cash_book.html.haml:27
+#: app/views/reports/_bank_book.html.haml:27 app/views/accounts/_book.html.haml:50
+msgid "Credit"
+msgstr ""
+
+#: app/views/reports/_projected_report.html.haml:7 app/views/reports/_cash_projected_report.html.haml:7
+msgid "Disbursals delayed"
+msgstr ""
+
+#: app/views/reports/_projected_report.html.haml:10 app/views/reports/_cash_projected_report.html.haml:10
+msgid "Disbursals scheduled"
+msgstr ""
+
+#: app/views/reports/_projected_report.html.haml:13 app/views/reports/_cash_projected_report.html.haml:13
+#: app/views/reports/_repayment_overdue.html.haml:10 app/views/dashboard/index.html.haml:16
+#: app/views/funding_lines/show.html.haml:58 app/views/loans/index.html.haml:127
+msgid "Repayments"
+msgstr ""
+
+#: app/views/reports/_projected_report.html.haml:21 app/views/reports/_projected_report.html.haml:27
+#: app/views/reports/_cash_projected_report.html.haml:21 app/views/reports/_cash_projected_report.html.haml:27
+#: app/views/reports/_loan_size_per_manager_report.html.haml:27 app/views/reports/_staff_consolidated_report.html.haml:24
+#: app/views/reports/_quarter_consolidated_report.html.haml:24 app/views/reports/_group_consolidated_report.html.haml:24
+msgid "Applied"
+msgstr ""
+
+#: app/views/reports/_projected_report.html.haml:24 app/views/reports/_projected_report.html.haml:30
+#: app/views/reports/_cash_projected_report.html.haml:24 app/views/reports/_cash_projected_report.html.haml:30
+#: app/views/reports/_staff_consolidated_report.html.haml:27 app/views/reports/_quarter_consolidated_report.html.haml:27
+#: app/views/reports/_staff_target_report.html.haml:89 app/views/reports/_group_consolidated_report.html.haml:27
+msgid "Sanctioned"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:9
+msgid "Date of Joining"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:12 app/views/reports/_incentive_report.html.haml:36
+msgid "Transfer"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:15
+msgid "Operation Area"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:18
+msgid "Loan frequency-1 (weekly)"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:21
+msgid "Loan frequency-2 (Monthly)"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:24
+msgid "Payable"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:33
+msgid "Present"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:39
+msgid "Clients(current month)"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:42 app/views/reports/_incentive_report.html.haml:63
+msgid "OP BL"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:45 app/views/reports/_incentive_report.html.haml:66
+msgid "Take Over"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:48 app/views/reports/_incentive_report.html.haml:69
+msgid "Clients(last month)"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:51 app/views/reports/_incentive_report.html.haml:72
+msgid "Hand Over"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:54 app/views/reports/_incentive_report.html.haml:75
+msgid "Close"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:57 app/views/reports/_incentive_report.html.haml:78
+msgid "Death"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:60 app/views/reports/_incentive_report.html.haml:81
+msgid "NET MGT"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:84 app/views/audit_trails/_list.html.haml:4
+msgid "For"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:87
+msgid "MAN IGL"
+msgstr ""
+
+#: app/views/reports/_incentive_report.html.haml:90
+msgid "MAN LTL"
+msgstr ""
+
+#: app/views/reports/_par_by_center_report.html.haml:9 app/views/dashboard/index.html.haml:37
+#: app/views/funding_lines/show.html.haml:49
+msgid "Loan count"
+msgstr ""
+
+#: app/views/reports/_par_by_center_report.html.haml:12 app/views/reports/_repayment_overdue.html.haml:7
+#: app/views/funding_lines/show.html.haml:52
+msgid "Disbursed amount"
+msgstr ""
+
+#: app/views/reports/_par_by_center_report.html.haml:15
+msgid "PAR"
+msgstr ""
+
+#: app/views/reports/_par_by_center_report.html.haml:18
+msgid "Overdue amount"
+msgstr ""
+
+#: app/views/reports/_par_by_center_report.html.haml:32 app/views/reports/_death_claim_report.html.haml:46
+#: app/views/reports/_staff_consolidated_report.html.haml:39 app/views/reports/_repayment_overdue.html.haml:33
+#: app/views/reports/_repayment_overdue.html.haml:48 app/views/reports/_quarter_consolidated_report.html.haml:39
+#: app/views/reports/_daily_transaction_summary.html.haml:36 app/views/reports/_group_consolidated_report.html.haml:39
+#: app/views/reports/_transaction_ledger.html.haml:26 app/views/fees/show.html.haml:2
+#: app/views/applicable_fees/_fields.html.haml:4 app/views/dashboard/today.html.haml:56
+#: app/views/dashboard/today.html.haml:68 app/views/dashboard/today.html.haml:80
+msgid "Fee"
+msgstr ""
+
+#: app/views/reports/new.html.haml:1
+msgid "New Report"
+msgstr ""
+
+#: app/views/reports/new.html.haml:10
+msgid "Report Type"
+msgstr ""
+
+#: app/views/reports/new.html.haml:15 app/views/account_balances/_list.html.haml:14
+#: app/views/targets/_fields.html.haml:14 app/views/targets/index.html.haml:20
+msgid "Start Date"
+msgstr ""
+
+#: app/views/reports/_cash_projected_report.html.haml:16 app/views/reports/_cash_projected_report.html.haml:42
+msgid "Net"
+msgstr ""
+
+#: app/views/reports/_client_attendance_report.html.haml:4 app/views/reports/_client_absenteeism_report.html.haml:4
+#: app/views/reports/_scheduled_disbursement_register.html.haml:4 app/views/reports/_loan_disbursement_register.html.haml:4
+#: app/views/reports/_loan_sanction_register.html.haml:4 app/views/reports/_delinquent_loan_report.html.haml:4
+msgid "Ref no."
+msgstr ""
+
+#: app/views/reports/_client_attendance_report.html.haml:7 app/views/reports/_client_absenteeism_report.html.haml:7
+#: app/views/reports/_scheduled_disbursement_register.html.haml:7 app/views/reports/_loan_disbursement_register.html.haml:7
+#: app/views/reports/_loan_sanction_register.html.haml:7 app/views/reports/_delinquent_loan_report.html.haml:7
+msgid "Member name"
+msgstr ""
+
+#: app/views/reports/_client_attendance_report.html.haml:10 app/views/reports/_client_absenteeism_report.html.haml:10
+msgid "Loans disbursed"
+msgstr ""
+
+#: app/views/reports/_client_attendance_report.html.haml:13 app/views/reports/_client_absenteeism_report.html.haml:13
+msgid "Presence count"
+msgstr ""
+
+#: app/views/reports/_client_attendance_report.html.haml:16 app/views/reports/_client_absenteeism_report.html.haml:16
+msgid "Late count"
+msgstr ""
+
+#: app/views/reports/_client_attendance_report.html.haml:19 app/views/reports/_client_absenteeism_report.html.haml:19
+msgid "On leave count"
+msgstr ""
+
+#: app/views/reports/_client_attendance_report.html.haml:22 app/views/reports/_client_absenteeism_report.html.haml:22
+msgid "Absent count"
+msgstr ""
+
+#: app/views/reports/_client_attendance_report.html.haml:25 app/views/reports/_client_absenteeism_report.html.haml:25
+msgid "Proxy count"
+msgstr ""
+
+#: app/views/reports/_death_claim_report.html.haml:10
+msgid "Death of"
+msgstr ""
+
+#: app/views/reports/_death_claim_report.html.haml:13 app/views/reports/_claim_report.html.haml:12
+msgid "Date of Death"
+msgstr ""
+
+#: app/views/reports/_death_claim_report.html.haml:16 app/views/reports/_claim_report.html.haml:15
+msgid "Date of Claim"
+msgstr ""
+
+#: app/views/reports/_death_claim_report.html.haml:19 app/views/reports/_claim_report.html.haml:18
+msgid "Pending Documents"
+msgstr ""
+
+#: app/views/reports/_death_claim_report.html.haml:26 app/views/payments/show.html.haml:2
+msgid "Payment"
+msgstr ""
+
+#: app/views/reports/_death_claim_report.html.haml:29 app/views/reports/_claim_report.html.haml:27
+msgid "Balance Outstanding"
+msgstr ""
+
+#: app/views/reports/_target_report.html.haml:7
+msgid "Attached to"
+msgstr ""
+
+#: app/views/reports/_target_report.html.haml:10 app/views/targets/_fields.html.haml:19
+#: app/views/targets/index.html.haml:23
+msgid "Deadline"
+msgstr ""
+
+#: app/views/reports/_target_report.html.haml:13 app/views/targets/index.html.haml:11
+msgid "Assigned to"
+msgstr ""
+
+#: app/views/reports/_target_report.html.haml:16
+msgid "Start value"
+msgstr ""
+
+#: app/views/reports/_target_report.html.haml:19
+msgid "To reach"
+msgstr ""
+
+#: app/views/reports/_target_report.html.haml:22 app/views/portfolios/show.html.haml:27
+msgid "Present value"
+msgstr ""
+
+#: app/views/reports/_target_report.html.haml:25
+msgid "Percentage complete"
+msgstr ""
+
+#: app/views/reports/_loan_size_per_manager_report.html.haml:7 app/views/dashboard/index.html.haml:10
+#: app/views/data_entry/payments/by_staff_member.html.haml:28 app/views/admin/upload.html.haml:26
+#: app/views/centers/index.html.haml:57 app/views/branches/index.html.haml:24
+msgid "Centers"
+msgstr ""
+
+#: app/views/reports/_loan_size_per_manager_report.html.haml:14 app/views/reports/_late_disbursals_report.html.haml:9
+#: app/views/data_entry/payments/by_center.html.haml:152 app/views/data_entry/payments/_disbursals.html.haml:10
+#: app/views/data_entry/loans/bulk_update_funding_line.html.haml:12 app/views/payments/show.html.haml:8
+#: app/views/payments/index.html.haml:15 app/views/centers/bulk_data_entry.html.haml:17
+msgid "Loan"
+msgstr ""
+
+#: app/views/reports/_loan_size_per_manager_report.html.haml:17
+msgid "Average Per Client"
+msgstr ""
+
+#: app/views/reports/_loan_size_per_manager_report.html.haml:20
+msgid "Average Per Center"
+msgstr ""
+
+#: app/views/reports/_loan_size_per_manager_report.html.haml:30 app/views/data_entry/payments/_approvals.html.haml:14
+msgid "Approved"
+msgstr ""
+
+#: app/views/reports/_loan_size_per_manager_report.html.haml:61
+msgid "Total ("
+msgstr ""
+
+#: app/views/reports/_staff_consolidated_report.html.haml:4 app/views/reports/_quarter_consolidated_report.html.haml:4
+msgid "Staff"
+msgstr ""
+
+#: app/views/reports/_staff_consolidated_report.html.haml:7 app/views/reports/_quarter_consolidated_report.html.haml:7
+#: app/views/reports/_group_consolidated_report.html.haml:7 app/views/centers/bulk_loan_entry_form.html.haml:8
+msgid "Loan amount"
+msgstr ""
+
+#: app/views/reports/_staff_consolidated_report.html.haml:10 app/views/reports/_quarter_consolidated_report.html.haml:10
+#: app/views/reports/_group_consolidated_report.html.haml:10 app/views/reports/_transaction_ledger.html.haml:13
+msgid "Repayment"
+msgstr ""
+
+#: app/views/reports/_staff_consolidated_report.html.haml:13 app/views/reports/_quarter_consolidated_report.html.haml:13
+#: app/views/reports/_group_consolidated_report.html.haml:13
+msgid "Balance outstanding"
+msgstr ""
+
+#: app/views/reports/_staff_consolidated_report.html.haml:16 app/views/reports/_quarter_consolidated_report.html.haml:16
+#: app/views/reports/_group_consolidated_report.html.haml:16
+msgid "Balance Overdue"
+msgstr ""
+
+#: app/views/reports/_staff_consolidated_report.html.haml:19 app/views/reports/_quarter_consolidated_report.html.haml:19
+#: app/views/reports/_group_consolidated_report.html.haml:19
+msgid "Advance repayment"
+msgstr ""
+
+#: app/views/reports/_staff_consolidated_report.html.haml:63 app/views/reports/_quarter_consolidated_report.html.haml:63
+#: app/views/reports/_group_consolidated_report.html.haml:63 app/views/dashboard/today.html.haml:86
+msgid "Collected"
+msgstr ""
+
+#: app/views/reports/_staff_consolidated_report.html.haml:66 app/views/reports/_quarter_consolidated_report.html.haml:66
+#: app/views/reports/_group_consolidated_report.html.haml:66 app/views/dashboard/today.html.haml:89
+msgid "Adjusted"
+msgstr ""
+
+#: app/views/reports/_last_update_report.html.haml:13
+msgid "Last Payment created at"
+msgstr ""
+
+#: app/views/reports/_last_update_report.html.haml:16
+msgid "Last Loan created at"
+msgstr ""
+
+#: app/views/reports/_last_update_report.html.haml:19
+msgid "Last Client created at"
+msgstr ""
+
+#: app/views/reports/_balance_sheet.html.haml:9
+msgid "Asset Class or GL Code"
+msgstr ""
+
+#: app/views/reports/_balance_sheet.html.haml:19 app/views/reports/_balance_sheet.html.haml:128
+msgid "Assets"
+msgstr ""
+
+#: app/views/reports/_balance_sheet.html.haml:42 app/views/reports/_balance_sheet.html.haml:77
+#: app/views/reports/_balance_sheet.html.haml:112 app/views/reports/_income_statement.html.haml:46
+#: app/views/reports/_income_statement.html.haml:83
+msgid "Sub-total"
+msgstr ""
+
+#: app/views/reports/_balance_sheet.html.haml:48
+msgid "Total Assets"
+msgstr ""
+
+#: app/views/reports/_balance_sheet.html.haml:54
+msgid "Liabilities"
+msgstr ""
+
+#: app/views/reports/_balance_sheet.html.haml:83
+msgid "Total Liabilities"
+msgstr ""
+
+#: app/views/reports/_balance_sheet.html.haml:89
+msgid "Capital & Reserves"
+msgstr ""
+
+#: app/views/reports/_balance_sheet.html.haml:118
+msgid "Total Equity"
+msgstr ""
+
+#: app/views/reports/_balance_sheet.html.haml:124 app/views/reports/_income_statement.html.haml:18
+msgid "Totals"
+msgstr ""
+
+#: app/views/reports/_balance_sheet.html.haml:134
+msgid "Liabilities + Equity"
+msgstr ""
+
+#: app/views/reports/_scheduled_disbursement_register.html.haml:10 app/views/reports/_loan_disbursement_register.html.haml:10
+#: app/views/reports/_loan_sanction_register.html.haml:10 app/views/loans/index.html.haml:51
+#: app/views/centers/bulk_data_entry.html.haml:14
+msgid "Spouse name"
+msgstr ""
+
+#: app/views/reports/_scheduled_disbursement_register.html.haml:13 app/views/reports/_loan_disbursement_register.html.haml:13
+#: app/views/reports/_loan_sanction_register.html.haml:13
+msgid "Loan product"
+msgstr ""
+
+#: app/views/reports/_scheduled_disbursement_register.html.haml:16 app/views/reports/_loan_disbursement_register.html.haml:16
+#: app/views/reports/_loan_sanction_register.html.haml:16
+msgid "Loan sequence"
+msgstr ""
+
+#: app/views/reports/_scheduled_disbursement_register.html.haml:19
+msgid "Scheduled Disbursment date"
+msgstr ""
+
+#: app/views/reports/index.html.haml:2 app/views/admin/edit.html.haml:326
+msgid "Reports"
+msgstr ""
+
+#: app/views/reports/index.html.haml:14
+msgid "Custom"
+msgstr ""
+
+#: app/views/reports/_repayment_overdue.html.haml:16
+msgid "Overdue Repayment"
+msgstr ""
+
+#: app/views/reports/_repayment_overdue.html.haml:39 app/views/reports/_staff_target_report.html.haml:16
+#: app/views/portfolios/_fields.html.haml:26
+msgid "Outstanding"
+msgstr ""
+
+#: app/views/reports/_general_ledger_report.html.haml:7 app/views/reports/_weekly_report.html.haml:4
+#: app/views/reports/_monthly_report.html.haml:4 app/views/accounts/_book.html.haml:38
+#: app/views/loans/prepay.html.haml:39 app/views/loans/_prepay.html.haml:33
+msgid "Particulars"
+msgstr ""
+
+#: app/views/reports/_general_ledger_report.html.haml:10
+msgid "Vch. Type"
+msgstr ""
+
+#: app/views/reports/_general_ledger_report.html.haml:13 app/views/reports/_cash_book.html.haml:21
+#: app/views/reports/_bank_book.html.haml:21
+msgid "Vch. No."
+msgstr ""
+
+#: app/views/reports/_general_ledger_report.html.haml:16 app/views/accounts/branch.html.haml:4
+#: app/views/accounts/index.html.haml:9
+msgid "Accounts"
+msgstr ""
+
+#: app/views/reports/_general_ledger_report.html.haml:19
+msgid "Debit Amount"
+msgstr ""
+
+#: app/views/reports/_general_ledger_report.html.haml:22
+msgid "Credit Amount"
+msgstr ""
+
+#: app/views/reports/_general_ledger_report.html.haml:53
+msgid "Dr"
+msgstr ""
+
+#: app/views/reports/_closed_loan_report.html.haml:14 app/views/reports/_loan_purpose_report.html.haml:7
+#: app/views/reports/_insurance_register.html.haml:10 app/views/reports/_delinquent_loan_report.html.haml:13
+msgid "Loan Amount"
+msgstr ""
+
+#: app/views/reports/_closed_loan_report.html.haml:17
+msgid "Reason for closure"
+msgstr ""
+
+#: app/views/reports/_closed_loan_report.html.haml:44 app/views/reports/_late_disbursals_report.html.haml:55
+msgid "Center total"
+msgstr ""
+
+#: app/views/reports/_par_by_loan_ageing_report.html.haml:9
+msgid "Loan Ageing (in )"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:4
+msgid "Nothing to show. Perhaps monthly targets for staff haven't been set for the selected month?"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:11 app/views/users/show.html.haml:19
+#: app/views/monthly_targets/_fields.html.haml:4 app/views/monthly_targets/index.html.haml:9
+msgid "Staff Member"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:14 app/views/monthly_targets/_fields.html.haml:14
+#: app/views/monthly_targets/index.html.haml:15
+msgid "Disbursements Target"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:17
+msgid "Disbursements till date"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:20 app/views/reports/_monthly_target_report.html.haml:38
+msgid "Variance till date"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:23
+msgid "Disbursements today"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:26
+msgid "Variance as of today"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:29
+msgid "Approved But Not Disbursed"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:32 app/views/monthly_targets/_fields.html.haml:19
+#: app/views/monthly_targets/index.html.haml:18
+msgid "Collections Target"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:35
+msgid "Payments received till date"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:41
+msgid "Payments received today"
+msgstr ""
+
+#: app/views/reports/_monthly_target_report.html.haml:44
+msgid "Variance today"
+msgstr ""
+
+#: app/views/reports/_cash_book.html.haml:5
+msgid "Nothing to show. Perhaps no Cash Accounts set up?"
+msgstr ""
+
+#: app/views/reports/_cash_book.html.haml:18 app/views/reports/_bank_book.html.haml:18
+msgid "Vch Type"
+msgstr ""
+
+#: app/views/reports/_late_disbursals_report.html.haml:15
+#: app/views/reports/_non_disbursed_clients_after_group_recognition_test.html.haml:21 app/views/data_entry/payments/_disbursals.html.haml:13
+#: app/views/data_entry/payments/_approvals.html.haml:8
+msgid "Scheduled Disbursal Date"
+msgstr ""
+
+#: app/views/reports/_late_disbursals_report.html.haml:18
+msgid "Days delayed"
+msgstr ""
+
+#: app/views/reports/_loan_disbursement_register.html.haml:20
+msgid "Disbursment date"
+msgstr ""
+
+#: app/views/reports/_loan_disbursement_register.html.haml:32 app/views/dashboard/today.html.haml:95
+msgid "Scheduled"
+msgstr ""
+
+#: app/views/reports/_loan_disbursement_register.html.haml:35 app/views/reports/_staff_target_report.html.haml:28
+#: app/views/reports/_staff_target_report.html.haml:34 app/views/reports/_staff_target_report.html.haml:116
+#: app/views/dashboard/today.html.haml:98
+msgid "Actual"
+msgstr ""
+
+#: app/views/reports/_loan_disbursement_register.html.haml:41
+msgid "Premia"
+msgstr ""
+
+#: app/views/reports/_loan_disbursement_register.html.haml:44
+msgid "To disburse"
+msgstr ""
+
+#: app/views/reports/_loan_purpose_report.html.haml:4 app/views/centers/bulk_loan_entry_form.html.haml:16
+msgid "Purpose"
+msgstr ""
+
+#: app/views/reports/_loan_purpose_report.html.haml:10
+msgid "Loan Outstanding"
+msgstr ""
+
+#: app/views/reports/_loan_purpose_report.html.haml:15 app/views/reports/_loan_purpose_report.html.haml:21
+#: app/views/portfolios/_fields.html.haml:23 app/views/portfolios/_fields.html.haml:32
+msgid "Count"
+msgstr ""
+
+#: app/views/reports/_client_occupation_report.html.haml:4
+msgid "S. No."
+msgstr ""
+
+#: app/views/reports/_client_occupation_report.html.haml:7 app/views/reports/_insurance_register.html.haml:31
+msgid "Occupation"
+msgstr ""
+
+#: app/views/reports/_client_occupation_report.html.haml:10
+msgid "Number of clients"
+msgstr ""
+
+#: app/views/reports/_client_occupation_report.html.haml:13 app/views/portfolios/show.html.haml:12
+msgid "Number of loans"
+msgstr ""
+
+#: app/views/reports/_client_occupation_report.html.haml:16 app/views/dashboard/index.html.haml:40
+#: app/views/dashboard/index.html.haml:94
+msgid "Amount disbursed"
+msgstr ""
+
+#: app/views/reports/_non_disbursed_clients_after_group_recognition_test.html.haml:6 app/views/reports/_offline_payments.html.haml:21
+msgid "Client Id"
+msgstr ""
+
+#: app/views/reports/_non_disbursed_clients_after_group_recognition_test.html.haml:15
+msgid "Joining Date"
+msgstr ""
+
+#: app/views/reports/_non_disbursed_clients_after_group_recognition_test.html.haml:18
+msgid "GRT Pass Date"
+msgstr ""
+
+#: app/views/reports/_non_disbursed_clients_after_group_recognition_test.html.haml:24
+msgid "Delayed By"
+msgstr ""
+
+#: app/views/reports/_income_statement.html.haml:9
+msgid "Head"
+msgstr ""
+
+#: app/views/reports/_income_statement.html.haml:22
+msgid "EXPENSES"
+msgstr ""
+
+#: app/views/reports/_income_statement.html.haml:53
+msgid "Total Expenditure"
+msgstr ""
+
+#: app/views/reports/_income_statement.html.haml:59
+msgid "INCOMES"
+msgstr ""
+
+#: app/views/reports/_income_statement.html.haml:90
+msgid "Total Income"
+msgstr ""
+
+#: app/views/reports/_income_statement.html.haml:97
+msgid "Net Profit (Loss)"
+msgstr ""
+
+#: app/views/reports/_claim_report.html.haml:9
+msgid "Reason"
+msgstr ""
+
+#: app/views/reports/_claim_report.html.haml:24
+msgid "Amount Repaid"
+msgstr ""
+
+#: app/views/reports/_claim_report.html.haml:74
+msgid "Branch Total"
+msgstr ""
+
+#: app/views/reports/_portfolio_allocation_report.html.haml:4
+msgid "Funders"
+msgstr ""
+
+#: app/views/reports/_portfolio_allocation_report.html.haml:7
+msgid "Portfolio"
+msgstr ""
+
+#: app/views/reports/_portfolio_allocation_report.html.haml:12
+msgid "Date of Allocation"
+msgstr ""
+
+#: app/views/reports/_portfolio_allocation_report.html.haml:15
+msgid "Allocated Value"
+msgstr ""
+
+#: app/views/reports/_portfolio_allocation_report.html.haml:18
+msgid "Present Value calculated on"
+msgstr ""
+
+#: app/views/reports/_portfolio_allocation_report.html.haml:21
+msgid "Present Value"
+msgstr ""
+
+#: app/views/reports/_performance_report.html.haml:5
+msgid "Month/Year"
+msgstr ""
+
+#: app/views/reports/_insurance_register.html.haml:4
+msgid "Loan Account No."
+msgstr ""
+
+#: app/views/reports/_insurance_register.html.haml:7
+msgid "Unique Reference Number / Cust ID"
+msgstr ""
+
+#: app/views/reports/_insurance_register.html.haml:13
+msgid "Full Name with Initials"
+msgstr ""
+
+#: app/views/reports/_insurance_register.html.haml:16
+msgid "Gender"
+msgstr ""
+
+#: app/views/reports/_insurance_register.html.haml:19
+msgid "Age"
+msgstr ""
+
+#: app/views/reports/_insurance_register.html.haml:25
+msgid "Date of Disbursement"
+msgstr ""
+
+#: app/views/reports/_insurance_register.html.haml:28 app/views/reports/_duplicate_clients_report.html.haml:28
+#: app/views/branches/_fields.html.haml:2
+msgid "Branch Name"
+msgstr ""
+
+#: app/views/reports/_insurance_register.html.haml:34
+msgid "Member(M)/ Guarantor(G)"
+msgstr ""
+
+#: app/views/reports/form.html.haml:4
+msgid "Please choose the parameters you which to generate this report on"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:24 app/views/reports/_form.html.haml:194
+msgid "Area:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:46 app/views/reports/_form.html.haml:145
+msgid "Product:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:52
+msgid "Staff:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:58 app/views/reports/_form.html.haml:219
+msgid "Funder:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:64 app/views/reports/_form.html.haml:224
+msgid "Funding Line:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:70 app/views/reports/_form.html.haml:106
+#: app/views/reports/_form.html.haml:112 app/views/reports/_form.html.haml:229
+msgid "Account:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:76
+msgid "Target Type:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:82
+msgid "Journal Type:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:88 app/views/reports/_form.html.haml:177
+msgid "Month:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:94 app/views/reports/_form.html.haml:182
+msgid "Period:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:100 app/views/reports/_form.html.haml:187
+msgid "Year:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:118
+msgid "Loan Cycle:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:122 app/views/portfolios/_form.html.haml:2
+msgid "Change parameters"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:130
+msgid "From:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:135
+msgid "To:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:140
+msgid "Date:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:150
+msgid "Late by more than:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:152 app/views/reports/_form.html.haml:159
+msgid "days"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:157
+msgid "Late by less than:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:169
+msgid "by more than:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:214 app/views/dashboard/_form.html.haml:15
+#: app/views/locations/index.html.haml:11
+msgid "Staff member:"
+msgstr ""
+
+#: app/views/reports/_form.html.haml:234
+msgid "Include past data ?"
+msgstr ""
+
+#: app/views/reports/_daily_transaction_summary.html.haml:10
+msgid "Cash Collection"
+msgstr ""
+
+#: app/views/reports/_daily_transaction_summary.html.haml:13
+msgid "Cash Foreclosure"
+msgstr ""
+
+#: app/views/reports/_daily_transaction_summary.html.haml:16
+msgid "VAR Adjusted"
+msgstr ""
+
+#: app/views/reports/_daily_transaction_summary.html.haml:19
+msgid "Death Settlement"
+msgstr ""
+
+#: app/views/reports/_daily_transaction_summary.html.haml:22
+msgid "Write Offs"
+msgstr ""
+
+#: app/views/reports/_daily_transaction_summary.html.haml:39
+msgid "VAR"
+msgstr ""
+
+#: app/views/reports/_default_report.html.haml:11
+msgid "Parameter"
+msgstr ""
+
+#: app/views/reports/_default_report.html.haml:14
+msgid "All Branches"
+msgstr ""
+
+#: app/views/reports/_default_report.html.haml:21
+msgid "No. of CM"
+msgstr ""
+
+#: app/views/reports/_default_report.html.haml:30
+msgid "No. of Centers"
+msgstr ""
+
+#: app/views/reports/_default_report.html.haml:39
+msgid "No. of Clients"
+msgstr ""
+
+#: app/views/reports/_default_report.html.haml:48
+msgid "No. of Borowers"
+msgstr ""
+
+#: app/views/reports/_staff_target_report.html.haml:7
+msgid "Development"
+msgstr ""
+
+#: app/views/reports/_staff_target_report.html.haml:13
+msgid "Repayment (Principal & Interest)"
+msgstr ""
+
+#: app/views/reports/_staff_target_report.html.haml:22 app/views/reports/_staff_target_report.html.haml:43
+#: app/views/targets/index.html.haml:32
+msgid "Target"
+msgstr ""
+
+#: app/views/reports/_staff_target_report.html.haml:25 app/views/reports/_staff_target_report.html.haml:46
+msgid "For Month"
+msgstr ""
+
+#: app/views/reports/_staff_target_report.html.haml:31 app/views/reports/_staff_target_report.html.haml:52
+#: app/views/reports/_staff_target_report.html.haml:55 app/views/dashboard/today.html.haml:2
+msgid "Today"
+msgstr ""
+
+#: app/views/reports/_staff_target_report.html.haml:37 app/views/reports/_staff_target_report.html.haml:49
+#: app/views/reports/_staff_target_report.html.haml:122
+msgid "Till Date"
+msgstr ""
+
+#: app/views/reports/_staff_target_report.html.haml:40 app/views/reports/_staff_target_report.html.haml:58
+#: app/views/reports/_staff_target_report.html.haml:86 app/views/reports/_staff_target_report.html.haml:98
+#: app/views/reports/_staff_target_report.html.haml:104 app/views/reports/_staff_target_report.html.haml:110
+#: app/views/reports/_staff_target_report.html.haml:119
+msgid "Variance"
+msgstr ""
+
+#: app/views/reports/_staff_target_report.html.haml:65 app/views/reports/_staff_target_report.html.haml:68
+#: app/views/reports/_staff_target_report.html.haml:71 app/views/reports/_staff_target_report.html.haml:74
+#: app/views/reports/_staff_target_report.html.haml:80
+msgid "Nos"
+msgstr ""
+
+#: app/views/reports/_staff_target_report.html.haml:101
+msgid "From Sanctioned"
+msgstr ""
+
+#: app/views/reports/_staff_target_report.html.haml:107
+msgid "From Target"
+msgstr ""
+
+#: app/views/reports/_staff_target_report.html.haml:113 app/views/dashboard/today.html.haml:33
+#: app/views/audit_items/show.html.haml:18 app/views/audit_items/index.html.haml:17
+#: app/views/loans/prepay.html.haml:42 app/views/loans/_prepay.html.haml:36
+msgid "Due"
+msgstr ""
+
+#: app/views/reports/_offline_payments.html.haml:6
+msgid "Received Date"
+msgstr ""
+
+#: app/views/reports/_offline_payments.html.haml:9
+msgid "Payment Id"
+msgstr ""
+
+#: app/views/reports/_offline_payments.html.haml:18 app/views/loans/_write_off_suggested.html.haml:5
+msgid "Loan Id"
+msgstr ""
+
+#: app/views/reports/_offline_payments.html.haml:24 app/views/reports/_offline_attendance.html.haml:21
+msgid "Desktop Id"
+msgstr ""
+
+#: app/views/reports/_offline_payments.html.haml:27 app/views/reports/_offline_attendance.html.haml:24
+#: app/views/api_accesses/index.html.haml:19
+msgid "Origin"
+msgstr ""
+
+#: app/views/reports/_offline_payments.html.haml:30
+msgid "Received staffmember"
+msgstr ""
+
+#: app/views/reports/_loan_sanction_register.html.haml:19
+msgid "Approval date"
+msgstr ""
+
+#: app/views/reports/_offline_attendance.html.haml:9
+msgid "Attendance Id"
+msgstr ""
+
+#: app/views/reports/_offline_attendance.html.haml:18 app/views/reports/_duplicate_clients_report.html.haml:25
+msgid "Center Name"
+msgstr ""
+
+#: app/views/reports/_duplicate_clients_report.html.haml:2
+msgid "Total Duplicates ="
+msgstr ""
+
+#: app/views/reports/_duplicate_clients_report.html.haml:22
+msgid "Date of birth"
+msgstr ""
+
+#: app/views/reports/_duplicate_clients_report.html.haml:31
+msgid "Other Details"
+msgstr ""
+
+#: app/views/reports/_transaction_ledger.html.haml:75
+msgid "Date total"
+msgstr ""
+
+#: app/views/reports/_results.html.haml:23
+msgid "No group"
+msgstr ""
+
+#: app/views/reports/_delinquent_loan_report.html.haml:16
+msgid "Principal Repaid"
+msgstr ""
+
+#: app/views/reports/_delinquent_loan_report.html.haml:19
+msgid "Interest Repaid"
+msgstr ""
+
+#: app/views/reports/_delinquent_loan_report.html.haml:22
+msgid "Fees Repaid"
+msgstr ""
+
+#: app/views/reports/edit.html.haml:2
+msgid "Reports controller, edit action"
+msgstr ""
+
+#: app/views/reports/edit.html.haml:8
+msgid "app/views/reports/edit.html.erb"
+msgstr ""
+
+#: app/views/reports/_bank_book.html.haml:5
+msgid "Nothing to show. Perhaps no bank accounts set up?"
+msgstr ""
+
+#: app/views/insurance_companies/new.html.haml:1
+msgid "New Insurance Company"
+msgstr ""
+
+#: app/views/insurance_companies/_fields.html.haml:4
+msgid "Company Name"
+msgstr ""
+
+#: app/views/insurance_companies/show.html.haml:4
+msgid "No further info."
+msgstr ""
+
+#: app/views/insurance_companies/index.html.haml:2
+msgid "Insurance Companies"
+msgstr ""
+
+#: app/views/branch_diaries/branch.html.haml:2
+msgid "Branch Diary"
+msgstr ""
+
+#: app/views/branch_diaries/branch.html.haml:5
+msgid "Record of Daily Activities of Branch"
+msgstr ""
+
+#: app/views/branch_diaries/branch.html.haml:10 app/views/accounts/branch.html.haml:12
+msgid "New entry"
+msgstr ""
+
+#: app/views/branch_diaries/_fields.html.haml:11
+msgid "select the person who opens the branch"
+msgstr ""
+
+#: app/views/branch_diaries/_fields.html.haml:18
+msgid "pre-selected is todays date"
+msgstr ""
+
+#: app/views/branch_diaries/_fields.html.haml:33 app/views/branch_diaries/index.html.haml:22
+#: app/views/branch_diaries/_list.html.haml:10
+msgid "Opening Time"
+msgstr ""
+
+#: app/views/branch_diaries/_fields.html.haml:36 app/views/branch_diaries/_fields.html.haml:45
+#: app/views/data_entry/payments/by_staff_member.html.haml:17 app/views/centers/_fields.html.haml:34
+msgid ":"
+msgstr ""
+
+#: app/views/branch_diaries/_fields.html.haml:38 app/views/branch_diaries/_fields.html.haml:47
+msgid "enter time in 24 hour format (hh:mm)"
+msgstr ""
+
+#: app/views/branch_diaries/_fields.html.haml:42 app/views/branch_diaries/index.html.haml:24
+#: app/views/branch_diaries/_list.html.haml:13
+msgid "Closing Time"
+msgstr ""
+
+#: app/views/branch_diaries/_fields.html.haml:51
+msgid "Branch Key"
+msgstr ""
+
+#: app/views/branch_diaries/_fields.html.haml:54
+msgid "person who holds the keys of the branch today"
+msgstr ""
+
+#: app/views/branch_diaries/show.html.haml:2
+msgid "Day to day activities of the Branch"
+msgstr ""
+
+#: app/views/branch_diaries/index.html.haml:2
+msgid "Daily Activities of Branch"
+msgstr ""
+
+#: app/views/branch_diaries/index.html.haml:8
+msgid "No data to display. Please enter the data to view the Branch Diary."
+msgstr ""
+
+#: app/views/branch_diaries/index.html.haml:26
+msgid "Branch Key held by"
+msgstr ""
+
+#: app/views/branch_diaries/index.html.haml:28 app/views/branch_diaries/_list.html.haml:19
+msgid "Branch Opened By"
+msgstr ""
+
+#: app/views/branch_diaries/_list.html.haml:16
+msgid "Key Hold By"
+msgstr ""
+
+#: app/views/branch_diaries/edit.html.haml:6
+msgid "Edit the branch diary details"
+msgstr ""
+
+#: app/views/comments/_index.html.haml:10
+msgid "at"
+msgstr ""
+
+#: app/views/comments/new.html.haml:1
+msgid "Comments controller, new action"
+msgstr ""
+
+#: app/views/comments/new.html.haml:7
+msgid "app/views/comments/new.html.erb"
+msgstr ""
+
+#: app/views/comments/show.html.haml:2
+msgid "Comments controller, show action"
+msgstr ""
+
+#: app/views/comments/show.html.haml:8
+msgid "app/views/comments/show.html.erb"
+msgstr ""
+
+#: app/views/comments/index.html.haml:2
+msgid "Comments controller, index action"
+msgstr ""
+
+#: app/views/comments/index.html.haml:8
+msgid "app/views/comments/index.html.erb"
+msgstr ""
+
+#: app/views/comments/_form.html.haml:5
+msgid "Add a Comment"
+msgstr ""
+
+#: app/views/comments/edit.html.haml:2
+msgid "Comments controller, edit action"
+msgstr ""
+
+#: app/views/comments/edit.html.haml:8
+msgid "app/views/comments/edit.html.erb"
+msgstr ""
+
+#: app/views/fees/new.html.haml:1
+msgid "New fee"
+msgstr ""
+
+#: app/views/fees/_fields.html.haml:4
+msgid "Fee Name"
+msgstr ""
+
+#: app/views/fees/_fields.html.haml:9
+msgid "Fees percentage"
+msgstr ""
+
+#: app/views/fees/_fields.html.haml:14
+msgid "Fee amount"
+msgstr ""
+
+#: app/views/fees/_fields.html.haml:19
+msgid "Minimum payable"
+msgstr ""
+
+#: app/views/fees/_fields.html.haml:24
+msgid "Maximum payable"
+msgstr ""
+
+#: app/views/fees/_fields.html.haml:29
+msgid "Payable on"
+msgstr ""
+
+#: app/views/fees/index.html.haml:17
+msgid "Show"
+msgstr ""
+
+#: app/views/fees/edit.html.haml:2
+msgid "Edit fee"
+msgstr ""
+
+#: app/views/holidays/new.html.haml:1
+msgid "New Holiday"
+msgstr ""
+
+#: app/views/holidays/_fields.html.haml:14
+msgid "Shifts Meeting"
+msgstr ""
+
+#: app/views/holidays/show.html.haml:1
+msgid "Holiday"
+msgstr ""
+
+#: app/views/holidays/show.html.haml:7
+msgid "shifts the meeting to the day"
+msgstr ""
+
+#: app/views/holidays/show.html.haml:9
+msgid "the actual meeting day"
+msgstr ""
+
+#: app/views/holidays/index.html.haml:1
+msgid "Manage Holidays"
+msgstr ""
+
+#: app/views/holidays/index.html.haml:8
+msgid "Holiday Name"
+msgstr ""
+
+#: app/views/holidays/index.html.haml:14
+msgid "Shift Meeting"
+msgstr ""
+
+#: app/views/holidays/edit.html.haml:1
+msgid "Edit Holiday"
+msgstr ""
+
+#: app/views/documents/list.html.haml:2 app/views/loans/index.html.haml:123
+#: app/views/centers/index.html.haml:66
+msgid "Documents"
+msgstr ""
+
+#: app/views/documents/_fields.html.haml:4 app/views/documents/show.html.haml:6
+msgid "Document type"
+msgstr ""
+
+#: app/views/documents/_fields.html.haml:9 app/views/documents/show.html.haml:26
+msgid "Issuing authority"
+msgstr ""
+
+#: app/views/documents/_fields.html.haml:14 app/views/documents/index.html.haml:7
+msgid "Number"
+msgstr ""
+
+#: app/views/documents/_fields.html.haml:19 app/views/documents/show.html.haml:16
+#: app/views/documents/index.html.haml:10
+msgid "Date of issue"
+msgstr ""
+
+#: app/views/documents/_fields.html.haml:24
+msgid "Valid Date"
+msgstr ""
+
+#: app/views/documents/_fields.html.haml:29
+msgid "Description(optional)"
+msgstr ""
+
+#: app/views/documents/_fields.html.haml:34 app/views/documents/_fields.html.haml:39
+#: app/views/documents/_fields.html.haml:44 app/views/documents/_fields.html.haml:49
+msgid "Select document"
+msgstr ""
+
+#: app/views/documents/show.html.haml:11
+msgid "Document number"
+msgstr ""
+
+#: app/views/documents/show.html.haml:21
+msgid "Date of expiry"
+msgstr ""
+
+#: app/views/documents/show.html.haml:31 app/views/admin/upload.html.haml:8
+msgid "Download"
+msgstr ""
+
+#: app/views/documents/index.html.haml:16
+msgid "Issued by"
+msgstr ""
+
+#: app/views/documents/index.html.haml:22
+msgid "Attachments"
+msgstr ""
+
+#: app/views/applicable_fees/new.html.haml:1
+msgid "Levy fee"
+msgstr ""
+
+#: app/views/applicable_fees/_fields.html.haml:14 app/views/rules/show.html.haml:6
+msgid "Applicable on"
+msgstr ""
+
+#: app/views/applicable_fees/show.html.haml:2
+msgid "ApplicableFees controller, show action"
+msgstr ""
+
+#: app/views/applicable_fees/show.html.haml:8
+msgid "app/views/applicable_fees/show.html.erb"
+msgstr ""
+
+#: app/views/applicable_fees/_form.html.haml:2
+msgid "Levy penalty/fee"
+msgstr ""
+
+#: app/views/applicable_fees/edit.html.haml:2
+msgid "Edit Applicable Fee"
+msgstr ""
+
+#: app/views/dashboard/_center_loader.html.haml:2
+msgid "Month on month"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:18
+msgid "Key Ratios"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:25
+msgid "Center count"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:28 app/views/browse/_totalinfo.html.haml:99
+msgid "Staff count"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:31
+msgid "Client count"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:43
+msgid "Outstanding principal"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:46
+msgid "Outstanding total"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:66
+msgid "Client growth (by month)"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:69
+msgid "Cumulative growth"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:72
+msgid "By religion"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:75
+msgid "By caste"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:78
+msgid "Age profile"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:81
+msgid "Member since"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:97 app/views/browse/_totalinfo.html.haml:61
+msgid "Amount outstanding"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:100
+msgid "Number of borrowers added"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:103
+msgid "Cumulative growth in borrowers"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:106
+msgid "Percentage of loans repaid"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:109
+msgid "Breakup by product"
+msgstr ""
+
+#: app/views/dashboard/index.html.haml:112
+msgid "Breakup by occupation"
+msgstr ""
+
+#: app/views/dashboard/today.html.haml:13
+msgid "Repayments & disbursals"
+msgstr ""
+
+#: app/views/dashboard/today.html.haml:16
+msgid "Graphs"
+msgstr ""
+
+#: app/views/dashboard/today.html.haml:36 app/views/payments/index.html.haml:151
+#: app/views/payments/index.html.haml:156 app/views/payments/index.html.haml:166
+#: app/views/loans/index.html.haml:100 app/views/loans/prepay.html.haml:45
+#: app/views/loans/_prepay.html.haml:39
+msgid "Paid"
+msgstr ""
+
+#: app/views/dashboard/today.html.haml:39
+msgid "Overdue"
+msgstr ""
+
+#: app/views/dashboard/today.html.haml:42
+msgid "Advance"
+msgstr ""
+
+#: app/views/dashboard/today.html.haml:45 app/views/data_entry/payments/by_center.html.haml:120
+#: app/views/payments/index.html.haml:67
+msgid "Disbursal"
+msgstr ""
+
+#: app/views/dashboard/_form.html.haml:5
+msgid "Time Period:"
+msgstr ""
+
+#: app/views/data_entry/payments/by_center.html.haml:114 app/views/data_entry/payments/by_center.html.haml:129
+#: app/views/loans/approve.html.haml:23 app/views/loans/disburse.html.haml:18
+#: app/views/loans/write_off_suggested.html.haml:23
+msgid "Reject selected loans"
+msgstr ""
+
+#: app/views/data_entry/payments/by_center.html.haml:117
+msgid "No approvals today"
+msgstr ""
+
+#: app/views/data_entry/payments/by_center.html.haml:124 app/views/loans/approve.html.haml:17
+#: app/views/loans/disburse.html.haml:13 app/views/loans/write_off_suggested.html.haml:17
+#: app/views/entrance/index.html.haml:19 app/views/branches/_fields.html.haml:54
+msgid "or"
+msgstr ""
+
+#: app/views/data_entry/payments/by_center.html.haml:132 app/views/loans/disburse.html.haml:21
+msgid "No disbursals today"
+msgstr ""
+
+#: app/views/data_entry/payments/by_center.html.haml:138
+msgid "Fees collected by"
+msgstr ""
+
+#: app/views/data_entry/payments/by_center.html.haml:140 app/views/data_entry/payments/_cds.html.haml:4
+msgid "collected on"
+msgstr ""
+
+#: app/views/data_entry/payments/by_center.html.haml:155
+msgid "Total Fees Payable"
+msgstr ""
+
+#: app/views/data_entry/payments/by_center.html.haml:158
+msgid "Fees Already Paid"
+msgstr ""
+
+#: app/views/data_entry/payments/by_center.html.haml:161
+msgid "Fees Due Today"
+msgstr ""
+
+#: app/views/data_entry/payments/staff_collection_sheet.html.haml:1
+msgid "Generate Collection sheet"
+msgstr ""
+
+#: app/views/data_entry/payments/staff_collection_sheet.html.haml:9 app/views/data_entry/loans/staff_disbursement_sheet.html.haml:10
+msgid "Staff Name"
+msgstr ""
+
+#: app/views/data_entry/payments/_disbursals.html.haml:19
+msgid "Disbursed?"
+msgstr ""
+
+#: app/views/data_entry/payments/_disbursals.html.haml:22 app/views/loans/_disburse.html.haml:30
+msgid "Cheque number"
+msgstr ""
+
+#: app/views/data_entry/payments/_disbursals.html.haml:25
+msgid "Disbursed On"
+msgstr ""
+
+#: app/views/data_entry/payments/_disbursals.html.haml:28 app/views/loans/_disburse.html.haml:33
+msgid "Disbursed By"
+msgstr ""
+
+#: app/views/data_entry/payments/_disbursals.html.haml:41 app/views/data_entry/payments/_approvals.html.haml:32
+#: app/views/funding_lines/show.html.haml:20 app/views/centers/_disbursals.html.haml:33
+#: app/views/centers/_approvals.html.haml:33
+msgid ""
+msgstr ""
+
+#: app/views/data_entry/payments/_disbursals.html.haml:44 app/views/data_entry/payments/_approvals.html.haml:35
+msgid "on time"
+msgstr ""
+
+#: app/views/data_entry/payments/by_staff_member.html.haml:3
+msgid "Please wait while we process your request"
+msgstr ""
+
+#: app/views/data_entry/payments/by_staff_member.html.haml:14
+msgid "Error with loan"
+msgstr ""
+
+#: app/views/data_entry/payments/_cds.html.haml:2 app/views/centers/_cds.html.haml:2
+msgid "Payments collected by"
+msgstr ""
+
+#: app/views/data_entry/payments/_cds.html.haml:17 app/views/centers/_cds.html.haml:19
+msgid "disbursed on"
+msgstr ""
+
+#: app/views/data_entry/payments/_cds.html.haml:19 app/views/centers/_cds.html.haml:23
+msgid "installment"
+msgstr ""
+
+#: app/views/data_entry/payments/_cds.html.haml:21 app/views/centers/_cds.html.haml:25
+#: app/views/branches/today.html.haml:17
+msgid "principal due"
+msgstr ""
+
+#: app/views/data_entry/payments/_cds.html.haml:23 app/views/centers/_cds.html.haml:27
+#: app/views/branches/today.html.haml:19
+msgid "interest due"
+msgstr ""
+
+#: app/views/data_entry/payments/_cds.html.haml:25 app/views/centers/_cds.html.haml:29
+#: app/views/branches/today.html.haml:21
+msgid "total due"
+msgstr ""
+
+#: app/views/data_entry/payments/_cds.html.haml:29
+msgid "repay type"
+msgstr ""
+
+#: app/views/data_entry/payments/_cds.html.haml:31
+msgid "attendance"
+msgstr ""
+
+#: app/views/data_entry/payments/delete.html.haml:1
+msgid "Delete a repayment"
+msgstr ""
+
+#: app/views/data_entry/payments/delete.html.haml:18
+msgid "Please select the repayment you want to delete..."
+msgstr ""
+
+#: app/views/data_entry/payments/delete.html.haml:26 app/views/payments/_deleted_payments.html.haml:7
+msgid "received on"
+msgstr ""
+
+#: app/views/data_entry/payments/delete.html.haml:28 app/views/payments/_deleted_payments.html.haml:9
+msgid "received by"
+msgstr ""
+
+#: app/views/data_entry/payments/delete.html.haml:32 app/views/payments/_deleted_payments.html.haml:13
+msgid "type"
+msgstr ""
+
+#: app/views/data_entry/payments/delete.html.haml:59
+msgid "Please select a loan that you want to delete a repayment for by entering its loan ID."
+msgstr ""
+
+#: app/views/data_entry/payments/delete.html.haml:71 app/views/data_entry/payments/record.html.haml:25
+msgid "Loan ID:"
+msgstr ""
+
+#: app/views/data_entry/payments/record.html.haml:1
+msgid "Record a new repayment"
+msgstr ""
+
+#: app/views/data_entry/payments/record.html.haml:13
+msgid "Please select a loan that you want to record a repayment for by entering its loan ID."
+msgstr ""
+
+#: app/views/data_entry/payments/_approvals.html.haml:17
+msgid "Approved On"
+msgstr ""
+
+#: app/views/data_entry/payments/_approvals.html.haml:20 app/views/loans/_approve.html.haml:29
+msgid "Approved By"
+msgstr ""
+
+#: app/views/data_entry/loans/new.html.haml:2
+msgid "New loan"
+msgstr ""
+
+#: app/views/data_entry/loans/bulk_update_funding_line.html.haml:1
+msgid "Bulk Update Funding Line"
+msgstr ""
+
+#: app/views/data_entry/loans/bulk_update_funding_line.html.haml:21 app/views/centers/bulk_loan_entry_form.html.haml:18
+msgid "Funding Line"
+msgstr ""
+
+#: app/views/data_entry/loans/staff_disbursement_sheet.html.haml:1
+msgid "Disbursement sheet"
+msgstr ""
+
+#: app/views/data_entry/loans/bulk_form.html.haml:3
+msgid "Bulk loan entry for"
+msgstr ""
+
+#: app/views/data_entry/loans/bulk_form.html.haml:5 app/views/audit_trails/show.html.haml:6
+msgid "in"
+msgstr ""
+
+#: app/views/data_entry/loans/bulk_form.html.haml:8
+msgid "Choose clients"
+msgstr ""
+
+#: app/views/data_entry/loans/bulk_form.html.haml:25
+msgid "Existing loans"
+msgstr ""
+
+#: app/views/data_entry/loans/bulk_form.html.haml:28
+msgid "Choose"
+msgstr ""
+
+#: app/views/data_entry/loans/bulk_form.html.haml:48
+msgid "Choose loan product"
+msgstr ""
+
+#: app/views/data_entry/loans/bulk_form.html.haml:51
+msgid "Loan Products listed above are valid loan products for today which are not linked to any insurance"
+msgstr ""
+
+#: app/views/data_entry/loans/_make_loan_utilization.html.haml:12 app/views/loans/_approve.html.haml:11
+#: app/views/loans/_write_off_suggested.html.haml:11
+msgid "Details"
+msgstr ""
+
+#: app/views/data_entry/loans/_make_loan_utilization.html.haml:21 app/views/portfolios/show.html.haml:58
+msgid "Disbursed on"
+msgstr ""
+
+#: app/views/data_entry/loans/_make_loan_utilization.html.haml:24 app/views/loans/_approve.html.haml:26
+msgid "Selected"
+msgstr ""
+
+#: app/views/data_entry/loans/_make_loan_utilization.html.haml:27
+msgid "Utilization"
+msgstr ""
+
+#: app/views/data_entry/loans/edit.html.haml:2
+msgid "Edit loan"
+msgstr ""
+
+#: app/views/data_entry/loans/make_loan_utilization.html.haml:3
+msgid "Loan utilization"
+msgstr ""
+
+#: app/views/data_entry/loans/make_loan_utilization.html.haml:6
+msgid "The following loans do not have loan utilization data"
+msgstr ""
+
+#: app/views/data_entry/loans/make_loan_utilization.html.haml:23 app/views/loans/approve.html.haml:26
+msgid "Nothing to approve"
+msgstr ""
+
+#: app/views/data_entry/index/index.html.haml:5
+msgid "Select center"
+msgstr ""
+
+#: app/views/data_entry/index/index.html.haml:7
+msgid "Data Entry"
+msgstr ""
+
+#: app/views/data_entry/index/index.html.haml:9
+msgid "Follow the links below to perform common actions quickly."
+msgstr ""
+
+#: app/views/data_entry/index/index.html.haml:15
+msgid "Most forms are made especially for mass data entry."
+msgstr ""
+
+#: app/views/locations/new.html.haml:1
+msgid "Locations controller, new action"
+msgstr ""
+
+#: app/views/locations/new.html.haml:7
+msgid "app/views/locations/new.html.erb"
+msgstr ""
+
+#: app/views/locations/index.html.haml:5
+msgid "Locations"
+msgstr ""
+
+#: app/views/locations/_map.html.haml:4
+msgid "Geocode"
+msgstr ""
+
+#: app/views/locations/_map.html.haml:9
+msgid "Latitude"
+msgstr ""
+
+#: app/views/locations/_map.html.haml:12
+msgid "Longitude"
+msgstr ""
+
+#: app/views/locations/edit.html.haml:2
+msgid "Locations controller, edit action"
+msgstr ""
+
+#: app/views/locations/edit.html.haml:8
+msgid "app/views/locations/edit.html.erb"
+msgstr ""
+
+#: app/views/layout/application.html.haml:38
+msgid "existing users can"
+msgstr ""
+
+#: app/views/layout/application.html.haml:40
+msgid "to proceed"
+msgstr ""
+
+#: app/views/layout/report.html.haml:28
+msgid "login as"
+msgstr ""
+
+#: app/views/insurance_products/new.html.haml:1
+msgid "New Insurance Product"
+msgstr ""
+
+#: app/views/insurance_products/_fields.html.haml:9
+msgid "Insurance company"
+msgstr ""
+
+#: app/views/insurance_products/_fields.html.haml:20
+msgid "No fees defined for insurance products"
+msgstr ""
+
+#: app/views/insurance_products/index.html.haml:2
+msgid "Insurance Products"
+msgstr ""
+
+#: app/views/insurance_products/_list.html.haml:11
+msgid "Company"
+msgstr ""
+
+#: app/views/insurance_products/edit.html.haml:2
+msgid "Edit Insurance Product"
+msgstr ""
+
+#: app/views/account_types/new.html.haml:8
+msgid "Create an Account Type"
+msgstr ""
+
+#: app/views/account_types/_fields.html.haml:9
+msgid "Code"
+msgstr ""
+
+#: app/views/account_types/show.html.haml:2
+msgid "AccountTypes controller, show action"
+msgstr ""
+
+#: app/views/account_types/show.html.haml:8
+msgid "app/views/account_types/show.html.erb"
+msgstr ""
+
+#: app/views/account_types/index.html.haml:7 app/views/accounts/_fields.html.haml:7
+msgid "Account Type"
+msgstr ""
+
+#: app/views/account_types/index.html.haml:10 app/views/accounts/_fields.html.haml:61
+msgid "GL Code"
+msgstr ""
+
+#: app/views/account_types/edit.html.haml:6
+msgid "Edit Account Type"
+msgstr ""
+
+#: app/views/accounts/branch.html.haml:7 app/views/accounts/index.html.haml:21
+msgid "Journal entries"
+msgstr ""
+
+#: app/views/accounts/new.html.haml:5
+msgid "New Account"
+msgstr ""
+
+#: app/views/accounts/_fields.html.haml:17
+msgid "Account Category (if applicable)"
+msgstr ""
+
+#: app/views/accounts/_fields.html.haml:22
+msgid "Asset Class"
+msgstr ""
+
+#: app/views/accounts/_fields.html.haml:27
+msgid "Income Head"
+msgstr ""
+
+#: app/views/accounts/_fields.html.haml:45 app/views/accounts/show.html.haml:19
+msgid "Parent Account"
+msgstr ""
+
+#: app/views/accounts/show.html.haml:5
+msgid "GL Code :"
+msgstr ""
+
+#: app/views/accounts/show.html.haml:10
+msgid "Parent"
+msgstr ""
+
+#: app/views/accounts/show.html.haml:14
+msgid "Branch :"
+msgstr ""
+
+#: app/views/accounts/show.html.haml:24
+msgid "Opening Balance :"
+msgstr ""
+
+#: app/views/accounts/show.html.haml:28
+msgid "(as on"
+msgstr ""
+
+#: app/views/accounts/show.html.haml:33
+msgid "Today's Balance"
+msgstr ""
+
+#: app/views/accounts/show.html.haml:41
+msgid "Ledger"
+msgstr ""
+
+#: app/views/accounts/show.html.haml:43
+msgid "End-of-period Balances"
+msgstr ""
+
+#: app/views/accounts/index.html.haml:4
+msgid "Manage Book Keeping"
+msgstr ""
+
+#: app/views/accounts/index.html.haml:12
+msgid "New account"
+msgstr ""
+
+#: app/views/accounts/index.html.haml:15
+msgid "Accounting rules"
+msgstr ""
+
+#: app/views/accounts/index.html.haml:18
+msgid "New voucher"
+msgstr ""
+
+#: app/views/accounts/index.html.haml:24 app/views/payments/index.html.haml:197
+#: app/views/loans/index.html.haml:131
+msgid "Miscellaneous"
+msgstr ""
+
+#: app/views/accounts/index.html.haml:27
+msgid "Reconcile"
+msgstr ""
+
+#: app/views/accounts/index.html.haml:30
+msgid "Chart of Accounts"
+msgstr ""
+
+#: app/views/accounts/index.html.haml:33
+msgid "Show accounts of"
+msgstr ""
+
+#: app/views/accounts/index.html.haml:50
+msgid "Account name"
+msgstr ""
+
+#: app/views/accounts/_book.html.haml:3
+msgid "Show ledger for accounting period"
+msgstr ""
+
+#: app/views/accounts/_book.html.haml:6
+msgid "Ledger entries for -"
+msgstr ""
+
+#: app/views/accounts/_book.html.haml:14 app/views/accounts/_book.html.haml:24
+msgid "["
+msgstr ""
+
+#: app/views/accounts/_book.html.haml:16 app/views/accounts/_book.html.haml:26
+msgid "]"
+msgstr ""
+
+#: app/views/accounts/_book.html.haml:18 app/views/accounts/_book.html.haml:28
+msgid "="
+msgstr ""
+
+#: app/views/accounts/_book.html.haml:41
+msgid "Voucher Type"
+msgstr ""
+
+#: app/views/accounts/_book.html.haml:44
+msgid "Voucher Number"
+msgstr ""
+
+#: app/views/accounts/duplicate.html.haml:3
+msgid "Duplicate all accounts of"
+msgstr ""
+
+#: app/views/accounts/duplicate.html.haml:17
+msgid "Copy?"
+msgstr ""
+
+#: app/views/accounts/duplicate.html.haml:20
+msgid "Account type"
+msgstr ""
+
+#: app/views/accounts/duplicate.html.haml:26
+msgid "Gl code"
+msgstr ""
+
+#: app/views/accounts/duplicate.html.haml:29
+msgid "Opening balance"
+msgstr ""
+
+#: app/views/accounts/duplicate.html.haml:32
+msgid "Opening balance on"
+msgstr ""
+
+#: app/views/accounts/_accounts_selection.html.haml:9
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+msgstr ""
+
+#: app/views/accounts/_accounts_selection.html.haml:13
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;"
+msgstr ""
+
+#: app/views/account_balances/new.html.haml:2
+msgid "New Account Balance for"
+msgstr ""
+
+#: app/views/account_balances/_fields.html.haml:17
+msgid "Verify"
+msgstr ""
+
+#: app/views/account_balances/show.html.haml:2
+msgid "AccountBalances controller, show action"
+msgstr ""
+
+#: app/views/account_balances/show.html.haml:8
+msgid "app/views/account_balances/show.html.erb"
+msgstr ""
+
+#: app/views/account_balances/verify.html.haml:1
+msgid "Close Account"
+msgstr ""
+
+#: app/views/account_balances/verify.html.haml:5
+msgid "This will close and lock the account balances for"
+msgstr ""
+
+#: app/views/account_balances/verify.html.haml:7
+msgid "for accounting period"
+msgstr ""
+
+#: app/views/account_balances/index.html.haml:2
+msgid "Account Balances"
+msgstr ""
+
+#: app/views/account_balances/index.html.haml:14
+msgid "No opening or closing account balances are currently set"
+msgstr ""
+
+#: app/views/account_balances/index.html.haml:23 app/views/account_balances/_list.html.haml:11
+#: app/views/accounting_periods/show.html.haml:2
+msgid "Accounting Period"
+msgstr ""
+
+#: app/views/account_balances/index.html.haml:51
+msgid "Verified"
+msgstr ""
+
+#: app/views/account_balances/index.html.haml:54
+msgid "Not Verified"
+msgstr ""
+
+#: app/views/account_balances/_list.html.haml:2
+msgid "End-of-period Balances for )\n\n_("
+msgstr ""
+
+#: app/views/account_balances/_list.html.haml:17
+msgid "End Date"
+msgstr ""
+
+#: app/views/account_balances/_list.html.haml:52
+msgid "Account Balance Locked"
+msgstr ""
+
+#: app/views/account_balances/edit.html.haml:1
+msgid "Edit Account Balance"
+msgstr ""
+
+#: app/views/account_balances/edit.html.haml:7
+msgid "for period"
+msgstr ""
+
+#: app/views/grts/new.html.haml:1
+msgid "Grts controller, new action"
+msgstr ""
+
+#: app/views/grts/new.html.haml:7
+msgid "app/views/grts/new.html.erb"
+msgstr ""
+
+#: app/views/grts/_grts.html.haml:4
+msgid "No GRTs scheduled yet"
+msgstr ""
+
+#: app/views/grts/show.html.haml:2
+msgid "Grts controller, show action"
+msgstr ""
+
+#: app/views/grts/show.html.haml:8
+msgid "app/views/grts/show.html.erb"
+msgstr ""
+
+#: app/views/grts/index.html.haml:2
+msgid "GRTs for Client Group "
+msgstr ""
+
+#: app/views/grts/index.html.haml:11
+msgid "Add a GRT on"
+msgstr ""
+
+#: app/views/grts/edit.html.haml:2
+msgid "Edit GRT"
+msgstr ""
+
+#: app/views/mutations/index.html.haml:1
+msgid "You're in index of the Mutations controller."
+msgstr ""
+
+#: app/views/asset_registers/_edit_fields.html.haml:14 app/views/asset_registers/_fields.html.haml:14
+#: app/views/asset_registers/index.html.haml:20
+msgid "Asset Type"
+msgstr ""
+
+#: app/views/asset_registers/_edit_fields.html.haml:19 app/views/asset_registers/_fields.html.haml:19
+msgid "Issue To"
+msgstr ""
+
+#: app/views/asset_registers/_edit_fields.html.haml:25 app/views/asset_registers/_fields.html.haml:26
+#: app/views/asset_registers/index.html.haml:22
+msgid "Issue Date"
+msgstr ""
+
+#: app/views/asset_registers/_edit_fields.html.haml:30 app/views/asset_registers/_fields.html.haml:31
+#: app/views/asset_registers/index.html.haml:24
+msgid "Issued By"
+msgstr ""
+
+#: app/views/asset_registers/_edit_fields.html.haml:40 app/views/asset_registers/_fields.html.haml:41
+msgid "select the person who has issued the asset"
+msgstr ""
+
+#: app/views/asset_registers/_edit_fields.html.haml:44 app/views/asset_registers/index.html.haml:26
+msgid "Returned On"
+msgstr ""
+
+#: app/views/asset_registers/_fields.html.haml:22
+msgid "enter the name to whom the asset type is being issued."
+msgstr ""
+
+#: app/views/asset_registers/show.html.haml:2
+msgid "AssetRegisters controller, show action"
+msgstr ""
+
+#: app/views/asset_registers/show.html.haml:8
+msgid "app/views/asset_registers/show.html.erb"
+msgstr ""
+
+#: app/views/asset_registers/index.html.haml:2 app/views/asset_registers/edit.html.haml:6
+msgid "Asset Register"
+msgstr ""
+
+#: app/views/asset_registers/index.html.haml:8
+msgid "No data to display. Please enter the data to the Asset Register."
+msgstr ""
+
+#: app/views/asset_registers/index.html.haml:18
+msgid "Issued To"
+msgstr ""
+
+#: app/views/asset_registers/index.html.haml:28 app/views/targets/index.html.haml:35
+msgid "Edit/Delete"
+msgstr ""
+
+#: app/views/audit_items/new.html.haml:3
+msgid "New audit Item"
+msgstr ""
+
+#: app/views/audit_items/_fields.html.haml:2 app/views/searches/_form.html.haml:4
+#: app/views/searches/edit.html.haml:7
+msgid "Model"
+msgstr ""
+
+#: app/views/audit_items/_fields.html.haml:8
+msgid "Audit Due On"
+msgstr ""
+
+#: app/views/audit_items/_fields.html.haml:11
+msgid "Assigned To"
+msgstr ""
+
+#: app/views/audit_items/_fields.html.haml:22 app/views/audit_items/show.html.haml:28
+#: app/views/audit_items/index.html.haml:21
+msgid "Result"
+msgstr ""
+
+#: app/views/audit_items/show.html.haml:1
+msgid "Audit Item"
+msgstr ""
+
+#: app/views/audit_items/show.html.haml:11
+msgid "Audited Item"
+msgstr ""
+
+#: app/views/audit_items/index.html.haml:2
+msgid "Audit Items"
+msgstr ""
+
+#: app/views/audit_items/index.html.haml:9
+msgid "No audit items here"
+msgstr ""
+
+#: app/views/audit_items/index.html.haml:15
+msgid "Object"
+msgstr ""
+
+#: app/views/audit_items/index.html.haml:23 app/views/loans/index.html.haml:117
+#: app/views/centers/index.html.haml:69
+msgid "Comments"
+msgstr ""
+
+#: app/views/audit_items/edit.html.haml:3
+msgid "Edit Audit Item"
+msgstr ""
+
+#: app/views/audit_trails/show.html.haml:3
+msgid "Changes by"
+msgstr ""
+
+#: app/views/audit_trails/show.html.haml:13
+msgid "change type"
+msgstr ""
+
+#: app/views/audit_trails/show.html.haml:16
+msgid "Between"
+msgstr ""
+
+#: app/views/audit_trails/show.html.haml:19
+msgid "and"
+msgstr ""
+
+#: app/views/audit_trails/show.html.haml:21
+msgid "Audit Trail"
+msgstr ""
+
+#: app/views/audit_trails/show.html.haml:26
+msgid "S.No."
+msgstr ""
+
+#: app/views/audit_trails/show.html.haml:38
+msgid "Time"
+msgstr ""
+
+#: app/views/audit_trails/show.html.haml:41 app/views/audit_trails/_list.html.haml:10
+msgid "Changes"
+msgstr ""
+
+#: app/views/audit_trails/show.html.haml:44 app/views/audit_trails/_list.html.haml:16
+msgid "User"
+msgstr ""
+
+#: app/views/funding_lines/new.html.haml:1
+msgid "Create a new funding line"
+msgstr ""
+
+#: app/views/funding_lines/_fields.html.haml:24
+msgid "Last Payment Date"
+msgstr ""
+
+#: app/views/funding_lines/show.html.haml:23
+msgid "disbursal"
+msgstr ""
+
+#: app/views/funding_lines/show.html.haml:27
+msgid "first payment"
+msgstr ""
+
+#: app/views/funding_lines/show.html.haml:31
+msgid "last payment"
+msgstr ""
+
+#: app/views/funding_lines/show.html.haml:55
+msgid "Outstanding amount"
+msgstr ""
+
+#: app/views/graph_data/index.html.haml:1
+msgid "You're in index of the GraphData controller."
+msgstr ""
+
+#: app/views/payments/new.html.haml:1
+msgid "Register a repayment"
+msgstr ""
+
+#: app/views/payments/_fields.html.haml:14
+msgid "Repayment Style"
+msgstr ""
+
+#: app/views/payments/_fields.html.haml:18
+msgid "only applies to "
+msgstr ""
+
+#: app/views/payments/_fields.html.haml:21
+msgid "Received:"
+msgstr ""
+
+#: app/views/payments/_fields.html.haml:24
+msgid "on&nbsp;&nbsp;"
+msgstr ""
+
+#: app/views/payments/_fields.html.haml:26
+msgid "&nbsp;&nbsp;by&nbsp;&nbsp;"
+msgstr ""
+
+#: app/views/payments/show.html.haml:15
+msgid "N/A"
+msgstr ""
+
+#: app/views/payments/show.html.haml:34
+msgid "Received on"
+msgstr ""
+
+#: app/views/payments/show.html.haml:39
+msgid "Received by"
+msgstr ""
+
+#: app/views/payments/index.html.haml:9
+msgid "History of this loan is not updated. Click"
+msgstr ""
+
+#: app/views/payments/index.html.haml:11
+msgid "to repair"
+msgstr ""
+
+#: app/views/payments/index.html.haml:17
+msgid "by client"
+msgstr ""
+
+#: app/views/payments/index.html.haml:28
+msgid "Application"
+msgstr ""
+
+#: app/views/payments/index.html.haml:40
+msgid "Sanction"
+msgstr ""
+
+#: app/views/payments/index.html.haml:51
+msgid "Not approved yet"
+msgstr ""
+
+#: app/views/payments/index.html.haml:63
+msgid "approval is pending"
+msgstr ""
+
+#: app/views/payments/index.html.haml:75
+msgid "Not disbursed yet"
+msgstr ""
+
+#: app/views/payments/index.html.haml:87
+msgid "to be disbursed on"
+msgstr ""
+
+#: app/views/payments/index.html.haml:93
+msgid "original loan disbursed on"
+msgstr ""
+
+#: app/views/payments/index.html.haml:97
+msgid "Product"
+msgstr ""
+
+#: app/views/payments/index.html.haml:102
+msgid "Installments"
+msgstr ""
+
+#: app/views/payments/index.html.haml:108
+msgid "First repayment"
+msgstr ""
+
+#: app/views/payments/index.html.haml:117
+msgid "(scheduled, no payments yet)"
+msgstr ""
+
+#: app/views/payments/index.html.haml:128
+msgid "than scheduled"
+msgstr ""
+
+#: app/views/payments/index.html.haml:136
+msgid "Original first payment date"
+msgstr ""
+
+#: app/views/payments/index.html.haml:169
+msgid "Unpaid fees exist"
+msgstr ""
+
+#: app/views/payments/index.html.haml:188
+msgid "Repayment Schedule"
+msgstr ""
+
+#: app/views/payments/index.html.haml:190
+msgid "Repayments made"
+msgstr ""
+
+#: app/views/payments/index.html.haml:193
+msgid "Insurance policy"
+msgstr ""
+
+#: app/views/payments/index.html.haml:195 app/views/loans/index.html.haml:119
+msgid "Audits"
+msgstr ""
+
+#: app/views/payments/index.html.haml:201
+msgid "Deleted Payments"
+msgstr ""
+
+#: app/views/payments/index.html.haml:206
+msgid "Repayment schedule"
+msgstr ""
+
+#: app/views/payments/index.html.haml:213
+msgid "date due"
+msgstr ""
+
+#: app/views/payments/index.html.haml:215
+msgid "scheduled balance"
+msgstr ""
+
+#: app/views/payments/index.html.haml:217
+msgid "scheduled repayment"
+msgstr ""
+
+#: app/views/payments/index.html.haml:219
+msgid "actual balance"
+msgstr ""
+
+#: app/views/payments/index.html.haml:221
+msgid "actual repayments"
+msgstr ""
+
+#: app/views/payments/index.html.haml:223
+msgid "difference"
+msgstr ""
+
+#: app/views/payments/index.html.haml:295
+msgid "No deleted payments"
+msgstr ""
+
+#: app/views/payments/_deleted_payments.html.haml:15
+msgid "created at"
+msgstr ""
+
+#: app/views/payments/_deleted_payments.html.haml:18
+msgid "deleted at"
+msgstr ""
+
+#: app/views/payments/_deleted_payments.html.haml:35
+msgid "hide all"
+msgstr ""
+
+#: app/views/payments/_deleted_payments.html.haml:39
+msgid "show all"
+msgstr ""
+
+#: app/views/payments/_deleted_payments.html.haml:43
+msgid "check all"
+msgstr ""
+
+#: app/views/payments/_deleted_payments.html.haml:47
+msgid "uncheck all"
+msgstr ""
+
+#: app/views/users/new.html.haml:3
+msgid "Create a new user"
+msgstr ""
+
+#: app/views/users/_fields.html.haml:4
+msgid "Login name:"
+msgstr ""
+
+#: app/views/users/_fields.html.haml:8
+msgid "(only letters and numbers are allowed)"
+msgstr ""
+
+#: app/views/users/_fields.html.haml:12 app/views/users/_fields.html.haml:53
+#: app/views/users/edit.html.haml:19 app/views/users/change_password.html.haml:5
+#: app/views/exceptions/unauthenticated.html.haml:23 app/views/exceptions/session_expired.html.haml:23
+msgid "Password:"
+msgstr ""
+
+#: app/views/users/_fields.html.haml:17 app/views/users/_fields.html.haml:58
+#: app/views/users/edit.html.haml:24 app/views/users/change_password.html.haml:10
+msgid "Password confirmation:"
+msgstr ""
+
+#: app/views/users/_fields.html.haml:21 app/views/users/edit.html.haml:28
+msgid "(password fields must be filled to complete user profile)"
+msgstr ""
+
+#: app/views/users/_fields.html.haml:25
+msgid "Select role"
+msgstr ""
+
+#: app/views/users/_fields.html.haml:30
+msgid "Is a staff member?"
+msgstr ""
+
+#: app/views/users/_fields.html.haml:35
+msgid "Is a funder"
+msgstr ""
+
+#: app/views/users/_fields.html.haml:40 app/views/users/show.html.haml:44
+msgid "Preferred Locale"
+msgstr ""
+
+#: app/views/users/_fields.html.haml:66
+msgid "Active ?"
+msgstr ""
+
+#: app/views/users/show.html.haml:35
+msgid "Created At"
+msgstr ""
+
+#: app/views/users/index.html.haml:1
+msgid "Users"
+msgstr ""
+
+#: app/views/users/index.html.haml:10
+msgid "Login"
+msgstr ""
+
+#: app/views/users/index.html.haml:12
+msgid "Role"
+msgstr ""
+
+#: app/views/users/index.html.haml:14
+msgid "Staff member/Funder"
+msgstr ""
+
+#: app/views/users/edit.html.haml:13
+msgid "Change password"
+msgstr ""
+
+#: app/views/loans/new.html.haml:1
+msgid "Add a new loan"
+msgstr ""
+
+#: app/views/loans/approve.html.haml:2
+msgid "Approve loans"
+msgstr ""
+
+#: app/views/loans/approve.html.haml:5
+msgid "The following loans have not been approved yet"
+msgstr ""
+
+#: app/views/loans/_fields.html.haml:197
+msgid "Approved Amount:"
+msgstr ""
+
+#: app/views/loans/_fields.html.haml:201
+msgid "in Rupees"
+msgstr ""
+
+#: app/views/loans/_approve.html.haml:20
+msgid "Approval Date"
+msgstr ""
+
+#: app/views/loans/index.html.haml:11
+msgid "This client is insincere and is not elgible for a loan"
+msgstr ""
+
+#: app/views/loans/index.html.haml:15
+msgid "This client is not active anymore."
+msgstr ""
+
+#: app/views/loans/index.html.haml:44
+msgid "( Age :"
+msgstr ""
+
+#: app/views/loans/index.html.haml:46
+msgid "yrs.)"
+msgstr ""
+
+#: app/views/loans/index.html.haml:58
+msgid "At center"
+msgstr ""
+
+#: app/views/loans/index.html.haml:86
+msgid "Fees applicable"
+msgstr ""
+
+#: app/views/loans/index.html.haml:94
+msgid "Fees paid"
+msgstr ""
+
+#: app/views/loans/index.html.haml:107
+msgid "Attendance()"
+msgstr ""
+
+#: app/views/loans/index.html.haml:125
+msgid "Insurance"
+msgstr ""
+
+#: app/views/loans/index.html.haml:129 app/views/centers/index.html.haml:46
+#: app/views/attendances/index.html.haml:2
+msgid "Attendance"
+msgstr ""
+
+#: app/views/loans/index.html.haml:234 app/views/centers/index.html.haml:108
+msgid "Add a comment"
+msgstr ""
+
+#: app/views/loans/index.html.haml:253
+msgid "No insurance policies."
+msgstr ""
+
+#: app/views/loans/_write_off_suggested.html.haml:20
+msgid "Suggested Written Off Date"
+msgstr ""
+
+#: app/views/loans/_write_off_suggested.html.haml:26
+msgid "Write Off?"
+msgstr ""
+
+#: app/views/loans/_write_off_suggested.html.haml:29
+msgid "Written Off By"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:4 app/views/loan_utilizations/new.html.haml:1
+#: app/views/loan_utilizations/edit.html.haml:2
+msgid "Loan Utilization"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:7
+msgid "Update Loan Utilization"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:16
+msgid "Pay"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:23
+msgid "Levy Penalty/Fee"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:30
+msgid "Write Off Loan"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:36
+msgid "Write off Date :"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:41
+msgid "Select Staff Member :"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:50
+msgid "Pick the staff member who is writing off the loan"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:59
+msgid "Suggest to Write Off this Loan"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:63
+msgid "suggested write off Date :"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:68
+msgid "Suggested by staff member :"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:81
+msgid "Applicable fees"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:88
+msgid "Values"
+msgstr ""
+
+#: app/views/loans/misc.html.haml:103
+msgid "Scheduled Maturity Date"
+msgstr ""
+
+#: app/views/loans/disburse.html.haml:1
+msgid "Disbursals"
+msgstr ""
+
+#: app/views/loans/_disburse.html.haml:15
+msgid "Scheduled Disbursal"
+msgstr ""
+
+#: app/views/loans/_disburse.html.haml:18
+msgid "Actual Disbursal Date"
+msgstr ""
+
+#: app/views/loans/_disburse.html.haml:24
+msgid "Scheduled 1st Payment"
+msgstr ""
+
+#: app/views/loans/_disburse.html.haml:27
+msgid "Disburse?"
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:4 app/views/loans/_prepay.html.haml:3
+msgid "Please tell us the date you wish to prepay this loan as of, so we can calculate the correct amounts."
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:6 app/views/loans/_prepay.html.haml:5
+msgid "Prepay date"
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:21 app/views/loans/_prepay.html.haml:15
+msgid "Loan id"
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:25 app/views/loans/_prepay.html.haml:19
+msgid ") for client"
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:27 app/views/loans/_prepay.html.haml:21
+msgid ". Prepaying on"
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:81
+msgid "Total Interest Due"
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:84
+msgid "Remaining Interest"
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:99
+msgid "Total P and I due"
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:105
+msgid "Penalty"
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:111
+msgid "Received By"
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:116
+msgid "Write off?"
+msgstr ""
+
+#: app/views/loans/prepay.html.haml:120
+msgid "If the repaid amount is less than the outstanding amount<br> it is recommended to write off the loan"
+msgstr ""
+
+#: app/views/loans/write_off_suggested.html.haml:2
+msgid "Write Off loans"
+msgstr ""
+
+#: app/views/loans/write_off_suggested.html.haml:5
+msgid "The following loans have been suggested for write off"
+msgstr ""
+
+#: app/views/loans/write_off_suggested.html.haml:26
+msgid "Nothing to write off"
+msgstr ""
+
+#: app/views/client_groups/new.html.haml:2
+msgid "Add a new Group"
+msgstr ""
+
+#: app/views/client_groups/_fields.html.haml:13
+msgid "Group name:"
+msgstr ""
+
+#: app/views/client_groups/_fields.html.haml:18
+msgid "Group Code:"
+msgstr ""
+
+#: app/views/client_groups/_fields.html.haml:22
+msgid "a two letter unique code for the group"
+msgstr ""
+
+#: app/views/client_groups/_fields.html.haml:26
+msgid "Maximum clients:"
+msgstr ""
+
+#: app/views/client_groups/_fields.html.haml:38
+msgid "cancel"
+msgstr ""
+
+#: app/views/client_groups/show.html.haml:24
+msgid "CGTs"
+msgstr ""
+
+#: app/views/client_groups/show.html.haml:27
+msgid "GRTs"
+msgstr ""
+
+#: app/views/client_groups/index.html.haml:2
+msgid "Groups"
+msgstr ""
+
+#: app/views/client_groups/search.html.haml:19
+msgid "Edit group"
+msgstr ""
+
+#: app/views/client_groups/search.html.haml:22
+msgid "Please select a group that you want to edit, either by its ID, code, name or through the center it belongs to."
+msgstr ""
+
+#: app/views/client_groups/search.html.haml:33
+msgid "Group ID, Name or Code:"
+msgstr ""
+
+#: app/views/admin/dirty_loans.html.haml:15
+msgid "Added at"
+msgstr ""
+
+#: app/views/admin/upload.html.haml:2
+msgid "Mostfit data upload"
+msgstr ""
+
+#: app/views/admin/upload.html.haml:5
+msgid "Upload information for your past operations here, and you are ready to begin using Mostfit"
+msgstr ""
+
+#: app/views/admin/upload.html.haml:11
+msgid "sample spreadsheet"
+msgstr ""
+
+#: app/views/admin/upload.html.haml:16
+msgid "The spreadsheet can contain tabs for one or more of the following:"
+msgstr ""
+
+#: app/views/admin/upload.html.haml:20
+msgid "Staff members"
+msgstr ""
+
+#: app/views/admin/upload.html.haml:38
+msgid "Loan products"
+msgstr ""
+
+#: app/views/admin/upload.html.haml:41
+msgid "Upload currently erases all existing data for the items you upload (handle with care!)"
+msgstr ""
+
+#: app/views/admin/upload.html.haml:45
+msgid "Erase old data?"
+msgstr ""
+
+#: app/views/admin/insurance.html.haml:1
+msgid "Insurance masters"
+msgstr ""
+
+#: app/views/admin/insurance.html.haml:5
+msgid "Insurance companies"
+msgstr ""
+
+#: app/views/admin/insurance.html.haml:11
+msgid "Insurance products"
+msgstr ""
+
+#: app/views/admin/index.html.haml:2
+msgid "Administration"
+msgstr ""
+
+#: app/views/admin/index.html.haml:6
+msgid "Manage organization profile and calendar"
+msgstr ""
+
+#: app/views/admin/index.html.haml:12
+msgid "Manage geographical locations"
+msgstr ""
+
+#: app/views/admin/index.html.haml:18
+msgid "Manage staff, users, and roles"
+msgstr ""
+
+#: app/views/admin/index.html.haml:25
+msgid "Manage financial products, funds, rules, and accounting"
+msgstr ""
+
+#: app/views/admin/index.html.haml:36
+msgid "Manage commonly-used lists (masters)"
+msgstr ""
+
+#: app/views/admin/index.html.haml:47
+msgid "Assign targets, perform audits"
+msgstr ""
+
+#: app/views/admin/index.html.haml:53
+msgid "Data"
+msgstr ""
+
+#: app/views/admin/index.html.haml:86
+msgid "API Use"
+msgstr ""
+
+#: app/views/admin/upload_status.html.haml:2
+msgid "Log window for upload status"
+msgstr ""
+
+#: app/views/admin/download.html.haml:1
+msgid "Database dumps"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:9
+msgid "Contact details"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:11
+msgid "Operational details"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:13
+msgid "Access control & Security"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:15
+msgid "Main page"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:21
+msgid "Name of the mfi"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:26
+msgid "Select Color for this name"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:31
+msgid "and choose a logo"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:35
+msgid "Upload Logo"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:290
+msgid "Application revision"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:295
+msgid "Organization Locale"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:302
+msgid "Session expiry time"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:306
+msgid "Automatically log out users after certain time"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:311
+msgid "Force password change (in days)"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:315
+msgid "prompt users to change password"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:318
+msgid "and not allow to use the application unless done so"
+msgstr ""
+
+#: app/views/admin/edit.html.haml:321
+msgid "Access control for reports"
+msgstr ""
+
+#: app/views/portfolios/new.html.haml:1
+msgid "Create a new portfolio"
+msgstr ""
+
+#: app/views/portfolios/_fields.html.haml:13
+msgid "Total loans"
+msgstr ""
+
+#: app/views/portfolios/_fields.html.haml:16
+msgid "Selected loans"
+msgstr ""
+
+#: app/views/portfolios/_fields.html.haml:29
+msgid "Select"
+msgstr ""
+
+#: app/views/portfolios/_fields.html.haml:35
+msgid "Allocated outstanding"
+msgstr ""
+
+#: app/views/portfolios/_fields.html.haml:38
+msgid "Current outstanding"
+msgstr ""
+
+#: app/views/portfolios/show.html.haml:4
+msgid "Portfolio:"
+msgstr ""
+
+#: app/views/portfolios/show.html.haml:23
+msgid "Starting value"
+msgstr ""
+
+#: app/views/portfolios/show.html.haml:31
+msgid "Last payment"
+msgstr ""
+
+#: app/views/portfolios/show.html.haml:36
+msgid "Created on"
+msgstr ""
+
+#: app/views/portfolios/show.html.haml:43
+msgid "Client ID"
+msgstr ""
+
+#: app/views/portfolios/show.html.haml:46 app/views/claims/_fields.html.haml:4
+msgid "Client name"
+msgstr ""
+
+#: app/views/portfolios/show.html.haml:52
+msgid "Loan purpose"
+msgstr ""
+
+#: app/views/portfolios/show.html.haml:61
+msgid "Added to portfolio"
+msgstr ""
+
+#: app/views/portfolios/show.html.haml:64
+msgid "Starting balance"
+msgstr ""
+
+#: app/views/portfolios/show.html.haml:67
+msgid "Current balance"
+msgstr ""
+
+#: app/views/portfolios/show.html.haml:84
+msgid ","
+msgstr ""
+
+#: app/views/portfolios/index.html.haml:2
+msgid "Portfolios controller, index action"
+msgstr ""
+
+#: app/views/portfolios/index.html.haml:8
+msgid "app/views/portfolios/index.html.erb"
+msgstr ""
+
+#: app/views/portfolios/_form.html.haml:13
+msgid "Add as on"
+msgstr ""
+
+#: app/views/portfolios/_form.html.haml:17
+msgid "Disbursed after"
+msgstr ""
+
+#: app/views/api_accesses/new.html.haml:1
+msgid "Register for API access"
+msgstr ""
+
+#: app/views/api_accesses/_fields.html.haml:4
+msgid "At Branch"
+msgstr ""
+
+#: app/views/api_accesses/show.html.haml:8
+msgid "description"
+msgstr ""
+
+#: app/views/api_accesses/show.html.haml:12
+msgid "origin"
+msgstr ""
+
+#: app/views/api_accesses/index.html.haml:1
+msgid "API Access"
+msgstr ""
+
+#: app/views/api_accesses/index.html.haml:9
+msgid "No clients have been registered yet for API access"
+msgstr ""
+
+#: app/views/api_accesses/edit.html.haml:2
+msgid "ApiAccesses controller, edit action"
+msgstr ""
+
+#: app/views/api_accesses/edit.html.haml:8
+msgid "app/views/api_accesses/edit.html.erb"
+msgstr ""
+
+#: app/views/loan_utilizations/show.html.haml:2
+msgid "LoanUtilizations controller, show action"
+msgstr ""
+
+#: app/views/loan_utilizations/show.html.haml:8
+msgid "app/views/loan_utilizations/show.html.erb"
+msgstr ""
+
+#: app/views/loan_utilizations/index.html.haml:2
+msgid "Loan Utilization Master"
+msgstr ""
+
+#: app/views/centers/bulk_data_entry.html.haml:29 app/views/centers/bulk_loan_entry_form.html.haml:35
+msgid "Not attached to any group"
+msgstr ""
+
+#: app/views/centers/bulk_data_entry.html.haml:40
+msgid "(disbursed on"
+msgstr ""
+
+#: app/views/centers/new.html.haml:4
+msgid "Create new center"
+msgstr ""
+
+#: app/views/centers/_misc.html.haml:3
+msgid "Meeting day changes"
+msgstr ""
+
+#: app/views/centers/_misc.html.haml:15
+msgid "Meeting day"
+msgstr ""
+
+#: app/views/centers/_fields.html.haml:11
+msgid "Center name:"
+msgstr ""
+
+#: app/views/centers/_fields.html.haml:14
+msgid "Center code:"
+msgstr ""
+
+#: app/views/centers/_fields.html.haml:17
+msgid "a two letter unique code for the center"
+msgstr ""
+
+#: app/views/centers/_fields.html.haml:20 app/views/branches/_fields.html.haml:23
+msgid "Creation date:"
+msgstr ""
+
+#: app/views/centers/_fields.html.haml:23
+msgid "pick the date this center was created on"
+msgstr ""
+
+#: app/views/centers/_fields.html.haml:26
+msgid "Meeting every:"
+msgstr ""
+
+#: app/views/centers/_fields.html.haml:32
+msgid "&nbsp;&nbsp;on&nbsp;&nbsp;"
+msgstr ""
+
+#: app/views/centers/_fields.html.haml:38
+msgid "time is in a 24 hour format"
+msgstr ""
+
+#: app/views/centers/_fields.html.haml:45
+msgid "change effective from:"
+msgstr ""
+
+#: app/views/centers/_fields.html.haml:55
+msgid "pick the staff member that manages this center"
+msgstr ""
+
+#: app/views/centers/_fields.html.haml:72
+msgid "Center leader:"
+msgstr ""
+
+#: app/views/centers/index.html.haml:21
+msgid "No. of centers"
+msgstr ""
+
+#: app/views/centers/index.html.haml:63
+msgid "Exceptions"
+msgstr ""
+
+#: app/views/centers/index.html.haml:72
+msgid "Audit"
+msgstr ""
+
+#: app/views/centers/index.html.haml:78
+msgid "Accounting"
+msgstr ""
+
+#: app/views/centers/index.html.haml:82
+msgid "Diary"
+msgstr ""
+
+#: app/views/centers/index.html.haml:86
+msgid "Stock"
+msgstr ""
+
+#: app/views/centers/index.html.haml:90
+msgid "Asset"
+msgstr ""
+
+#: app/views/centers/search.html.haml:6
+msgid "Choose center to edit"
+msgstr ""
+
+#: app/views/centers/search.html.haml:12
+msgid "Please select a center that you want to edit"
+msgstr ""
+
+#: app/views/centers/search.html.haml:23
+msgid "Center ID, Code or Name:"
+msgstr ""
+
+#: app/views/centers/bulk_loan_entry_form.html.haml:12
+msgid "Installment frequency"
+msgstr ""
+
+#: app/views/centers/bulk_loan_entry_form.html.haml:14
+msgid "Number of installments"
+msgstr ""
+
+#: app/views/centers/bulk_loan_entry_form.html.haml:20
+msgid "Application date"
+msgstr ""
+
+#: app/views/centers/bulk_loan_entry_form.html.haml:22
+msgid "Applied by"
+msgstr ""
+
+#: app/views/centers/bulk_loan_entry_form.html.haml:24
+msgid "Scheduled disbursal"
+msgstr ""
+
+#: app/views/centers/bulk_loan_entry_form.html.haml:26
+msgid "Scheduled first payment"
+msgstr ""
+
+#: app/views/centers/_list.html.haml:2
+msgid "Centers meeting on"
+msgstr ""
+
+#: app/views/centers/_list.html.haml:5
+msgid "Select center meeting day: &nbsp;"
+msgstr ""
+
+#: app/views/centers/_list.html.haml:12
+msgid "No centers have been created yet."
+msgstr ""
+
+#: app/views/centers/_list.html.haml:16
+msgid "No centers meet on this day."
+msgstr ""
+
+#: app/views/centers/_cds.html.haml:9
+msgid "on name"
+msgstr ""
+
+#: app/views/centers/_cds.html.haml:11
+msgid "View"
+msgstr ""
+
+#: app/views/centers/_cds.html.haml:21
+msgid "funder"
+msgstr ""
+
+#: app/views/centers/_cds.html.haml:33
+msgid "attended"
+msgstr ""
+
+#: app/views/centers/_cds.html.haml:91 app/views/centers/_payments.html.haml:125
+msgid "nothing outstanding"
+msgstr ""
+
+#: app/views/centers/_cds.html.haml:119
+msgid "This day is not a meeting day"
+msgstr ""
+
+#: app/views/ledger_entries/new.html.haml:1
+msgid "LedgerEntries controller, new action"
+msgstr ""
+
+#: app/views/ledger_entries/new.html.haml:7
+msgid "app/views/ledger_entries/new.html.erb"
+msgstr ""
+
+#: app/views/ledger_entries/show.html.haml:2
+msgid "LedgerEntries controller, show action"
+msgstr ""
+
+#: app/views/ledger_entries/show.html.haml:8
+msgid "app/views/ledger_entries/show.html.erb"
+msgstr ""
+
+#: app/views/ledger_entries/index.html.haml:2
+msgid "LedgerEntries controller, index action"
+msgstr ""
+
+#: app/views/ledger_entries/index.html.haml:8
+msgid "app/views/ledger_entries/index.html.erb"
+msgstr ""
+
+#: app/views/ledger_entries/edit.html.haml:2
+msgid "LedgerEntries controller, edit action"
+msgstr ""
+
+#: app/views/ledger_entries/edit.html.haml:8
+msgid "app/views/ledger_entries/edit.html.erb"
+msgstr ""
+
+#: app/views/browse/show_log.html.haml:4
+msgid "IP"
+msgstr ""
+
+#: app/views/browse/show_log.html.haml:7
+msgid "At"
+msgstr ""
+
+#: app/views/browse/show_log.html.haml:13
+msgid "What"
+msgstr ""
+
+#: app/views/browse/show_log.html.haml:19
+msgid "Respone time (secs)"
+msgstr ""
+
+#: app/views/browse/show_log.html.haml:29
+msgid "Accessed"
+msgstr ""
+
+#: app/views/browse/show_log.html.haml:32
+msgid "Created:"
+msgstr ""
+
+#: app/views/browse/index.html.haml:4
+msgid "$.get("
+msgstr ""
+
+#: app/views/browse/index.html.haml:9
+msgid "Home"
+msgstr ""
+
+#: app/views/browse/index.html.haml:12
+msgid "You can navigate to the most commonly used screens from here"
+msgstr ""
+
+#: app/views/browse/for_staff_member.html.haml:2
+msgid "Browse"
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:3
+msgid "At one glance"
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:10
+msgid "branches"
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:14
+msgid "centers"
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:18
+msgid "clients"
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:28
+msgid "Active clients"
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:33
+msgid "Attendance "
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:50
+msgid "Closed/repaid loans (number)"
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:55
+msgid "Loans disbursed (amount)"
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:67
+msgid "Receipts"
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:94
+msgid "Total receipts"
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:104
+msgid "Regions"
+msgstr ""
+
+#: app/views/browse/_totalinfo.html.haml:118
+msgid "as of yesterday"
+msgstr ""
+
+#: app/views/targets/new.html.haml:1
+msgid "Edit target"
+msgstr ""
+
+#: app/views/targets/_fields.html.haml:4
+msgid "Target of"
+msgstr ""
+
+#: app/views/targets/_fields.html.haml:9
+msgid "Target value"
+msgstr ""
+
+#: app/views/targets/_fields.html.haml:24
+msgid "Target type"
+msgstr ""
+
+#: app/views/targets/_fields.html.haml:29
+msgid "Responsibility of:"
+msgstr ""
+
+#: app/views/targets/show.html.haml:2
+msgid "Targets controller, show action"
+msgstr ""
+
+#: app/views/targets/show.html.haml:8
+msgid "app/views/targets/show.html.erb"
+msgstr ""
+
+#: app/views/targets/index.html.haml:2
+msgid "Targets"
+msgstr ""
+
+#: app/views/targets/index.html.haml:14
+msgid "Target For"
+msgstr ""
+
+#: app/views/targets/index.html.haml:17
+msgid "Target Type"
+msgstr ""
+
+#: app/views/targets/index.html.haml:26
+msgid "Start Value"
+msgstr ""
+
+#: app/views/targets/index.html.haml:29
+msgid "To Reach"
+msgstr ""
+
+#: app/views/targets/bulk_entry_new.html.haml:2
+msgid "Bulk Target Entry Form"
+msgstr ""
+
+#: app/views/targets/edit.html.haml:2
+msgid "Targets controller, edit action"
+msgstr ""
+
+#: app/views/claims/new.html.haml:1
+msgid "New Claim"
+msgstr ""
+
+#: app/views/claims/_fields.html.haml:9
+msgid "Client spouse name"
+msgstr ""
+
+#: app/views/claims/_fields.html.haml:29
+msgid "Reference number"
+msgstr ""
+
+#: app/views/claims/_fields.html.haml:34
+msgid "Insurance details"
+msgstr ""
+
+#: app/views/claims/_fields.html.haml:47
+msgid "policy number"
+msgstr ""
+
+#: app/views/claims/_fields.html.haml:56
+msgid "cover amount"
+msgstr ""
+
+#: app/views/claims/_fields.html.haml:59
+msgid "premium paid"
+msgstr ""
+
+#: app/views/claims/_fields.html.haml:62
+msgid "cover for"
+msgstr ""
+
+#: app/views/claims/_fields.html.haml:84
+msgid "No insurance policies attached to this client"
+msgstr ""
+
+#: app/views/claims/_fields.html.haml:88
+msgid "Date of death"
+msgstr ""
+
+#: app/views/claims/_fields.html.haml:93 app/views/claims/index.html.haml:7
+msgid "Claim ID"
+msgstr ""
+
+#: app/views/claims/_fields.html.haml:98
+msgid "Documents received"
+msgstr ""
+
+#: app/views/claims/show.html.haml:2
+msgid "Claims controller, show action"
+msgstr ""
+
+#: app/views/claims/show.html.haml:8
+msgid "app/views/claims/show.html.erb"
+msgstr ""
+
+#: app/views/claims/index.html.haml:2
+msgid "Claims for"
+msgstr ""
+
+#: app/views/claims/index.html.haml:10
+msgid "Claim Amount"
+msgstr ""
+
+#: app/views/claims/index.html.haml:13
+msgid "Submission date"
+msgstr ""
+
+#: app/views/claims/edit.html.haml:2
+msgid "Claim"
+msgstr ""
+
+#: app/views/bookmarks/new.html.haml:2
+msgid "New Bookmark"
+msgstr ""
+
+#: app/views/bookmarks/new.html.haml:9 app/views/bookmarks/system.html.haml:3
+#: app/views/searches/index.html.haml:4
+msgid "[close]"
+msgstr ""
+
+#: app/views/bookmarks/show.html.haml:2
+msgid "Bookmarks controller, show action"
+msgstr ""
+
+#: app/views/bookmarks/show.html.haml:8
+msgid "app/views/bookmarks/show.html.erb"
+msgstr ""
+
+#: app/views/bookmarks/system.html.haml:8
+msgid "Bookmark this page"
+msgstr ""
+
+#: app/views/bookmarks/_form.html.haml:6
+msgid "[x]"
+msgstr ""
+
+#: app/views/bookmarks/edit.html.haml:12
+msgid "Page Title:"
+msgstr ""
+
+#: app/views/bookmarks/edit.html.haml:17
+msgid "Accessible to:"
+msgstr ""
+
+#: app/views/exceptions/unauthenticated.html.haml:5 app/views/exceptions/session_expired.html.haml:5
+msgid "Please login to continue..."
+msgstr ""
+
+#: app/views/exceptions/unauthenticated.html.haml:17 app/views/exceptions/session_expired.html.haml:17
+msgid "Login:"
+msgstr ""
+
+#: app/views/exceptions/not_privileged.html.haml:2
+msgid "Not Privileged"
+msgstr ""
+
+#: app/views/exceptions/not_privileged.html.haml:5
+msgid "You are not authorised to perform this action"
+msgstr ""
+
+#: app/views/exceptions/not_supported_pattern.html.haml:2
+msgid "Not Supported Pattern"
+msgstr ""
+
+#: app/views/exceptions/not_supported_pattern.html.haml:5
+msgid "Given date pattern is not supported"
+msgstr ""
+
+#: app/views/rules/new.html.haml:1
+msgid "Business Rules"
+msgstr ""
+
+#: app/views/rules/_conditions.html.haml:41
+msgid "error in model"
+msgstr ""
+
+#: app/views/rules/_fields.html.haml:11
+msgid "Allow"
+msgstr ""
+
+#: app/views/rules/_fields.html.haml:16
+msgid "Activate"
+msgstr ""
+
+#: app/views/rules/_fields.html.haml:21
+msgid "Applicable for"
+msgstr ""
+
+#: app/views/rules/_fields.html.haml:26 app/views/rules/show.html.haml:11
+#: app/views/rules/index.html.haml:16
+msgid "On action"
+msgstr ""
+
+#: app/views/rules/_fields.html.haml:32
+msgid "Pre Condition"
+msgstr ""
+
+#: app/views/rules/_fields.html.haml:39 app/views/rules/show.html.haml:34
+msgid "Condition"
+msgstr ""
+
+#: app/views/rules/show.html.haml:16
+msgid "Pre-condition"
+msgstr ""
+
+#: app/views/rules/show.html.haml:49
+msgid "Allow this condition?"
+msgstr ""
+
+#: app/views/rules/index.html.haml:2 app/views/rules/index.html.haml:22
+msgid "Rules"
+msgstr ""
+
+#: app/views/rules/index.html.haml:19
+msgid "Pre conditions"
+msgstr ""
+
+#: app/views/rules/index.html.haml:25
+msgid "On match"
+msgstr ""
+
+#: app/views/searches/index.html.haml:43 app/views/searches/_form.html.haml:16
+#: app/views/searches/edit.html.haml:19
+msgid "more"
+msgstr ""
+
+#: app/views/searches/index.html.haml:52
+msgid "Please refine your search keyword for relevant results"
+msgstr ""
+
+#: app/views/searches/index.html.haml:58
+msgid "No results found"
+msgstr ""
+
+#: app/views/searches/advanced.html.haml:1 app/views/searches/edit.html.haml:1
+msgid "Mostfit advanced search tool"
+msgstr ""
+
+#: app/views/searches/advanced.html.haml:7
+msgid "Choose fields"
+msgstr ""
+
+#: app/views/searches/_form.html.haml:7 app/views/searches/edit.html.haml:10
+msgid "Property"
+msgstr ""
+
+#: app/views/searches/_form.html.haml:10 app/views/searches/edit.html.haml:13
+msgid "operator"
+msgstr ""
+
+#: app/views/searches/_form.html.haml:13 app/views/searches/edit.html.haml:16
+msgid "values"
+msgstr ""
+
+#: app/views/searches/reporting.html.haml:79
+msgid "No records"
+msgstr ""
+
+#: app/views/entrance/index.html.haml:21
+msgid "(login: 'admin', password: 'password')"
+msgstr ""
+
+#: app/views/entrance/index.html.haml:26
+msgid "MOST FIT &mdash; a free and open source MIS for MFI's"
+msgstr ""
+
+#: app/views/entrance/index.html.haml:30 app/views/entrance/index.html.haml:32
+msgid "<a href="
+msgstr ""
+
+#: app/views/entrance/index.html.haml:35
+msgid "Contact us for a free account"
+msgstr ""
+
+#: app/views/entrance/index.html.haml:37
+msgid "Are you a startup MFI looking for an MIS? <a href="
+msgstr ""
+
+#: app/views/entrance/index.html.haml:40
+msgid "Development process"
+msgstr ""
+
+#: app/views/entrance/index.html.haml:42
+msgid "MOSTFIT is in very late beta and about to reach its first release."
+msgstr ""
+
+#: app/views/entrance/index.html.haml:48
+msgid "We believe passionately in"
+msgstr ""
+
+#: app/views/entrance/index.html.haml:50
+msgid "therefor we prefer to use Linux over Microsoft's Windows (or Apple's OSX). Yet the following tools are worth mentioning because the helped making MOSTFIT possible."
+msgstr ""
+
+#: app/views/entrance/index.html.haml:59
+msgid "We love the Ruby programming language. It has revolutionized the way programmers can do their work, and, maybe more important: it helps us to write better software, using less lines-of-code, in less time!"
+msgstr ""
+
+#: app/views/entrance/index.html.haml:72
+msgid "Download, use, test-drive, feedback, etc."
+msgstr ""
+
+#: app/views/entrance/index.html.haml:75
+msgid "In order to make use of the source code, it is recommended to have a good skill at Ruby and some experience with Linux servers (do Apache, MySQL, bash and ssh ring a bell?). If these terms mean nothing to you, then downloading MOSTFIT is probably not the best option for you. However, you can still enjoy MOSTFIT with a free demo account. <a href="
+msgstr ""
+
+#: app/views/entrance/index.html.haml:77
+msgid "If you just want to test MOSTFIT you do not have to download it: the site that you are looking at right now is a live demo of MOSTFIT!"
+msgstr ""
+
+#: app/views/entrance/about.html.haml:1
+msgid "About MISFIT"
+msgstr ""
+
+#: app/views/branches/new.html.haml:4
+msgid "Create a new branch"
+msgstr ""
+
+#: app/views/branches/_fields.html.haml:4
+msgid "the name by which the branch is known"
+msgstr ""
+
+#: app/views/branches/_fields.html.haml:7
+msgid "Branch code"
+msgstr ""
+
+#: app/views/branches/_fields.html.haml:9
+msgid "a two letter unique code for the branch"
+msgstr ""
+
+#: app/views/branches/_fields.html.haml:25
+msgid "pick the date this branch was created on"
+msgstr ""
+
+#: app/views/branches/_fields.html.haml:36
+msgid "You do not have any staff members data yet. Create them"
+msgstr ""
+
+#: app/views/branches/_fields.html.haml:42
+msgid "pick the staff member that manages this branch"
+msgstr ""
+
+#: app/views/branches/_fields.html.haml:48
+msgid "Pick the aread to which this branch belongs to"
+msgstr ""
+
+#: app/views/branches/index.html.haml:2
+msgid "Overview of all branches"
+msgstr ""
+
+#: app/views/branches/index.html.haml:9
+msgid "No branches have been created yet."
+msgstr ""
+
+#: app/views/branches/index.html.haml:26
+msgid "Edit | Delete"
+msgstr ""
+
+#: app/views/branches/search.html.haml:6
+msgid "Choose branch to edit"
+msgstr ""
+
+#: app/views/branches/search.html.haml:12
+msgid "Please select a branch that you want to edit"
+msgstr ""
+
+#: app/views/branches/search.html.haml:23
+msgid "Branch ID, Code or Name:"
+msgstr ""
+
+#: app/views/branches/today.html.haml:2
+msgid "Activity for"
+msgstr ""
+
+#: app/views/branches/today.html.haml:11
+msgid "loan id"
+msgstr ""
+
+#: app/views/branches/today.html.haml:15
+msgid "loan details"
+msgstr ""
+
+#: app/views/accounting_periods/new.html.haml:8
+msgid "Create a new accounting period"
+msgstr ""
+
+#: app/views/accounting_periods/new.html.haml:16
+msgid "Add the next accounting period"
+msgstr ""
+
+#: app/views/accounting_periods/new.html.haml:25 app/views/accounting_periods/_fields.html.haml:8
+msgid "Begin date"
+msgstr ""
+
+#: app/views/accounting_periods/new.html.haml:30 app/views/accounting_periods/_fields.html.haml:13
+msgid "End date"
+msgstr ""
+
+#: app/views/accounting_periods/close.html.haml:1
+msgid "Close Accounting Period"
+msgstr ""
+
+#: app/views/accounting_periods/close.html.haml:5
+msgid "This will close and lock the accounting period"
+msgstr ""
+
+#: app/views/accounting_periods/close.html.haml:17 app/views/accounting_periods/show.html.haml:11
+#: app/views/accounting_periods/index.html.haml:21
+msgid "Begins"
+msgstr ""
+
+#: app/views/accounting_periods/close.html.haml:20 app/views/accounting_periods/show.html.haml:14
+#: app/views/accounting_periods/index.html.haml:24
+msgid "Ends"
+msgstr ""
+
+#: app/views/accounting_periods/close.html.haml:23 app/views/accounting_periods/show.html.haml:17
+#: app/views/accounting_periods/index.html.haml:27
+msgid "Entries Allowed?"
+msgstr ""
+
+#: app/views/accounting_periods/close.html.haml:26 app/views/accounting_periods/show.html.haml:20
+#: app/views/accounting_periods/index.html.haml:30
+msgid "Account balances"
+msgstr ""
+
+#: app/views/accounting_periods/index.html.haml:4
+msgid "There are no accounting periods defined"
+msgstr ""
+
+#: app/views/accounting_periods/edit.html.haml:6
+msgid "Edit Accounting Period"
+msgstr ""
+
+#: app/views/accounting_periods/period_balances.html.haml:14
+msgid "No accounts or end-of-period balances for the accounting period"
+msgstr ""
+
+#: app/views/accounting_periods/period_balances.html.haml:24
+msgid "Opening balances"
+msgstr ""
+
+#: app/views/accounting_periods/period_balances.html.haml:27
+msgid "Closing balances"
+msgstr ""
+
+#: app/views/accounting_periods/period_balances.html.haml:35 app/views/accounting_periods/period_balances.html.haml:44
+msgid "Computed"
+msgstr ""
+
+#: app/views/accounting_periods/period_balances.html.haml:38 app/views/accounting_periods/period_balances.html.haml:47
+msgid "Saved"
+msgstr ""
+
+#: app/views/accounting_periods/period_balances.html.haml:41 app/views/accounting_periods/period_balances.html.haml:50
+msgid "Adjust Saved By"
+msgstr ""
+
+#: app/views/monthly_targets/new.html.haml:1
+msgid "New Monthly Target"
+msgstr ""
+
+#: app/views/monthly_targets/_fields.html.haml:9 app/views/monthly_targets/index.html.haml:12
+msgid "For month"
+msgstr ""
+
+#: app/views/monthly_targets/show.html.haml:5
+msgid "Disbursements target"
+msgstr ""
+
+#: app/views/monthly_targets/show.html.haml:8
+msgid "Collections target"
+msgstr ""
+
+#: app/views/monthly_targets/index.html.haml:2
+msgid "Monthly Targets"
+msgstr ""

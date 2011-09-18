@@ -1,13 +1,10 @@
-%h1 LoanPurposes controller, new action
-
-%p 
-  Edit this file in 
-  %tt app/views/loan_purposes/new.html.erb
+%h1 
+  = I18n.t "loan_purpose.new.title", :default => "New Loan Purpose"
 
 = error_messages_for @loan_purpose
 
 = form_for(@loan_purpose, :action => url(:loan_purposes) ) do
-  %p
-    = submit "Create"
+  = partial :fields
+  = submit I18n.t "loan_purpose.new.create", :default => "Create"
 
-= link_to 'Back', url(:loan_purposes)
+= link_to I18n.t("loan_purpose.new.back", :default => "Back"), url(:loan_purposes)

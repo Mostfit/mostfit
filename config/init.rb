@@ -46,6 +46,9 @@ Merb::BootLoader.before_app_loads do
   require 'lib/functions.rb'
   require 'lib/core_ext.rb'
   require 'lib/fees_container.rb'
+  require 'gettext'
+  require 'haml_gettext'
+
 
   #initialize i18n
   require 'i18n'

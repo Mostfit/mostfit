@@ -83,7 +83,7 @@ class StaffMembers < Application
       file = @staff_member.generate_collection_pdf(@date)
       filename   = File.join(Merb.root, "doc", "pdfs", "staff", @staff_member.name, "collection_sheets", "collection_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
       if file
-        send_data(File.read(filename), :filename => filename)
+        send_data(File.read(filename), :filename => filename, :type => "application/pdf")
       else
         redirect resource(@staff_member), :message => {:notice => "No centers for collection today"}
       end
@@ -103,7 +103,7 @@ class StaffMembers < Application
       file = @staff_member.generate_disbursement_pdf(@date)
       filename   = File.join(Merb.root, "doc", "pdfs", "staff", @staff_member.name, "disbursement_sheets", "disbursement_#{@staff_member.id}_#{@date.strftime('%Y_%m_%d')}.pdf")
       if file
-        send_data(File.read(filename), :filename => filename)
+        send_data(File.read(filename), :filename => filename, :type => "application/pdf")
       else
         redirect resource(@staff_member), :message => {:notice => "No centers for collection today"}
       end
@@ -175,7 +175,7 @@ class StaffMembers < Application
   end
 
   def send_sheet(filename)
-    send_data(File.read(filename), :filename => filename)
+    send_data(File.read(filename), :filename => filename, :type => "application/pdf")
   end
 
   # this redirects to the proper url, used from the router

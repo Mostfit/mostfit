@@ -1,0 +1,16 @@
+%table
+  %tr
+    %th
+      = I18n.t "loan_purpose.fields.name", :default => "Name"
+    %td
+      = text_field :name
+  %tr
+    %th
+      = I18n.t "loan_purpose.fields.code", :default => "Code"
+    %td
+      = text_field :code
+  %tr
+    %th
+      = I18n.t "loan_purpose.fields.classified_under", :default => "Classified Under"
+    %td
+      = select :parent_id, :collection => @parents.map{|x| [x.id, x.name]}, :prompt => (I18n.t "loan_purpose.fields.choose_a_loan_purpose", :default => "Choose a loan purpose")

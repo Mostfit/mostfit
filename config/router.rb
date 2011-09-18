@@ -140,6 +140,10 @@ Merb::Router.prepare do
     match('/regions/:id.:format').to(:controller => 'regions', :action =>'show')
     match('/areas.:format').to(:controller => 'areas', :action =>'index')
     match('/areas/:id.:format').to(:controller => 'areas', :action =>'show')
+    match('/transaction_logs.:format').to(:controller => 'transaction_logs', :action =>'index')
+    match('/transaction_logs/:id.:format').to(:controller => 'transaction_logs', :action =>'show')
+    match('/model_event_logs.:format').to(:controller => 'model_event_logs', :action =>'index')
+    match('/model_event_logs/:id.:format').to(:controller => 'model_event_logs', :action =>'show')
     match('/branches') do
       match('.:format').to(:controller => 'branches', :action =>'index')
       match('/:id.:format').to(:controller => 'branches', :action =>'show')
