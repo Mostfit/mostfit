@@ -209,7 +209,9 @@ class Hash
     rhash = {}
     (keys + other.keys).uniq.each do |k|
       if has_key?(k) and other.has_key?(k)
-        rhash[k] = self[k] + other[k]
+        if self[k].respond_to?(:+) and other[k].respond_to?(:+)
+          rhash[k] = self[k] + other[k]
+        end
       elsif other.has_key?(k)
         rhash[k] = other[k]
       elsif has_key?(k)
@@ -282,10 +284,6 @@ class Array
     self.reduce(:+)
   end
   
-  def grp_by
-    # a proper group_by
-    # group by returns
-  end
 end
 
 module ExcelFormula

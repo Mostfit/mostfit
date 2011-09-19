@@ -39,7 +39,7 @@
     in current selection.
     = "#{@missing_centers.values.flatten.count} missing centers"
     in current selection.
-    = link_to "update", url({:controller => :cachers, :action => :update, :date => @date, :branch_id => params[:branch_id]}), :class => "green_button"
+    = link_to "update", url({:controller => :cachers, :action => :generate, :date => @date, :branch_id => params[:branch_id]}), :class => "green_button"
 = form(:method => :get, :action => resource(:cachers)) do
   = date_select_old_html(:name => 'date', :id => 'date', :min_date => Cacher.aggregate(:date.min), :max_date => Cacher.aggregate(:date.max), :date => @date)
   = select :name => 'branch_id', :id => "branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch', :class => 'chosen'

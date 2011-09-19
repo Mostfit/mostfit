@@ -13,15 +13,8 @@ class Cachers < Application
   end
   
   def update
-    debugger
-    @cachers = get_cachers
-    stale_centers = @cachers.get_stale(:center)
-    missing_centers = @cachers.get_missing_centers
-    stale_center_branches = stale_centers.blank? ? [] : Center.all(:id => stale_centers.values.flatten).branches.aggregate(:id)
-    missing_center_branches = missing_centers.blank? ? [] : missing_centers.keys
-    bids =  (stale_center_branches + missing_center_branches).uniq
-    bids.each{|bid| BranchCache.update(bid, @date)}
-    
+    BranchCache.update(@date)
+    redirect resource(:cachers, :date => @date)
   end
 
   private

@@ -9,7 +9,6 @@ class GraphData < Application
 
   def tm_collections
     @date = begin; Date.parse(params[:date]); rescue; Date.today; end
-    debugger
     if params[:branch_id]
       @history_totals = Cacher.all(:model_name => "Center", :date => @date, :branch_id => params[:branch_id])
     else

@@ -16,16 +16,11 @@
 
 - debugger
 - bnames = @branch_names.keys.sort
-- keys = [:advance_principal_paid, :advance_interest_paid, :principal_paid, :principal_due, :interest_paid, :interest_due]
 %script{:type => "text/javascript"}
   == names=['#{bnames.join("','")}']
   == values = ['#{@branch_names.values.join("','")}']
 #stats
-  - total = {}
-  - @branch_data.each do |bid, bv|
-    - keys.each do |k|
-      - total[k] ||= 0
-      - total[k] += bv.send(k)
+  - total = @caches.reduce(nil){|s,h| h + s}
   %table#menu{:style => "float:left; position: relative; left: 1px;"}
     %tr.selected
       %th
@@ -33,15 +28,15 @@
           today
       %td.number
         %h1.green
-          = total[:principal_paid] + total[:interest_paid]
+          = total.fees_paid_today + total.principal_paid + total.interest_paid
         %p collected
       %td.number
         %h1
-          = total[:principal_due] + total[:interest_due]
+          = total.total_fees_due + total.principal_due + total.interest_due
         %p due
       %td.number
         %h1.red
-          1,745
+          0
         %p
           missed
 
@@ -59,10 +54,10 @@
           %th
             Paid
           - t = 0
-          - paid_values = [:total_advance_paid_today, :principal_paid, :interest_paid, :fees_paid_today]
+          - keys = [:total_advance_paid, :principal_paid, :interest_paid, :fees_paid_today, :noop]
           - keys.map do |k| 
             %td.green
-              - value = total[k] || 0
+              - value = total.send(k) || 0
               - t += value
               = value.to_currency.split(".")[0]
           %th
@@ -71,9 +66,10 @@
           %th
             Due
           - t = 0
-          - keys.map{|k| k.to_s.split("_")[0..-2].join("_")}.uniq.each do |k|
+          - keys = [:noop, :principal_due, :interest_due, :fees_due_today, :total_default]
+          - keys.map do |k|
             %td.red
-              - value = total["#{k}_due".to_sym] || 0
+              - value = total.send(k) || 0
               - t += value
               = value.to_currency.split(".")[0]
           %th
