@@ -231,4 +231,9 @@ Merb::BootLoader.after_app_loads do
     Holiday.all.each{|h| $holidays_list << [h.date.day, h.date.month, h.date.strftime('%y')]}
   rescue
   end
+
+  #this is to create an Organization if it is not created.
+  if Organization.all.empty?
+    Organization.create(:name => "Mostfit")
+  end
 end
