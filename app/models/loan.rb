@@ -1083,6 +1083,9 @@ class Loan
       total_fees_paid = fee_payments.select{|dt,fp| dt <= date}.to_hash.values.sum || 0
       fees_due_today = ap_fees[date] || 0
       fees_paid_today = fee_payments[date] || 0
+
+      funder_id = funding_line.funder.id
+      
       @history_array << {
         :loan_id                             => self.id,
         :date                                => date,
@@ -1119,7 +1122,10 @@ class Loan
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f,
         :branch_id                           => c_branch_id,
         :center_id                           => c_center_id,
-        :created_at                          => now
+        :created_at                          => now,
+        :funding_line_id                     => funding_line_id,
+        :funder_id                           => funder_id,
+        :loan_product_id                     => loan_product_id
       }
     end
 

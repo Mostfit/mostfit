@@ -13,34 +13,34 @@ class LoanHistory
   property :week_id,                    Integer # good for aggregating.
 
   # some properties for similarly named methods of a loan:
-  property :scheduled_outstanding_total,     Float, :nullable => false, :index => true
-  property :scheduled_outstanding_principal, Float, :nullable => false, :index => true
-  property :actual_outstanding_total,        Float, :nullable => false, :index => true
-  property :actual_outstanding_principal,    Float, :nullable => false, :index => true
-  property :scheduled_principal_due,         Float, :nullable => false, :index => true
-  property :scheduled_interest_due,          Float, :nullable => false, :index => true
-  property :principal_due,                   Float, :nullable => false, :index => true
-  property :interest_due,                    Float, :nullable => false, :index => true
-  property :principal_paid,                  Float, :nullable => false, :index => true
-  property :interest_paid,                   Float, :nullable => false, :index => true
-  property :total_principal_due,             Float, :nullable => false, :index => true
-  property :total_interest_due,              Float, :nullable => false, :index => true
-  property :total_principal_paid,            Float, :nullable => false, :index => true
-  property :total_interest_paid,             Float, :nullable => false, :index => true
-  property :advance_principal_paid,          Float, :nullable => false, :index => true
-  property :advance_interest_paid,           Float, :nullable => false, :index => true
-  property :total_advance_paid,              Float, :nullable => false, :index => true
-  property :advance_principal_paid_today,    Float, :nullable => false, :index => true
-  property :advance_interest_paid_today,     Float, :nullable => false, :index => true
-  property :total_advance_paid_today,        Float, :nullable => false, :index => true
-  property :advance_principal_adjusted,      Float, :nullable => false, :index => true
-  property :advance_interest_adjusted,       Float, :nullable => false, :index => true
-  property :principal_in_default,            Float, :nullable => false, :index => true
-  property :interest_in_default,             Float, :nullable => false, :index => true
-  property :total_fees_due,                  Float, :nullable => false, :index => true
-  property :total_fees_paid,                 Float, :nullable => false, :index => true
-  property :fees_due_today,                  Float, :nullable => false, :index => true
-  property :fees_paid_today,                 Float, :nullable => false, :index => true
+  property :scheduled_outstanding_total,     Float, :nullable => false
+  property :scheduled_outstanding_principal, Float, :nullable => false
+  property :actual_outstanding_total,        Float, :nullable => false
+  property :actual_outstanding_principal,    Float, :nullable => false
+  property :scheduled_principal_due,         Float, :nullable => false
+  property :scheduled_interest_due,          Float, :nullable => false
+  property :principal_due,                   Float, :nullable => false
+  property :interest_due,                    Float, :nullable => false
+  property :principal_paid,                  Float, :nullable => false
+  property :interest_paid,                   Float, :nullable => false
+  property :total_principal_due,             Float, :nullable => false
+  property :total_interest_due,              Float, :nullable => false
+  property :total_principal_paid,            Float, :nullable => false
+  property :total_interest_paid,             Float, :nullable => false
+  property :advance_principal_paid,          Float, :nullable => false
+  property :advance_interest_paid,           Float, :nullable => false
+  property :total_advance_paid,              Float, :nullable => false
+  property :advance_principal_paid_today,    Float, :nullable => false
+  property :advance_interest_paid_today,     Float, :nullable => false
+  property :total_advance_paid_today,        Float, :nullable => false
+  property :advance_principal_adjusted,      Float, :nullable => false
+  property :advance_interest_adjusted,       Float, :nullable => false
+  property :principal_in_default,            Float, :nullable => false
+  property :interest_in_default,             Float, :nullable => false
+  property :total_fees_due,                  Float, :nullable => false
+  property :total_fees_paid,                 Float, :nullable => false
+  property :fees_due_today,                  Float, :nullable => false
+  property :fees_paid_today,                 Float, :nullable => false
 
   property :status,                          Enum.send('[]', *STATUSES)
 
@@ -48,6 +48,9 @@ class LoanHistory
   property :client_group_id,             Integer, :index => true
   property :center_id,                   Integer, :index => true
   property :branch_id,                   Integer, :index => true
+  property :funding_line_id,             Integer, :index => true
+  property :funder_id,                   Integer, :index => true
+  property :loan_product_id,             Integer, :index => true
 
   property :composite_key, Float, :index => true
 
@@ -56,6 +59,7 @@ class LoanHistory
   belongs_to :client_group, :nullable => true   # by avoiding 
   belongs_to :center         # lots of joins!
   belongs_to :branch         # muahahahahahaha!
+  belongs_to :funding_line, :funder, :loan_product
   
   validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
