@@ -1060,8 +1060,6 @@ class Loan
     repayed=false
     dates.each_with_index do |date,i|
       i_num = installment_for_date(date)
-      current   = date == Date.today ? true : (((dates[[i,0].max] < Date.today and dates[[dates.size - 1,i+1].min] > Date.today) or 
-                   (i == dates.size - 1 and dates[i] < Date.today)))
       scheduled = get_scheduled(:all, date)
       actual    = get_actual(:all, date)
       prin      = principal_received_on(date).round(2)
