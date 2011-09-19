@@ -45,9 +45,14 @@ dependency "uuid"
 dependency "builder"
 #dependency "dm-is-paginated"
 dependency "mongrel", "1.1.5"
+# <<<<<<< HEAD
+# dependency "ya2yaml", "0.30"
+# dependency "i18n", "0.6.0"
+# =======
 
 # dependencies for maintainer slice
 dependency "cronedit", "0.3.0"
 dependency "git", "1.2.5"
 dependency "do_sqlite3", do_gems_version
 dependency "tlsmail"
+# >>>>>>> master

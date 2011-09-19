@@ -1,20 +1,20 @@
 %h1
-  Occupations 
-= link_to 'Add an occupation', url(:new_occupation), :class => 'add'
+  = I18n.t "occupation.index.title", :default => "Occupations"
+= link_to I18n.t("occupation.index.add_an_occupation", :default => "Add an occupation"), url(:new_occupation), :class => 'add'
 %table.narrow
   %thead
     %tr
       %th
-        id
+        = I18n.t "occupation.index.id", :default => "Id"
       %th
-        occupation
+        = I18n.t "occupation.index.occupation", :default => "Occupation"
       %th
-        code
+        = I18n.t "occupation.index.code", :default => "Code"
       %th
-        actions
+        = I18n.t "occupation.index.actions", :default => "Actions"
 
   - for occupation in @occupations
-    %tr
+    %tr{:class => cycle('odd', '')}
       %td
         = occupation.id
       %td
@@ -22,7 +22,7 @@
       %td
         = occupation.code
       %td
-        = link_to 'Show', url(:occupation, occupation)
+        = link_to I18n.t("occupation.index.show", :default => "Show"), url(:occupation, occupation)
         |
-        = link_to 'Edit', url(:edit_occupation,  occupation)
+        = link_to I18n.t("occupation.index.edit", :default => "Edit"), url(:edit_occupation,  occupation)
 
