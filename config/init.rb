@@ -233,7 +233,10 @@ Merb::BootLoader.after_app_loads do
   end
 
   #this is to create an Organization if it is not created.
-  if Organization.all.empty?
-    Organization.create(:name => "Mostfit")
+  begin
+    if Organization.all.empty?
+      Organization.create(:name => "Mostfit", :org_guid => UUID.generate)
+    end
+  rescue
   end
 end
