@@ -39,5 +39,9 @@ namespace :mostfit do
         }
       }
     end
+
+    desc "pay levied fees"
+    task :pay do
+    end
   end
 end

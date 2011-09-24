@@ -118,7 +118,8 @@ class Loan
   belongs_to :client
   belongs_to :funding_line, :nullable => true
   belongs_to :loan_product
-  belongs_to :occupation,                :nullable  => true
+  belongs_to :loan_purpose,              :nullable  => true
+  belongs_to :occupation,                :nullable => true
   belongs_to :applied_by,                :child_key => [:applied_by_staff_id],                :model => 'StaffMember'
   belongs_to :approved_by,               :child_key => [:approved_by_staff_id],               :model => 'StaffMember'
   belongs_to :rejected_by,               :child_key => [:rejected_by_staff_id],               :model => 'StaffMember'
@@ -132,6 +133,12 @@ class Loan
   belongs_to :loan_utilization
   belongs_to :verified_by,               :child_key => [:verified_by_user_id],                :model => 'User'
   belongs_to :repayment_style
+
+  belongs_to :organization, :parent_key => [:org_guid], :child_key => [:parent_org_guid], :required => false  
+  property   :parent_org_guid, String, :nullable => true
+  
+  belongs_to :domain, :parent_key => [:domain_guid], :child_key => [:parent_domain_guid], :required => false
+  property   :parent_domain_guid, String, :nullable => true
 
   has n, :loan_history,                                                                       :model => 'LoanHistory'
   has n, :payments

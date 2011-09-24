@@ -1,50 +1,133 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-	<xs:element name="xml">
+    <xs:element name="xml">
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="user"/>
-				<xs:element ref="error"/>
+				<xs:element ref="errors"/>
 				<xs:element ref="staff_member"/>
-				<xs:element ref="center"/>
-				<xs:element ref="client"/>
-				<xs:element ref="loan"/>
-				<xs:element ref="branch"/>
-				<xs:element ref="client_group"/>
-				<xs:element ref="center_meeting"/>
-				<xs:element ref="region"/>
-				<xs:element ref="area"/>
-				<xs:element ref="loan_product"/>
-				<xs:element ref="error"/>
-				<xs:element ref="holiday"/>
+				<xs:element ref="centers"/>
+				<xs:element ref="clients"/>
+				<xs:element ref="loans"/>
+				<xs:element ref="branches"/>
+				<xs:element ref="client_groups"/>
+				<xs:element ref="center_meetings"/>
+				<xs:element ref="regions"/>
+				<xs:element ref="areas"/>
+				<xs:element ref="loan_products"/>
+				<xs:element ref="holidays"/>
 				<xs:element ref="handshake"/>
 				<xs:element ref="weeksheet"/>
-				<xs:element ref="weeksheet_row"/>
+				<xs:element ref="weeksheet_rows"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="user">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="id" type="xs:integer"/>
-				<xs:element name="login" type="xs:string"/>
-				<xs:element name="time_at_server" type="xs:dateTime"/>
-				<xs:element name="created_at" type="xs:dateTime"/>
-				<xs:element name="updated_at" type="xs:dateTime"/>
-				<xs:element name="password_changed_at" type="xs:string"/>
-				<xs:element name="active" type="xs:boolean"/>
-				<xs:element name="role" type="xs:string"/>
-				<xs:element name="staff_member_id" type="xs:integer"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="error">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="error_message" type="xs:string"/>
-				<xs:element name="error_code" type="xs:integer"/>
-			</xs:sequence>
-		</xs:complexType>
+    <xs:element name="errors">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="error" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="centers">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="center" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="clients">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="client" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="loans">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="loan" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="branches">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="branch" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="regions">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="region" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="areas">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="area" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="client_groups">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="client_group" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="center_meetings">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="center_meeting" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="loan_products">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="loan_product" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="holidays">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="holiday" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="weeksheet_rows">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element ref="weeksheet_row" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="user">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:integer"/>
+                <xs:element name="login" type="xs:string"/>
+                <xs:element name="time_at_server" type="xs:dateTime"/>
+                <xs:element name="created_at" type="xs:dateTime"/>
+                <xs:element name="updated_at" type="xs:dateTime"/>
+                <xs:element name="password_changed_at" type="xs:string"/>
+                <xs:element name="active" type="xs:boolean"/>
+                <xs:element name="role" type="xs:string"/>
+                <xs:element name="staff_member_id" type="xs:integer"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="error">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="error_message" type="xs:string"/>
+                <xs:element name="error_code" type="xs:integer"/>
+            </xs:sequence>
+        </xs:complexType>
     </xs:element>
     <xs:element name="staff_member">
         <xs:complexType>
@@ -55,17 +138,18 @@
                 <xs:element name="creation_date" type="xs:dateTime" />
                 <xs:element name="active" type="xs:boolean" />
                 <xs:element name="user_id" type="xs:string" />
-                <xs:element name="clients" ref="client" maxOccuer="unbounded"/>
-                <xs:element name="centers" ref="center" maxOccuer="unbounded"/>
-                <xs:element name="branches" ref="branches" maxOccuer="unbounded" />
-                <xs:element name="loans" ref="loan" maxOccuer="unbounded"/>
-                <xs:element name="client_groups" ref="client_group" maxOccuer="unbounded"/>
-                <xs:element name="center_meetings" ref="center_meeting" maxOccuer="unbounded"/>
+                <xs:element ref="clients"/>
+                <xs:element ref="centers"/>
+                <xs:element ref="branches"/>
+                <xs:element ref="loans"/>
+                <xs:element ref="client_groups"/>
+                <xs:element ref="center_meetings"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-	<xs:element name="center">
-		<xs:complexType>
+
+    <xs:element name="center">
+        <xs:complexType>
             <xs:sequence>
                 <xs:element name="id" type="xs:integer" />
                 <xs:element name="name" type="xs:string" />
@@ -96,11 +180,11 @@
                 <xs:element name="client_group_id" type="xs:int" />
                 <xs:element name="client_group_name" type="xs:string" />
                 <xs:element name="center_id" type="xs:integer" />
-                <xs:element name="loans" ref="loan" maxOccuer="unbounded"/>
+                <xs:element ref="loan"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="loans">
+    <xs:element name="loan">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="id" type="xs:integer" />
@@ -257,7 +341,7 @@
                 <xs:element name="meeting_day" type="xs:string" />
                 <xs:element name="meeting_time_hours" type="xs:integer" />
                 <xs:element name="meeting_time_minutes" type="xs:integer" />
-                <xs:element name="weeksheet_rows" ref="weeksheet_row" maxOccuer="unbounded"/>
+                <xs:element ref="weeksheet_rows"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -274,7 +358,7 @@
                 <xs:element name="loan_amount" type="xs:decimal" />
                 <xs:element name="disbursal_date" type="xs:string" />
                 <xs:element name="outstanding" type="xs:decimal" />
-                <xs:element name="installment" type="xs:intteger" />
+                <xs:element name="installment" type="xs:integer" />
                 <xs:element name="principal" type="xs:decimal" />
                 <xs:element name="interest" type="xs:decimal" />
                 <xs:element name="fees" type="xs:decimal" />

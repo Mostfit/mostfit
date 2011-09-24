@@ -1,10 +1,22 @@
 %h1
-  LoanPurposes controller, show action
-%p
-  Edit this file in
-  %tt
-    app/views/loan_purposes/show.html.erb
-
-= link_to 'Edit',  url(:edit_loan_purpose,  @loan_purpose)
+  = I18n.t "loan_purpose.show.title", :default => "Loan Purpose"
+%table
+  %tr.odd
+    %td 
+      = I18n.t"loan_purpose.show.id", :default => "Id"
+    %td=@loan_purpose.id
+  %tr
+    %td
+      = I18n.t"loan_purpose.show.name", :default => "Name"
+    %td=@loan_purpose.name
+  %tr.odd
+    %td
+      = I18n.t"loan_purpose.show.code", :default => "Code"
+    %td= @loan_purpose.code.blank?  ? '-' : @loan_purpose.code
+  %tr
+    %td
+      = I18n.t"loan_purpose.show.classified_under", :default => "Classified Under"
+    %td= @loan_purpose.parent_id != 0 ? LoanPurpose.get(@loan_purpose.parent_id).name : '-'
+= link_to I18n.t("loan_purpose.show.edit", :default => "Edit"), url(:edit_loan_purpose, @loan_purpose)
 |
-= link_to 'Back', url(:loan_purposes)
+= link_to I18n.t("loan_purpose.show.back", :default => "Back"), url(:loan_purposes)

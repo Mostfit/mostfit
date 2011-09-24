@@ -1,3 +1,8 @@
+%h2== Repayments #{link_to 'new repayment', url_for_loan(@loan, 'payments/new'), :class => "add"}
+- if @payments.blank?
+  %p
+    %i No repayments have been made so far.
+- else
 / %a{:href => "#", :onclick => "javascript:$('.checkbox').attr('checked',true); return false"} check all
 / %a{:href => "#", :onclick => "javascript:$('.checkbox').attr('checked',false); return false"} uncheck all
 
@@ -17,6 +22,7 @@
   - @center = @client.center unless @center
   - @branch = @center.branch unless @branch 
   - cls = 'odd'
+  - pmts = @payments
   - pmts.each_with_index do |payment, pi|
     - if pi > 0
       - if payment.deleted_at != pmts[pi-1].deleted_at
@@ -50,6 +56,3 @@
   %tfoot
     %tr
       %td{ :colspan => 8 }
-
-
-%p= link_to 'new repayment >>', url_for_loan(@loan, 'payments/new'), :class => "button"

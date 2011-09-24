@@ -1,0 +1,36 @@
+%xml
+  %transaction_log
+    %txn_log_guid #{@transaction_log.txn_log_guid}      
+    %txn_guid #{@transaction_log.txn_guid}
+    %update_type #{@transaction_log.update_type}
+    %txn_type #{@transaction_log.txn_type}         
+    %nature_of_transaction #{@transaction_log.nature_of_transaction} 
+    %sub_type_id #{@transaction_log.sub_type_id}       
+    %sub_type_name #{@transaction_log.sub_type_name}     
+    %amount #{@transaction_log.amount}          
+    %currency #{@transaction_log.currency}        
+    %effective_date #{@transaction_log.effective_date}  
+    %record_date #{@transaction_log.record_date}     
+    %updated_at_time #{@transaction_log.updated_at_time} 
+    %verified_at_time #{@transaction_log.verified_at_time} 
+    %deleted_at_time #{@transaction_log.deleted_at_time} 
+    %paid_by_type #{@transaction_log.paid_by_type}    
+    %paid_by_id #{@transaction_log.paid_by_id}      
+    %paid_by_name #{@transaction_log.paid_by_name}    
+    %received_by_type #{@transaction_log.received_by_type}
+    %received_by_id #{@transaction_log.received_by_id}  
+    %received_by_name #{@transaction_log.received_by_name}
+    %transacted_at_type #{@transaction_log.transacted_at_type}  
+    %transacted_at_id #{@transaction_log.transacted_at_id}    
+    %transacted_at_name #{@transaction_log.transacted_at_name}
+    %parent_org_guid #{@transaction_log.parent_org_guid}
+    %parent_domain_guid #{@transaction_log.parent_domain_guid}
+    - if @transaction_log.extended_info_items
+      %extended_info_items
+        - @transaction_log.extended_info_items.each do |e|
+          %extended_info_item
+            %item_type #{e.item_type}
+            %item_id #{e.item_id}
+            %item_value #{e.item_value}
+            %parent_guid #{e.parent_guid}
+	   

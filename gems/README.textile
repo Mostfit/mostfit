@@ -1,0 +1,14 @@
+* After install bundled gems using following command
+$ cd mostfit
+$ bin/thor merb:gem:redeploy
+$ bin/thor merb:gem:install
+
+You need to install some other gem locally. You can find this gem file in /gems/other_gems folder
+
+$ sudo gem install uuid
+$ sudo gem install pdf-writer
+$ sudo gem install mongrel
+$ sudo gem install log4r
+$ sudo gem install i18n-translators-tools
+
+
