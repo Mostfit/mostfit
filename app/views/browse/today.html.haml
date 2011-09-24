@@ -1,3 +1,92 @@
-.today
-  %h1
-    = Center.all(:meeting_day => @date.weekday).count
+= js_include_tag 'Jit/jit-yc'
+= js_include_tag :treemap, :hbarchart
+
+= css_include_tag 'jit-base','treemap'
+:javascript
+  var date = new Date('#{@date.strftime("%Y-%m-%d")}')
+  var date_string = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+  function get_charts(q) {
+    $.get('/graph_data/tm_collections?' + q,'', function(data){
+      init_barchart($.parseJSON(data).pmts_barchart);
+      init_treemap($.parseJSON(data).treemap);
+      });
+    }
+
+  $(document).ready(function(){ get_charts('date=' + date_string)});
+
+- debugger
+- bnames = @branch_names.keys.sort
+%script{:type => "text/javascript"}
+  == names=['#{bnames.join("','")}']
+  == values = ['#{@branch_names.values.join("','")}']
+#stats
+  - total = @caches.reduce(nil){|s,h| h + s}
+  %table#menu{:style => "float:left; position: relative; left: 1px;"}
+    %tr.selected
+      %th
+        %h1
+          today
+      %td.number
+        %h1.green
+          = total.fees_paid_today + total.principal_paid + total.interest_paid
+        %p collected
+      %td.number
+        %h1
+          = total.total_fees_due + total.principal_due + total.interest_due
+        %p due
+      %td.number
+        %h1.red
+          0
+        %p
+          missed
+
+      
+  .detail
+    #today
+      %table.new-report{:style => "margin: auto; width: 90%"}
+        %thead
+          %tr
+            %th.purple
+            - ["adv", "prin", "int", "fees","default","total"].each do |k|
+              %th
+                = k
+        %tr
+          %th
+            Paid
+          - t = 0
+          - keys = [:total_advance_paid, :principal_paid, :interest_paid, :fees_paid_today, :noop]
+          - keys.map do |k| 
+            %td.green
+              - value = total.send(k) || 0
+              - t += value
+              = value.to_currency.split(".")[0]
+          %th
+            = t.to_currency.split(".")[0]
+        %tr
+          %th
+            Due
+          - t = 0
+          - keys = [:noop, :principal_due, :interest_due, :fees_due_today, :total_default]
+          - keys.map do |k|
+            %td.red
+              - value = total.send(k) || 0
+              - t += value
+              = value.to_currency.split(".")[0]
+          %th
+            = t.to_currency.split(".")[0]
+      %h1.green
+        = link_to "See a more detailed report", url(:controller => :browse, :action => :centers_paying_today)
+      #hbarchart{:style => "width: 92%;  height: 30px; margin-left: 3%"}
+      #infovis{:style => "width: 90%; height: 400px; margin: auto"}
+      
+ 
+            
+    #staff
+      %h1 Staff Members
+    
+    %table
+      %tr
+        %th
+          
+        
+    

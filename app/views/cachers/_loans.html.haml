@@ -4,7 +4,6 @@
   - histories = LoanHistory.latest({:center_id => params[:center_id]}, @date)
   - histories.each do |h|
     - cls = h.status == :outstanding ? "" : "closed"
-    - next if (params[:show_all].blank? and h.status != :outstanding)
     %tr{:class => cls}
       - keys.each do |at|
         - val = h.send(at)

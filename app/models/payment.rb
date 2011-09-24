@@ -24,16 +24,14 @@ class Payment
   property :verified_by_user_id, Integer, :nullable => true, :index => true
   property :loan_id,             Integer, :nullable => true, :index => true
   property :client_id,           Integer, :nullable => true, :index => true
-  property :center_id,           Integer, :nullable => true, :index => true
-  property :branch_id,           Integer, :nullable => false, :index => true
+  property :c_center_id,           Integer, :nullable => true, :index => true
+  property :c_branch_id,           Integer, :nullable => false, :index => true
   property :fee_id,              Integer, :nullable => true, :index => true
   property :desktop_id,          Integer
   property :origin,              String, :default => DEFAULT_ORIGIN
 
   belongs_to :loan, :nullable => true
   belongs_to :client
-  belongs_to :center, :nullable => true
-  belongs_to :branch, :nullable => true
   belongs_to :fee
   belongs_to :created_by,  :child_key => [:created_by_user_id],   :model => 'User'
   belongs_to :received_by, :child_key => [:received_by_staff_id], :model => 'StaffMember'
@@ -56,8 +54,8 @@ class Payment
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :if => Proc.new{|p| p.deleted_at != nil and p.deleted_by!=nil}
   
   def add_center_and_branch
-    self.center = self.loan.client.center
-    self.branch = self.loan.client.center.branch
+    self.c_center_id = self.client.center.id
+    self.c_branch_id = self.client.center.branch.id
   end
 
   def self.from_csv(row, headers, loans)

@@ -9,10 +9,12 @@ class Dashboard < Application
     render
   end
 
-  def today
+  def old_today
     @date = params[:date].blank? ? Date.today : Date.parse(params[:date])
     render
   end
+
+
 
   def branch
     case params[:id]

@@ -1022,7 +1022,7 @@ class Loan
   def update_history(forced=false)
     t = Time.now
     reload
-    puts "RELOAD: #{Time.now - t} secs"
+    Merb.logger.info "RELOAD: #{Time.now - t} secs"
     extend_loan
     return true if Mfi.first.dirty_queue_enabled and DirtyLoan.add(self) and not forced
     return if @already_updated and not forced
@@ -1035,6 +1035,12 @@ class Loan
     update_history_attributes
     self.save!
     Merb.logger.info "LOAN CACHE UPDATE TIME: #{(Time.now - t).round(4)} secs"
+  end
+
+  def update_history_only
+    t = Time.now
+    update_history_bulk_insert
+    Merb.logger.info "HISTORY EXEC TIME: #{(Time.now - t).round(4)} secs"
   end
 
   def loan_outstanding_on?(date)
@@ -1069,9 +1075,9 @@ class Loan
       int       = interest_received_on(date).round(2)
       total_interest_paid += int
       st = get_status(date)
-      scheduled_principal_due = i_num > 0 ? scheduled_principal_for_installment(i_num) : 0
-      scheduled_interest_due = i_num > 0 ? scheduled_interest_for_installment(i_num) : 0
-      outstanding = loan_outstanding_on?(date)
+      scheduled_principal_due = i_num > 0 ? scheduled[:principal] : 0
+      scheduled_interest_due = i_num > 0 ? scheduled[:interest] : 0
+      outstanding = [:disbursed, :outstanding].include?(st)
       principal_due  =  outstanding ? actual[:balance].round(2) - scheduled[:balance].round(2) : 0
       interest_due   = outstanding ? actual[:total_balance].round(2) - scheduled[:total_balance].round(2) - (actual[:balance].round(2) - scheduled[:balance].round(2)) : 0
       total_principal_due += scheduled[:principal].round(2)
@@ -1084,8 +1090,13 @@ class Loan
       fees_due_today = ap_fees[date] || 0
       fees_paid_today = fee_payments[date] || 0
 
-      funder_id = funding_line.funder.id
-      
+      last_loan_history = @loan_history.last || nil
+
+      principal_in_default = (date <= Date.today) ? [0,total_principal_paid.round(2) - total_principal_due.round(2)].min : 0
+      interest_in_default = (date <= Date.today) ? [0,total_interest_paid.round(2) - total_interest_due.round(2)].min : 0
+
+      days_overdue = ((principal_in_default > 0  or interest_in_default > 0) and last_loan_history) ? last_loan_history[:days_overdue] + (date - last_loan_history[:date]) : 0
+
       @history_array << {
         :loan_id                             => self.id,
         :date                                => date,
@@ -1095,8 +1106,8 @@ class Loan
         :actual_outstanding_principal        => outstanding ? actual[:balance].round(2) : 0,
         :actual_outstanding_total            => outstanding ? actual[:total_balance].round(2) : 0,
         :amount_in_default                   => actual[:balance].round(2) - scheduled[:balance].round(2),
-        :principal_in_default                => date <= Date.today ? [0,total_principal_paid.round(2) - total_principal_due.round(2)].min : 0,
-        :interest_in_default                 => date <= Date.today ? [0,total_interest_paid.round(2) - total_interest_due.round(2)].min : 0,
+        :principal_in_default                => principal_in_default,
+        :interest_in_default                 => interest_in_default,
         :scheduled_principal_due             => scheduled_principal_due,
         :scheduled_interest_due              => scheduled_interest_due,
         :principal_due                       => principal_due.round(2), 
@@ -1113,8 +1124,8 @@ class Loan
         :advance_principal_paid_today        => (appt = @history_array.last ? [0,advance_principal_paid - (@history_array.last[:advance_principal_paid] || 0)].max : 0),
         :advance_interest_paid_today         => (aipt = @history_array.last ? [0,advance_interest_paid - (@history_array.last[:advance_interest_paid] || 0)].max : 0),
         :total_advance_paid_today            => appt + aipt,
-        :advance_principal_adjusted          => @history_array.last ? [0,@history_array.last[:advance_principal_paid] - advance_principal_paid].max : 0,
-        :advance_interest_adjusted           => @history_array.last ? [0,@history_array.last[:advance_interest_paid] - advance_interest_paid].max : 0,
+        :advance_principal_adjusted          => last_loan_history ? [0,last_loan_history[:advance_principal_paid] - advance_principal_paid].max : 0,
+        :advance_interest_adjusted           => last_loan_history ? [0,last_loan_history[:advance_interest_paid] - advance_interest_paid].max : 0,
         :total_fees_due                      => total_fees_due,
         :total_fees_paid                     => total_fees_paid,
         :fees_due_today                      => fees_due_today,
@@ -1124,8 +1135,8 @@ class Loan
         :center_id                           => c_center_id,
         :created_at                          => now,
         :funding_line_id                     => funding_line_id,
-        :funder_id                           => funder_id,
-        :loan_product_id                     => loan_product_id
+        :loan_product_id                     => loan_product_id,
+        :days_overdue                        => days_overdue
       }
     end
 
@@ -1165,6 +1176,7 @@ class Loan
     t = Time.now
     Merb.logger.error! "could not destroy the history" unless self.loan_history.destroy!
     sql = get_bulk_insert_sql("loan_history",calculate_history)
+    t = Time.now
     repository.adapter.execute(sql)
     Merb.logger.info "update_history_bulk_insert done in #{Time.now - t}"
     return true

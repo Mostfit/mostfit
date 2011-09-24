@@ -210,7 +210,7 @@ class Hash
     (keys + other.keys).uniq.each do |k|
       if has_key?(k) and other.has_key?(k)
         if self[k].respond_to?(:+) and other[k].respond_to?(:+)
-          rhash[k] = self[k] + other[k]
+          rhash[k] = self[k] + other[k] rescue self[k]
         end
       elsif other.has_key?(k)
         rhash[k] = other[k]
@@ -318,6 +318,7 @@ end
 
 
 def get_bulk_insert_sql(table_name, data)
+  t = Time.now
   keys = data.first.keys
   sql = "INSERT INTO #{table_name}(#{keys.join(',')} )
               VALUES "
@@ -338,6 +339,7 @@ def get_bulk_insert_sql(table_name, data)
     values << "(#{value.join(',')})"
   end
   sql += values.join(",") + ";"
-  
+  Merb.logger.info "sql statement crafted in #{Time.now - t}"
+  sql
 end
 

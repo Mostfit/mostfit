@@ -73,7 +73,7 @@ class Cacher
     # get the absolutely lowest last update time
     last_updated_at = cacher_update_times.map{|x| x[1]}.min
     # get all payments after this time and return an array  [[model_id, created_at]....]
-    models_with_payment_update = Payment.all(:created_at.gt => last_updated_at, "#{what}_id".to_sym => model_ids).aggregate("#{what}_id".to_sym, :created_at.max).to_hash
+    models_with_payment_update = Payment.all(:created_at.gt => last_updated_at, "c_#{what}_id".to_sym => model_ids).aggregate("c_#{what}_id".to_sym, :created_at.max).to_hash
     # then check created_at.max against each cacher's updated_at
     models_with_payment_update = models_with_payment_update.select{|k,v| cacher_update_times[k] < v} 
     
@@ -126,8 +126,8 @@ class Cacher
   def + (other)
     # this adds all attributes and uses the latest date to add two cachers together
     return self if other.nil?
-    raise ArgumentError "cannot add cacher to something that is not a cacher" unless other.is_a? Cacher
-    raise ArgumentError "cannot add cachers of different classes" unless self.class == other.class
+    raise ArgumentError.new("cannot add cacher to something that is not a cacher") unless other.is_a? Cacher
+#    raise ArgumentError "cannot add cachers of different classes" unless self.class == other.class
     date = (self.date > other.date ? self.date : other.date)
     me = self.attributes; other = other.attributes;
     attrs = me + other; attrs[:date] = date; attrs[:id] = -1; attrs[:model_name] = "Sum"; 
