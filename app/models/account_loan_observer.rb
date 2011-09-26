@@ -1,6 +1,6 @@
 class AccountLoanObserver
   include DataMapper::Observer    
-  observe Loan
+  observe BranchDiary
   
   def self.get_state(obj)
     #needed for deep copy!

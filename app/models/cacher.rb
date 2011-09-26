@@ -63,7 +63,6 @@ class Cacher
   end
 
   def self.get_stale(what)
-    debugger
     raise ArgumentError unless [:center, :branch].include?(what)
     # get the last update time per cacher as an array [[model_id, updated_at]...]
     objs = self.all(:model_name => what.to_s.camel_case)

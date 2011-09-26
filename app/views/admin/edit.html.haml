@@ -113,7 +113,7 @@
           %td
             Default repayment style
           %td
-            = select :default_repayment_style, :collection => [[NORMAL_REPAYMENT_STYLE,"fees=>int=>prin"], [PRORATA_REPAYMENT_STYLE,"pro rata"]]
+            = select :default_repayment_style, :collection => [[NORMAL_REPAYMENT_STYLE,"fees=>int=>prin"], [PRORATA_REPAYMENT_STYLE,"pro rata"], [:sequential, "sequential"]]
         %tr
           %td
             Allow choice of repayment style in weeksheets?

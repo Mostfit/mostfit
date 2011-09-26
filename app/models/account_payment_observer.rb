@@ -1,7 +1,7 @@
 class AccountPaymentObserver
   include DataMapper::Observer
-  observe Payment
-  
+  observe BranchDiary
+
   def self.make_posting_entries(obj)
     # This function will make entries to the posting database when save, update or delete envent triggers  
     credit_accounts, debit_accounts, rules = RuleBook.get_accounts(obj)

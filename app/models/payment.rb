@@ -52,6 +52,7 @@ class Payment
   validates_with_method :principal,   :method => :is_positive?
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :on => [:destroy]
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :if => Proc.new{|p| p.deleted_at != nil and p.deleted_by!=nil}
+  validates_with_method :is_last_payment?, :if => Proc.new{|p| p.deleted_at == nil and p.deleted_by == nil}
   
   def add_center_and_branch
     self.c_center_id = self.client.center.id
@@ -231,6 +232,12 @@ class Payment
     end
   end
 
+  def is_last_payment?
+    return true if type == :fees
+    return true unless loan.c_last_payment_received_on
+    return [false, "Payments cannot be received on a date before the last actual payment"] if received_on <= loan.c_last_payment_received_on
+    return true
+  end
 
   def put_fee
     if type==:fees and comment and not fee
