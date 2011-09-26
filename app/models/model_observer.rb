@@ -16,7 +16,7 @@ class ModelObserver
 
   before :create do
     created_on = Date.new(self.created_at.year, self.created_at.month, self.created_at.mday)
-    self.parent_org_guid = Organization.get_organization(created_on).org_guid
+    self.parent_org_guid = Organization.get_organization(created_on).org_guid if Organization.get_organization(created_on)
   end
 
   after :create do
