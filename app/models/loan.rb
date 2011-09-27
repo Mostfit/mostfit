@@ -459,7 +459,7 @@ class Loan
 
     # if we disallow repayment of loans on a date before the date of the last actual payment
     # then the reallocation logic becomes very clean as we do not have to worry about future payments.
-    debugger
+
     self.extend_loan
 
     # only possible if we get a hash or a single number.
@@ -468,7 +468,10 @@ class Loan
     end
     raise "cannot repay a loan that has not been saved" if new?
 
-    vals = input.is_a?(Hash) ? input : self.send("pay_#{style}",input, received_on) # if vals is a single number, then split it per the chosen style
+    # if vals is a single number, then split it per the chosen style
+    # else vals is like {:fees => 123, :interest => 456, :principal => 789}
+    vals = input.is_a?(Hash) ? input : self.send("pay_#{style}",input, received_on) 
+                              
     
     payments = []
     [:fees, :interest, :principal].each do |type|
@@ -1107,6 +1110,7 @@ class Loan
       @history_array << {
         :loan_id                             => self.id,
         :date                                => date,
+        :last_status                         => last_loan_history ? last_loan_history[:status] : 1,
         :status                              => STATUSES.index(st) + 1,
         :scheduled_outstanding_principal     => scheduled[:balance].round(2),
         :scheduled_outstanding_total         => scheduled[:total_balance].round(2),

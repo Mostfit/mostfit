@@ -42,8 +42,8 @@ class LoanHistory
   property :fees_due_today,                  Float, :nullable => false
   property :fees_paid_today,                 Float, :nullable => false
 
-  property :status,                          Enum.send('[]', *STATUSES)
-
+  property :status,                      Enum.send('[]', *STATUSES)
+  property :last_status,                 Enum.send('[]', *STATUSES)
   property :client_id,                   Integer, :index => true
   property :client_group_id,             Integer, :index => true
   property :center_id,                   Integer, :index => true

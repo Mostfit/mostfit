@@ -1,5 +1,8 @@
 class Cacher
   # like LoanHistory but for anything that has loans
+
+  
+
   include DataMapper::Resource
   property :id,                              Serial
   property :type,                            Discriminator
@@ -106,6 +109,8 @@ class Cacher
     # if there are no loan history rows that match today, then pmts is just a single hash, else it is a hash of hashes
     ng = flow_cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
     balances.map{|k,v| [k,(pmts[k] || ng).merge(v)]}.to_hash 
+
+    # now to add approvals, disbursals, writeoffs, etc.
   end
 
   def consolidate (other)
