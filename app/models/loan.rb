@@ -292,6 +292,10 @@ class Loan
 
 
   # MISC FUNCTIONS
+  def name
+    "Loan #{id} for client #{client.name}"
+  end
+
   def description
     "#{id}:Rs. #{amount} @ #{interest_rate} for client #{client.name}"
   end
