@@ -62,6 +62,9 @@ module Misfit
       def is_manager_of?(obj)
         @staff ||= self.staff_member
         return false unless obj
+        return true if [:admin, :mis_manager].include?(self.role)
+        return false if [:funder, :read_only, :accountant, :maintainer].include?(self.role)
+        return true if self.role == :data_entry and not @staff # data entry member who does not have a staff role means he does data entry across all branches / regions
         if obj.class == Region
           return(obj.manager == @staff ? true : false)
         elsif obj.class == Area
@@ -74,8 +77,10 @@ module Misfit
           return(is_manager_of?(obj.center))
         elsif obj.class == ClientGroup
           return(obj.center.manager == @staff or is_manager_of?(obj.center))
-        elsif obj.class == Loan or obj.class.superclass == Loan or obj.class.superclass.superclass == Loan
+        elsif obj.is_a?(Loan)
           return(is_manager_of?(obj.client.center))
+        elsif obj.is_a?(Payment)
+          return(is_manager_of?(obj.loan))
         elsif obj.class == StaffMember
           return true if obj == @staff 
           #branch manager needs access to the its Center managers

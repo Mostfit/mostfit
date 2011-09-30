@@ -1,11 +1,13 @@
 class DataAccessObserver
   include DataMapper::Observer
-  observe Branch, Center, Client, Loan, AccountingPeriod, User, Fee, LoanProduct
+  observe *(DataMapper::Model.descendants.to_a - [AuditTrail] + [Branch, Center, ClientGroup, Client, Loan, Payment]).uniq # strange bug where observer drops some of the descnedants.
 
   
   def self.insert_session(id)
     @_session = ObjectSpace._id2ref(id)
+    @_user = @_session.user
   end
+
 
   def self.get_object_state(obj, type)
     #load lazy attributes forcefully here
@@ -34,7 +36,7 @@ class DataAccessObserver
         return if diff.length==0
         model = (/Loan$/.match(obj.class.to_s) ? "Loan" : obj.class.to_s)
         log = AuditTrail.new(:auditable_id => obj.id, :action => @action, :changes => diff.to_yaml, :type => :log,
-                             :auditable_type => model, :user => @_session ? @_session.user : User.first)
+                             :auditable_type => model, :user => @_user)
         log.save
       end
     rescue Exception => e
@@ -44,23 +46,38 @@ class DataAccessObserver
     end
   end
 
+  def self.check_session
+    @_user = User.authenticate(ENV['MOSTFIT_USER'], ENV['MOSTFIT_PASSWORD'])    unless @_user
+    raise NotPrivileged unless @_user and @_user.is_manager_of?(self)
+  end
+
+
   before :create do
+    DataAccessObserver.check_session
     DataAccessObserver.get_object_state(self, :create)
   end  
   
   before :save do
+    debugger
+    DataAccessObserver.check_session
     DataAccessObserver.get_object_state(self, :update) if not self.new?
   end  
   
   after :save do
     DataAccessObserver.log(self)
   end  
-    
+  
   before :destroy do
+    DataAccessObserver.check_session
     DataAccessObserver.get_object_state(self, :destroy) if not self.new?
   end
 
   after :destroy do
     DataAccessObserver.log(self)
   end
+  
+  before :destroy! do
+    DataAccessObserver.check_session
+  end
+
 end
