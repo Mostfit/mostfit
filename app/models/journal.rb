@@ -10,7 +10,7 @@ class Journal
   property :transaction_id, String, :index => true  
   property :date,           Date,   :index => true, :default => Date.today
   property :created_at,     DateTime, :index => true  
-  property :deleted_at,     DateTime, :index => true  
+  property :deleted_at,     ParanoidDateTime, :index => true  
   property :batch_id,       Integer, :nullable => true
   property :uuid,           String, :nullable => false
   belongs_to :batch
@@ -21,7 +21,7 @@ class Journal
   property :verified_by_user_id, Integer, :nullable => true, :index => true
   belongs_to :verified_by,  :child_key => [:verified_by_user_id],        :model => 'User'
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :on => [:destroy]
-  validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :if => Proc.new{|p| p.deleted_at != nil and p.deleted_by!=nil}
+  validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :if => Proc.new{|p| p.deleted_at != nil}
 
   def verified_cannot_be_deleted
     return true unless verified_by_user_id

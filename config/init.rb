@@ -46,7 +46,8 @@ Merb::BootLoader.before_app_loads do
   require 'lib/functions.rb'
   require 'lib/core_ext.rb'
   require 'lib/fees_container.rb'
-  require 'lib/caching.rb'
+  require 'gettext'
+  require 'haml_gettext'
 
   #initialize i18n
   require 'i18n'
@@ -227,6 +228,14 @@ Merb::BootLoader.after_app_loads do
   $holidays_list = []
   begin
     Holiday.all.each{|h| $holidays_list << [h.date.day, h.date.month, h.date.strftime('%y')]}
+  rescue
+  end
+
+  #this is to create an Organization if it is not created.
+  begin
+    if Organization.all.empty?
+      Organization.create(:name => "Mostfit", :org_guid => UUID.generate)
+    end
   rescue
   end
 end

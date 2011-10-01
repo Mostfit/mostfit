@@ -318,7 +318,6 @@ class Loans < Application
     else
       msg = {:error => "Loan could not be reversed because #{@loan.errors.values.join(',')}"}
     end
-    debugger
     redirect(resource(@branch, @center, @client, @loan) + "#misc", :message => msg) 
   end
   

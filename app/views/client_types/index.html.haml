@@ -18,7 +18,7 @@
         = client_type.type
       %td
         %ul.inline
-          - client_type.fees each do |f|
+          - client_type.fees.each do |f|
             %li
               = link_to f.name.humanize, resource(f)
       %td

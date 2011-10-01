@@ -40,6 +40,7 @@ namespace :mostfit do
       }
     end
 
+
     desc "pay all applicable fees"
     task :pay_all do
       ApplicableFee.all.each do |af|
@@ -54,6 +55,8 @@ namespace :mostfit do
         end
       end
     end
+
+
   end
 
 

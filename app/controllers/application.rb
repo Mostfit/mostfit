@@ -101,7 +101,7 @@ class Application < Merb::Controller
       # if flag is still set to true delete the object
     if flag == true and obj.destroy
       # delete all the loan history
-      LoanHistory.all(:loan_id => obj.id).destroy if model  == Loan or model.superclass == Loan or model.superclass.superclass == Loan
+      LoanHistory.all(:loan_id => obj.id).destroy if obj.is_a?(Loan)
       Attendance.all(:client_id => obj.id).destroy if model == Client
       PortfolioLoan.all(:portfolio_id => obj.id).destroy if model == Portfolio
       Posting.all(:journal_id => obj.id).destroy if model == Journal
@@ -118,7 +118,7 @@ class Application < Merb::Controller
       end
     else
       if model == ApplicableFee
-        obj.destroy #skip validations. they fail on the duplicate one
+        obj.destroy
         redirect(params[:return], :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
       end
 

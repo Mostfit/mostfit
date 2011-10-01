@@ -118,7 +118,8 @@ class Loan
   belongs_to :client
   belongs_to :funding_line, :nullable => true
   belongs_to :loan_product
-  belongs_to :occupation,                :nullable  => true
+  belongs_to :loan_purpose,              :nullable  => true
+  belongs_to :occupation,                :nullable => true
   belongs_to :applied_by,                :child_key => [:applied_by_staff_id],                :model => 'StaffMember'
   belongs_to :approved_by,               :child_key => [:approved_by_staff_id],               :model => 'StaffMember'
   belongs_to :rejected_by,               :child_key => [:rejected_by_staff_id],               :model => 'StaffMember'
@@ -132,6 +133,12 @@ class Loan
   belongs_to :loan_utilization
   belongs_to :verified_by,               :child_key => [:verified_by_user_id],                :model => 'User'
   belongs_to :repayment_style
+
+  belongs_to :organization, :parent_key => [:org_guid], :child_key => [:parent_org_guid], :required => false  
+  property   :parent_org_guid, String, :nullable => true
+  
+  belongs_to :domain, :parent_key => [:domain_guid], :child_key => [:parent_domain_guid], :required => false
+  property   :parent_domain_guid, String, :nullable => true
 
   has n, :loan_history,                                                                       :model => 'LoanHistory'
   has n, :payments
@@ -285,6 +292,10 @@ class Loan
 
 
   # MISC FUNCTIONS
+  def name
+    "Loan #{id} for client #{client.name}"
+  end
+
   def description
     "#{id}:Rs. #{amount} @ #{interest_rate} for client #{client.name}"
   end
@@ -1160,9 +1171,16 @@ class Loan
     @history_array
   end
 
-  def _show_his(width = 10, padding = 4, fields = [:basic, :next])
+  def _show_his(arg = {})
+    # pretty prints the loan history
+    # get extended info by saying _show_his(:extended)
+    arg = {:fields => [:basic, :next]} if arg == :extended
+    args = {:width => 10, :padding => 4, :fields => [:basic]}
+    args = args.merge(arg) if arg.is_a? Hash
+    width = args[:width]; padding = args[:padding]; fields = args[:fields]
+
     print_order = {:basic => {:titles => {:date => :date, :s_total => :scheduled_outstanding_total, :s_bal => :scheduled_outstanding_principal,
-          :a_total => :actual_outstanding_total, :_bal => :actual_outstanding_principal,
+          :a_total => :actual_outstanding_total, :a_bal => :actual_outstanding_principal,
           :p_paid => :principal_paid, :p_due => :principal_due, :i_paid => :interest_paid, :i_due => :interest_due,
           :tot_p_pd => :total_principal_paid, :tot_i_pd => :total_interest_paid, :tot_p_due => :total_principal_due, :tot_i_due => :total_interest_due},
         :title_order => [:date, :s_total, :s_bal, :a_total, :a_bal, :p_paid, :p_due, :i_paid, :i_due, :tot_p_pd, :tot_p_due]},
@@ -1178,7 +1196,9 @@ class Loan
       hist.each do |h|
         puts (["#{h[:date]}"] + title_order[1..-1].map{|t| (h[titles[t]] || 0).round(2)}.map{|v| v.to_s}.map{|s| s.rjust(width - padding/2).ljust(width)}).join("|")
       end
+
     end
+    puts "Call with _show_his(:extended) to see more fields" if fields == [:basic]
     false
   end
 

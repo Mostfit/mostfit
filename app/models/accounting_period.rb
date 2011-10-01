@@ -16,7 +16,10 @@ class AccountingPeriod
 
   has n, :account_balances
   has n, :accounts, :through => :account_balances
-
+  
+  belongs_to :organization
+  property :organization_id, Integer, :nullable => true
+  
   validates_with_method :cannot_overlap
   validates_with_method :closing_done_sequentially
   validates_with_method :all_account_balances_are_verified_before_closing_accounting_period

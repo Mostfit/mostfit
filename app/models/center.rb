@@ -1,7 +1,6 @@
 class Center
   include DataMapper::Resource
   include DateParser
-  include Mostfit::Caching
 
   attr_accessor :meeting_day_change_date
 

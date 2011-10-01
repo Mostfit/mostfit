@@ -11,9 +11,19 @@ development: &defaults
   password: hatstars
   host:     localhost
 
+  repositories:
+    maintainer:
+      adapter: sqlite3
+      database: slices/maintainer/maintainer.db
+
 test:
   <<:       *defaults
   database: db/test.db
+
+  repositories:
+    maintainer:
+      adapter: sqlite3
+      database: slices/maintainer/maintainer_test.db
  
 production:
   adapter:  mysql
