@@ -38,7 +38,7 @@ class Date
   end
 
   def inspect
-    "<Date: #{self.to_s}>"
+    "<Date: #{self.to_s} #{self.weekday}>"
   end
 
   def weekday

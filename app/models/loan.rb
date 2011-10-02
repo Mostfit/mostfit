@@ -1271,7 +1271,7 @@ class Loan
   end
 
 
-  def reallocate(style, user)
+  def reallocate(style, user, date_from = nil)
     self.extend_loan
     return false unless REPAYMENT_STYLES.include?(style)
     if style == :correct_prepayments
@@ -1283,7 +1283,8 @@ class Loan
     _pmts = []
     self.payments_hash([])
     bal = amount
-    ph.keys.sort.each_with_index do |date, i|
+    dates = date_from ? ph.keys.sort.select{|d| d >= date_from} : ph.keys.sort
+    dates.each_with_index do |date, i|
       prins = ph[date].select{|p| p.type == :principal}
       ints = ph[date].select{|p| p.type == :interest}
       p_amt = prins.reduce(0){|s,p| s + p.amount} || 0

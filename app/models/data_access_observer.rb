@@ -47,6 +47,7 @@ class DataAccessObserver
   end
 
   def self.check_session
+    return true if Merb.environment == "test"
     @_user = User.authenticate(ENV['MOSTFIT_USER'], ENV['MOSTFIT_PASSWORD'])    unless @_user
     raise NotPrivileged unless @_user and @_user.is_manager_of?(self)
   end
@@ -58,7 +59,6 @@ class DataAccessObserver
   end  
   
   before :save do
-    debugger
     DataAccessObserver.check_session
     DataAccessObserver.get_object_state(self, :update) if not self.new?
   end  

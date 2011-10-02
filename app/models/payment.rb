@@ -59,7 +59,7 @@ class Payment
   validates_with_method :principal,   :method => :is_positive?
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :on => [:destroy]
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :if => Proc.new{|p| p.deleted_at != nil and p.deleted_by!=nil}
-  validates_with_method :is_last_payment?, :if => Proc.new{|p| p.deleted_at == nil and p.deleted_by == nil}
+  # validates_with_method :is_last_payment?, :if => Proc.new{|p| p.deleted_at == nil and p.deleted_by == nil}
   
   def add_center_and_branch
     self.c_center_id = self.client.center.id
