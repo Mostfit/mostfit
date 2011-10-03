@@ -83,6 +83,7 @@ class DateVector
 
   def apply_holidays(holidays)
     # holidays is a hash of {:orig_date => [:shifted_date, :holiday_id]}
+    
   end
 
 
