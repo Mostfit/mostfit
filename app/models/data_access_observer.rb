@@ -58,7 +58,6 @@ class DataAccessObserver
   end  
   
   before :save do
-    debugger
     DataAccessObserver.check_session
     DataAccessObserver.get_object_state(self, :update) if not self.new?
   end  

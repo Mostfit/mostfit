@@ -86,7 +86,6 @@ class Account
   end
   
   def opening_balance_as_of(for_date = Date.today)
-    debugger
     return nil if for_date > Date.today
     datum_balance = 0.0; datum = nil
     check_past_period = true
