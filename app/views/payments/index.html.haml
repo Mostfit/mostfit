@@ -201,6 +201,7 @@
         - last_payment = @loan.payments.first(:order => [:received_on.desc])
         - last_payment_date = last_payment.received_on if last_payment
         - principal_so_far = interest_so_far = principal_received_so_far = interest_received_so_far = 0
+        - i = 0
         - @history.each_with_index do |lh, i|
           - principal_so_far += lh.principal_due
           - interest_so_far += lh.interest_due
@@ -215,9 +216,12 @@
                 %td{ :colspan => 6, :style => "text-align: center;" }
                   %span.greytext== today (#{Date.today})
           - first = false
-          - if lh.date <= Date.today
+          - if lh.date <= Date.today and lh.date >= (@loan.c_actual_first_payment_date || @loan.scheduled_first_payment_date)
             - default =  lh.actual_outstanding_total - lh.scheduled_outstanding_total
-            - default_class = default ? (default > 0 ? 'due' : (default < 0 ? 'overpaid' : 'paid')) : ""
+          - else
+            - default = 0
+          - default_class = default ? (default > 0 ? 'due' : (default < 0 ? 'overpaid' : 'paid')) : ""
+          
           %tr{ :class => cycle('odd','even') }
             %td{:class => default_class}
               = [i - 2,0].max
