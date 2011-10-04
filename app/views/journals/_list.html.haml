@@ -40,11 +40,11 @@
         - debit_postings, credit_postings = journal.postings.group_by{|x| x.amount>0}.values
         %td.text 
           - debit_postings.each do |p|
-            = p.account.name
+            = p.account ? p.account.name : "Some deleted account id #{p.account_id}"
             %br
         %td.text
           - credit_postings.each do |p|
-            = p.account.name
+            = p.account ? p.account.name : "Some deleted account id #{p.account_id}"
             %br
         %td
           %b De
