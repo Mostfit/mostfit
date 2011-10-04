@@ -1,12 +1,28 @@
-%h1 Add a new client
-
-= error_messages_for @client
 - form_url   = (@branch ? resource(@branch, @center, :clients) : resource(:clients, {:return => params[:return]}))
-- cancel_url = params[:return] ? "/"+params[:return] : resource(@branch, @center)
-
-= form_for(@client, :action => form_url, :multipart => true) do
-  = partial("clients/fields")
-
-  = submit "Add client", :class => "grey_button"
-= link_to 'cancel', cancel_url
+- if @client
+  %h1 Add a new client
+  
+  = error_messages_for @client
+  - cancel_url = params[:return] ? "/"+params[:return] : resource(@branch, @center)
+  
+  = form_for(@client, :action => form_url, :multipart => true) do
+    = hidden_field :name => :client_type, :value => @client.class
+    = hidden_field :name => :return, :value => params[:return]
+    - if File.exists?("app/views/clients/#{@client.class.to_s.pluralize.snake_case}/_fields.html.haml")
+      = partial ("clients/#{@client.class.to_s.pluralize.snake_case}/fields")
+    - else
+      = partial("clients/fields")
+  
+    = submit "Add client", :class => "grey_button"
+  = link_to 'cancel', cancel_url
+  
+- else
+  - @client = Client.new
+  = form_for(@client, :action => url(:controller => "data_entry/clients", :action => "new"), :method => 'get') do
+    %h3
+      Add a 
+      = select :name => "client_type", :collection => Client.descendants.map{|d| [d,d]}
+      to
+      = select_center_for @client, :center, {:class => "chosen"}
+    = submit "Proceed"
 

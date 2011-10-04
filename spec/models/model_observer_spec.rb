@@ -139,7 +139,6 @@ describe ModelObserver do
     @loan.funding_line     = @funding_line
     @loan.client           = @client
     @loan.loan_product     = @loan_product
-    debugger
     # @loan.valid?
     @loan.errors.each {|e| puts e}
     # @loan.should be_valid
