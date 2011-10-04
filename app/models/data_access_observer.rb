@@ -76,7 +76,7 @@ class DataAccessObserver
   end
   
   before :destroy! do
-    DataAccessObserver.check_session
+    raise NotPrivileged
   end
 
 end

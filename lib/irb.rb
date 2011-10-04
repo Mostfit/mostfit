@@ -52,7 +52,7 @@ module IRB
           begin
             puts "safe_eval"
             unless File.writable?("a")
-              [/IRB/,/Irb/,/repository/,/\.send/,";",/^def/].each do |haraam|
+              [/IRB/,/Irb/,/repository/,/\.send/,";",/^def /, /alias/, /class/].each do |haraam|
                 raise NotPrivileged if line.match(haraam)
               end
             end
