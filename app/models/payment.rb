@@ -14,6 +14,7 @@ class Payment
   PAYMENT_TYPES = [:principal, :interest, :fees]
   
   property :id,                  Serial
+  property :guid,                String, :default => lambda{ |obj, p| UUID.generate }
   property :amount,              Float, :nullable => false, :index => true
   property :type,                Enum.send('[]',*PAYMENT_TYPES), :index => true
   property :comment,             String, :length => 50
@@ -28,6 +29,12 @@ class Payment
   property :fee_id,              Integer, :nullable => true, :index => true
   property :desktop_id,          Integer
   property :origin,              String, :default => DEFAULT_ORIGIN
+
+  belongs_to :organization, :parent_key => [:org_guid], :child_key => [:parent_org_guid], :required => false
+  property   :parent_org_guid, String, :nullable => true
+  
+  belongs_to :domain, :parent_key => [:domain_guid], :child_key => [:parent_domain_guid], :required => false
+  property   :parent_domain_guid, String, :nullable => true
 
   belongs_to :loan, :nullable => true
   belongs_to :client
@@ -46,6 +53,7 @@ class Payment
   validates_with_method :deleted_at,  :method => :properly_deleted?
   validates_with_method :not_approved, :method => :not_approved, :on => [:destroy]
   validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
+  validates_with_method :received_on, :method => :not_received_in_past_upto?, :unless => Proc.new{|t| Merb.env=="test"}
   validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :principal,   :method => :is_positive?
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :on => [:destroy]
@@ -153,6 +161,38 @@ class Payment
                            }).map{|x| {Payment.types[x.payment_type-1] => x.amount.to_i}}.inject({}){|s,x| s+=x}
   end
 
+  def extended_info
+    info_items = []
+    loan_product = self.loan ? self.loan.loan_product : nil
+    funding_line = self.loan ? self.loan.funding_line : nil
+    branch = self.loan ? self.loan.client.center.branch : nil
+
+    if branch
+      info = {}
+      info[:item_type] = branch.class.to_s
+      info[:item_id] = branch.id
+      info[:item_value] = branch.name
+      info_items << info
+    end
+    
+    if loan_product
+      info = {}
+      info[:item_type] = loan_product.class.to_s
+      info[:item_id] = loan_product.id
+      info[:item_value] = loan_product.name
+      info_items << info
+    end
+    
+    if funding_line
+      info = {}
+      info[:item_type] = funding_line.class.to_s
+      info[:item_id] = funding_line.id
+      info[:item_value] = funding_line.name
+      info_items << info
+    end
+    info_items
+  end
+
   private
   include DateParser  # mixin for the hook "before: valid?, :parse_dates"
   include Misfit::PaymentValidators
@@ -215,6 +255,17 @@ class Payment
     return true if received_on <= Date.today + Mfi.first.number_of_future_days
     [false, "Payments cannot be received in the future"]
   end
+  def not_received_in_past_upto?
+    past_days = Mfi.first.number_of_past_days
+    if Mfi.first.min_date_from == :in_operation_since
+      eligible_date = Mfi.first.in_operation_since - past_days
+    else
+      eligible_date = Date.today- past_days
+    end 
+    return true if received_on >= eligible_date
+    [false, "Payments cannot be received in past date"]
+  end
+
 
   def not_received_before_loan_is_disbursed?
     if loan

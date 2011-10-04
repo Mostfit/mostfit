@@ -1,10 +1,18 @@
 %h1
-  Occupations controller, show action
-%p
-  Edit this file in
-  %tt
-    app/views/occupations/show.html.erb
-
-= link_to 'Edit',  url(:edit_occupation,  @occupation)
+  = I18n.t "occupation.show.title", :default => "Occupation"
+%table
+  %tr.odd
+    %td
+      = I18n.t"occupation.show.id", :default => "Id"   
+    %td=@occupation.id
+  %tr
+    %td
+      = I18n.t"occupation.show.name", :default => "Name"   
+    %td=@occupation.name
+  %tr.odd
+    %td
+      = I18n.t"occupation.show.code", :default => "Code"   
+    %td=@occupation.code.blank? ? '-' : @occupation.code
+= link_to I18n.t("occupation.show.edit", :default => "Edit"),  url(:edit_occupation,  @occupation)
 |
-= link_to 'Back', url(:occupations)
+= link_to I18n.t("occupation.show.back", :default => "Back"), url(:occupations)

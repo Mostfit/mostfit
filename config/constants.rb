@@ -97,7 +97,7 @@ DEFAULT_ORIGIN = "server"
 #Date format initializers
 #PREFERED_DATE_PATTERNS = ["%d-%m-%y", "%m-%d-%y", "%y-%m-%d", "%y-%d-%m", "%d-%m-%Y", "%m-%d-%Y", "%Y-%m-%d", "%Y-%d-%m"]
 DEFAULT_DATE_PATTERN = "%d-%m-%Y"
-PREFERED_DATE_PATTERNS = [DEFAULT_DATE_PATTERN]
+PREFERED_DATE_PATTERNS = [DEFAULT_DATE_PATTERN, "%Y-%m-%d"]
 PREFERED_DATE_SEPARATORS = { :hypen => "-", :slash => "/", :period => "." }
 PREFERED_DATE_STYLES = [[:SHORT, "31-12-2001"],[:MEDIUM, "Dec 31, 2001"],[:LONG, "December 31, 2001"], [:FULL,"Monday, December 31, 2001"]]
 DEFAULT_DATE_SEPARATOR = "-"

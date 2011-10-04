@@ -13,6 +13,7 @@ class Posting
   property :account_id,   Integer, :index => true  
   property :currency_id,  Integer, :index => true
   property :action,       Enum.send('[]',*ACTIONS), :nullable => true
+  property :deleted_at,   ParanoidDateTime
   belongs_to :journal
   belongs_to :account
   belongs_to :currency
