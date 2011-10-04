@@ -57,6 +57,10 @@ class DataAccessObserver
     DataAccessObserver.get_object_state(self, :create)
   end  
   
+  before :valid? do
+    DataAccessObserver.check_session
+  end
+
   before :save do
     DataAccessObserver.check_session
     DataAccessObserver.get_object_state(self, :update) if not self.new?
