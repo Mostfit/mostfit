@@ -50,7 +50,6 @@ class DataAccessObserver
     return true if File.writable?("config.ru") and not @_user
     @_user = User.authenticate(ENV['MOSTFIT_USER'], ENV['MOSTFIT_PASSWORD'])    unless @_user
     privileged = @_user and @_user.is_manager_of?(obj)
-    debugger unless privileged
     raise NotPrivileged unless privileged
   end
 
