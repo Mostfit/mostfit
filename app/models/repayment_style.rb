@@ -11,8 +11,8 @@ class RepaymentStyle
   property :active, Boolean
   property :rounding_style, String
   property :force_num_installments, Boolean
-  property :custom_principal_schedule, Text
-  property :custom_interest_schedule, Text
+  property :custom_principal_schedule, Text, :lazy => false
+  property :custom_interest_schedule, Text, :lazy => false
 
   def to_s
     style
@@ -27,6 +27,7 @@ class RepaymentStyle
   end
 
   def return_schedule(type)
+    debugger
     raise ArgumentError ("type must be :principal or :interest") unless [:principal, :interest].include? type
     s = self.send("custom_#{type}_schedule")
     if s.index("?").nil? # only one amount

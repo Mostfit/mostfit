@@ -47,14 +47,16 @@ class DataAccessObserver
   end
 
   def self.check_session
-    return true if File.writable?("config.ru")
+    return true if File.writable?("config.ru") and not @_user
     @_user = User.authenticate(ENV['MOSTFIT_USER'], ENV['MOSTFIT_PASSWORD'])    unless @_user
-    raise NotPrivileged unless @_user and @_user.is_manager_of?(self)
+    privileged = @_user and @_user.is_manager_of?(obj)
+    debugger unless privileged
+    raise NotPrivileged unless privileged
   end
 
 
   before :create do
-    DataAccessObserver.check_session
+    DataAccessObserver.check_session(self)
     DataAccessObserver.get_object_state(self, :create)
   end  
   
@@ -63,7 +65,7 @@ class DataAccessObserver
   end
 
   before :save do
-    DataAccessObserver.check_session
+    DataAccessObserver.check_session(self)
     DataAccessObserver.get_object_state(self, :update) if not self.new?
   end  
   
@@ -72,7 +74,7 @@ class DataAccessObserver
   end  
   
   before :destroy do
-    DataAccessObserver.check_session
+    DataAccessObserver.check_session(self)
     DataAccessObserver.get_object_state(self, :destroy) if not self.new?
   end
 
