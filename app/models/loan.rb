@@ -1101,8 +1101,6 @@ class Loan
       int                                    = interest_received_on(date).round(2)
       total_principal_paid                  += prin
       total_interest_paid                   += int
-      total_principal_paid                   = act_total_principal_paid
-      total_interest_paid                    = act_total_interest_paid
       st                                     = get_status(date)
       scheduled_principal_due                = i_num > 0 ? scheduled[:principal] : 0
       scheduled_interest_due                 = i_num > 0 ? scheduled[:interest] : 0
