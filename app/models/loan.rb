@@ -534,7 +534,6 @@ class Loan
         t.rollback
         return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
       end
-      AccountPaymentObserver.single_voucher_entry(payments)
     end
     unless defer_update #i.e. bulk updating loans
       self.history_disabled=false
