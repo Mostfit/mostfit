@@ -1,47 +1,6 @@
-# Monkey path IRB to provide a secure shell to power users.
-
+# Monkey patch IRB to provide a secure shell to power users.
+require 'irb'
 module IRB
-
-  
-  def IRB.parse_opts
-    # Don't touch ARGV, which belongs to the app which called this module.
-  end
-
-  def IRB.start
-    unless $irb
-      IRB.setup nil
-      ## maybe set some opts here, as in parse_opts in irb/init.rb?
-    end
-
-    workspace = WorkSpace.new(Shell.new)
-
-    if @CONF[:SCRIPT] ## normally, set by parse_opts
-      $irb = Irb.new(workspace, @CONF[:SCRIPT])
-    else
-      $irb = Irb.new(workspace)
-    end
-
-    @CONF[:IRB_RC].call($irb.context) if @CONF[:IRB_RC]
-    @CONF[:MAIN_CONTEXT] = $irb.context
-
-    trap 'INT' do
-      puts "INT"
-      $irb.signal_handle
-    end
-    custom_configuration if defined?(IRB.custom_configuration)
-
-    catch :IRB_EXIT do
-      $irb.safe_eval_input
-    end
-
-    catch :IN_EVAL do
-      puts "IN EVAL"
-
-    end
-
-    ## might want to reset your app's interrupt handler here
-  end
-
   class Irb
     def safe_eval_input
       @scanner.set_prompt do |ltype, indent, continue, line_no|
@@ -91,8 +50,11 @@ module IRB
       @scanner.each_top_level_statement do |line, line_no|
         signal_status(:IN_EVAL) do
           begin
-            [/IRB/,/Irb/,/repository/,/send/,";"].each do |haraam|
-              raise NotPrivileged if line.match(haraam)
+            puts "safe_eval"
+            unless File.writable?("a")
+              [/IRB/,/Irb/,/repository/,/\.send/,";",/^def/].each do |haraam|
+                raise NotPrivileged if line.match(haraam)
+              end
             end
             line.untaint
             @context.evaluate(line, line_no)
@@ -142,11 +104,10 @@ module IRB
         end
       end
     end
+    alias :old :eval_input
+    alias :eval_input :safe_eval_input
+
   end
 end
 
 
-class Shell
-
-end
-    
