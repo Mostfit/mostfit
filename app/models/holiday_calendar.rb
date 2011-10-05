@@ -2,9 +2,9 @@ class HolidayCalendar
   include DataMapper::Resource
   
   before :save, :convert_blank_to_nil
-
   after :save, :update_loan_history
-
+  
+  attr_accessor :old_holidays
   # Holiday calendars apply to branches, regions and areas.
   # If a holiday calendar applies to a branch, then the holiday calendars that apply to the region and area, NO LONGER APPLY
   # Therefore a holiday calendar may belong only to one of area, region or branch
@@ -17,7 +17,9 @@ class HolidayCalendar
   property :area_id,   Integer, :nullable => true
   property :deleted_at, ParanoidDateTime
 
-  belongs_to :region, :area, :branch
+  belongs_to :region
+  belongs_to :area
+  belongs_to :branch
 
   has n, :holidays, :through => Resource
 
@@ -32,9 +34,18 @@ class HolidayCalendar
     branch || area || region
   end
 
-  def update_loan_history
+
+  def update_loan_history()
+    debugger
+    @old_holidays ||= []
     branch_ids = branches.aggregate(:id)
-    holidays.each do |holiday|
+    deleted_holidays = @old_holidays - holidays
+    deleted_holidays.each do |holiday|
+      Merb.logger.info "Updating branches #{branch_ids.join(',')} for holiday #{holiday.name}"
+      LoanHistory.update_holidays(branch_ids, holiday, true)
+    end      
+    new_holidays = holidays - @old_holidays
+    new_holidays.each do |holiday|
       Merb.logger.info "Updating branches #{branch_ids.join(',')} for holiday #{holiday.name}"
       LoanHistory.update_holidays(branch_ids, holiday)
     end

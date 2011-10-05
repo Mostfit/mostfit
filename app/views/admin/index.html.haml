@@ -8,6 +8,8 @@
           = link_to_with_rights 'Profile and system-wide policies', url(:controller => "admin", :action => "edit"), :class => 'admin icon'
         %li
           = link_to_with_rights 'Holidays', url(:controller => 'holidays', :action => "index"), :class => 'icon holiday'
+        %li
+          = link_to_with_rights 'Holiday Calendars', url(:controller => 'holiday_calendars', :action => "index"), :class => 'icon holiday'
     .admin-box
       %h2 Manage geographical locations
       %ul.icon_links

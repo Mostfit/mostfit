@@ -36,12 +36,25 @@ class HolidayCalendars < Application
   end
 
   def update(id, holiday_calendar)
+    debugger
     @holiday_calendar = HolidayCalendar.get(id)
     raise NotFound unless @holiday_calendar
-    if @holiday_calendar.update(holiday_calendar)
-       redirect resource(@holiday_calendar)
+    if holiday_calendar.has_key?(:holiday) # just adding a holiday
+      holiday = Holiday.get(holiday_calendar[:holiday])
+      raise NotFound unless holiday
+      @holiday_calendar.old_holidays = @holiday_calendar.holidays.dup
+      @holiday_calendar.holidays << holiday
+      if @holiday_calendar.save
+        redirect resource(@holiday_calendar), :message => {:notice => "Holiday added succesfully"}
+      else
+        redirect resource(@holiday_calendar), :message => {:error => "Holiday not added"}
+      end
     else
-      display @holiday_calendar, :edit
+      if @holiday_calendar.update(holiday_calendar)
+        redirect resource(@holiday_calendar)
+      else
+        display @holiday_calendar, :edit
+      end
     end
   end
 
@@ -53,6 +66,15 @@ class HolidayCalendars < Application
     else
       raise InternalServerError
     end
+  end
+
+  def delete_holiday(id, holiday_id)
+    debugger
+    @holiday_calendar = HolidayCalendar.get(id)
+    raise NotFound unless @holiday_calendar
+    @holiday_calendar.holidays = @holiday_calendar.holidays.select{|h| h.id != holiday_id.to_i}
+    @holiday_calendar.save
+    redirect resource(@holiday_calendar)
   end
 
 end # HolidayCalendars
