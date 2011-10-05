@@ -1,0 +1,16 @@
+%h1
+  HolidayCalendarHolidays controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/holiday_calendar_holidays/index.html.erb
+%table
+  %tr
+  - for holiday_calendar_holiday in @holiday_calendar_holidays
+    %tr
+      %td
+        = link_to 'Show', url(:holiday_calendar_holiday, holiday_calendar_holiday)
+      %td
+        = link_to 'Edit', url(:edit_holiday_calendar_holiday,  holiday_calendar_holiday)
+
+= link_to 'New', url(:new_holiday_calendar_holiday)

@@ -1,0 +1,10 @@
+%label Name
+= text_field :name
+%fieldset.nostyle
+  %legend Applies to
+  Choose any one 
+  %br
+  - [Region, Area, Branch].each do |thing|
+    %label
+      = thing
+    = select "#{thing.to_s.snake_case}_id".to_sym, :collection => thing.all, :text_method => :name, :value_method => :id, :prompt => "Choose a #{thing}", :class => "chosen"

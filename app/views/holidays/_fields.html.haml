@@ -11,6 +11,11 @@
       = date_select_for @holiday, :date
   %tr
     %th
+      New Date
+    %td
+      = date_select_for @holiday, :new_date
+  %tr
+    %th
       Shifts Meeting
     %td
       = select :shift_meeting, :collection => [[:before,"before"],[:after,"after"]]

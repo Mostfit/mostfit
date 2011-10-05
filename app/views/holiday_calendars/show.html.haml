@@ -1,0 +1,6 @@
+%h1
+  == Holiday Calendar: #{@holiday_calendar.name}
+
+= link_to 'Edit',  url(:edit_holiday_calendar,  @holiday_calendar)
+|
+= link_to 'Back', url(:holiday_calendars)

@@ -1,5 +1,7 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :holiday_calendar_holidays
+  resources :holiday_calendars
   resources :api_accesses
   resources :monthly_targets
   resources :account_balances

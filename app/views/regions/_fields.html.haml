@@ -8,7 +8,7 @@
     %td
       = I18n.t "region.fields.manager", :default => "Manager"
     %td
-      = select :manager_id, :collection => StaffMember.all.map{|s| [s.id, s.name]}, :prompt => "---"
+      = select :manager_id, :collection => StaffMember.all.sort_by{|s| s.name}.map{|s| [s.id, s.name]}, :prompt => "---", :class => "chosen"
   %tr
     %td
       = I18n.t("region.fields.address", :default => "Address")

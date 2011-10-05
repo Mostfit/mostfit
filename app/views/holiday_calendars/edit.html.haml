@@ -1,0 +1,15 @@
+%h1
+  HolidayCalendars controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/holiday_calendars/edit.html.erb
+= error_messages_for @holiday_calendar
+
+= form_for(@holiday_calendar, :action => url(:holiday_calendar, @holiday_calendar)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:holiday_calendar, @holiday_calendar)
+|
+= link_to 'Back', url(:holiday_calendars)

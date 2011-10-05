@@ -393,7 +393,7 @@ class Loan
   # used by many other methods, it accepts a negative +number+
   # TODO: decide if we should make sure returned date is a payment date.
   def shift_date_by_installments(date, number, ensure_meeting_day = true)
-    return date.holiday_bump if number == 0
+    return date if number == 0
     case installment_frequency
     when :daily
       new_date =  date + number
@@ -431,7 +431,7 @@ class Loan
       end
       #new_date - new_date.cwday + Center.meeting_days.index(client.center.meeting_day)
     end
-    new_date.holiday_bump
+    new_date
   end
 
   def self.description
@@ -1011,6 +1011,11 @@ class Loan
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
     @_installment_dates = (0..(actual_number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
+    
+    # apply holidays
+    holidays = client.center.branch.holidays.map{|h| [h.date, h.new_date]}.to_hash
+    @_installment_dates = @_installment_dates.map{|d| holidays[d] || d}
+    
   end
 
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted

@@ -116,6 +116,14 @@ class Branch
     }
   end
   
+  def holidays
+    # go up the chain and find the first calendar that applies.
+    hc = HolidayCalendar.all(:branch_id => id)
+    hc = HolidayCalendar.all(:area_id => area_id) if hc.blank?
+    hc = HolidayCalendar.all(:region_id => area.region_id) if hc.blank?
+    hc.holidays
+  end
+
   def <=> (other)
     @name <=> other.name
   end

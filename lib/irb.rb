@@ -51,8 +51,8 @@ module IRB
         signal_status(:IN_EVAL) do
           begin
             puts "safe_eval"
-            unless File.writable?("a")
-              [/IRB/,/Irb/,/repository/,/\.send/,";",/^def /, /alias/, /class/].each do |haraam|
+            unless File.writable?("config.ru")
+              [/IRB/,/Irb/,/repository/,/\.send/,/^def /, /alias/, /class/].each do |haraam|
                 raise NotPrivileged if line.match(haraam)
               end
             end
