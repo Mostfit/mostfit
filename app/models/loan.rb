@@ -1223,7 +1223,24 @@ class Loan
 
 
   def correct_prepayments
-    
+    prins = payments(:type => :principal).sort_by{|p| p.received_on}.reverse
+    ints = payments(:type => :interest).sort_by{|p| p.received_on}.reverse
+    total = 0
+    diff = amount - prins.map{|p| p.amount}.reduce(:+)
+    ints.each do |ix|
+      transfer = [ix.amount, diff - total].min
+      px = prins.find{|_p| _p.received_on == ix.received_on}
+      px.amount += transfer
+      ix.amount -= transfer
+      puts "transferred #{transfer}"
+      px.amount = px.amount.round(2)
+      ix.amount = ix.amount.round(2)
+      total += transfer
+      px.save!
+      ix.save!
+    end
+    puts total
+    self.update_history
   end
 
 
