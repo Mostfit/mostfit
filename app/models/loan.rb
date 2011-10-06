@@ -146,6 +146,7 @@ class Loan
   has n, :portfolio_loans
   has 1, :insurance_policy
   has n, :applicable_fees,    :child_key => [:applicable_id], :applicable_type => "Loan"
+  has n, :accruals, :required => false
   #validations
 
   validates_present      :client, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
@@ -302,6 +303,21 @@ class Loan
 
   def short_tag
     "#{id}:Rs. #{amount} @ #{interest_rate}"
+  end
+
+  def effective_rate
+    self.interest_rate
+  end
+
+  #TODO
+  # We can accrue interest on any loan at any point in time since payment was last received
+  # For loans that are NPA, we can compute and accrue interest
+  def accrue_ad_hoc(on_date = Date.today)
+  end
+
+  #TODO
+  # We simply accrue the interest that is anticipated as per the repayment schedule
+  def accrue_per_schedule(on_date = Date.today)
   end
 
   def info(date = Date.today)
@@ -534,7 +550,6 @@ class Loan
         t.rollback
         return [false, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find{|p| p.type==:fees}]
       end
-      AccountPaymentObserver.single_voucher_entry(payments)
     end
     unless defer_update #i.e. bulk updating loans
       self.history_disabled=false

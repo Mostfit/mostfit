@@ -8,18 +8,6 @@
       %span.greytext (only letters and numbers are allowed)
   %tr
     %td
-      Password:
-    %td
-      = password_field :password
-  %tr
-    %td
-      Password confirmation:
-    %td
-      = password_field :password_confirmation
-      %br/
-      %span.greytext (password fields must be filled to complete user profile)
-  %tr
-    %td
       Select role
     %td
       = select :role, :collection => User.roles
@@ -27,7 +15,7 @@
     %td
       Is a staff member?
     %td
-      = select :staff_member, :collection => [["","---"]] + StaffMember.all(:order => [:name]).map{|s| [s.id.to_s, s.name]}, :selected => (@user.staff_member ? @user.staff_member.id.to_s : "")
+      = select :staff_member, :collection => [["","---"]] + StaffMember.all(:order => [:name]).map{|s| [s.id.to_s, s.name]}, :selected => (@user.staff_member ? @user.staff_member.id.to_s : ""), :class => "chosen"
   %tr.funder
     %td
       Is a funder
