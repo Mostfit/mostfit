@@ -41,7 +41,8 @@
           %b Debit
         %th
           %b Credit
-    - @posting_array = @posting_hash.map{|p| [p.journal.date, p]}
+    - @posting_array = @posting_hash.select{|p| p.journal}.map{|p| [p.journal.date, p]}
+    - @posting_pages = @posting_hash.paginate(:page => params[:page], :per_page => 20)
     - @posting_array.sort_by{|pa| pa[0]}.reverse.each do |pa|
       %tr{:class => cycle('odd','even')}
         - posting = pa[1]
@@ -57,4 +58,4 @@
           = posting.amount < 0 ? posting.amount.abs.to_currency : "-"
         %td
           = posting.amount > 0 ? posting.amount.to_currency : "-"
-  = paginate(@posting_hash).to_s.gsub("<a", "<a class='_remote_' id='ledger_entry_table'")
+  = paginate(@posting_pages).to_s.gsub("<a", "<a class='_remote_' id='ledger_entry_table'")
