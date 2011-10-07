@@ -33,7 +33,7 @@
         = @loan.applied_on.strftime('%A')
         )
         by
-        %b= link_to @loan.applied_by.name, resource(@loan.applied_by)
+        %b= link_to @loan.applied_by.name, resource(@loan.applied_by) if @loan.applied_by
     %tr
       %th.even{ :width => '30%', :rowspan => "2" } Sanction
       %td
@@ -51,7 +51,7 @@
           = @loan.approved_on.strftime('%A')
           )
           by
-          %b= link_to @loan.approved_by.name, resource(@loan.approved_by)
+          %b= link_to @loan.approved_by.name, resource(@loan.approved_by) if @loan.approved_by
         - else
           %i approval is pending
 
@@ -72,7 +72,7 @@
           = @loan.disbursal_date.strftime('%A')
           )
           by
-          %b= link_to @loan.disbursed_by.name, resource(@loan.disbursed_by)
+          %b= link_to @loan.disbursed_by.name, resource(@loan.disbursed_by) if @loan.disbursed_by
         - else
           to be disbursed on
           = @loan.scheduled_disbursal_date
@@ -92,7 +92,7 @@
       %td
         = link_to @loan.loan_product.name, resource(@loan.loan_product)
         %br
-        = @loan.discriminator.display_name
+        = @loan.loan_product.repayment_style.name if @loan.loan_product.repayment_style
     %tr
       %th.odd Installments
       %td
