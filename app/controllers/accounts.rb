@@ -135,7 +135,7 @@ class Accounts < Application
   private
   def get_context
     @branches_list = Branch.all.map{ |x| [x.id, x.name]}
-    @branches_list.unshift([nil, 'Head Office Accounts'])
+    @branches_list.unshift([0, 'Head Office Accounts'])
     @branch = Branch.get(params[:branch_id]) if params.key?(:branch_id)
   end
 
