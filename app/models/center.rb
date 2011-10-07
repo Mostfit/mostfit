@@ -1,6 +1,7 @@
 class Center
   include DataMapper::Resource
   include DateParser
+
   attr_accessor :meeting_day_change_date
 
   before :save, :convert_blank_to_nil
@@ -8,6 +9,7 @@ class Center
   before :save, :set_meeting_change_date
   before :create, :set_meeting_change_date
   before :valid?, :convert_blank_to_nil
+
   
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
@@ -40,6 +42,7 @@ class Center
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
   validates_with_method :meeting_time_minutes, :method => :minutes_valid?
 
+
   def self.from_csv(row, headers)
     hour, minute = row[headers[:center_meeting_time_in_24h_format]].split(":")
     branch       = Branch.first(:name => row[headers[:branch]].strip)
@@ -61,13 +64,9 @@ class Center
   end
 
   def self.meeting_days
-    # Center.properties[:meeting_day].type.flag_map.values would give us a garbled order, so:
     DAYS
   end
 
-  def loans
-    clients.loans
-  end
 
   # a simple catalog (Hash) of center names and ids grouped by branches
   # returns some like: {"One branch" => {1 => 'center1', 2 => 'center2'}, "b2" => {3 => 'c3', 4 => 'c4'}} 
@@ -125,12 +124,11 @@ class Center
 
 
   def meeting_day?(date)
-    x = LoanHistory.all(:date => date).aggregate(:center_id).include?(self.id)
-    return x
+    LoanHistory.all(:date => date).aggregate(:center_id).include?(self.id)
   end
 
   def meeting_time
-    meeting_time_hours.two_digits + ':' + meeting_time_minutes.two_digits
+    meeting_time_hours.two_digits + ':' + meeting_time_minutes.two_digits rescue "00:00"
   end
 
   def self.paying_today(user, date = Date.today)
@@ -153,12 +151,7 @@ class Center
   end
   
   def leader=(cid)
-    if cid
-      client = Client.get(cid)
-      return if not client
-      client.make_center_leader
-    end
-    return true
+    Client.get(cid).make_center_leader rescue false
   end
 
   def location
@@ -167,7 +160,7 @@ class Center
   
   def self.meeting_today(date=Date.today, user=nil)
     user = User.first
-    center_ids = LoanHistory.all(:date => date).map{|x| x.center_id}.uniq
+    center_ids = LoanHistory.all(:date => date).aggregate(:center_id)
     # restrict branch manager and center managers to their own branches
     if user.role==:staff_member
       st = user.staff_member
@@ -178,12 +171,12 @@ class Center
   
   private
   def hours_valid?
-    return true if meeting_time_hours.blank? or (0..23).include? meeting_time_hours.to_i
-    [false, "Hours of the meeting time should be within 0-23 or blank"]
+    return true if (0..23).include? meeting_time_hours.to_i
+    [false, "Hours of the meeting time should be within 0-23"]
   end
   def minutes_valid?
-    return true if meeting_time_minutes.blank? or (0..59).include? meeting_time_minutes.to_i
-    [false, "Minutes of the meeting time should be within 0-59 or blank"]
+    return true if (0..59).include? meeting_time_minutes.to_i
+    [false, "Minutes of the meeting time should be within 0-59"]
   end
   def manager_is_an_active_staff_member?
     return true if manager and manager.active

@@ -248,8 +248,7 @@
                   = default.to_currency
                 %br/
                 %span.greytext
-                  = format("%.0f%", (default.abs.to_f / @loan.total_to_be_received) * 100)
-                  = default <= 0 ? 'overpaid' : 'shortfall'
+                  == #{lh.principal_due} prin +  #{lh.interest_due} int
             - else
               %td
         %tfoot

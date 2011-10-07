@@ -413,7 +413,11 @@ class Loans < Application
     end
   end
     
-
+  def diagnose(id)
+    @loan = Loan.get(id)
+    raise NotFound unless @loan
+    display [@loan], :layout => false
+  end
 
   def repayment_sheet(id)
     @loan = Loan.get(id)

@@ -64,5 +64,4 @@ module Pdf
       return pdf
     end
   end
-  
 end

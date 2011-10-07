@@ -49,7 +49,7 @@ if defined?(Merb::Plugins)
     
     # Activation hook - runs after AfterAppLoads BootLoader
     def self.activate
-      begin; User.create(:login => "maintainer", :password => "password", :password_confirmation => "password", :role => :maintainer) if User.all(:role => :maintainer).length == 0; rescue; end
+      User.create(:login => "maintainer", :password => "password", :password_confirmation => "password", :role => :maintainer) if User.all(:role => :maintainer).length == 0 rescue false
       DM_REPO.scope { Maintainer::DeploymentItem.auto_upgrade! }
       DM_REPO.scope { Maintainer::HistoryItem.auto_upgrade! }
       DM_REPO.scope { Maintainer::DeploymentItem.create_from_last_commit if Maintainer::DeploymentItem.all.empty? }

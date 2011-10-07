@@ -1,8 +1,37 @@
 class GraphData < Application
   COLORS = ["edd400", "f57900", "c17d11", "73d216", "3465a4", "75507b", "cc0000", "fce94f", "3465a4", "fcaf3e", "204a87", "ad7fa8", "875678", "456789", "234567"]
   include Grapher
-  before :display_from_cache, :exclude => [:dashboard]
-  after  :store_to_cache, :exclude => [:dashboard]
+
+  before :display_from_cache, :exclude => [:dashboard, :tm_collections]
+  after  :store_to_cache, :exclude => [:dashboard, :tm_collections]
+
+  
+
+  def tm_collections
+    @date = begin; Date.parse(params[:date]); rescue; Date.today; end
+    if params[:branch_id]
+      @history_totals = Cacher.all(:model_name => "Center", :date => @date, :branch_id => params[:branch_id])
+    else
+      @history_totals = Cacher.all(:model_name => "Branch", :date => @date)
+    end
+    keys = [:advance_interest_paid, :advance_principal_paid, :principal_paid, :principal_due, :interest_paid, :interest_due, :fees_paid_today, :fees_due_today]
+    @history_sum = @history_totals.map{|ht| keys.map{|k| [k,ht.send(k)]}.to_hash}.reduce({}){|s,h| s + h}
+    treemap = {:children => @history_totals.map { |v|
+        pd = v.principal_paid
+        due = v.principal_due
+        tot = pd + due
+        color = "#" + (prorata_color(0, tot, pd) || "000000")
+        center = params[:branch_id] ? Center.get(v.center_id) : nil
+        branch = Branch.get(v.branch_id)
+        id = center ? center.id : branch.id
+        name = center ? center.name : branch.name
+        data = {"$area" => tot, :"$color" => color,"branch_id" => branch.id, "branch_name" => branch.name, 
+          "center_id" => (center ? center.id : 0), "center_name" => (center ? center.name : ""), "amounts" => v}
+        {"id" => id, "name" => name, "data" => data}
+      }, :name => "Branches"}
+    barchart = { 'label' => keys, 'values' => [{'label' => "", 'values' => keys.map{|k| (@history_sum[k] || 0).round(2)}}]}
+    {'treemap' => treemap, 'pmts_barchart' => barchart}.to_json
+  end
 
   def loan(id)
     @loan      = Loan.get(id)
@@ -327,7 +356,11 @@ class GraphData < Application
         color = (255 - 255 * color_ratio).to_i.to_s(16) + (255 * color_ratio).to_i.to_s(16) + "00"
         color = color + "0" * (6 - color.length) if color.length < 6
         percent = (paid*100/(paid + due)).to_i
-        {:value => (paid + due).to_i, :label => "#{objs.find{|x| x.id ==  oid}.name} -  (paid: #{percent}%)", :colour => color}
+        if true
+          {:value => (paid + due).to_i, :label => "", :colour => color}
+        else
+          {:value => (paid + due).to_i, :label => "#{objs.find{|x| x.id ==  oid}.name} -  (paid: #{percent}%)", :colour => color}
+        end
       end
       type="pie"
     end
@@ -335,13 +368,24 @@ class GraphData < Application
   end
 
   def render_graph(vals, type = "bar", labels = [], steps = 10)
-    x = { :elements => [{:type => type, :values => vals}]}
-    x_axis = {:labels => {:labels => labels.to_json, :steps => steps}}
+    x = { :elements => [{:type => type, :values => vals}], :bg_colour => "#efefef"}
+    x_axis = {} # {:labels => {:labels => labels.to_json, :steps => steps}}
     x[:x_axis] = x_axis
     return x.to_json
   end
 
   private
+
+  def prorata_color(start_val, end_val, val, r1 = 164, r2 = 100, g1 = 72, g2 = 222, b1 = 72, b2 = 137)
+    debugger
+    color_ratio = (start_val + val)/(start_val + end_val).to_f
+    color_ratio = 1 if color_ratio.nan?
+    color_ratio = 0 if color_ratio < 0
+    color = (r1 - (r1 - r2) * color_ratio).to_i.to_s(16) + (g1 + (g2 - g1) * color_ratio).to_i.to_s(16) + (b1 + (b2 - b1)*color_ratio).to_i.to_s(16)
+    color = color + "0" * (6 - color.length) if color.length < 6
+    return color
+  end
+  
   def display_from_cache
     return false if params[:action]=="dashboard" and (params[:id]=="center_day" or params[:id] == "branch_day")
     file = get_cached_filename

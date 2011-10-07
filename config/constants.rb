@@ -85,9 +85,10 @@ REPORT_ACCESS_HASH = {
   "LoanSizePerManagerReport" => ["mis_manager", "admin", "read_only"], 
   "ClientOccupationReport" => ["mis_manager", "admin", "read_only"]
 }
+PAYMENT_TYPES = [:principal, :interest, :fees]
 NORMAL_REPAYMENT_STYLE = :normal
 PRORATA_REPAYMENT_STYLE = :prorata
-REPAYMENT_STYLES = [NORMAL_REPAYMENT_STYLE, PRORATA_REPAYMENT_STYLE]
+REPAYMENT_STYLES = [NORMAL_REPAYMENT_STYLE, PRORATA_REPAYMENT_STYLE, :sequential]
 API_SUPPORT_FORMAT = ["xml"]
 LOAN_AGEING_BUCKETS = [0, 30, 60, 90, 180, 365, :older]
 LOSS_PROVISION_PERCENTAGES_BY_BUCKET = [0, 10, 25, 50, 75, 90, 100]
@@ -106,4 +107,16 @@ MEDIUM_DATE_PATTERN = "%b %d, %Y"
 LONG_DATE_PATTERN = "%B %d, %Y"
 FULL_DATE_PATTERN = "%A, %B %d, %Y"
 FORMAT_REG_EXP = /[- . \/]/
+
+# Bookmark Constants
+Types   = [:custom_reports, :system]
+Methods = [:get, :post, :put, :delete]
+
+# Audit
+AUDITABLES = ["Branch","Center","Client","ClientGroup","Loan","Payment","StaffMember"]
+
+# Targets
+TargetOf    = [:center_creation, :group_creation, :client_registration, :loan_disbursement_by_amount, :loan_disbursements_by_number]
+TargetType  = [:relative, :absolute]
+
 

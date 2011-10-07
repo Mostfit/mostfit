@@ -42,8 +42,6 @@
         %td &nbsp;
         %td
           = client.id
-          - if center_leader and center_leader.client_id == client.id
-            =image_tag("elements/tick.gif", :title => "Center leader", :height => "23px", :style => "float: right;")
           - unless client.active
             %i{:style => "background-color : #{client.active ? '#fff' : '#fdd'}; padding: 3px;" }
               inactive 

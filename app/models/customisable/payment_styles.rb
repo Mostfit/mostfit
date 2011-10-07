@@ -4,7 +4,7 @@ module Mostfit
 
     module Flat
 
-      def pay_prorata(total, received_on, curr_bal = nil)
+      def _pay_prorata(total, received_on, curr_bal = nil)
         #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
         i = used = prin = int = 0.0
         d = received_on
@@ -82,7 +82,7 @@ module Mostfit
         reducing_schedule.count
       end
 
-      def pay_prorata(total, received_on, curr_bal = nil)
+      def _pay_prorata(total, received_on, curr_bal = nil)
         i = used = prin = int = 0.0
         d = received_on
         total = total.to_f
@@ -160,7 +160,7 @@ module Mostfit
         scheduled_interest_for_installment(1) * (1 - (scheduled_first_payment_date - date) / (scheduled_first_payment_date - disbursal_date||scheduled_disbursal_date))
       end
       
-      def pay_prorata(total, received_on, cur_bal = 0)
+      def _pay_prorata(total, received_on, cur_bal = 0)
         #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
         int  = scheduled_interest_up_to(received_on)
         int -= interest_received_up_to(received_on)
@@ -181,7 +181,7 @@ module Mostfit
         "Single shot principal with periodic interest (Bullet Loan With Periodic Interest)"
       end
   
-      def pay_prorata(total, received_on, curbal = 0)
+      def _pay_prorata(total, received_on, curbal = 0)
         #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
         int  = scheduled_interest_up_to(received_on)
         int -= interest_received_up_to(received_on)
@@ -237,7 +237,7 @@ module Mostfit
     end
 
     module CustomPrincipalAndInterest
-      def pay_prorata(total, received_on, curr_bal = nil)
+      def _pay_prorata(total, received_on, curr_bal = nil)
         #adds up the principal and interest amounts that can be paid with this amount and prorates the amount
         i = used = prin = int = 0.0
         d = received_on

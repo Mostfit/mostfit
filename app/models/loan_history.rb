@@ -13,26 +13,51 @@ class LoanHistory
   property :week_id,                    Integer # good for aggregating.
 
   # some properties for similarly named methods of a loan:
-  property :scheduled_outstanding_total,     Float, :nullable => false, :index => true
-  property :scheduled_outstanding_principal, Float, :nullable => false, :index => true
-  property :actual_outstanding_total,        Float, :nullable => false, :index => true
-  property :actual_outstanding_principal,    Float, :nullable => false, :index => true
-  property :principal_due,                   Float, :nullable => false, :index => true
-  property :interest_due,                    Float, :nullable => false, :index => true
-  property :principal_paid,                  Float, :nullable => false, :index => true
-  property :interest_paid,                   Float, :nullable => false, :index => true
-  property :total_principal_due,             Float, :nullable => false, :index => true
-  property :total_interest_due,              Float, :nullable => false, :index => true
-  property :total_principal_paid,            Float, :nullable => false, :index => true
-  property :total_interest_paid,             Float, :nullable => false, :index => true
+  property :scheduled_outstanding_total,     Float, :nullable => false
+  property :scheduled_outstanding_principal, Float, :nullable => false
+  property :actual_outstanding_total,        Float, :nullable => false
+  property :actual_outstanding_principal,    Float, :nullable => false
+  property :scheduled_principal_due,         Float, :nullable => false
+  property :scheduled_interest_due,          Float, :nullable => false
+  property :principal_due,                   Float, :nullable => false
+  property :interest_due,                    Float, :nullable => false
+  property :principal_paid,                  Float, :nullable => false
+  property :interest_paid,                   Float, :nullable => false
+  property :total_principal_due,             Float, :nullable => false
+  property :total_interest_due,              Float, :nullable => false
+  property :total_principal_paid,            Float, :nullable => false
+  property :total_interest_paid,             Float, :nullable => false
+  property :advance_principal_paid,          Float, :nullable => false
+  property :advance_interest_paid,           Float, :nullable => false
+  property :total_advance_paid,              Float, :nullable => false
+  property :advance_principal_paid_today,    Float, :nullable => false
+  property :advance_interest_paid_today,     Float, :nullable => false
+  property :total_advance_paid_today,        Float, :nullable => false
+  property :advance_principal_adjusted,      Float, :nullable => false
+  property :advance_interest_adjusted,       Float, :nullable => false
+  property :principal_in_default,            Float, :nullable => false
+  property :interest_in_default,             Float, :nullable => false
+  property :total_fees_due,                  Float, :nullable => false
+  property :total_fees_paid,                 Float, :nullable => false
+  property :fees_due_today,                  Float, :nullable => false
+  property :fees_paid_today,                 Float, :nullable => false
 
-  property :status,                          Enum.send('[]', *STATUSES)
-
+  property :status,                      Enum.send('[]', *STATUSES)
+  property :last_status,                 Enum.send('[]', *STATUSES)
   property :client_id,                   Integer, :index => true
   property :client_group_id,             Integer, :index => true
   property :center_id,                   Integer, :index => true
   property :branch_id,                   Integer, :index => true
+
   property :holiday_id,                  Integer
+
+  property :funding_line_id,             Integer, :index => true
+  property :funder_id,                   Integer, :index => true
+  property :loan_product_id,             Integer, :index => true
+
+  property :composite_key, Float, :index => true
+
+
 
   belongs_to :loan
   belongs_to :client
@@ -41,6 +66,8 @@ class LoanHistory
   belongs_to :branch         
 
   belongs_to :holiday     
+  belongs_to :funding_line, :funder, :loan_product
+
   
   validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
@@ -62,7 +89,54 @@ class LoanHistory
   @@models = [Region, Area, Branch, Center, ClientGroup, Client, Loan]
   @@optionals = [ClientGroup]
 
-  
+  ########### NICE NEW FUNCTIONS ###########################
+
+  def self.latest_keys(hash = {}, date = Date.today)
+    # returns the composite key for the last row before date per loan from loan history and filters by hash
+    LoanHistory.all(hash.merge(:date.lte => date)).aggregate(:loan_id,:composite_key.max).map{|x| x[1]}
+  end
+
+  def self.latest(hash = {}, date = Date.today)
+    # returns the last LoanHistory per loan before date
+    LoanHistory.all(:composite_key => LoanHistory.latest_keys(hash, date))
+  end
+
+  def self.latest_sum(hash = {}, date = Date.today, group_by = [], cols = [])
+    # sums up the latest loan_history row per loan, even groups by any attribute
+    LoanHistory.composite_key_sum(LoanHistory.latest_keys(hash,date),group_by, cols)
+  end
+
+  def self.composite_key_sum(keys, group_by = [], my_cols = [])
+    # returns a row which is the sum of various conmposite keys. even does grouping.
+    # i.e. LoanHistory.composite_key_sum(LoanHistory.latest_keys, [:branch_id, :center_id]) will give you the current situation grouped by branch and center
+    cols = group_by + (my_cols.empty? ? LoanHistory.sum_cols : my_cols)
+    ng = {group_by.map{|g| :no_group} => cols.map{|c| [c,0]}.to_hash}
+    return ng if keys.blank?
+    agg_cols = cols[group_by.length..-1].map{|c| DataMapper::Query::Operator.new(c, :sum)}
+    vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
+    if group_by.count > 0
+      vals = vals.group_by{|v| v[0..(group_by.count-1)]} 
+      return vals.to_hash.map{|k,v| [k,cols.zip(v.flatten).to_hash]}.to_hash
+    else
+      return {:no_group => cols.zip(vals).to_hash}
+    end
+  end
+
+
+
+  def self.sum_cols
+    # only some columns make sense to add while aggregating LoanHistory rows.
+    # namely the ones below
+    # this method is purely for DRY
+    [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total, 
+     :principal_due, :principal_paid, :interest_due, :interest_paid, :total_interest_due, :total_interest_paid, 
+     :total_principal_due, :total_principal_paid, :advance_principal_paid, :advance_interest_paid, :principal_in_default, :interest_in_default,
+     :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted]
+  end
+
+  ######################## END NICE NEW FUNCTIONS ####################################
+
+
   # Provides outstanding amount of loans given as ids on a particular date
   def self.sum_outstanding_for_loans(date, loan_ids)
     loan_ids = loan_ids ? (loan_ids.length > 0 ? loan_ids.join(', ') : "NULL") : nil
@@ -223,7 +297,7 @@ class LoanHistory
         COUNT(lh.loan_id) loan_count,
         #{selects}
       FROM #{subtable} as dt, loan_history lh, loans l
-      WHERE lh.loan_id=dt.loan_id AND lh.date=dt.date AND lh.status in (5,6) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL
+      WHERE lh.loan_id=dt.loan_id AND lh.date=dt.date AND lh.status in (5,6) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL 
       #{group_by_query};
     })
   end
@@ -697,6 +771,7 @@ class LoanHistory
                                  }).collect{|x| "(#{x.loan_id}, '#{x.mdate.strftime('%Y-%m-%d')}')"}.join(",")
   end
 
+
   def self.build_extra(query)
     query = query.to_a.map{|k, v| 
       if v.is_a?(Array) and v.length == 0
@@ -786,7 +861,7 @@ class LoanHistory
     query = build_extra(query)    
     return "(SELECT max(lh.date) date, lh.loan_id loan_id
      FROM loan_history lh, loans l
-     WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (5,6,7,8,9) AND lh.date<='#{date.strftime('%Y-%m-%d')}' #{query}
+     WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (5,6,7,8,9,10) AND lh.date<='#{date.strftime('%Y-%m-%d')}' #{query}
      GROUP BY lh.loan_id
      )"
   end

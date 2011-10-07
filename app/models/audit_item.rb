@@ -1,8 +1,6 @@
 class AuditItem
   include DataMapper::Resource
 
-  AUDITABLES = ["Branch","Center","Client","ClientGroup","Loan","Payment","StaffMember"]
-
   property :id, Serial
 
   property :audited_model, String

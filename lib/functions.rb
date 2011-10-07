@@ -1,4 +1,7 @@
 # small monkey patch, real patch is submitted to extlib/merb/dm, hoping for inclusion soon
+
+
+
 class NilClass
   def to_currency
     "-"
@@ -35,7 +38,7 @@ class Date
   end
 
   def inspect
-    "<Date: #{self.to_s}>"
+    "<Date: #{self.to_s} #{self.weekday}>"
   end
 
   def weekday
@@ -150,6 +153,28 @@ module Misfit
 end
 
 class Hash
+
+  # a function to turn {[:a, :b, :c] => 123, [:a, :b, :d] => 456} into {:a => {:b => {:c => 123, :d => 456}}}
+  # very useful when bucketing and dealing with composite_key_sum group by from LoanHistory
+  def deepen
+    result = self.class.new
+
+    each do |key, value|
+      if key.is_a? Array and key.length > 1
+        if result[key[0]]
+          result[key[0]] += {key[1..-1] => value}.deepen
+        else 
+          result[key[0]] = {key[1..-1] => value}.deepen
+        end
+      else
+        result[key.is_a?(Array) ? key[0] : key] = value
+      end
+    end
+
+    result
+  end
+
+
   #Hash diffs are easy
   def diff(other)
     keys = self.keys
@@ -184,7 +209,9 @@ class Hash
     rhash = {}
     (keys + other.keys).uniq.each do |k|
       if has_key?(k) and other.has_key?(k)
-        rhash[k] = self[k] + other[k]
+        if self[k].respond_to?(:+) and other[k].respond_to?(:+)
+          rhash[k] = self[k] + other[k] rescue self[k]
+        end
       elsif other.has_key?(k)
         rhash[k] = other[k]
       elsif has_key?(k)
@@ -193,6 +220,8 @@ class Hash
     end
     rhash
   end
+
+
 
 end
 
@@ -250,6 +279,11 @@ class Array
        }]
     }.sort_by{|x| x[0]}
   end
+
+  def sum
+    self.reduce(:+)
+  end
+  
 end
 
 module ExcelFormula
@@ -281,3 +315,31 @@ module DmPagination
     end
   end
 end
+
+
+def get_bulk_insert_sql(table_name, data)
+  t = Time.now
+  keys = data.first.keys
+  sql = "INSERT INTO #{table_name}(#{keys.join(',')} )
+              VALUES "
+  values = []
+  data.each do |row|
+    value = keys.map do |k| 
+      v = row[k]
+      if v.class == Date
+        "'#{v.strftime('%Y-%m-%d')}'"
+      elsif v.class == DateTime
+        "'#{v.strftime('%Y-%m-%d %H:%M:%S')}'"
+      elsif row[k].class == String
+        "'#{v}'"
+      else
+        v
+      end
+    end
+    values << "(#{value.join(',')})"
+  end
+  sql += values.join(",") + ";"
+  Merb.logger.info "sql statement crafted in #{Time.now - t}"
+  sql
+end
+

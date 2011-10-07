@@ -1,0 +1,128 @@
+= js_include_tag 'Jit/jit-yc'
+= js_include_tag :treemap, :hbarchart
+
+= css_include_tag 'jit-base','treemap'
+:javascript
+  var date = new Date('#{@date.strftime("%Y-%m-%d")}')
+  var date_string = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+  function get_charts(q) {
+    $.get('/graph_data/tm_collections?' + q,'', function(data){
+      init_barchart($.parseJSON(data).pmts_barchart);
+      init_treemap($.parseJSON(data).treemap);
+      });
+    }
+
+  $(document).ready(function(){ get_charts('date=' + date_string)});
+
+- bnames = @branch_names.keys.sort
+- bvalues = @branch_names.map{|name, id| @branch_data[id][:principal_paid] if @branch_data[id]}
+- keys = [:advance_principal_paid, :advance_interest_paid, :principal_paid, :principal_due, :interest_paid, :interest_due]
+%script{:type => "text/javascript"}
+  == names=['#{bnames.join("','")}']
+  == values = ['#{bvalues.join("','")}']
+#stats
+  - array = @branch_data.reduce({}){|s,a| s + a[1]}
+  %table#menu{:style => "float:left; position: relative; left: 1px;"}
+    %tr.selected
+      %th
+        %h1
+          today
+      %td.number
+        %h1.green
+          = keys.select{|k| k.to_s.match(/paid/)}.map{|k| array[k] || 0}.reduce(:+).to_currency
+        %p collected
+      %td.number
+        %h1
+          = keys.select{|k| k.to_s.match(/due/)}.map{|k| array[k] || 0}.reduce(:+).to_currency
+        %p due
+      %td.number
+        %h1.red
+          1,745
+        %p
+          missed
+        
+    %tr
+      %th
+        %h1 meetings
+        - pt = Center.paying_today(session.user) 
+      %td.number
+        %h1
+          = pt.count
+        %p 
+          mtngs
+          %br
+          today
+      %td.number
+        %h1
+          = pt.select{|c| c.meeting_time_hours.to_i <= DateTime.now.hour}.count
+        %p
+          mtngs
+          %br
+          by now
+      %td.number
+        %h1
+          = Payment.all(:received_on => @date, :center_id => pt.aggregate(:id)).aggregate(:center_id).count
+        %p
+          meetings
+          %br
+          done
+    %tr
+      %th
+        %h1 ytd
+      %td.number{:colspan => "4"}
+        %h1 0
+        %p PAR
+        
+
+      
+  .detail
+    #today
+      %table.new-report{:style => "margin: auto; width: 90%"}
+        %thead
+          %tr
+            %th.purple
+            - ["adv", "prin", "int", "fees","default"].each do |k|
+              %th
+                = k
+        %tr
+          %th
+            Paid
+          %td.green
+            = (array[:advance_principal_paid] + array[:advance_interest_paid]).to_currency
+          %td.green
+            = (array[:principal_paid]).to_currency
+          %td.green
+            = (array[:interest_paid]).to_currency
+          %td.green 
+            = (array[:fees_paid]).to_currency
+          %td.green
+            = (-array[:principal_in_default] + array[:interest_in_default]).to_currency
+        %tr
+          %th
+            Due
+          %td.red
+            = "-"
+          %td.red
+            = (array[:principal_due]).to_currency
+          %td.red
+            = (array[:interest_due]).to_currency
+          %td.red
+            = (array[:fees_due]).to_currency
+          %td.red
+            = "-"
+      %h1.green
+        See a more detailed report
+      #hbarchart{:style => "width: 92%;  height: 30px; margin-left: 3%"}
+      #infovis{:style => "width: 90%; height: 400px; margin: auto"}
+      
+ 
+            
+    #staff
+      %h1 Staff Members
+    
+    %table
+      %tr
+        %th
+          
+        
+    

@@ -1,4 +1,5 @@
 class CenterMeetingDay
+
   include DataMapper::Resource
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
   
@@ -8,6 +9,13 @@ class CenterMeetingDay
   property :valid_from,  Date, :nullable => false
   property :valid_upto,  Date, :nullable => false, :default => Date.new(2100, 12, 31) # a date far in future
   belongs_to :center
+
+
+  # adding the new properties to calculate the datevector for this center.
+  # for now we will allow only one datevector type per center. This means a center can only have one frequency
+  
+  property :datevector, Text # this is a marshal.dump of a datevector object
+
   
   after :destroy, :fix_dates
 

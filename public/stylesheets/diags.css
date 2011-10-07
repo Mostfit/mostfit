@@ -1,0 +1,30 @@
+body {
+  color: black;
+  font-size: 16px;
+}
+table.diags {
+  font-family: monospace;
+  min-width: 2000px;
+  font-size: 0.8em;
+}
+
+table.diags td {
+  text-align: center;
+  margin: 0px;
+  border: 0px;
+  cell-spacing: 0px;
+}
+
+table.diags tr.odd {
+  background: #efefef;
+}
+
+tr.total {
+  background: #cdcdcd;
+}
+
+th.headerSortUp { 
+    background-position: 15px 15px;
+    background-color: #3399FF; 
+    background-image: url(/images/asc.gif) no-repeat;
+} 

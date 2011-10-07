@@ -6,8 +6,17 @@ class Browse < Application
   Line = Struct.new(:ip, :date_time, :method, :model, :url, :status, :response_time)
   
   def index
-    display @template
+    render
   end
+
+  def today
+    @date = params[:date] ? Date.parse(params[:date]) : Date.today
+    @caches = BranchCache.all(:date => @date)
+    @branch_data = @caches.map{|c| [c.model_id, c]}.to_hash
+    @branch_names = Branch.all.aggregate(:name, :id).to_hash
+    display [@branch_data, @branch_names], @template
+  end
+
 
   def branches
     redirect resource(:branches)

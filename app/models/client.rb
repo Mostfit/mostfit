@@ -18,6 +18,7 @@ class Client
   property :name,            String, :length => 100, :nullable => false, :index => true
   property :spouse_name,     String, :length => 100, :lazy => true
   property :date_of_birth,   Date,   :index => true, :lazy => true
+  property :spouse_date_of_birth, Date, :index => true, :lazy => true
   property :address,         Text, :lazy => true
   property :active,          Boolean, :default => true, :nullable => false, :index => true
   property :inactive_reason, Enum.send('[]', *INACTIVE_REASONS), :nullable => true, :index => true, :default => ''

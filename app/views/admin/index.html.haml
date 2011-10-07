@@ -43,7 +43,8 @@
       %li
         = link_to_with_rights 'Insurance companies & products', url(:action => :insurance), :class => 'insurance icon'
       %li
-        = link_to_with_rights 'Book Keeping', resource(:accounts), :class => 'book icon'
+        = link_to_with_rights 'Perform Audits', resource(:audit_items), :class => 'icon audit'
+
   .admin-box
     %h2 Manage commonly-used lists (masters)
     %ul.icon_links
@@ -62,12 +63,12 @@
       %li
         = link_to_with_rights 'Asset Master', resource(:asset_registers), :class => 'report icon'
   .admin-box
-    %h2 Assign targets, perform audits
+    %h2 Data Administration
     %ul.icon_links
       %li
-        = link_to_with_rights 'Perform Audits', resource(:audit_items), :class => 'icon audit'
-      %li
         = link_to_with_rights 'History log', url(:controller => :audit_trails, :action => :show), :class => 'icon zoom'
+      %li 
+        = link_to_with_rights 'Caches', resource(:cachers), :class => 'icon zoom'
   .admin-box
     %h2 Data
     %ul.icon_links

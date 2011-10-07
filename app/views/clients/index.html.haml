@@ -44,10 +44,6 @@
       %tr.odd
         %td Landmark
         %td=@center.landmark
-      %tr
-        %td Center leader
-        - leader = @center.leader
-        %td=leader.client.name if leader
       - if total_attendance_at_branch = Attendance.count("client.center_id" => @center.id) and total_attendance_at_branch > 0
         %tr
           %td
@@ -78,7 +74,7 @@
         %li#map
           Map
     %div.tab    
-      =partial "clients/list", :center_leader => leader
+      =partial "clients/list", :center_leader => @clients.first
       %p.menu-strip 
         = link_to 'Create new client', resource(@branch, @center, :clients, :new), :class => "add"
         = link_to "Bulk entry of loans", url(:enter_loans, :action => :bulk_form, :query => @center), :class => "edit"

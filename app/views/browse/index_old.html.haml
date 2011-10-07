@@ -1,0 +1,31 @@
+%div.right_pane
+  %div.result
+  %script
+    $.get("/browse/hq_tab", function(data){$('.result').html(data);})
+  = random_chart
+  %br
+
+%div.left_pane
+  %h1 Home
+  %h3
+    You can navigate to the most commonly used screens from here
+  %div
+    %ul
+      %li
+        = link_to_with_rights('Branches', url(:browse, :action => 'branches'), :class => 'edit')
+      %li
+        = link_to_with_rights('Staff members', resource(:staff_members), :class => 'edit')
+      %li
+        = link_to_with_rights('Centers meeting today', url(:browse, :centers_paying_today), :class => 'edit')
+      %li
+        = link_to_with_rights('Areas', resource(:areas), :class => 'edit')
+      %li
+        = link_to_with_rights('Regions', resource(:regions), :class => 'edit')
+      %li
+        = link_to_with_rights 'Verify data', resource(:verifications), :class => 'edit'
+      %li
+        = link_to_with_rights 'Documents', resource(:documents), :class => 'edit'
+      %li
+        = link_to 'Funder page', url(:funders), :class => 'edit' if session.user.role == :funder
+      %li
+        = link_to_with_rights 'Book keeping', resource(:accounts), :class => 'edit'

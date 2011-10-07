@@ -1,7 +1,5 @@
 class Bookmark
   include DataMapper::Resource
-  Types   = [:custom_reports, :system]
-  Methods = [:get, :post, :put, :delete]
   attr_accessor :url
   #ShareWith = [:none, :all, :admin, :staff_member, :mis_manager, :data_entry, :read_only]
 
@@ -10,7 +8,7 @@ class Bookmark
   property :title,      String, :length => 100, :nullable => false
   property :route,      Text,   :nullable => false
   property :type,       Enum.send('[]', *Types), :nullable => false,   :default => :system, :index => true
-  property :method,     Enum.send('[]', *Methods), :nullable => false, :default => :get, :index => true
+#  property :method,     Enum.send('[]', *Methods), :nullable => false, :default => :get, :index => true
   property :params,     Text,    :nullable => true
   property :user_id,    Integer, :nullable => false, :index => true
   property :share_with, Flag.send('[]', *User::ROLES), :nullable => false, :default => :none, :index => true

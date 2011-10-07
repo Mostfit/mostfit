@@ -70,7 +70,7 @@ input[type='text'] { cursor: text; }
 /* MARGINS & PADDINGS */
 
 .container blockquote *:first-child { margin: .8em 0; }
-.container hr, .container p, .container ul, .container ol, .container dl, .container pre, .container blockquote, .container address, .container table, .container form { margin-bottom: 1.6em; }
+/*.container hr, .container p, .container ul, .container ol, .container dl, .container pre, .container blockquote, .container address, .container table, .container form { margin-bottom: 1.6em; }*/
 /* NOTE: Calulate header margins: TOP: 1.6em/size, BOTTOM: 1.6em/size/2 */
 /*.container h1 { margin: 0.2em 0 .2em;  }
 .container h2 { margin: 1.07em 0 .535em; }

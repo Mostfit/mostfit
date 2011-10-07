@@ -47,9 +47,9 @@ Merb::BootLoader.before_app_loads do
   require 'lib/functions.rb'
   require 'lib/core_ext.rb'
   require 'lib/fees_container.rb'
+  require 'lib/datevector.rb'
   require 'gettext'
   require 'haml_gettext'
-
 
   #initialize i18n
   require 'i18n'
@@ -86,7 +86,7 @@ Merb::BootLoader.before_app_loads do
   Merb::Plugins.config[:exceptions] = {
     :email_addresses => [''],
     :app_name        => "Mostfit",
-    :environments    => ['production', 'development'],
+    :environments    => ['production'],
     :email_from      => "",
     :mailer_config => {
       :host   => 'smtp.gmail.com',
