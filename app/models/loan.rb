@@ -991,7 +991,7 @@ class Loan
   def installment_dates
     return @_installment_dates if @_installment_dates
     if installment_frequency == :daily
-      # we have to br careful that when we do a holiday bump, we do not get stuck in an endless loop
+      # we have to be careful that when we do a holiday bump, we do not get stuck in an endless loop
       ld = scheduled_first_payment_date - 1
       @_installment_dates = []
       (1..number_of_installments).each do |i|

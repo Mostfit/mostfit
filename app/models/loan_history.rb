@@ -45,10 +45,15 @@ class LoanHistory
   validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
   def self.update_holidays(branch_ids, holiday, delete = false)
+    # get the loans which already have a loan history row for the new date
+    # we will have to do a manual update history for them.
     if delete
       repository.adapter.execute("update loan_history set date='#{holiday.date.strftime('%Y-%m-%d')}', holiday_id=NULL where holiday_id = #{holiday.id}")
     else      
-      repository.adapter.execute("update loan_history set date='#{holiday.new_date.strftime('%Y-%m-%d')}', holiday_id=#{holiday.id} where date='#{holiday.date.strftime('%Y-%m-%d')}' AND branch_id in (#{branch_ids.join(',')})")
+      pls = LoanHistory.all(:branch_id => branch_ids, :date => holiday.new_date).aggregate(:loan_id)
+      s = pls.empty? ? " AND loan_id NOT IN (#{pls.join','})" : ""
+      repository.adapter.execute("update loan_history set date='#{holiday.new_date.strftime('%Y-%m-%d')}', holiday_id=#{holiday.id} where date='#{holiday.date.strftime('%Y-%m-%d')}' AND branch_id in (#{branch_ids.join(',')} #{s})")
+      pls.each_with_index {|lid,i| Loan.get(lid).update_history; Merb.logger.info("Updating #{i}/#{pls.count}")}
     end
   end
 
