@@ -77,6 +77,7 @@ class Application < Merb::Controller
   end
 
   def delete
+    debugger
     raise NotPrivileged unless session.user.admin?
     raise NotFound      unless params[:model] and params[:id]
     model    = Kernel.const_get(params[:model].camel_case.singularize)
@@ -112,6 +113,8 @@ class Application < Merb::Controller
       end
       if model == Account
         redirect(params[:return], :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
+      elsif model == Journal
+        redirect("/accounts/#journal_entries", :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
       else
         return_url = params[:return].split("/")[0..-3].join("/")
         redirect(return_url, :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
