@@ -77,7 +77,7 @@ namespace :mostfit do
       loan_ids.each_with_index do |loan_id, idx|
         loan = Loan.get(loan_id)
         next unless loan
-        loan.update_history_only
+        loan.update_history
         pdone = (idx + 1)/co.to_f
         elapsed = (Time.now - t0).round
         avg_s_per_loan = (elapsed.to_f/(idx + 1)).round(2)

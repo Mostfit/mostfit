@@ -107,7 +107,7 @@ class Branch
     hc = HolidayCalendar.all(:branch_id => id)
     hc = HolidayCalendar.all(:area_id => area_id) if hc.blank?
     hc = HolidayCalendar.all(:region_id => area.region_id) if hc.blank?
-    hc.holidays
+    hc.holidays_fors.holidays
   end
 
   private

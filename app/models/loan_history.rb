@@ -77,10 +77,11 @@ class LoanHistory
     if delete
       repository.adapter.execute("update loan_history set date='#{holiday.date.strftime('%Y-%m-%d')}', holiday_id=NULL where holiday_id = #{holiday.id}")
     else      
+      debugger
       pls = LoanHistory.all(:branch_id => branch_ids, :date => holiday.new_date).aggregate(:loan_id)
-      s = pls.empty? ? " AND loan_id NOT IN (#{pls.join','})" : ""
-      repository.adapter.execute("update loan_history set date='#{holiday.new_date.strftime('%Y-%m-%d')}', holiday_id=#{holiday.id} where date='#{holiday.date.strftime('%Y-%m-%d')}' AND branch_id in (#{branch_ids.join(',')} #{s})")
-      pls.each_with_index {|lid,i| Loan.get(lid).update_history; Merb.logger.info("Updating #{i}/#{pls.count}")}
+      s = pls.empty? ? "" : " AND loan_id NOT IN (#{pls.join','})"
+      repository.adapter.execute("update loan_history set date='#{holiday.new_date.strftime('%Y-%m-%d')}', holiday_id=#{holiday.id} where date='#{holiday.date.strftime('%Y-%m-%d')}' AND branch_id in (#{branch_ids.join(',')}) #{s}")
+      pls.each_with_index {|lid,i| l = Loan.get(lid); l.update_history_bulk_insert; puts("Updating #{i}/#{pls.count}")}
     end
   end
 

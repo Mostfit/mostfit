@@ -1,6 +1,6 @@
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
-  resources :holiday_calendar_holidays
+
   resources :holiday_calendars
   resources :cachers, :id => %r(\d+)
 

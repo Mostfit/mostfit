@@ -49,9 +49,6 @@
           %form._remote_{:action => '/search', :class => 'search', :method => "POST", :style => "float:left;", :id => "search-form"}
             %input{:name => 'query', :value => params[:query], :autocomplete => "off"}
             %input{:type => 'hidden', :name => '_target_', :value => "content p:first"}
-        - if Mfi.first.dirty_queue_enabled and count = DirtyLoan.pending.length and count > 0
-          %i
-            == (#{count} loans in queue)
     #breadcrums
       = breadcrumbs
       #login
@@ -63,6 +60,9 @@
           existing users can
           %b= link_to 'login', url(:login)
           to proceed
+        - if count = DirtyLoan.pending.length and count > 0
+          %i
+            == (#{count} loans in queue)
 
 
     #content

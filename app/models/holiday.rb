@@ -8,7 +8,11 @@ class Holiday
   property :new_date, Date
   property :deleted_at, ParanoidDateTime
 
-  has n, :holiday_calendars, :through => Resource
+  has n, :holidays_fors
+
+  def holiday_calendars
+    holidays_fors.holiday_calendars
+  end
 
   
 

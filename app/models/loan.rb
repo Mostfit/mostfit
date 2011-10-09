@@ -1038,10 +1038,6 @@ class Loan
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
     @_installment_dates = (0..(actual_number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
     
-    # apply holidays
-    holidays = client.center.branch.holidays.map{|h| [h.date, h.new_date]}.to_hash
-    @_installment_dates = @_installment_dates.map{|d| holidays[d] || d}
-    
   end
 
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
@@ -1067,10 +1063,17 @@ class Loan
     Merb.logger.info "HISTORY EXEC TIME: #{(Time.now - t).round(4)} secs"
     @already_updated=true
     t = Time.now
-    update_history_attributes
-    self.save!
+    #update_history_attributes
+    #self.save!
     Merb.logger.info "LOAN CACHE UPDATE TIME: #{(Time.now - t).round(4)} secs"
   end
+
+  def holidays
+    return @holidays if @holidays
+    @holidays = client.center.branch.holidays.map{|h| [h.date, h]}.to_hash
+  end
+
+
 
   def calculate_history
     return @history_array if @history_array
@@ -1127,10 +1130,11 @@ class Loan
       interest_in_default                    = (date <= Date.today) ? [0,total_interest_paid.round(2) - total_interest_due.round(2)].min : 0
 
       days_overdue                           = ((principal_in_default > 0  or interest_in_default > 0) and last_loan_history) ? last_loan_history[:days_overdue] + (date - last_loan_history[:date]) : 0
-
+      puts "#{holidays[date]}"
       @history_array << {
         :loan_id                             => self.id,
-        :date                                => date,
+        :date                                => self.holidays[date] ? self.holidays[date].new_date : date,         # apply holiday
+        :holiday_id                          => self.holidays[date] ? self.holidays[date].id       : 0,            # and mark holiday id
         :last_status                         => last_loan_history ? last_loan_history[:status] : 1,
         :status                              => STATUSES.index(st) + 1,
         :scheduled_outstanding_principal     => scheduled[:balance].round(2),

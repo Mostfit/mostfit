@@ -21,9 +21,14 @@ class HolidayCalendar
   belongs_to :area
   belongs_to :branch
 
-  has n, :holidays, :through => Resource
+  has n, :holidays_fors
 
   validates_with_method :must_belong_somewhere
+
+  def holidays
+    holidays_fors.holidays
+  end
+
 
   def branches
     # returns the branches to which this holiday calendar applies
@@ -39,16 +44,29 @@ class HolidayCalendar
     debugger
     @old_holidays ||= []
     branch_ids = branches.aggregate(:id)
+    # get the loan_ids for the loans affected by deleted holidays
     deleted_holidays = @old_holidays - holidays
-    deleted_holidays.each do |holiday|
-      Merb.logger.info "Updating branches #{branch_ids.join(',')} for holiday #{holiday.name}"
-      LoanHistory.update_holidays(branch_ids, holiday, true)
-    end      
+    loan_ids = deleted_holidays.map{|holiday| LoanHistory.all(:holiday_id => holiday.id).aggregate(:loan_id)}.flatten.uniq
+    
+    # then add the loan_ids for loans affected by new holidays
     new_holidays = holidays - @old_holidays
-    new_holidays.each do |holiday|
-      Merb.logger.info "Updating branches #{branch_ids.join(',')} for holiday #{holiday.name}"
-      LoanHistory.update_holidays(branch_ids, holiday)
-    end
+    loan_ids += new_holidays.map{|holiday| LoanHistory.all(:branch_id => branch_ids, :date => holiday.date).aggregate(:loan_id)}.flatten.uniq
+    
+    # then insert these into the dirty loans list and let the system take care of them
+    now = DateTime.now
+    repository.adapter.execute(get_bulk_insert_sql("dirty_loans", loan_ids.map{|pl| {:loan_id => pl, :created_at => now}}))
+    DirtyLoan.set_class_variable("@@poke_thread", true)
+  end
+
+  def add_holiday(holiday)
+    holiday = Holiday.get(holiday) if holiday.is_a? Fixnum
+    @old_holidays ||= holidays
+    self.holidays_fors.push(HolidaysFor.new(:holiday => holiday, :holiday_calendar => self))
+  end
+
+  def remove_holiday(holiday)
+    @old_holidays ||= holidays
+    self.holidays_fors = self.holidays_fors.select{|hf| hf.holiday != holiday}
   end
 
   private
