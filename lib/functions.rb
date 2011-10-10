@@ -336,7 +336,8 @@ def get_bulk_insert_sql(table_name, data)
         v
       end
     end
-    values << "(#{value.join(',')})"
+    values << "(#{value.join(',')})
+              "
   end
   sql += values.join(",") + ";"
   Merb.logger.info "sql statement crafted in #{Time.now - t}"

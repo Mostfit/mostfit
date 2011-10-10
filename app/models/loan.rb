@@ -1037,6 +1037,7 @@ class Loan
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
     @_installment_dates = (0..(actual_number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
+    @_installment_dates = @_installment_dates.map{|d| self.holidays[d] ? self.holidays[d].new_date : d}
     
   end
 
@@ -1090,9 +1091,9 @@ class Loan
     end.to_hash
     ap_fees = fee_schedule.map{|k,v| [k,v.values.sum]}.to_hash
 
-    dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on, scheduled_first_payment_date].map{|d|
-               d.holiday_bump if d.is_a?(Date)
-             } + payment_dates + installment_dates).compact.uniq.sort
+    dates = (([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on, scheduled_first_payment_date] + installment_dates).map{|d|
+               (self.holidays[d] ? self.holidays[d].new_date : d)
+             } + payment_dates).compact.uniq.sort
 
     total_principal_due = total_interest_due = total_principal_paid = total_interest_paid = 0
 
@@ -1100,7 +1101,7 @@ class Loan
     # this is helpful for adjusting interest and principal due on a particular date while taking into account future payments
     last_payments_hash = payments_hash.sort.last; 
     act_total_principal_paid = last_payments_hash[1][:total_principal]; act_total_interest_paid = last_payments_hash[1][:total_interest]
-
+    
     dates.each_with_index do |date,i|
       i_num                                  = installment_for_date(date)
       scheduled                              = get_scheduled(:all, date)
@@ -1130,11 +1131,11 @@ class Loan
       interest_in_default                    = (date <= Date.today) ? [0,total_interest_paid.round(2) - total_interest_due.round(2)].min : 0
 
       days_overdue                           = ((principal_in_default > 0  or interest_in_default > 0) and last_loan_history) ? last_loan_history[:days_overdue] + (date - last_loan_history[:date]) : 0
-      puts "#{holidays[date]}"
+
       @history_array << {
         :loan_id                             => self.id,
-        :date                                => self.holidays[date] ? self.holidays[date].new_date : date,         # apply holiday
-        :holiday_id                          => self.holidays[date] ? self.holidays[date].id       : 0,            # and mark holiday id
+        :date                                => date,
+        :holiday_id                          => 0,
         :last_status                         => last_loan_history ? last_loan_history[:status] : 1,
         :status                              => STATUSES.index(st) + 1,
         :scheduled_outstanding_principal     => scheduled[:balance].round(2),
