@@ -21,11 +21,11 @@
       %legend Pay
       = link_to("Prepay This Loan",  url(:prepay_loan, @loan.id), :class => "_remote_ grey_button")
 
-      - if [:admin, :mis_manager].include?(session.user.role)
-        .box
-          %fieldset
-            %legend Levy Penalty/Fee
-            = partial "applicable_fees/form", :layout => false
+- if [:admin, :mis_manager].include?(session.user.role)
+  .box
+    %fieldset
+      %legend Levy Penalty/Fee
+      = partial "applicable_fees/form", :layout => false
 
   .box
     %fieldset
