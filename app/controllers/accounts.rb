@@ -128,14 +128,14 @@ class Accounts < Application
     @account = Account.get(params[:account_id])
     @from_date = (@accounting_period ? @accounting_period.begin_date : @account.account_earliest_date - 1)
     @to_date =  (@accounting_period ? @accounting_period.end_date : Date.today)
-    @posting_hash = Posting.all(:account => @account, "journal.date.lte" => @to_date, "journal.date.gte" => @from_date).paginate(:page => params[:page], :per_page => 20)
+    @posting_hash = Posting.all(:account => @account, "journal.date.lte" => @to_date, "journal.date.gte" => @from_date)
     partial :book, :layout => layout?
   end
 
   private
   def get_context
     @branches_list = Branch.all.map{ |x| [x.id, x.name]}
-    @branches_list.unshift([nil, 'Head Office Accounts'])
+    @branches_list.unshift([0, 'Head Office Accounts'])
     @branch = Branch.get(params[:branch_id]) if params.key?(:branch_id)
   end
 

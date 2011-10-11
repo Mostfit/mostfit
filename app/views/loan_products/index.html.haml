@@ -14,7 +14,7 @@
       %th
         Product name
       %th
-        Loan type
+        Repayment Style
       %th
         Amount
       %th
@@ -33,7 +33,7 @@
       %td
         = link_to loan_product.name, url(:loan_product, loan_product) 
       %td
-        = loan_product.loan_type_string
+        = loan_product.repayment_style.name if loan_product.repayment_style
       %td
         = loan_product.min_amount!=loan_product.max_amount ? "#{loan_product.min_amount} - #{loan_product.max_amount}" : loan_product.min_amount
       %td
@@ -52,7 +52,7 @@
           %td
             = link_to loan_product.name, url(:loan_product, loan_product) 
           %td
-            = loan_product.loan_type_string
+            = loan_product.repayment_style.name if loan_product.repayment_style
           %td
             = loan_product.min_amount!=loan_product.max_amount ? "#{loan_product.min_amount} - #{loan_product.max_amount}" : loan_product.min_amount
           %td
@@ -71,7 +71,7 @@
           %td
             = link_to loan_product.name, url(:loan_product, loan_product) 
           %td
-            - loan_product.loan_type_string
+            = loan_product.repayment_style.name if loan_product.repayment_style
           %td
             = loan_product.min_amount!=loan_product.max_amount ? "#{loan_product.min_amount} - #{loan_product.max_amount}" : loan_product.min_amount
           %td
