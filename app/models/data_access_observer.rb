@@ -1,6 +1,6 @@
 class DataAccessObserver
   include DataMapper::Observer
-  observe *(DataMapper::Model.descendants.to_a - [AuditTrail] + [Branch, Center, ClientGroup, Client, Loan, Payment]).uniq # strange bug where observer drops some of the descnedants.
+  observe *(DataMapper::Model.descendants.to_a - [AuditTrail, Cacher] + [Branch, Center, ClientGroup, Client, Loan, Payment]).uniq # strange bug where observer drops some of the descnedants.
 
   
   def self.insert_session(id)
