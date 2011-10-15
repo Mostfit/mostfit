@@ -1,5 +1,6 @@
 DEFAULT_JOURNAL_TYPES = ['Payment','Receipt','Journal']
 
+ASSETS = 'Assets'
 CASH = 'Cash'; BANK_DEPOSITS = 'Bank Deposits'; SECURITIES = 'Securities'
 LAND = 'Land'; MACHINERY = 'Machinery'
 LOANS_MADE = 'Loans made'; BORROWINGS = 'Borrowings'; TAXES_PAYABLE = "Tax payable"; OTHER_LIABILITIES = "Other liabilities"
@@ -17,6 +18,11 @@ SALARIES = 'Salaries'; RENT_AND_TAXES = 'Rent, Rates, and Taxes'; ADMIN_EXPENSES
 EXPENSES = [SALARIES, RENT_AND_TAXES, ADMIN_EXPENSES, TRAVEL_EXPENSES]
 INCOME_HEAD_NOT_CHOSEN = 'Choose income or expense head'
 INCOME_HEADS = [INCOMES, EXPENSES].flatten
+
+DEBIT_BALANCE = "Dr."
+CREDIT_BALANCE = "Cr."
+DEFAULT_TO_DEBIT_BALANCE = [ASSETS, EXPENSES]
+DEFAULT_TO_CREDIT_BALANCE = [LIABILITIES, INCOMES]
 
 INSTALLMENT_FREQUENCIES = [:daily, :weekly, :biweekly, :monthly, :quadweekly]
 WEEKDAYS = [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
