@@ -39,7 +39,6 @@ class TrialBalance < Report
       end
       data[acc] = [debit_balance, credit_balance]
     }
-    p data
     data
   end
 
