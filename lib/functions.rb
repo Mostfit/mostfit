@@ -10,6 +10,7 @@ class NilClass
   def to_account_balance
     "-"
   end
+
 end
 
 class Date
@@ -344,3 +345,25 @@ def get_bulk_insert_sql(table_name, data)
   sql
 end
 
+class BigDecimal
+
+  def inspect
+    self.to_f
+  end
+
+  def round_to_nearest(i = nil, style = :round)
+    return self if i.nil?
+    return self unless self.respond_to?(style)
+    (self / i).send(style) * i
+  end
+
+end
+
+
+class Nothing
+  # instead of saying i.e. (Organization.get_organization(self.received_on).org_guid if Organization.get_organization(self.received_on) or "0000-0000" you can now say
+  # (Organization.get_organization(self.received_on) || Nothing).org_guid || "0000-0000"
+  def self.method_missing(method_name, *args)
+    nil
+  end
+end

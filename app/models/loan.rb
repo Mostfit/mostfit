@@ -1181,11 +1181,13 @@ class Loan
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f,
         :branch_id                           => c_branch_id,
         :center_id                           => c_center_id,
-        :client_group_id                     => c_client_group_id,
+        :client_group_id                     => c_client_group_id || 0,
         :created_at                          => now,
         :funding_line_id                     => funding_line_id,
         :loan_product_id                     => loan_product_id,
         :days_overdue                        => days_overdue
+
+
       }
     end
 
