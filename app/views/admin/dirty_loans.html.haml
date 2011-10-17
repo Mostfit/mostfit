@@ -1,27 +1,35 @@
-%table.report.nojs
-  %th
-    Loan ID
-  %th
-    Client
-  %th
-    Client
-  %th
-    Branch
-  %th
-    Added at
-  %th
-  - @loans.each do |dl|
-    %tr
-      %td
-        = dl.loan_id
-      %td
-        = dl.loan.client.name
-      %td
-        = dl.loan.client.center.name
-      %td
-        = dl.loan.client.center.branch.name
-      %td
-        on
-        = dl.created_at.strftime(Mfi.first.date_format + " at %H %m")
-      %td
-        = link_to("clear", url(:action => :clear_loan, :id => dl.id), :class => "_remote_")
+- if DirtyLoan.pending.count > 0 
+  - if DirtyLoan.send(:class_variable_get, "@@poke_thread")
+    = link_to "Stop queue", url(:controller => "admin", :action => "toggle_queue_processing"), :class => "greenButton"
+  - else
+    = link_to "Start queue", url(:controller => "admin", :action => "toggle_queue_processing"), :class => "greenButton"
+
+= link_to "Clear all dirty loans", url(:controller => "admin", :action => "clear_loans"), :class => "greenButton"
+- if params[:show_all]
+  %table.report.nojs
+    %th
+      Loan ID
+    %th
+      Client
+    %th
+      Client
+    %th
+      Branch
+    %th
+      Added at
+    %th
+    - @loans.each do |dl|
+      %tr
+        %td
+          = dl.loan_id
+        %td
+          = dl.loan.client.name
+        %td
+          = dl.loan.client.center.name
+        %td
+          = dl.loan.client.center.branch.name
+        %td
+          on
+          = dl.created_at.strftime(Mfi.first.date_format + " at %H %m")
+        %td
+          = link_to("clear", url(:action => :clear_loan, :id => dl.id), :class => "_remote_")

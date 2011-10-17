@@ -60,10 +60,9 @@
           existing users can
           %b= link_to 'login', url(:login)
           to proceed
-        - if count = DirtyLoan.pending.length and count > 0
+        - if count = DirtyLoan.pending.count and count > 0
           %i
             == (#{count} loans in queue)
-
 
     #content
       .container

@@ -51,11 +51,12 @@ class HolidayCalendar
     # then add the loan_ids for loans affected by new holidays
     new_holidays = holidays - @old_holidays
     loan_ids += new_holidays.map{|holiday| LoanHistory.all(:branch_id => branch_ids, :date => holiday.date).aggregate(:loan_id)}.flatten.uniq
-    
-    # then insert these into the dirty loans list and let the system take care of them
-    now = DateTime.now
-    repository.adapter.execute(get_bulk_insert_sql("dirty_loans", loan_ids.map{|pl| {:loan_id => pl, :created_at => now}}))
-    DirtyLoan.send(:class_variable_set,"@@poke_thread", true)
+    unless loan_ids.blank?
+      # then insert these into the dirty loans list and let the system take care of them
+      now = DateTime.now
+      repository.adapter.execute(get_bulk_insert_sql("dirty_loans", loan_ids.map{|pl| {:loan_id => pl, :created_at => now}}))
+      DirtyLoan.send(:class_variable_set,"@@poke_thread", true)
+    end
   end
 
   def update_unadjusted_holidays
@@ -74,6 +75,7 @@ class HolidayCalendar
   end
 
   def remove_holiday(holiday)
+    holiday = Holiday.get(holiday) unless holiday.is_a? Holiday
     @old_holidays ||= holidays
     self.holidays_fors = self.holidays_fors.select{|hf| hf.holiday != holiday}
   end
@@ -95,3 +97,4 @@ class HolidayCalendar
 
     
 end
+

@@ -43,7 +43,7 @@ class HolidayCalendars < Application
       holiday = Holiday.get(holiday_calendar[:holiday])
       raise NotFound unless holiday
       @holiday_calendar.old_holidays = @holiday_calendar.holidays.dup
-      @holiday_calendar.holidays << holiday
+      @holiday_calendar.add_holiday(holiday)
       if @holiday_calendar.save
         redirect resource(@holiday_calendar), :message => {:notice => "Holiday added succesfully"}
       else
@@ -72,9 +72,10 @@ class HolidayCalendars < Application
     debugger
     @holiday_calendar = HolidayCalendar.get(id)
     raise NotFound unless @holiday_calendar
-    @holiday_calendar.holidays = @holiday_calendar.holidays.select{|h| h.id != holiday_id.to_i}
+    @holiday_calendar.remove_holiday(holiday_id)
     @holiday_calendar.save
     redirect resource(@holiday_calendar)
   end
 
 end # HolidayCalendars
+

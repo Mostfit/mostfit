@@ -12,7 +12,7 @@
 - if @holiday_calendar.holidays.blank?
   %h2 No holidays in this calendar
 - else
-  %table.form
+  %table.form.shaded.narrow
     %tr
       %th
         Name
@@ -22,18 +22,13 @@
         New Date
       %th
         Actions
-  - @holiday_calendar.holidays.each do |h|
-    %tr
-      %td
-        = h.name
-      %td
-        = h.date
-      %td
-        = h.new_date
-      %td
-        = link_to 'delete', url(:controller => :holiday_calendars, :action => :delete_holiday, :id => @holiday_calendar.id, :holiday_id => h.id)
-
-  
-= link_to 'Edit',  url(:edit_holiday_calendar,  @holiday_calendar)
-|
-= link_to 'Back', url(:holiday_calendars)
+    - @holiday_calendar.holidays.each do |h|
+      %tr
+        %td
+          = h.name
+        %td
+          = h.date
+        %td
+          = h.new_date
+        %td
+          = link_to 'delete', url(:controller => :holiday_calendars, :action => :delete_holiday, :id => @holiday_calendar.id, :holiday_id => h.id)
