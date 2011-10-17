@@ -20,15 +20,15 @@ class DirtyLoan
   end
 
   def self.clear(id=nil)
-    hash = {}
-    hash[:cleaned_at] = nil
-    hash[:id] = id if id
-    DirtyLoan.all(hash).each{|dl|
+    hash = id ? {:id => id} : {}
+    DirtyLoan.pending(hash).aggregate(:id).each{|_dl|
+      dl = DirtyLoan.get(_dl)
       if not dl.cleaning_started or (Time.now.to_time - dl.cleaning_started.to_time > 14400)
         dl.cleaning_started = Time.now
         dl.save
       end
       begin
+        break unless @@poke_thread
         dl.loan.update_history(true)
         dl.cleaned_at = Time.now
         dl.save
@@ -41,8 +41,8 @@ class DirtyLoan
     return true
   end
 
-  def self.pending
-    DirtyLoan.all(:cleaned_at => nil)
+  def self.pending(hash = {})
+    DirtyLoan.all({:cleaned_at => nil}.merge(hash))
   end
 
   def self.start_thread

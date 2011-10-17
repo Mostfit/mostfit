@@ -75,6 +75,7 @@ class HolidayCalendar
   end
 
   def remove_holiday(holiday)
+    holiday = Holiday.get(holiday) unless holiday.is_a? Holiday
     @old_holidays ||= holidays
     self.holidays_fors = self.holidays_fors.select{|hf| hf.holiday != holiday}
   end

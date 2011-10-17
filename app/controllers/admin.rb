@@ -54,13 +54,28 @@ class Admin < Application
   end
 
   def dirty_loans
-    @loans = DirtyLoan.pending
+    @loans = DirtyLoan.pending if params[:show_all]
     render
   end
 
   def clear_loan
     DirtyLoan.clear(params[:id])
     render "done", :layout => false
+  end
+
+  def clear_loans
+    DirtyLoan.send(:class_variable_set,"@@poke_thread",true)
+    DirtyLoan.start_thread
+    redirect url(:controller => :admin, :action => :index), :message => {:notice => "Started clearing the queue"}
+  end
+
+  def toggle_queue_processing
+    pt = DirtyLoan.send(:class_variable_get,"@@poke_thread")
+    queue_state = pt ? "Running" : "Stopped"
+    DirtyLoan.send(:class_variable_set,"@@poke_thread", (not pt))
+    queue_state = (not pt) ? "Running" : "Stopped"
+    DirtyLoan.start_thread unless pt
+    redirect url(:controller => :admin, :action => :index), :message => {:notice => "Queue #{queue_state}"}
   end
 
   def proxy_logon

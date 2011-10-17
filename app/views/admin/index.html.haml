@@ -69,6 +69,8 @@
         = link_to_with_rights 'History log', url(:controller => :audit_trails, :action => :show), :class => 'icon zoom'
       %li 
         = link_to_with_rights 'Caches', resource(:cachers), :class => 'icon zoom'
+      %li
+        = link_to_with_rights 'Loan update queue', url(:controller => 'admin', :action => "dirty_loans"), :class => 'edit'
   .admin-box
     %h2 Data
     %ul.icon_links
@@ -76,9 +78,6 @@
         = link_to_with_rights 'Upload data', url(:controller => 'admin', :action => "upload"), :class => 'upload icon'
       %li
         = link_to_with_rights 'Download data', url(:controller => 'admin', :action => "download"), :class => 'download icon'
-      - if Mfi.first.dirty_queue_enabled
-        %li
-          = link_to_with_rights 'Loan update queue', url(:controller => 'admin', :action => "dirty_loans"), :class => 'edit'
   .admin-box
     %h2 API Use
     %ul
