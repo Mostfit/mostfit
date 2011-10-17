@@ -1110,7 +1110,27 @@ class Loan
         :total_interest_due                  => total_interest_due.round(2),
         :total_principal_paid                => total_principal_paid.round(2),
         :total_interest_paid                 => total_interest_paid.round(2),
-        
+        :advance_principal_paid              => advance_principal_paid,
+        :advance_interest_paid               => advance_interest_paid,
+        :total_advance_paid                  => advance_principal_paid + advance_interest_paid,
+        :advance_principal_paid_today        => (appt = @history_array.last ? [0,advance_principal_paid - (@history_array.last[:advance_principal_paid] || 0)].max : 0),
+        :advance_interest_paid_today         => (aipt = @history_array.last ? [0,advance_interest_paid - (@history_array.last[:advance_interest_paid] || 0)].max : 0),
+        :total_advance_paid_today            => appt + aipt,
+        :advance_principal_adjusted          => last_loan_history ? [0,last_loan_history[:advance_principal_paid] - advance_principal_paid].max : 0,
+        :advance_interest_adjusted           => last_loan_history ? [0,last_loan_history[:advance_interest_paid] - advance_interest_paid].max : 0,
+        :total_fees_due                      => total_fees_due,
+        :total_fees_paid                     => total_fees_paid,
+        :fees_due_today                      => fees_due_today,
+        :fees_paid_today                     => fees_paid_today,
+        :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f,
+        :branch_id                           => c_branch_id,
+        :center_id                           => c_center_id,
+        :client_group_id                     => c_client_group_id || 0,
+        :created_at                          => now,
+        :funding_line_id                     => funding_line_id,
+        :loan_product_id                     => loan_product_id,
+        :days_overdue                        => days_overdue
+
       }
     end
 

@@ -7,6 +7,7 @@ class NilClass
   def to_account_balance
     "-"
   end
+
 end
 
 class Date
@@ -281,3 +282,87 @@ module DmPagination
     end
   end
 end
+<<<<<<< Updated upstream
+||||||| merged common ancestors
+
+
+def get_bulk_insert_sql(table_name, data)
+  t = Time.now
+  keys = data.first.keys
+  sql = "INSERT INTO #{table_name}(#{keys.join(',')} )
+              VALUES "
+  values = []
+  data.each do |row|
+    value = keys.map do |k| 
+      v = row[k]
+      if v.class == Date
+        "'#{v.strftime('%Y-%m-%d')}'"
+      elsif v.class == DateTime
+        "'#{v.strftime('%Y-%m-%d %H:%M:%S')}'"
+      elsif row[k].class == String
+        "'#{v}'"
+      else
+        v
+      end
+    end
+    values << "(#{value.join(',')})
+              "
+  end
+  sql += values.join(",") + ";"
+  Merb.logger.info "sql statement crafted in #{Time.now - t}"
+  sql
+end
+
+=======
+
+
+def get_bulk_insert_sql(table_name, data)
+  t = Time.now
+  keys = data.first.keys
+  sql = "INSERT INTO #{table_name}(#{keys.join(',')} )
+              VALUES "
+  values = []
+  data.each do |row|
+    value = keys.map do |k| 
+      v = row[k]
+      if v.class == Date
+        "'#{v.strftime('%Y-%m-%d')}'"
+      elsif v.class == DateTime
+        "'#{v.strftime('%Y-%m-%d %H:%M:%S')}'"
+      elsif row[k].class == String
+        "'#{v}'"
+      else
+        v
+      end
+    end
+    values << "(#{value.join(',')})
+              "
+  end
+  sql += values.join(",") + ";"
+  Merb.logger.info "sql statement crafted in #{Time.now - t}"
+  sql
+end
+
+class BigDecimal
+
+  def inspect
+    self.to_f
+  end
+
+  def round_to_nearest(i = nil, style = :round)
+    return self if i.nil?
+    return self unless self.respond_to?(style)
+    (self / i).send(style) * i
+  end
+
+end
+
+
+class Nothing
+  # instead of saying i.e. (Organization.get_organization(self.received_on).org_guid if Organization.get_organization(self.received_on) or "0000-0000" you can now say
+  # (Organization.get_organization(self.received_on) || Nothing).org_guid || "0000-0000"
+  def self.method_missing(method_name, *args)
+    nil
+  end
+end
+>>>>>>> Stashed changes
