@@ -56,7 +56,7 @@ class HolidayCalendar
       now = DateTime.now
       repository.adapter.execute(get_bulk_insert_sql("dirty_loans", loan_ids.map{|pl| {:loan_id => pl, :created_at => now}}))
       DirtyLoan.send(:class_variable_set,"@@poke_thread", true)
-    end1
+    end
   end
 
   def update_unadjusted_holidays
