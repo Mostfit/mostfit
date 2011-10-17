@@ -14,32 +14,32 @@ namespace :mostfit do
   namespace :db do
     desc "populate the database using the csv's"
     task :prepare do
-      # repository.adapter.execute(%Q{
-      #    alter table loan_history modify actual_outstanding_total decimal(15,2) not null, 
-      #                        modify scheduled_outstanding_total decimal(15,2) not null,
-      #                        modify actual_outstanding_principal decimal(15,2) not null,
-      #                        modify scheduled_outstanding_principal decimal(15,2) not null,
-      #                        modify scheduled_principal_due decimal(15,2) not null,
-      #                        modify scheduled_interest_due  decimal(15,2) not null,
-      #                        modify principal_due  decimal(15,2) not null,
-      #                        modify interest_due decimal(15,2) not null,
-      #                        modify principal_paid  decimal(15,2) not null,
-      #                        modify interest_paid  decimal(15,2) not null,
-      #                        modify total_interest_due  decimal(15,2) not null,
-      #                        modify total_principal_due  decimal(15,2) not null,
-      #                        modify total_principal_paid  decimal(15,2) not null,
-      #                        modify total_interest_paid  decimal(15,2) not null,
-      #                        modify advance_principal_paid decimal(15,2) not null,
-      #                        modify advance_interest_paid  decimal(15,2) not null,
-      #                        modify advance_principal_adjusted  decimal(15,2) not null,
-      #                        modify advance_interest_adjusted   decimal(15,2) not null,
-      #                        modify principal_in_default        decimal(15,2) not null,
-      #                        modify interest_in_default         decimal(15,2) not null,
-      #                        modify total_fees_due               decimal(15,2) not null,
-      #                        modify total_fees_paid            decimal(15,2) not null,
-      #                        modify fees_due_today              decimal(15,2) not null,
-      #                        modify composite_key              decimal(10,4) not null;
-      #    })
+      repository.adapter.execute(%Q{
+         alter table loan_history modify actual_outstanding_total decimal(15,2) not null, 
+                             modify scheduled_outstanding_total decimal(15,2) not null,
+                             modify actual_outstanding_principal decimal(15,2) not null,
+                             modify scheduled_outstanding_principal decimal(15,2) not null,
+                             modify scheduled_principal_due decimal(15,2) not null,
+                             modify scheduled_interest_due  decimal(15,2) not null,
+                             modify principal_due  decimal(15,2) not null,
+                             modify interest_due decimal(15,2) not null,
+                             modify principal_paid  decimal(15,2) not null,
+                             modify interest_paid  decimal(15,2) not null,
+                             modify total_interest_due  decimal(15,2) not null,
+                             modify total_principal_due  decimal(15,2) not null,
+                             modify total_principal_paid  decimal(15,2) not null,
+                             modify total_interest_paid  decimal(15,2) not null,
+                             modify advance_principal_paid decimal(15,2) not null,
+                             modify advance_interest_paid  decimal(15,2) not null,
+                             modify advance_principal_adjusted  decimal(15,2) not null,
+                             modify advance_interest_adjusted   decimal(15,2) not null,
+                             modify principal_in_default        decimal(15,2) not null,
+                             modify interest_in_default         decimal(15,2) not null,
+                             modify total_fees_due               decimal(15,2) not null,
+                             modify total_fees_paid            decimal(15,2) not null,
+                             modify fees_due_today              decimal(15,2) not null,
+                             modify composite_key              decimal(10,4) not null;
+         })
       repository.adapter.execute(%Q{
          alter table cachers modify actual_outstanding_total decimal(15,2) not null, 
                              modify scheduled_outstanding_total decimal(15,2) not null,

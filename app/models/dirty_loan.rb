@@ -11,11 +11,10 @@ class DirtyLoan
   belongs_to :loan
 
   def self.add(loan)
-    if dirty = DirtyLoan.first(:loan => loan, :cleaned_at => nil)      
-      dirty.created_at = Time.now
-      dirty.save
-    else
-      DirtyLoan.create(:loan => loan)
+    if loan.is_a? Loan
+      dirty = DirtyLoan.first_or_create(:loan => loan, :cleaned_at => nil)      
+    elsif loan.is_a? Integer
+      dirty = DirtyLoan.first_or_create(:loan_id => loan, :cleaned_at => nil)      
     end
     @@poke_thread = true
   end
@@ -48,7 +47,7 @@ class DirtyLoan
 
   def self.start_thread
     cleaner_interval = Kernel.const_defined?("CLEANER_INTERVAL") ? CLEANER_INTERVAL : 300
-    if Mfi.first.dirty_queue_enabled
+    if true
       Thread.new{
         counter = 0
         while true

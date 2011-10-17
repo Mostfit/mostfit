@@ -1,0 +1,17 @@
+%h1
+  Holiday Calendars
+
+%table
+  %tr
+  - for holiday_calendar in @holiday_calendars
+    %tr
+      %td
+        = holiday_calendar.name
+      %td
+        = holiday_calendar.applic.name
+      %td
+        = link_to 'Show', url(:holiday_calendar, holiday_calendar)
+      %td
+        = link_to 'Edit', url(:edit_holiday_calendar,  holiday_calendar)
+
+= link_to 'New', url(:new_holiday_calendar)

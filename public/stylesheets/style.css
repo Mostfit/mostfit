@@ -833,7 +833,7 @@ table.comments tr td span{
 }
 
 
-form.form {
+form {
 /*  background-color: #F6E8B1; */
 /*  background-color: #F5F6D4; */
   font-size: 14px;
@@ -863,10 +863,10 @@ form.form label {
 }
 label {
   display: inline-block;
-  width: 200px;
-  text-align: right;
+  width: 100px;
+  text-align: left;
   margin-right: 5px;
-  vertical-align: top;
+  font-size: 1.2em;
 }
 form.form td {
   vertical-align: middle;

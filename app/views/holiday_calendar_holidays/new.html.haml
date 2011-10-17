@@ -1,0 +1,13 @@
+%h1 HolidayCalendarHolidays controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/holiday_calendar_holidays/new.html.erb
+
+= error_messages_for @holiday_calendar_holiday
+
+= form_for(@holiday_calendar_holiday, :action => url(:holiday_calendar_holidays) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:holiday_calendar_holidays)

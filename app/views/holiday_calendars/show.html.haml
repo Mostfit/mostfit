@@ -1,0 +1,39 @@
+%h1
+  == Holiday Calendar: #{@holiday_calendar.name}
+
+%h2 
+  == Applies to #{@holiday_calendar.applic.model}: #{@holiday_calendar.applic.name}
+  
+= form_for (@holiday_calendar, :action => resource(@holiday_calendar)) do
+  %label Add holiday
+  = select :name => :'holiday_calendar[holiday]', :collection => (Holiday.all - @holiday_calendar.holidays).map{|x| [x.id, "#{x.name} : #{x.date}"]}, :prompt => "choose a holiday", :class => "chosen"
+  = submit 'Add holiday'
+
+- if @holiday_calendar.holidays.blank?
+  %h2 No holidays in this calendar
+- else
+  %table.form
+    %tr
+      %th
+        Name
+      %th
+        Date
+      %th
+        New Date
+      %th
+        Actions
+  - @holiday_calendar.holidays.each do |h|
+    %tr
+      %td
+        = h.name
+      %td
+        = h.date
+      %td
+        = h.new_date
+      %td
+        = link_to 'delete', url(:controller => :holiday_calendars, :action => :delete_holiday, :id => @holiday_calendar.id, :holiday_id => h.id)
+
+  
+= link_to 'Edit',  url(:edit_holiday_calendar,  @holiday_calendar)
+|
+= link_to 'Back', url(:holiday_calendars)

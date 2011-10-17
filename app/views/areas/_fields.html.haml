@@ -18,7 +18,7 @@
     %th
       Manager
     %td
-      = select :manager_id, :collection =>  StaffMember.all.map{|r| [r.id, r.name]}, :prompt => "---", :selected => @area.manager ? @area.manager.id.to_s : nil
+      = select :manager_id, :collection =>  StaffMember.all.sort_by{|s| s.name}.map{|r| [r.id, r.name]}, :prompt => "---", :selected => @area.manager ? @area.manager.id.to_s : nil, :class => "chosen"
   %tr
     %th
       Address:

@@ -411,7 +411,7 @@ class Loan
   # used by many other methods, it accepts a negative +number+
   # TODO: decide if we should make sure returned date is a payment date.
   def shift_date_by_installments(date, number, ensure_meeting_day = true)
-    return date.holiday_bump if number == 0
+    return date if number == 0
     case installment_frequency
     when :daily
       new_date =  date + number
@@ -449,7 +449,7 @@ class Loan
       end
       #new_date - new_date.cwday + Center.meeting_days.index(client.center.meeting_day)
     end
-    new_date.holiday_bump
+    new_date
   end
 
   def self.description
@@ -1028,7 +1028,7 @@ class Loan
   def installment_dates
     return @_installment_dates if @_installment_dates
     if installment_frequency == :daily
-      # we have to br careful that when we do a holiday bump, we do not get stuck in an endless loop
+      # we have to be careful that when we do a holiday bump, we do not get stuck in an endless loop
       ld = scheduled_first_payment_date - 1
       @_installment_dates = []
       (1..number_of_installments).each do |i|
@@ -1048,6 +1048,8 @@ class Loan
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
     @_installment_dates = (0..(actual_number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
+    @_installment_dates = @_installment_dates.map{|d| self.holidays[d] ? self.holidays[d].new_date : d}
+    
   end
 
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted
@@ -1073,10 +1075,17 @@ class Loan
     Merb.logger.info "HISTORY EXEC TIME: #{(Time.now - t).round(4)} secs"
     @already_updated=true
     t = Time.now
-    update_history_attributes
-    self.save!
+    #update_history_attributes
+    #self.save!
     Merb.logger.info "LOAN CACHE UPDATE TIME: #{(Time.now - t).round(4)} secs"
   end
+
+  def holidays
+    return @holidays if @holidays
+    @holidays = client.center.branch.holidays.map{|h| [h.date, h]}.to_hash
+  end
+
+
 
   def calculate_history
     return @history_array if @history_array
@@ -1093,9 +1102,9 @@ class Loan
     end.to_hash
     ap_fees = fee_schedule.map{|k,v| [k,v.values.sum]}.to_hash
 
-    dates = ([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on, scheduled_first_payment_date].map{|d|
-               d.holiday_bump if d.is_a?(Date)
-             } + payment_dates + installment_dates).compact.uniq.sort
+    dates = (([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on, scheduled_first_payment_date] + installment_dates).map{|d|
+               (self.holidays[d] ? self.holidays[d].new_date : d)
+             } + payment_dates).compact.uniq.sort
 
     total_principal_due = total_interest_due = total_principal_paid = total_interest_paid = 0
 
@@ -1103,7 +1112,7 @@ class Loan
     # this is helpful for adjusting interest and principal due on a particular date while taking into account future payments
     last_payments_hash = payments_hash.sort.last; 
     act_total_principal_paid = last_payments_hash[1][:total_principal]; act_total_interest_paid = last_payments_hash[1][:total_interest]
-
+    
     dates.each_with_index do |date,i|
       i_num                                  = installment_for_date(date)
       scheduled                              = get_scheduled(:all, date)
@@ -1137,6 +1146,7 @@ class Loan
       @history_array << {
         :loan_id                             => self.id,
         :date                                => date,
+        :holiday_id                          => 0,
         :last_status                         => last_loan_history ? last_loan_history[:status] : 1,
         :status                              => STATUSES.index(st) + 1,
         :scheduled_outstanding_principal     => scheduled[:balance].round(2),
