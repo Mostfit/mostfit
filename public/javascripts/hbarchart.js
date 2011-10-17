@@ -19,9 +19,9 @@ function init_barchart(data) {
     //bars style
     type:'stacked',
     //whether to show the aggregation of the values
-    showAggregates:true,
+    showAggregates:false,
     //whether to show the labels for the bars
-    showLabels:true,
+    showLabels:false,
     //label styles
     Label: {
       type: labelType, //Native or HTML

@@ -13,7 +13,8 @@
           - total[at] += h.send(at) if h.send(at).is_a? Numeric
       %td{:style => "background: #aaee00"}
         = link_to h.composite_key, "/loans/#{h.composite_key.floor}"
-  %tr.total
-    - keys.each do |at|
-      %td
-        = total[at].to_i.to_currency(:mostfit_default)
+  %tfoot
+    %tr.total
+      - keys.each do |at|
+        %td
+          = total[at].to_i.to_currency(:mostfit_default)

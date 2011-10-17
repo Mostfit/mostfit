@@ -1,8 +1,5 @@
 class Cacher
   # like LoanHistory but for anything that has loans
-
-  
-
   include DataMapper::Resource
   property :id,                              Serial
   property :type,                            Discriminator
@@ -12,30 +9,30 @@ class Cacher
   property :branch_id,                       Integer, :index => true
   property :center_id,                       Integer, :index => true
   property :funding_line_id,                 Integer, :index => true
-  property :scheduled_outstanding_total,     Float, :nullable => false, :index => true
-  property :scheduled_outstanding_principal, Float, :nullable => false, :index => true
-  property :actual_outstanding_total,        Float, :nullable => false, :index => true
-  property :actual_outstanding_principal,    Float, :nullable => false, :index => true
-  property :scheduled_principal_due,         Float, :nullable => false, :index => true
-  property :scheduled_interest_due,          Float, :nullable => false, :index => true
-  property :principal_due,                   Float, :nullable => false, :index => true
-  property :interest_due,                    Float, :nullable => false, :index => true
-  property :principal_paid,                  Float, :nullable => false, :index => true
-  property :interest_paid,                   Float, :nullable => false, :index => true
-  property :total_principal_due,             Float, :nullable => false, :index => true
-  property :total_interest_due,              Float, :nullable => false, :index => true
-  property :total_principal_paid,            Float, :nullable => false, :index => true
-  property :total_interest_paid,             Float, :nullable => false, :index => true
-  property :advance_principal_paid,          Float, :nullable => false, :index => true
-  property :advance_interest_paid,           Float, :nullable => false, :index => true
-  property :advance_principal_adjusted,      Float, :nullable => false, :index => true
-  property :advance_interest_adjusted,       Float, :nullable => false, :index => true
-  property :principal_in_default,            Float, :nullable => false, :index => true
-  property :interest_in_default,             Float, :nullable => false, :index => true
-  property :total_fees_due,                  Float, :nullable => false, :index => true
-  property :total_fees_paid,                 Float, :nullable => false, :index => true
-  property :fees_due_today,                  Float, :nullable => false, :index => true
-  property :fees_paid_today,                 Float, :nullable => false, :index => true
+  property :scheduled_outstanding_total,     Float, :nullable => false
+  property :scheduled_outstanding_principal, Float, :nullable => false
+  property :actual_outstanding_total,        Float, :nullable => false
+  property :actual_outstanding_principal,    Float, :nullable => false
+  property :scheduled_principal_due,         Float, :nullable => false
+  property :scheduled_interest_due,          Float, :nullable => false
+  property :principal_due,                   Float, :nullable => false
+  property :interest_due,                    Float, :nullable => false
+  property :principal_paid,                  Float, :nullable => false
+  property :interest_paid,                   Float, :nullable => false
+  property :total_principal_due,             Float, :nullable => false
+  property :total_interest_due,              Float, :nullable => false
+  property :total_principal_paid,            Float, :nullable => false
+  property :total_interest_paid,             Float, :nullable => false
+  property :advance_principal_paid,          Float, :nullable => false
+  property :advance_interest_paid,           Float, :nullable => false
+  property :advance_principal_adjusted,      Float, :nullable => false
+  property :advance_interest_adjusted,       Float, :nullable => false
+  property :principal_in_default,            Float, :nullable => false
+  property :interest_in_default,             Float, :nullable => false
+  property :total_fees_due,                  Float, :nullable => false
+  property :total_fees_paid,                 Float, :nullable => false
+  property :fees_due_today,                  Float, :nullable => false
+  property :fees_paid_today,                 Float, :nullable => false
 
   property :created_at,                      DateTime
   property :updated_at,                      DateTime
@@ -66,27 +63,6 @@ class Cacher
   end
 
   def self.get_stale(what)
-    raise ArgumentError unless [:center, :branch].include?(what)
-    # get the last update time per cacher as an array [[model_id, updated_at]...]
-    objs = self.all(:model_name => what.to_s.camel_case)
-    cacher_update_times = objs.blank? ? {} : objs.aggregate(:model_id, :updated_at.max).to_hash
-    model_ids = cacher_update_times.map{|x| x[0]}
-    return {} if model_ids.empty?
-    # get the absolutely lowest last update time
-    last_updated_at = cacher_update_times.map{|x| x[1]}.min
-    # get all payments after this time and return an array  [[model_id, created_at]....]
-    models_with_payment_update = Payment.all(:created_at.gt => last_updated_at, "c_#{what}_id".to_sym => model_ids).aggregate("c_#{what}_id".to_sym, :created_at.max).to_hash
-    # then check created_at.max against each cacher's updated_at
-    models_with_payment_update = models_with_payment_update.select{|k,v| cacher_update_times[k] < v} 
-    
-    # then do the same for loan updates
-    models_with_loan_update = Loan.all(:updated_at.gt => last_updated_at, "c_#{what}_id".to_sym => model_ids).aggregate("c_#{what}_id".to_sym, :updated_at.max)
-    models_with_loan_update = models_with_loan_update.select{|k,v| cacher_update_times[k] < v} 
-    # and then turn it into an hash of {:date1 => [:model_id1, model_id2]...}
-    models_with_payment_update = models_with_payment_update.map{|x| {x[1] => [x[0]]}}.reduce({}){|s,h| s + h}
-    models_with_loan_update = models_with_loan_update.map{|x| {x[1] => [x[0]]}}.reduce({}){|s,h| s + h}
-    # and sum the two
-    models_with_payment_update + models_with_loan_update
   end
   
   def self.get_missing_centers
@@ -97,7 +73,7 @@ class Cacher
     cached_centers = Cacher.all(:model_name => "Center", :branch_id => branch_ids, :date => dates).aggregate(:branch_id, :center_id).group_by{|x| x[0]}.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
     branch_centers - cached_centers
   end
-
+  
   def self.create(hash = {})
     # creates a cacher from loan_history table for any arbitrary condition. Also does grouping
     date = hash.delete(:date) || Date.today
@@ -151,16 +127,16 @@ class BranchCache < Cacher
   def self.update(date = Date.today, branch_ids = nil, force = false)
     # updates the cache object for a branch
     # first create caches for the centers that do not have them
-    
+    debugger
     t0 = Time.now; t = Time.now;
     branch_ids = Branch.all.aggregate(:id) unless branch_ids
     branch_centers = Branch.all(:id => branch_ids).centers(:creation_date.lte => date).aggregate(:id)
  
     # unless we are forcing an update, only work with the missing and stale centers
     unless force
-      ccs = Cacher.all(:model_name => "Center", :branch_id => branch_ids, :date => date, :center_id.gt => 0)
-      cached_centers = ccs.blank? ? [] : ccs.aggregate(:center_id)
-      stale_centers = ccs.get_stale(:center).values.flatten
+      ccs = CenterCache.all(:model_name => "Center", :branch_id => branch_ids, :date => date, :center_id.gt => 0)
+      cached_centers = ccs.aggregate(:center_id)
+      stale_centers = ccs.stale.aggregate(:center_id)
       cids = (branch_centers - cached_centers) + stale_centers
       puts "#{cached_centers.count} cached centers; #{branch_centers.count} total centers; #{stale_centers.count} stale; #{cids.count} to update"
     else
@@ -179,14 +155,14 @@ class BranchCache < Cacher
     
     # we now have {:branch => [{...center data...}, {...center data...}]}, ...
     # we have to convert this to {:branch => { sum of centers data }, ...}
-   
+    
     branch_data = branch_data_hash.map do |bid,ccs| 
       sum_centers = ccs.map do |c| 
         center_sum_attrs = c.attributes.select{|k,v| v.is_a? Numeric}.to_hash
       end
       [bid, sum_centers.reduce({}){|s,h| s+h}]
     end.to_hash
-
+    
     # TODO then add the loans that do not belong to any center
     # this does not exist right now so there is no code here.
     # when you add clients directly to the branch, do also update the code here
@@ -228,20 +204,32 @@ end
 
 class CenterCache < Cacher
   def self.update(hash = {})
-      # creates a cache per center for branches and centers per the hash passed as argument
-      date = hash.delete(:date) || Date.today
-      hash = hash.select{|k,v| [:branch_id, :center_id].include?(k)}.to_hash
-      centers_data = CenterCache.create(hash.merge(:date => date, :group_by => [:branch_id,:center_id])).deepen.values.sum
-      return false if centers_data == nil
-      now = DateTime.now
-      centers_data.delete(:no_group)
-      return true if centers_data.empty?
-      cs = centers_data.keys.flatten.map do |center_id|
-        centers_data[center_id].merge({:type => "CenterCache",:model_name => "Center", :model_id => center_id, :date => date, :updated_at => now})
-      end
-      return false if cs.nil?
-      sql = get_bulk_insert_sql("cachers", cs)
-      raise unless CenterCache.all(:date => date, :center_id => centers_data.keys).destroy!
-      repository.adapter.execute(sql)
+    # creates a cache per center for branches and centers per the hash passed as argument
+    debugger
+    date = hash.delete(:date) || Date.today
+    hash = hash.select{|k,v| [:branch_id, :center_id].include?(k)}.to_hash
+    centers_data = CenterCache.create(hash.merge(:date => date, :group_by => [:branch_id,:center_id])).deepen.values.sum
+    return false if centers_data == nil
+    now = DateTime.now
+    centers_data.delete(:no_group)
+    return true if centers_data.empty?
+    cs = centers_data.keys.flatten.map do |center_id|
+      centers_data[center_id].merge({:type => "CenterCache",:model_name => "Center", :model_id => center_id, :date => date, :updated_at => now})
+    end
+    return false if cs.nil?
+    sql = get_bulk_insert_sql("cachers", cs)
+    raise unless CenterCache.all(:date => date, :center_id => centers_data.keys).destroy!
+    repository.adapter.execute(sql)
   end
+
+
+  def self.stalify(obj)
+    # obj is either a Payment or a Loan
+    t = Time.now
+    cid = obj.c_center_id
+    d = obj.is_a?(Payment) ? obj.received_on : obj.applied_on
+    repository.adapter.execute("UPDATE cachers SET stale=1 WHERE center_id=#{cid} AND date >= '#{d.strftime('%Y-%m-%d')}' AND stale=0")
+    puts "STALIFIED CENTERS in #{(Time.now - t).round(2)} secs"
+  end
+
 end

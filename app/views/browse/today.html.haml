@@ -21,18 +21,18 @@
   == values = ['#{@branch_names.values.join("','")}']
 #stats
   - total = @caches.reduce(nil){|s,h| h + s}
-  %table#menu{:style => "float:left; position: relative; left: 1px;"}
+  %table#menu{:style => "position: relative; left: 1px; wisth: 80%"}
     %tr.selected
       %th
         %h1
           today
       %td.number
         %h1.green
-          = total.fees_paid_today + total.principal_paid + total.interest_paid
+          = (total.fees_paid_today + total.principal_paid + total.interest_paid).to_currency(:mostfit)
         %p collected
       %td.number
         %h1
-          = total.total_fees_due + total.principal_due + total.interest_due
+          = (total.total_fees_due + total.principal_due + total.interest_due).to_currency
         %p due
       %td.number
         %h1.red
@@ -54,7 +54,7 @@
           %th
             Paid
           - t = 0
-          - keys = [:total_advance_paid, :principal_paid, :interest_paid, :fees_paid_today, :noop]
+          - keys = [:noop, :principal_paid, :interest_paid, :fees_paid_today, :noop]
           - keys.map do |k| 
             %td.green
               - value = total.send(k) || 0
@@ -66,7 +66,7 @@
           %th
             Due
           - t = 0
-          - keys = [:noop, :principal_due, :interest_due, :fees_due_today, :total_default]
+          - keys = [:noop, :principal_due, :interest_due, :fees_due_today, :noop]
           - keys.map do |k|
             %td.red
               - value = total.send(k) || 0

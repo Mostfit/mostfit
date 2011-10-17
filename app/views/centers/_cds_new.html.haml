@@ -1,0 +1,103 @@
+- if @center.meeting_day? @date
+  Payments collected by 
+  = select :received_by, :collection => StaffMember.all, :value_method => :id, :text_method => :name, :selected => @center.manager.id.to_s
+
+  %table.narrow.form{ :width => '100%' }
+    %thead
+      %tr
+        %th
+        %th on name
+        %th View
+        %th amount
+        %th outstanding
+        %th.center status
+        %th disbursed on
+        %th funder
+        %th installment
+        %th principal due
+        %th interest due
+        %th total due
+        %th paid
+        %th attended
+          
+    %tbody
+      - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_total = 0, 0, 0, 0, 0, 0
+      - @center.clients.each do |client|
+        - loan_row_count = 0
+        - client.loans.each do |loan|
+          - next if LOANS_NOT_PAYABLE.include? loan.status
+          - lh = loan.loan_history(:date => @date)[0]
+          - loan_row_count += 1
+          %tr{ :class => cycle('odd','') }
+            %td &nbsp;
+            %td
+              %b= link_to loan.client.name, resource(@branch, @center, loan.client)
+            %td
+              = link_to loan.id, url_for_loan(loan)
+            %td.numeric
+              - amt = loan.amount
+              %b= amt.to_currency
+              - tot_amount += amt
+            %td.numeric
+              - os_prin = lh.nil? ? 0 : lh.actual_outstanding_principal
+              %b= os_prin.to_currency
+              - tot_outstanding += os_prin
+            %td.center
+              = lh.status.to_s unless lh.nil?
+            %td
+              = loan.disbursal_date.to_s
+            %td
+              = loan.funder_name
+            %td.numeric
+              - ins = loan.number_of_installments_before(@date)
+              = ins
+              - tot_installments += ins
+            %td.numeric
+              - p = lh.nil? ? 0 : lh.principal_due
+              = p.to_currency
+              - tot_principal += p
+            %td.numeric
+              - i = lh.nil? ? 0 : lh.interest_due
+              = i.to_currency
+              - tot_interest += i
+            %td.numeric
+              - a = i + p
+              = a.to_currency
+              - tot_total += a
+            %td.numeric
+              = text_field :name => loan.id, :value => a, :cols => "7"
+
+        - if loan_row_count == 0
+          %tr{ :class => cycle('odd','') }
+            %td
+            %td
+              %b= link_to client.name, resource(@branch, @center, client)
+            %td{ :colspan => 5 }
+              %i nothing outstanding
+      %tr{ :style => 'border-bottom: 2px solid;' }
+        %tr
+          %td
+          %td
+          %td
+          %td.numeric
+            %b= tot_amount.to_currency
+          %td.numeric
+            %b= tot_outstanding.to_currency
+          %td
+          %td
+          %td
+          %td.numeric
+            %b= tot_installments
+          %td.numeric
+            %b= tot_principal.to_currency
+          %td.numeric
+            %b= tot_interest.to_currency
+          %td.numeric
+            %b= tot_total.to_currency
+            
+    %tfoot    
+      %tr
+        %td{ :colspan => 12 }
+
+- else
+  %i This day is not a meeting day

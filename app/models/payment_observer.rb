@@ -23,11 +23,13 @@ class PaymentObserver
   after :create do
     return false unless Mfi.first.transaction_logging_enabled
     PaymentObserver.make_transaction_entry(self, :create) 
+    CenterCache.stalify(:center_id => self.c_center_id, :date.gte => self.received_on)
   end
 
   after :update do
     return false unless Mfi.first.transaction_logging_enabled
     PaymentObserver.make_transaction_entry(self, :delete)
+    CenterCache.stalify(:center_id => self.c_center_id, :date.gte => self.received_on)
   end
   
 end

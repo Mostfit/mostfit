@@ -48,6 +48,14 @@ describe Loan do
     @client.should be_valid
     # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
 
+    @equated_weekly = RepaymentStyle.new(:style => "EquatedWeekly", :round_total_to => 1, :round_interest_to => 1)
+    @equated_weekly.save
+
+    @flat = RepaymentStyle.new(:style => "Flat")
+    @flat.save
+
+
+
     @loan_product = LoanProduct.new
     @loan_product.name = "LP1"
     @loan_product.max_amount = 1000
@@ -57,7 +65,7 @@ describe Loan do
     @loan_product.installment_frequency = :weekly
     @loan_product.max_number_of_installments = 25
     @loan_product.min_number_of_installments = 25
-    @loan_product.loan_type_string = "DefaultLoan"
+    @loan_product.repayment_style = @flat
     @loan_product.valid_from = Date.parse('2000-01-01')
     @loan_product.valid_upto = Date.parse('2012-01-01')
     @loan_product.save
@@ -70,7 +78,7 @@ describe Loan do
     @loan_product.save
 
     @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
-    @loan.discriminator = DefaultLoan
+    @loan.discriminator = Loan
     @loan.history_disabled = true
     @loan.applied_by       = @manager
     @loan.funding_line     = @funding_line
@@ -646,9 +654,10 @@ describe Loan do
   it "should have correct takeover schedule and balances" do
     @loan_product.max_amount = 8000
     @loan_product.max_number_of_installments = 50
-    @loan1 = Loan.create(:amount => 8000, :interest_rate => 0.15, :installment_frequency => :weekly, :number_of_installments => 46, :discriminator => DefaultLoan,
-                         :scheduled_first_payment_date => "2009-12-28", :applied_on => "2009-12-22", :scheduled_disbursal_date => "2009-12-22", :disbursal_date => "2009-12-22", 
-                         :applied_by       => @manager, :funding_line     => @funding_line, :client => @client, :loan_product => @loan_product, :approved_on => "2009-12-22",
+    @loan1 = Loan.create(:amount => 8000, :interest_rate => 0.15, :installment_frequency => :weekly, :number_of_installments => 46, 
+                         :discriminator => Loan, :scheduled_first_payment_date => "2009-12-28", :applied_on => "2009-12-22", 
+                         :scheduled_disbursal_date => "2009-12-22", :disbursal_date => "2009-12-22", :applied_by       => @manager, 
+                         :funding_line     => @funding_line, :client => @client, :loan_product => @loan_product, :approved_on => "2009-12-22",
                          :approved_by => @manager, :disbursed_by => @manager
                          )
     @loan1.errors.each {|e| puts e} unless @loan1.valid?
@@ -657,14 +666,16 @@ describe Loan do
 
     @loan_product.min_interest_rate = 0
     @loan_product.min_amount = 0
-    @loan2 = Object.const_get("#{@loan1.discriminator}").new(:interest_rate => 0.15, :installment_frequency => :weekly, :number_of_installments => 46, 
-                                                                     :original_amount => @loan1.amount,
-                                                                     :original_first_payment_date => "2009-12-28", :applied_on => "2009-12-22", :original_disbursal_date => "2009-12-22",
-                                                                     :applied_by       => @manager, :funding_line => @funding_line, :client => @client, :loan_product => @loan_product, 
-                                                                     :approved_on => "2009-12-22", :approved_by => @manager, :disbursed_by => @manager,
-                                                                     :taken_over_on_installment_number => 10, :taken_over_on => "2010-02-28", :scheduled_disbursal_date => "2010-02-28",
-                                                                     :scheduled_first_payment_date => "2010-03-01", :disbursal_date => "2010-02-28", :amount => 8000
-                                                                    )
+    @loan2 = Object.const_get("#{@loan1.discriminator}").new(:interest_rate => 0.15, :installment_frequency => :weekly, 
+                                                             :number_of_installments => 46, :original_amount => @loan1.amount,
+                                                             :original_first_payment_date => "2009-12-28", :applied_on => "2009-12-22", 
+                                                             :original_disbursal_date => "2009-12-22", :applied_by => @manager, 
+                                                             :funding_line => @funding_line, :client => @client, :loan_product => @loan_product, 
+                                                             :approved_on => "2009-12-22", :approved_by => @manager, :disbursed_by => @manager,
+                                                             :taken_over_on_installment_number => 10, :taken_over_on => "2010-02-28", 
+                                                             :scheduled_disbursal_date => "2010-02-28", :amount => 8000, 
+                                                             :disbursal_date => "2010-02-28", :scheduled_first_payment_date => "2010-03-01"
+                                                             )
     @loan2.save.should be_true
     @loan2.errors.each {|e| puts e} unless @loan2.valid?
     @loan2.should be_valid
@@ -782,15 +793,10 @@ describe Loan do
 
   it "should repay properly" do
     # this test is failing.
-<<<<<<< HEAD
     @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, 
                      :scheduled_first_payment_date => "2000-12-06", 
                      :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", 
                      :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, 
-=======
-    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", 
-                     :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-14", :applied_by => @manager, :client => Client.get(@client.id), :funding_line => @funding_line, 
->>>>>>> takeoverness fixed
                      :loan_product => @loan_product, :approved_by => @manager, :approved_on => "2000-02-03")
     @loan.save
     fee =  Fee.create(:amount => 100, :name => "processing fee", :payable_on => :loan_disbursal_date)
@@ -805,12 +811,9 @@ describe Loan do
     @loan.disbursed_by = @manager
 
     r = @loan.repay(500, @user, @loan.scheduled_first_payment_date, @manager)
-<<<<<<< HEAD
     r[0].should == true
     r[3].type.should == :fees
     r[3].amount.should == 100
-=======
->>>>>>> takeoverness fixed
   end
 
   it "should not disburse if loan fees are not paid" do

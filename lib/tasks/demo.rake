@@ -35,8 +35,12 @@ namespace :mostfit do
             next unless l
             amount = lh[1] + lh[2]
             print "\t repaying loan id #{l.id} (#{i}/#{lhs.count}) with amount #{amount}..."
-            l.repay(amount, u, date, s, false, PRORATA_REPAYMENT_STYLE)
-            print "...done  (#{(Time.now - t).round} secs)\n"
+            begin
+              l.repay(amount, u, date, s, false, PRORATA_REPAYMENT_STYLE)
+              print "...done  (#{(Time.now - t).round} secs)\n"
+            rescue
+              print "....FAILED!"
+            end
           end
         end
       end

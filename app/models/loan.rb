@@ -100,6 +100,7 @@ class Loan
 
   property :staleness_frequency, Integer
 
+  property :c_client_group_id, Integer
   property :c_center_id, Integer
   property :c_branch_id, Integer
   property :c_scheduled_maturity_date, Date
@@ -209,6 +210,7 @@ class Loan
     t = Time.now
     self.c_center_id = self.client.center.id if force
     self.c_branch_id = self.client.center.branch.id if force
+    self.c_client_group_id = (self.client.center.client_group_id if force) or 0
     self.c_scheduled_maturity_date = scheduled_maturity_date
   end
 
@@ -484,9 +486,6 @@ class Loan
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
 
-    # if we disallow repayment of loans on a date before the date of the last actual payment
-    # then the reallocation logic becomes very clean as we do not have to worry about future payments.
-
     self.extend_loan
 
     # only possible if we get a hash or a single number.
@@ -536,10 +535,6 @@ class Loan
     # return the success boolean and the payment object itself for further processing
   end
 
-    # WARNING: For all these schemes, we have to ensure that payments are made in chronological order.
-    # i.e. if a payment is made on Jun 15th and then you attempt to make a payment on June 1st, there is no way for the 
-    # new payment to accurately calculate the pro_rata split.
-    # this is probably not an insurmountable problem, but we will live with this for the time being.
 
   def pay_prorata(total, received_on)
     # calculates total interest and principal payable in this amount and divides the amount proportionally
@@ -1176,6 +1171,7 @@ class Loan
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f,
         :branch_id                           => c_branch_id,
         :center_id                           => c_center_id,
+        :client_group_id                     => c_client_group_id,
         :created_at                          => now,
         :funding_line_id                     => funding_line_id,
         :loan_product_id                     => loan_product_id,

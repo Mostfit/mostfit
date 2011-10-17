@@ -317,9 +317,10 @@ module Merb
     end
 
     def centers_paying_today_collection(date)
-      Center.paying_today(session.user, date).reduce({}) do |h, c|
-        key   = "Branch: #{c.branch.name}"
-        value = [c.id.to_s, c.name]
+      branches = Branch.all.aggregate(:id, :name).to_hash
+      Center.paying_today(session.user, date).aggregate(:id, :name, :branch_id).reduce({}) do |h, c|
+        key   = "Branch: #{branches[c[2]]}"
+        value = [c[0].to_s, c[1]]
         (h[key] ||= []) << value
         h
       end

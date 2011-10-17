@@ -10,6 +10,6 @@
 =partial "centers/disbursals", {:loans_to_disburse => Loan.all(:client_id => @clients.map{|x| x.id}, :scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil), :center => @center, :branch => @center.branch, :date => @date}
 - if @center.meeting_day?(@date)
   %h2=I18n.t "center.payment.label", :default => "Repayments"
-  =partial "centers/payments", {:loans => Loan.all(:client_id => @clients.map{|x| x.id}), :clients => @clients_grouped, :branch => @center.branch, :center => @center, :date => @date}
+  =partial "centers/payments_new", {:loans => Loan.all(:client_id => @clients.map{|x| x.id}), :clients => @clients_grouped, :branch => @center.branch, :center => @center, :date => @date}
 - else
   %i=I18n.t "center.weeksheet.no_meeting", :default => "This day is not a meeting day"

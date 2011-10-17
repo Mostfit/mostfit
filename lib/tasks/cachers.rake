@@ -16,15 +16,13 @@ namespace :mostfit do
   namespace :caches do
     desc "finds and adds caches for dates that are in loan history but not in the caches"
     task :do_missing do
-      missing = BranchCache.missing
-      total = missing.values.flatten.count
+      missing = BranchCache.missing_dates.values.flatten.uniq
+      total = missing.count
       i = 0
-      missing.map do |k,v| 
-        v.each do |d| 
-          BranchCache.update(k,d) 
-          i += 1
-          puts "#{k}:#{d} (#{i}/#{total})"
-        end
+      missing.map do |date| 
+        i += 1
+        print "DOING #{date}  (#{i}/#{total})"
+        BranchCache.update(date) 
       end
     end
   end

@@ -33,24 +33,6 @@ Spec::Runner.configure do |config|
   end
 end
 
-def load_fixtures(*files)
-  DataMapper.auto_migrate! if Merb.orm == :datamapper
-  (repository.adapter.query("show tables") - ["payments", "journals", "postings"]).each{|t| repository.adapter.execute("alter table #{t} ENGINE=MYISAM")}
-  files.each do |name|
-    klass = Kernel::const_get(name.to_s.singularize.camel_case)
-    yml_file =  "spec/fixtures/#{name}.yml"
-    entries = YAML::load_file(ERB.new(Merb.root / yml_file).result)
-    entries.each do |name, entry|
-      k = klass::new(entry)
-      k.history_disabled = true if k.class == Loan  # do not update the hisotry for loans
-      k.client_type = ClientType.first if k.class==Client
-      unless (klass==RuleBook and k.save!) or k.save
-        puts "Validation errors saving a #{klass} (##{k.id}):"
-        p k.errors
-      end
-    end
-  end
-end
 
 class MockLog
   def info(data)

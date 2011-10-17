@@ -61,7 +61,7 @@
           %span.number-hint 
             = nd
           %br
-          - sg = Loan.all(:write_off_rejected_on => nil, :written_off_on => nil, :suggested_written_off_on.lte => Date.today).size
+          - sg = Loan.all(:write_off_rejected_on => nil, :written_off_on => nil, :suggested_written_off_on.lte => Date.today).count
           = link_to_with_rights("Write Off Loans", url(:loan_actions, :action => 'write_off_suggested'), :class => 'edit_small')
           %span.number-hint
             = sg

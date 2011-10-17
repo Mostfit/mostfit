@@ -1,0 +1,113 @@
+%table{:style => "margin:auto; border: solid 1px #777;"}
+  %tr{:style => "border: solid 1px black; background: lightyellow"}
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.on_name", :default => "on name"
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.loan_id", :default => "loan id"
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.amount", :default => "amount"
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.outstanding", :default => "outstanding"
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.disbursed_on", :default => "disbursed on" 
+    %th{:rowspan => "2"}=I18n.t "center.payment.table.installment", :default => "installment" 
+    %th{:colspan => 2, :style => "border: solid black 1px"}=I18n.t "center.payment.table.principal", :default => "principal"
+    %th{:colspan => 2, :style => "border: solid black 1px"}=I18n.t "center.payment.table.interest", :default => "intrest"
+    %th{:colspan => 2, :style => "border: solid black 1px;"}=I18n.t "center.payment.table.fee", :default => "fee"
+    %th{:colspan => 2, :style => "border: solid black 1px;"}=I18n.t "center.payment.table.total", :default => "total"
+  %tr{:style => "border: solid 1px black;"}
+    %th.due.left-numeric=I18n.t "center.payment.table.due", :default => "due"
+    %th.paid.right-numeric=I18n.t "center.payment.table.paid", :default => "paid" 
+    %th.due.left-numeric=I18n.t "center.payment.table.due", :default => "due"
+    %th.paid.right-numeric=I18n.t "center.payment.table.paid", :default => "paid"
+    %th.due.left-numeric=I18n.t "center.payment.table.due", :default => "due" 
+    %th.paid.right-numeric=I18n.t "center.payment.table.paid", :default => "paid"
+    %th.due.left-numeric=I18n.t "center.payment.table.due", :default => "due"
+    %th.paid.right-numeric=I18n.t "center.payment.table.paid", :default => "paid"
+  %tbody
+    - histories = LoanHistory.latest({:center_id => @center.id, :status => [:disbursed, :outstanding]}, @date)
+    - tot_amount, tot_outstanding, tot_installments, tot_principal_due, tot_principal_paid, tot_interest_due, tot_interest_paid, tot_fee_due, tot_fee_paid, tot_total_due, tot_total_paid = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    - num_loans_to_pay = num_fees_to_pay = 0
+    - grouped_histories = histories.group_by{|h| h.client_group_id}
+    - grouped_histories.keys.sort.each do |group_id, client_id|
+      %tr.group{:style => 'font-weight: bold; text-align: center; background: #cfcfcf'}
+        %td{:colspan => 6}
+          =(group = ClientGroup.get(group_id)) ? group.name : "none"
+        %td.left-numeric.due
+        %td.right-numeric.paid
+        %td.left-numeric.due
+        %td.right-numeric.paid
+        %td.left-numeric.due
+        %td.right-numeric.paid
+        %td.left-numeric.due
+        %td.right-numeric.paid
+
+      - grp_amount, grp_outstanding, grp_installments, grp_principal_paid, grp_principal_due, grp_interest_due, grp_interest_paid, grp_fee_due, grp_fee_paid, grp_total_due, grp_total_paid = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      - grouped_histories[group_id].each do |lh|
+        / Initialize some often used variables
+        - client = lh.client; loan = lh.loan; pdue = lh.principal_due; ppaid = lh.principal_paid;
+        - idue = lh.interest_due; ipaid = lh.interest_paid; fee_due = lh.fees_due_today; fee_paid = lh.fees_paid_today
+        %tr{ :class => cycle('odd','even') }
+          - fee = 0
+          %td
+            %b= link_to client.name, resource(branch, center, client)            
+          %td
+            = link_to lh.loan_id, url(:quick_link, "loans", lh.loan_id)
+          %td
+            %b= (i = loan.amount).to_currency
+            - tot_amount += i; grp_amount += i
+          %td
+            %b= (i = lh.actual_outstanding_principal).to_currency
+            - tot_outstanding += i; grp_outstanding += i
+          %td
+            = loan.disbursal_date.to_s
+          %td
+            = (i = loan.number_of_installments_before(date))
+            - tot_installments += i; grp_installments += i
+          %td.left-numeric.due
+            = pdue.to_currency
+            - tot_principal_due += pdue; grp_principal_due += pdue
+          %td.right-numeric.paid
+            = ppaid.to_currency
+            - tot_principal_paid += ppaid; grp_principal_paid += ppaid
+          %td.left-numeric.due
+            = idue.to_currency
+            - tot_interest_due += idue; grp_interest_due += idue
+          %td.right-numeric.paid
+            = ipaid.to_currency
+            - tot_interest_paid += ipaid; grp_interest_paid += ipaid
+          %td.left-numeric.due
+            = fee_due.to_currency
+            - tot_fee_due += fee_due; grp_fee_due += fee_due; num_fees_to_pay += 1 if fee_due > 0
+          %td.right-numeric.paid
+            = fee_paid.to_currency
+            - tot_fee_paid += fee_paid; grp_fee_paid += fee_paid
+          %td.left-numeric.due
+            = (pdue + idue + fee_due).to_currency
+            - tot_total_due += (pdue + idue + fee_due); grp_total_due += (pdue + idue + fee_due)
+          %td.right-numeric.paid
+            = (ppaid + ipaid + fee_paid).to_currency
+            - tot_total_paid += (ppaid + ipaid + fee_paid); grp_total_paid += (ppaid + ipaid + fee_paid)
+      %tr{:style => 'border-bottom: 2px solid; border-top: 1px solid;' }  
+        %td{:colspan => 2}
+        %td.numeric
+          %b= grp_amount.to_currency
+        %td.numeric
+          %b= grp_outstanding.to_currency
+        %td{:colspan => 2}
+        %td.left-numeric.due
+          %b= grp_principal_due.to_currency
+        %td.right-numeric.paid
+          %b= grp_principal_paid.to_currency
+        %td.left-numeric.due
+          %b= grp_interest_due.to_currency
+        %td.right-numeric.paid
+          %b= grp_interest_paid.to_currency
+        %td.left-numeric.due
+          %b= grp_fee_due.to_currency
+        %td.right-numeric.paid
+          %b= grp_fee_paid.to_currency
+        %td.left-numeric.due
+          %b= grp_total_due.to_currency
+        %td.right-numeric.paid
+          %b= grp_total_paid.to_currency
+      %tr{:style => 'border-bottom: 2px solid; border-top: 1px solid;' }  
+
+  %tfoot    
+    %tr
+      %td{ :colspan => 15}  
