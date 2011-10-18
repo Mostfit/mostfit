@@ -77,7 +77,9 @@ class HolidayCalendar
   def remove_holiday(holiday)
     holiday = Holiday.get(holiday) unless holiday.is_a? Holiday
     @old_holidays ||= holidays
-    self.holidays_fors = self.holidays_fors.select{|hf| hf.holiday != holiday}
+    HolidaysFor.first(:holiday_calendar => self, :holiday => holiday).destroy
+    reload
+    update_loan_history
   end
 
   private
