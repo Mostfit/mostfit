@@ -282,38 +282,6 @@ module DmPagination
     end
   end
 end
-<<<<<<< Updated upstream
-||||||| merged common ancestors
-
-
-def get_bulk_insert_sql(table_name, data)
-  t = Time.now
-  keys = data.first.keys
-  sql = "INSERT INTO #{table_name}(#{keys.join(',')} )
-              VALUES "
-  values = []
-  data.each do |row|
-    value = keys.map do |k| 
-      v = row[k]
-      if v.class == Date
-        "'#{v.strftime('%Y-%m-%d')}'"
-      elsif v.class == DateTime
-        "'#{v.strftime('%Y-%m-%d %H:%M:%S')}'"
-      elsif row[k].class == String
-        "'#{v}'"
-      else
-        v
-      end
-    end
-    values << "(#{value.join(',')})
-              "
-  end
-  sql += values.join(",") + ";"
-  Merb.logger.info "sql statement crafted in #{Time.now - t}"
-  sql
-end
-
-=======
 
 
 def get_bulk_insert_sql(table_name, data)
@@ -365,4 +333,4 @@ class Nothing
     nil
   end
 end
->>>>>>> Stashed changes
+
