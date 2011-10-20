@@ -1,0 +1,55 @@
+= partial :form
+- journals_by_date = @data[:journals_by_date]
+- dates = journals_by_date.keys
+%table.report.nojs
+  %thead
+    %tr
+      %th
+        Created
+      %th
+        Type
+      %th
+        Narration
+      %th
+        Ledger
+      %th
+        Dr.
+      %th
+        Cr.
+  %tbody
+    - dates.sort.each do |date|
+      - debit_totals = 0; credit_totals = 0
+      %tr
+        %th{:colspan => 7, :align => "center"}
+          = "On #{date}"
+      - journals = journals_by_date[date]
+      - journals.each do |jl|
+        - postings = jl.postings
+        - pcount = postings.count + 1
+        %tr
+          %td{:rowspan => pcount}
+            = jl.created_at
+          %td{:rowspan => pcount}
+            = jl.journal_type.name if jl.journal_type
+          %td{:rowspan => pcount}
+            = jl.comment
+        - postings.each do |p|
+          - account = Account.get(p.account_id)
+          - debit_amount = p.amount < 0 ? p.amount : nil
+          - debit_totals += debit_amount if debit_amount
+          - credit_amount = p.amount > 0 ? p.amount : nil
+          - credit_totals += credit_amount if credit_amount
+          %tr
+            %td
+              = account.name if account
+            %td
+              = debit_amount.abs.round(2) if debit_amount
+            %td
+              = credit_amount.abs.round(2) if credit_amount
+      %tr
+        %th{:colspan => 4, :align => "right"}
+          = "Totals for #{date}"
+        %th
+          = debit_totals.abs.round(2)
+        %th
+          = credit_totals.abs.round(2)
