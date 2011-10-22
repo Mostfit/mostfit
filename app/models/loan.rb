@@ -100,24 +100,24 @@ class Loan
 
   property :staleness_frequency, Integer
 
-  property :c_client_group_id, Integer
-  property :c_center_id, Integer
-  property :c_branch_id, Integer
-  property :c_scheduled_maturity_date, Date
-  property :c_maturity_date, Date
-  property :c_actual_first_payment_date, Date
-  property :c_last_status, Integer
-  property :c_principal_received, Float
-  property :c_interest_received, Float
-  property :c_last_payment_received_on, Date
-  property :c_last_payment_id, Integer
-  property :c_stale?, Boolean
+  property :c_client_group_id,                   Integer, :index => true
+  property :c_center_id,                         Integer, :index => true
+  property :c_branch_id,                         Integer, :index => true
+  property :c_scheduled_maturity_date,           Date
+  property :c_maturity_date,                     Date
+  property :c_actual_first_payment_date,         Date
+  property :c_last_status,                       Integer
+  property :c_principal_received,                Float
+  property :c_interest_received,                 Float
+  property :c_last_payment_received_on,          Date
+  property :c_last_payment_id,                   Integer
+  property :c_stale?,                            Boolean
   
-  property :converted, Boolean
+  property :converted,                           Boolean
 
   # associations
   belongs_to :client
-  belongs_to :funding_line, :nullable => true
+  belongs_to :funding_line,              :nullable => true
   belongs_to :loan_product
   belongs_to :loan_purpose,              :nullable  => true
   belongs_to :occupation,                :nullable => true

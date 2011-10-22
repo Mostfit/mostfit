@@ -67,26 +67,41 @@ namespace :mostfit do
          })
     end
 
+    # the following three tasks make it easy to create a massive database from a small one.
+    # simply create a dummy database
+    # then
+    # rake mostfit:db:copy_tables[dummy]      - copies the relevant tables to the dummy database
+    # rake mostfit:db:up_ids[dummy]           - bumps ids on the tables in the dummy database
+    # rake mostfit:db:copy_tables_back[dummy] - merges the tables from the dummy database into your database.
 
-    desc "copies financial tables from new_layout"
+    # by this point, the database should have doubled in size.
+    # repeat!
+
+    desc "copies financial tables to a new database"
     task :copy_tables, :database do |task, args|
       db = args[:database]
       tables = %w{branches centers clients loans payments loan_history funders funding_lines users staff_members areas regions comments client_groups occupations applicable_fees repayment_styles loan_products insurance_policies fees}
       tables.each do |t|
-        repository.adapter.execute("drop table if exists #{t}")
-        repository.adapter.execute("create table #{t} select * from #{db}.#{t}")
+        puts "dropping table #{db}.#{t}"
+        repository.adapter.execute("drop table if exists #{db}.#{t}")
+        puts "copying #{t} to #{db}.#{t}"
+        repository.adapter.execute("create table #{db}.#{t} select * from #{t}")
       end
     end
 
     desc "increases ids by max(id) to easily copy back into legacy database"
-    task :up_ids do
+    task :up_ids, :database do |task, args|
+      db = args[:database]
       max = {:branches => nil, :centers => nil, :clients => nil, :loans => nil, :payments => nil, :client_groups => nil}
       # get the max id for each table
-      max.keys.each {|k| max[k] = repository.adapter.query("select max(id) from #{k.to_s}")[0]}
+      max.keys.each {|k| max[k] = repository.adapter.query("select max(id) from #{db}.#{k.to_s}")[0]}
       max.each{|k,v| puts "#{k}:#{v}"}
 
       # update the ids
-      max.keys.each {|k| repository.adapter.execute("update #{k.to_s} set id = id + #{max[k]}")}
+      max.keys.each {|k| 
+        puts "up-ing ids for #{db}.#{k.to_s}"
+        repository.adapter.execute("update #{db}.#{k.to_s} set id = id + #{max[k]}")
+      }
       
       #update the children
       update = {:centers => [:branch], :clients => [:center, :client_group], :client_groups => [:center],
@@ -95,7 +110,8 @@ namespace :mostfit do
       update.each do |k,v|
         v.each do |f|
           max_key = f.to_s.match(/^c_/) ? f.to_s.split("_")[1].pluralize.to_sym : f.to_s.pluralize.to_sym
-          repository.adapter.execute("update #{k.to_s} set #{f.to_s}_id = #{f.to_s}_id + #{max[max_key]}")
+          puts "\t updating children for #{db}.#{k.to_s}"
+          repository.adapter.execute("update #{db}.#{k.to_s} set #{f.to_s}_id = #{f.to_s}_id + #{max[max_key]}")
         end
       end
     end
@@ -105,8 +121,17 @@ namespace :mostfit do
       db = args[:database]
       tables = %w{branches centers clients loans payments loan_history}
       tables.each do |t|
-        repository.adapter.execute("insert into #{db}.#{t} select * from #{t}")
+        puts "copying #{db}.#{t} to #{t}"
+        repository.adapter.execute("insert into #{t} select * from #{db}.#{t}")
       end
+    end
+
+    desc "does all three tasks above"
+    task :fatten_db, :database do |task, args|
+      db_name = args[:database]
+      #mostfit:db:copy_tables').invoke(db_name)
+      #Rake::Task('mostfit:db:up_ids').invoke(db_name)
+      #Rake::Task('mostfit:db:').invoke(db_name)
     end
 
   end

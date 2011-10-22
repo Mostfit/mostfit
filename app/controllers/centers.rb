@@ -13,8 +13,7 @@ class Centers < Application
   end
 
   def list
-    @centers = @centers ? @centers.all(:meeting_day => params[:meeting_day]||Date.today) : @branch.centers_with_paginate({:meeting_day => params[:meeting_day]}, 
-                                                                                                                         session.user)
+    @centers = @centers ? @centers.all(:meeting_day => params[:meeting_day]||Date.today) : @branch.centers_with_paginate({:meeting_day => params[:meeting_day]}, session.user)
     partial "centers/list", :layout => layout?
   end
 
