@@ -73,6 +73,7 @@ class Exceptions < Merb::Controller
       render
     end    
   end
+
  
   #get list of errors handle 
   def index

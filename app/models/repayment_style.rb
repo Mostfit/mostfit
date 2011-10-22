@@ -18,6 +18,12 @@ class RepaymentStyle
     style
   end
 
+  def self.from_csv(row, headers)
+    obj = new([:name, :style, :round_total_to, :round_interest_to, :active, :rounding_style, :force_num_installments, :custom_principal_schedule, :custom_interest_schedule].map{|k| [k,row[headers[k]]] if headers[k]}.compact.to_hash)
+    [obj.save, obj]
+
+  end
+
   def convert_blank_to_nil
     self.attributes.each{|k, v|
       if v.is_a?(String) and v.empty? and (self.class.send(k).type == Integer or self.class.send(k).type == Float)

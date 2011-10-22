@@ -11,7 +11,12 @@ namespace :excel do
     excel.sheets.each{|sheet|
       puts sheet
       excel.default_sheet=sheet
-      excel.to_csv(File.join("uploads", args.directory, sheet))
+      if File.exists?(File.join("uploads",args.directory, sheet))
+        puts "extracting sheet #{sheet}"
+        excel.to_csv(File.join("uploads", args.directory, sheet))
+      else
+        puts "skipping #{sheet}"
+      end
     }
   end
 end

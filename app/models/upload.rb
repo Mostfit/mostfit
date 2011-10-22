@@ -22,7 +22,8 @@ class Upload
   end
 
   def load_csv(log=nil, erase=false)
-    models = [StaffMember, Branch, Center, ClientGroup, Client, FundingLine, LoanProduct, Loan, Payment]
+    debugger
+    models = [StaffMember, Branch, RepaymentStyle, FundingLine, LoanProduct, Center, ClientGroup, Client,  Loan, Payment]
     funding_lines, loans = {}, {}
     User.all.each{|u|
       u.destroy if not u.login=="admin"

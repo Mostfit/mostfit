@@ -9,7 +9,12 @@ def to_csv(directory, filename)
   excel.sheets.each{|sheet|
     puts sheet
     excel.default_sheet=sheet
-    excel.to_csv(File.join("uploads", directory, sheet))
+      unless File.exists?(File.join("uploads",directory, sheet))
+        puts "extracting sheet #{sheet}"
+        excel.to_csv(File.join("uploads", directory, sheet))
+      else
+        puts "skipping #{sheet}"
+      end
   }
 end
 puts ARGV

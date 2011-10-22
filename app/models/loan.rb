@@ -256,6 +256,7 @@ class Loan
               :approved_by_staff_id => StaffMember.first(:name => row[headers[:approved_by_staff]]).id,
               :client => Client.first(:reference => row[headers[:client_reference]]))
     obj.history_disabled=true
+    debugger
     [obj.save, obj]
   end
 

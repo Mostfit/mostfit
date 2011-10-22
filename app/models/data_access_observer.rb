@@ -47,7 +47,8 @@ class DataAccessObserver
   end
 
   def self.check_session(obj)
-    return true if Merb.environment == "test"
+    return true unless Merb.environment == "production"
+    return true if Mfi.first.system_state == :migration
     return true if File.writable?("config.ru") and not @_user
     @_user = User.authenticate(ENV['MOSTFIT_USER'], ENV['MOSTFIT_PASSWORD'])    unless @_user
     privileged = @_user and @_user.is_manager_of?(obj)
@@ -83,7 +84,9 @@ class DataAccessObserver
   end
   
   before :destroy! do
-    raise NotPrivileged
+    # the destroy! method goes direct to the data store and so bypasses all validations
+    # obviously this is not acceptable except when system state is :migration
+    raise NotPrivileged unless Mfi.first.system_state == :migration
   end
 
 end

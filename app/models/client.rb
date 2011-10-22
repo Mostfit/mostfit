@@ -161,8 +161,8 @@ class Client
     client_type     = ClientType.first||ClientType.create(:type => "Standard")
     grt_date        = row[headers[:grt_date]] ? Date.parse(row[headers[:grt_date]]) : nil
     obj             = new(:reference => row[headers[:reference]], :name => row[headers[:name]], :spouse_name => row[headers[:spouse_name]],
-                          :date_of_birth => Date.parse(row[headers[:date_of_birth]]), :address => row[headers[:address]], :date_joined => row[headers[:date_joined]],
-                          :center => center, :grt_pass_date => grt_date, :created_by => User.first,
+                          :date_of_birth => Date.parse(row[headers[:date_of_birth]]), :address => row[headers[:address]], 
+                          :date_joined => row[headers[:date_joined]], :center => center, :grt_pass_date => grt_date, :created_by => User.first,
                           :client_group => client_group, :client_type => client_type)
     [obj.save, obj]
   end
