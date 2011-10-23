@@ -1,14 +1,63 @@
 class Upload
-  attr_accessor :log, :directory, :filename
+  include DataMapper::Resource
+  attr_accessor :log, :state_detail_hash
 
-  def initialize(filename, uid=nil)
-    @directory = uid||UUID.generate
-    @filename  = filename
+  property :id,           Serial
+  property :filename,     String
+  property :directory,    String
+  property :md5sum,       String, :unique => true
+  property :state,        Enum[:new, :uploaded, :extracted, :processing, :complete]
+  property :state_detail, Text # state_detail is a hash like {:clients => {:last_id => 234, :more_info => "more info"}...}
+
+  property :created_at,   DateTime
+  property :updated_at,   DateTime
+
+  belongs_to :user
+
+  before :valid? do 
+    self.directory ||= UUID.generate
+    self.state ||= :new
+    self.state_detail = Marshal.dump(@state_detail_hash)
   end
 
+  before :create do
+  end
+
+  def self.make(params)
+    # our intializer parses the params and moves the tempfile to a sane location
+    debugger
+    require 'digest/md5'
+    md5sum = Digest::MD5.hexdigest(params[:file][:tempfile].read)
+    u = Upload.first_or_new(:filename => params[:file][:filename], :user => params[:user], :md5sum => md5sum)
+    u.save if u.new?
+    u.move(params[:file][:tempfile].path)
+  end
+
+  def get_state
+    # checks if the file actually exists
+    File.exists?(my_file) ? state : "deleted"
+  end
+
+  def read
+    File.read(my_file)
+  end
+
+  def my_file
+    # shortcut
+    File.join(Merb.root, "uploads", directory, filename)
+  end
+
+  def details
+    # use this method to check the details as it serializes the state_details object
+    @state_detail_hash ||= Marshal.load(self.state_detail)
+  end
+  
   def move(tempfile)
+    # moves the tempfile to a nice location
     File.makedirs(File.join(Merb.root, "uploads", directory))
     FileUtils.mv(tempfile, File.join(Merb.root, "uploads", directory, filename))
+    self.state = :uploaded
+    self.save
   end
 
   def self.find(directory)
@@ -17,8 +66,23 @@ class Upload
     }.compact
   end
 
+  def continue
+    # picks up where we left off last time
+    while self.state != :complete
+      debugger
+      if state == :uploaded
+        process_excel_to_csv
+      elsif state == :extracted
+        load_csv
+      end
+    end
+  end
+
   def process_excel_to_csv
     `ruby lib/tasks/excel.rb #{directory} #{filename}`
+    debugger
+    self.state = :extracted
+    self.save
   end
 
   def load_csv(log=nil, erase=false)
@@ -33,7 +97,7 @@ class Upload
         model.all.destroy!
         log.info("Destroying old records for #{model.to_s.plural} (if any)") if log
       end
-      next unless File.exists?(File.join(Merb.root, "uploads", @directory, model.to_s.snake_case.pluralize))
+      next unless File.exists?(File.join(Merb.root, "uploads", directory, model.to_s.snake_case.pluralize))
       log.info("Creating #{model.to_s.plural}") if log
       headers = {}
       FasterCSV.open(File.join(Merb.root, "uploads", @directory, model.to_s.snake_case.pluralize), "r").each_with_index{|row, idx|

@@ -4,19 +4,6 @@ class Admin < Application
     render
   end
 
-  def upload 
-    erase = params.has_key?(:erase)
-    if params[:file] and params[:file][:filename] and params[:file][:tempfile]
-      file      = Upload.new(params[:file][:filename])
-      file.move(params[:file][:tempfile].path)
-      Process.fork{
-        `rake 'mostfit:upload[#{file.directory}, #{file.filename}, #{erase.to_s}]'`
-      }
-      redirect "/admin/upload_status/#{file.directory}"
-    else
-      render
-    end
-  end
 
   def upload_status        
     render

@@ -42,8 +42,8 @@ class Searches < Application
     end
     q = q.merge({:order => [:name]})
     q = q.merge(:limit => 25, :offset => (params[:page].to_i - 1) * 25) if params[:page]
-    @list = model.all(q)
-    @list.map{|l| {:value => l.id,:label => l.name}}.to_json
+    fn = params[:as] ? "to_#{params[:as]}" : "all"
+    @list = model.send(fn,q).to_json
   end
 
   def advanced
