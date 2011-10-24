@@ -1,7 +1,7 @@
 Mostfit: an MIS for MFIs
 ========================
 
-This software is build using the Ruby programming language, on top of the Merb web framework and the DataMapper ORM. Mostfit takes a minimal approach, it basically creates the application in the most generic form, yet fully usable for the needs of our clients and beyond. You can [see our demo](http://mostfit.intellecap.in).
+This software is build using the [Ruby](http://ruby-lang.org) programming language, on top of the Merb web framework and the DataMapper ORM. Mostfit takes a minimal approach, it basically creates the application in the most generic form, yet fully usable for the needs of our clients and beyond. You can [see our demo](http://mostfit.intellecap.in).
 
 
 ## Philosophy
