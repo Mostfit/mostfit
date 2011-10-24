@@ -210,7 +210,7 @@ class Loan
     t = Time.now
     self.c_center_id = self.client.center.id if force
     self.c_branch_id = self.client.center.branch.id if force
-    self.c_client_group_id = (self.client.center.client_group_id if force) or 0
+    self.c_client_group_id = (self.client.client_group_id if force) or 0
     self.c_scheduled_maturity_date = scheduled_maturity_date
   end
 
