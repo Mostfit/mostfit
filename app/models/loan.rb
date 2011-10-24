@@ -1182,6 +1182,7 @@ class Loan
         :branch_id                           => c_branch_id,
         :center_id                           => c_center_id,
         :client_group_id                     => c_client_group_id || 0,
+        :client_id                           => client.id,
         :created_at                          => now,
         :funding_line_id                     => funding_line_id,
         :loan_product_id                     => loan_product_id,
