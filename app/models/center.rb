@@ -107,18 +107,18 @@ class Center
   def next_meeting_date_from(date)    
     number = get_meeting_date(date, :next)
     if meeting_day != :none and (date + number - get_meeting_date(date + number, :previous)).cweek == (date + number).cweek
-      (date + number + get_meeting_date(date + number, :next)).holiday_bump
+      (date + number + get_meeting_date(date + number, :next))
     else
-      (date + number).holiday_bump
+      (date + number)
     end
   end
 
   def previous_meeting_date_from(date)
     number = get_meeting_date(date, :previous)
     if meeting_day != :none and (date - number - get_meeting_date(date - number, :previous)).cweek == (date - number).cweek
-      (date - number - get_meeting_date(date - number, :previous)).holiday_bump
+      (date - number - get_meeting_date(date - number, :previous))
     else
-      (date - number).holiday_bump
+      (date - number)
     end
   end
 

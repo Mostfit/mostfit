@@ -1047,8 +1047,8 @@ class Loan
     ensure_meeting_day = false
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
-    @_installment_dates = (0..(actual_number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
-    @_installment_dates = @_installment_dates.map{|d| self.holidays[d] ? self.holidays[d].new_date : d}
+    ids = (0..(actual_number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
+    @_installment_dates = ids.map{|d| self.holidays[d] ? self.holidays[d].new_date : d}
     
   end
 
@@ -1101,10 +1101,9 @@ class Loan
       [k,amt]
     end.to_hash
     ap_fees = fee_schedule.map{|k,v| [k,v.values.sum]}.to_hash
-
-    dates = (([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on, scheduled_first_payment_date] + installment_dates).map{|d|
+    dates = (([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on, scheduled_first_payment_date]).map{|d|
                (self.holidays[d] ? self.holidays[d].new_date : d)
-             } + payment_dates).compact.uniq.sort
+             } +  installment_dates + payment_dates).compact.uniq.sort
 
     total_principal_due = total_interest_due = total_principal_paid = total_interest_paid = 0
 

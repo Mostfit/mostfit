@@ -60,19 +60,24 @@ class Date
   end
 
   def holiday_bump(direction = nil)
-    hols = $holidays
-    new_date = self
-    return new_date unless hols
-    while hols.keys.include?(new_date)
-      direction ||= hols[new_date].shift_meeting
-      case direction
-        when :before
-          new_date -= 1 
-        when :after
-          new_date += 1
-      end
-    end
-    return new_date
+    # this is deprecated.
+    # we no longer bump holidays. for each holiday we replace the date with the new date
+    # and so we never have to call this function.
+    # to deprecte, simple return the original date
+    return self
+    # hols = $holidays
+    # new_date = self
+    # return new_date unless hols
+    # while hols.keys.include?(new_date)
+    #   direction ||= hols[new_date].shift_meeting
+    #   case direction
+    #     when :before
+    #       new_date -= 1 
+    #     when :after
+    #       new_date += 1
+    #   end
+    # end
+    # return new_date
   end  
   
   def holidays_shifted_today
