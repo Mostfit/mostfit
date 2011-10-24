@@ -135,10 +135,10 @@ class Loan
   belongs_to :verified_by,               :child_key => [:verified_by_user_id],                :model => 'User'
   belongs_to :repayment_style
 
-  belongs_to :organization, :parent_key => [:org_guid], :child_key => [:parent_org_guid], :required => false  
+  belongs_to :organization, :parent_key => [:org_guid], :child_key => [:parent_org_guid], :nullable => true  
   property   :parent_org_guid, String, :nullable => true
   
-  belongs_to :domain, :parent_key => [:domain_guid], :child_key => [:parent_domain_guid], :required => false
+  belongs_to :domain, :parent_key => [:domain_guid], :child_key => [:parent_domain_guid], :nullable => true
   property   :parent_domain_guid, String, :nullable => true
 
   has n, :loan_history,                                                                       :model => 'LoanHistory'
@@ -147,7 +147,7 @@ class Loan
   has n, :portfolio_loans
   has 1, :insurance_policy
   has n, :applicable_fees,    :child_key => [:applicable_id], :applicable_type => "Loan"
-  has n, :accruals, :required => false
+  has n, :accruals
   #validations
 
   validates_present      :client, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on

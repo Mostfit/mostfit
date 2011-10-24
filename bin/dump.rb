@@ -10,7 +10,10 @@ mostfit_dir = File.expand_path(ARGV[0]) rescue Dir.pwd
 
 config  = YAML.load_file(File.join(mostfit_dir, 'config', 'database.yml'))
 db_name = config['production']['database']
+
+username = config['production']['username']
 password = config['production']['password']
+
 d = DateTime.now
 dump_name = "#{File.basename(mostfit_dir)}-dump-#{d.strftime('%F-%H:%M')}.sql"
 dump_path = File.join(mostfit_dir, dump_name)

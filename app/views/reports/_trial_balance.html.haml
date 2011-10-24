@@ -1,0 +1,64 @@
+= partial :form
+- accounts_and_balances = @data
+- accounts = accounts_and_balances.keys
+- assets = accounts.select { |acc| acc.get_account_type == ASSETS }
+- liabilities = accounts.select {|acc| acc.get_account_type == LIABILITIES }
+- incomes = accounts.select {|acc| acc.get_account_type == INCOMES }
+- expenses = accounts.select {|acc| acc.get_account_type == EXPENSES }
+- ordered_account_types = [ "Assets", "Liabilities", "Incomes", "Expenses" ]
+- accounts_by_type = { "Assets" => assets, "Liabilities" => liabilities, "Incomes" => incomes, "Expenses" => expenses }
+- total_debit_balances = 0.0
+- total_credit_balances = 0.0
+- table_width = 3
+- figures_column_width = "10%"
+%table.report.nojs
+  %thead
+    %tr.header
+      %th
+        Account
+      %th{:width => figures_column_width}
+        Debit balance
+      %th{:width => figures_column_width}
+        Credit balance
+  %tbody
+    - ordered_account_types.each do |account_type|
+      %tr
+        %th{:colspan => table_width}
+          = account_type
+      - typed_accounts = accounts_by_type[account_type]
+      - type_credit_balances = 0.0; type_debit_balances = 0.0
+      - unless typed_accounts.empty?
+        - typed_accounts.each do |account|
+          - balances = accounts_and_balances[account]
+          - debit_balance = balances.first
+          - type_debit_balances += debit_balance if debit_balance
+          - credit_balance = balances.last
+          - type_credit_balances += credit_balance if credit_balance
+          %tr
+            %td
+              = account.name
+            %td
+              = debit_balance ? debit_balance.abs.round(2) : "-"
+            %td
+              = credit_balance ? credit_balance.abs.round(2) : "-"
+        - total_debit_balances += type_debit_balances
+        - total_credit_balances += type_credit_balances
+        %tr
+          %th
+            = "Total balances for #{account_type}"
+          %th
+            = type_debit_balances.abs.round(2)
+          %th
+            = type_credit_balances.abs.round(2)
+      - else
+        %tr
+          %td{:colspan => table_width, :align => "left" }
+            = "No accounts that are #{account_type}"
+  %thead
+    %tr.header
+      %th
+        Totals
+      %th
+        = total_debit_balances.abs.round(2)
+      %th
+        = total_credit_balances.abs.round(2)
