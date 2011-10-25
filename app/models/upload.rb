@@ -106,6 +106,18 @@ class Upload
         next
       end
       log.info("Creating #{model.to_s.plural}")
+
+      # first find out which fields are required to be unique
+      # we read them first so as not to waste time on entries already in the database
+      _o =  (model.send(:properties).map{|x| x.name if x.unique?}.compact - [:id])                                  # all unique properties
+      _o += model.validators.first[1].map{|x| x.field_name if x.is_a? DataMapper::Validate::UniquenessValidator}.compact    # all Uniqueness validator fieldnames
+      unique_field = _o[0]
+      log.info(unique_field ? unique_field.to_s : "No unique field")
+      log.error("Atleast one property in #{model} must be unique") unless unique_field
+      break
+      # get the uniques
+      uniques = model.all.aggregate(unique_field)
+      
       headers = {}
       FasterCSV.open(File.join(Merb.root, "uploads", @directory, model.to_s.snake_case.pluralize), "r").each_with_index{|row, idx|
         if idx==0
@@ -113,6 +125,10 @@ class Upload
             headers[name.downcase.gsub(' ', '_').to_sym] = index
           }
         else
+          if uniques.include?(row[headers[unique_field]])
+            log.info("Skipping unique #{row[headers[unique_field]]}")
+            next
+          end
           begin
             status, record = 
               if model == Loan

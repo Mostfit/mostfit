@@ -4,7 +4,7 @@ class RepaymentStyle
   before :save, :convert_blank_to_nil
 
   property :id,       Serial
-  property :name,     String
+  property :name,     String, :unique => true
   property :style,    String
   property :round_total_to, Integer
   property :round_interest_to, Integer
