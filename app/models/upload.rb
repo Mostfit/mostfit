@@ -126,7 +126,10 @@ class Upload
             if status
               #Storing funding lines and loans for serial number reference
               funding_lines[row[headers[:serial_number]]] = record if model==FundingLine
-              loans[row[headers[:serial_number]]]         = record if model==Loan
+              if model==Loan
+                loans[row[headers[:serial_number]]]         = record 
+                record.update_history
+              end
               log.info("Created #{idx-99} - #{idx+1}. Some more left")    if idx%100==99
             else
               log.error("<font color='red'>#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors.to_a.join(', ')}</font>") if log

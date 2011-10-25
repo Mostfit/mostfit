@@ -37,6 +37,7 @@ class Center
   validates_length      :code, :min => 1, :max => 12
 
   validates_length      :name, :min => 3
+  validates_is_unique   :name
   validates_present     :manager
   validates_present     :branch
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
