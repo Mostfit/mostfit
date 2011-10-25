@@ -4,6 +4,7 @@ class LoanProduct
 
   property :id, Serial, :nullable => false, :index => true
   property :name, String, :nullable => false, :index => true, :min => 3
+#  property :reference, String
   property :max_amount, Integer, :nullable => false, :index => true
   property :min_amount, Integer, :nullable => false, :index => true
   property :amount_multiple, Float, :nullable => false, :index => true, :default => 1, :min => 0.01
@@ -51,6 +52,10 @@ class LoanProduct
   validates_is_unique   :name
   validates_is_number   :max_amount, :min_amount
   # validates_with_method :check_loan_type_correctness
+
+  # while migrating, we have to provde a reference for every data point
+  # this is for reasons of sanity.
+  # validates_present :reference, :if => Proc.new{|t| Mfi.first.state == :migration}
   
   def self.from_csv(row, headers)
     min_interest = row[headers[:min_interest_rate]].to_f < 1 ? row[headers[:min_interest_rate]].to_f*100 : row[headers[:min_interest_rate]]

@@ -98,6 +98,11 @@ class Loan
 
   # Caching baby!
 
+  # this caching is totally inappropriate now with the upgrade of the LoanHistory model.
+  # All values must come from LoanHistory model. These properties will be deprecated but before that
+  # * we need to change all the reporting to move away from the SQL statements
+  # * we need to replace c_branch_id and c_client_id with branch_id and client_id (this is currently causing problems in reporting)
+
   property :staleness_frequency, Integer
 
   property :c_client_group_id,                   Integer, :index => true
@@ -114,6 +119,9 @@ class Loan
   property :c_stale?,                            Boolean
   
   property :converted,                           Boolean
+
+  property :reference,                           String, :lazy => true # to be used during migrations
+  
 
   # associations
   belongs_to :client

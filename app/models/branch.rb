@@ -30,6 +30,7 @@ class Branch
   property   :parent_domain_guid, String, :nullable => true
 
   validates_is_unique   :code
+  validates_is_unique   :name
   validates_length      :code, :min => 1, :max => 10
 
   validates_length      :name, :min => 3

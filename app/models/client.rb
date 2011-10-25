@@ -164,6 +164,7 @@ class Client
                           :date_of_birth => Date.parse(row[headers[:date_of_birth]]), :address => row[headers[:address]], 
                           :date_joined => row[headers[:date_joined]], :center => center, :grt_pass_date => grt_date, :created_by => User.first,
                           :client_group => client_group, :client_type => client_type)
+    debugger
     [obj.save, obj]
   end
 

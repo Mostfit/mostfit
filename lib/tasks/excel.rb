@@ -14,8 +14,14 @@ def to_csv(directory, filename)
         excel.to_csv(File.join("uploads", directory, sheet))
       else
         puts "skipping #{sheet}"
+        return false
       end
   }
+  return true
 end
 puts ARGV
-to_csv(ARGV[0], ARGV[1])
+begin
+  return to_csv(ARGV[0], ARGV[1])
+rescue
+  return false
+end
