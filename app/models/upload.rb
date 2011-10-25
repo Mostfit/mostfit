@@ -25,7 +25,6 @@ class Upload
 
   def self.make(params)
     # our intializer parses the params and moves the tempfile to a sane location
-    debugger
     require 'digest/md5'
     md5sum = Digest::MD5.hexdigest(params[:file][:tempfile].read)
     u = Upload.first_or_new(:filename => params[:file][:filename], :user => params[:user], :md5sum => md5sum)
@@ -66,39 +65,47 @@ class Upload
     }.compact
   end
 
-  def continue
+  def cont
     # picks up where we left off last time
-    while self.state != :complete
-      debugger
-      if state == :uploaded
-        process_excel_to_csv
-      elsif state == :extracted
-        load_csv
-      end
+    require "log4r"
+    log_file_name = "#{self.directory}"
+    log       = Log4r::Logger.new log_file_name
+    pf        = Log4r::PatternFormatter.new(:pattern => "<b>[%l]</b> %m")
+    file_log  = Log4r::FileOutputter.new(log_file_name, :filename => [Merb.root, "public", "logs", self.directory].join("/"), :truncate => false, :formatter => pf)
+    log.add(file_log) 
+    p file_log
+    log.level = Log4r::INFO
+
+    if state == :uploaded
+      process_excel_to_csv
+      cont
+    elsif state == :extracted
+      load_csv(log)
     end
   end
-
+  
   def process_excel_to_csv
     `ruby lib/tasks/excel.rb #{directory} #{filename}`
-    debugger
     self.state = :extracted
     self.save
   end
-
-  def load_csv(log=nil, erase=false)
-    debugger
-    models = [StaffMember, Branch, RepaymentStyle, FundingLine, LoanProduct, Center, ClientGroup, Client,  Loan, Payment]
+  
+  def load_csv(log=Nothing, erase=false)
+    models = [StaffMember, RepaymentStyle,  LoanProduct, FundingLine, Branch, Center, ClientGroup, Client,  Loan, Payment]
     funding_lines, loans = {}, {}
-    User.all.each{|u|
-      u.destroy if not u.login=="admin"
-    }
-    models.each{|model| 
-      if erase     
+    if erase
+      log.info("Destroying old data as requested")
+      models.each{|model| 
         model.all.destroy!
-        log.info("Destroying old records for #{model.to_s.plural} (if any)") if log
+        log.info("Destroying old records for #{model.to_s.plural} (if any)")
+      }
+    end
+    models.each {|model|
+      unless File.exists?(File.join(Merb.root, "uploads", directory, model.to_s.snake_case.pluralize))
+        log.info("not found #{model} csv file")
+        next
       end
-      next unless File.exists?(File.join(Merb.root, "uploads", directory, model.to_s.snake_case.pluralize))
-      log.info("Creating #{model.to_s.plural}") if log
+      log.info("Creating #{model.to_s.plural}")
       headers = {}
       FasterCSV.open(File.join(Merb.root, "uploads", @directory, model.to_s.snake_case.pluralize), "r").each_with_index{|row, idx|
         if idx==0
@@ -115,7 +122,7 @@ class Upload
               else
                 model.from_csv(row, headers)
               end
-
+            
             if status
               #Storing funding lines and loans for serial number reference
               funding_lines[row[headers[:serial_number]]] = record if model==FundingLine

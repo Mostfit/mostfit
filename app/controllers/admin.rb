@@ -5,9 +5,6 @@ class Admin < Application
   end
 
 
-  def upload_status        
-    render
-  end
   
   def edit
     @mfi  = Mfi.first

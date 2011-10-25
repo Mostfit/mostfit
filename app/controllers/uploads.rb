@@ -4,6 +4,10 @@ class Uploads < Application
     raise NotAcceptable unless Mfi.first.system_state == :migration
   end
 
+  def upload_status        
+    render
+  end
+
   def index
     hash = session.user.admin? ? {} : {:user => session.user}
     @uploads = Upload.all(hash.merge(:order => [:updated_at]))
@@ -25,11 +29,22 @@ class Uploads < Application
     end
   end
 
-  def continue(id)
-    debugger
+  def show(id)
     @upload = Upload.get(id)
-    @upload.continue
-    redirect resource(:uploads)
+    raise NotFound unless @upload
+    display @upload
+  end
+
+  def continue(id)
+    if request.xhr?
+      @upload = Upload.get(id)
+      raise NotFound unless @upload
+      @upload.cont
+    else
+      @upload = Upload.get(id)
+      raise NotFound unless @upload
+      display @upload
+    end
   end
 
   
