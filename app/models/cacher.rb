@@ -39,13 +39,13 @@ class Cacher
 
   property :stale,                           Boolean, :default => false
 
-  COLS =   [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total, 
-                                    :total_interest_due, :total_interest_paid, :total_principal_due, :total_principal_paid, 
+  COLS =   [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total,
+                                    :total_interest_due, :total_interest_paid, :total_principal_due, :total_principal_paid,
                                    :principal_in_default, :interest_in_default, :total_fees_due, :total_fees_paid]
   FLOW_COLS = [:principal_due, :principal_paid, :interest_due, :interest_paid,
                  :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted,
                  :advance_principal_paid, :advance_interest_paid, :fees_due_today, :fees_paid_today]
-  
+
   def total_advance_paid
     advance_principal_paid + advance_interest_paid
   end
@@ -57,14 +57,14 @@ class Cacher
   def noop
     0
   end
-  
+
   def self.stale
     self.all(:stale => true)
   end
 
   def self.get_stale(what)
   end
-  
+
   def self.get_missing_centers
     return [] if self.all.empty?
     branch_ids = self.aggregate(:branch_id)
@@ -73,7 +73,7 @@ class Cacher
     cached_centers = Cacher.all(:model_name => "Center", :branch_id => branch_ids, :date => dates).aggregate(:branch_id, :center_id).group_by{|x| x[0]}.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
     branch_centers - cached_centers
   end
-  
+
   def self.create(hash = {})
     # creates a cacher from loan_history table for any arbitrary condition. Also does grouping
     date = hash.delete(:date) || Date.today
@@ -84,7 +84,7 @@ class Cacher
     pmts = LoanHistory.composite_key_sum(LoanHistory.all(hash.merge(:date => date)).aggregate(:composite_key), group_by, flow_cols)
     # if there are no loan history rows that match today, then pmts is just a single hash, else it is a hash of hashes
     ng = flow_cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
-    balances.map{|k,v| [k,(pmts[k] || ng).merge(v)]}.to_hash 
+    balances.map{|k,v| [k,(pmts[k] || ng).merge(v)]}.to_hash
 
     # now to add approvals, disbursals, writeoffs, etc.
   end
@@ -110,10 +110,10 @@ class Cacher
 #    raise ArgumentError "cannot add cachers of different classes" unless self.class == other.class
     date = (self.date > other.date ? self.date : other.date)
     me = self.attributes; other = other.attributes;
-    attrs = me + other; attrs[:date] = date; attrs[:id] = -1; attrs[:model_name] = "Sum"; 
+    attrs = me + other; attrs[:date] = date; attrs[:id] = -1; attrs[:model_name] = "Sum";
     attrs[:model_id] = nil; attrs[:branch_id] = nil; attrs[:center_id] = nil;
     Cacher.new(attrs)
-  end    
+  end
 
 
 end
@@ -131,7 +131,7 @@ class BranchCache < Cacher
     t0 = Time.now; t = Time.now;
     branch_ids = Branch.all.aggregate(:id) unless branch_ids
     branch_centers = Branch.all(:id => branch_ids).centers(:creation_date.lte => date).aggregate(:id)
- 
+
     # unless we are forcing an update, only work with the missing and stale centers
     unless force
       ccs = CenterCache.all(:model_name => "Center", :branch_id => branch_ids, :date => date, :center_id.gt => 0)
@@ -152,21 +152,21 @@ class BranchCache < Cacher
     branch_data_hash = CenterCache.all(:model_name => "Center", :branch_id => branch_ids, :date => date).group_by{|x| x.branch_id}.to_hash
     puts "READ CENTER CACHES in #{(Time.now - t).round} secs"
     t = Time.now
-    
+
     # we now have {:branch => [{...center data...}, {...center data...}]}, ...
     # we have to convert this to {:branch => { sum of centers data }, ...}
-    
-    branch_data = branch_data_hash.map do |bid,ccs| 
-      sum_centers = ccs.map do |c| 
+
+    branch_data = branch_data_hash.map do |bid,ccs|
+      sum_centers = ccs.map do |c|
         center_sum_attrs = c.attributes.select{|k,v| v.is_a? Numeric}.to_hash
       end
       [bid, sum_centers.reduce({}){|s,h| s+h}]
     end.to_hash
-    
+
     # TODO then add the loans that do not belong to any center
     # this does not exist right now so there is no code here.
     # when you add clients directly to the branch, do also update the code here
-    
+
     puts "CONSOLIDATED CENTER CACHES in #{(Time.now - t).round} secs"
     t = Time.now
     branch_data.map do |bid, c|
@@ -193,7 +193,7 @@ class BranchCache < Cacher
   end
 
 
-  
+
   def self.missing_for_date(date = Date.today, branch_ids = nil, hash = {})
     BranchCache.missing_dates(branch_ids, hash.merge(:date => date))
   end
