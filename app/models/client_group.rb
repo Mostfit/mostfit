@@ -6,7 +6,7 @@ class ClientGroup
   property :id,                Serial
   property :name,              String, :nullable => false
   property :number_of_members, Integer, :nullable => true, :min => 1, :max => 20, :default => 5
-  property :code,              String, :length => 14, :nullable => false, :index => true
+  property :code,              String, :length => 50, :nullable => false, :index => true
   property :created_by_staff_member_id,  Integer, :nullable => false, :index => true
 
   validates_is_unique   :code, :scope => :center_id
