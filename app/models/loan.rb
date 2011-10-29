@@ -143,10 +143,10 @@ class Loan
   belongs_to :verified_by,               :child_key => [:verified_by_user_id],                :model => 'User'
   belongs_to :repayment_style
 
-  belongs_to :organization, :parent_key => [:org_guid], :child_key => [:parent_org_guid], :required => false  
+  belongs_to :organization, :parent_key => [:org_guid], :child_key => [:parent_org_guid], :nullable => true  
   property   :parent_org_guid, String, :nullable => true
   
-  belongs_to :domain, :parent_key => [:domain_guid], :child_key => [:parent_domain_guid], :required => false
+  belongs_to :domain, :parent_key => [:domain_guid], :child_key => [:parent_domain_guid], :nullable => true
   property   :parent_domain_guid, String, :nullable => true
 
   has n, :loan_history,                                                                       :model => 'LoanHistory'
@@ -155,7 +155,7 @@ class Loan
   has n, :portfolio_loans
   has 1, :insurance_policy
   has n, :applicable_fees,    :child_key => [:applicable_id], :applicable_type => "Loan"
-  has n, :accruals, :required => false
+  has n, :accruals
   #validations
 
   validates_present      :client, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by, :applied_on
@@ -218,7 +218,7 @@ class Loan
     t = Time.now
     self.c_center_id = self.client.center.id if force
     self.c_branch_id = self.client.center.branch.id if force
-    self.c_client_group_id = (self.client.center.client_group_id if force) or 0
+    self.c_client_group_id = (self.client.client_group_id if force) or 0
     self.c_scheduled_maturity_date = scheduled_maturity_date
   end
 
@@ -1056,8 +1056,8 @@ class Loan
     ensure_meeting_day = false
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
-    @_installment_dates = (0..(actual_number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
-    @_installment_dates = @_installment_dates.map{|d| self.holidays[d] ? self.holidays[d].new_date : d}
+    ids = (0..(actual_number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
+    @_installment_dates = ids.map{|d| self.holidays[d] ? self.holidays[d].new_date : d}
     
   end
 
@@ -1110,10 +1110,9 @@ class Loan
       [k,amt]
     end.to_hash
     ap_fees = fee_schedule.map{|k,v| [k,v.values.sum]}.to_hash
-
-    dates = (([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on, scheduled_first_payment_date] + installment_dates).map{|d|
+    dates = (([applied_on, approved_on, scheduled_disbursal_date, disbursal_date, written_off_on, scheduled_first_payment_date]).map{|d|
                (self.holidays[d] ? self.holidays[d].new_date : d)
-             } + payment_dates).compact.uniq.sort
+             } +  installment_dates + payment_dates).compact.uniq.sort
 
     total_principal_due = total_interest_due = total_principal_paid = total_interest_paid = 0
 
@@ -1191,6 +1190,7 @@ class Loan
         :branch_id                           => c_branch_id,
         :center_id                           => c_center_id,
         :client_group_id                     => c_client_group_id || 0,
+        :client_id                           => client.id,
         :created_at                          => now,
         :funding_line_id                     => funding_line_id,
         :loan_product_id                     => loan_product_id,
