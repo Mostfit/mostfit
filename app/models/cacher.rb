@@ -1,14 +1,17 @@
-class Cacher
-  # like LoanHistory but for anything that has loans
+# The base class for all aggregating caches.
+# These caches can be made for anything that 'has' loans, like branches,
+# centers, managers, fundlines, etc.  The cache reflects the state of the
+# loans hanging under that particular object on a particulat date.
+
+class LoanAggregatingCache
   include DataMapper::Resource
-  property :id,                              Serial
+  property :id,                              Serial  # actually the composite key of (type/model_name, model_id, date)
   property :type,                            Discriminator
   property :date,                            Date, :nullable => false, :index => true
-  property :model_name,                      String, :nullable => false, :index => true
-  property :model_id,                        Integer, :nullable => false, :index => true, :unique => [:model_name, :date]
-  property :branch_id,                       Integer, :index => true
-  property :center_id,                       Integer, :index => true
-  property :funding_line_id,                 Integer, :index => true
+  property :model_name,                      String, :nullable => false, :index => true  # can we derive the model namde from the type (eg BranchCache) property?
+
+  property :model_id,                        Integer, :nullable => false, :index => true, :unique => [:model_name, :date]  # i do not see this (unique with array) documented anywhere, sure this works?
+
   property :scheduled_outstanding_total,     Float, :nullable => false
   property :scheduled_outstanding_principal, Float, :nullable => false
   property :actual_outstanding_total,        Float, :nullable => false
@@ -37,35 +40,24 @@ class Cacher
   property :created_at,                      DateTime
   property :updated_at,                      DateTime
 
-  property :stale,                           Boolean, :default => false
+  property :stale,                           Boolean, :default => false  # how does this exactly work?
 
-  COLS =   [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total,
-                                    :total_interest_due, :total_interest_paid, :total_principal_due, :total_principal_paid,
-                                   :principal_in_default, :interest_in_default, :total_fees_due, :total_fees_paid]
-  FLOW_COLS = [:principal_due, :principal_paid, :interest_due, :interest_paid,
-                 :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted,
-                 :advance_principal_paid, :advance_interest_paid, :fees_due_today, :fees_paid_today]
+  AGGR_BY_LAST = [:scheduled_outstanding_principal, :scheduled_outstanding_total,
+                  :actual_outstanding_principal,    :actual_outstanding_total,
+                  :total_interest_due,              :total_interest_paid,
+                  :total_principal_due,             :total_principal_paid,
+                  :principal_in_default,            :interest_in_default,
+                  :total_fees_due,                  :total_fees_paid]
 
-  def total_advance_paid
-    advance_principal_paid + advance_interest_paid
-  end
+  AGGR_BY_SUM  = [:principal_due,              :principal_paid,
+                  :interest_due,               :interest_paid,
+                  :scheduled_principal_due,    :scheduled_interest_due,
+                  :advance_principal_adjusted, :advance_interest_adjusted,
+                  :advance_principal_paid,     :advance_interest_paid,
+                  :fees_due_today,             :fees_paid_today]
 
-  def total_default
-    (principal_in_default + interest_in_default).abs
-  end
 
-  def noop
-    0
-  end
-
-  def self.stale
-    self.all(:stale => true)
-  end
-
-  def self.get_stale(what)
-  end
-
-  def self.get_missing_centers
+  def self.get_missing_centers  # should be implemented on the CenterCache subclass, right?
     return [] if self.all.empty?
     branch_ids = self.aggregate(:branch_id)
     dates = self.aggregate(:date)
@@ -73,6 +65,10 @@ class Cacher
     cached_centers = Cacher.all(:model_name => "Center", :branch_id => branch_ids, :date => dates).aggregate(:branch_id, :center_id).group_by{|x| x[0]}.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
     branch_centers - cached_centers
   end
+
+
+# it seems this method is not fully implemented yet...
+  # lets make the argument signature clear
 
   def self.create(hash = {})
     # creates a cacher from loan_history table for any arbitrary condition. Also does grouping
@@ -86,88 +82,101 @@ class Cacher
     ng = flow_cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
     balances.map{|k,v| [k,(pmts[k] || ng).merge(v)]}.to_hash
 
-    # now to add approvals, disbursals, writeoffs, etc.
+    # now to add approvals, disbursals, writeoffs, etc.  are available on sid's branch.
   end
 
-  def consolidate (other)
-    # this not addition, it is consolidation
-    # for cols (i.e balances) it takes the last balance, and for flow_cols i.e. payments, it takes the sum and returns a new cacher
-    # it is used for summing cachers across time
+
+# im quite sure this is not possible by sql..
+# but lets try:
+  # select sum(AGGR_BY_SUM), last(AGGR_BY_LAST) from cachers where date >= x and date <= y order by date asc grouped by type;
+# if this works we can make a self.consolidate(ids_array)
+
+
+  # Consolidates this cache with an other cache.
+  # For cols (i.e balances) it takes the last balance, and for flow_cols i.e. payments, it takes the sum and returns a new cacher
+  # it is used for summing cachers across time.
+  def consolidate(other)
     return self if other.nil?
-    raise ArgumentError "cannot add cacher to something that is not a cacher" unless other.is_a? Cacher
-    raise ArgumentError "cannot add cachers of different classes" unless self.class == other.class
-    attrs = (self.date > other.date ? self : other).attributes.dup
-    me = self.attributes; other = other.attributes;
+    raise ArgumentError "Cannot consolidate a cache with somehting of a different class (#{other.class})" unless self.class == other.class
+    attrs = (self.date > other.date ? self : other).attributes.dup  # default all to last
     attrs.delete(:id)
-    FLOW_COLS.map{|col| attrs[col] = me[col] + other[col]}
+    AGGR_BY_SUM.map{|col| last_attrs[col] = self.attributes[col] + other.attributes[col]}
     Cacher.new(attrs)
   end
 
-  def + (other)
-    # this adds all attributes and uses the latest date to add two cachers together
+
+  # Unlike the +consolidate+ method, this adds _all_ attributes while using the latest date,
+  # and returns them in a new Cacher object.
+  def +(other)
     return self if other.nil?
-    raise ArgumentError.new("cannot add cacher to something that is not a cacher") unless other.is_a? Cacher
-#    raise ArgumentError "cannot add cachers of different classes" unless self.class == other.class
+    raise ArgumentError "cannot add cachers of different classes" unless self.class == other.class
+    raise ArgumentError "cannot add cachers of different models" unless self.model_name == other.model_name
     date = (self.date > other.date ? self.date : other.date)
-    me = self.attributes; other = other.attributes;
-    attrs = me + other; attrs[:date] = date; attrs[:id] = -1; attrs[:model_name] = "Sum";
-    attrs[:model_id] = nil; attrs[:branch_id] = nil; attrs[:center_id] = nil;
+    attrs = self.attributes + other.attributes  # Hash addition is implemented in lib/functions.rb, and is a little hairy.
+    attrs.merge!({ :date => date,    :id => -1,# why? :id -1??? ##   :model_name => "Sum",  # what was this doing here?  because you can sum a branchcache and a funderlinecache?  what use case?
+                   :model_id => nil, :branch_id => nil, :center_id => nil })
     Cacher.new(attrs)
   end
 
 
 end
 
-class BranchCache < Cacher
+class BranchCache < LoanAggregatingCache
 
   def self.recreate(date = Date.today, branch_ids = nil)
     self.update(date, branch_ids, true)
   end
 
+  # Updates the caches
+  # The +date+ default to today, the +branch_ids+ to nil (which causes all to
+  # be updated) and +force+ defaults to false.
   def self.update(date = Date.today, branch_ids = nil, force = false)
     # updates the cache object for a branch
     # first create caches for the centers that do not have them
     debugger
-    t0 = Time.now; t = Time.now;
+    t0 = t = Time.now
     branch_ids = Branch.all.aggregate(:id) unless branch_ids
-    branch_centers = Branch.all(:id => branch_ids).centers(:creation_date.lte => date).aggregate(:id)
+    branch_centers = Branch.all(:id => branch_ids).centers(:creation_date.lte => date).aggregate(:id)  # no need to exclude 'dissolved' centers?
 
-    # unless we are forcing an update, only work with the missing and stale centers
-    unless force
+    if force
+      cids = branch_centers
+      puts "#{cids.count} to update"  ### is this idiom for logging?  shouldn't we use some logger then?
+    else  # unless we are forcing an update, only update the missing and stale centers
       ccs = CenterCache.all(:model_name => "Center", :branch_id => branch_ids, :date => date, :center_id.gt => 0)
       cached_centers = ccs.aggregate(:center_id)
       stale_centers = ccs.stale.aggregate(:center_id)
       cids = (branch_centers - cached_centers) + stale_centers
       puts "#{cached_centers.count} cached centers; #{branch_centers.count} total centers; #{stale_centers.count} stale; #{cids.count} to update"
-    else
-      cids = branch_centers
-      puts " #{cids.count} to update"
     end
-    return true if cids.blank? #nothing to do
-    # update all the centers for today
-    return false unless (CenterCache.update(:center_id => cids, :date => date))
+
+    return true if cids.blank?  # nothing to do
+    # update all the centers for the date we want to update this branch for
+    return false unless CenterCache.update(:center_id => cids, :date => date)  ### is CenterCache using a different argument structure?
+
     puts "UPDATED CENTER CACHES in #{(Time.now - t).round} secs"
     t = Time.now
     # then add up all the cached centers by branch
     branch_data_hash = CenterCache.all(:model_name => "Center", :branch_id => branch_ids, :date => date).group_by{|x| x.branch_id}.to_hash
     puts "READ CENTER CACHES in #{(Time.now - t).round} secs"
+
     t = Time.now
-
-    # we now have {:branch => [{...center data...}, {...center data...}]}, ...
-    # we have to convert this to {:branch => { sum of centers data }, ...}
-
+    # branch_data_hash now looks like:
+    #     {:branch => [{...center data...}, {...center data...}], ...}
+    # we have to convert this to:
+    #     {:branch => {...sum of centers data...}, ...}
     branch_data = branch_data_hash.map do |bid,ccs|
       sum_centers = ccs.map do |c|
-        center_sum_attrs = c.attributes.select{|k,v| v.is_a? Numeric}.to_hash
+        # is_a? is not something to use in places like this because of the performance penalty.
+        center_sum_attrs = c.attributes.select{|k,v| v.is_a? Numeric}.to_hash  ### why asssign to a never used local var?
       end
-      [bid, sum_centers.reduce({}){|s,h| s+h}]
+      [bid, sum_centers.reduce({}){|s,h| s+h}]  # i dont really understadn this line, does it use Hash addition?
     end.to_hash
-
     # TODO then add the loans that do not belong to any center
     # this does not exist right now so there is no code here.
     # when you add clients directly to the branch, do also update the code here
-
+    ### do we allow clinet directly on the branch?  or should we create a reserved center for that, "the default center'?
     puts "CONSOLIDATED CENTER CACHES in #{(Time.now - t).round} secs"
+
     t = Time.now
     branch_data.map do |bid, c|
       bc = BranchCache.first_or_new({:model_name => "Branch", :model_id => bid, :date => date})
@@ -180,26 +189,35 @@ class BranchCache < Cacher
       end
     end
     puts "WROTE BRANCH CACHES in #{(Time.now - t).round} secs"
-    t = Time.now
+
     puts "COMPLETED IN #{(Time.now - t0).round} secs"
   end
 
+  # This method returns a Hash like:
+  #     { :branch_id => [..dates that have caches missing...] }
+  # It takes an Array of branch ids in +branch_ids+ and a Hash of DM selection
+  # options that is very descriptively named +hash+.
   def self.missing_dates(branch_ids = nil, hash = {})
     hash = hash.merge(:branch_id => branch_ids) if branch_ids
-    history_dates = LoanHistory.all(hash).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
-    cache_dates = BranchCache.all(hash).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
-    # hopefully we now have {:branch_id => :dates}
+    def massage_to_hash(array_of_arrays)  # easier to read, more mem efficient and faster (not benchmarked though)
+      h = {}; array_of_arrays.each{|x| h[x[0]] = x[1]}; h
+    end
+    # history_dates = LoanHistory.all(hash).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
+    history_dates = massage_to_hash(LoanHistory.all(hash).aggregate(:branch_id, :date))
+    # cache_dates = BranchCache.all(hash).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
+    cache_dates   = massage_to_hash(BranchCache.all(hash).aggregate(:branch_id, :date))
+    # hopefully we now have {:branch_id => :dates}   ### hopefully???
     missing_dates = history_dates - cache_dates
   end
-
 
 
   def self.missing_for_date(date = Date.today, branch_ids = nil, hash = {})
     BranchCache.missing_dates(branch_ids, hash.merge(:date => date))
   end
 
-  def self.stale_for_date(date = Date.today, branch_ids = nil, hash = {})
-  end
+  ### staling is not doing much yet
+  # def self.stale_for_date(date = Date.today, branch_ids = nil, hash = {})
+  # end
 end
 
 class CenterCache < Cacher
