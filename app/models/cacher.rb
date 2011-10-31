@@ -57,15 +57,6 @@ class LoanAggregatingCache
                   :fees_due_today,             :fees_paid_today]
 
 
-  def self.get_missing_centers  # should be implemented on the CenterCache subclass, right?
-    return [] if self.all.empty?
-    branch_ids = self.aggregate(:branch_id)
-    dates = self.aggregate(:date)
-    branch_centers = Branch.all(:id => branch_ids).centers(:creation_date.lte => dates.min).aggregate(:branch_id, :id).group_by{|x| x[0]}.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
-    cached_centers = Cacher.all(:model_name => "Center", :branch_id => branch_ids, :date => dates).aggregate(:branch_id, :center_id).group_by{|x| x[0]}.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
-    branch_centers - cached_centers
-  end
-
 
 # it seems this method is not fully implemented yet...
   # lets make the argument signature clear
@@ -240,14 +231,25 @@ class CenterCache < Cacher
     repository.adapter.execute(sql)
   end
 
-
-  def self.stalify(obj)
-    # obj is either a Payment or a Loan
-    t = Time.now
-    cid = obj.c_center_id
-    d = obj.is_a?(Payment) ? obj.received_on : obj.applied_on
-    repository.adapter.execute("UPDATE cachers SET stale=1 WHERE center_id=#{cid} AND date >= '#{d.strftime('%Y-%m-%d')}' AND stale=0")
-    puts "STALIFIED CENTERS in #{(Time.now - t).round(2)} secs"
+  # convenience class method to find all centers without caches
+  def self.get_missing_centers
+    return [] if LoanAggregatingCache.all.empty?
+    branch_ids = CenterCache.aggregate(:branch_id)
+    dates = self.aggregate(:date)
+    branch_centers = Br
+    anch.all(:id => branch_ids).centers(:creation_date.lte => dates.min).aggregate(:branch_id, :id).group_by{|x| x[0]}.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
+    cached_centers = Cacher.all(:model_name => "Center", :branch_id => branch_ids, :date => dates).aggregate(:branch_id, :center_id).group_by{|x| x[0]}.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
+    branch_centers - cached_centers
   end
+
+
+  # def self.stalify(obj)
+  #   # obj is either a Payment or a Loan
+  #   t = Time.now
+  #   cid = obj.c_center_id
+  #   d = obj.is_a?(Payment) ? obj.received_on : obj.applied_on
+  #   repository.adapter.execute("UPDATE cachers SET stale=1 WHERE center_id=#{cid} AND date >= '#{d.strftime('%Y-%m-%d')}' AND stale=0")
+  #   puts "STALIFIED CENTERS in #{(Time.now - t).round(2)} secs"
+  # end
 
 end
