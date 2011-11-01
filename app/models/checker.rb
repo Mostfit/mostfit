@@ -5,6 +5,8 @@ class Checker
 
   include DataMapper::Resource
   
+  before :save, :get_loan
+
   attr_accessor :value
 
   property :id, Serial
@@ -15,17 +17,26 @@ class Checker
   property :as_on, Date
 
   property :expected_value, Float
+  property :actual_value,   Float
   property :checked,        Boolean, :default => false
   property :checked_at,     DateTime
   property :ok,             Boolean, :default => false
+
+  belongs_to :upload
+  belongs_to :loan
 
   def self.check_unchecked
     self.all(:checked => false).map{|c| c.check}
   end
 
+  def get_loan
+    self.loan ||= Loan.first(:reference => self.reference)
+  end
+
   def check
     self.checked = true
     self.checked_at = DateTime.now
+    self.actual_value = get_value
     if self.correct?
       self.ok = true
     end

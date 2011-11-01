@@ -66,7 +66,7 @@ class LoanProduct
               :max_number_of_installments => row[headers[:max_number_of_installments]], 
               :installment_frequency => row[headers[:installment_frequency]].downcase.to_sym,
               :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]), 
-              :repayment_style => RepaymentStyle.first(:name => row[headers[:repayment_style]]))
+              :repayment_style => RepaymentStyle.first(:name => row[headers[:repayment_style]]), :upload_id => row[headers[:upload_id]])
     [obj.save, obj]
   end
 

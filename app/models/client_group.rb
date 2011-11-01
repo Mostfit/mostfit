@@ -59,7 +59,7 @@ class ClientGroup
 
   def self.from_csv(row, headers)
     center = Center.first(:code => row[headers[:center_code]])
-    obj    = new(:name => row[headers[:name]], :center_id => center.id, :code => row[headers[:code]])
+    obj    = new(:name => row[headers[:name]], :center_id => center.id, :code => row[headers[:code]], :upload_id => row[headers[:upload_id]])
     [obj.save, obj]
   end
 

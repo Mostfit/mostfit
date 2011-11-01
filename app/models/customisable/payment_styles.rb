@@ -261,7 +261,6 @@ module Mostfit
       end
 
       def scheduled_principal_for_installment(number)
-        debugger
         rs.principal_schedule(amount.to_i)[number - 1]
       end
 

@@ -14,6 +14,8 @@ class Upload
 
   belongs_to :user
 
+  has n, :checkers
+
   MODELS = [:staff_members, :repayment_styles, :loan_products, :funding_lines, :branches, :centers, :client_groups, :clients, :loans]
 
   MODELS.each do |model|
@@ -168,7 +170,7 @@ class Upload
 
       # get the uniques
       uniques = model.all.aggregate(unique_field)
-      headers = {}
+      headers = {}; done = 0; skipped = 0;
       FasterCSV.open(file_name, "r").each_with_index{|row, idx|
         error = true
         if idx==0
@@ -182,6 +184,7 @@ class Upload
           row.push(self.id)
           if uniques.include?(row[headers[unique_field]])
             @log.debug("Skipping unique #{model} with #{unique_field} #{row[headers[unique_field]]}")
+            skipped += 1
             next
           end
           begin
@@ -190,6 +193,7 @@ class Upload
             if status
               error = false
               @log.debug("Created #{model} #{record.id}")
+              done += 1
               @log.info("Created #{idx-99} - #{idx+1}. Some more left")    if idx%100==99
             else
               @log.error("<font color='red'>#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors.to_a.join(', ')}</font>") if log
@@ -200,13 +204,14 @@ class Upload
             @log.error("<font color='red'>#{model}: #{e.message}</font>") if log
           ensure
             if error
+              debugger
               error_file.write(row.to_csv)         # log all errors in a separate csv file
               error_count += 1                    # so we can iterate down to perfection
             end
           end
         end    
       }
-      @log.info("<font color='#8DC73F'><b>Created #{model.count} #{model.to_s.plural}</b></strong>") 
+      @log.info("<font color='#8DC73F'><b>Created #{done} #{model.to_s.plural}</b></strong> Skipped #{skipped}") 
       error_file.close
     }
   end

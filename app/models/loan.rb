@@ -273,6 +273,7 @@ class Loan
       c.as_on = Date.parse(row[headers[:arguments]])
       c.expected_value = row[headers[:expected_value]]
       c.unique_field = :reference
+      c.upload_id = row[headers[:upload_id]]
       c.save
     end
     debugger unless saved
@@ -316,7 +317,7 @@ class Loan
 
   # MISC FUNCTIONS
   def name
-    "Loan #{id} for client #{client.name}"
+    "Loan #{id} "
   end
 
   def description

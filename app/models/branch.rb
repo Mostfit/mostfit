@@ -39,7 +39,7 @@ class Branch
 
   def self.from_csv(row, headers)
     obj = new(:code => row[headers[:code]], :name => row[headers[:name]], :address => row[headers[:address]], 
-              :manager => StaffMember.first(:name => row[headers[:manager]]))
+              :manager => StaffMember.first(:name => row[headers[:manager]]), :upload_id => row[headers[:upload_id]])
     [obj.save, obj]
   end
 
