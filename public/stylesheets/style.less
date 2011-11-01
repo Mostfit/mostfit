@@ -1,9 +1,9 @@
 @body-background: #fff;
 @lightblue: #abc7f6;
 @pastel-yellow: #feeb24;
-@lightgreen: #abcf76;
-@darkgreen: #56683B;
-@orange: #E68c00;
+@lightgreen: #008899;
+@darkgreen: #cfcfcf;
+@orange: #666;
 @lightgreen-text: @darkgreen;
 @header: @pastel-yellow;
 @header-text: @lightgreen * 0.5;
@@ -28,13 +28,15 @@
   text-shadow: 1px 1px white;
 }
 
+html { height: 100%}
+
 body {
     background: @body-background;
     color: #222;
     font-family: Arial,Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
     padding: 0px;
     margin: 0px;
-
+    height: 100%;
 }
 h1 {
   color: @orange;
@@ -105,6 +107,9 @@ h1.logo{
     height: 60px;
     padding-bottom: 0px;
     margin-bottom: 0px;
+    font-weight: bold;
+    letter-spacing: -0.06em;
+    text-shadow: 1px 1px white;
 }
 h1.logo span{
     vertical-align: top;
@@ -126,6 +131,7 @@ h1.logo span{
 {
   margin: 0px;
   position: relative;
+  min-height: 100%;
 }
 
 .graph{
@@ -342,10 +348,15 @@ span.blue  { background-color: #3465a4; padding: 3px; color: white;}
 #footer
 {
 margin-top: 0px;
-margin-bottom: 20px;
+margin-bottom: 0px;
 text-align: center;
 color: #666;
 font-size: 11px;
+background: #cfcfcf;
+width: 100%;
+height: 100px;
+position: relative;
+top: -80px;
 }
 #footer a:link, #footer a:visited, #footer a:active
 {
@@ -544,11 +555,10 @@ a.bold:visited {
   box-shadow: 1px 1px @nav-selected-bg * 0.6 inset;
 }
 #navigation a:hover{
-  @nav-hover-bg: #D3FF91;
-  background: @nav-hover-bg;
+  background: @pastel-yellow * 1.2;
   color: #5c8f11;
   z-index:10;
-  box-shadow: 2px 2px @nav-hover-bg * 0.6 inset;
+  box-shadow: 2px 2px @pastel-yellow * 0.6 inset;
 }
 
 #header_search_div {
@@ -1445,7 +1455,7 @@ table.clearform tr td.legend{
   width: 100%;
   padding: 5px 4.5%;
   vertical-align: middle;
-  color: white;
+  color: #333;
   font-size: 1.5em;
   background: @darkgreen * 1.1;
 }

@@ -249,7 +249,8 @@ class Loan
     return true
   end
 
-  def self.from_csv(row, headers, funding_lines)
+  def self.from_csv(row, headers)
+    debugger
     interest_rate = (row[headers[:interest_rate]].to_f>1 ? row[headers[:interest_rate]].to_f/100 : row[headers[:interest_rate]].to_f)
     
     obj = new(:loan_product => LoanProduct.first(:name => row[headers[:product]]), :amount => row[headers[:amount]],
@@ -258,24 +259,23 @@ class Loan
               :scheduled_disbursal_date => Date.parse(row[headers[:scheduled_disbursal_date]]),
               :scheduled_first_payment_date => Date.parse(row[headers[:scheduled_first_payment_date]]),
               :applied_on => Date.parse(row[headers[:applied_on]]), :approved_on => Date.parse(row[headers[:approved_on]]),
-              :disbursal_date => Date.parse(row[headers[:disbursal_date]]),
+              :disbursal_date => Date.parse(row[headers[:disbursal_date]]), :upload_id => row[headers[:upload_id]],
               :disbursed_by_staff_id => StaffMember.first(:name => row[headers[:disbursed_by_staff]]).id,
               :funding_line_id => FundingLine.first(:reference => row[headers[:funding_line_serial_number]]).id,
               :applied_by_staff_id => StaffMember.first(:name => row[headers[:applied_by_staff]]).id,
               :approved_by_staff_id => StaffMember.first(:name => row[headers[:approved_by_staff]]).id,
               :reference => row[headers[:reference]], :client => Client.first(:reference => row[headers[:client_reference]]))
     obj.history_disabled=true
-    debugger
     saved = obj.save
     if saved
       c = Checker.first_or_new(:model_name => "Loan", :reference => obj.reference)
       c.check_field = row[headers[:check_field]]
-      c.arguments = Marshal.dump(Date.parse(row[headers[:arguments]]))
+      c.as_on = Date.parse(row[headers[:arguments]])
       c.expected_value = row[headers[:expected_value]]
       c.unique_field = :reference
       c.save
     end
-    debugger
+    debugger unless saved
     [saved, obj]
   end
 
@@ -296,9 +296,9 @@ class Loan
         loan_attr    = loan_attr.to_f.round(6)
       end
 
-      if k==:min and loan_attr and product_attr and  loan_attr < product_attr
+      if k==:min and loan_attr and product_attr and (product_attr - loan_attr > 0.000001)
         return [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
-      elsif k==:max and loan_attr and product_attr and  loan_attr > product_attr
+      elsif k==:max and loan_attr and product_attr and  (loan_attr - product_attr > 0.000001)
        return  [false, "#{v.to_s.capitalize} #{method.to_s.humanize} limit violated"]
       end
     }

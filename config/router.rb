@@ -83,7 +83,7 @@ Merb::Router.prepare do
   resources :center_meeting_days
   resources :repayment_styles
 
-  resources :uploads, :member => {:continue => [:get]}
+  resources :uploads, :member => {:continue => [:get], :reset => [:get]}
 
   match('/dashboard/centers/:report_type/:branch_id').to(:controller => 'dashboard', :action => "centers", :branch_id => ":branch_id", :report_type => ":report_type").name(:dashboard_centers)
   match('/design').to(:controller => 'loan_products', :action => 'design').name(:design_loan_product)

@@ -14,6 +14,12 @@ class Upload
 
   belongs_to :user
 
+  MODELS = [:staff_members, :repayment_styles, :loan_products, :funding_lines, :branches, :centers, :client_groups, :clients, :loans]
+
+  MODELS.each do |model|
+    has n, model
+  end
+
   before :valid? do 
     self.directory ||= UUID.generate
     self.state ||= :new
@@ -90,19 +96,20 @@ class Upload
 
   # destroys all the entries in the database created by this upload
   def destroy_models
-    Marshal.load(state_detail).each do |model_name, ids|
+    MODEL.each do |model|
       @log.debug("Erasing #{model_name}")
-      Kernel.const_get(model_name).all(:id => ids).destroy!
+      self.send(model).aggregate(:id).destroy!
       @log.debug("done")
     end
   end
 
+  # removes the csv files and optionally rolls back the database
   def reset(options = {:verbose => false, :erase => false})
-    log_file(options[:verbose]) unless @log
+    log_file unless @log
     @log.info("Stopping processing")
-    self.state = :stopped
+    self.state = :uploaded
     self.save
-    if options[:erase]
+    if false # TODO set this to option[:erase] once done
       @log.info("Erasing records from database")
       destroy_models
     end
@@ -110,7 +117,9 @@ class Upload
     FileUtils.rm Dir.glob(File.join("uploads",directory,"*csv"))
   end
   
+  # turns an excel file into its constituent worksheets as CSV files
   def process_excel_to_csv
+    # DIRTY HACK!
     # there is some gem that conflicts with the name Logger which causes roo to crash upon load.
     # therefore, we run the roo task from a separate ruby file with no gems loaded
     s =  `ruby lib/tasks/excel.rb #{directory} #{filename}`
@@ -138,13 +147,12 @@ class Upload
       @log.error("No CSV files found here. Exiting")
       return
     end
-    model_order = [:staff_members, :repayment_styles, :loan_products, :funding_lines, :repayment_styles, :branches, :centers, :client_groups, :clients, :loans]
-    model_order.each {|model|
+    
+    MODELS.each {|model|
       error_count = 0
       error_file = File.open(File.join("uploads",directory,"#{model.to_s}_errors.csv"),"w")
-      next unless file_name = csv_file_for(model)
+      next unless file_name = csv_file_for(model)                                                             # no CSV file? next!
       model = Kernel.const_get(model.to_s.singularize.camel_case)
-      debugger if model == Loan
       @log.info("Creating #{model.to_s.plural}")
 
       # first find out which fields are required to be unique
@@ -157,47 +165,44 @@ class Upload
         @log.error("Atleast one property in #{model} must be unique") 
         break
       end
+
       # get the uniques
       uniques = model.all.aggregate(unique_field)
       headers = {}
       FasterCSV.open(file_name, "r").each_with_index{|row, idx|
+        error = true
         if idx==0
           row.to_enum(:each_with_index).collect{|name, index| 
             headers[name.downcase.gsub(' ', '_').to_sym] = index
           }
+          headers[:upload_id] = headers.keys.count
+            
           error_file.write(row.to_csv)
         else
+          row.push(self.id)
           if uniques.include?(row[headers[unique_field]])
             @log.debug("Skipping unique #{model} with #{unique_field} #{row[headers[unique_field]]}")
             next
           end
           begin
-            status, record = 
-              if model == Loan
-                model.from_csv(row, headers, funding_lines)
-              elsif model==Payment
-                model.from_csv(row, headers, loans)
-              else
-                model.from_csv(row, headers)
-              end
-            
+            debugger if model == Loan
+            status, record = model.from_csv(row, headers)
             if status
+              error = false
               @log.debug("Created #{model} #{record.id}")
-              #Storing funding lines and loans for serial number reference
-              funding_lines[row[headers[:serial_number]]] = record if model==FundingLine
-              if model==Loan
-                loans[row[headers[:serial_number]]]         = record 
-                record.update_history
-              end
               @log.info("Created #{idx-99} - #{idx+1}. Some more left")    if idx%100==99
             else
               @log.error("<font color='red'>#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors.to_a.join(', ')}</font>") if log
+            end
+          rescue Exception => e
+            debugger
+            @log.error("<font color='red'>#{model}: Problem in inserting #{model} #{row[headers[:serial_number]]}. Insert it manually later</font>") if log
+            @log.error("<font color='red'>#{model}: #{e.message}</font>") if log
+          ensure
+            if error
               error_file.write(row.to_csv)         # log all errors in a separate csv file
               error_count += 1                    # so we can iterate down to perfection
             end
-          rescue Exception => e
-            @log.error("<font color='red'>#{model}: Problem in inserting #{model} #{row[headers[:serial_number]]}. Insert it manually later</font>") if log
-            @log.error("<font color='red'>#{model}: #{e.message}</font>") if log
           end
         end    
       }

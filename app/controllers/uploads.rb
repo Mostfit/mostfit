@@ -39,7 +39,9 @@ class Uploads < Application
     if request.xhr?
       @upload = Upload.get(id)
       raise NotFound unless @upload
-      @upload.cont
+      Merb.run_later do
+        @upload.cont
+      end
     else
       @upload = Upload.get(id)
       raise NotFound unless @upload
@@ -51,7 +53,29 @@ class Uploads < Application
     @upload = Upload.get(id)
     raise NotFound unless @upload
     @upload.reset(params[:restart])
+    redirect resource(@upload), :message => {:notice => "This upload was succesfully reset"}
+
   end
+
+  def edit(id)
+    @upload = Upload.get(id)
+    raise NotFound unless @upload
+    display @upload
+  end
+
+  def update(id, upload)
+    @upload = Upload.get(id)
+    raise NotFound unless @upload
+    if params[:file] and params[:file][:filename] and params[:file][:tempfile]
+      @upload.move(params[:file][:tempfile].path)
+      redirect resource(@upload), :message => {:notice => "File has been replaced. Click continue to extract"}
+    else
+      render
+    end
+  end
+
+
+
     
 
   
