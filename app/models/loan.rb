@@ -120,7 +120,7 @@ class Loan
   
   property :converted,                           Boolean
 
-  property :reference,                           String, :lazy => true # to be used during migrations
+  property :reference,                           String, :unique => true # to be used during migrations
   
 
   # associations
@@ -213,6 +213,7 @@ class Loan
   end
   
   def update_non_history_attributes(force)
+    force = true if self.new?
     self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
     @orig_attrs = self.original_attributes
     t = Time.now
@@ -259,13 +260,23 @@ class Loan
               :applied_on => Date.parse(row[headers[:applied_on]]), :approved_on => Date.parse(row[headers[:approved_on]]),
               :disbursal_date => Date.parse(row[headers[:disbursal_date]]),
               :disbursed_by_staff_id => StaffMember.first(:name => row[headers[:disbursed_by_staff]]).id,
-              :funding_line_id => funding_lines[row[headers[:funding_line_serial_number]]].id,
+              :funding_line_id => FundingLine.first(:reference => row[headers[:funding_line_serial_number]]).id,
               :applied_by_staff_id => StaffMember.first(:name => row[headers[:applied_by_staff]]).id,
               :approved_by_staff_id => StaffMember.first(:name => row[headers[:approved_by_staff]]).id,
-              :client => Client.first(:reference => row[headers[:client_reference]]))
+              :reference => row[headers[:reference]], :client => Client.first(:reference => row[headers[:client_reference]]))
     obj.history_disabled=true
     debugger
-    [obj.save, obj]
+    saved = obj.save
+    if saved
+      c = Checker.first_or_new(:model_name => "Loan", :reference => obj.reference)
+      c.check_field = row[headers[:check_field]]
+      c.arguments = Marshal.dump(Date.parse(row[headers[:arguments]]))
+      c.expected_value = row[headers[:expected_value]]
+      c.unique_field = :reference
+      c.save
+    end
+    debugger
+    [saved, obj]
   end
 
   def is_valid_loan_product_amount; is_valid_loan_product(:amount); end

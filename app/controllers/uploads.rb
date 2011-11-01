@@ -46,6 +46,13 @@ class Uploads < Application
       display @upload
     end
   end
+  
+  def reset(id)
+    @upload = Upload.get(id)
+    raise NotFound unless @upload
+    @upload.reset(params[:restart])
+  end
+    
 
   
 end

@@ -10,7 +10,7 @@ class ClientGroup
   property :created_by_staff_member_id,  Integer, :nullable => false, :index => true
 
   validates_is_unique   :code, :scope => :center_id
-  validates_length      :code, :min => 1, :max => 14
+  validates_length      :code, :min => 1, :max => 50
 
   has n, :clients
   belongs_to :center, :nullable => false
