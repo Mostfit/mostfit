@@ -34,6 +34,14 @@ class Cacher
   property :fees_due_today,                  Float, :nullable => false
   property :fees_paid_today,                 Float, :nullable => false
 
+  # we need to track also the changes in status
+  # i.e. from approved to disbursed, etc.
+
+  STATUSES.each do |status|
+    property "#{status.to_s}_count".to_sym,  Integer, :nullable => false, :default => 0
+    property "#{status.to_s}".to_sym,        Float,   :nullable => false, :default => 0
+  end
+
   property :created_at,                      DateTime
   property :updated_at,                      DateTime
 
@@ -44,7 +52,7 @@ class Cacher
                                    :principal_in_default, :interest_in_default, :total_fees_due, :total_fees_paid]
   FLOW_COLS = [:principal_due, :principal_paid, :interest_due, :interest_paid,
                  :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted,
-                 :advance_principal_paid, :advance_interest_paid, :fees_due_today, :fees_paid_today]
+               :advance_principal_paid, :advance_interest_paid, :fees_due_today, :fees_paid_today] + STATUSES.map{|s| [s, "#{s}_count".to_sym]}.flatten
 
   def total_advance_paid
     advance_principal_paid + advance_interest_paid
@@ -60,9 +68,6 @@ class Cacher
 
   def self.stale
     self.all(:stale => true)
-  end
-
-  def self.get_stale(what)
   end
 
   def self.get_missing_centers
@@ -86,7 +91,6 @@ class Cacher
     ng = flow_cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
     balances.map{|k,v| [k,(pmts[k] || ng).merge(v)]}.to_hash
 
-    # now to add approvals, disbursals, writeoffs, etc.
   end
 
   def consolidate (other)
@@ -143,7 +147,9 @@ class BranchCache < Cacher
       cids = branch_centers
       puts " #{cids.count} to update"
     end
+
     return true if cids.blank? #nothing to do
+
     # update all the centers for today
     return false unless (CenterCache.update(:center_id => cids, :date => date))
     puts "UPDATED CENTER CACHES in #{(Time.now - t).round} secs"
