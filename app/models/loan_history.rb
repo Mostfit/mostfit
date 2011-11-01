@@ -42,8 +42,18 @@ class LoanHistory
   property :fees_due_today,                  Float, :nullable => false
   property :fees_paid_today,                 Float, :nullable => false
 
+
+
   property :status,                      Enum.send('[]', *STATUSES)
   property :last_status,                 Enum.send('[]', *STATUSES)
+
+  # add a column per status to track approvals, disbursals, etc.
+  STATUSES.each do |status|
+    property "#{status.to_s}_count".to_sym,  Integer, :nullable => false, :default => 0
+    property "#{status.to_s}".to_sym,        Float,   :nullable => false, :default => 0
+  end
+  
+
   property :client_id,                   Integer, :index => true
   property :client_group_id,             Integer, :index => true
   property :center_id,                   Integer, :index => true
@@ -122,8 +132,7 @@ class LoanHistory
       return {:no_group => cols.zip(vals).to_hash}
     end
   end
-
-
+      
 
   def self.sum_cols
     # only some columns make sense to add while aggregating LoanHistory rows.

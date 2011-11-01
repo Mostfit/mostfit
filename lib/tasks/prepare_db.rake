@@ -38,7 +38,25 @@ namespace :mostfit do
                              modify total_fees_due               decimal(15,2) not null,
                              modify total_fees_paid            decimal(15,2) not null,
                              modify fees_due_today              decimal(15,2) not null,
-                             modify composite_key              decimal(10,4) not null;
+                             modify composite_key              decimal(10,4) not null,
+                             modify applied                     decimal(15,2) not null,
+                             modify applied_count               integer not null,
+                             modify approved                    decimal(15,2) not null,
+                             modify approved_count              integer not null,
+                             modify rejected                    decimal(15,2) not null,
+                             modify rejected_count              integer not null,
+                             modify disbursed                   decimal(15,2) not null,
+                             modify disbursed_count             integer not null,
+                             modify outstanding                 decimal(15,2) not null,
+                             modify outstanding_count           integer not null,
+                             modify repaid                      decimal(15,2) not null,
+                             modify repaid_count                integer not null,
+                             modify written_off                 decimal(15,2) not null,
+                             modify written_off_count           integer not null,
+                             modify claim_settlement            decimal(15,2) not null,
+                             modify claim_settlement_count      integer not null,
+                             modify preclosed                   decimal(15,2) not null,
+                             modify preclosed_count             integer not null;
          })
       repository.adapter.execute(%Q{
          alter table cachers modify actual_outstanding_total decimal(15,2) not null, 
@@ -61,9 +79,24 @@ namespace :mostfit do
                              modify advance_interest_adjusted   decimal(15,2) not null,
                              modify principal_in_default        decimal(15,2) not null,
                              modify interest_in_default         decimal(15,2) not null,
-                             modify total_fees_due               decimal(15,2) not null,
-                             modify total_fees_paid            decimal(15,2) not null,
-                             modify fees_due_today              decimal(15,2) not null;
+                             modify applied                     decimal(15,2) not null,
+                             modify applied_count               integer not null,
+                             modify approved                    decimal(15,2) not null,
+                             modify approved_count              integer not null,
+                             modify rejected                    decimal(15,2) not null,
+                             modify rejected_count              integer not null,
+                             modify disbursed                   decimal(15,2) not null,
+                             modify disbursed_count             integer not null,
+                             modify outstanding                 decimal(15,2) not null,
+                             modify outstanding_count           integer not null,
+                             modify repaid                      decimal(15,2) not null,
+                             modify repaid_count                integer not null,
+                             modify written_off                 decimal(15,2) not null,
+                             modify written_off_count           integer not null,
+                             modify claim_settlement            decimal(15,2) not null,
+                             modify claim_settlement_count      integer not null,
+                             modify preclosed                   decimal(15,2) not null,
+                             modify preclosed_count             integer not null;
          })
     end
 

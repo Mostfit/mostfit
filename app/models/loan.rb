@@ -1005,7 +1005,7 @@ class Loan
     date = Date.parse(date)      if date.is_a? String
 
     return :applied_in_future    if applied_on.holiday_bump > date  # non existant
-    return :pending_approval     if applied_on.holiday_bump <= date and
+    return :applied              if applied_on.holiday_bump <= date and
                                  not (approved_on and approved_on.holiday_bump <= date) and
                                  not (rejected_on and rejected_on.holiday_bump <= date)
     return :approved             if (approved_on and approved_on.holiday_bump <= date) and not (disbursal_date and disbursal_date.holiday_bump <= date) and 
@@ -1105,7 +1105,13 @@ class Loan
     @holidays = client.center.branch.holidays.map{|h| [h.date, h]}.to_hash
   end
 
+  def amt_sanctioned
+    amount_sanctioned || amount
+  end
 
+  def amt_applied_for
+    amount_applied_for || amount
+  end
 
   def calculate_history
     return @history_array if @history_array
@@ -1131,7 +1137,7 @@ class Loan
     # this is helpful for adjusting interest and principal due on a particular date while taking into account future payments
     last_payments_hash = payments_hash.sort.last; 
     act_total_principal_paid = last_payments_hash[1][:total_principal]; act_total_interest_paid = last_payments_hash[1][:total_interest]
-    
+    last_status = 1; last_row = nil;
     dates.each_with_index do |date,i|
       i_num                                  = installment_for_date(date)
       scheduled                              = get_scheduled(:all, date)
@@ -1146,7 +1152,7 @@ class Loan
       outstanding                            = [:disbursed, :outstanding].include?(st)
       total_principal_due                   += scheduled[:principal].round(2)
       total_interest_due                    += scheduled[:interest].round(2)
-      principal_due                          =  outstanding ? [total_principal_due - act_total_principal_paid,0].max : 0
+      principal_due                          = outstanding ? [total_principal_due - act_total_principal_paid,0].max : 0
       interest_due                           = outstanding ? [total_interest_due - act_total_interest_paid,0].max : 0
       advance_principal_paid                 = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max
       advance_interest_paid                  = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
@@ -1155,18 +1161,17 @@ class Loan
       fees_due_today                         = ap_fees[date] || 0
       fees_paid_today                        = fee_payments[date] || 0
 
-      last_loan_history                      = @history_array.last || nil
+      
 
       principal_in_default                   = (date <= Date.today) ? [0,total_principal_paid.round(2) - total_principal_due.round(2)].min : 0
       interest_in_default                    = (date <= Date.today) ? [0,total_interest_paid.round(2) - total_interest_due.round(2)].min : 0
 
       days_overdue                           = ((principal_in_default > 0  or interest_in_default > 0) and last_loan_history) ? last_loan_history[:days_overdue] + (date - last_loan_history[:date]) : 0
-
-      @history_array << {
+      current_row = {
         :loan_id                             => self.id,
         :date                                => date,
         :holiday_id                          => 0,
-        :last_status                         => last_loan_history ? last_loan_history[:status] : 1,
+        :last_status                         => last_status,
         :status                              => STATUSES.index(st) + 1,
         :scheduled_outstanding_principal     => scheduled[:balance].round(2),
         :scheduled_outstanding_total         => scheduled[:total_balance].round(2),
@@ -1191,8 +1196,8 @@ class Loan
         :advance_principal_paid_today        => (appt = @history_array.last ? [0,advance_principal_paid - (@history_array.last[:advance_principal_paid] || 0)].max : 0),
         :advance_interest_paid_today         => (aipt = @history_array.last ? [0,advance_interest_paid - (@history_array.last[:advance_interest_paid] || 0)].max : 0),
         :total_advance_paid_today            => appt + aipt,
-        :advance_principal_adjusted          => last_loan_history ? [0,last_loan_history[:advance_principal_paid] - advance_principal_paid].max : 0,
-        :advance_interest_adjusted           => last_loan_history ? [0,last_loan_history[:advance_interest_paid] - advance_interest_paid].max : 0,
+        :advance_principal_adjusted          => last_row ? [0,last_row[:advance_principal_paid] - advance_principal_paid].max : 0,
+        :advance_interest_adjusted           => last_row ? [0,last_row[:advance_interest_paid] - advance_interest_paid].max : 0,
         :total_fees_due                      => total_fees_due,
         :total_fees_paid                     => total_fees_paid,
         :fees_due_today                      => fees_due_today,
@@ -1206,9 +1211,22 @@ class Loan
         :funding_line_id                     => funding_line_id,
         :loan_product_id                     => loan_product_id,
         :days_overdue                        => days_overdue
-
-
       }
+      # {:date_field => [:status, :loan_property]}
+      {:applied_on => [:applied, :amt_applied_for], :approved_on => [:approved, :amt_sanctioned], :rejected_on => [:rejected, :amount], 
+        :disbursal_date => [:disbursed, :amount], :written_off_on => [:written_off, :last_balance], :preclosed_on => [:preclosed, :last_balance]}.each do |dt, action|
+        if date == self.send(dt)
+          current_row[action[0]] = action[1] == :last_balance ? last_row[:actual_outstanding_principal] : self.send(action[1])
+          current_row["#{action[0].to_s}_count".to_sym] = 1 
+        else
+          current_row[action[0]] = 0
+          current_row["#{action[0].to_s}_count".to_sym] = 0 
+        end
+      end
+
+      @history_array << current_row
+      last_status = current_row[:status]
+      last_row = current_row
     end
 
     if taken_over?
