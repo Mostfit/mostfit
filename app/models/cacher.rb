@@ -190,10 +190,14 @@ class BranchCache < Cacher
     puts "COMPLETED IN #{(Time.now - t0).round} secs"
   end
 
-  def self.missing_dates(branch_ids = nil, hash = {})
-    hash = hash.merge(:branch_id => branch_ids) if branch_ids
-    history_dates = LoanHistory.all(hash).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
-    cache_dates = BranchCache.all(hash).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
+  # returns a hash of {:branch_id => [date1, date2...]} where dates are those where no caches exist for the branch
+  #
+  # param  [Integer or Array] branch_ids to filter for
+  # param  [Hash]             selection hash to pass to datamapper 
+  def self.missing_dates(branch_ids = nil, selection = {})
+    selection = selection.merge(:branch_id => branch_ids) if branch_ids
+    history_dates = LoanHistory.all(selection).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
+    cache_dates = BranchCache.all(selection).aggregate(:branch_id, :date).group_by{|x| x[0]}.map{|k,v| [k,v.map{|x| x[1]}]}.to_hash
     # hopefully we now have {:branch_id => :dates}
     missing_dates = history_dates - cache_dates
   end

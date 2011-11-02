@@ -75,13 +75,17 @@ namespace :mostfit do
       t0 = Time.now
       co = loan_ids.count
       loan_ids.each_with_index do |loan_id, idx|
-        loan = Loan.get(loan_id)
-        next unless loan
-        loan.update_history
+        begin
+          loan = Loan.get(loan_id)
+          next unless loan
+          loan.update_history
+          print "."
+        rescue
+          print "!"
+        end
         pdone = (idx + 1)/co.to_f
         elapsed = (Time.now - t0).round
         avg_s_per_loan = (elapsed.to_f/(idx + 1)).round(2)
-        print "."
         status_line = "\n#{idx}/#{co} or #{(pdone*100).round(2)}% in #{elapsed} secs ETA #{(avg_s_per_loan * (co - idx) / 60).round(2)} mins: Avg #{avg_s_per_loan} s/loan\n"
         print status_line if idx%50 == 0
       end

@@ -250,7 +250,6 @@ class Loan
   end
 
   def self.from_csv(row, headers)
-    debugger
     interest_rate = (row[headers[:interest_rate]].to_f>1 ? row[headers[:interest_rate]].to_f/100 : row[headers[:interest_rate]].to_f)
     
     obj = new(:loan_product => LoanProduct.first(:name => row[headers[:product]]), :amount => row[headers[:amount]],
@@ -267,6 +266,7 @@ class Loan
               :reference => row[headers[:reference]], :client => Client.first(:reference => row[headers[:client_reference]]))
     obj.history_disabled=true
     saved = obj.save
+    debugger
     if saved
       c = Checker.first_or_new(:model_name => "Loan", :reference => obj.reference)
       c.check_field = row[headers[:check_field]]
@@ -274,6 +274,7 @@ class Loan
       c.expected_value = row[headers[:expected_value]]
       c.unique_field = :reference
       c.upload_id = row[headers[:upload_id]]
+      c.loan = obj
       c.save
     end
     debugger unless saved

@@ -4,7 +4,7 @@ class Cachers < Application
 
   def index
     @cachers = get_cachers
-    display [@cachers]
+    display [@cachers], :layout => (params[:layout] or Nothing).to_sym
   end
   
   def generate
