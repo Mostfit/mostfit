@@ -1026,6 +1026,9 @@ class Loan
   end
   # the installment dates
   def installment_dates
+    if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
+      return client.center.get_dates(scheduled_first_payment_date, number_of_installments)
+    end
     return @_installment_dates if @_installment_dates
     if installment_frequency == :daily
       # we have to be careful that when we do a holiday bump, we do not get stuck in an endless loop
@@ -1048,8 +1051,7 @@ class Loan
     ensure_meeting_day = [:weekly, :biweekly].include?(installment_frequency)
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
     ids = (0..(actual_number_of_installments-1)).to_a.map {|x| shift_date_by_installments(scheduled_first_payment_date, x, ensure_meeting_day) }    
-    @_installment_dates = ids.map{|d| self.holidays[d] ? self.holidays[d].new_date : d}
-    
+    @_installment_dates = ids.map{|d| self.holidays[d] ? self.holidays[d].new_date : d}   
   end
 
   #Increment/sync the loan cycle number. All the past loans which are disbursed are counted

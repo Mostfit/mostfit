@@ -4,7 +4,7 @@ class Date
     # returns today + 7 if today is also the same weekday
     # this is to prevent us getting stuck in an endless loop
     
-    # the :after parameterallows us to get the nth such weekday
+    # the :after parameter allows us to get the nth such weekday
     n  = self - self.wday + WEEKDAYS.index(weekday) + 1
     after += 1 if n <= self 
     return n + (7 * (after - 1))
@@ -41,17 +41,26 @@ class DateVector
     @to = to
   end
 
-  def get_dates
-    raise ArgumentError.new("from and to must be dates") unless (@from.is_a?(Date) and @to.is_a?(Date))
-    d = @from
-    rv = []
+  def get_next_n_dates(n, from = Date.today, override_to_date = false)
+    # gets the next n dates from from date. Stops at @to unless you override_to_date
+    ds = get_dates(from, n)
+    override_to_date ? ds.select{|d| d <= @to} : ds
+  end
+
+  def get_dates(from = @from, to = @to)
+    # get the dates as specified by this vector from the from date uptil "to" if "to" is a Date, or else get "to" such dates if an integer
+    raise ArgumentError.new("from and must be a date") unless from.is_a?(Date) 
+    raise ArgumentError.new("to must be either a date or an Integer") unless (to.is_a?(Date) or to.is_a? Integer)
+    d = from;    rv = [];     i = 0
     case @period
     when :week
-      while d  <= @to
+      while (to.is_a?(Date) ? d  <= to : i <= to)
         [@what].flatten.map do |wday| # convert :tuesday into [:tuesday] so we can treat everything as an array
+          debugger
           d = d.next_(wday)
-          rv << d if d <= to
+          rv << d if (to.is_a?(Date) ? d  <= to : i <= to)
           d = d + ((@of_every - 1) * 7)
+          i += 1
         end
       end
     when :month 
@@ -60,9 +69,10 @@ class DateVector
         while d<= to
           [@every].flatten.each do |e|
             d = d.first_day_of_month + e - 1
-            rv << d if d >= from and d <= to
+            rv << d if d >= from and (to.is_a?(Date) ? d  <= to : i <= to)
           end
           d = (d.last_day_of_month + 1) >> (@of_every - 1)
+          i += 1
         end          
       else
         # handle 2nd tuesday every 2nd month type. every = 2, what = :tuesday, :of_every = 2, :period = :month
@@ -70,20 +80,16 @@ class DateVector
           [@every].flatten.each do |e|
             [@what].flatten.each do |w|
               d = d.first_day_of_month.next_(w,e)
-              rv << d if d >= from and d <= to
+              rv << d if d >= from and (to.is_a?(Date) ? d  <= to : i <= to)
             end
           end
           d = (d.last_day_of_month + 1) >> (@of_every - 1)
+          i += 1
         end
         
       end
     end
-    @dates = rv.select{|d| d >= from and d <= to}
-  end
-
-  def apply_holidays(holidays)
-    # holidays is a hash of {:orig_date => [:shifted_date, :holiday_id]}
-    
+    @dates = rv.select{|d| d >= from and (to.is_a?(Date) ? d <= to : true)}
   end
 
 

@@ -93,11 +93,18 @@ class Centers < Application
   end
 
   def create(center)
+    debugger
+    @center_meeting_day = CenterMeetingDay.new(center.delete(:center_meeting_day))
+    @center_meeting_day.valid_from = center[:creation_date]
+    
     @center = Center.new(center)
+    @center.center_meeting_days << @center_meeting_day
     if @branch
       @center.branch = @branch  # set direct context
     end
     if @center.save
+      @center_meeting_day.center_id = @center.id
+      @center_meeting_day.save
       if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @center
       else

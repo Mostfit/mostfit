@@ -8,15 +8,36 @@ class CenterMeetingDay
   property :meeting_day, Enum.send('[]', *DAYS), :nullable => false, :default => :none, :index => true
   property :valid_from,  Date, :nullable => false
   property :valid_upto,  Date, :nullable => false, :default => Date.new(2100, 12, 31) # a date far in future
+  
+  # define some properties using which we can construct a DateVector of meeting dates
+  # see lib/date_vector.rb for details but in short one can say things like
+  # :every => [2,4], :what => :thursday, :of_every => 2, :period => :month to mean "every 2nd and 4th thursday of every 2nd month"
+  # this is the kind of feature that sets Mostfit miles apart from the rest of the pack!
+
+  property :every, CommaSeparatedList 
+  property :what, CommaSeparatedList
+  property :of_every, Integer
+  property :period, Enum[:week, :month]
+  
   belongs_to :center
 
+  
 
   # adding the new properties to calculate the datevector for this center.
-  # for now we will allow only one datevector type per center. This means a center can only have one frequency
+  # for now we will allow only one datevector type per center. This means a center can only have one meeting schedule frequency
   
-  property :datevector, Text # this is a marshal.dump of a datevector object
+  def date_vector(from = self.valid_from, to = self.valid_upto)
+    DateVector.new(every, what.map{|w| w.to_sym}, of_every, period.to_sym, from, to)
+  end
 
-  
+  def get_dates(from = self.valid_from, to = self.valid_upto)
+    date_vector(from, to).get_dates
+  end
+
+  def get_next_n_dates(n, from = self.valid_from)
+    get_dates(from, n)
+  end
+
   after :destroy, :fix_dates
 
 

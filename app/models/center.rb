@@ -67,6 +67,12 @@ class Center
     DAYS
   end
 
+  def get_meeting_dates(from, to)
+    # to can be a date or a number
+    _a = center_meeting_days.map{|cmd| cmd.get_dates(from, to)}.flatten
+    to.is_a?(Date) ? _a.select{|x| x <= to} : _a[0..(to - 1)]
+  end
+
 
   # a simple catalog (Hash) of center names and ids grouped by branches
   # returns some like: {"One branch" => {1 => 'center1', 2 => 'center2'}, "b2" => {3 => 'c3', 4 => 'c4'}} 

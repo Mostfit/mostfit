@@ -83,7 +83,7 @@ class DataAccessObserver
   end
   
   before :destroy! do
-    raise NotPrivileged
+    raise NotPrivileged unless File.writable?("config.ru")
   end
 
 end
