@@ -17,6 +17,21 @@ class Cachers < Application
     redirect resource(:cachers, :date => @date)
   end
 
+  def consolidate
+    debugger
+    @cachers = get_cachers
+    @stale = @cachers.stale.aggregate(:branch_id, :center_id)
+    @center_names = @cachers.blank? ? {} : Center.all(:id => @cachers.aggregate(:center_id)).aggregate(:id, :name).to_hash
+    @last_cache_update = @cachers.aggregate(:updated_at.min)
+    group_by = params[:group_by] ||= "branch"
+    group_by_model = Kernel.const_get(group_by.camelcase) 
+    @grouped_cachers = @cachers.group_by{|c| c.send("#{group_by}_id".to_sym)}.to_hash.map do |group_by_id, cachers| 
+      group_obj = group_by_model.get(group_by_id)
+      [group_obj, cachers.reduce(:consolidate)]
+    end.to_hash
+    display @grouped_cachers
+  end
+
   private
   
   def parse_dates
@@ -25,8 +40,6 @@ class Cachers < Application
     end
   end
 
-  def consolidate
-  end
 
   def get_cachers
     q = {}
@@ -36,7 +49,8 @@ class Cachers < Application
     else
       q[:model_name] = "Branch"
     end
-    q[:date] = @date
+    q[:date] = @date if @date
+    q[:date] = @from_date..@to_date if (@from_date and @to_date)
     Cacher.all(q)
   end
 end

@@ -1,4 +1,4 @@
-- keys = [:date, :branch_id, :center_id,  :scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid, :fees_due_today, :fees_paid_today, :total_fees_due, :total_fees_paid, :approved, :approved_count]
+- keys = [:date, :branch_id, :center_id,  :scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid, :fees_due_today, :fees_paid_today, :total_fees_due, :total_fees_paid, :advance_principal_paid, :advance_interest_paid, :advance_principal_adjusted, :advance_interest_adjusted, :approved, :approved_count]
 - total_keys = [:scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid, :fees_due_today, :fees_paid_today, :total_fees_due, :total_fees_paid]
 - query_params = request.send(:query_params)
 - @stale = @cachers.all(:model_name => "Center").stale.aggregate(:branch_id,:center_id)
@@ -58,9 +58,9 @@
       No caches found. 
       = link_to 'generate?', url(:controller => :cachers, :action => :generate, :date => @date), :class => "green_button"
   
-%table.diags{:style => "width: 1400px;"}
+%table.diags{:style => "width: 2100px;"}
   %thead
-    %tr
+    %tr{:class => "header"}
       - keys.each do |at|
         %th
           = at.to_s.gsub("_","<br>")

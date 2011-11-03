@@ -270,8 +270,8 @@ class LoanHistory
 
     repository.adapter.query(%Q{
       SELECT 
-        (-1 * SUM(lh.principal_due)) AS advance_principal,
-        (-1 * (SUM(lh.principal_due) + SUM(lh.interest_due))) AS advance_total,
+        (1 * SUM(lh.advance_principal_paid)) AS advance_principal,
+        (1 * (SUM(lh.total_advance_paid))) AS advance_total,
         #{selects}
       FROM loan_history lh, loans l
       WHERE lh.status in (6) AND l.id=lh.loan_id AND lh.date>='#{from_date.strftime('%Y-%m-%d')}' AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'

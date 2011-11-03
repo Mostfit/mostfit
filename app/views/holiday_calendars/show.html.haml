@@ -4,7 +4,7 @@
 %h2 
   == Applies to #{@holiday_calendar.applic.model}: #{@holiday_calendar.applic.name}
   
-= form_for (@holiday_calendar, :action => resource(@holiday_calendar)) do
+= form_for(@holiday_calendar, :action => resource(@holiday_calendar)) do
   %label Add holiday
   = select :name => :'holiday_calendar[holiday]', :collection => (Holiday.all - @holiday_calendar.holidays).map{|x| [x.id, "#{x.name} : #{x.date}"]}, :prompt => "choose a holiday", :class => "chosen"
   = submit 'Add holiday'

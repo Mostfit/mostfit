@@ -38,9 +38,9 @@ class Date
     end
   end
 
- # def inspect
- #   "<Date: #{self.to_s} #{self.weekday}>"
- # end
+ def inspect
+   "<Date: #{self.to_s} #{self.weekday}>"
+ end
 
   def weekday
     #week starts on monday

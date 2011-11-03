@@ -3,7 +3,7 @@ Merb::Router.prepare do
   resources :checkers
 
   resources :holiday_calendars
-  resources :cachers, :id => %r(\d+)
+  resources :cachers, :id => %r(\d+), :collection => {:consolidate => [:get]}
 
   resources :api_accesses
   resources :monthly_targets
