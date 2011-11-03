@@ -332,6 +332,7 @@ def get_bulk_insert_sql(table_name, data)
   data.each do |row|
     value = keys.map do |k| 
       v = row[k]
+      raise ArgumentError.new("#{k} is nil") if v.nil?
       if v.class == Date
         "'#{v.strftime('%Y-%m-%d')}'"
       elsif v.class == DateTime
