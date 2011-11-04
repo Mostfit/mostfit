@@ -53,7 +53,8 @@ class StaffMember
     mobile = nil
     mobile = row[headers[:mobile_number]] if headers[:mobile_number] and row[headers[:mobile_number]]
     obj = new(:name => row[headers[:name]], :user => user, :creation_date => Date.today,
-              :mobile_number => mobile, 
+              :mobile_number => mobile,
+              :gender => row[headers[:gender]],
               :active => true)
     [obj.save, obj]
   end

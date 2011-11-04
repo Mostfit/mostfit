@@ -18,6 +18,13 @@ class RepaymentStyle
     style
   end
 
+  def self.from_csv(row, headers)
+    obj = new(:name => row[headers[:name]], :style => row[headers[:style]],
+              :custom_principal_schedule => row[headers[:custom_principal_schedule]], :active => true,
+              :custom_interest_schedule => row[headers[:custom_interest_schedule]])
+    [obj.save, obj]
+  end
+
   def convert_blank_to_nil
     self.attributes.each{|k, v|
       if v.is_a?(String) and v.empty? and (self.class.send(k).type == Integer or self.class.send(k).type == Float)

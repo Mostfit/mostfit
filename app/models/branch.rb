@@ -37,7 +37,8 @@ class Branch
   validates_with_method :manager, :method => :manager_is_an_active_staff_member?
 
   def self.from_csv(row, headers)
-    obj = new(:code => row[headers[:code]], :name => row[headers[:name]], :address => row[headers[:address]], 
+    obj = new(:code => row[headers[:code]], :name => row[headers[:name]], :address => row[headers[:address]],
+              :creation_date => Date.parse(row[headers[:creation_date]]),
               :manager => StaffMember.first(:name => row[headers[:manager]]))
     [obj.save, obj]
   end
