@@ -47,6 +47,7 @@ class DataAccessObserver
   end
 
   def self.check_session(obj)
+    debugger
     return true if Merb.environment == "test"
     return true if File.writable?("config.ru") and not @_user
     @_user = User.authenticate(ENV['MOSTFIT_USER'], ENV['MOSTFIT_PASSWORD'])    unless @_user
@@ -83,7 +84,7 @@ class DataAccessObserver
   end
   
   before :destroy! do
-    raise NotPrivileged
+    raise NotPrivileged if self.model.properties.map{|r| r.name}.include?(:deleted_at)
   end
 
 end
