@@ -254,9 +254,11 @@ class Loan
               :funding_line_id => funding_lines[row[headers[:funding_line_serial_number]]].id,
               :applied_by_staff_id => StaffMember.first(:name => row[headers[:applied_by_staff]]).id,
               :approved_by_staff_id => StaffMember.first(:name => row[headers[:approved_by_staff]]).id,
+              :repayment_style_id => RepaymentStyle.first(:name => row[headers[:repayment_style]]).id,
+              :c_center_id => Center.first(:name => row[headers[:center]]).id,
               :client => Client.first(:reference => row[headers[:client_reference]]))
     obj.history_disabled=true
-    [obj.save, obj]
+    [obj.save!, obj]
   end
 
   def is_valid_loan_product_amount; is_valid_loan_product(:amount); end
