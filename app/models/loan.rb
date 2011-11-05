@@ -1213,7 +1213,7 @@ class Loan
         :fees_due_today                      => fees_due_today,
         :fees_paid_today                     => fees_paid_today,
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f,
-        :branch_id                           => branch_id
+        :branch_id                           => branch_id,
         :center_id                           => center_id,
         :client_group_id                     => client_group_id,
         :client_id                           => client.id,
