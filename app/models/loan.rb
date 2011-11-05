@@ -1133,7 +1133,14 @@ class Loan
                (self.holidays[d] ? self.holidays[d].new_date : d)
              } +  installment_dates + payment_dates).compact.uniq.sort
 
+
+    # initialize
     total_principal_due = total_interest_due = total_principal_paid = total_interest_paid = 0
+
+    # find out what branch, center and client group we are in
+    client_group_id = (client.client_group or Nothing).id || 0
+    center_id       = client.center.id
+    branch_id       = client.center.branch_id
 
     # find the actual total principal and interest paid.
     # this is helpful for adjusting interest and principal due on a particular date while taking into account future payments
@@ -1206,9 +1213,9 @@ class Loan
         :fees_due_today                      => fees_due_today,
         :fees_paid_today                     => fees_paid_today,
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f,
-        :branch_id                           => c_branch_id || client.center.branch.id,
-        :center_id                           => c_center_id,
-        :client_group_id                     => c_client_group_id || 0,
+        :branch_id                           => branch_id
+        :center_id                           => center_id,
+        :client_group_id                     => client_group_id,
         :client_id                           => client.id,
         :created_at                          => now,
         :funding_line_id                     => funding_line_id,
