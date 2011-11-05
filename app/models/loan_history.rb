@@ -50,7 +50,7 @@ class LoanHistory
   # add a column per status to track approvals, disbursals, etc.
   STATUSES.each do |status|
     property "#{status.to_s}_count".to_sym,  Integer, :nullable => false, :default => 0
-    property "#{status.to_s}".to_sym,        Float,   :nullable => false, :default => 0
+    property status,        Float,   :nullable => false, :default => 0
   end
   
 
@@ -81,18 +81,20 @@ class LoanHistory
   
   validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
-  def self.update_holidays(branch_ids, holiday, delete = false)
-    # get the loans which already have a loan history row for the new date
-    # we will have to do a manual update history for them.
-    if delete
-      repository.adapter.execute("update loan_history set date='#{holiday.date.strftime('%Y-%m-%d')}', holiday_id=NULL where holiday_id = #{holiday.id}")
-    else      
-      debugger
-      pls = LoanHistory.all(:branch_id => branch_ids, :date => holiday.new_date).aggregate(:loan_id)
-      s = pls.empty? ? "" : " AND loan_id NOT IN (#{pls.join','})"
-      repository.adapter.execute("update loan_history set date='#{holiday.new_date.strftime('%Y-%m-%d')}', holiday_id=#{holiday.id} where date='#{holiday.date.strftime('%Y-%m-%d')}' AND branch_id in (#{branch_ids.join(',')}) #{s}")
-      pls.each_with_index {|lid,i| l = Loan.get(lid); l.update_history_bulk_insert; puts("Updating #{i}/#{pls.count}")}
-    end
+  def total_paid
+    principal_paid + interest_paid + fees_paid_today
+  end
+
+  def actual_outstanding_interest
+    actual_outstanding_total - actual_outstanding_principal
+  end
+
+  def total_advance_paid
+    advance_principal_paid_today + advance_interest_paid_today
+  end
+
+  def total_default
+    (principal_in_default + interest_in_default).abs
   end
 
   @@selects = {Branch => "b.id", Center => "c.id", Client => "cl.id", Loan => "l.id", Area => "a.id", Region => "r.id", ClientGroup => "cg.id", Portfolio => "p.id"}

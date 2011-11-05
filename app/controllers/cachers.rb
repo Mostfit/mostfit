@@ -22,14 +22,15 @@ class Cachers < Application
     @cachers = get_cachers
     @stale = @cachers.stale.aggregate(:branch_id, :center_id)
     @center_names = @cachers.blank? ? {} : Center.all(:id => @cachers.aggregate(:center_id)).aggregate(:id, :name).to_hash
+    @branch_names = @cachers.blank? ? {} : Branch.all(:id => @cachers.aggregate(:branch_id)).aggregate(:id, :name).to_hash
     @last_cache_update = @cachers.aggregate(:updated_at.min)
     group_by = params[:group_by] ||= "branch"
     group_by_model = Kernel.const_get(group_by.camelcase) 
     @grouped_cachers = @cachers.group_by{|c| c.send("#{group_by}_id".to_sym)}.to_hash.map do |group_by_id, cachers| 
       group_obj = group_by_model.get(group_by_id)
       [group_obj, cachers.reduce(:consolidate)]
-    end.to_hash
-    display @grouped_cachers
+    end
+    display @cachers
   end
 
   private

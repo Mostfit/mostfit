@@ -1845,9 +1845,15 @@ table.moreinfo thead th {
   margin: 2px;
 }
 
-table.diags tr.stale {
-  background:#ff9999;
-  border: solid 1px pink;
+table.diags {
+    table-layout: fixed;
+    tr.stale {
+    background:#ff9999;
+    border: solid 1px pink;
+  }
+  td.date {
+    width: 300px;
+  }
 }
 
 tr.closed {

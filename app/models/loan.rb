@@ -1152,8 +1152,8 @@ class Loan
       scheduled_principal_due                = i_num > 0 ? scheduled[:principal] : 0
       scheduled_interest_due                 = i_num > 0 ? scheduled[:interest] : 0
       outstanding                            = [:disbursed, :outstanding].include?(st)
-      total_principal_due                   += scheduled[:principal].round(2)
-      total_interest_due                    += scheduled[:interest].round(2)
+      total_principal_due                   += outstanding ? scheduled[:principal].round(2) : 0
+      total_interest_due                    += outstanding ? scheduled[:interest].round(2) : 0
       principal_due                          = outstanding ? [total_principal_due - act_total_principal_paid,0].max : 0
       interest_due                           = outstanding ? [total_interest_due - act_total_interest_paid,0].max : 0
       advance_principal_paid                 = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max
@@ -1165,10 +1165,11 @@ class Loan
 
       
 
-      principal_in_default                   = (date <= Date.today) ? [0,total_principal_paid.round(2) - total_principal_due.round(2)].min : 0
-      interest_in_default                    = (date <= Date.today) ? [0,total_interest_paid.round(2) - total_interest_due.round(2)].min : 0
+      principal_in_default                   = outstanding ? ((date <= Date.today) ? [0,total_principal_paid.round(2) - total_principal_due.round(2)].min : 0) : 0
+      interest_in_default                    = outstanding ? ((date <= Date.today) ? [0,total_interest_paid.round(2) - total_interest_due.round(2)].min : 0)   : 0
 
       days_overdue                           = ((principal_in_default > 0  or interest_in_default > 0) and last_loan_history) ? last_loan_history[:days_overdue] + (date - last_loan_history[:date]) : 0
+
       current_row = {
         :loan_id                             => self.id,
         :date                                => date,
@@ -1195,8 +1196,8 @@ class Loan
         :advance_principal_paid              => advance_principal_paid,
         :advance_interest_paid               => advance_interest_paid,
         :total_advance_paid                  => advance_principal_paid + advance_interest_paid,
-        :advance_principal_paid_today        => (appt = @history_array.last ? [0,advance_principal_paid - (@history_array.last[:advance_principal_paid] || 0)].max : 0),
-        :advance_interest_paid_today         => (aipt = @history_array.last ? [0,advance_interest_paid - (@history_array.last[:advance_interest_paid] || 0)].max : 0),
+        :advance_principal_paid_today        => (appt = last_row ? [0,advance_principal_paid - (last_row[:advance_principal_paid] || 0)].max : 0),
+        :advance_interest_paid_today         => (aipt = last_row ? [0,advance_interest_paid - (last_row[:advance_interest_paid] || 0)].max : 0),
         :total_advance_paid_today            => appt + aipt,
         :advance_principal_adjusted          => last_row ? [0,last_row[:advance_principal_paid] - advance_principal_paid].max : 0,
         :advance_interest_adjusted           => last_row ? [0,last_row[:advance_interest_paid] - advance_interest_paid].max : 0,
@@ -1205,7 +1206,7 @@ class Loan
         :fees_due_today                      => fees_due_today,
         :fees_paid_today                     => fees_paid_today,
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f,
-        :branch_id                           => c_branch_id,
+        :branch_id                           => c_branch_id || client.center.branch.id,
         :center_id                           => c_center_id,
         :client_group_id                     => c_client_group_id || 0,
         :client_id                           => client.id,

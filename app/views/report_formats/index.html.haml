@@ -1,0 +1,16 @@
+%h1
+  ReportFormats controller, index action
+%p
+  Edit this file in
+  %tt
+    app/views/report_formats/index.html.erb
+%table
+  %tr
+  - for report_format in @report_formats
+    %tr
+      %td
+        = link_to 'Show', url(:report_format, report_format)
+      %td
+        = link_to 'Edit', url(:edit_report_format,  report_format)
+
+= link_to 'New', url(:new_report_format)

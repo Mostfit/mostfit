@@ -25,6 +25,8 @@ class Cacher
   property :total_interest_paid,             Float, :nullable => false
   property :advance_principal_paid,          Float, :nullable => false
   property :advance_interest_paid,           Float, :nullable => false
+  property :advance_principal_paid_today,    Float, :nullable => false
+  property :advance_interest_paid_today,     Float, :nullable => false
   property :advance_principal_adjusted,      Float, :nullable => false
   property :advance_interest_adjusted,       Float, :nullable => false
   property :principal_in_default,            Float, :nullable => false
@@ -52,10 +54,18 @@ class Cacher
                                    :principal_in_default, :interest_in_default, :total_fees_due, :total_fees_paid]
   FLOW_COLS = [:principal_due, :principal_paid, :interest_due, :interest_paid,
                  :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted,
-               :advance_principal_paid, :advance_interest_paid, :fees_due_today, :fees_paid_today] + STATUSES.map{|s| [s, "#{s}_count".to_sym]}.flatten
+               :advance_principal_paid, :advance_interest_paid, :advance_principal_paid_today, :advance_interest_paid_today, :fees_due_today, :fees_paid_today] + STATUSES.map{|s| [s, "#{s}_count".to_sym]}.flatten
+
+  def total_paid
+    principal_paid + interest_paid + fees_paid_today
+  end
+
+  def actual_outstanding_interest
+    actual_outstanding_total - actual_outstanding_principal
+  end
 
   def total_advance_paid
-    advance_principal_paid + advance_interest_paid
+    advance_principal_paid_today + advance_interest_paid_today
   end
 
   def total_default
