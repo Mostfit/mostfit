@@ -1,4 +1,4 @@
-- if params  and params[:center_id] and params[:date]
+- if params  and params[:center_id] and (@date || @to_date)
   = link_to 'weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet"
   - total = {}
   - histories = LoanHistory.latest({:center_id => params[:center_id]}, @date)

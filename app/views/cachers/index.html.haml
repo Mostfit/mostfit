@@ -58,9 +58,9 @@
       No caches found. 
       = link_to 'generate?', url(:controller => :cachers, :action => :generate, :date => @date), :class => "green_button"
   
-%table.diags{:style => "width: 2100px;"}
+%table.report.nojs
   %thead
-    %tr{:class => "header"}
+    %tr.header
       - keys.each do |at|
         %th
           = at.to_s.gsub("_","<br>")

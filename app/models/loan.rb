@@ -207,14 +207,13 @@ class Loan
   validates_with_method  :insurance_policy,             :method => :check_insurance_policy    
 
 
-  def update_loan_cache(force = false)
-    update_non_history_attributes(force)
-    update_history_attributes
+  def update_loan_cache(force = true)
+    update_non_history_attributes(true)
   end
   
   def update_non_history_attributes(force)
     force = true if self.new?
-    self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
+    self.repayment_style = self.rs
     @orig_attrs = self.original_attributes
     t = Time.now
     self.c_center_id = self.client.center.id if force
@@ -223,20 +222,21 @@ class Loan
     self.c_scheduled_maturity_date = scheduled_maturity_date
   end
 
-  def update_history_attributes
-    # avoid SQL calls
-    first_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}[0]
-    self.c_actual_first_payment_date = first_payment.received_on if first_payment
-    st = self.get_status
-    self.c_last_status = STATUSES.index(st) + 1
-    self.c_principal_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
-    self.c_interest_received = payments.select{|p| p.type == :interest}.reduce(0){|s,p| s + p.amount}
-    last_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}.reverse[0]
-    self.c_last_payment_received_on = (last_payment.received_on if last_payment) || nil
-    self.c_maturity_date = (STATUSES.index(st) > 5 and last_payment) ? c_last_payment_received_on : nil
-    self.c_last_payment_id = last_payment.id if last_payment
-    true
-  end
+  # DEPRECATED: all this good stuff is now easily accessible from loan_history
+  # def update_history_attributes
+  #   # avoid SQL calls
+  #   first_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}[0]
+  #   self.c_actual_first_payment_date = first_payment.received_on if first_payment
+  #   st = self.get_status
+  #   self.c_last_status = STATUSES.index(st) + 1
+  #   self.c_principal_received = payments.select{|p| p.type == :principal}.reduce(0){|s,p| s + p.amount}
+  #   self.c_interest_received = payments.select{|p| p.type == :interest}.reduce(0){|s,p| s + p.amount}
+  #   last_payment = payments.select{|p| [:prinicpal, :interest].include?(p.type)}.sort_by{|p| p.received_on}.reverse[0]
+  #   self.c_last_payment_received_on = (last_payment.received_on if last_payment) || nil
+  #   self.c_maturity_date = (STATUSES.index(st) > 5 and last_payment) ? c_last_payment_received_on : nil
+  #   self.c_last_payment_id = last_payment.id if last_payment
+  #   true
+  # end
 
 
   def self.display_name
@@ -1097,8 +1097,6 @@ class Loan
     Merb.logger.info "HISTORY EXEC TIME: #{(Time.now - t).round(4)} secs"
     @already_updated=true
     t = Time.now
-    #update_history_attributes
-    #self.save!
     Merb.logger.info "LOAN CACHE UPDATE TIME: #{(Time.now - t).round(4)} secs"
   end
 
@@ -1138,9 +1136,10 @@ class Loan
     total_principal_due = total_interest_due = total_principal_paid = total_interest_paid = 0
 
     # find out what branch, center and client group we are in
-    client_group_id = (client.client_group or Nothing).id || 0
-    center_id       = client.center.id
-    branch_id       = client.center.branch_id
+    # client_group_id = (client.client_group or Nothing).id || 0
+    # center_id       = client.center.id
+    # branch_id       = client.center.branch_id
+    # SLOW!
 
     # find the actual total principal and interest paid.
     # this is helpful for adjusting interest and principal due on a particular date while taking into account future payments
@@ -1213,10 +1212,10 @@ class Loan
         :fees_due_today                      => fees_due_today,
         :fees_paid_today                     => fees_paid_today,
         :composite_key                       => "#{id}.#{(i/10000.0).to_s.split('.')[1]}".to_f,
-        :branch_id                           => branch_id,
-        :center_id                           => center_id,
-        :client_group_id                     => client_group_id,
-        :client_id                           => client.id,
+        :branch_id                           => c_branch_id,
+        :center_id                           => c_center_id,
+        :client_group_id                     => c_client_group_id || 0,
+        :client_id                           => client_id,
         :created_at                          => now,
         :funding_line_id                     => funding_line_id,
         :loan_product_id                     => loan_product_id,

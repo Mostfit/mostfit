@@ -105,7 +105,7 @@
         %td{:style => "text-align: right", :class => at}
           - if at == :branch_id
             - br = Branch.get(val)
-            = link_to((br ? br.name : "-"), url(:consolidate_cachers, request.send(:query_params).merge(:branch_id => br.id)))
+            = link_to((br ? br.name : "-"), url(:consolidate_cachers, request.send(:query_params).merge(:branch_id => br.id, :group_by => :center)))
           - elsif at == :center_id
             = link_to((@center_names[val] || "-"), url(:consolidate_cachers, request.send(:query_params).merge(:center_id => val, :date => c.date)))
           - else

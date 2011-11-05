@@ -82,6 +82,7 @@ namespace :mostfit do
           print "."
         rescue
           print "!"
+          puts loan_id
         end
         pdone = (idx + 1)/co.to_f
         elapsed = (Time.now - t0).round
