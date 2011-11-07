@@ -93,32 +93,8 @@ class Cacher
     branch_centers - cached_centers
   end
 
-  # finds the missing caches given some caches 
-  def self.missing(selection)
-    bs = self.all(selection).aggregate(:date,:branch_id, :center_id) #.map{|x| [[x[0],x[1]],[x[2]].flatten]}
-    #b = {}; h = {}
-    #bs.each{|x| b[x[0]] ? b[x[0]] += x[1] : b[x[0]] = x[1]}
-    hs = LoanHistory.all(selection).aggregate(:date,:branch_id, :center_id) #.map{|x| [[x[0],x[1]],[x[2]].flatten]}
-    #hs.each{|x| h[x[0]] ? h[x[0]] += x[1] : h[x[0]] = x[1]}
-    #debugger
-    #h.to_hash.deepen - b.to_hash.deepen
-    hs - bs
-  end
 
 
-  def self.create(hash = {})
-    # creates a cacher from loan_history table for any arbitrary condition. Also does grouping
-    date = hash.delete(:date) || Date.today
-    group_by = hash.delete(:group_by) || []
-    cols = hash.delete(:cols) || COLS
-    flow_cols = FLOW_COLS
-    balances = LoanHistory.latest_sum(hash,date, group_by, cols)
-    pmts = LoanHistory.composite_key_sum(LoanHistory.all(hash.merge(:date => date)).aggregate(:composite_key), group_by, flow_cols)
-    # if there are no loan history rows that match today, then pmts is just a single hash, else it is a hash of hashes
-    ng = flow_cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
-    balances.map{|k,v| [k,(pmts[k] || ng).merge(v)]}.to_hash
-
-  end
 
   def consolidate (other)
     # this not addition, it is consolidation
@@ -246,6 +222,7 @@ end
 class CenterCache < Cacher
   def self.update(hash = {})
     # creates a cache per center for branches and centers per the hash passed as argument
+    debugger
     date = hash.delete(:date) || Date.today
     hash = hash.select{|k,v| [:branch_id, :center_id].include?(k)}.to_hash
     centers_data = CenterCache.create(hash.merge(:date => date, :group_by => [:branch_id,:center_id])).deepen.values.sum
@@ -257,13 +234,37 @@ class CenterCache < Cacher
       centers_data[center_id].merge({:type => "CenterCache",:model_name => "Center", :model_id => center_id, :date => date, :updated_at => now})
     end
     if cs.nil?
-      debugger
       return false 
     end
     sql = get_bulk_insert_sql("cachers", cs)
     raise unless CenterCache.all(:date => date, :center_id => centers_data.keys).destroy!
     repository.adapter.execute(sql)
   end
+
+  def self.create(hash = {})
+    # creates a cacher from loan_history table for any arbitrary condition. Also does grouping
+    date = hash.delete(:date) || Date.today
+    group_by = hash.delete(:group_by) || []
+    cols = hash.delete(:cols) || COLS
+    flow_cols = FLOW_COLS
+    balances = LoanHistory.latest_sum(hash,date, group_by, cols)
+    pmts = LoanHistory.composite_key_sum(LoanHistory.all(hash.merge(:date => date)).aggregate(:composite_key), group_by, flow_cols)
+    # if there are no loan history rows that match today, then pmts is just a single hash, else it is a hash of hashes
+    ng_pmts = flow_cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
+    ng_bals = cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
+    # workaround for the situation where no rows get returned for centers without loans.
+    # this makes it very difficult to find missing center caches so we must have a row for all centers, even if it is full of zeros
+    debugger
+    universe = Center.all(:id => hash[:center_id]).aggregate(:branch_id, :id)
+    universe.map do |k| 
+      pmts = pmts[k] || ng_pmts
+      bals = balances[k] || ng_bals
+      extra = balances[k] ? {} : {:center_id => k[1], :branch_id => k[0]} # for ng rows, we need to insert center_id and branch_id
+      [k, pmts.merge(bals).merge(extra)]
+    end.to_hash
+
+  end
+
 
   # executes an SQL statement to mark all center caches and branch caches for this center as stale. Only does this for cachers on or after options[:date]
   # params [Hash] a hash of options thus {:center_id => Integer, :date => Date or String}
@@ -279,5 +280,17 @@ class CenterCache < Cacher
     puts "STALIFIED CENTERS in #{(Time.now - t).round(2)} secs"
 
   end
+
+  # finds the missing caches given some caches 
+  def self.missing(selection)
+    bs = self.all(selection).aggregate(:date, :center_id).group_by{|x| x[0]}.to_hash.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
+    # bs is a hash of {:date => [:center_id,...]}
+    selection.delete(:date)
+    selection[:id] = selection.delete(:center_id) if selection[:center_id]
+    hs = Center.all(selection).aggregate(:id)
+    bs.keys.map{|date| [date,hs - bs[date]]}.to_hash
+  end
+
+
 
 end

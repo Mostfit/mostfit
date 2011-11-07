@@ -9,6 +9,12 @@ class Cachers < Application
     @keys = [:date] + @keys
     display @cachers
   end
+
+  def missing
+    params[:stale] = true
+    get_cachers
+    display @cachers, :template => 'cachers/index'
+  end
   
   def generate
     if @from_date and @to_date
@@ -76,9 +82,10 @@ class Cachers < Application
     end
     q[:date] = @date if @date
     q[:date] = @from_date..@to_date if (@from_date and @to_date)
+    q[:stale] = true if params[:stale]
     @cachers = Cacher.all(q)
     q.delete(:model_name)
-    @missing_centers = Cacher.missing(q)
+    @missing_centers = CenterCache.missing(q)
     get_context
   end
 
@@ -87,13 +94,14 @@ class Cachers < Application
     @branch = params[:branch_id].blank? ? nil : Branch.get(params[:branch_id])
     @center_names = @cachers.blank? ? {} : Center.all(:id => @cachers.aggregate(:center_id)).aggregate(:id, :name).to_hash
     @branch_names = @cachers.blank? ? {} : Branch.all(:id => @cachers.aggregate(:branch_id)).aggregate(:id, :name).to_hash
-    @stale_centers = @cachers.all(:type => CenterCache, :stale => true)
-    @stale_branches = @cachers.all(:type => CenterCache, :stale => true)
+    debugger
+    q = (@from_date and @to_date) ? {:date => @from_date..@to_date} : {:date => @date}
+    @stale_centers = CenterCache.all(q.merge(:stale => true))
+    @stale_branches = BranchCache.all(q.merge(:stale => true))
     @last_cache_update = @cachers.aggregate(:updated_at.min)
     @resource = params[:action] == "index" ? :cachers : (params[:action].to_s + "_" + "cachers").to_sym
     @keys = [:branch_id, :center_id] + ReportFormat.get(params[:report_format] || 1).keys 
     @total_keys = @keys[3..-1]
-
     if @resource == :split_cachers
       @level = params[:center_id].blank? ? :branches : :centers
       @keys = [:date] + @keys
