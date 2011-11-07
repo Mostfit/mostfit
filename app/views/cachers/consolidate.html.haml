@@ -83,12 +83,20 @@
       No caches found. 
       = link_to 'generate?', url(:controller => :cachers, :action => :generate, :date => @date), :class => "green_button"
 
+- @show_loans = params  and (not params[:center_id].blank?) and (@date || @to_date)
+- if @show_loans
+  .menu-strip
+    = link_to 'go to weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet", :class => "edit"
+
+
 %table.report.nojs
   %thead
     %tr.header
       - keys.each do |at|
         %th{:class => at}
           = at.to_s.gsub("_"," ")
+      %th loan link
+
   = partial :loans, :keys => keys
   - total_row = {}
 

@@ -1,20 +1,36 @@
-- if params  and params[:center_id] and (@date || @to_date)
-  = link_to 'weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet"
-  - total = {}
-  - histories = LoanHistory.latest({:center_id => params[:center_id]}, @date)
+.menu-strip
+  = link_to 'go to weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet", :class => "edit"
+  = link_to 'rebuild caches', url(:rebuild_cachers, :center_id => params[:center_id]), :title => "Recreates history for these loans. Marks center and branch caches on and after this date as stale. recreates todays caches"
+
+- total = {}
+- histories = LoanHistory.latest({:center_id => params[:center_id]}, @date)
+%table.report.nojs
+  %thead
+    %tr.header
+      - @keys.each do |at|
+        %th
+          = at.to_s.gsub("_","<br>")
+      %th
+        loan
   - histories.each do |h|
-    - cls = h.status == :outstanding ? "" : "closed"
-    %tr{:class => cls}
-      - keys.each do |at|
+    %tr{:class => "#{h.status} #{cycle('odd','even')}"}
+      - @keys.each do |at|
         - val = h.send(at)
         %td
           = val.is_a?(Numeric) ? val.to_currency(:mostfit_default) : val
           - total[at] ||= 0
           - total[at] += h.send(at) if h.send(at).is_a? Numeric
       %td{:style => "background: #aaee00"}
-        = link_to h.composite_key, "/loans/#{h.composite_key.floor}"
+        = link_to h.composite_key, "/loans/diagnose/#{h.composite_key.floor}"
   %tfoot
     %tr.total
-      - keys.each do |at|
+      - @keys.each_with_index do |at,i|
         %td
-          = total[at].to_i.to_currency(:mostfit_default)
+          - if i == 0
+            Calculated Total
+          - else
+            - vv = total[at].to_i.to_currency(:mostfit_default)
+            = vv == "0" ? "-" : vv 
+    %tr.total
+      - @center_row = CenterCache.first(:date => @date, :center_id => params[:center_id])
+      = (partial :cache_row, :cache => @center_row, :cls => "total", :ignore_total => true) if @center_row

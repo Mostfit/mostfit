@@ -29,7 +29,6 @@ class ConsolidatedReport < Report
   end
   
   def generate
-    debugger
     branches, centers, data, clients, loans = {}, {}, {}, {}, {}
     extra, funder_loan_ids = get_extra
 

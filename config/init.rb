@@ -1,5 +1,5 @@
 # Go to http://wiki.merbivore.com/pages/init-rb
-require 'lib/irb.rb'
+# require 'lib/irb.rb'
 require 'yaml'
 require 'config/dependencies.rb'
 
