@@ -130,10 +130,11 @@ class LoanHistory
     vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
     if group_by.count > 0
       vals = vals.group_by{|v| v[0..(group_by.count-1)]} 
-      return vals.to_hash.map{|k,v| [k,cols.zip(v.flatten).to_hash]}.to_hash
+      rv = vals.to_hash.map{|k,v| [k,cols.zip(v.flatten).to_hash]}.to_hash
     else
-      return {:no_group => cols.zip(vals).to_hash}
+      rv = {:no_group => cols.zip(vals).to_hash}
     end
+    rv
   end
       
 

@@ -38,8 +38,10 @@ class Cachers < Application
     get_cachers
     group_by = @level.to_s.singularize
     group_by_model = Kernel.const_get(group_by.camelcase) 
-    @cachers = @cachers.group_by{|c| c.send("#{group_by}_id".to_sym)}.to_hash.map do |group_by_id, cachers| 
-      cachers.reduce(:consolidate)
+    unless group_by == "loan"
+      @cachers = @cachers.group_by{|c| c.send("#{group_by}_id".to_sym)}.to_hash.map do |group_by_id, cachers| 
+        cachers.reduce(:consolidate)
+      end
     end
     display @cachers, :template => 'cachers/index'
   end

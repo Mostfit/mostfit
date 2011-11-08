@@ -20,7 +20,7 @@
         - else
           == -
       - else
-        = (val == 0 or val.blank?) ? "-" : (val.respond_to?(:to_currency) ? val.to_currency(:mostfit_default) : val)
+        = (val == 0 or val.blank?) ? "-" : (val.respond_to?(:to_currency) ? val.to_currency : val)
       - if @total_keys.include?(at) and (not (ignore_total ||= false) )
         - @calculated_total_row[at] ||= 0
         - @calculated_total_row[at] += val

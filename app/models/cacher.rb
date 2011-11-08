@@ -2,9 +2,7 @@ class Cacher
   # like LoanHistory but for anything that has loans
   include DataMapper::Resource
 
-  @@poke_thread = false
-
-  property :id,                              Serial
+   property :id,                              Serial
   property :type,                            Discriminator
   property :date,                            Date, :nullable => false, :index => true
   property :model_name,                      String, :nullable => false, :index => true
@@ -222,7 +220,6 @@ end
 class CenterCache < Cacher
   def self.update(hash = {})
     # creates a cache per center for branches and centers per the hash passed as argument
-    debugger
     date = hash.delete(:date) || Date.today
     hash = hash.select{|k,v| [:branch_id, :center_id].include?(k)}.to_hash
     centers_data = CenterCache.create(hash.merge(:date => date, :group_by => [:branch_id,:center_id])).deepen.values.sum
@@ -244,7 +241,7 @@ class CenterCache < Cacher
   def self.create(hash = {})
     # creates a cacher from loan_history table for any arbitrary condition. Also does grouping
     date = hash.delete(:date) || Date.today
-    group_by = hash.delete(:group_by) || []
+    group_by = hash.delete(:group_by) || [:branch_id, :center_id]
     cols = hash.delete(:cols) || COLS
     flow_cols = FLOW_COLS
     balances = LoanHistory.latest_sum(hash,date, group_by, cols)
@@ -254,13 +251,12 @@ class CenterCache < Cacher
     ng_bals = cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
     # workaround for the situation where no rows get returned for centers without loans.
     # this makes it very difficult to find missing center caches so we must have a row for all centers, even if it is full of zeros
-    debugger
     universe = Center.all(:id => hash[:center_id]).aggregate(:branch_id, :id)
     universe.map do |k| 
-      pmts = pmts[k] || ng_pmts
-      bals = balances[k] || ng_bals
+      _p = pmts[k] || ng_pmts
+      _b = balances[k] || ng_bals
       extra = balances[k] ? {} : {:center_id => k[1], :branch_id => k[0]} # for ng rows, we need to insert center_id and branch_id
-      [k, pmts.merge(bals).merge(extra)]
+      [k, _p.merge(_b).merge(extra)]
     end.to_hash
 
   end
@@ -285,9 +281,9 @@ class CenterCache < Cacher
   def self.missing(selection)
     bs = self.all(selection).aggregate(:date, :center_id).group_by{|x| x[0]}.to_hash.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
     # bs is a hash of {:date => [:center_id,...]}
-    selection.delete(:date)
+    date = selection.delete(:date)
     selection[:id] = selection.delete(:center_id) if selection[:center_id]
-    hs = Center.all(selection).aggregate(:id)
+    hs = Center.all(selection.merge(:creation_date.lte => date)).aggregate(:id)
     bs.keys.map{|date| [date,hs - bs[date]]}.to_hash
   end
 
