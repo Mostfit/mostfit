@@ -18,8 +18,10 @@ class Upload
 
   MODELS = [:staff_members, :repayment_styles, :loan_products, :funding_lines, :branches, :centers, :client_groups, :clients, :loans]
 
-  MODELS.each do |model|
-    has n, model
+  if Mfi.first.system_state == :migration
+    MODELS.each do |model|
+      has n, model
+    end
   end
 
   before :valid? do 

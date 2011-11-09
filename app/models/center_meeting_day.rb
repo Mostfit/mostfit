@@ -2,6 +2,8 @@ class CenterMeetingDay
 
   include DataMapper::Resource
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+
+  before :destroy, :check_not_last
   
   property :id, Serial
   property :center_id, Integer, :index => false, :nullable => false
@@ -21,6 +23,9 @@ class CenterMeetingDay
   
   belongs_to :center
 
+  def check_not_last
+    raise ArgumentError.new("Cannot delete the only center meeting schedule") if self.center.center_meeting_days.count == 1
+  end
   
 
   # adding the new properties to calculate the datevector for this center.
@@ -36,6 +41,15 @@ class CenterMeetingDay
 
   def get_next_n_dates(n, from = self.valid_from)
     get_dates(from, n)
+  end
+
+  def meeting_day_string
+    return meeting_day.to_s if meeting_day and meeting_day != :none
+    "every #{every} #{what.join(',')} of every #{of_every} #{period}"
+  end
+
+  def to_s
+    "from #{valid_from} to #{valid_upto} : #{meeting_day_string}"
   end
 
   after :destroy, :fix_dates

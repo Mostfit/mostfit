@@ -20,6 +20,6 @@
       %td
         = day.valid_upto
       %td
-        = day.meeting_day
+        = day.meeting_day_string
       %td
         = link_to("[x]", url(:controller => "application", :action => "delete", :id => day.id, :model => "center_meeting_days", :return => "/branches/#{@center.branch.id}/centers/#{@center.id}"))
