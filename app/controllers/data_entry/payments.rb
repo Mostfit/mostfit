@@ -11,7 +11,6 @@ module DataEntry
     end
 
     def by_center
-      debugger
       @option = params[:option] if params[:option]
       @info = params[:info] if params[:info]
       @center = Center.get(params[:center_id]) if params[:center_id]
@@ -32,7 +31,6 @@ module DataEntry
       end
 
       unless @center.nil?
-        debugger
         @branch = @center.branch
         @clients = Client.all(:center_id => @center.id, :fields => [:id, :name, :center_id, :client_group_id])
         @loans   = Loan.all(:c_center_id => @center.id, :rejected_on => nil)
@@ -191,7 +189,6 @@ module DataEntry
     include DateParser
     # this function is called by by_center and by_staff_member
     def bulk_payments_and_disbursals
-      debugger
       @center = Center.get(params[:center_id]) || Center.first(:name => params[:center_id]) 
       @branch = @center.branch unless @center.nil?
       @clients = @center.clients(:fields => [:id, :name, :center_id, :client_group_id]) unless @center.nil?

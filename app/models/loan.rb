@@ -266,7 +266,6 @@ class Loan
               :reference => row[headers[:reference]], :client => Client.first(:reference => row[headers[:client_reference]]))
     obj.history_disabled=true
     saved = obj.save
-    debugger
     if saved
       c = Checker.first_or_new(:model_name => "Loan", :reference => obj.reference)
       c.check_field = row[headers[:check_field]]

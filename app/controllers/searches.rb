@@ -18,7 +18,6 @@ class Searches < Application
   def list
     # returns a list based on params
     # useful for stuff like autocomplete
-    debugger
     only_provides :json
     model = Kernel.const_get(params[:model].camelcase)
     if params[:q]

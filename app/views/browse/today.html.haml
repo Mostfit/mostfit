@@ -14,7 +14,6 @@
 
   $(document).ready(function(){ get_charts('date=' + date_string)});
 
-- debugger
 - bnames = @branch_names.keys.sort
 %script{:type => "text/javascript"}
   == names=['#{bnames.join("','")}']

@@ -96,7 +96,6 @@ class Cachers < Application
     @branch = params[:branch_id].blank? ? nil : Branch.get(params[:branch_id])
     @center_names = @cachers.blank? ? {} : Center.all(:id => @cachers.aggregate(:center_id)).aggregate(:id, :name).to_hash
     @branch_names = @cachers.blank? ? {} : Branch.all(:id => @cachers.aggregate(:branch_id)).aggregate(:id, :name).to_hash
-    debugger
     q = (@from_date and @to_date) ? {:date => @from_date..@to_date} : {:date => @date}
     @stale_centers = CenterCache.all(q.merge(:stale => true))
     @stale_branches = BranchCache.all(q.merge(:stale => true))
