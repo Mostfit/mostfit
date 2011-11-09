@@ -1,9 +1,9 @@
 @body-background: #fff;
 @lightblue: #abc7f6;
 @pastel-yellow: #feeb24;
-@lightgreen: #abcf76;
-@darkgreen: #56683B;
-@orange: #E68c00;
+@lightgreen: #008899;
+@darkgreen: #cfcfcf;
+@orange: #666;
 @lightgreen-text: @darkgreen;
 @header: @pastel-yellow;
 @header-text: @lightgreen * 0.5;
@@ -28,13 +28,15 @@
   text-shadow: 1px 1px white;
 }
 
+html { height: 100%}
+
 body {
     background: @body-background;
     color: #222;
     font-family: Arial,Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
     padding: 0px;
     margin: 0px;
-
+    height: 100%;
 }
 h1 {
   color: @orange;
@@ -56,7 +58,7 @@ h2, h3, h4, h5, h6 {
 h1 {
   margin: 10px 4px 10px 4px;
 }
-h2 {
+h2{
   margin: 16px;
 }
 .container {
@@ -105,6 +107,9 @@ h1.logo{
     height: 60px;
     padding-bottom: 0px;
     margin-bottom: 0px;
+    font-weight: bold;
+    letter-spacing: -0.06em;
+    text-shadow: 1px 1px white;
 }
 h1.logo span{
     vertical-align: top;
@@ -126,6 +131,7 @@ h1.logo span{
 {
   margin: 0px;
   position: relative;
+  min-height: 100%;
 }
 
 .graph{
@@ -293,11 +299,13 @@ margin: 0px;
   padding: 0px 15px 0px 15px;
   border: 0px;  
 }
-input[type="text"], input[type="password"], textarea {
-  font-size: 100%;
+input[type="text"], input[type="password"], select, textarea {
   font-family: Arial,Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
   background: #fbfbfb;
   border: 1px solid #E5E5E5;
+  height: 1.4em;
+  font-size: 1.2em;
+  padding: 3px;
 }
 input.disabled[type="submit"] {
     color: #ccc;
@@ -340,10 +348,11 @@ span.blue  { background-color: #3465a4; padding: 3px; color: white;}
 #footer
 {
 margin-top: 0px;
-margin-bottom: 20px;
+margin-bottom: 0px;
 text-align: center;
 color: #666;
 font-size: 11px;
+width: 100%;
 }
 #footer a:link, #footer a:visited, #footer a:active
 {
@@ -542,11 +551,10 @@ a.bold:visited {
   box-shadow: 1px 1px @nav-selected-bg * 0.6 inset;
 }
 #navigation a:hover{
-  @nav-hover-bg: #D3FF91;
-  background: @nav-hover-bg;
+  background: @pastel-yellow * 1.2;
   color: #5c8f11;
   z-index:10;
-  box-shadow: 2px 2px @nav-hover-bg * 0.6 inset;
+  box-shadow: 2px 2px @pastel-yellow * 0.6 inset;
 }
 
 #header_search_div {
@@ -964,9 +972,6 @@ table.tall th {
   font-size: 0.8em;
 }
 
-table.tall input {
-  font-size: 0.8em;
-}
   
 .floating_form{
     position: absolute;
@@ -1446,7 +1451,7 @@ table.clearform tr td.legend{
   width: 100%;
   padding: 5px 4.5%;
   vertical-align: middle;
-  color: white;
+  color: #333;
   font-size: 1.5em;
   background: @darkgreen * 1.1;
 }
@@ -1470,18 +1475,18 @@ table.clearform tr td.legend{
 }
 
 .applied { font-weight: bold; color: blue;}
-.approved { font-weight: bold; color: grey;}
+.approved { font-weight: bold; color: lightgreen;}
 .outstanding { font-weight: bold; color: darkgreen;}
-.repaid { font-weight: bold; color: brown;}
+.repaid { font-weight: bold; color: grey;}
 .arrears { font-weight: bold; color: red;}
 .written-off { font-weight: bold; color: black;}
 .preclosed { font-weight: bold; color: orange;}
 
 .container {
   a.applied { font-weight: bold; color: blue;}
-  a.approved { font-weight: bold; color: grey;}
+  a.approved { font-weight: bold; color: lightgreen;}
   a.outstanding { font-weight: bold; color: darkgreen;}
-  a.repaid { font-weight: bold; color: brown;}
+  a.repaid { font-weight: bold; color: grey;}
   a.arrears { font-weight: bold; color: red;}
   a.written-off { font-weight: bold; color: black;}
   a.preclosed { font-weight: bold; color: orange;}
@@ -1510,12 +1515,6 @@ table.tall .greytext {
   font-size: 0.9em;
 }
 
-table.tall input[type="text"], input[type="password"], textarea {
-  font-family: Arial,Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
-  background: #fbfbfb;
-  border: 1px solid #E5E5E5;
-  padding: 3px;
-}
 table.tall input.disabled[type="submit"] {
     color: #ccc;
 }
@@ -1846,9 +1845,11 @@ table.moreinfo thead th {
   margin: 2px;
 }
 
-table.diags tr.stale {
-  background:#ff9999;
-  border: solid 1px pink;
+table.report {
+    tr.stale {
+    background:#ff9999;
+    border: solid 1px pink;
+  }
 }
 
 tr.closed {

@@ -1,0 +1,35 @@
+%h1 Centers
+%table.report.nojs
+  %thead
+    %tr.header
+      - @keys.each do |at|
+        %th
+          = at.to_s.gsub("_","<br>")
+      - unless @resource == :split_cachers
+        %th
+          split
+  - @calculated_total_row = {}
+  
+  - @cachers.sort_by{|c| [c.date,c.center_id == 0 ? "" : @center_names[c.center_id]]}.each do |c|
+    - cls = (c.stale ? "stale" : "") + " " + cycle('odd','even')
+    - if c.center_id == 0
+      - @branch_row = c
+      - next
+    - else
+      = partial :cache_row, :cache => c, :cls => cls
+
+  %tfoot
+    - if @branch_row
+      = partial :cache_row, :cache => @branch_row, :cls => "total", :ignore_total => true
+    %tr.total
+      - @keys.each_with_index do |k,i|
+        %th{:style => "text-align: right"}
+          - if i == 0
+            Sum of Cached Values
+          - else
+            - if @total_keys.include?(k)
+              = @calculated_total_row[k].to_currency
+            - else
+              &nbsp;
+      
+

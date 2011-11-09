@@ -1,0 +1,15 @@
+%h1
+  ReportFormats controller, edit action
+%p
+  Edit this file in
+  %tt
+    app/views/report_formats/edit.html.erb
+= error_messages_for @report_format
+
+= form_for(@report_format, :action => url(:report_format, @report_format)) do
+  %p
+    = submit "Update"
+
+= link_to 'Show', url(:report_format, @report_format)
+|
+= link_to 'Back', url(:report_formats)

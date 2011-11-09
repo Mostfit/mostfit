@@ -1,0 +1,15 @@
+- debugger
+%h1 Check Data
+
+%h3 Some helpful statistics to ensure data integrity
+
+%h2
+  == #{@stale_loan_histories.keys.count} loans with stale history
+
+
+%h2
+  == #{@stale_caches.values.reduce(:+).keys.count rescue "oops!"} stale centers in #{@stale_caches.keys.count} branches
+
+%h2 
+  == #{@loan_history_for_deleted_loans.count} deleted loans still have history in the history table.
+

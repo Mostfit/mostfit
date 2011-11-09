@@ -22,6 +22,7 @@
     %tbody{:style => "text-align:left;" }
       - @branch||=@center.branch
       - tot_amount, tot_outstanding, tot_installments, tot_principal, tot_interest, tot_fees, tot_total = 0, 0, 0, 0, 0, 0, 0
+      - debugger
       - clients = Client.all(:center_id => @center.id, :active => true, :date_joined.lte => @date, :fields => [:id, :name, :client_group_id, :center_id])
       - atts = Attendance.all(:client_id => clients.map{|x| x.id}, :date => @date).map{|x| [x.client_id,x]}.to_hash
       - loans = @loans||Loan.all(:client_id => clients.map{|x| x.id})

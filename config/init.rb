@@ -1,5 +1,5 @@
 # Go to http://wiki.merbivore.com/pages/init-rb
-require 'lib/irb.rb'
+# require 'lib/irb.rb'
 require 'yaml'
 require 'config/dependencies.rb'
 
@@ -84,15 +84,15 @@ Merb::BootLoader.before_app_loads do
   require 'lib/extensions.rb'
 
   Merb::Plugins.config[:exceptions] = {
-    :email_addresses => [''],
+    :email_addresses => ['svs@intellecap.net'],
     :app_name        => "Mostfit",
     :environments    => ['production'],
-    :email_from      => "",
+    :email_from      => "errors@mostfit.org",
     :mailer_config => {
       :host   => 'smtp.gmail.com',
       :port   => '587',
-      :user   => '',
-      :pass   => '',
+      :user   => 'production@mostfit.org',
+      :pass   => 'm0stf1t123',
       :auth   => :plain,
       :tls    => true
     },
@@ -106,16 +106,6 @@ Merb::BootLoader.after_app_loads do
   # Activate SSL Support
   Net::SMTP.enable_tls(OpenSSL::SSL::VERIFY_NONE)
  
-  # Every application eventually evolves until it can send mail.
-  # Configure Merb Mailer
-  # Merb::Mailer.config = {
-  #   :host   => 'smtp.gmail.com',
-  #   :port   => '587',
-  #   :user   => 'sidleypatang@gmail.com',
-  #   :pass   => 's8s4a7m2',
-  #   :auth   => :plain,
-  #   :tls    => true
-  # }
 
   loan_types = Loan.descendants
 

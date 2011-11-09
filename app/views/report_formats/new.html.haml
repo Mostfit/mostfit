@@ -1,0 +1,13 @@
+%h1 ReportFormats controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/report_formats/new.html.erb
+
+= error_messages_for @report_format
+
+= form_for(@report_format, :action => url(:report_formats) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:report_formats)
