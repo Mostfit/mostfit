@@ -377,7 +377,6 @@ class GraphData < Application
   private
 
   def prorata_color(start_val, end_val, val, r1 = 164, r2 = 100, g1 = 72, g2 = 222, b1 = 72, b2 = 137)
-    debugger
     color_ratio = (start_val + val)/(start_val + end_val).to_f
     color_ratio = 1 if color_ratio.nan?
     color_ratio = 0 if color_ratio < 0

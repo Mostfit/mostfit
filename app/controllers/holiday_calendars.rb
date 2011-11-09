@@ -36,7 +36,6 @@ class HolidayCalendars < Application
   end
 
   def update(id, holiday_calendar)
-    debugger
     @holiday_calendar = HolidayCalendar.get(id)
     raise NotFound unless @holiday_calendar
     if holiday_calendar.has_key?(:holiday) # just adding a holiday
@@ -69,7 +68,6 @@ class HolidayCalendars < Application
   end
 
   def delete_holiday(id, holiday_id)
-    debugger
     @holiday_calendar = HolidayCalendar.get(id)
     raise NotFound unless @holiday_calendar
     @holiday_calendar.remove_holiday(holiday_id)

@@ -15,7 +15,6 @@ namespace :mostfit do
 
     require "log4r"
     #    include Log4r
-    debugger
     filename  = args[:filename]
     directory = args[:directory]
 

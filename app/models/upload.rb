@@ -88,7 +88,6 @@ class Upload
   #
   # @param [Hash] like {:verbose => <boolean>, :erase => <boolean>}
   def cont(options = {:verbose => false, :erase => false})
-    debugger
     log_file(options[:verbose]) unless @log
     if state == :uploaded
       process_excel_to_csv
@@ -144,7 +143,6 @@ class Upload
   # @param [Hash] the options to use. Valid options are {:erase => <boolean>, :verbose => <boolean>}
   #   :erase will erase old data, :verbose prints debugging information
   def load_csv(options)
-    debugger
     erase = options[:erase]; verbose = options[:verbose]
     funding_lines, loans = {}, {}
     if csv_files.blank?
@@ -201,12 +199,10 @@ class Upload
               @log.error("<font color='red'>#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors.to_a.join(', ')}</font>") if log
             end
           rescue Exception => e
-            debugger
             @log.error("<font color='red'>#{model}: Problem in inserting #{model} #{row[headers[:serial_number]]}. Insert it manually later</font>") if log
             @log.error("<font color='red'>#{model}: #{e.message}</font>") if log
           ensure
             if error
-              debugger
               error_file.write(row.to_csv)         # log all errors in a separate csv file
               error_count += 1                    # so we can iterate down to perfection
             end

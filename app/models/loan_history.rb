@@ -120,7 +120,6 @@ class LoanHistory
   end
 
   def self.composite_key_sum(keys, group_by = [], my_cols = [])
-    debugger
     # returns a row which is the sum of various conmposite keys. even does grouping.
     # i.e. LoanHistory.composite_key_sum(LoanHistory.latest_keys, [:branch_id, :center_id]) will give you the current situation grouped by branch and center
     cols = group_by + (my_cols.empty? ? LoanHistory.sum_cols : my_cols)

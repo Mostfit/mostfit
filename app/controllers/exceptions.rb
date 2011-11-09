@@ -13,7 +13,6 @@ class Exceptions < Merb::Controller
   end
 
   def argument_error
-    debugger
     redirect request.referer, :message => {:error => "Argument Error"}
   end
 
