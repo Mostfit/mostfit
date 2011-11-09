@@ -65,14 +65,8 @@ class LoanProduct
               :min_number_of_installments => row[headers[:min_number_of_installments]], 
               :max_number_of_installments => row[headers[:max_number_of_installments]], 
               :installment_frequency => row[headers[:installment_frequency]].downcase.to_sym,
-<<<<<<< HEAD
-              :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]),
-              :repayment_style => RepaymentStyle.first(:name => row[headers[:repayment_style]]),
-              :loan_type_string => row[headers[:loan_type]])
-=======
               :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]), 
               :repayment_style => RepaymentStyle.first(:name => row[headers[:repayment_style]]), :upload_id => row[headers[:upload_id]])
->>>>>>> new-layout
     [obj.save, obj]
   end
 

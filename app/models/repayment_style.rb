@@ -19,16 +19,8 @@ class RepaymentStyle
   end
 
   def self.from_csv(row, headers)
-<<<<<<< HEAD
-    obj = new(:name => row[headers[:name]], :style => row[headers[:style]],
-              :custom_principal_schedule => row[headers[:custom_principal_schedule]], :active => true,
-              :custom_interest_schedule => row[headers[:custom_interest_schedule]])
-    [obj.save, obj]
-=======
     obj = new([:name, :style, :round_total_to, :round_interest_to, :active, :rounding_style, :force_num_installments, :custom_principal_schedule, :custom_interest_schedule].map{|k| [k,row[headers[k]]] if headers[k]}.compact.to_hash)
     [obj.save, obj]
-
->>>>>>> new-layout
   end
 
   def convert_blank_to_nil
