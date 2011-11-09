@@ -25,7 +25,11 @@ namespace :mostfit do
     log.info("CSV extraction complete. Processing files.")
     file.load_csv(log, args[:erase] == "true")
     log.info("CSV files are now loaded into the DB. Creating loan schedules. This may take a few minutes.")
-    Loan.all.each{|l| l.update_history}
+   # Loan.all.each{|l| l.update_history}
+    #these 3 rake task are meant to prepare db with the new-layout branch.
+    Rake::Task['mostfit:db:prepare'].invoke
+    Rake::Task['mostfit:conversion:update_loan_cache'].invoke
+    Rake::Task['mostfit:data:create_history'].invoke
     log.info("<h2>Processing complete! Your MIS is now ready for use. Please take a note of all the errors reported here(if any) and rectify them.</h2>")            
   end
 end

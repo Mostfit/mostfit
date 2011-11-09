@@ -28,7 +28,7 @@ namespace :mostfit do
       end
       puts "1: #{Time.now - t0}"
       loan_ids.each do |loan_id|
-        sql = " INSERT INTO `payments` (`received_by_staff_id`, `amount`, `type`, `created_by_user_id`, `loan_id`, `received_on`, `client_id`) VALUES ";
+        sql = " INSERT INTO `payments` (`received_by_staff_id`, `amount`, `type`, `created_by_user_id`, `loan_id`, `received_on`, `client_id`, `c_branch_id`, `c_center_id`) VALUES ";
         _t0 = Time.now
         loan = Loan.get(loan_id)
         staff_member = loan.client.center.manager
@@ -39,8 +39,8 @@ namespace :mostfit do
         dates.each do |date|
           prin = loan.scheduled_principal_for_installment(loan.installment_for_date(date))
           int = loan.scheduled_interest_for_installment(loan.installment_for_date(date))
-          values << "(#{staff_member.id}, #{prin}, 1, 1, #{loan.id}, '#{date}', #{loan.client.id})"
-          values << "(#{staff_member.id}, #{int}, 2, 1, #{loan.id}, '#{date}', #{loan.client.id})"
+          values << "(#{staff_member.id}, #{prin}, 1, 1, #{loan.id}, '#{date}', #{loan.client.id}, #{loan.c_branch_id}, #{loan.c_center_id})"
+          values << "(#{staff_member.id}, #{int}, 2, 1, #{loan.id}, '#{date}', #{loan.client.id}, #{loan.c_branch_id}, #{loan.c_center_id})"
           count += 1
         end
         puts "done constructing sql in #{Time.now - _t0}"
@@ -55,6 +55,10 @@ namespace :mostfit do
       #    end
       t1 = Time.now
       secs = (t1 - t0).round
+      #for updating history of all loans.
+      Loan.all.each do |l|
+        l.update_history
+      end
       Merb.logger.info! "Finished mock:all_payments rake task in #{secs} secs for #{Loan.all.size} loans creating #{count} payments, at #{t1}"
     end
 
