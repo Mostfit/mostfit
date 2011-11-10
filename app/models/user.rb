@@ -15,6 +15,8 @@ class User
   # permissions
   # to add to this, only add at the back of the array
   ROLES = [:data_entry, :mis_manager, :admin, :read_only, :staff_member, :funder, :accountant, :maintainer]
+  ROLES_TO_S = Hash.new{ |hash, role| hash[role] = role.to_s.split('_').join(' ').capitalize }
+
   property :role, Enum.send('[]', *ROLES), :nullable => false
 
   # it gets                                   
@@ -51,6 +53,10 @@ class User
       roles << [v, v.to_s.gsub('_', ' ').capitalize]
     }
     roles
+  end
+
+  def role_to_s
+    ROLES_TO_S[self.role]
   end
 
   def admin?
