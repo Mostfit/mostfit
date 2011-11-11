@@ -68,13 +68,45 @@ class Center
     DAYS
   end
 
-  def get_meeting_dates(from, to)
+  # get a list of meeting dates between from and to if to is a Date. Else gets "to" meeting dates if to is an integer
+  #
+  # a center must take the responsibility that center_meeting_days never overlap.
+  def get_meeting_dates(to = Date.new(2100,12,31),from = creation_date)
     # to can be a date or a number
-    _a = center_meeting_days.map{|cmd| cmd.get_dates(from, to)}.flatten
-    to.is_a?(Date) ? _a.select{|x| x <= to} : _a[0..(to - 1)]
+    # first find the date_Vectors for all center_meeting_days as a hash {:valid_from => DateVector}
+    select = to.class == Date ? {:valid_from.lte => to} : {}
+    dvs = center_meeting_days.all(select).map{|cmd| [cmd.valid_from, cmd.date_vector]}.to_hash
+
+    # if from is after the center creation but before the first additional center meeting date then deal with this
+    if from < dvs.keys.min and meeting_day != :none
+      dvs[from] =       DateVector.new(1, meeting_day, 1, :week, creation_date, first_cmd_date)
+    end
+
+    # then cycle through this hash and get the appropriate dates
+    dates = []
+    dvs.keys.sort.each_with_index{|date,i|
+      debugger
+      d1 = date
+      d1 -= 1 if [dvs[date].what].flatten.include?(d1.weekday)
+      d2 = dvs.keys.sort[i+1] || (to.class == Date ? to - 1: (to - dates.count - 1))
+      _ds = dvs[date].get_dates(d1,d2)
+      _ds = _ds[0..(to - dates.count - 1)] if to.class == Fixnum
+      dates.concat(_ds)
+    }
+    dates.sort
   end
 
+  # returns the date vector in use for a given date.
+  def date_vector_for(date)
+    first_cmd_date = center_meeting_days.aggregate(:valid_from.min) || Date.new(2100,12,31)
+    if date < first_cmd_date
+      DateVector.new(1, meeting_day, 1, :week, creation_date, first_cmd_date)
+    else
+      (center_meeting_days.all(:order => [:valid_from]).select{|cmd| cmd.valid_from <= date and cmd.valid_upto >= date}[0]).date_vector
+    end
+  end
 
+    
   # a simple catalog (Hash) of center names and ids grouped by branches
   # returns some like: {"One branch" => {1 => 'center1', 2 => 'center2'}, "b2" => {3 => 'c3', 4 => 'c4'}} 
   def self.catalog(user=nil)
@@ -98,6 +130,8 @@ class Center
     result
   end
 
+
+  
   def meeting_day_for(date)
     @meeting_days ||= self.center_meeting_days(:order => [:valid_from])
     if @meeting_days.length==0
@@ -110,7 +144,7 @@ class Center
       @meeting_days[-1].meeting_day
     end
   end
-    
+  
   def next_meeting_date_from(date)    
     number = get_meeting_date(date, :next)
     if meeting_day != :none and (date + number - get_meeting_date(date + number, :previous)).cweek == (date + number).cweek
@@ -119,7 +153,7 @@ class Center
       (date + number)
     end
   end
-
+  
   def previous_meeting_date_from(date)
     number = get_meeting_date(date, :previous)
     if meeting_day != :none and (date - number - get_meeting_date(date - number, :previous)).cweek == (date - number).cweek

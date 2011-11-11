@@ -1049,7 +1049,7 @@ class Loan
   # the installment dates
   def installment_dates
     if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
-      return client.center.get_dates(scheduled_first_payment_date, number_of_installments)
+      return client.center.get_meeting_dates(number_of_installments, scheduled_first_payment_date)
     end
     return @_installment_dates if @_installment_dates
     if installment_frequency == :daily

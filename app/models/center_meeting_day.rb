@@ -3,13 +3,16 @@ class CenterMeetingDay
   include DataMapper::Resource
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
-  before :destroy, :check_not_last
-  
+  after :destroy, :fix_dates
+  after :save,    :add_loans_to_queue
+
   property :id, Serial
   property :center_id, Integer, :index => false, :nullable => false
   property :meeting_day, Enum.send('[]', *DAYS), :nullable => false, :default => :none, :index => true
   property :valid_from,  Date, :nullable => false
-  property :valid_upto,  Date, :nullable => false, :default => Date.new(2100, 12, 31) # a date far in future
+  property :valid_upto,  Date, :nullable => true # we do not really need valid upto.  CMDs are valid up to the next center meeting days start from
+  
+  property :deleted_at,  ParanoidDateTime
   
   # define some properties using which we can construct a DateVector of meeting dates
   # see lib/date_vector.rb for details but in short one can say things like
@@ -23,19 +26,29 @@ class CenterMeetingDay
   
   belongs_to :center
 
+  validates_with_method :valid_from_is_lesser_than_valid_upto
+  validates_with_method :dates_do_not_overlap
+  validates_with_method :check_not_last, :if => Proc.new{|t| t.deleted_at}
+
   def check_not_last
-    raise ArgumentError.new("Cannot delete the only center meeting schedule") if self.center.center_meeting_days.count == 1
+    return true if deleted_at
+    return [false,"cannot delete the last center meeting date"] if (self.center.center_meeting_days.count == 1 and (self.center.meeting_day == :none or (not self.center.meeting_day)))
   end
   
-
-  # adding the new properties to calculate the datevector for this center.
-  # for now we will allow only one datevector type per center. This means a center can only have one meeting schedule frequency
-  
-  def date_vector(from = self.valid_from, to = self.valid_upto)
-    DateVector.new(every, what.map{|w| w.to_sym}, of_every, period.to_sym, from, to)
+  def last_date
+    valid_upto || Date.new(2100,12,31)
   end
 
-  def get_dates(from = self.valid_from, to = self.valid_upto)
+
+  def date_vector(from = self.valid_from, to = last_date)
+    if every and what and of_every and period
+      DateVector.new(every, what.map{|w| w.to_sym}, of_every, period.to_sym, from, to)
+    else
+      DateVector.new(1,meeting_day, 1, :week, from, to)
+    end
+  end
+
+  def get_dates(from = self.valid_from, to = last_date)
     date_vector(from, to).get_dates
   end
 
@@ -52,16 +65,50 @@ class CenterMeetingDay
     "from #{valid_from} to #{valid_upto} : #{meeting_day_string}"
   end
 
-  after :destroy, :fix_dates
-
-
-  validates_with_method :valid_from_is_lesser_than_valid_upto
   
   def valid_from_is_lesser_than_valid_upto
+    self.valid_from = Date.parse(self.valid_from) unless self.valid_from.is_a? Date
+    self.valid_upto = (self.valid_upto.blank? ? Date.new(2100,12,31) : Date.parse(self.valid_upto))     if self.valid_upto.class == String
+
     if self.valid_from and self.valid_upto
       return [false, "Valid from date cannot be before than valid upto date"] if self.valid_from > self.valid_upto
-      return true    
     end
+    return true    
+
+  end
+
+  # checks that for a given center, the valid_from and valid_to dates for this center do not overlap with another center_meeting_day
+  def dates_do_not_overlap
+    return true if deleted_at
+    cmds = self.center.center_meeting_days
+    return true if cmds.count == 0
+    return true if cmds.count == 1 and cmds.first.id == self.id
+    return [false, "Center Meeting Day validity overlaps with another center meeting day."] if center.center_meeting_days.map do |cmd| 
+      if cmd.valid_upto and cmd.valid_upto != Date.new(2100,12,31) # an end date is specified for the other cmd 
+        if valid_upto  valid_upto != Date.new(2100,12,31)          # and for ourselves
+          cmd.valid_from > valid_upto or cmd.valid_upto < valid_from # either we end before the other one starts or start after the other one ends
+        else            # but not for ourselves
+          valid_from > cmd.valid_upto or valid_from < cmd.valid_from # either we start after the other one starts or we start after the other one ends
+        end
+      else                 # no end date specified for the other one
+        if valid_upto and  valid_upto != Date.new(2100,12,31)     # but we have one
+          valid_from > cmd.valid_from or valid_upto < cmd.valid_from  # either we start after the other one starts or we end before the other one starts
+        else               # neither one has an end date
+          true
+        end
+      end
+    end.select{|x| not x}.count > 0
+    return true
+  end
+
+
+  # adds the loans from this center into the dirty_loan queue to recreate their history
+  def add_loans_to_queue
+    loan_ids = self.center.loans.aggregate(:id)
+    return if loan_ids.blank?
+    now = DateTime.now
+    repository.adapter.execute(get_bulk_insert_sql("dirty_loans", loan_ids.map{|pl| {:loan_id => pl, :created_at => now}}))
+    DirtyLoan.send(:class_variable_set,"@@poke_thread", true)
   end
 
   def fix_dates

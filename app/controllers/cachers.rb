@@ -20,7 +20,7 @@ class Cachers < Application
     if @from_date and @to_date
       (@from_date..@to_date).each{|date| BranchCache.update(date)}
     else
-      BranchCache.update(@date)
+      BranchCache.update(@date || Date.today)
     end
     redirect request.referer
   end
