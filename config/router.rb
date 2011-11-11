@@ -63,7 +63,9 @@ Merb::Router.prepare do
     resources :cgts
   end
   resources :loans, :id => %r(\d+), :member => {:prepay => [:get, :put]} 
-  resources :centers, :id => %r(\d+)
+  resources :centers, :id => %r(\d+) do
+    resources :center_meeting_days
+  end
   resources :payments
   resources :branches, :id => %r(\d+)  do    
     resources :journals
