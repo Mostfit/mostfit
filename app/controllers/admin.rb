@@ -80,7 +80,6 @@ class Admin < Application
     max_loan = Loan.all.aggregate(:id, :updated_at).to_hash
     latest = (max_payment + max_loan).map{|k,v| [k,v.respond_to?(:max) ? v.max : v]}.to_hash
     @last_histories = LoanHistory.all.aggregate(:loan_id, :created_at).to_hash
-    debugger
     @stale_loan_histories = latest.select{|loan_id, updated_at| @last_histories[loan_id] ? @last_histories[loan_id] < updated_at : true}.to_hash
     render
   end

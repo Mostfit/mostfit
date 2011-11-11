@@ -79,7 +79,6 @@ class Application < Merb::Controller
   end
 
   def delete
-    debugger
     raise NotPrivileged unless session.user.admin?
     raise NotFound      unless params[:model] and params[:id]
     model    = Kernel.const_get(params[:model].camel_case.singularize)

@@ -20,7 +20,6 @@ class Uploads < Application
   end
   
   def create
-    debugger
     erase = params.has_key?(:erase)
     if params[:file] and params[:file][:filename] and params[:file][:tempfile]
       file      = Upload.make(params.merge(:user => session.user))

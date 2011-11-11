@@ -396,7 +396,6 @@ class Loans < Application
   def repair(id)
     loan = Loan.get(id)
     raise NotFound unless loan
-    debugger
     loan.update_history_bulk_insert
     redirect url_for_loan(loan), :message => {:notice => "LoanHistory updated!"}
   end
