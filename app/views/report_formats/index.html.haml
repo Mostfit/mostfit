@@ -1,16 +1,18 @@
 %h1
-  ReportFormats controller, index action
-%p
-  Edit this file in
-  %tt
-    app/views/report_formats/index.html.erb
-%table
+  Report Formats
+.menu-strip
+  =link_to 'add', resource(:report_formats, :new), :class => 'add'
+%table.narrow.shaded
   %tr
+    %th
+      name
+    %th
+      action
   - for report_format in @report_formats
     %tr
       %td
-        = link_to 'Show', url(:report_format, report_format)
+        = link_to report_format.name
       %td
+        = link_to 'show', resource(report_format)
         = link_to 'Edit', url(:edit_report_format,  report_format)
 
-= link_to 'New', url(:new_report_format)

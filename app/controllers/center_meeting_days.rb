@@ -26,12 +26,16 @@ class CenterMeetingDays < Application
   end
   
   def create(center_meeting_day)
+    debugger
     @center = Center.get(params[:center_id])
     @cmd = CenterMeetingDay.new(center_meeting_day)
     @cmd.center = @center
-    debugger
+    @cmd.valid_from = @center.creation_date if @cmd.valid_from.blank?
+    @cmd.valid_upto = Date.new(2100,12,31) if @cmd.valid_upto.blank?
+    @cmd.every = "1" unless @cmd.every
+    @cmd.of_every = 1 unless @cmd.of_every
     if @cmd.save
-      redirect resource(@center, :center_meeting_days), :message => {:success => "Center Meeting Day updated"}
+      redirect resource(@center, :center_meeting_days), :message => {:success => "Center Meeting Day created"}
     else
       render :new
     end
@@ -39,6 +43,7 @@ class CenterMeetingDays < Application
   
   
   def update(id, center_meeting_day)
+    debugger
     center_meeting_day[:valid_from] = Date.parse(center_meeting_day[:valid_from])
     center_meeting_day[:valid_upto] = Date.parse(center_meeting_day[:valid_upto])
     @cmd = CenterMeetingDay.get(id)

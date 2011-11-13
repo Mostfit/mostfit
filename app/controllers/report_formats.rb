@@ -27,6 +27,7 @@ class ReportFormats < Application
 
   def create(report_format)
     @report_format = ReportFormat.new(report_format)
+    debugger
     if @report_format.save
       redirect resource(@report_format), :message => {:notice => "ReportFormat was successfully created"}
     else

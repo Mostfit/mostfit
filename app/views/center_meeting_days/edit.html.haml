@@ -2,15 +2,5 @@
   == Editing Center Meeting Day #{@cmd.id} for center: #{@cmd.center.name}
 
 = form_for(@cmd, :action => resource(@cmd), :class => "tall shaded") do
-  = hidden_field :center_id
-  = @cmd.center.name
-  meets
-  every
-  = text_field :every
-  - options = [['day', 'day']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
-  = select :what, :collection => options
-  of every
-  = text_field :of_every
-  = select :period, :collection => ["week", "month"]
-
+  = partial :fields
   = submit 'Update Meeting Date'
