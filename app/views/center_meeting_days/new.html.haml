@@ -3,19 +3,5 @@
 
 = error_messages_for @cmd
 = form_for(@cmd, :action => resource(@center, :center_meeting_days), :class => "tall shaded") do
-  = hidden_field :center_id
-  = @cmd.center.name
-  meets
-  every
-  = text_field :every
-  - options = [['day', 'day']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
-  = select :what, :collection => options
-  of every
-  = text_field :of_every
-  = select :period, :collection => ["week", "month"]
-  %br
-  valid from
-  = date_select_for @cmd, :valid_from
-  to
-  = date_select_for @cmd, :valid_upto
+  = partial :fields
   = submit 'Update Meeting Date'

@@ -1,0 +1,27 @@
+= js_include_tag "multiple_select.js"
+= css_include_tag "user_groups.css"
+- keys = (Cacher::COLS  + Cacher::FLOW_COLS).map(&:to_s).sort
+- report_keys  = @report_format.keys ? @report_format.keys.map(&:to_s).sort : []
+- remaining_keys = keys - report_keys
+%table.form#user_group_form
+  %tr
+    %td
+      Name:
+    %td
+      = text_field :name
+      %br/
+      %span.greytext (only letters and numbers are allowed)
+
+  %tr
+    %td
+      Fields
+    %td.multi-select
+      %select.remaining{:multiple => "multiple", :style => "height : 200px; min-width : 100px"}
+        - (remaining_keys.uniq).sort.each do |user|
+          %option{:value => user}= user
+      %input.select{:type => "button", :value => "&raquo;"}
+      %input.deselect{:type => "button", :value => "&laquo;"}
+      %select.current{:multiple => "multiple", :name => "report_format[keys][]", :style => "height : 200px; min-width : 100px"}
+        - report_keys.map(&:to_s).sort.each do |user|
+          %option{:value => user.to_s}= user
+

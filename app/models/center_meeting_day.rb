@@ -85,7 +85,7 @@ class CenterMeetingDay
     return true if cmds.count == 1 and cmds.first.id == self.id
     return [false, "Center Meeting Day validity overlaps with another center meeting day."] if center.center_meeting_days.map do |cmd| 
       if cmd.valid_upto and cmd.valid_upto != Date.new(2100,12,31) # an end date is specified for the other cmd 
-        if valid_upto  valid_upto != Date.new(2100,12,31)          # and for ourselves
+        if valid_upto  and valid_upto != Date.new(2100,12,31)          # and for ourselves
           cmd.valid_from > valid_upto or cmd.valid_upto < valid_from # either we end before the other one starts or start after the other one ends
         else            # but not for ourselves
           valid_from > cmd.valid_upto or valid_from < cmd.valid_from # either we start after the other one starts or we start after the other one ends
@@ -104,7 +104,7 @@ class CenterMeetingDay
 
   # adds the loans from this center into the dirty_loan queue to recreate their history
   def add_loans_to_queue
-    loan_ids = self.center.loans.aggregate(:id)
+    loan_ids = self.center.loans.aggregate(:id) rescue nil
     return if loan_ids.blank?
     now = DateTime.now
     repository.adapter.execute(get_bulk_insert_sql("dirty_loans", loan_ids.map{|pl| {:loan_id => pl, :created_at => now}}))
