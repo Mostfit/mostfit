@@ -43,7 +43,7 @@ class Cachers < Application
         cachers.reduce(:consolidate)
       end
     end
-    display @cachers, :template => 'cachers/index', :layout => :printer
+    display @cachers, :template => 'cachers/index'
   end
 
   def split
@@ -109,6 +109,7 @@ class Cachers < Application
     else 
       @level = (not params[:center_id].blank?) ? :loans : ((not params[:branch_id].blank?) ? :centers : :branches)
     end
+
   end
 
 end
