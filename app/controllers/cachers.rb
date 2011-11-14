@@ -43,7 +43,7 @@ class Cachers < Application
         cachers.reduce(:consolidate)
       end
     end
-    display @cachers, :template => 'cachers/index', :layout => :printer
+    display @cachers, :template => 'cachers/index'
   end
 
   def split
