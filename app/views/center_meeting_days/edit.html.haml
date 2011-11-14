@@ -1,6 +1,7 @@
 %h1
   == Editing Center Meeting Day #{@cmd.id} for center: #{@cmd.center.name}
 
+= error_messages_for @cmd
 = form_for(@cmd, :action => resource(@cmd), :class => "tall shaded") do
   = partial :fields
   = submit 'Update Meeting Date'

@@ -109,6 +109,7 @@ class Cachers < Application
     else 
       @level = (not params[:center_id].blank?) ? :loans : ((not params[:branch_id].blank?) ? :centers : :branches)
     end
+
   end
 
 end

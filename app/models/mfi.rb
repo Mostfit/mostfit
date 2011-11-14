@@ -55,7 +55,7 @@ class Mfi
 
   property :report_access_rules, Yaml, :nullable => true, :default => {}
 
-  property :system_state, Enum.send('[]', *SYSTEM_STATES)
+  property :system_state, Enum.send('[]', *SYSTEM_STATES), :default => :running
 
   property :main_text, Text, :nullable => true, :lazy => true
   validates_length :name, :min => 0, :max => 20

@@ -93,6 +93,7 @@ class Cacher
 
 
   def self.get_missing_centers
+    debugger
     return [] if self.all.empty?
     branch_ids = self.aggregate(:branch_id)
     dates = self.aggregate(:date)
@@ -294,7 +295,7 @@ class CenterCache < Cacher
     date = selection.delete(:date)
     selection[:id] = selection.delete(:center_id) if selection[:center_id]
     hs = Center.all(selection.merge(:creation_date.lte => date)).aggregate(:id)
-    bs.keys.map{|date| [date,hs - bs[date]]}.to_hash
+    date.map{|d| [d,hs - (bs[d] || [])]}.to_hash
   end
 
 

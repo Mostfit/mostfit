@@ -79,25 +79,32 @@ class CenterMeetingDay
 
   # checks that for a given center, the valid_from and valid_to dates for this center do not overlap with another center_meeting_day
   def dates_do_not_overlap
+    debugger
     return true if deleted_at
     cmds = self.center.center_meeting_days
     return true if cmds.count == 0
     return true if cmds.count == 1 and cmds.first.id == self.id
-    return [false, "Center Meeting Day validity overlaps with another center meeting day."] if center.center_meeting_days.map do |cmd| 
-      if cmd.valid_upto and cmd.valid_upto != Date.new(2100,12,31) # an end date is specified for the other cmd 
-        if valid_upto  and valid_upto != Date.new(2100,12,31)          # and for ourselves
-          cmd.valid_from > valid_upto or cmd.valid_upto < valid_from # either we end before the other one starts or start after the other one ends
-        else            # but not for ourselves
-          valid_from > cmd.valid_upto or valid_from < cmd.valid_from # either we start after the other one starts or we start after the other one ends
-        end
-      else                 # no end date specified for the other one
-        if valid_upto and  valid_upto != Date.new(2100,12,31)     # but we have one
-          valid_from > cmd.valid_from or valid_upto < cmd.valid_from  # either we start after the other one starts or we end before the other one starts
-        else               # neither one has an end date
-          true
+    bad_ones = center.center_meeting_days.map do |cmd| 
+      debugger
+      if cmd.id == id
+        true
+      else
+        if cmd.valid_upto and cmd.valid_upto != Date.new(2100,12,31) # an end date is specified for the other cmd 
+          if valid_upto  and valid_upto != Date.new(2100,12,31)          # and for ourselves
+            cmd.valid_from > valid_upto or cmd.valid_upto < valid_from # either we end before the other one starts or start after the other one ends
+          else            # but not for ourselves
+            valid_from > cmd.valid_upto or valid_from < cmd.valid_from # either we start after the other one starts or we start after the other one ends
+          end
+        else                 # no end date specified for the other one
+          if valid_upto and  valid_upto != Date.new(2100,12,31)     # but we have one
+            valid_from > cmd.valid_from or valid_upto < cmd.valid_from  # either we start after the other one starts or we end before the other one starts
+          else               # neither one has an end date
+            true
+          end
         end
       end
-    end.select{|x| not x}.count > 0
+    end
+    return [false, "Center Meeting Day validity overlaps with another center meeting day."] if bad_ones.select{|x| not x}.count > 0
     return true
   end
 

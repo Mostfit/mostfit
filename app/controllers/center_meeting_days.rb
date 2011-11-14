@@ -51,7 +51,7 @@ class CenterMeetingDays < Application
     if @cmd.save
       redirect resource(@cmd.center, :center_meeting_days), :message => {:success => "Center Meeting Day updated"}
     else
-      render
+      render :edit
     end
   end
   
