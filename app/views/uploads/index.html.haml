@@ -1,0 +1,23 @@
+%h1 Uploads
+
+%table.narrow.shaded
+  %tr
+    %th
+      id
+    %th
+      Filename
+    %th
+      State
+    %th
+      Action
+  - @uploads.each do |upload|
+    %tr
+      %td
+        = upload.id
+      %td
+        = upload.filename
+      %td
+        = upload.state
+      %td
+        = link_to "Details", resource(upload)
+        = link_to "Continue", url(:continue_upload, :id => upload.id)

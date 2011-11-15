@@ -1,0 +1,41 @@
+%h1 Upload
+.menu-strip
+  = link_to 'Continue', url(:continue_upload, @upload), :class => "greenButton"
+  = link_to 'Reset', url(:reset_upload, @upload), :class => "cancelButton"
+%table.tall
+  %tr
+    %th
+      Directory
+    %td
+      = @upload.directory
+  %tr
+    %th
+      Filename
+    %td
+      = @upload.filename
+  %tr
+    %th
+      md5
+    %td
+      = @upload.md5sum
+  %tr
+    %th
+      Status
+    %td
+      = @upload.state
+  %tr
+    %th
+      State Detail
+    %td
+      - @upload.state_detail.each do |k,v|
+        == #{k} : #{v}
+
+%h2 Status
+- Upload::MODELS.each do |model|
+  %ul.inline
+    %li
+      = @upload.send(model).count
+      = model
+
+%h2 Checks
+= link_to "#{@upload.checkers(:ok => false).count} failed checks", resource(@upload, :checkers)
