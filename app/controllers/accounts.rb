@@ -49,6 +49,8 @@ class Accounts < Application
   def create(account)
     if account.is_a?(Hash)
       @account = Account.new(account)
+      # @account.opening_balance = params['opening_balance'] if params['txn_type'] == 'credit' # this line is a redundancy
+      @account.opening_balance = -params['account']['opening_balance'].to_f if params['txn_type'] == 'debit'  
       if @account.save
         redirect resource(:accounts, :branch_id => account[:branch_id] || 0), :message => {:notice => "Account was successfully created"}
       else

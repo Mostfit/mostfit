@@ -60,5 +60,6 @@
       Opening Balance
     %td
       = text_field :opening_balance
+      = select(:name => :txn_type, :collection => [['debit', :debit], ['credit', :credit]])
       on
       = date_select_for @account, :opening_balance_on_date 
