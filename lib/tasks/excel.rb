@@ -4,18 +4,19 @@ require "rubygems"
 require "roo"
 
 def to_csv(directory, filename)
+  log_file = File.open(File.join("public","logs", directory), "a")
   excel = Excel.new(File.join("uploads", directory, filename))
   excel.sheets.each{|sheet|
-    puts sheet
     excel.default_sheet=sheet
     unless File.exists?(File.join("uploads",directory, "#{sheet}.csv"))
-      puts "extracting sheet #{sheet}"
+      log_file.write "extracting sheet #{sheet}\n"
       excel.to_csv(File.join("uploads", directory, "#{sheet}.csv"))
     else
-      puts "skipping #{sheet}"
+      log_file.write "skipping #{sheet}\n"
       return false
     end
   }
+  log_file.close
   return true
 end
 
