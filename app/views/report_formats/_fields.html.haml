@@ -22,8 +22,8 @@
     });
   });
   });
-- keys = (Cacher::COLS  + Cacher::FLOW_COLS).map(&:to_s).sort
-- report_keys  = @report_format.keys ? @report_format.keys.map(&:to_s).sort : []
+- keys = (Cacher::COLS  + Cacher::FLOW_COLS).map(&:to_s)
+- report_keys  = @report_format.keys ? @report_format.keys.map(&:to_s) : []
 - remaining_keys = keys - report_keys
 %table.form#user_group_form
   %tr
@@ -38,14 +38,17 @@
     %td
       Fields
     %td.multi-select
-      %select.remaining{:multiple => "multiple", :style => "height : 200px; min-width : 100px"}
+      %select.remaining#select-from{:multiple => "multiple", :style => "height: #{keys.count}em; min-width : 100px", :size => 100}
         - (remaining_keys.uniq).sort.each do |user|
           %option{:value => user}= user
-      %input.select{:type => "button", :value => "&raquo;"}
-      %input.deselect{:type => "button", :value => "&laquo;"}
-      %select.current#select-to{:multiple => "multiple", :name => "report_format[keys][]", :style => "height : 200px; min-width : 100px"}
-        - report_keys.map(&:to_s).sort.each do |user|
+    %td
+      %input#add{:type => "button", :value => "&raquo;"}
+      %input#remove{:type => "button", :value => "&laquo;"}
+    %td.multi-select
+      <a href="JavaScript:void(0);" id="btn-up">Move Up</a>
+      <a href="JavaScript:void(0);" id="btn-down">Move Down</a>
+      %br
+      %select.current#select-to{:multiple => "multiple", :name => "report_format[keys][]", :style => "height : #{keys.count}em; min-width : 100px"}
+        - report_keys.map(&:to_s).each do |user|
           %option{:value => user.to_s}= user
 
-<a href="JavaScript:void(0);" id="btn-up">Up</a>
-<a href="JavaScript:void(0);" id="btn-down">Down</a>
