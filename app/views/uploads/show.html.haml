@@ -1,0 +1,51 @@
+%h1 Upload
+.menu-strip
+  = link_to 'Continue', url(:continue_upload, @upload), :class => "greenButton"
+  = link_to 'Reset', url(:reset_upload, @upload), :class => "cancelButton"
+  = link_to 'Reset and Delete all Data', url(:reset_upload, @upload, :delete => 1), :class => "cancelButton"
+%table.tall
+  %tr
+    %th
+      Directory
+    %td
+      = @upload.directory
+  %tr
+    %th
+      Filename
+    %td
+      = @upload.filename
+  %tr
+    %th
+      md5
+    %td
+      = @upload.md5sum
+  %tr
+    %th
+      Status
+    %td
+      = @upload.state
+  %tr
+    %th
+      State Detail
+    %td
+      - @upload.state_detail.each do |k,v|
+        == #{k} : #{v}
+
+%h2 Status
+- Upload::MODELS.each do |model|
+  %ul.inline
+    %li
+      = @upload.send(model).count
+      = model
+
+%h3 Errors
+- Upload::MODELS.each do |model|
+  - fn = File.join("uploads", @upload.directory, "#{model}_errors.csv")
+  %ul.inline
+    - if File.exists?(fn)
+      %li
+        - link_text = `wc -l #{fn} | awk -F" " '{print $1}'` + " " + model.to_s
+        = link_to link_text, url(:controller => :uploads, :action => :error_log, :model => model, :id => @upload.id)
+
+%h2 Checks
+= link_to "#{@upload.checkers(:ok => false).count} failed checks", resource(@upload, :checkers)

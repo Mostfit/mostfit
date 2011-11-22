@@ -1,3 +1,19 @@
 = css_include_tag :diags
 = link_to 'loan', resource(@loan)
-= show_history(@loan)
+= select :name => 'report_format', :collection => ReportFormat.all,:text_method => :name, :value_method => :id, :selected => (params[:report_format] || 1).to_s, :prompt => 'Select a report format', :onchange => "javascript: document.location = '#{url(:controller => :loans, :action => :diagnose, :id => @loan.id)}?report_format=' + (this.options[this.selectedIndex].value)"
+
+
+- keys = params[:report_format] ? ReportFormat.get(params[:report_format]).keys : []
+%table.diags
+  %thead
+    %tr
+      - keys.each do |k|
+        %th
+          = k.to_s.gsub("_"," ")
+  - @loan.loan_history(:order => [:date]).each do |h|
+    %tr{:class => cycle('odd','even')}
+      - keys.each do |k|
+        %td
+          = h.send(k)
+        
+  

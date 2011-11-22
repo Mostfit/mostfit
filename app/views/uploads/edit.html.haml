@@ -1,0 +1,11 @@
+%h1
+  Mostfit data upload
+%p
+  Upload information for your past operations here, and you are ready to begin using Mostfit 
+%p
+  Download 
+  %a{:href => "/upload_data.xls"}
+    sample spreadsheet
+= form_for(@upload, :action => "/uploads/3/", :multipart => true, :class => "bold") do
+  = partial :fields
+  = hidden_field :state, :value => :uploaded

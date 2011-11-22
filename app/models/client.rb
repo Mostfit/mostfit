@@ -154,7 +154,7 @@ class Client
       client_group  =  ClientGroup.first(:code => row[headers[:group_code]].strip)
     elsif headers[:group] and row[headers[:group]]
       name          = row[headers[:group]].strip
-      client_group  = ClientGroup.first(:name => name)||ClientGroup.create(:name => name, :center => center, :code => name.split(' ').join)
+      client_group  = ClientGroup.first(:name => name)||ClientGroup.create(:name => name, :center => center, :code => name.split(' ').join, :upload_id => row[headers[:upload_id]])
     else
       client_group  = nil
     end

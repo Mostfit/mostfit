@@ -265,6 +265,7 @@ class Loan
               :approved_by_staff_id => StaffMember.first(:name => row[headers[:approved_by_staff]]).id,
               :reference => row[headers[:reference]], :client => Client.first(:reference => row[headers[:client_reference]]))
     obj.history_disabled=true
+    debugger
     saved = obj.save
     if saved
       c = Checker.first_or_new(:model_name => "Loan", :reference => obj.reference)
@@ -461,6 +462,7 @@ class Loan
     end
     
     # take care of date changes in weekly schedules
+    debugger
     if [:weekly, :biweekly, :quadweekly].include?(installment_frequency) and cl=self.client(:fields => [:id, :center_id]) and cen=cl.center and cen.meeting_day != :none and ensure_meeting_day
       unless (new_date.weekday == cen.meeting_day_for(new_date) or (cen.meeting_day_for(new_date) == :none))
         # got wrong val. recalculate
@@ -1048,6 +1050,7 @@ class Loan
   end
   # the installment dates
   def installment_dates
+    debugger
     return @_installment_dates if @_installment_dates
     if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
       @_installment_dates =  ([scheduled_first_payment_date].concat(client.center.get_meeting_dates(number_of_installments, scheduled_first_payment_date))).uniq

@@ -1,5 +1,27 @@
 = js_include_tag "multiple_select.js"
 = css_include_tag "user_groups.css"
+:javascript
+  $(document).ready(function() {
+  $('#btn-up').bind('click', function() {
+    $('#select-to option:selected').each( function() {
+      var newPos = $('#select-to option').index(this) - 1;
+      if (newPos > -1) {
+        $('#select-to option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+        $(this).remove();
+      }
+    });
+  });
+  $('#btn-down').bind('click', function() {
+    var countOptions = $('#select-to option').size();
+    $('#select-to option:selected').each( function() {
+      var newPos = $('#select-to option').index(this) + 1;
+      if (newPos < countOptions) {
+        $('#select-to option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+        $(this).remove();
+      }
+    });
+  });
+  });
 - keys = (Cacher::COLS  + Cacher::FLOW_COLS).map(&:to_s).sort
 - report_keys  = @report_format.keys ? @report_format.keys.map(&:to_s).sort : []
 - remaining_keys = keys - report_keys
@@ -21,7 +43,9 @@
           %option{:value => user}= user
       %input.select{:type => "button", :value => "&raquo;"}
       %input.deselect{:type => "button", :value => "&laquo;"}
-      %select.current{:multiple => "multiple", :name => "report_format[keys][]", :style => "height : 200px; min-width : 100px"}
+      %select.current#select-to{:multiple => "multiple", :name => "report_format[keys][]", :style => "height : 200px; min-width : 100px"}
         - report_keys.map(&:to_s).sort.each do |user|
           %option{:value => user.to_s}= user
 
+<a href="JavaScript:void(0);" id="btn-up">Up</a>
+<a href="JavaScript:void(0);" id="btn-down">Down</a>
