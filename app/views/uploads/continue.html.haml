@@ -1,0 +1,9 @@
+:javascript
+  $(document).ready(function() {
+    $.get('#{url(:continue_upload, :id => @upload.id)}')
+  });
+
+%h3
+  Log window for upload status
+%div.log_box{:id => @upload.directory}
+

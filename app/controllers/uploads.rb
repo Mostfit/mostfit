@@ -35,25 +35,27 @@ class Uploads < Application
   end
 
   def continue(id)
-    if request.xhr?
-      @upload = Upload.get(id)
-      raise NotFound unless @upload
-      Merb.run_later do
-        @upload.cont
-      end
-    else
-      @upload = Upload.get(id)
-      raise NotFound unless @upload
-      display @upload
+    @upload = Upload.get(id)
+    raise NotFound unless @upload
+    Merb.run_later do
+      @upload.cont
     end
+    redirect resource(@upload), :message => {:notice => "Started processing"}
   end
   
   def reset(id)
     @upload = Upload.get(id)
     raise NotFound unless @upload
-    @upload.reset(params[:restart])
+    options = {:erase => true} if params[:delete]
+    @upload.reset(options)
     redirect resource(@upload), :message => {:notice => "This upload was succesfully reset"}
 
+  end
+
+  def error_log
+    @upload = Upload.get(params[:id])
+    raise Notfound unless @upload
+    "<pre>" + File.read(File.join("uploads", @upload.directory, "#{params[:model]}_errors.csv")) + "</pre>"
   end
 
   def edit(id)

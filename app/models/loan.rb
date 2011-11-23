@@ -276,7 +276,6 @@ class Loan
       c.loan = obj
       c.save
     end
-    debugger unless saved
     [saved, obj]
   end
 
@@ -787,7 +786,6 @@ class Loan
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
     (1..actual_number_of_installments).each do |number|
       date      = installment_dates[number-1] #shift_date_by_installments(scheduled_first_payment_date, number - 1, ensure_meeting_day)
-      debugger if date.nil?
       principal = scheduled_principal_for_installment(number)
       interest  = scheduled_interest_for_installment(number)
       next if repayed
@@ -1150,6 +1148,7 @@ class Loan
     act_total_principal_paid = last_payments_hash[1][:total_principal]; act_total_interest_paid = last_payments_hash[1][:total_interest]
     last_status = 1; last_row = nil;
     dates.each_with_index do |date,i|
+      debugger if date == Date.new(2011,9,30)
       i_num                                  = installment_for_date(date)
       scheduled                              = get_scheduled(:all, date)
       actual                                 = get_actual(:all, date)
@@ -1169,12 +1168,12 @@ class Loan
       advance_principal_outstanding          = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max
       advance_interest_outstanding           = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
       total_advance_outstanding              = advance_interest_outstanding + advance_principal_outstanding
-      advance_principal_paid_today           = last_row ? [0,advance_principal_paid - (last_row[:advance_principal_outstatnding] || 0)].max : 0
-      advance_interest_paid_today            = last_row ? [0,advance_interest_paid -  (last_row[:advance_interest_outstanding] || 0)].max   : 0
+      advance_principal_paid_today           = last_row ? [0,advance_principal_outstanding - (last_row[:advance_principal_outstanding] || 0)].max : 0
+      advance_interest_paid_today            = last_row ? [0,advance_interest_outstanding -  (last_row[:advance_interest_outstanding] || 0)].max   : 0
       total_advance_paid_today               = advance_principal_paid_today + advance_interest_paid_today
       advance_principal_paid                += advance_principal_paid_today
       advance_interest_paid                 += advance_interest_paid_today
-      advance_principal_paid                 = advance_principal_paid + advance_interest_paid 
+      total_advance_paid                     = advance_principal_paid + advance_interest_paid 
 
       advance_principal_adjusted             = advance_principal_paid - advance_principal_outstanding
       advance_interest_adjusted              = advance_interest_paid  - advance_interest_outstanding
@@ -1217,17 +1216,17 @@ class Loan
         :total_interest_due                  => total_interest_due.round(2),
         :total_principal_paid                => total_principal_paid.round(2),
         :total_interest_paid                 => total_interest_paid.round(2),
-        :advance_principal_outstanding       => advance_principal_paid,
-        :advance_interest_outstanding        => advance_interest_paid,
-        :total_advance_outstanding           => advance_principal_paid + advance_interest_paid,
+        :advance_principal_outstanding       => advance_principal_outstanding,
+        :advance_interest_outstanding        => advance_interest_outstanding,
+        :total_advance_outstanding           => advance_principal_outstanding + advance_interest_outstanding,
         :advance_principal_paid_today        => advance_principal_paid_today,
         :advance_interest_paid_today         => advance_interest_paid_today,
         :total_advance_paid_today            => advance_principal_paid_today + advance_interest_paid_today,
         :advance_principal_paid              => advance_principal_paid,
         :advance_interest_paid               => advance_interest_paid,
         :total_advance_paid                  => advance_interest_paid + advance_principal_paid,
-        :advance_principal_adjusted          => last_row ? [0,last_row[:advance_principal_paid] - advance_principal_paid].max : 0,
-        :advance_interest_adjusted           => last_row ? [0,last_row[:advance_interest_paid] - advance_interest_paid].max : 0,
+        :advance_principal_adjusted          => advance_principal_adjusted,
+        :advance_interest_adjusted           => advance_interest_adjusted,
         :advance_principal_adjusted_today    => advance_principal_adjusted_today,
         :advance_interest_adjusted_today     => advance_interest_adjusted_today,
         :total_advance_adjusted_today        => total_advance_adjusted_today,

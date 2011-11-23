@@ -1,4 +1,6 @@
 class Upload  
+  require "log4r"
+
   include DataMapper::Resource
   attr_accessor :log, :state_detail_hash
 
@@ -50,7 +52,7 @@ class Upload
   end
 
   def details
-    # use this method to check the details as it serializes the state_details object
+    # use this method to check the state details. it serializes the state_details object
     @state_detail_hash ||= Marshal.load(self.state_detail)
   end
   
@@ -73,7 +75,6 @@ class Upload
   # @param [Symbol] either :info or :verbose
   def log_file(log_level = :verbose)
     return @log if @log
-    require "log4r"
     log_file_name = "#{self.directory}"
     @log       = Log4r::Logger.new log_file_name
     pf        = Log4r::PatternFormatter.new(:pattern => "<b>[%l]</b> %m")
@@ -97,11 +98,17 @@ class Upload
     end
   end
 
+  def spawn
+    Thread.new {
+      cont
+    }
+  end
+
   # destroys all the entries in the database created by this upload
   def destroy_models
-    MODEL.each do |model|
-      @log.debug("Erasing #{model_name}")
-      self.send(model).aggregate(:id).destroy!
+    MODELS.each do |model|
+      @log.debug("Erasing #{model}")
+      self.send(model).destroy!
       @log.debug("done")
     end
   end
@@ -112,7 +119,7 @@ class Upload
     @log.info("Stopping processing")
     self.state = :uploaded
     self.save
-    if false # TODO set this to option[:erase] once done
+    if options[:erase] # TODO set this to option[:erase] once done
       @log.info("Erasing records from database")
       destroy_models
     end
@@ -152,9 +159,16 @@ class Upload
     
     MODELS.each {|model|
       error_count = 0
-      error_file = File.open(File.join("uploads",directory,"#{model.to_s}_errors.csv"),"w")
+      error_filename = File.join("uploads",directory,"#{model.to_s}_errors.csv")
+      FileUtils.rm(error_filename, :force => true)
+      error_file = File.open(error_filename,"w")
       next unless file_name = csv_file_for(model)                                                             # no CSV file? next!
       model = Kernel.const_get(model.to_s.singularize.camel_case)
+      if [Branch, Center, Client, Loan].include?(model) and StaffMember.count == 0                       # some models need staff members
+        @log.error("No point continuing with #{model} without any staff members")
+        next 
+      end
+
       @log.info("Creating #{model.to_s.plural}")
 
       # first find out which fields are required to be unique
@@ -178,8 +192,8 @@ class Upload
             headers[name.downcase.gsub(' ', '_').to_sym] = index
           }
           headers[:upload_id] = headers.keys.count
-            
-          error_file.write(row.to_csv)
+          
+          error_file.write((row + ["errors"]).to_csv)
         else
           row.push(self.id)
           if uniques.include?(row[headers[unique_field]])
@@ -188,7 +202,6 @@ class Upload
             next
           end
           begin
-            debugger if model == Loan
             status, record = model.from_csv(row, headers)
             if status
               error = false
@@ -203,14 +216,17 @@ class Upload
             @log.error("<font color='red'>#{model}: #{e.message}</font>") if log
           ensure
             if error
-              error_file.write(row.to_csv)         # log all errors in a separate csv file
-              error_count += 1                    # so we can iterate down to perfection
+              errors = [record.errors.values.join(".")] rescue e ? [e.message] : ["Unknown error"]
+              error_file.write((row + errors).to_csv)        # log all errors in a separate csv file
+              error_count += 1                                                                    # so we can iterate down to perfection
             end
           end
         end    
       }
       @log.info("<font color='#8DC73F'><b>Created #{done} #{model.to_s.plural}</b></strong> Skipped #{skipped}") 
       error_file.close
+      FileUtils.rm(error_filename, :force => true) if error_count == 0
+
     }
   end
 end

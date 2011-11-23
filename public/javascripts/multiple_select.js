@@ -1,19 +1,17 @@
 $(function() {
-	$("table td input.select").click(function() {
-		var parent = $(this).parent();
-		var selection_ids = parent.find("select.remaining").val();
+	$("#add").click(function() {
+	  var selection_ids = $('#select-from').val();
 		for(var i = 0; i < selection_ids.length; i++) {
-		    var selection = parent.find("select.remaining option[value="+selection_ids[i]+"]")
-		    parent.find("select.current").append(selection[0]);
+		  var selection = $("#select-from option[value="+selection_ids[i]+"]");
+		  $('#select-to').append(selection[0]);
 		}
 	});
 
-	$("table td input.deselect").click(function() {
-		var parent = $(this).parent();
-		var deselection_ids = parent.find("select.current").val();
+	$("#remove").click(function() {
+		var deselection_ids = $('#select-to').val();
 		for(var i = 0; i < deselection_ids.length; i++) {
-		    var deselection = parent.find("select.current option[value="+deselection_ids[i]+"]")
-		    parent.find("select.remaining").append(deselection[0]);
+		    var deselection = $("#select-to option[value="+deselection_ids[i]+"]")
+		    $('#select-from').append(deselection[0]);
 		}
 	});
 

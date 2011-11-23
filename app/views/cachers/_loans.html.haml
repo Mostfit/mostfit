@@ -7,23 +7,31 @@
 %table.report.nojs
   %thead
     %tr.header
+      %th date
+      %th loan
+      %th client
       - @keys.each do |at|
         %th
           = at.to_s.gsub("_","<br>")
-      %th
-        loan
   - histories.each do |h|
     %tr{:class => "#{h.status} #{cycle('odd','even')}"}
+      %td
+        = h.date
+      %td
+        = link_to h.loan_id, "/loans/diagnose/#{h.composite_key.floor}"
+      %td
+        = link_to h.loan.client.name, resource(h.loan.client)
       - @keys.each do |at|
         - val = h.send(at)
         %td
           = val.is_a?(Numeric) ? val.to_currency(:mostfit_default) : val
           - total[at] ||= 0
           - total[at] += h.send(at) if h.send(at).is_a? Numeric
-      %td{:style => "background: #aaee00"}
-        = link_to h.composite_key, "/loans/diagnose/#{h.composite_key.floor}"
   %tfoot
     %tr.total
+      %td
+      %td
+      %td
       - @keys.each_with_index do |at,i|
         %td
           - if i == 0
@@ -33,4 +41,5 @@
             = vv == "0" ? "-" : vv 
     %tr.total
       - @center_row = CenterCache.first(:date => @date, :center_id => params[:center_id])
+      - @keys = [:x,:y,:z] + @keys
       = (partial :cache_row, :cache => @center_row, :cls => "total", :ignore_total => true) if @center_row
