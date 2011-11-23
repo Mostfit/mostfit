@@ -59,7 +59,7 @@
     %th 
       Opening Balance
     %td
-      = text_field :opening_balance
-      = select(:name => :txn_type, :collection => [['debit', :debit], ['credit', :credit]])
+      = text_field :opening_balance, :value => @account.opening_balance.abs 
+      = select(:name => :txn_type, :collection => [['debit', :debit], ['credit', :credit]], :selected => (@account.opening_balance > 0 ? 'credit' : 'debit'))
       on
       = date_select_for @account, :opening_balance_on_date 
