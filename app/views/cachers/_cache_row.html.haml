@@ -2,7 +2,7 @@
 - date = nil
 %tr{:class => cls}
   - @keys.each do |at|
-    - val = cache.send(at)
+    - val = cache.send(at) rescue "-"
     %td{:style => "text-align: right", :class => at}
       - if at == :date
         = link_to val, resource(:cachers, request.send(:query_params).merge(:date => val))
