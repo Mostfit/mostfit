@@ -1,0 +1,9 @@
+%h1 New Report Format
+
+= error_messages_for @report_format
+
+= form_for(@report_format, :action => url(:report_formats) ) do
+  = partial :fields
+  = submit "Create"
+
+= link_to 'Back', url(:report_formats)

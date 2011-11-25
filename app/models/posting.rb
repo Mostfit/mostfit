@@ -7,13 +7,15 @@ class Posting
              'advance_interest', 'advance_principal_adjusted', 'advance_interest_adjusted', 'journal'
             ]
 
-  property :id,           Serial
-  property :amount,       Float,   :index => true   
-  property :journal_id,   Integer, :index => true  
-  property :account_id,   Integer, :index => true  
-  property :currency_id,  Integer, :index => true
-  property :action,       Enum.send('[]',*ACTIONS), :nullable => true
-  property :deleted_at,   ParanoidDateTime
+  property :id,             Serial
+  property :amount,         Float,   :index => true   
+  property :journal_id,     Integer, :index => true  
+  property :account_id,     Integer, :index => true  
+  property :currency_id,    Integer, :index => true
+  property :action,         Enum.send('[]', *ACTIONS), :nullable => true
+  property :effective_date, Date,    :nullable => false, :default => lambda{ |obj, p| (obj.journal.date if obj.journal)}
+  property :deleted_at,     ParanoidDateTime
+  
   belongs_to :journal
   belongs_to :account
   belongs_to :currency

@@ -55,10 +55,21 @@
       GL Code
     %td
       = text_field :gl_code
+  - unless @account.id.nil?
+    %tr
+      %th
+        Opening Balance 
+      %td
+        = @account.opening_balance.to_account_balance 
+        = "(as of #{@account.opening_balance_on_date})"
   %tr
     %th 
       Opening Balance
+      = "(edit)" unless @account.id.nil?
     %td
-      = text_field :opening_balance
+      - opening_balance_value = params['account'] ? params['account']['opening_balance'].to_f : @account.opening_balance.abs
+      = text_field :opening_balance, :value => opening_balance_value 
+      = select(:name => :txn_type, :collection => [['debit', :debit], ['credit', :credit]], :selected => (@account.opening_balance > 0 ? 'credit' : 'debit'))
       on
       = date_select_for @account, :opening_balance_on_date 
+

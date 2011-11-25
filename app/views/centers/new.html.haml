@@ -1,6 +1,6 @@
 - form_url   = (@branch ? resource(@branch, :centers) : resource(:centers, {:return => params[:return]}))
 - cancel_url = params[:return] ? "/"+params[:return] : resource(@branch)
-= form_for(@center, :action => form_url, :class => "form") do
+= form_for(@center, :action => form_url, :class => "form shaded") do
   %h1 Create new center
   = error_messages_for @center
   %fieldset

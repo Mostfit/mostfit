@@ -1,0 +1,133 @@
+- keys = [:branch_id, :center_id] + ReportFormat.get(params[:format] || 1).keys 
+- total_keys = keys[3..-1]
+- query_params = request.send(:query_params)
+- @stale_centers = @stale.map{|s| s[1]}
+- @stale_branches = @stale.map{|s| s[0]}
+
+
+
+- unless params[:layout]
+  = js_include_tag 'jquery.tablesorter.min'
+  :javascript
+    hidden_fields = [];
+
+    $('.chosen').chosen();
+    $.tablesorter.addParser({ 
+      id: 'mostfit_currency', 
+      is: function(s) { 
+        return false; 
+      }, 
+      format: function(s) { 
+        return isNaN(parseFloat(s.replace(/ /g, ''))) ? 0 : parseFloat(s.replace(/ /g, ''));
+      }, 
+      type: 'numeric' 
+    }); 
+       
+    function hide_fields() {
+      $.each(hidden_fields,function(){ $('.' + this).show();});
+      $('#hide_fields :selected').each(
+      function(i, selected) { 
+      hid = $(selected).val()
+      $('.' + hid).hide('fast');
+      });
+    }
+
+    $(document).ready(function(){
+      //initialize the table sorter
+      $('#show_hide').hide();
+      $($('table')[0]).tablesorter({
+        headers: { 
+          0: { sorter: 'date' },
+          1: { sorter: 'string' },
+          2: { sorter: 'string' },
+          3: { sorter: 'mostfit_currency' },
+          4: { sorter: 'mostfit_currency' },
+          5: { sorter: 'mostfit_currency' },
+          6: { sorter: 'mostfit_currency' },
+          7: { sorter: 'mostfit_currency' }
+        }} );
+        // set up the column hiding
+        $('#hide_fields').focus(function() {alert('abc');hidden_fields = $('#hide_fields :selected').map(function(i, selected) { return $(selected).val()})});
+        $('#hide_fields').change(hide_fields());
+      });
+  
+  - unless @stale_centers.empty? and @stale_branches.empty? and @missing_centers.empty?
+    .nb
+      = link_to "#{@stale_centers.count} stale centers", resource(:cachers, query_params.merge(:model_name => "Center", :stale => true, :date => @date))
+      and
+      = link_to "#{@stale_branches.count} stale branches", resource(:cachers, query_params.merge(:model_name => "Branch", :stale => true, :date => @date))
+      in current selection.
+      = "#{@missing_centers.values.flatten.count} missing centers"
+      in current selection.
+      = link_to "update", url({:controller => :cachers, :action => :generate, :date => @date, :branch_id => params[:branch_id]}), :class => "green_button"
+  = form(:method => :get, :action => resource(:cachers)) do
+    = date_select_old_html(:name => 'from_date', :id => 'from_date', :min_date => Cacher.aggregate(:date.min), :max_date => Cacher.aggregate(:date.max), :date => @from_date)
+    to
+    = date_select_old_html(:name => 'to_date', :id => 'to_date', :min_date => Cacher.aggregate(:date.min), :max_date => Cacher.aggregate(:date.max), :date => @to_date)
+    = select :name => 'branch_id', :id => "branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch', :class => 'chosen'
+    = select :name => 'center_id', :id => 'center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center', :class => 'chosen'
+    = submit 'apply filter'
+    %a{:href => "javascript: $('#show_hide').slideToggle()"} 
+      more options
+  #show_hide{:style => "background: lightyellow; padding: 10px 5px; margin: 5px;"}
+    %label
+      hide
+    = select :name => 'hide_fields', :id => 'hide_fields', :multiple => true, :collection => keys.map{|k| k.to_s}, :class => 'chosen', :style => 'width: 70%'
+    %button{:onclick =>  'javascript: hide_fields()', :style => 'position: relative; top: -10px;'}
+      hide chosen fields
+    %button.greenButton
+      Save this layout
+  
+  - if @cachers.count == 0
+    %h3 
+      No caches found. 
+      = link_to 'generate?', url(:controller => :cachers, :action => :generate, :date => @date), :class => "green_button"
+
+- @show_loans = params  and (not params[:center_id].blank?) and (@date || @to_date)
+- if @show_loans
+  .menu-strip
+    = link_to 'go to weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet", :class => "edit"
+
+
+%table.report.nojs
+  %thead
+    %tr.header
+      - keys.each do |at|
+        %th{:class => at}
+          = at.to_s.gsub("_"," ")
+      %th loan link
+
+  = partial :loans, :keys => keys
+  - total_row = {}
+
+  - @grouped_cachers.sort_by{|g,c| [(g or Nothing).name,c.center_id]}.each do |g,c|
+    - if @stale_branches.include?(c.branch_id) and c.model_name == "Branch"
+      - cls = "stale"
+    - elsif @stale_centers.include?(c.center_id) and c.model_name == "Center"
+      - cls = "stale"
+    - else
+      - cls = ""
+    %tr{:class => cycle('odd','even') + " " + cls}
+      - keys.each do |at|
+        - val = c.send(at)
+        %td{:style => "text-align: right", :class => at}
+          - if at == :branch_id
+            - br = Branch.get(val)
+            = link_to((br ? br.name : "-"), url(:consolidate_cachers, request.send(:query_params).merge(:branch_id => br.id, :group_by => :center)))
+          - elsif at == :center_id
+            = link_to((@center_names[val] || "-"), url(:consolidate_cachers, request.send(:query_params).merge(:center_id => val, :date => c.date)))
+          - else
+            = (val == 0 or val.blank?) ? "-" : (val.respond_to?(:to_currency) ? val.to_currency(:mostfit_default) : val)
+          - if total_keys.include?(at) and g.class.to_s.snake_case == params[:group_by]
+            - total_row[at] ||= 0
+            - total_row[at] += val
+  %tfoot
+    %tr.org_total
+      - keys.each do |k|
+        %th{:style => "text-align: right"}
+          - if total_keys.include?(k)
+            = total_row[k].to_currency
+          - else
+            &nbsp;
+      
+

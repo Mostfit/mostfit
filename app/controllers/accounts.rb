@@ -49,7 +49,11 @@ class Accounts < Application
   def create(account)
     if account.is_a?(Hash)
       @account = Account.new(account)
-      if @account.save
+      @account.opening_balance = -params['account']['opening_balance'].to_f if params['txn_type'] == 'debit'  
+      if params['account']['opening_balance'].to_f < 0
+        message[:error] = "Account balance cannot be negative. Please choose credit or debit and enter a positive number for the account opening balance."
+        render :new
+      elsif @account.save && params['account']['opening_balance'].to_f >= 0
         redirect resource(:accounts, :branch_id => account[:branch_id] || 0), :message => {:notice => "Account was successfully created"}
       else
         message[:error] = "Account failed to be created"
@@ -84,8 +88,18 @@ class Accounts < Application
   def update(id, account)
     @account = Account.get(id)
     raise NotFound unless @account
-    if @account.update(account)
-       redirect resource(:accounts, :branch_id => @account.branch_id)
+
+    account['parent_id'] = nil if account['parent_id'].empty?
+    if params['account']['opening_balance'].to_f < 0
+      message[:error] = "Account failed to be updated. Account opening balance cannot be negative. Please choose credit or debit and enter a positive number for the account opening balance."
+      display @account, :edit
+    elsif @account.update(account)
+      @account.opening_balance = -params['account']['opening_balance'].to_f if params['txn_type'] == 'debit'
+      if @account.save
+        redirect resource(:accounts, :branch_id => @account.branch_id)
+      else
+        display @account, :edit
+      end
     else
       display @account, :edit
     end

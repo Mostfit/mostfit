@@ -37,6 +37,7 @@ class Center
   validates_length      :code, :min => 1, :max => 12
 
   validates_length      :name, :min => 3
+  validates_is_unique   :name
   validates_present     :manager
   validates_present     :branch
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
@@ -51,7 +52,7 @@ class Center
     creation_date = ((headers[:creation_date] and row[headers[:creation_date]]) ? row[headers[:creation_date]] : Date.today)
     obj = new(:name => row[headers[:center_name]], :meeting_day => row[headers[:meeting_day]].downcase.to_s.to_sym, :code => row[headers[:code]],
               :meeting_time_hours => hour, :meeting_time_minutes => minute, :branch_id => branch.id, :manager_staff_id => staff_member.id,
-              :creation_date => creation_date)
+              :creation_date => creation_date, :upload_id => row[headers[:upload_id]])
     [obj.save, obj]
   end
 
@@ -67,7 +68,47 @@ class Center
     DAYS
   end
 
+  # get a list of meeting dates between from and to if to is a Date. Else gets "to" meeting dates if to is an integer
+  #
+  # a center must take the responsibility that center_meeting_days never overlap.
+  def get_meeting_dates(to = Date.new(2100,12,31),from = creation_date)
+    # to can be a date or a number
+    # first find the date_Vectors for all center_meeting_days as a hash {:valid_from => DateVector}
+    debugger
+    select = to.class == Date ? {:valid_from.lte => to} : {}
+    dvs = center_meeting_days.all(select).map{|cmd| [cmd.valid_from, cmd.date_vector]}.to_hash
 
+    # if from is after the center creation but before the first additional center meeting date then deal with this
+    if dvs.blank? or (from < dvs.keys.min and meeting_day != :none)
+      dvs[from] =       DateVector.new(1, meeting_day, 1, :week, creation_date, dvs.keys.min || Date.new(2100,12,31))
+    end
+
+    # then cycle through this hash and get the appropriate dates
+    dates = []
+    dvs.keys.sort.each_with_index{|date,i|
+      debugger
+      d1 = [date,from].max
+      d1 -= 1 if [dvs[date].what].flatten.include?(d1.weekday)
+      d2 = dvs.keys.sort[i+1] || (to.class == Date ? to - 1: (to - dates.count - 1))
+      _ds = dvs[date].get_dates(d1,d2)
+      _ds = _ds[0..(to - dates.count - 1)] if to.class == Fixnum
+      dates.concat(_ds)
+    }
+    debugger
+    dates.sort
+  end
+
+  # returns the date vector in use for a given date.
+  def date_vector_for(date)
+    first_cmd_date = center_meeting_days.aggregate(:valid_from.min) || Date.new(2100,12,31)
+    if date < first_cmd_date
+      DateVector.new(1, meeting_day, 1, :week, creation_date, first_cmd_date)
+    else
+      (center_meeting_days.all(:order => [:valid_from]).select{|cmd| cmd.valid_from <= date and cmd.valid_upto >= date}[0]).date_vector
+    end
+  end
+
+    
   # a simple catalog (Hash) of center names and ids grouped by branches
   # returns some like: {"One branch" => {1 => 'center1', 2 => 'center2'}, "b2" => {3 => 'c3', 4 => 'c4'}} 
   def self.catalog(user=nil)
@@ -91,19 +132,22 @@ class Center
     result
   end
 
+
+  
   def meeting_day_for(date)
+    debugger
     @meeting_days ||= self.center_meeting_days(:order => [:valid_from])
     if @meeting_days.length==0
       meeting_day
     elsif date_row = @meeting_days.find{|md| md.valid_from <= date and md.valid_upto >= date} 
-      date_row.meeting_day
+      (date_row.meeting_day == :none and (not date_row.what.blank?)) ? date_row.what[0].to_sym : date_row.meeting_day
     elsif @meeting_days[0].valid_from > date
-      @meeting_days[0].meeting_day
+      (@meeting_days[0].meeting_day == :none and (not @meeting_days[0].what.blank?)) ? @meeting_days[0].what[0].to_sym : @meeting_days[0].meeting_day
     else
-      @meeting_days[-1].meeting_day
+      (@meeting_days[-1].meeting_day == :none and (not @meeting_days[-1].what.blank?)) ? @meeting_days[-1].what[0].to_sym : @meeting_days[-1].meeting_day
     end
   end
-    
+  
   def next_meeting_date_from(date)    
     number = get_meeting_date(date, :next)
     if meeting_day != :none and (date + number - get_meeting_date(date + number, :previous)).cweek == (date + number).cweek
@@ -112,7 +156,7 @@ class Center
       (date + number)
     end
   end
-
+  
   def previous_meeting_date_from(date)
     number = get_meeting_date(date, :previous)
     if meeting_day != :none and (date - number - get_meeting_date(date - number, :previous)).cweek == (date - number).cweek
@@ -132,7 +176,6 @@ class Center
   end
 
   def self.paying_today(user, date = Date.today)
-    debugger
     center_ids = LoanHistory.all(:date => date||Date.today).aggregate(:center_id)
     centers = center_ids.blank? ? [] : Center.all(:id => center_ids)
     if user.staff_member

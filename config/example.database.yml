@@ -1,37 +1,32 @@
 ---
 # This is a sample database file for the DataMapper ORM
-development: &defaults
-  # These are the settings for repository :default
+# WARNING: Do not use sqlite3. This is a FINANCIAL application, it needs a real database.
 
-  # WARNING: Do not use sqlite3. This is a FINANCIAL application, it needs a real database.
-
-  adapter:  mysql 
-  database: nfl
+development: &defaults  # These are the settings for repository :default
+  adapter:  mysql
+  database: mostfit_dev
   username: root
-  password: hatstars
+  password: secret
   host:     localhost
-
   repositories:
     maintainer:
-      adapter: sqlite3
-      database: slices/maintainer/maintainer.db
+      adapter:  sqlite3
+      database: slices/maintainer/maintainer_dev.db
 
 test:
-  <<:       *defaults
-  database: db/test.db
-
+  <<: *defaults
+  database: mostfit_test
   repositories:
     maintainer:
-      adapter: sqlite3
+      adapter:  sqlite3
       database: slices/maintainer/maintainer_test.db
- 
+
 production:
   adapter:  mysql
-  database: nfl
+  database: mostfit_prod
   username: root
-  password: hatstars
+  password: secret
   host:     localhost
 
- 
 rake:
   <<: *defaults

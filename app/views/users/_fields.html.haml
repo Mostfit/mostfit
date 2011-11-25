@@ -6,16 +6,30 @@
       = text_field :login
       %br/
       %span.greytext (only letters and numbers are allowed)
-  %tr
-    %td
-      Select role
-    %td
-      = select :role, :collection => User.roles
-  %tr.staff_member
-    %td
-      Is a staff member?
-    %td
-      = select :staff_member, :collection => [["","---"]] + StaffMember.all(:order => [:name]).map{|s| [s.id.to_s, s.name]}, :selected => (@user.staff_member ? @user.staff_member.id.to_s : ""), :class => "chosen"
+  - unless @user.role
+    %tr
+      %td
+        Select role
+      %td
+        = select :role, :collection => User.roles
+  - else
+    %tr
+      %td
+        Role
+      %td
+        = @user.role_to_s
+  - unless @user.staff_member
+    %tr.staff_member
+      %td
+        Is a staff member?
+      %td
+        = select :staff_member, :collection => [["","---"]] + StaffMember.all(:order => [:name]).map{|s| [s.id.to_s, s.name]}, :selected => (@user.staff_member ? @user.staff_member.id.to_s : ""), :class => "chosen"
+  - else
+    %tr
+      %td
+        Staff member
+      %td
+        = @user.staff_member.name
   %tr.funder
     %td
       Is a funder

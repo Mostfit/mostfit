@@ -11,10 +11,10 @@ module Merb
             :tot_p_due => :total_principal_due, :tot_i_due => :total_interest_due,
             :tp_due => :total_principal_due, :tp_paid => :total_principal_paid, 
             :ti_due => :total_interest_due, :ti_paid => :total_interest_paid, 
-            :adv_p => :advance_principal_paid, :adv_i => :advance_interest_paid, 
+            :adv_p => :advance_principal_paid, :adv_i => :advance_interest_paid, :adv_p_a => :advance_principal_adjusted, :adv_i_a => :advance_interest_adjusted, 
             :def_p => :principal_in_default, :def_i => :interest_in_default, 
             :b => :branch_id, :c => :center_id, :k => :composite_key},
-        :title_order => [:date, :s_total, :a_total, :s_bal, :a_bal, :p_paid, :p_due, :i_paid, :i_due, :tp_due, :tp_paid, :ti_due, :ti_paid, :adv_p, :adv_i, :def_p, :def_i, :b, :c, :k]}
+        :title_order => [:date, :s_total, :a_total, :s_bal, :a_bal, :p_paid, :p_due, :i_paid, :i_due, :tp_due, :tp_paid, :ti_due, :ti_paid, :adv_p, :adv_i, :adv_p_a, :adv_i_a, :def_p, :def_i, :b, :c, :k]}
       hist = loan.calculate_history.sort_by{|x| x[:date]}
       title_order = print_order[:title_order]
       titles = print_order[:titles]

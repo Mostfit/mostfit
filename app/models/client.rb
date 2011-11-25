@@ -154,16 +154,16 @@ class Client
       client_group  =  ClientGroup.first(:code => row[headers[:group_code]].strip)
     elsif headers[:group] and row[headers[:group]]
       name          = row[headers[:group]].strip
-      client_group  = ClientGroup.first(:name => name)||ClientGroup.create(:name => name, :center => center, :code => name.split(' ').join)
+      client_group  = ClientGroup.first(:name => name)||ClientGroup.create(:name => name, :center => center, :code => name.split(' ').join, :upload_id => row[headers[:upload_id]])
     else
       client_group  = nil
     end
     client_type     = ClientType.first||ClientType.create(:type => "Standard")
     grt_date        = row[headers[:grt_date]] ? Date.parse(row[headers[:grt_date]]) : nil
     obj             = new(:reference => row[headers[:reference]], :name => row[headers[:name]], :spouse_name => row[headers[:spouse_name]],
-                          :date_of_birth => Date.parse(row[headers[:date_of_birth]]), :address => row[headers[:address]], :date_joined => row[headers[:date_joined]],
-                          :center => center, :grt_pass_date => grt_date, :created_by => User.first,
-                          :client_group => client_group, :client_type => client_type)
+                          :date_of_birth => Date.parse(row[headers[:date_of_birth]]), :address => row[headers[:address]], 
+                          :date_joined => row[headers[:date_joined]], :center => center, :grt_pass_date => grt_date, :created_by => User.first,
+                          :client_group => client_group, :client_type => client_type, :upload_id => row[headers[:upload_id]])
     [obj.save, obj]
   end
 

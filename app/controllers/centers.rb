@@ -13,8 +13,7 @@ class Centers < Application
   end
 
   def list
-    @centers = @centers ? @centers.all(:meeting_day => params[:meeting_day]||Date.today) : @branch.centers_with_paginate({:meeting_day => params[:meeting_day]}, 
-                                                                                                                         session.user)
+    @centers = @centers ? @centers.all(:meeting_day => params[:meeting_day]||Date.today) : @branch.centers_with_paginate({:meeting_day => params[:meeting_day]}, session.user)
     partial "centers/list", :layout => layout?
   end
 
@@ -93,11 +92,17 @@ class Centers < Application
   end
 
   def create(center)
+    @center_meeting_day = CenterMeetingDay.new(center.delete(:center_meeting_day))
+    @center_meeting_day.valid_from = center[:creation_date]
+    @center_meeting_day.valid_upto = Date.new(2100,12,31)
     @center = Center.new(center)
+    @center.center_meeting_days << @center_meeting_day
     if @branch
       @center.branch = @branch  # set direct context
     end
     if @center.save
+      @center_meeting_day.center_id = @center.id
+      @center_meeting_day.save
       if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @center
       else
@@ -137,6 +142,9 @@ class Centers < Application
   end
 
   def destroy(id)
+    @center_meeting_day = CenterMeetingDay.new(center.delete(:center_meeting_day))
+    @center_meeting_day.valid_from = center[:creation_date]
+    @center_meeting_day.valid_upto = Date.new(2100,12,31)
     @center = Center.get(id)
     raise NotFound unless @center
     if @center.destroy

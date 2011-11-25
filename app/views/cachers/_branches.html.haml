@@ -1,0 +1,28 @@
+%h1 Branches
+%table.report.nojs
+  %thead
+    %tr.header
+      - @keys.each do |at|
+        %th
+          = at.to_s.gsub("_","<br>")
+      - unless @resource == :split_cachers
+        %th
+          split
+  - @calculated_total_row = {}
+  
+  - @cachers.sort_by{|c| [c.date,@branch_names[c.branch_id]]}.each do |c|
+    - cls = (c.stale ? "stale" : "") + " " + cycle('odd','even')
+    = partial :cache_row, :cache => c, :cls => cls
+  %tfoot
+    %tr.total
+      - @keys.each_with_index do |k,i|
+        %th{:style => "text-align: right"}
+          - if i == 0
+            Sum of Cached Values
+          - else
+            - if @total_keys.include?(k)
+              = @calculated_total_row[k].to_currency
+            - else
+              &nbsp;
+      
+

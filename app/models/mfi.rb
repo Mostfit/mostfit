@@ -2,21 +2,19 @@ class Mfi
   include DataMapper::Resource
   MinDateFrom = {:in_operation_since => "In operation since date", :today => "Today's date"}
 
+  SYSTEM_STATES = [:running, :stopped, :migration, :admin_only]
+
   def self.default_repository_name
     :abstract 
   end 
 
   attr_accessor :subdomain, :city_name, :state_id, :district_id, :logo, :fetched
 
-  property :id, Serial, :nullable => false, :index => true
-  property :name, String, :nullable => true, :index => true
-  property :address, Text, :nullable => false, :index => false
-  property :website, String
-  property :telephone, String, :nullable => false, :index => true
-
-  property :number_of_clients, Integer, :nullable => true, :index => true
-  property :number_of_branches, Integer, :nullable => true, :index => true
-  property :number_of_centers, Integer, :nullable => true, :index => true
+  property :id,           Serial, :nullable => false, :index => true
+  property :name,         String, :nullable => true, :index => true
+  property :address,      Text
+  property :website,      String
+  property :telephone,    String
 
   property :in_operation_since, Date, :nullable => false, :index => true, :default => Date.new(2000, 1, 1)
 
@@ -57,10 +55,14 @@ class Mfi
 
   property :report_access_rules, Yaml, :nullable => true, :default => {}
 
+  property :system_state, Enum.send('[]', *SYSTEM_STATES), :default => :running
+
   property :main_text, Text, :nullable => true, :lazy => true
   validates_length :name, :min => 0, :max => 20
   before :valid?, :save_image
   
+  validates_with_method :check_contact_details, :if => Proc.new{|m| m.new?}
+
   def self.first
     if $globals and $globals[:mfi_details] and $globals[:mfi_details].fetched==Date.today
       $globals[:mfi_details]
@@ -134,5 +136,11 @@ class Mfi
       return pattern
     end
   end
+  
+  def check_contact_details
+    return true if address and telephone
+    return [false, "Please enter your address and telephone number"]
+  end
+
 
 end

@@ -1,4 +1,4 @@
-=partial :form
+= partial :form
 - length = 9
 %table.report
   %tr.header
@@ -27,7 +27,7 @@
     %tr.branch#claim
       %td{:colspan => length+1}
         %b
-          =branch.name
+          = branch.name
     - branch_total = Array.new(4, 0) 
     - claims.each do |claim|      
       %tr.claim
@@ -43,7 +43,7 @@
         %td
           = claim.claim_submission_date
         %td
-          -documents = CLAIM_DOCUMENTS - claim.documents
+          - documents = CLAIM_DOCUMENTS - claim.documents
           - documents.each do |doc| 
             = doc.to_s.camelcase(' ')
             %br
@@ -77,6 +77,8 @@
       %td
       %td
       %td
+      %td
+      %td
         = branch_total[1].to_currency
       %td
         = branch_total[2].to_currency
@@ -88,6 +90,8 @@
     %td Total
     %td
       = org_total[0]
+    %td
+    %td
     %td
     %td
     %td

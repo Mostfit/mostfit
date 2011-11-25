@@ -27,7 +27,7 @@
   %tr
     %th Opening Balance : 
     %td
-      = @account.opening_balance 
+      = @account.opening_balance.to_account_balance 
       %span.greytext 
         (as on
         = @account.opening_balance_on_date

@@ -20,10 +20,34 @@
   %br/
   %span.greytext pick the date this center was created on
 %p
-  %label{:for =>"meeting day"}Meeting every:
-  - options = [['none', '<none>']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
-  = select :meeting_day, :collection => options, :onchange => "$('#hidden').css('display', 'block')"
-  &nbsp;&nbsp;on&nbsp;&nbsp;
+  %label Meeting Dates
+  %table
+    - @center.center_meeting_days.each do |cmd|
+      %tr
+        %td
+          == from #{cmd.valid_from} to #{cmd.valid_upto} this center meets every <b>#{cmd.meeting_day_string}</b>
+    - unless @center.new?
+      = link_to 'manage meeting schedule', resource(:center_meeting_days, :center_id => @center.id)
+  - if @center.new?
+    %label{:for =>"meeting day"}Meeting every:
+    %span.greytext
+      Something like: Meeting every "1 Wednesday of every 1 week" for meetings on wednesday or
+      %br 
+      Meeting every 1,3 Friday of every 1 month
+      %br
+    = text_field :name => "center[center_meeting_day[every]]"
+    - options = [['day', 'day']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
+    = select :name => "center[center_meeting_day[what]]", :collection => options, :onchange => "$('#hidden').css('display', 'block')"
+    of every
+    = text_field :name => "center[center_meeting_day[of_every]]"
+    = select :name => "center[center_meeting_day[period]]", :collection => ["week", "month"]
+    %br
+    valid from
+    = date_select "center[center_meeting_day[valid_from]]", nil, :id => "center_center_meeting_day_valid_from"
+    to
+    = date_select "center[center_meeting_day[valid_upto]]", nil, :id => "center_center_meeting_day_valid_to"
+%p
+  %label Meeting time
   = text_field :meeting_time_hours,   :size => 2
   %b :
   = text_field :meeting_time_minutes, :size => 2

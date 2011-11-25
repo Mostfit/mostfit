@@ -1,99 +1,57 @@
-= js_include_tag 'jquery.tablesorter.min'
-:javascript
-  $('.chosen').chosen();
-  $.tablesorter.addParser({ 
-  id: 'mostfit_currency', 
-  is: function(s) { 
-  return false; 
-  }, 
-  format: function(s) { 
-  return isNaN(parseFloat(s.replace(/ /g, ''))) ? 0 : parseFloat(s.replace(/ /g, ''));
-  }, 
-  type: 'numeric' 
-  }); 
-     
-  $(document).ready(function(){
-    $($('table')[0]).tablesorter({
-    //sortList: [[5,1],[6,1]],
-    headers: { 
-    0: { sorter: 'date' },
-    1: { sorter: 'string' },
-    2: { sorter: 'string' },
-    3: { sorter: 'mostfit_currency' },
-    4: { sorter: 'mostfit_currency' },
-    5: { sorter: 'mostfit_currency' },
-    6: { sorter: 'mostfit_currency' },
-    7: { sorter: 'mostfit_currency' }
-    }} )});
-
-- keys = [:date, :branch_id, :center_id,  :scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid, :fees_due_today, :fees_paid_today, :total_fees_due, :total_fees_paid]
-- total_keys = [:scheduled_outstanding_total, :actual_outstanding_total, :scheduled_outstanding_principal,:actual_outstanding_principal, :principal_due, :principal_paid, :interest_due, :interest_paid, :fees_due_today, :fees_paid_today, :total_fees_due, :total_fees_paid]
 - query_params = request.send(:query_params)
-- @stale_centers = @cachers.all(:model_name => "Center").stale.aggregate(:center_id, :updated_at).to_hash
-- @stale_branches = {} # @cachers.get_stale(:branch)
-- @missing_centers = {} # @cachers.get_missing_centers
-- @last_cache_update = @cachers.aggregate(:updated_at.min)
-- unless @stale_centers.empty? and @stale_branches.empty? and @missing_centers.empty?
-  .nb
-    = link_to "#{@stale_centers.values.flatten.count} stale centers", resource(:cachers, query_params.merge(:model_name => "Center", :stale => true, :date => @date))
-    and
-    = link_to "#{@stale_branches.values.flatten.count} stale branches", resource(:cachers, query_params.merge(:model_name => "Branch", :stale => true, :date => @date))
-    in current selection.
-    = "#{@missing_centers.values.flatten.count} missing centers"
-    in current selection.
-    = link_to "update", url({:controller => :cachers, :action => :generate, :date => @date, :branch_id => params[:branch_id]}), :class => "green_button"
-= form(:method => :get, :action => resource(:cachers)) do
-  = date_select_old_html(:name => 'date', :id => 'date', :min_date => Cacher.aggregate(:date.min), :max_date => Cacher.aggregate(:date.max), :date => @date)
-  = select :name => 'branch_id', :id => "branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch', :class => 'chosen'
-  = select :name => 'center_id', :id => 'center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center', :class => 'chosen'
-  = submit 'apply filter'
+- # TODO refactor to find the level properly
+- unless params[:layout]
+  = js_include_tag 'jquery.tablesorter.min'
+  :javascript
+    $('.chosen').chosen();
+    $.tablesorter.addParser({ 
+    id: 'mostfit_currency', 
+    is: function(s) { 
+    return false; 
+    }, 
+    format: function(s) { 
+    return isNaN(parseFloat(s.replace(/ /g, ''))) ? 0 : parseFloat(s.replace(/ /g, ''));
+    }, 
+    type: 'numeric' 
+    }); 
+       
+    $(document).ready(function(){
+      $($('table')[0]).tablesorter({
+      //sortList: [[5,1],[6,1]],
+      headers: { 
+      0: { sorter: 'date' },
+      1: { sorter: 'string' },
+      2: { sorter: 'string' },
+      3: { sorter: 'mostfit_currency' },
+      4: { sorter: 'mostfit_currency' },
+      5: { sorter: 'mostfit_currency' },
+      6: { sorter: 'mostfit_currency' },
+      7: { sorter: 'mostfit_currency' }
+      }} )});
+  
+  - unless @stale_centers.empty? and @stale_branches.empty? and @missing_centers.values.flatten.empty?
+    .nb
+      = link_to "#{@stale_centers.count} stale centers", resource(:cachers, query_params.merge(:model_name => "Center", :stale => true, :date => @date))
+      and
+      = link_to "#{@stale_branches.count} stale branches", resource(:cachers, query_params.merge(:model_name => "Branch", :stale => true, :date => @date))
+      in current selection.
+      = "#{@missing_centers.values.flatten.count} missing centers"
+      in current selection.
+      = link_to "update", url({:controller => :cachers, :action => :generate}.merge(query_params)), :class => "green_button"
+  = form(:method => :get, :action => url(:consolidate_cachers)) do
+    = date_select_old_html(:name => 'from_date', :id => 'from_date', :min_date => Cacher.aggregate(:date.min), :max_date => Cacher.aggregate(:date.max), :date => @from_date)
+    to
+    = date_select_old_html(:name => 'to_date', :id => 'to_date', :min_date => Cacher.aggregate(:date.min), :max_date => Cacher.aggregate(:date.max), :date => @to_date)
+    = select :name => 'branch_id', :id => "branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch', :class => 'chosen'
+    = select :name => 'center_id', :id => 'center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center', :class => 'chosen'
+    showng columns
+    = select :name => 'report_format', :collection => ReportFormat.all,:text_method => :name, :value_method => :id, :selected => (params[:report_format] || 1).to_s, :prompt => 'Select a report format'
+    = submit 'apply filter'
+    
+  - if @cachers.count == 0
+    %h3 
+      No caches found. 
+      = link_to 'generate?', url({:controller => :cachers, :action => :generate}.merge(query_params)), :class => "green_button"
 
-- if @cachers.count == 0
-  %h3 
-    No caches found. 
-    = link_to 'generate?', url(:controller => :cachers, :action => :generate, :date => @date), :class => "green_button"
-
-%table.diags{:style => "width: 1400px;"}
-  %thead
-    %tr
-      - keys.each do |at|
-        %th
-          = at.to_s.gsub("_","<br>")
-  = partial :loans, :keys => keys
-  - total_row = {}
-
-  - center_names = Center.all(:id => @cachers.aggregate(:center_id)).aggregate(:id, :name).to_hash
-
-  - @cachers.sort_by{|c| [c.branch_id,c.center_id]}.each do |c|
-    - if @stale_branches.values.flatten.include?(c.branch_id) and c.model_name == "Branch"
-      - cls = "stale"
-    - elsif @stale_centers.include?(c.center_id) and c.model_name == "Center"
-      - cls = "stale"
-    - else
-      - cls = ""
-    %tr{:class => cycle('odd','even') + " " + cls}
-      - keys.each do |at|
-        - val = c.send(at)
-        %td{:style => "text-align: right"}
-          - if at == :date
-            = link_to val, resource(:cachers, request.send(:query_params).merge(:date => val))
-          - elsif at == :branch_id
-            - br = Branch.get(val)
-            = link_to((br ? br.name : "-"), resource(:cachers, request.send(:query_params).merge(:branch_id => br.id)))
-          - elsif at == :center_id
-            = link_to((center_names[val] || "-")[0..10], resource(:cachers, request.send(:query_params).merge(:center_id => val, :date => c.date)))
-          - else
-            = (val == 0 or val.blank?) ? "-" : (val.respond_to?(:to_currency) ? val.to_currency(:mostfit_default) : val)
-          - if total_keys.include?(at)
-            - total_row[at] ||= 0
-            - total_row[at] += val
-  %tfoot
-    %tr.total
-      - keys.each do |k|
-        %th{:style => "text-align: right"}
-          - if total_keys.include?(k)
-            = total_row[k].to_currency
-          - else
-            &nbsp;
-      
+= partial @level
 
