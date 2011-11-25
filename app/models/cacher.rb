@@ -288,7 +288,7 @@ class CenterCache < Cacher
     raise ArgumentError.new("Cannot parse date") unless d
 
     repository.adapter.execute("UPDATE cachers SET stale=1 WHERE center_id=#{cid} OR (center_id = 0 AND branch_id = #{@center.branch_id}) AND date >= '#{d.strftime('%Y-%m-%d')}' AND stale=0")
-    puts "STALIFIED CENTERS in #{(Time.now - t).round(2)} secs"
+    # puts "STALIFIED CENTERS in #{(Time.now - t).round(2)} secs"
 
   end
 

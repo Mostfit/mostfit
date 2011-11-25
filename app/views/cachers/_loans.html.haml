@@ -1,45 +1,53 @@
-.menu-strip
-  = link_to 'go to weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet", :class => "edit"
-  = link_to 'rebuild caches', url(:rebuild_cachers, :center_id => params[:center_id]), :title => "Recreates history for these loans. Marks center and branch caches on and after this date as stale. recreates todays caches"
-
-- total = {}
-- histories = LoanHistory.latest({:center_id => params[:center_id]}, @date)
-%table.report.nojs
-  %thead
-    %tr.header
-      %th date
-      %th loan
-      %th client
-      - @keys.each do |at|
-        %th
-          = at.to_s.gsub("_","<br>")
-  - histories.each do |h|
-    %tr{:class => "#{h.status} #{cycle('odd','even')}"}
-      %td
-        = h.date
-      %td
-        = link_to h.loan_id, "/loans/diagnose/#{h.composite_key.floor}"
-      %td
-        = link_to h.loan.client.name, resource(h.loan.client)
-      - @keys.each do |at|
-        - val = h.send(at)
+%form{:action => url(:controller => :cachers, :action => :reallocate)}
+  .menu-strip{:style => "width: 100%"}
+    = link_to 'go to weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet", :class => "edit"
+    = link_to 'rebuild caches', url(:rebuild_cachers, :center_id => params[:center_id]), :title => "Recreates history for these loans. Marks center and branch caches on and after this date as stale. recreates todays caches"
+    %br
+    = submit "Reallocate whole center with style"
+    = hidden_field :name => :center_id, :value => params[:center_id]
+    = repayment_style_select
+    only fix payments that are mismatched with the schedule
+    = check_box :name => :only_mismatches, :checked => :checked
+  - total = {}
+  - histories = LoanHistory.latest({:center_id => params[:center_id]}, @date)
+  %table.report.nojs
+    %thead
+      %tr.header
+        %th date
+        %th loan
+        %th client
+        - @keys.each do |at|
+          %th
+            = at.to_s.gsub("_","<br>")
+    - histories.each do |h|
+      %tr{:class => "#{h.status} #{cycle('odd','even')}"}
         %td
-          = val.is_a?(Numeric) ? val.to_currency(:mostfit_default) : val
-          - total[at] ||= 0
-          - total[at] += h.send(at) if h.send(at).is_a? Numeric
-  %tfoot
-    %tr.total
-      %td
-      %td
-      %td
-      - @keys.each_with_index do |at,i|
+          = check_box :name => "loan_ids[#{h.loan_id}]"
+          = h.date
         %td
-          - if i == 0
-            Calculated Total
-          - else
-            - vv = total[at].to_i.to_currency(:mostfit_default)
-            = vv == "0" ? "-" : vv 
-    %tr.total
-      - @center_row = CenterCache.first(:date => @date, :center_id => params[:center_id])
-      - @keys = [:x,:y,:z] + @keys
-      = (partial :cache_row, :cache => @center_row, :cls => "total", :ignore_total => true) if @center_row
+          = link_to h.loan_id, "/loans/diagnose/#{h.composite_key.floor}"
+        %td
+          = link_to h.loan.client.name, resource(h.loan.client)
+        - @keys.each do |at|
+          - val = h.send(at)
+          %td
+            = val.is_a?(Numeric) ? val : val
+            - total[at] ||= 0
+            - total[at] += h.send(at) if h.send(at).is_a? Numeric
+    %tfoot
+      %tr.total
+        %td
+        %td
+        %td
+        - @keys.each_with_index do |at,i|
+          %td
+            - if i == 0
+              Calculated Total
+            - else
+              - vv = total[at].to_i.to_currency(:mostfit_default)
+              = vv == "0" ? "-" : vv 
+      %tr.total
+        - @center_row = CenterCache.first(:date => @date, :center_id => params[:center_id])
+        - @keys = [:x,:y,:z] + @keys
+        = (partial :cache_row, :cache => @center_row, :cls => "total", :ignore_total => true) if @center_row
+  

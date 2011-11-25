@@ -64,6 +64,18 @@ class Cachers < Application
     redirect request.referer, :message => {:notice => 'Rebuilt caches for today. Marked caches after today as stale. They will be rebuilt upon request'}
   end
 
+  def reallocate
+    debugger
+    @center = Center.get(params[:center_id])
+    raise NotFound unless @center
+    @loans = params[:loan_ids].blank? ? @center.loans.select{|l| l.status == :outstanding} : Loan.all(:id => params[:loan_ids].keys.map(&:to_i)) 
+    CenterCache.stalify(:center_id => params[:center_id], :date => (@date || @center.creation_date))
+    only_schedule_mismatches = (not params[:only_mismatches].blank?)
+    @loans.each{|l| l.reallocate(params[:style].to_sym, session.user, nil, only_schedule_mismatches)}
+    BranchCache.update(@date, @center.branch.id)
+    redirect request.referer, :message => {:notice => 'Reallocated all loans. Marked caches after today as stale. They will be rebuilt upon request'}
+  end
+
   private
   
   def parse_dates
