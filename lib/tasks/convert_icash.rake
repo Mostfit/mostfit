@@ -16,10 +16,11 @@ namespace :mostfit do
   namespace :conversion do
     desc "convert intellecash db to takeover-intellecash"
     task :convert_icash do
-      # Rake::Task['db:autoupgrade'].invoke
+      puts "upgrading"
+      Rake::Task['db:autoupgrade'].invoke
       # add repayment styles to loan products
       LoanProduct.all(:id => [1,2,3,4]).each{|lp| lp.repayment_style = RepaymentStyle.get(3); lp.save}
-      LoanProduct.all(:id => [5..10]).each{|lp| lp.repayment_style = RepaymentStyle.get(1); lp.save}
+      LoanProduct.all(:id => 5..10).each{|lp| lp.repayment_style = RepaymentStyle.get(1); lp.save}
       LoanProduct.all(:id => [11,12,13]).each{|lp| lp.repayment_style = RepaymentStyle.get(2); lp.save}
 
       # update the center_meeting_days for the Dairy Loan centers
@@ -28,9 +29,12 @@ namespace :mostfit do
       cmds.each do |cmd|
         cmd.update(:every => "1", :what => cmd.meeting_day.to_s, :of_every => 2, :period => :week)
       end
-
+      puts "done with normal stuff"
       # run the standard conversion script
-      # Rake::Task['mostfit:conversion:to_new_layout'].invoke
+      #repository.adapter.execute('update loans set discriminator="Loan"')
+      #repository.adapter.execute('alter table loan_history drop column scheduled_principal_to_be_paid')
+      #repository.adapter.execute('alter table loan_history drop column scheduled_interest_to_be_paid')
+      Rake::Task['mostfit:conversion:to_new_layout'].invoke
     end
   end
 end

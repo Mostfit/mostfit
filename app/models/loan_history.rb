@@ -88,19 +88,19 @@ class LoanHistory
   validates_present :loan,:scheduled_outstanding_principal,:scheduled_outstanding_total,:actual_outstanding_principal,:actual_outstanding_total
 
   def total_paid
-    principal_paid + interest_paid + fees_paid_today
+    (principal_paid + interest_paid + fees_paid_today).round(2)
   end
 
   def actual_outstanding_interest
-    actual_outstanding_total - actual_outstanding_principal
+    (actual_outstanding_total - actual_outstanding_principal).round(2)
   end
 
   def total_advance_paid
-    advance_principal_paid_today + advance_interest_paid_today
+    (advance_principal_paid_today + advance_interest_paid_today).round(2)
   end
 
   def total_default
-    (principal_in_default + interest_in_default).abs
+    (principal_in_default + interest_in_default).abs.round(2)
   end
 
   @@selects = {Branch => "b.id", Center => "c.id", Client => "cl.id", Loan => "l.id", Area => "a.id", Region => "r.id", ClientGroup => "cg.id", Portfolio => "p.id"}

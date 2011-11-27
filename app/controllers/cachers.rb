@@ -43,7 +43,7 @@ class Cachers < Application
         cachers.reduce(:consolidate)
       end
     end
-    display @cachers, :template => 'cachers/index'
+    display @cachers, :template => 'cachers/index', :layout => (params[:layout] or Nothing).to_sym
   end
 
   def split
