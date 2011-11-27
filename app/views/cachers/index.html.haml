@@ -38,11 +38,25 @@
       = "#{@missing_centers.values.flatten.count} missing centers"
       in current selection.
       = link_to "update", url({:controller => :cachers, :action => :generate}.merge(query_params)), :class => "green_button"
+  .menu-strip
+    %ul.inline
+      %li
+        = link_to 'previous day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date - 1, :to_date => @to_date - 1))
+      %li
+        = link_to 'last week', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - 1, :to_date => Date.today - 1))
+      %li
+        = link_to 'week to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - 1, :to_date => Date.today - 1))
+      %li
+        = link_to 'last month', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - 1, :to_date => Date.today - 1))
+      %li
+        = link_to 'month to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - 1, :to_date => Date.today - 1))
   = form(:method => :get, :action => url(:consolidate_cachers)) do
-    = date_select_old_html(:name => 'from_date', :id => 'from_date', :min_date => Cacher.aggregate(:date.min), :max_date => Cacher.aggregate(:date.max), :date => @from_date)
+    = date_select('from_date', @from_date, {:id => 'from_date'})
     to
-    = date_select_old_html(:name => 'to_date', :id => 'to_date', :min_date => Cacher.aggregate(:date.min), :max_date => Cacher.aggregate(:date.max), :date => @to_date)
+    = date_select('to_date', @to_date, {:id => 'to_date'})
+    for branch
     = select :name => 'branch_id', :id => "branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch', :class => 'chosen'
+    and center
     = select :name => 'center_id', :id => 'center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center', :class => 'chosen'
     showng columns
     = select :name => 'report_format', :collection => ReportFormat.all,:text_method => :name, :value_method => :id, :selected => (params[:report_format] || 1).to_s, :prompt => 'Select a report format'

@@ -3,9 +3,9 @@
 %tr{:class => cls}
   - @keys.each do |at|
     - val = cache.send(at) rescue "-"
-    %td{:style => "text-align: right", :class => at}
+    %td{:style => "text-align: right", :class => "#{at} text"}
       - if at == :date
-        = link_to val, resource(:cachers, request.send(:query_params).merge(:date => val))
+        = link_to val.strftime("%Y/%m/%d"), resource(:cachers, request.send(:query_params).merge(:date => val))
         - date = at
       - elsif at == :branch_id
         - if @resource == :split_cachers

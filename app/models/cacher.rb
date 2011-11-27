@@ -53,6 +53,8 @@ class Cacher
     property "#{status.to_s}".to_sym,        Float,   :nullable => false, :default => 0
   end
 
+  property :additional_fields,               Text. :lazy => true
+
   property :created_at,                      DateTime
   property :updated_at,                      DateTime
 
@@ -75,7 +77,7 @@ class Cacher
   end
 
   def actual_outstanding_interest
-    actual_outstanding_total - actual_outstanding_principal
+    (actual_outstanding_total - actual_outstanding_principal).round(2)
   end
 
   def total_advance_paid
@@ -85,7 +87,6 @@ class Cacher
   def total_default
     (principal_in_default + interest_in_default).abs
   end
-
 
   def self.stale
     self.all(:stale => true)
@@ -105,7 +106,6 @@ class Cacher
     cached_centers = Cacher.all(:model_name => "Center", :branch_id => branch_ids, :date => dates).aggregate(:branch_id, :center_id).group_by{|x| x[0]}.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
     branch_centers - cached_centers
   end
-
 
 
 
@@ -233,6 +233,10 @@ class BranchCache < Cacher
 end
 
 class CenterCache < Cacher
+
+  # these have to be hooks, for obvious reasons, but for now we make do with some hardcoded magic!
+
+  EXTRA_FIELDS = [:delayed_disbursals]
   def self.update(hash = {})
     # creates a cache per center for branches and centers per the hash passed as argument
     date = hash.delete(:date) || Date.today
@@ -253,6 +257,10 @@ class CenterCache < Cacher
     repository.adapter.execute(sql)
   end
 
+  def self.delayed_disbursal(hash = {})
+    Loan.all(:scheduled_disbursal_date.lt => date, :disbursal_date => nil).aggregate(:branch_id, :center_id, :amount.sum)
+  end
+
   def self.create(hash = {})
     # creates a cacher from loan_history table for any arbitrary condition. Also does grouping
     date = hash.delete(:date) || Date.today
@@ -266,7 +274,12 @@ class CenterCache < Cacher
     ng_bals = cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
     # workaround for the situation where no rows get returned for centers without loans.
     # this makes it very difficult to find missing center caches so we must have a row for all centers, even if it is full of zeros
-    universe = Center.all(:id => hash[:center_id]).aggregate(:branch_id, :id)
+    
+    # now hook in all the other functions that do not correspond to properties on loan history such as waiting borrowers, delayed disbursls etc.
+    extras = EXTRA_FIELDS.each do |hook|
+      [hook, self.send(hook)]
+    end
+    universe = Center.all(:id => hash[:center_id]).aggregate(:branch_id, :id) # array of [[:branch_id, :center_id]...] for all branches and centers
     universe.map do |k| 
       _p = pmts[k] || ng_pmts
       _b = balances[k] || ng_bals
@@ -288,7 +301,7 @@ class CenterCache < Cacher
     raise ArgumentError.new("Cannot parse date") unless d
 
     repository.adapter.execute("UPDATE cachers SET stale=1 WHERE center_id=#{cid} OR (center_id = 0 AND branch_id = #{@center.branch_id}) AND date >= '#{d.strftime('%Y-%m-%d')}' AND stale=0")
-    puts "STALIFIED CENTERS in #{(Time.now - t).round(2)} secs"
+    # puts "STALIFIED CENTERS in #{(Time.now - t).round(2)} secs"
 
   end
 

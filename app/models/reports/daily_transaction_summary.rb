@@ -73,7 +73,7 @@ class DailyTransactionSummary < Report
     collections = {}
     #var_adjustments = old_balances - balances + advances
     @grouper_objects.each{|go|
-      clients = go.clients.aggregate(:id)
+      clients = go.clients.aggregate(:id) rescue []
       collections[go.id] = {:principal => 0, :interest => 0, :fees => 0}
       unless clients.empty?
         payment_principal = Payment.all(:client_id => clients, :received_on => @date, :type => :principal).aggregate(:amount.sum)

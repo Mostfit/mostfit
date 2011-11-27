@@ -502,10 +502,8 @@ class Loan
   end
 
   def get_payments(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default, desktop_id = nil, origin = nil) 
-
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
-
     self.extend_loan
 
     # only possible if we get a hash or a single number.
@@ -603,7 +601,15 @@ class Loan
     
   def pay_normal(total, received_on)
     lh = info(received_on)
+    debugger if $debug
     {:interest => lh.interest_due, :principal => total - lh.interest_due}
+  end
+
+  def pay_reallocate_normal(total, received_on)
+    # we need a separate one while reallocating due to the fact the interest_due becomes 0 after being paid and so we cannot use the one above while reallocating
+    debugger if $debug
+    lh = info(received_on)
+    {:interest => lh.interest_due + lh.interest_paid, :principal => total - (lh.interest_due + lh.interest_paid)}
   end
 
   # the way to delete payments from the db
@@ -786,8 +792,8 @@ class Loan
     ensure_meeting_day = true if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
     (1..actual_number_of_installments).each do |number|
       date      = installment_dates[number-1] #shift_date_by_installments(scheduled_first_payment_date, number - 1, ensure_meeting_day)
-      principal = scheduled_principal_for_installment(number)
-      interest  = scheduled_interest_for_installment(number)
+      principal = scheduled_principal_for_installment(number).round(2)
+      interest  = scheduled_interest_for_installment(number).round(2)
       next if repayed
       repayed   = true if amount <= principal_received_up_to(date)
       
@@ -1048,7 +1054,16 @@ class Loan
   def installment_dates
     return @_installment_dates if @_installment_dates
     if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
-      @_installment_dates =  ([scheduled_first_payment_date].concat(client.center.get_meeting_dates(number_of_installments, scheduled_first_payment_date))).uniq
+      # DIRTY HACK! We cannot have two installment dates in the same week. So, we have to start counting with the first installment date and then go on to Sunday
+      # so that the next date is gauranteed to be in the next week.
+      if installment_frequency == :weekly
+        d = scheduled_first_payment_date
+        start_date = d - d.cwday + 7
+      else
+        # we need to verify if this works correctly when we get loans that are not weekly
+        start_date = scheduled_first_payment_date
+      end
+      @_installment_dates =  ([scheduled_first_payment_date].concat(client.center.get_meeting_dates(number_of_installments, start_date))).uniq
       return @_installment_dates
     end
     if installment_frequency == :daily
@@ -1148,7 +1163,7 @@ class Loan
     act_total_principal_paid = last_payments_hash[1][:total_principal]; act_total_interest_paid = last_payments_hash[1][:total_interest]
     last_status = 1; last_row = nil;
     dates.each_with_index do |date,i|
-      debugger if date == Date.new(2011,9,30)
+      debugger if date == Date.new(2011,11,23)
       i_num                                  = installment_for_date(date)
       scheduled                              = get_scheduled(:all, date)
       actual                                 = get_actual(:all, date)
@@ -1369,7 +1384,8 @@ class Loan
   end
 
 
-  def reallocate(style, user, date_from = nil)
+  # only_schedule_mismatches only repays the payments that are made badly.
+  def reallocate(style, user, date_from = nil, only_schedule_mismatches = false)
     self.extend_loan
     return false unless REPAYMENT_STYLES.include?(style)
     if style == :correct_prepayments
@@ -1377,12 +1393,21 @@ class Loan
       return status, _pmts
     end
     _ps  = self.payments(:type => [:principal, :interest])
+    if only_schedule_mismatches
+      # i.e. we are only interested in correcting the principal interest split to match with the "schedule" and not actually reallocating the loan payments to a different style
+      _ps = _ps.select do |p|
+        _info = info(p.received_on)
+        p.amount != (p.type == :principal ? _info[:scheduled_principal_due] : _info[:scheduled_interest_due])
+      end
+    end
+    debugger
     ph = _ps.group_by{|p| p.received_on}.to_hash
     _pmts = []
     self.payments_hash([])
     bal = amount
     dates = date_from ? ph.keys.sort.select{|d| d >= date_from} : ph.keys.sort
-    dates.each_with_index do |date, i|
+    # first find the total amount, user etc for each date
+    pmt_details = dates.map do |date|
       prins = ph[date].select{|p| p.type == :principal}
       ints = ph[date].select{|p| p.type == :interest}
       p_amt = prins.reduce(0){|s,p| s + p.amount} || 0
@@ -1391,23 +1416,24 @@ class Loan
       ref_payment = (prins[0] ? prins[0] : ints[0])
       user = ref_payment.created_by
       received_by = ref_payment.received_by
-      pmts = get_payments(total_amt, user, date, received_by, true, style, :default, nil, nil)
-      _pp = pmts.find{|_p| _p.type == :principal}
-      bal -= _pp.amount if _pp
-      _pmts << pmts
-    end
-    _pmts = _pmts.flatten
-    Payment.transaction do |t|
-      _t = Time.now
-      ds = _ps.map{|p| p.deleted_by = user; p.deleted_at = _t; p.destroy}
-      statii =  _pmts.map do |p| 
-        p.created_at = _t
-        p.save(:reallocate)
-      end
-      if statii.include?(false) or ds.include?(false)
-        t.rollback
-        return false, _pmts
-      end
+      [date, {:total => total_amt, :user => user, :date => date, :received_by => received_by}]
+    end.to_hash
+    statii = []
+    _t = DateTime.now
+    debugger if $debug
+    # then delete all payments and recalculate a virgin loan_history
+    ds = _ps.map{|p| p.deleted_by = user; p.deleted_at = _t; p.destroy}
+    reload
+    update_history
+    clear_cache
+    # then make the payments again
+    $debug = true
+    pmt_details.keys.sort.each do |date|
+      debugger
+      details = pmt_details[date]
+      pmts = repay(details[:total], details[:user], date, details[:received_by], false, style, :reallocate, nil, nil)
+      clear_cache
+      statii.push(pmts[0])
     end
     self.reload
     update_history(true)

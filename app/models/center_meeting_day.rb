@@ -26,6 +26,39 @@ class CenterMeetingDay
   
   belongs_to :center
 
+  def check_not_last
+    raise ArgumentError.new("Cannot delete the only center meeting schedule") if self.center.center_meeting_days.count == 1
+  end
+  
+
+  # adding the new properties to calculate the datevector for this center.
+  # for now we will allow only one datevector type per center. This means a center can only have one meeting schedule frequency
+  
+  def date_vector(from = self.valid_from, to = self.valid_upto)
+    DateVector.new(every, what.map{|w| w.to_sym}, of_every, period.to_sym, from, to)
+  end
+
+  def get_dates(from = self.valid_from, to = self.valid_upto)
+    date_vector(from, to).get_dates
+  end
+
+  def get_next_n_dates(n, from = self.valid_from)
+    get_dates(from, n)
+  end
+
+  def meeting_day_string
+    return "every #{every} #{what.join(',')} of every #{of_every} #{period}" unless [every,what,of_every,period].include?(nil)
+    return meeting_day.to_s
+
+  end
+
+  def to_s
+    "from #{valid_from} to #{valid_upto} : #{meeting_day_string}"
+  end
+
+  after :destroy, :fix_dates
+
+
   validates_with_method :valid_from_is_lesser_than_valid_upto
   validates_with_method :dates_do_not_overlap
   validates_with_method :check_not_last, :if => Proc.new{|t| t.deleted_at}
