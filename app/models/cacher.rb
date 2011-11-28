@@ -154,7 +154,7 @@ class BranchCache < Cacher
     # first create caches for the centers that do not have them
     t0 = Time.now; t = Time.now;
     branch_ids = Branch.all.aggregate(:id) unless branch_ids
-    branch_centers = Branch.all(:id => branch_ids).centers(:creation_date.lte => date).aggregate(:id)
+    branch_centers = Branch.all(:id => branch_ids).centers.aggregate(:id)
 
     # unless we are forcing an update, only work with the missing and stale centers
     unless force
@@ -171,7 +171,9 @@ class BranchCache < Cacher
     return true if cids.blank? #nothing to do
 
     # update all the centers for today
-    return false unless (CenterCache.update(:center_id => cids, :date => date))
+    cids.chunk(3000).each do |_cids|
+      return false unless (CenterCache.update(:center_id => _cids, :date => date))
+    end
     puts "UPDATED CENTER CACHES in #{(Time.now - t).round} secs"
     t = Time.now
     # then add up all the cached centers by branch
