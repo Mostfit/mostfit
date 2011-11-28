@@ -53,7 +53,7 @@ class Cacher
     property "#{status.to_s}".to_sym,        Float,   :nullable => false, :default => 0
   end
 
-  property :additional_fields,               Text. :lazy => true
+  property :additional_fields,               Text, :lazy => true
 
   property :created_at,                      DateTime
   property :updated_at,                      DateTime
