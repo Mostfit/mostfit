@@ -30,16 +30,18 @@
       = link_to 'manage meeting schedule', resource(:center_meeting_days, :center_id => @center.id)
   - if @center.new?
     %label{:for =>"meeting day"}Meeting every:
+    = select :name => "center[center_meeting_day[meeting_day]]", :collection => Center::DAYS.map{|c| c.to_s}
+    %br
+    %b OR
+    %br
     %span.greytext
-      Something like: Meeting every "1 Wednesday of every 1 week" for meetings on wednesday or
-      %br 
-      Meeting every 1,3 Friday of every 1 month
+      i.e. Meeting every 1,3 Friday of every 1 month
       %br
-    = text_field :name => "center[center_meeting_day[every]]"
+    = text_field :name => "center[center_meeting_day[every]]", :style => "width:5em"
     - options = [['day', 'day']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
     = select :name => "center[center_meeting_day[what]]", :collection => options, :onchange => "$('#hidden').css('display', 'block')"
     of every
-    = text_field :name => "center[center_meeting_day[of_every]]"
+    = text_field :name => "center[center_meeting_day[of_every]]", :style => "width:5em"
     = select :name => "center[center_meeting_day[period]]", :collection => ["week", "month"]
     %br
     valid from
