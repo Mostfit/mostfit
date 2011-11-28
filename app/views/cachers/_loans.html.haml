@@ -1,5 +1,6 @@
 %form{:action => url(:controller => :cachers, :action => :reallocate)}
   .menu-strip{:style => "width: 100%"}
+    = link_to 'go to center', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date), :class => "edit"
     = link_to 'go to weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet", :class => "edit"
     = link_to 'rebuild caches', url(:rebuild_cachers, :center_id => params[:center_id]), :title => "Recreates history for these loans. Marks center and branch caches on and after this date as stale. recreates todays caches"
     %br
@@ -10,6 +11,8 @@
     = check_box :name => :only_mismatches, :checked => :checked
   - total = {}
   - histories = LoanHistory.latest({:center_id => params[:center_id]}, @date)
+  %h1
+    == Center #{@center.name}
   %table.report.nojs
     %thead
       %tr.header

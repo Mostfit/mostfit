@@ -26,6 +26,8 @@ class CenterMeetingDay
   
   belongs_to :center
 
+  before :valid?, :convert_blank_to_nil
+
   def check_not_last
     raise ArgumentError.new("Cannot delete the only center meeting schedule") if self.center.center_meeting_days.count == 1
   end
@@ -174,4 +176,14 @@ class CenterMeetingDay
       cen.save
     end
   end
+
+  def convert_blank_to_nil
+    self.attributes.each{|k, v|
+      if v.is_a?(String) and v.empty? and self.class.properties.find{|x| x.name == k}.type==Integer
+        self.send("#{k}=", nil)
+      end
+    }
+  end
+
+
 end

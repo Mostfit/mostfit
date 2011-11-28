@@ -38,8 +38,9 @@
       = "#{@missing_centers.values.flatten.count} missing centers"
       in current selection.
       = link_to "update", url({:controller => :cachers, :action => :generate}.merge(query_params)), :class => "green_button"
-  .menu-strip
+  .menu-strip{:style => "width:100%"}
     %ul.inline
+      [
       %li
         = link_to 'previous day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date - 1, :to_date => @to_date - 1))
       %li
@@ -50,6 +51,11 @@
         = link_to 'last month', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - 1, :to_date => Date.today - 1))
       %li
         = link_to 'month to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - 1, :to_date => Date.today - 1))
+      ]
+      %li
+        = link_to 'report formats', url(:report_formats), :class => "edit"
+      %li
+        = link_to 'printer friendly', url(:consolidate_cachers, query_params.merge(:layout => :printer, :target => "_blank"))
   = form(:method => :get, :action => url(:consolidate_cachers)) do
     = date_select('from_date', @from_date, {:id => 'from_date'})
     to

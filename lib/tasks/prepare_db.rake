@@ -14,6 +14,7 @@ namespace :mostfit do
   namespace :db do
     desc "populate the database using the csv's"
     task :prepare do
+      repository.adapter.execute("create index index_loan_history_composite_key on loan_history(composite_key);")
       repository.adapter.execute(%Q{
          alter table loan_history modify actual_outstanding_total   decimal(15,2) not null, 
                              modify scheduled_outstanding_total     decimal(15,2) not null,

@@ -30,6 +30,12 @@ class Cachers < Application
     redirect resource(:cachers, :date => @date)
   end
 
+  def recreate
+    BranchCache.recreate(@date)
+    redirect resource(:cachers, :date => @date)
+  end
+
+
   # puts stale branch caches in a queue for recalculation
   def freshen
   end
@@ -82,7 +88,7 @@ class Cachers < Application
     {:date => Date.today, :from_date => Date.today - 7, :to_date => Date.today}.each do |date, default|
       instance_variable_set("@#{date.to_s}", (params[date] ? (params[date].is_a?(Hash) ? Date.new(params[date][:year].to_i, params[date][:month].to_i, params[date][:day].to_i) : Date.parse(params[date])) : nil))
     end
-    @date = @to_date unless @date
+    @date = (@to_date or Date.today) unless @date
   end
 
 

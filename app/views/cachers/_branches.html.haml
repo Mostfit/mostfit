@@ -11,6 +11,7 @@
   - @calculated_total_row = {}
   
   - @cachers.sort_by{|c| [c.date,@branch_names[c.branch_id]]}.each do |c|
+    - next if c.actual_outstanding_principal == 0
     - cls = (c.stale ? "stale" : "") + " " + cycle('odd','even')
     = partial :cache_row, :cache => c, :cls => cls
   %tfoot

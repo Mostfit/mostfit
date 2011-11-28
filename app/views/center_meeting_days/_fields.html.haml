@@ -2,6 +2,11 @@
 = @cmd.center.name
 meets
 every
+= select :meeting_day, :collection => Center::DAYS.map{|d|d.to_s}, :selected => @cmd.meeting_day.to_s
+%br
+%b OR
+%br
+every
 = text_field :every
 - options = [['day', 'day']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
 = select :what, :collection => options
