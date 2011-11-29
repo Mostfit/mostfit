@@ -3,7 +3,7 @@ class Uploads < Application
   before do
     #raise NotAcceptable unless Mfi.first.system_state == :migration
     if Mfi.first.system_state != :migration
-      redirect(url(:admin), :message => {:error => "System must be in migration state for using the data upload feature."})
+      redirect(url(:admin), :message => {:error => "System must be in migration state for using the data upload functionality."})
     end
   end
 

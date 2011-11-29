@@ -163,8 +163,9 @@ class Client
     obj             = new(:reference => row[headers[:reference]], :name => row[headers[:name]], :spouse_name => row[headers[:spouse_name]],
                           :date_of_birth => Date.parse(row[headers[:date_of_birth]]), :address => row[headers[:address]], 
                           :date_joined => row[headers[:date_joined]], :center => center, :grt_pass_date => grt_date, :created_by => User.first,
+                          :created_by_staff_member_id => StaffMember.first(:name => row[headers[:created_by_staff]]).id,
                           :client_group => client_group, :client_type => client_type, :upload_id => row[headers[:upload_id]])
-    [obj.save, obj]
+    [obj.save!, obj]
   end
 
   def self.search(q, per_page=10)
