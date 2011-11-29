@@ -1,7 +1,10 @@
 class Uploads < Application
 
   before do
-    raise NotAcceptable unless Mfi.first.system_state == :migration
+    #raise NotAcceptable unless Mfi.first.system_state == :migration
+    if Mfi.first.system_state != :migration
+      redirect(url(:admin), :message => {:error => "System must be in migration state for using the data upload functionality."})
+    end
   end
 
   def upload_status        
@@ -26,6 +29,7 @@ class Uploads < Application
     else
       render
     end
+    redirect resource(:uploads)
   end
 
   def show(id)
@@ -46,7 +50,7 @@ class Uploads < Application
   def reset(id)
     @upload = Upload.get(id)
     raise NotFound unless @upload
-    options = {:erase => true} if params[:delete]
+    options = params[:delete] ? {:erase => true} : {}  
     @upload.reset(options)
     redirect resource(@upload), :message => {:notice => "This upload was succesfully reset"}
 
