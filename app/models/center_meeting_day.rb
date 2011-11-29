@@ -79,13 +79,11 @@ class CenterMeetingDay
 
   # checks that for a given center, the valid_from and valid_to dates for this center do not overlap with another center_meeting_day
   def dates_do_not_overlap
-    debugger
     return true if deleted_at
     cmds = self.center.center_meeting_days
     return true if cmds.count == 0
     return true if cmds.count == 1 and cmds.first.id == self.id
     bad_ones = center.center_meeting_days.map do |cmd| 
-      debugger
       if cmd.id == id
         true
       else
@@ -104,7 +102,6 @@ class CenterMeetingDay
         end
       end
     end
-    debugger
     return [false, "Center Meeting Day validity overlaps with another center meeting day."] if bad_ones.select{|x| not x}.count > 0
     return true
   end

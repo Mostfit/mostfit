@@ -90,7 +90,6 @@ class DateVector
         
       end
     end
-    debugger
     @dates = rv.select{|d| d >= from and (to.class == Date ? d <= to : true)}
   end
 

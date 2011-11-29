@@ -93,7 +93,6 @@ class Cacher
 
 
   def self.get_missing_centers
-    debugger
     return [] if self.all.empty?
     branch_ids = self.aggregate(:branch_id)
     dates = self.aggregate(:date)
