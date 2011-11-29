@@ -29,6 +29,7 @@ class Uploads < Application
     else
       render
     end
+    redirect resource(:uploads)
   end
 
   def show(id)
