@@ -60,7 +60,6 @@ class DateVector
     when :week
       while (to.class == Date ? d  <= to : i <= to)
         [@what].flatten.map do |wday| # convert :tuesday into [:tuesday] so we can treat everything as an array
-          debugger
           d = d.next_(wday)
           rv << d if (to.class == Date ? d  <= to : i <= to)
           d = d + ((@of_every - 1) * 7)
@@ -94,7 +93,6 @@ class DateVector
         
       end
     end
-    debugger
     @dates = rv.select{|d| d >= from and (to.class == Date ? d <= to : true)}
   end
 

@@ -71,7 +71,6 @@ class Cachers < Application
   end
 
   def reallocate
-    debugger
     @center = Center.get(params[:center_id])
     raise NotFound unless @center
     @loans = params[:loan_ids].blank? ? @center.loans.select{|l| l.status == :outstanding} : Loan.all(:id => params[:loan_ids].keys.map(&:to_i)) 

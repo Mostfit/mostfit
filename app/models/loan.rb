@@ -254,7 +254,8 @@ class Loan
     
     obj = new(:loan_product => LoanProduct.first(:name => row[headers[:product]]), :amount => row[headers[:amount]],
               :interest_rate => interest_rate,
-              :installment_frequency => row[headers[:installment_frequency]].downcase, :number_of_installments => row[headers[:number_of_installments]],
+              :installment_frequency => row[headers[:installment_frequency]].downcase, 
+              :number_of_installments => row[headers[:number_of_installments]],
               :scheduled_disbursal_date => Date.parse(row[headers[:scheduled_disbursal_date]]),
               :scheduled_first_payment_date => Date.parse(row[headers[:scheduled_first_payment_date]]),
               :applied_on => Date.parse(row[headers[:applied_on]]), :approved_on => Date.parse(row[headers[:approved_on]]),
@@ -263,9 +264,11 @@ class Loan
               :funding_line_id => FundingLine.first(:reference => row[headers[:funding_line_serial_number]]).id,
               :applied_by_staff_id => StaffMember.first(:name => row[headers[:applied_by_staff]]).id,
               :approved_by_staff_id => StaffMember.first(:name => row[headers[:approved_by_staff]]).id,
+              :repayment_style_id => RepaymentStyle.first(:name => row[headers[:repayment_style]]).id,
+              :c_center_id => Center.first(:name => row[headers[:center]]).id,
               :reference => row[headers[:reference]], :client => Client.first(:reference => row[headers[:client_reference]]))
     obj.history_disabled=true
-    saved = obj.save
+    saved = obj.save!
     if saved
       c = Checker.first_or_new(:model_name => "Loan", :reference => obj.reference)
       c.check_field = row[headers[:check_field]]
@@ -813,7 +816,6 @@ class Loan
       }
     end
     # we have to do the following to avoid the circular reference from total_to_be_received.
-    debugger
     total = @schedule[@schedule.keys.max][:total]
     @schedule.each { |k,v| v[:total_balance] = (total - v[:total]).round(2)}
     @schedule
@@ -1402,7 +1404,6 @@ class Loan
         p.amount != (p.type == :principal ? _info[:scheduled_principal_due] : _info[:scheduled_interest_due])
       end
     end
-    debugger
     ph = _ps.group_by{|p| p.received_on}.to_hash
     _pmts = []
     self.payments_hash([])
@@ -1431,7 +1432,6 @@ class Loan
     # then make the payments again
     $debug = true
     pmt_details.keys.sort.each do |date|
-      debugger
       details = pmt_details[date]
       pmts = repay(details[:total], details[:user], date, details[:received_by], false, style, :reallocate, nil, nil)
       clear_cache

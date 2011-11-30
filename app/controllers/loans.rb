@@ -122,7 +122,6 @@ class Loans < Application
   end
 
   def update(id)
-    debugger
     klass, attrs = get_loan_and_attrs
     attrs[:interest_rate] = attrs[:interest_rate].to_f / 100 if attrs[:interest_rate].to_f > 0
     attrs[:occupation_id] = nil if attrs[:occupation_id] == ''
@@ -509,7 +508,6 @@ class Loans < Application
   # the loan is not of type Loan of a derived type, therefor we cannot just assume its name..
   # this method gets the loans type from a hidden field value and uses that to get the attrs
   def get_loan_and_attrs   # FIXME: this is a code dup with data_entry/loans
-    debugger
     if params[:id] and not params[:id].blank?
       loan =  Loan.get(params[:id])      
       loan_product = loan.loan_product
@@ -521,7 +519,6 @@ class Loans < Application
       raise NotFound if not params[:loan_type]
       klass = Kernel::const_get(params[:loan_type])
     end
-    debugger
     attrs[:client_id] ||= params[:client_id] if params[:client_id]
     attrs[:client] = Client.get(attrs.delete(:client_id))
     attrs[:loan_product] = LoanProduct.get(attrs.delete(:loan_product_id)) if attrs[:loan_product_id]

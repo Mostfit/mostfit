@@ -1,14 +1,18 @@
-=partial :form
+= partial :form
 %table.report{:class => "nojs"}
   %tr.header
     %th
       Creation date
     %th
+      Target Of
+    %th
+      Target Type
+    %th
       Attached to
     %th
-      Deadline
-    %th
       Assigned to
+    %th
+      Deadline
     %th
       Start value
     %th
@@ -22,25 +26,29 @@
   - @data.each do |target|
     %tr
       %td
-        =target.created_at.strftime(Mfi.first.date_format || "%d-%m-%Y")
+        = target.created_at.strftime(Mfi.first.date_format || "%d-%m-%Y")
       %td
-        =target.type.to_s.camelcase(' ')
+        = target.target_of.to_s.capitalize
       %td
-        =target.deadline
-      %td                                                                          |
+        = target.target_type.to_s.capitalize
+      %td
+        = target.attached_to.to_s.capitalize
+      %td
         = target.responsible.name
       %td
-        =target.start_value
+        = target.deadline
       %td
-        =target.target_value
+        = target.start_value
       %td
-        -present_value = target.get_present_value
-        -percentage    = ((present_value - target.start_value)*100.0/(target.target_value - target.start_value)).to_currency
-        =present_value
+        = target.target_value
       %td
-        =percentage
+        - present_value = target.get_present_value
+        - percentage    = ((present_value - target.start_value)*100.0/(target.target_value - target.start_value)).to_currency
+        = present_value
+      %td
+        = percentage
       %td
         - if (target.deadline > Date.today)
-          = percentage >= 100 ? "Reached" : "In progress"
-        -else
-          = percentage >= 100 ? "Reached" : "Not reached"
+          = percentage >= (100.to_s) ? "Reached" : "In progress"
+        - else
+          = percentage >= (100.to_s) ? "Reached" : "Not reached"
