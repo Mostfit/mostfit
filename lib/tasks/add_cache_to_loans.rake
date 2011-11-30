@@ -27,7 +27,38 @@ namespace :mostfit do
           SET c_branch_id = 
              (SELECT b.id from centers cn, clients cs, branches b
              WHERE loans.client_id = cs.id AND cs.center_id = cn.id AND cn.branch_id = b.id)})
-      puts "marking client groups..."
+      # repository.adapter.execute(%Q{
+      #    UPDATE loans SET c_actual_first_payment_date = 
+      #    (SELECT fp_date FROM 
+      #        (SELECT loan_id, MIN(received_on) AS fp_date 
+      #         FROM payments 
+      #         WHERE type = 1 
+      #         GROUP BY loan_id) AS fp_dates 
+      #     WHERE fp_dates.loan_id = loans.id)})
+      # puts "adding scheduled_maturity_date..."
+      # repository.adapter.execute("update loans set c_scheduled_maturity_date = (SELECT max(date) from loan_history where loan_id = loans.id)")
+      # puts "marking last_payment_received_on"
+      # repository.adapter.execute(%Q{
+      #    UPDATE loans SET c_last_payment_received_on = 
+      #    (SELECT fp_date FROM 
+      #        (SELECT loan_id, MAX(received_on) AS fp_date 
+      #         FROM payments 
+      #         WHERE type = 1 
+      #         GROUP BY loan_id) AS fp_dates 
+      #     WHERE fp_dates.loan_id = loans.id)})
+      # puts "updating last status"
+      # repository.adapter.execute(%Q{
+      #   UPDATE loans l SET c_last_status = (SELECT status FROM loan_history lh WHERE lh.loan_id = l.id and current = 1)})
+      # puts "updating principal received"
+      # repository.adapter.execute(%Q{
+      #   UPDATE loans SET c_principal_received = (SELECT SUM(amount) FROM payments WHERE loan_id = loans.id and type = 1 and deleted_at is null)})
+      # puts "updating interest received"
+      # repository.adapter.execute(%Q{
+      #   UPDATE loans SET c_interest_received = (SELECT SUM(amount) FROM payments WHERE loan_id = loans.id and type = 2 and deleted_at is null)})
+      # puts "updating maturiy date"
+      # repository.adapter.execute(%Q{
+      #    update loans l set c_maturity_date = (select min(date) from loan_history lh where loan_id = l.id and status > 6)})
+      puts "updating client_groups"
       repository.adapter.execute(%Q{
           UPDATE loans 
           SET c_client_group_id =

@@ -28,7 +28,7 @@ namespace :mostfit do
         cmd.update(:every => "1", :what => cmd.meeting_day.to_s, :of_every => 1, :period => :week, :valid_from => cmd.valid_from + 1)
       end
       cmd = CenterMeetingDay.get(4121)
-      cmd.update(:every => "1", :what => cmd.meeting_day.to_s, :of_every => 1, :period => :week, :valid_from => cmd.valid_from  2)
+      cmd.update(:every => "1", :what => cmd.meeting_day.to_s, :of_every => 1, :period => :week, :valid_from => cmd.valid_from + 2)
       cmd = CenterMeetingDay.get(3738)
       cmd.update(:every => "1", :what => cmd.meeting_day.to_s, :of_every => 1, :period => :week, :valid_from => cmd.valid_from + 2)
       cmd = CenterMeetingDay.get(3740)

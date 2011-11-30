@@ -44,6 +44,7 @@ class Cacher
   property :total_fees_paid,                 Float, :nullable => false
   property :fees_due_today,                  Float, :nullable => false
   property :fees_paid_today,                 Float, :nullable => false
+  property :principal_at_risk,               Float, :nullable => false
 
   # we need to track also the changes in status
   # i.e. from approved to disbursed, etc.
@@ -62,7 +63,7 @@ class Cacher
   COLS =   [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total,
             :total_interest_due, :total_interest_paid, :total_principal_due, :total_principal_paid,
             :principal_in_default, :interest_in_default, :total_fees_due, :total_fees_paid, :total_advance_paid, :advance_principal_paid, :advance_interest_paid,
-           :advance_principal_adjusted, :advance_interest_adjusted, :advance_principal_outstanding, :advance_interest_outstanding, :total_advance_outstanding]
+           :advance_principal_adjusted, :advance_interest_adjusted, :advance_principal_outstanding, :advance_interest_outstanding, :total_advance_outstanding, :principal_at_risk]
   FLOW_COLS = [:principal_due, :principal_paid, :interest_due, :interest_paid,
                :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted,
                :advance_principal_paid, :advance_interest_paid, :advance_principal_paid_today, :advance_interest_paid_today, :fees_due_today, :fees_paid_today,
@@ -78,8 +79,21 @@ class Cacher
     (actual_outstanding_total - actual_outstanding_principal).round(2)
   end
 
-  def total_advance_paid
+  def total_advance_paid_today
     advance_principal_paid_today + advance_interest_paid_today
+  end
+
+  def total_advance_paid
+    advance_principal_paid + advance_interest_paid
+  end
+
+  def total_advance_os
+    advance_principal_outstanding + advance_interest_outstanding
+  end
+
+
+  def total_advance_adjusted
+    advance_principal_adjusted + advance_interest_adjusted
   end
 
   def total_default
@@ -167,15 +181,22 @@ class BranchCache < Cacher
     end
 
     return true if cids.blank? #nothing to do
-
     # update all the centers for today
-    cids.chunk(3000).each do |_cids|
-      return false unless (CenterCache.update(:center_id => _cids, :date => date))
+    chunks = cids.count/3000
+    begin
+      _t = Time.now
+      cids.chunk(3000).each_with_index do |_cids,i|
+        (CenterCache.update(:center_id => _cids, :date => date))
+        puts "UPDATED #{i}/#{chunks} CACHES in #{(Time.now - _t).round} secs"
+      end
+    rescue
+      return false
     end
     puts "UPDATED CENTER CACHES in #{(Time.now - t).round} secs"
     t = Time.now
     # then add up all the cached centers by branch
-    branch_data_hash = CenterCache.all(:model_name => "Center", :branch_id => branch_ids, :date => date).group_by{|x| x.branch_id}.to_hash
+    relevant_branch_ids = Center.all(:id => cids).aggregate(:branch_id)
+    branch_data_hash = CenterCache.all(:model_name => "Center", :branch_id => relevant_branch_ids, :date => date).group_by{|x| x.branch_id}.to_hash
     puts "READ CENTER CACHES in #{(Time.now - t).round} secs"
     t = Time.now
 

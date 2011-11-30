@@ -74,7 +74,6 @@ class Center
   def get_meeting_dates(to = Date.new(2100,12,31),from = creation_date)
     # to can be a date or a number
     # first find the date_Vectors for all center_meeting_days as a hash {:valid_from => DateVector}
-    debugger
     select = to.class == Date ? {:valid_from.lte => to} : {}
     dvs = center_meeting_days.all(select).map{|cmd| [cmd.valid_from, cmd.date_vector]}.to_hash
 
@@ -86,7 +85,6 @@ class Center
     # then cycle through this hash and get the appropriate dates
     dates = []
     dvs.keys.sort.each_with_index{|date,i|
-      debugger
       d1 = [date,from].max
       d1 -= 1 if [dvs[date].what].flatten.include?(d1.weekday)
       d2 = dvs.keys.sort[i+1] || (to.class == Date ? to - 1: (to - dates.count - 1))
@@ -94,7 +92,6 @@ class Center
       _ds = _ds[0..(to - dates.count - 1)] if to.class == Fixnum
       dates.concat(_ds)
     }
-    debugger
     dates.sort
   end
 
@@ -135,7 +132,6 @@ class Center
 
   
   def meeting_day_for(date)
-    debugger
     @meeting_days ||= self.center_meeting_days(:order => [:valid_from])
     if @meeting_days.length==0
       meeting_day
@@ -175,8 +171,9 @@ class Center
     meeting_time_hours.two_digits + ':' + meeting_time_minutes.two_digits rescue "00:00"
   end
 
-  def self.paying_today(user, date = Date.today)
-    center_ids = LoanHistory.all(:date => date||Date.today).aggregate(:center_id)
+  def self.paying_today(user, date = Date.today, branch_id = nil)
+    selection = {:date => date}.merge(branch_id ? {:branch_id => branch_id} : {})
+    center_ids = LoanHistory.all(selection).aggregate(:center_id)
     centers = center_ids.blank? ? [] : Center.all(:id => center_ids)
     if user.staff_member
       staff = user.staff_member

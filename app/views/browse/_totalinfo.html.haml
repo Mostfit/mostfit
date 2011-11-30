@@ -1,3 +1,79 @@
 %div.totalinfo
   %h1 today
-  
+  - cbc = BranchCache.all(:date => Date.today).reduce(:consolidate)
+  %table
+    %thead
+      %tr
+        %th &nbsp;
+        %th Due
+        %th Paid
+        %th &nbsp;
+    - total = {:due => 0, :paid => 0}
+    %tr
+      %th
+        Principal
+      %td
+        = cbc.principal_due.to_currency
+        - total[:due] += cbc.principal_due
+      %td
+        = cbc.principal_paid.to_currency
+        - total[:paid] += cbc.principal_paid
+      %td &nbsp;
+    %tr
+      %th
+        Interest
+      %td
+        = cbc.interest_due.to_currency
+        - total[:due] += cbc.interest_due
+      %td
+        = cbc.interest_paid.to_currency
+        - total[:paid] += cbc.interest_paid
+      %td &nbsp;
+    %tr
+      %th
+        Fees
+      %td
+        = cbc.fees_due_today.to_currency
+        - total[:paid] += cbc.fees_due_today
+      %td
+        = cbc.fees_paid_today.to_currency
+        - total[:paid] += cbc.fees_paid_today
+      %td &nbsp;
+    %tr.total
+      %th
+        Total
+      %td
+        = total[:due].to_currency
+      %td
+        = total[:paid].to_currency
+      %td
+        &nbsp;
+    %thead
+      %tr
+        %th &nbsp;
+        %th Received
+        %th Adjusted
+        %th Balance
+    %tr
+      %th
+        Advances
+      %td
+        = cbc.total_advance_paid.to_currency
+      %td
+        = cbc.total_advance_adjusted.to_currency
+      %td
+        = (cbc.total_advance_paid - cbc.total_advance_adjusted).to_currency
+  = link_to 'see graph', '/browse/today'
+  %h1.total
+    Total
+  %h2
+    %ul.inline
+      %li
+        == #{Branch.all.count} branches
+      %li
+        == #{Center.all.count} centers
+      %li
+        == #{Client.all.count.to_currency} clients
+      %li
+        == #{Loan.all.count.to_currency} loans
+

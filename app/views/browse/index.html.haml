@@ -2,7 +2,6 @@
   %div.result
   %script
     $.get("/browse/hq_tab", function(data){$('.result').html(data);})
-  = random_chart
   %br
 
 %div.left_pane
@@ -29,3 +28,4 @@
         = link_to 'Funder page', url(:funders), :class => 'edit' if session.user.role == :funder
       %li
         = link_to_with_rights 'Book keeping', resource(:accounts), :class => 'edit'
+

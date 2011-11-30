@@ -15,6 +15,8 @@ namespace :mostfit do
     desc "populate the database using the csv's"
     task :prepare do
       repository.adapter.execute("create index index_loan_history_composite_key on loan_history(composite_key);")
+      repository.adapter.execute("create index index_loan_history_date_center_id_idx on loan_history(date, center_id);")
+      repository.adapter.execute("create index index_loan_history_center_id_date on loan_history(center_id,date);")
       repository.adapter.execute(%Q{
          alter table loan_history modify actual_outstanding_total   decimal(15,2) not null, 
                              modify scheduled_outstanding_total     decimal(15,2) not null,
@@ -46,6 +48,7 @@ namespace :mostfit do
                              modify total_advance_outstanding       decimal(15,2) not null,
                              modify principal_in_default            decimal(15,2) not null,
                              modify interest_in_default             decimal(15,2) not null,
+                             modify principal_at_risk               decimal(15,2) not null,
                              modify total_fees_due                  decimal(15,2) not null,
                              modify total_fees_paid                 decimal(15,2) not null,
                              modify fees_due_today                  decimal(15,2) not null,
@@ -96,6 +99,7 @@ namespace :mostfit do
                              modify total_advance_outstanding       decimal(15,2) not null,
                              modify principal_in_default        decimal(15,2) not null,
                              modify interest_in_default         decimal(15,2) not null,
+                             modify principal_at_risk               decimal(15,2) not null,
                              modify applied                     decimal(15,2) not null,
                              modify applied_count               integer not null,
                              modify approved                    decimal(15,2) not null,
@@ -130,7 +134,7 @@ namespace :mostfit do
     desc "copies financial tables to a new database"
     task :copy_tables, :database do |task, args|
       db = args[:database]
-      tables = %w{branches centers clients loans payments loan_history funders funding_lines users staff_members areas regions comments client_groups occupations applicable_fees repayment_styles loan_products insurance_policies fees}
+      tables = %w{branches centers clients loans payments loan_history funders funding_lines users staff_members areas regions comments client_groups occupations applicable_fees repayment_styles loan_products insurance_policies fees attendances}
       tables.each do |t|
         puts "dropping table #{db}.#{t}"
         repository.adapter.execute("drop table if exists #{db}.#{t}")
@@ -161,9 +165,10 @@ namespace :mostfit do
         v.each do |f|
           max_key = f.to_s.match(/^c_/) ? f.to_s.split("_")[1].pluralize.to_sym : f.to_s.pluralize.to_sym
           puts "\t updating children for #{db}.#{k.to_s}"
-          repository.adapter.execute("update #{db}.#{k.to_s} set #{f.to_s}_id = #{f.to_s}_id + #{max[max_key]}")
+          repository.adapter.execute("update #{db}.#{k.to_s} set #{f.to_s}_id = #{f.to_s}_id + #{max[max_key]}") rescue nil
         end
       end
+      repository.adapter.execute("update loan_history set composite_key=(loan_id + datediff(date, '2008-01-01')/10000);")
     end
 
     desc "copies the updated tables back into the original database"
@@ -178,10 +183,12 @@ namespace :mostfit do
 
     desc "does all three tasks above"
     task :fatten_db, :database do |task, args|
+      t = Time.now
       db_name = args[:database]
-      #mostfit:db:copy_tables').invoke(db_name)
-      #Rake::Task('mostfit:db:up_ids').invoke(db_name)
-      #Rake::Task('mostfit:db:').invoke(db_name)
+      Rake::Task['mostfit:db:copy_tables'].invoke(db_name)
+      Rake::Task['mostfit:db:up_ids'].invoke(db_name)
+      Rake::Task['mostfit:db:copy_tables_back'].invoke(db_name)
+      puts "COMPLETED IN #{Time.now -t} secs"
     end
 
 

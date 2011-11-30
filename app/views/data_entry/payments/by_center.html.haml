@@ -1,12 +1,17 @@
 :javascript
   $(document).ready(function() {
-    $('#center_text').autocomplete({
-      source: "/searches/list?model=center&op=name.like",
-      minLength: 3,
-      select: function(event, ui){
-        $("#center_text").val(ui.item.label);}
+  $("#paying_branch_selector").change(function(){
+  $("#paying_center_selector").html('');
+    $.ajax({
+      type: "GET",
+      url: "/branches/centers/"+$("#paying_branch_selector").val()+"?paying=true&date=#{@date.strftime('%Y-%m-%d')}",
+      success: function(data){
+        $("#paying_center_selector").html(data);
+      }
     });
-  })
+  });
+  });
+
 - if @center and @date
   - @md = @center.meeting_day?(@date)
   %h1
@@ -202,9 +207,14 @@
     %table.form
       %tr
         %th
+          In branch
+        %td
+          = select :name => 'branch_id', :id => "paying_branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch'
+      %tr
+        %th
           Centers repaying today
         %td
-          = select :name => 'center_id', :collection => centers_paying_today_collection(@date), :selected => session[:center_id], :prompt => 'Select a center', :class => "chosen"
+          = select :name => 'center_id', :id => 'paying_center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center'
       %tr
         %th
           or any other center
