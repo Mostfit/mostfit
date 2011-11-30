@@ -43,8 +43,7 @@
               %td{:rowspan => postings_count}
                 = journal.date.display if journal.date and count == 0
               %td{:rowspan => postings_count}
-                %b
-                  = journal.journal_type.name
+                = journal.journal_type.display
               %td{:rowspan => postings_count}
                 = journal.comment
               %td
