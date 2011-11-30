@@ -12,7 +12,7 @@ class TargetReport < Report
   end
   
   def name
-    "Report from #{@from_date} to #{@to_date}"
+    "Target Report from #{@from_date} to #{@to_date}"
   end
   
   def self.name
@@ -25,7 +25,7 @@ class TargetReport < Report
              {:attached_to => :branch, :attached_id => @branch.map{|x| x.id}}
            elsif @center_id and @center_id.to_i > 0 
              {:attached_to => :center, :attached_id => @center.map{|x| x.id}}
-           elsif @staff_member_id and @staff_member_id.to_i > 0 
+           elsif @staff_member_id and @staff_member_id.to_i > 0
              {:attached_to => :staff_member, :attached_id => @staff_member.map{|x| x.id}}
            else
              {}
