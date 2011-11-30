@@ -16,17 +16,18 @@ class GraphData < Application
     end
     keys = [:advance_interest_paid, :advance_principal_paid, :principal_paid, :principal_due, :interest_paid, :interest_due, :fees_paid_today, :fees_due_today]
     @history_sum = @history_totals.map{|ht| keys.map{|k| [k,ht.send(k)]}.to_hash}.reduce({}){|s,h| s + h}
+    branch_names = Branch.all.aggregate(:id, :name).to_hash
+    center_names = Center.all(:branch_id => params[:branch_id]).aggregate(:id, :name).to_hash if params[:branch_id]  
+    center = params[:branch_id]
     treemap = {:children => @history_totals.map { |v|
         pd = v.principal_paid
         due = v.principal_due
         tot = pd + due
         color = "#" + (prorata_color(0, tot, pd) || "000000")
-        center = params[:branch_id] ? Center.get(v.center_id) : nil
-        branch = Branch.get(v.branch_id)
-        id = center ? center.id : branch.id
-        name = center ? center.name : branch.name
-        data = {"$area" => tot, :"$color" => color,"branch_id" => branch.id, "branch_name" => branch.name, 
-          "center_id" => (center ? center.id : 0), "center_name" => (center ? center.name : ""), "amounts" => v}
+        id = center ? v.center_id : v.branch_id
+        name = center ? center_names[id] : branch_names[id]
+        data = {"$area" => tot, :"$color" => color,"branch_id" => v.branch_id, "branch_name" => branch_names[v.branch_id], 
+          "center_id" => (center ? id : 0), "center_name" => (center ? name : ""), "amounts" => v}
         {"id" => id, "name" => name, "data" => data}
       }, :name => "Branches"}
     barchart = { 'label' => keys, 'values' => [{'label' => "", 'values' => keys.map{|k| (@history_sum[k] || 0).round(2)}}]}

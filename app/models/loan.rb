@@ -1181,6 +1181,7 @@ class Loan
       total_interest_due                    += outstanding ? scheduled[:interest].round(2) : 0
       principal_due                          = outstanding ? [total_principal_due - act_total_principal_paid,0].max : 0
       interest_due                           = outstanding ? [total_interest_due - act_total_interest_paid,0].max : 0
+      actual_outstanding_principal           = outstanding ? actual[:balance].round(2) : 0
 
       advance_principal_outstanding          = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max
       advance_interest_outstanding           = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
@@ -1218,11 +1219,12 @@ class Loan
         :status                              => STATUSES.index(st) + 1,
         :scheduled_outstanding_principal     => scheduled[:balance].round(2),
         :scheduled_outstanding_total         => scheduled[:total_balance].round(2),
-        :actual_outstanding_principal        => outstanding ? actual[:balance].round(2) : 0,
+        :actual_outstanding_principal        => actual_outstanding_principal,
         :actual_outstanding_total            => outstanding ? actual[:total_balance].round(2) : 0,
         :amount_in_default                   => actual[:balance].round(2) - scheduled[:balance].round(2),
         :principal_in_default                => principal_in_default,
         :interest_in_default                 => interest_in_default,
+        :principal_at_risk                   => principal_in_default > 0 ? actual_outstanding_principal : 0,
         :scheduled_principal_due             => scheduled_principal_due,
         :scheduled_interest_due              => scheduled_interest_due,
         :principal_due                       => principal_due.round(2), 

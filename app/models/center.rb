@@ -171,8 +171,9 @@ class Center
     meeting_time_hours.two_digits + ':' + meeting_time_minutes.two_digits rescue "00:00"
   end
 
-  def self.paying_today(user, date = Date.today)
-    center_ids = LoanHistory.all(:date => date||Date.today).aggregate(:center_id)
+  def self.paying_today(user, date = Date.today, branch_id = nil)
+    selection = {:date => date}.merge(branch_id ? {:branch_id => branch_id} : {})
+    center_ids = LoanHistory.all(selection).aggregate(:center_id)
     centers = center_ids.blank? ? [] : Center.all(:id => center_ids)
     if user.staff_member
       staff = user.staff_member
