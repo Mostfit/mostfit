@@ -21,7 +21,8 @@ class BalanceSheet < Report
     ASSET_CLASSES.each do |asset_class|
       accounts_and_balances = {}
       Account.all(:asset_class => asset_class).each do |account|
-        closing_balance = account.closing_balance_as_of accounting_period.end_date
+        on_date = accounting_period.end_date > Date.today ? Date.today : accounting_period.end_date
+        closing_balance = account.closing_balance_as_of on_date
         bal = closing_balance || 0.0
         accounts_and_balances[account] = bal
       end
