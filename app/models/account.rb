@@ -47,6 +47,11 @@ class Account
   # Danger, Will Robinson! This will break if anyone edits the master table for account_types
   ACCOUNT_TYPES = [:none, ASSETS, EXPENSES, INCOMES, LIABILITIES ]
 
+  def display_name
+    return "#{self.name} (Head Office Accounts)" if self.branch_id.nil?
+    return "#{self.name} (#{self.branch.name})"
+  end
+
   def get_account_type
     ACCOUNT_TYPES[self.account_type_id]
   end

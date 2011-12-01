@@ -37,18 +37,19 @@
           - unless count > 0
             %tr
               %td{:rowspan => postings_count}
-                = link_to "#{journal.id}", resource(journal) 
+                = link_to "#{journal.id}", resource(journal)
+                %br
+                = "Txn ID: (#{journal.transaction_id})" unless journal.transaction_id.empty? 
               %td{:rowspan => postings_count}
                 = journal.created_at.strftime(Mfi.first.date_format + " at %H:%m") if journal.created_at and count == 0
               %td{:rowspan => postings_count}
                 = journal.date.display if journal.date and count == 0
               %td{:rowspan => postings_count}
-                %b
-                  = journal.journal_type.name
+                = journal.journal_type.display
               %td{:rowspan => postings_count}
                 = journal.comment
               %td
-                = p.account.name unless p.account.nil?
+                = p.account.display_name unless p.account.nil?
               %td
                 = p.amount.to_account_balance if p.amount && p.amount <= 0
               %td
@@ -57,7 +58,7 @@
           - else
             %tr
               %td
-                = p.account.name unless p.account.nil?
+                = p.account.display_name unless p.account.nil?
               %td
                 = p.amount.to_account_balance if p.amount && p.amount <= 0
               %td
