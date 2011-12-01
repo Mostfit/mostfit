@@ -17,6 +17,7 @@ class LoanHistory
   property :scheduled_outstanding_principal, Float, :nullable => false
   property :actual_outstanding_total,        Float, :nullable => false
   property :actual_outstanding_principal,    Float, :nullable => false
+  property :actual_outstanding_interest,     Float, :nullable => false
   property :scheduled_principal_due,         Float, :nullable => false
   property :scheduled_interest_due,          Float, :nullable => false
   property :principal_due,                   Float, :nullable => false
@@ -91,9 +92,6 @@ class LoanHistory
     (principal_paid + interest_paid + fees_paid_today).round(2)
   end
 
-  def actual_outstanding_interest
-    (actual_outstanding_total - actual_outstanding_principal).round(2)
-  end
 
   def total_advance_paid
     (advance_principal_paid_today + advance_interest_paid_today).round(2)
@@ -102,6 +100,17 @@ class LoanHistory
   def total_default
     (principal_in_default + interest_in_default).abs.round(2)
   end
+
+  # this adjusts defaulted interest against advance principal
+  def icash_interest_in_default
+    [0,interest_in_default + total_advance_outstanding].min
+  end
+
+  def icash_total_in_default
+    principal_in_default + icash_interest_in_default
+  end
+
+
 
   @@selects = {Branch => "b.id", Center => "c.id", Client => "cl.id", Loan => "l.id", Area => "a.id", Region => "r.id", ClientGroup => "cg.id", Portfolio => "p.id"}
   @@tables = ["regions r", "areas a", "branches b", "centers c", "client_groups cg", "clients cl", "loans l"]

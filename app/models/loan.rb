@@ -1153,11 +1153,6 @@ class Loan
     # initialize
     total_principal_due = total_interest_due = total_principal_paid = total_interest_paid = advance_principal_paid = advance_interest_paid = 0
 
-    # find out what branch, center and client group we are in
-    # client_group_id = (client.client_group or Nothing).id || 0
-    # center_id       = client.center.id
-    # branch_id       = client.center.branch_id
-    # SLOW!
 
     # find the actual total principal and interest paid.
     # this is helpful for adjusting interest and principal due on a particular date while taking into account future payments
@@ -1165,7 +1160,6 @@ class Loan
     act_total_principal_paid = last_payments_hash[1][:total_principal]; act_total_interest_paid = last_payments_hash[1][:total_interest]
     last_status = 1; last_row = nil;
     dates.each_with_index do |date,i|
-      debugger if date == Date.new(2011,11,23)
       i_num                                  = installment_for_date(date)
       scheduled                              = get_scheduled(:all, date)
       actual                                 = get_actual(:all, date)
@@ -1176,13 +1170,15 @@ class Loan
       st                                     = get_status(date)
       scheduled_principal_due                = i_num > 0 ? scheduled[:principal] : 0
       scheduled_interest_due                 = i_num > 0 ? scheduled[:interest] : 0
-      outstanding                            = [:disbursed, :outstanding].include?(st)
+      outstanding                            = [:disbursed, :outstanding].include?(st) 
+      outstanding                            = date == scheduled_maturity_date ? [:disbursed, :outstanding].include?(STATUSES[last_row[:status]-1]) : outstanding
       total_principal_due                   += outstanding ? scheduled[:principal].round(2) : 0
       total_interest_due                    += outstanding ? scheduled[:interest].round(2) : 0
       principal_due                          = outstanding ? [total_principal_due - act_total_principal_paid,0].max : 0
       interest_due                           = outstanding ? [total_interest_due - act_total_interest_paid,0].max : 0
       actual_outstanding_principal           = outstanding ? actual[:balance].round(2) : 0
-
+      actual_outstanding_total               = outstanding ? actual[:total_balance].round(2) : 0
+      actual_outstanding_interest            = actual_outstanding_total - actual_outstanding_principal
       advance_principal_outstanding          = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max
       advance_interest_outstanding           = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
       total_advance_outstanding              = advance_interest_outstanding + advance_principal_outstanding
@@ -1220,7 +1216,8 @@ class Loan
         :scheduled_outstanding_principal     => scheduled[:balance].round(2),
         :scheduled_outstanding_total         => scheduled[:total_balance].round(2),
         :actual_outstanding_principal        => actual_outstanding_principal,
-        :actual_outstanding_total            => outstanding ? actual[:total_balance].round(2) : 0,
+        :actual_outstanding_total            => actual_outstanding_total,
+        :actual_outstanding_interest         => actual_outstanding_interest,
         :amount_in_default                   => actual[:balance].round(2) - scheduled[:balance].round(2),
         :principal_in_default                => principal_in_default,
         :interest_in_default                 => interest_in_default,
