@@ -6,7 +6,7 @@
     = "Transaction ID: #{@journal.transaction_id}" unless @journal.transaction_id == ""
 
   %p.menu-strip
-    = link_to 'Delete',  "/application/delete/#{@journal.id}?model=journal&return=/journals/#{@journal.id}//", :class => 'delete'
+    = link_to_with_rights 'reverse this journal entry', url(:controller => :journals, :action => :reverse, :id => @journal.id), :class => 'delete'
 
   %table.tall.shaded{:style => "width: 40%;"}
     %tr
