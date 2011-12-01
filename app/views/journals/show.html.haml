@@ -1,13 +1,51 @@
-%h1
-  Journal
-= link_to 'Delete',  "/application/delete/#{@journal.id}?model=journal&return=/journals/#{@journal.id}//", :class => 'delete'
+.shaded{:style => "padding: 5px; margin-bottom: 10px;"}
+  %h1
+    Journal
+    = "( #{@journal.id} )"
+  %h3
+    = "Transaction ID: #{@journal.transaction_id}" unless @journal.transaction_id == ""
 
-%h3
-  = @journal.comment
+  %p.menu-strip
+    = link_to_with_rights 'reverse this journal entry', url(:controller => :journals, :action => :reverse, :id => @journal.id), :class => 'delete'
 
-- @journal.postings.each do |p|
-  == #{p.account.name} => #{p.amount}<br>
-        
+  %table.tall.shaded{:style => "width: 40%;"}
+    %tr
+      %th Narration
+      %td
+        = @journal.comment
+    %tr
+      %th Date Created
+      %td
+        = @journal.created_at.strftime(Mfi.first.date_format + " at %H:%m")
+    %tr
+      %th Effective Date
+      %td
+        = @journal.date.display
+    %tr
+      %th Journal Type
+      %td
+        = @journal.journal_type.display
 
-|
+-# .shaded{:style => "padding: 5px; margin-bottom: 10px;"}
+%div.tab_container.shaded
+  %h2 Postings
+  %table.report.nojs
+    %thead
+      %th Account ID
+      %th Account Name
+      %th Debit
+      %th Credit
+    %tbody
+      - @journal.postings.each do |p|
+        %tr
+          %td
+            = link_to("#{p.account.id}", resource(p.account)) unless p.account.nil?
+          %td
+            = p.account.display_name unless p.account.nil?
+          %td
+            = p.amount.to_account_balance if p.amount && p.amount <= 0
+          %td
+            = p.amount.to_account_balance if p.amount && p.amount > 0
+
+            
 = link_to 'Back', url(:journals)

@@ -12,7 +12,7 @@ class Journal
   property :created_at,     DateTime, :index => true  
   property :deleted_at,     ParanoidDateTime, :index => true  
   property :batch_id,       Integer, :nullable => true
-  property :uuid,           String, :nullable => false
+  property :uuid,           String, :default => lambda{ |obj, p| UUID.generate }
   belongs_to :batch
   belongs_to :journal_type
   has n, :postings
@@ -72,8 +72,8 @@ class Journal
 
       journal = Journal.create(:comment => journal_params[:comment], :date => journal_params[:date]||Date.today,
                                :transaction_id => journal_params[:transaction_id],
-                               :journal_type_id => journal_params[:journal_type_id],
-                               :uuid => UUID.generate)
+                               :journal_type_id => journal_params[:journal_type_id])
+
       
       amount = journal_params.key?(:amount) ? journal_params[:amount].to_f : nil
 
@@ -145,7 +145,31 @@ class Journal
               }
     repository.adapter.query(sql)
   end
-  
+ 
+  def reverse_transaction
+    journal_id = nil
+    Journal.transaction do |t|
+      journal = Journal.create(
+                               :comment => ("REVERSED:"+self.comment),
+                               :date => self.date,
+                               :journal_type_id => self.journal_type_id,
+                               :transaction_id => ""
+                               )
+      status = []
+      self.postings.each{|posting| status << posting.reverse(journal.id)} 
+      if status.include?(false)
+        t.rollback 
+      else
+        journal_id = journal.id 
+      end
+    end
+    
+    if journal_id.nil?
+      return false
+    else
+      return Journal.get(journal_id)
+    end
+  end
 
   def self.xml_tally(hash={}, xml_file = nil)
     xml_file ||= '/tmp/voucher.xml'
