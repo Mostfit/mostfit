@@ -1,7 +1,7 @@
 - if @branch
   .shaded{:style => "padding: 5px; margin-bottom: 10px;"}
-    -# .graph{:style => "height: 200px; position: relative; top: 30px;"}
-    -#   = ofc2(550, 250, url(:graph_data, :action => 'branch', :id => @branch.id, :scope_unit => 'months', :scope_size => 3) )
+    .graph{:style => "height: 200px; position: relative; top: 30px;"}
+      = ofc2(550, 250, url(:graph_data, :action => 'branch', :id => @branch.id, :scope_unit => 'months', :scope_size => 3) )
 
     %h1== Branch: <i>#{@branch.name}</i>
     %p.menu-strip{:style => "width: 44%; margin-bottom: 0.2em;"}

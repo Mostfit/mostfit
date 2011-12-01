@@ -31,7 +31,7 @@ class Browse < Application
   end
 
   def hq_tab
-    partial :totalinfo
+    partial :totalinfo rescue partial :missing_caches
   end
 
   def centers_paying_today

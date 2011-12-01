@@ -48,6 +48,9 @@
         = total[:paid].to_currency
       %td
         &nbsp;
+  %h1.total
+    Total
+  %table
     %thead
       %tr
         %th &nbsp;
@@ -64,8 +67,6 @@
       %td
         = (cbc.total_advance_paid - cbc.total_advance_adjusted).to_currency
   = link_to 'see graph', '/browse/today'
-  %h1.total
-    Total
   %h2
     %ul.inline
       %li
@@ -73,7 +74,7 @@
       %li
         == #{Center.all.count} centers
       %li
-        == #{Client.all.count.to_currency} clients
+        == #{Client.all.count.to_currency(:mostfit_default)} clients
       %li
-        == #{Loan.all.count.to_currency} loans
+        == #{Loan.all.count.to_currency(:mostfit_default)} loans
 
