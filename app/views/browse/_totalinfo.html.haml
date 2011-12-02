@@ -18,55 +18,55 @@
         Principal
       %td.number
         %h1
-          = (cbc.principal_due + cbc.principal_paid).to_currency
+          = (cbc.principal_due + cbc.principal_paid).to_currency(:mostfit_default)
           - total[:due] += cbc.principal_due
       %td.number
         %h1.green
-          = cbc.principal_paid.to_currency
+          = cbc.principal_paid.to_currency(:mostfit_default)
           - total[:paid] += cbc.principal_paid
       %td.number
         %h1.red
-          = cbc.principal_due.to_currency
+          = cbc.principal_due.to_currency(:mostfit_default)
     %tr
       %th
         Interest
       %td.number
         %h1
-          = (cbc.interest_due + cbc.interest_paid).to_currency
+          = (cbc.interest_due + cbc.interest_paid).to_currency(:mostfit_default)
         - total[:due] += cbc.interest_due
       %td.number
         %h1.green
-          = cbc.interest_paid.to_currency
+          = cbc.interest_paid.to_currency(:mostfit_default)
         - total[:paid] += cbc.interest_paid
       %td.number
         %h1.red
-          = cbc.interest_due.to_currency
+          = cbc.interest_due.to_currency(:mostfit_default)
     %tr
       %th
         Fees
       %td.number
         %h1
-          = (cbc.fees_due_today + cbc.fees_paid_today).to_currency
+          = (cbc.fees_due_today + cbc.fees_paid_today).to_currency(:mostfit_default)
           - total[:paid] += cbc.fees_due_today
       %td.number
         %h1.green
-          = cbc.fees_paid_today.to_currency
+          = cbc.fees_paid_today.to_currency(:mostfit_default)
           - total[:paid] += cbc.fees_paid_today
       %td.number
         %h1.red
-          = cbc.fees_due_today.to_currency
+          = cbc.fees_due_today.to_currency(:mostfit_default)
     %tr.total
       %th
         Total
       %td.number
         %h1
-          = (total[:due] + total[:paid]).to_currency
+          = (total[:due] + total[:paid]).to_currency(:mostfit_default)
       %td.number
         %h1.green
-          = total[:paid].to_currency
+          = total[:paid].to_currency(:mostfit_default)
       %td.number
         %h1.red
-          = total[:due].to_currency
+          = total[:due].to_currency(:mostfit_default)
     %thead
       %tr.selected
         %th{:colspan => 4}
@@ -81,37 +81,37 @@
         Principal
       %td.number
         %h1
-          = (cbc.total_principal_due + cbc.total_principal_paid).to_currency
+          = (cbc.total_principal_due + cbc.total_principal_paid).to_currency(:mostfit_default)
       %td.number
         %h1
-          = cbc.total_principal_paid.to_currency
+          = cbc.total_principal_paid.to_currency(:mostfit_default)
       %td.number
         %h1
-          = cbc.total_principal_due.to_currency
+          = cbc.total_principal_due.to_currency(:mostfit_default)
     %tr
       %th
         Interest
       %td.number
         %h1
-          = (cbc.total_interest_due + cbc.total_interest_paid).to_currency
+          = (cbc.total_interest_due + cbc.total_interest_paid).to_currency(:mostfit_default)
       %td.number
         %h1
-          = cbc.total_interest_paid.to_currency
+          = cbc.total_interest_paid.to_currency(:mostfit_default)
       %td.number
         %h1
-          = cbc.total_interest_due.to_currency
+          = cbc.total_interest_due.to_currency(:mostfit_default)
     %tr
       %th
         Fees
       %td.number
         %h1
-          = (cbc.total_fees_due + cbc.total_fees_paid).to_currency
+          = (cbc.total_fees_due + cbc.total_fees_paid).to_currency(:mostfit_default)
       %td.number
         %h1
-          = cbc.total_fees_paid.to_currency
+          = cbc.total_fees_paid.to_currency(:mostfit_default)
       %td.number
         %h1
-          = cbc.total_fees_due.to_currency
+          = cbc.total_fees_due.to_currency(:mostfit_default)
     %tr.total
       %td.number
         %h1

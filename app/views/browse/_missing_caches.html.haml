@@ -1,0 +1,5 @@
+%div.totalinfo
+  %h1 today
+  %div{:style => 'padding: 15px'}
+    No reporting data seems to have been generated for today. 
+    = link_to('Generate now', url({:controller => :cachers, :action => :generate}))
