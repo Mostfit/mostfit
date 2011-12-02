@@ -7,18 +7,17 @@
 
 
 %div.left_pane
-  %h1 Home
+  %h1 Quick Links
   %div
     %ul
       %li
-        %h2
-          = link_to_with_rights("#{Branch.all.count} Branches", url(:browse, :action => 'branches'), :class => 'edit')
+        = link_to_with_rights("#{Branch.all.count} Branches", url(:browse, :action => 'branches'))
       %li
-        = link_to_with_rights('Staff members', resource(:staff_members), :class => 'edit')
+        = link_to_with_rights('Staff members', resource(:staff_members))
       %li
-        = link_to_with_rights('Centers meeting today', url(:browse, :centers_paying_today), :class => 'edit')
+        = link_to_with_rights('Centers meeting today', url(:browse, :centers_paying_today))
       %li
-        = link_to_with_rights('Browse Aggregate Data', url(:cachers, :date => Date.today.strftime('%Y-%m-%d')), :class => 'edit')
+        = link_to_with_rights('Browse Aggregate Data', url(:cachers, :date => Date.today.strftime('%Y-%m-%d')))
       %li
-        = link_to_with_rights 'Verify data', resource(:verifications), :class => 'edit'
+        = link_to_with_rights 'Verify data', resource(:verifications)
 

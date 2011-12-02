@@ -1238,14 +1238,18 @@ ul#tree li.depth_4 span{
     float: right;
 }
 .left_pane{
-    width: 50%;
-    h2 {
+    width: 45%;
+    h1 {
 	font-size: 200%;
-	float:left;
-	background: #cfcfcf;
-	border-radius: 5px;
 	padding: 10px;
+	text-decoration: underline;
     }
+    ul { margin: 6px 20px;
+	 li {
+	     margin: 6px 2px;
+	     font-size: 1.6em;
+	 }
+       }
 }
 .right_pane{
     float: right;
@@ -1708,7 +1712,7 @@ table.moreinfo thead th {
     background: transparent;
 }
  .green {
-     color: @darkgreen;
+     color: #466124;
      background: transparent;
  }
 
@@ -1734,110 +1738,89 @@ table.moreinfo thead th {
 
 
  #stats {
-   @stats-highlight: #efefef;
-   @stats-highlight-text: black;
-   @stats-highlight-shadow: white;
-   @stats-bg: #dfdfdf;
-   @stats-bg-text: #999;
-   @stats-bg-shadow: @stats-bg * 1.2;
-   padding: 25px;
-   width: 95%;
-   margin: auto;
-   min-height: 500px;
-   .rounded;
-   table#menu {
-     margin-bottom: 0.2em;
-     tr {
-       h1 {
-	   font-weight: bold;
-	   letter-spacing: -0.03em;
-	   color: @stats-bg-text;
-	   text-shadow: @stats-bg-shadow;
-	   margin: 0px;
-
-	   .red-text {
-	       .red;
-	   }
-
-      }
-    }
-    tr {
-      background: @stats-bg;
-      text-shadow: 1px 1px @stats-bg-shadow;
-      color: @stats-bg-text;
-      border-bottom: solid 1px @stats-bg-text;
-      box-shadow: 0px 1px @stats-bg-shadow;
-      }
-
-    tr.selected {
-      background: @stats-highlight;
-      color: @stats-highlight-text;
-      box-shadow: none;
-      z-index: 10;
-      width: 110%;
-      .white-shadow-text;
-      h1 {
-	  color: @orange;
-	  text-shadow: 1px 1px @stats-highlight-shadow;
-      }
-    }
-    .th {
-      vertical-align: middle;
-    }
-  }
-  table#menu {
-    width:80%;
-      tr.selected {
-	  border: 1px solid @stats-highlight;
-	  h1.green {
-	      .green;
-	  }
-	  h1.red {
-	      .red;
-	  }
-
-      }
-      tr {
-	border-right: solid 1px @darkgreen;
-      }
-
-  }
-
-  .number {
-    vertical-align: top;
-    text-align: center;
-    p {
-	font-size: 1.1em; font-weight: bold; text-align: center;
-    }
-
-  }
-  .detail {
-    font-family: Helvetica;
-    font-weight: bold;
-    font-size: 1em;
-    float: left;
-    background: #efefef;
-    border: solid 1px @darkgreen;
-    padding: 0px 10px;
-    min-height: 400px;
-    min-width: 80%;
-  }
-  .chart {
-    background: #efefef;
-    
-    .rounded(10px);
-    margin: 30px;
-    margin-top: 5px;
-    text-align: center;
-    width: 430px;
-    height: 330px;
-    display: inline-table;
-    vertical-align: top;
-  }
-  
-}
-	     
-#today {
+     @stats-highlight: #efefef;
+     @stats-highlight-text: black;
+     @stats-highlight-shadow: white;
+     @stats-bg: #dfdfdf;
+     @stats-bg-text: #999;
+     @stats-bg-shadow: @stats-bg * 1.2;
+     padding: 25px;
+     width: 95%;
+     margin: auto;
+     min-height: 500px;
+     .rounded;
+     table#menu {
+	 margin-bottom: 0.2em;
+	 border: solid 6px #efefef;
+	 tr {
+	     background: @stats-bg;
+	     text-shadow: 1px 1px @stats-bg-shadow;
+	     color: @stats-bg-text;
+	     border-bottom: solid 1px @stats-bg-text;
+	     box-shadow: 0px 1px @stats-bg-shadow;
+	     .selected {
+		 background: @stats-highlight;
+		 color: @stats-highlight-text;
+		 border: 1px solid @stats-highlight;
+		 box-shadow: none;
+		 z-index: 10;
+		 width: 110%;
+		 .white-shadow-text;
+		 h1 {
+		     color: @orange;
+		     text-shadow: 1px 1px @stats-highlight-shadow;
+		     text-align: left;
+		 }
+	     }
+	     th {
+		 font-size: 1.2em;
+		 font-weight: bold;
+		 letter-spacing: -0.03em;
+		 color: @stats-bg-text;
+		 text-shadow: @stats-bg-shadow;
+		 vertical-align: middle;
+		 text-align: center;
+		 margin: 0px;
+		 padding: 4px;
+	     }
+	 }
+     }
+     
+     .number {
+	 vertical-align: top;
+	 text-align: center;
+	 p {
+	     font-size: 1.1em; font-weight: bold; text-align: center;
+	 }
+	 
+     }
+     .detail {
+	 font-family: Helvetica;
+	 font-weight: bold;
+	 font-size: 1em;
+	 float: left;
+	 background: #efefef;
+	 border: solid 1px @darkgreen;
+	 padding: 0px 10px;
+	 min-height: 400px;
+	 min-width: 80%;
+     }
+     .chart {
+	 background: #efefef;
+	 
+	 .rounded(10px);
+	 margin: 30px;
+	 margin-top: 5px;
+	 text-align: center;
+	 width: 430px;
+	 height: 330px;
+	 display: inline-table;
+	 vertical-align: top;
+     }
+     
+ }
+ 
+ #today {
   #stats;
   padding: 0px;
   width: 80%;
