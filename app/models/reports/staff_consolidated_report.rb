@@ -170,7 +170,7 @@ class StaffConsolidatedReport < Report
       center = centers[l.center_id]
       branch = branches[l.branch_id]
       st     = (report_by_loans_created == 1 ? staff[l.applied_by_staff_id] : staff[center.manager_staff_id])
-
+      debugger
       data[branch][st] ||= {}
       data[branch][st][center] ||= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       data[branch][st][center][0] += l.loan_amount
