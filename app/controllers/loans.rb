@@ -131,7 +131,7 @@ class Loans < Application
 
     # if an attached insurance policy then create or update insurance policy
     if attrs[:insurance_policy]
-      @insurance_policy = @loan.insurance_policy || Insurance.new
+      @insurance_policy = @loan.insurance_policy || InsurancePolicy.new
       @insurance_policy.client = @loan.client
       @insurance_policy.attributes = attrs.delete(:insurance_policy)
     end
