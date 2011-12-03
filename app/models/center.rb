@@ -210,16 +210,6 @@ class Center
     Center.all(:id => center_ids)
   end
   
-<<<<<<< Updated upstream
-  private
-=======
-  def length_valid?
-    return true unless distance_from_HO and distance_from_branch
-    return true if (distance_from_HO >= 0) && (distance_from_branch >= 0)
-    [false, "Distance cannot be negative"]
-  end
-
->>>>>>> Stashed changes
   def hours_valid?
     return true if (0..23).include? meeting_time_hours.to_i
     [false, "Hours of the meeting time should be within 0-23"]
