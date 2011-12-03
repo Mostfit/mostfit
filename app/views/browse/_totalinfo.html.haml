@@ -1,10 +1,19 @@
+- @date = Date.parse(params[:date]) || Date.today
 %div#stats{:style => "position: relative; top: -15px;"}
   %table#menu
     %thead
       %tr.selected
         %th{:colspan => 4}
-          %h1 today
-    - cbc = BranchCache.all(:date => Date.today).reduce(:consolidate)
+          %h1
+            = link_to image_tag('/images/previous-grey.png'), url(:browse, :date => @date - 1)
+            - if @date == Date.today
+              today
+            - else
+              = @date
+            = link_to image_tag('/images/next-grey.png'), url(:browse, :date => @date + 1)
+            
+          
+    - cbc = BranchCache.all(:date => @date).reduce(:consolidate)
     %thead
       %tr
         %th &nbsp;

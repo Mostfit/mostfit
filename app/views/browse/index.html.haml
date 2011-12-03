@@ -1,6 +1,6 @@
 = js_include_tag 'Jit/jit-yc'
 = js_include_tag :treemap, :hbarchart
-- @date = Date.today
+- @date = Date.parse(params[:date]) rescue Date.today
 
 = css_include_tag 'jit-base','treemap'
 :javascript
@@ -33,7 +33,7 @@
 %div.right_pane
   %div.result
   %script
-    $.get("/browse/hq_tab", function(data){$('.result').html(data);})
+    $.get("/browse/hq_tab?date=#{@date.strftime('%Y-%m-%d')}", function(data){$('.result').html(data);})
   %br
 
 %div{:style => "float: left;width: 40%; margin: 10px 30px"}
