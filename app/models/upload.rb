@@ -8,7 +8,7 @@ class Upload
   property :filename,     String
   property :directory,    String
   property :md5sum,       String, :unique => true
-  property :state,        Enum[:new, :uploaded, :extracted, :processing, :complete, :stopped]
+  property :state,        Enum[:new, :uploaded, :extracting, :extracted, :processing, :complete, :stopped]
   property :state_detail, Text # state_detail is a hash like {:clients => {:last_id => 234, :more_info => "more info"}...}
 
   property :created_at,   DateTime
@@ -90,10 +90,11 @@ class Upload
   # @param [Hash] like {:verbose => <boolean>, :erase => <boolean>}
   def cont(options = {:verbose => false, :erase => false})
     log_file(options[:verbose]) unless @log
+    debugger
     if state == :uploaded
       process_excel_to_csv
       cont
-    elsif state == :extracted
+    else
       load_csv(options)
     end
   end
@@ -102,6 +103,10 @@ class Upload
     Thread.new {
       cont
     }
+  end
+
+  def stop
+    self.update(:state => :stopped)
   end
 
   # destroys all the entries in the database created by this upload
@@ -119,7 +124,7 @@ class Upload
     @log.info("Stopping processing")
     self.state = :uploaded
     self.save
-    if options[:erase] # TODO set this to option[:erase] once done
+    if options[:erase] 
       @log.info("Erasing records from database")
       destroy_models
     end
@@ -132,11 +137,11 @@ class Upload
     # DIRTY HACK!
     # there is some gem that conflicts with the name Logger which causes roo to crash upon load.
     # therefore, we run the roo task from a separate ruby file with no gems loaded
+    self.update(:state => :extracting)
     s =  `ruby lib/tasks/excel.rb #{directory} #{filename}`
     @log.info s
     if s
-      self.state = :extracted
-      self.save
+      self.update(:state => :extracted)
     end
   end
   
@@ -145,11 +150,18 @@ class Upload
     Dir.glob(File.join("uploads", directory, "*csv")).map{|c| c.split("/")[-1]}
   end
 
+  def reload(model)
+    load_csv({:erase => false, :verbose => false}, [model])
+  end 
+
   # Loads the extracted CSV files into the database. Params are passed in the options hash as follows
   #
   # @param [Hash] the options to use. Valid options are {:erase => <boolean>, :verbose => <boolean>}
   #   :erase will erase old data, :verbose prints debugging information
-  def load_csv(options)
+  def load_csv(options, models = MODELS)
+    log_file unless @log
+    self.state = :processing
+    self.save
     erase = options[:erase]; verbose = options[:verbose]
     funding_lines, loans = {}, {}
     if csv_files.blank?
@@ -157,7 +169,9 @@ class Upload
       return
     end
     
-    MODELS.each {|model|
+    models.each {|model|
+      self.state_detail = "started processing #{model}"
+      self.save
       error_count = 0
       error_filename = File.join("uploads",directory,"#{model.to_s}_errors.csv")
       FileUtils.rm(error_filename, :force => true)
@@ -185,6 +199,7 @@ class Upload
       # get the uniques
       uniques = model.all.aggregate(unique_field)
       headers = {}; done = 0; skipped = 0;
+      begin
       FasterCSV.open(file_name, "r").each_with_index{|row, idx|
         error = true
         if idx==0
@@ -192,8 +207,11 @@ class Upload
             headers[name.downcase.gsub(' ', '_').to_sym] = index
           }
           headers[:upload_id] = headers.keys.count
-          
           error_file.write((row + ["errors"]).to_csv)
+          unless headers.keys.include?(unique_field)
+            error_file.write("Headers do not contain the unique field '#{unique_field}'")
+            break
+          end
         else
           row.push(self.id)
           if uniques.include?(row[headers[unique_field]])
@@ -212,21 +230,26 @@ class Upload
               @log.error("<font color='red'>#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors.to_a.join(', ')}</font>") if log
             end
           rescue Exception => e
+            debugger
             @log.error("<font color='red'>#{model}: Problem in inserting #{model} #{row[headers[:serial_number]]}. Insert it manually later</font>") if log
             @log.error("<font color='red'>#{model}: #{e.message}</font>") if log
           ensure
             if error
-              errors = [record.errors.values.join(".")] rescue e ? [e.message] : ["Unknown error"]
+              debugger
+              errors = [record.errors.values.join(".")] rescue (e ? [e.message] : ["Unknown error"])
               error_file.write((row + errors).to_csv)        # log all errors in a separate csv file
               error_count += 1                                                                    # so we can iterate down to perfection
             end
           end
         end    
       }
+      rescue Exception =>e
+        debugger
+      end
       @log.info("<font color='#8DC73F'><b>Created #{done} #{model.to_s.plural}</b></strong> Skipped #{skipped}") 
       error_file.close
       FileUtils.rm(error_filename, :force => true) if error_count == 0
-
+      self.state = :stopped; self.save
     }
   end
 end

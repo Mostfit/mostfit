@@ -9,9 +9,10 @@ class Checkers < Application
   end
 
   def recheck
-    @checkers = @upload.checkers(:ok => false)
-    @checkers.each{|c| c.check}
-    redirect resource(@upload, :checkers)
+    hash = {:ok => false}.merge(params[:limit] ? {:limit => params[:limit].to_i} : {})
+    @checkers = @upload.checkers(hash)
+    Merb.run_later {@checkers.each{|c| c.check}}
+    redirect resource(@upload, :checkers), :message => {:notice => "Started checking #{params[:limit] ? params[:limit] : 'all'} loans"}
   end
 
   def show(id)
