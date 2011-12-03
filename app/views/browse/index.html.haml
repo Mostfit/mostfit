@@ -1,9 +1,18 @@
-%div.right_pane
-  %div.result
-  %script
-    $.get("/browse/hq_tab", function(data){$('.result').html(data);})
-  %br
+= js_include_tag 'Jit/jit-yc'
+= js_include_tag :treemap, :hbarchart
+- @date = Date.today
 
+= css_include_tag 'jit-base','treemap'
+:javascript
+  var date = new Date('#{@date.strftime("%Y-%m-%d")}')
+  var date_string = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+  function get_charts(q) {
+    $.get('/graph_data/tm_collections?' + q,'', function(data){
+      init_treemap($.parseJSON(data).treemap);
+      });
+    }
+
+  $(document).ready(function(){ get_charts('date=' + date_string)});
 
 
 %div.left_pane
@@ -21,3 +30,12 @@
       %li
         = link_to_with_rights 'Verify data', resource(:verifications)
 
+%div.right_pane
+  %div.result
+  %script
+    $.get("/browse/hq_tab", function(data){$('.result').html(data);})
+  %br
+
+%div{:style => "float: left;width: 40%; margin: 10px 30px"}
+  %h1 Your MFI Today
+  #infovis{:style => " height: 400px; margin: auto; "}

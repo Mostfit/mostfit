@@ -1168,7 +1168,7 @@ class Loan
       scheduled_principal_due                = i_num > 0 ? scheduled[:principal] : 0
       scheduled_interest_due                 = i_num > 0 ? scheduled[:interest] : 0
       outstanding                            = [:disbursed, :outstanding].include?(st) 
-      outstanding                            = (st == :repaid) ? [:disbursed, :outstanding].include?(STATUSES[last_row[:status]-1]) : outstanding
+      outstanding                            = ([:written_off,:preclosed,:repaid].include?(st)) ? [:disbursed, :outstanding].include?(STATUSES[last_row[:status]-1]) : outstanding
       total_principal_due                   += outstanding ? scheduled[:principal].round(2) : 0
       total_interest_due                    += outstanding ? scheduled[:interest].round(2) : 0
       principal_due                          = outstanding ? [total_principal_due - act_total_principal_paid,0].max : 0

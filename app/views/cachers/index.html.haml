@@ -53,9 +53,9 @@
         = link_to 'month to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - 1, :to_date => Date.today - 1))
       ]
       %li
-        = link_to 'report formats', url(:report_formats), :class => "edit"
+        = link_to 'report formats', url(:report_formats), :class => "report"
       %li
-        = link_to 'printer friendly', url(:consolidate_cachers, query_params.merge(:layout => :printer, :target => "_blank"))
+        = link_to 'printer friendly', url(:consolidate_cachers, query_params.merge(:layout => :printer, :target => "_blank")), :class => 'print'
   = form(:method => :get, :action => url(:consolidate_cachers)) do
     = date_select('from_date', @from_date, {:id => 'from_date'})
     to

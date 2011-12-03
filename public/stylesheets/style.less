@@ -370,8 +370,7 @@ width: 100%;
 /* at the bottom so it has preference */
 a.nopic { background:none; padding:0; margin:0; }
 
-a.add, a.add:visited, a.add:link {
-  background-image: url(/images/add.png);
+.classy_link {
   background-repeat: no-repeat;
   /* background-color: #62ed1e; */
   background-position: 1px 3px;
@@ -385,6 +384,21 @@ a.add, a.add:visited, a.add:link {
   font-size: 16px;
   padding: 6px 35px 4px;
   margin: 5px 5px 10px;
+}
+
+a.print, a.print:visited, a.print:link {
+    .classy_link;
+    background-image: url(/images/print.png);
+}
+
+a.add, a.add:visited, a.add:link {
+    .classy_link;
+    background-image: url(/images/add.png);
+}
+
+a.report, a.report:visited, a.report:link {
+  .classy_link;
+  background-image: url(/images/report.png);
 }
 
 a.add_small, a.add_small:visited, a.add_small:link {
@@ -1238,7 +1252,7 @@ ul#tree li.depth_4 span{
     float: right;
 }
 .left_pane{
-    width: 45%;
+    float: left;
     h1 {
 	font-size: 200%;
 	padding: 10px;
@@ -1252,8 +1266,8 @@ ul#tree li.depth_4 span{
        }
 }
 .right_pane{
-    float: right;
-    width: 50%;
+    float: left;
+    width: 30%;
 }
 ul.bookmarks li{
     margin-bottom: 5px;
@@ -1773,7 +1787,7 @@ table.moreinfo thead th {
 		 }
 	     }
 	     th {
-		 font-size: 1.2em;
+		 font-size: 1.3em;
 		 font-weight: bold;
 		 letter-spacing: -0.03em;
 		 color: @stats-bg-text;
@@ -1792,6 +1806,9 @@ table.moreinfo thead th {
 	 p {
 	     font-size: 1.1em; font-weight: bold; text-align: center;
 	 }
+	 h1 {
+	     font-size: 1.6em;
+	     }
 	 
      }
      .detail {

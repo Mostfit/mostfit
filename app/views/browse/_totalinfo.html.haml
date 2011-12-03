@@ -4,7 +4,6 @@
       %tr.selected
         %th{:colspan => 4}
           %h1 today
-          = link_to 'see graph', '/browse/today'
     - cbc = BranchCache.all(:date => Date.today).reduce(:consolidate)
     %thead
       %tr
