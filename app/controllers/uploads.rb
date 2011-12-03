@@ -47,13 +47,33 @@ class Uploads < Application
     redirect resource(@upload), :message => {:notice => "Started processing"}
   end
   
+  def stop(id)
+    # stops an upload that is processing
+    @upload = Upload.get(id)
+    raise NotFound unless @upload
+    @upload.stop
+    redirect resource(@upload)
+  end
+
+  def reload(id)
+    # reloads a single model
+    @upload = Upload.get(id)
+    raise NotFound unless @upload
+    Kernel.const_get(params[:model].to_s.singularize.camel_case).all(:upload_id => @upload.id).destroy!
+    Merb.run_later {
+      @upload.reload(params[:model])
+    }
+    redirect resource(@upload)
+  end    
+
+
+
   def reset(id)
     @upload = Upload.get(id)
     raise NotFound unless @upload
-    options = params[:delete] ? {:erase => true} : {}  
+    options = params[:delete] ? {:erase => true} : {}
     @upload.reset(options)
     redirect resource(@upload), :message => {:notice => "This upload was succesfully reset"}
-
   end
 
   def error_log
@@ -70,6 +90,8 @@ class Uploads < Application
 
   def update(id, upload)
     @upload = Upload.get(id)
+    FileUtils.rm(File.join("uploads",@upload.directory,@upload.filename))
+    @upload.reset # does not delete data. only removes the files
     raise NotFound unless @upload
     if params[:file] and params[:file][:filename] and params[:file][:tempfile]
       @upload.move(params[:file][:tempfile].path)
@@ -79,7 +101,11 @@ class Uploads < Application
     end
   end
 
-
+  def show_csv(id)
+    @upload = Upload.get(id)
+    raise NotFound unless @upload
+    "<pre>" + File.read(File.join(Merb.root, "uploads",@upload.directory, params[:filename])) + "</pre>"
+  end
 
     
 

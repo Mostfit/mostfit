@@ -2,6 +2,7 @@
   == Checking Loan Balances for Upload #{@upload.id}
 .menu-strip
   = link_to "Recheck!", url(:recheck_upload_checkers, @upload)
+  = link_to "Recheck 50!", url(:recheck_upload_checkers, @upload, :limit => 50)
 %table.narrow.shaded
   %tr
     %th
