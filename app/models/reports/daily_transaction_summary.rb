@@ -40,18 +40,11 @@ class DailyTransactionSummary < Report
       collections[type] = objects.map{|go| [go.send(grouper_id), go.amount]}.to_hash
     }
    
-    #foreclosures as calculated because there is a doubt that Loan History is getting created properly. for instance prepayment is not recoreded as a preclosure
-    foreclosures  = LoanHistory.all(:status => :repaid,  :date => @date, :scheduled_outstanding_principal.gt => 0).aggregate(grouper_id.to_sym, :principal_paid.sum, :interest_paid.sum).map{|x| [x[0], [x[1], x[2]]]}.to_hash
-    
     # preclosures calculated if the Loan History get created properly. A pre-payment has to be recorded as a preclosure.
     # NOTE: until we are sure about the that Loan History is recording preclosures correctly we will have to use the above foreclosures code.
-    preclosures_composite_keys = LoanHistory.all(:status => :preclosed, :last_status => :outstanding, :date => @date).aggregate(:composite_key)
-    unless preclosures_composite_keys.empty?
-      pck = preclosures_composite_keys.map{|x| x-0.0001}
-      precloures    = LoanHistory.all(:composite_key => pck).aggregate(grouper_id.to_sym, 
-                                                                       :actual_outstanding_principal.sum, 
-                                                                       :actual_outstanding_total.sum).map{|x| [x[0], [x[1], x[2]]]}.to_hash
-    end
+    preclosures    = LoanHistory.all(:status => :preclosed, :last_status => :outstanding, :date => @date).aggregate(grouper_id.to_sym, 
+                                                                       :principal_paid.sum, 
+                                                                       :interest_paid.sum).map{|x| [x[0], [x[1], x[2]]]}.to_hash
 
     # calculation of written off outstanding. Once the Loan gets written off the corresponding LoanHistory entry with the written_off status shows loan_outstanding as zero
     write_offs_composite_keys = LoanHistory.all(:status => :written_off, :last_status => :outstanding, :date => @date).aggregate(:composite_key)
@@ -96,11 +89,11 @@ class DailyTransactionSummary < Report
       data[go][1][:fees] += collections[go.id][:fees] || 0 
       data[go][1][:total] += data[go][1][:principal] + data[go][1][:interest] + data[go][1][:fees]
 
-      # foreclosure
-      if foreclosures.key?(go.id)
-        data[go][2][:principal] += foreclosures[go.id][0] || 0
-        data[go][2][:interest]  += foreclosures[go.id][1] || 0
-        data[go][2][:total]     += ((foreclosures[go.id][1] || 0) + (foreclosures[go.id][0] || 0))
+      # preclosure
+      if preclosures && preclosures.key?(go.id)
+        data[go][2][:principal] += preclosures[go.id][0] || 0
+        data[go][2][:interest]  += preclosures[go.id][1] || 0
+        data[go][2][:total]     += ((preclosures[go.id][1] || 0) + (preclosures[go.id][0] || 0))
       end
 
       # var adjusted
