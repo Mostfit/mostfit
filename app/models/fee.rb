@@ -35,6 +35,9 @@ class Fee
   property :payable_on,    Enum.send('[]',*PAYABLE.map{|m| m[0]}), :nullable => false
   property :overridable_by, Flag[:data_entry, :mis_manager, :admin,:staff_member]
 
+  property :round_to,       Float
+  property :rounding_style, Enum[:round, :ceil, :floor]
+
   has n, :loan_products, :through => Resource
   has n, :client_types, :through => Resource
   has n, :insurance_products, :through => Resource
@@ -84,7 +87,7 @@ class Fee
 
   def fees_for(loan)
     return amount if amount
-    return [[min_amount || 0 , (percentage ? percentage * loan.amount : 0)].max, max_amount || (1.0/0)].min
+    return [[min_amount || 0 , (percentage ? percentage * loan.amount : 0)].max, max_amount || (1.0/0)].min.round_to_nearest(round_to, rounding_style)
   end
 
   # Calculate the amount to be levied depending on the object type
