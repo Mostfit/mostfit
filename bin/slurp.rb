@@ -5,10 +5,6 @@
 
 # dump path is on mostfit.in
 
-pwd = `pwd`.split("/")[-1].chomp
-
-ssh_result = `ssh mostfit@msmer.com 'cd ~/mostfit_installations/#{pwd}; bin/dump.rb'`
-
 dump_path = ARGV[0]
 
 # db_name is on the local machine
