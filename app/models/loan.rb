@@ -1174,36 +1174,49 @@ class Loan
       i_num                                  = installment_for_date(date)
       scheduled                              = get_scheduled(:all, date)
       actual                                 = get_actual(:all, date)
+
+      st                                     = get_status(date)
+      outstanding                            = [:disbursed, :outstanding].include?(st) # is the loan outstanding?
+      # if it is not, was it outstanding in the last period? 
+      outstanding_at_start                   = outstanding ? true : (last_row ? [:disbursed, :outstanding].include?(STATUSES[last_row[:status]-1]) : true)
+      # so, was it closed in this period?
+      # this is important because a lot of stuff is calculated differently in the last period
+
       prin                                   = principal_received_on(date).round(2) 
       int                                    = interest_received_on(date).round(2)
       total_principal_paid                  += prin
       total_interest_paid                   += int
-      st                                     = get_status(date)
-      scheduled_principal_due                = i_num > 0 ? scheduled[:principal] : 0
-      scheduled_interest_due                 = i_num > 0 ? scheduled[:interest] : 0
-      outstanding                            = [:disbursed, :outstanding].include?(st) 
-      outstanding                            = ([:written_off,:preclosed,:repaid].include?(st)) ? [:disbursed, :outstanding].include?(STATUSES[last_row[:status]-1]) : outstanding
-      total_principal_due                   += outstanding ? scheduled[:principal].round(2) : 0
-      total_interest_due                    += outstanding ? scheduled[:interest].round(2) : 0
-      principal_due                          = outstanding ? [total_principal_due - act_total_principal_paid,0].max : 0
-      interest_due                           = outstanding ? [total_interest_due - act_total_interest_paid,0].max : 0
+
+      scheduled_principal_due                = outstanding_at_start ? (i_num > 0 ? scheduled[:principal] : 0) : 0
+      scheduled_interest_due                 = outstanding_at_start ? (i_num > 0 ? scheduled[:interest] : 0) : 0
+      total_principal_due                   += outstanding_at_start ? scheduled[:principal].round(2) : 0
+      total_interest_due                    += outstanding_at_start ? scheduled[:interest].round(2) : 0
+      principal_due                          = outstanding_at_start ? [total_principal_due - act_total_principal_paid,0].max : 0
+      interest_due                           = outstanding_at_start ? [total_interest_due - act_total_interest_paid,0].max : 0
+
       actual_outstanding_principal           = outstanding ? actual[:balance].round(2) : 0
       actual_outstanding_total               = outstanding ? actual[:total_balance].round(2) : 0
-      actual_outstanding_interest            = actual_outstanding_total - actual_outstanding_principal
-      advance_principal_outstanding          = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max
-      advance_interest_outstanding           = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
+      actual_outstanding_interest            = outstanding ? (actual_outstanding_total - actual_outstanding_principal) : 0
+
+      debugger if date == Date.new(2011,9,7)
+      _apo                                   = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max # advance principal outstanding at the start
+      _api                                   = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
+      advance_principal_outstanding          = outstanding ?  _apo : 0
+      advance_interest_outstanding           = outstanding ?  _api : 0
       total_advance_outstanding              = advance_interest_outstanding + advance_principal_outstanding
-      advance_principal_paid_today           = last_row ? [0,advance_principal_outstanding - (last_row[:advance_principal_outstanding] || 0)].max : 0
-      advance_interest_paid_today            = last_row ? [0,advance_interest_outstanding -  (last_row[:advance_interest_outstanding] || 0)].max   : 0
+      advance_principal_paid_today           = outstanding_at_start ? (last_row ? [0,_apo - (last_row[:advance_principal_outstanding] || 0)].max : 0) : 0
+      advance_interest_paid_today            = outstanding_at_start ? (last_row ? [0,_api -  (last_row[:advance_interest_outstanding] || 0)].max   : 0) : 0
       total_advance_paid_today               = advance_principal_paid_today + advance_interest_paid_today
       advance_principal_paid                += advance_principal_paid_today
+      advance_principal_paid                 = outstanding_at_start ? advance_principal_paid : 0
       advance_interest_paid                 += advance_interest_paid_today
+      advance_interest_paid                  = outstanding_at_start ? advance_interest_paid  : 0
       total_advance_paid                     = advance_principal_paid + advance_interest_paid 
 
-      advance_principal_adjusted             = advance_principal_paid - advance_principal_outstanding
+      advance_principal_adjusted             = outstanding_at_start ? advance_principal_paid - advance_principal_outstanding : 0
       advance_interest_adjusted              = advance_interest_paid  - advance_interest_outstanding
-      advance_principal_adjusted_today       = last_row ? [0, advance_principal_adjusted - last_row[:advance_principal_adjusted]].max : 0
-      advance_interest_adjusted_today        = last_row ? [0, advance_interest_adjusted - last_row[:advance_principal_adjusted]].max  : 0
+      advance_principal_adjusted_today       = outstanding_at_start ? (last_row ? [0, _apo - last_row[:advance_principal_adjusted]].max : 0) : 0
+      advance_interest_adjusted_today        = outstanding_at_start ? (last_row ? [0, _api - last_row[:advance_principal_adjusted]].max  : 0) : 0
       total_advance_adjusted_today           = advance_interest_adjusted_today + advance_principal_adjusted_today
 
       total_fees_due                         = ap_fees.select{|dt,af| dt <= date}.to_hash.values.sum || 0
