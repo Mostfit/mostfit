@@ -251,6 +251,13 @@ class Loan
 
   def self.from_csv(row, headers)
     interest_rate = (row[headers[:interest_rate]].to_f>1 ? row[headers[:interest_rate]].to_f/100 : row[headers[:interest_rate]].to_f)
+    debugger
+    keys = [:product, :amount, :installment_frequency, :number_of_installments, :scheduled_disbursal_date, :scheduled_first_payment_date,
+            :applied_on, :approved_on, :disbursal_date, :funding_line_serial_number, :applied_by_staff, :approved_by_staff, :repayment_style,
+            :center, :reference, :client_reference]
+    missing_keys = keys - headers.keys
+    debugger
+    raise ArgumentError.new("missing keys #{missing_keys.join(',')}") unless missing_keys.blank?
     hash = {
       :loan_product                       => LoanProduct.first(:name => row[headers[:product]]), 
       :amount                             => row[headers[:amount]],
@@ -428,7 +435,7 @@ class Loan
     self.interest_rate = percentage.to_f/100
   end
   # returns the name of the funder
-  def funder_name
+  def deffunder_name
     self.funding_line and self.funding_line.funder.name or nil
   end
 
@@ -1141,6 +1148,7 @@ class Loan
     now = DateTime.now
     payments_hash
     
+    update_loan_cache unless c_branch_id and c_center_id
     # get fee payments. this is probably better of moved to functions in the fees_container
 
     fee_payments= Payment.all(:loan_id => id, :type => :fees).group_by{|p| p.received_on}.map do |k,v| 

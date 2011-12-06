@@ -33,6 +33,7 @@ class Upload
   end
 
   def self.make(params)
+    # params should have {:file => {:tempfile => tmpfile_handle, :filename => :actual_file_name}, :user => User.xxx}
     # our intializer parses the params and moves the tempfile to a sane location
     require 'digest/md5'
     md5sum = Digest::MD5.hexdigest(params[:file][:tempfile].read)
@@ -55,6 +56,21 @@ class Upload
     # use this method to check the state details. it serializes the state_details object
     @state_detail_hash ||= Marshal.load(self.state_detail)
   end
+
+  def short_status
+    # returns a short string showing the status of this upload
+    link_text = ''
+    MODELS.each do |model|
+      fn = File.join("uploads", directory, "#{model}_errors.csv")
+      if File.exists?(fn)
+        error_rows = `wc -l #{fn} | awk -F" " '{print $1}'`.to_i
+        next if error_rows == 0
+        link_text +=  "#{error_rows} #{model.to_s} "
+      end
+    end
+    link_text
+  end
+
   
   def move(tempfile)
     # moves the tempfile to a nice location
@@ -90,7 +106,6 @@ class Upload
   # @param [Hash] like {:verbose => <boolean>, :erase => <boolean>}
   def cont(options = {:verbose => false, :erase => false})
     log_file(options[:verbose]) unless @log
-    debugger
     if state == :uploaded
       process_excel_to_csv
       cont
@@ -150,6 +165,7 @@ class Upload
     Dir.glob(File.join("uploads", directory, "*csv")).map{|c| c.split("/")[-1]}
   end
 
+  # @param model is a pluralised symbol i.e. :clients
   def reload(model)
     load_csv({:erase => false, :verbose => false}, [model])
   end 
@@ -196,12 +212,13 @@ class Upload
         break
       end
 
-      # get the uniques
+      # get the unique identifiers for objects already in the database. these can be skipped. you know, for speed. and robustness.
       uniques = model.all.aggregate(unique_field)
       headers = {}; done = 0; skipped = 0;
       begin
       FasterCSV.open(file_name, "r").each_with_index{|row, idx|
         error = true
+        row = row.compact # drop all nils. this means we can deal with blank columns tranpsarently
         if idx==0
           row.to_enum(:each_with_index).collect{|name, index| 
             headers[name.downcase.gsub(' ', '_').to_sym] = index
@@ -210,10 +227,13 @@ class Upload
           error_file.write((row + ["errors"]).to_csv)
           unless headers.keys.include?(unique_field)
             error_file.write("Headers do not contain the unique field '#{unique_field}'")
+            error_file.close
             break
           end
         else
-          row.push(self.id)
+          row.push(self.id) #add the upload_id property to the end of the row
+
+          # skip objects already in the database
           if uniques.include?(row[headers[unique_field]])
             @log.debug("Skipping unique #{model} with #{unique_field} #{row[headers[unique_field]]}")
             skipped += 1
@@ -225,17 +245,19 @@ class Upload
               error = false
               @log.debug("Created #{model} #{record.id}")
               done += 1
-              @log.info("Created #{idx-99} - #{idx+1}. Some more left")    if idx%100==99
+              if idx%100==99
+                reload
+                return if self.state == :stopped
+                @log.info("Created #{idx-99} - #{idx+1}. Some more left")    
+              end
             else
               @log.error("<font color='red'>#{model}: Problem in inserting #{row[headers[:serial_number]]}. Reason: #{record.errors.to_a.join(', ')}</font>") if log
             end
           rescue Exception => e
-            debugger
             @log.error("<font color='red'>#{model}: Problem in inserting #{model} #{row[headers[:serial_number]]}. Insert it manually later</font>") if log
             @log.error("<font color='red'>#{model}: #{e.message}</font>") if log
           ensure
             if error
-              debugger
               errors = [record.errors.values.join(".")] rescue (e ? [e.message] : ["Unknown error"])
               error_file.write((row + errors).to_csv)        # log all errors in a separate csv file
               error_count += 1                                                                    # so we can iterate down to perfection
@@ -244,12 +266,11 @@ class Upload
         end    
       }
       rescue Exception =>e
-        debugger
       end
       @log.info("<font color='#8DC73F'><b>Created #{done} #{model.to_s.plural}</b></strong> Skipped #{skipped}") 
       error_file.close
       FileUtils.rm(error_filename, :force => true) if error_count == 0
-      self.state = :stopped; self.save
+      self.state = :complete; self.save
     }
   end
 end

@@ -1,9 +1,9 @@
 %h1 Upload
-.menu-strip
-  = link_to 'Continue', url(:continue_upload, @upload), :class => "greenButton"
-  = link_to 'Reset', url(:reset_upload, @upload), :class => "cancelButton"
+.menu-strip{:class => "width:100%"}
   = link_to 'Reset and Delete all Data', url(:reset_upload, @upload, :delete => 1), :class => "cancelButton"
   = link_to 'Reupload', url(:edit_upload, @upload), :class => "cancelButton"
+  = link_to 'Extract', url(:extract_upload, @upload), :class => "cancelButton"
+  = link_to 'Stop', url(:stop_upload, @upload), :class => "cancelButton"
 %table.tall
   %tr
     %th
@@ -35,33 +35,51 @@
   %h2 Directory contents
   - entries = `ls -l #{File.join(Merb.root,"uploads",@upload.directory)}`.split("\n").map{|x| x.split(" ")}
   %table
+    %thead
+      %tr
+        %th
+          filename
+        %th
+          filesize
     - entries.each do |e|
       %tr
         %td
           = link_to e[8], url(:show_csv_upload, @upload, :filename => e[8]), :target => "_blank"
         %td
           = e[4]
-  
-    
+
+
+- file_wcs = {}
+- Upload::MODELS.each do |model|
+  - fn = File.join("uploads", @upload.directory, "#{model}.csv")
+  - if File.exists?(fn)
+    - file_wcs[model] = `wc -l #{fn} | awk -F" " '{print $1}'`
+- file_error_wcs = {}
+- Upload::MODELS.each do |model|
+  - fn = File.join("uploads", @upload.directory, "#{model}_errors.csv")
+  - if File.exists?(fn)
+    - file_error_wcs[model] = `wc -l #{fn} | awk -F" " '{print $1}'`
 .admin-box
   %h2 Status
   - Upload::MODELS.each do |model|
     %ul.inline
       %li
         = @upload.send(model).count
+        = "/"
+        = file_wcs[model]
         = model
-        = link_to 'reload', url(:reload_upload, @upload, :model => model.to_s)
+        = link_to 'retry', url(:reload_upload, @upload, :model => model.to_s)
+        &bull;
+        = link_to 'erase and reload', url(:reload_upload, @upload, :model => model.to_s, :erase => true)
         %br
 
 .admin-box
   %h2 Errors
-  - Upload::MODELS.each do |model|
-    - fn = File.join("uploads", @upload.directory, "#{model}_errors.csv")
-    %ul
-      - if File.exists?(fn)
-        %li
-          - link_text = `wc -l #{fn} | awk -F" " '{print $1}'` + " " + model.to_s
-          = link_to link_text, url(:controller => :uploads, :action => :error_log, :model => model, :id => @upload.id)
+  %ul
+    - Upload::MODELS.each do |model|
+      %li
+        - link_text =  "#{file_error_wcs[model]} #{model.to_s}"
+        = link_to link_text, url(:controller => :uploads, :action => :error_log, :model => model, :id => @upload.id), :target => "_blank"
 .admin-box
   %h2 Checks
   = link_to "#{@upload.checkers(:ok => false).count} failed checks", resource(@upload, :checkers)
