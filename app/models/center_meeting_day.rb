@@ -22,16 +22,24 @@ class CenterMeetingDay
   property :every, CommaSeparatedList 
   property :what, CommaSeparatedList
   property :of_every, Integer
-  property :period, Enum[:week, :month]
+  property :period, Enum[nil,:week, :month], :nullable => true
+
+  validates_with_method :either_meeting_day_or_date_vector
   
   belongs_to :center
 
   before :valid?, :convert_blank_to_nil
-
+  
   def check_not_last
     raise ArgumentError.new("Cannot delete the only center meeting schedule") if self.center.center_meeting_days.count == 1
   end
   
+  def either_meeting_day_or_date_vector
+    date_vector_valid = every and what and of_every and period
+    return true if meeting_day or date_vector_valid
+    return [false, 'Choose either a meeting day or a scheme to set up a schedule']
+  end
+
 
   # adding the new properties to calculate the datevector for this center.
   # for now we will allow only one datevector type per center. This means a center can only have one meeting schedule frequency
