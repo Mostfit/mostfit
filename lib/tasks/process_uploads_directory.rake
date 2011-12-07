@@ -1,3 +1,5 @@
+require "rubygems"
+
 # Add the local gems dir if found within the app root; any dependencies loaded
 # hereafter will try to load from the local gems before loading system gems.
 if (local_gem_dir = File.join(File.dirname(__FILE__), '..', '..', 'gems')) && $BUNDLE.nil?
@@ -10,16 +12,21 @@ require "merb-core"
 # here again, Merb will do it for you
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
-
 namespace :mostfit do
-  namespace :conversion do
-    desc "convert to new-layout branch"
-    task :to_new_layout do
-      repository.adapter.execute("truncate table loan_history;") rescue nil
-      Rake::Task['db:autoupgrade'].invoke
-      Rake::Task['mostfit:db:prepare'].invoke
-      Rake::Task['mostfit:conversion:update_loan_cache'].invoke
-      Rake::Task['mostfit:data:create_history'].invoke
+  namespace :data do
+    desc "read all excel files in a directory and process them"
+    task :process_upload_directory do
+      file_list = Dir.glob(File.join(Merb.root,"uploads","*xls"))
+      puts "found #{file_list}.count files"
+      uploads = []
+      file_list.each do |f|
+        puts "copying #{f}"
+        u = Upload.make(:file => {:filename => f.split("/")[-1], :tempfile => File.new(f,"r")}, :user => User.first)
+        uploads.push u
+      end
+      uploads.each do |u|
+        # u.cont
+      end
     end
   end
 end

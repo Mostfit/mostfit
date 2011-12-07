@@ -66,7 +66,8 @@ class CenterMeetingDay
   validates_with_method :check_not_last, :if => Proc.new{|t| t.deleted_at}
 
   def check_not_last
-    return true if deleted_at
+    return true unless center
+    return true unless deleted_at
     return [false,"cannot delete the last center meeting date"] if (self.center.center_meeting_days.count == 1 and (self.center.meeting_day == :none or (not self.center.meeting_day)))
   end
   
@@ -115,6 +116,7 @@ class CenterMeetingDay
   # checks that for a given center, the valid_from and valid_to dates for this center do not overlap with another center_meeting_day
   def dates_do_not_overlap
     return true if deleted_at
+    return true unless self.center
     cmds = self.center.center_meeting_days
     return true if cmds.count == 0
     return true if cmds.count == 1 and cmds.first.id == self.id

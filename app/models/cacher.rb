@@ -14,6 +14,7 @@ class Cacher
   property :scheduled_outstanding_principal, Float, :nullable => false
   property :actual_outstanding_total,        Float, :nullable => false
   property :actual_outstanding_principal,    Float, :nullable => false
+  property :actual_outstanding_interest,     Float, :nullable => false
   property :scheduled_principal_due,         Float, :nullable => false
   property :scheduled_interest_due,          Float, :nullable => false
   property :principal_due,                   Float, :nullable => false
@@ -60,7 +61,7 @@ class Cacher
   property :stale,                           Boolean, :default => false
 
 
-  COLS =   [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total,
+  COLS =   [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total, :actual_outstanding_interest,
             :total_interest_due, :total_interest_paid, :total_principal_due, :total_principal_paid,
             :principal_in_default, :interest_in_default, :total_fees_due, :total_fees_paid, :total_advance_paid, :advance_principal_paid, :advance_interest_paid,
            :advance_principal_adjusted, :advance_interest_adjusted, :advance_principal_outstanding, :advance_interest_outstanding, :total_advance_outstanding, :principal_at_risk]
@@ -75,9 +76,6 @@ class Cacher
     principal_paid + interest_paid + fees_paid_today
   end
 
-  def actual_outstanding_interest
-    (actual_outstanding_total - actual_outstanding_principal).round(2)
-  end
 
   def total_advance_paid_today
     advance_principal_paid_today + advance_interest_paid_today
@@ -100,6 +98,14 @@ class Cacher
     (principal_in_default + interest_in_default).abs
   end
 
+  def icash_interest_in_default
+    [0,interest_in_default + total_advance_outstanding].min
+  end
+
+  def icash_total_default
+    principal_in_default + icash_interest_in_default
+  end
+
   def self.stale
     self.all(:stale => true)
   end
@@ -108,6 +114,9 @@ class Cacher
     0
   end
 
+  def method_missing(name, args)
+    "N/A"
+  end
 
   def self.get_missing_centers
     return [] if self.all.empty?

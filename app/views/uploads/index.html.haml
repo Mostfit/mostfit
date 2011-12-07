@@ -10,6 +10,10 @@
     %th
       State
     %th
+      Errors
+    %th
+      Checkers
+    %th
       Action
   - @uploads.each do |upload|
     %tr
@@ -19,6 +23,10 @@
         = upload.filename
       %td
         = upload.state
+      %td
+        = upload.short_status
+      %td
+        = Checker.all(:upload_id => upload.id, :ok => false).count
       %td
         = link_to "Details", resource(upload)
         |

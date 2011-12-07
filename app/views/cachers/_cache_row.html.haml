@@ -6,10 +6,10 @@
     %td{:style => "text-align: right", :class => "#{at} text"}
       - if at == :date
         = link_to val.strftime("%Y/%m/%d"), resource(:cachers, request.send(:query_params).merge(:date => val))
-        - date = at
+        - date = val
       - elsif at == :branch_id
         - if @resource == :split_cachers
-          = link_to @branch_names[val], url(:cachers, request.send(:query_params).merge(:date => date))
+          = link_to @branch_names[val], url(:cachers, request.send(:query_params).reject{|k,v| ["from_date","to_date"].include?(k)}.to_hash.merge(:date => date))
         - else
           = link_to((@branch_names[val] || "-"), url(@resource, request.send(:query_params).merge(:branch_id => val, :group_by => "center")))
         - bid = val

@@ -42,6 +42,7 @@ class Center
   validates_present     :branch
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
   validates_with_method :meeting_time_minutes, :method => :minutes_valid?
+
   validates_with_method :creation_date_ok
 
   def self.from_csv(row, headers)
@@ -209,7 +210,6 @@ class Center
     Center.all(:id => center_ids)
   end
   
-  private
   def hours_valid?
     return true if (0..23).include? meeting_time_hours.to_i
     [false, "Hours of the meeting time should be within 0-23"]
@@ -226,7 +226,7 @@ class Center
   def creation_date_ok
     return true if clients.map{|c| c.loans}.count == 0
     return true if creation_date <= loans.aggregate(:applied_on.min)
-    return [false, "Creation date cannot be after the first loan applica,tion date"]
+    return [false, "Creation date cannot be after the first loan application date"]
   end
 
   def handle_meeting_date_change

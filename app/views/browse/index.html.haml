@@ -1,24 +1,41 @@
-%div.right_pane
-  %div.result
-  %script
-    $.get("/browse/hq_tab", function(data){$('.result').html(data);})
-  %br
+= js_include_tag 'Jit/jit-yc'
+= js_include_tag :treemap, :hbarchart
+- @date = Date.parse(params[:date]) rescue Date.today
 
+= css_include_tag 'jit-base','treemap'
+:javascript
+  var date = new Date('#{@date.strftime("%Y-%m-%d")}')
+  var date_string = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+  function get_charts(q) {
+    $.get('/graph_data/tm_collections?' + q,'', function(data){
+      init_treemap($.parseJSON(data).treemap);
+      });
+    }
+
+  $(document).ready(function(){ get_charts('date=' + date_string)});
 
 
 %div.left_pane
-  %h1 Home
+  %h1 Quick Links
   %div
     %ul
       %li
-        %h2
-          = link_to_with_rights("#{Branch.all.count} Branches", url(:browse, :action => 'branches'), :class => 'edit')
+        = link_to_with_rights("#{Branch.all.count} Branches", url(:browse, :action => 'branches'))
       %li
-        = link_to_with_rights('Staff members', resource(:staff_members), :class => 'edit')
+        = link_to_with_rights('Staff members', resource(:staff_members))
       %li
-        = link_to_with_rights('Centers meeting today', url(:browse, :centers_paying_today), :class => 'edit')
+        = link_to_with_rights('Centers meeting today', url(:browse, :centers_paying_today))
       %li
-        = link_to_with_rights('Browse Aggregate Data', url(:cachers, :date => Date.today.strftime('%Y-%m-%d')), :class => 'edit')
+        = link_to_with_rights('Browse Aggregate Data', url(:cachers, :date => Date.today.strftime('%Y-%m-%d')))
       %li
-        = link_to_with_rights 'Verify data', resource(:verifications), :class => 'edit'
+        = link_to_with_rights 'Verify data', resource(:verifications)
 
+%div.right_pane
+  %div.result
+  %script
+    $.get("/browse/hq_tab?date=#{@date.strftime('%Y-%m-%d')}", function(data){$('.result').html(data);})
+  %br
+
+%div{:style => "float: left;width: 40%; margin: 10px 30px"}
+  %h1 Your MFI Today
+  #infovis{:style => " height: 400px; margin: auto; "}

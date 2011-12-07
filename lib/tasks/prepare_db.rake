@@ -20,10 +20,12 @@ namespace :mostfit do
       repository.adapter.execute("create index index_clients_deleted_at on clients(deleted_at);") rescue nil
       repository.adapter.execute("create index index_loans_client_id on loans(client_id);") rescue nil
       repository.adapter.execute("create index index_loan_history_center_id on loan_history(center_id);") rescue nil
+      repository.adapter.execute("alter table loan_products modify column loan_type varchar(100) null;") rescue nil
       repository.adapter.execute(%Q{
          alter table loan_history modify actual_outstanding_total   decimal(15,2) not null, 
                              modify scheduled_outstanding_total     decimal(15,2) not null,
                              modify actual_outstanding_principal    decimal(15,2) not null,
+                             modify actual_outstanding_interest decimal(15,2) not null,
                              modify scheduled_outstanding_principal decimal(15,2) not null,
                              modify scheduled_principal_due         decimal(15,2) not null,
                              modify scheduled_interest_due          decimal(15,2) not null,
@@ -79,6 +81,7 @@ namespace :mostfit do
          alter table cachers modify actual_outstanding_total decimal(15,2) not null, 
                              modify scheduled_outstanding_total decimal(15,2) not null,
                              modify actual_outstanding_principal decimal(15,2) not null,
+                             modify actual_outstanding_interest decimal(15,2) not null,
                              modify scheduled_outstanding_principal decimal(15,2) not null,
                              modify scheduled_principal_due decimal(15,2) not null,
                              modify scheduled_interest_due  decimal(15,2) not null,

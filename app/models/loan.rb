@@ -251,22 +251,32 @@ class Loan
 
   def self.from_csv(row, headers)
     interest_rate = (row[headers[:interest_rate]].to_f>1 ? row[headers[:interest_rate]].to_f/100 : row[headers[:interest_rate]].to_f)
-    
-    obj = new(:loan_product => LoanProduct.first(:name => row[headers[:product]]), :amount => row[headers[:amount]],
-              :interest_rate => interest_rate,
-              :installment_frequency => row[headers[:installment_frequency]].downcase, 
-              :number_of_installments => row[headers[:number_of_installments]],
-              :scheduled_disbursal_date => Date.parse(row[headers[:scheduled_disbursal_date]]),
-              :scheduled_first_payment_date => Date.parse(row[headers[:scheduled_first_payment_date]]),
-              :applied_on => Date.parse(row[headers[:applied_on]]), :approved_on => Date.parse(row[headers[:approved_on]]),
-              :disbursal_date => Date.parse(row[headers[:disbursal_date]]), :upload_id => row[headers[:upload_id]],
-              :disbursed_by_staff_id => StaffMember.first(:name => row[headers[:disbursed_by_staff]]).id,
-              :funding_line_id => FundingLine.first(:reference => row[headers[:funding_line_serial_number]]).id,
-              :applied_by_staff_id => StaffMember.first(:name => row[headers[:applied_by_staff]]).id,
-              :approved_by_staff_id => StaffMember.first(:name => row[headers[:approved_by_staff]]).id,
-              :repayment_style_id => RepaymentStyle.first(:name => row[headers[:repayment_style]]).id,
-              :c_center_id => Center.first(:name => row[headers[:center]]).id,
-              :reference => row[headers[:reference]], :client => Client.first(:reference => row[headers[:client_reference]]))
+    keys = [:product, :amount, :installment_frequency, :number_of_installments, :scheduled_disbursal_date, :scheduled_first_payment_date,
+            :applied_on, :approved_on, :disbursal_date, :funding_line_serial_number, :applied_by_staff, :approved_by_staff, :repayment_style,
+            :center, :reference, :client_reference]
+    missing_keys = keys - headers.keys
+    raise ArgumentError.new("missing keys #{missing_keys.join(',')}") unless missing_keys.blank?
+    hash = {
+      :loan_product                       => LoanProduct.first(:name => row[headers[:product]]), 
+      :amount                             => row[headers[:amount]],
+      :interest_rate                      => interest_rate,
+      :installment_frequency              => row[headers[:installment_frequency]].downcase, 
+      :number_of_installments             => row[headers[:number_of_installments]],
+      :scheduled_disbursal_date           => Date.parse(row[headers[:scheduled_disbursal_date]]),
+      :scheduled_first_payment_date       => Date.parse(row[headers[:scheduled_first_payment_date]]),
+      :applied_on                         => Date.parse(row[headers[:applied_on]]), 
+      :approved_on                        => Date.parse(row[headers[:approved_on]]),
+      :disbursal_date                     => Date.parse(row[headers[:disbursal_date]]), 
+      :upload_id                          => row[headers[:upload_id]],
+      :disbursed_by_staff_id              => StaffMember.first(:name => row[headers[:disbursed_by_staff]]).id,
+      :funding_line_id                    => FundingLine.first(:reference => row[headers[:funding_line_serial_number]]).id,
+      :applied_by_staff_id                => StaffMember.first(:name => row[headers[:applied_by_staff]]).id,
+      :approved_by_staff_id               => StaffMember.first(:name => row[headers[:approved_by_staff]]).id,
+      :repayment_style_id                 => RepaymentStyle.first(:name => row[headers[:repayment_style]]).id,
+      :c_center_id                        => Center.first(:name => row[headers[:center]]).id,
+      :reference                          => row[headers[:reference]],
+      :client                             => Client.first(:reference => row[headers[:client_reference]])}
+    obj = new(hash)
     obj.history_disabled=true
     saved = obj.save!
     if saved
@@ -422,7 +432,7 @@ class Loan
     self.interest_rate = percentage.to_f/100
   end
   # returns the name of the funder
-  def funder_name
+  def deffunder_name
     self.funding_line and self.funding_line.funder.name or nil
   end
 
@@ -559,7 +569,6 @@ class Loan
 
   def pay_prorata(total, received_on)
     # calculates total interest and principal payable in this amount and divides the amount proportionally
-
     int_to_pay = prin_to_pay = amt_to_pay = 0
 
     # load relevant loan_history rows
@@ -604,13 +613,11 @@ class Loan
     
   def pay_normal(total, received_on)
     lh = info(received_on)
-    debugger if $debug
     {:interest => lh.interest_due, :principal => total - lh.interest_due}
   end
 
   def pay_reallocate_normal(total, received_on)
     # we need a separate one while reallocating due to the fact the interest_due becomes 0 after being paid and so we cannot use the one above while reallocating
-    debugger if $debug
     lh = info(received_on)
     {:interest => lh.interest_due + lh.interest_paid, :principal => total - (lh.interest_due + lh.interest_paid)}
   end
@@ -1138,6 +1145,7 @@ class Loan
     now = DateTime.now
     payments_hash
     
+    update_loan_cache unless c_branch_id and c_center_id
     # get fee payments. this is probably better of moved to functions in the fees_container
 
     fee_payments= Payment.all(:loan_id => id, :type => :fees).group_by{|p| p.received_on}.map do |k,v| 
@@ -1153,11 +1161,6 @@ class Loan
     # initialize
     total_principal_due = total_interest_due = total_principal_paid = total_interest_paid = advance_principal_paid = advance_interest_paid = 0
 
-    # find out what branch, center and client group we are in
-    # client_group_id = (client.client_group or Nothing).id || 0
-    # center_id       = client.center.id
-    # branch_id       = client.center.branch_id
-    # SLOW!
 
     # find the actual total principal and interest paid.
     # this is helpful for adjusting interest and principal due on a particular date while taking into account future payments
@@ -1165,38 +1168,52 @@ class Loan
     act_total_principal_paid = last_payments_hash[1][:total_principal]; act_total_interest_paid = last_payments_hash[1][:total_interest]
     last_status = 1; last_row = nil;
     dates.each_with_index do |date,i|
-      debugger if date == Date.new(2011,11,23)
       i_num                                  = installment_for_date(date)
       scheduled                              = get_scheduled(:all, date)
       actual                                 = get_actual(:all, date)
+
+      st                                     = get_status(date)
+      outstanding                            = [:disbursed, :outstanding].include?(st) # is the loan outstanding?
+      # if it is not, was it outstanding in the last period? 
+      outstanding_at_start                   = outstanding ? true : (last_row ? [:disbursed, :outstanding].include?(STATUSES[last_row[:status]-1]) : true)
+      # so, was it closed in this period?
+      # this is important because a lot of stuff is calculated differently in the last period
+
       prin                                   = principal_received_on(date).round(2) 
       int                                    = interest_received_on(date).round(2)
       total_principal_paid                  += prin
       total_interest_paid                   += int
-      st                                     = get_status(date)
-      scheduled_principal_due                = i_num > 0 ? scheduled[:principal] : 0
-      scheduled_interest_due                 = i_num > 0 ? scheduled[:interest] : 0
-      outstanding                            = [:disbursed, :outstanding].include?(st)
-      total_principal_due                   += outstanding ? scheduled[:principal].round(2) : 0
-      total_interest_due                    += outstanding ? scheduled[:interest].round(2) : 0
-      principal_due                          = outstanding ? [total_principal_due - act_total_principal_paid,0].max : 0
-      interest_due                           = outstanding ? [total_interest_due - act_total_interest_paid,0].max : 0
-      actual_outstanding_principal           = outstanding ? actual[:balance].round(2) : 0
 
-      advance_principal_outstanding          = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max
-      advance_interest_outstanding           = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
+      scheduled_principal_due                = outstanding_at_start ? (i_num > 0 ? scheduled[:principal] : 0) : 0
+      scheduled_interest_due                 = outstanding_at_start ? (i_num > 0 ? scheduled[:interest] : 0) : 0
+      total_principal_due                   += outstanding_at_start ? scheduled[:principal].round(2) : 0
+      total_interest_due                    += outstanding_at_start ? scheduled[:interest].round(2) : 0
+      principal_due                          = outstanding_at_start ? [total_principal_due - act_total_principal_paid,0].max : 0
+      interest_due                           = outstanding_at_start ? [total_interest_due - act_total_interest_paid,0].max : 0
+
+      actual_outstanding_principal           = outstanding ? actual[:balance].round(2) : 0
+      actual_outstanding_total               = outstanding ? actual[:total_balance].round(2) : 0
+      actual_outstanding_interest            = outstanding ? (actual_outstanding_total - actual_outstanding_principal) : 0
+
+      debugger if date == Date.new(2011,9,7)
+      _apo                                   = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max # advance principal outstanding at the start
+      _api                                   = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
+      advance_principal_outstanding          = outstanding ?  _apo : 0
+      advance_interest_outstanding           = outstanding ?  _api : 0
       total_advance_outstanding              = advance_interest_outstanding + advance_principal_outstanding
-      advance_principal_paid_today           = last_row ? [0,advance_principal_outstanding - (last_row[:advance_principal_outstanding] || 0)].max : 0
-      advance_interest_paid_today            = last_row ? [0,advance_interest_outstanding -  (last_row[:advance_interest_outstanding] || 0)].max   : 0
+      advance_principal_paid_today           = outstanding_at_start ? (last_row ? [0,_apo - (last_row[:advance_principal_outstanding] || 0)].max : 0) : 0
+      advance_interest_paid_today            = outstanding_at_start ? (last_row ? [0,_api -  (last_row[:advance_interest_outstanding] || 0)].max   : 0) : 0
       total_advance_paid_today               = advance_principal_paid_today + advance_interest_paid_today
       advance_principal_paid                += advance_principal_paid_today
+      advance_principal_paid                 = outstanding_at_start ? advance_principal_paid : 0
       advance_interest_paid                 += advance_interest_paid_today
+      advance_interest_paid                  = outstanding_at_start ? advance_interest_paid  : 0
       total_advance_paid                     = advance_principal_paid + advance_interest_paid 
 
-      advance_principal_adjusted             = advance_principal_paid - advance_principal_outstanding
+      advance_principal_adjusted             = outstanding_at_start ? advance_principal_paid - advance_principal_outstanding : 0
       advance_interest_adjusted              = advance_interest_paid  - advance_interest_outstanding
-      advance_principal_adjusted_today       = last_row ? [0, advance_principal_adjusted - last_row[:advance_principal_adjusted]].max : 0
-      advance_interest_adjusted_today        = last_row ? [0, advance_interest_adjusted - last_row[:advance_principal_adjusted]].max  : 0
+      advance_principal_adjusted_today       = outstanding_at_start ? (last_row ? [0, _apo - last_row[:advance_principal_adjusted]].max : 0) : 0
+      advance_interest_adjusted_today        = outstanding_at_start ? (last_row ? [0, _api - last_row[:advance_principal_adjusted]].max  : 0) : 0
       total_advance_adjusted_today           = advance_interest_adjusted_today + advance_principal_adjusted_today
 
       total_fees_due                         = ap_fees.select{|dt,af| dt <= date}.to_hash.values.sum || 0
@@ -1220,7 +1237,8 @@ class Loan
         :scheduled_outstanding_principal     => scheduled[:balance].round(2),
         :scheduled_outstanding_total         => scheduled[:total_balance].round(2),
         :actual_outstanding_principal        => actual_outstanding_principal,
-        :actual_outstanding_total            => outstanding ? actual[:total_balance].round(2) : 0,
+        :actual_outstanding_total            => actual_outstanding_total,
+        :actual_outstanding_interest         => actual_outstanding_interest,
         :amount_in_default                   => actual[:balance].round(2) - scheduled[:balance].round(2),
         :principal_in_default                => principal_in_default,
         :interest_in_default                 => interest_in_default,
@@ -1397,13 +1415,6 @@ class Loan
       return status, _pmts
     end
     _ps  = self.payments(:type => [:principal, :interest])
-    if only_schedule_mismatches
-      # i.e. we are only interested in correcting the principal interest split to match with the "schedule" and not actually reallocating the loan payments to a different style
-      _ps = _ps.select do |p|
-        _info = info(p.received_on)
-        p.amount != (p.type == :principal ? _info[:scheduled_principal_due] : _info[:scheduled_interest_due])
-      end
-    end
     ph = _ps.group_by{|p| p.received_on}.to_hash
     _pmts = []
     self.payments_hash([])
@@ -1423,16 +1434,15 @@ class Loan
     end.to_hash
     statii = []
     _t = DateTime.now
-    debugger if $debug
     # then delete all payments and recalculate a virgin loan_history
     ds = _ps.map{|p| p.deleted_by = user; p.deleted_at = _t; p.destroy}
     reload
     update_history
     clear_cache
     # then make the payments again
-    $debug = true
     pmt_details.keys.sort.each do |date|
       details = pmt_details[date]
+      reload
       pmts = repay(details[:total], details[:user], date, details[:received_by], false, style, :reallocate, nil, nil)
       clear_cache
       statii.push(pmts[0])
