@@ -87,7 +87,7 @@ Merb::Router.prepare do
   resources :center_meeting_days
   resources :repayment_styles
 
-  resources :uploads, :member => {:continue => [:get], :reset => [:get], :show_csv => [:get], :reload => [:get]} do
+  resources :uploads, :member => {:continue => [:get], :reset => [:get], :show_csv => [:get], :reload => [:get], :extract => [:get], :stop => [:get]} do
     resources :checkers, :collection => {:recheck => [:get]}
   end
 

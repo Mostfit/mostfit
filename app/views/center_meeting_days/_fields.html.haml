@@ -1,20 +1,35 @@
 = hidden_field :center_id
-= @cmd.center.name
-meets
-every
-= select :meeting_day, :collection => Center::DAYS.map{|d|d.to_s}, :selected => @cmd.meeting_day.to_s
-%br
-%b OR
-%br
-every
-= text_field :every
-- options = [['day', 'day']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
-= select :what, :collection => options
-of every
-= text_field :of_every
-= select :period, :collection => ["week", "month"]
-%br
-valid from
-= date_select_for @cmd, :valid_from
-to
-= date_select_for @cmd, :valid_upto
+%table{:style => "width: 80%"}
+  %tr
+    %td
+      %b
+        = @cmd.center.name
+      meets
+      every
+    %td
+      = select :meeting_day, :collection => Center::DAYS.map{|d|d.to_s}, :selected => @cmd.meeting_day.to_s
+      %br
+      %br
+        %b OR
+      %br
+        %span.greytext eg. Meeting every 1,3 Friday of every 1 month
+      %br
+        every
+        &nbsp;
+        = text_field :every
+        - options = [['day', 'day']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
+        &nbsp;
+        = select :what, :collection => options
+        of every
+        &nbsp;
+        = text_field :of_every
+        &nbsp;
+        = select :period, :collection => ["week", "month"]
+        %br
+          valid from:
+          &nbsp;
+          = date_select_for @cmd, :valid_from
+          &nbsp;
+          to
+          &nbsp;
+          = date_select_for @cmd, :valid_upto

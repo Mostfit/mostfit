@@ -4,4 +4,10 @@
   %h1 Create new center
   = error_messages_for @center
   %fieldset
-    = partial("centers/fields", :submit_text => 'Create new center', :cancel_url => cancel_url)
+    = partial "centers/fields"
+    = submit "Create new center"
+    &nbsp;&nbsp;&nbsp;
+    %b
+      Or
+    &nbsp;&nbsp;&nbsp;
+    = link_to 'Cancel', cancel_url

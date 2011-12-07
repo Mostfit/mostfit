@@ -57,7 +57,7 @@ class CenterMeetingDay
   end
 
   def meeting_day_string
-    return "every #{every} #{what.join(',')} of every #{of_every} #{period}" unless [every,what,of_every,period].include?(nil)
+    return "#{every.join(',')} #{what.join(',')} of every #{of_every} #{period}" unless [every,what,of_every,period].include?(nil)
     return meeting_day.to_s
 
   end
@@ -74,7 +74,8 @@ class CenterMeetingDay
   validates_with_method :check_not_last, :if => Proc.new{|t| t.deleted_at}
 
   def check_not_last
-    return true if deleted_at
+    return true unless center
+    return true unless deleted_at
     return [false,"cannot delete the last center meeting date"] if (self.center.center_meeting_days.count == 1 and (self.center.meeting_day == :none or (not self.center.meeting_day)))
   end
   
@@ -101,7 +102,7 @@ class CenterMeetingDay
 
   def meeting_day_string
     return meeting_day.to_s if meeting_day and meeting_day != :none
-    "every #{every} #{(what or Nothing).join(',')} of every #{of_every} #{period}"
+    "#{every.join(',')} #{(what or Nothing).join(',')} of every #{of_every} #{period}"
   end
 
   def to_s
@@ -123,6 +124,7 @@ class CenterMeetingDay
   # checks that for a given center, the valid_from and valid_to dates for this center do not overlap with another center_meeting_day
   def dates_do_not_overlap
     return true if deleted_at
+    return true unless self.center
     cmds = self.center.center_meeting_days
     return true if cmds.count == 0
     return true if cmds.count == 1 and cmds.first.id == self.id
