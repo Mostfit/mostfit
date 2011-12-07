@@ -2,12 +2,14 @@
   == Center Meeting Schedule for center #{@center.name}
 
 .menu-strip
-  = link_to 'add', url(:new_center_center_meeting_day, @center)
+  = link_to 'add', url(:new_center_center_meeting_day, @center), :class => 'add'
 %table
   - @center_meeting_days.each do |cmd|
     %tr
       %td
         = cmd
+        &nbsp;
         = link_to 'edit', resource(cmd, :edit)
         - if @center_meeting_days.count > 1
+          |
           = link_to 'delete', url(:controller => "application", :action => "delete", :id => cmd.id, :model => "center_meeting_days", :return => "/branches/#{@center.branch.id}/centers/#{@center.id}")
