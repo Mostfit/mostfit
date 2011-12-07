@@ -17,7 +17,6 @@ class Cachers < Application
   end
   
   def generate
-    debugger
     if @from_date and @to_date
       (@from_date..@to_date).each{|date| BranchCache.update(date)}
     else

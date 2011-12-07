@@ -251,12 +251,10 @@ class Loan
 
   def self.from_csv(row, headers)
     interest_rate = (row[headers[:interest_rate]].to_f>1 ? row[headers[:interest_rate]].to_f/100 : row[headers[:interest_rate]].to_f)
-    debugger
     keys = [:product, :amount, :installment_frequency, :number_of_installments, :scheduled_disbursal_date, :scheduled_first_payment_date,
             :applied_on, :approved_on, :disbursal_date, :funding_line_serial_number, :applied_by_staff, :approved_by_staff, :repayment_style,
             :center, :reference, :client_reference]
     missing_keys = keys - headers.keys
-    debugger
     raise ArgumentError.new("missing keys #{missing_keys.join(',')}") unless missing_keys.blank?
     hash = {
       :loan_product                       => LoanProduct.first(:name => row[headers[:product]]), 
@@ -282,7 +280,6 @@ class Loan
     obj.history_disabled=true
     saved = obj.save!
     if saved
-      debugger
       c = Checker.first_or_new(:model_name => "Loan", :reference => obj.reference)
       c.check_field = row[headers[:check_field]]
       c.as_on = Date.parse(row[headers[:arguments]])

@@ -79,7 +79,6 @@ class Branches < Application
   end
 
   def centers
-    debugger
     if params[:id] 
       branch = Branch.get(params[:id])
       next unless branch

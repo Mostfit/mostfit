@@ -16,7 +16,6 @@ namespace :mostfit do
   namespace :data do
     desc "read all excel files in a directory and process them"
     task :check_all_checkers, :upload_id do |task, args|
-      debugger
       select = {:ok => false}.merge( args[:upload_id] ? {:upload_id => args[:upload_id]} : {})
       cids = Checker.all(select).aggregate(:id)
       count = cids.count
