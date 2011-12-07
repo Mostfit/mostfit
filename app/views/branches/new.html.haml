@@ -4,4 +4,10 @@
   %h1 Create a new branch
   = error_messages_for @branch
   %fieldset 
-    = partial "branches/fields", :submit_text => "Create branch", :cancel_url => cancel_url
+    = partial "branches/fields"
+    = submit "Create branch"
+    &nbsp;&nbsp;&nbsp;
+    %b
+      Or
+    &nbsp;&nbsp;&nbsp;
+    = link_to 'Cancel', cancel_url

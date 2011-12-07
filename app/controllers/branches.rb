@@ -58,7 +58,7 @@ class Branches < Application
     @branch = Branch.get(id)
     raise NotFound unless @branch
     if @branch.update_attributes(branch)
-      redirect(params[:return]||resource(:branches), :message => {:notice => "Branch '#{@branch.name}' (Id:#{@branch.id}) has been edited successfully"})
+      redirect(params[:return]||resource(@branch), :message => {:notice => "Branch '#{@branch.name}' (Id:#{@branch.id}) has been edited successfully"})
     else
       display @branch, :edit  # error messages will show
     end
