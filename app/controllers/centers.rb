@@ -92,6 +92,7 @@ class Centers < Application
   end
 
   def create(center)
+    debugger
     @center_meeting_day = CenterMeetingDay.new(center.delete(:center_meeting_day))
     @center_meeting_day.valid_from = center[:creation_date]
     @center_meeting_day.valid_upto = Date.new(2100,12,31)

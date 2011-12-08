@@ -30,12 +30,9 @@ class CenterMeetingDay
 
   before :valid?, :convert_blank_to_nil
   
-  def check_not_last
-    raise ArgumentError.new("Cannot delete the only center meeting schedule") if self.center.center_meeting_days.count == 1
-  end
   
   def either_meeting_day_or_date_vector
-    date_vector_valid = every and what and of_every and period
+    date_vector_valid = every and (not every.blank?) and what and (not what.blank?) and of_every and (not of_every.blank?) and period and (not period.blank?)
     return true if meeting_day or date_vector_valid
     return [false, 'Choose either a meeting day or a scheme to set up a schedule']
   end
@@ -56,11 +53,6 @@ class CenterMeetingDay
     get_dates(from, n)
   end
 
-  def meeting_day_string
-    return "#{every.join(',')} #{what.join(',')} of every #{of_every} #{period}" unless [every,what,of_every,period].include?(nil)
-    return meeting_day.to_s
-
-  end
 
   def to_s
     "from #{valid_from} to #{valid_upto} : #{meeting_day_string}"
@@ -74,9 +66,11 @@ class CenterMeetingDay
   validates_with_method :check_not_last, :if => Proc.new{|t| t.deleted_at}
 
   def check_not_last
+    debugger
     return true unless center
     return true unless deleted_at
     return [false,"cannot delete the last center meeting date"] if (self.center.center_meeting_days.count == 1 and (self.center.meeting_day == :none or (not self.center.meeting_day)))
+    return true
   end
   
   def last_date
@@ -102,7 +96,7 @@ class CenterMeetingDay
 
   def meeting_day_string
     return meeting_day.to_s if meeting_day and meeting_day != :none
-    "#{every.join(',')} #{(what or Nothing).join(',')} of every #{of_every} #{period}"
+    "#{every.join(',')} #{(what or Nothing).join(',')} of every #{of_every} #{period}" rescue meeting_day
   end
 
   def to_s
@@ -187,10 +181,11 @@ class CenterMeetingDay
 
   def convert_blank_to_nil
     self.attributes.each{|k, v|
-      if v.is_a?(String) and v.empty? and self.class.properties.find{|x| x.name == k}.type==Integer
+      if v.is_a?(String) and v.empty? and [Integer, Enum].include?(self.class.properties.find{|x| x.name == k}.type)
         self.send("#{k}=", nil)
       end
     }
+    self.period = self.period.to_sym rescue nil
   end
 
 
