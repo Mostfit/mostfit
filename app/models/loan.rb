@@ -1282,7 +1282,9 @@ class Loan
         :created_at                          => now,
         :funding_line_id                     => funding_line_id,
         :loan_product_id                     => loan_product_id,
-        :days_overdue                        => days_overdue
+        :days_overdue                        => days_overdue,
+        :outstanding_count                   => outstanding ? 1 : 0,
+        :outstanding                         => actual_outstanding_principal
       }
       # {:date_field => [:status, :loan_property]}
       {:applied_on => [:applied, :amt_applied_for], :approved_on => [:approved, :amt_sanctioned], :rejected_on => [:rejected, :amount], 
