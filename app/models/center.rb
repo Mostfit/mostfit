@@ -137,11 +137,11 @@ class Center
     if @meeting_days.length==0
       meeting_day
     elsif date_row = @meeting_days.find{|md| md.valid_from <= date and md.valid_upto >= date} 
-      (date_row.meeting_day_string)
+      (date_row.meeting_wday)
     elsif @meeting_days[0].valid_from > date
-      (@meeting_days[0].meeting_day_string)
+      (@meeting_days[0].meeting_wday)
     else
-      (@meeting_days[-1].meeting_day_string)
+      (@meeting_days[-1].meeting_wday)
     end
   end
   

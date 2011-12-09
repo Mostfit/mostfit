@@ -20,9 +20,11 @@ class CenterMeetingDay
   # this is the kind of feature that sets Mostfit miles apart from the rest of the pack!
 
   property :every, CommaSeparatedList 
-  property :what, CommaSeparatedList
+  property :what, Enum.send('[]',*([:day] + DAYS[1..-1]))
   property :of_every, Integer
   property :period, Enum[nil,:week, :month], :nullable => true
+
+  property :new_what, String
 
   validates_with_method :either_meeting_day_or_date_vector
   
@@ -97,6 +99,13 @@ class CenterMeetingDay
   def meeting_day_string
     return meeting_day.to_s if meeting_day and meeting_day != :none
     "#{every.join(',')} #{(what or Nothing).join(',')} of every #{of_every} #{period}" rescue meeting_day
+  end
+
+  def meeting_wday
+    # returns only the weekday of the meeting day
+    return meeting_day if meeting_day and meeting_day != :none
+    return what if what != :day
+    return meeting_day
   end
 
   def to_s

@@ -55,14 +55,15 @@ class Branch
     elsif user.role == :funder 
       hash[:id] = Funder.first(:user_id => user.id).centers({:branch_id => self.id}).map{|c| c.id}
     end
-    mday = (params[:meeting_day] or Nothing).to_sym
-    if mday and Center::DAYS.include?(mday)
-      # find the weekday of this week
-      date = Date.today - Date.today.cwday + (mday == :sunday ? 0 : Center::DAYS.index(mday))
-    else
-      date = Date.today
+    branch_center_ids = self.centers.aggregate(:id)
+    mday = (params[:meeting_day] or Nothing).to_sym || Date.today.weekday
+    debugger
+    if Center::DAYS.include?(mday)
+      cids = self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :meeting_day => mday).aggregate(:center_id)
+      cids += self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :what => mday).aggregate(:center_id)
+      branch_center_ids -= cids
+      cids += Center.all(:id => branch_center_ids, :meeting_day => mday).aggregate(:id) unless branch_center_ids.blank?
     end
-    cids = LoanHistory.all(:date => date, :branch_id => id).aggregate(:center_id)
     hash[:id]= cids
     Center.all(hash)
   end
