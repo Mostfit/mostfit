@@ -9,7 +9,7 @@ require 'yaml'
 dump_path = ARGV[0]
 
 # db_name is on the local machine
-config  = YAML.load_file(File.join( 'config', 'database.yml'))
+config  = YAML.load_file(File.join('config', 'database.yml'))
 db_name = config['production']['database'] rescue nil
 
 username = config['production']['username']

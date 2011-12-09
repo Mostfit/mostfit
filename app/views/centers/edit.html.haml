@@ -5,4 +5,10 @@
   %h1== Edit the '#{@center.name}' center
   = error_messages_for @center
   %fieldset
-    = partial("centers/fields", :submit_text => "Save changes", :cancel_url => cancel_url)
+    = partial "centers/fields"
+    = submit "Save Changes"
+    &nbsp;&nbsp;&nbsp;
+    %b
+      Or
+    &nbsp;&nbsp;&nbsp;
+    = link_to 'Cancel', cancel_url
