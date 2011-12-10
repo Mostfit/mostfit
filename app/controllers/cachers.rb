@@ -89,7 +89,7 @@ class Cachers < Application
   private
   
   def parse_dates
-    {:date => Date.today, :from_date => Date.today - 7, :to_date => Date.today}.each do |date, default|
+    {:date => nil, :from_date => Date.today - 7, :to_date => Date.today}.each do |date, default|
       instance_variable_set("@#{date.to_s}", (params[date] ? (params[date].is_a?(Hash) ? Date.new(params[date][:year].to_i, params[date][:month].to_i, params[date][:day].to_i) : Date.parse(params[date])) : nil))
     end
     @date = (@to_date or Date.today) unless @date

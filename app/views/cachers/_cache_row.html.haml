@@ -4,6 +4,8 @@
   - @keys.each do |at|
     - val = cache.send(at) rescue 0
     %td{:style => "text-align: right", :class => "#{at} text"}
+      - if at.to_s.match(/count$/)
+        - val = val.to_i
       - if at == :date
         = link_to val.strftime("%Y/%m/%d"), resource(:cachers, request.send(:query_params).merge(:date => val))
         - date = val
