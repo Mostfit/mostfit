@@ -12,13 +12,6 @@ class CenterMeetingDays < Application
     display @cmd
   end
   
-  def update(center_meeting_day)
-    @cmd = CenterMeetingDay.get(params[:id])
-    raise NotFound unless @cmd
-    @cmd.update(center_meeting_day)
-    redirect resource(@cmd), :message => {:notice => "Success!"}
-  end
-  
   def new
     @center = Center.get(params[:center_id])
     @cmd = CenterMeetingDay.new(:center => @center)
@@ -42,6 +35,7 @@ class CenterMeetingDays < Application
   
   
   def update(id, center_meeting_day)
+    debugger
     center_meeting_day[:valid_from] = Date.parse(center_meeting_day[:valid_from])
     center_meeting_day[:valid_upto] = Date.parse(center_meeting_day[:valid_upto])
     @cmd = CenterMeetingDay.get(id)

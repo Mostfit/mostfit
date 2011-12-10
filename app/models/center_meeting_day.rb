@@ -20,38 +20,23 @@ class CenterMeetingDay
   # this is the kind of feature that sets Mostfit miles apart from the rest of the pack!
 
   property :every, CommaSeparatedList 
-  property :what, CommaSeparatedList
+  property :what, Enum.send('[]',*([:day] + DAYS[1..-1]))
   property :of_every, Integer
-  property :period, Enum[:week, :month]
+  property :period, Enum[nil,:week, :month], :nullable => true
+
+  property :new_what, String
+
+  validates_with_method :either_meeting_day_or_date_vector
   
   belongs_to :center
 
   before :valid?, :convert_blank_to_nil
-
-  def check_not_last
-    raise ArgumentError.new("Cannot delete the only center meeting schedule") if self.center.center_meeting_days.count == 1
-  end
   
-
-  # adding the new properties to calculate the datevector for this center.
-  # for now we will allow only one datevector type per center. This means a center can only have one meeting schedule frequency
   
-  def date_vector(from = self.valid_from, to = self.valid_upto)
-    DateVector.new(every, what.map{|w| w.to_sym}, of_every, period.to_sym, from, to)
-  end
-
-  def get_dates(from = self.valid_from, to = self.valid_upto)
-    date_vector(from, to).get_dates
-  end
-
-  def get_next_n_dates(n, from = self.valid_from)
-    get_dates(from, n)
-  end
-
-  def meeting_day_string
-    return "every #{every} #{what.join(',')} of every #{of_every} #{period}" unless [every,what,of_every,period].include?(nil)
-    return meeting_day.to_s
-
+  def either_meeting_day_or_date_vector
+    date_vector_valid = every and (not every.blank?) and what and (not what.blank?) and of_every and (not of_every.blank?) and period and (not period.blank?)
+    return true if meeting_day or date_vector_valid
+    return [false, 'Choose either a meeting day or a scheme to set up a schedule']
   end
 
   def to_s
@@ -69,16 +54,18 @@ class CenterMeetingDay
     return true unless center
     return true unless deleted_at
     return [false,"cannot delete the last center meeting date"] if (self.center.center_meeting_days.count == 1 and (self.center.meeting_day == :none or (not self.center.meeting_day)))
+    return true
   end
   
   def last_date
     valid_upto || Date.new(2100,12,31)
   end
 
-
+  # adding the new properties to calculate the datevector for this center.
+  # for now we will allow only one datevector type per center. This means a center can only have one meeting schedule frequency
   def date_vector(from = self.valid_from, to = last_date)
     if every and what and of_every and period
-      DateVector.new(every, what.map{|w| w.to_sym}, of_every, period.to_sym, from, to)
+      DateVector.new(every, what, of_every, period.to_sym, from, to)
     else
       DateVector.new(1,meeting_day, 1, :week, from, to)
     end
@@ -94,7 +81,14 @@ class CenterMeetingDay
 
   def meeting_day_string
     return meeting_day.to_s if meeting_day and meeting_day != :none
-    "every #{every} #{(what or Nothing).join(',')} of every #{of_every} #{period}"
+    "#{every.join(',')} #{what} of every #{of_every} #{period}" rescue meeting_day
+  end
+
+  def meeting_wday
+    # returns only the weekday of the meeting day
+    return meeting_day if meeting_day and meeting_day != :none
+    return what if what != :day
+    return meeting_day
   end
 
   def to_s
@@ -179,10 +173,11 @@ class CenterMeetingDay
 
   def convert_blank_to_nil
     self.attributes.each{|k, v|
-      if v.is_a?(String) and v.empty? and self.class.properties.find{|x| x.name == k}.type==Integer
+      if v.is_a?(String) and v.empty? and [Integer, Enum].include?(self.class.properties.find{|x| x.name == k}.type)
         self.send("#{k}=", nil)
       end
     }
+    self.period = self.period.to_sym rescue nil
   end
 
 

@@ -17,6 +17,7 @@ namespace :mostfit do
     desc "convert intellecash db to takeover-intellecash"
     task :convert_sahayog do
       puts "upgrading"
+      repository.adapter.execute("drop table loan_history")
       Rake::Task['db:autoupgrade'].invoke
       puts "done"
       # add repayment styles to loan products
@@ -27,6 +28,11 @@ namespace :mostfit do
         cmd = CenterMeetingDay.all(:center => c).last
         cmd.update(:every => "1", :what => cmd.meeting_day.to_s, :of_every => 1, :period => :week, :valid_from => cmd.valid_from + 1)
       end
+      puts "done with normal stuff"
+      # run the standard conversion script
+      repository.adapter.execute("update loans set discriminator='Loan'")
+      repository.adapter.execute('alter table loan_history drop column scheduled_principal_to_be_paid') rescue nil
+      repository.adapter.execute('alter table loan_history drop column scheduled_interest_to_be_paid') rescue nil
       Rake::Task['mostfit:conversion:to_new_layout'].invoke
     end
   end
