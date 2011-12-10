@@ -20,9 +20,11 @@ class CenterMeetingDay
   # this is the kind of feature that sets Mostfit miles apart from the rest of the pack!
 
   property :every, CommaSeparatedList 
-  property :what, CommaSeparatedList
+  property :what, Enum.send('[]',*([:day] + DAYS[1..-1]))
   property :of_every, Integer
   property :period, Enum[nil,:week, :month], :nullable => true
+
+  property :new_what, String
 
   validates_with_method :either_meeting_day_or_date_vector
   
@@ -37,23 +39,6 @@ class CenterMeetingDay
     return [false, 'Choose either a meeting day or a scheme to set up a schedule']
   end
 
-
-  # adding the new properties to calculate the datevector for this center.
-  # for now we will allow only one datevector type per center. This means a center can only have one meeting schedule frequency
-  
-  def date_vector(from = self.valid_from, to = self.valid_upto)
-    DateVector.new(every, what.map{|w| w.to_sym}, of_every, period.to_sym, from, to)
-  end
-
-  def get_dates(from = self.valid_from, to = self.valid_upto)
-    date_vector(from, to).get_dates
-  end
-
-  def get_next_n_dates(n, from = self.valid_from)
-    get_dates(from, n)
-  end
-
-
   def to_s
     "from #{valid_from} to #{valid_upto} : #{meeting_day_string}"
   end
@@ -66,7 +51,6 @@ class CenterMeetingDay
   validates_with_method :check_not_last, :if => Proc.new{|t| t.deleted_at}
 
   def check_not_last
-    debugger
     return true unless center
     return true unless deleted_at
     return [false,"cannot delete the last center meeting date"] if (self.center.center_meeting_days.count == 1 and (self.center.meeting_day == :none or (not self.center.meeting_day)))
@@ -77,10 +61,11 @@ class CenterMeetingDay
     valid_upto || Date.new(2100,12,31)
   end
 
-
+  # adding the new properties to calculate the datevector for this center.
+  # for now we will allow only one datevector type per center. This means a center can only have one meeting schedule frequency
   def date_vector(from = self.valid_from, to = last_date)
     if every and what and of_every and period
-      DateVector.new(every, what.map{|w| w.to_sym}, of_every, period.to_sym, from, to)
+      DateVector.new(every, what, of_every, period.to_sym, from, to)
     else
       DateVector.new(1,meeting_day, 1, :week, from, to)
     end
@@ -96,7 +81,14 @@ class CenterMeetingDay
 
   def meeting_day_string
     return meeting_day.to_s if meeting_day and meeting_day != :none
-    "#{every.join(',')} #{(what or Nothing).join(',')} of every #{of_every} #{period}" rescue meeting_day
+    "#{every.join(',')} #{what} of every #{of_every} #{period}" rescue meeting_day
+  end
+
+  def meeting_wday
+    # returns only the weekday of the meeting day
+    return meeting_day if meeting_day and meeting_day != :none
+    return what if what != :day
+    return meeting_day
   end
 
   def to_s

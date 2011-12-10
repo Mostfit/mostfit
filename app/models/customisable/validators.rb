@@ -120,7 +120,7 @@ module Misfit
 	  return true
 	end
 	  
-	if date = instance_eval(d) and not date.weekday == center.meeting_day_for(date)
+	if date = instance_eval(d) and not date.weekday == center.meeting_day_for(date).to_sym
           failed << d.humanize
           correct_weekday = center.meeting_day_for(date)
         end
