@@ -124,7 +124,7 @@ class Cachers < Application
     @last_cache_update = @cachers.aggregate(:updated_at.min)
     @resource = params[:action] == "index" ? :cachers : (params[:action].to_s + "_" + "cachers").to_sym
     @keys = [:branch_id, :center_id] + (ReportFormat.get(params[:report_format]) || ReportFormat.first).keys
-    @total_keys = @keys[3..-1]
+    @total_keys = @keys[2..-1]
     if @resource == :split_cachers
       @level = params[:center_id].blank? ? :branches : :centers
       @keys = [:date] + @keys
