@@ -10,9 +10,9 @@ class Loan
   before :valid?,  :parse_dates
   before :valid?,  :convert_blank_to_nil
   after  :save,    :update_history_caller  # also seems to do updates
+  before :save,    :update_loan_cache
   after  :create,  :levy_fees_new          # we need a separate one for create for a variety of reasons to  do with overwriting old fees
   before :save,    :levy_fees
-  before :save,    :update_loan_cache
   after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
   before :valid?,    :set_loan_product_parameters
