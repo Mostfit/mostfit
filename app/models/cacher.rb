@@ -76,6 +76,9 @@ class Cacher
     principal_paid + interest_paid + fees_paid_today
   end
 
+  def total_due
+    principal_due + interest_due + fees_due_today
+  end
 
   def total_advance_paid_today
     advance_principal_paid_today + advance_interest_paid_today
