@@ -4,27 +4,27 @@
       Date
     %td
       = date_select_for @journal, :date
-  - if params[:credit_accounts]
-    - params[:credit_accounts].each_with_index do |ca, idx|
-      = partial "journals/account_amount", :account => ca, :account_type => :credit_accounts, :last_account => (params[:debit_accounts].length == idx + 1 ? true : false)
-  - else
-    = partial "journals/account_amount", :account => {}, :account_type => :credit_accounts, :last_account => true
   - if params[:debit_accounts]
     - params[:debit_accounts].each_with_index do |ca, idx|
       = partial "journals/account_amount", :account => ca, :account_type => :debit_accounts, :last_account => (params[:debit_accounts].length == idx + 1 ? true : false)
   - else
     = partial "journals/account_amount", :account => {}, :account_type => :debit_accounts, :last_account => true
+  - if params[:credit_accounts]
+    - params[:credit_accounts].each_with_index do |ca, idx|
+      = partial "journals/account_amount", :account => ca, :account_type => :credit_accounts, :last_account => (params[:debit_accounts].length == idx + 1 ? true : false)
+  - else
+    = partial "journals/account_amount", :account => {}, :account_type => :credit_accounts, :last_account => true
   %tr
     %td
       Narration
     %td
-      =text_field :comment
+      = text_area :comment
   %tr
     %td
       Transaction ID
     %td
-      =text_field :transaction_id
-      =text_field :journal_type_id, :value => @journal_type.nil? ? 1 : @journal_type.id, :hidden => true
+      = text_field :transaction_id
+      = text_field :journal_type_id, :value => @journal_type.nil? ? 1 : @journal_type.id, :hidden => true
 
 %p
   = submit "Create"

@@ -4,4 +4,10 @@
   %h1== Edit the '#{@branch.name}' branch details
   = error_messages_for @branch
   %fieldset 
-    = partial "branches/fields", :submit_text => "Save changes", :cancel_url => cancel_url
+    = partial "branches/fields"
+    = submit "Save Changes"
+    &nbsp;&nbsp;&nbsp;
+    %b
+      Or
+    &nbsp;&nbsp;&nbsp;
+    = link_to 'Cancel', cancel_url

@@ -53,8 +53,8 @@
     %ul.tabs
       %li#centers
         Centers
-      %li#info
-        Info
+      -# %li#info
+        -# Info
       %li#exceptions
         Exceptions
       %li#documents
@@ -85,8 +85,8 @@
         =partial "centers/list"
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@branch.id}?for=branch"}
-    %div.tab
-      %input{:type => "hidden", :name => "_load_remote", :value => "/info/exceptions/#{@branch.id}?for=branch"}
+    -# %div.tab
+      -# %input{:type => "hidden", :name => "_load_remote", :value => "/info/exceptions/#{@branch.id}?for=branch"}
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @branch.id, :parent_model => Branch)}
     %div.tab

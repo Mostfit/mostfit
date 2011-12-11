@@ -20,7 +20,7 @@ class LateDisbursalsReport < Report
     hash_non_disbursed[:loan_product_id] = loan_product_id if loan_product_id
     hash_non_disbursed[:approved_on.not]  = nil if not @include_unapproved_loans or @include_unapproved_loans == 0
     loans = Loan.all(hash_non_disbursed)
-
+    branches_and_centers = loans.aggregate(:c_branch_id, :c_center_id)
     r = { }
     @branch.each do |b|
       r[b] = { }

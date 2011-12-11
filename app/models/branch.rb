@@ -30,6 +30,7 @@ class Branch
   property   :parent_domain_guid, String, :nullable => true
 
   validates_is_unique   :code
+  validates_is_unique   :name
   validates_length      :code, :min => 1, :max => 10
 
   validates_length      :name, :min => 3
@@ -37,9 +38,8 @@ class Branch
   validates_with_method :manager, :method => :manager_is_an_active_staff_member?
 
   def self.from_csv(row, headers)
-    obj = new(:code => row[headers[:code]], :name => row[headers[:name]], :address => row[headers[:address]],
-              :creation_date => Date.parse(row[headers[:creation_date]]),
-              :manager => StaffMember.first(:name => row[headers[:manager]]))
+    obj = new(:code => row[headers[:code]], :name => row[headers[:name]], :address => row[headers[:address]], 
+              :manager => StaffMember.first(:name => row[headers[:manager]]), :upload_id => row[headers[:upload_id]])
     [obj.save, obj]
   end
 
@@ -55,13 +55,19 @@ class Branch
     elsif user.role == :funder 
       hash[:id] = Funder.first(:user_id => user.id).centers({:branch_id => self.id}).map{|c| c.id}
     end
-
-    if params[:meeting_day] and Center::DAYS.include?(params[:meeting_day].to_sym)
-      hash[:meeting_day]= params[:meeting_day].to_sym
-    else
-      hash[:meeting_day]=Date.today.weekday
+    branch_center_ids = self.centers.aggregate(:id)
+    mday = (params[:meeting_day] or Nothing).to_sym || Date.today.weekday
+    debugger
+    if Center::DAYS.include?(mday)
+      # either the meeting day is set directly on the center_meeting_day
+      cids = self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :meeting_day => mday).aggregate(:center_id)
+      # or it is set on the "what" property. effing backward compatibility!
+      cids += (self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :what => mday).aggregate(:center_id) &
+               self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :meeting_day => :none).aggregate(:center_id))
+      branch_center_ids -= cids
+      cids += Center.all(:id => branch_center_ids, :meeting_day => mday).aggregate(:id) unless branch_center_ids.blank?
     end
-
+    hash[:id]= cids
     Center.all(hash)
   end
 
@@ -107,7 +113,7 @@ class Branch
     # go up the chain and find the first calendar that applies.
     hc = HolidayCalendar.all(:branch_id => id)
     hc = HolidayCalendar.all(:area_id => area_id) if hc.blank?
-    hc = HolidayCalendar.all(:region_id => area.region_id) if hc.blank?
+    hc = HolidayCalendar.all(:region_id => area.region_id) if (hc.blank? and area)
     hc.holidays_fors.holidays
   end
 

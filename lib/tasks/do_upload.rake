@@ -6,6 +6,13 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'production')
 namespace :mostfit do
   desc "Create DB from excel sheet"
   task :upload, :directory, :filename, :erase do |task, args|
+
+    # to run this rake task manually, invoke it as follows from the command line
+    # uuid should correspond to a directory in merb-root/uploads
+    # filename is the name of the escel file
+    # the third argument decides whether you want to destroy old data or not UNTESTED
+    # rake mostfit:upload["filename.xls","uuid","false"]
+
     require "log4r"
     #    include Log4r
     filename  = args[:filename]
@@ -21,7 +28,7 @@ namespace :mostfit do
     log.level = Log4r::INFO
 
     log.info("File has been uploaded to the server. Now processing it into a bunch of csv files")
-    puts `ruby #{Merb.root}/lib/tasks/excel.rb #{directory} #{filename}`
+    # puts `ruby #{Merb.root}/lib/tasks/excel.rb #{directory} #{filename}`
     log.info("CSV extraction complete. Processing files.")
     file.load_csv(log, args[:erase] == "true")
     log.info("CSV files are now loaded into the DB. Creating loan schedules. This may take a few minutes.")

@@ -68,7 +68,7 @@ class Report
        WHERE b.id=c.branch_id AND c.id=cl.center_id AND cl.id=l.client_id AND l.deleted_at is NULL AND cl.deleted_at is NULL AND l.rejected_on is NULL
              #{condition}
        GROUP BY #{by_query}
-    })    
+    })
   end
 
   def get_pdf
@@ -95,10 +95,10 @@ class Report
       tr.search("th").map{|td|
         [td.inner_text.strip => td.attributes["colspan"].blank? ? 1 : td.attributes["colspan"].to_i]
       }
-    }.map{|x| 
+    }.map{|x|
       x.reduce([]){|s,x| s+=x}
     }
-    
+
   end
 
   def process_conditions(conditions)
@@ -125,9 +125,9 @@ class Report
       return nil
     else
       return query
-    end    
+    end
   end
-  
+
   def get_operator(query, value)
     if query.respond_to?(:operator)
       case query.operator
@@ -162,7 +162,7 @@ class Report
       "NULL"
     else
       val
-    end    
+    end
   end
 
   def date_should_not_be_in_future
@@ -205,10 +205,10 @@ class Report
     end
 
     # if the user is a staff member or funder and center is not selected then pick all the managed centers
-    @center = 
+    @center =
       if user and not @center and (not params[:staff_member_id] or params[:staff_member_id].blank?)
         if staff and (not params[:staff_member_id] or params[:staff_member_id].blank?)
-          # if user is a staff and not staff member is selected then fill eligible staff members          
+          # if user is a staff and not staff member is selected then fill eligible staff members
           staff.related_centers
         elsif staff and params[:staff_member_id] and not params[:staff_member_id].blank?
           # if user is a staff and staff member is selected then fill eligible centers of staff member
@@ -242,6 +242,7 @@ class Report
     return true
   end
 
+  # this method builds an array of SQL query clauses
   def get_extra
     extra     = []
     extra    << "l.loan_product_id = #{self.loan_product_id}" if loan_product_id
@@ -254,7 +255,7 @@ class Report
       extra    << "lh.center_id in (#{@center.map{|c| c.id}.join(', ')})"
     end
 
-    if @report_by_loan_disbursed == 1 
+    if @report_by_loan_disbursed == 1
       extra    << "l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
     end
 
@@ -262,7 +263,7 @@ class Report
     if @funder
       funder_loan_ids = @funder.loan_ids
       funder_loan_ids = ["NULL"] if funder_loan_ids.length == 0
-      extra    << "l.id in (#{funder_loan_ids.join(", ")})" 
+      extra    << "l.id in (#{funder_loan_ids.join(", ")})"
     end
 
     #if funding_lines are selected
@@ -271,7 +272,7 @@ class Report
       funding_line_ids = ["NULL"] if funding_line_ids.length == 0
       extra   << "l.id in (#{funding_line_ids.join(", ")})"
     end
-    
+
     #if loan cycle_number is selected
     if @loan_cycle
       lc = @loan_cycle
@@ -299,7 +300,7 @@ class Report
       froms << "loans l"
       extra_condition += " and p.loan_id=l.id and l.disbursal_date >='#{from_date.strftime('%Y-%m-%d')}' and l.disbursal_date <='#{to_date.strftime('%Y-%m-%d')}'"
     end
-    
+
     if @funder
       froms << "loans l"
       extra_condition += " and p.loan_id=l.id" unless extra_condition.include?("and p.loan_id=l.id")
@@ -323,20 +324,20 @@ class Report
     [froms.uniq.join(", "), extra_condition]
   end
 
-  # This function adds corresponding rows of 'obj' in histories, advances, balances etc 
+  # This function adds corresponding rows of 'obj' in histories, advances, balances etc
   # to data hash at key obj.
   def add_outstanding_to(data, obj, histories, advances, balances, old_balances, defaults)
-    #0              1                 2                3              4              5     6                  7         8    9,10,11     12       
+    #0              1                 2                3              4              5     6                  7         8    9,10,11     12
     #amount_applied,amount_sanctioned,amount_disbursed,outstanding(p),outstanding(i),total,principal_paidback,interest_,fee_,shortfalls, #defaults
     history  = histories[obj.id][0]       if histories.key?(obj.id)
     advance  = advances[obj.id][0]        if advances.key?(obj.id)
     balance  = balances[obj.id][0]        if balances.key?(obj.id)
     old_balance = old_balances[obj.id][0] if old_balances.key?(obj.id)
-    
+
     if history
       principal_scheduled = history.scheduled_outstanding_principal
       total_scheduled     = history.scheduled_outstanding_total
-      
+
       principal_actual    = history.actual_outstanding_principal
       total_actual        = history.actual_outstanding_total
     else
@@ -353,7 +354,7 @@ class Report
       add_to_result(data, obj, 12, defaults[obj.id].tdiff)
       add_to_result(data, obj, 11, defaults[obj.id].tdiff - defaults[obj.id].pdiff)
     end
-    
+
     new_advance         = advance ? advance.advance_total : 0
     new_advance_balance = balance ? balance.balance_total : 0
     old_advance_balance = old_balance ? old_balance.balance_total : 0
@@ -362,7 +363,7 @@ class Report
     add_to_result(data, obj, 14, new_advance + old_advance_balance - new_advance_balance )
     add_to_result(data, obj, 15, new_advance_balance)
     data
-  end 
+  end
 
   def add_payments_to(data, obj, payment)
     if payment.ptype==1

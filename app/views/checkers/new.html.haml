@@ -1,0 +1,13 @@
+%h1 Checkers controller, new action
+
+%p 
+  Edit this file in 
+  %tt app/views/checkers/new.html.erb
+
+= error_messages_for @checker
+
+= form_for(@checker, :action => url(:checkers) ) do
+  %p
+    = submit "Create"
+
+= link_to 'Back', url(:checkers)

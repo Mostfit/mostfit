@@ -1,3 +1,17 @@
+:javascript
+  $(document).ready(function() {
+  $("#paying_branch_selector").change(function(){
+  $("#paying_center_selector").html('');
+    $.ajax({
+      type: "GET",
+      url: "/branches/centers/"+$("#paying_branch_selector").val()+"?paying=true&date=#{@date.strftime('%Y-%m-%d')}",
+      success: function(data){
+        $("#paying_center_selector").html(data);
+      }
+    });
+  });
+  });
+
 - if @center and @date
   - @md = @center.meeting_day?(@date)
   %h1
@@ -43,13 +57,6 @@
           = date_select 'for_date', @date
           = hidden_field :name => :center_id, :value => @center.id
           = submit 'Go!',  :style => 'margin: 0px; padding: 0px;'
-  - @loans_to_approve = @clients.loans(:approved_on => nil, :rejected_on => nil)
-  - @loans_to_utilize = @clients.loans(:loan_utilization_id => nil, :rejected_on => nil, :disbursal_date.not => nil)
-  - date_with_holiday = [@date, @date.holidays_shifted_today].max
-  - @loans_to_disburse = @clients.loans(:scheduled_disbursal_date.lte => date_with_holiday, :disbursal_date => nil, :approved_on.not => nil, :rejected_on => nil)
-  - @fee_paying_loans   = @loans.collect{|x| {x => x.fees_payable_on(@date)}}.inject({}){|s,x| s+=x}
-  - @fee_paying_clients = @clients.collect{|x| {x => x.fees_payable_on(@date)}}.inject({}){|s,x| s+=x}
-  - @fee_paying_things = @fee_paying_clients + @fee_paying_loans
   - fees_payable       = @fee_paying_things.values.inject({}){|s,x| s+=x}.length
   %div.tab_container
     %ul.tabs
@@ -57,7 +64,7 @@
         Repayments
         %b
           (
-          = LoanHistory.all(:date => @date, :center => @center).select{|lh| (lh.principal_due + lh.interest_due) > 0.1}.count
+          = LoanHistory.all(:date => @date, :center => @center, :status => [:outstanding]).count
           )
       %li#repayments
         Approvals
@@ -71,8 +78,6 @@
         Fees payments
         %b
           = "(#{@fee_paying_things.values.reject{|v| v.empty?}.count})"
-      %li#premia
-        Insurance Premia
       %li#luc
         Loan utilization check 
         %b
@@ -202,14 +207,19 @@
     %table.form
       %tr
         %th
+          In branch
+        %td
+          = select :name => 'branch_id', :id => "paying_branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch'
+      %tr
+        %th
           Centers repaying today
         %td
-          = select :name => 'center_id', :collection => centers_paying_today_collection(@date), :selected => session[:center_id], :prompt => 'Select a center', :class => "chosen"
+          = select :name => 'center_id', :id => 'paying_center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center'
       %tr
         %th
           or any other center
         %td
-          = text_field :name => 'center_text'
+          = text_field :name => 'center_text', :id => 'center_text'
       %tr
         %th
           For Date

@@ -67,11 +67,11 @@
           = select :name => "received_by", :collection => staff_members_collection
       %tr
         %th
-          Write off?
+          Preclose?
         %td
           = check_box :name => "writeoff"
           .greytext
-            If the repaid amount is less than the outstanding amount<br> it is recommended to write off the loan
+            If you want to close the loan before its intended/scheduled tenure it is recommended to preclose the loan.<br><br> If the repaid amount is less than the outstanding amount it is recommended to write off the loan.<br> To write off the loan, please scroll down the screen
         
           
     = submit 'Make Prepayment'

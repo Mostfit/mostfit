@@ -40,6 +40,15 @@ class Rules < Application
     end
   end
 
+  def toggle_active(id)
+    @rule = Rule.get(id)
+    raise NotFound unless @rule
+    @rule.active = (not(@rule.active))
+    message = @rule.save ? {:notice => "Rule is now #{@rule.active ? 'active' : 'inactive'}"} : {:error => "Could not toggle active state"}
+    redirect resource(:rules), :message => message
+  end
+
+
   #TODO has to be fixed
   def update(id, rule)
     rule = fix_conditions(rule)

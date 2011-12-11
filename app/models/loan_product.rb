@@ -4,6 +4,7 @@ class LoanProduct
 
   property :id, Serial, :nullable => false, :index => true
   property :name, String, :nullable => false, :index => true, :min => 3
+#  property :reference, String
   property :max_amount, Integer, :nullable => false, :index => true
   property :min_amount, Integer, :nullable => false, :index => true
   property :amount_multiple, Float, :nullable => false, :index => true, :default => 1, :min => 0.01
@@ -51,6 +52,10 @@ class LoanProduct
   validates_is_unique   :name
   validates_is_number   :max_amount, :min_amount
   # validates_with_method :check_loan_type_correctness
+
+  # while migrating, we have to provde a reference for every data point
+  # this is for reasons of sanity.
+  # validates_present :reference, :if => Proc.new{|t| Mfi.first.state == :migration}
   
   def self.from_csv(row, headers)
     min_interest = row[headers[:min_interest_rate]].to_f < 1 ? row[headers[:min_interest_rate]].to_f*100 : row[headers[:min_interest_rate]]
@@ -61,8 +66,8 @@ class LoanProduct
               :max_number_of_installments => row[headers[:max_number_of_installments]], 
               :installment_frequency => row[headers[:installment_frequency]].downcase.to_sym,
               :valid_from => Date.parse(row[headers[:valid_from]]), :valid_upto => Date.parse(row[headers[:valid_upto]]),
-              :repayment_style => RepaymentStyle.first(:name => row[headers[:repayment_style]]),
-              :loan_type_string => row[headers[:loan_type]])
+              :loan_type_string => row[headers[:loan_type]],
+              :repayment_style => RepaymentStyle.first(:name => row[headers[:repayment_style]]), :upload_id => row[headers[:upload_id]])
     [obj.save, obj]
   end
 

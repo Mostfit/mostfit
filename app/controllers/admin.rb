@@ -4,23 +4,7 @@ class Admin < Application
     render
   end
 
-  def upload 
-    erase = params.has_key?(:erase)
-    if params[:file] and params[:file][:filename] and params[:file][:tempfile]
-      file      = Upload.new(params[:file][:filename])
-      file.move(params[:file][:tempfile].path)
-      Process.fork{
-        `rake 'mostfit:upload[#{file.directory}, #{file.filename}, #{erase.to_s}]'`
-      }
-      redirect "/admin/upload_status/#{file.directory}"
-    else
-      render
-    end
-  end
 
-  def upload_status        
-    render
-  end
   
   def edit
     @mfi  = Mfi.first
@@ -86,6 +70,18 @@ class Admin < Application
     else
       raise NotFound
     end
+  end
+
+  def data
+    # towards some functions for assessing data quality and addressing these issues
+    @stale_caches = CenterCache.all(:stale => true).aggregate(:branch_id, :center_id,:updated_at).map{|x| [[x[0],x[1]], x[2]]}.to_hash.deepen
+    @loan_history_for_deleted_loans = LoanHistory.all(:loan_id => Loan.with_deleted{Loan.all(:deleted_at.not => nil)}.aggregate(:id))
+    max_payment = Payment.all.aggregate(:loan_id, :created_at.max).to_hash
+    max_loan = Loan.all.aggregate(:id, :updated_at).to_hash
+    latest = (max_payment + max_loan).map{|k,v| [k,v.respond_to?(:max) ? v.max : v]}.to_hash
+    @last_histories = LoanHistory.all.aggregate(:loan_id, :created_at).to_hash
+    @stale_loan_histories = latest.select{|loan_id, updated_at| @last_histories[loan_id] ? @last_histories[loan_id] < updated_at : true}.to_hash
+    render
   end
   
   def insurance

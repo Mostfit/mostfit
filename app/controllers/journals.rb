@@ -65,6 +65,18 @@ class Journals < Application
     end
   end
 
+  def reverse(id)
+    journal = Journal.get(id)
+    raise NotFound unless journal
+    @journal = journal.reverse_transaction
+    if @journal.nil?
+      message[:error] = "Journal could not be reversed"
+      redirect resource(:journals)
+    else
+      redirect resource(:journals), :message => {:notice => "Journal was successfully reversed"}
+    end
+  end
+
   def edit(id)
     only_provides :html
     @journal = Journal.get(id)

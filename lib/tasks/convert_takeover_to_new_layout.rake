@@ -15,7 +15,7 @@ namespace :mostfit do
   namespace :conversion do
     desc "convert to new-layout branch"
     task :to_new_layout do
-      repository.adapter.execute("truncate table loan_history;")
+      repository.adapter.execute("truncate table loan_history;") rescue nil
       Rake::Task['db:autoupgrade'].invoke
       Rake::Task['mostfit:db:prepare'].invoke
       Rake::Task['mostfit:conversion:update_loan_cache'].invoke

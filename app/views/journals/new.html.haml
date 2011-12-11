@@ -20,7 +20,7 @@
   %div#voucher_entry{:style => "display: block; padding-left: 25px;"}
     %h2 Voucher entry
     = error_messages_for @journal
-    - if session.user.role == :admin
+    - if session.user.role == :admin || session.user.role == :accountant
       %form{:class => "_remote_", :method => "GET", :action => resource(:journals, :new, {:return => params[:return]})}
         %b Select branch
         = select :name => :branch_id, :collection => Branch.all.map{|x| [x.id, x.name]}.unshift([0, 'Head Office Accounts']), :prompt => "Select Account", :selected => params[:branch_id]

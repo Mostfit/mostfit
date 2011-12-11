@@ -46,7 +46,7 @@ class Payment
   belongs_to :verified_by,  :child_key => [:verified_by_user_id],        :model => 'User'
 
   validates_present     :created_by, :received_by, :if => Proc.new{|p| p.deleted_at == nil}
-  validates_with_method :loan_or_client_present?,  :method => :loan_or_client_present?
+  validates_with_method :loan_or_client_present?,  :method => :loan_or_client_present?, :when => [:default, :reallocate]
   validates_with_method :only_take_payments_on_disbursed_loans?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :created_by,  :method => :created_by_active_user?, :if => Proc.new{|p| p.deleted_at == nil}
   validates_with_method :received_by, :method => :received_by_active_staff_member?, :when => [:default, :reallocate]
@@ -253,6 +253,7 @@ class Payment
   end
 
   def only_take_payments_on_disbursed_loans?
+    return true if deleted_at
     if loan
       return true if [:outstanding, :disbursed, :repaid, :written_off].include?(loan.get_status(received_on))
       [false, "Payments cannot be made on loans that are written off, repaid or not (yet) disbursed. This loan is #{loan.get_status(received_on)}"]

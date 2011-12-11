@@ -1,43 +1,37 @@
-%h1== Account: <i>#{@account.name}</i>
-.menu-strip
-  = link_to_with_rights 'edit this account\'s details ', resource(@account, :edit), :class => "edit"
-  = link_to_with_rights 'delete this account', url(:controller => :application, :action => :delete, :id => @account.id, :model => :account, :return => "/accounts?branch_id=#{@account.branch.id}"), :class => "delete"
-  = link_to_with_rights 'create child account', resource(:accounts, :new, :parent_id => @account.id), :class => "add"
+.shaded{:style => "padding: 5px; margin-bottom: 10px;"}
+  %h1== Account: <i>#{@account.name}</i>
+  .menu-strip
+    = link_to_with_rights 'edit this account\'s details ', resource(@account, :edit), :class => "edit"
+    = link_to_with_rights 'delete this account', url(:controller => :application, :action => :delete, :id => @account.id, :model => :account, :return => "/accounts?branch_id=#{@account.branch.id}"), :class => "delete"
+    = link_to_with_rights 'create child account', resource(:accounts, :new, :parent_id => @account.id), :class => "add"
 
-%table.tall.shaded{ :style => "width: 40%;" }
-  %tr
-    %th GL Code : 
-    %td
-      = @account.gl_code
-  %tr
-    %th
-      Parent
-    %td
-      = @account.parent.name if @account.parent
-  %tr
-    %th Branch : 
-    %td
-      = @account.branch ? @account.branch.name : ""
-  %tr
-    %th
-      Parent Account
-    %td
-      = @account.parent.name if @account.parent
+  %table.tall.shaded{ :style => "width: 40%;" }
+    %tr
+      %th GL Code : 
+      %td
+        = @account.gl_code
+    %tr
+      %th Branch : 
+      %td
+        = @account.branch ? @account.branch.name : ""
+    %tr
+      %th Parent Account
+      %td
+        = @account.parent.name if @account.parent
+    %tr
+      %th Opening Balance : 
+      %td
+        = @account.opening_balance.to_account_balance 
+        %span.greytext 
+          (as on
+          = @account.opening_balance_on_date
+          )
+    %tr
+      %th Today's Balance
+      %td
+        = @account.balance_as_of_now.to_account_balance 
 
-  %tr
-    %th Opening Balance : 
-    %td
-      = @account.opening_balance 
-      %span.greytext 
-        (as on
-        = @account.opening_balance_on_date
-        )
-  %tr
-    %th Today's Balance
-    %td
-      = @account.balance_as_of_now.to_account_balance 
-
-%div.tab_container
+%div.tab_container.shaded
   %ul.tabs
     %li#journal Journal
     %li#book Ledger

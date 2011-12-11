@@ -52,14 +52,6 @@
         %td Spouse name
         %td
           = @client.spouse_name
-      %tr
-        %td Spouse Date of Birth
-        %td
-          - if @client.spouse_date_of_birth
-            = @client.spouse_date_of_birth
-            ( Age :
-            = Time.now.year - @client.spouse_date_of_birth.year
-            yrs.)
       %tr.odd
         %td Manager
         %td= link_to @center.manager.name, resource(@center.manager)

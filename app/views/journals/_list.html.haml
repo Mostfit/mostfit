@@ -11,49 +11,56 @@
     %input{:type => :hidden, :name => "_target_", :value => "journals_container"}
     = submit "GO"  
   %table.report.nojs
-    %tr
-      %th 
-        Created at
-      %th
-        Date
-      %th 
-        Journal ID  
-      %th 
-        Debit Account
-      %th 
-        Credit Account
-      %th 
-        Breakup
-      %th 
-        Amount
-      %th 
-        Comment
-    - journals.each do |journal|
-      - postings = journal.postings.sort_by{|x| x.amount}
+    %thead
       %tr
-        %td.text
-          = journal.created_at.strftime(Mfi.first.date_format + " at %H:%m")
-        %td.text
-          = journal.date
-        %td
-          = link_to journal.id, resource(journal)
-        - debit_postings, credit_postings = journal.postings.group_by{|x| x.amount>0}.values
-        %td.text 
-          - debit_postings.each do |p|
-            = p.account ? p.account.name : "Some deleted account id #{p.account_id}"
-            %br
-        %td.text
-          - credit_postings.each do |p|
-            = p.account ? p.account.name : "Some deleted account id #{p.account_id}"
-            %br
-        %td
-          %b De
-          = debit_postings.map{|x| x.amount.abs.to_currency}.join("<br/>")
-          %br
-          %b Cr
-          = credit_postings.map{|x| x.amount.abs.to_currency}.join("<br/>")
-        %td
-          = postings.map{|x| x.amount>0 ? x.amount : 0}.inject(0){|s,x| s+=x}
-        %td.text
-          = journal.comment
-  = paginate(journals).to_s.gsub("<a", "<a class='_remote_' id='journal_entries'")
+        %th
+          ID
+        %th
+          Created at
+        %th
+          Effective Date
+        %th
+          Journal Type
+        %th
+          Narration
+        %th
+          Account
+        %th
+          Debit
+        %th
+          Credit
+    %tbody
+      - journals.each do |journal|
+        - count = 0
+        - postings_count = journal.postings.count
+        - journal.postings.each do |p|
+          - unless count > 0
+            %tr
+              %td{:rowspan => postings_count}
+                = link_to "#{journal.id}", resource(journal)
+                %br
+                = "Txn ID: (#{journal.transaction_id})" unless journal.transaction_id.empty? 
+              %td{:rowspan => postings_count}
+                = journal.created_at.strftime(Mfi.first.date_format + " at %H:%m") if journal.created_at and count == 0
+              %td{:rowspan => postings_count}
+                = journal.date.display if journal.date and count == 0
+              %td{:rowspan => postings_count}
+                = journal.journal_type.display
+              %td{:rowspan => postings_count}
+                = journal.comment
+              %td
+                = p.account.display_name unless p.account.nil?
+              %td
+                = p.amount.to_account_balance if p.amount && p.amount <= 0
+              %td
+                = p.amount.to_account_balance if p.amount && p.amount > 0
+              - count += 1
+          - else
+            %tr
+              %td
+                = p.account.display_name unless p.account.nil?
+              %td
+                = p.amount.to_account_balance if p.amount && p.amount <= 0
+              %td
+                = p.amount.to_account_balance if p.amount && p.amount > 0
+              - count += 1

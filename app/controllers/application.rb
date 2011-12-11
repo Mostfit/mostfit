@@ -46,7 +46,9 @@ class Application < Merb::Controller
   end
 
   def ensure_can_do
+    raise NotPrivileged if Mfi.first.system_state == :admin_only and session.user.role != :admin
     @route = Merb::Router.match(request)
+    raise NotAcceptable if Mfi.first.system_state == :stopped and @route[1][:controller] != "admin"
     unless session.user and session.user.can_access?(@route[1], params)
       raise NotPrivileged
     end
@@ -77,7 +79,6 @@ class Application < Merb::Controller
   end
 
   def delete
-    debugger
     raise NotPrivileged unless session.user.admin?
     raise NotFound      unless params[:model] and params[:id]
     model    = Kernel.const_get(params[:model].camel_case.singularize)

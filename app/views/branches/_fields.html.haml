@@ -1,44 +1,52 @@
-%p
-  %label{:for => "name"}Branch Name
-  = text_field :name, :size => 40
-  %span.greytext the name by which the branch is known
-%p
-  %label{:for => "code"}Branch code
-  = text_field :code, :size => 10
-  %span.greytext a two letter unique code for the branch
-%p
-  %label{:for => "address"}Address:
-  = text_area :address, :rows => 6, :cols => 38
-%p
-  %label{:for => "contact_number"}Contact phone number:
-  = text_field :contact_number, :size => 15
-%p
-  %label{:for => "landmark"}
-    Landmark
-  = text_field :landmark, :size => 25
-%p
-  %label{:for => "creation_date"}
-    Creation date:
-  = date_select_for @branch, :creation_date
-  %span.greytext pick the date this branch was created on
-%p
-  - if StaffMember.count==0 and session.user.role==:admin
-    %div.error
-      You do not have any staff members data yet. Create them 
-      =link_to("here", resource(:staff_members, :new), :target => "_blank")
-  %label{:for => "managed_by"}
-    Managed by:
-  = select_staff_member_for @branch, :manager, {}, true
-  %span.greytext pick the staff member that manages this branch
-%p
-  %label{:for => "area"}
-    Area
-  = select :area_id, :collection => Area.all.map{|a| [a.id.to_s, a.name]}, :prompt => "---"
-  %span.greytext Pick the aread to which this branch belongs to
-    
-%button{:type => "submit", :class => "add"}
-  = submit_text
-&nbsp;&nbsp;
-%b or
-&nbsp;&nbsp;
-= link_to 'cancel', cancel_url
+%table{:style => "width: 80%"}
+  %tr
+    %td
+      Branch Name
+    %td
+      = text_field :name, :size => 40
+      %span.greytext the name by which the branch is known
+  %tr
+    %td
+      Branch Code
+    %td
+      = text_field :code, :size => 10
+      %span.greytext a two letter unique code for the branch
+  %tr
+    %td
+      Address
+    %td
+      = text_area :address, :rows => 6, :cols => 38
+  %tr
+    %td
+      Contact Phone Number
+    %td
+      = text_field :contact_number, :size => 15
+  %tr
+    %td
+      Landmark
+    %td
+      = text_field :landmark, :size => 25
+  %tr
+    %td
+      Creation Date
+    %td
+      = date_select_for @branch, :creation_date
+      %span.greytext pick the date this branch was created on
+  %tr
+    - if StaffMember.count==0 and session.user.role==:admin
+      %div.error
+        You do not have any staff members data yet. Create them 
+        = link_to("here", resource(:staff_members, :new), :target => "_blank")
+    %td
+      Managed by
+    %td  
+      = select_staff_member_for @branch, :manager, {}, true
+      %span.greytext pick the staff member that manages this branch
+  %tr
+    %td
+      Area
+    %td
+      = select :area_id, :collection => Area.all.map{|a| [a.id.to_s, a.name]}, :prompt => "---"
+      %span.greytext Pick the aread to which this branch belongs to
+  %tr
+    %td
