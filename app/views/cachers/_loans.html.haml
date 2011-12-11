@@ -3,12 +3,12 @@
     = link_to 'go to center', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date), :class => "edit"
     = link_to 'go to weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet", :class => "edit"
     = link_to 'rebuild caches', url(:rebuild_cachers, :center_id => params[:center_id]), :title => "Recreates history for these loans. Marks center and branch caches on and after this date as stale. recreates todays caches"
-    %br
-    = submit "Reallocate whole center with style"
-    = hidden_field :name => :center_id, :value => params[:center_id]
-    = repayment_style_select
-    only fix payments that are mismatched with the schedule
-    = check_box :name => :only_mismatches, :checked => :checked
+    -# %br
+    -# = submit "Reallocate whole center with style"
+    -# = hidden_field :name => :center_id, :value => params[:center_id]
+    -# = repayment_style_select
+    -# only fix payments that are mismatched with the schedule
+    -# = check_box :name => :only_mismatches, :checked => :checked
   - total = {}
   - histories = LoanHistory.latest({:center_id => params[:center_id]}, @date)
   %h1
