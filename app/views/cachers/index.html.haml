@@ -72,6 +72,13 @@
     %h3 
       No caches found. 
       = link_to 'generate?', url({:controller => :cachers, :action => :generate}.merge(query_params)), :class => "green_button"
+- else
+  %h1
+    = (ReportFormat.get(params[:report_format].to_i) || ReportFormat.first).name
+    - if @from_date and @to_date
+      == from #{@from_date} to #{@to_date}
+    - elsif @date
+      == for #{@date}
 
 = partial @level
 

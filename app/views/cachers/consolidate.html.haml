@@ -5,7 +5,7 @@
 - @stale_branches = @stale.map{|s| s[0]}
 
 
-
+- debugger
 - unless params[:layout]
   = js_include_tag 'jquery.tablesorter.min'
   :javascript
@@ -82,6 +82,7 @@
     %h3 
       No caches found. 
       = link_to 'generate?', url(:controller => :cachers, :action => :generate, :date => @date), :class => "green_button"
+
 
 - @show_loans = params  and (not params[:center_id].blank?) and (@date || @to_date)
 - if @show_loans
