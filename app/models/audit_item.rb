@@ -10,7 +10,6 @@ class AuditItem
   property :status, Enum[:outstanding, :completed], :default => :outstanding
   property :result, Enum['',:pass, :fail], :default => '', :nullable => true
 
-  # This should be validated or :nullable, right now it's raising an error on create
   belongs_to :assigned_to, :model => StaffMember
 
   validates_with_method :result, :result_needs_completed
