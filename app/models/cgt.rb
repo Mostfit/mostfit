@@ -1,3 +1,4 @@
+# What the heck is a Cgt?
 class Cgt
   include DataMapper::Resource
   

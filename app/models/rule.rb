@@ -24,6 +24,10 @@ class Rule
   validates_is_unique :name
   validates_with_method :apply_rule
 
+
+  #
+  # This probably doesn't happen too often, but.. Ouch...
+  #
   after :destroy do
     h = {:name => @name, :model_name => @model_name}
     #puts "Removed Rule"
@@ -47,6 +51,9 @@ class Rule
   end
 
 
+  # On creating new rules occassionally I got a validation error "nil" which I'm assuming
+  # originates here, would be nice to give a reason for the failure though I couldn't quite
+  # figure out what it is (I think it's related to the Condition model somehow.)
   def apply_rule
     # can't go ahead without a condition
     return false unless condition

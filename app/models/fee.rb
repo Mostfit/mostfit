@@ -8,6 +8,7 @@ class Fee
   # on which to call the function.
   # We have this difference to handle cases where the fee is applicable on an Insurance Policy but is payable on the loan application date
 
+  # ^ Good to see some docs but the example seems to have more elements than the actual table below. Model can be scrapped I think?
 
   PAYABLE = [
              [:loan_applied_on, Loan, :applied_on], 

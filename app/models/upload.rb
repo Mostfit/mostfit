@@ -20,6 +20,8 @@ class Upload
 
   MODELS = [:staff_members, :repayment_styles, :loan_products, :funding_lines, :branches, :centers, :client_groups, :clients, :loans]
 
+
+  # Asking for trouble? Let's just make this a permanent, optional relationship
   if Mfi.first.system_state == :migration
     MODELS.each do |model|
       has n, model

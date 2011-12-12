@@ -95,6 +95,7 @@ class StaffMember
     [self.centers, self.branches.centers, self.areas.branches.centers, self.regions.areas.branches.centers].flatten
   end
   
+  # This method returns all ids of staff members related to the given branch, center or client
   def self.related_to(obj)
     staff_members = []    
     [:applied_by_staff_id, :approved_by_staff_id, :rejected_by_staff_id, :disbursed_by_staff_id, :written_off_by_staff_id, :suggested_written_off_by_staff_id].each{|type|

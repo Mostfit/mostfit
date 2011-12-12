@@ -54,6 +54,7 @@ class LoanHistory
   property :status,                      Enum.send('[]', *STATUSES)
   property :last_status,                 Enum.send('[]', *STATUSES)
 
+  # Although these won't change often, updating the schema this way feels iffy..
   # add a column per status to track approvals, disbursals, etc.
   STATUSES.each do |status|
     property "#{status.to_s}_count".to_sym,  Integer, :nullable => false, :default => 0

@@ -1,3 +1,5 @@
+# Don't want this any more?
+
 # class StaffAccount
 #   include DataMapper::Resource
   

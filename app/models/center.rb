@@ -236,6 +236,7 @@ class Center
     date = self.meeting_day_change_date
 
     if not CenterMeetingDay.first(:center => self)
+      # FIXME: This line appears to be failing, because the period attribute is left blank and should be one of %w[week month] probably true in the "elsif" below as well. This means new centers never get a meeting day.
       CenterMeetingDay.create(:center_id => self.id, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
     elsif self.meeting_day != self.meeting_day_for(date)
       if prev_cm = CenterMeetingDay.first(:center_id => self.id, :valid_from.lte => date, :order => [:valid_from.desc])

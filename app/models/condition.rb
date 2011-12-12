@@ -1,4 +1,5 @@
 class Condition
+  # Just a detail but shouldn't this be used in the enum below?
   COMPARATORS = {:less_than => :<, :less_than_equal => :<=, :equal => :==, :greater_than => :>, :greater_than_equal => :>=}
   
   include DataMapper::Resource  

@@ -11,6 +11,7 @@ class AuditTrail
   property :type, Enum[:log, :warning, :error], :index => true
   belongs_to :user
 
+  # Not sure what this means:
   # we need this dummy validation to define the reallocation context which bubbles down into AuditTrail as well. 
   validates_present :created_at, :when => [:default, :reallocate]
 

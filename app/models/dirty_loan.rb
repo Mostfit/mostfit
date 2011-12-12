@@ -3,6 +3,7 @@ class DirtyLoan
   @@poke_thread = false
 
   property :id, Serial
+  # loan_id should be automatically created with the belongs_to association below
   property :loan_id, Integer, :index => true, :nullable => false
   property :created_at, DateTime, :index => true, :nullable => false, :default => Time.now
   property :cleaning_started, DateTime, :index => true, :nullable => true

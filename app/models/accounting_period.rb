@@ -4,6 +4,16 @@
 # At the end of an accounting period, "books" must be "closed" and balances brought forward to the beginning of the next accounting period as the opening balances for the new period
 # Ideally, an administrator should "close" an accounting period and the system should disallow any accounting entries under the period once closed
 
+
+# Are these supposed to be system wide? I saw they (optionally) belong_to an Organization but when I look
+# at validation methods like #closing_done_sequentially it seems to validate against AccountingPeriod.all,
+# without any mention of the related organization.
+#
+# Also creating a new accounting period when no others exist seems to be impossible as far as I can tell.
+# The validation done in #closing_done_sequentially seems to always fail if no other records exist, even
+# if we're not trying to close the period.
+#
+
 class AccountingPeriod
   include DataMapper::Resource
   
@@ -19,16 +29,22 @@ class AccountingPeriod
   
   belongs_to :organization
   property :organization_id, Integer, :nullable => true
-  
+
+  # Let's make sure closed is never nil to avoid confusing error messages from #closing_done_sequentially
+  # which may bork if closed is nil instead of false
+  validates_present :closed
+
   validates_with_method :cannot_overlap
   validates_with_method :closing_done_sequentially
   validates_with_method :all_account_balances_are_verified_before_closing_accounting_period
 
+  # This method is used to compare/sort AccountingPeriods by begin_date
   def <=>(other)
     return (end_date <=> other.begin_date) if other.respond_to?(:begin_date) && other.begin_date
     return 0
   end
 
+  # The total duration of the period in days
   def duration
     (end_date - begin_date).to_i + 1
   end
@@ -46,7 +62,16 @@ class AccountingPeriod
     return [false, "Your accounting period overlaps with other accounting periods"]
   end
 
+  # This returns true if the current record is the very first of the open accounting periods
+  # and we've set the closed attribute to true (i.e. we're trying to close the first remaining
+  # open period) OR if we are the last of the closed periods and we've set closed to false
+  # (i.e. we're reopening the last closed period)
+  #
+  # Right now this also causes validations to fail if we're creating a new accounting period
+  # from scratch which should probably be fixed.
+  #
   def closing_done_sequentially
+    # This may be slightly faster if we move the first conditional before the second database query
     closedAP = AccountingPeriod.all(:closed => true, :order => [:begin_date.asc])
     openAP = AccountingPeriod.all(:closed => false, :order => [:begin_date.asc])
     return true if self.id == openAP.first.id and self.closed == true

@@ -136,7 +136,8 @@ class Mfi
       return pattern
     end
   end
-  
+
+  # How about some normal validations?
   def check_contact_details
     return true if address and telephone
     return [false, "Please enter your address and telephone number"]

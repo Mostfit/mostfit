@@ -1,7 +1,9 @@
 class CreditAccountRule
   include DataMapper::Resource
   property :id, Serial
+  # This rule_book_id should be supplied by the belongs_to association below
   property :rule_book_id, Integer  
+  # This account_id may be wrong? We already have a credit_account_id below
   property :account_id,   Integer
   property :percentage,   Float, :nullable => false, :default => 100
 

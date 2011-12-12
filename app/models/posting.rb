@@ -9,6 +9,7 @@ class Posting
 
   property :id,             Serial
   property :amount,         Float,   :index => true   
+  # These association ids will be provided by belongs_to below, but can belongs_to set index?
   property :journal_id,     Integer, :index => true  
   property :account_id,     Integer, :index => true  
   property :currency_id,    Integer, :index => true
@@ -28,6 +29,7 @@ class Posting
   end
   
   def journal_date_of_posting_is_after_account_opening_date
+    # Journal.get? Why not just self.journal?
     return [false, "Account #{self.account.name} does not exists on this date"] if self.account.opening_balance_on_date > Journal.get(journal_id).date
     return true
   end

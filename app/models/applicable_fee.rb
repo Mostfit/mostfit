@@ -29,6 +29,8 @@ class ApplicableFee
     Loan.get(self.applicable_id) if applicable_type == 'Loan'
   end
 
+  # An ApplicableFee is applied to either a Loan, Client or InsurancePolicy
+  # Why are we doing this manually? Does datamapper not have a polymorphic association type?
   def parent
     Kernel.const_get(self.applicable_type).get(self.applicable_id)
   end

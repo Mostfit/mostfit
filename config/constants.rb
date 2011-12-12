@@ -1,3 +1,6 @@
+# What a mess.. Where do all these constants belong? Why no namespacing or at least a comment explaining what they're for?
+# Globals and global constants are BAD
+
 DEFAULT_JOURNAL_TYPES = ['Payment','Receipt','Journal']
 
 ASSETS = 'Assets'
