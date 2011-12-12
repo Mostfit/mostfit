@@ -47,7 +47,7 @@ namespace :mostfit do
         m = Kernel.const_get(af.applicable_type).get(af.applicable_id)
         rb = af.applicable_type == "Loan" ? m.client.center.manager : m.center.manager
         p = Payment.new(:received_on => af.applicable_on, :received_by => rb, :amount => af.amount, :type => :fees, :fee_id => af.fee_id,
-                        :created_by_user_id => 1, :loan_id => m.is_a? (Loan) ? m.id : nil, :client_id => m.is_a? (Loan) ? m.client.id : m.id)
+                        :created_by_user_id => 1, :loan_id => m.is_a?(Loan) ? m.id : nil, :client_id => m.is_a?(Loan) ? m.client.id : m.id)
         if p.save
           puts "Paid #{p.amount} as #{af.fee.name}"
         else
