@@ -137,11 +137,11 @@ class Center
     if @meeting_days.length==0
       meeting_day
     elsif date_row = @meeting_days.find{|md| md.valid_from <= date and md.valid_upto >= date} 
-      (date_row.meeting_day == :none and (not date_row.what.blank?)) ? date_row.what[0].to_sym : date_row.meeting_day
+      (date_row.meeting_wday)
     elsif @meeting_days[0].valid_from > date
-      (@meeting_days[0].meeting_day == :none and (not @meeting_days[0].what.blank?)) ? @meeting_days[0].what[0].to_sym : @meeting_days[0].meeting_day
+      (@meeting_days[0].meeting_wday)
     else
-      (@meeting_days[-1].meeting_day == :none and (not @meeting_days[-1].what.blank?)) ? @meeting_days[-1].what[0].to_sym : @meeting_days[-1].meeting_day
+      (@meeting_days[-1].meeting_wday)
     end
   end
   

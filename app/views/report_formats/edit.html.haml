@@ -6,7 +6,5 @@
 = form_for(@report_format, :action => url(:report_format, @report_format)) do
   = partial :fields
   = submit "Update"
-
-= link_to 'Show', url(:report_format, @report_format)
-|
-= link_to 'Back', url(:report_formats)
+  &nbsp;&nbsp;&nbsp;
+  = link_to 'Back', url(:report_format, @report_format)

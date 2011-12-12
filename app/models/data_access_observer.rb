@@ -1,6 +1,6 @@
 class DataAccessObserver
   include DataMapper::Observer
-  observe *(DataMapper::Model.descendants.to_a - [AuditTrail, Cacher, BranchCache, CenterCache] + [Branch, Center, ClientGroup, Client, Loan, Payment]).uniq # strange bug where observer drops some of the descnedants.
+  observe *(DataMapper::Model.descendants.to_a - [AuditTrail, Cacher, BranchCache, CenterCache] + [Branch, Center, ClientGroup, Client, Loan, Payment, Fee]).uniq # strange bug where observer drops some of the descnedants.
 
   
   def self.insert_session(id)
@@ -36,7 +36,8 @@ class DataAccessObserver
         return if diff.length==0
         model = (/Loan$/.match(obj.class.to_s) ? "Loan" : obj.class.to_s)
         log = AuditTrail.new(:auditable_id => obj.id, :action => @action, :changes => diff.to_yaml, :type => :log,
-                             :auditable_type => model, :user => @_user)
+                             :auditable_type => model, :user => @_user, :created_at => DateTime.now)
+        debugger
         log.save
       end
     rescue Exception => e
@@ -47,7 +48,6 @@ class DataAccessObserver
   end
 
   def self.check_session(obj)
-    return true
   end
 
 
@@ -61,7 +61,8 @@ class DataAccessObserver
   end
 
   before :save do
-    DataAccessObserver.check_session(self)
+    # DataAccessObserver.check_session(self)
+    debugger
     DataAccessObserver.get_object_state(self, :update) if not self.new?
   end  
   

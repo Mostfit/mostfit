@@ -5,9 +5,14 @@ class Cachers < Application
   def index
     @date ||= Date.today
     @from_date = @to_date = @date
-    get_cachers
-    @keys = [:date] + @keys
-    display @cachers
+    @report_format = ReportFormat.get(params[:report_format]) || ReportFormat.first
+    if @report_format
+      get_cachers
+      @keys = [:date] + @keys
+      display @cachers
+    else
+      redirect(resource(:report_formats), :message => {:error => "Could not generate Caches as no Report formats were found. Create one to generate Caches"})
+    end
   end
 
   def missing
@@ -17,7 +22,6 @@ class Cachers < Application
   end
   
   def generate
-    debugger
     if @from_date and @to_date
       (@from_date..@to_date).each{|date| BranchCache.update(date)}
     else
@@ -85,7 +89,7 @@ class Cachers < Application
   private
   
   def parse_dates
-    {:date => Date.today, :from_date => Date.today - 7, :to_date => Date.today}.each do |date, default|
+    {:date => nil, :from_date => Date.today - 7, :to_date => Date.today}.each do |date, default|
       instance_variable_set("@#{date.to_s}", (params[date] ? (params[date].is_a?(Hash) ? Date.new(params[date][:year].to_i, params[date][:month].to_i, params[date][:day].to_i) : Date.parse(params[date])) : nil))
     end
     @date = (@to_date or Date.today) unless @date
@@ -119,8 +123,8 @@ class Cachers < Application
     @stale_branches = BranchCache.all(q.merge(:stale => true))
     @last_cache_update = @cachers.aggregate(:updated_at.min)
     @resource = params[:action] == "index" ? :cachers : (params[:action].to_s + "_" + "cachers").to_sym
-    @keys = [:branch_id, :center_id] + ReportFormat.get(params[:report_format] || 1).keys 
-    @total_keys = @keys[3..-1]
+    @keys = [:branch_id, :center_id] + (ReportFormat.get(params[:report_format]) || ReportFormat.first).keys
+    @total_keys = @keys[2..-1]
     if @resource == :split_cachers
       @level = params[:center_id].blank? ? :branches : :centers
       @keys = [:date] + @keys

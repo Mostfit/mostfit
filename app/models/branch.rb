@@ -55,13 +55,19 @@ class Branch
     elsif user.role == :funder 
       hash[:id] = Funder.first(:user_id => user.id).centers({:branch_id => self.id}).map{|c| c.id}
     end
-
-    if params[:meeting_day] and Center::DAYS.include?(params[:meeting_day].to_sym)
-      hash[:meeting_day]= params[:meeting_day].to_sym
-    else
-      hash[:meeting_day]=Date.today.weekday
+    branch_center_ids = self.centers.aggregate(:id)
+    mday = (params[:meeting_day] or Nothing).to_sym || Date.today.weekday
+    debugger
+    if Center::DAYS.include?(mday)
+      # either the meeting day is set directly on the center_meeting_day
+      cids = self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :meeting_day => mday).aggregate(:center_id)
+      # or it is set on the "what" property. effing backward compatibility!
+      cids += (self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :what => mday).aggregate(:center_id) &
+               self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :meeting_day => :none).aggregate(:center_id))
+      branch_center_ids -= cids
+      cids += Center.all(:id => branch_center_ids, :meeting_day => mday).aggregate(:id) unless branch_center_ids.blank?
     end
-
+    hash[:id]= cids
     Center.all(hash)
   end
 

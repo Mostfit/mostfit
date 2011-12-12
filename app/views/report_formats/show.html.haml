@@ -1,10 +1,20 @@
 %h1
-  ReportFormats controller, show action
-%p
-  Edit this file in
-  %tt
-    app/views/report_formats/show.html.erb
+  == Report Format #{@report_format.name}
 
-= link_to 'Edit',  url(:edit_report_format,  @report_format)
-|
-= link_to 'Back', url(:report_formats)
+%table.narrow.shaded
+  %tr
+    %th
+      Id
+    %th
+      Name
+    %th
+      Action
+  %tr
+    %td
+      == #{@report_format.id}
+    %td
+      == #{@report_format.name}
+    %td
+      = link_to 'Edit',  url(:edit_report_format,  @report_format)
+      |
+      = link_to 'Back', url(:report_formats)

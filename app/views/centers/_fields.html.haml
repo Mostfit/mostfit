@@ -1,85 +1,115 @@
-%p
-  %label{:for => "branch"}Branch
-  - if @branch and not @center.new?
-    = select :name => 'center[branch_id]', :collection => get_accessible_branches.map{|b| [b.id,b.name]}, :selected => @branch.id.to_s
-  - elsif @branch and @center.new?
-    = select :name => 'center[branch_id]', :collection => Branch.all(:id => @branch.id).map{|b| [b.id,b.name]}
-  - else
-    = select :name => 'center[branch_id]', :collection => get_accessible_branches.map{|b| [b.id,b.name]}, :selected => session[:branch_id].to_s
-%p
-  %label{:for => "name"}Center name:
-  = text_field :name, :size => 40
-%p
-  %label{:for =>"code"}Center code:
-  = text_field :code, :size => 2
-  %br/
-  %span.greytext a two letter unique code for the center
-%p
-  %label{:for =>"creation_date"}Creation date:
-  = date_select_for @center, :creation_date
-  %br/
-  %span.greytext pick the date this center was created on
-%p
-  %label Meeting Dates
-  %table
-    - @center.center_meeting_days.each do |cmd|
+%table{:style => "width: 80%"}
+  %tr
+    %td
+      %b Branch
+    %td
+      - if @branch and not @center.new?
+        = select :name => 'center[branch_id]', :collection => get_accessible_branches.map{|b| [b.id,b.name]}, :selected => @branch.id.to_s
+      - elsif @branch and @center.new?
+        = select :name => 'center[branch_id]', :collection => Branch.all(:id => @branch.id).map{|b| [b.id,b.name]}
+      - else
+        = select :name => 'center[branch_id]', :collection => get_accessible_branches.map{|b| [b.id,b.name]}, :selected => session[:branch_id].to_s
+  %tr
+    %td
+      %b Center Name
+    %td
+      = text_field :name, :size => 40
+  %tr
+    %td
+      %b Center Code
+    %td
+      = text_field :code, :size => 2
+      %span.greytext a two letter unique code for the center
+  %tr
+    %td
+      %b Creation Date
+    %td
+      = date_select_for @center, :creation_date
+      %span.greytext pick the date this center was created on
+  %tr
+    %td
+      %b Meeting Dates
+    %td
+      - @center.center_meeting_days.each do |cmd|
+        == from #{cmd.valid_from} to #{cmd.valid_upto} this center meets every <b>#{cmd.meeting_day_string}</b>
+      %br
+      - unless @center.new?
+        = link_to 'Manage meeting schedule', resource(:center_meeting_days, :center_id => @center.id)
+    - if @center.new?
       %tr
         %td
-          == from #{cmd.valid_from} to #{cmd.valid_upto} this center meets every <b>#{cmd.meeting_day_string}</b>
-    - unless @center.new?
-      = link_to 'manage meeting schedule', resource(:center_meeting_days, :center_id => @center.id)
-  - if @center.new?
-    %label{:for =>"meeting day"}Meeting every:
-    = select :name => "center[center_meeting_day[meeting_day]]", :collection => Center::DAYS.map{|c| c.to_s}
-    %br
-    %b OR
-    %br
-    %span.greytext
-      i.e. Meeting every 1,3 Friday of every 1 month
+          Meeting every:
+        %td
+          = select :name => "center[center_meeting_day[meeting_day]]", :collection => Center::DAYS.map{|c| c.to_s}
+          %br
+          %br
+            %b OR
+          %br
+            %span.greytext eg. Meeting every 1,3 Friday of every 1 month
+          %br
+            = text_field :name => "center[center_meeting_day[every]]", :style => "width:5em"
+            &nbsp;
+            - options = [['day', 'day']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
+            &nbsp;
+            = select :name => "center[center_meeting_day[what]]", :collection => options, :onchange => "$('#hidden').css('display', 'block')"
+            &nbsp;&nbsp;
+            of every
+            &nbsp;&nbsp;
+            = text_field :name => "center[center_meeting_day[of_every]]", :style => "width:5em"
+            &nbsp;
+            = select :name => "center[center_meeting_day[period]]", :collection => ["week", "month"]
+          %br
+            valid from:
+            &nbsp;&nbsp;
+            = date_select "center[center_meeting_day[valid_from]]", nil, :id => "center_center_meeting_day_valid_from"
+            &nbsp;&nbsp;
+            to
+            &nbsp;&nbsp;
+            = date_select "center[center_meeting_day[valid_upto]]", nil, :id => "center_center_meeting_day_valid_to"
+  %tr
+    %td
+      %b Meeting Time
+    %td
+      = text_field :meeting_time_hours,   :size => 2
+      %b :
+      = text_field :meeting_time_minutes, :size => 2
+      &nbsp;&nbsp;
+      %span.greytext time is in a 24 hour format
       %br
-    = text_field :name => "center[center_meeting_day[every]]", :style => "width:5em"
-    - options = [['day', 'day']] + (Center.meeting_days.map { |x| [x.to_s, x.to_s.capitalize] })[1..-1]
-    = select :name => "center[center_meeting_day[what]]", :collection => options, :onchange => "$('#hidden').css('display', 'block')"
-    of every
-    = text_field :name => "center[center_meeting_day[of_every]]", :style => "width:5em"
-    = select :name => "center[center_meeting_day[period]]", :collection => ["week", "month"]
-    %br
-    valid from
-    = date_select "center[center_meeting_day[valid_from]]", nil, :id => "center_center_meeting_day_valid_from"
-    to
-    = date_select "center[center_meeting_day[valid_upto]]", nil, :id => "center_center_meeting_day_valid_to"
-%p
-  %label Meeting time
-  = text_field :meeting_time_hours,   :size => 2
-  %b :
-  = text_field :meeting_time_minutes, :size => 2
-  &nbsp;&nbsp;
-  %span.greytext time is in a 24 hour format
-  %div#hidden{:style => "display: none"}
-    - unless @center.new?
-      change effective from:  
-      = date_select_for @center, :meeting_day_change_date, :min_date => @center.creation_date||Date.min_date, :max_date => Date.max_date
-%p
-  %label{:for =>""}Managed by:
-  - if not @center.new? and session.user.staff_member==@center.manager
-    = @center.manager.name
-  - else
-    = select_staff_member_for @center, :manager, {}, true
-    %br/
-    %span.greytext pick the staff member that manages this center
-%p
-  %label{:for =>""}Address:
-  = text_area :address, :rows => 6, :cols => 38
-%p
-  %label{:for =>""}Contact phone number:
-  = text_field :contact_number, :size => 15
-%p
-  %label{:for =>""}Landmark:
-  = text_field :landmark, :size => 25
-- unless @center.new?
-  %p
-    %label{:for =>""}Center leader:
-    - leader_client_id = @center.leader ? @center.leader.client_id : nil
-    = select :leader, :collection => @center.clients(:order => [:name]).map{|x| [x.id, x.name]}, :selected => leader_client_id, :prompt => "Choose center leader"
-%button{:class => "add", :type => "submit"}
-  = submit_text
+        %div#hidden{:style => "display: none"}
+        - unless @center.new?
+          change effective from:  
+          = date_select_for @center, :meeting_day_change_date, :min_date => @center.creation_date||Date.min_date, :max_date => Date.max_date
+  %tr
+    %td
+      %b Managed By
+    %td
+      - if not @center.new? and session.user.staff_member==@center.manager
+        = @center.manager.name
+      - else
+        = select_staff_member_for @center, :manager, {}, true
+        %span.greytext pick the staff member that manages this center
+  %tr
+    %td
+      %b Address
+    %td
+      = text_area :address, :rows => 6, :cols => 38
+  %tr
+    %td
+      %b Contact Phone Number
+    %td
+      = text_field :contact_number, :size => 15
+  %tr
+    %td
+      %b Landmark
+    %td
+      = text_field :landmark, :size => 25
+  - unless @center.new?
+    %tr
+      %td
+        %b Center Leader
+      %td
+        - leader_client_id = @center.leader ? @center.leader.client_id : nil
+        = select :leader, :collection => @center.clients(:order => [:name]).map{|x| [x.id, x.name]}, :selected => leader_client_id, :prompt => "Choose center leader"
+  %tr
+    %td
