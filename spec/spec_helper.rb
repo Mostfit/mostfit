@@ -7,6 +7,8 @@ if (local_gem_dir = File.join(File.dirname(__FILE__), '..', 'gems')) && $BUNDLE.
   $BUNDLE = true; Gem.clear_paths; Gem.path.unshift(local_gem_dir)
 end
 
+require 'spec/factories'
+
 require "merb-core"
 require "spec" # Satisfies Autotest and anyone else not using the Rake tasks
 
@@ -18,7 +20,7 @@ Spec::Runner.configure do |config|
   config.include(Merb::Test::RouteHelper)
   config.include(Merb::Test::ControllerHelper)
   config.include(Spec::Matchers)
-  
+ 
   config.before(:all) do
     if Merb.orm == :datamapper
       DataMapper.auto_migrate!
