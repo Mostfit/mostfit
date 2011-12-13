@@ -19,8 +19,13 @@ class Payment
   property :comment,             String, :length => 50
   property :received_on,         Date,    :nullable => false, :index => true
   property :deleted_by_user_id,  Integer, :nullable => true
+<<<<<<< Updated upstream
   property :created_at,          DateTime,:nullable => false, :index => true
   property :deleted_at,          ParanoidDateTime, :nullable => true, :index => true
+=======
+  property :created_at,          DateTime, :nullable => false, :index => true
+  property :deleted_at,          ParanoidDateTime
+>>>>>>> Stashed changes
   property :created_by_user_id,  Integer, :nullable => false, :index => true
   property :verified_by_user_id, Integer, :nullable => true, :index => true
   property :loan_id,             Integer, :nullable => true, :index => true

@@ -515,6 +515,7 @@ class Loan
   end
 
   def get_payments(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default, desktop_id = nil, origin = nil) 
+    debugger if id == 4713
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
     self.extend_loan
@@ -542,6 +543,7 @@ class Loan
   end
 
   def make_payments(payments, context = :default, defer_update = false)
+    debugger if id == 4713
     return [false, nil, nil, nil] if payments.empty?
     Payment.transaction do |t|
       self.history_disabled=true
@@ -570,9 +572,10 @@ class Loan
   def pay_prorata(total, received_on)
     # calculates total interest and principal payable in this amount and divides the amount proportionally
     int_to_pay = prin_to_pay = amt_to_pay = 0
-
+    $debug = true
     # load relevant loan_history rows
     loan_history.all( :order => [:date]).map do |lh|
+      debugger if $debug
       next if amt_to_pay >= total or ((lh.interest_due + lh.principal_due) == 0)
       # interest/prin due has the total interest/prin payable. 
       # to get the proper ratio, we need the interest prin payable on that day only
@@ -583,6 +586,7 @@ class Loan
       prin_to_pay += [amount_remaining, total_due_today].min  * prin_due_today / total_due_today
       amt_to_pay = (int_to_pay + prin_to_pay)
     end
+    debugger
     total = int_to_pay + prin_to_pay
     int_to_pay = int_to_pay.round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
     prin_to_pay = total - int_to_pay
@@ -1437,9 +1441,10 @@ class Loan
     statii = []
     _t = DateTime.now
     # then delete all payments and recalculate a virgin loan_history
-    ds = _ps.map{|p| p.deleted_by = user; p.deleted_at = _t; p.destroy}
+    ds = _ps.map{|p| p.deleted_by = user; p.deleted_at = _t; p.save!}
     reload
     update_history
+    debugger
     clear_cache
     # then make the payments again
     pmt_details.keys.sort.each do |date|
