@@ -340,7 +340,7 @@ end
 # Wow. It this supposed to be classless?
 def get_bulk_insert_sql(table_name, data)
   t = Time.now
-  keys = data.first.keys
+  keys = data.first.keys.sort_by{|k| k.to_s}
   sql = "INSERT INTO #{table_name}(#{keys.join(',')} )
               VALUES "
   values = []

@@ -1,0 +1,16 @@
+#! /usr/bin/env ruby
+require 'rubygems'
+require 'yaml'
+config  = YAML.load_file(File.join('config', 'remote.yml')) rescue {}
+this_dir = `pwd`.split("/")[-1].chomp
+remote_directory = config['remote_directory'] || this_dir
+iname = config['remote_host'] || "#{this_dir}.mostfit.in"
+uname = config['remote_username'] || "mostfit"
+what = ARGV[0]
+# if there is a date, get the corresponding db dump, else dump one now
+date = Date.parse(ARGV[0]) rescue nil
+debugger
+unless date
+  status = `ssh -t #{uname}@#{iname} 'cd ~/mostfit_installations/#{iname};bin/dump.rb'`
+  puts status
+end
