@@ -76,3 +76,13 @@ Constants
 
 We have a large number of constants in config/constants.rb ripe for renaming. I don't think we need examples here as they are quite obvious, but Types and Methods (used only in the Bookmark model) for starters.
 
+
+Outdated views
+--------------
+
+Not strictly a naming issue but we've got a bunch of cruft littering our views, namely:
+
+    app/views/dashboard/old_today.html.haml
+    app/views/browse/_totalinfo_old.html.haml
+    app/views/browse/index.html.old
+    app/views/browse/index_old.html.haml
