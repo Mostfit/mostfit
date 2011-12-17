@@ -2,33 +2,29 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Attendance do
   before(:all) do
-    @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
-    @manager.save
+    StaffMember.all.destroy!
+    Branch.all.destroy!
+    Center.all.destroy!
+    User.all.destroy!
+    ClientType.all.destroy!
+    Client.all.destroy!
+
+    @manager = Factory(:staff_member, :name => "Mrs. M.A. Nerger")
     @manager.should be_valid
 
-    @branch = Branch.new(:name => "Kerela branch")
-    @branch.manager = @manager
-    @branch.code = "bra"
-    @branch.save
+    @branch = Factory(:branch, :name => "Kerela branch", :manager => @manager)
     @branch.should be_valid
 
-    @center = Center.new(:name => "Munnar hill center")
-    @center.manager = @manager
-    @center.branch  = @branch
-    @center.code = "cen"
-    @center.save
+    @center = Factory(:center, :branch => @branch, :manager => @manager, :name => "Munnar hill center")
     @center.should be_valid
 
-    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin, :active => true)
+    @user = Factory(:user)
     @user.should be_valid
-    @user.save
 
-    @client_type  =  ClientType.first||ClientType.create(:type => "standard")
+    @client_type = Factory(:client_type, :type => "standard")
+    @client_type.should be_valid
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => 'XW000-2009.01.05', :date_joined => '2008-01-01', :created_by => @user, :client_type => @client_type)
-    @client.center  = @center
-    @client.save
-    @client.errors.each {|e| puts e}
+    @client = Factory(:client, :reference => 'XW000-2009.01.05', :date_joined => '2008-01-01', :created_by => @user, :client_type => @client_type, :center => @center )
     @client.should be_valid
   end
 

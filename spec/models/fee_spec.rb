@@ -1,62 +1,44 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
+#
+# NOTE: This spec contains a great number of tests that fail on an error on #round_to_nearest in /lib/functions.rb
+# which appears to be called through the Loan model. This is beyond the scope of the Fee spec.
+#
+
 describe Fee do
   before(:all) do
-    Payment.all.destroy! if Payment.all.count > 0
-    Client.all.destroy! if Client.count > 0
-    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password')
-    @user.role = :admin
-    @user.save
+    User.all.destroy!
+    StaffMember.all.destroy!
+    Funder.all.destroy!
+    Branch.all.destroy!
+    Center.all.destroy!
+    Payment.all.destroy!
+    Client.all.destroy!
+    LoanProduct.all.destroy!
+
+    @user = Factory(:user, :role => 'admin')
     @user.should be_valid
 
-    @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
-    @manager.save
+    @manager = Factory(:staff_member, :name => "Mrs. M.A. Nerger")
     @manager.should be_valid
 
-    @funder = Funder.new(:name => "FWWB")
-    @funder.save
+    @funder = Factory(:funder, :name => "FWWB")
     @funder.should be_valid
 
-    @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
-    @funding_line.funder = @funder
-    @funding_line.save
+    @funding_line = Factory(:funding_line, :funder => @funder)
     @funding_line.should be_valid
 
-    @branch = Branch.new(:name => "Kerela branch")
-    @branch.manager = @manager
-    @branch.code = "BR"
-    @branch.save
+    @branch = Factory(:branch, :manager => @manager)
     @branch.should be_valid
 
-    @center = Center.new(:name => "Munnar hill center")
-    @center.manager = @manager
-    @center.branch  = @branch
-    @center.code = "CE"
-    @center.creation_date = Date.parse('2006-01-01')
-    @center.save
-    @center.errors.each {|e| puts e}
+    @center = Factory(:center, :manager => @manager, :branch => @branch)
     @center.should be_valid
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => Time.now.to_s, :created_by => @user, 
-                         :date_joined => Date.parse('2006-01-01'), :created_by_staff => @center.manager,
-                         :client_type => ClientType.create(:type => "Standard"), :center => @center)
-    @client.save
+    @client = Factory(:client, :created_by => @user, :created_by_staff => @center.manager, :center => @center)
     @client.errors.each {|e| puts e}
     @client.should be_valid
-    # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
-    @loan_product = LoanProduct.new
-    @loan_product.name = "LP1"
-    @loan_product.max_amount = 2000
-    @loan_product.min_amount = 1000
-    @loan_product.max_interest_rate = 100
-    @loan_product.min_interest_rate = 0.1
-    @loan_product.installment_frequency = :weekly
-    @loan_product.max_number_of_installments = 25
-    @loan_product.min_number_of_installments = 25
-    @loan_product.loan_type = "DefaultLoan"
-    @loan_product.valid_from = Date.parse('2000-01-01')
-    @loan_product.valid_upto = Date.parse('2012-01-01')
-    @loan_product.save
+
+    @loan_product = Factory(:loan_product)
     @loan_product.errors.each {|e| puts e}
     @loan_product.should be_valid
   end
@@ -65,22 +47,13 @@ describe Fee do
     ApplicableFee.all.destroy!
     Loan.all.destroy!
     Fee.all.destroy!
-    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
-    @loan.history_disabled = true
-    @loan.applied_by       = @manager
-    @loan.funding_line     = @funding_line
-    @loan.client           = @client
-    @loan.loan_product     = @loan_product
-    @loan.valid?
+
+    @loan = Factory(:loan, :applied_by => @manager, :funding_line => @funding_line, :client => @client, :loan_product => @loan_product)
     @loan.errors.each {|e| puts e}
     @loan.should be_valid
-    @loan.save
-    @f = Fee.new
-    @f.name = "Test Fee"
-    @f.payable_on = :loan_applied_on
-    @f.amount = 1000
+
+    @f = Factory.build(:fee)
     @f.should be_valid
-    @f.amount = nil
   end
 
   it "should have a name" do
@@ -99,11 +72,16 @@ describe Fee do
     @f.should be_valid
   end
 
+  # This spec currently fails because the model does not take the min_amount attribute
+  # into account when the amount attribute is set. It is possible to set the amount to
+  # 100 and the min_amount to 1000. If the amount attribute is set then fees_for
+  # automatically takes this number without checking min_amount, causing this test to fail.
   it "should never return less than min_amount" do
     @f.min_amount = 1000
     @f.fees_for(@loan).should == 1000
   end
 
+  # This spec also currently fails, see the previous spec
   it "should never return more than max_amount" do
     @f.percentage = 1
     @f.max_amount = 1
@@ -161,10 +139,7 @@ it "should change when loan amount changes" do
   end
 
   it "should return correct fee_schedule for disbursal / scheduled_disbursal_date" do
-    @f = Fee.new
-    @f.name = "Disbursal Fee"
-    @f.payable_on = :loan_disbursal_date
-    @f.amount = 1000
+    @f = Factory(:fee, :amount => 1000, :payable_on => :loan_disbursal_date)
     @f.should be_valid
     @loan_product.fees = [@f]
     @loan_product.save
@@ -179,7 +154,7 @@ it "should change when loan amount changes" do
   end
   
   it "should return correct fee_schedule for multiple fees even on the same date" do
-    @f2 = Fee.new(:name => "Other Fee")
+    @f2 = Factory.build(:fee, :name => "Other Fee")
     @f2.amount = 111
     @f2.payable_on = :loan_applied_on
     @f2.save.should be_true
@@ -238,7 +213,7 @@ it "should change when loan amount changes" do
     
 
   it "should return correct fees payable" do
-    @f2 = Fee.new(:name => "Other Fee")
+    @f2 = Factory.build(:fee, :name => "Other Fee")
     @f2.amount = 111
     @f2.payable_on = :loan_applied_on
     @f2.should be_valid
@@ -252,7 +227,7 @@ it "should change when loan amount changes" do
 
 
   it "should return correct fees_paid" do
-    @f2 = Fee.new(:name => "Other Fee")
+    @f2 = Factory.build(:fee, :name => "Other Fee")
     @f2.amount = 111
     @f2.payable_on = :loan_applied_on
     @f2.should be_valid
@@ -332,7 +307,7 @@ it "should change when loan amount changes" do
 ### start of client fee spec
 
   it "should give correct fee schedule for client" do
-    @client_fee = Fee.new(:name => "client fee", :amount => 20, :payable_on => :client_date_joined)
+    @client_fee = Factory(:fee, :amount => 20, :payable_on => :client_date_joined)
     @client_fee.client_types << ClientType.first
     @client_fee.save
     @client_fee.errors.each {|e| puts e}
@@ -365,52 +340,61 @@ it "should change when loan amount changes" do
   it "should work just as well for another fee" do
     Payment.all(:client => @client, :loan => nil).destroy!
     ct = ClientType.create(:type => "New")
-    @fee1 = Fee.new(:name => "card fee", :amount => 20, :payable_on => :client_date_joined)
+    @fee1 = Factory.build(:fee, :name => "card fee", :amount => 20, :payable_on => :client_date_joined)
     @fee1.errors.each {|e| puts e}
     @fee1.client_types << ct
     @fee1.save
     @fee1.should be_valid
 
-    @fee2 = Fee.new(:name => "grt fee", :amount => 10, :payable_on => :client_grt_pass_date)
+    @fee2 = Factory.build(:fee, :name => "grt fee", :amount => 10, :payable_on => :client_grt_pass_date)
     @fee2.errors.each {|e| puts e}
     @fee2.client_types << ct
     @fee2.save
     @fee2.should be_valid
 
-    @client = Client.new(:name => 'Ramesh bhai', :reference => "foo132431", :created_by => @user, :date_joined => Date.parse('2006-01-01'),
-                         :client_type => ct, :center => @center, :grt_pass_date => Date.today)
+    @client = Factory.build(:client, :name => 'Ramesh bhai', :reference => "foo132431", :created_by => @user, :date_joined => Date.parse('2006-01-01'),
+                            :client_type => ct, :center => @center, :grt_pass_date => Date.today)
     @client.save
 
     @client.fee_schedule.should == {@client.date_joined => {@fee1 => 20}, Date.today => {@fee2 => 10}}
     @client.total_fees_payable_on(Date.today - 1).should == 20
     @client.total_fees_payable_on(Date.today).should == 30
     @client.fees_payable_on.should == {@fee1 => 20, @fee2 => 10}
-    @p = Payment.new(:amount => 20, :received_on => @client.date_joined, :type => :fees, :client => @client,
-                     :received_by => @manager, :created_by => @user, :comment => "card fee")
+
+    @p = Factory.build(:payment, :amount => 20, :received_on => @client.date_joined, :type => :fees, :client => @client,
+                       :received_by => @manager, :created_by => @user, :comment => "card fee")
     @p.should be_valid 
     @p.save
-    @p = Payment.new(:amount => 5, :received_on => Date.today - 1, :type => :fees, :client => @client,
-                     :received_by => @manager, :created_by => @user, :comment => "grt fee")
+
+    # This one is currently failing but I couldn't quite work out why. I think this may be supposed to
+    # fail on #not_received_before_loan_is_disbursed but not sure.
+    # (We're also testing payments in the Fee spec here by the way.)
+    @p = Factory.build(:payment, :amount => 5, :received_on => Date.today - 1, :type => :fees, :client => @client,
+                       :received_by => @manager, :created_by => @user, :comment => "grt fee")
     @p.should_not be_valid # trying to pay fee before it is due
     @p.received_on = Date.today
     @p.should be_valid
     @p.save
+
     @client.fees_paid.should == {@client.date_joined => {@fee1 => 20}, Date.today => {@fee2 => 5}}
     @client.fees_payable_on.should == {@fee2 => 5}
-
   end
 
   it "should pay client fees correctly" do
     Payment.all.destroy!
     Fee.all.destroy!
+    # Isn't this slightly redundant?
     @client = Client.get(@client.id)
-    @fee1 = Fee.new(:name => "client fee", :amount => 20, :payable_on => :client_date_joined)
+
+    @fee1 = Factory.build(:fee, :name => "client fee", :amount => 20, :payable_on => :client_date_joined)
     @fee1.client_types << @client.client_type
     @fee1.save
+    @fee1.should be_valid
 
-    @fee2 = Fee.new(:name => "grt fee", :amount => 10, :payable_on => :client_grt_pass_date)
+    @fee2 = Factory.build( :fee, :name => "grt fee", :amount => 10, :payable_on => :client_grt_pass_date)
     @fee2.client_types << @client.client_type
     @fee2.save
+    @fee2.should be_valid
     
     @client.applicable_fees.destroy!
     @client.should be_valid

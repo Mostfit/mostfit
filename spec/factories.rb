@@ -90,6 +90,7 @@ FactoryGirl.define do
     reference       { "XW000-2009.01.05.#{Time.new.usec}" }
     name            { Factory.next(:name) }
     active          true
+    gender          'male'
     date_joined     { Date.parse('2000-01-01') }
 
     association     :client_type

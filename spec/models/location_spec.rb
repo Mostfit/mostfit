@@ -2,7 +2,8 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Location do
   before(:all) do
-    load_fixtures :staff_members, :branches, :centers
+    @branch = Factory(:branch)
+    @center = Factory(:center, :branch => @branch)
   end
 
   it "should have parent" do

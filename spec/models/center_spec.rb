@@ -4,18 +4,16 @@ describe Center do
 
   before(:all) do
     StaffMember.all.destroy!
-    @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
-    @manager.save
+    User.all.destroy!
+    Branch.all.destroy!
+
+    @manager = Factory(:staff_member)
     @manager.should be_valid
 
-    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin, :active => true)
+    @user = Factory(:user)
     @user.should be_valid
-    @user.save
 
-    @branch = Branch.new(:name => "Kerela branch")
-    @branch.manager = @manager
-    @branch.code = "bra"
-    @branch.save
+    @branch = Factory(:branch, :manager => @manager)
     @branch.should be_valid
   end
 
@@ -41,12 +39,14 @@ describe Center do
     @center.should_not be_valid
   end
 
-  it "center should have meeting_days" do
+  # The following specs are currently failing because the method that sets up center_meeting_days
+  # is borked. This is documented in the Center model itself.
+  it "should have meeting_days" do
     @center.center_meeting_days.length.should eql(1)
     @center.should be_valid
   end
 
-  it "center should have meeting date change should create a new center_meeting_day entry" do
+  it "should have meeting date change should create a new center_meeting_day entry" do
     @center.meeting_day = :tuesday
     @center.save
     @center.center_meeting_days.length.should eql(2)
@@ -181,32 +181,21 @@ describe Center do
   end
  
   it "should be able to 'have' clients" do
-    name = 'Ms C.L. Ient'
-    ref  = 'XW000-2009.01.05'
-    @user = User.create(:login => "branchmanager", :password => "branchmanager", :password_confirmation => "branchmanager", :role => :mis_manager)
-    @client = Client.new(:name => name, :reference => ref, :date_joined => Date.today, :client_type => ClientType.create(:type => "standard"))
-    @client.center     = @center
-    @client.created_by = @user
-    @client.save
-    @client.errors.each {|e| p e}
-    @client.should be_valid
-    @client.save
-    
-    @center.clients << @client
-    @center.should be_valid
-    @center.clients.first.name.should eql(name)
-    @center.clients.first.reference.should eql(ref)
 
-    client2 = Client.new(:name => 'Mr. T.A. Kesmoney', :reference => 'AN000THER_REF', :date_joined => Date.today,
-                         :client_type => ClientType.first, :created_by => @user)
-    client2.center  = @center
-    client2.created_by = @user
-    client2.save
+    user = Factory(:user, :role => :mis_manager)
+    user.should be_valid
+
+    client = Factory(:client, :center => @center, :created_by => user)
+    client.errors.each {|e| p e}
+    client.should be_valid
+    
+    @center.clients.count.should eql(1)
+
+    client2 = Factory(:client, :center => @center, :created_by => user)
+    client2.errors.each {|e| p e}
     client2.should be_valid
 
-    @center.clients << client2
-    @center.should be_valid
-    @center.clients.size.should eql(2)
+    @center.clients.count.should eql(2)
   end
 
 end

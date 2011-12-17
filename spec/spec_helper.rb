@@ -7,8 +7,6 @@ if (local_gem_dir = File.join(File.dirname(__FILE__), '..', 'gems')) && $BUNDLE.
   $BUNDLE = true; Gem.clear_paths; Gem.path.unshift(local_gem_dir)
 end
 
-require 'spec/factories'
-
 require "merb-core"
 require "spec" # Satisfies Autotest and anyone else not using the Rake tasks
 
@@ -35,6 +33,8 @@ Spec::Runner.configure do |config|
   end
 end
 
+# Don't include the factories until the environment has been loaded
+require 'spec/factories'
 
 class MockLog
   def info(data)
