@@ -253,6 +253,7 @@ class Payment
     end
   end
 
+  # This assumes a payment is related to a loan, if no loan is present it fails the validation without warning (nil is returned)
   def only_take_payments_on_disbursed_loans?
     return true if deleted_at
     if loan
@@ -260,10 +261,12 @@ class Payment
       [false, "Payments cannot be made on loans that are written off, repaid or not (yet) disbursed. This loan is #{loan.get_status(received_on)}"]
     end
   end
+
   def not_received_in_the_future?
     return true if received_on <= Date.today + Mfi.first.number_of_future_days
     [false, "Payments cannot be received in the future"]
   end
+
   def not_received_in_past_upto?
     past_days = Mfi.first.number_of_past_days
     if Mfi.first.min_date_from == :in_operation_since
@@ -275,7 +278,7 @@ class Payment
     [false, "Payments cannot be received in past date"]
   end
 
-
+  # Again if no loan is associated with this payment this validation fails silently
   def not_received_before_loan_is_disbursed?
     if loan
       return [false, "Payments cannot be received before the loan is disbursed"] if loan.disbursal_date.blank?

@@ -5,12 +5,10 @@ describe DirtyLoan do
   # a new loan between the two tests below as this would cause the queue
   # to clear
   before(:all) do
-    Loan.all.destroy!
     @loan = Factory(:loan)
   end
 
   it "should dirty the loan when added" do
-    loan = Loan.first
     DirtyLoan.pending.length.should == 0
     DirtyLoan.add(@loan)
     DirtyLoan.pending.length.should == 1

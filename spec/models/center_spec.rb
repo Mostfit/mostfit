@@ -3,10 +3,6 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe Center do
 
   before(:all) do
-    StaffMember.all.destroy!
-    User.all.destroy!
-    Branch.all.destroy!
-
     @manager = Factory(:staff_member)
     @manager.should be_valid
 

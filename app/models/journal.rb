@@ -95,7 +95,10 @@ class Journal
           Posting.create(:amount => (debit_amount||amount) * -1, :journal_id => journal.id, :account => debit_account, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
         }
       else
-        Posting.create(:amount => amount * -1, :journal_id => journal.id, :account => debit_accounts, :currency => journal_params[:currency], :fee_id => rules.first.fee_id, :action => rules.first.action)
+        # I changed this statement to match the one right above here, because we were raising nil errors
+        # if no rules were supplied as a parameter. Since the create statement above used this method, I
+        # assumed it would be safe.
+        Posting.create(:amount => amount * -1, :journal_id => journal.id, :account => debit_accounts, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
       end
       
 
@@ -115,8 +118,8 @@ class Journal
           Posting.create(:amount => (credit_amount||amount), :journal_id => journal.id, :account => credit_account, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
         }
       else
-
-        Posting.create(:amount => amount, :journal_id => journal.id, :account => credit_accounts, :currency => journal_params[:currency], :fee_id => rules.first.fee_id, :action => rules.first.action)
+        # Similar to line #98 I updated this to work the same way as the create statement right above here.
+        Posting.create(:amount => amount, :journal_id => journal.id, :account => credit_accounts, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
       end
       
       # Rollback in case of both accounts being the same      

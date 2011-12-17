@@ -9,14 +9,17 @@ class Loan
 
   before :valid?,  :parse_dates
   before :valid?,  :convert_blank_to_nil
-  after  :save,    :update_history_caller  # also seems to do updates
+  before :valid?,  :set_loan_product_parameters
+
   before :save,    :update_loan_cache
-  after  :create,  :levy_fees_new          # we need a separate one for create for a variety of reasons to  do with overwriting old fees
   before :save,    :levy_fees
-  after  :create,  :update_cycle_number
+  before :save,    :set_bullet_installments
+
   before :destroy, :verified_cannot_be_deleted
-  before :valid?,    :set_loan_product_parameters
-  before :save, :set_bullet_installments
+
+  after  :save,    :update_history_caller  # also seems to do updates
+  after  :create,  :levy_fees_new          # we need a separate one for create for a variety of reasons to  do with overwriting old fees
+  after  :create,  :update_cycle_number
 
   def rs
     self.repayment_style or self.loan_product.repayment_style
@@ -215,7 +218,7 @@ class Loan
     force = true if self.new?
     self.repayment_style = self.rs
     @orig_attrs = self.original_attributes
-    t = Time.now
+    t = Time.now # < Are we using this for anything?
     self.c_center_id = self.client.center.id if force
     self.c_branch_id = self.client.center.branch.id if force
     self.c_client_group_id = (self.client.client_group_id if force) or 0
@@ -1194,7 +1197,7 @@ class Loan
       actual_outstanding_principal           = outstanding ? actual[:balance].round(2) : 0
       actual_outstanding_total               = outstanding ? actual[:total_balance].round(2) : 0
       actual_outstanding_interest            = outstanding ? (actual_outstanding_total - actual_outstanding_principal) : 0
-
+      # Debug only on 9/7/2011?
       debugger if date == Date.new(2011,9,7)
       _apo                                   = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max # advance principal outstanding at the start
       _api                                   = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max

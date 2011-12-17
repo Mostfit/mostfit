@@ -2,13 +2,6 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Attendance do
   before(:all) do
-    StaffMember.all.destroy!
-    Branch.all.destroy!
-    Center.all.destroy!
-    User.all.destroy!
-    ClientType.all.destroy!
-    Client.all.destroy!
-
     @manager = Factory(:staff_member, :name => "Mrs. M.A. Nerger")
     @manager.should be_valid
 

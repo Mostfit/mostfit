@@ -2,11 +2,12 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Weeksheet do
   before(:all) do
-    load_fixtures :users, :staff_members, :regions, :areas, :branches, :centers, :client_types, :clients, :loan_products, :funders, :funding_lines, :loans, :loan_history
+    #load_fixtures :users, :staff_members, :regions, :areas, :branches, :centers, :client_types, :clients, :loan_products, :funders, :funding_lines, :loans, :loan_history
+
+    @center = Factory(:center)
   end
 
   before(:each) do
-    @center = Center.get(1)
     @weeksheets = Weeksheet.get_center_weeksheet(@center, Date::civil(2011,03,22))
   end
 

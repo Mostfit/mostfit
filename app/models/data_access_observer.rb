@@ -16,6 +16,9 @@ class DataAccessObserver
   end
   
   def self.log(obj)
+    Merb.logger.debug ">> Logging access of object: #{obj.inspect} by user #{@_user.inspect}"
+
+    # We seem to be opening a file here for no good reason, nothing ever gets written to it?
     f = File.open("log/#{obj.class}.log","a")
     begin
       if obj
@@ -38,11 +41,11 @@ class DataAccessObserver
         log = AuditTrail.new(:auditable_id => obj.id, :action => @action, :changes => diff.to_yaml, :type => :log,
                              :auditable_type => model, :user => @_user, :created_at => DateTime.now)
         debugger
+        Merb.logger.debug ">> Logging to AuditTrail: #{log.inspect}: #{log.valid?} (#{log.errors.full_messages.join(', ')})"
         log.save
       end
     rescue Exception => e
-      p diff if diff
-      Merb.logger.info(e.to_s)
+      Merb.logger.info("Error creating AuditTrail: #{e.to_s}, diff: #{diff.inspect}")
       Merb.logger.info(e.backtrace.join("\n"))
     end
   end

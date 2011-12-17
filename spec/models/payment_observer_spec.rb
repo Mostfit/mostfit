@@ -1,43 +1,37 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
+#
+# These tests won't work without proper account_period fixtures, but the current issue
+# with their validations is making this test fail before it starts.
+# (see spec/models/accounting_period_spec.rb for details)
+#
 describe PaymentObserver do
 
   before(:all) do
+    # Not sure what this is used for?
     ParRow = Struct.new(:less_than_30, :between_30_and_60, :between_60_and_90, :more_than_90)
+
     @date = Date.new(2009, 6, 29)
     @weekdays = [:monday,:tuesday,:wednesday,:thursday,:friday,:saturday,:sunday]
-    @user = User.new(:login => 'Joe', :password => 'password', :password_confirmation => 'password', :role => :admin)
-    @user.save
+
+    @user = Factory(:user, :login => 'Joe', :password => 'password', :password_confirmation => 'password', :role => :admin)
     @user.should be_valid
 
-    @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
+    @manager = Factory(:staff_member)
     @manager.should be_valid
-    @manager.save
 
-    @funder = Funder.new(:name => "FWWB")
-    @funder.save
-    @funder.should be_valid
-    
-    @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", 
-                                    :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
-    @funding_line.funder = @funder
-    @funding_line.save
+    @funding_line = Factory(:funding_line, :amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
     @funding_line.should be_valid
+
     @num_clients = []
     @loans = []
 
-    @fee = Fee.new(:name => "Processing Fee 3 %", :percentage => 0.03, :payable_on => :loan_approved_on)
-    @fee.save
-    @fee.errors.each{|e| puts e}
+    @fee = Factory(:fee, :name => "Processing Fee 3 %", :percentage => 0.03, :payable_on => :loan_approved_on)
     @fee.should be_valid
 
-    @organization = Organization.new(:name => "Organization", :org_guid => "63416690-b6c1-012e-8195-002170a9c469")
-    @organization.save
-    @organization.should be_valid
-    
-    @accounting_period = AccountingPeriod.new(:name => "Organization", :begin_date => (@date - 100), :end_date => (Date.today + 100), :organization_id => Organization.first.id)
-    @accounting_period.save!
-    
+    @accounting_period = Factory(:accounting_period, :name => "Organization", :begin_date => (@date - 100), :end_date => (Date.today + 100))
+    @accounting_period.should be_valid
+
     @loan_product = LoanProduct.new
     @loan_product.name = "LP1"
     @loan_product.max_amount = 10000
@@ -70,14 +64,10 @@ describe PaymentObserver do
     @target_for_amount.errors.each {|e| puts e}
     @target_for_amount.should be_valid
 
-    @region = Region.new(:id => 1, :name => "Region 1", :manager_id => @manager.id, :creation_date => Date.today)
-    @region.save
-    @region.errors.each {|e| puts e}
+    @region = Factory(:region, :name => "Region 1", :manager_id => @manager.id, :creation_date => Date.today)
     @region.should be_valid
 
-    @area = Area.new(:name => "Area 1", :region_id => @region.id, :manager_id => @manager.id, :creation_date => Date.today)
-    @area.save
-    @area.errors.each {|e| puts e}
+    @area = Factory(:area, :name => "Area 1", :region_id => @region.id, :manager_id => @manager.id, :creation_date => Date.today)
     @area.should be_valid
     
     # generate a couple of branches

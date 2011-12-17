@@ -1,5 +1,11 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
+#
+# Again, although these specs look relatively simple to refactor they bork on the dependency between
+# Loan and lib/functions. The massive setup could probably be reduced to two or three factory calls if
+# we can work this out.
+#
+
 describe Payment do
 
   before(:all) do
@@ -86,51 +92,54 @@ describe Payment do
     @payment.save
     @payment.errors.each {|e| puts e}
     @payment.should be_valid
+
+#    @payment = Factory.build(:payment, :loan => Factory(:loan, :disbursal_date => Date.today - 365))
+#    @payment.should be_valid
   end
 
   it "should not be valid without belonging to a loan" do
-    @payment.loan=nil
+    @payment.loan = nil
     @payment.should raise_error
   end
   it "should not be valid without being created by a staff member" do
-    @payment.created_by=nil
+    @payment.created_by = nil
     @payment.should_not be_valid
   end
   it "should not be valid without being received by a staff member" do
-    @payment.received_by=nil
+    @payment.received_by = nil
     @payment.should_not be_valid
   end
   it "should not be valid without being created by active user" do
-    @user.active=false
+    @user.active = false
     @payment.should_not be_valid
   end
   it "should not be valid without beng received by an active staff member" do
-    @manager.active=false
+    @manager.active = false
     @payment.should_not be_valid
   end
   it "should not be valid without being properly deleted" do
-    @payment.deleted_by=@user
-    @payment.deleted_at=nil
+    @payment.deleted_by = @user
+    @payment.deleted_at = nil
     @payment.should_not be_valid
-    @payment.deleted_at=Date.parse("2009-02-02")
+    @payment.deleted_at = Date.parse("2009-02-02")
     @payment.should be_valid
   end
   it "should not be valid if date of receival is in future" do
-    @payment.received_on=Date.new() + 10
+    @payment.received_on = Date.new() + 10
     @payment.should_not be_valid	
     @payment.received_on = nil
   end
   it "should not be valid if interest is negative" do
-    @payment.amount= -2
+    @payment.amount = -2
     @payment.should_not be_valid
   end
   it "should not be valid if principal is negative" do
-    @payment.amount=-600
+    @payment.amount = -600
     @payment.type = :principal
     @payment.should_not be_valid
   end
   it "should not be valid if total is negative" do
-    @payment.amount =-1900
+    @payment.amount = -1900
     @payment.should_not be_valid
   end
   it "should not be valid if payment is received before disbursal of loan" do
@@ -138,7 +147,7 @@ describe Payment do
     @payment.should_not be_valid
   end
   it "should not be valid if paying too much principal" do
-    @payment.amount=5000
+    @payment.amount = 5000
     @payment.type = :principal
     @payment.should_not be_valid
   end
@@ -153,16 +162,16 @@ describe Payment do
     payment.verified_by = @user
     payment.should be_valid
     payment.save
-    payment.deleted_by=@user
-    payment.deleted_at=Date.parse("2009-02-02")
+    payment.deleted_by = @user
+    payment.deleted_at = Date.parse("2009-02-02")
     payment.save.should be_false
 
     payment = Payment.first(:loan_id => @loan.id)
     payment.verified_by = nil
     payment.save.should be_true
     
-    payment.deleted_by=@user
-    payment.deleted_at=Date.parse("2009-02-02")
+    payment.deleted_by = @user
+    payment.deleted_at = Date.parse("2009-02-02")
     payment.should be_valid
   end
 

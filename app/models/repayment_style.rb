@@ -9,6 +9,8 @@ class RepaymentStyle
   property :round_total_to, Integer
   property :round_interest_to, Integer
   property :active, Boolean
+  # Maybe a validation against this rounding style would be helpful, it took me forever to figure
+  # out why loans were raising nil errors in lib/functions on validation.
   property :rounding_style, String
   property :force_num_installments, Boolean
   property :custom_principal_schedule, Text, :lazy => false

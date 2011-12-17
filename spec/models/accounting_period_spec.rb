@@ -7,10 +7,6 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 #
 describe AccountingPeriod do
 
-  before(:all) do
-    AccountingPeriod.all.destroy!
-  end
-
   before(:each) do
     @valid_accounting_period = Factory.build(:accounting_period)
   end

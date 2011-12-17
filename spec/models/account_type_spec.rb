@@ -3,8 +3,6 @@ describe AccountType do
   
   before (:each) do
     AccountType.all.destroy!
-    Account.all.destroy!
-
     @account_type = Factory(:account_type, :name => 'Assets', :code => '10000')
   end
 

@@ -6,6 +6,7 @@ FACTORY_HOLIDAYS    = %w[Diwali Holi Pongal Dussehra].freeze
 FACTORY_OCCUPATIONS = %w[Carpenter Astrologer Engineer Teller Cook Butcher Actuary Executive Artist].freeze
 FACTORY_PROVINCES   = ['Maharashtra', 'Andra Pradesh', 'Madhya Pradesh', 'Kerala', 'Tamil Nadu'].freeze
 FACTORY_PURPOSES    = ['Buying a boat', 'Christmas presents', 'Wife\'s birthday'].freeze
+FACTORY_ASSETS      = ['Laptop charger', 'Laser printer', 'Mobile phone', 'Airconditioner'].freeze
 
 FactoryGirl.define do
 
@@ -13,7 +14,7 @@ FactoryGirl.define do
   sequence(:name)               { |n| [FACTORY_NAMES[n%FACTORY_NAMES.length], n.to_s].join(' ') }
   sequence(:email)              { |n| [FACTORY_NAMES[n%FACTORY_NAMES.length], n.to_s, '@', FACTORY_PLACES[n%FACTORY_PLACES.length], '.in'].join.downcase }
   sequence(:city)               { |n| [FACTORY_PLACES[n%FACTORY_PLACES.length], "center", n.to_s].join(' ') }
-  sequence(:province)           { |n| [FACTORY_PROVINCES[n%FACTORY_PROVINCES.length], "branch", n.to_s].join(' ') }
+  sequence(:province)           { |n| [FACTORY_PROVINCES[n%FACTORY_PROVINCES.length], n.to_s].join(' ') }
   # User related sequences
   sequence(:user_login)         { |n| "user_#{n}" }
   # Branch sequences
@@ -38,6 +39,8 @@ FactoryGirl.define do
   # Occupations
   sequence(:occupation)         { |n| [FACTORY_OCCUPATIONS[n%FACTORY_OCCUPATIONS.length], n.to_s].join(' ') }
   sequence(:occupation_code)    { |n| "OCC#{n}" }
+  # Assets
+  sequence(:asset_type)         { |n| [FACTORY_ASSETS[n%FACTORY_ASSETS.length], n.to_s].join(' ') }
 
   #
   # Organizations, Domains, MFIs
@@ -174,6 +177,7 @@ FactoryGirl.define do
   factory :center do
     name            { Factory.next(:province) }
     code            { Factory.next(:center_code) }
+    meeting_day     :wednesday
 
     association     :branch
     association     :manager, :factory => :staff_member
@@ -210,6 +214,7 @@ FactoryGirl.define do
 
   factory :asset_register do
     name            { Factory.next(:name) }
+    asset_type      { Factory.next(:asset_type) }
     association     :manager, :factory => :staff_member
   end
 
@@ -240,6 +245,9 @@ FactoryGirl.define do
     association                   :client
     association                   :loan_product
     association                   :repayment_style
+
+    c_center_id                   { self.client.center.id }
+    c_branch_id                   { self.client.center.branch.id }
   end
 
   factory :loan_product do
@@ -325,15 +333,18 @@ FactoryGirl.define do
     type                :principal
     created_at          { Date.today }
     received_on         { Date.today }
-
     association         :created_by, :factory => :user
     association         :received_by, :factory => :staff_member
     association         :client
+
+    c_center_id         { self.client.center.id }
+    c_branch_id         { self.client.center.branch.id }
   end
 
   factory :repayment_style do
     name                'EquatedWeekly'
     style               'EquatedWeekly'
+    rounding_style      'round' # Took me forever to figure this one out but if we don't specify a rounding style loans will bork badly
     round_total_to      1
     round_interest_to   1
   end
@@ -566,7 +577,7 @@ FactoryGirl.define do
   factory :claim do
     date_of_death       { Date.today }
     claim_id            '201001011'
-    association         :client
+    association         :client, :active => false
   end
 
   factory :comment do

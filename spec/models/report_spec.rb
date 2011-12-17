@@ -21,21 +21,15 @@ describe Report do
     @funding_line.should be_valid
     @num_clients = []
     @loans = []
-    @loan_product = LoanProduct.new
-    @loan_product.name = "LP1"
-    @loan_product.max_amount = 10000
-    @loan_product.min_amount = 1000
-    @loan_product.max_interest_rate = 100
-    @loan_product.min_interest_rate = 0.1
-    @loan_product.installment_frequency = :weekly
+
+
+    @loan_product = Factory.build(:loan_product, :max_amount => 10000, :min_amount => 1000, :min_interest_rate => 0.1, :max_interest_rate => 100)
     @loan_product.max_number_of_installments = 50
     @loan_product.min_number_of_installments = 25
-    @loan_product.loan_type = "DefaultLoan"
     @loan_product.valid_from = Date.parse('2000-01-01')
     @loan_product.valid_upto = Date.parse('2012-01-01')
-    @loan_product.save
-    @loan_product.errors.each {|e| puts e}
     @loan_product.should be_valid
+    @loan_product.save
 
     @target_for_number = Target.new(:attached_to => :staff_member, :target_of => :client_registration, :attached_id => @manager.id, :start_value => 100, :target_type => :relative,
                                     :target_value => 1000, :created_at => Date.today, :start_date => Date.new(Date.today.year, Date.today.month, 01),

@@ -3,58 +3,29 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe Loan do
 
   before(:all) do
-    Rule.all.each{|r| r.destroy}
-    Payment.all.destroy! if Payment.all.count > 0
-    Client.all.destroy! if Client.count > 0
-    @user = User.new(:login => 'Joey', :password => 'password', :password_confirmation => 'password', :role => :admin)
-    @user.save
+    @user = Factory(:user)
     @user.should be_valid
 
-    @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
-    @manager.save
+    @manager = Factory(:staff_member)
     @manager.should be_valid
 
-    @funder = Funder.new(:name => "FWWB")
-    @funder.save
-    @funder.should be_valid
-
-    @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
-    @funding_line.funder = @funder
-    @funding_line.save
+    @funding_line = Factory(:funding_line, :funder => @funder)
     @funding_line.should be_valid
 
-    @branch = Branch.new(:name => "Kerela branch")
-    @branch.manager = @manager
-    @branch.code = "bra"
-    @branch.save
+    @branch = Factory(:branch, :manager => @manager)
     @branch.should be_valid
 
-    @center = Center.new(:name => "Munnar hill center")
-    @center.manager = @manager
-    @center.branch  = @branch
-    @center.code = "cen"
-    @center.creation_date = Date.new(2000, 1, 1)
-    @center.meeting_day = :wednesday
-    @center.save
+    @center = Factory(:center, :manager => @manager, :branch => @branch, :meeting_day => :wednesday)
     @center.should be_valid
 
-    @client = Client.new(:name => 'Ms C.L. Ient', :reference => Time.now.to_s, :client_type => ClientType.create(:type => "Standard"))
-    @client.center  = @center
-    @client.date_joined = Date.parse('2006-01-01')
-    @client.created_by_user_id = 1
-    @client.client_type_id = 1
-    @client.save
-    @client.errors.each {|e| puts e}
+    @client = Factory(:client, :center => @center, :created_by_user_id => @user.id)
     @client.should be_valid
-    # validation needs to check for uniqueness, therefor calls the db, therefor we dont do it
 
     @equated_weekly = RepaymentStyle.new(:style => "EquatedWeekly", :round_total_to => 1, :round_interest_to => 1)
     @equated_weekly.save
 
     @flat = RepaymentStyle.new(:style => "Flat")
     @flat.save
-
-
 
     @loan_product = LoanProduct.new
     @loan_product.name = "LP1"
@@ -77,20 +48,15 @@ describe Loan do
     @loan_product.loan_validation_methods = nil
     @loan_product.save
 
-    @loan = Loan.new(:amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25, :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13")
+    @loan = Factory(:loan,
+      :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25,
+      :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13",
+      :applied_by => @manager, :funding_line => @funding_line, :client => @client, :loan_product => @loan_product)
     @loan.discriminator = Loan
-    @loan.history_disabled = true
-    @loan.applied_by       = @manager
-    @loan.funding_line     = @funding_line
-    @loan.client           = @client
-    @loan.loan_product     = @loan_product.reload
-    @loan.valid?
-    @loan.errors.each {|e| puts e}
     @loan.should be_valid
     @loan.approved_on = "2000-02-03"
     @loan.approved_by = @manager
     @loan.should be_valid
-    @loan_product.errors.each {|e| puts e}
   end
   
   it "should have a discrimintator" do

@@ -2,10 +2,6 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Account do
 
-  before(:all) do
-    Account.all.destroy!
-  end
-
   before(:each) do
     @account = Factory.build( :account, :name => "Cash Account", :gl_code => "CA1001", :opening_balance_on_date => Date.today )
   end
