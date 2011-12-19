@@ -4,8 +4,8 @@
   Overview of all staff members 
   = " of #{@branch.name}" if @branch
 .menu-strip.shaded{:style => "width:90%; margin-bottom: 20px;"}
-  =link_to_with_rights 'create a new staff member', resource(:staff_members, :new), :class => "add"
-  =form(:method => :get, :action => url(:staff_members)) do 
+  = link_to_with_rights 'create a new staff member', resource(:staff_members, :new), :class => "add grey_button"
+  = form(:method => :get, :action => url(:staff_members)) do 
     %b Branch selector
     = select :branch_id, :collection => get_accessible_branches, :text_method => :name, :value_method => :id, :prompt => "All branches"
     |
@@ -15,7 +15,7 @@
     |
     %b Change date
     = date_select "date", @date
-    =submit "Go"
+    = submit "Go"
 
 - if @staff_members.blank?
   %p
@@ -44,7 +44,7 @@
           Written-off loans
       %tr.header
         %th{:colspan => 2}
-        -7.times do
+        - 7.times do
           %th
             This month
           %th
@@ -135,10 +135,9 @@
     - if @staff_members.num_pages==@staff_members.page
       %tr.total
         %td{:colspan => 2 }
-        -7.times do |i|
+        - 7.times do |i|
           %td
-            =instance_variable_get("@#{vars[i]}_thismonth").map{|x| x[1]}.inject(0){|s,x| s+=x}
+            = instance_variable_get("@#{vars[i]}_thismonth").map{|x| x[1]}.inject(0){|s,x| s+=x}
           %td
-            =instance_variable_get("@#{vars[i]}_overall").map{|x| x[1]}.inject(0){|s,x| s+=x}
+            = instance_variable_get("@#{vars[i]}_overall").map{|x| x[1]}.inject(0){|s,x| s+=x}
   = paginate @staff_members
-
