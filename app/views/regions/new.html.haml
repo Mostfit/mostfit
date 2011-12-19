@@ -1,9 +1,12 @@
 %h1 
-  =I18n.t "region.fields.title", :default => "New Region"
+  = I18n.t "region.fields.title", :default => "New Region"
 = error_messages_for @region
 
 = form_for(@region, :action => url(:regions) ) do
   = partial :fields
   = submit I18n.t "region.fields.create", :default => "create"
-
-= link_to I18n.t("region.fields.back", :default => "Back"), url(:regions)
+  &nbsp;&nbsp;&nbsp;
+  %b
+    Or
+  &nbsp;&nbsp;&nbsp;
+  = link_to I18n.t("region.fields.back", :default => "Back"), url(:regions), :class => "grey_button"
