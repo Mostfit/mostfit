@@ -5,6 +5,10 @@
     %td
       = text_field :name
   %tr
+    - if StaffMember.count==0 and session.user.role==:admin
+      %div.error
+        You do not have any staff members data yet. Create them
+        = link_to("here", resource(:staff_members, :new), :target => "_blank")
     %td
       = I18n.t "region.fields.manager", :default => "Manager"
     %td
