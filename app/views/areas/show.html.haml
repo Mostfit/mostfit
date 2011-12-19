@@ -1,17 +1,43 @@
-%h1
-  Area
-  = @area.name
-  = link_to 'Edit',  url(:edit_area,  @area), :class => "edit"
-%table
+%h1== Area : <i>#{@area.name}</i>
+%p.menu-strip{:style => "width: 44%; margin-bottom: 0.2em;"}
+  = link_to 'edit this area details', url(:edit_area, @area), :class => 'edit grey_button'
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  = link_to 'back', resource(:areas), :class => 'grey_button'
+
+%table.loan{ :style => "width: 45%; border: solid 1px #cfcfcf; margin: 5px; " }
   %tr.odd
-    %td Address
-    %td=@area.address
-  %tr
-    %td Contact number
-    %td=@area.contact_number
+    %th.odd
+      Name
+    %td
+      = @area.name
+      ( id:
+      = @area.id
+      )
+  %tr.even
+    %th.even
+      Region
+    %td
+      = link_to @area.region.name, resource(@area.region), :target => "_blank"
   %tr.odd
-    %td Landmark
-    %td=@area.landmark
+    %th.odd
+      Manager
+    %td
+      = link_to @area.manager.name, resource(@area.manager), :target => "_blank"
+  %tr.even
+    %th.even
+      Address
+    %td
+      = @area.address
+  %tr.odd
+    %th.odd
+      Contact number
+    %td
+      = @area.contact_number
+  %tr.even
+    %th.even
+      Landmark
+    %td
+      = @area.landmark
 
 %div.tab_container
   %ul.tabs
