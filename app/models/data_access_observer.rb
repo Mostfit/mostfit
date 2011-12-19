@@ -37,7 +37,6 @@ class DataAccessObserver
         model = (/Loan$/.match(obj.class.to_s) ? "Loan" : obj.class.to_s)
         log = AuditTrail.new(:auditable_id => obj.id, :action => @action, :changes => diff.to_yaml, :type => :log,
                              :auditable_type => model, :user => @_user, :created_at => DateTime.now)
-        debugger
         log.save
       end
     rescue Exception => e
@@ -62,7 +61,6 @@ class DataAccessObserver
 
   before :save do
     # DataAccessObserver.check_session(self)
-    debugger
     DataAccessObserver.get_object_state(self, :update) if not self.new?
   end  
   

@@ -101,6 +101,18 @@ class LoanHistory
     (principal_in_default + interest_in_default).abs.round(2)
   end
 
+  def principal_defaulted_today
+    [scheduled_principal_due - principal_paid,0].max
+  end
+
+  def interest_defaulted_today
+    [scheduled_interest_due - interest_paid,0].max
+  end
+  
+  def total_defaulted_today
+    principal_defaulted_today + interest_defaulted_today
+  end
+
   # this adjusts defaulted interest against advance principal
   def icash_interest_in_default
     [0,interest_in_default + total_advance_outstanding].min
