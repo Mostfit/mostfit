@@ -101,6 +101,19 @@ class Cacher
     (principal_in_default + interest_in_default).abs
   end
 
+  def principal_defaulted_today
+    [scheduled_principal_due - principal_paid,0].max
+  end
+
+  def interest_defaulted_today
+    [scheduled_interest_due - interest_paid,0].max
+  end
+  
+  def total_defaulted_today
+    principal_defaulted_today + interest_defaulted_today
+  end
+
+
   def icash_interest_in_default
     [0,interest_in_default + total_advance_outstanding].min
   end

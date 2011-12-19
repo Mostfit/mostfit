@@ -1289,7 +1289,7 @@ class Loan
       }
       # {:date_field => [:status, :loan_property]}
       {:applied_on => [:applied, :amt_applied_for], :approved_on => [:approved, :amt_sanctioned], :rejected_on => [:rejected, :amount], 
-        :disbursal_date => [:disbursed, :amount], :written_off_on => [:written_off, :last_balance], :preclosed_on => [:preclosed, :last_balance]}.each do |dt, action|
+        :disbursal_date => [:disbursed, :amount], :written_off_on => [:written_off, :last_balance]}.each do |dt, action|
         if date == self.send(dt)
           current_row[action[0]] = action[1] == :last_balance ? last_row[:actual_outstanding_principal] : self.send(action[1])
           current_row["#{action[0].to_s}_count".to_sym] = 1 
@@ -1298,6 +1298,9 @@ class Loan
           current_row["#{action[0].to_s}_count".to_sym] = 0 
         end
       end
+
+      current_row[:preclosed] =   (date == self.preclosed_on) ? current_row[:advance_principal_paid_today] : 0
+      current_row[:preclosed_count] = (date == self.preclosed_on) ? 1 : 0
 
       @history_array << current_row
       last_status = current_row[:status]
@@ -1313,34 +1316,15 @@ class Loan
     @history_array
   end
 
-  def _show_his(arg = {})
+  def _show_his(report_format_id = 1, width = 8, padding = 2)
     # pretty prints the loan history
     # get extended info by saying _show_his(:extended)
-    arg = {:fields => [:basic, :next]} if arg == :extended
-    args = {:width => 10, :padding => 4, :fields => [:basic]}
-    args = args.merge(arg) if arg.is_a? Hash
-    width = args[:width]; padding = args[:padding]; fields = args[:fields]
-
-    print_order = {:basic => {:titles => {:date => :date, :s_total => :scheduled_outstanding_total, :s_bal => :scheduled_outstanding_principal,
-          :a_total => :actual_outstanding_total, :a_bal => :actual_outstanding_principal,
-          :p_paid => :principal_paid, :p_due => :principal_due, :i_paid => :interest_paid, :i_due => :interest_due,
-          :tot_p_pd => :total_principal_paid, :tot_i_pd => :total_interest_paid, :tot_p_due => :total_principal_due, :tot_i_due => :total_interest_due},
-        :title_order => [:date, :s_total, :s_bal, :a_total, :a_bal, :p_paid, :p_due, :i_paid, :i_due, :tot_p_pd, :tot_p_due, :tot_i_pd, :tot_i_due]},
-      :next => {:titles => {:date => :date, :tp_due => :total_principal_due, :tp_paid => :total_principal_paid, :ti_due => :total_interest_due,
-          :ti_paid => :total_interest_paid, :adv_p => :advance_principal_paid, :adv_i => :advance_interest_paid, :def_p => :principal_in_default, 
-          :def_i => :interest_in_default, :b => :branch_id, :c => :center_id, :k => :composite_key},
-        :title_order => [:date, :tp_due, :tp_paid, :ti_due, :ti_paid, :adv_p, :adv_i, :def_p, :def_i, :b, :c, :k]}}
-    fields.each do |f|
-      hist = calculate_history.sort_by{|x| x[:date]}
-      title_order = print_order[f][:title_order]
-      titles = print_order[f][:titles]
-      puts title_order.map{|t| t.to_s.rjust(width - padding/2).ljust(width)}.join("|")
-      hist.each do |h|
-        puts (["#{h[:date]}"] + title_order[1..-1].map{|t| (h[titles[t]] || 0).round(2)}.map{|v| v.to_s}.map{|s| s.rjust(width - padding/2).ljust(width)}).join("|")
-      end
-
+    hist = calculate_history.sort_by{|x| x[:date]}
+    keys = ReportFormat.get(report_format_id).keys
+    puts keys.map{|t| t.to_s.rjust(width - padding/2).ljust(width)}.join("|")
+    hist.each do |h|
+      puts (["#{h[:date]}"] + keys.map{|t| (h[t.to_sym] || 0).round(2)}.map{|v| v.to_s}.map{|s| s.rjust(width - padding/2).ljust(width)}).join("|")
     end
-    puts "Call with _show_his(:extended) to see more fields" if fields == [:basic]
     false
   end
 
