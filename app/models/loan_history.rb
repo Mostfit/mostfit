@@ -65,7 +65,8 @@ class LoanHistory
   property :client_group_id,             Integer, :index => true
   property :center_id,                   Integer, :index => true
   property :branch_id,                   Integer, :index => true
-
+  property :area_id,                     Integer, :index => true
+  property :region_id,                   Integer, :index => true
   property :holiday_id,                  Integer
 
   property :funding_line_id,             Integer, :index => true

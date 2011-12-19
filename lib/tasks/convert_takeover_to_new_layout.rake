@@ -18,7 +18,7 @@ namespace :mostfit do
       repository.adapter.execute("truncate table loan_history;") rescue nil
       Rake::Task['db:autoupgrade'].invoke
       Rake::Task['mostfit:db:prepare'].invoke
-      Rake::Task['mostfit:conversion:update_loan_cache'].invoke
+      Rake::Task['mostfit:data:update_loan_cache'].invoke
       Rake::Task['mostfit:data:create_history'].invoke
     end
   end

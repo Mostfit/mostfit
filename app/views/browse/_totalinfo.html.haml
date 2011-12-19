@@ -55,7 +55,7 @@
       %td.number
         %h1
           = (cbc.fees_due_today + cbc.fees_paid_today).to_currency(:mostfit_default)
-          - total[:paid] += cbc.fees_due_today
+          - total[:due] += cbc.fees_due_today
       %td.number
         %h1.green
           = cbc.fees_paid_today.to_currency(:mostfit_default)

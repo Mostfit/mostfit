@@ -6,7 +6,7 @@ class Cacher
   property :type,                            Discriminator
   property :date,                            Date, :nullable => false, :index => true
   property :model_name,                      String, :nullable => false, :index => true
-  property :model_id,                        Integer, :nullable => false, :index => true, :unique => [:model_name, :date]
+  property :model_id,                        Integer, :nullable => false, :index => true, :unique => [:model_name, :date, :center_id, :branch_id]
   property :branch_id,                       Integer, :index => true
   property :center_id,                       Integer, :index => true
   property :funding_line_id,                 Integer, :index => true
@@ -167,8 +167,9 @@ class Cacher
 #    raise ArgumentError "cannot add cachers of different classes" unless self.class == other.class
     date = (self.date > other.date ? self.date : other.date)
     me = self.attributes; other = other.attributes;
-    attrs = me + other; attrs[:date] = date; attrs[:id] = -1; attrs[:model_name] = "Sum";
+    attrs = me + other; attrs[:date] = date; attrs[:id] = -1; attrs[:model_name] = self.model_name;
     attrs[:model_id] = nil; attrs[:branch_id] = nil; attrs[:center_id] = nil;
+    attrs[:stale] = me[:stale] || other[:stale]
     Cacher.new(attrs)
   end
 
@@ -182,10 +183,12 @@ end
 class BranchCache < Cacher
 
   def self.recreate(date = Date.today, branch_ids = nil)
-    self.update(date, branch_ids, true)
+    self.update(:date => date, :branch_ids => branch_ids, :force => true)
   end
 
-  def self.update(date = Date.today, branch_ids = nil, force = false)
+  def self.update(hash = {})
+    hash = {:date => Date.today, :branch_ids => nil, :force => false}.merge(hash)
+    date = hash[:date]; branch_ids = hash[:branch_ids]; force = hash[:force]
     # updates the cache object for a branch
     # first create caches for the centers that do not have them
     t0 = Time.now; t = Time.now;
@@ -279,9 +282,6 @@ end
 
 class CenterCache < Cacher
 
-  # these have to be hooks, for obvious reasons, but for now we make do with some hardcoded magic!
-
-  EXTRA_FIELDS = [:delayed_disbursals]
   def self.update(hash = {})
     # creates a cache per center for branches and centers per the hash passed as argument
     date = hash.delete(:date) || Date.today
@@ -344,8 +344,16 @@ class CenterCache < Cacher
     @center = Center.get(cid)
     d = options[:date].class != Date ? (Date.parse(options[:date]) rescue nil) : options[:date]
     raise ArgumentError.new("Cannot parse date") unless d
-
-    repository.adapter.execute("UPDATE cachers SET stale=1 WHERE center_id=#{cid} OR (center_id = 0 AND branch_id = #{@center.branch_id}) AND date >= '#{d.strftime('%Y-%m-%d')}' AND stale=0")
+    sql = %Q{
+        UPDATE cachers 
+        SET stale=1 
+        WHERE (center_id=#{cid} 
+             OR (center_id = 0 
+               AND branch_id = #{@center.branch_id})) 
+           AND date >= '#{d.strftime('%Y-%m-%d')}' 
+           AND stale=0 
+           AND type IN ('CenterCache','BranchCache')}
+    repository.adapter.execute(sql)
     # puts "STALIFIED CENTERS in #{(Time.now - t).round(2)} secs"
 
   end
@@ -363,3 +371,166 @@ class CenterCache < Cacher
 
 
 end
+
+
+class FundingLineCache < Cacher
+
+  def self.update(hash = {})
+    # creates a cache per funding line for branches and funding lines per the hash passed as argument
+    date = hash.delete(:date) || Date.today
+    force = hash.delete(:force) || false
+    hash = hash.select{|k,v| [:branch_id, :center_id, :funding_line_id].include?(k)}.to_hash
+
+    unless force
+      # the problem of doing 2 factor stalification - we might have within the same center some loans that belong to a stale funding line
+      # and others that belong to other fuding lines.
+      # therefore, the incremental update must necessarily be per loan_ids.
+      # we have to find the loan ids in the stale funding line
+      fl_caches = FundingLineCache.all(:center_id.not => 0, :date => date)
+      stale_caches = fl_caches.stale.aggregate(:model_id, :center_id)
+      missing_caches = LoanHistory.all(:date.gte => date).aggregate(:funding_line_id, :center_id) - fl_caches.aggregate(:model_id, :center_id)
+      caches_to_do = stale_caches + missing_caches
+      unless caches_to_do.blank?
+        ids = caches_to_do.map{|x| "(#{x.join(',')})"}
+        sql = "select loan_id from loan_history where (funding_line_id, center_id) in (#{ids.join(',')}) group by loan_id"
+        loan_ids = repository.adapter.query(sql)
+        hash[:loan_id] = loan_ids
+      end
+    end
+    
+    fl_data = FundingLineCache.create(hash.merge(:date => date, :group_by => [:branch_id, :center_id, :funding_line_id])).deepen.values.sum
+    return false if fl_data == nil
+    now = DateTime.now
+    fl_data.delete(:no_group)
+    return true if fl_data.empty?
+    fls = fl_data.map do |center_id,funding_line_hash|
+      funding_line_hash.map do |fl_id, fl|
+        fl_data[center_id][fl_id].merge({:type => "FundingLineCache",:model_name => "FundingLine", :model_id => fl_id, :date => date, :updated_at => now})
+      end
+    end.flatten
+    if fls.nil?
+      return false 
+    end
+    _fls = fls.map{|fl| fl.delete(:funding_line_id); fl}
+    sql = get_bulk_insert_sql("cachers", _fls)
+    # destroy the relevant funding_line caches in the database
+    debugger
+    ids = fl_data.map{|center_id, funding_lines|
+      funding_lines.map{|fl_id, data|
+        [center_id, fl_id]
+      }
+    }
+    ids = ids.flatten(1).map{|x| "(#{x.join(',')})"}.join(",")
+    raise unless repository.adapter.execute("delete from cachers where model_name = 'FundingLine' and (center_id, model_id) in (#{ids})")
+    repository.adapter.execute(sql)
+
+    # now do the branch aggregates for each funding line cache
+    FundingLine.all.each do |fl|
+      debugger
+      relevant_branch_ids = (hash[:center_ids] ? Center.all(:id => hash[:center_ids]) : Center.all).aggregate(:branch_id)
+      branch_data_hash = FundingLineCache.all(:model_name => "FundingLine", :branch_id => relevant_branch_ids, :date => date, :center_id.gt => 0, :model_id => fl.id).group_by{|x| x.branch_id}.to_hash
+
+      # we now have {:branch => [{...center data...}, {...center data...}]}, ...
+      # we have to convert this to {:branch => { sum of centers data }, ...}
+
+      branch_data = branch_data_hash.map do |bid,ccs|
+        sum_centers = ccs.map do |c|
+          center_sum_attrs = c.attributes.select{|k,v| v.is_a? Numeric}.to_hash
+        end
+        [bid, sum_centers.reduce({}){|s,h| s+h}]
+      end.to_hash
+
+      # TODO then add the loans that do not belong to any center
+      # this does not exist right now so there is no code here.
+      # when you add clients directly to the branch, do also update the code here
+
+      branch_data.map do |bid, c|
+        debugger
+        bc = FundingLineCache.first_or_new({:model_name => "FundingLine", :branch_id => bid, :date => date, :model_id => fl.id, :center_id => 0})
+        attrs = c.merge(:branch_id => bid, :center_id => 0, :model_id => fl.id, :stale => false, :updated_at => DateTime.now, :model_name => "FundingLine")
+        if bc.new?
+          bc.attributes = attrs.merge(:id => nil, :updated_at => DateTime.now)
+          bc.save
+        else
+          bc.update(attrs.merge(:id => bc.id))
+        end
+      end
+    end
+  end
+
+
+  def self.create(hash = {})
+    # creates a cacher from loan_history table for any arbitrary condition. Also does grouping
+    debugger
+    date = hash.delete(:date) || Date.today
+    group_by = hash.delete(:group_by) || [:branch_id, :center_id, :funding_line_id]
+    cols = hash.delete(:cols) || COLS
+    flow_cols = FLOW_COLS
+    balances = LoanHistory.latest_sum(hash,date, group_by, cols)
+    pmts = LoanHistory.composite_key_sum(LoanHistory.all(hash.merge(:date => date)).aggregate(:composite_key), group_by, flow_cols)
+    # if there are no loan history rows that match today, then pmts is just a single hash, else it is a hash of hashes
+
+``    # set up some default hashes to use in case we get dodgy results back.
+    ng_pmts = flow_cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
+    ng_bals = cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
+    # workaround for the situation where no rows get returned for centers without loans.
+    # this makes it very difficult to find missing center caches so we must have a row for all centers, even if it is full of zeros
+    # find all relevant centers
+
+    # if we are doing only a subset of centers / funding lines, we do it using loan_ids.
+    # so if we have some loan_ids, then we just use these
+    if hash[:loan_id]
+      universe = LoanHistory.all(hash).aggregate(:branch_id, :center_id, :funding_line_id)
+    else
+      # else we find all the centers that we're interested in
+       _u = Center.all(hash[:center_id] ? {:id => hash[:center_id]} : {}).aggregate(:branch_id, :id) # array of [[:branch_id, :center_id]...] for all branches and centers
+      # now add the funding line id to each of these universes
+      universe = FundingLine.all.map{|f| 
+        __u = Marshal.load(Marshal.dump(_u)) # effing ruby pass by reference....my ass
+        __u.map{|u| u.push(f.id)}
+      }.flatten(1)
+    end
+    universe.map do |k| 
+      _p = pmts[k] || ng_pmts
+      _b = balances[k] || ng_bals
+      extra = balances[k] ? {} : {:center_id => k[1], :branch_id => k[0], :model_id => k[2]} # for ng rows, we need to insert center_id and branch_id
+      [k, _p.merge(_b).merge(extra)]
+    end.to_hash
+
+  end
+
+
+  # executes an SQL statement to mark all center caches and branch caches for this center as stale. Only does this for cachers on or after options[:date]
+  # params [Hash] a hash of options thus {:center_id => Integer, :date => Date or String, :model_id => Integer}
+  def self.stalify(options = {})
+    t = Time.now
+    raise NotAcceptable unless [:center_id, :date].map{|o| options[o]}.compact.size == 2
+    cid = options[:center_id]
+    @center = Center.get(cid)
+    d = options[:date].class != Date ? (Date.parse(options[:date]) rescue nil) : options[:date]
+    raise ArgumentError.new("Cannot parse date") unless d
+
+    sql = %Q{
+      UPDATE cachers SET stale=1 
+      WHERE model_name = 'FundingLine' 
+        AND model_id=#{options[:model_id]} 
+        AND (center_id = #{cid} 
+           OR (center_id = 0 AND branch_id = #{@center.branch_id}) 
+           OR (branch_id = 0 and center_id = 0 and model_id = #{options[:model_id]})
+          ) 
+        AND date >= '#{d.strftime('%Y-%m-%d')}' AND stale=0}
+    repository.adapter.execute(sql)
+  end
+
+  # finds the missing caches given some caches 
+  def self.missing(selection)
+    bs = self.all(selection).aggregate(:date, :model_id).group_by{|x| x[0]}.to_hash.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
+    # bs is a hash of {:date => [:center_id,...]}
+    date = selection.delete(:date)
+    selection[:id] = selection.delete(:funding_line_id) if selection[:funding_line_id]
+    hs = FundingLine.all(selection.merge(:creation_date.lte => date)).aggregate(:id)
+    date.map{|d| [d,hs - (bs[d] || [])]}.to_hash
+  end
+end
+
+

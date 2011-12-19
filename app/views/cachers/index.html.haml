@@ -28,9 +28,8 @@
       6: { sorter: 'mostfit_currency' },
       7: { sorter: 'mostfit_currency' }
       }} )});
-  
   - unless @stale_centers.empty? and @stale_branches.empty? and @missing_centers.values.flatten.empty?
-    .nb
+    .warn
       = link_to "#{@stale_centers.count} stale centers", resource(:cachers, query_params.merge(:model_name => "Center", :stale => true, :date => @date))
       and
       = link_to "#{@stale_branches.count} stale branches", resource(:cachers, query_params.merge(:model_name => "Branch", :stale => true, :date => @date))
@@ -42,9 +41,9 @@
     %ul.inline
       [
       %li
-        = link_to 'previous day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date - 1, :to_date => @to_date - 1))
+        -# = link_to 'previous day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date - 1, :to_date => @to_date - 1))
       %li
-        = link_to 'next day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date + 1, :to_date => @to_date + 1))
+        -# = link_to 'next day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date + 1, :to_date => @to_date + 1))
       %li
         = link_to 'last week', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.cwday - 7, :to_date => Date.today - Date.today.cwday))
       %li
@@ -70,6 +69,10 @@
     = select :name => 'report_format', :collection => ReportFormat.all,:text_method => :name, :value_method => :id, :selected => (params[:report_format] || 1).to_s, :prompt => 'Select a report format'
     = submit 'apply filter'
     
+  %b by
+  - root_url_hash = query_params.dup
+  - root_url_hash.delete(:by); root_url_hash.delete(:branch_id); root_url_hash.delete(:center_id); root_url_hash.delete(:model_id)
+  = link_to 'funding_line', url(:consolidate_cachers, root_url_hash.merge(:by => "funding_line"))
   - if @cachers.count == 0
     %h3 
       No caches found. 

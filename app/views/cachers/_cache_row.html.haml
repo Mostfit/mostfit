@@ -1,10 +1,13 @@
 - cid = bid = 0
 - date = nil
 %tr{:class => cls}
-  - @keys.each do |at|
+  - @keys.each_with_index do |at,i|
     - val = cache.send(at) rescue 0
     %td{:style => "text-align: right", :class => "#{at} text"}
-      - if at == :date
+      - if at == :model_name
+        - @thing = @model.get(cache.model_id) rescue nil
+        = (link_to @thing.name, resource(:cachers, request.send(:query_params).merge(:model_id => cache.model_id))) if @thing
+      - elsif at == :date
         = link_to val.strftime("%Y/%m/%d"), resource(:cachers, request.send(:query_params).merge(:date => val))
         - date = val
       - elsif at == :branch_id

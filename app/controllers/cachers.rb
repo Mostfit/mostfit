@@ -22,10 +22,11 @@ class Cachers < Application
   end
   
   def generate
+    @model = params[:by] ? Kernel.const_get(params[:by].camel_case + "Cache") : BranchCache
     if @from_date and @to_date
-      (@from_date..@to_date).each{|date| BranchCache.update(date)}
+      (@from_date..@to_date).each{|date| @model.update(:date => date)}
     else
-      BranchCache.update(@date || Date.today)
+      @model.update(:date => (@date || Date.today))
     end
     redirect request.referer
   end
@@ -48,10 +49,19 @@ class Cachers < Application
   def consolidate
     get_cachers
     group_by = @level.to_s.singularize
-    group_by_model = Kernel.const_get(group_by.camelcase) 
+    group_by_model = Kernel.const_get(group_by.camelcase) rescue Kernel.const_get(params[:by].camel_case)
     unless group_by == "loan"
       @cachers = @cachers.group_by{|c| c.send("#{group_by}_id".to_sym)}.to_hash.map do |group_by_id, cachers| 
-        cachers.reduce(:consolidate)
+        # when we are aggregating "by" something else we need to consolidate cachers that span across dates and 
+        # add cachers for the same date
+        if params[:by]
+          cachers_for_date = cachers.group_by{|c| c.date}.to_hash.map{|d, cs| [d,cs.reduce(:+)]}.to_hash
+          r = cachers_for_date.values.reduce(:consolidate)
+          r.model_id = group_by_id
+          r
+        else
+          cachers.reduce(:consolidate)
+        end
       end
     end
     display @cachers, :template => 'cachers/index', :layout => (params[:layout] or Nothing).to_sym
@@ -99,37 +109,60 @@ class Cachers < Application
   def get_cachers
     q = {}
     q[:branch_id] = params[:branch_id] unless params[:branch_id].blank? 
-    if (not params[:branch_id].blank?)
-      q[:center_id] = params[:center_id] unless (params[:center_id].blank? or params[:center_id].to_i == 0)
-    else
-      q[:model_name] = "Branch"
+    unless params[:branch_id].blank?
+      if params[:center_id]
+        q[:center_id] = params[:center_id] unless (params[:center_id].blank? or params[:center_id].to_i == 0)
+      else
+        q[:center_id.not] = 0
+      end
+    end
+    if true
+      if params[:by]
+        q[:model_name] = params[:by].camel_case
+        q[:center_id] ||= 0 unless q[:center_id.not]
+        q[:model_id] = params[:model_id] if params[:model_id]
+      else
+        q[:model_name] = "Branch"
+      end
     end
     q[:date] = @date if @date
     q[:date] = @from_date..@to_date if (@from_date and @to_date)
     q[:stale] = true if params[:stale]
     @cachers = Cacher.all(q)
     q.delete(:model_name)
-    @missing_centers = CenterCache.missing(q)
+    if params[:by]
+      @missing_centers = {} # TODO
+    else
+      @missing_centers = {} #CenterCache.missing(q)
+    end
     get_context
   end
 
   def get_context
     @center = params[:center_id].blank? ? nil : Center.get(params[:center_id])
     @branch = params[:branch_id].blank? ? nil : Branch.get(params[:branch_id])
+    @area = params[:area_id].blank? ? nil : Area.get(params[:area_id])
+    @region = params[:region_id].blank? ? nil : Region.get(params[:region_id])
     @center_names = @cachers.blank? ? {} : Center.all(:id => @cachers.aggregate(:center_id)).aggregate(:id, :name).to_hash
     @branch_names = @cachers.blank? ? {} : Branch.all(:id => @cachers.aggregate(:branch_id)).aggregate(:id, :name).to_hash
     q = (@from_date and @to_date) ? {:date => @from_date..@to_date} : {:date => @date}
-    @stale_centers = CenterCache.all(q.merge(:stale => true))
+    @stale_centers = Cacher.all(q.merge(:stale => true))
     @stale_branches = BranchCache.all(q.merge(:stale => true))
     @last_cache_update = @cachers.aggregate(:updated_at.min)
     @resource = params[:action] == "index" ? :cachers : (params[:action].to_s + "_" + "cachers").to_sym
     @keys = [:branch_id, :center_id] + (ReportFormat.get(params[:report_format]) || ReportFormat.first).keys
     @total_keys = @keys[2..-1]
     if @resource == :split_cachers
-      @level = params[:center_id].blank? ? :branches : :centers
+      @level = (params[:center_id].blank? ? :branches : :centers)
       @keys = [:date] + @keys
     else 
-      @level = (not params[:center_id].blank?) ? :loans : ((not params[:branch_id].blank?) ? :centers : :branches)
+      @level = @center ? :loans : (@branch ? :centers : (@area ? :branches : (@region ? :areas : :branches)))
+      if params[:by]
+        @level = :model unless @level == :loans
+        @keys = [:model_name] + @keys
+        @model = Kernel.const_get(params[:by].camel_case)
+      else
+      end
     end
 
   end

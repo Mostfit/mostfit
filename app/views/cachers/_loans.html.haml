@@ -10,7 +10,10 @@
     -# only fix payments that are mismatched with the schedule
     -# = check_box :name => :only_mismatches, :checked => :checked
   - total = {}
-  - histories = LoanHistory.latest({:center_id => params[:center_id]}, @date)
+  - debugger
+  - selection = {:center_id => params[:center_id]}
+  - selection.merge!("#{params[:by]}_id".to_sym => params[:model_id]) if params[:by]
+  - histories = LoanHistory.latest(selection, @date)
   %h1
     == Center #{@center.name}
   %table.report.nojs
@@ -32,11 +35,11 @@
         %td
           = link_to h.loan.client.name, resource(h.loan.client)
         - @keys.each do |at|
-          - val = h.send(at)
+          - val = h.send(at) rescue "-"
           %td
             = val.is_a?(Numeric) ? val : val
             - total[at] ||= 0
-            - total[at] += h.send(at) if h.send(at).is_a? Numeric
+            - (total[at] += h.send(at) if h.send(at).is_a? Numeric) rescue "-"
     %tfoot
       %tr.total
         %td
