@@ -63,9 +63,11 @@ class Cachers < Application
         # when we are aggregating "by" something else we need to consolidate cachers that span across dates and 
         # add cachers for the same date
         if params[:by]
+          $debug = true if group_by_id == 2
           cachers_for_date = cachers.group_by{|c| c.date}.to_hash.map{|d, cs| [d,cs.reduce(:+)]}.to_hash
           r = cachers_for_date.values.reduce(:consolidate)
           r.model_id = group_by_id
+          r.branch_id = nil
           r
         else
           cachers.reduce(:consolidate)
@@ -130,7 +132,7 @@ class Cachers < Application
         q[:center_id] ||= 0 unless q[:center_id.not]
         q[:model_id] = params[:model_id] if params[:model_id]
       else
-        q[:model_name] = "Branch"
+        q[:model_name] = ["Branch","Center"] 
       end
     end
     q[:date] = @date if @date
