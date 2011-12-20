@@ -1,0 +1,31 @@
+%h1 Model
+%table.report.nojs
+  %thead
+    %tr.header
+      - @keys.each do |at|
+        %th
+          = at.to_s.gsub("_","<br>")
+      - unless @resource == :split_cachers
+        %th
+          split
+  - @calculated_total_row = {}
+  
+  - @cachers.each do |c|
+    - next if (c.actual_outstanding_principal == 0) and (c.total_paid == 0) and c.total_due == 0
+    - cls = (c.stale ? "stale" : "") + " " + cycle('odd','even')
+    = partial :cache_row, :cache => c, :cls => cls
+  %tfoot
+    %tr.total
+      - @keys.each_with_index do |k,i|
+        %th{:style => "text-align: right"}
+          - if i == 0
+            Sum of Cached Values
+          - else
+            - if @total_keys.include?(k)
+              = @calculated_total_row[k].to_currency
+            - else
+              &nbsp;
+      %th
+        &nbsp;
+      
+
