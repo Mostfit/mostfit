@@ -22,7 +22,7 @@
     });
   });
   });
-- keys = (Cacher::COLS  + Cacher::FLOW_COLS).map(&:to_s) + ["icash_interest_in_default", "icash_total_in_default", "principal_defaulted_today", "interest_defaulted_today", "total_defaulted_today", "status"]
+- keys = (Cacher::COLS  + Cacher::FLOW_COLS).map(&:to_s) + ["icash_interest_in_default", "icash_total_in_default", "principal_defaulted_today", "interest_defaulted_today", "total_defaulted_today", "status", "total_paid"]
 - report_keys  = @report_format.keys ? @report_format.keys.map(&:to_s) : []
 - remaining_keys = keys - report_keys
 %table.form#user_group_form
