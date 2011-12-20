@@ -46,7 +46,7 @@
     %td
       Area
     %td
-      = select :area_id, :collection => Area.all.map{|a| [a.id.to_s, a.name]}, :prompt => "---"
+      = select :area_id, :collection => Area.all.map{|a| [a.id.to_s, a.name]}, :prompt => "---", :class => 'chosen'
       %span.greytext Pick the aread to which this branch belongs to
   %tr
     %td

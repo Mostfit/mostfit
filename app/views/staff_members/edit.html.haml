@@ -1,6 +1,13 @@
 %h1== Edit staff member by the name '#{@staff_member.name}' 
 
 = error_messages_for @staff_member
+- cancel_url = params[:return] ? params[:return] : resource(@staff_member)
 
 = form_for(@staff_member, :action => url(:staff_member, @staff_member)) do
-  = partial :fields, :submit_text => "Save changes"
+  = partial :fields
+  = submit "Save changes"
+  &nbsp;&nbsp;&nbsp;
+  %b
+    Or
+  &nbsp;&nbsp;&nbsp;
+  = link_to 'Cancel', cancel_url, :class => 'grey_button'

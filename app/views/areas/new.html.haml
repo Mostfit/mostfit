@@ -1,4 +1,10 @@
 %h1 New Area
 = form_for(@area, :action => url(:areas) ) do
   = partial :fields
+  %br
   = submit 'Create this area'
+  &nbsp;&nbsp;&nbsp;
+  %b
+    Or
+  &nbsp;&nbsp;&nbsp;
+  = link_to 'Cancel', url(params[:return]), :class => "grey_button"
