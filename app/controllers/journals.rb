@@ -69,9 +69,8 @@ class Journals < Application
     journal = Journal.get(id)
     raise NotFound unless journal
     @journal = journal.reverse_transaction
-    if @journal.nil?
-      message[:error] = "Journal could not be reversed"
-      redirect resource(:journals)
+    if @journal.nil? || @journal == false
+      redirect resource(:journals), :message => {:error => "Journal could not be reversed"}
     else
       redirect resource(:journals), :message => {:notice => "Journal was successfully reversed"}
     end
