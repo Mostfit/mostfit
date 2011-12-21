@@ -35,7 +35,6 @@ class CenterMeetingDays < Application
   
   
   def update(id, center_meeting_day)
-    debugger
     center_meeting_day[:valid_from] = Date.parse(center_meeting_day[:valid_from])
     center_meeting_day[:valid_upto] = Date.parse(center_meeting_day[:valid_upto])
     @cmd = CenterMeetingDay.get(id)

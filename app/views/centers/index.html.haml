@@ -5,34 +5,35 @@
 
     %h1== Branch: <i>#{@branch.name}</i>
     %p.menu-strip{:style => "width: 44%; margin-bottom: 0.2em;"}
-      = link_to_with_rights 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit"
-      = link_to_with_rights 'create a new center', resource(@branch, :centers, :new), :class => "add"
+      = link_to_with_rights 'edit this branch\'s details ', resource(@branch, :edit), :class => "edit grey_button"
+      &nbsp;&nbsp;
+      = link_to_with_rights 'create a new center', resource(@branch, :centers, :new), :class => "add grey_button"
     %table.loan{ :style => "width: 45%; border: solid 1px #cfcfcf; margin: 5px; " }
       %tr.odd
         %th.odd Name
         %td
           %b= @branch.name
           == (code: #{@branch.code}, id: #{@branch.id})
-      %tr
+      %tr.even
         %th.even Creation Date
         %td
           = @branch.creation_date
           (
           = @branch.creation_date.strftime('%A')
           )
-      %tr
+      %tr.odd
         %th.odd Manager
-        %td= link_to @branch.manager.name, resource(@branch.manager)
+        %td= link_to @branch.manager.name, resource(@branch.manager), :target => "_blank"
       %tr.even
         %th.even No. of centers
         %td=@branch.centers.count
-      %tr
+      %tr.odd
         %th.odd Address
         %td=@branch.address
       %tr.even
         %th.even Contact number
         %td=@branch.contact_number
-      %tr
+      %tr.odd
         %th.odd Landmark
         %td=@branch.landmark
       %tr.even
@@ -40,7 +41,7 @@
         - area = @branch.area
         %td=link_to(area.name, resource(area)) if area
       - if total_attendance_at_branch = Attendance.count("client.center.branch_id" => @branch.id) and total_attendance_at_branch > 0
-        %tr
+        %tr.odd
           %th.odd
             Attendance
           %td

@@ -1,18 +1,19 @@
 %h1
   == #{I18n.t "region.show.name", :default => "Region"} #{@region.name}
-  = link_to I18n.t("region.index.edit", :default => "Edit"), url(:edit_region,  @region), :class => "edit"
+  &nbsp;
+  = link_to I18n.t("region.index.edit", :default => "Edit"), url(:edit_region,  @region), :class => "edit grey_button"
 %table
   %tr.odd
-    %td=I18n.t "region.show.address", :default => "Address"
-    %td=@region.address
+    %td= I18n.t "region.show.address", :default => "Address"
+    %td= @region.address
   %tr
-    %td=I18n.t "region.show.contact_phone_number", :default => "Contact phone number"
-    %td=@region.contact_number
+    %td= I18n.t "region.show.contact_phone_number", :default => "Contact phone number"
+    %td= @region.contact_number
   %tr.odd
-    %td=I18n.t "region.show.landmark", :default => "Landmark"
-    %td=@region.landmark
-
-= link_to I18n.t("region.show.new_link", :default => "Add a new area" ), resource(@region, :areas, :new), :class => "add"
+    %td= I18n.t "region.show.landmark", :default => "Landmark"
+    %td= @region.landmark
+%br
+= link_to I18n.t("region.show.new_link", :default => "Add a new area" ), resource(@region, :areas, :new), :class => "add grey_button"
 %div.tab_container
   %ul.tabs
     %li#areas

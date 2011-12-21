@@ -22,7 +22,7 @@
     });
   });
   });
-- keys = (Cacher::COLS  + Cacher::FLOW_COLS).map(&:to_s) + ["icash_interest_in_default", "icash_total_in_default", "principal_defaulted_today", "interest_defaulted_today", "total_defaulted_today", "status"]
+- keys = (Cacher::COLS  + Cacher::FLOW_COLS).map(&:to_s) + ["icash_interest_in_default", "icash_total_in_default", "principal_defaulted_today", "interest_defaulted_today", "total_defaulted_today", "status", "total_paid"]
 - report_keys  = @report_format.keys ? @report_format.keys.map(&:to_s) : []
 - remaining_keys = keys - report_keys
 %table.form#user_group_form
@@ -46,6 +46,7 @@
       %input#remove{:type => "button", :value => "&laquo;"}
     %td.multi-select
       <a href="JavaScript:void(0);" id="btn-up">Move Up</a>
+      &nbsp;&nbsp;
       <a href="JavaScript:void(0);" id="btn-down">Move Down</a>
       %br
       %select.current#select-to{:multiple => "multiple", :name => "report_format[keys][]", :style => "height : #{keys.count}em; min-width : 100px"}

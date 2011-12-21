@@ -5,13 +5,13 @@
 %table.narrow.shaded
   %tr
     %th
-      name
+      Name
     %th
-      action
+      Action
   - for report_format in @report_formats
     %tr
       %td
-        = link_to report_format.name
+        = link_to report_format.name, resource(report_format)
       %td
         = link_to 'show', resource(report_format)
         |

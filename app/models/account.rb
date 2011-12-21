@@ -235,7 +235,6 @@ class Account
   end
 
   def self.output_li(account, depth)
-    # debugger if account.id == 32
     puts "#{account.id} : #{account.name} : #{account.branch_id}"
     prefix = (0..(depth*4)).map{|d| "-"}.join
     return (account.branch_edge ? "#{prefix}#{account.id} : #{account.name}  Branch: #{account.branch.name if account.branch} Parent: #{account.parent_id} #{Account.get(account.parent_id).name if account.parent_id}\n" : "(#{account.branch_id} #{account.name})\n")
