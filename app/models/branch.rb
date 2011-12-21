@@ -57,7 +57,6 @@ class Branch
     end
     branch_center_ids = self.centers.aggregate(:id)
     mday = (params[:meeting_day] or Nothing).to_sym || Date.today.weekday
-    debugger
     if Center::DAYS.include?(mday)
       # either the meeting day is set directly on the center_meeting_day
       cids = self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :meeting_day => mday).aggregate(:center_id)

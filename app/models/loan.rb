@@ -515,7 +515,6 @@ class Loan
   end
 
   def get_payments(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default, desktop_id = nil, origin = nil) 
-    debugger if id == 4713
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
     self.extend_loan
@@ -543,7 +542,6 @@ class Loan
   end
 
   def make_payments(payments, context = :default, defer_update = false)
-    debugger if id == 4713
     return [false, nil, nil, nil] if payments.empty?
     Payment.transaction do |t|
       self.history_disabled=true
@@ -586,7 +584,6 @@ class Loan
       prin_to_pay += [amount_remaining, total_due_today].min  * prin_due_today / total_due_today
       amt_to_pay = (int_to_pay + prin_to_pay)
     end
-    debugger
     total = int_to_pay + prin_to_pay
     int_to_pay = int_to_pay.round(2).round_to_nearest(rs.round_interest_to, rs.rounding_style)
     prin_to_pay = total - int_to_pay
@@ -1199,7 +1196,6 @@ class Loan
       actual_outstanding_total               = outstanding ? actual[:total_balance].round(2) : 0
       actual_outstanding_interest            = outstanding ? (actual_outstanding_total - actual_outstanding_principal) : 0
 
-      debugger if date == Date.new(2011,9,7)
       _apo                                   = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max # advance principal outstanding at the start
       _api                                   = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
       advance_principal_outstanding          = outstanding ?  _apo : 0
@@ -1428,7 +1424,6 @@ class Loan
     ds = _ps.map{|p| p.deleted_by = user; p.deleted_at = _t; p.save!}
     reload
     update_history
-    debugger
     clear_cache
     # then make the payments again
     pmt_details.keys.sort.each do |date|
