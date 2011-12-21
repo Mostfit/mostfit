@@ -145,9 +145,15 @@ class Journal
               }
     repository.adapter.query(sql)
   end
- 
+
+  def was_reversed?
+    ReversedJournalLog.first(:journal_id => self.id) ? true : false
+  end
+
   def reverse_transaction
     journal_id = nil
+    return false if self.was_reversed?
+
     Journal.transaction do |t|
       journal = Journal.create(
                                :comment => ("REVERSED:"+self.comment),
@@ -157,6 +163,7 @@ class Journal
                                )
       status = []
       self.postings.each{|posting| status << posting.reverse(journal.id)} 
+      ReversedJournalLog.create(:journal_id => self.id)
       if status.include?(false)
         t.rollback 
       else
