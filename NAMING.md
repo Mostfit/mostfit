@@ -33,6 +33,26 @@ Some examples listed below (a simple grep will show all). In some cases the nami
 Of course this would be a huge pita to fix.
 
 
+Dates
+-----
+
+There are also many cases of models being approved, disbursed, deleted, etc. on certain dates. Let's set up a consistent naming scheme for these attributes. The Loan model for example has these date attributes:
+
+*   scheduled_disbursal_date
+*   scheduled_first_payment_date
+*   applied_on
+*   approved_on
+*   rejected_on
+*   disbursal_date
+*   written_off_on
+*   suggested_written_off_on
+*   write_off_rejected_on
+*   validated_on
+*   preclosed_on
+
+As you can see the naming varies between _on and _date. I would recommend sticking with _on for dates and _at for times both because it's the de-facto standard and because most existing attributes already comply.
+
+
 Hand-made associations
 ----------------------
 

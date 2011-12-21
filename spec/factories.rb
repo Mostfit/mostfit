@@ -233,9 +233,9 @@ FactoryGirl.define do
     interest_rate                 0.20
     installment_frequency         :weekly
     number_of_installments        25
-    scheduled_first_payment_date  "2000-12-06"
-    applied_on                    "2000-02-01"
-    scheduled_disbursal_date      "2000-06-13"
+    scheduled_first_payment_date  { Date.new(2000,12,06) }
+    applied_on                    { Date.new(2000,02,01) }
+    scheduled_disbursal_date      { Date.new(2000,06,13) }
     history_disabled              true
 
     association                   :applied_by, :factory => :staff_member
@@ -244,8 +244,19 @@ FactoryGirl.define do
     association                   :loan_product
     association                   :repayment_style
 
+    # These cached properties should probably be set automatically somewhere?
     c_center_id                   { self.client.center.id }
     c_branch_id                   { self.client.center.branch.id }
+  end
+
+  # This is a variation of the minimal :loan factory.
+  # It includes disbursal dates and other attributes necessary to make
+  # the loan work with the :payment factory.
+  factory :disbursed_loan, :parent => :loan do
+    approved_by                   { self.applied_by }
+    approved_on                   { Date.today - 20 }
+    disbursal_date                { Date.today - 10 }
+    disbursed_by                  { self.applied_by }
   end
 
   factory :loan_product do
@@ -335,6 +346,9 @@ FactoryGirl.define do
     association         :received_by, :factory => :staff_member
     association         :client
 
+    association         :loan, :factory => :disbursed_loan
+
+    # It feels like these properties should be assigned automatically on creation or something?
     c_center_id         { self.client.center.id }
     c_branch_id         { self.client.center.branch.id }
   end
@@ -620,6 +634,14 @@ FactoryGirl.define do
     received_by_type      'StaffMember'
     received_by_id        { Factory(:staff_member).id }
     transacted_at_type    'Center'
+  end
+
+  # Dunno what this is either..
+  factory :grt do
+    date                  { Date.today }
+    status                'Passed'
+
+    association           :client_group
   end
 
 end

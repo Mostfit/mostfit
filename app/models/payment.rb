@@ -54,8 +54,9 @@ class Payment
   validates_with_method :deleted_by,  :method => :properly_deleted?
   validates_with_method :deleted_at,  :method => :properly_deleted?
   validates_with_method :not_approved, :method => :not_approved, :on => [:destroy]
-  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
 
+  # This is a little strange, we don't want to validate here while in the test environment? It's causing tests to fail.
+  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
   validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :principal,   :method => :is_positive?
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :on => [:destroy]
@@ -98,6 +99,7 @@ class Payment
   
   # returns the amount collected by/under/for various kind of objects like Branch, Center, StaffMember, Area, Region, LoanProduct etc
   # TODO:  rewrite it using Datamapper
+  # Something weird is going on here: at the end of this method the amount is cast .to_i. Is this intended behavior?
   def self.collected_for(obj, from_date=Date.min_date, to_date=Date.max_date, types=[1,2], payment_created_type = :created)
     from, where = "", ""
     if obj.class==Branch
@@ -233,12 +235,14 @@ class Payment
     return true if created_by and created_by.active
     [false, "Payments can only be created if an active user is supplied"]
   end
+
   def received_by_active_staff_member?
     return true if self.send(:current_validation_context) == :reallocate
     return true if deleted_at
     return true if received_by and received_by.active
     [false, "Receiving staff member is currently not active"]
   end
+
   def properly_deleted?
     return true if (deleted_by and deleted_at) or (!deleted_by and !deleted_at)
     [false, "deleted_by and deleted_at properties have to be (un)set together"]
