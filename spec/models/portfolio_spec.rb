@@ -1,15 +1,9 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Portfolio do
-  before(:all) do
-    @staff_member = Factory(:staff_member)
-    @user = Factory(:user)
-    @funder = Factory(:funder)
-  end
 
-# This one raises a nil error somewhere deep in the bowels of Loan,
-# I couldn't quite figure it out
-#
+  # This one raises a nil error somewhere deep in the bowels of Loan,
+  # I couldn't quite figure out how to rewrite it properly
 #  it "should have correct eligible loans" do
 #    Loan.all(:id => [1, 2, 3]).each{|l|
 #      l.history_disabled = false
@@ -33,15 +27,13 @@ describe Portfolio do
 #  end
 
   it "should not delete verified portfolios" do
-    @portfolio = Portfolio.new(:name => "first", :created_by => @user, :funder => @funder)
-    @portfolio.save
+    @portfolio = Factory(:portfolio)
     @portfolio.should be_valid
     
-    @portfolio.verified_by = User.first
+    @portfolio.verified_by = Factory(:user)
+    @portfolio.save
     @portfolio.should be_valid
-    @portfolio.save.should be_true
-    @portfolio.should be_valid
-    @portfolio.destroy.should == nil
+    @portfolio.destroy.should eql(nil)
     
     @portfolio.verified_by = nil
     @portfolio.save

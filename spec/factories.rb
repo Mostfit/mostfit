@@ -129,7 +129,7 @@ FactoryGirl.define do
     target_type     'absolute'
     deadline        { Date.today + 60 }
     start_date      { Date.today - 60 }
-    attached_to     'Center'
+    attached_to     :center
     attached_id     { Factory(:center).id }
   end
 
@@ -398,7 +398,7 @@ FactoryGirl.define do
   # Portfolios
   #
   factory :portfolio do
-    name                { "#{Factory.next(:name)}'s Portfolio" }
+    name                { "#{Factory.next(:name)}'s Portfolio"[0...20] }
     association         :created_by, :factory => :user
     association         :funder
   end
