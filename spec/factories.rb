@@ -222,6 +222,7 @@ FactoryGirl.define do
     date            { Date.today }
     status          'present'
     association     :client
+    association     :center
   end
 
   #
@@ -237,10 +238,7 @@ FactoryGirl.define do
     scheduled_disbursal_date      "2000-06-13"
     history_disabled              true
 
-    approved_on                   "2000-02-03"
-
     association                   :applied_by, :factory => :staff_member
-    association                   :approved_by, :factory => :staff_member
     association                   :funding_line
     association                   :client
     association                   :loan_product

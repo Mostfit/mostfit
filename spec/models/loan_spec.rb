@@ -9,7 +9,7 @@ describe Loan do
     @manager = Factory(:staff_member)
     @manager.should be_valid
 
-    @funding_line = Factory(:funding_line, :funder => @funder)
+    @funding_line = Factory(:funding_line)
     @funding_line.should be_valid
 
     @branch = Factory(:branch, :manager => @manager)

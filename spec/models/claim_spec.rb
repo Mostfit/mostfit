@@ -1,12 +1,6 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Claim do
-  before(:all) do
-    Claim.all.destroy!
-    Client.all.destroy!
-    Branch.all.destroy!
-    StaffMember.all.destroy!
-  end
 
   before(:each) do
     @claim = Factory(:claim)

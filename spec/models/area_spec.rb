@@ -3,10 +3,15 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe Area do
 
   before(:all) do
-    @manager = StaffMember.create(:name => "Region manager")
-    @region  = Region.create(:name => "test region2", :manager => @manager)
+    @manager = Factory(:staff_member)
+    @manager.should be_valid
+
+    @region = Factory(:region, :manager => @manager)
     @region.should be_valid
-    @area = Area.create(:name => "test area", :region => @region, :manager => @manager)
+  end
+
+  before(:each) do
+    @area = Factory(:area, :region => @region, :manager => @manager)
     @area.should be_valid
   end
 
@@ -16,21 +21,9 @@ describe Area do
   end
 
   it "should have some branches" do
-    @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
-    @manager.save
-    @manager.should be_valid
-    @area.name =  "Foo"
+    branch = Factory(:branch, :manager => @manager, :area => @area)
+    branch.should be_valid
 
-    Branch.all.destroy!
-    @branch = Branch.new(:name => "Kerela branch")
-    @branch.manager = @manager
-    @branch.code = "branch"
-    @branch.area = @area
-    @branch.save
-    @branch.errors.each {|e| p e}
-    @branch.should be_valid
-
-    @branch.should be_valid
-    @area.branches.should == [@branch]
+    @area.branches.should include(branch)
   end
 end

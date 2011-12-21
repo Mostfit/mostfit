@@ -10,54 +10,49 @@ describe Funder do
   it "should not be valid without having a name" do
     @funder.name=nil
     @funder.should_not be_valid
-    end
-    it "should be able to have funding lines" do
-    @fundingline1= FundingLine.new(:amount => 10_000_00, :interest_rate => 0.15, :purpose => "for 			     women",:disbursal_date=>"2002-02-02", :first_payment_date => "2007-05-05", :last_payment_date => 			     "2009-03-03")
-    @fundingline1.funder=@funder
-    @fundingline1.should be_valid
-    @funder.should be_valid
-    @fundingline2= FundingLine.new(:amount => 10_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date 		=>"2002-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
-    @fundingline2.funder=@funder
-    @fundingline2.should be_valid
-    @funder.should be_valid
   end
 
+  it "should be able to have funding lines" do
+    funding_line1 = Factory(:funding_line, :funder => @funder)
+    funding_line1.should be_valid
+
+    @funder.funding_lines.count.should eql(1)
+
+    funding_line2 = Factory(:funding_line, :funder => @funder)
+    funding_line2.should be_valid
+
+    @funder.funding_lines.count.should eql(2)
+  end
+
+  # Note that completed_lines gives all funding lines with a last_payment_date BEFORE a given
+  # date. If no date is given (as is the case here) "Date.today" is used.
   it "should give correct count of completed lines " do
-    @funder.completed_lines.should==0
-    @funder.should be_valid
-    fundingline3= FundingLine.new(:amount => 10_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date 		=>"2002-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
-    fundingline3.funder=@funder
-    fundingline3.should be_valid
-    fundingline3.save
-    @funder.completed_lines.should==1
-    @funder.destroy
-    fundingline3.destroy
+    lambda {
+      funding_line = Factory(:funding_line, :funder => @funder, :disbursal_date => Date.new(1999,01,01), :first_payment_date => Date.new(2000,01,01), :last_payment_date => Date.new(2001,01,01))
+      funding_line.should be_valid
+    }.should change( @funder, :completed_lines ).by(1)
   end
 
+  # Note that active_lines gives all funding_lines with a disbursal_date and last_payment_date BEFORE
+  # or EQUAL TO a given date. If no date is given (as is the case here) "Date.today" is used.
   it "should give correct count of active lines" do
-    fundingline4= FundingLine.new(:amount => 10_000, :interest_rate => 0.15, :purpose => "for women", 
-          :disbursal_date=>"2002-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
-    fundingline5= FundingLine.new(:amount => 10_000, :interest_rate => 0.15, :purpose => "for women", 
-          :disbursal_date =>"2002-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
-    fundingline4.funder=@funder
-    fundingline5.funder=@funder
-    fundingline4.save
-    fundingline5.save
-    @funder.active_lines.should==2
-    @funder.destroy
-    FundingLine.all.destroy!
+    lambda {
+      funding_line1 = Factory(:funding_line, :funder => @funder, :disbursal_date => Date.new(1999,01,01), :first_payment_date => Date.new(2000,01,01), :last_payment_date => Date.new(2001,01,01))
+      funding_line1.should be_valid
+      funding_line2 = Factory(:funding_line, :funder => @funder, :disbursal_date => Date.new(1999,01,01), :first_payment_date => Date.new(2000,01,01), :last_payment_date => Date.new(2001,01,01))
+      funding_line2.should be_valid
+    }.should change( @funder, :active_lines ).by(2)
   end
 
+  # Note that total_lines gives all funding_lines with a disbursal_date AFTER a given date
+  # If no date is given (as is the case here) "Date.today" is used.
   it "should give correct count of total lines " do
-    fundingline6= FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", 
-          :disbursal_date	=>"2012-02-02", :first_payment_date => "2012-05-05", :last_payment_date => "2012-08-03")
-    fundingline7= FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", 
-          :disbursal_date=>"2012-02-02", :first_payment_date => "2012-05-05", :last_payment_date => "2012-08-03")
-    fundingline6.funder=@funder
-    fundingline7.funder=@funder
-    fundingline6.save
-    fundingline7.save
-    @funder.total_lines("2009-02-02").should==2
+    lambda {
+      funding_line1 = Factory(:funding_line, :funder => @funder, :disbursal_date => Date.today + 365, :first_payment_date => Date.today + 366, :last_payment_date => Date.today + 367)
+      funding_line1.should be_valid
+      funding_line2 = Factory(:funding_line, :funder => @funder, :disbursal_date => Date.today + 365, :first_payment_date => Date.today + 366, :last_payment_date => Date.today + 367)
+      funding_line2.should be_valid
+    }.should change( @funder, :total_lines ).by(2)
   end
 
 end
