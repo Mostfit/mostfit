@@ -31,6 +31,7 @@ describe AccountLoanObserver do
     Posting.all.destroy!
   end
 
+  # This test is passing but probably in error, see below
   it "should not do journal entry when loan is created" do
     loan = Factory(:loan, :history_disabled => true)
     loan.should be_valid
@@ -44,7 +45,7 @@ describe AccountLoanObserver do
     Posting.count.should eql(0)
   end
 
-# Loans are not creating Journals on save, but so far I haven't found out why.
+  # Loans are not creating Journals on save, but so far I haven't found out why.
 #
 #  context "when loan is disbursed during creation" do
 #    before(:each) do
