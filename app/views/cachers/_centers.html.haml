@@ -10,7 +10,7 @@
           split
   - @calculated_total_row = {}
   
-  - @cachers.sort_by{|c| [c.date,c.center_id == 0 ? "" : @center_names[c.center_id]]}.each do |c|
+  - @cachers.sort_by{|c| [c.date,c.center_id == 0 ? "" : (@center_names[c.center_id] || c.center_id.to_s)]}.each do |c|
     - next if (c.actual_outstanding_principal == 0) and (c.total_paid == 0) and c.total_due == 0
     - cls = (c.stale ? "stale" : "") + " " + cycle('odd','even')
     - if c.center_id == 0
