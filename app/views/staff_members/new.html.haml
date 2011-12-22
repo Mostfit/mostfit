@@ -3,4 +3,10 @@
 = error_messages_for @staff_member
 
 = form_for(@staff_member, :action => url(:staff_members)) do
-  = partial :fields, :submit_text => "Create staff member"
+  = partial :fields
+  = submit "Create staff member"
+  &nbsp;&nbsp;&nbsp;
+  %b
+    Or
+  &nbsp;&nbsp;&nbsp;
+  = link_to "Cancel", url(:staff_members), :class => "grey_button"

@@ -2,7 +2,7 @@ class Cacher
   # like LoanHistory but for anything that has loans
   include DataMapper::Resource
 
-   property :id,                              Serial
+  property :id,                              Serial
   property :type,                            Discriminator
   property :date,                            Date, :nullable => false, :index => true
   property :model_name,                      String, :nullable => false, :index => true
@@ -100,6 +100,19 @@ class Cacher
   def total_default
     (principal_in_default + interest_in_default).abs
   end
+
+  def principal_defaulted_today
+    [scheduled_principal_due - principal_paid,0].max
+  end
+
+  def interest_defaulted_today
+    [scheduled_interest_due - interest_paid,0].max
+  end
+  
+  def total_defaulted_today
+    principal_defaulted_today + interest_defaulted_today
+  end
+
 
   def icash_interest_in_default
     [0,interest_in_default + total_advance_outstanding].min

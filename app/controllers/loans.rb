@@ -44,7 +44,10 @@ class Loans < Application
     raise BadRequest unless @loan_product
     @loan = klass.new(attrs)
     @loan.loan_product = @loan_product
-    if @loan.save
+
+    if @loan.valid? and (@loan.insurance_policy.nil? ? true : @loan.insurance_policy.valid?) 
+      @loan.insurance_policy.save unless @loan.insurance_policy.nil?      
+      @loan.save
       if params[:format] and API_SUPPORT_FORMAT.include?(params[:format])
         display @loan
       else
@@ -139,7 +142,9 @@ class Loans < Application
     @loan_product = @loan.loan_product
     @loan.insurance_policy = @insurance_policy if @loan_product.linked_to_insurance and @insurance_policy   
 
-    if @loan.save or @loan.errors.length==0
+    if (@loan.valid? or @loan.errors.length==0) and (@loan.insurance_policy.nil? ? true : @loan.insurance_policy.valid?)
+      @loan.insurance_policy.save unless @loan.insurance_policy.nil?
+      @loan.save
       if params[:return]
         redirect(params[:return], :message => {:notice => "Loan '#{@loan.id}' has been edited"})
       else

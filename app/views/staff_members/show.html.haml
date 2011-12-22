@@ -1,16 +1,45 @@
-%h1 
-  = @staff_member.name
-%ul
-  %li
-    = link_to 'Daily Collection Sheet >>', url(:day_sheet, @staff_member.id), :class => "bold"
-  %li
-    = link_to 'Daily Disbursement Sheet >>', url(:disbursement_sheet, @staff_member.id), :class => "bold"
-  %li
-    = link_to 'Centers Managed >>', url(:show_staff_member_centers, @staff_member.id), :class => "bold"
-  %li
-    = link_to 'edit', resource(@staff_member, :edit)
-%p
-  = link_to '<< back', resource(:staff_members), :class => "button"
+%h1== Staff Member : <i>#{@staff_member.name}</i>
+%p.menu-strip{:style => "width: 44%; margin-bottom: 0.2em;"}
+  = link_to_with_rights 'edit this staff member details', resource(@staff_member, :edit), :class => 'edit grey_button'
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  = link_to 'back', resource(:staff_members), :class => 'grey_button'
+
+%table.loan{ :style => "width: 45%; border: solid 1px #cfcfcf; margin: 5px; " }
+  %tr.odd
+    %th.odd
+      Name
+    %td
+      = @staff_member.name
+      ( id:
+      = @staff_member.id
+      )
+  %tr.even
+    %th.even
+      Mobile Number
+    %td
+      = @staff_member.mobile_number
+  %tr.odd
+    %th.odd
+      Joining Date
+    %td
+      = @staff_member.creation_date
+      (
+      = @staff_member.creation_date.strftime('%A')
+      )
+  %tr.even
+    %th.even
+      Status
+    %td
+      %span{:class => @staff_member.active? ? '' : 'red'}
+        = @staff_member.active? ? 'active' : 'disabled'
+%table
+  %tr
+    %td
+      = link_to 'Daily Collection Sheet', url(:day_sheet, @staff_member.id), :class => "grey_button"
+      &nbsp;
+      = link_to 'Daily Disbursement Sheet', url(:disbursement_sheet, @staff_member.id), :class => "grey_button"
+      &nbsp;
+      = link_to 'Centers Managed', url(:show_staff_member_centers, @staff_member.id), :class => "grey_button"
 
 %div.tab_container
   %ul.tabs
@@ -24,11 +53,11 @@
     - @manages.keys.each do |type|
       - if @manages[type].length> 0
         %h2
-          ="#{type.to_s.capitalize} managed"
+          = "#{type.to_s.capitalize} managed"
         %ul
-          -@manages[type].each do |obj|
+          - @manages[type].each do |obj|
             %li
-              =link_to(obj.name, resource(obj))
+              = link_to(obj.name, resource(obj))
   %div.tab
     %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@staff_member.id}?for=staff_member&type=created"}
   %div.tab

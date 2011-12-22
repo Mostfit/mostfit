@@ -6,7 +6,12 @@
 = form_for(@area, :action => url(:area, @area)) do
   = partial :fields
   = submit "Update #{@area.name.capitalize}"
-
-= link_to 'Show', url(:area, @area)
-|
-= link_to 'Back', url(:areas)
+  &nbsp;&nbsp;&nbsp;
+  %b
+    Or
+  &nbsp;&nbsp;&nbsp;
+  = link_to 'Show', url(:areas), :class => "grey_button"
+  &nbsp;&nbsp;&nbsp;
+  |
+  &nbsp;&nbsp;&nbsp;
+  = link_to 'Back', url(:area, @area), :class => "grey_button"
