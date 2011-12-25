@@ -233,9 +233,9 @@ FactoryGirl.define do
     interest_rate                 0.20
     installment_frequency         :weekly
     number_of_installments        25
-    scheduled_first_payment_date  { Date.new(2000,12,06) }
     applied_on                    { Date.new(2000,02,01) }
     scheduled_disbursal_date      { Date.new(2000,06,13) }
+    scheduled_first_payment_date  { Date.new(2000,12,06) }
     history_disabled              true
 
     association                   :applied_by, :factory => :staff_member
@@ -249,13 +249,15 @@ FactoryGirl.define do
     c_branch_id                   { self.client.center.branch.id }
   end
 
-  # This is a variation of the minimal :loan factory.
+  # This is a variation of the minimal :loan factory, representing a recently disbursed loan.
   # It includes disbursal dates and other attributes necessary to make
-  # the loan work with the :payment factory.
+  # the loan work with the :payment factory and others.
   factory :disbursed_loan, :parent => :loan do
     approved_by                   { self.applied_by }
     approved_on                   { Date.today - 20 }
+    scheduled_disbursal_date      { Date.today - 10 }
     disbursal_date                { Date.today - 10 }
+    scheduled_first_payment_date  { Date.today + 10 }
     disbursed_by                  { self.applied_by }
   end
 

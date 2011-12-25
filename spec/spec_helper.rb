@@ -39,7 +39,7 @@ Spec::Runner.configure do |config|
   #     rake db:automigrate MERB_ENV=test
   #
   config.before(:all) do
-    [AccountType, Account, Currency, JournalType, CreditAccountRule, DebitAccountRule, RuleBook, StaffMember, User, Funder, FundingLine, Branch, Center, ClientType, Client, LoanProduct, Region, Area, Portfolio].each do |model|
+    [AccountType, Account, Currency, JournalType, CreditAccountRule, DebitAccountRule, RuleBook, StaffMember, User, Funder, FundingLine, Branch, Center, ClientType, Client, LoanProduct, LoanHistory, Region, Area, Portfolio].each do |model|
       model.all.destroy!
     end
   end

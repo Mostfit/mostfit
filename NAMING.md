@@ -9,6 +9,18 @@ Models and Libraries
 We're mixing up a lot of models and libraries in app/models, moving the non-datamapper models to lib would be a good idea.
 
 
+Incosistencies in naming methods
+--------------------------------
+
+Some inconsistently named methods in models/modules:
+
+*   app/models/reports/branch.rb
+        #client_count
+        #active_client_count
+        #dormant_client_count
+        #borrower_clients_count   <= plural used here
+
+
 Consistent id columns
 ---------------------
 
@@ -21,14 +33,14 @@ I recommend we stick to 'standard' association naming and using :child_key optio
 Some examples listed below (a simple grep will show all). In some cases the naming is ok but use of :child_key is superfluous.
 
 *   "Good" uses:
-    AuditItem             belongs_to :assigned_to, :model => StaffMember
+        AuditItem             belongs_to :assigned_to, :model => StaffMember
 
 *   "Bad" uses:
-    AccountBalance        belongs_to :verified_by, :child_key => [:verified_by_user_id], :model => 'User'
-    Accrual               belongs_to :created_by, :child_key => [:created_by_user_id]
-    ApplicableFee         belongs_to :waived_off_by, 'StaffMember', :child_key => [:waived_off_by_id]
-    AssetRegister         belongs_to :manager, :child_key => [:manager_staff_id],  :model => 'StaffMember'
-    AssetRegister         belongs_to :branch, :child_key => [:branch_id],         :model => 'Branch'
+        AccountBalance        belongs_to :verified_by, :child_key => [:verified_by_user_id], :model => 'User'
+        Accrual               belongs_to :created_by, :child_key => [:created_by_user_id]
+        ApplicableFee         belongs_to :waived_off_by, 'StaffMember', :child_key => [:waived_off_by_id]
+        AssetRegister         belongs_to :manager, :child_key => [:manager_staff_id],  :model => 'StaffMember'
+        AssetRegister         belongs_to :branch, :child_key => [:branch_id],         :model => 'Branch'
 
 Of course this would be a huge pita to fix.
 

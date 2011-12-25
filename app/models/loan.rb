@@ -21,6 +21,7 @@ class Loan
   after  :create,  :levy_fees_new          # we need a separate one for create for a variety of reasons to  do with overwriting old fees
   after  :create,  :update_cycle_number
 
+  # This could really use a better name.
   def rs
     self.repayment_style or self.loan_product.repayment_style
   end
@@ -507,6 +508,9 @@ class Loan
 
   # LOAN MANIPULATION FUNCTIONS
 
+  # !!!! The comment below is no longer true. #repay no longer accepts an array of payments but rather a hash 
+  # of the format { :principal => 100.0, :interest => 20.0, :fees => 10.0 }
+
   # this is the method used for creating payments, not directly on the Payment class
   # for +input+ it allows either a "total" amount as Fixnum or an array with
   # principal[0] and interest[1].
@@ -517,6 +521,26 @@ class Loan
     make_payments(pmts, context, defer_update)
   end
 
+  # This method prepares (but does not save) new payments based on the input. The input format is either a hash
+  # or a fixnum or float. The hash lets you separate what types of payments to make, e.g.:
+  #
+  #   # this would create three separate payments, one for each amount
+  #   { :principal => 100.0, :interest => 20.0, :fees => 10.0 }
+  #
+  # If a fixnum/float is supplied instead separation of the payment types is handled by the style parameter. By
+  # default the style parameter is set to :normal, the alternative styles being :prorata, :sequential and reallocate_normal.
+  # This defers separation out to the pay_normal, pay_prorata, pay_sequential and pay_reallocate_normal methods
+  # respectively. Each of which will return a hash in the format described above.
+  #
+  # user          represents the user registering the payment in the system
+  # received_on   the date on which the payment was made
+  # received_by   the staff_member who took in the payment
+  #
+  # Some more documentation here would not go amiss, as far as I can tell context and defer_update are never used?
+  #
+  # Note that the #extend_loan method below does literally that, it extends the Loan model with the relevant
+  # RepaymentStyle module, determined by either the loan's own RepaymentStyle or the related LoanProduct's RepaymentStyle
+  #
   def get_payments(input, user, received_on, received_by, defer_update = false, style = NORMAL_REPAYMENT_STYLE, context = :default, desktop_id = nil, origin = nil) 
     # this is the way to repay loans, _not_ directly on the Payment model
     # this to allow validations on the Payment to be implemented in (subclasses of) the Loan
@@ -532,7 +556,6 @@ class Loan
     # else vals is like {:fees => 123, :interest => 456, :principal => 789}
     vals = input.is_a?(Hash) ? input : self.send("pay_#{style}",input, received_on) 
                               
-    
     payments = []
     [:fees, :interest, :principal].each do |type|
       if ((vals[type] || 0) > 0)
@@ -544,6 +567,20 @@ class Loan
     payments             
   end
 
+  # This method attempts to register the given payments. The input is assumed to be a collection of Payment objects.
+  #
+  # We return an array representing the status of the update, which contains the following elements:
+  #
+  # Boolean     true or false depending on whether the payments could be registered (saved)
+  # Payment     the payment with type :principal
+  # Payment     the payment with type :interest
+  # Array       the collection of payments with type :fees
+  #
+  # If any of the payments fails to register the entire transaction is rolled back
+  # 
+  # defer_update refers to history logging, set to true for batch updates so not every call updates
+  # the loan_history (persumably this is done manually after the batch update.)
+  #
   def make_payments(payments, context = :default, defer_update = false)
     return [false, nil, nil, nil] if payments.empty?
     Payment.transaction do |t|
@@ -558,9 +595,11 @@ class Loan
     unless defer_update #i.e. bulk updating loans
       self.history_disabled=false
       @already_updated=false
+      # We're mapping twice here? Can we just map{ |p| installment_dates.include?(p.received_on) } ?
       self.reload if payments.map{|p| p.received_on}.map{|d| installment_dates.include?(d)}.include?(false)
       update_history(true)  # update the history if we saved a payment
     end
+    # Perhaps it would be more efficient to check for zero length at the start?
     if payments.length > 0
       return [true, payments.find{|p| p.type==:principal}, payments.find{|p| p.type==:interest}, payments.find_all{|p| p.type==:fees}]
     else
@@ -613,7 +652,17 @@ class Loan
     {:interest => int_to_pay, :principal => prin_to_pay}
   end
 
-    
+  # This method separates a received payment into :interest en :pricipal portions.
+  # First the interest is taken out of the amount and any remaining amount is paid
+  # towards the principal.
+  #
+  # NOTE: We don't seem to check against negative values? If the "total" amount is
+  # lower than the outstanding interest, it seems we count the interest as paid and
+  # we make a negative payment to the principal.
+  # 
+  # After looking at #make_payments it seems that all payment parts are done as a single
+  # transaction in MySQL. If one part of the payment fails to validate (like on a
+  # negative amount) all the payment parts are rolled back. So there is a safeguard.
   def pay_normal(total, received_on)
     lh = info(received_on)
     {:interest => lh.interest_due, :principal => total - lh.interest_due}
