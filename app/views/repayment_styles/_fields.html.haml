@@ -8,7 +8,7 @@
     %th
       Style
     %td
-      = select :style, :collection => [['','---']] + Mostfit::PaymentStyles.constants.sort.map{|f| [f,f]}
+      = select :style, :collection => [['','---']] + Mostfit::PaymentStyles.constants.sort.map{|f| [f.chomp,f.chomp]}, :selected => rs.style.chomp
   %tr
     %th
       Round Equated Payment To

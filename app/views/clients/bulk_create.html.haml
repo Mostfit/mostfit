@@ -1,0 +1,32 @@
+%h1 Bulk Create Clients
+
+%table.form
+  %tr
+    %th
+      In branch
+    %td
+      = select :name => 'branch_id', :id => "branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch'
+  %tr
+    %th
+      In Center
+    %td
+      = select :name => 'center_id', :id => 'center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center'
+
+
+%table.form
+  %thead
+    %tr
+      %th
+        Name
+      %th
+        Date of Birth
+      %th
+        Date Joined
+  - (1..5).each do |i|
+    %tr
+      %td
+        = text_field :name => "clients[#{i}][name]"
+      %td
+        = date_select "clients[#{i}][date_of_birth]", nil, :id => "dob_#{i}"
+      %td
+        = date_select "clients[#{i}][date_joined]", nil, :id => "date_joined_#{i}"

@@ -64,6 +64,11 @@ class Clients < Application
     end
   end
 
+  def bulk_create
+    render
+  end
+
+
   def edit(id)
     only_provides :html
     @client = Client.get(id)
