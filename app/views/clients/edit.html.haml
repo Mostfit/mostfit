@@ -11,6 +11,8 @@
   = partial "clients/fields", :submit_text => "Save changes", :cancel_link => cancel_url
 
   = submit "Save client"
-&nbsp;&nbsp;
-= link_to 'cancel', cancel_url
-
+  &nbsp;&nbsp;
+  %b
+    Or
+  &nbsp;&nbsp;
+  = link_to 'Cancel', cancel_url, :class => "grey_button"

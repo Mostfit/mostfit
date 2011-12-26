@@ -16,7 +16,7 @@ class Client
   property :id,              Serial
   property :reference,       String, :length => 100, :nullable => false, :index => true
   property :name,            String, :length => 100, :nullable => false, :index => true
-  property :gender,     Enum.send('[]', *['', 'female', 'male']), :nullable => true, :lazy => true
+  property :gender,     Enum.send('[]', *['', 'female', 'male']), :nullable => true, :lazy => true, :default => :female
   property :spouse_name,     String, :length => 100, :lazy => true
   property :date_of_birth,   Date,   :index => true, :lazy => true
   property :spouse_date_of_birth, Date, :index => true, :lazy => true
