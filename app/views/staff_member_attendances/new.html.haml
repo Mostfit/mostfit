@@ -1,0 +1,17 @@
+%h1
+  Mark attendance
+  = "of staff: #{@staff_member.name}" if @staff_member
+  
+= error_messages_for @staff_member_attendance
+
+- form_url = resource(:staff_member_attendances, {:return => params[:return]})
+  
+= form_for(@staff_member_attendance, :action => form_url, :classs => "") do
+  %fieldset
+    = partial :fields
+    = submit "Submit"
+    &nbsp;&nbsp;&nbsp;
+    %b
+      Or
+    &nbsp;&nbsp;&nbsp;
+    = link_to "Cancel", url(:quick_link, "staff_members", @staff_member.id), :class => "grey_button"

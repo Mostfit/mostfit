@@ -47,6 +47,7 @@
     %li#info_created Info (created)
     %li#info_managed Info (managed)
     %li#sheets Day Sheets
+    %li#attendance Attendance
     - if Mfi.first.map_enabled
       %li#map Map
   %div.tab
@@ -69,6 +70,8 @@
       %input{:type => "hidden", :name => "_target_", :value => "file_list"}
       = submit "GO"
     #file_list
+  %div.tab
+    %input{:type => "hidden", :name => "_load_remote", :value => resource(@staff_member, :staff_member_attendances)}
  
   - if Mfi.first.map_enabled
     %div.tab
