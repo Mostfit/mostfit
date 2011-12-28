@@ -15,7 +15,7 @@ class Loan
   before :save,    :levy_fees
   after  :create,  :update_cycle_number
   before :destroy, :verified_cannot_be_deleted
-  before :valid?,    :set_loan_product_parameters
+
   before :save, :set_bullet_installments
 
   def rs
@@ -278,7 +278,7 @@ class Loan
       :client                             => Client.first(:reference => row[headers[:client_reference]])}
     obj = new(hash)
     obj.history_disabled=true
-    saved = obj.save!
+    saved = obj.save
     if saved
       c = Checker.first_or_new(:model_name => "Loan", :reference => obj.reference)
       c.check_field = row[headers[:check_field]]
@@ -1359,6 +1359,11 @@ class Loan
 
   def set_loan_product_parameters
     self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
+    [:amount, :interest_rate, :number_of_installments].each do |attr|
+      self.send("#{attr}=", self.loan_product.send("max_#{attr}")) if self.loan_product.send("max_#{attr}") == self.loan_product.send("min_#{attr}")
+    end
+    self.interest_rate = self.interest_rate / 100 #loan product stores it as 26, not 0.26
+    self.installment_frequency = self.loan_product.installment_frequency
   end
 
   def interest_calculation(balance)

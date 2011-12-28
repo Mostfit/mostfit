@@ -83,41 +83,51 @@ module DataEntry
 
     # action to bulk create loans with same paramters for an entire center
     def bulk_form
+      debugger
+      # read the params into nice variables
+      sc = params[:clients].map{|k,v| k if v[:chosen]}.compact if params[:clients]   # nice to be able to say "if @selected_clients" 
+      @selected_clients = sc.blank? ? nil : sc                                       # instead of "unless @selected_clients.blank?"
+      @center = Center.get(params[:center_id])
+      @clients = @center.clients(:active => true, :order => [:client_group_id, :name]) if @center
+
       # find center and clients
-      if not params[:query] and not params[:center_id] and not params[:client_ids]
+
+      if not params[:query] and not params[:center_id] and @selected_clients.blank? # no idea about anything. 
+        # ask which center
         @url = url(:action => :bulk_form)
         display([], "centers/search")
-      elsif params[:query] and not params[:client_ids]
+      elsif params[:query] and @selected_clients.blank? # query is there? good. no clients? 
+        # ask about clients
         @center = Center.get(params[:query]) || Center.first(:code => params[:query]) || Center.first(:name => params[:query])
         raise NotFound unless @center
         @clients = @center.clients(:active => true, :order => [:client_group_id, :name])
         display([@center, @clients], "data_entry/loans/bulk_form")
-      elsif params[:client_ids] and not params[:client_ids].blank? and params[:loan_product_id] and not params[:loan_product_id].blank?
-        @clients = Client.all(:id => params[:client_ids])
-        raise NotFound unless @clients.length > 0
         
-        @center = @clients.first.center
-        raise NotFound unless @center
-        
-        @loan_product = LoanProduct.get(params[:loan_product_id])
-        raise NotFound unless @loan_product
-
-        klass = Kernel::const_get(@loan_product.loan_type_string || @loan_product.loan_type)
-        @loan = klass.new
-        
-        @branch = @center.branch
-        @client = @clients.first
-
-        if @loan_product.linked_to_insurance
-          @insurance_policy = InsurancePolicy.new
-          @insurance_policy.client = @client
+      elsif params[:loan] 
+        if @selected_clients
+          # ok, we have enough to start making the loans
+          @loans = []
+          debugger
+          @selected_clients.each do |client_id|
+            params[:clients][client_id].delete(:chosen)
+            l = Loan.new(params[:loan].merge(params[:clients][client_id]).merge(:client_id => client_id))
+            l.set_loan_product_parameters
+            @loans.push(l)
+          end
+          Loan.transaction do |t|
+            r = @loans.map{|l| l.save}
+            if r.include?(false)
+              t.rollback 
+            else
+              redirect resource(@center), :message => {:notice => "all loans added succesfully"}
+            end
+          end
         end
         render
       elsif params.key?(:center_id)
         @center = Center.get(params[:center_id])
         # get list of clients
         @clients = @center.clients(:active => true, :order => [:client_group_id, :name])
-        @selected = params[:client_ids].map{|x| x.to_i} if params[:client_ids] and not params[:client_ids].blank?
         message[:error] = ""
         message[:error] += "Please select at least one client." if not params[:client_ids] or params[:client_ids].blank?
         message[:error] += "Please select at loan product." if not params[:loan_product_id] or params[:loan_product_id].blank?
