@@ -1,0 +1,58 @@
+%h1 Bulk Entry of Clients
+
+= form :action => url(:controller => :clients, :action => :bulk_entry, :method => :post) do
+  %table.tall.shaded
+    %tr
+      %th
+        In branch
+      %td
+        = select :name => 'branch_id', :id => "branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch', :selected => params[:branch_id]
+    %tr
+      %th
+        and center
+      %td
+        = select :name => 'center_id', :id => 'center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center', :selected => params[:center_id]
+        %span.red
+          = @errors[:center]
+
+  %table
+    %thead
+      %tr
+        %th
+          name
+        %th
+          reference
+        %th
+          d.o.b.
+        %th
+          date joined
+        %th
+          spouse name
+        %th
+          spouse d.o.b
+      
+    - debugger
+    - ((params[:clients] or Nothing).keys || (1..5)).each do |i|
+      - if (@errors or Nothing)[i] 
+        %tr
+          %td{:colspan => 10}
+            .error
+              - @errors.map do |k,v|
+                - v.keys.each do |key|
+                  == #{key} : #{v[key]}
+      %tr
+        %th
+          = text_field :name => "clients[#{i}][name]", :value => (params[:clients] and params[:clients][i.to_s][:name])
+        %th
+          = text_field :name => "clients[#{i}][reference]", :value => (params[:clients] and params[:clients][i.to_s][:reference])
+        %th
+          = date_select "clients[#{i}][date_of_birth]", (params[:clients] and params[:clients][i.to_s][:date_of_birth]), :id => "client_#{i}_dob"
+        %th
+          = date_select "clients[#{i}][date_joined]", (params[:clients] and params[:clients][i.to_s][:date_joined]), :id => "client_#{i}_date_joined"
+        %th
+          = text_field :name => "clients[#{i}][spouse_name]", :value => (params[:clients] and params[:clients][i.to_s][:spouse_name])
+        %th
+          = date_select "clients[#{i}][spouse_date_of_birth]",(params[:clients] and params[:clients][i.to_s][:spouse_date_of_birth]) , :id => "client_#{i}_spouse_dob"
+  = submit 'add clients'
+      
+

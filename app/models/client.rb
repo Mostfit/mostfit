@@ -94,7 +94,7 @@ class Client
   
   belongs_to :domain, :parent_key => [:domain_guid], :child_key => [:parent_domain_guid], :required => false
   property   :parent_domain_guid, String, :nullable => true
-
+  property   :client_type_id,     Integer, :default => 1
   has n, :loans
   has n, :payments
   has n, :insurance_policies

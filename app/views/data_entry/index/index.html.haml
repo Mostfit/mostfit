@@ -74,6 +74,8 @@
       
         - if thing == :client
           %br
+          = link_to "Bulk add clients", url(:controller => :clients, :action => :bulk_entry), :class => 'add_small'
+          %br
           = link_to ("Add Guarantors", url(:enter_clients, :action => 'add_guarantor'), :class => 'edit_small')
           %br
           - cl = Client.all(:active => false).aggregate(:id.count)
