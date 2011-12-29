@@ -79,7 +79,7 @@ namespace :mostfit do
          })
 
       # drop and recreate the cachers table if required
-      if Cacher.properties.map{|x| x.name}.include?(:id) # if the cacher has a property called "id"
+      unless repository.adapter.query("select id from loan_history limit 1") rescue false
         dates = Cacher.all.aggregate(:date)
         repository.adapter.execute("drop table cachers");
         Rake::Task['db:autoupgrade'].invoke
