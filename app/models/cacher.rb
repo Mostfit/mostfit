@@ -2,13 +2,12 @@ class Cacher
   # like LoanHistory but for anything that has loans
   include DataMapper::Resource
 
-  property :id,                              Serial
-  property :type,                            Discriminator
-  property :date,                            Date, :nullable => false, :index => true
-  property :model_name,                      String, :nullable => false, :index => true
-  property :model_id,                        Integer, :nullable => false, :index => true, :unique => [:model_name, :date]
-  property :branch_id,                       Integer, :index => true
-  property :center_id,                       Integer, :index => true
+  property :type,                            Discriminator, :key => true
+  property :date,                            Date, :nullable => false, :index => true, :key => true
+  property :model_name,                      String, :nullable => false, :index => true, :key => true
+  property :model_id,                        Integer, :nullable => false, :index => true, :unique => [:model_name, :date], :key => true
+  property :branch_id,                       Integer, :index => true, :key => true
+  property :center_id,                       Integer, :index => true, :key => true
   property :funding_line_id,                 Integer, :index => true
   property :scheduled_outstanding_total,     Float, :nullable => false
   property :scheduled_outstanding_principal, Float, :nullable => false
@@ -154,7 +153,6 @@ class Cacher
     raise ArgumentError "cannot add cachers of different classes" unless self.class == other.class
     attrs = (self.date > other.date ? self : other).attributes.dup
     me = self.attributes; other = other.attributes;
-    attrs.delete(:id)
     FLOW_COLS.map{|col| attrs[col] = me[col] + other[col]}
     attrs[:stale] = me[:stale] || other[:stale]
     Cacher.new(attrs)
@@ -186,73 +184,72 @@ class BranchCache < Cacher
   end
 
   def self.update(date = Date.today, branch_ids = nil, force = false)
-    # updates the cache object for a branch
-    # first create caches for the centers that do not have them
-    t0 = Time.now; t = Time.now;
-    branch_ids = Branch.all.aggregate(:id) unless branch_ids
-    branch_centers = Branch.all(:id => branch_ids).centers.aggregate(:id)
+    # cache updates must be pristine, so rollback on failure.
+    BranchCache.transaction do |t|
+      # updates the cache object for a branch
+      # first create caches for the centers that do not have them
+      t0 = Time.now; t = Time.now;
+      branch_ids = Branch.all.aggregate(:id) unless branch_ids
+      branch_centers = Branch.all(:id => branch_ids).centers.aggregate(:id)
 
-    # unless we are forcing an update, only work with the missing and stale centers
-    unless force
-      ccs = CenterCache.all(:model_name => "Center", :branch_id => branch_ids, :date => date, :center_id.gt => 0)
-      cached_centers = ccs.aggregate(:center_id)
-      stale_centers = ccs.stale.aggregate(:center_id)
-      cids = (branch_centers - cached_centers) + stale_centers
-      puts "#{cached_centers.count} cached centers; #{branch_centers.count} total centers; #{stale_centers.count} stale; #{cids.count} to update"
-    else
-      cids = branch_centers
-      puts " #{cids.count} to update"
-    end
-
-    return true if cids.blank? #nothing to do
-    # update all the centers for today
-    chunks = cids.count/3000
-    begin
-      _t = Time.now
-      cids.chunk(3000).each_with_index do |_cids,i|
-        (CenterCache.update(:center_id => _cids, :date => date))
-        puts "UPDATED #{i}/#{chunks} CACHES in #{(Time.now - _t).round} secs"
-      end
-    rescue
-      return false
-    end
-    puts "UPDATED CENTER CACHES in #{(Time.now - t).round} secs"
-    t = Time.now
-    # then add up all the cached centers by branch
-    relevant_branch_ids = Center.all(:id => cids).aggregate(:branch_id)
-    branch_data_hash = CenterCache.all(:model_name => "Center", :branch_id => relevant_branch_ids, :date => date).group_by{|x| x.branch_id}.to_hash
-    puts "READ CENTER CACHES in #{(Time.now - t).round} secs"
-    t = Time.now
-
-    # we now have {:branch => [{...center data...}, {...center data...}]}, ...
-    # we have to convert this to {:branch => { sum of centers data }, ...}
-
-    branch_data = branch_data_hash.map do |bid,ccs|
-      sum_centers = ccs.map do |c|
-        center_sum_attrs = c.attributes.select{|k,v| v.is_a? Numeric}.to_hash
-      end
-      [bid, sum_centers.reduce({}){|s,h| s+h}]
-    end.to_hash
-
-    # TODO then add the loans that do not belong to any center
-    # this does not exist right now so there is no code here.
-    # when you add clients directly to the branch, do also update the code here
-
-    puts "CONSOLIDATED CENTER CACHES in #{(Time.now - t).round} secs"
-    t = Time.now
-    branch_data.map do |bid, c|
-      bc = BranchCache.first_or_new({:model_name => "Branch", :model_id => bid, :date => date})
-      attrs = c.merge(:branch_id => bid, :center_id => 0, :model_id => bid, :stale => false, :updated_at => DateTime.now)
-      if bc.new?
-        bc.attributes = attrs.merge(:id => nil, :updated_at => DateTime.now)
-        bc.save
+      # unless we are forcing an update, only work with the missing and stale centers
+      unless force
+        ccs = CenterCache.all(:model_name => "Center", :branch_id => branch_ids, :date => date, :center_id.gt => 0)
+        cached_centers = ccs.aggregate(:center_id)
+        stale_centers = ccs.stale.aggregate(:center_id)
+        cids = (branch_centers - cached_centers) + stale_centers
+        puts "#{cached_centers.count} cached centers; #{branch_centers.count} total centers; #{stale_centers.count} stale; #{cids.count} to update"
       else
-        bc.update(attrs.merge(:id => bc.id))
+        cids = branch_centers
+        puts " #{cids.count} to update"
       end
+
+      return true if cids.blank? #nothing to do
+      # update all the centers for today
+      chunks = cids.count/3000
+      begin
+        _t = Time.now
+        cids.chunk(3000).each_with_index do |_cids,i|
+          (CenterCache.update(:center_id => _cids, :date => date))
+          puts "UPDATED #{i}/#{chunks} CACHES in #{(Time.now - _t).round} secs"
+        end
+      rescue
+        return false
+      end
+      puts "UPDATED CENTER CACHES in #{(Time.now - t).round} secs"
+      t = Time.now
+      # then add up all the cached centers by branch
+      relevant_branch_ids = Center.all(:id => cids).aggregate(:branch_id)
+      branch_data_hash = CenterCache.all(:model_name => "Center", :branch_id => relevant_branch_ids, :date => date).group_by{|x| x.branch_id}.to_hash
+      puts "READ CENTER CACHES in #{(Time.now - t).round} secs"
+      t = Time.now
+
+      # we now have {:branch => [{...center data...}, {...center data...}]}, ...
+      # we have to convert this to {:branch => { sum of centers data }, ...}
+
+      branch_data = branch_data_hash.map do |bid,ccs|
+        sum_centers = ccs.map do |c|
+          center_sum_attrs = c.attributes.select{|k,v| v.is_a? Numeric}.to_hash
+        end
+        [bid, sum_centers.reduce({}){|s,h| s+h}]
+      end.to_hash
+
+      # TODO then add the loans that do not belong to any center
+      # this does not exist right now so there is no code here.
+      # when you add clients directly to the branch, do also update the code here
+
+      puts "CONSOLIDATED CENTER CACHES in #{(Time.now - t).round} secs"
+      t = Time.now
+      branch_data.map do |bid, c|
+        bc = BranchCache.first_or_new({:model_name => "Branch", :model_id => bid, :date => date})
+        attrs = c.merge(:branch_id => bid, :center_id => 0, :model_id => bid, :stale => false, :updated_at => DateTime.now)
+        bc.attributes = attrs
+        bc.save
+      end
+      puts "WROTE BRANCH CACHES in #{(Time.now - t).round} secs"
+      t = Time.now
+      puts "COMPLETED IN #{(Time.now - t0).round} secs"
     end
-    puts "WROTE BRANCH CACHES in #{(Time.now - t).round} secs"
-    t = Time.now
-    puts "COMPLETED IN #{(Time.now - t0).round} secs"
   end
 
   # returns a hash of {:branch_id => [date1, date2...]} where dates are those where no caches exist for the branch
@@ -299,7 +296,7 @@ class CenterCache < Cacher
     end
     sql = get_bulk_insert_sql("cachers", cs)
     raise unless CenterCache.all(:date => date, :center_id => centers_data.keys).destroy!
-    repository.adapter.execute(sql)
+    repository.adapter.execute(sql) # raise an exception if anything goes wrong
   end
 
   def self.delayed_disbursal(hash = {})
@@ -352,6 +349,7 @@ class CenterCache < Cacher
 
   # finds the missing caches given some caches 
   def self.missing(selection)
+    debugger
     bs = self.all(selection).aggregate(:date, :center_id).group_by{|x| x[0]}.to_hash.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
     # bs is a hash of {:date => [:center_id,...]}
     date = selection.delete(:date)

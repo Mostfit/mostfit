@@ -4,11 +4,9 @@
   %h1== Center: <i>#{@center.name}</i> (#{@clients.count} clients)
   .menu-strip
     = link_to 'edit center', resource(@branch, @center, :edit), :class => "edit grey_button"
-    &nbsp;
-    = link_to 'new client', resource(@branch, @center, :clients, :new), :class => "add_small grey_button", :style => "margin: 0px; padding-right: 3px;"
-    = link_to "Bulk add loans", url(:enter_loans, :action => :bulk_form, :query => @center), :class => "add_small grey_button"
-    &nbsp;
-    = link_to "Bulk add clients", url(:controller => :clients, :action => :bulk_entry, :branch_id => @center.branch.id, :center_id => @center.id), :class => 'add_small grey_button'
+    = link_to 'new client', resource(@branch, @center, :clients, :new), :class => "add grey_button", :style => "margin: 0px; padding-right: 3px;"
+    = link_to "Bulk add loans", url(:enter_loans, :action => :bulk_form, :query => @center), :class => "add grey_button", :style => "margin: 0px; padding-right: 3px;"
+    = link_to "Bulk add clients", url(:controller => :clients, :action => :bulk_entry, :branch_id => @center.branch.id, :center_id => @center.id), :class => 'add grey_button', :style => "margin: 0px; padding-right: 3px;"
 
 
   %div.maininfo

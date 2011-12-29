@@ -7,6 +7,9 @@ class StaffMember
   property :name,    String, :length => 100, :nullable => false
   property :mobile_number,  String, :length => 12,  :nullable => true
   property :creation_date,  Date, :length => 12,  :nullable => true, :default => Date.today
+  property :address, Text, :lazy => true
+  property :father_name,  String, :length => 100, :nullable => true
+  property :gender,     Enum.send('[]', *['', 'female', 'male']), :nullable => true, :lazy => true, :default => :male
   property :active,  Boolean, :default => true, :nullable => false  
   property :user_id,  Integer,  :nullable => true  
   # no designations, they are derived from the relations it has
@@ -28,6 +31,7 @@ class StaffMember
   has n, :payments, :child_key  => [:received_by_staff_id]
   has n, :monthly_targets
   has n, :weeksheets
+  has n, :staff_member_attendances
 
   belongs_to :user
 

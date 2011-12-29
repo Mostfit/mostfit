@@ -163,7 +163,7 @@ module Pdf
                premia = "NA"
             end
             table.data.push({"amount" => loan.amount.to_currency, "name" => loan.client.name,
-                              "group" => loan.client.client_group.name,
+                              "group" => (loan.client.client_group or Nothing).name,
                               "loan product" => loan.loan_product.name, "first payment" => loan.scheduled_first_payment_date, 
                               "spouse name" => loan.client.spouse_name, "loan status" => loan.status,
                               "insurance premium" => premia, "balance to disburse" => (amount_to_disburse||loan.amount.to_currency)

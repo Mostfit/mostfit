@@ -1,0 +1,16 @@
+- form_url = url(:controller => params[:controller], :action => 'update', :id => @staff_member_attendance.id, :return => params[:return])
+
+= error_messages_for @staff_member_attendance
+
+= form_for(@staff_member_attendance, :action => form_url, :class => "") do
+  %h1 Edit the attendance for: #{@staff_member.name}
+  = error_messages_for @staff_member_attendance
+
+  %fieldset
+    = partial "staff_member_attendances/fields"
+    = submit "Save changes"
+    &nbsp;&nbsp;
+    %b
+      Or
+    &nbsp;&nbsp;
+    = link_to 'Cancel', url(:quick_link, "staff_members", @staff_member.id), :class => "grey_button"

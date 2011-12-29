@@ -8,6 +8,21 @@
       %span.greytext the screen name of the staff member
   %tr
     %td
+      Father Name
+    %td
+      = text_field :father_name, :size => 40
+  %tr
+    %td
+      Address
+    %td
+      = text_area :address, :rows => 6, :cols => 38
+  %tr
+    %td
+      Gender
+    %td
+      = select :gender, :collection => [[:female, "Female"], [:male, "Male"]], :prompt => "Please choose a gender"
+  %tr
+    %td
       Mobile number:
     %td
       = text_field :mobile_number, :size => 40
