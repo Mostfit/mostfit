@@ -14,7 +14,11 @@
       = partial("clients/fields")
   
     = submit "Add client", :class => "grey_button"
-  = link_to 'cancel', cancel_url
+    &nbsp;&nbsp;
+    %b
+      Or
+    &nbsp;&nbsp;
+    = link_to 'Cancel', cancel_url, :class => "grey_button"
   
 - else
   - @client = Client.new

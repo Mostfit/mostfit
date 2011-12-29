@@ -111,8 +111,8 @@ module FeesContainer
     @fee_schedule = {}
     ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class).map{|af|
       @fee_schedule[af.applicable_on] ||= {}
-      @fee_schedule[af.applicable_on][af.fee] = af.amount
-    }
+      @fee_schedule[af.applicable_on][af.fee] = af.amount if self.send(af.fee.payable_on.to_s.split("_")[1..-1].join("_"))
+    }.compact
     @fee_schedule
   end
 

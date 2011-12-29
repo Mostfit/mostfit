@@ -44,7 +44,7 @@
           = link_to_with_rights "Edit a #{thing.to_s}", url("enter_#{plural}".to_sym, :action => 'edit'), :class => 'edit_small'
         - if thing == :loan
           %br
-          = link_to_with_rights("Bulk entry of loans", url(:enter_loans, :action => :bulk_form), :class => 'edit_small')
+          = link_to_with_rights("Bulk entry of loans", url(:enter_loans, :action => :bulk_form), :class => 'add_small')
           %br
           -# - fl = Loan.all(:funding_line => nil).count
           = link_to_with_rights("Bulk Edit Funding Lines", url(:enter_loans, :action => :bulk_update_funding_line), :class => 'edit_small')
@@ -74,7 +74,7 @@
       
         - if thing == :client
           %br
-          = link_to ("Add Guarantors", url(:enter_clients, :action => 'add_guarantor'), :class => 'edit_small')
+          = link_to "Bulk add clients", url(:controller => :clients, :action => :bulk_entry), :class => 'add_small'
           %br
           - cl = Client.all(:active => false).aggregate(:id.count)
           = link_to_with_rights("Inactive Clients", url(:controller => :clients, :action => :inactive_client_count), :class => 'edit_small')

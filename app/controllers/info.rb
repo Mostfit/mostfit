@@ -224,16 +224,19 @@ private
     @fees            = Fee.collected_for(obj, @from_date, @to_date, child_type)
     @total_fees      = Fee.collected_for(obj, Date.min_date, @to_date, child_type)
 
-    @total_disbursed = LoanHistory.amount_disbursed_for(obj, Date.min_date, @to_date, child_type)
-    @loan_disbursed  = LoanHistory.amount_disbursed_for(obj, @from_date, @to_date, child_type)
+    if LoanHistory.count > 0
+      @total_disbursed = LoanHistory.amount_disbursed_for(obj, Date.min_date, @to_date, child_type)
+      @loan_disbursed  = LoanHistory.amount_disbursed_for(obj, @from_date, @to_date, child_type)
 
-    @loan_data       = LoanHistory.sum_outstanding_for(obj, @to_date, child_type)
-    @defaulted       = LoanHistory.defaulted_loan_info_for(obj, @to_date, nil, :aggregate, child_type)
-    # @total_death_cases = Client.death_cases(obj,Date.min_date,@to_date)  
-    # @death_cases = Client.death_cases(obj,@from_date,@to_date) 
-    # @pending_death_cases = Client.pending_death_cases(obj,@from_date,@to_date)
-    @loans_repaid  = LoanHistory.loan_repaid_count(obj,@from_date, @to_date, child_type)
-    @loans_repaid_total =  LoanHistory.loan_repaid_count(obj,Date.min_date, @to_date, child_type)
+      @loan_data       = LoanHistory.sum_outstanding_for(obj, @to_date, child_type)
+      @defaulted       = LoanHistory.defaulted_loan_info_for(obj, @to_date, nil, :aggregate, child_type)
+      # @total_death_cases = Client.death_cases(obj,Date.min_date,@to_date)  
+      # @death_cases = Client.death_cases(obj,@from_date,@to_date) 
+      # @pending_death_cases = Client.pending_death_cases(obj,@from_date,@to_date)
+      @loans_repaid  = LoanHistory.loan_repaid_count(obj,@from_date, @to_date, child_type)
+      @loans_repaid_total =  LoanHistory.loan_repaid_count(obj,Date.min_date, @to_date, child_type)
+    else
+      @total_disbursed = @loan_disbursed = @loan_data = @defaulted = @loans_repaid = @loans_repaid_total = 0
+    end
   end
 end
-  

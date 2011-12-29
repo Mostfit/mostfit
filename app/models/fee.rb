@@ -36,7 +36,7 @@ class Fee
   property :overridable_by, Flag[:data_entry, :mis_manager, :admin,:staff_member]
 
   property :round_to,       Float
-  property :rounding_style, Enum[:round, :ceil, :floor]
+  property :rounding_style, Enum[:round, :ceil, :floor], :default => :round, :nullable => false
 
   has n, :loan_products, :through => Resource
   has n, :client_types, :through => Resource

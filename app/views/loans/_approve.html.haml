@@ -14,6 +14,8 @@
       %th
         Approval Date
       %th
+        Scheduled Disbursal Date
+      %th
         Scheduled 1st Payment Date
       %th
         Center Meeting Day
@@ -40,6 +42,11 @@
       %td.text
         - min_date = (loan.applied_on > Date.min_transaction_date ? loan.applied_on : Date.min_transaction_date)
         = date_select("loans[#{loan.id}][approved_on]", min_date, :id => "loans_#{loan.id}_approved_on", :min_date => min_date, :max_date => Date.max_transaction_date)
+      %td.text
+        - min_date = (loan.scheduled_disbursal_date > Date.min_transaction_date ? loan.scheduled_disbursal_date : Date.min_transaction_date)
+        = date_select("loans[#{loan.id}][scheduled_disbursal_date]", min_date, :id => "loans_#{loan.id}_scheduled_disbursal_date", :min_date => min_date, :max_date => Date.max_transaction_date)
+        = loan.scheduled_first_payment_date.strftime('%A')
+
       %td.text
         - min_date = (loan.scheduled_first_payment_date > Date.min_transaction_date ? loan.scheduled_first_payment_date : Date.min_transaction_date)
         = date_select("loans[#{loan.id}][scheduled_first_payment_date]", min_date, :id => "loans_#{loan.id}_scheduled_first_payment_date", :min_date => min_date, :max_date => Date.max_transaction_date)

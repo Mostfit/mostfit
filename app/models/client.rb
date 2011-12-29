@@ -16,7 +16,7 @@ class Client
   property :id,              Serial
   property :reference,       String, :length => 100, :nullable => false, :index => true
   property :name,            String, :length => 100, :nullable => false, :index => true
-  property :gender,     Enum.send('[]', *['', 'female', 'male']), :nullable => true, :lazy => true
+  property :gender,     Enum.send('[]', *['', 'female', 'male']), :nullable => true, :lazy => true, :default => :female
   property :spouse_name,     String, :length => 100, :lazy => true
   property :date_of_birth,   Date,   :index => true, :lazy => true
   property :spouse_date_of_birth, Date, :index => true, :lazy => true
@@ -94,7 +94,7 @@ class Client
   
   belongs_to :domain, :parent_key => [:domain_guid], :child_key => [:parent_domain_guid], :required => false
   property   :parent_domain_guid, String, :nullable => true
-
+  property   :client_type_id,     Integer, :default => 1
   has n, :loans
   has n, :payments
   has n, :insurance_policies

@@ -2,7 +2,7 @@ class Cacher
   # like LoanHistory but for anything that has loans
   include DataMapper::Resource
 
-   property :id,                              Serial
+  property :id,                              Serial
   property :type,                            Discriminator
   property :date,                            Date, :nullable => false, :index => true
   property :model_name,                      String, :nullable => false, :index => true

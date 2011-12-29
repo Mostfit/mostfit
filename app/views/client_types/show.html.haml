@@ -1,13 +1,19 @@
 %h1
+  Client Type:
   = @client_type.type
   Client
 
-%h3 The following fees are applicable on this client type:
-%ul
-  - @client_type.fees.each do |f|
-    %li
-      = f.description
-
-= link_to 'Edit',  url(:edit_client_type,  @client_type)
-|
-= link_to 'Back', url(:client_types)
+- if (@client_type and @client_type.fees.count > 0)
+  %h3 The following fees are applicable on this client type:
+  %ul
+    - @client_type.fees.each do |f|
+      %li
+        = f.description
+- else
+  %h2
+    No fees is applicable on this client type.
+  
+%br
+  = link_to 'Edit',  url(:edit_client_type,  @client_type), :class => "grey_button"
+  &nbsp;&nbsp;&nbsp;
+  = link_to 'Back', url(:client_types), :class => "grey_button"

@@ -39,25 +39,27 @@
       in current selection.
       = link_to "update", url({:controller => :cachers, :action => :generate}.merge(query_params)), :class => "green_button"
   .menu-strip{:style => "width:100%"}
-    %ul.inline
-      [
-      %li
-        = link_to 'previous day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date - 1, :to_date => @to_date - 1))
-      %li
-        = link_to 'next day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date + 1, :to_date => @to_date + 1))
-      %li
-        = link_to 'last week', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.cwday - 7, :to_date => Date.today - Date.today.cwday))
-      %li
-        = link_to 'week to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.cwday, :to_date => Date.today))
-      %li
-        = link_to 'last month', url(:consolidate_cachers, query_params.merge(:from_date => (Date.today << 1) - Date.today.day + 1, :to_date => Date.today - Date.today.day))
-      %li
-        = link_to 'month to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.day + 1, :to_date => Date.today ))
-      ]
-      %li
-        = link_to 'report formats', url(:report_formats), :class => "report"
-      %li
-        = link_to 'printer friendly', url(:consolidate_cachers, query_params.merge(:layout => :printer, :target => "_blank")), :class => 'print'
+    %tr
+      %td
+        [
+      %td
+        = link_to 'previous day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date - 1, :to_date => @to_date - 1)), :class => "grey_button"
+      %td
+        = link_to 'next day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date + 1, :to_date => @to_date + 1)), :class => "grey_button"
+      %td
+        = link_to 'last week', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.cwday - 7, :to_date => Date.today - Date.today.cwday)), :class => "grey_button"
+      %td
+        = link_to 'week to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.cwday, :to_date => Date.today)), :class => "grey_button"
+      %td
+        = link_to 'last month', url(:consolidate_cachers, query_params.merge(:from_date => (Date.today << 1) - Date.today.day + 1, :to_date => Date.today - Date.today.day)), :class => "grey_button"
+      %td
+        = link_to 'month to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.day + 1, :to_date => Date.today )), :class => "grey_button"
+      %td
+        ]
+      %td
+        = link_to 'report formats', url(:report_formats), :class => "report", :target => "_blank"
+      %td
+        = link_to 'printer friendly', url(:consolidate_cachers, query_params.merge(:layout => :printer)), :class => 'print', :target => "_blank"
   = form(:method => :get, :action => url(:consolidate_cachers)) do
     = date_select('from_date', @from_date, {:id => 'from_date'})
     to
@@ -66,8 +68,8 @@
     = select :name => 'branch_id', :id => "branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch', :class => 'chosen'
     and center
     = select :name => 'center_id', :id => 'center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center', :class => 'chosen'
-    showng columns
-    = select :name => 'report_format', :collection => ReportFormat.all,:text_method => :name, :value_method => :id, :selected => (params[:report_format] || 1).to_s, :prompt => 'Select a report format'
+    showing columns
+    = select :name => 'report_format', :collection => ReportFormat.all,:text_method => :name, :value_method => :id, :selected => (params[:report_format] || 1).to_s, :prompt => 'Select a report format', :class => 'chosen'
     = submit 'apply filter'
     
   - if @cachers.count == 0

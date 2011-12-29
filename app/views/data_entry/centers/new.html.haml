@@ -2,6 +2,10 @@
 
 %h3 Please choose a branch to add a center to
 
+- if Branch.count==0
+  %div.error
+    You do not have any branch data yet. Create them 
+    = link_to("here", resource(:branches, :new), :target => "_blank")
 = form_for(@center, :action => url(:controller => :"data_entry/centers", :action => "new")) do
   = select :name => :branch_id, :collection => get_accessible_branches, :value_method => :id, :text_method => :name, :prompt => "Please select a branch"
   = submit 'Next...'

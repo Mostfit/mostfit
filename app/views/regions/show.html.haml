@@ -1,18 +1,46 @@
 %h1
-  == #{I18n.t "region.show.name", :default => "Region"} #{@region.name}
-  = link_to I18n.t("region.index.edit", :default => "Edit"), url(:edit_region,  @region), :class => "edit"
-%table
-  %tr.odd
-    %td=I18n.t "region.show.address", :default => "Address"
-    %td=@region.address
-  %tr
-    %td=I18n.t "region.show.contact_phone_number", :default => "Contact phone number"
-    %td=@region.contact_number
-  %tr.odd
-    %td=I18n.t "region.show.landmark", :default => "Landmark"
-    %td=@region.landmark
+  == #{I18n.t "region.show.name", :default => "Region"} : <i>#{@region.name}</i>
+%p.menu-strip{:style => "width: 29%; margin-bottom: 0.2em;"}
+  = link_to I18n.t("region.index.edit", :default => "Edit"), url(:edit_region, @region), :class => 'edit grey_button'
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  = link_to 'back', resource(:regions), :class => 'grey_button'
 
-= link_to I18n.t("region.show.new_link", :default => "Add a new area" ), resource(@region, :areas, :new), :class => "add"
+%table.loan{ :style => "width: 30%; border: solid 1px #cfcfcf; margin: 5px; " }
+  %tr.odd
+    %th.odd
+      = I18n.t "region.show.region_name", :default => "Region Name"
+    %td
+      = @region.name
+  %tr.even
+    %th.even
+      = I18n.t("region.show.creation_date", :default => "Creation date")
+    %td
+      = @region.creation_date
+      (
+      = @region.creation_date.strftime('%A')
+      )
+  %tr.odd
+    %th.odd
+      = I18n.t "region.show.manager", :default => "Manager"
+    %td
+      = link_to @region.manager.name, resource(@region.manager), :target => "_blank"
+  %tr.odd
+    %th.odd
+      = I18n.t "region.show.address", :default => "Address"
+    %td
+      = @region.address
+  %tr.even
+    %th.even
+      = I18n.t "region.show.contact_phone_number", :default => "Contact phone number"
+    %td
+      = @region.contact_number
+  %tr.odd
+    %th.odd
+      = I18n.t "region.show.landmark", :default => "Landmark"
+    %td
+      = @region.landmark
+%br
+= link_to I18n.t("region.show.new_link", :default => "Add a new area" ), resource(@region, :areas, :new), :class => "add grey_button"
 %div.tab_container
   %ul.tabs
     %li#areas

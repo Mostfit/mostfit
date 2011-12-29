@@ -1,13 +1,64 @@
-- if not @loan_product or not @clients
+:javascript
+  $(document).ready(function() {
+    $('.loan_purpose').change(function() {
+      my_id = $(this).attr('id');
+      $('#client_' + my_id).attr('checked',true);
+    });
+    $('.loan_purpose').change(function() {
+      my_id = $(this).attr('id');
+      $('#client_' + my_id).attr('checked',true);
+    });
+    $('#loan_purpose_chooser').change(function(){
+      $('.loan_purpose').each(function(){
+        $(this).attr('selectedIndex',$('#loan_purpose_chooser').attr('selectedIndex'));
+      });
+    });
+    $('#loan_product_chooser').change(function(){
+      $('.loan_product').each(function(){
+        $(this).attr('selectedIndex',$('#loan_product_chooser').attr('selectedIndex'));
+      });
+    });
+
+  });
+  
+- if true
   %h1
     Bulk loan entry for
     = @center.name
     in
     = @center.branch.name
   
-  %h2 Choose clients
   = form_for(@center, :action => :bulk_form, :class => "_disable_button_") do
     = hidden_field :name => :center_id, :value => @center.id
+    .menu-strip{:style => "width:100%"}
+      - if @loans
+        .error
+          %ul
+            - [:applied_on, :scheduled_disbursal_date, :scheduled_first_payment_date, :applied_by_staff_id, :funding_line_id].each do |field|
+              = @loans.first.errors[field].each do |x|
+                %li
+                  = x
+      %b Make bulk applications for loan product
+      - params[:loan] ||= Nothing
+      = select :name => "loan[loan_product_id]", :id => "loan_product_chooser", :collection => LoanProduct.valid(:order => [:name], :linked_to_insurance => false).map{|lp| [lp.id, lp.name]}, :prompt => "select loan product", :selected => ((@loan_product or Nothing).id or Nothing).to_s
+      %b for purpose
+      = select :name => "loan[loan_purpose_id]", :id => 'loan_purpose_chooser', :collection => LoanPurpose.all, :text_method => :name, :value_method => :id, :prompt => 'please choose a loan purpose', :selected => ((@loan_purpose or Nothing).id or Nothing).to_s
+      %br
+      %span.greytext Loan Products listed above are valid loan products for today which are not linked to any insurance
+      %br
+      %b application date
+      = date_select "loan[applied_on]", (params[:loan] or Nothing)[:applied_on], :id =>"applied_on"
+      %b scheduled disbursal date
+      = date_select "loan[scheduled_disbursal_date]", (params[:loan] or Nothing)[:scheduled_disbursal_date], :id =>"scheduled_disbursal_date"
+      %b scheduled first payment date
+      = date_select "loan[scheduled_first_payment_date]", (params[:loan] or Nothing)[:scheduled_first_payment_date], :id =>"scheduled_first_payment_date"
+      %br
+      %b applied_by
+      = select :name => "loan[applied_by_staff_id]", :collection => StaffMember.all(:active => true), :value_method => :id, :text_method => :name, :class => 'chosen', :prompt => 'select a staff member', :selected => params[:loan][:applied_by_staff_id]
+      %b funding line
+      = select :name => "loan[funding_line_id]", :collection => FundingLine.all, :value_method => :id, :text_method => :name, :class => 'chosen', :prompt => 'select a funding line', :selected => params[:loan][:funding_line_id]
+    %h2 Choose clients
+
     %table.report.nojs
       %tr.header
         %th
@@ -17,38 +68,27 @@
         %th
           Name
         %th
-          Existing loans      
+          Loan Product
         %th
-          Choose  
+          Loan Purpose
+        %th Choose
       - @clients.group_by{|client| client.client_group}.each do |client_group, clients|
         %tr.branch
-          %td{:colspan => 5}
+          %td{:colspan => 15}
             %b= client_group ? client_group.name : "None"
           - clients.each do |client|
             %tr
               %td
-                = client.id
+                = link_to client.id, resource(client)
               %td
                 = client.reference
               %td
                 = client.name
               %td
-                = client.loans.map{|l| l.description}.join("<br/>")
+                = select :name => "clients[#{client.id}][loan_product_id]", :class => "loan_product", :collection => LoanProduct.valid(:order => [:name]), :prompt => "Please select a loan product", :value_method => :id, :text_method => :name, :selected => (params[:clients] ? params[:clients][client.id.to_s][:loan_product_id] : nil)
               %td
-                = check_box(:name => "client_ids[]", :value => client.id, :checked => (@selected and @selected.include?(client.id) ? true : false))
-    %hr
-    %h2 Choose loan product
-    = select :name => :loan_product_id, :collection => LoanProduct.all(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :order => [:name], :linked_to_insurance => false).map{|lp| [lp.id, lp.name]}, :prompt => "select loan product"
-    %br
-    %span.greytext Loan Products listed above are valid loan products for today which are not linked to any insurance
-    %br
+                = select :name => "clients[#{client.id}][loan_purpose_id]", :class => "loan_purpose", :collection => LoanPurpose.all.map{|lp| [lp.id, lp.name]}, :prompt => "select loan purpose", :selected => (params[:clients] ? params[:clients][client.id.to_s][:loan_purpose_id] : nil), :id => client.id
+              %td
+                = check_box :name => "clients[#{client.id}][chosen]", :value => client.id, :checked => (@selected_clients and @selected_clients.include?(client.id.to_s)), :id => "client_#{client.id}"
     = submit "Go"
-- else
-  = form_for(@loan, :action => url(:controller => :loans, :action => :bulk_create), :class => "_disable_button_") do
-    = error_messages_for @loan
-    - @clients.each do |c|
-      = hidden_field :name => "client_ids[]", :value => c.id
-    = hidden_field :name => "center_id", :value => @center.id
-    = hidden_field :name => "branch_id", :value => @branch.id
-    = partial "loans/fields", :submit_text => "Create #{@clients.count} loans", :cancel_link => "/data_entry"
-  
+    %hr
