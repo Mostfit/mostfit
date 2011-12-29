@@ -83,7 +83,6 @@ module DataEntry
 
     # action to bulk create loans with same paramters for an entire center
     def bulk_form
-      debugger
       # read the params into nice variables
       sc = params[:clients].map{|k,v| k if v[:chosen]}.compact if params[:clients]   # nice to be able to say "if @selected_clients" 
       @selected_clients = sc.blank? ? nil : sc                                       # instead of "unless @selected_clients.blank?"
@@ -107,7 +106,6 @@ module DataEntry
         if @selected_clients
           # ok, we have enough to start making the loans
           @loans = []
-          debugger
           @selected_clients.each do |client_id|
             params[:clients][client_id].delete(:chosen)
             l = Loan.new(params[:loan].merge(params[:clients][client_id]).merge(:client_id => client_id))
