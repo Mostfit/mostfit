@@ -21,7 +21,7 @@ Spec::Runner.configure do |config|
  
   config.before(:all) do
     if Merb.orm == :datamapper
-      #DataMapper.auto_migrate!
+      DataMapper.auto_migrate!
       (repository.adapter.query("show tables") - ["payments", "journals", "postings"]).each{|t| repository.adapter.execute("alter table #{t} ENGINE=MYISAM")}
     end
 
@@ -32,11 +32,11 @@ Spec::Runner.configure do |config|
     mfi.save
   end
 
-  # This is kind of ugly but we want to clear the database before each test runs, this would normally be
-  # done by automigrate before every test but since automigrate takes forever, this is faster.
-  # This does mean we have to migrate the test-db manually with:
+  # This could be prettier but just to make sure we don't carry over records between tests. In a perfect world
+  # specs should be isolated so that leftover records from other specs shouldn't influence them but this is not
+  # always the case.
   #
-  #     rake db:automigrate MERB_ENV=test
+  # The following is run before each individual spec (but not between tests within a spec)
   #
   config.before(:all) do
     [AccountType, Account, Currency, JournalType, CreditAccountRule, DebitAccountRule, RuleBook, StaffMember, User, Funder, FundingLine, Branch, Center, ClientType, Client, LoanProduct, LoanHistory, Region, Area, Portfolio].each do |model|
