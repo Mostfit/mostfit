@@ -1,8 +1,10 @@
 %form{:action => url(:controller => :cachers, :action => :reallocate)}
   .menu-strip{:style => "width: 100%"}
-    = link_to 'go to center', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date), :class => "edit"
-    = link_to 'go to weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet", :class => "edit"
-    = link_to 'rebuild caches', url(:rebuild_cachers, :center_id => params[:center_id]), :title => "Recreates history for these loans. Marks center and branch caches on and after this date as stale. recreates todays caches"
+    = link_to 'go to center', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date), :class => "edit grey_button"
+    &nbsp;&nbsp;
+    = link_to 'go to weeksheet', url(:controller => :centers, :id => params[:center_id], :action => :show, :date => @date) + "#weeksheet", :class => "edit grey_button"
+    &nbsp;&nbsp;
+    = link_to 'rebuild caches', url(:rebuild_cachers, :center_id => params[:center_id]), :title => "Recreates history for these loans. Marks center and branch caches on and after this date as stale. recreates todays caches", :class => "grey_button"
     -# %br
     -# = submit "Reallocate whole center with style"
     -# = hidden_field :name => :center_id, :value => params[:center_id]
@@ -53,4 +55,3 @@
         - @center_row = CenterCache.first(:date => @date, :center_id => params[:center_id])
         - @keys = [:x,:y,:z] + @keys
         = (partial :cache_row, :cache => @center_row, :cls => "total", :ignore_total => true) if @center_row
-  

@@ -34,4 +34,3 @@
     %td
       = (link_to 'split', url(:split_cachers, request.send(:query_params).merge(:branch_id => bid))) if @level == :branches 
       = (link_to 'split', url(:split_cachers, request.send(:query_params).merge(:center_id => cid))) if @level == :centers
-          
