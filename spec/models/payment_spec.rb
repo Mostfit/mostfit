@@ -110,9 +110,9 @@ describe Payment do
     @payment.should be_valid
   end
 
-  # This one fails, but the reason is unclear (a bug in Payment.collected_for?) Although we input a payment
-  # with a float amount (10.50, see before(:each)), the amount returned by collected_for is always a rounded integer
-  # Because this seems like an important issue I will not comment out this test.
+  # This one fails, because Payment.collected_for always returns a rounded integer as the amount rather than
+  # the float one might expect. Is this a bug or is the method supposed to round its output? If so we should
+  # fix these tests by calling #to_i on 'amount' below.
   it "should give correct payment collected for" do
     @loan.history_disabled = false
     @loan.update_history(true)

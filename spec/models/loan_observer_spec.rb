@@ -3,32 +3,15 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe AccountLoanObserver do
   
   before(:all) do
-    mfi = Mfi.first
-    mfi.accounting_enabled = true
-    mfi.save
-
-    @manager = Factory(:staff_member)
-    @manager.should be_valid
-
-    @loan_product = Factory(:loan_product)
-    @loan_product.should be_valid
-
-    @funding_line = Factory(:funding_line)
-    @funding_line.should be_valid
-
-    @client = Factory(:client)
-    @client.should be_valid
+    @mfi = Factory.build(:mfi, :accounting_enabled => true)
+    @mfi.should be_valid
+    @mfi.save
   end
   
-  after(:all) do
-    mfi = Mfi.first
-    mfi.accounting_enabled = false
-    mfi.save
-  end
-
   before (:each) do
     Journal.all.destroy!
     Posting.all.destroy!
+    Loan.all.destroy!
   end
 
   # This test is passing but probably in error, see below
@@ -36,6 +19,7 @@ describe AccountLoanObserver do
     loan = Factory(:loan, :history_disabled => true)
     loan.should be_valid
 
+    # These were called manually in the old test but they should be called by the observer, no?
     AccountLoanObserver.get_state(loan)
     AccountLoanObserver.make_posting_entries_on_update(loan)
 
@@ -46,21 +30,17 @@ describe AccountLoanObserver do
   end
 
   # Loans are not creating Journals on save, but so far I haven't found out why.
+  # As far as I can tell the AccountLoanObserver observes BranchDiary, not Loan. Loan
+  # is only observed from DataAccessObserver, which doesn't create Journals(?)
 #
 #  context "when loan is disbursed during creation" do
 #    before(:each) do
-#      @loan = Factory.build(:loan,
-#        :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25,
-#        :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13",
-#        :approved_on => Date.today, :approved_by => @manager, :disbursal_date => Date.today, :disbursed_by => @manager, :history_disabled => true )
+#      @loan = Factory.build(:disbursed_loan, :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25)
 #      @loan.should be_valid
 #    end
 #
 #    it "should create a journal entry when disbursed" do
 #      @loan.save
-#
-#      journal = Journal.first
-#      journal.should be_valid
 #
 #      # One journal entry when new loan is created and disbursed simultaneously
 #      Journal.count.should eql(1)
@@ -129,6 +109,6 @@ describe AccountLoanObserver do
 #
 #      Posting.count.should eql(Journal.count * 2)
 #    end
-#  end
+  end
 end
 
