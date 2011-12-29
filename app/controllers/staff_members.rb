@@ -148,7 +148,7 @@ class StaffMembers < Application
     @staff_member = StaffMember.get(id)
     raise NotFound unless @staff_member
     if @staff_member.update_attributes(staff_member)
-      redirect resource(:staff_members)
+      redirect resource(@staff_member), :message => {:notice => "Details of staff member '#{@staff_member.name}' (Id: #{@staff_member.id}) was successfully updated"}
     else
       display @staff_member, :edit
     end
