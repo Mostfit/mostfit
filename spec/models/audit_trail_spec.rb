@@ -1,10 +1,5 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
-#
-# These tests are currently failing because AuditTrails require a user, which
-# DataAccessObserver takes from the current session. Of course there is no session
-# while runnnig these specs.
-#
 describe AuditTrail do 
 
   before(:each) do
@@ -14,7 +9,7 @@ describe AuditTrail do
     DataAccessObserver.insert_session( session_mock.object_id )
   end
 
-  # This test, and all on create tests, fails because DataAccessObserver
+  # This test (and all 'on create' tests) fails because DataAccessObserver
   # does not log on create, only update. There is no after :create callback.
   # Initially I expected after :save to cover the create action as well but
   # apparently it does not.

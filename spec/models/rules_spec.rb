@@ -7,38 +7,16 @@ describe Rules do
   end
 
   before(:all) do
-    @center_manager = StaffMember.first_or_create(:name => "Center manager1")
-    @center_manager.save
-    @center_manager.should be_valid
-    @branch_manager = StaffMember.first_or_create(:name => "Branch manager1")
-    @branch_manager.save
-    @branch_manager.should be_valid
-    @branch = Branch.new(:name => "Kerela branch1")
-    @branch.manager = @branch_manager
-    @branch.code = "br1"
-    @branch.save
-    @branch.should be_valid
-    @center = Center.new(:name => "Munnar hill center1")
-    @center.manager = @center_manager
-    @center.branch  = @branch
-    @center.code = "cen1"
-    @center.save
-    @center.should be_valid
     
-    @cg = ClientGroup.first_or_create(:name => "DummyGroup1", :code => "97", :center_id => 1, :created_by_staff_member_id => @branch_manager.id)
-    @cg.save
-    @cg.should be_valid
-    
-    @c1 = Client.first_or_create(:name => 'Dummy Client1', :reference => Time.now.to_s+"1",
-                                 :client_type => ClientType.create(:type => "Standard"),
-                                 :center  => @center, :date_joined => Date.parse('2010-01-01') )
-    @c1.created_by_user_id = @branch_manager.id
-    @c1.client_group = @cg
-    @c1.save
+    @c1 = Factory(:client)
     @c1.should be_valid
-    
-    @funder = Funder.new(:name => "FWWB")
-    @funder.save
+
+    @center = @c1.center
+    @branch = @center.branch
+
+    @branch_manager = @branch.manager
+
+    @funder = Factory(:funder)
     @funder.should be_valid
 
     @funding_line = FundingLine.new(:amount => 10_000_000, :interest_rate => 0.15, :purpose => "for women", :disbursal_date => "2006-02-02", :first_payment_date => "2007-05-05", :last_payment_date => "2009-03-03")
@@ -46,20 +24,10 @@ describe Rules do
     @funding_line.save
     @funding_line.should be_valid
 
-    @loan_product = LoanProduct.new
-    @loan_product.name = "LP1"
-    @loan_product.max_amount = 100000
-    @loan_product.min_amount = 1000
-    @loan_product.max_interest_rate = 100
-    @loan_product.min_interest_rate = 0.1
-    @loan_product.installment_frequency = :weekly
-    @loan_product.max_number_of_installments = 25
-    @loan_product.min_number_of_installments = 25
-    @loan_product.loan_type = "DefaultLoan"
-    @loan_product.valid_from = Date.parse('2000-01-01')
-    @loan_product.valid_upto = Date.parse('2012-01-01')
-    @loan_product.save
-    @loan_product.errors.each {|e| puts e}
+    @loan_product = Factory(:loan_product,
+      :max_amount => 100000, :min_amount => 1000, :max_interest_rate => 100, :min_interest_rate => 0.1,
+      :installment_frequency => :weekly, :max_number_of_installments => 25, :min_number_of_installments => 25,
+      :valid_from => Date.new(2000, 01, 01), :valid_upto => Date.new(2100, 01, 01))
     @loan_product.should be_valid
   end
 
@@ -424,7 +392,7 @@ describe Rules do
     @center.save
     @center.should be_valid
 
-    c1 = Client.first_or_create(:name => 'Dummy Client11', :reference => Time.now.to_s+"11",
+    c1 = Client.first_or_create(:name => 'Dummy Client11', :reference => Time.now.to_s+"11", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => @center, :date_joined => Date.parse('2010-01-01') )
     c1.created_by_user_id = @branch_manager.id
@@ -432,7 +400,7 @@ describe Rules do
     c1.save
     c1.should be_valid
 
-    c2 = Client.first_or_create(:name => 'Dummy Client12', :reference => Time.now.to_s+"12",
+    c2 = Client.first_or_create(:name => 'Dummy Client12', :reference => Time.now.to_s+"12", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => @center, :date_joined => Date.parse('2010-01-01') )
     c2.created_by_user_id = @branch_manager.id
@@ -440,7 +408,7 @@ describe Rules do
     c2.save
     c2.should be_valid
 
-    c3 = Client.first_or_create(:name => 'Dummy Client3', :reference => Time.now.to_s+"3",
+    c3 = Client.first_or_create(:name => 'Dummy Client3', :reference => Time.now.to_s+"3", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => @center, :date_joined => Date.parse('2010-01-01') )
     c3.created_by_user_id = @branch_manager.id
@@ -448,7 +416,7 @@ describe Rules do
     c3.save
     c3.should be_valid
 
-    c4 = Client.first_or_create(:name => 'Dummy Client4', :reference => Time.now.to_s+"4",
+    c4 = Client.first_or_create(:name => 'Dummy Client4', :reference => Time.now.to_s+"4", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => @center, :date_joined => Date.parse('2010-01-01') )
     c4.created_by_user_id = @branch_manager.id
@@ -456,7 +424,7 @@ describe Rules do
     c4.save
     c4.should be_valid
 
-    c5 = Client.first_or_create(:name => 'Dummy Client5', :reference => Time.now.to_s+"5",
+    c5 = Client.first_or_create(:name => 'Dummy Client5', :reference => Time.now.to_s+"5", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => @center, :date_joined => Date.parse('2010-01-01') )
     c5.created_by_user_id = @branch_manager.id
@@ -464,7 +432,7 @@ describe Rules do
     c5.save
     c5.should_not be_valid
 
-    c6 = Client.first_or_create(:name => 'Dummy Client6', :reference => Time.now.to_s+"6",
+    c6 = Client.first_or_create(:name => 'Dummy Client6', :reference => Time.now.to_s+"6", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => @center, :date_joined => Date.parse('2010-01-01') )
     c6.created_by_user_id = @branch_manager.id
@@ -493,7 +461,7 @@ describe Rules do
     cg.save
     cg.should be_valid
     
-    c2 = Client.first_or_create(:name => 'Dummy Client', :reference => Time.now.to_s+"2",
+    c2 = Client.first_or_create(:name => 'Dummy Client', :reference => Time.now.to_s+"2", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => @center, :date_joined => Date.parse('2010-01-01') )
     c2.created_by_user_id = @branch_manager.id
@@ -590,42 +558,42 @@ describe Rules do
     center2.errors.each {|e| puts e}
     center2.should be_valid
 
-    c1 = Client.first_or_create(:name => 'Dummy Client1', :reference => Time.now.to_s+"1",
+    c1 = Client.first_or_create(:name => 'Dummy Client1', :reference => Time.now.to_s+"1", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center1, :date_joined => Date.parse('2010-01-01') )
     c1.created_by_user_id = branch_manager.id
     c1.save
     c1.should be_valid
 
-    c2 = Client.first_or_create(:name => 'Dummy Client2', :reference => Time.now.to_s+"2",
+    c2 = Client.first_or_create(:name => 'Dummy Client2', :reference => Time.now.to_s+"2", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center1, :date_joined => Date.parse('2010-01-01') )
     c2.created_by_user_id = branch_manager.id
     c2.save
     c2.should_not be_valid
 
-    c3 = Client.first_or_create(:name => 'Dummy Client3', :reference => Time.now.to_s+"3",
+    c3 = Client.first_or_create(:name => 'Dummy Client3', :reference => Time.now.to_s+"3", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center1, :date_joined => Date.parse('2010-01-01') )
     c3.created_by_user_id = branch_manager.id
     c3.save
     c3.should_not be_valid
 
-    c4 = Client.first_or_create(:name => 'Dummy Client4', :reference => Time.now.to_s+"4",
+    c4 = Client.first_or_create(:name => 'Dummy Client4', :reference => Time.now.to_s+"4", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center2, :date_joined => Date.parse('2010-01-01') )
     c4.created_by_user_id = branch_manager.id
     c4.save
     c4.should be_valid
 
-    c5 = Client.first_or_create(:name => 'Dummy Client5', :reference => Time.now.to_s+"5",
+    c5 = Client.first_or_create(:name => 'Dummy Client5', :reference => Time.now.to_s+"5", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center2, :date_joined => Date.parse('2010-01-01') )
     c5.created_by_user_id = branch_manager.id
     c5.save
     c5.should be_valid
     
-    c6 = Client.first_or_create(:name => 'Dummy Client6', :reference => Time.now.to_s+"6",
+    c6 = Client.first_or_create(:name => 'Dummy Client6', :reference => Time.now.to_s+"6", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center2, :date_joined => Date.parse('2010-01-01') )
     c6.created_by_user_id = branch_manager.id
@@ -782,6 +750,8 @@ describe Rules do
     center1.manager = center_manager
     center1.branch  = branch
     center1.code = "cen"
+    center1.valid?
+    puts center1.errors.full_messages.inspect
     center1.save
     center1.errors.each {|e| puts e}
     center1.should be_valid
@@ -795,42 +765,42 @@ describe Rules do
     center2.should be_valid
 
 
-    c1 = Client.first_or_create(:name => 'Dummy Client1', :reference => Time.now.to_s+"1",
+    c1 = Client.first_or_create(:name => 'Dummy Client1', :reference => Time.now.to_s+"1", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center1, :date_joined => Date.parse('2010-01-01') )
     c1.created_by_user_id = branch_manager.id
     c1.save
     c1.should be_valid
 
-    c2 = Client.first_or_create(:name => 'Dummy Client2', :reference => Time.now.to_s+"2",
+    c2 = Client.first_or_create(:name => 'Dummy Client2', :reference => Time.now.to_s+"2", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center1, :date_joined => Date.parse('2010-01-01') )
     c2.created_by_user_id = branch_manager.id
     c2.save
     c2.should be_valid
 
-    c3 = Client.first_or_create(:name => 'Dummy Client3', :reference => Time.now.to_s+"3",
+    c3 = Client.first_or_create(:name => 'Dummy Client3', :reference => Time.now.to_s+"3", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center1, :date_joined => Date.parse('2010-01-01') )
     c3.created_by_user_id = branch_manager.id
     c3.save
     c3.should be_valid
 
-    c4 = Client.first_or_create(:name => 'Dummy Client4', :reference => Time.now.to_s+"4",
+    c4 = Client.first_or_create(:name => 'Dummy Client4', :reference => Time.now.to_s+"4", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center1, :date_joined => Date.parse('2010-01-01') )
     c4.created_by_user_id = branch_manager.id
     c4.save
     c4.should be_valid
 
-    c5 = Client.first_or_create(:name => 'Dummy Client5', :reference => Time.now.to_s+"5",
+    c5 = Client.first_or_create(:name => 'Dummy Client5', :reference => Time.now.to_s+"5", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center2, :date_joined => Date.parse('2010-01-01') )
     c5.created_by_user_id = branch_manager.id
     c5.save
     c5.should_not be_valid
 
-    c6 = Client.first_or_create(:name => 'Dummy Client6', :reference => Time.now.to_s+"6",
+    c6 = Client.first_or_create(:name => 'Dummy Client6', :reference => Time.now.to_s+"6", :gender => 'male',
                                 :client_type => ClientType.create(:type => "Standard"),
                                 :center  => center2, :date_joined => Date.parse('2010-01-01') )
     c6.created_by_user_id = branch_manager.id
