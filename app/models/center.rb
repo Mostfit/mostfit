@@ -43,7 +43,7 @@ class Center
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
   validates_with_method :meeting_time_minutes, :method => :minutes_valid?
 
-  validates_with_method :creation_date_ok
+  # validates_with_method :creation_date_ok
 
   def self.from_csv(row, headers)
     hour, minute = row[headers[:center_meeting_time_in_24h_format]].split(":")
