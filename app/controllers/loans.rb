@@ -415,6 +415,18 @@ class Loans < Application
       render 
     end
   end
+
+  def unpreclose(id)
+    raise NotPrivileged unless [:mis_manager, :admin].include?(session.user.role) # this should be handled by the ACL
+    @loan = Loan.get(id)
+    raise NotFound unless @loan
+    @loan.preclosed_on = @loan.preclosed_by = nil
+    @loan.save
+    redirect request.referer, :message => {:success => "Loan has been unpreclosed!"}
+  end
+
+                    
+  
     
   def diagnose(id)
     @loan = Loan.get(id)
