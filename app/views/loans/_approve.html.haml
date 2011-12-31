@@ -27,7 +27,7 @@
         Approved By
   - staff_members_allowed = staff_members_collection
   -@loans_to_approve.each do |loan|
-    - client = @clients.find{|x| x.id==loan.client_id}
+    - client = @clients.find{|x| x.id==loan.client_id} || loan.client
     %tr{:class => cycle('odd','')}
       %td.number
         = link_to loan.id, url(:quick_link, "loans", loan.id)
