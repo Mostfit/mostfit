@@ -7,16 +7,16 @@ class Loan
 
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
-  before :valid?,  :parse_dates
-  before :valid?,  :convert_blank_to_nil
-  after  :save,    :update_history_caller  # also seems to do updates
-  before :save,    :update_loan_cache
-  after  :create,  :levy_fees_new          # we need a separate one for create for a variety of reasons to  do with overwriting old fees
-  before :save,    :levy_fees
-  after  :create,  :update_cycle_number
-  before :destroy, :verified_cannot_be_deleted
-
-  before :save, :set_bullet_installments
+  before :valid?,    :parse_dates
+  before :valid?,    :convert_blank_to_nil
+  after  :save,      :update_history_caller  # also seems to do updates
+  before :save,      :update_loan_cache
+  after  :create,    :levy_fees_new          # we need a separate one for create for a variety of reasons to  do with overwriting old fees
+  before :save,      :levy_fees
+  after  :create,    :update_cycle_number
+  before :destroy,   :verified_cannot_be_deleted
+  before :valid?,    :set_loan_product_parameters
+  before :save,      :set_bullet_installments
 
   def rs
     self.repayment_style or self.loan_product.repayment_style
@@ -220,6 +220,8 @@ class Loan
     self.c_branch_id = self.client.center.branch.id if force
     self.c_client_group_id = (self.client.client_group_id if force) or 0
     self.c_scheduled_maturity_date = scheduled_maturity_date
+    st = self.get_status
+    self.c_last_status = STATUSES.index(st) + 1
   end
 
   # DEPRECATED: all this good stuff is now easily accessible from loan_history

@@ -354,7 +354,10 @@ class CenterCache < Cacher
     # bs is a hash of {:date => [:center_id,...]}
     date = selection.delete(:date)
     selection[:id] = selection.delete(:center_id) if selection[:center_id]
-    hs = Center.all(selection.merge(:creation_date.lte => date)).aggregate(:id)
+    # hs = Center.all(selection.merge(:creation_date.lte => date)).aggregate(:id)
+    # centers cannot be searched by creation date because loans may be moved into the center
+    # which have dates before the creation date
+    hs = LoanHistory.all(selection.merge(:date.gte => date)).aggregate(:center_id)
     date.map{|d| [d,hs - (bs[d] || [])]}.to_hash
   end
 
