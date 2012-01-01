@@ -1,9 +1,9 @@
 @body-background: #fff;
 @lightblue: #abc7f6;
 @pastel-yellow: #feeb24;
-@lightgreen: #abcf76;
-@darkgreen: #56683B;
-@orange: #E68c00;
+@lightgreen: #008899;
+@darkgreen: #cfcfcf;
+@orange: #666;
 @lightgreen-text: @darkgreen;
 @header: @pastel-yellow;
 @header-text: @lightgreen * 0.5;
@@ -28,13 +28,15 @@
   text-shadow: 1px 1px white;
 }
 
+html { height: 100%}
+
 body {
     background: @body-background;
     color: #222;
     font-family: Arial,Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
     padding: 0px;
     margin: 0px;
-
+    height: 100%;
 }
 h1 {
   color: @orange;
@@ -56,7 +58,7 @@ h2, h3, h4, h5, h6 {
 h1 {
   margin: 10px 4px 10px 4px;
 }
-h2 {
+h2{
   margin: 16px;
 }
 .container {
@@ -105,6 +107,9 @@ h1.logo{
     height: 60px;
     padding-bottom: 0px;
     margin-bottom: 0px;
+    font-weight: bold;
+    letter-spacing: -0.06em;
+    text-shadow: 1px 1px white;
 }
 h1.logo span{
     vertical-align: top;
@@ -126,6 +131,7 @@ h1.logo span{
 {
   margin: 0px;
   position: relative;
+  min-height: 100%;
 }
 
 .graph{
@@ -293,11 +299,13 @@ margin: 0px;
   padding: 0px 15px 0px 15px;
   border: 0px;  
 }
-input[type="text"], input[type="password"], textarea {
-  font-size: 100%;
+input[type="text"], input[type="password"], select, textarea {
   font-family: Arial,Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
   background: #fbfbfb;
   border: 1px solid #E5E5E5;
+  height: 1.4em;
+  font-size: 1.2em;
+  padding: 3px;
 }
 input.disabled[type="submit"] {
     color: #ccc;
@@ -340,10 +348,11 @@ span.blue  { background-color: #3465a4; padding: 3px; color: white;}
 #footer
 {
 margin-top: 0px;
-margin-bottom: 20px;
+margin-bottom: 0px;
 text-align: center;
 color: #666;
 font-size: 11px;
+width: 100%;
 }
 #footer a:link, #footer a:visited, #footer a:active
 {
@@ -361,8 +370,7 @@ font-size: 11px;
 /* at the bottom so it has preference */
 a.nopic { background:none; padding:0; margin:0; }
 
-a.add, a.add:visited, a.add:link {
-  background-image: url(/images/add.png);
+.classy_link {
   background-repeat: no-repeat;
   /* background-color: #62ed1e; */
   background-position: 1px 3px;
@@ -376,6 +384,21 @@ a.add, a.add:visited, a.add:link {
   font-size: 16px;
   padding: 6px 35px 4px;
   margin: 5px 5px 10px;
+}
+
+a.print, a.print:visited, a.print:link {
+    .classy_link;
+    background-image: url(/images/print.png);
+}
+
+a.add, a.add:visited, a.add:link {
+    .classy_link;
+    background-image: url(/images/add.png);
+}
+
+a.report, a.report:visited, a.report:link {
+  .classy_link;
+  background-image: url(/images/report.png);
 }
 
 a.add_small, a.add_small:visited, a.add_small:link {
@@ -542,11 +565,10 @@ a.bold:visited {
   box-shadow: 1px 1px @nav-selected-bg * 0.6 inset;
 }
 #navigation a:hover{
-  @nav-hover-bg: #D3FF91;
-  background: @nav-hover-bg;
-  color: #5c8f11;
+  background: white;
+  color: @lightgreen;
   z-index:10;
-  box-shadow: 2px 2px @nav-hover-bg * 0.6 inset;
+  box-shadow: 2px 2px @lightgreen * 0.6 inset;
 }
 
 #header_search_div {
@@ -964,9 +986,6 @@ table.tall th {
   font-size: 0.8em;
 }
 
-table.tall input {
-  font-size: 0.8em;
-}
   
 .floating_form{
     position: absolute;
@@ -1019,6 +1038,7 @@ a.expand_collapsed{
     margin-top: 5px;
     margin-right: 25px;
     margin-bottom: 25px;
+    font-size: 1.2em;
 }
 .totalinfo h1{
     background: #3456a4;
@@ -1232,11 +1252,22 @@ ul#tree li.depth_4 span{
     float: right;
 }
 .left_pane{
-    width: 50%;
+    float: left;
+    h1 {
+	font-size: 200%;
+	padding: 10px;
+	text-decoration: underline;
+    }
+    ul { margin: 6px 20px;
+	 li {
+	     margin: 6px 2px;
+	     font-size: 1.6em;
+	 }
+       }
 }
 .right_pane{
-    float: right;
-    width: 50%;
+    float: left;
+    width: 30%;
 }
 ul.bookmarks li{
     margin-bottom: 5px;
@@ -1446,7 +1477,7 @@ table.clearform tr td.legend{
   width: 100%;
   padding: 5px 4.5%;
   vertical-align: middle;
-  color: white;
+  color: #333;
   font-size: 1.5em;
   background: @darkgreen * 1.1;
 }
@@ -1470,18 +1501,18 @@ table.clearform tr td.legend{
 }
 
 .applied { font-weight: bold; color: blue;}
-.approved { font-weight: bold; color: grey;}
+.approved { font-weight: bold; color: lightgreen;}
 .outstanding { font-weight: bold; color: darkgreen;}
-.repaid { font-weight: bold; color: brown;}
+.repaid { font-weight: bold; color: grey;}
 .arrears { font-weight: bold; color: red;}
 .written-off { font-weight: bold; color: black;}
 .preclosed { font-weight: bold; color: orange;}
 
 .container {
   a.applied { font-weight: bold; color: blue;}
-  a.approved { font-weight: bold; color: grey;}
+  a.approved { font-weight: bold; color: lightgreen;}
   a.outstanding { font-weight: bold; color: darkgreen;}
-  a.repaid { font-weight: bold; color: brown;}
+  a.repaid { font-weight: bold; color: grey;}
   a.arrears { font-weight: bold; color: red;}
   a.written-off { font-weight: bold; color: black;}
   a.preclosed { font-weight: bold; color: orange;}
@@ -1510,12 +1541,6 @@ table.tall .greytext {
   font-size: 0.9em;
 }
 
-table.tall input[type="text"], input[type="password"], textarea {
-  font-family: Arial,Helvetica, FreeSans,LiberationSans,Myriad Pro,Arial,Verdana,sans-serif;
-  background: #fbfbfb;
-  border: 1px solid #E5E5E5;
-  padding: 3px;
-}
 table.tall input.disabled[type="submit"] {
     color: #ccc;
 }
@@ -1701,7 +1726,7 @@ table.moreinfo thead th {
     background: transparent;
 }
  .green {
-     color: @darkgreen;
+     color: #466124;
      background: transparent;
  }
 
@@ -1727,110 +1752,92 @@ table.moreinfo thead th {
 
 
  #stats {
-   @stats-highlight: #efefef;
-   @stats-highlight-text: black;
-   @stats-highlight-shadow: white;
-   @stats-bg: #dfdfdf;
-   @stats-bg-text: #999;
-   @stats-bg-shadow: @stats-bg * 1.2;
-   padding: 25px;
-   width: 95%;
-   margin: auto;
-   min-height: 500px;
-   .rounded;
-   table#menu {
-     margin-bottom: 0.2em;
-     tr {
-       h1 {
-	   font-weight: bold;
-	   letter-spacing: -0.03em;
-	   color: @stats-bg-text;
-	   text-shadow: @stats-bg-shadow;
-	   margin: 0px;
-
-	   .red-text {
-	       .red;
-	   }
-
-      }
-    }
-    tr {
-      background: @stats-bg;
-      text-shadow: 1px 1px @stats-bg-shadow;
-      color: @stats-bg-text;
-      border-bottom: solid 1px @stats-bg-text;
-      box-shadow: 0px 1px @stats-bg-shadow;
-      }
-
-    tr.selected {
-      background: @stats-highlight;
-      color: @stats-highlight-text;
-      box-shadow: none;
-      z-index: 10;
-      width: 110%;
-      .white-shadow-text;
-      h1 {
-	  color: @orange;
-	  text-shadow: 1px 1px @stats-highlight-shadow;
-      }
-    }
-    .th {
-      vertical-align: middle;
-    }
-  }
-  table#menu {
-    width:80%;
-      tr.selected {
-	  border: 1px solid @stats-highlight;
-	  h1.green {
-	      .green;
-	  }
-	  h1.red {
-	      .red;
-	  }
-
-      }
-      tr {
-	border-right: solid 1px @darkgreen;
-      }
-
-  }
-
-  .number {
-    vertical-align: top;
-    text-align: center;
-    p {
-	font-size: 1.1em; font-weight: bold; text-align: center;
-    }
-
-  }
-  .detail {
-    font-family: Helvetica;
-    font-weight: bold;
-    font-size: 1em;
-    float: left;
-    background: #efefef;
-    border: solid 1px @darkgreen;
-    padding: 0px 10px;
-    min-height: 400px;
-    min-width: 80%;
-  }
-  .chart {
-    background: #efefef;
-    
-    .rounded(10px);
-    margin: 30px;
-    margin-top: 5px;
-    text-align: center;
-    width: 430px;
-    height: 330px;
-    display: inline-table;
-    vertical-align: top;
-  }
-  
-}
-	     
-#today {
+     @stats-highlight: #efefef;
+     @stats-highlight-text: black;
+     @stats-highlight-shadow: white;
+     @stats-bg: #dfdfdf;
+     @stats-bg-text: #999;
+     @stats-bg-shadow: @stats-bg * 1.2;
+     padding: 25px;
+     width: 95%;
+     margin: auto;
+     min-height: 500px;
+     .rounded;
+     table#menu {
+	 margin-bottom: 0.2em;
+	 border: solid 6px #efefef;
+	 tr {
+	     background: @stats-bg;
+	     text-shadow: 1px 1px @stats-bg-shadow;
+	     color: @stats-bg-text;
+	     border-bottom: solid 1px @stats-bg-text;
+	     box-shadow: 0px 1px @stats-bg-shadow;
+	     .selected {
+		 background: @stats-highlight;
+		 color: @stats-highlight-text;
+		 border: 1px solid @stats-highlight;
+		 box-shadow: none;
+		 z-index: 10;
+		 width: 110%;
+		 .white-shadow-text;
+		 h1 {
+		     color: @orange;
+		     text-shadow: 1px 1px @stats-highlight-shadow;
+		     text-align: left;
+		 }
+	     }
+	     th {
+		 font-size: 1.3em;
+		 font-weight: bold;
+		 letter-spacing: -0.03em;
+		 color: @stats-bg-text;
+		 text-shadow: @stats-bg-shadow;
+		 vertical-align: middle;
+		 text-align: center;
+		 margin: 0px;
+		 padding: 4px;
+	     }
+	 }
+     }
+     
+     .number {
+	 vertical-align: top;
+	 text-align: center;
+	 p {
+	     font-size: 1.1em; font-weight: bold; text-align: center;
+	 }
+	 h1 {
+	     font-size: 1.6em;
+	     }
+	 
+     }
+     .detail {
+	 font-family: Helvetica;
+	 font-weight: bold;
+	 font-size: 1em;
+	 float: left;
+	 background: #efefef;
+	 border: solid 1px @darkgreen;
+	 padding: 0px 10px;
+	 min-height: 400px;
+	 min-width: 80%;
+     }
+     .chart {
+	 background: #efefef;
+	 
+	 .rounded(10px);
+	 margin: 30px;
+	 margin-top: 5px;
+	 text-align: center;
+	 width: 430px;
+	 height: 330px;
+	 display: inline-table;
+	 vertical-align: top;
+     }
+     
+ }
+ 
+ #today {
   #stats;
   padding: 0px;
   width: 80%;
@@ -1846,11 +1853,17 @@ table.moreinfo thead th {
   margin: 2px;
 }
 
-table.diags tr.stale {
-  background:#ff9999;
-  border: solid 1px pink;
+table.report {
+    tr.stale {
+    background:#ff9999;
+    border: solid 1px pink;
+  }
 }
 
 tr.closed {
   color: grey;
+}
+
+td.date {
+  word-wrap: none;
 }

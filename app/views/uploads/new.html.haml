@@ -1,0 +1,31 @@
+%h1
+  Mostfit data upload
+%p
+  Upload information for your past operations here, and you are ready to begin using Mostfit 
+%p
+  Download 
+  %a{:href => "/upload_data.xls"}
+    sample spreadsheet
+%fieldset
+  %p
+    The spreadsheet can contain tabs for one or more of the following:
+    %ol
+      %li
+        Staff members
+      %li
+        Branches
+      %li
+        Centers
+      %li
+        Clients
+      %li
+        Loans
+      %li
+        Payments
+      %li
+        Loan products
+      %li
+        Repayment Styles
+      %br
+= form_for(@upload, :action => resource(:uploads), :multipart => true, :class => "bold") do
+  = partial :fields

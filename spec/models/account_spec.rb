@@ -1,35 +1,15 @@
 require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Account do
-  before(:all) do
-    AccountType.all.destroy!
-    @account_type = AccountType.new(:name => "Assets", :code => "AST")
-    @account_type.save
-    @account_type.errors
-    @account_type.should be_valid
-
-    @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
-    @manager.save
-    @manager.errors
-    @manager.should be_valid
-
-    @branch = Branch.new(:name => "Kerela branch")
-    @branch.manager = @manager
-    @branch.code = "ker"
-    @branch.save
-    @branch.errors
-    @branch.should be_valid
-  end
 
   before(:each) do
-    Account.all.destroy!
-    @account = Account.new(:name => "Cash Account", :gl_code => "CA1001", :opening_balance_on_date => Date.today)
-    @account.account_type = @account_type
-    @account.save
-    @account.errors
+    @account = Factory.build( :account, :name => "Cash Account", :gl_code => "CA1001", :opening_balance_on_date => Date.today )
+  end
+
+  it "should be valid with default attributes" do
     @account.should be_valid
   end
-  
+
   it "should not be valid without a name" do
     @account.name = nil
     @account.should_not be_valid
@@ -82,16 +62,14 @@ Opening balance on any date = opening balance on the most recent accounting peri
 =end
 
   it "should be able to 'have' account" do
-    @acc = Account.new(:name => "Income Account", :gl_code => "IA1002", :account_type => @account_type, :opening_balance_on_date => Date.today)
-    @acc.save
-    @acc.errors
-    @acc.should be_valid
-    @account.account = @acc
+    @child_account = Factory.build(:account, :name => "Income Account", :gl_code => "IA1002", :account_type => @account.account_type, :opening_balance_on_date => Date.today)
+    @child_account.should be_valid
+    @account.account = @child_account
     @account.should be_valid
   end
 
   it "should be valid with or without branch" do
-    @account.branch = @branch
+    @account.branch = Factory.build(:branch)
     @account.should be_valid
     @account.branch = nil
     @account.should be_valid

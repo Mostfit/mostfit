@@ -22,6 +22,9 @@ class Funder
     result
   end
 
+  # It would be nice if these following three methods had an indication what the argument was for
+  # While reviewing the tests it was not clear that the 'date' argument refers to last_payment_date
+  # for completed lines, disbursal date for total lines and a combination for active_lines
   def completed_lines(date = Date.today)
     funding_lines.count(:conditions => ['last_payment_date < ?', date])
   end

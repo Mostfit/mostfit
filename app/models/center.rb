@@ -37,11 +37,13 @@ class Center
   validates_length      :code, :min => 1, :max => 12
 
   validates_length      :name, :min => 3
+  validates_is_unique   :name
   validates_present     :manager
   validates_present     :branch
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
   validates_with_method :meeting_time_minutes, :method => :minutes_valid?
 
+  validates_with_method :creation_date_ok
 
   def self.from_csv(row, headers)
     hour, minute = row[headers[:center_meeting_time_in_24h_format]].split(":")
@@ -51,7 +53,7 @@ class Center
     creation_date = ((headers[:creation_date] and row[headers[:creation_date]]) ? row[headers[:creation_date]] : Date.today)
     obj = new(:name => row[headers[:center_name]], :meeting_day => row[headers[:meeting_day]].downcase.to_s.to_sym, :code => row[headers[:code]],
               :meeting_time_hours => hour, :meeting_time_minutes => minute, :branch_id => branch.id, :manager_staff_id => staff_member.id,
-              :creation_date => creation_date)
+              :creation_date => creation_date, :upload_id => row[headers[:upload_id]])
     [obj.save, obj]
   end
 
@@ -67,7 +69,44 @@ class Center
     DAYS
   end
 
+  # get a list of meeting dates between from and to if to is a Date. Else gets "to" meeting dates if to is an integer
+  #
+  # a center must take the responsibility that center_meeting_days never overlap.
+  def get_meeting_dates(to = Date.new(2100,12,31),from = creation_date)
+    # to can be a date or a number
+    # first find the date_Vectors for all center_meeting_days as a hash {:valid_from => DateVector}
+    select = to.class == Date ? {:valid_from.lte => to} : {}
+    dvs = center_meeting_days.all(select).map{|cmd| [cmd.valid_from, cmd.date_vector]}.to_hash
 
+    # if from is after the center creation but before the first additional center meeting date then deal with this
+    if dvs.blank? or (from < dvs.keys.min and meeting_day != :none)
+      dvs[from] =       DateVector.new(1, meeting_day, 1, :week, creation_date, dvs.keys.min || Date.new(2100,12,31))
+    end
+
+    # then cycle through this hash and get the appropriate dates
+    dates = []
+    dvs.keys.sort.each_with_index{|date,i|
+      d1 = [date,from].max
+      d1 -= 1 if [dvs[date].what].flatten.include?(d1.weekday)
+      d2 = dvs.keys.sort[i+1] || (to.class == Date ? to - 1: (to - dates.count - 1))
+      _ds = dvs[date].get_dates(d1,d2)
+      _ds = _ds[0..(to - dates.count - 1)] if to.class == Fixnum
+      dates.concat(_ds)
+    }
+    dates.sort
+  end
+
+  # returns the date vector in use for a given date.
+  def date_vector_for(date)
+    first_cmd_date = center_meeting_days.aggregate(:valid_from.min) || Date.new(2100,12,31)
+    if date < first_cmd_date
+      DateVector.new(1, meeting_day, 1, :week, creation_date, first_cmd_date)
+    else
+      (center_meeting_days.all(:order => [:valid_from]).select{|cmd| cmd.valid_from <= date and cmd.valid_upto >= date}[0]).date_vector
+    end
+  end
+
+    
   # a simple catalog (Hash) of center names and ids grouped by branches
   # returns some like: {"One branch" => {1 => 'center1', 2 => 'center2'}, "b2" => {3 => 'c3', 4 => 'c4'}} 
   def self.catalog(user=nil)
@@ -91,34 +130,36 @@ class Center
     result
   end
 
+
+  
   def meeting_day_for(date)
     @meeting_days ||= self.center_meeting_days(:order => [:valid_from])
     if @meeting_days.length==0
       meeting_day
     elsif date_row = @meeting_days.find{|md| md.valid_from <= date and md.valid_upto >= date} 
-      date_row.meeting_day
+      (date_row.meeting_wday)
     elsif @meeting_days[0].valid_from > date
-      @meeting_days[0].meeting_day
+      (@meeting_days[0].meeting_wday)
     else
-      @meeting_days[-1].meeting_day
+      (@meeting_days[-1].meeting_wday)
     end
   end
-    
+  
   def next_meeting_date_from(date)    
     number = get_meeting_date(date, :next)
     if meeting_day != :none and (date + number - get_meeting_date(date + number, :previous)).cweek == (date + number).cweek
-      (date + number + get_meeting_date(date + number, :next)).holiday_bump
+      (date + number + get_meeting_date(date + number, :next))
     else
-      (date + number).holiday_bump
+      (date + number)
     end
   end
-
+  
   def previous_meeting_date_from(date)
     number = get_meeting_date(date, :previous)
     if meeting_day != :none and (date - number - get_meeting_date(date - number, :previous)).cweek == (date - number).cweek
-      (date - number - get_meeting_date(date - number, :previous)).holiday_bump
+      (date - number - get_meeting_date(date - number, :previous))
     else
-      (date - number).holiday_bump
+      (date - number)
     end
   end
 
@@ -131,9 +172,9 @@ class Center
     meeting_time_hours.two_digits + ':' + meeting_time_minutes.two_digits rescue "00:00"
   end
 
-  def self.paying_today(user, date = Date.today)
-    debugger
-    center_ids = LoanHistory.all(:date => date||Date.today).aggregate(:center_id)
+  def self.paying_today(user, date = Date.today, branch_id = nil)
+    selection = {:date => date}.merge(branch_id ? {:branch_id => branch_id} : {})
+    center_ids = LoanHistory.all(selection).aggregate(:center_id)
     centers = center_ids.blank? ? [] : Center.all(:id => center_ids)
     if user.staff_member
       staff = user.staff_member
@@ -169,7 +210,6 @@ class Center
     Center.all(:id => center_ids)
   end
   
-  private
   def hours_valid?
     return true if (0..23).include? meeting_time_hours.to_i
     [false, "Hours of the meeting time should be within 0-23"]
@@ -182,6 +222,12 @@ class Center
     return true if manager and manager.active
     [false, "Receiving staff member is currently not active"]
   end
+  
+  def creation_date_ok
+    return true if clients.map{|c| c.loans}.count == 0
+    return true if creation_date <= loans.aggregate(:applied_on.min)
+    return [false, "Creation date cannot be after the first loan application date"]
+  end
 
   def handle_meeting_date_change
     # no need to do all this if meeting date was not changed
@@ -190,6 +236,7 @@ class Center
     date = self.meeting_day_change_date
 
     if not CenterMeetingDay.first(:center => self)
+      # FIXME: This line appears to be failing, because the period attribute is left blank and should be one of %w[week month] probably true in the "elsif" below as well. This means new centers never get a meeting day.
       CenterMeetingDay.create(:center_id => self.id, :valid_from => creation_date||date, :meeting_day => self.meeting_day)
     elsif self.meeting_day != self.meeting_day_for(date)
       if prev_cm = CenterMeetingDay.first(:center_id => self.id, :valid_from.lte => date, :order => [:valid_from.desc])

@@ -1,0 +1,54 @@
+= js_include_tag "multiple_select.js"
+= css_include_tag "user_groups.css"
+:javascript
+  $(document).ready(function() {
+  $('#btn-up').bind('click', function() {
+    $('#select-to option:selected').each( function() {
+      var newPos = $('#select-to option').index(this) - 1;
+      if (newPos > -1) {
+        $('#select-to option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+        $(this).remove();
+      }
+    });
+  });
+  $('#btn-down').bind('click', function() {
+    var countOptions = $('#select-to option').size();
+    $('#select-to option:selected').each( function() {
+      var newPos = $('#select-to option').index(this) + 1;
+      if (newPos < countOptions) {
+        $('#select-to option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+        $(this).remove();
+      }
+    });
+  });
+  });
+- keys = (Cacher::COLS  + Cacher::FLOW_COLS).map(&:to_s) + ["icash_interest_in_default", "icash_total_in_default", "status"]
+- report_keys  = @report_format.keys ? @report_format.keys.map(&:to_s) : []
+- remaining_keys = keys - report_keys
+%table.form#user_group_form
+  %tr
+    %td
+      Name:
+    %td
+      = text_field :name
+      %br/
+      %span.greytext (only letters and numbers are allowed)
+
+  %tr
+    %td
+      Fields
+    %td.multi-select
+      %select.remaining#select-from{:multiple => "multiple", :style => "height: #{keys.count}em; min-width : 100px", :size => 100}
+        - (remaining_keys.uniq).sort.each do |user|
+          %option{:value => user}= user
+    %td
+      %input#add{:type => "button", :value => "&raquo;"}
+      %input#remove{:type => "button", :value => "&laquo;"}
+    %td.multi-select
+      <a href="JavaScript:void(0);" id="btn-up">Move Up</a>
+      <a href="JavaScript:void(0);" id="btn-down">Move Down</a>
+      %br
+      %select.current#select-to{:multiple => "multiple", :name => "report_format[keys][]", :style => "height : #{keys.count}em; min-width : 100px"}
+        - report_keys.map(&:to_s).each do |user|
+          %option{:value => user.to_s}= user
+

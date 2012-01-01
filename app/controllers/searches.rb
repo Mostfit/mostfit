@@ -1,4 +1,5 @@
 class Searches < Application
+  
   def index
     if params[:query] and params[:query].length>=1
       per_page       = request.xhr? ? 11 : 100
@@ -12,6 +13,36 @@ class Searches < Application
     end
     @floating = true if request.xhr?
     render :layout => layout?
+  end
+
+  def list
+    # returns a list based on params
+    # useful for stuff like autocomplete
+    only_provides :json
+    model = Kernel.const_get(params[:model].camelcase)
+    if params[:q]
+      # this code block handles multiple search criteria such as
+      # q[name.like]=tam%25&q[amount]=25000
+      q = params[:q].map do |k,v| 
+        if k.match(".")
+          n,o = k.split(".")
+          k = DataMapper::Query::Operator.new(n, o.to_sym)
+          [k, v]
+        else
+          [k.to_sym, v.to_sym]
+        end
+      end.to_hash || {}
+    else
+      # here we handle stuff from jquery autocomplete ui which send in args thus
+      # op=name.like&term=xyz
+      n,o = params[:op].split(".")
+      term = "%#{params[:term]}%" if o == "like"
+      q = {DataMapper::Query::Operator.new(n, o.to_sym) =>  term}
+    end
+    q = q.merge({:order => [:name]})
+    q = q.merge(:limit => 25, :offset => (params[:page].to_i - 1) * 25) if params[:page]
+    fn = params[:as] ? "to_#{params[:as]}" : "all"
+    @list = model.send(fn,q).to_json
   end
 
   def advanced

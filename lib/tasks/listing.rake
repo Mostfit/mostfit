@@ -53,5 +53,18 @@ namespace :mostfit do
       }
       f.close
     end
+
+    desc "List the disbursal dates of all the loans"
+    task :disbursal_dates do
+      @loans = Loan.all.aggregate(:c_branch_id, :c_center_id, :client_id, :id, :disbursal_date)
+      f = File.open("tmp/disbursal_dates_#{DateTime.now.to_s}.csv", "w")
+      f.puts("\"Branch Id\", \"Branch Name\", \"Center Id\", \"Center Name\", \"Client Id\", \"Client Name\", \"Loan Id\", \"Disbursal Date\"")
+      # @loans is an array of arrays which contains branch_id, center_id, client_id, loan_id and disbursal_dates
+      # in the sequence 0, 1, 2, 3, 4 respectively.
+      @loans.each{|l|
+        f.puts("#{l[0]}, \"#{Branch.get(l[0]).name}\", #{l[1]}, \"#{Center.get(l[1]).name}\", #{l[2]}, \"#{Client.get(l[2]).name}\", #{l[3]}, #{l[4]}")
+      }
+      f.close
+    end
   end
 end

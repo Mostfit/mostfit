@@ -9,7 +9,7 @@
     = hidden_field :name => :client_type, :value => @client.class
     = hidden_field :name => :return, :value => params[:return]
     - if File.exists?("app/views/clients/#{@client.class.to_s.pluralize.snake_case}/_fields.html.haml")
-      = partial ("clients/#{@client.class.to_s.pluralize.snake_case}/fields")
+      = partial("clients/#{@client.class.to_s.pluralize.snake_case}/fields")
     - else
       = partial("clients/fields")
   

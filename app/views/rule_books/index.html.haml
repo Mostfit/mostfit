@@ -19,9 +19,9 @@
       %th
         Journal type
       %th
-        Credit accounts
-      %th
         Debit accounts
+      %th
+        Credit accounts
       %th
         From date
       %th
@@ -44,28 +44,20 @@
         %td 
           = rule_book.action.camelcase(' ')
         %td
-          - if rule_book.journal_type
-            - if rule_book.journal_type.name.downcase.to_sym == :payment
-              %span.pink
-                = rule_book.journal_type.name
-            - elsif rule_book.journal_type.name.downcase.to_sym == :receipt
-              %span.green
-                = rule_book.journal_type.name
-            - else
-              %span.blue
-                = rule_book.journal_type.name
-        %td 
-          - rule_book.credit_accounts.map do |credit_account|
-            = credit_account.name 
-            | 
-            = car.first(:credit_account_id => credit_account.id).percentage
-            %br
+          = rule_book.journal_type.display if rule_book.journal_type
         %td
           - rule_book.debit_accounts.each do |debit_account|
             = debit_account.name
             | 
             = dar.first(:debit_account_id => debit_account.id).percentage
             %br
+        %td 
+          - rule_book.credit_accounts.map do |credit_account|
+            = credit_account.name 
+            | 
+            = car.first(:credit_account_id => credit_account.id).percentage
+            %br
+
         %td
           = rule_book.from_date
         %td

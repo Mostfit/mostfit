@@ -3,6 +3,7 @@ class MonthlyTarget
 
   property :id,                   Serial
   property :for_month,            Date, :nullable => false, :index => true
+  # staff_member_id should be supplied by belongs_to :staff_member below
   property :staff_member_id,      Integer, :nullable => false, :index => true
   property :disbursements_target, Float
   property :collections_target,   Float
@@ -16,7 +17,8 @@ class MonthlyTarget
   validates_with_method :is_staff_member_active?
 
   def is_staff_member_active?
-    staff_member.active ? true : [false, "Cannot set a target for an inactive staff member"]
+    # Adding staff_member && in front here makes sure we get a neat validation message instead of an ugly raised error
+    staff_member && staff_member.active ? true : [false, "Cannot set a target for an inactive staff member"]
   end
 
   def MonthlyTarget.get_first_date_of_month(month, year)

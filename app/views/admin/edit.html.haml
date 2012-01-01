@@ -3,7 +3,7 @@
 = js_include_tag "mce_editor.js"
 = css_include_tag "colorPicker.css"
 = error_messages_for @mfi
-= form_for(@mfi, :action => url(:controller => :admin, :action => :update), :enctype => "multipart/form-data") do
+= form_for(@mfi, :action => url(:controller => :admin, :action => :update), :enctype => "multipart/form-data", :class => "shaded") do
   %div.tab_container
     %ul.tabs
       %li#contact Contact details
@@ -11,22 +11,22 @@
       %li#security Access control & Security
       %li#info Main page
     %div.tab
-      %table.wide
+      %table.tall.shaded
         %tr
-          %td
+          %th
             Name of the mfi
           %td
             = text_field :name
         %tr
-          %td
+          %th
             Select Color for this name
           %td
             = text_field :color
         %tr
-          %td
+          %th
             and choose a logo
         %tr
-          %td
+          %th
             Upload Logo
           %td
             - if @mfi.logo_name and not @mfi.logo_name.blank?          
@@ -43,22 +43,22 @@
             %li==Only gif, jpg and png type images are allowed
             %li==Maximum size is 100kb
         %tr
-          %td
+          %th
             Address of MFI HQ
           %td
             = text_area :address
         %tr
-          %td
+          %th
             Website (if any)
           %td
             = text_field :website
         %tr
-          %td
+          %th
             Telephone number
           %td
             = text_field :telephone
         %tr
-          %td
+          %th
             Email address
           %td
             = text_field :email
@@ -68,16 +68,6 @@
           %td{:colspan => "2"}
             %h3 
               Operational details (these will help us build a suitable system for you) 
-        %tr
-          %td
-            Number of clients
-          %td
-            = text_field :number_of_clients
-        %tr
-          %td
-            Number of centers
-          %td
-            = text_field :number_of_centers
         %tr
           %td
             In operation since

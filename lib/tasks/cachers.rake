@@ -15,11 +15,13 @@ Merb.start_environment(:environment => ENV['MERB_ENV'] || 'production')
 namespace :mostfit do
   namespace :caches do
     desc "finds and adds caches for dates that are in loan history but not in the caches"
-    task :do_missing do
-      missing = BranchCache.missing_dates.values.flatten.uniq
+    task :do_missing, :start_date, :end_date do |task, args|
+      date_hash = [:start_date, :end_date].map{|x| Date.parse(args[x]) if args[x] rescue nil}.compact
+      selection = date_hash.count == 2 ? {:date => (date_hash[0]..date_hash[1])} : {}
+      missing = BranchCache.missing_dates(nil, selection).values.flatten.uniq
       total = missing.count
       i = 0
-      missing.map do |date| 
+      missing.sort.map do |date| 
         i += 1
         print "DOING #{date}  (#{i}/#{total})"
         BranchCache.update(date) 

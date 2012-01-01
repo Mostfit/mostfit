@@ -4,11 +4,13 @@ class RepaymentStyle
   before :save, :convert_blank_to_nil
 
   property :id,       Serial
-  property :name,     String
+  property :name,     String, :unique => true
   property :style,    String
   property :round_total_to, Integer
   property :round_interest_to, Integer
   property :active, Boolean
+  # Maybe a validation against this rounding style would be helpful, it took me forever to figure
+  # out why loans were raising nil errors in lib/functions on validation.
   property :rounding_style, String
   property :force_num_installments, Boolean
   property :custom_principal_schedule, Text, :lazy => false
@@ -16,6 +18,14 @@ class RepaymentStyle
 
   def to_s
     style
+  end
+
+  def self.from_csv(row, headers)
+    # obj = new([:name, :style, :round_total_to, :round_interest_to, :active, :rounding_style, :force_num_installments, :custom_principal_schedule, :custom_interest_schedule, :upload_id].map{|k| [k,row[headers[k]]] if headers[k]}.compact.to_hash)
+    obj = new(:name => row[headers[:name]], :style => row[headers[:style]],
+              :custom_principal_schedule => row[headers[:custom_principal_schedule]], :active => true, :upload_id => row[headers[:upload_id]],
+              :force_num_installments => true, :custom_interest_schedule => row[headers[:custom_interest_schedule]])
+    [obj.save, obj]
   end
 
   def convert_blank_to_nil

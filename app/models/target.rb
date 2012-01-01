@@ -52,8 +52,8 @@ class Target
     return [false, "This target value is not present"] if target_value.nil?
     return [false, "This target cannot be applied to this object"] if start_value.nil?
     return true if target_value > start_value
-    return [false, "This target value of #{target_value} is less than present value of #{start_value}"] if target_value < start_value
-    return [false, "This target value of #{target_value} is equal to present value of #{start_value}"] if target_value == start_value
+    return [false, "This target value of #{target_value} is less than start value of #{start_value}"] if target_value < start_value
+    return [false, "This target value of #{target_value} is equal to start value of #{start_value}"] if target_value == start_value
   end
 
   def future_date

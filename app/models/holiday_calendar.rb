@@ -41,7 +41,6 @@ class HolidayCalendar
 
 
   def update_loan_history()
-    debugger
     @old_holidays ||= []
     branch_ids = branches.aggregate(:id)
     # get the loan_ids for the loans affected by deleted holidays

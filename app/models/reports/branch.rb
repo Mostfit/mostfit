@@ -13,7 +13,12 @@
       #Kernel.instance_variable_set("@_#{calling_method}",o)
       o
     end
-    
+
+    # Class method that returns all centers for a branch that were created after start_date and
+    # before end_date in the form of a hash:
+    #
+    #   { branch1.id => number of centers, branch2.id => number of centers, etc... }
+    #
     def center_count(start_date=Date.min_date, end_date = Date.today)
       query_as_hash(%Q{
           SELECT b.id, COUNT(c.id) as count
@@ -23,6 +28,11 @@
           GROUP BY b.id})            
     end
     
+    # Class method that returns all clients for a branch that joined before the given date
+    # in the form of a hash:
+    #
+    #   { branch1.id => number of clients, branch2.id => number of clients, etc...}
+    #
     def client_count(date = Date.today)
       query_as_hash(%Q{
           SELECT b.id, COUNT(cl.id) as count
@@ -31,7 +41,12 @@
                                     AND deleted_at is NULL
           GROUP BY b.id})            
     end
-    
+
+    # This method returns a hash of all branches and the number of disbused loans as of the
+    # given date in the form of a hash:
+    #
+    #   { branch1.id => number of disbursed loans, branch2.id => number of disbursed loans, etc... }
+    #
     def loan_count(date = Date.today)
       query_as_hash(%Q{
           SELECT b.id, COUNT(l.id) 
@@ -41,7 +56,12 @@
                                     AND cl.deleted_at is NULL
           GROUP BY b.id})
     end
-    
+
+    # Returns the total amount of all loans disbursed before the given date for all branches
+    # in the form of a hash:
+    #
+    #   { branch1.id => total disbursed amount, branch2.id => total disbursed amount, etc... }
+    #
     def loan_amount(date = Date.today)
       query_as_hash(%Q{
           SELECT b.id, SUM(l.amount) 
@@ -51,8 +71,30 @@
                                     AND cl.deleted_at is NULL
           GROUP BY b.id})
     end
-    
+
+    # Returns the total number of active clients for all branches that joined before the
+    # given date as a hash:
+    #
+    #   { branch1.id => active client count, branch2.id => active client count, etc... }
+    #
+    # Whether a client is 'active' is determined by the state of loan/loan_history.
+    # A client must have at least one 'active' loan_history (with status :disbursed or
+    # :outstanding) belonging to a loan that is not deleted or rejected.
+    #
+    # The date argument refers to the client's date_joined. Only clients that joined before
+    # the given date are counted.
+    #
     def active_client_count(date = Date.today)
+      # First we query all loan_histories with status in (5,6,7,8,9), of which the client
+      # joined before the given date and of which the loan has not been deleted or rejeced.
+      #
+      # (status numbers refer to the index of the STATUSES global constant, i.e. 5-9 represents:
+      #   [:disbursed, :outstanding, :repaid, :written_off, :claim_settlement] )
+      #
+      # We group these records by loan_id and map them and the most recent history's date to a
+      # composite key of the form ['(loan_id, YYYY-MM-DD)', 'loan_id2, YYYY-MM-DD', etc..]
+      #
+      # NOTE: This does not take into account WHEN the loan was deleted?
       ids = repository.adapter.query(%Q{
                   SELECT loan_id, max(date) date
                   FROM loan_history lh, clients cl, loans l
@@ -60,6 +102,10 @@
                         AND lh.loan_id=l.id AND l.rejected_on is NULL AND l.deleted_at is NULL
                   GROUP BY loan_id}).collect{|x| "(#{x.loan_id}, '#{x.date.strftime('%Y-%m-%d')}')"}.join(",")
       return {} if ids.length==0     
+      # Finally we query the loan_histories table again finding all loan_histories with
+      # the composite keys generated above and status in (5,6) and group those by branch_id
+      # returning for each branch the branch_id and the count of distinct client_ids.
+      #
       query_as_hash(%Q{
         SELECT branch_id, count(DISTINCT(client_id))
         FROM loan_history lh
@@ -67,11 +113,34 @@
         GROUP BY branch_id
       })
     end
-    
+
+    # This method simply returns the difference between client_count and active_client_count
+    #
+    # NOTE: because we use a hash subtraction our output is slightly inconsistent with the other two
+    # client_count methods above. If client_count or active_client_count find no clients for their
+    # given date they will not include the branch_id in the output hash. This method will!
+    # 
+    # For example: take three branches with ids 101, 102 and 103. In branch 101 two clients are dormant,
+    # in branch 102, two clients are active, branch 103 has no clients at all yet. The output of the
+    # different methods will read:
+    #
+    #   client_count will return:         { 101 => 2, 102 => 2 }
+    #   active_client_count will return:  { 102 => 2 }
+    #   dormant_client_count will return: { 101 => 2, 102 => 0 }
+    #
+    # 103 will never be mentioned as it has no clients, but 102 will be listed in the dormant_client_count.
+    #
     def dormant_client_count(date = Date.today)
       client_count(date) - active_client_count(date)
     end
-    
+
+    # Returns number of 'borrower' clients for each branch that joined before the given date in the form of a hash.
+    #
+    #   { branch1.id => number of borrowers, branch2.id => number of borrowers, etc...}
+    #
+    # A borrower is defined as an client which has its active bool set to true and has at least one disbursed loan
+    #
+    # NOTE: Naming is slightly inconsistent with the other client_count methods (plural for clients used here)
     def borrower_clients_count(date)
       query_as_hash(%Q{
                        SELECT b.id, COUNT(DISTINCT(client_id)) as count
@@ -82,7 +151,12 @@
                        GROUP BY b.id
       })
     end
-    
+
+    # Returns the number of clients which have loans with the given loan_cycle that were disbursed before the given date.
+    # Again in hash format:
+    #
+    #   { branch1.id => number of clients, branch2.id => number of clients, etc...}
+    #
     def client_count_by_loan_cycle(loan_cycle, date=Date.today)
       # this simply counts the number of loans for a given client without taking into account the status of those loans.
       query_as_hash(%Q{
@@ -92,7 +166,11 @@
                   AND l.disbursal_date<='#{date.strftime('%Y-%m-%d')}' AND cycle_number='#{loan_cycle}' AND l.rejected_on is NULL
             GROUP BY b.id})
     end
-    
+
+    # Returns all clients whose date_joined lies between start_date and end_date as a hash:
+    #
+    #   { branch1.id => number of clients, branch2.id => number of clients, etc...}
+    #
     def clients_added_between(start_date, end_date)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
@@ -104,6 +182,10 @@
         GROUP BY b.id})
     end
     
+    # Returns all clients whose delete_at lies between start_date and end_date as a hash:
+    #
+    #   { branch1.id => number of clients, branch2.id => number of clients, etc...}
+    #
     def clients_deleted_between(start_date, end_date)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date
@@ -115,6 +197,12 @@
         GROUP BY b.id})
     end
     
+    # Returns either a count or a sum of all loans repaid between start and end dates
+    #
+    #   { branch1.id => count or sum of loans, branch2.id => count or sum of loans, etc...}
+    #
+    # The what parameter can either be 'sum' or 'count'
+    #
     def loans_repaid_between(start_date, end_date, what)
       start_date = Date.parse(start_date) unless start_date.is_a? Date
       end_date = Date.parse(end_date) unless end_date.is_a? Date

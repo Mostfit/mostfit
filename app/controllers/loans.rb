@@ -131,7 +131,7 @@ class Loans < Application
 
     # if an attached insurance policy then create or update insurance policy
     if attrs[:insurance_policy]
-      @insurance_policy = @loan.insurance_policy || Insurance.new
+      @insurance_policy = @loan.insurance_policy || InsurancePolicy.new
       @insurance_policy.client = @loan.client
       @insurance_policy.attributes = attrs.delete(:insurance_policy)
     end
@@ -396,10 +396,8 @@ class Loans < Application
   def repair(id)
     loan = Loan.get(id)
     raise NotFound unless loan
-    loan.update_history
-    loan.update_loan_cache
-    message = {:error => loan.errors.values.join("<br>")} unless loan.save
-    redirect url_for_loan(loan), :message => message
+    loan.update_history_bulk_insert
+    redirect url_for_loan(loan), :message => {:notice => "LoanHistory updated!"}
   end
 
   def reallocate(id)
@@ -517,11 +515,13 @@ class Loans < Application
       klass = loan.class
     else
       loan_product = LoanProduct.get(params[:loan_product_id])
-      attrs = params[loan_product.loan_type_string.snake_case.to_sym] || params[:loan]
+      attrs = (params[loan_product.loan_type_string.snake_case.to_sym] || params[:loan]).dup
       raise NotFound if not params[:loan_type]
       klass = Kernel::const_get(params[:loan_type])
     end
-    attrs[:client_id] = params[:client_id] if params[:client_id]
+    attrs[:client_id] ||= params[:client_id] if params[:client_id]
+    attrs[:client] = Client.get(attrs.delete(:client_id))
+    attrs[:loan_product] = LoanProduct.get(attrs.delete(:loan_product_id)) if attrs[:loan_product_id]
     attrs[:insurance_policy] = params[:insurance_policy] if params[:insurance_policy]
     attrs[:repayment_style_id] ||= loan_product.repayment_style.id
     [klass, attrs]

@@ -14,7 +14,6 @@
       Account Credit
   - counter = 0
   - @journals.each do |journal|
-    - debugger
     - postings = Posting.all(:journal_id => journal.id).group_by{|x| x.amount>0 ? :credit : :debit}
     - time_format = Mfi.first.date_format || "%d-%m-%Y"
     - time_format += " %H:%M"

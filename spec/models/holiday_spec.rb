@@ -4,12 +4,13 @@ describe Holiday do
   
   before(:each) do
     Holiday.all.destroy!
-    @h = Holiday.first_or_create(:name => "Makar Sankranti", :date => Date.parse('2009-03-03'), :shift_meeting => :before)
+    @h = Factory(:holiday, :name => "Makar Sankranti", :date => Date.parse('2009-03-03'), :shift_meeting => :before)
     @h.should be_valid
   end
 
   after(:all) do
     Holiday.all.destroy!
+    # A global holidays variable?
     $holidays = {}
   end
 

@@ -4,7 +4,7 @@
       = ofc2(550, 400, 'http://' + (request.env['HTTP_HOST'] or 'example.org') + url(:graph_data, :action => 'loan', :id => @loan.id, :scope_unit => 'months', :scope_size => 3) )
   
   = error_messages_for @payment
-  - if @loan.loan_history.length == 0 or (@loan.disbursal_date and @loan.payments.count > 0  and @loan.loan_history.max(:created_at).to_time < @loan.payments.max(:created_at).to_time) or (@loan.loan_history.last.total_principal_due == 0)
+  - if @loan.loan_history.length == 0 or (@loan.disbursal_date and @loan.payments.count > 0  and @loan.loan_history.max(:created_at).to_time < @loan.payments.max(:created_at).to_time)
     .error
       History of this loan is not updated. Click
       = link_to("here", url(:controller => "loans", :id => @loan.id, :action => "repair"))
@@ -18,6 +18,7 @@
   .menu-strip{:style => "margin-bottom: 0.5em; margin-left: 0px; margin-top: 0px"}
     = link_to 'edit this loan', url_for_loan(@loan, 'edit'), :class => "edit"
     = link_to 'make repayment', url_for_loan(@loan, 'payments/new'), :class => "add"
+    = link_to 'visit center', resource(@loan.client.center)
   
   %table.loan{ :style => 'width : 50%; border: solid 1px #c9c9c9' }
     %tr
@@ -207,8 +208,8 @@
           - interest_so_far += lh.interest_due
           - principal_received_so_far += lh.principal_paid
           - interest_received_so_far += lh.interest_paid
-          - scheduled_principal = i > 0 ? @history[i-1].scheduled_outstanding_principal - lh.scheduled_outstanding_principal : 0
-          - scheduled_interest = i > 0 ? @history[i-1].scheduled_outstanding_total - lh.scheduled_outstanding_total - scheduled_principal : 0
+          - scheduled_principal = lh.scheduled_principal_due
+          - scheduled_interest =  lh.scheduled_interest_due
           - if lh.date > Date.today and not passed
             - passed = true
             - if not first
@@ -228,17 +229,17 @@
             %td
               = lh.date
             %td
-              %b= lh.scheduled_outstanding_principal.round(2).to_currency
+              %b= lh.scheduled_outstanding_principal.round(2)
             %td
               %b= (scheduled_principal + scheduled_interest).to_currency
               %br/
-              %span.greytext== #{scheduled_principal.round(2).to_currency} principal + #{scheduled_interest.round(2).to_currency} interest
+              %span.greytext== #{scheduled_principal.round(2)} principal + #{scheduled_interest.round(2)} interest
             %td
               - if last_payment_date and (lh.date <= last_payment_date or lh.date <= Date.today)
-                %b= lh.actual_outstanding_principal.round(2).to_currency
+                %b= lh.actual_outstanding_principal.round(2)
             %td
               - if last_payment_date and (lh.date <= last_payment_date or lh.date <= Date.today)
-                %b= (lh.principal_paid + lh.interest_paid).to_currency
+                %b= (lh.principal_paid + lh.interest_paid)
                 %br/
                 %span.greytext
                   == #{lh.principal_paid.to_currency} principal + #{lh.interest_paid.to_currency} interest
@@ -248,7 +249,8 @@
                   = default.to_currency
                 %br/
                 %span.greytext
-                  == #{lh.advance_principal_paid.to_currency} prin +  #{lh.advance_interest_paid} int
+                  = format("%.0f%", (default.abs.to_f / @loan.total_to_be_received) * 100)
+                  = default <= 0 ? 'overpaid' : 'shortfall'
             - else
               %td
         %tfoot

@@ -34,7 +34,7 @@
             = link_to @center.branch.manager.name, resource(@center.manager)
       %tr
         %td Meeting
-        %td== #{@center.meeting_day.to_s.capitalize}#{(@center.meeting_time_hours and @center.meeting_time_minutes) ? ", #{@center.meeting_time_hours}:#{@center.meeting_time_minutes}" : ''}
+        %td== #{@center.meeting_day_for(Date.today)}#{(@center.meeting_time_hours and @center.meeting_time_minutes) ? ", #{@center.meeting_time_hours}:#{@center.meeting_time_minutes}" : ''}
       %tr.odd
         %td Address
         %td=@center.address

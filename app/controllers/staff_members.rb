@@ -189,6 +189,14 @@ class StaffMembers < Application
     return "printer" if params[:layout] and params[:layout]=="printer"
   end
   
+  # Return all staff member ids that are in any way related to the current user's branch
+  #
+  # OR if current user does not have role :staff_member and params[:branch_id] is given
+  # return all staff member ids related to the given branch_id.
+  #
+  # Staff member ids are returned in a hash like { :id => [1,2,3] } this hash is used as
+  # a condition for the index action
+  #
   def get_staff_members_hash
     if session.user.role == :staff_member or session.user.staff_member
       st = session.user.staff_member

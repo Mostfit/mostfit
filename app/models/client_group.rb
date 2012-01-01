@@ -6,11 +6,11 @@ class ClientGroup
   property :id,                Serial
   property :name,              String, :nullable => false
   property :number_of_members, Integer, :nullable => true, :min => 1, :max => 20, :default => 5
-  property :code,              String, :length => 14, :nullable => false, :index => true
+  property :code,              String, :length => 100, :nullable => false, :index => true
   property :created_by_staff_member_id,  Integer, :nullable => false, :index => true
 
   validates_is_unique   :code, :scope => :center_id
-  validates_length      :code, :min => 1, :max => 14
+  validates_length      :code, :min => 1, :max => 100
 
   has n, :clients
   belongs_to :center, :nullable => false
@@ -59,7 +59,7 @@ class ClientGroup
 
   def self.from_csv(row, headers)
     center = Center.first(:code => row[headers[:center_code]])
-    obj    = new(:name => row[headers[:name]], :center_id => center.id, :code => row[headers[:code]])
+    obj    = new(:name => row[headers[:name]], :center_id => center.id, :code => row[headers[:code]], :upload_id => row[headers[:upload_id]])
     [obj.save, obj]
   end
 

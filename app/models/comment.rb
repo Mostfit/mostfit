@@ -4,6 +4,7 @@ class Comment
   property :id, Serial
   
   property :text,           Text, :min => 5
+  # Perhaps we should validate these two
   property :parent_model,   String
   property :parent_id,      Integer
   property :created_at,     DateTime

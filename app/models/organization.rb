@@ -1,3 +1,6 @@
+# It's not clear what exactly an organization represents. It has a 1:1 relation with accounting periods,
+# so when an accounting_period ends, so does the organization?
+#
 class Organization
   include DataMapper::Resource
   

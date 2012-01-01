@@ -18,7 +18,7 @@ Spec::Runner.configure do |config|
   config.include(Merb::Test::RouteHelper)
   config.include(Merb::Test::ControllerHelper)
   config.include(Spec::Matchers)
-  
+ 
   config.before(:all) do
     if Merb.orm == :datamapper
       DataMapper.auto_migrate!
@@ -31,7 +31,22 @@ Spec::Runner.configure do |config|
     mfi.in_operation_since = Date.new(2000, 01, 01)
     mfi.save
   end
+
+  # This could be prettier but just to make sure we don't carry over records between tests. In a perfect world
+  # specs should be isolated so that leftover records from other specs shouldn't influence them but this is not
+  # always the case.
+  #
+  # The following is run before each individual spec (but not between tests within a spec)
+  #
+  config.before(:all) do
+    [AccountType, Account, Currency, JournalType, CreditAccountRule, DebitAccountRule, RuleBook, StaffMember, User, Funder, FundingLine, Branch, Center, ClientType, Client, LoanProduct, LoanHistory, Region, Area, Portfolio].each do |model|
+      model.all.destroy!
+    end
+  end
 end
+
+# Don't include the factories until the environment has been loaded
+require 'spec/factories'
 
 
 class MockLog

@@ -12,6 +12,10 @@ class Exceptions < Merb::Controller
     end
   end
 
+  def argument_error
+    redirect request.referer, :message => {:error => "Argument Error"}
+  end
+
   # handle NotAcceptable exceptions (400)
   def bad_request
     if request.xhr?
@@ -73,6 +77,7 @@ class Exceptions < Merb::Controller
       render
     end    
   end
+
  
   #get list of errors handle 
   def index

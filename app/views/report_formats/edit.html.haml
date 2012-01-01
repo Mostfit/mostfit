@@ -1,0 +1,10 @@
+%h1
+  == Edit #{@report_format.name} Report Format
+
+= error_messages_for @report_format
+
+= form_for(@report_format, :action => url(:report_format, @report_format)) do
+  = partial :fields
+  = submit "Update"
+  &nbsp;&nbsp;&nbsp;
+  = link_to 'Back', url(:report_format, @report_format)

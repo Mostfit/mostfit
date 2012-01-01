@@ -37,6 +37,7 @@ class Claim
   validates_with_method :date_of_death, :date_of_death_not_more_than_client_payment
   validates_with_method :date_of_death, :date_of_death_not_before_date_of_joining
 
+  # These will not commonly occur more than once daily for a client presumably, but shouldn't we validate uniqueness just in case?
   def generate_claim_id
     self.claim_id = Date.today.strftime("%Y%m%d")
     if client

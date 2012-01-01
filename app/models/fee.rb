@@ -8,6 +8,7 @@ class Fee
   # on which to call the function.
   # We have this difference to handle cases where the fee is applicable on an Insurance Policy but is payable on the loan application date
 
+  # ^ Good to see some docs but the example seems to have more elements than the actual table below. Model can be scrapped I think?
 
   PAYABLE = [
              [:loan_applied_on, Loan, :applied_on], 
@@ -34,6 +35,9 @@ class Fee
   property :max_amount,    Integer
   property :payable_on,    Enum.send('[]',*PAYABLE.map{|m| m[0]}), :nullable => false
   property :overridable_by, Flag[:data_entry, :mis_manager, :admin,:staff_member]
+
+  property :round_to,       Float
+  property :rounding_style, Enum[:round, :ceil, :floor]
 
   has n, :loan_products, :through => Resource
   has n, :client_types, :through => Resource
@@ -84,7 +88,7 @@ class Fee
 
   def fees_for(loan)
     return amount if amount
-    return [[min_amount || 0 , (percentage ? percentage * loan.amount : 0)].max, max_amount || (1.0/0)].min
+    return [[min_amount || 0 , (percentage ? percentage * loan.amount : 0)].max, max_amount || (1.0/0)].min.round_to_nearest(round_to, rounding_style)
   end
 
   # Calculate the amount to be levied depending on the object type

@@ -33,7 +33,18 @@ module DataEntry
       unless @center.nil?
         @branch = @center.branch
         @clients = Client.all(:center_id => @center.id, :fields => [:id, :name, :center_id, :client_group_id])
-        @loans   = @clients.loans(:disbursal_date.not => nil)
+        @loans   = Loan.all(:c_center_id => @center.id, :rejected_on => nil)
+        @disbursed_loans = @loans.all(:disbursal_date.not => nil)
+        @undisbursed_loans = @loans.all(:disbursal_date => nil, :approved_on.not => nil)
+        @loans_to_approve = @loans.all(:approved_on  => nil)
+        @loans_to_utilize = @disbursed_loans.all(:loan_utilization_id => nil)
+        date_with_holiday = [@date, @date.holidays_shifted_today].max
+        @loans_to_disburse = @undisbursed_loans.all(:scheduled_disbursal_date.lte => date_with_holiday)
+        @fee_paying_loans   = @loans.collect{|x| {x => x.fees_payable_on(@date)}}.inject({}){|s,x| s+=x}
+        @fee_paying_clients = @clients.collect{|x| {x => x.fees_payable_on(@date)}}.inject({}){|s,x| s+=x}
+        @fee_paying_things = @fee_paying_clients + @fee_paying_loans
+
+        
       end
 
       if request.method == :post

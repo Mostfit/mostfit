@@ -1,0 +1,40 @@
+%h1
+  == Checking Loan Balances for Upload #{@upload.id}
+.menu-strip
+  = link_to "Recheck!", url(:recheck_upload_checkers, @upload)
+  = link_to "Recheck 50!", url(:recheck_upload_checkers, @upload, :limit => 50)
+%table.narrow.shaded
+  %tr
+    %th
+      id
+    %th
+      reference
+    %th
+      field
+    %th
+      as on
+    %th
+      expected
+    %th
+      actual
+    %th
+      checked_at
+  - for checker in @checkers
+    %tr{:class => cycle('odd','even')}
+      %td
+        = checker.id
+      %td
+        - if checker.loan
+          = link_to checker.reference, resource(checker.loan)
+        - else
+          = checker.reference
+      %td
+        = checker.check_field
+      %td
+        = checker.as_on
+      %td
+        = checker.expected_value
+      %td
+        = checker.actual_value
+      %td
+        = checker.checked_at

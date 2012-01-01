@@ -14,6 +14,8 @@ class Weeksheet
   belongs_to :staff_member
   belongs_to :center
 
+  # This is slightly misnamed, it actually returnes a collection of weeksheet_rows rather than
+  # a single weeksheet.
   #Get weeksheet of center 
   def self.get_center_weeksheet(center, date, option = nil)
     if option == "data"
@@ -29,6 +31,8 @@ class Weeksheet
   end
 
   private
+  # Just like the method above, although this method creates a Weeksheet record, what is returned
+  # is actually a collection of WeeksheetRows (that belong to the generated Weeksheet)
   def self.generate_weeksheet(center, date, option)
     collection_of_weeksheet = []
     clients = center.clients

@@ -1,6 +1,7 @@
 class DebitAccountRule
   include DataMapper::Resource
   property :id, Serial
+  # Similar to CreditAccountRule, these two ids are probably not needed
   property :rule_book_id, Integer
   property :account_id,   Integer
   property :percentage,   Float, :nullable => false, :default => 100

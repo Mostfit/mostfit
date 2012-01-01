@@ -2,36 +2,32 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 
 describe Weeksheet do
   before(:all) do
-    load_fixtures :users, :staff_members, :regions, :areas, :branches, :centers, :client_types, :clients, :loan_products, :funders, :funding_lines, :loans, :loan_history
+    @client = Factory(:client)
+    @center = @client.center
   end
 
   before(:each) do
-    @center = Center.get(1)
-    @weeksheets = Weeksheet.get_center_weeksheet(@center, Date::civil(2011,03,22))
+    @weeksheet_rows = Weeksheet.get_center_weeksheet(@center, Date::civil(2011,03,22))
   end
 
   it "should be get center weeksheet" do
-    @weeksheets.first.should_not == nil
-    @weeksheets.first.weeksheet.center_id.should == @center.id
+    @weeksheet_rows.first.should_not eql(nil)
+    @weeksheet_rows.first.weeksheet.center_id.should eql(@center.id)
   end
 
   it "should be equal to given date" do
-    @weeksheets.first.weeksheet.date.should == Date::civil(2011,03,22)
+    @weeksheet_rows.first.weeksheet.date.should == Date::civil(2011,03,22)
   end
 
-  it "Installment number should be befor given date" do
-    @loan = Loan.get(1)
-    installment_number = @loan.number_of_installments_before(Date::civil(2011,03,22))    
-    @weeksheets.first.installment.should == installment_number
-  end
-
-  it "should be equal to given center_id" do
-    @weeksheets.first.weeksheet.center_id.should == @center.id
+  it "Installment number should be before given date" do
+    loan = Factory(:disbursed_loan, :client => @client)
+    installment_number = loan.number_of_installments_before(Date::civil(2011,03,22))    
+    @weeksheet_rows.first.installment.should == installment_number
   end
 
   it "should not get center weeksheet if center not paying on given date" do
-    @weeksheets = Weeksheet.get_center_weeksheet(@center, Date::civil(2011,03,21))
-    @weeksheets.first.weeksheet_id.should == nil
+    @weeksheet_rows = Weeksheet.get_center_weeksheet(@center, Date::civil(2011,03,21))
+    @weeksheet_rows.first.weeksheet_id.should == nil
   end
 
 end

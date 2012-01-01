@@ -19,6 +19,7 @@ class Payment
   property :comment,             String, :length => 50
   property :received_on,         Date,    :nullable => false, :index => true
   property :deleted_by_user_id,  Integer, :nullable => true
+  # Default this one to today?
   property :created_at,          DateTime,:nullable => false, :index => true
   property :deleted_at,          ParanoidDateTime, :nullable => true, :index => true
   property :created_by_user_id,  Integer, :nullable => false, :index => true
@@ -46,15 +47,16 @@ class Payment
   belongs_to :verified_by,  :child_key => [:verified_by_user_id],        :model => 'User'
 
   validates_present     :created_by, :received_by, :if => Proc.new{|p| p.deleted_at == nil}
-  validates_with_method :loan_or_client_present?,  :method => :loan_or_client_present?
+  validates_with_method :loan_or_client_present?,  :method => :loan_or_client_present?, :when => [:default, :reallocate]
   validates_with_method :only_take_payments_on_disbursed_loans?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :created_by,  :method => :created_by_active_user?, :if => Proc.new{|p| p.deleted_at == nil}
   validates_with_method :received_by, :method => :received_by_active_staff_member?, :when => [:default, :reallocate]
   validates_with_method :deleted_by,  :method => :properly_deleted?
   validates_with_method :deleted_at,  :method => :properly_deleted?
   validates_with_method :not_approved, :method => :not_approved, :on => [:destroy]
-  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
 
+  # This is a little strange, we don't want to validate here while in the test environment? Disabling this validation in the test env is causing tests to fail.
+  validates_with_method :received_on, :method => :not_received_in_the_future?, :unless => Proc.new{|t| Merb.env=="test"}
   validates_with_method :received_on, :method => :not_received_before_loan_is_disbursed?, :if => Proc.new{|p| (p.type == :principal or p.type == :interest)}
   validates_with_method :principal,   :method => :is_positive?
   validates_with_method :verified_by_user_id, :method => :verified_cannot_be_deleted, :on => [:destroy]
@@ -97,6 +99,7 @@ class Payment
   
   # returns the amount collected by/under/for various kind of objects like Branch, Center, StaffMember, Area, Region, LoanProduct etc
   # TODO:  rewrite it using Datamapper
+  # Something weird is going on here: at the end of this method the amount is cast .to_i. Is this intended behavior?
   def self.collected_for(obj, from_date=Date.min_date, to_date=Date.max_date, types=[1,2], payment_created_type = :created)
     from, where = "", ""
     if obj.class==Branch
@@ -232,12 +235,14 @@ class Payment
     return true if created_by and created_by.active
     [false, "Payments can only be created if an active user is supplied"]
   end
+
   def received_by_active_staff_member?
     return true if self.send(:current_validation_context) == :reallocate
     return true if deleted_at
     return true if received_by and received_by.active
     [false, "Receiving staff member is currently not active"]
   end
+
   def properly_deleted?
     return true if (deleted_by and deleted_at) or (!deleted_by and !deleted_at)
     [false, "deleted_by and deleted_at properties have to be (un)set together"]
@@ -252,16 +257,20 @@ class Payment
     end
   end
 
+  # This assumes a payment is related to a loan, if no loan is present it fails the validation without warning (nil is returned)
   def only_take_payments_on_disbursed_loans?
+    return true if deleted_at
     if loan
       return true if [:outstanding, :disbursed, :repaid, :written_off].include?(loan.get_status(received_on))
       [false, "Payments cannot be made on loans that are written off, repaid or not (yet) disbursed. This loan is #{loan.get_status(received_on)}"]
     end
   end
+
   def not_received_in_the_future?
     return true if received_on <= Date.today + Mfi.first.number_of_future_days
     [false, "Payments cannot be received in the future"]
   end
+
   def not_received_in_past_upto?
     past_days = Mfi.first.number_of_past_days
     if Mfi.first.min_date_from == :in_operation_since
@@ -273,7 +282,7 @@ class Payment
     [false, "Payments cannot be received in past date"]
   end
 
-
+  # Again if no loan is associated with this payment this validation fails silently
   def not_received_before_loan_is_disbursed?
     if loan
       return [false, "Payments cannot be received before the loan is disbursed"] if loan.disbursal_date.blank?

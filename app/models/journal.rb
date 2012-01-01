@@ -12,7 +12,7 @@ class Journal
   property :created_at,     DateTime, :index => true  
   property :deleted_at,     ParanoidDateTime, :index => true  
   property :batch_id,       Integer, :nullable => true
-  property :uuid,           String, :nullable => false
+  property :uuid,           String, :default => lambda{ |obj, p| UUID.generate }
   belongs_to :batch
   belongs_to :journal_type
   has n, :postings
@@ -72,8 +72,8 @@ class Journal
 
       journal = Journal.create(:comment => journal_params[:comment], :date => journal_params[:date]||Date.today,
                                :transaction_id => journal_params[:transaction_id],
-                               :journal_type_id => journal_params[:journal_type_id],
-                               :uuid => UUID.generate)
+                               :journal_type_id => journal_params[:journal_type_id])
+
       
       amount = journal_params.key?(:amount) ? journal_params[:amount].to_f : nil
 
@@ -95,7 +95,10 @@ class Journal
           Posting.create(:amount => (debit_amount||amount) * -1, :journal_id => journal.id, :account => debit_account, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
         }
       else
-        Posting.create(:amount => amount * -1, :journal_id => journal.id, :account => debit_accounts, :currency => journal_params[:currency], :fee_id => rules.first.fee_id, :action => rules.first.action)
+        # I changed this statement to match the one right above here, because we were raising nil errors
+        # if no rules were supplied as a parameter. Since the create statement above used this method, I
+        # assumed it would be safe.
+        Posting.create(:amount => amount * -1, :journal_id => journal.id, :account => debit_accounts, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
       end
       
 
@@ -115,8 +118,8 @@ class Journal
           Posting.create(:amount => (credit_amount||amount), :journal_id => journal.id, :account => credit_account, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
         }
       else
-
-        Posting.create(:amount => amount, :journal_id => journal.id, :account => credit_accounts, :currency => journal_params[:currency], :fee_id => rules.first.fee_id, :action => rules.first.action)
+        # Similar to line #98 I updated this to work the same way as the create statement right above here.
+        Posting.create(:amount => amount, :journal_id => journal.id, :account => credit_accounts, :currency => journal_params[:currency], :fee_id => (rules.first.fee_id unless rules.nil?), :action => (rules.nil? ? 'journal' : rules.first.action))
       end
       
       # Rollback in case of both accounts being the same      
@@ -145,7 +148,31 @@ class Journal
               }
     repository.adapter.query(sql)
   end
-  
+ 
+  def reverse_transaction
+    journal_id = nil
+    Journal.transaction do |t|
+      journal = Journal.create(
+                               :comment => ("REVERSED:"+self.comment),
+                               :date => self.date,
+                               :journal_type_id => self.journal_type_id,
+                               :transaction_id => ""
+                               )
+      status = []
+      self.postings.each{|posting| status << posting.reverse(journal.id)} 
+      if status.include?(false)
+        t.rollback 
+      else
+        journal_id = journal.id 
+      end
+    end
+    
+    if journal_id.nil?
+      return false
+    else
+      return Journal.get(journal_id)
+    end
+  end
 
   def self.xml_tally(hash={}, xml_file = nil)
     xml_file ||= '/tmp/voucher.xml'

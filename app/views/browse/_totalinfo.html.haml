@@ -1,3 +1,140 @@
-%div.totalinfo
-  %h1 today
-  
+- @date = Date.parse(params[:date]) || Date.today
+%div#stats{:style => "position: relative; top: -15px;"}
+  %table#menu
+    %thead
+      %tr.selected
+        %th{:colspan => 4}
+          %h1
+            = link_to image_tag('/images/previous-grey.png'), url(:browse, :date => @date - 1)
+            - if @date == Date.today
+              today
+            - else
+              = @date
+            = link_to image_tag('/images/next-grey.png'), url(:browse, :date => @date + 1)
+            
+          
+    - cbc = BranchCache.all(:date => @date).reduce(:consolidate)
+    %thead
+      %tr
+        %th &nbsp;
+        %th Due
+        %th Paid
+        %th Remaining
+    - total = {:due => 0, :paid => 0}
+    %tr
+      %th
+        Principal
+      %td.number
+        %h1
+          = (cbc.principal_due + cbc.principal_paid).to_currency(:mostfit_default)
+          - total[:due] += cbc.principal_due
+      %td.number
+        %h1.green
+          = cbc.principal_paid.to_currency(:mostfit_default)
+          - total[:paid] += cbc.principal_paid
+      %td.number
+        %h1.red
+          = cbc.principal_due.to_currency(:mostfit_default)
+    %tr
+      %th
+        Interest
+      %td.number
+        %h1
+          = (cbc.interest_due + cbc.interest_paid).to_currency(:mostfit_default)
+        - total[:due] += cbc.interest_due
+      %td.number
+        %h1.green
+          = cbc.interest_paid.to_currency(:mostfit_default)
+        - total[:paid] += cbc.interest_paid
+      %td.number
+        %h1.red
+          = cbc.interest_due.to_currency(:mostfit_default)
+    %tr
+      %th
+        Fees
+      %td.number
+        %h1
+          = (cbc.fees_due_today + cbc.fees_paid_today).to_currency(:mostfit_default)
+          - total[:paid] += cbc.fees_due_today
+      %td.number
+        %h1.green
+          = cbc.fees_paid_today.to_currency(:mostfit_default)
+          - total[:paid] += cbc.fees_paid_today
+      %td.number
+        %h1.red
+          = cbc.fees_due_today.to_currency(:mostfit_default)
+    %tr.total
+      %th
+        Total
+      %td.number
+        %h1
+          = (total[:due] + total[:paid]).to_currency(:mostfit_default)
+      %td.number
+        %h1.green
+          = total[:paid].to_currency(:mostfit_default)
+      %td.number
+        %h1.red
+          = total[:due].to_currency(:mostfit_default)
+    %thead
+      %tr.selected
+        %th{:colspan => 4}
+          %h1 total
+      %tr
+        %th &nbsp;
+        %th Due
+        %th Paid
+        %th Balance
+    %tr
+      %th
+        Principal
+      %td.number
+        %h1
+          = (cbc.total_principal_due + cbc.total_principal_paid).to_currency(:mostfit_default)
+      %td.number
+        %h1
+          = cbc.total_principal_paid.to_currency(:mostfit_default)
+      %td.number
+        %h1
+          = cbc.total_principal_due.to_currency(:mostfit_default)
+    %tr
+      %th
+        Interest
+      %td.number
+        %h1
+          = (cbc.total_interest_due + cbc.total_interest_paid).to_currency(:mostfit_default)
+      %td.number
+        %h1
+          = cbc.total_interest_paid.to_currency(:mostfit_default)
+      %td.number
+        %h1
+          = cbc.total_interest_due.to_currency(:mostfit_default)
+    %tr
+      %th
+        Fees
+      %td.number
+        %h1
+          = (cbc.total_fees_due + cbc.total_fees_paid).to_currency(:mostfit_default)
+      %td.number
+        %h1
+          = cbc.total_fees_paid.to_currency(:mostfit_default)
+      %td.number
+        %h1
+          = cbc.total_fees_due.to_currency(:mostfit_default)
+    %tr.total
+      %td.number
+        %h1
+          == #{Branch.all.count} 
+        branches
+      %td.number
+        %h1
+          == #{Center.all.count} 
+        centers
+      %td.number
+        %h1
+          == #{Client.all.count.to_currency(:mostfit_default)} 
+        clients
+      %td.number
+        %h1
+          == #{Loan.all.count.to_currency(:mostfit_default)} 
+        loans
+

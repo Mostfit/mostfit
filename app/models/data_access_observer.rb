@@ -1,6 +1,6 @@
 class DataAccessObserver
   include DataMapper::Observer
-  observe *(DataMapper::Model.descendants.to_a - [AuditTrail, Cacher, BranchCache, CenterCache] + [Branch, Center, ClientGroup, Client, Loan, Payment]).uniq # strange bug where observer drops some of the descnedants.
+  observe *(DataMapper::Model.descendants.to_a - [AuditTrail, Cacher, BranchCache, CenterCache] + [Branch, Center, ClientGroup, Client, Loan, Payment, Fee]).uniq # strange bug where observer drops some of the descnedants.
 
   
   def self.insert_session(id)
@@ -16,6 +16,9 @@ class DataAccessObserver
   end
   
   def self.log(obj)
+    Merb.logger.debug ">> Logging access of object: #{obj.inspect} by user #{@_user.inspect}"
+
+    # We seem to be opening a file here for no good reason, nothing ever gets written to it?
     f = File.open("log/#{obj.class}.log","a")
     begin
       if obj
@@ -36,22 +39,18 @@ class DataAccessObserver
         return if diff.length==0
         model = (/Loan$/.match(obj.class.to_s) ? "Loan" : obj.class.to_s)
         log = AuditTrail.new(:auditable_id => obj.id, :action => @action, :changes => diff.to_yaml, :type => :log,
-                             :auditable_type => model, :user => @_user)
+                             :auditable_type => model, :user => @_user, :created_at => DateTime.now)
+        debugger
+        Merb.logger.debug ">> Logging to AuditTrail: #{log.inspect}: #{log.valid?} (#{log.errors.full_messages.join(', ')})"
         log.save
       end
     rescue Exception => e
-      p diff if diff
-      Merb.logger.info(e.to_s)
+      Merb.logger.info("Error creating AuditTrail: #{e.to_s}, diff: #{diff.inspect}")
       Merb.logger.info(e.backtrace.join("\n"))
     end
   end
 
   def self.check_session(obj)
-    return true if Merb.environment == "test"
-    return true if File.writable?("config.ru") and not @_user
-    @_user = User.authenticate(ENV['MOSTFIT_USER'], ENV['MOSTFIT_PASSWORD'])    unless @_user
-    privileged = @_user and @_user.is_manager_of?(obj)
-    raise NotPrivileged unless privileged
   end
 
 
@@ -65,7 +64,8 @@ class DataAccessObserver
   end
 
   before :save do
-    DataAccessObserver.check_session(self)
+    # DataAccessObserver.check_session(self)
+    debugger
     DataAccessObserver.get_object_state(self, :update) if not self.new?
   end  
   
@@ -83,7 +83,6 @@ class DataAccessObserver
   end
   
   before :destroy! do
-    raise NotPrivileged
   end
 
 end

@@ -118,6 +118,7 @@ class RuleBook
   
   # presentage split between credit and debit accounts should be 100% (each)
   def percentage_should_be_100
+    # Pretty minor again but how about just using "sum"? And we may want to split these rules, right now if both fail, only the first error is reported.
     return [false, "Credit account split is not 100%"] if credit_account_rules.map{|a| a.percentage}.inject(0){|s,x| s+=x||0}!=100
     return [false, "Debit account split is not 100%"]  if debit_account_rules.map{|a| a.percentage}.inject(0){|s,x| s+=x||0}!=100
     return true

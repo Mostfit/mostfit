@@ -3,20 +3,18 @@ require File.join( File.dirname(__FILE__), '..', "spec_helper" )
 describe Branch do
 
   before(:all) do
+    Center.all.destroy!
     StaffMember.all.destroy!
-    @manager = StaffMember.new(:name => "Mrs. M.A. Nerger")
-    @manager.save
-    @manager.errors
+    @manager = Factory( :staff_member )
     @manager.should be_valid
   end
 
   before(:each) do
     Branch.all.destroy!
-    @branch = Branch.new(:name => "Kerela branch")
-    @branch.manager = @manager
-    @branch.code = "branch"
-    @branch.save
-    @branch.errors.each {|e| p e}
+    @branch = Factory(:branch)
+  end
+
+  it "should be valid with default attributes" do
     @branch.should be_valid
   end
  
@@ -36,27 +34,19 @@ describe Branch do
   end
  
   it "should be able to 'have' centers" do
-    name = 'Munnar hill center'
-    @center = Center.new(:name => name)
-    @center.branch  = @branch
-    @center.manager = @manager
-    @center.code = "Cen"
-    @center.save
-    @center.errors.each {|e| puts e}
-    @center.should be_valid
+    center = Factory(:center, :branch => @branch, :manager => @branch.manager)
+    center.should be_valid
 
-    # @branch.centers << @center
     @branch.should be_valid
-    @branch.centers.first.name.should eql(name)
+    @branch.centers.count.should eql(1)
+    @branch.centers.first.name.should eql(center.name)
 
-    kochin = Center.new(:name => 'Kochin harbour center', :code => "koch")
-    kochin.branch  = @branch
-    kochin.manager = @manager
-    kochin.should be_valid
+    second_center = Factory(:center, :branch => @branch, :manager => @branch.manager)
+    second_center.should be_valid
 
-    @branch.centers << kochin
     @branch.should be_valid
-    @branch.centers.size.should eql(2)
+    @branch.centers.count.should eql(2)
+    @branch.centers.last.name.should eql(second_center.name)
   end
 
 end

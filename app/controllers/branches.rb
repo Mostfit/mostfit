@@ -58,7 +58,7 @@ class Branches < Application
     @branch = Branch.get(id)
     raise NotFound unless @branch
     if @branch.update_attributes(branch)
-      redirect(params[:return]||resource(:branches), :message => {:notice => "Branch '#{@branch.name}' (Id:#{@branch.id}) has been edited successfully"})
+      redirect(params[:return]||resource(@branch), :message => {:notice => "Branch '#{@branch.name}' (Id:#{@branch.id}) has been edited successfully"})
     else
       display @branch, :edit  # error messages will show
     end
@@ -82,7 +82,8 @@ class Branches < Application
     if params[:id] 
       branch = Branch.get(params[:id])
       next unless branch
-      return("<option value=''>Select center</option>"+branch.centers(:order => [:name]).map{|cen| "<option value=#{cen.id}>#{cen.name}</option>"}.join)
+      centers = params[:paying] ? Center.paying_today(session.user, Date.parse(params[:date]), params[:id]) : branch.centers(:order => [:name]) 
+      return("<option value=''>Select center</option>"+centers.map{|cen| "<option value=#{cen.id}>#{cen.name}:#{cen.branch.name}</option>"}.join)
     end
   end
 

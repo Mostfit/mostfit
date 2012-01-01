@@ -1,3 +1,4 @@
+# And what the heck is a Grt?
 class Grt
   include DataMapper::Resource
   
