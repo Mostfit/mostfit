@@ -23,8 +23,7 @@
     - if @branch_row
       - debugger
       - $debug = true
-      - @calculated_fields = ::COLS + FLOW_COLS - @branch_row.attributes.keys
-      = partial :cache_row, :cache => @branch_row, :cls => "total", :ignore_total => true, :calc_fields => @calculated_fields
+      = partial :cache_row, :cache => @branch_row, :cls => "total", :ignore_total => true
     %tr.total
       - @keys.each_with_index do |k,i|
         %th{:style => "text-align: right"}
