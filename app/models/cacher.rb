@@ -60,15 +60,6 @@ class Cacher
   property :stale,                           Boolean, :default => false
 
 
-  COLS =   [:scheduled_outstanding_principal, :scheduled_outstanding_total, :actual_outstanding_principal, :actual_outstanding_total, :actual_outstanding_interest,
-            :total_interest_due, :total_interest_paid, :total_principal_due, :total_principal_paid,
-            :principal_in_default, :interest_in_default, :total_fees_due, :total_fees_paid, :total_advance_paid, :advance_principal_paid, :advance_interest_paid,
-           :advance_principal_adjusted, :advance_interest_adjusted, :advance_principal_outstanding, :advance_interest_outstanding, :total_advance_outstanding, :principal_at_risk, :outstanding_count, :outstanding]
-  FLOW_COLS = [:principal_due, :principal_paid, :interest_due, :interest_paid,
-               :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted,
-               :advance_principal_paid, :advance_interest_paid, :advance_principal_paid_today, :advance_interest_paid_today, :fees_due_today, :fees_paid_today,
-               :total_advance_paid_today, :advance_principal_adjusted_today, :advance_interest_adjusted_today, :total_advance_adjusted_today] + STATUSES.map{|s| [s, "#{s}_count".to_sym] unless s == :outstanding}.compact.flatten
-
 
   # some convenience functions
   def total_paid
@@ -151,21 +142,42 @@ class Cacher
     return self if other.nil?
     raise ArgumentError "cannot add cacher to something that is not a cacher" unless other.is_a? Cacher
     raise ArgumentError "cannot add cachers of different classes" unless self.class == other.class
-    attrs = (self.date > other.date ? self : other).attributes.dup
-    me = self.attributes; other = other.attributes;
-    FLOW_COLS.map{|col| attrs[col] = me[col] + other[col]}
+
+    # first copy the attributes of the later one
+    later_cacher = (self.date > other.date ? self : other)
+    attrs = later_cacher.attributes.dup
+    
+    # for the FLOW_COLS, take the sum of the attributes in the two cachers
+    my_attrs = self.attributes; other_attrs = other.attributes;
+    FLOW_COLS.map{|col| attrs[col] = my_attrs[col] + other_attrs[col]}    
+
+    # of course, simply doing the attributes means we have left out the "calculated" fields
+    calc_flow_fields = FLOW_COLS - attrs
+    calc_flow_fields.each{|cff| attrs[cff] = self.send(cff) + other.send(cff)}
+    calc_col_fields = COLS - attrs
+    calc_col_fields.each{|c| attrs[c] = later_cacher.send(c)}
+    
     attrs[:stale] = me[:stale] || other[:stale]
     Cacher.new(attrs)
   end
 
   def + (other)
-    # this adds all attributes and uses the latest date to add two cachers together
+    # this adds all attributes to add two cachers together.
+    # the date of the resultant cacher is the later date of the two
     return self if other.nil?
     raise ArgumentError.new("cannot add cacher to something that is not a cacher") unless other.is_a? Cacher
 #    raise ArgumentError "cannot add cachers of different classes" unless self.class == other.class
     date = (self.date > other.date ? self.date : other.date)
     me = self.attributes; other = other.attributes;
     attrs = me + other; attrs[:date] = date; attrs[:id] = -1; attrs[:model_name] = "Sum";
+
+    # add the calculated fields
+    calc_flow_fields = FLOW_COLS - attrs
+    calc_flow_fields.each{|cff| attrs[cff] = self.send(cff) + other.send(cff)}
+    calc_col_fields = COLS - attrs
+    calc_col_fields.each{|c| attrs[c] = self.send(c) + other.send(c)}
+
+    
     attrs[:model_id] = nil; attrs[:branch_id] = nil; attrs[:center_id] = nil;
     Cacher.new(attrs)
   end
@@ -352,13 +364,13 @@ class CenterCache < Cacher
     debugger
     bs = self.all(selection).aggregate(:date, :center_id).group_by{|x| x[0]}.to_hash.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
     # bs is a hash of {:date => [:center_id,...]}
-    date = selection.delete(:date)
-    selection[:id] = selection.delete(:center_id) if selection[:center_id]
+    # date = selection.delete(:date)
+    # selection[:id] = selection.delete(:center_id) if selection[:center_id]
     # hs = Center.all(selection.merge(:creation_date.lte => date)).aggregate(:id)
     # centers cannot be searched by creation date because loans may be moved into the center
     # which have dates before the creation date
-    hs = LoanHistory.all(selection.merge(:date.gte => date)).aggregate(:center_id)
-    date.map{|d| [d,hs - (bs[d] || [])]}.to_hash
+    hs = LoanHistory.all(selection).aggregate(:center_id)
+    selection.delete(:date).map{|d| [d,hs - (bs[d] || [])]}.to_hash
   end
 
 

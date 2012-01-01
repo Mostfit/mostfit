@@ -10,10 +10,10 @@
       - route_url = route.class == Array ? url(route.last) : route
       %li
         = link_to("[share]", resource(bookmark, :edit), :style => "float: right")
-        - if bookmark.method==:get
+        - if bookmark.type==:get
           = link_to bookmark.name, route_url
         - else
-          %form{:action => route_url, :method => bookmark.method, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
+          %form{:action => route_url, :method => bookmark.type, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
             = transform_raw_post_to_hidden_fields(bookmark.params)
             %a{:href => "#", :onclick => "$(this).parent().submit()"}
               = bookmark.name
@@ -26,10 +26,10 @@
       - route = YAML.load(bookmark.route)          
       - route_url = route.class == Array ? url(route.last) : route
       %li
-        - if bookmark.method==:get
+        - if bookmark.type==:get
           = link_to bookmark.name, route_url
         - else
-          %form{:action => route_url, :method => bookmark.method, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
+          %form{:action => route_url, :method => bookmark.type, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
             = transform_raw_post_to_hidden_fields(bookmark.params)
             %a{:href => "#", :onclick => "$(this).parent().submit()"}
               = bookmark.name

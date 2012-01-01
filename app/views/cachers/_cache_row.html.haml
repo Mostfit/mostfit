@@ -2,7 +2,12 @@
 - date = nil
 %tr{:class => cls}
   - @keys.each do |at|
-    - val = cache.send(at) rescue 0
+    - if (ignore_total rescue false) and calc_fields.include?(at.to_sym) # is a total level row
+      - debugger if $debug == true
+      - # for calculated fields, we have to substitute this dodgy figure with the right one
+      - val = @calculated_total_row[at]
+    - else
+      - val = cache.send(at) rescue 0
     %td{:style => "text-align: right", :class => "#{at} text"}
       - if at == :date
         = link_to val.strftime("%Y/%m/%d"), resource(:cachers, request.send(:query_params).merge(:date => val))
