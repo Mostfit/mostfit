@@ -162,14 +162,16 @@ class Cacher
     my_attrs = self.attributes; other_attrs = other.attributes;
     FLOW_COLS.map{|col| attrs[col] = my_attrs[col] + other_attrs[col]}    
 
+    me = self.attributes; other = other.attributes;
+
     # of course, simply doing the attributes means we have left out the "calculated" fields
-    calc_flow_fields = FLOW_COLS - attrs
-    calc_flow_fields.each{|cff| attrs[cff] = self.send(cff) + other.send(cff)}
-    calc_col_fields = COLS - attrs
-    calc_col_fields.each{|c| attrs[c] = later_cacher.send(c)}
-    
+    # calc_flow_fields = FLOW_COLS - attrs.keys
+    #calc_flow_fields.each{|cff| attrs[cff] = self.send(cff) + other.send(cff)}
+    #calc_col_fields = COLS - attrs.keys
+    #calc_col_fields.each{|c| attrs[c] = later_cacher.send(c)}
+    debugger
     attrs[:stale] = me[:stale] || other[:stale]
-    Cacher.new(attrs)
+    Cacher.new(my_attrs)
   end
 
   def + (other)
@@ -180,13 +182,13 @@ class Cacher
 #    raise ArgumentError "cannot add cachers of different classes" unless self.class == other.class
     date = (self.date > other.date ? self.date : other.date)
     me = self.attributes; other = other.attributes;
-    attrs = me + other; attrs[:date] = date; attrs[:id] = -1; attrs[:model_name] = "Sum";
+    attrs = me + other; attrs[:date] = date; attrs[:model_name] = "Sum";
 
     # add the calculated fields
-    calc_flow_fields = FLOW_COLS - attrs
-    calc_flow_fields.each{|cff| attrs[cff] = self.send(cff) + other.send(cff)}
-    calc_col_fields = COLS - attrs
-    calc_col_fields.each{|c| attrs[c] = self.send(c) + other.send(c)}
+    #calc_flow_fields = FLOW_COLS - attrs.keys
+    #calc_flow_fields.each{|cff| attrs[cff] = self.send(cff) + other.send(cff)}
+    #calc_col_fields = COLS - attrs
+    #calc_col_fields.each{|c| attrs[c] = self.send(c) + other.send(c)}
 
     
     attrs[:model_id] = nil; attrs[:branch_id] = nil; attrs[:center_id] = nil;
