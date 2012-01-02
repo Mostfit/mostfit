@@ -169,7 +169,6 @@ class Cacher
     #calc_flow_fields.each{|cff| attrs[cff] = self.send(cff) + other.send(cff)}
     #calc_col_fields = COLS - attrs.keys
     #calc_col_fields.each{|c| attrs[c] = later_cacher.send(c)}
-    debugger
     attrs[:stale] = me[:stale] || other[:stale]
     Cacher.new(my_attrs)
   end
@@ -213,7 +212,6 @@ class BranchCache < Cacher
     BranchCache.transaction do |t|
       # updates the cache object for a branch
       # first create caches for the centers that do not have them
-      debugger
       t0 = Time.now; t = Time.now;
       branch_ids = Branch.all.aggregate(:id) unless branch_ids
       branch_centers = Branch.all(:id => branch_ids).centers.aggregate(:id)
@@ -240,7 +238,6 @@ class BranchCache < Cacher
           puts "UPDATED #{i}/#{chunks} CACHES in #{(Time.now - _t).round} secs"
         end
       rescue Exception => e
-        debugger
         return false
       end
       puts "UPDATED CENTER CACHES in #{(Time.now - t).round} secs"
@@ -376,7 +373,6 @@ class CenterCache < Cacher
 
   # finds the missing caches given some caches 
   def self.missing(selection)
-    debugger
     bs = self.all(selection).aggregate(:date, :center_id).group_by{|x| x[0]}.to_hash.map{|k,v| [k, v.map{|x| x[1]}]}.to_hash
     # bs is a hash of {:date => [:center_id,...]}
     # date = selection.delete(:date)

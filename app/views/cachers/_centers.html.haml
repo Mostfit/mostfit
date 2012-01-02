@@ -21,7 +21,6 @@
 
   %tfoot
     - if @branch_row
-      - debugger
       - $debug = true
       = partial :cache_row, :cache => @branch_row, :cls => "total", :ignore_total => true
     %tr.total
