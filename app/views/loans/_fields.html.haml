@@ -224,6 +224,31 @@
       %td
         on&nbsp;&nbsp;
         = date_select_for @loan, :under_claim_settlement, :nullable => true
+    - if session.user.role == :admin and (not @loan.new?)
+      %tr
+        %th
+          Written Off:
+        %td
+          on&nbsp;&nbsp;
+          = date_select_for @loan, :written_off_on
+          &nbsp;&nbsp;by&nbsp;&nbsp;
+          = select_staff_member_for @loan, :written_off_by, :id => "written_off_by"
+      %tr
+        %th
+          Suggested Written Off:
+        %td
+          on&nbsp;&nbsp;
+          = date_select_for @loan, :suggested_written_off_on
+          &nbsp;&nbsp;by&nbsp;&nbsp;
+          = select_staff_member_for @loan, :suggested_written_off_by, :id => "suggested_written_off_by"
+      %tr
+        %th
+          Write Off Rejected:
+        %td
+          on&nbsp;&nbsp;
+          = date_select_for @loan, :write_off_rejected_on
+          &nbsp;&nbsp;by&nbsp;&nbsp;
+          = select_staff_member_for @loan, :write_off_rejected_by, :id => "write_off_rejected_by"
   %tr
     %th
       %b Applicable Fees
