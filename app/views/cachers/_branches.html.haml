@@ -22,10 +22,11 @@
             Sum of Cached Values
           - else
             - if @total_keys.include?(k)
-              = @calculated_total_row[k].to_currency
+              - if k.match(/count$/)
+                = @calculated_total_row[k]
+              - else
+                = @calculated_total_row[k].to_currency
             - else
               &nbsp;
       %th
         &nbsp;
-      
-

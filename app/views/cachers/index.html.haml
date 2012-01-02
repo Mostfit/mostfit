@@ -42,21 +42,29 @@
     %tr
       %td
         [
+      &nbsp;
       %td
-        = link_to 'previous day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date - 1, :to_date => @to_date - 1)), :class => "grey_button"
+        = link_to 'previous day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date - 1, :to_date => @to_date - 1)), :class => "grey_button", :style => "margin: 0px; padding-right: 6px; padding-left: 6px;"
+      &nbsp;&nbsp;
       %td
-        = link_to 'next day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date + 1, :to_date => @to_date + 1)), :class => "grey_button"
+        = link_to 'next day', url(:consolidate_cachers, query_params.merge(:from_date => @from_date + 1, :to_date => @to_date + 1)), :class => "grey_button", :style => "margin: 0px; padding-right: 6px; padding-left: 6px;"
+      &nbsp;&nbsp;
       %td
-        = link_to 'last week', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.cwday - 7, :to_date => Date.today - Date.today.cwday)), :class => "grey_button"
+        = link_to 'last week', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.cwday - 7, :to_date => Date.today - Date.today.cwday)), :class => "grey_button", :style => "margin: 0px; padding-right: 6px; padding-left: 6px;"
+      &nbsp;&nbsp;
       %td
-        = link_to 'week to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.cwday, :to_date => Date.today)), :class => "grey_button"
+        = link_to 'week to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.cwday, :to_date => Date.today)), :class => "grey_button", :style => "margin: 0px; padding-right: 6px; padding-left: 6px;"
+      &nbsp;&nbsp;
       %td
-        = link_to 'last month', url(:consolidate_cachers, query_params.merge(:from_date => (Date.today << 1) - Date.today.day + 1, :to_date => Date.today - Date.today.day)), :class => "grey_button"
+        = link_to 'last month', url(:consolidate_cachers, query_params.merge(:from_date => (Date.today << 1) - Date.today.day + 1, :to_date => Date.today - Date.today.day)), :class => "grey_button", :style => "margin: 0px; padding-right: 6px; padding-left: 6px;"
+      &nbsp;&nbsp;
       %td
-        = link_to 'month to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.day + 1, :to_date => Date.today )), :class => "grey_button"
+        = link_to 'month to date', url(:consolidate_cachers, query_params.merge(:from_date => Date.today - Date.today.day + 1, :to_date => Date.today )), :class => "grey_button", :style => "margin: 0px; padding-right: 6px; padding-left: 6px;"
+      &nbsp;
       %td
         ]
       %td
+        &nbsp;&nbsp;
         = link_to 'report formats', url(:report_formats), :class => "report", :target => "_blank"
       %td
         = link_to 'printer friendly', url(:consolidate_cachers, query_params.merge(:layout => :printer)), :class => 'print', :target => "_blank"

@@ -126,8 +126,9 @@
       - keys.each do |k|
         %th{:style => "text-align: right"}
           - if total_keys.include?(k)
-            = total_row[k].to_currency
+            - if k.match(/count$/)
+              = total_row[k]
+            - else
+              = total_row[k].to_currency
           - else
             &nbsp;
-      
-
