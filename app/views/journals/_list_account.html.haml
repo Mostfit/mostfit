@@ -1,6 +1,9 @@
 - postings = Posting.all("account_id" => @account.id)
 - journal_ids = postings.collect {|p| p.journal_id}.uniq
-- if (journal_ids.empty? == false)
+- if journal_ids.empty?
+  %h2
+    No Journals to display.
+- else
   - @journals = Journal.all(:id => journal_ids, :order => [:created_at.desc]).paginate(:page => params[:page], :per_page => 25)
   = paginate @journals
   %table.narrow.form
@@ -46,5 +49,3 @@
             = p.amount.to_account_balance
    
   = paginate @journals
-- else
-  No Journals to show.
