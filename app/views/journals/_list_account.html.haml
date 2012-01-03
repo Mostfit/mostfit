@@ -1,4 +1,6 @@
-- @journals = Journal.all("postings.account_id" => @account.id, :order => [:date.desc]).paginate(:page => params[:page], :per_page => 25)
+- postings = Posting.all("account_id" => @account.id)
+- journal_ids = postings.collect {|p| p.journal_id}.uniq
+- @journals = Journal.all(:id => journal_ids, :order => [:created_at.desc]).paginate(:page => params[:page], :per_page => 25)
 = paginate @journals
 %table.narrow.form
   %tr
