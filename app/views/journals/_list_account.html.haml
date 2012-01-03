@@ -1,48 +1,50 @@
 - postings = Posting.all("account_id" => @account.id)
 - journal_ids = postings.collect {|p| p.journal_id}.uniq
-- @journals = Journal.all(:id => journal_ids, :order => [:created_at.desc]).paginate(:page => params[:page], :per_page => 25)
-= paginate @journals
-%table.narrow.form
-  %tr
-    %th
-      id
-    %th
-      Date
-    %th 
-      Description
-    %th{:colspan => 2} 
-      Account Debit
-    %th{:colspan => 2}
-      Account Credit
-  - counter = 0
-  - @journals.each do |journal|
-    - postings = Posting.all(:journal_id => journal.id).group_by{|x| x.amount>0 ? :credit : :debit}
-    - time_format = Mfi.first.date_format || "%d-%m-%Y"
-    - time_format += " %H:%M"
-    - counter += 1 
-    - set_class = counter % 2 == 1 ? 'odd' : 'even'
-    - rowspan_count = postings.size + 1
-    %tr{:class => set_class}
-      %td{:rowspan => rowspan_count}
-        = journal.id
-      %td{:rowspan => rowspan_count}
-        = journal.date.strftime(time_format)
-      %td{:rowspan => rowspan_count} 
-        = journal.comment
-    - (postings[:debit] || []).each do |p|
+- if (journal_ids.empty? == false)
+  - @journals = Journal.all(:id => journal_ids, :order => [:created_at.desc]).paginate(:page => params[:page], :per_page => 25)
+  = paginate @journals
+  %table.narrow.form
+    %tr
+      %th
+        id
+      %th
+        Date
+      %th 
+        Description
+      %th{:colspan => 2} 
+        Account Debit
+      %th{:colspan => 2}
+        Account Credit
+    - counter = 0
+    - @journals.each do |journal|
+      - postings = Posting.all(:journal_id => journal.id).group_by{|x| x.amount>0 ? :credit : :debit}
+      - time_format = Mfi.first.date_format || "%d-%m-%Y"
+      - time_format += " %H:%M"
+      - counter += 1 
+      - set_class = counter % 2 == 1 ? 'odd' : 'even'
+      - rowspan_count = postings.size + 1
       %tr{:class => set_class}
-        %td 
-          = p.account.name if p.account
-        %td
-          = p.amount.to_account_balance
-        %td{:colspan => 2}
-    - (postings[:credit] || []).each do |p|
-      
-      %tr{:class => set_class}
-        %td{:colspan => 2}
-        %td
-          = p.account.name if p.account
-        %td
-          = p.amount.to_account_balance
+        %td{:rowspan => rowspan_count}
+          = journal.id
+        %td{:rowspan => rowspan_count}
+          = journal.date.strftime(time_format)
+        %td{:rowspan => rowspan_count} 
+          = journal.comment
+      - (postings[:debit] || []).each do |p|
+        %tr{:class => set_class}
+          %td 
+            = p.account.name if p.account
+          %td
+            = p.amount.to_account_balance
+          %td{:colspan => 2}
+      - (postings[:credit] || []).each do |p|
+        %tr{:class => set_class}
+          %td{:colspan => 2}
+          %td
+            = p.account.name if p.account
+          %td
+            = p.amount.to_account_balance
    
-= paginate @journals
+  = paginate @journals
+- else
+  No Journals to show.
