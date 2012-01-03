@@ -1,6 +1,6 @@
 class StaffMemberAttendances < Application
 
-  before :get_context, :exclude => ['redirect_to_show']
+  before :get_context, :exclude => ['redirect_to_show', 'bulk_entry']
   provides :xml #, :yaml, :js
 
   def index
@@ -12,11 +12,11 @@ class StaffMemberAttendances < Application
     end
   end
 
-  # def show(id)
-  #   @staff_member_attendance = StaffMemberAttendance.get(id)
-  #   raise NotFound unless @staff_member_attendance
-  #   display @staff_member_attendance
-  # end
+  def show(id)
+    @staff_member_attendance = StaffMemberAttendance.get(id)
+    raise NotFound unless @staff_member_attendance
+    display @staff_member_attendance
+  end
 
   def new
     only_provides :html
@@ -38,6 +38,29 @@ class StaffMemberAttendances < Application
     else
       redirect(params[:return] || resource(@staff_member_attendance.staff_member),
                :message => {:error => "Attendance could not be recorded because : #{@staff_member_attendance.errors.instance_variable_get("@errors").map{|k, v| v.join(", ")}.join(", ")}"})
+    end
+  end
+
+  def bulk_entry
+    if request.method == :get
+      render  #show branch selector
+    else
+      if params[:sma]    #actual attendance submitted
+        @date = Date.parse(params[:date]) rescue Date.today
+        @failures = []
+        params[:sma].keys.each do |staff_id|
+          attendance = StaffMemberAttendance.first_or_new(:staff_member_id => staff_id, :date => @date)
+          attendance.status = params[:sma][staff_id.to_s].to_sym
+          @failures.push(attendance) unless attendance.save #keep track of the failures
+        end
+        if @failures.empty?
+          (redirect resource(:staff_members), :message => {:success => "All attendance were marked successfully"})
+        else
+          render # errors will be shown
+        end
+      else
+        render   #show actual attendance form
+      end
     end
   end
 

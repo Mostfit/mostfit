@@ -5,8 +5,10 @@ class StaffMemberAttendance
   
   property :id,            Serial
   property :date,          Date, :index => true, :nullable => false
-  property :status,        Enum.send('[]', *ATTENDANCE_STATES), :nullable => false, :index => true
+  property :status,        Enum.send('[]', *ATTENDANCE_STATES), :nullable => false, :index => true, :default => :present
   property :created_at,    DateTime
+
+  property :sma_branch_id, Integer, :index => true
 
   belongs_to :staff_member
 
