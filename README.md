@@ -21,6 +21,7 @@ For more information have a look at the official website, [mostfit.org](http://m
 ## Technical notes
 
 This software is written in the [Ruby](http://ruby-lang.org) programming language (which is available as open source).  We make use of many so-called libraries (all of which are open source), of which the biggest ones are:
+
   * the [Merb](http://merb.org) web framework (currently assimilated into [Rails](http://rubyonrails.org) 3)
   * the [DataMapper](http://datamapper.org) [ORM](http://en.wikipedia.org/wiki/Object-relational_mapping)
   * the [RSpec](http://relishapp.com/rspec) testing toolkit
