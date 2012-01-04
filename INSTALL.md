@@ -15,12 +15,13 @@ I heard that I was doing it wrong, so here my second attempt.  This seems to wor
 
 
     git clone git@git.mostfit.in:mostfit.git
-    git co new-layout
+    # git co new-layout   # in case the branch is other then master
 
     rvm use 1.8.7  # install it if you haven't got it already
-    rvm gemset create mostfit-new-layout
-    rvm 1.8.7@mostfit-new-layout
+    rvm gemset create mostfit
+    rvm 1.8.7@mostfit
     rvm rubygems 1.4.2
+    # got an error but that could be safely ignored in my case
 
     (cd gems/cache; gem install --local * --no-ri --no-rdoc)
     # got errors: pdf-writer wants color, and roo wants spreadsheet, google-spreadsheet-ruby wants hpricot
@@ -40,11 +41,11 @@ Here I use thor, which is not the most ideal method...
 
 
     git clone git@git.mostfit.in:mostfit.git
-    git co new-layout
+    # git co new-layout   # in case the branch is other then master
 
     rvm use 1.8.7  # install it if you haven't got it already
-    rvm gemset create mostfit-new-layout
-    rvm 1.8.7@mostfit-new-layout
+    rvm gemset create mostfit
+    rvm 1.8.7@mostfit
     rvm rubygems 1.4.2
 
     # found this in install instructions
