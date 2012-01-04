@@ -16,8 +16,12 @@ class Cacher
   property :actual_outstanding_interest,     Float, :nullable => false
   property :scheduled_principal_due,         Float, :nullable => false
   property :scheduled_interest_due,          Float, :nullable => false
+
   property :principal_due,                   Float, :nullable => false
   property :interest_due,                    Float, :nullable => false
+  property :principal_due_today,             Float, :nullable => false # this is the principal and interest 
+  property :interest_due_today,              Float, :nullable => false  #that has become payable today
+
   property :principal_paid,                  Float, :nullable => false
   property :interest_paid,                   Float, :nullable => false
   property :total_principal_due,             Float, :nullable => false
@@ -65,9 +69,10 @@ class Cacher
           :advance_principal_adjusted, :advance_interest_adjusted, :advance_principal_outstanding, :advance_interest_outstanding, :total_advance_outstanding, :principal_at_risk, 
           :outstanding_count, :outstanding]
   FLOW_COLS = [:principal_due, :principal_paid, :interest_due, :interest_paid,
-             :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted,
-             :advance_principal_paid, :advance_interest_paid, :advance_principal_paid_today, :advance_interest_paid_today, :fees_due_today, :fees_paid_today,
-             :total_advance_paid_today, :advance_principal_adjusted_today, :advance_interest_adjusted_today, :total_advance_adjusted_today] + STATUSES.map{|s| [s, "#{s}_count".to_sym] unless s == :outstanding}.compact.flatten
+               :scheduled_principal_due, :scheduled_interest_due, :advance_principal_adjusted, :advance_interest_adjusted,
+               :advance_principal_paid, :advance_interest_paid, :advance_principal_paid_today, :advance_interest_paid_today, :fees_due_today, :fees_paid_today,
+               :principal_due_today, :interest_due_today, :total_advance_paid_today, :advance_principal_adjusted_today, :advance_interest_adjusted_today, 
+               :total_advance_adjusted_today] + STATUSES.map{|s| [s, "#{s}_count".to_sym] unless s == :outstanding}.compact.flatten
   CALCULATED_COLS = [:principal_defaulted_today, :interest_defaulted_today, :total_defaulted_today]
   
 
