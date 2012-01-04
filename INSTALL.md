@@ -19,7 +19,7 @@ I heard that I was doing it wrong, so here my second attempt.  This seems to wor
 
     rvm use 1.8.7  # install it if you haven't got it already
     rvm gemset create mostfit
-    rvm 1.8.7@mostfit
+    rvm use 1.8.7@mostfit
     rvm rubygems 1.4.2
     # got an error but that could be safely ignored in my case
 
@@ -45,7 +45,7 @@ Here I use thor, which is not the most ideal method...
 
     rvm use 1.8.7  # install it if you haven't got it already
     rvm gemset create mostfit
-    rvm 1.8.7@mostfit
+    rvm use 1.8.7@mostfit
     rvm rubygems 1.4.2
 
     # found this in install instructions
