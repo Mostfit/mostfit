@@ -1,17 +1,20 @@
 Mostfit: an MIS for MFIs
 ========================
 
+
 This software is build using the [Ruby](http://ruby-lang.org) programming language, on top of the Merb web framework and the DataMapper ORM. Mostfit takes a minimal approach, it basically creates the application in the most generic form, yet fully usable for the needs of our clients and beyond. You can [see our demo](http://mostfit.intellecap.in).
 
 
 ## Philosophy
 
-A dead-simple, easy-to-use and easy-to-adapt, webbased MIS for MFIs with a decent feature set.
+A dead-simple, easy-to-use and easy-to-adapt, web-based MIS for MFIs with a decent feature set.
 
 Many software has been written to accomplish this. Not much was written well. Most of it is closed source, so suffers from limited exposure and often stalled development. We try to do is right by creating just enough.
 
 
 ## Installation
+
+See the `INSTALL.md` file first.
 
 Edit `config/dependencies.rb` and make sure you have the correct version of the gems required. Edit `config/example.database.yml`, update the db name, username and password to reflect your database settings and save it as `config/database.yml`. Then run:
 
@@ -40,7 +43,8 @@ Which brings us to our goals of sharing costs, being flexible and delivering the
 
 ## Copyright and License
 
-Copyright (c) 2009-2011 Intellecap.
+Copyright (c) 2009-2012 Intellecap/ISTPL.
 
 Mostfit is available under the GNU AFFERO GENERAL PUBLIC LICENSE version 3 or (at your option) any later version. You should have received a file named COPYING along with Mostfit. COPYING is the complete text of the license. If you did not receive this file you can find it on [the GNU website](http://www.gnu.org/licenses).
+
 
