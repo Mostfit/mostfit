@@ -1,4 +1,4 @@
-%table
+%table.form
   %tr
     %td
       Fee Name
@@ -6,14 +6,19 @@
       = text_field :name
   %tr
     %td
-      Fees percentage
+      Payable on
     %td
-      = text_field :percentage
+      = select :payable_on, :collection => Fee.payable_dates.map{|f| [f,f.humanize]}    
   %tr
     %td
       Fee amount
     %td
       = text_field :amount
+  %tr
+    %td
+      Fees percentage
+    %td
+      = text_field :percentage
   %tr
     %td
       Minimum payable
@@ -33,9 +38,5 @@
     %td
       Rounding Style
     %td
-      = select :rounding_style, :collection => ["round", "ceil", "floor"], :prompt => 'Please choose a rounding style', :selected => @fee.rounding_style.to_s
-  %tr
-    %td
-      Payable on
-    %td
-      = select :payable_on, :collection => Fee.payable_dates.map{|f| [f,f.humanize]}
+      = select :rounding_style, :collection => ["round", "ceil", "floor"], :selected => @fee.rounding_style.to_s
+

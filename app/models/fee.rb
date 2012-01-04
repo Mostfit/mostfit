@@ -8,7 +8,6 @@ class Fee
   # on which to call the function.
   # We have this difference to handle cases where the fee is applicable on an Insurance Policy but is payable on the loan application date
 
-
   PAYABLE = [
              [:loan_applied_on, Loan, :applied_on], 
              [:loan_approved_on, Loan, :approved_on],
@@ -52,13 +51,22 @@ class Fee
   has n, :insurance_policies, :through => :applicable_insurance_policies
   has n, :audit_trails, :auditable_type => "Fee", :child_key => ["auditable_id"]
 
-  
+  validates_is_unique   :name  
   validates_with_method :amount_is_okay
   validates_with_method :min_lte_max
+  validates_with_method :is_payable_on_compatible_with_fee_metric?
   
+  # This function checks if the fee metric is compatible with the the type payable on
+  # e.g. for fees that are payable on client type we cannot have a percentage
+  def is_payable_on_compatible_with_fee_metric?
+    return [false, "The fee metric is not compatible with the fee payable on. e.g. you cannot have a fee in percent for payable on 'client date joined' "] if (self.payable_on.to_s.match(/^client/) and percentage != nil)
+    return true
+  end
+
   def amount_is_okay
-    return true if (amount or percentage)
-    return [false, "Either an amount or a percentage must be specified"]
+    return [false, "Either an amount or a percentage must be specified"] if (amount == nil and percentage == nil)
+    return [false, "Both amount and percentage cannot be specified"] if (amount != nil and percentage != nil)
+    return true
   end
 
   def min_lte_max
@@ -245,4 +253,5 @@ class Fee
                              GROUP BY p.fee_id
                            }).map{|x| [x.name, x.amount.to_i]}.to_hash
   end
+
 end
