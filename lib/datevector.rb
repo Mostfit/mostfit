@@ -71,7 +71,7 @@ class DateVector
         # handle dates i.e. every => [15,22], what => :day, :of_every => 1, :period => :month means the 15th and 22nd of every month
         while (to.class == Date ? d<= to : i <= to)
           [@every].flatten.each do |e|
-            d = d.first_day_of_month + e - 1
+            d = d.first_day_of_month + e.to_i - 1
             rv << d if d >= from and (to.class == Date ? d  <= to : i <= to)
           end
           d = (d.last_day_of_month + 1) >> (@of_every - 1)
