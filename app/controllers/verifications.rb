@@ -24,7 +24,7 @@ class Verifications < Application
     else
       if @centers.length>0
         @clients_count  = clients.count
-        @loans_count    = loans.count
+        @loans_count    = @loans_count ? loans.count : 0
         @payments_count = payments.count
         @portfolios_count = portfolios.count
         @journals_count = journals.count

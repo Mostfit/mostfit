@@ -1,21 +1,25 @@
 %h1
   Pending approval
--if params[:model]
+- if params[:model]
   %form{:action => "/verifications", :enctype => "multipart/form-data",  :method => "GET"}
     %input{:type => "hidden", :name => "model", :value => params[:model]}
     %b
-      Date range:     
-    =date_select("from_date", @from_date.strftime(Mfi.first.date_format))
-    ==-- 
-    =date_select("to_date", @to_date.strftime(Mfi.first.date_format))
-    %input{:type => "submit", :value => "Filter"}
-  =partial "verifications/#{params[:model]}"
--else
+      Date range:
+    &nbsp;
+    = date_select("from_date", @from_date.strftime(Mfi.first.date_format))
+    &nbsp;
+    ==--
+    &nbsp;
+    = date_select("to_date", @to_date.strftime(Mfi.first.date_format))
+    &nbsp;
+    %input{:type => "submit", :value => "Filter", :class => "grey_button"}
+  = partial "verifications/#{params[:model]}"
+- else
   %br
   %ul
-    -[:clients, :loans, :payments, :portfolios, :journals].each do |model|
+    - [:clients, :loans, :payments, :portfolios, :journals].each do |model|
       %li
-        =link_to("List unverified #{model}", resource(:verifications, {:model => model}))
+        = link_to("List unverified #{model}", resource(:verifications, {:model => model}))
         (
-        =instance_variable_get("@#{model}_count")
+        = instance_variable_get("@#{model}_count")
         )
