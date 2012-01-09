@@ -30,8 +30,10 @@
     %td
       %b Meeting Dates
     %td
-      - @center.center_meeting_days.each do |cmd|
-        == from #{cmd.valid_from} to #{cmd.valid_upto} this center meets every <b>#{cmd.meeting_day_string}</b>
+      %ul
+        - @center.center_meeting_days.each do |cmd|
+          %li
+            == from #{cmd.valid_from} to #{cmd.valid_upto} this center meets every <b>#{cmd.meeting_day_string}</b>
       %br
       - unless @center.new?
         = link_to 'Manage meeting schedule', resource(:center_meeting_days, :center_id => @center.id)
@@ -58,14 +60,6 @@
             = text_field :name => "center[center_meeting_day[of_every]]", :style => "width:5em"
             &nbsp;
             = select :name => "center[center_meeting_day[period]]", :collection => ["week", "month"]
-          %br
-            valid from:
-            &nbsp;&nbsp;
-            = date_select "center[center_meeting_day[valid_from]]", nil, :id => "center_center_meeting_day_valid_from"
-            &nbsp;&nbsp;
-            to
-            &nbsp;&nbsp;
-            = date_select "center[center_meeting_day[valid_upto]]", nil, :id => "center_center_meeting_day_valid_to"
   %tr
     %td
       %b Meeting Time

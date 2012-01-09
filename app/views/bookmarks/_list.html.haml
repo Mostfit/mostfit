@@ -13,7 +13,7 @@
         - if bookmark.type==:get
           = link_to bookmark.name, route_url
         - else
-          %form{:action => route_url, :type => bookmark.type, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
+          %form{:action => route_url, :method => bookmark.type, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
             = transform_raw_post_to_hidden_fields(bookmark.params)
             %a{:href => "#", :onclick => "$(this).parent().submit()"}
               = bookmark.name
@@ -29,7 +29,7 @@
         - if bookmark.type==:get
           = link_to bookmark.name, route_url
         - else
-          %form{:action => route_url, :type => bookmark.type, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
+          %form{:action => route_url, :method => bookmark.type, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
             = transform_raw_post_to_hidden_fields(bookmark.params)
             %a{:href => "#", :onclick => "$(this).parent().submit()"}
               = bookmark.name

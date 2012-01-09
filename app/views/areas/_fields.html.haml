@@ -5,6 +5,10 @@
       %td
         = text_field :name
   %tr
+    - if Region.count==0 and session.user.role==:admin
+      %div.error
+        You do not have any region data yet. Create them
+        = link_to("here", resource(:regions, :new), :target => "_blank")
     %th
       Region
     %td

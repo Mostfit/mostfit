@@ -137,7 +137,7 @@
           - if @report.respond_to?(:period)
             %td
               Period:
-              = select(:period, :collection => (AccountingPeriod.get_all_previous_periods ? AccountingPeriod.get_all_previous_periods.map {|p| [p.id, p.name]} : [[nil, "No periods defined"]]), :selected => period)
+              = select(:period, :collection => AccountingPeriod.all.map {|p| [p.id, p.name]}, :selected => period)
           - if @report.respond_to?(:chosen_year)
             %td
               Year:

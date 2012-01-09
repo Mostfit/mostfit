@@ -25,7 +25,7 @@
       %select{:id => "client_group_id", :name => "client[client_group_id]"}
         %option{:value => ""}
           Select the group for this person
-        -if @center
+        - if @center
           = @center.client_groups.collect{|g| "<option #{'selected=\"selected\"' if g.id==@client.client_group_id} value='#{g.id}'>#{g.name}</option>"}.join
       %a{:href => "#", :id => "new_client_group_link", :style => "#{@center ? 'display:block' : 'display: none;'}"}
         Add new group
@@ -44,10 +44,19 @@
           = f
           = check_box :name => "tags[#{f}]", :checked => @client.tags && @client.tags.include?(f)
   %tr
+    - if ClientType.count==0 and session.user.role==:admin
+      %div.error
+        You have not set any Client Types. Create them 
+        = link_to("here", resource(:client_types, :new), :target => "_blank")
     %th
       Client Type
     %td
       = select :client_type_id, :collection => ClientType.all, :value_method => :id, :text_method => :type
+  %tr
+    %th
+      Gender
+    %td
+      = select :gender, :collection => [[:female, "Female"], [:male, "Male"]], :prompt => "Please choose a gender"
   %tr
     %th
       Reference:

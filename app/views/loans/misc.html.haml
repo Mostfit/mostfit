@@ -15,11 +15,14 @@
         = submit 'Reallocate loans with style', :class => "grey_button", :style => "margin: 4px"
         = repayment_style_select
 
-- if @loan.status == :outstanding    
-  .box
-    %fieldset
-      %legend Pay
+.box
+  %fieldset
+    - if @loan.status == :outstanding    
+      %legend Preclose
       = link_to("Prepay This Loan",  url(:prepay_loan, @loan.id), :class => "_remote_ grey_button")
+    - if @loan.status == :preclosed
+      %legend Unpreclose(!)
+      = link_to 'Unpreclose', url(:controller => :loans, :action => :unpreclose, :id => @loan.id), :class => "grey_button"
 
 - if [:admin, :mis_manager].include?(session.user.role)
   .box

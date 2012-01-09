@@ -142,7 +142,8 @@ class Accounts < Application
     @account = Account.get(params[:account_id])
     @from_date = (@accounting_period ? @accounting_period.begin_date : @account.account_earliest_date - 1)
     @to_date =  (@accounting_period ? @accounting_period.end_date : Date.today)
-    @posting_hash = Posting.all(:account => @account, "journal.date.lte" => @to_date, "journal.date.gte" => @from_date)
+    journal_ids = Journal.all(:date.gte => @from_date, :date.lte => @to_date).map{|x| x.id}
+    @posting_hash = Posting.all(:account => @account, :journal_id => journal_ids)
     partial :book, :layout => layout?
   end
 

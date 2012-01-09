@@ -11,7 +11,7 @@
   - @calculated_total_row = {}
   
   - @cachers.sort_by{|c| [c.date,@branch_names[c.branch_id]]}.each do |c|
-    - next if (c.actual_outstanding_principal == 0) and (c.total_paid == 0) and c.total_due == 0
+    - next if (c.actual_outstanding_principal == 0) and (c.total_paid == 0) and c.total_due == 0 and not params[:show_all]
     - cls = (c.stale ? "stale" : "") + " " + cycle('odd','even')
     = partial :cache_row, :cache => c, :cls => cls
   %tfoot
@@ -22,10 +22,11 @@
             Sum of Cached Values
           - else
             - if @total_keys.include?(k)
-              = @calculated_total_row[k].to_currency
+              - if k.match(/count$/)
+                = @calculated_total_row[k]
+              - else
+                = @calculated_total_row[k].to_currency
             - else
               &nbsp;
       %th
         &nbsp;
-      
-

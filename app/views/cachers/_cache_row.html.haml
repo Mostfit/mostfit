@@ -1,8 +1,13 @@
 - cid = bid = 0
 - date = nil
 %tr{:class => cls}
-  - @keys.each_with_index do |at,i|
-    - val = cache.send(at) rescue 0
+  - @keys.each do |at|
+    - if (ignore_total rescue false) and Cacher::CALCULATED_COLS.include?(at.to_sym) # is a total level row
+      - debugger if $debug == true
+      - # for calculated fields, we have to substitute this dodgy figure with the right one
+      - val = @calculated_total_row[at]
+    - else
+      - val = cache.send(at) rescue 0
     %td{:style => "text-align: right", :class => "#{at} text"}
       - if at == :model_name
         - @thing = @model.get(cache.model_id) rescue nil
@@ -37,4 +42,3 @@
     %td
       = (link_to 'split', url(:split_cachers, request.send(:query_params).merge(:branch_id => bid))) if @level == :branches 
       = (link_to 'split', url(:split_cachers, request.send(:query_params).merge(:center_id => cid))) if @level == :centers
-          

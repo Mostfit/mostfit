@@ -78,6 +78,17 @@ namespace :mostfit do
                              modify preclosed                       decimal(15,2) not null default 0,
                              modify preclosed_count                 integer not null default 0;
          })
+
+      # drop and recreate the cachers table if required
+      unless (repository.adapter.query("select id from loan_history limit 1") rescue false)
+        dates = Cacher.all.aggregate(:date)
+        repository.adapter.execute("drop table cachers");
+        Rake::Task['db:autoupgrade'].invoke
+        dates.each do |date|
+          BranchCache.update(date)
+        end
+      end
+      
       repository.adapter.execute(%Q{
          alter table cachers modify actual_outstanding_total decimal(15,2) not null, 
                              modify scheduled_outstanding_total decimal(15,2) not null,

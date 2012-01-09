@@ -1,7 +1,7 @@
 DEFAULT_JOURNAL_TYPES = ['Payment','Receipt','Journal']
 
 ASSETS = 'Assets'
-CASH = 'Cash'; BANK_DEPOSITS = 'Bank Deposits'; SECURITIES = 'Securities'
+CASH = 'Cash'; BANK_DEPOSITS = 'Bank Accounts'; SECURITIES = 'Securities'
 LAND = 'Land'; MACHINERY = 'Machinery'
 LOANS_MADE = 'Loans made'; BORROWINGS = 'Borrowings'; TAXES_PAYABLE = "Tax payable"; OTHER_LIABILITIES = "Other liabilities"
 CURRENT_ASSET_HEADS = [CASH, BANK_DEPOSITS, SECURITIES, LOANS_MADE]
@@ -124,5 +124,4 @@ AUDITABLES = ["Branch","Center","Client","ClientGroup","Loan","Payment","StaffMe
 # Targets
 TargetOf    = [:center_creation, :group_creation, :client_registration, :loan_disbursement_by_amount, :loan_disbursements_by_number]
 TargetType  = [:relative, :absolute]
-
 

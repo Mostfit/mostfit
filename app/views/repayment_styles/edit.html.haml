@@ -4,8 +4,12 @@
 = error_messages_for @repayment_style
 
 = form_for(@repayment_style, :action => url(:repayment_style, @repayment_style)) do
-  = partial :fields, :button_text => "Update"
-
-= link_to 'Show', url(:repayment_style, @repayment_style)
-|
-= link_to 'Back', url(:repayment_styles)
+  = partial :fields, :rs => @repayment_style
+  = submit "Update"
+  &nbsp;&nbsp;
+  %b
+    Or
+  &nbsp;&nbsp;
+  = link_to 'Show', url(:repayment_style, @repayment_style), :class => "grey_button"
+  &nbsp;&nbsp;
+  = link_to 'Back', url(:repayment_styles), :class => "grey_button"

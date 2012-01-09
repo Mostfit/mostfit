@@ -43,7 +43,7 @@ class Center
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
   validates_with_method :meeting_time_minutes, :method => :minutes_valid?
 
-  validates_with_method :creation_date_ok
+  # validates_with_method :creation_date_ok
 
   def self.from_csv(row, headers)
     hour, minute = row[headers[:center_meeting_time_in_24h_format]].split(":")
@@ -86,6 +86,7 @@ class Center
     # then cycle through this hash and get the appropriate dates
     dates = []
     dvs.keys.sort.each_with_index{|date,i|
+      debugger
       d1 = [date,from].max
       d1 -= 1 if [dvs[date].what].flatten.include?(d1.weekday)
       d2 = dvs.keys.sort[i+1] || (to.class == Date ? to - 1: (to - dates.count - 1))

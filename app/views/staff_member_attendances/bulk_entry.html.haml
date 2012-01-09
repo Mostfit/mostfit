@@ -1,0 +1,51 @@
+- if request.method == :get
+  %h2
+    Please choose a branch and a date to mark attendance
+    = form_for(@staff_member_attendance, :controller => :staff_member_attendances, :action => "bulk_entry") do
+      = select :sma_branch_id, :collection => Branch.all.map{ |x| [x.id, x.name]}, :prompt => "Select Branch", :class => 'chosen'
+      &nbsp;&nbsp;
+      = date_select_for @staff_member_attendance, :date
+      &nbsp;&nbsp;
+      = submit 'Next...'
+- else
+  %h2
+    Bulk Entry of Attendance of Staff Member
+    - branch = Branch.get(params[:staff_member_attendance][:sma_branch_id])
+    = "for Branch: #{branch.name}"
+    = " and date: #{params[:staff_member_attendance][:date]}" 
+
+  - if @failures and not @failures.empty?
+    .error
+      %ul
+        - @failures.map do |f|
+          %li
+            = f.errors.join(",")
+    
+  = form :action => url(:controller => :staff_member_attendances, :action => :bulk_entry) do
+    %table.tall.shaded
+      %tr
+        %th
+          Staff Member
+        %th
+          Date
+          = hidden_field(:date, :value => params[:staff_member_attendance][:date])
+        %th
+          Attendance Status
+      - if @failures
+        - staff_members = StaffMember.all(:id => @failures.map{|a| a.staff_member_id})
+      - else
+        - staff_members = (branch.centers.managers(:order => [:name], :active => true)) + [branch.manager]
+      - staff_members.each do |staff|
+        %tr
+          %td
+            = link_to staff.name, resource(staff), :target => "_blank"
+          %td
+            = params[:staff_member_attendance][:date]
+          %td
+            = select :name => "sma[#{staff.id}]", :collection => [[:present, "Present"], [:late, "Late"], [:leave, "Leave"], [:absent, "Absent"]]
+    = submit "Mark attendance"
+    &nbsp;&nbsp;
+    %b
+      Or
+    &nbsp;&nbsp;
+    = link_to 'Cancel', resource(:staff_members), :class => "grey_button"

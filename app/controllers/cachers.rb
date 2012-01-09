@@ -174,7 +174,6 @@ class Cachers < Application
       else
       end
     end
-
   end
 
 end
