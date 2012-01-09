@@ -13,6 +13,7 @@
       %th 
   %tbody
   - for user in @users
+    - next if user.role == :maintainer
     %tr{ :class => cycle('odd','') }
       %td &nbsp;
       %td
