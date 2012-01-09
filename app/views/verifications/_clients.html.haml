@@ -1,6 +1,6 @@
 %h2
   Clients
-=form_for(@clients, :action => url("verifications/update/clients")) do
+= form_for(@clients, :action => url("verifications/update/clients")) do
   - if @clients and @clients.length>0
     %table{:width => "100%"}
       %tr{:style => "text-align: left;"}
@@ -26,29 +26,29 @@
           ==/
           %a{:href => "#", :onclick => "$('input.client_approval_box').attr('checked',false);"}
             Check none
-      -@clients.each do |client|
+      - @clients.each do |client|
         %tr
           %td
-            =link_to(client.name, resource(client), :target => "BLANK")
+            = link_to(client.name, resource(client), :target => "BLANK")
           %td
-            =client.reference
+            = client.reference
           %td
-            =client.date_joined
+            = client.date_joined
           %td
-            =client.center ? client.center.branch.name : "-"
+            = client.center ? client.center.branch.name : "-"
           %td
-            =client.center ? client.center.name : "-"
+            = client.center ? client.center.name : "-"
           %td
-            =client.client_group ? client.client_group.name : "-"
+            = client.client_group ? client.client_group.name : "-"
           %td
-            =client.created_by_user_id>0 ? client.created_by.login : "-"
+            = client.created_by_user_id>0 ? client.created_by.login : "-"
           %td
-            =client.created_at ? client.created_at.strftime(Mfi.first.date_format || "%d-%m-%Y") : ""
+            = client.created_at ? client.created_at.strftime(Mfi.first.date_format || "%d-%m-%Y") : ""
           %td
-            =check_box(:name => "clients[#{client.id}][]", :class => "client_approval_box", :value => 1)
+            = check_box(:name => "clients[#{client.id}][]", :class => "client_approval_box", :value => 1)
       %tr
         %td{:colspan => 8}
         %td
-          =submit("Approve")
-  -else
+          = submit("Approve")
+  - else
     %i==No pending verifications
