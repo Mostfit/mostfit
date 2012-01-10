@@ -269,29 +269,6 @@ function create_remotes(){
 			     return false;
 			 });
 
-    $("a._customreports_").click(function(){
-				   href=$(this).attr("href");
-				   method="GET";
-				   if($(this).hasClass("self")){
-				     href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
-				     method="POST"
-				   }
-				   a=$(this);
-				   $.ajax({
-				     type: "POST",
-				     url: href,
-				     success: function(data){
-				       $(a).after(data);
-				       //$(a).remove();
-				       attachCustomTableEvents();
-				     },
-				     error: function(xhr, text, errorThrown){
-				       txt = "<div class='error'>"+xhr.responseText+"</div>"
-				       $(a).after(txt);
-				     }
-				   });
-				   return false;
-				 });
     $('.confirm_click').each(function(idx, link){
 				 $(link).unbind();
 				 $(link).click(function(event) {
@@ -1009,7 +986,7 @@ $(document).ready(function(){
 									 success: function(data){$("#account_parent_id").html(data);}
 								 });
 			  });
-		      attachReportingFormEvents("formdiv_1");
+		    $('.formdiv').each(function(){ attachReportingFormEvents($(this).attr("id"));});
 		      attachRulesFormEvents("condition", 0);
 		      attachRulesFormEvents("condition", 1);
 		      attachRulesFormEvents("precondition", 0);
