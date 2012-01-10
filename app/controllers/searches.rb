@@ -73,6 +73,7 @@ class Searches < Application
   end  
 
   def reporting
+    debugger
     @counter = params[:counter]||1
     if request.xhr?
       @model = Kernel.const_get(params[:model].camelcase)
@@ -82,9 +83,9 @@ class Searches < Application
         @properties = get_properties_for(@model)
       end
       partial :form
-    elsif request.method==:get
+    elsif request.method==:get and (not params[:_method] == "post")
       render :advanced, :layout => layout?
-    elsif request.method==:post
+    elsif request.method==:post or params[:_method] == "post"
       @search  = Search.new(params)
       @bookmark= Bookmark.new
       @objects = @search.process
@@ -129,11 +130,16 @@ class Searches < Application
   
   private
   def get_values(model, property, counter, value = nil)
+    operator = params[:operator].is_a?(Hash) ? params[:operator][params[:counter]] : params[:operator]
     value = value.to_s if value
     if property.type==Date or property.type==DateTime
       return date_select("value[#{counter}][#{property.name}]", value||Date.today, :id => "value_#{counter}")
     elsif [DataMapper::Types::Serial, Integer, Float, String, DataMapper::Types::Text].include?(property.type)
-      return text_field(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", :value => value)
+      if operator == "in"
+        return "<select multiple='multiple' class='chosen' id='value_#{counter}' name='value[#{counter}][name][]'>" + model.all.aggregate(property).map{|p| "<option value='#{p}'>#{p}</option>"}.join + "</select>"
+      else
+        return text_field(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", :value => value)
+      end
     elsif property.class==DataMapper::Associations::ManyToOne::Relationship
       return select(:id => "value_#{counter}", :name => "value[#{counter}][#{property.name}]", :collection => property.parent_model.all, 
                     :value_method => :id, :text_method => :name,:prompt => "Choose #{property.name}", :selected => value)

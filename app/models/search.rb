@@ -13,9 +13,9 @@ class Search
       return [["eql", "equal"], ["not", "not equal"]]
     elsif [DataMapper::Types::Serial, Integer, Float, DateTime, Date, Time].include?(property.type)
       return [["lt", "less than"], ["lte", "less than equal"], ["eql", "equal to"], ["gt", "greater than"], ["gte", "greater than equal"], ["not", "not equal to"]]
-    elsif [DataMapper::Types::Text, String].include?(property.class)
-      return [["eql", "equal"], ["like", "like"]]
-    elsif [DataMapper::Types::Boolean].include?(property.class)
+    elsif [DataMapper::Types::Text, String].include?(property.type)
+      return [["eql", "equal"], ["like", "like"], ["in","in"]]
+    elsif [DataMapper::Types::Boolean].include?(property.type)
       return [["true", "true"], ["false", "false"]]
     elsif property.type.class==Class
       return [["eql", "equal"], ["not", "not equal"]]

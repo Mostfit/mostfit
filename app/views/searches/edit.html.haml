@@ -13,7 +13,7 @@
       %th
         %b more
     - @hash[:model].sort_by{|c, m| c}.each do |counter, model_str|
-      %tr{:id => "formdiv_#{counter}"}
+      %tr.formdiv{:id => "formdiv_#{counter}"}
         %td
           - model = Kernel.const_get(model_str.camelcase)
           - if model and model.class==Class

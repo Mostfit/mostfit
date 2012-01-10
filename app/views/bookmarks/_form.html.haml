@@ -9,8 +9,8 @@
       Save as
       = text_field :name, :value => name
       = hidden_field :title, :value => page_title
-      = hidden_field :method, :value => request.method
+      = hidden_field :method_name, :value => request.method
       = hidden_field :route, :value => @route.to_yaml
       = hidden_field :type, :value => bookmark_type
-      = hidden_field :params, :value => request.raw_post
+      = hidden_field :params, :value => request.query_string
       = submit "Save"

@@ -115,8 +115,8 @@ FULL_DATE_PATTERN = "%A, %B %d, %Y"
 FORMAT_REG_EXP = /[- . \/]/
 
 # Bookmark Constants
-Types   = [:custom_reports, :system]
-Methods = [:get, :post, :put, :delete]
+BookmarkTypes   = [:custom_reports, :system]
+MethodNames = [:get, :post, :put, :delete]
 
 # Audit
 AUDITABLES = ["Branch","Center","Client","ClientGroup","Loan","Payment","StaffMember"]
