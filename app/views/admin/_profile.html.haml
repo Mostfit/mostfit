@@ -1,0 +1,51 @@
+%table.tall.shaded
+  %tr
+    %td
+      Organisation name
+    %td
+      = text_field :name
+  %tr
+    %td
+      Choose a font colour
+    %td
+      = text_field :color
+  %tr
+    %td
+      About logo
+    %td
+      %ul
+      %li==Please use images with a file extension that is either .gif, .jpg, or .png
+      %li==Please restrict the image height to 50 pixels and file size not exceeding 100kilobits      
+  %tr
+    %td
+      Upload logo
+    %td
+      - if @mfi.logo_name and not @mfi.logo_name.blank?          
+        %div#logo_file_name
+          = image_tag("logos/#{@mfi.logo_name}", :height => 50)
+          %input{:type => "hidden", :name => "mfi[logo_name]", :value => @mfi.logo_name}          
+          %br
+          %a{:href => "javascript: $('div#logo_file_name').remove()"}
+            Remove Image
+        Change Image 
+      %input{:name => "mfi[logo]", :size => "20",  :type => "file", :value => @mfi.logo_name}   
+  %tr
+    %td
+      Address at headquarters
+    %td
+      = text_area :address
+  %tr
+    %td
+      Telephone number
+    %td
+      = text_field :telephone
+  %tr
+    %td
+      Email address
+    %td
+      = text_field :email
+  %tr
+    %td
+      Website (if any)
+    %td
+      = text_field :website

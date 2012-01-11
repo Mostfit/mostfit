@@ -1,0 +1,169 @@
+%table.tall.shaded
+  - table_width = 4
+  %tr
+    %td{:colspan => table_width}
+      %h3 
+        Control dates 
+  %tr
+    %td
+      Allow keyboard input for dates?
+    %td
+      = check_box :date_box_editable        
+  %tr
+    %td
+      In operation since
+    %td
+      = date_select_for @mfi, :in_operation_since, {:min_date => Date.parse("2000-01-01")}
+  %tr
+    %td
+      Allow dates in past within
+    %td
+      = text_field :number_of_past_days, :size => 3
+      days of 
+      = select :min_date_from, :collection => Mfi::MinDateFrom.to_a
+  %tr
+    %td
+      Allow farthest date in the future within
+    %td
+      = text_field :number_of_future_days, :size => 3
+      days from today      
+  %tr    
+    %td
+      Allow transactions in the future upto
+    %td
+      = text_field :number_of_future_transaction_days, :size => 3
+      days from today
+  %tr
+    %td{:colspan => table_width}  
+      %p.greytext
+        For loan application, approval, disbursal, client joining date, branch creation date, and center creation date      
+  %tr
+    %td{:colspan => "2"}
+      %h3 
+        Policies and user choice
+  %tr
+    %td
+      Default repayment allocation
+    %td
+      = select :default_repayment_style, :collection => [[NORMAL_REPAYMENT_STYLE,"fees=>int=>prin"], [PRORATA_REPAYMENT_STYLE,"pro rata"], [:sequential, "sequential"]]
+  %tr
+    %td
+      Allow user the choice of repayment allocation?
+    %td
+      = check_box :allow_choice_of_repayment_style
+  %tr
+    %td
+      Allow GRT date on new client form
+    %td
+      = check_box :allow_grt_date_on_form     
+  %tr
+    %td{:colspan => "2"}
+      %h3
+        Performance tweaks
+  %tr
+    %td
+      Defer loan history re-generation ?
+      %br
+      %span.greytext
+        results in faster turn around time for data entry
+    %td
+      = check_box :dirty_queue_enabled            
+  %tr
+    %td
+      Early generation of collection sheets 
+    %td
+      = text_field :generate_day_sheet_before, :size => 1
+      day(s) ahead of meeting date     
+  %tr
+    %td{:colspan => "2"}
+      %h3 
+        Localisation
+  %tr
+    %td
+      Currency formats
+    %td
+      - million = 1000000.00
+      - formats = Numeric::Transformer.instance_variable_get("@formats").keys.map{|x| [x.to_s, "#{x.to_s.camelcase(' ')} (#{million.to_currency(x)})"]}.sort
+      = select :currency_format, :collection => formats, :include_blank => true
+  %tr
+    %td
+      Default language locale
+    %td
+      = select :org_locale, :collection => LOCALES.map{|s| [s[0].to_s, s[1].to_s]}, :selected => @mfi.org_locale || DEFAULT_LOCALE                   
+  %tr
+    %td{:colspan => "2"}
+      %h3 
+        Choose formatting of dates
+  %tr
+    %td{:colspan => "2"} 
+      Available date styles
+  - PREFERED_DATE_STYLES.each do |s|
+    %tr
+      %td
+        = "#{s[0].to_s.capitalize}"
+      %td     
+        = "#{s[1]} <b>(default)</b>" if s[0].to_s == @mfi.prefered_date_style || (s[0].to_s ==  DEFAULT_DATE_STYLE and @mfi.prefered_date_style.blank?)
+  %tr
+    %td
+      Specify preferred date style
+    %td
+      = select :prefered_date_style, :collection => PREFERED_DATE_STYLES.collect{|x| [x[0].to_s,x[0].to_s]}, :selected => (@mfi.prefered_date_style if @mfi.prefered_date_style)|| DEFAULT_DATE_STYLE
+  - example_display_date = Date.new(2012, 12, 31)    
+  %tr
+    %td
+      Currently chosen default date display 
+    %td  
+      = "#{@mfi.prefered_date_style}" if @mfi.prefered_date_style|| DEFAULT_DATE_STYLE
+      = "displays dates like this: #{example_display_date.display}"    
+  %tr
+    %td{:colspan => 2}
+      %h3 Choose formatting for SHORT date style
+  %tr
+    %td
+      Prefered date pattern
+    %td
+      = select :prefered_date_pattern, :collection => PREFERED_DATE_PATTERNS.map{|x| [x, example_display_date.strftime(x)]}, :selected => (@mfi.prefered_date_pattern if @mfi.prefered_date_pattern) || DEFAULT_DATE_PATTERN
+  %tr      
+    %td
+      Prefered date separator
+    %td
+      = select :prefered_date_separator, :collection => PREFERED_DATE_SEPARATORS.collect{ |x| [x[1], "#{x[1]}  ( #{x[0].to_s} )"] }, :selected => (@mfi.prefered_date_separator if @mfi.prefered_date_separator)|| DEFAULT_DATE_SEPARATOR
+  %tr
+    %td{:colspan => "2"}
+      %h3 
+        Enable optional features      
+  %tr
+    %td
+      Enable per-transaction accounting?
+    %td
+      = check_box :accounting_enabled
+  %tr
+    %td
+      Enable transaction logging?
+    %td
+      = check_box :transaction_logging_enabled
+  %tr
+    %td
+      Enable event logging?
+    %td
+      = check_box :event_model_logging_enabled
+  %tr
+    %td
+      Enable maps?
+    %td
+      = check_box :map_enabled
+  %tr
+    %td
+      Enable Branch Diary?
+    %td
+      = check_box :branch_diary_enabled
+  %tr
+    %td
+      Enable Stock Register?
+    %td
+      = check_box :stock_register_enabled
+  %tr
+    %td
+      Enable Asset Register?
+    %td
+      = check_box :asset_register_enabled
