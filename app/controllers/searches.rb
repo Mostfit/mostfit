@@ -87,71 +87,71 @@ class Searches < Application
     elsif request.method==:post or params[:_method] == "post"
       @search  = Search.new(params)
       @bookmark= Bookmark.new
-      @objects = @search.process
-      @model   = @objects.first.class
-      @fields  = params[:fields].map{|k,v| [k,v.keys]}.to_hash
+      debugger
+      if params[:_method] == "post" # don't run the query while defining the report, only when requested from a link
+        @objects = @search.process
+        @fields  = params[:fields].map{|k,v| [k,v.keys]}.to_hash
 
-      
-      # we need to find the fields that are required.
-      # reproduced below is Piyush Ranjan's code from the :reporting haml file
-      # certainly looks as though it might be optimised better
-      if params[:precedence]
-        @precedence = params[:precedence]
-      else
-        @precedence = Marshal.load(Marshal.dump(@fields))   # this is for situations where
-        counter = 1                                         # a precedence is not specified
-        @precedence.each{|model, properties|                # not optimising this code now
-          properties.each{|k, v|                            # but could do with some at some point
-            properties[k] = counter                         # TODO optimize this code
-            counter+=1
+        # we need to find the fields that are required.
+        # reproduced below is Piyush Ranjan's code from the :reporting haml file
+        # certainly looks as though it might be optimised better
+        if params[:precedence]
+          @precedence = params[:precedence]
+        else
+          @precedence = Marshal.load(Marshal.dump(@fields))   # this is for situations where
+          counter = 1                                         # a precedence is not specified
+          @precedence.each{|model, properties|                # not optimising this code now
+            properties.each{|k, v|                            # but could do with some at some point
+              properties[k] = counter                         # TODO optimize this code
+              counter+=1
+            }
           }
-        }
+        end
+        
+        @field_order = @fields.map{|k,vs| vs.map{|v| [@precedence[k][v],[k,v]]}}.flatten(1).to_hash
+        
+        # @field_order now looks like 
+        # {"6"=>["center", "meeting_day"], "1"=>["center", "name"], "2"=>["branch", "name"], "3"=>["client", "reference"], "4"=>["client", "name"], "5"=>["branch", "address"]}
+        # oh, what I wouldn't give for sortable hashes!
+        # @field_order is only for presentation purposes. So, for now, on with gathering our results
+        #
+        # shameless plug - do check out an earlier version of this file
+        
+        # we have enough information now to preload all the objects into a nice hash.
+        # the previous version git commit b6db423f85e and prior would make too many SQL calls
+        # and so would be very slow for large datasets with a lot of relationships.
+        # we try and avoid it by loading everything we need upfront into a hash
+        
+        # params[:model] states which is the order that the models are chained in. this is cool for several reasons,
+        # chief being that we are guaranteed that any model will always have other_model_id field for the preceding model in the chain.
+        # it makes it easy for us to build a hash like
+        # {:client => {:id => [:fields..., :center_id]...}, :center => {:id => [:fields....:branch_id]...}, :branch => {:id => [:fields]}
+        # assuming we have params[:model] = {"1" => "branch", "2" => "center", "3"=> "client"}
+        # we will have @objects = collection of clients.
+        # we now need to end up with result = {:clients =>  @objects, :center => @object.centers, :branches => @objects.centers.branches}
+        
+        # the following code bulk loads all the relevant OBJECTS into a nice hash and saves you having to make shitloads of SQL calls
+        relevant_models = params["model"].sort_by{|serial,property| 0 - serial.to_i}.map{|a| a[1]} # sorted list of chained models
+        @result = {}; last_r = nil
+        relevant_models.each_with_index do |model,i| 
+          debugger
+          next_r = relevant_models[i + 1]
+          relevant_fields = (@fields[model] + ["id",("#{next_r}_id" if next_r)]).uniq.compact.map(&:to_sym)  # i.e. center_id is a relevant field for client, along with the explicitly stated fields
+          @result[model] = Kernel.const_get(model.camel_case).all(:id => @objects[model.to_sym], :fields => relevant_fields).aggregate(*relevant_fields).map{|rs| relevant_fields.zip([rs].flatten).to_hash}.map{|a| [a[:id],a]}.to_hash # some mangling to get a proper hash
+        end
+        
+        # this small couplet below turns the @result hash into a series of rows, just waiting to be printed
+        @rows = @objects[relevant_models.first.to_sym].map do |oid|
+          last_model = nil
+          relevant_models.map do |m|
+            k = (last_model or Nothing)["#{m}_id".to_sym] || oid
+            r = @result[m][k]
+            last_model = r
+            [m,r]
+          end.to_hash
+        end
+      else
       end
-
-      @field_order = @fields.map{|k,vs| vs.map{|v| [@precedence[k][v],[k,v]]}}.flatten(1).to_hash
-
-      # @field_order now looks like 
-      # {"6"=>["center", "meeting_day"], "1"=>["center", "name"], "2"=>["branch", "name"], "3"=>["client", "reference"], "4"=>["client", "name"], "5"=>["branch", "address"]}
-      # oh, what I wouldn't give for sortable hashes!
-      # @field_order is only for presentation purposes. So, for now, on with gathering our results
-      #
-      # shameless plug - do check out an earlier version of this file
-      
-      # we have enough information now to preload all the objects into a nice hash.
-      # the previous version git commit b6db423f85e and prior would make too many SQL calls
-      # and so would be very slow for large datasets with a lot of relationships.
-      # we try and avoid it by loading everything we need upfront into a hash
-
-      # params[:model] states which is the order that the models are chained in. this is cool for several reasons,
-      # chief being that we are guaranteed that any model will always have other_model_id field for the preceding model in the chain.
-      # it makes it easy for us to build a hash like
-      # {:client => {:id => [:fields..., :center_id]...}, :center => {:id => [:fields....:branch_id]...}, :branch => {:id => [:fields]}
-      # assuming we have params[:model] = {"1" => "branch", "2" => "center", "3"=> "client"}
-      # we will have @objects = collection of clients.
-      # we now need to end up with result = {:clients =>  @objects, :center => @object.centers, :branches => @objects.centers.branches}
-
-      # the following code bulk loads all the relevant OBJECTS into a nice hash and saves you having to make shitloads of SQL calls
-      relevant_models = params["model"].sort_by{|serial,property| 0 - serial.to_i}.map{|a| a[1]} # sorted list of chained models
-      @result = {}; last_r = nil
-      relevant_models.each_with_index do |model,i| 
-        next_r = relevant_models[i + 1]
-        relevant_fields = (@fields[model] + ["id",("#{next_r}_id" if next_r)]).uniq.compact.map(&:to_sym)  # i.e. center_id is a relevant field for client, along with the explicitly stated fields
-        last_r = ((last_r or Nothing).send(model) || @objects)
-        @result[model] = last_r.all(:fields => relevant_fields).aggregate(*relevant_fields).map{|rs| relevant_fields.zip([rs].flatten).to_hash}.map{|a| [a[:id],a]}.to_hash # some mangling to get a proper hash
-      end
-      
-      # this small couplet below turns the @result hash into a series of rows, just waiting to be printed
-      $debug = true
-      @rows = @objects.map do |o|
-        last_model = nil
-        relevant_models.map do |m|
-          k = (last_model or Nothing)["#{m}_id".to_sym] || o.id
-          r = @result[m][k]
-          last_model = r
-          [m,r]
-        end.to_hash
-      end
-      
       render :reporting
     end
   end

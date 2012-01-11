@@ -134,9 +134,25 @@ class LoanHistory
 
   ########### NICE NEW FUNCTIONS ###########################
 
+  def self.get_composite_keys(selection = {})
+    # this function is for speed.
+    # it should return the same result as LoanHistory.all(selection).aggregate(:composite_key)
+    q = "SELECT composite_key FROM loan_history WHERE " + get_where_from_hash(selection)
+    repository.adapter.query(q).map{|x| x.to_f.round(4)}
+  end
+
   def self.latest_keys(hash = {}, date = Date.today)
     # returns the composite key for the last row before date per loan from loan history and filters by hash
-    LoanHistory.all(hash.merge(:date.lte => date)).aggregate(:loan_id,:composite_key.max).map{|x| x[1]}
+    #LoanHistory.all(hash.merge(:date.lte => date)).aggregate(:loan_id,:composite_key.max).map{|x| x[1]}
+
+    # updated for speed
+    q(%Q{
+          SELECT loan_id, max(composite_key)
+          FROM   loan_history 
+          WHERE  #{get_where_from_hash(hash)} 
+          AND date <= '#{date.strftime('%Y-%m-%d')}'
+          GROUP BY loan_id}).map{|x| x[1].round(4)} 
+
   end
 
   def self.latest(hash = {}, date = Date.today)
@@ -155,8 +171,20 @@ class LoanHistory
     cols = group_by + (my_cols.empty? ? LoanHistory.sum_cols : my_cols)
     ng = {group_by.map{|g| :no_group} => cols.map{|c| [c,0]}.to_hash}
     return ng if keys.blank?
-    agg_cols = cols[group_by.length..-1].map{|c| DataMapper::Query::Operator.new(c, :sum)}
-    vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
+
+    #agg_cols = cols[group_by.length..-1].map{|c| DataMapper::Query::Operator.new(c, :sum)}
+    #vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
+    
+    # using datamapper across very large datasets seems to be a losing proposition.
+    # some hand-crafted SQL to the rescue
+    # for testing, the result from this should be the same as from the above two lines
+    query  = "SELECT "
+    query += group_by.join(",") + ","
+    query += cols[group_by.length..-1].map{|g| " SUM(#{g.to_s})"}.join(",")
+    query += " FROM loan_history WHERE composite_key IN (#{keys.join(',')})"
+    query += " GROUP BY "
+    query += group_by.join(",")
+    vals = repository.adapter.query(query).map(&:to_a)
     if group_by.count > 0
       vals = vals.group_by{|v| v[0..(group_by.count-1)]} 
       rv = vals.to_hash.map{|k,v| [k,cols.zip(v.flatten).to_hash]}.to_hash

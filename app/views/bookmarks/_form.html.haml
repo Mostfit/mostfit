@@ -12,5 +12,5 @@
       = hidden_field :method_name, :value => request.method
       = hidden_field :route, :value => @route.to_yaml
       = hidden_field :type, :value => bookmark_type
-      = hidden_field :params, :value => request.query_string
+      = hidden_field :params, :value => request.raw_post
       = submit "Save"

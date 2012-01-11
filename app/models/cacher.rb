@@ -219,13 +219,16 @@ class BranchCache < Cacher
       # first create caches for the centers that do not have them
       t0 = Time.now; t = Time.now;
       branch_ids = Branch.all.aggregate(:id) unless branch_ids
-      branch_centers = Branch.all(:id => branch_ids).centers.aggregate(:id)
-
+      #branch_centers = Branch.all(:id => branch_ids).centers.aggregate(:id)
+      branch_centers = q("SELECT id FROM centers WHERE #{get_where_from_hash(:branch_id => branch_ids)}")
       # unless we are forcing an update, only work with the missing and stale centers
       unless force
-        ccs = CenterCache.all(:model_name => "Center", :branch_id => branch_ids, :date => date, :center_id.gt => 0)
-        cached_centers = ccs.aggregate(:center_id)
-        stale_centers = ccs.stale.aggregate(:center_id)
+        hash = {:model_name => "Center", :branch_id => branch_ids, :date => date}
+        #ccs = CenterCache.all(hash)
+        # nothing like some raw SQL to speed up queries.....dammmitt!
+        cached_centers = repository.adapter.query("SELECT center_id FROM cachers WHERE type = 'CenterCache' AND center_id > 0 AND #{get_where_from_hash(hash)}").map(&:to_i) #ccs.aggregate(:center_id)
+        stale_centers = repository.adapter.query("SELECT center_id FROM cachers WHERE type = 'CenterCache' AND center_id > 0 AND stale = 1 AND #{get_where_from_hash(hash)}").map(&:to_i) #ccs.aggregate(:center_id)
+        #stale_centers = ccs.stale.aggregate(:center_id)
         cids = (branch_centers - cached_centers) + stale_centers
         puts "#{cached_centers.count} cached centers; #{branch_centers.count} total centers; #{stale_centers.count} stale; #{cids.count} to update"
       else
@@ -339,7 +342,8 @@ class CenterCache < Cacher
     cols = hash.delete(:cols) || COLS
     flow_cols = FLOW_COLS
     balances = LoanHistory.latest_sum(hash,date, group_by, cols)
-    pmts = LoanHistory.composite_key_sum(LoanHistory.all(hash.merge(:date => date)).aggregate(:composite_key), group_by, flow_cols)
+    # pmts = LoanHistory.composite_key_sum(LoanHistory.all(hash.merge(:date => date)).aggregate(:composite_key), group_by, flow_cols)
+    pmts = LoanHistory.composite_key_sum(LoanHistory.get_composite_keys(hash.merge(:date => date)), group_by, flow_cols)
     # if there are no loan history rows that match today, then pmts is just a single hash, else it is a hash of hashes
     ng_pmts = flow_cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data
     ng_bals = cols.map{|c| [c,0]}.to_hash # ng = no good. we return this if we get dodgy data

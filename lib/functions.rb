@@ -346,13 +346,13 @@ def get_bulk_insert_sql(table_name, data)
   values = []
   data.each do |row|
     value = keys.map do |k|
-      v = row[k]
+      v = row[k]; c = v.class
       raise ArgumentError.new("#{k} is nil") if v.nil?
-      if v.class == Date
+      if c == Date
         "'#{v.strftime('%Y-%m-%d')}'"
-      elsif v.class == DateTime
+      elsif c == DateTime
         "'#{v.strftime('%Y-%m-%d %H:%M:%S')}'"
-      elsif row[k].class == String
+      elsif c == String
         "'#{v}'"
       else
         v
@@ -364,6 +364,30 @@ def get_bulk_insert_sql(table_name, data)
   sql += values.join(",") + ";"
   Merb.logger.info "sql statement crafted in #{Time.now - t}"
   sql
+end
+
+def get_where_from_hash(hash)
+  # naive function to make a WHERE clause from a Hash.
+  # isn't there a library somewhere that does this? DM is too slow
+  # and additionally, not possible to ask DM to just craft an SQL statement and give it to us (i think)
+  hash.map do |col, v|
+    if v.class == Date
+      val = "'#{v.strftime('%Y-%m-%d')}'"
+    elsif v.class == DateTime
+      val = "'#{v.strftime('%Y-%m-%d %H:%M:%S')}'"
+    elsif v.class == String
+      val = "'#{v}'"
+    elsif v.class == Array
+      val = "(#{v.join(',')})"
+    else
+      val = v
+    end
+    v.class == Array ? "#{col} IN #{val}" : "#{col} = #{val}"
+  end.join(" AND ")
+end
+    
+def q(sql)
+  repository.adapter.query(sql)
 end
 
 
