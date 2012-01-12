@@ -169,11 +169,6 @@ class Cacher
 
     me = self.attributes; other = other.attributes;
 
-    # of course, simply doing the attributes means we have left out the "calculated" fields
-    # calc_flow_fields = FLOW_COLS - attrs.keys
-    #calc_flow_fields.each{|cff| attrs[cff] = self.send(cff) + other.send(cff)}
-    #calc_col_fields = COLS - attrs.keys
-    #calc_col_fields.each{|c| attrs[c] = later_cacher.send(c)}
     attrs[:stale] = me[:stale] || other[:stale]
     Cacher.new(my_attrs)
   end
@@ -187,14 +182,6 @@ class Cacher
     date = (self.date > other.date ? self.date : other.date)
     me = self.attributes; other = other.attributes;
     attrs = me + other; attrs[:date] = date; attrs[:model_name] = "Sum";
-
-    # add the calculated fields
-    #calc_flow_fields = FLOW_COLS - attrs.keys
-    #calc_flow_fields.each{|cff| attrs[cff] = self.send(cff) + other.send(cff)}
-    #calc_col_fields = COLS - attrs
-    #calc_col_fields.each{|c| attrs[c] = self.send(c) + other.send(c)}
-
-    
     attrs[:model_id] = nil; attrs[:branch_id] = nil; attrs[:center_id] = nil;
     Cacher.new(attrs)
   end
@@ -252,7 +239,12 @@ class BranchCache < Cacher
       t = Time.now
       # then add up all the cached centers by branch
       relevant_branch_ids = Center.all(:id => cids).aggregate(:branch_id)
-      branch_data_hash = CenterCache.all(:model_name => "Center", :branch_id => relevant_branch_ids, :date => date).group_by{|x| x.branch_id}.to_hash
+      # branch_data_hash = CenterCache.all(:model_name => "Center", :branch_id => relevant_branch_ids, :date => date).group_by{|x| x.branch_id}.to_hash
+      h = {:model_name => "Center", :branch_id => relevant_branch_ids, :date => date, :type => 'CenterCache'}
+      branch_data_hash = q(%Q{
+                           SELECT * 
+                           FROM cachers 
+                           WHERE #{get_where_from_hash(h)}}).group_by{|x| x.branch_id}.to_hash
       puts "READ CENTER CACHES in #{(Time.now - t).round} secs"
       t = Time.now
 
