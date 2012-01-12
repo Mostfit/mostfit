@@ -232,7 +232,6 @@ class BranchCache < Cacher
           puts "UPDATED #{i}/#{chunks} CACHES in #{(Time.now - _t).round} secs"
         end
       rescue Exception => e
-        debugger
         return false
       end
       puts "UPDATED CENTER CACHES in #{(Time.now - t).round} secs"
@@ -250,10 +249,10 @@ class BranchCache < Cacher
 
       # we now have {:branch => [{...center data...}, {...center data...}]}, ...
       # we have to convert this to {:branch => { sum of centers data }, ...}
-
+      numeric_attributes = branch_data_hash.first[1][0].attributes.select{|k,v| k if v.is_a? Numeric}.to_hash.keys
       branch_data = branch_data_hash.map do |bid,ccs|
         sum_centers = ccs.map do |c|
-          center_sum_attrs = c.attributes.select{|k,v| v.is_a? Numeric}.to_hash
+          center_sum_attrs = c.attributes.only(numeric_attributes)
         end
         [bid, sum_centers.reduce({}){|s,h| s+h}]
       end.to_hash
@@ -302,7 +301,7 @@ class CenterCache < Cacher
 
   # these have to be hooks, for obvious reasons, but for now we make do with some hardcoded magic!
 
-  EXTRA_FIELDS = [:delayed_disbursals]
+s  EXTRA_FIELDS = [:delayed_disbursals]
   def self.update(hash = {})
     # creates a cache per center for branches and centers per the hash passed as argument
     date = hash.delete(:date) || Date.today
@@ -312,13 +311,17 @@ class CenterCache < Cacher
     # for a given center which does not have a row in the loan history table, we can pick the preceding days caches 
     # if it is not stale
     centers_without_loan_history_row = hash[:center_id] - LoanHistory.all(hash.merge(:date => date)).aggregate(:center_id)
-    centers_data_wo = CenterCache.all(:center_id => centers_without_loan_history_row, :date => date - 1, :stale => false).map{|c| [c.center_id, c.attributes]}.to_hash
+    h = {:type => "CenterCache", :center_id => centers_without_loan_history_row, :date => (date - 1), :stale => false}
+    centers_data_wo = q(%Q{SELECT *
+                           FROM cachers
+                           WHERE #{get_where_from_hash(h)}}).map{|c| [c.center_id, c.attributes.except(:end_date)]}.to_hash
     # drop the stale ones from the list
     centers_to_not_update = centers_data_wo.keys
     puts "FOUND #{centers_to_not_update.count} centers without loan history row for #{date}"
     
     # now carry on without the unnecessary centers
     hash[:center_id] = hash[:center_id] - centers_to_not_update
+    return true if hash[:center_id].blank?
     centers_data = CenterCache.create(hash.merge(:date => date, :group_by => [:branch_id,:center_id])).deepen.values.sum
     centers_data += centers_data_wo
     return false if centers_data == nil
@@ -328,7 +331,6 @@ class CenterCache < Cacher
     cs = centers_data.keys.flatten.map do |center_id|
       centers_data[center_id].merge({:type => "CenterCache",:model_name => "Center", :model_id => center_id, :date => date, :updated_at => now, :created_at => now, :stale => false})
     end
-    debugger
     if cs.nil?
       return false 
     end
