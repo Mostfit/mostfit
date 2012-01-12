@@ -22,7 +22,7 @@
     %th.odd
       Gender
     %td
-      = (@staff_member.gender ? @staff_member.gender.capitalize : NIL)
+      = (@staff_member.gender ? @staff_member.gender.to_s.capitalize : NIL)
   %tr.even
     %th.even
       Address
