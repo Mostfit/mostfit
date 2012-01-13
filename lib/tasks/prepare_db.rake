@@ -20,6 +20,9 @@ namespace :mostfit do
       repository.adapter.execute("create index index_clients_deleted_at on clients(deleted_at);") rescue nil
       repository.adapter.execute("create index index_loans_client_id on loans(client_id);") rescue nil
       repository.adapter.execute("create index index_loan_history_center_id on loan_history(center_id);") rescue nil
+      repository.adapter.execute("create index index_loan_history_date_composite_key  on loan_history(date,composite_key)") rescue nil
+      repository.adapter.execute("create index index_loan_history_date_composite_key_loan_id  on loan_history(date,composite_key,loan_id)") rescue nil
+      repository.adapter.execute("create index index_loan_history_center_id_loan_id_composite_key  on loan_history(center_id,loan_id,composite_key)") rescue nil
       repository.adapter.execute("alter table loan_products modify column loan_type varchar(100) null;") rescue nil
       repository.adapter.execute(%Q{
          alter table loan_history modify actual_outstanding_total   decimal(15,2) not null, 

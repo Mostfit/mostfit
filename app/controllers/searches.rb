@@ -88,7 +88,7 @@ class Searches < Application
       @search  = Search.new(params)
       @bookmark= Bookmark.new
       debugger
-      if params[:_method] == "post" # don't run the query while defining the report, only when requested from a link
+      if true # don't run the query while defining the report, only when requested from a link
         @objects = @search.process
         @fields  = params[:fields].map{|k,v| [k,v.keys]}.to_hash
 
