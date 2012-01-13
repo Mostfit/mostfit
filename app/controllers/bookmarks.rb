@@ -34,7 +34,6 @@ class Bookmarks < Application
   end
 
   def create(bookmark)
-    debugger
     @bookmark = Bookmark.new(bookmark)
     @bookmark.user =  session.user
     if @bookmark.save
