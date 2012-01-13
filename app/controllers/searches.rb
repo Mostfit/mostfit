@@ -87,7 +87,6 @@ class Searches < Application
     elsif request.method==:post or params[:_method] == "post"
       @search  = Search.new(params)
       @bookmark= Bookmark.new
-      debugger
       if params[:_method] == "post" # don't run the query while defining the report, only when requested from a link
         @objects = @search.process
         @fields  = params[:fields].map{|k,v| [k,v.keys]}.to_hash
@@ -134,7 +133,6 @@ class Searches < Application
         relevant_models = params["model"].sort_by{|serial,property| 0 - serial.to_i}.map{|a| a[1]} # sorted list of chained models
         @result = {}; last_r = nil
         relevant_models.each_with_index do |model,i| 
-          debugger
           next_r = relevant_models[i + 1]
           relevant_fields = (@fields[model] + ["id",("#{next_r}_id" if next_r)]).uniq.compact.map(&:to_sym)  # i.e. center_id is a relevant field for client, along with the explicitly stated fields
           @result[model] = Kernel.const_get(model.camel_case).all(:id => @objects[model.to_sym], :fields => relevant_fields).aggregate(*relevant_fields).map{|rs| relevant_fields.zip([rs].flatten).to_hash}.map{|a| [a[:id],a]}.to_hash # some mangling to get a proper hash
