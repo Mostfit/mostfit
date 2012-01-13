@@ -102,7 +102,7 @@ class Fee
   def amount_for(obj)
     return amount if amount
     if obj.class == Loan or obj.class.superclass == Loan or obj.class.superclass.superclass == Loan and obj.loan_product and obj.loan_product.fees.include?(self)
-      return [[min_amount || 0 , (percentage ? percentage * obj.amount : 0)].max, max_amount || (1.0/0)].min
+      return [[min_amount || 0 , (percentage ? percentage * obj.amount : 0)].max, max_amount || (1.0/0)].min.round_to_nearest(round_to, rounding_style)
     elsif obj.class == Client and obj.client_type and obj.client_type.fees.include?(self)
       return self.client_types.include?(obj.client_type) ? [min_amount, max_amount].max : nil
     elsif obj.class == InsurancePolicy
