@@ -50,6 +50,11 @@
       = select :client_type_id, :collection => ClientType.all, :value_method => :id, :text_method => :type
   %tr
     %th
+      Gender
+    %td
+      = select :gender, :collection => [[:female, "Female"], [:male, "Male"]], :prompt => "Please choose a gender"
+  %tr
+    %th
       Reference:
     %td
       = text_field(:reference, :size => 40, :value => ((@client.reference.blank? and @center) ? "#{@branch.code}#{@center.code}" : @client.reference))
