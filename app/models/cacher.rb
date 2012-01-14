@@ -190,15 +190,11 @@ class BranchCache < Cacher
 
       return true if cids.blank? #nothing to do
       # update all the centers for today
-      chunk_size = 2600
-      chunks = (cids.count/chunk_size.to_f).ceil
       begin
         _t = Time.now
-        cids.chunk(chunk_size).each_with_index do |_cids,i|
-          (CenterCache.update(:center_id => _cids, :date => date))
-          puts "UPDATED #{i+1}/#{chunks} CACHES in #{(Time.now - _t).round} secs"
-        end
+        (CenterCache.update(:center_id => cids, :date => date))
       rescue Exception => e
+        puts "#{e}\n#{e.backtrace}"
         return false
       end
       puts "UPDATED CENTER CACHES in #{(Time.now - t).round} secs"
@@ -216,6 +212,7 @@ class BranchCache < Cacher
 
       # we now have {:branch => [{...center data...}, {...center data...}]}, ...
       # we have to convert this to {:branch => { sum of centers data }, ...}
+      debugger
       numeric_attributes = branch_data_hash.first[1][0].attributes.select{|k,v| k if v.is_a? Numeric}.to_hash.keys
       branch_data = branch_data_hash.map do |bid,ccs|
         sum_centers = ccs.map do |c|
@@ -271,37 +268,34 @@ class CenterCache < Cacher
 s  EXTRA_FIELDS = [:delayed_disbursals]
   def self.update(hash = {})
     # creates a cache per center for branches and centers per the hash passed as argument
+    t = Time.now
     date = hash.delete(:date) || Date.today
-    hash = hash.select{|k,v| [:branch_id, :center_id].include?(k)}.to_hash
+    hash = hash.only(:center_id)
     
     # we can make an optimisation here which will kick in when we are updating days caches sequentially
     # for a given center which does not have a row in the loan history table, we can pick the preceding days caches 
     # if it is not stale
-    centers_without_loan_history_row = hash[:center_id] - LoanHistory.all(hash.merge(:date => date)).aggregate(:center_id)
+
+    centers_without_loan_history_row = hash[:center_id] - q("SELECT center_id FROM loan_history WHERE #{get_where_from_hash(hash.merge(:date => date))}")
     h = {:type => "CenterCache", :center_id => centers_without_loan_history_row, :date => (date - 1), :stale => false}
+    ng_pmts = FLOW_COLS.map{|c| [c,0]}.to_hash #because the flows are all 0 for this date
     centers_data_wo = centers_without_loan_history_row.blank? ? {} : q(%Q{SELECT *
                            FROM cachers
-                           WHERE #{get_where_from_hash(h)}}).map{|c| [c.center_id, c.attributes.except(:end_date)]}.to_hash
+                           WHERE #{get_where_from_hash(h)}}).map{|c| [c.center_id, c.attributes.merge(ng_pmts)]}.to_hash
     # drop the stale ones from the list
     centers_to_not_update = centers_data_wo.keys
-    puts "FOUND #{centers_to_not_update.count} centers without loan history row for #{date}"
+    puts "FOUND #{centers_to_not_update.count} centers without loan history row for #{date} in #{Time.now - t} secs"
     
     # now carry on without the unnecessary centers
     hash[:center_id] = hash[:center_id] - centers_to_not_update
-    return true if hash[:center_id].blank?
-    centers_data = CenterCache.create(hash.merge(:date => date, :group_by => [:branch_id,:center_id])).deepen.values.sum
+    return true if hash[:center_id].blank? and centers_to_not_update.blank?
+    centers_data = hash[:center_id].blank? ? {} : CenterCache.create(hash.merge(:date => date, :group_by => [:branch_id,:center_id]))
+    debugger
     centers_data += centers_data_wo
     return false if centers_data == nil
     now = DateTime.now
-    centers_data.delete(:no_group)
     return true if centers_data.empty?
-    cs = centers_data.keys.flatten.map do |center_id|
-      centers_data[center_id].merge({:type => "CenterCache",:model_name => "Center", :model_id => center_id, :date => date, :updated_at => now, :created_at => now, :stale => false})
-    end
-    if cs.nil?
-      return false 
-    end
-    sql = get_bulk_insert_sql("cachers", cs)
+    sql = get_bulk_insert_sql("cachers", centers_data.values, {:type => "CenterCache",:model_name => "Center", :date => date, :updated_at => now, :created_at => now, :stale => false}, [:end_date])
     raise unless CenterCache.all(:date => date, :center_id => centers_data.keys).destroy!
     repository.adapter.execute(sql) # raise an exception if anything goes wrong
   end
@@ -333,8 +327,8 @@ s  EXTRA_FIELDS = [:delayed_disbursals]
     universe.map do |k| 
       _p = pmts[k] || ng_pmts
       _b = balances[k] || ng_bals
-      extra = balances[k] ? {} : {:center_id => k[1], :branch_id => k[0]} # for ng rows, we need to insert center_id and branch_id
-      [k, _p.merge(_b).merge(extra)]
+      extra = balances[k] ? {:model_id => k[1]} : {:center_id => k[1], :branch_id => k[0], :model_id => k[1]} # for ng rows, we need to insert center_id and branch_id
+      [k[1], _p.merge(_b).merge(extra)]
     end.to_hash
 
   end
