@@ -106,7 +106,7 @@ namespace :mostfit do
 
       # create branches
       if Branch.all.count == 0
-        branches = YAML::load_file('districts.yml').uniq
+        branches = YAML::load_file('spec/districts.yml').uniq
         r = branches[0..500].map do |b|
           puts "creating branch #{b}"
           br = Branch.new(:name => b, :manager => StaffMember.all[rand(StaffMember.all.count - 1)], :code => b[0..8])
@@ -140,7 +140,7 @@ namespace :mostfit do
       end
       # create clients
       puts "reading clients.yml"
-      client_names = YAML::load_file('names.yml')
+      client_names = YAML::load_file('spec/names.yml')
       u = User.first
       center_count = Center.all.count
       t = Time.now
