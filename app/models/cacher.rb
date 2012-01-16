@@ -160,7 +160,7 @@ class Cacher
     
     # for the FLOW_COLS, take the sum of the attributes in the two cachers
     my_attrs = self.attributes; other_attrs = other.attributes;
-    FLOW_COLS.map{|col| attrs[col] = my_attrs[col] + other_attrs[col]}    
+    FLOW_COLS.each{|col| attrs[col] = my_attrs[col] + other_attrs[col]}    
 
     me = self.attributes; other = other.attributes;
 
@@ -170,7 +170,7 @@ class Cacher
     #calc_col_fields = COLS - attrs.keys
     #calc_col_fields.each{|c| attrs[c] = later_cacher.send(c)}
     attrs[:stale] = me[:stale] || other[:stale]
-    Cacher.new(my_attrs)
+    Cacher.new(attrs)
   end
 
   def + (other)
