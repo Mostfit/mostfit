@@ -1,3 +1,29 @@
+:javascript
+  $(document).ready(function() {
+  $("a._customreports_").click(function(){
+    href=$(this).attr("href");
+    method="GET";
+    if($(this).hasClass("self")){
+      href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+      method="POST"
+    }
+    a=$(this);
+    $.ajax({
+      type: "POST",
+      url: href,
+      success: function(data){
+        $('#fields').html(data);
+        attachCustomTableEvents();
+      },
+      error: function(xhr, text, errorThrown){
+        txt = "<div class='error'>"+xhr.responseText+"</div>"
+        $(a).after(txt);
+      }
+    });
+    return false;
+  });
+  });
+
 %h1 Mostfit advanced search tool
 =form(:id => "reporting_form",  :action => "/search/reporting") do
   %table
@@ -13,7 +39,7 @@
       %th
         %b more
     - @hash[:model].sort_by{|c, m| c}.each do |counter, model_str|
-      %tr{:id => "formdiv_#{counter}"}
+      %tr.formdiv{:id => "formdiv_#{counter}"}
         %td
           - model = Kernel.const_get(model_str.camelcase)
           - if model and model.class==Class
@@ -35,25 +61,28 @@
         %td
           = select :name => "more[#{counter}]", :id => "more_#{counter}", :class => "more", :collection => ["and", "or", "not", "chain"], :prompt => "Add more conditions", :selected => @hash[:more][counter]
   %hr
-  %table#customtable
-    %tr
-      -@properties.each do |model, properties|
-        %td
-          %h2
-            = model
-          %table
-            - properties.each do |property|
-              %tr
-                %td
-                  - checked = (@hash[:fields] and @hash[:fields][model] and @hash[:fields][model][property]=="on" ? "checked" : nil)
-                  =check_box(:name => "fields[#{model}][#{property.to_s}]", :checked => checked)
-                %td
-                  = property.to_s.camelcase(' ')
-                %td
-                  - if checked and @hash[:precedence] and @hash[:precedence][model] and @hash[:precedence][model][property]
-                    =select(:name => "precedence[#{model}][#{property.to_s}]", :collection => %w(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20), :selected => @hash[:precedence][model][property])
-                  - else
-                    =select(:name => "precedence[#{model}][#{property.to_s}]", :collection => %w(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20), :style => "display: none")
+  %a{:class => "_customreports_ self", :href => "/search/fields"}
+    Choose fields
+  #fields
+    %table#customtable
+      %tr
+        -@properties.each do |model, properties|
+          %td
+            %h2
+              = model
+            %table
+              - properties.each do |property|
+                %tr
+                  %td
+                    - checked = (@hash[:fields] and @hash[:fields][model] and @hash[:fields][model][property]=="on" ? "checked" : nil)
+                    =check_box(:name => "fields[#{model}][#{property.to_s}]", :checked => checked)
+                  %td
+                    = property.to_s.camelcase(' ')
+                  %td
+                    - if checked and @hash[:precedence] and @hash[:precedence][model] and @hash[:precedence][model][property]
+                      =select(:name => "precedence[#{model}][#{property.to_s}]", :collection => %w(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20), :selected => @hash[:precedence][model][property])
+                    - else
+                      =select(:name => "precedence[#{model}][#{property.to_s}]", :collection => %w(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20), :style => "display: none")
   %p
     %b
       Report name
@@ -61,3 +90,4 @@
     %input{:name => "report_name", :value => @hash[:report_name], :size => 50}
   %p
     =submit "Go"
+  

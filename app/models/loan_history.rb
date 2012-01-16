@@ -1,16 +1,15 @@
 class LoanHistory
   include DataMapper::Resource
   
-#   property :id,                        Serial  # composite key transperantly enables history-rewriting
   property :loan_id,                   Integer, :key => true
-  property :date,                      Date,    :key => true  # the day that this record applies to
-  property :created_at,                DateTime  # automatic, nice for benchmarking runs
-  property :run_number,                Integer, :nullable => false, :default => 0
-  property :current,                   Boolean  # tracks the row refering to the loans current status. we can query for these
-                                                # during reporting. I put it here to save an extra write to the db during update_history_now
-  property :amount_in_default,          Float # less normalisation = faster queries
+  property :date,                      Date,    :key => true                      # the day that this record applies to
+  property :created_at,                DateTime                                   # automatic, nice for benchmarking runs
+  property :run_number,                Integer, :nullable => false, :default => 0 
+  property :current,                   Boolean                                    # tracks the row refering to the loans current status. we can query for these
+                                                                                  # during reporting. I put it here to save an extra write to the db during update_history_now
+  property :amount_in_default,          Float                                     # less normalisation = faster queries
   property :days_overdue,               Integer
-  property :week_id,                    Integer # good for aggregating.
+  property :week_id,                    Integer                                   # good for aggregating.
 
   # some properties for similarly named methods of a loan:
   property :scheduled_outstanding_total,     Float, :nullable => false
@@ -20,8 +19,12 @@ class LoanHistory
   property :actual_outstanding_interest,     Float, :nullable => false
   property :scheduled_principal_due,         Float, :nullable => false
   property :scheduled_interest_due,          Float, :nullable => false
-  property :principal_due,                   Float, :nullable => false
-  property :interest_due,                    Float, :nullable => false
+
+  property :principal_due,                   Float, :nullable => false # this is total principal due - total interest due
+  property :interest_due,                    Float, :nullable => false # and represents the amount payable today
+  property :principal_due_today,             Float, :nullable => false # this is the principal and interest 
+  property :interest_due_today,              Float, :nullable => false  #that has become payable today
+
   property :principal_paid,                  Float, :nullable => false
   property :interest_paid,                   Float, :nullable => false
   property :total_principal_due,             Float, :nullable => false
@@ -131,9 +134,25 @@ class LoanHistory
 
   ########### NICE NEW FUNCTIONS ###########################
 
+  def self.get_composite_keys(selection = {})
+    # this function is for speed.
+    # it should return the same result as LoanHistory.all(selection).aggregate(:composite_key)
+    q = "SELECT composite_key FROM loan_history WHERE " + get_where_from_hash(selection)
+    repository.adapter.query(q).map{|x| x.to_f.round(4)}
+  end
+
   def self.latest_keys(hash = {}, date = Date.today)
     # returns the composite key for the last row before date per loan from loan history and filters by hash
-    LoanHistory.all(hash.merge(:date.lte => date)).aggregate(:loan_id,:composite_key.max).map{|x| x[1]}
+    #LoanHistory.all(hash.merge(:date.lte => date)).aggregate(:loan_id,:composite_key.max).map{|x| x[1]}
+
+    # updated for speed
+    q(%Q{
+          SELECT loan_id, max(composite_key)
+          FROM   loan_history 
+          WHERE  #{get_where_from_hash(hash)} 
+          AND date <= '#{date.strftime('%Y-%m-%d')}'
+          GROUP BY loan_id}).map{|x| x[1].round(4)} 
+
   end
 
   def self.latest(hash = {}, date = Date.today)
@@ -152,8 +171,20 @@ class LoanHistory
     cols = group_by + (my_cols.empty? ? LoanHistory.sum_cols : my_cols)
     ng = {group_by.map{|g| :no_group} => cols.map{|c| [c,0]}.to_hash}
     return ng if keys.blank?
-    agg_cols = cols[group_by.length..-1].map{|c| DataMapper::Query::Operator.new(c, :sum)}
-    vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
+
+    #agg_cols = cols[group_by.length..-1].map{|c| DataMapper::Query::Operator.new(c, :sum)}
+    #vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
+    
+    # using datamapper across very large datasets seems to be a losing proposition.
+    # some hand-crafted SQL to the rescue
+    # for testing, the result from this should be the same as from the above two lines
+    query  = "SELECT "
+    query += group_by.join(",") + ","
+    query += cols[group_by.length..-1].map{|g| " SUM(#{g.to_s})"}.join(",")
+    query += " FROM loan_history WHERE composite_key IN (#{keys.join(',')})"
+    query += " GROUP BY "
+    query += group_by.join(",")
+    vals = repository.adapter.query(query).map(&:to_a)
     if group_by.count > 0
       vals = vals.group_by{|v| v[0..(group_by.count-1)]} 
       rv = vals.to_hash.map{|k,v| [k,cols.zip(v.flatten).to_hash]}.to_hash

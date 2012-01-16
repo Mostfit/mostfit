@@ -1,79 +1,36 @@
 - models = DataMapper::Model.descendants.map{|d| d}
-- if @objects.length>0
-  - relations = @model.relationships.reject{|name, rel| rel.class!=DataMapper::Associations::ManyToOne::Relationship}.inject({}){|s,x| s+={x[1].child_key.collect{|y| y.name}.first => x[0]}}
-  - model_names = constants_to_strings(@search.models)
-  = partial("bookmarks/form", :bookmark_type => 'custom_reports', :name => params[:report_name])
+- @page_no = (params[:page] or Nothing).to_i || 1
+- @per_page = (params[:per_page] or Nothing).to_i || 20
+= partial("bookmarks/form", :bookmark_type => 'custom_reports', :name => params[:report_name])
+- if @objects
   %div{:style => "padding-right: 25px;"}
-    %h2
+    %h1
       - klass = @objects.first.class.ancestors.include?(Loan) ? "loan" : @objects.first.class.to_s.snake_case
       - if params[:report_name] and not params[:report_name].blank?
         = params[:report_name]
       - else
         = klass.camelcase
+    .menu-strip
       %form{:action => "/searches/edit", :method => :post, :style => "margin-bottom: 0px;"}
         %input{:type => "hidden", :name => "parameters", :value => YAML::dump(params)}
-        = submit "edit"
-    %table
-      %tr
-        - @arr = Array.new;
-        - @precedence.each do |model, prop|
-          - keys = prop.keys
-          - keys.each do |key|
-            - if(@fields[model][key] != nil)
-              - if(@arr[(@precedence[model][key]).to_i-1] == nil)
-                - @arr[(@precedence[model][key]).to_i-1] = [ [model, key] ]
-              - else
-                - @arr[(@precedence[model][key]).to_i-1].push([model, key])
-        - @arr.delete(nil)
-        - @arr.flatten!(1) #flattens array once (this scheme is needed to handle
-        - @arr.each do |model, key|
-          %th
-            - if model==klass
-              = key.camelcase(' ')
-            - else
-              = model+' '+key.camelcase(' ')     
-      - @objects.each do |obj|
+        = submit "edit this report"
+    -# = paginate_objects(@objects, params)
+    %table.report.nojs
+      %thead
         %tr
-          - @arr.each do |model, key|
-            - if model==klass
-              - if relations.find{|k,v| v==key} and obj.respond_to?(key) and child_obj = obj.send(key)
-                %td
-                  = child_obj.respond_to?(:name) ? child_obj.name : child_obj
-              - elsif obj.respond_to?(key)
-                %td
-                  - val = obj.send(key)
-                  = val.respond_to?(:name) ? val.name : val
-              -else
-                %td
-                  = obj.respond_to?(:name) ? obj.name : obj
-            - elsif obj.respond_to?(model)
-              - nested_obj=obj.send(model)
-              %td
-                - if nested_obj.respond_to?(key)
-                  - val = nested_obj.send(key)
-                  = val.respond_to?(:name) ? val.name : val
-                - else 
-                  = nested_obj.respond_to?(:name) ? nested_obj.name : nested_obj
-            - else
-              - path = get_path(model_names, model, klass)
-              - nested_obj= obj
-              - while(func=path.pop)
-                - nested_obj = nested_obj.send(func)
-              - if nested_obj
-                %td
-                  - if nested_obj.respond_to?(key)
-                    - val = nested_obj.send(key) 
-                    - if not models.include?(val.class)
-                      =val
-                    -elsif val.respond_to?(:name)
-                      =val.name
-                    -else
-                      =val.to_s
-                  - elsif nested_obj.respond_to?(:name)
-                    = nested_obj.name
-                  - elsif nested_obj.respond_to?(:to_s)
-                    = nested_obj.to_s
-                  - else
-                    =nested_obj
+          %th
+            id
+          - @field_order.keys.sort_by(&:to_i).each do |k|
+            %th
+              = @field_order[k].join(" ")
+      - @rows.each_with_index do |r,i|
+        %tr
+          %td
+            = i + 1
+          - @field_order.keys.sort_by(&:to_i).each do |k|
+            %td
+              - model = @field_order[k][0]
+              - attr =  @field_order[k][1].to_sym
+              = r[model][attr]
 -else
   No records

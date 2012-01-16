@@ -13,9 +13,9 @@ class Search
       return [["eql", "equal"], ["not", "not equal"]]
     elsif [DataMapper::Types::Serial, Integer, Float, DateTime, Date, Time].include?(property.type)
       return [["lt", "less than"], ["lte", "less than equal"], ["eql", "equal to"], ["gt", "greater than"], ["gte", "greater than equal"], ["not", "not equal to"]]
-    elsif [DataMapper::Types::Text, String].include?(property.class)
-      return [["eql", "equal"], ["like", "like"]]
-    elsif [DataMapper::Types::Boolean].include?(property.class)
+    elsif [DataMapper::Types::Text, String].include?(property.type)
+      return [["eql", "equal"], ["like", "like"], ["in","in"]]
+    elsif [DataMapper::Types::Boolean].include?(property.type)
       return [["true", "true"], ["false", "false"]]
     elsif property.type.class==Class
       return [["eql", "equal"], ["not", "not equal"]]
@@ -34,14 +34,19 @@ class Search
   private
   def chain_queries
     #No chaining
-    return models.first.all(queries.values.first) if models.uniq.length==1
+    return {models.uniq.first.to_s.snake_case.to_sym => models.first.all(queries.values.first).aggregate(:id)} if models.uniq.length==1
+
     #chaining
-    objs = nil
-    objs = models.first.all(queries[models.first])
-    models.uniq[1..-1].each{|model|
-      objs = objs.send(model.to_s.snake_case.pluralize, queries[model])
+    last_ids = {}; ids = []; result = {}
+    models.each{|model|
+      # we use the ids here becuase datamapper is very slow dealing with collections
+      # after all, an ORM is not meant for aggregating data
+      # TODO check if this has been addressed in the latest version
+      ids = model.all(queries[model].merge(last_ids)).aggregate(:id)
+      result[model.to_s.snake_case.to_sym] = ids
+      last_ids = {"#{model.to_s.snake_case}_id".to_sym => ids}
     }
-    objs
+    result
   end
 
   def transform_enums

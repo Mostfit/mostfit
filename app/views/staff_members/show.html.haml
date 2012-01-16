@@ -22,7 +22,7 @@
     %th.odd
       Gender
     %td
-      = @staff_member.gender.capitalize
+      = (@staff_member.gender ? @staff_member.gender.to_s.capitalize : NIL)
   %tr.even
     %th.even
       Address
@@ -51,9 +51,9 @@
   %tr
     %td
       = link_to 'Daily Collection Sheet', url(:day_sheet, @staff_member.id), :class => "grey_button"
-      &nbsp;
+    %td
       = link_to 'Daily Disbursement Sheet', url(:disbursement_sheet, @staff_member.id), :class => "grey_button"
-      &nbsp;
+    %td
       = link_to 'Centers Managed', url(:show_staff_member_centers, @staff_member.id), :class => "grey_button"
 
 %div.tab_container

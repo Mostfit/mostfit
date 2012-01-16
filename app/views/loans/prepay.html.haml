@@ -14,7 +14,7 @@
     - info = @loan.info(@date)
     - missed_int = info.total_interest_due - info.total_interest_paid
     - accrued_int = @date > info.date ? info.actual_outstanding_principal * @loan.interest_rate * ((@date - info.date) - 1) / 365 : 0
-    - allow_override = (not @loan.loan_product.loan_validation_methods.split(",").include?("prepayment_must_be_per_system_numbers"))
+    - allow_override = (not @loan.loan_product.loan_validation_methods.split(",").include?("prepayment_must_be_per_system_numbers") if @loan.loan_product.loan_validation_methods)
     %h2
       Loan id
       = @loan.id
