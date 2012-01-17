@@ -125,3 +125,7 @@ AUDITABLES = ["Branch","Center","Client","ClientGroup","Loan","Payment","StaffMe
 TargetOf    = [:center_creation, :group_creation, :client_registration, :loan_disbursement_by_amount, :loan_disbursements_by_number]
 TargetType  = [:relative, :absolute]
 
+# Caches
+# in order to avoid overrunning the SQL max packet size, we split the cacher update into chunks
+# 2500 should be good for the standard SQL max_packet_size of 16MB
+CHUNK_SIZE = 2500 
