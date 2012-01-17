@@ -199,7 +199,7 @@ class BranchCache < Cacher
           print "#{(Time.now - _t).round(2)} secs"
         end
       rescue Exception => e
-        puts "#{e}\n#{e.backtrace}"
+        puts "#{e}\n#{e.backtrace[0..400]}"
         return false
       end
       puts "UPDATED CENTER CACHES in #{(Time.now - t).round} secs"
