@@ -1,3 +1,8 @@
+:javascript
+  $(document).ready(function() {
+  $('#toggle_approve').change(function() {
+    $('.approve').attr('checked',$(this).attr('checked'))});  
+  });
 %table.report.nojs    
   %thead
     %tr{:style => "font-size: 0.85em;"}
@@ -23,6 +28,7 @@
         Status
       %th
         Selected
+        = check_box :id => "toggle_approve"
       %th
         Approved By
   - staff_members_allowed = staff_members_collection
@@ -55,8 +61,16 @@
         = loan.client.center.meeting_day.to_s.camelcase
       %td.text
         = loan.status.to_s.camelcase(' ')
+      - hr = Highmark::HighmarkResponse.first(:loan_id => loan.id)
       %td
-        = check_box :name => "loans[#{loan.id}][approved?]"
+        - if hr
+          - if hr.status == :rejected
+            = check_box :name => "loans[#{loan.id}][approved?]", :onclick => "javascript:$('#approval_reason_#{loan.id}').toggle();", :class => "approve"
+          - else
+            = check_box :name => "loans[#{loan.id}][approved?]", :class => "approve"
+        - else
+          = check_box :name => "loans[#{loan.id}][approved?]", :class => "approve"
+        = select :name => "loans[#{loan.id}][approval_reason]", :collection => APPROVAL_REASONS.map{|k,v| [k,v]}, :style => "display:none;", :id => "approval_reason_#{loan.id}"
       %td.text
         = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => staff_members_allowed, :selected => client.center.branch.manager.id.to_s
   %tfoot
