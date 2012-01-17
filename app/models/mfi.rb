@@ -68,7 +68,7 @@ class Mfi
       $globals[:mfi_details]
     else
       mfi = if File.exists?(File.join(Merb.root, "config", "mfi.yml"))
-              Mfi.new(YAML.load(File.read(File.join(Merb.root, "config", "mfi.yml"))))
+              Mfi.new(YAML.load(File.read(File.join(Merb.root, "config", "mfi.yml"))).only(*Mfi.properties.map(&:name)))
             else
               Mfi.new(:name => "Mostfit", :fetched => Date.today)  
             end
