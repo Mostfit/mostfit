@@ -150,7 +150,7 @@ class Center
   end
   
   def previous_meeting_date_from(date)
-    LoanHistory.first(:loan_id => id, :date.lte => date, :order => [:date.desc], :limit => 1).date
+    LoanHistory.first(:center_id => self.id, :date.lte => date, :order => [:date.desc], :limit => 1).date
   end
 
 
