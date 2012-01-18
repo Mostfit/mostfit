@@ -101,7 +101,6 @@ class Cachers < Application
 
 
   def get_cachers
-    debugger
     q = {}
     q[:branch_id] = params[:branch_id] unless params[:branch_id].blank? 
     if (not params[:branch_id].blank?)

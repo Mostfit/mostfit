@@ -23,7 +23,7 @@
     %tbody
     - clients_count = Client.all(:center => @centers).aggregate(:center_id, :id.count).to_hash
     - today = Date.today.weekday
-    - @centers.each do |center|
+    - @centers.sort_by{|c| c.id}.each do |center|
       %tr{:class => cycle('odd','')}
         %td
           = center.id

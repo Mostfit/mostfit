@@ -219,7 +219,6 @@ class BranchCache < Cacher
 
       # we now have {:branch => [{...center data...}, {...center data...}]}, ...
       # we have to convert this to {:branch => { sum of centers data }, ...}
-      debugger
       numeric_attributes = branch_data_hash.first[1][0].attributes.select{|k,v| k if v.is_a? Numeric}.to_hash.keys
       branch_data = branch_data_hash.map do |bid,ccs|
         sum_centers = ccs.map do |c|
@@ -297,7 +296,6 @@ s  EXTRA_FIELDS = [:delayed_disbursals]
     hash[:center_id] = hash[:center_id] - centers_to_not_update
     return true if hash[:center_id].blank? and centers_to_not_update.blank?
     centers_data = hash[:center_id].blank? ? {} : CenterCache.create(hash.merge(:date => date, :group_by => [:branch_id,:center_id]))
-    debugger
     centers_data += centers_data_wo
     return false if centers_data == nil
     now = DateTime.now
