@@ -24,7 +24,7 @@
         %th
     %tbody
     - group=-1
-    - @clients.sort_by{|x| x.client_group.id}.each do |client|
+    - @clients.sort_by{|x| [x.client_group.id, x.id]}.each do |client|
       - if group!=client.client_group_id
         - group = client.client_group_id 
         %tr.group
@@ -33,9 +33,9 @@
               %b
                 = link_to client.client_group.name, resource(client.client_group)
                 (
-                =link_to('edit', resource(@branch, @center, client.client_group, :edit))
+                = link_to('edit', resource(@branch, @center, client.client_group, :edit))
                 )
-            -else
+            - else
               Not attached to any group
             
       %tr{ :class => cycle('odd','')}
@@ -62,7 +62,7 @@
           %b
             = link_to client_group.name, resource(client_group)
             (
-            =link_to('edit', resource(@branch, @center, client_group, :edit))
+            = link_to('edit', resource(@branch, @center, client_group, :edit))
             )
       %tr
 
