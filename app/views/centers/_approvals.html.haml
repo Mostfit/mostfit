@@ -26,7 +26,7 @@
           %td
             = loan.scheduled_disbursal_date
           %td
-            - late =  @date - loan.scheduled_disbursal_date
+            - late =  @date - loan.scheduled_disbursal_date rescue 0
             - if late > 0
               == "#{late} days late"
             - else
