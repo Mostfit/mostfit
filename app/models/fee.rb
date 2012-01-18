@@ -23,11 +23,16 @@ class Fee
              #[:policy_loan_disbursal_date, InsurancePolicy, :loan_disbursal_date],
              [:penalty, Loan, nil]
             ]
+  PERCENTAGE_OF = [:amount, 
+                   :actual_outstanding_principal, :scheduled_outstanding_principal, 
+                   :actual_outstanding_interest, :scheduled_outstanding_interest]
+
   FeeDue        = Struct.new(:applicable, :paid, :due)
   FeeApplicable = Struct.new(:loan_id, :client_id, :fees_applicable)
   property :id,            Serial
   property :name,          String, :nullable => false
   property :percentage,    Float
+  property :percentage_of, Enum.send('[]', *PERCENTAGE_OF), :default => :amount
   property :amount,        Integer
   property :min_amount,    Integer
   property :max_amount,    Integer
@@ -99,9 +104,14 @@ class Fee
   end
 
   # Calculate the amount to be levied depending on the object type
-  def amount_for(obj)
+  def amount_for(obj, date=Date.today)
     return amount if amount
     if obj.class == Loan or obj.class.superclass == Loan or obj.class.superclass.superclass == Loan and obj.loan_product and obj.loan_product.fees.include?(self)
+      if self.percentage_of == :amount
+        fee_amt = obj.amount
+      else
+        fee_amt = obj.info(date).send(percentage_of)
+      end
       return [[min_amount || 0 , (percentage ? percentage * obj.amount : 0)].max, max_amount || (1.0/0)].min.round_to_nearest(round_to, rounding_style)
     elsif obj.class == Client and obj.client_type and obj.client_type.fees.include?(self)
       return self.client_types.include?(obj.client_type) ? [min_amount, max_amount].max : nil
