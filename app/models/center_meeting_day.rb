@@ -88,6 +88,7 @@ class CenterMeetingDay
     # returns only the weekday of the meeting day
     return meeting_day if meeting_day and meeting_day != :none
     return what if what != :day
+    return period if period == :month
     return meeting_day
   end
 

@@ -18,7 +18,9 @@
     %td
       Fees percentage
     %td
-      = text_field :percentage
+      = text_field :percentage, :value => (@fee.percentage * 100 if @fee.percentage)
+      of
+      = select :percentage_of, :collection => Fee::PERCENTAGE_OF.map(&:to_s)
   %tr
     %td
       Minimum payable

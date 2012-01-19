@@ -179,17 +179,19 @@ class LoanHistory
     # some hand-crafted SQL to the rescue
     # for testing, the result from this should be the same as from the above two lines
     query  = "SELECT "
-    query += group_by.join(",") + ","
+    query += group_by.join(",") + "," unless group_by.blank?
     query += cols[group_by.length..-1].map{|g| " SUM(#{g.to_s})"}.join(",")
     query += " FROM loan_history WHERE composite_key IN (#{keys.join(',')})"
-    query += " GROUP BY "
-    query += group_by.join(",")
+    unless group_by.blank?
+      query += " GROUP BY "
+      query += group_by.join(",")
+    end
     vals = repository.adapter.query(query).map(&:to_a)
     if group_by.count > 0
       vals = vals.group_by{|v| v[0..(group_by.count-1)]} 
       rv = vals.to_hash.map{|k,v| [k,cols.zip(v.flatten).to_hash]}.to_hash
     else
-      rv = {:no_group => cols.zip(vals).to_hash}
+      rv = {:no_group => cols.zip(vals[0]).to_hash}
     end
     rv
   end

@@ -101,7 +101,7 @@ namespace :mostfit do
     end
 
     desc "big database"
-    task :big do
+    task :big, :centers_with do |task, args|
       # `bin/slurp.rb spec/fixtures/big.sql`
 
       # create branches
@@ -168,11 +168,13 @@ namespace :mostfit do
       end
 
       # create loans
+      
       puts "adding loans"
       t = Time.now
       client_count = Client.all.count
       current = 1
-      Center.all.aggregate(:id).each do |cid|
+      centers = args[:centers_with] ? Center.all(:name.like => "#{args[:centers_with]}%") : Center.all
+      centers.aggregate(:id).each do |cid|
         center = Center.get(cid)
         if center.loans.count > 0
           current += center.loans.count
@@ -185,7 +187,6 @@ namespace :mostfit do
         clients = Client.all(:center_id => cid)
         lp = LoanProduct.all[rand(LoanProduct.all.count - 1)] # same loan product for all
         clients.each do |c|
-          debugger
           mdates = center.get_meeting_dates(3,c.date_joined)
           scheduled_disbursal_date = mdates[-2]
           l = Loan.new(:amount => lp.min_amount, :interest_rate => lp.min_interest_rate/100, :loan_product => lp,

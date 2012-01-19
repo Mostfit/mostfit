@@ -68,6 +68,8 @@ class Branch
       # to be ignored because we have already counted these in the above cids
       to_be_ignored = self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today).aggregate(:center_id) 
       cids += Center.all(:id => branch_center_ids, :meeting_day => mday).aggregate(:id) - to_be_ignored
+    elsif mday == :monthly
+      cids = self.centers.center_meeting_days(:period => :month).aggregate(:center_id)
     end
     hash[:id]= cids
     Center.all(hash)
