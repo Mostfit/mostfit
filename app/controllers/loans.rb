@@ -446,7 +446,6 @@ class Loans < Application
   end
 
   def prepay(id)
-    debugger
     @loan = Loan.get(id)
     raise NotFound unless @loan
     if request.method == :get

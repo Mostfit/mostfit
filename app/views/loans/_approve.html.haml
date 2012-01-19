@@ -32,7 +32,7 @@
       %th
         Approved By
   - staff_members_allowed = staff_members_collection
-  -@loans_to_approve.each do |loan|
+  - @loans_to_approve.each do |loan|
     - client = @clients.find{|x| x.id==loan.client_id} || loan.client
     %tr{:class => cycle('odd','')}
       %td.number
@@ -61,21 +61,13 @@
         = loan.client.center.meeting_day.to_s.camelcase
       %td.text
         = loan.status.to_s.camelcase(' ')
-      - hr = Highmark::HighmarkResponse.first(:loan_id => loan.id)
       %td
-        - if hr
-          - if hr.status == :rejected
-            = check_box :name => "loans[#{loan.id}][approved?]", :onclick => "javascript:$('#approval_reason_#{loan.id}').toggle();", :class => "approve"
-          - else
-            = check_box :name => "loans[#{loan.id}][approved?]", :class => "approve"
-        - else
-          = check_box :name => "loans[#{loan.id}][approved?]", :class => "approve"
-        = select :name => "loans[#{loan.id}][approval_reason]", :collection => APPROVAL_REASONS.map{|k,v| [k,v]}, :style => "display:none;", :id => "approval_reason_#{loan.id}"
+        = check_box :name => "loans[#{loan.id}][approved?]", :class => "approve"
       %td.text
         = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => staff_members_allowed, :selected => client.center.branch.manager.id.to_s
   %tfoot
     %tr
-      %td{:colspan => 11}
+      %td{:colspan => 12}
   
 = paginate @loans_to_approve if @loans_to_approve.respond_to?(:page)
  
