@@ -87,7 +87,7 @@ class Searches < Application
     elsif request.method==:post or params[:_method] == "post"
       @search  = Search.new(params)
       @bookmark= Bookmark.new
-      if params[:_method] == "post" # don't run the query while defining the report, only when requested from a link
+      if true # don't run the query while defining the report, only when requested from a link
         @objects = @search.process
         @fields  = params[:fields].map{|k,v| [k,v.keys]}.to_hash
 
@@ -97,10 +97,11 @@ class Searches < Application
         if params[:precedence]
           @precedence = params[:precedence]
         else
-          @precedence = Marshal.load(Marshal.dump(@fields))   # this is for situations where
+          @precedence = params[:fields]                       # this is for situations where
           counter = 1                                         # a precedence is not specified
           @precedence.each{|model, properties|                # not optimising this code now
             properties.each{|k, v|                            # but could do with some at some point
+              debugger
               properties[k] = counter                         # TODO optimize this code
               counter+=1
             }
@@ -132,18 +133,46 @@ class Searches < Application
         # the following code bulk loads all the relevant OBJECTS into a nice hash and saves you having to make shitloads of SQL calls
         relevant_models = params["model"].sort_by{|serial,property| 0 - serial.to_i}.map{|a| a[1]} # sorted list of chained models
         @result = {}; last_r = nil
-        relevant_models.each_with_index do |model,i| 
+        related_models = {}
+        relevant_models.each_with_index do |model_name,i| 
+          model = Kernel.const_get(model_name.camel_case)
           next_r = relevant_models[i + 1]
-          relevant_fields = (@fields[model] + ["id",("#{next_r}_id" if next_r)]).uniq.compact.map(&:to_sym)  # i.e. center_id is a relevant field for client, along with the explicitly stated fields
-          @result[model] = Kernel.const_get(model.camel_case).all(:id => @objects[model.to_sym], :fields => relevant_fields).aggregate(*relevant_fields).map{|rs| relevant_fields.zip([rs].flatten).to_hash}.map{|a| [a[:id],a]}.to_hash # some mangling to get a proper hash
+          @relevant_fields = (@fields[model_name] + ["id",("#{next_r}_id" if next_r)]).uniq.compact.map(&:to_sym)  # i.e. center_id is a relevant field for client, along with the explicitly stated fields
+          # replace relationships with their relevant child keys
+          i = -1
+          relevant_properties = @relevant_fields.map do |property| 
+            i += 1
+            if model.relationships[property.to_s] 
+              related_models[model_name] ||= []
+              ck = model.relationships[property.to_s].child_key.first.name
+              related_models[model_name] << {:related_model => property, :index => i, :child_key => ck}
+              ck
+            else
+              property
+            end
+          end
+
+          # fetch the result
+          properties_result = model.all(:id => @objects[model_name.to_sym], :fields => relevant_properties).aggregate(*relevant_properties) #TODO convert to raw SQL
+          pr2 = q("SELECT #{relevant_properties.join(',')} FROM #{model_name.to_s.pluralize} WHERE #{get_where_from_hash(:id => @objects[model_name.to_sym])}")
+          @result[model_name] = properties_result.map{|rs| @relevant_fields.zip([rs].flatten).to_hash}.map{|a| [a[:id],a]}.to_hash # some mangling to get a proper hash
         end
+
+        # now we can load the relevant info for the related models
+        debugger
+        @related_info = related_models.map do |model, relateds|
+          [model,relateds.map do |r| 
+             # currently only supports aggregating on :name
+             [r[:related_model],Kernel.const_get(model.camel_case).all(:id => @result[model].keys).send(r[:related_model]).aggregate(:id,:name).to_hash] rescue nil
+           end.to_hash]
+        end.to_hash
         
         # this small couplet below turns the @result hash into a series of rows, just waiting to be printed
         @rows = @objects[relevant_models.first.to_sym].map do |oid|
           last_model = nil
           relevant_models.map do |m|
             k = (last_model or Nothing)["#{m}_id".to_sym] || oid
-            r = @result[m][k]
+            r = @result[m][k].map{|_k,_v| [_k,@related_info[m][_k] ? @related_info[m][_k][_v] : _v]}.to_hash
             last_model = r
             [m,r]
           end.to_hash
