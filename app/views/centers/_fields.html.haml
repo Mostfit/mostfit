@@ -39,7 +39,7 @@
         = link_to 'Manage meeting schedule', resource(:center_meeting_days, :center_id => @center.id)
     - if @center.new?
       %tr
-        %td
+        %th
           Meeting every:
         %td
           = select :name => "center[center_meeting_day[meeting_day]]", :collection => Center::DAYS.map{|c| c.to_s}
@@ -60,6 +60,13 @@
             = text_field :name => "center[center_meeting_day[of_every]]", :style => "width:5em"
             &nbsp;
             = select :name => "center[center_meeting_day[period]]", :collection => ["week", "month"]
+            %br
+            %br
+            %b OR
+            %br
+            paste a comma separated list of dates here
+            %br
+            = text_area :meeting_calendar, :rows => 25, :columns => 25
   %tr
     %td
       %b Meeting Time
