@@ -146,11 +146,31 @@ class Center
   end
   
   def next_meeting_date_from(date)    
-    LoanHistory.first(:center_id => self.id, :date.gt => date, :order => [:date], :limit => 1).date
+    date = (LoanHistory.first(:center_id => self.id, :date.gt => date, :order => [:date], :limit => 1) or Nothing).date
+    unless date
+      number = get_meeting_date(date, :next)
+      if meeting_day != :none and (date + number - get_meeting_date(date + number, :previous)).cweek == (date + number).cweek
+        (date + number + get_meeting_date(date + number, :next)).holiday_bump
+      else
+        (date + number).holiday_bump
+      end
+    end
+    date
+
   end
   
   def previous_meeting_date_from(date)
-    LoanHistory.first(:center_id => self.id, :date.lte => date, :order => [:date.desc], :limit => 1).date
+    date = (LoanHistory.first(:center_id => self.id, :date.lte => date, :order => [:date.desc], :limit => 1) or Nothing).date
+    unless date
+      number = get_meeting_date(date, :previous)
+      if meeting_day != :none and (date - number - get_meeting_date(date - number, :previous)).cweek == (date - number).cweek
+        (date - number - get_meeting_date(date - number, :previous)).holiday_bump
+      else
+        (date - number).holiday_bump
+      end
+    end
+    date
+
   end
 
 
