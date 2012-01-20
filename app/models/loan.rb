@@ -575,7 +575,6 @@ class Loan
     $debug = true
     # load relevant loan_history rows
     loan_history.all( :order => [:date]).map do |lh|
-      debugger if $debug
       next if amt_to_pay >= total or ((lh.interest_due + lh.principal_due) == 0)
       # interest/prin due has the total interest/prin payable. 
       # to get the proper ratio, we need the interest prin payable on that day only

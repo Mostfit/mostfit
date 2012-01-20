@@ -109,7 +109,6 @@ class Searches < Application
           counter = 1                                         # a precedence is not specified
           @precedence.each{|model, properties|                # not optimising this code now
             properties.each{|k, v|                            # but could do with some at some point
-              debugger
               properties[k] = counter                         # TODO optimize this code
               counter+=1
             }
@@ -168,7 +167,6 @@ class Searches < Application
         end
 
         # now we can load the relevant info for the related models
-        debugger
         @related_info = related_models.map do |model, relateds|
           [model,relateds.map do |r| 
              # currently only supports aggregating on :name

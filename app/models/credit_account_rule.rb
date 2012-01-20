@@ -11,7 +11,6 @@ class CreditAccountRule
   # Returns amount to be credited and whether amount can be changed or not.
   # amounts are changable to counter the fact that VAR not identified right now
   def amount(date)
-    debugger if $debug
     case self.rule_book.action.to_sym
     when :disbursement
       amount = Loan.all("client.center.branch_id" => self.rule_book.branch.id, :disbursal_date => date, :rejected_on => nil).aggregate(:amount.sum) || 0

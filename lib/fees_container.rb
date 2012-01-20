@@ -10,7 +10,6 @@ module FeesContainer
       # if this loan has some applicable fees, then we update the date and the amount, nothing else
       cur_fees.each do |af|
         next unless @orig_attrs
-        debugger if $debug
         method = @payable_models[af.fee.payable_on][1]
         if method
           date = (self.send(method) if self.respond_to?(method))|| (self.send("scheduled_#{method}") if self.respond_to?("scheduled_#{method}"))
