@@ -73,6 +73,14 @@ class Searches < Application
   end  
 
   def reporting
+    if params[:property]
+      params[:property].select{|k,v| v=="all"}.to_hash.each do |k,v| 
+        params[:property][k] = "id"
+        params[:value] ||= {}
+        params[:value][k] = {"id" => "0"}
+        params[:operator][k] = "gt"
+      end
+    end
     @counter = params[:counter]||1
     if request.xhr?
       @model = Kernel.const_get(params[:model].camelcase)
@@ -137,6 +145,7 @@ class Searches < Application
         relevant_models.each_with_index do |model_name,i| 
           model = Kernel.const_get(model_name.camel_case)
           next_r = relevant_models[i + 1]
+          next_r = next_r == model_name ? nil : next_r # avoid situations where the next model is the same as this one
           @relevant_fields = (@fields[model_name] + ["id",("#{next_r}_id" if next_r)]).uniq.compact.map(&:to_sym)  # i.e. center_id is a relevant field for client, along with the explicitly stated fields
           # replace relationships with their relevant child keys
           i = -1
@@ -172,14 +181,14 @@ class Searches < Application
           last_model = nil
           relevant_models.map do |m|
             k = (last_model or Nothing)["#{m}_id".to_sym] || oid
-            r = @result[m][k].map{|_k,_v| [_k,@related_info[m][_k] ? @related_info[m][_k][_v] : _v]}.to_hash
+            r = @result[m][k].map{|_k,_v| [_k,(@related_info[m] or Nothing)[_k] ? @related_info[m][_k][_v] : _v]}.to_hash
             last_model = r
             [m,r]
           end.to_hash
         end
       else
       end
-      render :reporting
+      render :reporting, :layout => "printer"
     end
   end
 
@@ -189,7 +198,7 @@ class Searches < Application
     model = Kernel.const_get(params[:model][params[:counter]].singularize.camelcase)
 
     if not params[:property] or not params[:property][params[:counter]] or params[:property][params[:counter]].blank?
-      return "<option value=''>select property</option>"+get_properties_for(model).collect{|prop| "<option value='#{prop}'>#{prop}</option>"}.join, :layout => false
+      return "<option value=''>select property</option><option value='all'><b>all</b></option>"+get_properties_for(model).collect{|prop| "<option value='#{prop}'>#{prop}</option>"}.join, :layout => false
     end
 
     property = model.properties.find{|p| p.name.to_s==params[:property][params[:counter]]} || model.relationships[params[:property][params[:counter]]]

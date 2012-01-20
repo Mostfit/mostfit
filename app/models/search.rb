@@ -37,14 +37,16 @@ class Search
     return {models.uniq.first.to_s.snake_case.to_sym => models.first.all(queries.values.first).aggregate(:id)} if models.uniq.length==1
 
     #chaining
-    last_ids = {}; ids = []; result = {}
+    last_ids = {}; ids = []; result = {}; last_model = nil
     models.each{|model|
       # we use the ids here becuase datamapper is very slow dealing with collections
       # after all, an ORM is not meant for aggregating data
       # TODO check if this has been addressed in the latest version
+      next if model == last_model # i am not sure if uniq preserves array order, which is why we are not relying on models.uniq to achieve this
       ids = model.all(queries[model].merge(last_ids)).aggregate(:id)
       result[model.to_s.snake_case.to_sym] = ids
       last_ids = {"#{model.to_s.snake_case}_id".to_sym => ids}
+      last_model = model
     }
     result
   end
