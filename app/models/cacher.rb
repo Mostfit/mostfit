@@ -16,6 +16,8 @@ class Cacher
   property :scheduled_principal_due,         Float, :nullable => false
   property :scheduled_interest_due,          Float, :nullable => false
   
+
+
   property :principal_due,                   Float, :nullable => false
   property :interest_due,                    Float, :nullable => false
   property :principal_due_today,             Float, :nullable => false # this is the principal and interest 

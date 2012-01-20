@@ -27,7 +27,7 @@
                 %td
                   - field = obj.send(function)
                   - if function == :manager or function == :center
-                    = link_to(field.name, resource(field))
+                    = link_to(field.name, resource(field)) rescue ''
                   - elsif model.to_sym == :bookmarks
                     - if obj.method==:get
                       - route = YAML::load(obj.route).last

@@ -281,134 +281,133 @@ class Array
   def group_by_function(func)
     group_by{|x|
       func.call(x[0])
-      }.map{|k,v|
-        [k, v.map{|x| x[1]}.reduce{|s,x|
+    }.map{|k,v|
+      [k, v.map{|x| x[1]}.reduce{|s,x|
          s+=x
-         }]
-         }.sort_by{|x| x[0]}
-       end
+       }]
+    }.sort_by{|x| x[0]}
+  end
 
-       def sum
-        self.reduce(:+)
-      end
+  def sum
+    self.reduce(:+)
+  end
 
-      def chunk len
-        a = []
-        each_with_index do |x,i|
-          a << [] if i % len == 0
-          a.last << x
-        end
-        a
-      end
-
+  def chunk len
+    a = []
+    each_with_index do |x,i|
+      a << [] if i % len == 0
+      a.last << x
     end
+    a
+  end
+end
 
 
-    module ExcelFormula
-      def pmt(interest, installments, present_value, future_value, paid_before=1)
-        vPow = (1 + interest) ** installments
-        actual_interest_rate = (paid_before == 0 ? interest : interest/(1 + interest))
-        (vPow * present_value - future_value)/(vPow - 1) * actual_interest_rate
-      end
+module ExcelFormula
+  def pmt(interest, installments, present_value, future_value, paid_before=1)
+    vPow = (1 + interest) ** installments
+    actual_interest_rate = (paid_before == 0 ? interest : interest/(1 + interest))
+    (vPow * present_value - future_value)/(vPow - 1) * actual_interest_rate
+  end
+end
+
+
+module FinancialFunctions
+  def npv(cashflows, discount_rate)
+    (cashflows.enum_for(:each_with_index).collect{|x,i| x/((1+discount_rate)**i)}).inject(0){|a,b| a+b}
+  end
+  
+  def irr(cash_flows, iterations = 100)
+    (1..iterations).inject do |rate,|
+      npv = cash_flows.enum_for(:each_with_index).inject {|(m,),(c,t)| m+c/(1.0+rate)**t}
+      rate * (1 - npv / cash_flows.first)
     end
+  end
+end
 
 
-    module FinancialFunctions
-      def npv(cashflows, discount_rate)
-        (cashflows.enum_for(:each_with_index).collect{|x,i| x/((1+discount_rate)**i)}).inject(0){|a,b| a+b}
-      end
-
-      def irr(cash_flows, iterations = 100)
-        (1..iterations).inject do |rate,|
-          npv = cash_flows.enum_for(:each_with_index).inject {|(m,),(c,t)| m+c/(1.0+rate)**t}
-          rate * (1 - npv / cash_flows.first)
-        end
-      end
+module DmPagination
+  class PaginationBuilder
+    def url(params)
+      @context.params.delete(:action) if @context.params[:action] == 'index'
+      @context.url(@context.params.merge(params).reject{|k,v| k=="_message"})
     end
+  end
+end
 
 
-    module DmPagination
-      class PaginationBuilder
-        def url(params)
-          @context.params.delete(:action) if @context.params[:action] == 'index'
-          @context.url(@context.params.merge(params).reject{|k,v| k=="_message"})
-        end
-      end
-    end
-
-
-    # Wow. It this supposed to be classless?
-    def get_bulk_insert_sql(table_name, data, add = {}, drop = [])
-      # if you have some values that are common across all rows, pass them in the 'add' parameter
-      # similarly, any keys to be dropped are in the 'drop' parameter
-      # this saves you two loops through the data
-      t = Time.now
-      first_row = add.blank? ? data.first : data.first.merge(add)
-      keys = first_row.keys - drop
-      sql = "INSERT INTO #{table_name}(#{keys.join(',')} )
+# Wow. It this supposed to be classless?
+def get_bulk_insert_sql(table_name, data, add = {}, drop = [])
+  # if you have some values that are common across all rows, pass them in the 'add' parameter
+  # similarly, any keys to be dropped are in the 'drop' parameter
+  # this saves you two loops through the data
+  t = Time.now
+  first_row = add.blank? ? data.first : data.first.merge(add)
+  keys = first_row.keys - drop
+  sql = "INSERT INTO #{table_name}(#{keys.join(',')} )
       VALUES "
-      values = []
-      classes = data.first.map{|k,v| [k,v.class]}.to_hash
-      data.each_with_index do |row,i|
-        row.merge!(add)
-        value = keys.map do |k|
-          v = row[k]; c = classes[k]
-          raise ArgumentError.new("#{k} is nil") if v.nil?
-          format_for_sql(v,c)
-        end
-        values << "(#{value.join(',')})"
-      end
-      sql += values.join(",") + ";"
-      sql
+  values = []
+  classes = data.first.map{|k,v| [k,v.class]}.to_hash
+  data.each_with_index do |row,i|
+    row.merge!(add)
+    value = keys.map do |k|
+      v = row[k]; c = classes[k]
+      raise ArgumentError.new("#{k} is nil") if v.nil?
+      format_for_sql(v,c)
     end
+    values << "(#{value.join(',')})"
+  end
+  sql += values.join(",") + ";"
+  sql
+end
 
-    # fast formatting. required for large bulk insert statements  
-    # v is the value, c is the class
-    def format_for_sql(v, c = nil) 
-      c ||= v.class
-      return "'#{v}'" if c == String
-      # we do not use strftime because gsub is very expensive.
-      # SERIOUS ABOUT SCALE baby!   
-      return "'#{v.year}-#{v.month}-#{v.day}'" if c == Date
-      return "'#{v.year}-#{v.month}-#{v.day} #{v.hour}:#{v.min}:#{v.sec}'" if  c == DateTime
-      return "(#{v.join(',')})" if c == Array
-      return "#{format_for_sql(v.first)} AND #{format_for_sql(v.last)}" if c == Range
-      return v
-    end
+# fast formatting. required for large bulk insert statements  
+# v is the value, c is the class
+def format_for_sql(v, c = nil) 
+  c ||= v.class
+  return "'#{v}'" if c == String
+  # we do not use strftime because gsub is very expensive.
+  # SERIOUS ABOUT SCALE baby!   
+  return "'#{v.year}-#{v.month}-#{v.day}'" if c == Date
+  return "'#{v.year}-#{v.month}-#{v.day} #{v.hour}:#{v.min}:#{v.sec}'" if  c == DateTime
+  return "(#{v.join(',')})" if c == Array
+  return "#{format_for_sql(v.first)} AND #{format_for_sql(v.last)}" if c == Range
+  return v
+end
 
-    def get_where_from_hash(hash)
-      # naive function to make a WHERE clause from a Hash.
-      # isn't there a library somewhere that does this? DM is too slow running aggregates
-      # and additionally, not possible to ask DM to just craft an SQL statement and give it to us (i think)
-      hash.map do |col, v|
-        val = format_for_sql(v)
-        operator = {Array => "IN", Range => "BETWEEN"}[v.class] || "="
-        "#{col} #{operator} #{val}" 
-      end.join(" AND ")
-    end
-    
-    def q(sql)
-      repository.adapter.query(sql)
-    end
-
-
-    class BigDecimal
-      def inspect
-        self.to_f
-      end
-
-      def round_to_nearest(i = nil, style = :round)
-        return self if i.nil?
-        return self unless self.respond_to?(style)
-        (self / i).send(style) * i
-      end
-    end
+def get_where_from_hash(hash)
+  # naive function to make a WHERE clause from a Hash.
+  # isn't there a library somewhere that does this? DM is too slow running aggregates
+  # and additionally, not possible to ask DM to just craft an SQL statement and give it to us (i think)
+  hash.map do |col, v|
+    val = format_for_sql(v)
+    operator = {Array => "IN", Range => "BETWEEN"}[v.class] || "="
+    "#{col} #{operator} #{val}" 
+  end.join(" AND ")
+end
 
 
-    class Nothing
-      # instead of saying i.e. (Organization.get_organization(self.received_on).org_guid if Organization.get_organization(self.received_on) or "0000-0000" you can now say
-      # (Organization.get_organization(self.received_on) || Nothing).org_guid || "0000-0000"
-      def self.method_missing(method_name, *args)
-        nil
-      end
-    end
+def q(sql)
+  repository.adapter.query(sql)
+end
+
+class BigDecimal
+  def inspect
+    self.to_f
+  end
+  
+  def round_to_nearest(i = nil, style = :round)
+    return self if i.nil?
+    return self unless self.respond_to?(style)
+    (self / i).send(style) * i
+  end
+end
+
+
+class Nothing
+  # instead of saying i.e. (Organization.get_organization(self.received_on).org_guid if Organization.get_organization(self.received_on) or "0000-0000" you can now say
+  # (Organization.get_organization(self.received_on) || Nothing).org_guid || "0000-0000"
+  def self.method_missing(method_name, *args)
+    nil
+  end
+end

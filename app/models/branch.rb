@@ -58,14 +58,15 @@ class Branch
     branch_center_ids = self.centers.aggregate(:id)
     mday = (params[:meeting_day] or Nothing).to_sym || Date.today.weekday
     if Center::DAYS.include?(mday) # is a weekday
+      # first check the center_meeting_days
       # either the meeting day is set directly on the center_meeting_day
       # or it is set on the "what" property. effing backward compatibility!
-      cids = self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :meeting_day => mday, :what => nil).aggregate(:center_id) +
-        self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :meeting_day => mday, :what => :day).aggregate(:center_id) +
+      cids = self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :meeting_day => mday).aggregate(:center_id) +
         self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :what => mday, :meeting_day => :none).aggregate(:center_id)
-      #cids += (self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :what => mday).aggregate(:center_id) &
-      #         self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today, :meeting_day => :none).aggregate(:center_id))
-      to_be_ignored = self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today).aggregate(:center_id)
+
+      # then check the centers themselves
+      # to be ignored because we have already counted these in the above cids
+      to_be_ignored = self.centers.center_meeting_days(:valid_from.lte => Date.today, :valid_upto.gte => Date.today).aggregate(:center_id) 
       cids += Center.all(:id => branch_center_ids, :meeting_day => mday).aggregate(:id) - to_be_ignored
     elsif mday == :monthly
       cids = self.centers.center_meeting_days(:period => :month).aggregate(:center_id)

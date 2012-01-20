@@ -1,8 +1,27 @@
+:javascript
+  // a function to insert the correct amount in the text box in case we choose to prepay all
+  $(document).ready(function () {
+    $('#preclose_all').change(function() {
+      checked = $('#preclose_all').attr('checked')
+      $('.pay_amt').each(function() {
+        me = $(this);
+        use_field = checked ? '#outstanding_amt_' : '#amount_due_'
+        oa =   $(use_field + me.attr('id').split("_")[1]).attr('value')
+        $(this).attr('value', oa)
+      });
+    });
+  });
+      
+          
+      
 - if @md
   Payments collected by 
   = select :name => "payment[received_by]", :collection => staff_members_collection, :selected => @center.manager.id.to_s, :id => 'payments_received_by', :class => "chosen"
   collected on
   = date_select "received_on", @date
+  &nbsp;&nbsp;
+  preclose all?
+  = check_box :id => "preclose_all", :name => "preclose_all"
   %table.report.nojs
     %thead
       %tr{:style => "font-size: 0.85em;"}
@@ -68,6 +87,7 @@
                 - tot_amount += amt
               %td.number
                 - prin = lh.nil? ? 0 : lh.actual_outstanding_principal
+                = hidden_field :id => "outstanding_amt_#{lh.loan_id}", :value => (lh.actual_outstanding_principal + lh.interest_due)
                 %b= prin.to_currency
                 - tot_outstanding += prin
               %td.text
@@ -87,10 +107,11 @@
                 = a.round(2)
                 - tot_total += a
               %td.paid
-                - if a > 0.01
-                  = text_field :name => "paid[loan][#{loan.id}]", :value => [a,0].max.round(2), :cols => "5", :style => "width:50px;" 
-                - else
-                  = lh.principal_paid + lh.interest_paid
+                -# - if a > 0.01
+                = hidden_field :id => "amount_due_#{lh.loan_id}", :value => [a,0].max.round(2)
+                = text_field :name => "paid[loan][#{loan.id}]", :value => [a,0].max.round(2), :cols => "5", :style => "width:50px;", :id => "pay_#{loan.id}", :class => 'pay_amt'
+                -# - else
+                -#   = lh.principal_paid + lh.interest_paid
               %td 
                 = select :name => "payment_style[#{loan.id}]", :collection => repayment_style_choices
               %td

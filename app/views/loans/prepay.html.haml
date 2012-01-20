@@ -67,14 +67,26 @@
             Total P and I due
           %td
           %td
-            = (missed_int + accrued_int + os_prin).to_currency
+            - total = (missed_int + accrued_int + os_prin)
+            = total.to_currency
         %tr
           %th
             Penalty
           %td
-            = select :name => "fee", :collection => Fee.all, :value_method => :id, :text_method => :name, :prompt => "Apply penalty as", :style => 'width:200px;'
+            - @loan.loan_product.fees(:payable_on => :penalty).each do |f|
+              = f.name
           %td
-            = text_field :name => :penalty_amount
+            - @loan.loan_product.fees(:payable_on => :penalty).each do |f|
+              - fee_amt = f.amount_for(@loan, @date)
+              - total += fee_amt
+              = fee_amt
+              = hidden_field :name => "fees[#{f.id}]", :value => fee_amt
+        %tr.total
+          %th
+            Total Due
+          %td
+          %td
+            = (total).to_currency
         %tr
           %th
             Received By

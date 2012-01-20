@@ -187,7 +187,6 @@ namespace :mostfit do
         clients = Client.all(:center_id => cid)
         lp = LoanProduct.all[rand(LoanProduct.all.count - 1)] # same loan product for all
         clients.each do |c|
-          debugger
           mdates = center.get_meeting_dates(3,c.date_joined)
           scheduled_disbursal_date = mdates[-2]
           l = Loan.new(:amount => lp.min_amount, :interest_rate => lp.min_interest_rate/100, :loan_product => lp,
