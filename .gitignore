@@ -53,3 +53,9 @@ oink.sed
 *csv
 *zip
 profile*html
+bin/i18n-translate
+bin/nokogiri
+bin/rgettext
+bin/rmsgfmt
+bin/rmsgmerge
+bin/techbook
