@@ -114,6 +114,25 @@ class Clients < Application
     end
   end
 
+  def move_to_center(id)
+    debugger
+    @client = Client.get(id)
+    raise NotFound unless @client
+    @center = @client.center
+    @date = Date.parse(params[:date]) rescue nil
+    @new_center = Center.get(params[:new_center_id])
+    if @date and @new_center
+      if @client.move_to_center(@new_center, @date)
+        redirect resource(@client), :message => {:success => "Client has been moved from <b>#{@center.name}</b> to <b>#{@new_center.name}</b>"}
+      else
+        redirect resource(@client), :message => {:error => "Client <b>could not</b> moved from <b>#{@center.name}</b> to <b>#{@new_center.name}</b>"}
+      end
+    else
+      redirect resource(@client), :message => {:error => "Date not valid or new center does not exist"}
+    end
+  end
+        
+
   def delete(id)
     edit(id)  # so far these are the same
   end
@@ -161,6 +180,31 @@ class Clients < Application
     render
   end
   
+  def bulk_move
+    if request.method == :get
+      @errors = {}
+      @center = Center.get(params[:center_id])
+      raise NotFound unless @center
+      @clients = @center.clients
+      render
+    else
+      debugger
+      @center = Center.get(params[:center_id])
+      raise NotFound unless @center
+      @date = Date.parse(params[:date]) rescue nil
+      @new_center = Center.get(params[:new_center_id])
+      if @date and @new_center
+        Client.transaction do |t|
+          @center.clients.each do |c|
+            debugger
+            c.move_to_center(@new_center, @date)
+          end
+        end
+      end
+      redirect resource(@new_center)
+    end
+  end
+
   def bulk_entry
     if request.method == :get
       @errors = {}

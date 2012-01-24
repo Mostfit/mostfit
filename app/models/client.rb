@@ -85,6 +85,50 @@ class Client
   property :not_irrigated_land_shared_wasteland, Integer, :lazy => true
   property :caste, Enum.send('[]', *['', 'sc', 'st', 'obc', 'general']), :default => '', :nullable => true, :lazy => true
   property :religion, Enum.send('[]', *['', 'hindu', 'muslim', 'sikh', 'jain', 'buddhist', 'christian']), :default => '', :nullable => true, :lazy => true
+
+  property :center_history, Text # marshal.dump of past centers in format{date_upto => center_id}
+
+  def past_centers=(hash)
+      self.center_history = hash.to_json
+  end
+
+  def past_centers
+    return @pcs if @pcs
+    @pcs = self.center_history ? JSON::parse(self.center_history).map{|k,v| [Date.parse(k),v]}.to_hash : {}
+  end
+
+
+  def past_branches
+    # later this must support movement of centers between branches as as well
+    return @pbs if @pbs
+    bs = Center.all(:id => past_centers.values).aggregate(:id, :branch_id).to_hash
+    @pbs = past_centers.map{|k,v| [k, bs[v]]}.to_hash
+  end
+
+
+  def move_to_center(center, as_of_date)
+    center = center.class == Center ? center : Center.get(center_id)
+    pcs = self.past_centers || {}
+    pcs[as_of_date - 1] = self.center.id
+    self.center = center
+    self.past_centers = pcs
+    self.client_group = nil
+    self.save!
+    self.loans.each{|l| l.update_history}
+    return true
+  end
+
+  def center_for_date(date)
+    return center_id if past_centers.blank?
+    return center_id if self.past_centers.keys.max < date
+    self.past_centers[self.past_centers.select{|k,v| k >= date}.to_hash.keys.sort[0]]
+  end
+
+  def branch_for_date(date)
+    return center.branch_id if past_centers.blank? or self.past_centers.keys.max < date
+    self.past_branches[self.past_branches.select{|k,v| k >= date}.to_hash.keys.sort[0]]
+  end
+
   validates_length :number_of_family_members, :max => 20
   validates_length :school_distance, :max => 200
   validates_length :phc_distance, :max => 500
