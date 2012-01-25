@@ -68,13 +68,14 @@ class LoanHistory
   property :client_group_id,             Integer, :index => true
   property :center_id,                   Integer, :index => true
   property :branch_id,                   Integer, :index => true
-
+  #property :area_id,                     Integer, :index => true
+  #property :region_id,                   Integer, :index => true
   property :holiday_id,                  Integer
 
   property :funding_line_id,             Integer, :index => true
   property :funder_id,                   Integer, :index => true
   property :loan_product_id,             Integer, :index => true
-
+  property :loan_pool_id,                Integer, :nullable => true, :index => true
   property :composite_key, Float, :index => true
 
 
@@ -149,16 +150,30 @@ class LoanHistory
     q(%Q{
           SELECT loan_id, max(composite_key)
           FROM   loan_history 
-          WHERE  #{get_where_from_hash(hash)} 
-          AND date <= '#{date.strftime('%Y-%m-%d')}'
-          GROUP BY loan_id}).map{|x| x[1].round(4)} 
-
+          WHERE  #{(get_where_from_hash(hash) + " AND ") unless hash.blank?} 
+                 date <= '#{date.strftime('%Y-%m-%d')}'
+          GROUP BY loan_id
+        }).map{|x| x[1].round(4)} 
   end
 
   def self.latest(hash = {}, date = Date.today)
     # returns the last LoanHistory per loan before date
     LoanHistory.all(:composite_key => LoanHistory.latest_keys(hash, date))
   end
+
+  def self.latest_by_status(options)
+    # to select, for example, only outstanding loans on a particular date,
+    # we cannot simply say LoanHistory.latest(:status => :outstanding, @date)
+    # because this will simply return the last row when the loan was outstanding even if the loan has been
+    # repaid before @date. Hence we need to take a circuituous route where we first select the latest row and then filter for outstanding loans
+    selection = options.except(:status)
+    date = options[:date] || Date.today
+    status = options[:status]
+    cks = LoanHistory.get_composite_keys(selection)
+    LoanHistory.all(:composite_key => cks, :status => :outstanding)
+  end
+    
+
 
   def self.latest_sum(hash = {}, date = Date.today, group_by = [], cols = [])
     # sums up the latest loan_history row per loan, even groups by any attribute
@@ -669,7 +684,7 @@ class LoanHistory
 
     repository.adapter.query(%Q{
       SELECT 
-        SUM(l.amount) AS loan_amount,
+        SUM(lh.total_principal_paid) AS loan_amount,
         COUNT(DISTINCT(lh.loan_id)) loan_count,
         #{selects}
       FROM loan_history lh, loans l
@@ -688,16 +703,11 @@ class LoanHistory
     repository.adapter.query(%Q{
       SELECT
         SUM(lh.actual_outstanding_principal) AS loan_amount,
-        COUNT(lh.loan_id) loan_count,
+        COUNT(DISTINCT(lh.loan_id)) loan_count,
         #{selects}
-      FROM (SELECT max(lh.date) date, lh.loan_id loan_id
-            FROM loan_history lh, loans l
-            WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (7) AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
-                  AND lh.scheduled_outstanding_total > 0 AND lh.scheduled_outstanding_principal > 0 #{extra}
-            GROUP BY lh.loan_id
-            ) dt, loan_history lh, loans l
-      WHERE lh.loan_id=dt.loan_id AND lh.date = dt.date AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}'
-            AND lh.loan_id=l.id AND l.deleted_at is NULL #{extra}
+      FROM loan_history lh, loans l
+      WHERE lh.status in (10) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL  
+           AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
       #{group_by_query};
     })    
   end
@@ -711,15 +721,11 @@ class LoanHistory
     repository.adapter.query(%Q{
       SELECT
         SUM(lh.actual_outstanding_principal) AS loan_amount,
-        COUNT(lh.loan_id) loan_count,
+        COUNT(DISTINCT(lh.loan_id)) loan_count,
         #{selects}
-      FROM (SELECT max(lh.date) date, lh.loan_id loan_id
-            FROM loan_history lh, loans l
-            WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (8) AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{query}
-            GROUP BY lh.loan_id
-            ) dt, loan_history lh, loans l
-      WHERE lh.loan_id=dt.loan_id AND lh.date = dt.date AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}'
-            AND lh.loan_id=l.id AND l.deleted_at is NULL #{extra}
+      FROM loan_history lh, loans l
+      WHERE lh.status in (8) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL  
+           AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
       #{group_by_query};
     })    
   end
