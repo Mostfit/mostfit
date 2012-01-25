@@ -288,10 +288,6 @@ class Array
     }.sort_by{|x| x[0]}
   end
 
-  def sum
-    self.reduce(:+)
-  end
-
   def chunk len
     a = []
     each_with_index do |x,i|
@@ -300,6 +296,12 @@ class Array
     end
     a
   end
+
+
+  def sum
+    self.reduce(:+)
+  end
+
 end
 
 
@@ -310,7 +312,6 @@ module ExcelFormula
     (vPow * present_value - future_value)/(vPow - 1) * actual_interest_rate
   end
 end
-
 
 module FinancialFunctions
   def npv(cashflows, discount_rate)
@@ -379,13 +380,28 @@ def get_where_from_hash(hash)
   # naive function to make a WHERE clause from a Hash.
   # isn't there a library somewhere that does this? DM is too slow running aggregates
   # and additionally, not possible to ask DM to just craft an SQL statement and give it to us (i think)
+  return " 1 " if hash.blank?
   hash.map do |col, v|
     val = format_for_sql(v)
-    operator = {Array => "IN", Range => "BETWEEN"}[v.class] || "="
+    if col.class == DataMapper::Query::Operator
+      fn = col.operator.to_s
+      col = col.target.to_s
+    else
+      fn = col.to_s.split(".")[1]
+      col = col.to_s.split(".")[0]
+    end
+    if fn == "not"
+      operator = {Array => "NOT IN", Range => "NOT BETWEEN"}[v.class] || "<>"
+    elsif fn == "gt"
+      operator = ">"
+    elsif fn == "gte"
+      operator = ">="
+    else
+      operator = {Array => "IN", Range => "BETWEEN"}[v.class] || "="
+    end
     "#{col} #{operator} #{val}" 
   end.join(" AND ")
 end
-
 
 def q(sql)
   repository.adapter.query(sql)
@@ -395,7 +411,7 @@ class BigDecimal
   def inspect
     self.to_f
   end
-  
+
   def round_to_nearest(i = nil, style = :round)
     return self if i.nil?
     return self unless self.respond_to?(style)
