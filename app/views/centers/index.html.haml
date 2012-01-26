@@ -1,7 +1,7 @@
 - if @branch
   .shaded{:style => "padding: 5px; margin-bottom: 10px;"}
-    .graph{:style => "height: 200px; position: relative; top: 30px;"}
-      = ofc2(550, 250, url(:graph_data, :action => 'branch', :id => @branch.id, :scope_unit => 'months', :scope_size => 3) )
+    -#  .graph{:style => "height: 200px; position: relative; top: 30px;"}
+    -#    = ofc2(550, 250, url(:graph_data, :action => 'branch', :id => @branch.id, :scope_unit => 'months', :scope_size => 3) )
 
     %h1== Branch: <i>#{@branch.name}</i>
     %p.menu-strip{:style => "width: 44%; margin-bottom: 0.2em;"}
@@ -54,8 +54,8 @@
     %ul.tabs
       %li#centers
         Centers
-      -# %li#info
-        -# Info
+      %li#info
+        Info
       %li#exceptions
         Exceptions
       %li#documents
@@ -85,9 +85,9 @@
       %div#container_centers_list
         =partial "centers/list"
     %div.tab
-      %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@branch.id}?for=branch"}
-    -# %div.tab
-      -# %input{:type => "hidden", :name => "_load_remote", :value => "/info/exceptions/#{@branch.id}?for=branch"}
+      %input{:type => "hidden", :name => "_load_remote", :value => url(:controller => :info, :action => :branchinfo, :id => @branch.id)}
+    %div.tab
+      %input{:type => "hidden", :name => "_load_remote", :value => "/info/exceptions/#{@branch.id}?for=branch"}
     %div.tab
       %input{:type => "hidden", :name => "_load_remote", :value => resource(:documents, :parent_id => @branch.id, :parent_model => Branch)}
     %div.tab

@@ -169,7 +169,7 @@ class LoanHistory
     selection = options.except(:status)
     date = options[:date] || Date.today
     status = options[:status]
-    cks = LoanHistory.get_composite_keys(selection)
+    cks = LoanHistory.latest_keys(selection,date)
     LoanHistory.all(:composite_key => cks, :status => status)
   end
     

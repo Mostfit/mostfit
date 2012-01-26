@@ -1067,9 +1067,9 @@ class Loan
     if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
       # DIRTY HACK! We cannot have two installment dates in the same week. So, we have to start counting with the first installment date and then go on to Sunday
       # so that the next date is gauranteed to be in the next week.
-      if installment_frequency == :weekly
+      if [:weekly, :biweekly].include?(installment_frequency)
         d = scheduled_first_payment_date
-        start_date = d - d.cwday + 7
+        start_date = d - d.cwday + (installment_frequency == :weekly ? 7 : 14)
       else
         # we need to verify if this works correctly when we get loans that are not weekly
         start_date = scheduled_first_payment_date

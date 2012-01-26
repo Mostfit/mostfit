@@ -12,6 +12,7 @@ class Branches < Application
   end
 
   def show(id)
+    debugger
     @option = params[:option] if params[:option]
     @branch = Branch.get(id)
     raise NotFound unless @branch
