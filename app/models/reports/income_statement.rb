@@ -22,12 +22,14 @@ class IncomeStatement < Report
     INCOME_HEADS.each do |income_head|
       accounts_and_amounts = {}
       Account.all(:income_head => income_head, :branch_id => branch_id).each do |account|
-        amount = account.change_closing_over_opening_balance_for_period accounting_period.begin_date
+        on_date = accounting_period.end_date > Date.today ? Date.today : accounting_period.end_date
+        amount = account.closing_balance_as_of on_date
         amount ||= 0.0
         accounts_and_amounts[account] = amount 
       end
       data[income_head] = accounts_and_amounts
     end
+    p data
     data
   # TODO: Display side-by-side for chosen period and previous period
   end

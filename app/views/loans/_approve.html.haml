@@ -1,3 +1,8 @@
+:javascript
+  $(document).ready(function() {
+  $('#toggle_approve').change(function() {
+    $('.approve').attr('checked',$(this).attr('checked'))});  
+  });
 %table.report.nojs    
   %thead
     %tr{:style => "font-size: 0.85em;"}
@@ -14,6 +19,8 @@
       %th
         Approval Date
       %th
+        Scheduled Disbursal Date
+      %th
         Scheduled 1st Payment Date
       %th
         Center Meeting Day
@@ -21,11 +28,12 @@
         Status
       %th
         Selected
+        = check_box :id => "toggle_approve"
       %th
         Approved By
   - staff_members_allowed = staff_members_collection
-  -@loans_to_approve.each do |loan|
-    - client = @clients.find{|x| x.id==loan.client_id}
+  - @loans_to_approve.each do |loan|
+    - client = @clients.find{|x| x.id==loan.client_id} || loan.client
     %tr{:class => cycle('odd','')}
       %td.number
         = link_to loan.id, url(:quick_link, "loans", loan.id)
@@ -41,6 +49,11 @@
         - min_date = (loan.applied_on > Date.min_transaction_date ? loan.applied_on : Date.min_transaction_date)
         = date_select("loans[#{loan.id}][approved_on]", min_date, :id => "loans_#{loan.id}_approved_on", :min_date => min_date, :max_date => Date.max_transaction_date)
       %td.text
+        - min_date = (loan.scheduled_disbursal_date > Date.min_transaction_date ? loan.scheduled_disbursal_date : Date.min_transaction_date)
+        = date_select("loans[#{loan.id}][scheduled_disbursal_date]", min_date, :id => "loans_#{loan.id}_scheduled_disbursal_date", :min_date => min_date, :max_date => Date.max_transaction_date)
+        = loan.scheduled_first_payment_date.strftime('%A')
+
+      %td.text
         - min_date = (loan.scheduled_first_payment_date > Date.min_transaction_date ? loan.scheduled_first_payment_date : Date.min_transaction_date)
         = date_select("loans[#{loan.id}][scheduled_first_payment_date]", min_date, :id => "loans_#{loan.id}_scheduled_first_payment_date", :min_date => min_date, :max_date => Date.max_transaction_date)
         = loan.scheduled_first_payment_date.strftime('%A')
@@ -49,12 +62,12 @@
       %td.text
         = loan.status.to_s.camelcase(' ')
       %td
-        = check_box :name => "loans[#{loan.id}][approved?]"
+        = check_box :name => "loans[#{loan.id}][approved?]", :class => "approve"
       %td.text
         = select :name => "loans[#{loan.id}][approved_by_staff_id]", :collection => staff_members_allowed, :selected => client.center.branch.manager.id.to_s
   %tfoot
     %tr
-      %td{:colspan => 11}
+      %td{:colspan => 12}
   
 = paginate @loans_to_approve if @loans_to_approve.respond_to?(:page)
  

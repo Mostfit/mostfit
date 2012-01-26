@@ -139,6 +139,7 @@ class Payments < Application
       @payment.loan = @loan if @loan
       @payment.client = @client if @client
       @payment.created_by = session.user
+      @payment.created_at = Time.now
       @payment.received_on = date
       success = @payment.save
     end

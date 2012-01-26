@@ -7,15 +7,16 @@ class Loan
 
   DAYS = [:none, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
 
-  before :valid?,  :parse_dates
-  before :valid?,  :convert_blank_to_nil
-  before :valid?,  :set_loan_product_parameters
-
-  before :save,    :update_loan_cache
-  before :save,    :levy_fees
-  before :save,    :set_bullet_installments
-
-  before :destroy, :verified_cannot_be_deleted
+  before :valid?,    :parse_dates
+  before :valid?,    :convert_blank_to_nil
+  after  :save,      :update_history_caller  # also seems to do updates
+  before :save,      :update_loan_cache
+  after  :create,    :levy_fees_new          # we need a separate one for create for a variety of reasons to  do with overwriting old fees
+  before :save,      :levy_fees
+  after  :create,    :update_cycle_number
+  before :destroy,   :verified_cannot_be_deleted
+  before :valid?,    :set_loan_product_parameters
+  before :save,      :set_bullet_installments
 
   after  :save,    :update_history_caller  # also seems to do updates
   after  :create,  :levy_fees_new          # we need a separate one for create for a variety of reasons to  do with overwriting old fees
@@ -224,6 +225,8 @@ class Loan
     self.c_branch_id = self.client.center.branch.id if force
     self.c_client_group_id = (self.client.client_group_id if force) or 0
     self.c_scheduled_maturity_date = scheduled_maturity_date
+    st = self.get_status
+    self.c_last_status = STATUSES.index(st) + 1
   end
 
   # DEPRECATED: all this good stuff is now easily accessible from loan_history
@@ -282,7 +285,7 @@ class Loan
       :client                             => Client.first(:reference => row[headers[:client_reference]])}
     obj = new(hash)
     obj.history_disabled=true
-    saved = obj.save!
+    saved = obj.save
     if saved
       c = Checker.first_or_new(:model_name => "Loan", :reference => obj.reference)
       c.check_field = row[headers[:check_field]]
@@ -612,7 +615,7 @@ class Loan
   def pay_prorata(total, received_on)
     # calculates total interest and principal payable in this amount and divides the amount proportionally
     int_to_pay = prin_to_pay = amt_to_pay = 0
-
+    $debug = true
     # load relevant loan_history rows
     loan_history.all( :order => [:date]).map do |lh|
       next if amt_to_pay >= total or ((lh.interest_due + lh.principal_due) == 0)
@@ -1086,7 +1089,7 @@ class Loan
     return :disbursed            if (date == disbursal_date.holiday_bump) and total_received < total_to_be_received
     if total_received >= total_to_be_received
       @status =  :repaid
-    elsif (amount - principal_received) <= EPSILON and scheduled_interest_up_to(date)<=interest_received_up_to(Date.today)
+    elsif (amount - principal_received) <= EPSILON and (scheduled_interest_up_to(date)-interest_received_up_to(Date.today) <= EPSILON)
       @status =  :repaid
     elsif amount<=principal_received
       @status =  :repaid
@@ -1117,9 +1120,9 @@ class Loan
     if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
       # DIRTY HACK! We cannot have two installment dates in the same week. So, we have to start counting with the first installment date and then go on to Sunday
       # so that the next date is gauranteed to be in the next week.
-      if installment_frequency == :weekly
+      if [:weekly, :biweekly].include?(installment_frequency)
         d = scheduled_first_payment_date
-        start_date = d - d.cwday + 7
+        start_date = d - d.cwday + (installment_frequency == :weekly ? 7 : 14)
       else
         # we need to verify if this works correctly when we get loans that are not weekly
         start_date = scheduled_first_payment_date
@@ -1242,12 +1245,12 @@ class Loan
       total_interest_due                    += outstanding_at_start ? scheduled[:interest].round(2) : 0
       principal_due                          = outstanding_at_start ? [total_principal_due - act_total_principal_paid,0].max : 0
       interest_due                           = outstanding_at_start ? [total_interest_due - act_total_interest_paid,0].max : 0
+      principal_due_today                    = [principal_due - ((last_row or Nothing)[:principal_due] || 0), 0].max
+      interest_due_today                     = [interest_due  - ((last_row or Nothing)[:interest_due]  || 0), 0].max
 
       actual_outstanding_principal           = outstanding ? actual[:balance].round(2) : 0
       actual_outstanding_total               = outstanding ? actual[:total_balance].round(2) : 0
       actual_outstanding_interest            = outstanding ? (actual_outstanding_total - actual_outstanding_principal) : 0
-      # Debug only on 9/7/2011?
-      debugger if date == Date.new(2011,9,7)
       _apo                                   = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max # advance principal outstanding at the start
       _api                                   = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
       advance_principal_outstanding          = outstanding ?  _apo : 0
@@ -1299,6 +1302,8 @@ class Loan
         :scheduled_interest_due              => scheduled_interest_due,
         :principal_due                       => principal_due.round(2), 
         :interest_due                        => interest_due.round(2),
+        :principal_due_today                 => principal_due_today.round(2),
+        :interest_due_today                  => interest_due_today.round(2),
         :principal_paid                      => prin.round(2),
         :interest_paid                       => int.round(2),
         :total_principal_due                 => total_principal_due.round(2),
@@ -1337,7 +1342,7 @@ class Loan
       }
       # {:date_field => [:status, :loan_property]}
       {:applied_on => [:applied, :amt_applied_for], :approved_on => [:approved, :amt_sanctioned], :rejected_on => [:rejected, :amount], 
-        :disbursal_date => [:disbursed, :amount], :written_off_on => [:written_off, :last_balance], :preclosed_on => [:preclosed, :last_balance]}.each do |dt, action|
+        :disbursal_date => [:disbursed, :amount], :written_off_on => [:written_off, :last_balance]}.each do |dt, action|
         if date == self.send(dt)
           current_row[action[0]] = action[1] == :last_balance ? last_row[:actual_outstanding_principal] : self.send(action[1])
           current_row["#{action[0].to_s}_count".to_sym] = 1 
@@ -1346,6 +1351,9 @@ class Loan
           current_row["#{action[0].to_s}_count".to_sym] = 0 
         end
       end
+
+      current_row[:preclosed] =   (date == self.preclosed_on) ? current_row[:advance_principal_paid_today] : 0
+      current_row[:preclosed_count] = (date == self.preclosed_on) ? 1 : 0
 
       @history_array << current_row
       last_status = current_row[:status]
@@ -1361,34 +1369,15 @@ class Loan
     @history_array
   end
 
-  def _show_his(arg = {})
+  def _show_his(report_format_id = 1, width = 8, padding = 2)
     # pretty prints the loan history
     # get extended info by saying _show_his(:extended)
-    arg = {:fields => [:basic, :next]} if arg == :extended
-    args = {:width => 10, :padding => 4, :fields => [:basic]}
-    args = args.merge(arg) if arg.is_a? Hash
-    width = args[:width]; padding = args[:padding]; fields = args[:fields]
-
-    print_order = {:basic => {:titles => {:date => :date, :s_total => :scheduled_outstanding_total, :s_bal => :scheduled_outstanding_principal,
-          :a_total => :actual_outstanding_total, :a_bal => :actual_outstanding_principal,
-          :p_paid => :principal_paid, :p_due => :principal_due, :i_paid => :interest_paid, :i_due => :interest_due,
-          :tot_p_pd => :total_principal_paid, :tot_i_pd => :total_interest_paid, :tot_p_due => :total_principal_due, :tot_i_due => :total_interest_due},
-        :title_order => [:date, :s_total, :s_bal, :a_total, :a_bal, :p_paid, :p_due, :i_paid, :i_due, :tot_p_pd, :tot_p_due, :tot_i_pd, :tot_i_due]},
-      :next => {:titles => {:date => :date, :tp_due => :total_principal_due, :tp_paid => :total_principal_paid, :ti_due => :total_interest_due,
-          :ti_paid => :total_interest_paid, :adv_p => :advance_principal_paid, :adv_i => :advance_interest_paid, :def_p => :principal_in_default, 
-          :def_i => :interest_in_default, :b => :branch_id, :c => :center_id, :k => :composite_key},
-        :title_order => [:date, :tp_due, :tp_paid, :ti_due, :ti_paid, :adv_p, :adv_i, :def_p, :def_i, :b, :c, :k]}}
-    fields.each do |f|
-      hist = calculate_history.sort_by{|x| x[:date]}
-      title_order = print_order[f][:title_order]
-      titles = print_order[f][:titles]
-      puts title_order.map{|t| t.to_s.rjust(width - padding/2).ljust(width)}.join("|")
-      hist.each do |h|
-        puts (["#{h[:date]}"] + title_order[1..-1].map{|t| (h[titles[t]] || 0).round(2)}.map{|v| v.to_s}.map{|s| s.rjust(width - padding/2).ljust(width)}).join("|")
-      end
-
+    hist = calculate_history.sort_by{|x| x[:date]}
+    keys = ReportFormat.get(report_format_id).keys
+    puts keys.map{|t| t.to_s.rjust(width - padding/2).ljust(width)}.join("|")
+    hist.each do |h|
+      puts (["#{h[:date]}"] + keys.map{|t| (h[t.to_sym] || 0).round(2)}.map{|v| v.to_s}.map{|s| s.rjust(width - padding/2).ljust(width)}).join("|")
     end
-    puts "Call with _show_his(:extended) to see more fields" if fields == [:basic]
     false
   end
 
@@ -1427,6 +1416,11 @@ class Loan
 
   def set_loan_product_parameters
     self.repayment_style = self.loan_product.repayment_style unless self.repayment_style
+    [:amount, :interest_rate, :number_of_installments].each do |attr|
+      self.send("#{attr}=", self.loan_product.send("max_#{attr}")) if self.loan_product.send("max_#{attr}") == self.loan_product.send("min_#{attr}")
+    end
+    self.interest_rate = self.interest_rate / 100 #loan product stores it as 26, not 0.26
+    self.installment_frequency = self.loan_product.installment_frequency
   end
 
   def interest_calculation(balance)
@@ -1489,7 +1483,7 @@ class Loan
     statii = []
     _t = DateTime.now
     # then delete all payments and recalculate a virgin loan_history
-    ds = _ps.map{|p| p.deleted_by = user; p.deleted_at = _t; p.destroy}
+    ds = _ps.map{|p| p.deleted_by = user; p.deleted_at = _t; p.save!}
     reload
     update_history
     clear_cache

@@ -4,7 +4,7 @@
 DEFAULT_JOURNAL_TYPES = ['Payment','Receipt','Journal']
 
 ASSETS = 'Assets'
-CASH = 'Cash'; BANK_DEPOSITS = 'Bank Deposits'; SECURITIES = 'Securities'
+CASH = 'Cash'; BANK_DEPOSITS = 'Bank Accounts'; SECURITIES = 'Securities'
 LAND = 'Land'; MACHINERY = 'Machinery'
 LOANS_MADE = 'Loans made'; BORROWINGS = 'Borrowings'; TAXES_PAYABLE = "Tax payable"; OTHER_LIABILITIES = "Other liabilities"
 CURRENT_ASSET_HEADS = [CASH, BANK_DEPOSITS, SECURITIES, LOANS_MADE]
@@ -118,8 +118,8 @@ FULL_DATE_PATTERN = "%A, %B %d, %Y"
 FORMAT_REG_EXP = /[- . \/]/
 
 # Bookmark Constants
-Types   = [:custom_reports, :system]
-Methods = [:get, :post, :put, :delete]
+BookmarkTypes   = [:custom_reports, :system]
+MethodNames = [:get, :post, :put, :delete]
 
 # Audit
 AUDITABLES = ["Branch","Center","Client","ClientGroup","Loan","Payment","StaffMember"]
@@ -128,4 +128,7 @@ AUDITABLES = ["Branch","Center","Client","ClientGroup","Loan","Payment","StaffMe
 TargetOf    = [:center_creation, :group_creation, :client_registration, :loan_disbursement_by_amount, :loan_disbursements_by_number]
 TargetType  = [:relative, :absolute]
 
-
+# Caches
+# in order to avoid overrunning the SQL max packet size, we split the cacher update into chunks
+# 2500 should be good for the standard SQL max_packet_size of 16MB
+CHUNK_SIZE = 2500 

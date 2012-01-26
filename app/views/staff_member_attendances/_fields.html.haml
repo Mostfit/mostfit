@@ -1,0 +1,11 @@
+%table.form
+  %tr
+    %td
+      Date
+    %td
+      = date_select_for @staff_member_attendance, :date
+    %td
+      Status
+    %td
+      = select :status, :collection => [[:present, "Present"], [:late, "Late"], [:leave, "Leave"], [:absent, "Absent"]], :prompt => "select status"
+      = hidden_field(:staff_member_id, :value => @staff_member.id)

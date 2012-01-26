@@ -10,7 +10,7 @@
       %b values
     %th
       %b more
-%tr{:id => "formdiv_#{@counter}"}
+%tr.formdiv{:id => "formdiv_#{@counter}"}
   %td
     -if @model and @model.class==Class
       = @model.name

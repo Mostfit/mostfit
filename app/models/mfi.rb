@@ -45,7 +45,7 @@ class Mfi
   property :default_repayment_style, Enum.send('[]', *REPAYMENT_STYLES), :default => NORMAL_REPAYMENT_STYLE, :index => true
   property :generate_day_sheet_before, Integer, :default => 1, :max => 5
 
-  property :currency_format,  String,  :nullable => true, :length => 20
+  property :currency_format,  String,  :nullable => true, :length => 20, :default => "in_with_paise"
   property :session_expiry,   Integer, :nullable => true, :min => 60, :max => 86400
   property :password_change_in, Integer, :nullable => true
   property :org_locale, String
@@ -68,7 +68,7 @@ class Mfi
       $globals[:mfi_details]
     else
       mfi = if File.exists?(File.join(Merb.root, "config", "mfi.yml"))
-              Mfi.new(YAML.load(File.read(File.join(Merb.root, "config", "mfi.yml"))))
+              Mfi.new(YAML.load(File.read(File.join(Merb.root, "config", "mfi.yml"))).only(*Mfi.properties.map(&:name)))
             else
               Mfi.new(:name => "Mostfit", :fetched => Date.today)  
             end

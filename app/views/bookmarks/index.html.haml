@@ -1,3 +1,6 @@
-= partial :list
-%h2
+%h1
+  - @text = ((params[:type] and params[:type] == "custom_reports") ? "custom Report" : "bookmark")
+  = @text.pluralize.capitalize
+.menu-strip
   = link_to("Create New #{@text}", "/search/reporting", :class => "add")
+= partial :list

@@ -5,16 +5,17 @@
   .flash
     .notice
       No areas
+  = link_to 'Add New Area', url(:new_area), :class => 'add grey_button'
 - else
   %table.narrow
     %thead
       %tr
         %th
-          id
+          Id
         %th
-          name
+          Name
         %th.actions
-          actions
+          Actions
     %tr
       - for area in @areas
         %tr
@@ -25,6 +26,5 @@
           %td
             = link_to 'Show', url(:area, area)
             |
-            = link_to 'Edit', url(:edit_area,  area)
-
-= link_to 'New', url(:new_area)
+            = link_to 'Edit', url(:edit_area, area)
+    = link_to 'Add new Area', url(:new_area), :class => 'add grey_button'

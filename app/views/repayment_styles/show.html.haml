@@ -1,10 +1,52 @@
-%h1
-  RepaymentStyles controller, show action
-%p
-  Edit this file in
-  %tt
-    app/views/repayment_styles/show.html.erb
+%h1== Repayment Style : <i>#{@repayment_style.name}</i>
+%p.menu-strip{:style => "width: 44%; margin-bottom: 0.2em;"}
+  = link_to 'Edit',  url(:edit_repayment_style,  @repayment_style), :class => "edit grey_button"
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  = link_to 'Back', url(:repayment_styles), :class => "grey_button"
 
-= link_to 'Edit',  url(:edit_repayment_style,  @repayment_style)
-|
-= link_to 'Back', url(:repayment_styles)
+%table.tall.shaded{:width => "44%"}
+  %tr
+    %th{:width => "45%"}
+      Name
+    %td
+      = @repayment_style.name
+  %tr
+    %th
+      Style
+    %td
+      = @repayment_style.style
+  %tr
+    %th
+      Round Equated Payment To
+    %td
+      = @repayment_style.round_total_to
+  %tr
+    %th
+      Round Interest Payment To
+    %td
+      = @repayment_style.round_interest_to
+  %tr
+    %th
+      Rounding style
+    %td
+      = @repayment_style.rounding_style
+  %tr
+    %th
+      Force Max Installments?
+    %td
+      = @repayment_style.force_num_installments
+  %tr
+    %th
+      Active
+    %td
+      = @repayment_style.active
+  %tr
+    %th
+      Custom Principal Schedule
+    %td
+      = @repayment_style.custom_principal_schedule
+  %tr
+    %th
+      Custom Interest Schedule
+    %td
+      = @repayment_style.custom_interest_schedule

@@ -20,7 +20,7 @@
     %th.due.left-numeric=I18n.t "center.payment.table.due", :default => "due"
     %th.paid.right-numeric=I18n.t "center.payment.table.paid", :default => "paid"
   %tbody
-    - histories = LoanHistory.latest({:center_id => @center.id, :status => [:disbursed, :outstanding]}, @date)
+    - histories = LoanHistory.latest({:center_id => @center.id}, @date).select{|lh| [:outstanding, :disbursed].include?(lh.status)}
     - tot_amount, tot_outstanding, tot_installments, tot_principal_due, tot_principal_paid, tot_interest_due, tot_interest_paid, tot_fee_due, tot_fee_paid, tot_total_due, tot_total_paid = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     - num_loans_to_pay = num_fees_to_pay = 0
     - grouped_histories = histories.group_by{|h| h.client_group_id}

@@ -2,7 +2,11 @@
 - date = nil
 %tr{:class => cls}
   - @keys.each do |at|
-    - val = cache.send(at) rescue 0
+    - if (ignore_total rescue false) and Cacher::CALCULATED_COLS.include?(at.to_sym) # is a total level row
+      - # for calculated fields, we have to substitute this dodgy figure with the right one
+      - val = @calculated_total_row[at]
+    - else
+      - val = cache.send(at) rescue 0
     %td{:style => "text-align: right", :class => "#{at} text"}
       - if at == :date
         = link_to val.strftime("%Y/%m/%d"), resource(:cachers, request.send(:query_params).merge(:date => val))
@@ -34,4 +38,3 @@
     %td
       = (link_to 'split', url(:split_cachers, request.send(:query_params).merge(:branch_id => bid))) if @level == :branches 
       = (link_to 'split', url(:split_cachers, request.send(:query_params).merge(:center_id => cid))) if @level == :centers
-          

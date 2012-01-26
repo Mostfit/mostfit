@@ -116,6 +116,11 @@ class Application < Merb::Controller
         redirect(params[:return], :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
       elsif model == Journal
         redirect("/accounts/#journal_entries", :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})
+      elsif model == StaffMemberAttendance
+        params[:staff_member_id] = obj.staff_member_id
+        @staff_member = StaffMember.get(params[:staff_member_id])
+        obj.destroy      
+        redirect resource(@staff_member), :message => {:notice => "Attendance was successfully deleted"}
       else
         return_url = params[:return].split("/")[0..-3].join("/")
         redirect(return_url, :message => {:notice =>  "Deleted #{model} #{model.respond_to?(:name) ? model.name : ''} (id: #{id})"})

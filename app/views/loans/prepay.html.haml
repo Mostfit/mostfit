@@ -14,7 +14,7 @@
     - info = @loan.info(@date)
     - missed_int = info.total_interest_due - info.total_interest_paid
     - accrued_int = @date > info.date ? info.actual_outstanding_principal * @loan.interest_rate * ((@date - info.date) - 1) / 365 : 0
-    - allow_override = (not @loan.loan_product.loan_validation_methods.split(",").include?("prepayment_must_be_per_system_numbers"))
+    - allow_override = (not @loan.loan_product.loan_validation_methods.split(",").include?("prepayment_must_be_per_system_numbers") if @loan.loan_product.loan_validation_methods)
     %h2
       Loan id
       = @loan.id
@@ -67,14 +67,26 @@
             Total P and I due
           %td
           %td
-            = (missed_int + accrued_int + os_prin).to_currency
+            - total = (missed_int + accrued_int + os_prin)
+            = total.to_currency
         %tr
           %th
             Penalty
           %td
-            = select :name => "fee", :collection => Fee.all, :value_method => :id, :text_method => :name, :prompt => "Apply penalty as", :style => 'width:200px;'
+            - @loan.loan_product.fees(:payable_on => :penalty).each do |f|
+              = f.name
           %td
-            = text_field :name => :penalty_amount
+            - @loan.loan_product.fees(:payable_on => :penalty).each do |f|
+              - fee_amt = f.amount_for(@loan, @date)
+              - total += fee_amt
+              = fee_amt
+              = hidden_field :name => "fees[#{f.id}]", :value => fee_amt
+        %tr.total
+          %th
+            Total Due
+          %td
+          %td
+            = (total).to_currency
         %tr
           %th
             Received By

@@ -186,5 +186,14 @@ module Misfit
       return true
     end
 
+    def only_one_loan_per_client
+      #this validation is to check that a particular client is given only one active loan at a time.
+      lp_ids     = LoanProduct.all(:loan_validation_methods.like => "%only_one_loan%").aggregate(:id)
+      lh_statuses  = LoanHistory.latest(:client_id => @client.id, :loan_product_id => lp_ids).map{|x| x.status} # using map because aggregate returns nil! bug?
+      outstanding_statuses = [:applied_in_future, :applied, :approved, :disbursed, :outstanding]
+      return [false, "Cannot create loan as client: #{@client.name} (id: #{@client.id}) already has an active loan"] if outstanding_statuses.map{|s| lh_statuses.include?(s)}.include?(true)
+      return true
+    end
+
   end    #LoanValidators 
 end

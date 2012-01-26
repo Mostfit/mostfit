@@ -1,0 +1,12 @@
+%xml
+  %attendance
+    - if not @staff_member_attendance.errors.blank?
+      %error
+        %error_code 600
+        - @staff_member_attendance.errors.map do |e|
+          %error_message #{e.to_s}
+    - else
+      %id #{@staff_member_attendance.id}
+      %staff_member_id #{@staff_member_attendance.staff_member_id}
+      %status #{@staff_member_attendance.status}
+      %date #{@staff_member_attendance.date}

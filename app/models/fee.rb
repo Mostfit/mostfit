@@ -8,8 +8,6 @@ class Fee
   # on which to call the function.
   # We have this difference to handle cases where the fee is applicable on an Insurance Policy but is payable on the loan application date
 
-  # ^ Good to see some docs but the example seems to have more elements than the actual table below. Model can be scrapped I think?
-
   PAYABLE = [
              [:loan_applied_on, Loan, :applied_on], 
              [:loan_approved_on, Loan, :approved_on],
@@ -25,11 +23,16 @@ class Fee
              #[:policy_loan_disbursal_date, InsurancePolicy, :loan_disbursal_date],
              [:penalty, Loan, nil]
             ]
+  PERCENTAGE_OF = [:amount, 
+                   :actual_outstanding_principal, :scheduled_outstanding_principal, 
+                   :actual_outstanding_interest, :scheduled_outstanding_interest]
+
   FeeDue        = Struct.new(:applicable, :paid, :due)
   FeeApplicable = Struct.new(:loan_id, :client_id, :fees_applicable)
   property :id,            Serial
   property :name,          String, :nullable => false
   property :percentage,    Float
+  property :percentage_of, Enum.send('[]', *PERCENTAGE_OF), :default => :amount
   property :amount,        Integer
   property :min_amount,    Integer
   property :max_amount,    Integer
@@ -37,7 +40,7 @@ class Fee
   property :overridable_by, Flag[:data_entry, :mis_manager, :admin,:staff_member]
 
   property :round_to,       Float
-  property :rounding_style, Enum[:round, :ceil, :floor]
+  property :rounding_style, Enum[:round, :ceil, :floor], :default => :round, :nullable => false
 
   has n, :loan_products, :through => Resource
   has n, :client_types, :through => Resource
@@ -53,13 +56,22 @@ class Fee
   has n, :insurance_policies, :through => :applicable_insurance_policies
   has n, :audit_trails, :auditable_type => "Fee", :child_key => ["auditable_id"]
 
-  
+  validates_is_unique   :name  
   validates_with_method :amount_is_okay
   validates_with_method :min_lte_max
+  validates_with_method :is_payable_on_compatible_with_fee_metric?
   
+  # This function checks if the fee metric is compatible with the the type payable on
+  # e.g. for fees that are payable on client type we cannot have a percentage
+  def is_payable_on_compatible_with_fee_metric?
+    return [false, "The fee metric is not compatible with the fee payable on. e.g. you cannot have a fee in percent for payable on 'client date joined' "] if (self.payable_on.to_s.match(/^client/) and percentage != nil)
+    return true
+  end
+
   def amount_is_okay
-    return true if (amount or percentage)
-    return [false, "Either an amount or a percentage must be specified"]
+    return [false, "Either an amount or a percentage must be specified"] if (amount == nil and percentage == nil)
+    return [false, "Both amount and percentage cannot be specified"] if (amount != nil and percentage != nil)
+    return true
   end
 
   def min_lte_max
@@ -92,10 +104,15 @@ class Fee
   end
 
   # Calculate the amount to be levied depending on the object type
-  def amount_for(obj)
+  def amount_for(obj, date=Date.today)
     return amount if amount
     if obj.class == Loan or obj.class.superclass == Loan or obj.class.superclass.superclass == Loan and obj.loan_product and obj.loan_product.fees.include?(self)
-      return [[min_amount || 0 , (percentage ? percentage * obj.amount : 0)].max, max_amount || (1.0/0)].min
+      if self.percentage_of == :amount
+        fee_amt = obj.amount
+      else
+        fee_amt = obj.info(date).send(percentage_of)
+      end
+      return [[min_amount || 0 , (percentage ? percentage * obj.amount : 0)].max, max_amount || (1.0/0)].min.round_to_nearest(round_to, rounding_style)
     elsif obj.class == Client and obj.client_type and obj.client_type.fees.include?(self)
       return self.client_types.include?(obj.client_type) ? [min_amount, max_amount].max : nil
     elsif obj.class == InsurancePolicy
@@ -246,4 +263,5 @@ class Fee
                              GROUP BY p.fee_id
                            }).map{|x| [x.name, x.amount.to_i]}.to_hash
   end
+
 end
