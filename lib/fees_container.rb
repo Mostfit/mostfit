@@ -10,7 +10,6 @@ module FeesContainer
       # if this loan has some applicable fees, then we update the date and the amount, nothing else
       cur_fees.each do |af|
         next unless @orig_attrs
-        debugger if $debug
         method = @payable_models[af.fee.payable_on][1]
         if method
           date = (self.send(method) if self.respond_to?(method))|| (self.send("scheduled_#{method}") if self.respond_to?("scheduled_#{method}"))
@@ -111,7 +110,8 @@ module FeesContainer
     @fee_schedule = {}
     ApplicableFee.all(:applicable_id => self.id, :applicable_type => get_class).map{|af|
       @fee_schedule[af.applicable_on] ||= {}
-      @fee_schedule[af.applicable_on][af.fee] = af.amount if self.send(af.fee.payable_on.to_s.split("_")[1..-1].join("_"))
+      fee_is_payable = af.fee.payable_on == :penalty ? true : self.send(af.fee.payable_on.to_s.split("_")[1..-1].join("_"))
+      @fee_schedule[af.applicable_on][af.fee] = af.amount if fee_is_payable
     }.compact
     @fee_schedule
   end

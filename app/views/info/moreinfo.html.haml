@@ -105,9 +105,9 @@
       %td
         Borrower clients
       %td.lightpurple
-        = (@loan_disbursed and @loan_disbursed>0 and @loan_disbursed.length>0) ? @loan_disbursed.client_count : 0
+        = @loan_histories.aggregate(:client_id.count)
       %td.purple
-        = (@total_disbursed and @total_disbursed>0 and @total_disbursed.length>0) ? @total_disbursed.client_count : 0
+        = @some_loan_histories.aggregate(:client_id.count)
     %tr
       %td
         Number of Loans

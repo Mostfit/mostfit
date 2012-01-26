@@ -1,13 +1,35 @@
 class Info < Application
   include DateParser
   # serves info tab for branch
+  def branchinfo(id)
+    @branch                                                  = Branch.get(id)
+    @loan_histories                                          = LoanHistory.all(:branch_id => id)
+    
+    @centers = @branch.centers
+    @center_count                                            = @centers.aggregate(:all.count)
+    @client_count                                            = @centers.clients.aggregate(:all.count)
+    @loan_count                                              = @loan_histories.aggregate(:loan_id).count
+    @borrower_client_count                                   = @loan_histories.aggregate(:client_id).count
+    # all the various statuses
+    cols = [:applied, :approved, :disbursed, :preclosed].map{|c| [c, "#{c}_count".to_sym]}.flatten
+    agg_cols = cols.map{|c| DataMapper::Query::Operator.new(c, :sum)}
+    @statuses = cols.zip(@loan_histories.aggregate(*agg_cols))
+    @active_client_count                                          = LoanHistory.latest_by_status(:branch_id => id, :status => :outstanding).aggregate(:client_id.count)
+    @principal_paid                                          = @loan_histories.aggregate(:principal_paid.sum)
+    @interest_paid                                           = @loan_histories.aggregate(:interest_paid.sum)
+    @fees_paid                                               = @loan_histories.aggregate(:fees_paid_today.sum)
+    @total_paid                                              = @principal_paid + @interest_paid + @fees_paid
+    render :layout => false
+  end
+
+
   def moreinfo(id)
     new_date_hash, upto_date_hash  = set_info_form_params
-
+    
     klass      = Kernel.const_get(params[:for].camelcase)
     @obj       = klass.get(id)
     raise NotFound unless @obj
-
+    
     if @obj.class == Region
       @areas, @branches, @centers, @clients = {}, {}, {}, {}
       new_date_hash ||= {}
@@ -19,13 +41,13 @@ class Info < Application
       
       @branches[:new]  = @obj.areas.branches(new_date_hash)
       @branches[:upto] = @obj.areas.branches(upto_date_hash)
-
+      
       @centers[:new]  = Center.all(new_date_hash.merge({branch_key => @obj.id}))
       @centers[:upto] = Center.all(upto_date_hash.merge({branch_key => @obj.id}))
-
+      
       @clients[:new]  = Client.all(client_hash(:new).merge({"center.#{branch_key}" => @obj.id, :fields => [:id]}))
       @clients[:upto] = Client.all(client_hash(:upto).merge({"center.#{branch_key}" => @obj.id, :fields => [:id]}))
-
+      
       hash = {"center.#{branch_key}" => @obj.id}
       hash["center.creation_date.lte"] = new_date_hash[:creation_date.lte] if new_date_hash[:creation_date.lte]
       hash["center.creation_date.gte"] = new_date_hash[:creation_date.gte] if new_date_hash[:creation_date.gte]

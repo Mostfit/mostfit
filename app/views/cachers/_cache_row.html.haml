@@ -3,7 +3,6 @@
 %tr{:class => cls}
   - @keys.each do |at|
     - if (ignore_total rescue false) and Cacher::CALCULATED_COLS.include?(at.to_sym) # is a total level row
-      - debugger if $debug == true
       - # for calculated fields, we have to substitute this dodgy figure with the right one
       - val = @calculated_total_row[at]
     - else

@@ -208,8 +208,8 @@ module DataEntry
             @success, @fees = @loan.pay_fees(amounts, @date, @staff, session.user)
             @fees.each{|f| @errors << f.errors unless f.errors.blank?}
           else
+            style = params[:preclose_all].blank? ? params[:payment_style][k.to_sym].to_sym : :normal #if preclosing, use fee => int => prin style
             @type = params[:payment][:type]
-            style = params[:payment_style][k.to_sym].to_sym
             next if amounts<=0
             @success, @prin, @int, @fees = @loan.repay(amounts, session.user, @date, @staff, true, style)
             @errors << @prin.errors if (@prin and not @prin.errors.blank?)
@@ -217,6 +217,10 @@ module DataEntry
             @fees.each{|f| @errors << f.errors unless f.errors.blank?} if @fees
           end
           if @success 
+            unless params[:preclose_all].blank?
+              @loan.preclosed_on = @date; @loan.preclosed_by = @staff; 
+              @loan.save
+            end
             @loan.history_disabled = false
             @loan.already_updated  = false
             @loan.update_history(true)

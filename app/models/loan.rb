@@ -578,7 +578,6 @@ class Loan
     $debug = true
     # load relevant loan_history rows
     loan_history.all( :order => [:date]).map do |lh|
-      debugger if $debug
       next if amt_to_pay >= total or ((lh.interest_due + lh.principal_due) == 0)
       # interest/prin due has the total interest/prin payable. 
       # to get the proper ratio, we need the interest prin payable on that day only
@@ -1071,9 +1070,9 @@ class Loan
     if self.loan_product.loan_validations and self.loan_product.loan_validations.include?(:scheduled_dates_must_be_center_meeting_days)
       # DIRTY HACK! We cannot have two installment dates in the same week. So, we have to start counting with the first installment date and then go on to Sunday
       # so that the next date is gauranteed to be in the next week.
-      if installment_frequency == :weekly
+      if [:weekly, :biweekly].include?(installment_frequency)
         d = scheduled_first_payment_date
-        start_date = d - d.cwday + 7
+        start_date = d - d.cwday + (installment_frequency == :weekly ? 7 : 14)
       else
         # we need to verify if this works correctly when we get loans that are not weekly
         start_date = scheduled_first_payment_date
@@ -1196,6 +1195,8 @@ class Loan
       total_interest_due                    += outstanding_at_start ? scheduled[:interest].round(2) : 0
       principal_due                          = outstanding_at_start ? [total_principal_due - act_total_principal_paid,0].max : 0
       interest_due                           = outstanding_at_start ? [total_interest_due - act_total_interest_paid,0].max : 0
+      principal_due_today                    = [principal_due - ((last_row or Nothing)[:principal_due] || 0), 0].max
+      interest_due_today                     = [interest_due  - ((last_row or Nothing)[:interest_due]  || 0), 0].max
 
       actual_outstanding_principal           = outstanding ? actual[:balance].round(2) : 0
       actual_outstanding_total               = outstanding ? actual[:total_balance].round(2) : 0
@@ -1252,6 +1253,8 @@ class Loan
         :scheduled_interest_due              => scheduled_interest_due,
         :principal_due                       => principal_due.round(2), 
         :interest_due                        => interest_due.round(2),
+        :principal_due_today                 => principal_due_today.round(2),
+        :interest_due_today                  => interest_due_today.round(2),
         :principal_paid                      => prin.round(2),
         :interest_paid                       => int.round(2),
         :total_principal_due                 => total_principal_due.round(2),

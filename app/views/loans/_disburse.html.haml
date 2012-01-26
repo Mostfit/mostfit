@@ -1,4 +1,9 @@
--staff_members = staff_members_collection
+:javascript
+  $(document).ready(function() {
+  $('#toggle_disburse').change(function() {
+    $('.disburse').attr('checked',$(this).attr('checked'))});
+  });
+- staff_members = staff_members_collection
 %table.report.nojs
   %thead
     %tr
@@ -18,6 +23,7 @@
         Scheduled 1st Payment
       %th
         Disburse?
+        = check_box :id => "toggle_disburse"
       %th
         Cheque number
       %th
@@ -48,7 +54,7 @@
         - else
           = loan.scheduled_first_payment_date
       %td
-        = check_box :name => "loans[#{loan.id}][disbursed?]"
+        = check_box :name => "loans[#{loan.id}][disbursed?]", :class => "disburse"
       %td
         = text_field :name => "loans[#{loan.id}][cheque_number]", :size => 8, :value => loan.cheque_number
       %td

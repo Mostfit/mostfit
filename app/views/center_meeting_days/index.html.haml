@@ -13,3 +13,12 @@
         - if @center_meeting_days.count > 1
           |
           = link_to 'delete', url(:controller => "application", :action => "delete", :id => cmd.id, :model => "center_meeting_days", :return => "/branches/#{@center.branch.id}/centers/#{@center.id}")
+
+%h1 OR
+paste a list of dates. 
+%b
+  this will override all other meeting day definitions
+= form_for(@center, :action => resource(@center)) do 
+  = text_area :meeting_calendar, :rows => 20, :columns => 40
+  %br
+  = submit 'update meeting calendar'

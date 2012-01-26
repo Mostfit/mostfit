@@ -529,7 +529,7 @@ module Merb
     end
 
     def paginate_on_weekdays(branch, selected=Date.today.weekday)      
-      Center::DAYS.map{|wday|
+      (Center::DAYS + [:monthly]).map{|wday|
         weekday = (wday==:none ? "Not defined" : wday.to_s)
         if selected==wday
           "<strong>#{weekday}</strong>"

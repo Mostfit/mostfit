@@ -259,7 +259,7 @@
         %tr.header
           %th
             Reports
-          - User::ROLES.each do |role|
+          - User::ALLOWED_ROLES.each do |role|
             %th
               = role.to_s.camelcase(' ')
         - Reports::Types.sort_by{|rt, rs| rt.to_s}.each do |report_type, reports|
@@ -271,7 +271,7 @@
             %tr
               %td
                 = report.name
-              - User::ROLES.each do |role|
+              - User::ALLOWED_ROLES.each do |role|
                 %td
                   = check_box :name => "mfi[report_access_rules][#{report}][]", :value => role.to_s, :checked => (@mfi.report_access_rules[report.to_s] and @mfi.report_access_rules[report.to_s].index(role.to_s))
     %div.tab

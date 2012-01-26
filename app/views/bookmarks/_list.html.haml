@@ -1,35 +1,29 @@
-%h2
-  - @text = ((params[:type] and params[:type] == "custom_reports") ? "custom Report" : "bookmark")
-  = @text.pluralize.capitalize
-%h3
-  = "Your #{@text.pluralize.capitalize}  "
-%ul.bookmarks
+.admin-box
+  %h2
+    = "Your #{@text.pluralize.capitalize}  "
   - if @bookmarks[:own]
-    - @bookmarks[:own].each do |bookmark|
-      - route = YAML.load(bookmark.route)          
-      - route_url = route.class == Array ? url(route.last) : route
-      %li
-        = link_to("[share]", resource(bookmark, :edit), :style => "float: right")
-        - if bookmark.type==:get
-          = link_to bookmark.name, route_url
-        - else
-          %form{:action => route_url, :method => bookmark.type, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
-            = transform_raw_post_to_hidden_fields(bookmark.params)
-            %a{:href => "#", :onclick => "$(this).parent().submit()"}
-              = bookmark.name
-%hr
-%h3
-  #{@text.pluralize.capitalize} shared with you
-%ul.bookmarks
-  - if @bookmarks[:shared]
-    - @bookmarks[:shared].each do |bookmark|
-      - route = YAML.load(bookmark.route)          
-      - route_url = route.class == Array ? url(route.last) : route
-      %li
-        - if bookmark.type==:get
-          = link_to bookmark.name, route_url
-        - else
-          %form{:action => route_url, :method => bookmark.type, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
-            = transform_raw_post_to_hidden_fields(bookmark.params)
-            %a{:href => "#", :onclick => "$(this).parent().submit()"}
-              = bookmark.name
+    %table{:style => "width: 100%"}
+      - @bookmarks[:own].each do |bookmark|
+        %tr
+          %td
+            = link_to bookmark.name, resource(bookmark)
+          %td
+            = link_to("[share]", resource(bookmark, :edit), :style => "float: right")
+
+.admin-box
+  %h2
+    #{@text.pluralize.capitalize} shared with you
+  %ul.bookmarks
+    - if @bookmarks[:shared]
+      - @bookmarks[:shared].each do |bookmark|
+        - route = YAML.load(bookmark.route)          
+        - route_url = route.class == Array ? url(route.last) : route
+        %li
+          - if bookmark.type==:get
+            = link_to bookmark.name, route_url
+          - else
+            %form{:action => route_url, :method => bookmark.type, :id => "bookmark_#{bookmark.id}_form", :style => "margin: 0px;"}
+              = transform_raw_post_to_hidden_fields(bookmark.params)
+              %a{:href => "#", :onclick => "$(this).parent().submit()"}
+                = bookmark.name
+  
