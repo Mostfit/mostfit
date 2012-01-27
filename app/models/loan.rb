@@ -572,7 +572,6 @@ class Loan
   def pay_prorata(total, received_on)
     # calculates total interest and principal payable in this amount and divides the amount proportionally
     int_to_pay = prin_to_pay = amt_to_pay = 0
-    $debug = true
     # load relevant loan_history rows
     loan_history.all( :order => [:date]).map do |lh|
       next if amt_to_pay >= total or ((lh.interest_due + lh.principal_due) == 0)
