@@ -63,7 +63,7 @@ class DateVector
           d = d.next_(wday)
           rv << d if ((to.class == Date ? d  <= to : i <= to) and d >= from)
           d = d + ((@of_every - 1) * 7)
-          i += 1
+          i = rv.count - 1
         end
       end
     when :month 
