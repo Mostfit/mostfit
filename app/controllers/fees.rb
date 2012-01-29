@@ -39,7 +39,6 @@ class Fees < Application
   end
 
   def update(id, fee)
-    debugger
     @fee = Fee.get(id)
     raise NotFound unless @fee
     fee[:percentage] = nil if fee[:percentage].to_f == 0.0
