@@ -18,6 +18,9 @@
         $(this).attr('selectedIndex',$('#loan_product_chooser').attr('selectedIndex'));
       });
     });
+    $('#toggle_choose_loan').change(function() {
+      $('.choose_loan').attr('checked',$(this).attr('checked'))
+      });
 
   });
   
@@ -71,7 +74,9 @@
           Loan Product
         %th
           Loan Purpose
-        %th Choose
+        %th
+          Choose
+          = check_box :id => "toggle_choose_loan"
       - @clients.group_by{|client| client.client_group}.each do |client_group, clients|
         %tr.branch
           %td{:colspan => 15}
@@ -89,6 +94,6 @@
               %td
                 = select :name => "clients[#{client.id}][loan_purpose_id]", :class => "loan_purpose", :collection => LoanPurpose.all.map{|lp| [lp.id, lp.name]}, :prompt => "select loan purpose", :selected => (params[:clients] ? params[:clients][client.id.to_s][:loan_purpose_id] : nil), :id => client.id
               %td
-                = check_box :name => "clients[#{client.id}][chosen]", :value => client.id, :checked => (@selected_clients and @selected_clients.include?(client.id.to_s)), :id => "client_#{client.id}"
+                = check_box :name => "clients[#{client.id}][chosen]", :value => client.id, :checked => (@selected_clients and @selected_clients.include?(client.id.to_s)), :id => "client_#{client.id}", :class => "choose_loan"
     = submit "Go"
     %hr
