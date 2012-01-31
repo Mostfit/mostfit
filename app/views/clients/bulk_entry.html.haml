@@ -45,13 +45,11 @@
         %th
           = text_field :name => "clients[#{i}][reference]", :value => (params[:clients] and params[:clients][i.to_s][:reference])
         %th
-          = date_select "clients[#{i}][date_of_birth]", (params[:clients] and params[:clients][i.to_s][:date_of_birth]), :id => "client_#{i}_dob"
+          = date_select "clients[#{i}][date_of_birth]", (params[:clients] and params[:clients][i.to_s][:date_of_birth]), :id => "client_#{i}_dob", :min_date => Date.today-36500, :max_date => Date.today-1000
         %th
-          = date_select "clients[#{i}][date_joined]", (params[:clients] and params[:clients][i.to_s][:date_joined]), :id => "client_#{i}_date_joined"
+          = date_select "clients[#{i}][date_joined]", (params[:clients] and params[:clients][i.to_s][:date_joined]), :id => "client_#{i}_date_joined", :max_date => Date.today
         %th
           = text_field :name => "clients[#{i}][spouse_name]", :value => (params[:clients] and params[:clients][i.to_s][:spouse_name])
         %th
-          = date_select "clients[#{i}][spouse_date_of_birth]",(params[:clients] and params[:clients][i.to_s][:spouse_date_of_birth]) , :id => "client_#{i}_spouse_dob"
+          = date_select "clients[#{i}][spouse_date_of_birth]",(params[:clients] and params[:clients][i.to_s][:spouse_date_of_birth]) , :id => "client_#{i}_spouse_dob", :min_date => Date.today-36500, :max_date => Date.today-1000
   = submit 'add clients'
-      
-
