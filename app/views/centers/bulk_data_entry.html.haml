@@ -1,3 +1,16 @@
+:javascript
+  $(document).ready(function(){
+    $('#bulk_form tbody input').change(function(){
+      if ($('#lock').attr('checked')) {
+        $('#bulk_form tbody input').attr('value', $(this).attr('value'))
+      }
+    });
+    $('#bulk_form tbody select').change(function(){
+      if ($('#lock').attr('checked')) {
+        $('#bulk_form tbody select').attr('selectedIndex', $(this).attr('selectedIndex'))
+      }
+    });
+  });
 %form._remote_{:action => url(:action => "bulk_data_entry", :id => @center.id, :branch_id => @branch.id, :model => @model.to_s, :field_name => params[:field_name]), :method => :post}
   %input{:name => "_target_", :type => "hidden", :value => "bulkDataEntryNotice"}
   %table.report.nojs
@@ -12,15 +25,19 @@
           - else
             Loan
         %th 
-          =@field.to_s.camelcase(' ')
+          = @field.to_s.camelcase(' ')
+        %th
+          Default
+          = check_box :id => :lock
+       
     %tbody
-    - loans = @clients.loans(:disbursal_date.not => nil).group_by{|x| x.client} if @model==Loan
+    - loans = @clients.loans.group_by{|x| x.client} if @model==Loan
     - @clients.group_by{|c| c.client_group}.each do |group, clients|
       %tr.group
-        %td{:colspan => 5}
+        %td{:colspan => 6}
           - if group
             = group.name
-          -else
+          - else
             Not attached to any group
       - clients.each do |client|
         - if @model == Loan
@@ -40,6 +57,7 @@
                   )
                 %td
                   = display_field_form(@model, @field, loan)
+                %td
         - else        
           %tr{:class => cycle('odd','')}
             %td
@@ -52,5 +70,5 @@
               = client.spouse_name
             %td
               = display_field_form(@model, @field, client)
-  =submit("Save")   
+  = submit("Save")
 %div#bulkDataEntryNotice

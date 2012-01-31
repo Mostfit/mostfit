@@ -51,7 +51,7 @@
           %ul.inline
             - client.loans.each do |l|
               %li
-                = link_to l.short_tag, url_for_loan(l), :class => l.info[:status] if l.info
+                = link_to l.short_tag, url_for_loan(l), :class => (l.info ? l.info[:status] : l.get_status)
         %td
           = link_to 'edit', resource(@branch, @center, client, :edit)
           &nbsp;|&nbsp;
