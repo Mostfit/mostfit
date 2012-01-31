@@ -1,16 +1,15 @@
 class LoanHistory
   include DataMapper::Resource
   
-#   property :id,                        Serial  # composite key transperantly enables history-rewriting
   property :loan_id,                   Integer, :key => true
-  property :date,                      Date,    :key => true  # the day that this record applies to
-  property :created_at,                DateTime  # automatic, nice for benchmarking runs
-  property :run_number,                Integer, :nullable => false, :default => 0
-  property :current,                   Boolean  # tracks the row refering to the loans current status. we can query for these
-                                                # during reporting. I put it here to save an extra write to the db during update_history_now
-  property :amount_in_default,          Float # less normalisation = faster queries
+  property :date,                      Date,    :key => true                      # the day that this record applies to
+  property :created_at,                DateTime                                   # automatic, nice for benchmarking runs
+  property :run_number,                Integer, :nullable => false, :default => 0 
+  property :current,                   Boolean                                    # tracks the row refering to the loans current status. we can query for these
+                                                                                  # during reporting. I put it here to save an extra write to the db during update_history_now
+  property :amount_in_default,          Float                                     # less normalisation = faster queries
   property :days_overdue,               Integer
-  property :week_id,                    Integer # good for aggregating.
+  property :week_id,                    Integer                                   # good for aggregating.
 
   # some properties for similarly named methods of a loan:
   property :scheduled_outstanding_total,     Float, :nullable => false
@@ -20,8 +19,12 @@ class LoanHistory
   property :actual_outstanding_interest,     Float, :nullable => false
   property :scheduled_principal_due,         Float, :nullable => false
   property :scheduled_interest_due,          Float, :nullable => false
-  property :principal_due,                   Float, :nullable => false
-  property :interest_due,                    Float, :nullable => false
+
+  property :principal_due,                   Float, :nullable => false # this is total principal due - total interest due
+  property :interest_due,                    Float, :nullable => false # and represents the amount payable today
+  property :principal_due_today,             Float, :nullable => false # this is the principal and interest 
+  property :interest_due_today,              Float, :nullable => false  #that has become payable today
+
   property :principal_paid,                  Float, :nullable => false
   property :interest_paid,                   Float, :nullable => false
   property :total_principal_due,             Float, :nullable => false
@@ -66,13 +69,14 @@ class LoanHistory
   property :client_group_id,             Integer, :index => true
   property :center_id,                   Integer, :index => true
   property :branch_id,                   Integer, :index => true
-
+  #property :area_id,                     Integer, :index => true
+  #property :region_id,                   Integer, :index => true
   property :holiday_id,                  Integer
 
   property :funding_line_id,             Integer, :index => true
   property :funder_id,                   Integer, :index => true
   property :loan_product_id,             Integer, :index => true
-
+  property :loan_pool_id,                Integer, :nullable => true, :index => true
   property :composite_key, Float, :index => true
 
 
@@ -93,6 +97,9 @@ class LoanHistory
     (principal_paid + interest_paid + fees_paid_today).round(2)
   end
 
+  def total_due
+    (principal_due + interest_due)
+  end
 
   def total_advance_paid
     (advance_principal_paid_today + advance_interest_paid_today).round(2)
@@ -100,6 +107,18 @@ class LoanHistory
 
   def total_default
     (principal_in_default + interest_in_default).abs.round(2)
+  end
+
+  def principal_defaulted_today
+    [scheduled_principal_due - principal_paid,0].max
+  end
+
+  def interest_defaulted_today
+    [scheduled_interest_due - interest_paid,0].max
+  end
+  
+  def total_defaulted_today
+    principal_defaulted_today + interest_defaulted_today
   end
 
   # this adjusts defaulted interest against advance principal
@@ -120,15 +139,45 @@ class LoanHistory
 
   ########### NICE NEW FUNCTIONS ###########################
 
+  def self.get_composite_keys(selection = {})
+    # this function is for speed.
+    # it should return the same result as LoanHistory.all(selection).aggregate(:composite_key)
+    q = "SELECT composite_key FROM loan_history WHERE " + get_where_from_hash(selection)
+    repository.adapter.query(q).map{|x| x.to_f.round(4)}
+  end
+
   def self.latest_keys(hash = {}, date = Date.today)
     # returns the composite key for the last row before date per loan from loan history and filters by hash
-    LoanHistory.all(hash.merge(:date.lte => date)).aggregate(:loan_id,:composite_key.max).map{|x| x[1]}
+    #LoanHistory.all(hash.merge(:date.lte => date)).aggregate(:loan_id,:composite_key.max).map{|x| x[1]}
+
+    # updated for speed
+    q(%Q{
+          SELECT loan_id, max(composite_key)
+          FROM   loan_history 
+          WHERE  #{(get_where_from_hash(hash) + " AND ") unless hash.blank?} 
+                 date <= '#{date.strftime('%Y-%m-%d')}'
+          GROUP BY loan_id
+        }).map{|x| x[1].round(4)} 
   end
 
   def self.latest(hash = {}, date = Date.today)
     # returns the last LoanHistory per loan before date
     LoanHistory.all(:composite_key => LoanHistory.latest_keys(hash, date))
   end
+
+  def self.latest_by_status(options)
+    # to select, for example, only outstanding loans on a particular date,
+    # we cannot simply say LoanHistory.latest(:status => :outstanding, @date)
+    # because this will simply return the last row when the loan was outstanding even if the loan has been
+    # repaid before @date. Hence we need to take a circuituous route where we first select the latest row and then filter for outstanding loans
+    selection = options.except(:status)
+    date = options[:date] || Date.today
+    status = options[:status]
+    cks = LoanHistory.latest_keys(selection,date)
+    LoanHistory.all(:composite_key => cks, :status => status)
+  end
+    
+
 
   def self.latest_sum(hash = {}, date = Date.today, group_by = [], cols = [])
     # sums up the latest loan_history row per loan, even groups by any attribute
@@ -141,13 +190,27 @@ class LoanHistory
     cols = group_by + (my_cols.empty? ? LoanHistory.sum_cols : my_cols)
     ng = {group_by.map{|g| :no_group} => cols.map{|c| [c,0]}.to_hash}
     return ng if keys.blank?
-    agg_cols = cols[group_by.length..-1].map{|c| DataMapper::Query::Operator.new(c, :sum)}
-    vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
+
+    #agg_cols = cols[group_by.length..-1].map{|c| DataMapper::Query::Operator.new(c, :sum)}
+    #vals = LoanHistory.all(:composite_key => keys).aggregate(*(group_by + agg_cols))
+    
+    # using datamapper across very large datasets seems to be a losing proposition.
+    # some hand-crafted SQL to the rescue
+    # for testing, the result from this should be the same as from the above two lines
+    query  = "SELECT "
+    query += group_by.join(",") + "," unless group_by.blank?
+    query += cols[group_by.length..-1].map{|g| " SUM(#{g.to_s})"}.join(",")
+    query += " FROM loan_history WHERE composite_key IN (#{keys.join(',')})"
+    unless group_by.blank?
+      query += " GROUP BY "
+      query += group_by.join(",")
+    end
+    vals = repository.adapter.query(query).map(&:to_a)
     if group_by.count > 0
       vals = vals.group_by{|v| v[0..(group_by.count-1)]} 
       rv = vals.to_hash.map{|k,v| [k,cols.zip(v.flatten).to_hash]}.to_hash
     else
-      rv = {:no_group => cols.zip(vals).to_hash}
+      rv = {:no_group => cols.zip(vals[0]).to_hash}
     end
     rv
   end
@@ -625,7 +688,7 @@ class LoanHistory
 
     repository.adapter.query(%Q{
       SELECT 
-        SUM(l.amount) AS loan_amount,
+        SUM(lh.total_principal_paid) AS loan_amount,
         COUNT(DISTINCT(lh.loan_id)) loan_count,
         #{selects}
       FROM loan_history lh, loans l
@@ -644,16 +707,11 @@ class LoanHistory
     repository.adapter.query(%Q{
       SELECT
         SUM(lh.actual_outstanding_principal) AS loan_amount,
-        COUNT(lh.loan_id) loan_count,
+        COUNT(DISTINCT(lh.loan_id)) loan_count,
         #{selects}
-      FROM (SELECT max(lh.date) date, lh.loan_id loan_id
-            FROM loan_history lh, loans l
-            WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (7) AND lh.date<='#{to_date.strftime('%Y-%m-%d')}'
-                  AND lh.scheduled_outstanding_total > 0 AND lh.scheduled_outstanding_principal > 0 #{extra}
-            GROUP BY lh.loan_id
-            ) dt, loan_history lh, loans l
-      WHERE lh.loan_id=dt.loan_id AND lh.date = dt.date AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}'
-            AND lh.loan_id=l.id AND l.deleted_at is NULL #{extra}
+      FROM loan_history lh, loans l
+      WHERE lh.status in (10) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL  
+           AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
       #{group_by_query};
     })    
   end
@@ -667,15 +725,11 @@ class LoanHistory
     repository.adapter.query(%Q{
       SELECT
         SUM(lh.actual_outstanding_principal) AS loan_amount,
-        COUNT(lh.loan_id) loan_count,
+        COUNT(DISTINCT(lh.loan_id)) loan_count,
         #{selects}
-      FROM (SELECT max(lh.date) date, lh.loan_id loan_id
-            FROM loan_history lh, loans l
-            WHERE lh.loan_id=l.id AND l.deleted_at is NULL AND lh.status IN (8) AND lh.date<='#{to_date.strftime('%Y-%m-%d')}' #{query}
-            GROUP BY lh.loan_id
-            ) dt, loan_history lh, loans l
-      WHERE lh.loan_id=dt.loan_id AND lh.date = dt.date AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}'
-            AND lh.loan_id=l.id AND l.deleted_at is NULL #{extra}
+      FROM loan_history lh, loans l
+      WHERE lh.status in (8) AND lh.loan_id=l.id AND l.deleted_at is NULL AND l.rejected_on is NULL  
+           AND lh.date <= '#{to_date.strftime('%Y-%m-%d')}' AND lh.date >= '#{from_date.strftime('%Y-%m-%d')}' #{extra}
       #{group_by_query};
     })    
   end

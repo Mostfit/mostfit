@@ -19,5 +19,13 @@ module Merb
     def transform_raw_post_to_hidden_fields(data)
       CGI.unescape(data).split('&').collect{|x| x.split('=')}.reject{|x| x[0]=='submit'}.map{|x| "<input type='hidden' name='#{x[0]}' value='#{x[1]}'>"}.join
     end
+
+    def paginate_objects(objects, params, per_page = 20)
+      (1..(objects.count/per_page.to_f).ceil).map do |page_no|
+        x = params.merge(:page => page_no, :_method => "post")
+        "<a href='#{url(x)}'>#{page_no}</a>"
+      end.join("&nbsp;")
+    end
+    
   end
 end # Merb

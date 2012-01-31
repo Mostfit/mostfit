@@ -13,7 +13,7 @@
             = link_to image_tag('/images/next-grey.png'), url(:browse, :date => @date + 1)
             
           
-    - cbc = BranchCache.all(:date => @date).reduce(:consolidate)
+    - cbc = BranchCache.all(:date => @date).reduce(:+)
     %thead
       %tr
         %th &nbsp;

@@ -2,7 +2,7 @@
   = ofc2(550, 350, url(:graph_data, :action => 'total', :scope_unit => 'months', :scope_size => 3) )
 %h1 Overview of all branches
 %p.menu-strip
-  = link_to_with_rights 'create a new branch', resource(:branches, :new), :class => "add"
+  = link_to_with_rights 'create a new branch', resource(:branches, :new), :class => "add grey_button"
 - if @branches.blank?
   %p
     %i No branches have been created yet.
@@ -24,9 +24,9 @@
         %td
           = branch.id
         %td
-          %b= link_to branch.name, resource(branch)
+          %b= link_to branch.name, resource(branch), :target => "_blank"
         %td
-          = link_to branch.manager.name, resource(branch.manager)
+          = link_to branch.manager.name, resource(branch.manager), :target => "_blank"
         %td
           = link_to branch.area.name, resource(branch.area) if branch.area
         %td

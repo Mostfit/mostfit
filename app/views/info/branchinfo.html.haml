@@ -1,0 +1,45 @@
+%h1== Info for #{@branch.name}
+
+.admin-box
+  %table.tall
+    %tr
+      %th Centers
+      %td= @center_count
+    %tr
+      %th Active Clients
+      %td= @active_client_count
+    %tr
+      %th Borrower Clients
+      %td= @borrower_client_count
+    %tr
+      %th Loans
+      %td= @loans_count
+
+.admin-box
+  %table.tall
+    - @statuses.each do |k,v|
+      %tr
+        %th= k
+        %td= v.to_currency
+
+.admin-box
+  %table.tall
+    %tr
+      %th
+        Principal Paid
+      %td
+        = @principal_paid.to_currency
+    %tr
+      %th
+        Interest Paid
+      %td
+        = @interest_paid.to_currency
+    %tr
+      %th
+        Fees Paid
+      %td
+        = @fees_paid.to_currency
+        
+        
+      
+        

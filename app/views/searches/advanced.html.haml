@@ -1,3 +1,30 @@
+:javascript
+  // loads the table which enables you to choose the properties you wish to see
+  $(document).ready(function() {
+  $("a._customreports_").click(function(){
+    href=$(this).attr("href");
+    method="GET";
+    if($(this).hasClass("self")){
+      href=href+(href.indexOf("?")>-1 ? "&" : "?")+$(this).parent().serialize();
+      method="POST"
+    }
+    a=$(this);
+    $.ajax({
+      type: "POST",
+      url: href,
+      success: function(data){
+        $(a).after(data);
+        //$(a).remove();
+        attachCustomTableEvents();
+      },
+      error: function(xhr, text, errorThrown){
+        txt = "<div class='error'>"+xhr.responseText+"</div>"
+        $(a).after(txt);
+      }
+    });
+    return false;
+  });
+  });
 %h1 Mostfit advanced search tool
 =form(:id => "reporting_form",  :action => "/search/reporting") do
   %table

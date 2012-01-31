@@ -1,0 +1,33 @@
+%h1
+  Attendance
+  = "for staff: #{@staff_member.name}" if @staff_member
+
+- if (@staff_member and @staff_member.staff_member_attendances.count > 0)
+  = link_to "Mark Attendance", resource(:staff_member_attendances, :new, {:staff_member_id => params[:staff_member_id]}), :class => "add grey_button"
+  %table.form.narrow{:style => "width: 80%;margin-left: 10%"}
+    %thead
+      %tr
+        %th
+          Date
+        %th
+          Status
+        %th
+    - @staff_member_attendances.sort_by{|d| d.date}.each do |sma|
+      %tr{:class => cycle('odd','even')}
+        %td
+          = sma.date
+        %td
+          = sma.status
+        %td
+          = link_to_with_rights 'Edit', resource(sma, :edit, {:staff_member_id => params[:staff_member_id]})
+          |
+          = link_to_with_rights 'Delete', resource(sma, :delete, {:staff_member_id => params[:staff_member_id]}), {:class => "confirm_click", :title => "Are you sure you want to delete the attendance on this date"}
+    %tfoot
+      %tr
+        %td{:colspan => 7}
+  = paginate @staff_member_attendances
+
+- else
+  %h2
+    Attendance for this staff member has not been recorded yet.
+  = link_to "Mark Attendance", resource(:staff_member_attendances, :new, {:staff_member_id => params[:staff_member_id]}), :class => "add grey_button"

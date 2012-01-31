@@ -17,7 +17,7 @@ class Bookmarks < Application
   def show(id)
     @bookmark = Bookmark.get(id)
     raise NotFound unless @bookmark
-    redirect url(YAML::load(@bookmark.route)[1])
+    redirect url(YAML::load(@bookmark.route)[1]) + (@bookmark.params.blank? ? "" : "?_method=post&" + @bookmark.params)
   end
 
   def new

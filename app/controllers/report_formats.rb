@@ -39,7 +39,7 @@ class ReportFormats < Application
     @report_format = ReportFormat.get(id)
     raise NotFound unless @report_format
     if @report_format.update(report_format)
-       redirect resource(@report_format)
+      redirect resource(@report_format)
     else
       display @report_format, :edit
     end

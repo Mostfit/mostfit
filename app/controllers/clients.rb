@@ -1,5 +1,5 @@
 class Clients < Application
-  before :get_context, :exclude => ['redirect_to_show']
+  before :get_context, :exclude => ['redirect_to_show', 'bulk_entry']
   provides :xml, :yaml, :js
 
   def index
@@ -114,6 +114,25 @@ class Clients < Application
     end
   end
 
+  def move_to_center(id)
+    debugger
+    @client = Client.get(id)
+    raise NotFound unless @client
+    @center = @client.center
+    @date = Date.parse(params[:date]) rescue nil
+    @new_center = Center.get(params[:new_center_id])
+    if @date and @new_center
+      if @client.move_to_center(@new_center, @date)
+        redirect resource(@client), :message => {:success => "Client has been moved from <b>#{@center.name}</b> to <b>#{@new_center.name}</b>"}
+      else
+        redirect resource(@client), :message => {:error => "Client <b>could not</b> moved from <b>#{@center.name}</b> to <b>#{@new_center.name}</b>"}
+      end
+    else
+      redirect resource(@client), :message => {:error => "Date not valid or new center does not exist"}
+    end
+  end
+        
+
   def delete(id)
     edit(id)  # so far these are the same
   end
@@ -159,6 +178,64 @@ class Clients < Application
   def inactive_client_count
     @data = Client.all(:active => false, :inactive_reason => 'death_of_client') + Client.all(:active => false, :inactive_reason => 'death_of_spouse')
     render
+  end
+  
+  def bulk_move
+    if request.method == :get
+      @errors = {}
+      @center = Center.get(params[:center_id])
+      raise NotFound unless @center
+      @clients = @center.clients
+      render
+    else
+      debugger
+      @center = Center.get(params[:center_id])
+      raise NotFound unless @center
+      @date = Date.parse(params[:date]) rescue nil
+      @new_center = Center.get(params[:new_center_id])
+      if @date and @new_center
+        Client.transaction do |t|
+          @center.clients.each do |c|
+            debugger
+            c.move_to_center(@new_center, @date)
+          end
+        end
+      end
+      redirect resource(@new_center)
+    end
+  end
+
+  def bulk_entry
+    if request.method == :get
+      @errors = {}
+      render
+    else
+      @center = Center.get(params[:center_id])
+      @errors = {}
+      @errors[:center] = "Please choose a center" unless @center
+      if @errors.blank?
+        @clients = params[:clients].each do |k,v| 
+          if v.values.join.length > 0 # if it isn't one of the blank rows
+            # create the client
+            c = Client.new(v.merge({:center_id => params[:center_id], 
+                                     :created_by_staff_member_id => @center.manager, 
+                                     :created_by_user_id => session.user.id}))
+            if c.save
+              params[:clients].delete(k) 
+            else
+              @errors[k] = c.errors # keep a copy of the errors in a global variable
+            end
+          else
+            params[:clients].delete(k) # this worked. delete this params so you can report errors on all the params that remain
+          end
+        end
+      end
+      if params[:clients].keys.length > 0 # there are some errors
+        render # errors will be shown
+      else
+        redirect resource(@center), :message => {:notice => "all clients succesfully added"}
+      end
+    end
   end
   
 

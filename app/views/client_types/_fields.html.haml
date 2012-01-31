@@ -9,7 +9,3 @@
       - Fee.all.select{|f| f.payable_on.to_s.split("_")[0] == "client"}.each do |f|
         = f.name.humanize
         = check_box :name => "fees[#{f.id}]", :checked => @client_type.fees.include?(f)
-  %tr
-    %td
-    %td
-      = submit button_text, :class => "add"

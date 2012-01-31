@@ -6,7 +6,10 @@
 = form_for(@client_type, :action => url(:client_type, @client_type), :class => "form") do
   = partial :fields
   = submit "Update"
-
-= link_to 'Show', url(:client_type, @client_type)
-|
-= link_to 'Back', url(:client_types)
+  &nbsp;&nbsp;
+  %b
+    Or
+  &nbsp;&nbsp;
+  = link_to 'Show', url(:client_type, @client_type), :class => "grey_button"
+  &nbsp;&nbsp;
+  = link_to 'Back', url(:client_types), :class => "grey_button"

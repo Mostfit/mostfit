@@ -39,7 +39,7 @@ class RepaymentStyles < Application
     @repayment_style = RepaymentStyle.get(id)
     raise NotFound unless @repayment_style
     if @repayment_style.update(repayment_style) || @repayment_style.errors.blank?
-       redirect resource(:repayment_styles)
+      redirect resource(@repayment_style), :message => {:notice => "RepaymentStyle : #{@repayment_style.name} was successfully updated"}
     else
       display @repayment_style, :edit
     end

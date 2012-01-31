@@ -23,7 +23,7 @@
     %tbody
     - clients_count = Client.all(:center => @centers).aggregate(:center_id, :id.count).to_hash
     - today = Date.today.weekday
-    - @centers.each do |center|
+    - @centers.sort_by{|c| c.id}.each do |center|
       %tr{:class => cycle('odd','')}
         %td
           = center.id
@@ -32,9 +32,8 @@
         %td.text
           = link_to center.manager.name, resource(center.manager)
         %td
-          - if center.meeting_day
-            %span{:class => center.meeting_day == today ? 'blue' : ''}
-              == #{center.meeting_day.to_s.capitalize}#{(center.meeting_time_hours and center.meeting_time_minutes) ? ", #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}" : ''}
+          %span
+            == #{center.meeting_day_for(Date.today).to_s.capitalize}#{(center.meeting_time_hours and center.meeting_time_minutes) ? ", #{center.meeting_time_hours}:#{'%02d' % center.meeting_time_minutes}" : ''}
         %td
           = clients_count[center.id] if clients_count.key?(center.id)
         %td

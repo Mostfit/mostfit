@@ -5,6 +5,10 @@
       %td
         = text_field :name
   %tr
+    - if Region.count==0 and session.user.role==:admin
+      %div.error
+        You do not have any region data yet. Create them
+        = link_to("here", resource(:regions, :new), :target => "_blank")
     %th
       Region
     %td
@@ -13,8 +17,12 @@
         %b
         = @region.name
       - else
-        = select :region_id, :collection =>  Region.all.map{|r| [r.id, r.name]}, :prompt => "---", :selected => @area.region ? @area.region.id.to_s : nil
+        = select :region_id, :collection =>  Region.all.map{|r| [r.id, r.name]}, :prompt => "---", :selected => @area.region ? @area.region.id.to_s : nil, :class => "chosen"
   %tr
+    - if StaffMember.count==0 and session.user.role==:admin
+      %div.error
+        You do not have any staff members data yet. Create them
+        = link_to("here", resource(:staff_members, :new), :target => "_blank")
     %th
       Manager
     %td

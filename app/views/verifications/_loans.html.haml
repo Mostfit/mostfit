@@ -1,7 +1,7 @@
 %h2
   Loans
-=form_for(@loans, :action => url("verifications/update/loans")) do
-  - if @loans and @loans.length>0
+= form_for(@loans, :action => url("verifications/update/loans")) do
+  - if @loans and @loans != nil and @loans.length>0
     %table{:width => "100%"}
       %tr{:style => "text-align: left;"}
         %th
@@ -30,34 +30,34 @@
           ==/
           %a{:href => "#", :onclick => "$('input.loan_approval_box').attr('checked',false);"}
             Check none
-      -@loans.each do |loan|
-        -client=loan.client
+      - @loans.each do |loan|
+        - client = loan.client
         %tr
           %td
-            =link_to(loan.id, resource(loan), :target => "BLANK")
+            = link_to(loan.id, resource(loan), :target => "BLANK")
           %td
-            =client.name
+            = client.name
           %td
-            =loan.amount
+            = loan.amount
           %td
-            =loan.applied_on
+            = loan.applied_on
           %td
-            =loan.disbursal_date
+            = loan.disbursal_date
           %td
-            =client.center ? client.center.branch.name : "-"
+            = client.center ? client.center.branch.name : "-"
           %td
-            =client.center ? client.center.name : "-"
+            = client.center ? client.center.name : "-"
           %td
-            =client.client_group ? client.client_group.name : "-"
+            = client.client_group ? client.client_group.name : "-"
           %td
-            =loan.created_by_user_id and loan.created_by_user_id>0 ? client.created_by.login : "-"
+            = loan.created_by_user_id and loan.created_by_user_id>0 ? client.created_by.login : "-"
           %td
-            =loan.created_at ? loan.created_at.strftime(Mfi.first.date_format || "%d-%m-%Y") : ""
+            = loan.created_at ? loan.created_at.strftime(Mfi.first.date_format || "%d-%m-%Y") : ""
           %td
-            =check_box(:name => "loans[#{loan.id}][]", :class => "loan_approval_box", :value => 1)
+            = check_box(:name => "loans[#{loan.id}][]", :class => "loan_approval_box", :value => 1)
       %tr
         %td{:colspan => 9}
         %td
-          =submit("Approve")
-  -else
+          = submit("Approve")
+  - else
     %i==No pending verifications    

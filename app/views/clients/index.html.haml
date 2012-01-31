@@ -3,9 +3,11 @@
     = ofc2(530, 300, url(:graph_data, :action => 'center', :id => @center.id, :scope_unit => 'months', :scope_size => 3) )
   %h1== Center: <i>#{@center.name}</i> (#{@clients.count} clients)
   .menu-strip
-    = link_to 'edit this center\'s details', resource(@branch, @center, :edit), :class => "edit"
-    = link_to 'add a new client', resource(@branch, @center, :clients, :new), :class => "add", :style => "margin: 0px; padding-right: 3px;"
-    = link_to "Bulk entry of loans", url(:enter_loans, :action => :bulk_form, :query => @center), :class => "edit"
+    = link_to 'edit center', resource(@branch, @center, :edit), :class => "edit grey_button"
+    = link_to 'new client', resource(@branch, @center, :clients, :new), :class => "add grey_button", :style => "margin: 0px; padding-right: 3px;"
+    = link_to "Bulk add loans", url(:enter_loans, :action => :bulk_form, :query => @center), :class => "add grey_button", :style => "margin: 0px; padding-right: 3px;"
+    = link_to "Bulk add clients", url(:controller => :clients, :action => :bulk_entry, :branch_id => @center.branch.id, :center_id => @center.id), :class => 'add grey_button', :style => "margin: 0px; padding-right: 3px;"
+
 
   %div.maininfo
     %table.narrow.form{ :style => "width: 40%;" }
@@ -21,10 +23,10 @@
           (
           = @center.creation_date.strftime('%A')
           )
-      %tr
+      %tr.odd
         %td Manager
         %td= link_to @center.manager.name, resource(@center.manager)
-      %tr.odd
+      %tr
         %td In branch
         %td
           = link_to @branch.name, resource(@center.branch)
@@ -32,20 +34,20 @@
           %span.greytext
             Managed by:
             = link_to @center.branch.manager.name, resource(@center.manager)
-      %tr
+      %tr.odd
         %td Meeting
         %td== #{@center.meeting_day_for(Date.today)}#{(@center.meeting_time_hours and @center.meeting_time_minutes) ? ", #{@center.meeting_time_hours}:#{@center.meeting_time_minutes}" : ''}
-      %tr.odd
+      %tr
         %td Address
         %td=@center.address
-      %tr
+      %tr.odd
         %td Contact number
         %td=@center.contact_number
-      %tr.odd
+      %tr
         %td Landmark
         %td=@center.landmark
       - if total_attendance_at_branch = Attendance.count("client.center_id" => @center.id) and total_attendance_at_branch > 0
-        %tr
+        %tr.odd
           %td
             Attendance
           %td
@@ -74,10 +76,10 @@
         %li#map
           Map
     %div.tab    
-      =partial "clients/list", :center_leader => @clients.first
+      = partial "clients/list", :center_leader => @clients.first
       %p.menu-strip 
-        = link_to 'Create new client', resource(@branch, @center, :clients, :new), :class => "add"
-        = link_to "Bulk entry of loans", url(:enter_loans, :action => :bulk_form, :query => @center), :class => "edit"
+        = link_to 'Create new client', resource(@branch, @center, :clients, :new), :class => "add grey_button"
+        = link_to "Bulk entry of loans", url(:enter_loans, :action => :bulk_form, :query => @center), :class => "edit grey_button"
     %div.tab    
       %input{:type => "hidden", :name => "_load_remote", :value => "/info/moreinfo/#{@center.id}?for=center"}
     %div.tab
@@ -90,7 +92,7 @@
     %div.tab
       %form._remote_{:action => url(:action => "bulk_data_entry", :controller => "centers", :id => @center.id, :branch_id => @branch.id), :method => :get}
         %b &nbsp; Select field to do mass entry
-        =select_mass_entry_field(:name => "field_name")
+        = select_mass_entry_field(:name => "field_name")
         %input{:type => "hidden", :name => "_target_", :value => "bulk_form"}
         = submit "GO"
       %div#bulk_form
@@ -101,5 +103,4 @@
     - if Mfi.first.map_enabled
       %div.tab
         = js_include_tag :map
-        =partial "locations/map", {:obj => @center}
-  
+        = partial "locations/map", {:obj => @center}

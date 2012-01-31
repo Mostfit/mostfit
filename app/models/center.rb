@@ -22,6 +22,7 @@ class Center
   property :meeting_day,          Enum.send('[]', *DAYS), :nullable => false, :default => :none, :index => true
   property :meeting_time_hours,   Integer, :length => 2, :index => true
   property :meeting_time_minutes, Integer, :length => 2, :index => true
+  property :meeting_calendar,     Text # this is a comma separated list of dates and takes precedence over everything else.
   property :created_at,           DateTime, :nullable => false, :default => Time.now, :index => true
   property :creation_date,        Date
   belongs_to :branch
@@ -43,7 +44,7 @@ class Center
   validates_with_method :meeting_time_hours,   :method => :hours_valid?
   validates_with_method :meeting_time_minutes, :method => :minutes_valid?
 
-  validates_with_method :creation_date_ok
+  # validates_with_method :creation_date_ok
 
   def self.from_csv(row, headers)
     hour, minute = row[headers[:center_meeting_time_in_24h_format]].split(":")
@@ -75,6 +76,14 @@ class Center
   def get_meeting_dates(to = Date.new(2100,12,31),from = creation_date)
     # to can be a date or a number
     # first find the date_Vectors for all center_meeting_days as a hash {:valid_from => DateVector}
+    unless self.meeting_calendar.blank?
+      ds = self.meeting_calendar.split(/[\s,]/).reject(&:blank?).map{|d| Date.parse(d) rescue nil}.compact.select{|d| d >= from}.sort
+      if to
+        ds = ds.select{|d| d <= to} if to.is_a? Date
+        ds = ds[0..to - 1] if to.is_a? Numeric
+      end
+      return ds
+    end
     select = to.class == Date ? {:valid_from.lte => to} : {}
     dvs = center_meeting_days.all(select).map{|cmd| [cmd.valid_from, cmd.date_vector]}.to_hash
 
@@ -136,7 +145,7 @@ class Center
     @meeting_days ||= self.center_meeting_days(:order => [:valid_from])
     if @meeting_days.length==0
       meeting_day
-    elsif date_row = @meeting_days.find{|md| md.valid_from <= date and md.valid_upto >= date} 
+    elsif date_row = @meeting_days.find{|md| md.valid_from <= date and (md.valid_upto == nil or md.valid_upto >= date)} 
       (date_row.meeting_wday)
     elsif @meeting_days[0].valid_from > date
       (@meeting_days[0].meeting_wday)
@@ -146,21 +155,31 @@ class Center
   end
   
   def next_meeting_date_from(date)    
-    number = get_meeting_date(date, :next)
-    if meeting_day != :none and (date + number - get_meeting_date(date + number, :previous)).cweek == (date + number).cweek
-      (date + number + get_meeting_date(date + number, :next))
-    else
-      (date + number)
+    r_date = (LoanHistory.first(:center_id => self.id, :date.gt => date, :order => [:date], :limit => 1) or Nothing).date
+    unless r_date
+      number = get_meeting_date(date, :next)
+      if meeting_day != :none and (date + number - get_meeting_date(date + number, :previous)).cweek == (date + number).cweek
+        r_date = (date + number + get_meeting_date(date + number, :next)).holiday_bump
+      else
+        r_date = (date + number).holiday_bump
+      end
     end
+    r_date
+
   end
   
   def previous_meeting_date_from(date)
-    number = get_meeting_date(date, :previous)
-    if meeting_day != :none and (date - number - get_meeting_date(date - number, :previous)).cweek == (date - number).cweek
-      (date - number - get_meeting_date(date - number, :previous))
-    else
-      (date - number)
+    r_date = (LoanHistory.first(:center_id => self.id, :date.lte => date, :order => [:date.desc], :limit => 1) or Nothing).date
+    unless r_date
+      number = get_meeting_date(date, :previous)
+      if meeting_day != :none and (date - number - get_meeting_date(date - number, :previous)).cweek == (date - number).cweek
+        r_date = (date - number - get_meeting_date(date - number, :previous)).holiday_bump
+      else
+        r_date = (date - number).holiday_bump
+      end
     end
+    r_date
+
   end
 
 

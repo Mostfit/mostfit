@@ -2,11 +2,9 @@
 - income_heads_and_accounts = @data
 - total_expenditure = 0.0; total_income = 0.0
 - non_breaking_space = "&nbsp;"
-- total_cols = 4
+- total_cols = 3
 %table.report.nojs
   %tr.header
-    %th
-      Head
     %th
       Account
     %th
@@ -19,23 +17,19 @@
   - EXPENSES.each do |expense_head|
     - sub_total = 0.0
     %tr
-      %td{:colspan => total_cols - 2}
+      %td{:colspan => total_cols, :align => 'center'}
         = expense_head
-      %td
-        = non_breaking_space
     - accounts_and_amounts = income_heads_and_accounts[expense_head]
     - accounts_and_amounts.each_pair do |account, amount|
       - total_expenditure += amount.abs; sub_total += amount.abs
       %tr
         %td
-          = account.gl_code
-        %td
           = account.name
         %td
           = amount.abs.to_currency
+        %td
+          = non_breaking_space
     %tr
-      %td
-        = non_breaking_space
       %td
         = non_breaking_space
       %td
@@ -53,23 +47,19 @@
   - INCOMES.each do |income_head|
     - sub_total = 0.0
     %tr
-      %td{:colspan => total_cols - 2}
+      %td{:colspan => total_cols, :align => 'center'}
         = income_head
-      %td
-        = non_breaking_space
     - accounts_and_amounts = income_heads_and_accounts[income_head]
     - accounts_and_amounts.each_pair do |account, amount|
       - total_income += amount.abs; sub_total += amount.abs
       %tr
         %td
-          = non_breaking_space
-        %td
           = account.name
         %td
           = amount.abs.to_currency
+        %td
+          = non_breaking_space
     %tr
-      %td
-        = non_breaking_space
       %td
         = non_breaking_space
       %td

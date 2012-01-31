@@ -5,17 +5,17 @@
         = ofc2(550, 300, 'http://' + request.env['HTTP_HOST'] + url(:graph_data, :action => 'client', :id => @client.id, :scope_unit => 'months', :scope_size => 3) )
     %h1{:width => '50%' }== Client: <i>#{@client.name}</i>
     %p.menu-strip
-      = link_to('edit client details', params[:controller]=="data_entry/clients" ? url(:enter_clients, :action => 'edit', :id => @client) : resource(@branch, @center, @client, :edit), :class => "edit")
+      = link_to('edit client details', params[:controller]=="data_entry/clients" ? url(:enter_clients, :action => 'edit', :id => @client) : resource(@branch, @center, @client, :edit), :class => "edit grey_button")
       - if @client.tags and @client.tags.include?(:insincere)
         %h3.blocked
           This client is insincere and is not elgible for a loan
       - elsif not @client.active
         %h3.blocked
           This client is not active anymore. 
-          -if @client.inactive_reason=='death_of_client' or @client.inactive_reason=='death_of_spouse'
-            =link_to('Click here for claim processing', resource(@client, :claims))
+          - if @client.inactive_reason=='death_of_client' or @client.inactive_reason=='death_of_spouse'
+            = link_to('Click here for claim processing', resource(@client, :claims))
       - else
-        = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add"
+        = link_to 'add a new loan', resource(@branch, @center, @client, :loans, :new), :class => "add grey_button"
 
     %table.narrow.form{ :style =>'width:50%' }
       %tr.odd
@@ -54,7 +54,7 @@
           = @client.spouse_name
       %tr.odd
         %td Manager
-        %td= link_to @center.manager.name, resource(@center.manager)
+        %td= link_to @center.manager.name, resource(@center.manager), :target => "_blank"
       %tr
         %td Occupation
         %td
@@ -62,21 +62,21 @@
       %tr.odd
         %td At center
         %td
-          = link_to @client.center.name, resource(@client.center)
+          = link_to @client.center.name, resource(@client.center), :target => "_blank"
           == (of branch #{link_to @branch.name, resource(@branch)})
           %br/
           %span.greytext
             center managed by:
-            = link_to @center.branch.manager.name, resource(@center.manager)
+            = link_to @center.branch.manager.name, resource(@center.manager), :target => "_blank"
       %tr
         %td
           Group
         %td
-          -if @client.client_group
-            =@client.client_group.name
-          -else
+          - if @client.client_group
+            = @client.client_group.name
+          - else
             Not associated with a group yet (
-            =link_to('Edit', resource(@branch, @center, @client, :edit))
+            = link_to('Edit', resource(@branch, @center, @client, :edit))
             to change)
       %tr.odd
         %td
@@ -220,18 +220,24 @@
     %div.tab 
       %input{:type => "hidden", :name => "_load_remote", :value => resource( @client, :attendances)}
     %div.tab
-      %fieldset
-        %legend Applicable Fees
-        - if @client.applicable_fees.empty?
-          = form_for(@loan, :action => url(:controller => 'clients', :action => :levy_fees, :id => @client.id)) do
-            = submit 'Re-apply Fees'
-        - else
-          = partial "applicable_fees/list", :layout => false, :applicable_fees => @client.applicable_fees, :return_url => resource(@branch, @center, @client) + "#misc"
-      - if [:admin, :mis_manager].include?(session.user.role)
-        .box
+      .box
+        %fieldset
+          %legend Applicable Fees
+          - if @client.applicable_fees.empty?
+            = form_for(@loan, :action => url(:controller => 'clients', :action => :levy_fees, :id => @client.id)) do
+              = submit 'Re-apply Fees'
+          - else
+            = partial "applicable_fees/list", :layout => false, :applicable_fees => @client.applicable_fees, :return_url => resource(@branch, @center, @client) + "#misc"
+        - if [:admin, :mis_manager].include?(session.user.role)
           - @applicable_fee = ApplicableFee.new(:applicable_type => 'Client', :applicable_id => @client.id)
           = partial "applicable_fees/form", :layout => false, :object => @client
-
+        %fieldset
+          %legend Move Client
+          - if [:admin, :mis_manager].include?(session.user.role)
+            = form_for(@client, :action => url(:action => :move_to_center, :controller => :clients, :id => @client.id)) do
+              = select :name => :new_center_id, :collection => @client.center.branch.centers - [@client.center], :text_method => :name, :value_method => :id, :prompt => "Please select a center", :class => "chosen"
+              = date_select "date", Date.today
+              = submit 'move client', :class => 'greenButton'
 
 
   
