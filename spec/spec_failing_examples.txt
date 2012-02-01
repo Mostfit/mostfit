@@ -1,25 +1,13 @@
-Loan should not be valid without being validated properly
-Loan should not be valid without being rejected properly
-Loan should not be valid without a proper interest_rate
-Loan should be valid with a proper installment_frequency
-Loan should not be valid with a disbursal date earlier than the loan is approved
-Loan should not be valid when validated_on is earlier than the disbursal_date
-Loan should not be valid when written_off_on is earlier than the disbursal_date
-Loan should not be valid without approved_on earlier than scheduled_disbursal_date
-Loan should not be valid without being properly written off
-Loan should not be valid without being properly disbursed
-Loan should not be valid when scheduled_first_payment_date if before scheduled_disbursal_date
-Loan should not be valid if repayment dates are not center meeting dates
+Loan .last_loan_history_date should have some tests -- albeit more a view thing
+Loan .scheduled_repaid_on give the proper date
 Loan should have proper values for principal, interest and total to be received
 Loan .status should give status accoring to changing properties up to it written off
 Loan .status should give status accoring to changing properties up to it is repaid
-Loan .status should give status accoring to changing properties before being approved
-Loan .status should give status accoring to changing properties when being rejected
+Loan .installment_dates should give a list with some dates
 Loan .payment_schedule should give correct results
 Loan .payments_hash should give correct results
 Loan history should be correct
 Loan should write the history correctly into the db
-Loan should not be deleteable if verified
 Loan .installment_dates should correctly deal with holidays
 Loan should change with center meeting date change
 Loan should change with center meeting date change

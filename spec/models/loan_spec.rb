@@ -29,13 +29,13 @@ describe Loan do
 
     @loan_product = LoanProduct.new
     @loan_product.name = "LP1"
-    @loan_product.max_amount = 1000
+    @loan_product.max_amount = 10000
     @loan_product.min_amount = 1000
     @loan_product.max_interest_rate = 100
     @loan_product.min_interest_rate = 0.1
     @loan_product.installment_frequency = :weekly
     @loan_product.max_number_of_installments = 25
-    @loan_product.min_number_of_installments = 25
+    @loan_product.min_number_of_installments = 12
     @loan_product.repayment_style = @flat
     @loan_product.valid_from = Date.parse('2000-01-01')
     @loan_product.valid_upto = Date.parse('2012-01-01')
@@ -49,7 +49,7 @@ describe Loan do
     @loan_product.save
 
     @loan = Factory(:loan,
-      :amount => 1000, :interest_rate => 20, :installment_frequency => :weekly, :number_of_installments => 25,
+      :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25,
       :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13",
       :applied_by => @manager, :funding_line => @funding_line, :client => @client, :loan_product => @loan_product)
     @loan.discriminator = Loan
@@ -69,8 +69,7 @@ describe Loan do
   end
 
   it "should give error if amount is blank" do
-    @loan.amount = ''
-    @loan.save.should be_false
+    @loan.amount = nil
     @loan.should_not be_valid
   end
 
@@ -81,10 +80,10 @@ describe Loan do
     @loan.applied_on = nil
     @loan.should_not be_valid
   end
+
   it "should not be valid without being validated properly" do
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @manager
-    debugger
     @loan.should be_valid
     @loan.validated_on = @loan.disbursal_date
     @loan.validated_by = @manager
@@ -120,6 +119,14 @@ describe Loan do
     @loan.amount = 0
     @loan.should_not be_valid
   end
+  it "should take the amount from the loan product if the loan product can give one" do
+    @loan_product.max_amount = @loan_product.min_amount = 10000
+    @loan.amount = nil
+    @loan.should be_valid
+    @loan.amount.should == 10000
+  end
+
+
   it "should not be valid without a proper interest_rate" do
     @loan.interest_rate = nil
     @loan.should_not be_valid
@@ -130,6 +137,15 @@ describe Loan do
     @loan.interest_rate = 0.1
     @loan.should be_valid
   end
+  it "should take the interest rate from the loan product if the loan product can give one" do
+    @loan_product.max_interest_rate = @loan_product.min_interest_rate = 20
+    @loan.interest_rate = nil
+    @loan.should be_valid
+    @loan.interest_rate.should == 0.2
+  end
+
+
+
   it "should be valid with a proper installment_frequency" do
     @loan.installment_frequency = :daily
     @loan.should be_valid
@@ -139,6 +155,8 @@ describe Loan do
     @loan.should be_valid
   end
   it "should not be valid without proper installment_frequency" do
+    @loan_product.installment_frequency = nil
+    @loan.loan_product = @loan_product
     @loan.installment_frequency = nil
     @loan.should_not be_valid
     @loan.installment_frequency = 'day'
@@ -155,6 +173,7 @@ describe Loan do
     @loan.should_not be_valid
     @loan.installment_frequency = 30
     @loan.should_not be_valid
+    @loan_product.installment_frequency = :weekly
   end
   it "should not be valid without a proper number_of_installments" do
     @loan.number_of_installments = nil
@@ -346,10 +365,6 @@ describe Loan do
     loan.shift_date_by_installments(Date.parse('2001-03-28'), -1).should == Date.parse('2001-02-28')
   end
 
-  it ".descendants should keep track of the subclasses (just testing dm-core functionality)" do
-    class TestLoan < Loan; end
-    Loan.descendants.include?(TestLoan).should be_true
-  end
 
   it ".number_of_installments_before should do what it promises" do
     loan = Loan.new(:installment_frequency => :daily, :scheduled_first_payment_date => Date.parse('2001-01-01'), :number_of_installments => 10)
@@ -435,8 +450,8 @@ describe Loan do
   end
   it ".status should give status accoring to changing properties before being approved" do
     @loan.status(@loan.applied_on - 1).should == :applied_in_future
-    @loan.status(@loan.applied_on).should == :pending_approval
-    @loan.status(@loan.approved_on - 1).should == :pending_approval
+    @loan.status(@loan.applied_on).should == :applied
+    @loan.status(@loan.approved_on - 1).should == :applied
     @loan.status.should == :approved
   end
   it ".status should give status accoring to changing properties when being rejected" do
@@ -446,7 +461,7 @@ describe Loan do
     @loan.rejected_on = date
     @loan.rejected_by = @manager
     @loan.should be_valid
-    @loan.status(@loan.rejected_on - 1).should == :pending_approval
+    @loan.status(@loan.rejected_on - 1).should == :applied
     @loan.status(@loan.rejected_on).should == :rejected
     @loan.status.should == :rejected
   end

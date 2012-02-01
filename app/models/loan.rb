@@ -1415,7 +1415,7 @@ class Loan
     [:amount, :interest_rate, :number_of_installments].each do |attr|
       self.send("#{attr}=", self.loan_product.send("max_#{attr}")) if self.loan_product.send("max_#{attr}") == self.loan_product.send("min_#{attr}")
     end
-    self.interest_rate = self.interest_rate / 100 #loan product stores it as 26, not 0.26
+    self.interest_rate = self.interest_rate / 100 if self.loan_product.max_interest_rate == self.loan_product.min_interest_rate #loan product stores it as 26, not 0.26 
     self.installment_frequency = self.loan_product.installment_frequency
   end
 
