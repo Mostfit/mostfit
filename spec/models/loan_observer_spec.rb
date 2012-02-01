@@ -109,6 +109,6 @@ describe AccountLoanObserver do
 #
 #      Posting.count.should eql(Journal.count * 2)
 #    end
-  end
 end
+
 

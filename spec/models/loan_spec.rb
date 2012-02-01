@@ -49,7 +49,7 @@ describe Loan do
     @loan_product.save
 
     @loan = Factory(:loan,
-      :amount => 1000, :interest_rate => 0.2, :installment_frequency => :weekly, :number_of_installments => 25,
+      :amount => 1000, :interest_rate => 20, :installment_frequency => :weekly, :number_of_installments => 25,
       :scheduled_first_payment_date => "2000-12-06", :applied_on => "2000-02-01", :scheduled_disbursal_date => "2000-06-13",
       :applied_by => @manager, :funding_line => @funding_line, :client => @client, :loan_product => @loan_product)
     @loan.discriminator = Loan
@@ -62,11 +62,13 @@ describe Loan do
   it "should have a discrimintator" do
     @loan.discriminator.should_not be_blank
   end
+
   it "should not be valid without belonging to a client" do
     @loan.client = nil
     @loan.should_not be_valid
   end
-  it "should not give error if amount is blank" do
+
+  it "should give error if amount is blank" do
     @loan.amount = ''
     @loan.save.should be_false
     @loan.should_not be_valid
@@ -82,6 +84,7 @@ describe Loan do
   it "should not be valid without being validated properly" do
     @loan.disbursal_date = @loan.scheduled_disbursal_date
     @loan.disbursed_by = @manager
+    debugger
     @loan.should be_valid
     @loan.validated_on = @loan.disbursal_date
     @loan.validated_by = @manager

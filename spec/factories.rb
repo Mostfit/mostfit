@@ -230,7 +230,7 @@ FactoryGirl.define do
   #
   factory :loan do
     amount                        1000
-    interest_rate                 0.20
+    interest_rate                 20
     installment_frequency         :weekly
     number_of_installments        25
     applied_on                    { Date.new(2000,02,01) }
@@ -582,7 +582,7 @@ FactoryGirl.define do
     name                'home'
     title               'Home page'
     route               '/'
-    type                Types.first
+    type                BookmarkTypes.first
     share_with          User::ROLES.first
 
     association         :user

@@ -432,7 +432,7 @@ class Loan
     format("%.2f", interest_rate * 100)
   end
   def interest_percentage= (percentage)
-    self.interest_rate = percentage.to_f/100
+    #self.interest_rate = percentage.to_f/100
   end
   # returns the name of the funder
   def deffunder_name
@@ -1246,10 +1246,7 @@ class Loan
       actual_outstanding_principal           = outstanding ? actual[:balance].round(2) : 0
       actual_outstanding_total               = outstanding ? actual[:total_balance].round(2) : 0
       actual_outstanding_interest            = outstanding ? (actual_outstanding_total - actual_outstanding_principal) : 0
-<<<<<<< HEAD
 
-=======
->>>>>>> e8b0fb3120ed49f25dac950f47aa21be9b15129f
       _apo                                   = [0,total_principal_paid.round(2) - total_principal_due.round(2)].max # advance principal outstanding at the start
       _api                                   = [0,total_interest_paid.round(2) - total_interest_due.round(2)].max
       advance_principal_outstanding          = outstanding ?  _apo : 0
