@@ -85,6 +85,7 @@ class Loan
   property :created_by_user_id,                Integer, :nullable => true, :index => true
   property :cheque_number,                     String,  :length => 20, :nullable => true, :index => true
   property :cycle_number,                      Integer, :default => 1, :nullable => false, :index => true
+  property :loan_pool_id,                      Integer, :nullable => true, :index => true
 
   #these amount and disbursal dates are required for TakeOver loan types. 
   property :original_amount,                    Integer
@@ -142,6 +143,8 @@ class Loan
   belongs_to :loan_utilization
   belongs_to :verified_by,               :child_key => [:verified_by_user_id],                :model => 'User'
   belongs_to :repayment_style
+
+  belongs_to :loan_pool
 
   belongs_to :organization, :parent_key => [:org_guid], :child_key => [:parent_org_guid], :nullable => true  
   property   :parent_org_guid, String, :nullable => true

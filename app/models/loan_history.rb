@@ -96,6 +96,9 @@ class LoanHistory
     (principal_paid + interest_paid + fees_paid_today).round(2)
   end
 
+  def total_due
+    (principal_due + interest_due)
+  end
 
   def total_advance_paid
     (advance_principal_paid_today + advance_interest_paid_today).round(2)

@@ -14,7 +14,7 @@ module Merb
         elsif property.type == String
           return(text_field(:name => name, :value => obj.send(field), :size => 10))
         elsif property.type == Date
-          return(date_select_for(:name => name, :value => obj.send(field)))
+          return(date_select(name, obj.send(field), :id => obj.id))
         elsif property.type.class==Class
           return(select(:name => name, :collection => property.type.flag_map.to_a.sort_by{|x| x[0]}.map{|x| [x[1], x[1]]}, :selected => (val ? val.to_s : "")))
         end

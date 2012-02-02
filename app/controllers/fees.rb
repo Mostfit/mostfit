@@ -22,7 +22,6 @@ class Fees < Application
   def edit(id)
     only_provides :html
     @fee = Fee.get(id)
-    @fee[:percentage] = @fee[:percentage].to_f * 100
     raise NotFound unless @fee
      display @fee
   end
@@ -42,6 +41,7 @@ class Fees < Application
   def update(id, fee)
     @fee = Fee.get(id)
     raise NotFound unless @fee
+    fee[:percentage] = nil if fee[:percentage].to_f == 0.0
     fee[:percentage] = fee[:percentage].to_f/100 unless (fee[:percentage] == nil)
     Fee.properties.select{|p| p.type == Integer or p.type == Float }.each{|f| fee[f.name] = nil if fee[f.name] == ""}
     if @fee.update(fee)

@@ -93,15 +93,15 @@ end #Bucket
 
 # Conjure a bucket class on demand ;). So, we don't have to define empty bucket
 # classes for each model that we want to use bucketing with.
-module Kernel
-  def self.const_missing(name)
-    if name.to_s =~ /Bucket\z/
-      const_set(name, Class.new(Bucket))
-    else
-      super
-    end
-  end
-end
+#module Kernel
+#  def self.const_missing(name)
+#    if name.to_s =~ /Bucket\z/
+#      const_set(name, Class.new(Bucket))
+#    else
+#      super
+#    end
+#  end
+#end
 
 class LoanBucket < Bucket
 
