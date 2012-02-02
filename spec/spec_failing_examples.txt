@@ -1,13 +1,1 @@
-Loan .status should give status accoring to changing properties up to it written off
-Loan .status should give status accoring to changing properties up to it is repaid
-Loan .payments_hash should give correct results
-Loan history should be correct
-Loan should write the history correctly into the db
-Loan should not be deleteable if verified
-Loan .installment_dates should correctly deal with holidays
-Loan should have correct takeover schedule and balances
-Loan should change with center meeting date change
-Loan should change with center meeting date change
-Loan should not be valid if duplicated
-Loan should repay properly
-Loan should not disburse if loan fees are not paid
+Center next and previous meeting dates should be correct
