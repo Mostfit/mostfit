@@ -13,7 +13,7 @@ require "merb-core"
 Merb.start_environment(:environment => ENV['MERB_ENV'] || 'development')
 
 namespace :mostfit do
-  namespace :conversion do
+  namespace :data do
     desc "This rake task adds some cached values to loans"
     task :update_loan_cache do
       puts "marking centers..."
@@ -64,6 +64,18 @@ namespace :mostfit do
           SET c_client_group_id =
           (SELECT c.client_group_id from clients c 
              WHERE loans.client_id = c.id)})
+      puts "updating loan history areas"
+      repository.adapter.execute(%Q{
+          UPDATE loan_history 
+          SET area_id =
+          (SELECT area_id from branches b 
+             WHERE b.id = branch_id)})
+      puts "updating loan history regions"
+      repository.adapter.execute(%Q{
+          UPDATE loan_history 
+          SET region_id =
+          (SELECT region_id from areas a 
+             WHERE a.id = area_id)})
       
     end
   end
