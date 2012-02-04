@@ -122,6 +122,3 @@ TargetType  = [:relative, :absolute]
 # in order to avoid overrunning the SQL max packet size, we split the cacher update into chunks
 # 2500 should be good for the standard SQL max_packet_size of 16MB
 CHUNK_SIZE = 2500 
-
-
-SEP_DATE = Date.new(2100,12,31) # SEP = Someone Else's Problem http://en.wikipedia.org/wiki/Somebody_Else's_Problem i.e. a date so far in the future as to represent infinity

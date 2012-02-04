@@ -98,9 +98,8 @@ class CenterMeetingDay
 
   
   def valid_from_is_lesser_than_valid_upto
-    return true if self.valid_from.blank? and self.valid_upto.blank? # neither is set
     self.valid_from = Date.parse(self.valid_from) unless self.valid_from.is_a? Date
-    self.valid_upto = (self.valid_upto.blank? ? SEP_DATE : Date.parse(self.valid_upto))     if self.valid_upto.class == String
+    self.valid_upto = (self.valid_upto.blank? ? Date.new(2100,12,31) : Date.parse(self.valid_upto))     if self.valid_upto.class == String
 
     if self.valid_from and self.valid_upto
       return [false, "Valid from date cannot be before than valid upto date"] if self.valid_from > self.valid_upto

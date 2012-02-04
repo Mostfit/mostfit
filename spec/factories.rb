@@ -582,7 +582,7 @@ FactoryGirl.define do
     name                'home'
     title               'Home page'
     route               '/'
-    type                BookmarkTypes.first
+    type                Types.first
     share_with          User::ROLES.first
 
     association         :user
