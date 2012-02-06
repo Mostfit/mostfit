@@ -1,15 +1,22 @@
 :javascript
-  $(document).ready(function() {
-  $("#paying_branch_selector").change(function(){
-  $("#paying_center_selector").html('');
+  function load_centers() {
+    $("#paying_center_selector").html('');
     $.ajax({
       type: "GET",
-      url: "/branches/centers/"+$("#paying_branch_selector").val()+"?paying=true&date=#{@date.strftime('%Y-%m-%d')}",
+      url: "/branches/centers/"+$("#paying_branch_selector").val()+"?paying=true&date=" + $("#for_date").val(),
       success: function(data){
         $("#paying_center_selector").html(data);
       }
     });
-  });
+  }
+
+  $(document).ready(function() {
+    $("#paying_branch_selector").change(function(){
+      load_centers();
+    });
+    $("#for_date").change(function(){
+      load_centers();
+    });
   });
 
 - if @center and @date
@@ -207,6 +214,12 @@
     %table.form
       %tr
         %th
+          For Date
+        %td
+          = date_select 'for_date', (@date || Date.today), {:id => 'for_date'}
+          = hidden_field :name => 'return', :value => url(:data_entry)
+      %tr
+        %th
           In branch
         %td
           = select :name => 'branch_id', :id => "paying_branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch'
@@ -215,17 +228,6 @@
           Centers repaying today
         %td
           = select :name => 'center_id', :id => 'paying_center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center'
-      %tr
-        %th
-          or any other center
-        %td
-          = text_field :name => 'center_text', :id => 'center_text'
-      %tr
-        %th
-          For Date
-        %td
-          = date_select :name => 'for_date', :value => @date || Date.today
-          = hidden_field :name => 'return', :value => url(:data_entry)
       %tr
         %td{:colspan => "2"}
           = submit 'Submit'
