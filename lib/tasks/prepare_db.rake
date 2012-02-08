@@ -15,6 +15,7 @@ namespace :mostfit do
     desc "populate the database using the csv's"
     task :prepare do
       repository.adapter.execute("create index index_loan_history_date_center_id_idx on loan_history(date, center_id);") rescue nil
+      repository.adapter.execute("create index index_loan_history_funding_line_id_idx on loan_history(funding_line_id);") rescue nil
       repository.adapter.execute("create index index_loan_history_center_id_date on loan_history(center_id,date);") rescue nil
       repository.adapter.execute("create index index_loans_deleted_at on loans(deleted_at);") rescue nil
       repository.adapter.execute("create index index_clients_deleted_at on clients(deleted_at);") rescue nil
