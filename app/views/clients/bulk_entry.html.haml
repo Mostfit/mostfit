@@ -6,14 +6,15 @@
       %th
         In branch
       %td
-        = select :name => 'branch_id', :id => "branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch', :selected => params[:branch_id]
+        = select :name => 'branch_id', :id => "branch_selector", :collection => Branch.all, :text_method => :name, :value_method => :id, :selected => params[:branch_id].to_s, :prompt => 'Select a branch', :selected => params[:branch_id], :class => 'chosen'
     %tr
       %th
         and center
       %td
-        = select :name => 'center_id', :id => 'center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center', :selected => params[:center_id]
-        %span.red
-          = @errors[:center]
+        = select :name => 'center_id', :id => 'center_selector', :collection => Center.all(:branch_id => params[:branch_id]), :text_method => :name, :value_method => :id, :selected => params[:center_id].to_s, :prompt => 'Select a center', :selected => params[:center_id], :class => 'chosen', :style => "width: 300px"
+        - if @errors[:center]
+          %span.red
+            = @errors[:center]
 
   %table
     %thead
