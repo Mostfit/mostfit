@@ -35,7 +35,7 @@ module Misfit
       :admin => all_models,
       :mis_manager => all_models_except([:user, :admin]),
       :data_entry => {
-        :all => [:client, :loan, :payment, :document, :client_group, :group, :insurance_company, :insurance_policy, :cgt, :grt, :staff_member],
+        :all => [:client, :loan, :payment, :document, :client_group, :group, :insurance_company, :insurance_policy, :cgt, :grt, :staff_member, :center],
       },
       :staff_member => {
         :all => [:center, :client, :loan, :payment, :document, :client_group, :group, :comment, :insurance_company, :staff_member, :location, :branch_diary, :stock_register, :asset_register]

@@ -27,15 +27,16 @@ class Cachers < Application
       (@from_date..@to_date).each{|date| @model.update(:date => date)}
     else
       @model.update(:date => (@date || Date.today))
-    if Branch.count > 0
-      if @from_date and @to_date
-        (@from_date..@to_date).each{|date| BranchCache.update(date)}
+      if Branch.count > 0
+        if @from_date and @to_date
+          (@from_date..@to_date).each{|date| BranchCache.update(date)}
+        else
+          BranchCache.update(@date || Date.today)
+        end
+        redirect request.referer
       else
-        BranchCache.update(@date || Date.today)
+        redirect url(:browse, :action => 'index'), :message => {:error => "No data found to generate report"}
       end
-      redirect request.referer
-    else
-      redirect url(:browse, :action => 'index'), :message => {:error => "No data found to generate report"}
     end
   end
 

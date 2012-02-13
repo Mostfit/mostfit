@@ -233,7 +233,8 @@ class Clients < Application
       if params[:clients].keys.length > 0 # there are some errors
         render # errors will be shown
       else
-        redirect resource(@center), :message => {:notice => "all clients succesfully added"}
+        return_to = session.user.role == :data_entry ? url(:data_entry) : resource(@center)
+        redirect return_to, :message => {:notice => "all clients succesfully added"}
       end
     end
   end

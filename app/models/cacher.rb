@@ -8,11 +8,6 @@ class Cacher
   property :model_id,                        Integer, :nullable => false, :index => true, :unique => [:model_name, :date], :key => true
   property :branch_id,                       Integer, :index => true, :key => true
   property :center_id,                       Integer, :index => true, :key => true
-<<<<<<< HEAD
-
-  property :funding_line_id,                 Integer, :index => true
-=======
->>>>>>> 53f1094295262f8d6c7e371a03dedd10ddff71af
   property :scheduled_outstanding_total,     Float, :nullable => false
   property :scheduled_outstanding_principal, Float, :nullable => false
   property :actual_outstanding_total,        Float, :nullable => false

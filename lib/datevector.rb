@@ -53,17 +53,17 @@ class DateVector
 
   def get_dates(from = @from, to = @to)
     # get the dates as specified by this vector from the from date uptil "to" if "to" is a Date, or else get "to" such dates if an integer
-    raise ArgumentError.new("from and must be a date") unless from.class == Date 
+    raise ArgumentError.new("from must be a date") unless from.class == Date 
     raise ArgumentError.new("to must be either a date or an Integer") unless (to.class == Date or to.class == Fixnum)
-    d = from;    rv = [];     i = 0
+    d = @from;    rv = [];     i = 0
     case @period
     when :week
       while (to.class == Date ? d  <= to : i <= to)
         [@what].flatten.map do |wday| # convert :tuesday into [:tuesday] so we can treat everything as an array
           d = d.next_(wday)
-          rv << d if (to.class == Date ? d  <= to : i <= to)
+          rv << d if ((to.class == Date ? d  <= to : i <= to) and d >= from)
           d = d + ((@of_every - 1) * 7)
-          i += 1
+          i = rv.count - 1
         end
       end
     when :month 

@@ -32,4 +32,4 @@
           &nbsp;
           to
           &nbsp;
-          = date_select_for @cmd, :valid_upto
+          = date_select_for @cmd, :valid_upto, :max_date => Date.new(2100,12,31)
